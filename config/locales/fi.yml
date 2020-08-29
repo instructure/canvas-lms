@@ -124,7 +124,9 @@ fi:
       deleteError: "Jotakin meni pieleen. Poistaminen ei onnistu tällä hetkellä."
       deleteSuccess: "Poisto onnistui"
       error: "Tapahtui virhe. Päivitä sivu ja yritä uudelleen."
+      unexpectedDeleteError: "Jotakin meni pieleen. Poistaminen ei onnistu tällä hetkellä."
       updateSuccess: "Päivitys onnistui"
+      userDeleteError: "Tulosryhmä sisältää vähintään yhden tuloksen, joka on parhaillaan kohdistettu sisältöön."
     length_error: "Saa olla enintään 255 merkkiä"
   OutcomeView: 
     length_error: "Saa olla enintään 255 merkkiä"
@@ -1812,6 +1814,7 @@ fi:
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ilmeni virhe tallennettaessa kurssin lähetyskäytäntöä"
   an_error_occurred_while_saving_your_settings_b503a31c: "Asetustesi tallentamisen yhteydessä tapahtui virhe"
   an_error_occurred_while_starting_migration_8e6015e2: "Siirron aloittamisessa tapahtui virhe"
+  an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ilmeni virhe, kun käyttöliittymää yritettiin vaihtaa"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ilmeni virhe, kun ilmoitusten lukitustilaa päivitettiin."
   an_error_occurred_while_updating_late_policies_a95b707f: "Ilmeni virhe päivittäessä myöhästymisiä koskevia käytäntöjä"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Tapaamisryhmän poistossa ilmeni virhe"
@@ -1899,6 +1902,7 @@ fi:
   anonymous_off_7985fcaf: "Anonymiteetti pois päältä"
   anonymous_on_c5fa120d: "Anonymiteetti päällä"
   anonymous_re_submission_assignment_title_d9402721: "Nimetön uudelleenpalautus: %{assignment_title}"
+  anonymous_student_91b9d664: "Nimetön opiskelija"
   anonymous_submission_annotation_student_id_assignm_25eb88c9: "Nimetön lähetyksen huomautus: Opiskelija (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Nimetön lähetyksen huomautus: Opiskelija (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Nimetön tehtäväpalautus: %{assignment_title}"
@@ -1993,6 +1997,7 @@ fi:
   appointments_dcb41d23: Tapaamiset
   approved_c3b285d4: Hyväksytty
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} tarkkuudella %{precision}"
+  apps_54d24a47: Sovellukset
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Sovellukset ovat helppo tapa lisätä uusia ominaisuuksia Canvasiin. Niitä voidaan lisätä yksittäisille kursseille tai kaikille tilin kursseille. Kun ne on määritetty, voit linkittää ne kurssimoduuleihin ja luoda arviointityökaluilla tehtäviä."
   appt_calendar_event_dialog: 
     invalid_participants: "Sinun täytyy sallia vähintään yhden käyttäjän osallistuminen"
@@ -3784,6 +3789,7 @@ fi:
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Pääset tilin asetuksiin napsauttamalla järjestelmäkäyttäjän navigointipainiketta."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Pääset kursseihin napsauttamalla kurssien navigointipainiketta."
   click_proceed_to_continue_b6eeffc6: "Jatka napsauttamalla ”Etene”."
+  click_the_admin_navigation_button_to_access_accoun_38d881bf: "Pääset tilin asetuksiin napsauttamalla järjestelmäkäyttäjän navigointipainiketta."
   click_the_button_above_to_add_content_4c7024a: "Lisää sisältöä napsauttamalla yllä olevaa painiketta"
   click_to_add_a_name_6cf551b0: "Lisää nimi napsauttamalla"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Napsauta vaihtaaksesi henkilön %{display_name}profiilikuvaa"
@@ -3824,6 +3830,7 @@ fi:
   click_to_view_event_details_b25dc1f3: "Napsauta tarkastellaksesi tapahtuman tietoja"
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Kun valintaruutua napsautetaan, vaikutusalueiden taulukko alla katoaa"
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Kun valintaruutua napsautetaan, vaikutusalueiden taulukko alla katoaa"
+  client_credentials_audience_218f2d93: "Asiakkaan valtuutustunnusten yleisö"
   client_id_cb2502af: "Asiakkaan tunnus"
   client_id_is_required_1afd54d1: "Asiakkaan tunnus vaaditaan"
   clone_group_set_c2a40e15: "Kloonaa ryhmäjoukko"
@@ -4356,7 +4363,7 @@ fi:
         upload_to: "Lataa kohteeseen"
       import_quizzes_next_view: 
         import_new_quizzes: "Tuo arvioinnin sisältö Uusina testeinä"
-        import_new_quizzes_help_text: "Uudet testit on Canvasin uusi työkalu erilaisten testien laatimiseen.%{p_p}Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai vieraile"
+        import_new_quizzes_help_text: "Uudet kyselyt on uusi arviointikone Canvasilta.%{p_p}Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai käy"
         import_quizzesNext_help_label: "Tuo arviointi Uusina testeinä Ohje-kuvake"
         import_quizzesNext_help_text: "Quizzes.Next on uusi arviointikone Canvasille.%{p_p}Jos haluat lukea lisää, ota yhteyttä pääkäyttäjääsi tai käy"
         import_quizzesNext_help_title: "Uudet testit"
@@ -6173,6 +6180,7 @@ fi:
   deployment_id_fc270280: "Käyttöönoton tunnus"
   deployment_id_for_tool_app_cb59335: "Käyttöönoton tunnus sovellukselle %{tool}"
   deployment_id_for_toolname_app_e54a7364: "Käyttöönoton tunnus sovellukselle %{toolName}"
+  desc_12ad2869: "%{desc}"
   description_436c48d7: Kuvaus
   description_61f4296: "* Kuvaus"
   details_98a31b68: Lisätiedot
@@ -6924,6 +6932,8 @@ fi:
   ends_at_9a62b528: Päättyy
   enforce_scopes_be28989c: "Pakota käyttöalat"
   english_c60612e2: englanti
+  enhance_color_contrast_of_content_685ddd49: "Tehosta sisällön värikontrastia"
+  enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Tehostaa tekstin, painikkeiden, jne. värikontrastia"
   enrolled_as_272da3b9: "Rekisteröitynyt roolissa"
   enrollment: 
     default_course_name: Kurssi
@@ -8345,10 +8355,12 @@ fi:
       pages: Sivut
       people: Henkilöt
   group_a8f5ed9c: Ryhmä
+  group_announcements_f6e0fc8c: "Ryhmän ilmoitukset"
   group_assignment_7060989f: Ryhmätehtävä
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Ryhmätehtäviä ei voi arvioida nimettömästi"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Ryhmätehtäviä ei voida ottaa käyttöön nimettömästi arvioitaville tehtäville"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Ryhmätehtävät eivät voi olla käytössä moderoiduissa tehtävissä"
+  group_calendar_5410c6ae: Ryhmäkalenteri
   group_categories: 
     notices: 
       create_category_success: "Luokan luonti onnistui."
@@ -8374,12 +8386,17 @@ fi:
     name_unavailable: "%{name} on jo käytössä."
     self_signup_for_courses: "Itseilmoittautumiset voidaan ottaa käyttöön vain kurssin ryhmille tai yhteisöille"
   group_category_id_7001cf89: group_category_id
+  group_collaborations_b747d43: "Ryhmän yhteistyöt"
+  group_conferences_12866179: "Ryhmän konferenssi"
   group_details_e51122f1: "Ryhmän tiedot"
+  group_discussions_17d79aa0: Ryhmäkeskustelut
+  group_files_4324f3df: "Ryhmän tiedostot"
   group_files_82e5dcdb: "Ryhmän tiedostot"
   group_group_name_is_full_297880d6: "Ryhmä %{group_name} on täysi"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "Ryhmään %{group_name} voi liittyä vain kutsusta"
   group_group_name_is_not_available_at_this_time_971001c1: "Ryhmä %{group_name} ei ole saatavilla tällä hetkellä"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Ryhmä \"%{guid}\" on jo ollut esillä tässä tuonnissa"
+  group_home_249cb392: Ryhmäkodit
   group_is_full_56849d78: "Ryhmä on täysi"
   group_is_joined_by_invitation_only_d00f5a63: "Ryhmään voi liittyä vain kutsusta"
   group_is_not_available_at_this_time_d99f0eab: "Ryhmä ei ole saatavilla tällä hetkellä"
@@ -8402,6 +8419,8 @@ fi:
   group_name_group_people_e9d548c1: "%{group_name} - Ryhmän henkilöt"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} kohdassa %{group_category_name} ryhmän luokka"
   group_name_is_required_5547bc0b: "Ryhmän nimi vaaditaan"
+  group_pages_656556f3: "Ryhmän sivut"
+  group_people_50e9785b: "Ryhmän henkilöt"
   group_roster_1846bf84: "Ryhmän osallistujaluettelo"
   group_select_330df8bd: "Ryhmän valinta"
   group_set_name_2aed2347: "Ryhmäjoukon nimi"
@@ -8739,6 +8758,7 @@ fi:
       update: "Päivitä %{model}"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Tässä on hyvä tilaisuus tutustua kalenteriin ja lisätä sinne muitakin kurssiin liittyviä tapahtumia kuin vain tehtäviä. Älä huolehdi, autamme sinua tässä."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Tässä on pikavihjeitä Canvasin käytön aloittamiseen!"
+  hi_contrast_373b614f: "Suuri kontrasti"
   hidden_14a032a7: Piilotettu
   hidden_available_with_a_link_65ef2bda: "Piilotettu. Saatavissa linkillä"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Piilotettu, tiedostot sisällä ovat käytettävissä linkkien kanssa."
@@ -8779,6 +8799,7 @@ fi:
   highest_28ad71e6: Korkein
   highest_score_e080551e: "Korkein pistemäärä"
   hindi_9bcd4b34: hindi
+  history_cd3f60a9: Historia
   history_settings_c63dbaaf: Historia-asetukset
   home_351838cd: Aloitussivu
   home_page_is_not_valid_2e8a25ae: "Aloitussivu on virheellinen"
@@ -8828,6 +8849,7 @@ fi:
   how_do_i_find_my_courses_b826e4ce: "Miten löydän kurssini?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Kuin tuon Canvas-kurssin vientipakkauksen?"
   how_do_i_import_outcomes_for_a_course_8eced1a: "Kuinka tuon kurssin tulokset?"
+  how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "Kuinka kutsun muut liittymään kokoukseen?"
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Mistä tiedän, onko kokoukseen jo liittynyt opiskelijoita?"
   how_do_i_manage_and_share_the_recording_52fc2993: "Miten hallitsen ja jaan nauhoituksen?"
   how_do_i_manage_rubrics_in_a_course_a5441fb7: "Kuinka hallitsen rubriikkeja kurssilla?"
@@ -8952,6 +8974,10 @@ fi:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Jos käytössä, sisällön suunnittelijoiden täytyy tarjota tekijänoikeuksia ja lisenssitietoja tiedostoille ennen kuin ne julkaistaan. Koskee vain, jos Parempi tiedoston selaus on käytössä."
   if_enabled_copyright_and_license_information_must__2a551827: "Jos käytössä, tekijänoikeutta ja lisenssiä koskevat tiedot täytyy toimittaa tiedostoille ennen niiden julkaisua."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jos käytössä, LTI-työkalut saattavat käyttää OAuth 1.0a -allekirjoitusta käyttääkseen jäsenyyspalvelun API-ohjelmaa."
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+      Jos käytössä, oEmbedin päätepisteet vaativat 
+      työkalun luoman tunnuksen vahvistaakseen Embedin resurssipyynnön alkuperän
+      .
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Jos käytössä, kyselyn parametreja ei kopioida POST runkoon LTI-käynnistyksen aikana."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Jos käytössä, Canvasin osaamistulosten käyttämät Sourcedid-kentät salataan."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Jos käytössä, Uudet testit -toiminnolla tehtyjen testien tehtäväpalautushistoria käsitellään erikseen."
@@ -12981,6 +13007,7 @@ fi:
     errors: 
       delete_reminder_failed: "Poisto epäonnistunut"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Vertaisarvioinnit eivät voi olla käytössä moderoiduissa tehtävissä"
+  peer_service_6b4828b9: "Kollegan palvelu"
   pending_3e506a5b: Odottaa
   pending_message_2d9a8796: "Odottaa: %{message}"
   people_account_30bbffec: "Henkilöt (Tili)"
@@ -15152,6 +15179,8 @@ fi:
   recent_activity_51239235: "Viimeaikainen toiminta"
   recent_announcements_8becc59c: "Viimeisimmät ilmoitukset"
   recent_f19e8c64: Äskettäinen
+  recent_history_bcb0f4c0: "Viimeaikainen historia"
+  recent_history_tray_241a384e: "Viimeaikaisen historian työkalualue"
   recent_student: 
     last_logged_in: "edellinen sisäänkirjautuminen %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} painotettu keskiarvo"
@@ -15249,6 +15278,7 @@ fi:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Personoidun oppimispolun julkaisema: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Personoidun oppimispolun julkaisema: %{path}"
   releasing_grades_31a57dde: "Arvosanoja julkaistaan"
+  reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Lataa sivu uudelleen tai siirry uudelle sivulle, jotta tämä tehoste tapahtuu."
   remember_my_choice_for_this_course_5a3b7206: "Muista valintani tällä kurssilla"
   remove_account_from_this_profile_c3095eb2: "Poista tili tästä profiilista"
   remove_all_course_observer_members_4622c70d: "Poista kaikki kurssin tarkkailijajäsenet"
@@ -15337,6 +15367,7 @@ fi:
   require_captcha_for_self_registration_b3b2ea02: "Vaadi Captcha itserekisteröintiin"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Vaadi ryhmän jäseniä olemaan samassa osiossa"
   require_respondus_lockdown_browser_31425b3a: "Respondus LockDown -selain vaaditaan"
+  require_signed_token_for_oembed_64883303: "Vaadi allekirjoitettu tunnus oEMbedille"
   require_usage_rights_for_uploaded_files_4507865b: "Vaadi käyttöoikeudet ladatuille tiedostoille"
   required_access_code_592902d7: "Vaadi pääsykoodia"
   required_email_address_379b2392: "Vaadittu sähköpostiosoite"
@@ -16662,6 +16693,7 @@ fi:
   show_76c0ed1c: Näytä
   show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: "Näytä tarkistusruutu, joka antaa vaihtoehtoisesti tilin järjestelmäkäyttäjän julkaista kursseja\n\
       automaattisesti sen jälkeen, kun Blueprint-kurssi on assosioitu ja synkronoitu "
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Näytä luettelo äskettäin käydyistä sivuista Canvasin globaalissa navigaatiossa"
   show_account_navigation_menu_d97270a9: "Näytä tilin navigointivalikko"
   show_admin_navigation_menu_92fb579f: "Näytä pääkäyttäjän navigointivalikko"
   show_all_artifacts_34b91a83: "Näytä kaikki arvioinnin kohteet"
@@ -17635,6 +17667,11 @@ fi:
                 
                 Kiitos,
                 Canvas-tuki
+  the_message_you_sent_with_the_subject_line_subject_c9a8f654: |-
+      Viestiä, jonka aiheena oli "%{subject}", ei toimitettu. Jos haluat vastata Canvasin viesteihin tästä sähköpostiosoitteesta, sen täytyy ensin olla lisättynä Canvas-profiiliisi. Käy profiilissasi ja lähetä vahvistusviesti uudelleen tälle sähköpostiosoitteelle. Sinun täytyy myös ottaa yhteyttä tähän henkilöön Canvasin tulevien laatikon kautta. Käyttäjärooliasi koskevat ohjeet löytyvät tulevien laatikko -kappaleen kautta Canvasin oppaissa. [Katso https://community.canvaslms.com/t5/Canvas/ct-p/canvas].
+                
+                Kiitos,
+                Canvasin tuki
   the_module_item_is_locked_27fe420b: "Moduulin osa on lukittu."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Viimeisimmät pistemäärät käyttäjälle %{current_user_name} ja tulokselle %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Seuraava saatavissa oleva tapaaminen tällä kurssilla on *%{date}*"
@@ -18824,6 +18861,7 @@ fi:
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Käytä kirjanmerkintää API-sivutuksessa ilmoittautumisten indeksissä"
   use_default_890939b7: "Käytä oletusta"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Käytä kokeellisia ominaisuuksia ennen kuin ne otetaan yleisesti käyttöön tuotannossa"
+  use_high_contrast_ui_a5917282: "Käytä voimakkaan kontrastin käyttöliittymää"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Käytä HTML5-tallenninta sisällön muokkaamisessa Flash-sovelluksen avulla"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX MathML:ksi?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Käytetäänkö kohdetta MathMan muuntamaan LaTeX SVG:ksi?"
@@ -18878,6 +18916,7 @@ fi:
   user_details_2613c079: "Käyttäjän tiedot"
   user_details_e9aef9e5: "Käyttäjän tiedot"
   user_does_not_have_permission_to_select_final_grad_47560e75: "Käyttäjällä ei ole käyttöoikeuksia valita lopullista arvosanaa"
+  user_files_78e21703: Käyttäjätiedostot
   user_groups_query_error_bba6a6b7: "Käyttäjäryhmien kyselyvirhe"
   user_id_8256faeb: user_id
   user_id_bcace870: Käyttäjätunnus
@@ -19305,6 +19344,7 @@ fi:
   video_player_b371005: Videosoitin
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: vietnam
+  view_all_e13bf0a6: "Näytä kaikki"
   view_analytics_for_name_9b31594e: "Tarkastele analytiikkaa kohteelle %{name}"
   view_announcements_b6d6d819: "Tarkastele ilmoituksia"
   view_app_center_6c89a3fe: "Tarkastele sovelluskeskusta"
@@ -19354,6 +19394,7 @@ fi:
   visit_group_group_name_7a816081: "Käy ryhmässä %{group_name}"
   visit_zoom_14636084: "Käy Zoomissa"
   waiting_for_attempted_login_6d00cb49: "Odotetaan kirjautumisyritystä"
+  waiting_for_change_to_complete_b75b5e8b: "Odotetaan muutoksen valmistumista"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Odotetaan vahvistusta näyttää viivakoodi"
   waiting_for_selection_ce0398c7: "Valintaa odotetaan"
   waiting_for_your_qr_code_to_load_809299e5: "Odotetaan viivakoodin latautumista"
@@ -19441,6 +19482,7 @@ fi:
             kurssillesi. Voit myös luoda opiskelijaryhmiä sijoittaaksesi niihin ryhmän tehtäviä,
             keskusteluita ja tiedostoja.
   what_should_the_csv_file_look_like_985a59ac: "Miltä CSV-tiedoston pitäisi näyttää?"
+  what_storage_options_do_i_have_in_zoom_b79c738e: "Mitä tallennustilan vaihtoehtoja minulla on Zoomissa?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Kun lisäät useita käyttäjiä, käytä pilkkua tai rivinvaihtoa käyttäjien erottamiseen."
   when_disabled_students_can_still_send_individual_m_567a911c: "Kun pois käytöstä, opiskelijat voivat yhä lähettää yksilöllisiä viestejä kurssin opettajille, kurssin apuopettajille, ja opiskelijoille, jotka kuuluvat samoihin ryhmiin tilitasolla."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Kun nimettömien tehtävien arvosanat piilotetaan, piilotetaan ne kaikilta kurssilla olevilta. Nimettömyys otetaan uudelleen käyttöön."
@@ -19602,6 +19644,7 @@ fi:
     cannot_update_published: "Et saa päivittää tämän wiki-sivun julkaistua tilaa"
     cannot_update_title: "Et saa päivittää tämän wiki-sivun otsikkoa"
     invalid_editing_roles: "Annetut muokkausroolit ovat virheellisiä"
+  will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Esitetäänkö tämän avaimen jakamat valtuutustunnukset Canvasille vai ryhmäpalveluun (esim. Canvasin tiedot)?"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Säilyttää kaikkien pistemääriesi keskiarvon"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Säilyttää kaikkein korkeimman pistemääräsi"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Säilyttää kaikkein viimeisimmän pistemääräsi"
