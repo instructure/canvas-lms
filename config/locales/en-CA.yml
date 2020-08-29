@@ -132,7 +132,9 @@ en-CA:
       deleteError: "Something went wrong. Unable to delete at this time."
       deleteSuccess: "Deletion successful"
       error: "An error occurred. Please refresh the page and try again."
+      unexpectedDeleteError: "Something went wrong. Unable to delete at this time."
       updateSuccess: "Update successful"
+      userDeleteError: "Outcome Group contains one or more Outcomes that are currently aligned to content."
     length_error: "Must be 255 characters or less"
   OutcomeView: 
     length_error: "Must be 255 characters or less"
@@ -2331,6 +2333,7 @@ en-CA:
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "An error occurred while saving the course post policy"
   an_error_occurred_while_saving_your_settings_b503a31c: "An error occurred while saving your settings"
   an_error_occurred_while_starting_migration_8e6015e2: "An error occurred while starting migration"
+  an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "An error occurred while trying to change the UI"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "An error occurred while updating announcements locked state."
   an_error_occurred_while_updating_late_policies_a95b707f: "An error occurred while updating late policies"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "An error ocurred while deleting the appointment group"
@@ -2474,6 +2477,7 @@ en-CA:
   anonymous_off_7985fcaf: "Anonymous Off"
   anonymous_on_c5fa120d: "Anonymous On"
   anonymous_re_submission_assignment_title_d9402721: "Anonymous Re-Submission: %{assignment_title}"
+  anonymous_student_91b9d664: "Anonymous Student"
   anonymous_submission_annotation_student_id_assignm_25eb88c9: "Anonymous Submission Annotation: Student (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Anonymous Submission annotation: Student (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Anonymous Submission: %{assignment_title}"
@@ -2587,6 +2591,7 @@ en-CA:
   appointments_dcb41d23: Appointments
   approved_c3b285d4: Approved
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} with precision %{precision}"
+  apps_54d24a47: Apps
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "Apps are an easy way to add new features to Canvas. They can be added to individual courses, or to all courses in an account. Once configured, you can link to them through course modules and create assignments for assessment tools."
   appt_calendar_event_dialog: 
     invalid_participants: "You must allow at least one user to attend"
@@ -4614,6 +4619,7 @@ en-CA:
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Click on the admin navigation button to access account settings."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Click on the courses navigation button to access your courses."
   click_proceed_to_continue_b6eeffc6: "Click \"Proceed\" to continue."
+  click_the_admin_navigation_button_to_access_accoun_38d881bf: "Click the admin navigation button to access account settings."
   click_the_button_above_to_add_content_4c7024a: "Click the button above to add content"
   click_to_add_a_name_6cf551b0: "Click to add a name"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Click to change profile picture for %{display_name}"
@@ -4661,6 +4667,7 @@ en-CA:
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Clicking on the column headers will sort the rows by that column."
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Clicking the checkbox will cause scopes table to appear below"
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Clicking the checkbox will cause scopes table to disappear below"
+  client_credentials_audience_218f2d93: "Client Credentials Audience"
   client_id_cb2502af: "Client ID"
   client_id_is_required_1afd54d1: "Client ID is required"
   clone_group_set_c2a40e15: "Clone Group Set"
@@ -5238,7 +5245,7 @@ en-CA:
         upload_to: "Upload to"
       import_quizzes_next_view: 
         import_new_quizzes: "Import assessment content as New Quizzes"
-        import_new_quizzes_help_text: "New Quizzes is the new assessment engine for Canvas.%{p_p}To learn more please contact your system administrator or visit"
+        import_new_quizzes_help_text: "New Quizzes is the new assessment engine for Canvas.%{p_p}To learn more, please contact your system administrator or visit"
         import_quizzesNext_help_label: "Import assessment as New Quizzes Help Icon"
         import_quizzesNext_help_text: "Quizzes.Next is the new assessment engine for Canvas.%{p_p}To learn more please contact your system administrator or visit"
         import_quizzesNext_help_title: "New Quizzes"
@@ -7296,6 +7303,7 @@ en-CA:
   deployment_id_fc270280: "Deployment Id"
   deployment_id_for_tool_app_cb59335: "Deployment Id for %{tool} App"
   deployment_id_for_toolname_app_e54a7364: "Deployment id for %{toolName} App"
+  desc_12ad2869: "%{desc}"
   description_436c48d7: Description
   description_61f4296: "* Description"
   details_98a31b68: Details
@@ -8164,6 +8172,8 @@ en-CA:
   ends_at_9a62b528: "Ends at"
   enforce_scopes_be28989c: "Enforce Scopes"
   english_c60612e2: English
+  enhance_color_contrast_of_content_685ddd49: "Enhance color contrast of content"
+  enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Enhances the color contrast of text, buttons, etc."
   enrolled_a6a517cd: Enrolled
   enrolled_as_272da3b9: "Enrolled as"
   enrollment: 
@@ -9731,10 +9741,12 @@ en-CA:
       pages: Pages
       people: People
   group_a8f5ed9c: Group
+  group_announcements_f6e0fc8c: "Group Announcements"
   group_assignment_7060989f: "Group Assignment"
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "Group assignments can't be anonymously graded"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "Group assignments cannot be enabled for anonymously graded assignments"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Group assignments cannot be enabled for moderated assignments"
+  group_calendar_5410c6ae: "Group Calendar"
   group_categories: 
     notices: 
       create_category_success: "Category was successfully created."
@@ -9761,7 +9773,11 @@ en-CA:
     self_signup_for_courses: "Self-signup may only be enabled for course groups or communities"
   group_category_id_7001cf89: group_category_id
   group_category_locked: "The group category can't be changed because students have already submitted on this assignment"
+  group_collaborations_b747d43: "Group Collaborations"
+  group_conferences_12866179: "Group Conferences"
   group_details_e51122f1: "Group Details"
+  group_discussions_17d79aa0: "Group Discussions"
+  group_files_4324f3df: "Group Files"
   group_files_82e5dcdb: "Group files"
   group_group_name_is_for_a_different_section_4d84d256: "Group %{group_name} is for a different section"
   group_group_name_is_full_297880d6: "Group %{group_name} is full"
@@ -9769,6 +9785,7 @@ en-CA:
   group_group_name_is_not_available_at_this_time_971001c1: "Group %{group_name} is not available at this time"
   group_guid_exists_in_incorrect_context_64263138: "Group \"%{guid}\" exists in incorrect context"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Group \"%{guid}\" has already appeared in this import"
+  group_home_249cb392: "Group Home"
   group_is_for_a_different_section_6a843a4d: "Group is for a different section"
   group_is_full_56849d78: "Group is full"
   group_is_joined_by_invitation_only_d00f5a63: "Group is joined by invitation only"
@@ -9792,6 +9809,8 @@ en-CA:
   group_name_group_people_e9d548c1: "%{group_name} - Group People"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} in %{group_category_name} group category"
   group_name_is_required_5547bc0b: "Group name is required"
+  group_pages_656556f3: "Group Pages"
+  group_people_50e9785b: "Group People"
   group_roster_1846bf84: "Group Roster"
   group_select_330df8bd: "Group Select"
   group_set_name_2aed2347: "Group Set Name"
@@ -10156,6 +10175,7 @@ en-CA:
   here_are_the_first_100_errors_that_occurred_d6e46739: "Here are the first 100 errors that occurred:"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Here's some quick tips to get you started in Canvas!"
+  hi_contrast_373b614f: Hi-contrast
   hidden_14a032a7: Hidden
   hidden_available_with_a_link_65ef2bda: "Hidden. Available with a link"
   hidden_files_inside_will_be_available_with_links_9bdf702b: "Hidden, files inside will be available with links."
@@ -10199,6 +10219,7 @@ en-CA:
   highest_28ad71e6: Highest
   highest_score_e080551e: "Highest Score"
   hindi_9bcd4b34: Hindi
+  history_cd3f60a9: History
   history_settings_c63dbaaf: "History Settings"
   home_351838cd: Home
   home_page_is_not_valid_2e8a25ae: "Home page is not valid"
@@ -10249,6 +10270,7 @@ en-CA:
   how_do_i_find_my_courses_b826e4ce: "How do I find my courses?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "How do I import a Canvas course export package?"
   how_do_i_import_outcomes_for_a_course_8eced1a: "How do I import outcomes for a course?"
+  how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "How do I invite others to join a meeting?"
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "How do I know if students have joined the meeting?"
   how_do_i_manage_and_share_the_recording_52fc2993: "How do I manage and share the recording?"
   how_do_i_manage_rubrics_in_a_course_a5441fb7: "How do I manage rubrics in a course?"
@@ -10379,6 +10401,10 @@ en-CA:
   if_enabled_developer_key_management_options_and_to_1708ddd3: "If enabled, developer key management options and token scoping will be used."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "If enabled, OAuth 1.0a signing may be used by LTI tools to access the Membership Service API"
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+      If enabled, oEmbed endpoints will require a
+      tool-generated token to verify the origin
+      of an oEmbed resource request.
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "If enabled, query parameters will not be copied to the POST body during an LTI launch."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "If enabled, scopes will be validated on API requests if the developer key being used requires scopes."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "If enabled, Sourcedids used by Canvas for Basic Outcomes will be encrypted."
@@ -14753,6 +14779,7 @@ en-CA:
       delete_reminder_failed: "Delete failed"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews cannot be enabled for moderated assignments"
   peer_reviews_e3a55964: "Peer Reviews"
+  peer_service_6b4828b9: "Peer Service"
   pending_3e506a5b: Pending
   pending_message_2d9a8796: "Pending: %{message}"
   people_account_30bbffec: "People (Account)"
@@ -17220,6 +17247,8 @@ en-CA:
   recent_activity_51239235: "Recent Activity"
   recent_announcements_8becc59c: "Recent Announcements"
   recent_f19e8c64: Recent
+  recent_history_bcb0f4c0: "Recent History"
+  recent_history_tray_241a384e: "Recent History tray"
   recent_student: 
     last_logged_in: "last logged in %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} Decaying Average"
@@ -17320,6 +17349,7 @@ en-CA:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Released by Mastery Path: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Released by Mastery Path: %{path}"
   releasing_grades_31a57dde: "Releasing Grades"
+  reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Reload the page or navigate to a new page for this change to take effect."
   remember_my_choice_for_this_course_5a3b7206: "Remember my choice for this course"
   remove_account_from_this_profile_c3095eb2: "Remove account from this profile"
   remove_all_course_observer_members_4622c70d: "Remove All Course Observer Members"
@@ -17411,6 +17441,7 @@ en-CA:
   require_captcha_for_self_registration_b3b2ea02: "Require Captcha for Self Registration"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Require group members to be in the same section"
   require_respondus_lockdown_browser_31425b3a: "Require Respondus LockDown Browser"
+  require_signed_token_for_oembed_64883303: "Require signed token for oEmbed"
   require_usage_rights_for_uploaded_files_4507865b: "Require Usage Rights for Uploaded Files"
   required_access_code_592902d7: "Required access code"
   required_email_address_379b2392: "Required Email Address"
@@ -18911,6 +18942,7 @@ en-CA:
   show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
       Show a checkbox that optionally lets an account admin publish courses
       automatically after associating and syncing with a blueprint course
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Show a list of recently visited pages in the Canvas global navigation"
   show_account_navigation_menu_d97270a9: "Show Account Navigation Menu"
   show_admin_navigation_menu_92fb579f: "Show Admin Navigation Menu"
   show_all_artifacts_34b91a83: "Show All Artifacts"
@@ -19965,6 +19997,11 @@ en-CA:
                 Canvas Support
   the_message_you_sent_with_the_subject_line_subject_c73f92e4: |-
       The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address [See https://community.canvaslms.com/docs/DOC-2281]. You may also contact this person via the Canvas Inbox [See https://community.canvaslms.com/docs/DOC-2670].
+                
+                Thank you,
+                Canvas Support
+  the_message_you_sent_with_the_subject_line_subject_c9a8f654: |-
+      The message you sent with the subject line "%{subject}" was not delivered. To reply to Canvas messages from this email, it must first be a confirmed communication channel in your Canvas profile. Please visit your profile and resend the confirmation email for this email address. You may also contact this person via the Canvas Inbox. For help, please see the Inbox chapter for your user role in the Canvas Guides. [See https://community.canvaslms.com/t5/Canvas/ct-p/canvas].
                 
                 Thank you,
                 Canvas Support
@@ -21249,6 +21286,7 @@ en-CA:
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Use bookmarking for API pagination in Enrollments Index"
   use_default_890939b7: "Use Default"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Use experimental features before they are generally enabled in production"
+  use_high_contrast_ui_a5917282: "Use High Contrast UI"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Use HTML5 Recorder in Content Editor instead of Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Use MathMan to convert LaTeX to MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan to convert LaTeX to SVG?"
@@ -21309,6 +21347,7 @@ en-CA:
   user_details_2613c079: "User Details"
   user_details_e9aef9e5: "User details"
   user_does_not_have_permission_to_select_final_grad_47560e75: "user does not have permission to select final grade"
+  user_files_78e21703: "User Files"
   user_groups_query_error_bba6a6b7: "User groups query error"
   user_id_8256faeb: user_id
   user_id_bcace870: "User ID"
@@ -21751,6 +21790,7 @@ en-CA:
   video_player_b371005: "Video Player"
   vietnam_84_e50a2a44: "Vietnam (+84)"
   vietnamese_e7a76583: Vietnamese
+  view_all_e13bf0a6: "View All"
   view_analytics_91a3b7a: "View Analytics"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "View analytics data in tables instead of graphs"
   view_analytics_for_name_9b31594e: "View analytics for %{name}"
@@ -21811,6 +21851,7 @@ en-CA:
   visit_group_group_name_7a816081: "Visit group %{group_name}"
   visit_zoom_14636084: "Visit Zoom"
   waiting_for_attempted_login_6d00cb49: "Waiting for attempted login"
+  waiting_for_change_to_complete_b75b5e8b: "Waiting for change to complete"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Waiting for confirmation to display QR code"
   waiting_for_selection_ce0398c7: "Waiting for Selection"
   waiting_for_your_qr_code_to_load_809299e5: "Waiting for your QR Code to load"
@@ -21910,6 +21951,7 @@ en-CA:
             your course. You can also create student groups to house group assignments,
             discussions, and files.
   what_should_the_csv_file_look_like_985a59ac: "What should the CSV file look like?"
+  what_storage_options_do_i_have_in_zoom_b79c738e: "What storage options do I have in Zoom?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "When adding multiple users, use a comma or line break to separate users."
   when_disabled_students_can_still_send_individual_m_567a911c: "When disabled, students can still send individual messages to course teachers, course TAs, and students that belong to the same account-level groups."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "When hiding grades for anonymous assignments, grades will be hidden for everyone in the course. Anonymity will be re-applied."
@@ -22078,6 +22120,7 @@ en-CA:
     cannot_update_published: "You are not allowed to update the published state of this wiki page"
     cannot_update_title: "You are not allowed to update the title of this wiki page"
     invalid_editing_roles: "The provided editing roles are invalid"
+  will_credentials_issued_by_this_key_be_presented_t_68faff8c: "Will credentials issued by this key be presented to Canvas or to a peer service (e.g. Canvas Data)?"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Will keep the average of all your scores"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Will keep the highest of all your scores"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Will keep the latest of all your scores"
