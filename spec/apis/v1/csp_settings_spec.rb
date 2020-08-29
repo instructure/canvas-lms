@@ -61,7 +61,7 @@ describe "CSP Settings API", type: :request do
         json = get_csp_settings(@course)
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
-        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
+        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
       end
 
       it "should indicate if disabled explicitly on course" do
@@ -98,9 +98,11 @@ describe "CSP Settings API", type: :request do
         json = get_csp_settings(@sub)
         expect(json["enabled"]).to eq true
         expect(json["inherited"]).to eq true
-        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com"])
-        expect(json["tools_whitelist"]).to eq(
-          {"example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}]})
+        expect(json["effective_whitelist"]).to match_array(["example1.com", "example2.com", "*.example2.com"])
+        expect(json["tools_whitelist"]).to eq({
+          "example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}],
+          "*.example2.com" => [{"id" => tool.id, "name" => tool.name, "account_id" => @sub.id}]
+        })
         expect(json["current_account_whitelist"]).to eq []
       end
 

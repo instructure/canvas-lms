@@ -119,6 +119,7 @@ module Csp::AccountHelper
     # first, get the allowed domain list from the enabled csp account
     # then get the list of domains extracted from external tools
     domains = ::Csp::Domain.get_cached_domains_for_account(self.csp_account_id)
+    domains += Setting.get('csp.global_whitelist', '').split(',').map(&:strip)
     domains += cached_tool_domains if include_tools
     domains += csp_files_domains(request) if include_files
     domains.uniq.sort
@@ -132,11 +133,16 @@ module Csp::AccountHelper
   end
 
   def csp_tools_grouped_by_domain
-    csp_tool_scope.to_a.group_by{|tool| (tool.domain || (Addressable::URI.parse(tool.url).normalize.host rescue nil))&.downcase }.except(nil)
+    csp_tool_scope.each_with_object({}) do |tool, hash|
+      Csp::Domain.domains_for_tool(tool).each do |domain|
+        hash[domain] ||= []
+        hash[domain] << tool
+      end
+    end
   end
 
   def get_account_tool_domains
-    Csp::Domain.domains_for_tools(csp_tool_scope)
+    csp_tools_grouped_by_domain.keys.uniq
   end
 
   def csp_tool_scope
