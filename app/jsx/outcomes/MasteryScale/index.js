@@ -22,27 +22,14 @@ import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import ProficiencyCalculation from './ProficiencyCalculation'
 import ProficiencyTable from './ProficiencyTable'
-import {saveProficiency, OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from './api'
+import {saveProficiency, OUTCOME_PROFICIENCY_QUERY} from './api'
 import {useQuery, useMutation} from 'react-apollo'
 
 const MasteryScale = ({contextType, contextId}) => {
   const {loading, error, data} = useQuery(OUTCOME_PROFICIENCY_QUERY, {
     variables: {contextId}
   })
-
-  const [setCalculationMethodQuery, {error: setCalculationMethodError}] = useMutation(
-    SET_OUTCOME_CALCULATION_METHOD
-  )
-  const setCalculationMethod = useCallback(
-    (calculationMethod, calculationInt) => {
-      setCalculationMethodQuery({
-        variables: {contextType, contextId, calculationMethod, calculationInt}
-      })
-    },
-    [contextType, contextId, setCalculationMethodQuery]
-  )
 
   // const [updateProficiencyRatingsQuery, {error: updateProficiencyRatingsError}] = useMutation(
   //   SET_OUTCOME_PROFICIENCY_RATINGS
@@ -84,7 +71,7 @@ const MasteryScale = ({contextType, contextId}) => {
       </Text>
     )
   }
-  const {outcomeProficiency, outcomeCalculationMethod} = data.account
+  const {outcomeProficiency} = data.account
   return (
     <div>
       <Heading level="h5" margin="medium 0">
@@ -94,14 +81,6 @@ const MasteryScale = ({contextType, contextId}) => {
         proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
-      />
-      <View as="div" borderWidth="small 0 0" margin="small 0" width="100%" />
-      <ProficiencyCalculation
-        contextType={contextType}
-        contextId={contextId}
-        method={outcomeCalculationMethod || undefined} // send undefined when value is null
-        update={setCalculationMethod}
-        updateError={setCalculationMethodError}
       />
     </div>
   )

@@ -19,6 +19,8 @@ import React, {useState, useEffect, useMemo} from 'react'
 import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
+import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
+
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
 
 export const OutcomePanel = () => {
@@ -38,9 +40,10 @@ export const OutcomePanel = () => {
 }
 
 const OutcomeManagement = () => {
-  const [selectedIndex, setSelectedIndex] = useState(
-    window.location.hash === '#mastery_scale' ? 1 : 0
-  )
+  const [selectedIndex, setSelectedIndex] = useState(() => {
+    const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
+    return window.location.hash in tabs ? tabs[window.location.hash] : 0
+  })
 
   const handleTabChange = (_, {index}) => {
     setSelectedIndex(index)
@@ -50,16 +53,19 @@ const OutcomeManagement = () => {
 
   const contextId = ENV.context_asset_string.split('_')[1]
   return (
-    <Tabs onRequestTabChange={handleTabChange}>
-      <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
-        <OutcomePanel />
-      </Tabs.Panel>
-      <Tabs.Panel renderTitle={I18n.t('Mastery Scale')} isSelected={selectedIndex === 1}>
-        <ApolloProvider client={client}>
+    <ApolloProvider client={client}>
+      <Tabs onRequestTabChange={handleTabChange}>
+        <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
+          <OutcomePanel />
+        </Tabs.Panel>
+        <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
           <MasteryScale contextType="Account" contextId={contextId} />
-        </ApolloProvider>
-      </Tabs.Panel>
-    </Tabs>
+        </Tabs.Panel>
+        <Tabs.Panel renderTitle={I18n.t('Calculation')} isSelected={selectedIndex === 2}>
+          <MasteryCalculation contextType="Account" contextId={contextId} />
+        </Tabs.Panel>
+      </Tabs>
+    </ApolloProvider>
   )
 }
 

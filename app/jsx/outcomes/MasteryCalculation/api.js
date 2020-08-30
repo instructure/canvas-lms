@@ -16,34 +16,50 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import axios from 'axios'
-
 import {gql} from 'jsx/canvas-apollo'
 
 export const OUTCOME_PROFICIENCY_QUERY = gql`
   query GetOutcomeProficiencyData($contextId: ID!) {
     account(id: $contextId) {
-      outcomeProficiency {
+      outcomeCalculationMethod {
         _id
+        calculationInt
+        calculationMethod
         contextId
         contextType
         locked
-        proficiencyRatingsConnection {
-          nodes {
-            _id
-            color
-            description
-            mastery
-            points
-          }
-        }
       }
     }
   }
 `
 
-export const fetchProficiency = (contextType, contextId) =>
-  axios.get(`/api/v1/accounts/${contextId}/outcome_proficiency`)
-
-export const saveProficiency = (contextType, contextId, config) =>
-  axios.post(`/api/v1/accounts/${contextId}/outcome_proficiency`, config)
+export const SET_OUTCOME_CALCULATION_METHOD = gql`
+  mutation SetOutcomeCalculationMethod(
+    $contextType: String!
+    $contextId: ID!
+    $calculationMethod: String!
+    $calculationInt: Int
+  ) {
+    createOutcomeCalculationMethod(
+      input: {
+        contextId: $contextId
+        contextType: $contextType
+        calculationMethod: $calculationMethod
+        calculationInt: $calculationInt
+      }
+    ) {
+      outcomeCalculationMethod {
+        _id
+        calculationMethod
+        calculationInt
+        contextId
+        contextType
+        locked
+      }
+      errors {
+        attribute
+        message
+      }
+    }
+  }
+`
