@@ -309,13 +309,13 @@ export default class ProficiencyTable extends React.Component {
         </Table>
         <View
           width="100%"
-          textAlign="center"
-          padding="small"
+          textAlign="start"
+          padding="small small medium small"
           as="div"
           borderWidth="none none small none"
         >
-          <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
-            <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
+          <Button onClick={this.addRow} renderIcon={<IconPlusLine />}>
+            {I18n.t('Add Proficiency Level')}
           </Button>
         </View>
         <div className="save">

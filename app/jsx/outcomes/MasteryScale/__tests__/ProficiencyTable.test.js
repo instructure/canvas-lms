@@ -54,7 +54,7 @@ describe('default proficiency', () => {
 
   it('clicking button adds rating', () => {
     const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getByText(/Add proficiency rating/)
+    const button = getByText(/Add Proficiency Level/)
     fireEvent.click(button)
     const inputs = getAllByLabelText(/Change description/)
     expect(inputs.length).toEqual(6)
@@ -62,7 +62,7 @@ describe('default proficiency', () => {
 
   it('clicking add rating button flashes SR message', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getByText(/Add proficiency rating/)
+    const button = getByText(/Add Proficiency Level/)
     fireEvent.click(button)
     expect(flashMock).toHaveBeenCalledTimes(1)
   })
