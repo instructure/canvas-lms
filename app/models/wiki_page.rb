@@ -81,8 +81,7 @@ class WikiPage < ActiveRecord::Base
   end
 
   scope :visible_to_user, -> (user_id) do
-    joins(sanitize_sql(["LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?", user_id])).
-      where("wiki_pages.assignment_id IS NULL OR asv IS NOT NULL")
+    where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
   end
 
   TITLE_LENGTH = 255
