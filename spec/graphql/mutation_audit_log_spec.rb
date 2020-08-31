@@ -64,9 +64,12 @@ describe AuditLogFieldExtension do
 
   it "fails gracefully (or silently!? when dynamo isn't working" do
     require 'canvas_dynamodb'
-    dynamo = CanvasDynamoDB::Database.new("asdf", "asdf",
-                                          {region: "us-east-1", endpoint: "http://localhost:8000"},
-                                          Rails.logger)
+    dynamo = CanvasDynamoDB::Database.new(
+      "asdf",
+      prefix: "asdf",
+      client_opts: { region: "us-east-1", endpoint: "http://localhost:8000" },
+      logger: Rails.logger
+    )
     expect(dynamo).to receive(:put_item).and_raise(Aws::DynamoDB::Errors::ServiceError.new("two", "arguments"))
     allow(Canvas::DynamoDB::DatabaseBuilder).to receive(:from_config).and_return(dynamo)
     response = CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
