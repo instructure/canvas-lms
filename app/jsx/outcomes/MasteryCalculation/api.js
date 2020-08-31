@@ -27,7 +27,6 @@ export const OUTCOME_PROFICIENCY_QUERY = gql`
         calculationMethod
         contextId
         contextType
-        locked
       }
     }
   }
@@ -54,7 +53,6 @@ export const SET_OUTCOME_CALCULATION_METHOD = gql`
         calculationInt
         contextId
         contextType
-        locked
       }
       errors {
         attribute

@@ -41,7 +41,6 @@ describe Mutations::UpdateOutcomeCalculationMethod do
             contextId
             calculationMethod
             contextType
-            locked
           }
           errors {
             attribute
@@ -69,7 +68,6 @@ describe Mutations::UpdateOutcomeCalculationMethod do
     expect(result.dig('contextId')).to eq @course.id
     expect(result.dig('calculationMethod')).to eq 'highest'
     expect(result.dig('calculationInt')).to be_nil
-    expect(result.dig('locked')).to be false
     expect(record.calculation_method).to eq 'highest'
     expect(record.calculation_int).to be_nil
     expect(record.context).to eq @course

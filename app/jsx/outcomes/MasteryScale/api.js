@@ -27,7 +27,6 @@ export const OUTCOME_PROFICIENCY_QUERY = gql`
         _id
         contextId
         contextType
-        locked
         proficiencyRatingsConnection {
           nodes {
             _id
