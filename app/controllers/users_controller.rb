@@ -561,7 +561,10 @@ class UsersController < ApplicationController
 
   def dashboard_sidebar
     Shackles.activate(:slave) do
-      prepare_current_user_dashboard_items
+      unless @current_user&.has_student_enrollment? && !@current_user.non_student_enrollment?
+        # it's not even using any of this for students - it's just using planner now
+        prepare_current_user_dashboard_items
+      end
 
       if (@show_recent_feedback = @current_user.student_enrollments.active.exists?)
         @recent_feedback = (@current_user && @current_user.recent_feedback) || []
