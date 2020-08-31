@@ -111,26 +111,12 @@ describe ContextExternalTool do
         it { is_expected.to eq true }
       end
 
-      context 'and the user does not have the needed permission in the context' do
-        let(:required_permission) { 'view_learning_analytics' }
-        let(:launch_type) { 'assignment_selection' }
-
-        it { is_expected.to eq false }
-      end
-
       context 'and the placement is "global_navigation"' do
         context 'and the user has an enrollment with the needed permission' do
           let(:required_permission) { 'view_group_pages' }
           let(:launch_type) { 'global_navigation' }
 
           it { is_expected.to eq true }
-        end
-
-        context 'and the user does not have an enrollment with the needed permission' do
-          let(:required_permission) { 'view_learning_analytics' }
-          let(:launch_type) { 'global_navigation' }
-
-          it { is_expected.to eq false }
         end
       end
     end
