@@ -126,7 +126,7 @@ describe "calendar2" do
         get '/calendar2'
         expect(f('#context-list li:nth-of-type(1)').text).to include(@teacher.name)
         expect(f('#context-list li:nth-of-type(2)').text).to include(@course.name)
-        f('.calendar .fc-week .fc-today').click
+        move_to_click_element(f('.calendar .fc-week .fc-today'))
         edit_event_dialog = f('#edit_event_tabs')
         expect(edit_event_dialog).to be_displayed
         edit_event_form = edit_event_dialog.find('#edit_calendar_event_form')
@@ -156,7 +156,7 @@ describe "calendar2" do
         day2 = 2.days.from_now.to_date
 
         get '/calendar2'
-        f('.calendar .fc-week .fc-today').click
+        move_to_click_element(f('.calendar .fc-week .fc-today'))
         wait_for_ajaximations
         f('#edit_event #edit_event_tabs') # using implicit wait for element to be displayed
         click_option(f('.context_id'), @course.name)
