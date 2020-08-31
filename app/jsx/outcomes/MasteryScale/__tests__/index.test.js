@@ -127,14 +127,15 @@ describe('MasteryScale', () => {
       moxios.uninstall()
     })
 
-    it('submits a request when ratings are updated', async () => {
-      const {findAllByLabelText} = render(
+    it('submits a request when ratings are saved', async () => {
+      const {findAllByLabelText, getByText} = render(
         <MockedProvider mocks={mocks}>
           <MasteryScale contextType="Account" contextId="11" />
         </MockedProvider>
       )
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
       fireEvent.change(pointsInput, {target: {value: '100'}})
+      fireEvent.click(getByText('Save Mastery Scale'))
 
       await wait(() => {
         const request = moxios.requests.mostRecent()

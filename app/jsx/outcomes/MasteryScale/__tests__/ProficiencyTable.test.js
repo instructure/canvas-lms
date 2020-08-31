@@ -74,103 +74,135 @@ describe('default proficiency', () => {
     expect(flashMock).toHaveBeenCalledTimes(1)
   })
 
-  it('setting blank description sets error', async () => {
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+  it('setting blank description sets error and focus', async () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
+    fireEvent.click(getByText('Save Mastery Scale'))
     const error = await within(masteryField.closest('td')).findByText(
       'Missing required description'
     )
     expect(error).not.toBeNull()
+    expect(document.activeElement).toEqual(masteryField.closest('input'))
   })
 
-  it('setting blank points sets error', async () => {
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+  it('setting blank points sets error and focus', async () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: ''}})
+    fireEvent.click(getByText('Save Mastery Scale'))
     const error = await within(row).findByText('Invalid points')
     expect(error).not.toBeNull()
+    expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
-  it('setting invalid points sets error', async () => {
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+  it('setting invalid points sets error and focus', async () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
     const error = await within(row).findByText('Invalid points')
     expect(error).not.toBeNull()
+    expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
-  it('setting negative points sets error', async () => {
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} />)
+  it('setting negative points sets error and focus', async () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '-1'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
     const error = await within(row).findByText('Negative points')
     expect(error).not.toBeNull()
+    expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
-  it('calls update on change', async () => {
+  it('only sets focus on the first error', () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const masteryField = getByDisplayValue('Mastery')
+    fireEvent.change(masteryField, {target: {value: ''}})
+    const pointsInput = within(masteryField.closest('tr')).getByLabelText(/Change points/)
+    fireEvent.change(pointsInput, {target: {value: '-1'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    expect(document.activeElement).toEqual(masteryField.closest('input'))
+  })
+
+  it('calls update on save', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
-    await wait(() => expect(updateSpy).toHaveBeenCalled())
+    fireEvent.click(getByText('Save Mastery Scale'))
+    expect(updateSpy).toHaveBeenCalled()
   })
 
   it('empty rating description does not call update', () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
-    jest.advanceTimersByTime(1000)
+    fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
   it('empty rating points does not call update', () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: ''}})
-    jest.advanceTimersByTime(1000)
+    fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
   it('invalid rating points does not call update', () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
-    jest.advanceTimersByTime(1000)
+    fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
   it('increasing rating points does not call update', () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '1000'}})
-    jest.advanceTimersByTime(1000)
+    fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
   it('negative rating points does not call update', () => {
-    jest.useFakeTimers()
     const updateSpy = jest.fn(() => Promise.resolve())
-    const {getByDisplayValue} = render(<ProficiencyTable {...defaultProps} update={updateSpy} />)
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
     const row = getByDisplayValue('Mastery').closest('tr')
     const pointsInput = within(row).getByLabelText(/Change points/)
     fireEvent.change(pointsInput, {target: {value: '-10'}})
-    jest.advanceTimersByTime(1000)
+    fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
+  })
+
+  it('save button is initially disabled', () => {
+    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const saveButton = getByText('Save Mastery Scale').closest('button')
+    expect(saveButton.disabled).toEqual(true)
   })
 })
 
