@@ -64,9 +64,12 @@ describe AuditLogFieldExtension do
 
   it "fails gracefully when dynamo isn't working, with captured exception" do
     require 'canvas_dynamodb'
-    dynamo = CanvasDynamoDB::Database.new("asdf", "asdf",
-                                          {region: "us-east-1", endpoint: "http://localhost:8000"},
-                                          Rails.logger)
+    dynamo = CanvasDynamoDB::Database.new(
+      "asdf",
+      prefix: "asdf",
+      client_opts: { region: "us-east-1", endpoint: "http://localhost:8000" },
+      logger: Rails.logger
+    )
     expect(dynamo).to receive(:put_item).and_raise(Aws::DynamoDB::Errors::ServiceError.new("two", "arguments"))
     expect(::Canvas::Errors).to receive(:capture_exception) do |name, e|
       expect(name).to eq(:graphql_mutation_audit_logs)

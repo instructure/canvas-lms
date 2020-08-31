@@ -24,12 +24,18 @@ module CanvasDynamoDB
 
     attr_reader :client, :fingerprint, :logger
 
-    def initialize(fingerprint, prefix, opts, logger_arg)
-      @client = Aws::DynamoDB::Client.new(opts)
-      @region = opts[:region]
+    # The "fingerprint" is really just for logging so you have
+    # some string you can grep for if you want to pull out only
+    # the ddb query logs for THIS database (often something like "db_name:environment").
+    # "prefix" will become part of whatever naming structure you use,
+    # and can be left blank if you do not intend to have this db
+    # be one of a class of similarly purposed tables.
+    #
+    def initialize(fingerprint, prefix: nil, client_opts: {}, logger: nil)
+      @client = client_opts[:client] || Aws::DynamoDB::Client.new(client_opts)
       @fingerprint = fingerprint
       @prefix = prefix
-      @logger = logger_arg
+      @logger = logger || Logger.new(STDOUT)
     end
 
     %i(delete_item get_item put_item query scan update_item).each do |method|
@@ -52,7 +58,7 @@ module CanvasDynamoDB
     end
 
     def prefixed_table_name(table_name)
-      "#{@prefix}-#{table_name}"
+      [@prefix, table_name].compact.join("-")
     end
 
     def batch_get
