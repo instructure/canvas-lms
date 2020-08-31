@@ -561,6 +561,30 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe '#log_asset_access' do
+    before :once do
+      course_model
+      user_model
+    end
+
+    before do
+      controller.instance_variable_set(:@current_user, @user)
+      controller.instance_variable_set(:@context, @user)
+    end
+
+    it 'sets @accessed_asset[asset_for_root_account_id] when asset is an array' do
+      controller.send(:log_asset_access, ["assignments", @course], "assignments", "other")
+      accessed_asset = controller.instance_variable_get(:@accessed_asset)
+      expect(accessed_asset[:asset_for_root_account_id]).to eq(@course)
+    end
+
+    it 'sets @accessed_asset[asset_for_root_account_id] when asset is not an array' do
+      controller.send(:log_asset_access, @course, "assignments", "other")
+      accessed_asset = controller.instance_variable_get(:@accessed_asset)
+      expect(accessed_asset[:asset_for_root_account_id]).to eq(@course)
+    end
+  end
+
   describe 'log_participation' do
     before :once do
       course_model

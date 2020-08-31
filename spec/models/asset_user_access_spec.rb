@@ -312,6 +312,37 @@ describe AssetUserAccess do
       end
     end
 
+    describe 'setting root account id' do
+      before :once do
+        @course = Account.default.courses.create!(:name => 'My Course')
+        @user = User.create!
+      end
+
+      it "loads root account id from context" do
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @course, { level: 'view', code: assignment.asset_string }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "loads root account id from asset_for_root_account_id when context is a User" do
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @user, { level: 'view', code: assignment.asset_string, asset_for_root_account_id: assignment }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "loads root account id from asset_for_root_account_id when context is a User and asset has a resolved_root_account_id but not a root_account_id" do
+        # Not sure if this really ever happens but handle it on the safe side
+        assignment = @course.assignments.create!(:title => 'My Assignment2')
+        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @course.root_account }
+        expect(AssetUserAccess.last.root_account_id).to eq(@course.root_account_id)
+      end
+
+      it "sets root account id to 0 when context is a User and asset is a User" do
+        AssetUserAccess.log @user, @user, { level: 'view', code: @user.asset_string, asset_for_root_account_id: @user }
+        expect(AssetUserAccess.last.root_account_id).to eq(0)
+      end
+    end
+
   end
 
   describe '#corrected_view_score' do
