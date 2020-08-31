@@ -37,7 +37,7 @@ class CutyCapt
   CUTYCAPT_DEFAULTS = {
     :delay => 3000,
     :timeout => 60000,
-    :ip_blacklist => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254' ],
+    :ip_blacklist => [ '10.0.0.0/8', '172.16.0.0/12', '192.168.0.0/16', '169.254.169.254', '127.0.0.0/8' ],
     :domain_blacklist => [ ],
     :allowed_schemes => [ 'http', 'https' ],
     :lang => 'en,*;q=0.9'
