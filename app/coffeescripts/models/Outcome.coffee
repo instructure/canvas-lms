@@ -36,6 +36,14 @@ export default class Outcome extends Backbone.Model
       points: 0
     ]
 
+  setMasteryScales: ->
+    ratings = ENV.MASTERY_SCALE.outcome_proficiency.ratings
+    @set {
+      ratings: ratings
+      mastery_points: _.find(ratings, (r) => r.mastery).points
+      points_possible: Math.max(_.map(ratings, (r) -> r.points)...)
+    }
+
   defaultCalculationInt: -> {
     n_mastery: 5
     decaying_average: 65
@@ -43,6 +51,7 @@ export default class Outcome extends Backbone.Model
 
   initialize: ->
     @setDefaultCalcSettings() unless @get('calculation_method')
+    @setMasteryScales() if ENV.ACCOUNT_LEVEL_MASTERY_SCALES && ENV.MASTERY_SCALE?.outcome_proficiency
     @on 'change:calculation_method', (model, changedTo) =>
       model.set calculation_int: @defaultCalculationInt()
     super
