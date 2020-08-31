@@ -1363,6 +1363,7 @@ class ApplicationController < ActionController::Base
         @accessed_asset = {
           :user => user,
           :code => code,
+          :asset_for_root_account_id => asset.is_a?(Array) ? asset[1] : asset,
           :group_code => group_code,
           :category => asset_category,
           :membership_type => membership_type,
