@@ -121,7 +121,6 @@ class Course < ActiveRecord::Base
   include RubricContext
 
   has_many :course_account_associations
-  has_many :non_unique_associated_accounts, -> { order('course_account_associations.depth') }, source: :account, through: :course_account_associations
   has_many :users, -> { distinct }, through: :enrollments, source: :user
   has_many :all_users, -> { distinct }, through: :all_enrollments, source: :user
   has_many :current_users, -> { distinct }, through: :current_enrollments, source: :user
@@ -642,7 +641,6 @@ class Course < ActiveRecord::Base
           did_an_update ||= !current_course_associations.empty?
           if did_an_update
             course.course_account_associations.reset
-            course.non_unique_associated_accounts.reset
             course_ids_to_update_user_account_associations << course.id
           end
         end
@@ -671,11 +669,23 @@ class Course < ActiveRecord::Base
   def associated_accounts
     Rails.cache.fetch_with_batched_keys("associated_accounts", batch_object: self, batched_keys: :account_associations) do
       Shackles.activate(:master) do
-        if association(:course_account_associations).loaded? && !association(:non_unique_associated_accounts).loaded?
-          accounts = course_account_associations.map(&:account).uniq
-        else
-          accounts = self.non_unique_associated_accounts.to_a.uniq
-        end
+        accounts = if association(:course_account_associations).loaded?
+            course_account_associations.map(&:account).uniq
+          else
+            shard.activate do
+              Account.find_by_sql(<<-SQL)
+                WITH depths AS (
+                  SELECT account_id, MIN(depth)
+                  FROM #{CourseAccountAssociation.quoted_table_name}
+                  WHERE course_id=#{id}
+                  GROUP BY account_id
+                )
+                SELECT accounts.*
+                FROM #{Account.quoted_table_name} INNER JOIN depths ON accounts.id=depths.account_id
+                ORDER BY min
+              SQL
+            end
+          end
         accounts << self.account if account_id && !accounts.find { |a| a.id == account_id }
         accounts << self.root_account if root_account_id && !accounts.find { |a| a.id == root_account_id }
         accounts
