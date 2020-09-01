@@ -21,6 +21,8 @@ require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
   before do
+    skip 'DEMO-32 (9/1/2020)'
+
     @account = Account.create!
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
