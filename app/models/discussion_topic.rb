@@ -525,7 +525,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def bulk_insert_new_participants(new_entry_ids, current_user, update_fields)
     records = new_entry_ids.map do |entry_id|
-      { discussion_entry_id: entry_id, user_id: current_user.id }.merge(update_fields)
+      { discussion_entry_id: entry_id, user_id: current_user.id, root_account_id: self.root_account_id}.merge(update_fields)
     end
     DiscussionEntryParticipant.bulk_insert(records)
   end
