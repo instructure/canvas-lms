@@ -174,7 +174,7 @@ module AccountReports
             LEFT JOIN #{Submission.quoted_table_name} sub ON sub.assignment_id = a.id
               AND sub.user_id = pseudonyms.user_id AND sub.workflow_state <> 'deleted'
               AND sub.workflow_state <> 'unsubmitted'", parameters])).
-          where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
+        where("ct.tag_type = 'learning_outcome' AND ct.workflow_state <> 'deleted'
             AND (r.id IS NULL OR (r.artifact_type IS NOT NULL AND r.artifact_type <> 'Submission'))")
 
       unless @include_deleted
@@ -208,9 +208,7 @@ module AccountReports
           COALESCE(qr.attempt, r.attempt)             AS "attempt",
           r.hide_points                               AS "learning outcome points hidden",
           COALESCE(qr.score, r.score)                 AS "outcome score",
-          CASE WHEN r.association_type IN ('Quiz', 'Quizzes::Quiz') THEN r.percent
-               ELSE NULL
-          END                                         AS "total percent outcome score",
+          r.percent                                   AS "total percent outcome score",
           c.name                                      AS "course name",
           c.id                                        AS "course id",
           c.sis_source_id                             AS "course sis id",
@@ -315,26 +313,60 @@ module AccountReports
       end
     end
 
+    def proficiency(course)
+      result = {}
+      proficiency = course.resolved_outcome_proficiency
+      ratings = proficiency_ratings(proficiency)
+      result[:mastery_points] = ratings.find {|rating| rating[:mastery] }[:points]
+      result[:points_possible] = ratings.first[:points]
+      result[:ratings] = ratings
+      result
+    end
+
+    def proficiency_ratings(proficiency)
+      proficiency.outcome_proficiency_ratings.map do |rating_obj|
+        convert_rating(rating_obj)
+      end
+    end
+
+    def convert_rating(rating_obj)
+      {
+          description: rating_obj.description,
+          points: rating_obj.points,
+          mastery: rating_obj.mastery
+      }
+    end
+
     def add_outcomes_data(row)
       row['learning outcome mastered'] = unless row['learning outcome mastered'].nil?
                                            row['learning outcome mastered'] ? 1 : 0
       end
-      outcome_data = if row['learning outcome data'].present?
-                       YAML.safe_load(row['learning outcome data'])[:rubric_criterion]
-                     else
-                       LearningOutcome.default_rubric_criterion
-      end
-      row['learning outcome mastery score'] = outcome_data[:mastery_points]
 
-      score = row['outcome score']
+      course = Course.find(row['course id'])
+      outcome_data = if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales) && course.resolved_outcome_proficiency.present?
+                       proficiency(course)
+                     elsif row['learning outcome data'].present?
+                         YAML.safe_load(row['learning outcome data'])[:rubric_criterion]
+                     else
+                         LearningOutcome.default_rubric_criterion
+      end
+
+
+      row['learning outcome mastery score'] = outcome_data[:mastery_points]
+      total_percent = row['total percent outcome score']
+      if total_percent.present?
+        points_possible = outcome_data[:points_possible]
+        points_possible = outcome_data[:mastery_points] if points_possible.zero?
+        score = points_possible * total_percent
+      else
+        score = if row['outcome score'].nil? || row['learning outcome points possible'].nil?
+            nil
+        else
+            outcome_data[:points_possible] * (row['outcome score'] / row['learning outcome points possible'])
+        end
+      end
       if score.present?
         ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
-        total_percent = row['total percent outcome score']
-        if total_percent
-          points_possible = outcome_data[:points_possible]
-          points_possible = outcome_data[:mastery_points] if points_possible.zero?
-          score = points_possible * total_percent
-        end
         rating = ratings.detect { |r| r[:points] <= score } || {}
         row['learning outcome rating'] = rating[:description]
 
