@@ -108,13 +108,13 @@ def cleanupFn(status) {
 }
 
 def postFn(status) {
-  if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
+  if(status == 'FAILURE' && configuration.isChangeMerged()) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
     def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
     slackSend(
-      channel: '#canvas_builds',
+      channel: getSlackChannel(),
       color: 'danger',
       message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
     )
@@ -137,9 +137,10 @@ def getPluginVersion(plugin) {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
 }
 
-def isPatchsetSlackableOnFailure() {
-  return env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
+def getSlackChannel() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
+
 // =========
 
 pipeline {
