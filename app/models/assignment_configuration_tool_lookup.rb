@@ -22,7 +22,6 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
 
   belongs_to :tool, polymorphic: [:context_external_tool, message_handler: 'Lti::MessageHandler']
   belongs_to :assignment
-  after_create :create_subscription
   # Do not add before_destroy or after_destroy, these records are "delete_all"ed
 
   class << self
@@ -56,31 +55,6 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
         # tools from working (if some course-level ACTLs as "Account")
       )
     end
-
-    def recreate_missing_subscriptions(account, message_handler)
-      Rails.logger.info do
-        "in: AssignmentConfigurationToolLookup::recreate_missing_subscriptions,"\
-        "account_id: #{account.id}, handler_id: #{message_handler.id}"
-      end
-      Assignment.active.where(
-        context_id: Course.not_deleted.where(root_account: account).pluck(:id)
-      ).find_in_batches do |assignments|
-        recreate_subscriptions(message_handler, assignments)
-      end
-    end
-
-    private
-
-    def recreate_subscriptions(message_handler, assignments)
-      Rails.logger.info do
-        "in: AssignmentConfigurationToolLookup::recreate_subscriptions, "\
-        "handler_id: #{message_handler.id}, assignments_size: #{assignments.count}"
-      end
-      by_message_handler(message_handler, assignments).each do |lookup|
-        lookup.destroy_subscription
-        lookup.create_subscription
-      end
-    end
   end
 
   def lti_tool
@@ -98,13 +72,6 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
     end
   end
 
-  def destroy_subscription
-    Rails.logger.info { "in: AssignmentConfigurationToolLookup::destroy_subscription, tool_lookup_id: #{id}" }
-    return unless lti_tool.instance_of? Lti::MessageHandler
-    tool_proxy = lti_tool.resource_handler.tool_proxy
-    Lti::AssignmentSubscriptionsHelper.new(tool_proxy).destroy_subscription(subscription_id)
-  end
-
   def resource_codes
     if tool_type == 'Lti::MessageHandler' && tool_id.blank?
       return {
@@ -116,12 +83,5 @@ class AssignmentConfigurationToolLookup < ActiveRecord::Base
       return lti_tool.resource_codes
     end
     {}
-  end
-
-  def create_subscription
-    return unless lti_tool.instance_of? Lti::MessageHandler
-    tool_proxy = lti_tool.resource_handler.tool_proxy
-    subscription_helper = Lti::AssignmentSubscriptionsHelper.new(tool_proxy, assignment)
-    self.update(subscription_id: subscription_helper.create_subscription)
   end
 end

@@ -763,7 +763,6 @@ describe ContentMigration do
       end
 
       before do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) do
           Lti::ToolProxy.where(id: tool_proxy.id)
         end

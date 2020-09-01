@@ -25,12 +25,12 @@ module Lti
     class << self
       def delete_subscriptions(tool_proxy)
         Rails.logger.info { "in: ToolProxyService::delete_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
-        self.new.delete_subscriptions_for(tool_proxy)
+        tool_proxy.delete_subscription
       end
 
       def recreate_missing_subscriptions(tool_proxy)
         Rails.logger.info { "in: ToolProxyService::recreate_missing_subscriptions, tool_proxy_id: #{tool_proxy.id}" }
-        tool_proxy&.message_handlers&.each(&:recreate_missing_subscriptions)
+        tool_proxy.manage_subscription
       end
     end
 
@@ -79,23 +79,6 @@ module Lti
         tc_half_secret + tp_half_secret
       else
         security_contract.shared_secret
-      end
-    end
-
-    def delete_subscriptions_for(tool_proxy)
-      Rails.logger.info { "in: ToolProxyService::delete_subscriptions_for, tool_id: #{tool_proxy.id}" }
-      product_family = tool_proxy.product_family
-      subscription_helper = AssignmentSubscriptionsHelper.new(tool_proxy)
-      lookups = AssignmentConfigurationToolLookup.where(tool_product_code: product_family.product_code,
-                                                        tool_vendor_code: product_family.vendor_code,
-                                                        context_type: tool_proxy.context_type)
-
-      lookups.each do |l|
-        subscription_helper.send_later_enqueue_args(
-          :destroy_subscription,
-          { n_strand: AssignmentConfigurationToolLookup::SUBSCRIPTION_MANAGEMENT_STRAND },
-          l.subscription_id
-        )
       end
     end
 

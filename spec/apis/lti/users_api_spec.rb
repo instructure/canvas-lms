@@ -42,8 +42,6 @@ module Lti
     end
 
     before do
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
       message_handler.update(capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2])
       tool_proxy.raw_data['security_contract']['tool_service'] = authorized_services
       tool_proxy.save!
