@@ -2871,13 +2871,9 @@ class User < ActiveRecord::Base
   end
 
   def adminable_accounts
-    @adminable_accounts ||= shard.activate do
-      Rails.cache.fetch(['adminable_accounts', self, ApplicationController.region].cache_key) do
-        Account.shard(self).active.joins(:account_users).
-          where(account_users: {user_id: self.id}).
-          where.not(account_users: {workflow_state: 'deleted'})
-      end
-    end
+    @adminable_accounts ||= Account.active.joins(:account_users).
+                              where(account_users: {user_id: self.id}).
+                              where.not(account_users: {workflow_state: 'deleted'})
   end
 
   def all_paginatable_accounts
