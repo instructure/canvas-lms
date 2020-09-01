@@ -21,6 +21,12 @@ class Auditors::GradeChange
   # that won't successfully "join" to any other tables.
   NULL_PLACEHOLDER = 0
 
+  # This is a "dummy assignment" that we use to look up override grade changes in
+  # Cassandra, since it stores them with the placeholder assignment ID above.
+  # If we're querying ActiveRecord, we swap this out for an actual IS NULL
+  # query instead.
+  COURSE_OVERRIDE_ASSIGNMENT = OpenStruct.new(id: NULL_PLACEHOLDER, global_id: NULL_PLACEHOLDER).freeze
+
   OverrideGradeChange = Struct.new(:grader, :old_grade, :old_score, :score, keyword_init: true)
 
   class Record < Auditors::Record
@@ -204,18 +210,14 @@ class Auditors::GradeChange
     delegate :root_account, to: :account
   end
 
-  # This method in its current form is temporary to make sure that we don't ever return
-  # override grade changes to the caller from Postgres, even though we record them.
   def self.filter_by_assignment(conditions)
-    # No need to change anything if an assignment ID was specified
-    return conditions if conditions[:assignment_id].present?
+    # If we're not specifically searching for override grades, this query is
+    # fine as is.
+    return conditions unless conditions[:assignment_id] == Auditors::GradeChange::NULL_PLACEHOLDER
 
-    # If the final grade override feature flag is enabled, no need to restrict
-    # results further
-    return conditions if Auditors::GradeChange.return_override_grades?
-
-    # If the flag is not enabled, make sure we don't return override grades
-    ["assignment_id IS NOT NULL", conditions.except(:assignment_id)]
+    # If we *are* specifically searching for override grades, swap out the
+    # placeholder ID for a real NULL check.
+    ["assignment_id IS NULL", conditions.except(:assignment_id)]
   end
 
   # rubocop:disable Metrics/BlockLength

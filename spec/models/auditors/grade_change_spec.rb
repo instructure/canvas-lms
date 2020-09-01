@@ -361,20 +361,13 @@ describe Auditors::GradeChange do
       end
     end
 
-    it "returns override grade changes if the final_grade_override_in_gradebook_history flag is enabled" do
-      Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+    it "returns override grade changes in results" do
       Auditors::GradeChange.record(override_grade_change: override_grade_change)
 
       expect(course_grade_changes.count).to eq 1
     end
 
-    it "does not return override grade changes if the final_grade_override_in_gradebook_history flag is not enabled" do
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
-
-      expect(course_grade_changes).to be_empty
-    end
-
-    it "stores override grade changes in the database even if the flag is not enabled" do
+    it "stores override grade changes in the database" do
       expect {
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
       }.to change {
