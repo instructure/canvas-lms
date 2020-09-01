@@ -312,7 +312,7 @@ module SeleniumDriverSetup
     def desired_capabilities
       case browser
       when :firefox
-        # TODO: options for firefox driver
+        caps = Selenium::WebDriver::Remote::Capabilities.firefox
       when :chrome
         caps = Selenium::WebDriver::Remote::Capabilities.chrome
         caps['goog:chromeOptions'] = {
