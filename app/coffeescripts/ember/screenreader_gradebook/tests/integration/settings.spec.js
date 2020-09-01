@@ -39,13 +39,13 @@ QUnit.module('global settings', {
 
 test('student names are hidden', () => {
   const selection = '#student_select option[value=1]'
-  equal($(selection).text(), 'Bob')
+  equal($(selection).text(), 'Barnes, Bob')
   return click('#hide_names_checkbox').then(() => {
     $(selection)
       .text()
       .search('Student') !== -1
     return click('#hide_names_checkbox').then(() => {
-      equal($(selection).text(), 'Bob')
+      equal($(selection).text(), 'Barnes, Bob')
     })
   })
 })

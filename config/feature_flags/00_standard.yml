@@ -144,16 +144,6 @@ allow_opt_out_of_inbox:
       on the Inbox, and hide the Conversation's notification preferences.
   applies_to: RootAccount
   root_opt_in: true
-gradebook_list_students_by_sortable_name:
-  state: allowed
-  display_name:
-    features.gradebook_list_students_by_sortable_name: Gradebook - List Students by
-      Sortable Name
-  description:
-    enable_gradebook_list_students_by_sortable_name: List students by their sortable
-      names in the Gradebook. Sortable name defaults to 'Last Name, First Name' and
-      can be changed in settings.
-  applies_to: Course
 lti2_rereg:
   state: hidden
   display_name: LTI 2 Reregistration

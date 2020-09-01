@@ -93,14 +93,14 @@ describe "Screenreader Gradebook" do
     simple_grade
     SRGB.visit(@course.id)
 
-    student_dropdown_options = ['No Student Selected', @students[0].name, @students[1].name]
+    student_dropdown_options = ['No Student Selected', @students[0].sortable_name, @students[1].sortable_name]
     expect(get_options('#student_select').map(&:text)).to eq student_dropdown_options
 
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     assignment_points = ["(#{@grade_array[0]} / 20)", "(#{@grade_array[2]} / 20)"]
     expect(ff('#student_information .assignment-subtotal-grade .points').map(&:text)).to eq assignment_points
 
-    click_option '#student_select', @students[1].name
+    click_option '#student_select', @students[1].sortable_name
     assignment_points = ["(#{@grade_array[1]} / 20)", "(#{@grade_array[3]} / 20)"]
     expect(ff('#student_information .assignment-subtotal-grade .points').map(&:text)).to eq assignment_points
   end
@@ -210,7 +210,7 @@ describe "Screenreader Gradebook" do
     user_session @teacher
     SRGB.visit(@course.id)
     click_option '#assignment_select', assignment.name
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     expect(f('p.resubmitted')).to be_displayed
 
     replace_content f('#student_and_assignment_grade'), "15\t"
@@ -233,7 +233,7 @@ describe "Screenreader Gradebook" do
     f('.canvas_1 .slick-row .slick-cell .grade').send_keys grades[0], :return
 
     SRGB.visit(@course.id)
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     click_option '#assignment_select', a1.name
     expect(f('#student_and_assignment_grade')).to have_value grades[0]
     expect(f('#student_information .total-grade')).to include_text "75% (#{grades[0]} / 20 points)"
@@ -250,7 +250,7 @@ describe "Screenreader Gradebook" do
     assignment.unmute!
     SRGB.visit(@course.id)
 
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
     fj('.ui-dialog:visible [data-action="mute"]').click
@@ -265,7 +265,7 @@ describe "Screenreader Gradebook" do
     assignment.mute!
     SRGB.visit(@course.id)
 
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     click_option '#assignment_select', assignment.name
     f('#assignment_muted_check').click
     fj('.ui-dialog:visible [data-action="unmute"]').click
@@ -296,7 +296,7 @@ describe "Screenreader Gradebook" do
     assignment.grade_student(@students[1], grade: 5, grader: @teacher)
 
     SRGB.visit(@course.id)
-    click_option '#student_select', @students[0].name
+    click_option '#student_select', @students[0].sortable_name
     click_option '#assignment_select', assignment.name
     expect(f('#assignment_information p:nth-of-type(2)')).to include_text 'Graded submissions: 2'
     expect(ff('#assignment_information table td').map(&:text)).to eq ['20', '10', '15', '5']

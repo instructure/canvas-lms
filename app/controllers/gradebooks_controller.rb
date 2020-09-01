@@ -568,7 +568,6 @@ class GradebooksController < ApplicationController
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
-      list_students_by_sortable_name_enabled: @context.list_students_by_sortable_name?,
       login_handle_name: @context.root_account.settings[:login_handle_name],
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       new_post_policy_icons_enabled: @context.root_account.feature_enabled?(:new_post_policy_icons),

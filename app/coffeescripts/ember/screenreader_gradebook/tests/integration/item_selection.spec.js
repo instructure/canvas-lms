@@ -41,7 +41,7 @@ const checkText = (selector, expectedText) =>
 function studentSectionAssertions(selected, currentIndex, expectedIndex) {
   equal(currentIndex, expectedIndex)
   checkSelection(selected.id, '#student_select')
-  return checkSelectedText(selected.name, '#student_select')
+  return checkSelectedText(selected.sortable_name, '#student_select')
 }
 
 QUnit.module('screenreader_gradebook student/assignment navigation: on page load', {
@@ -100,7 +100,7 @@ QUnit.module('screenreader_gradebook student/assignment navigation: with first i
 test('Previous buttons are disabled', () => {
   buttonDisabled('.student_navigation .previous_object:first', true)
   buttonDisabled('.assignment_navigation .previous_object', true)
-  checkText('.student_selection', 'Bob')
+  checkText('.student_selection', 'Bob Barnes')
   return checkText('.assignment_selection', 'Z Eats Soup')
 })
 
@@ -461,7 +461,7 @@ test('maintains selectedStudent when student is in both sections and updates nav
     buttonDisabled('.student_navigation .next_object:first', false)
 
     const selected = this.controller.get('selectedStudent')
-    checkSelectedText(selected.name, '#student_select')
+    checkSelectedText(selected.sortable_name, '#student_select')
     checkSelectedText(this.controller.get('selectedSection.name'), '#section_select')
 
     // position in selected dropdown
@@ -477,7 +477,7 @@ test('maintains selectedStudent when student is in both sections and updates nav
     buttonDisabled('.student_navigation .next_object:first', false)
 
     const newSelected = this.controller.get('selectedStudent')
-    checkSelectedText(newSelected.name, '#student_select')
+    checkSelectedText(newSelected.sortable_name, '#student_select')
     checkSelectedText(this.controller.get('selectedSection.name'), '#section_select')
     equal(selected, newSelected)
 

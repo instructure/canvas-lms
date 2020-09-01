@@ -3373,10 +3373,6 @@ class Course < ActiveRecord::Base
     self.clear_cache_key(:account_associations) if saved_change_to_root_account_id? || saved_change_to_account_id?
   end
 
-  def list_students_by_sortable_name?
-    feature_enabled?(:gradebook_list_students_by_sortable_name)
-  end
-
   def refresh_content_participation_counts(_progress)
     content_participation_counts.each(&:refresh_unread_count)
   end

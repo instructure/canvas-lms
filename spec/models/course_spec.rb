@@ -2017,17 +2017,7 @@ describe Course, "gradebook_to_csv" do
       test_student_enrollment.save!
     end
 
-    it "should alphabetize by sortable name with the test student at the end" do
-      csv = GradebookExporter.new(@course, @teacher).to_csv
-      rows = CSV.parse(csv)
-      expect([rows[2][0],
-       rows[3][0],
-       rows[4][0],
-       rows[5][0]]).to eq ["Zed Zed", "Aardvark Aardvark", "Ned Ned", "Test Student"]
-    end
-
-    it "can show students by sortable name" do
-      @course.enable_feature! :gradebook_list_students_by_sortable_name
+    it "alphabetizes by sortable name with the test student at the end" do
       csv = GradebookExporter.new(@course, @teacher).to_csv
       rows = CSV.parse(csv)
       expect([rows[2][0],

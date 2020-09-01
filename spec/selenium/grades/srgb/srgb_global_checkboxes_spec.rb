@@ -57,7 +57,7 @@ describe "Screenreader Gradebook" do
   it 'shows conluded enrollments', priority: "2", test_id: 615674 do
     srgb_page.concluded_enrollments.click
     wait_for_ajaximations
-    expect(srgb_page.student_dropdown).to include_text('Concluded Student')
+    expect(srgb_page.student_dropdown).to include_text('Student, Concluded')
   end
 
   it 'shows notes in student info', priority: "2", test_id: 615675 do
