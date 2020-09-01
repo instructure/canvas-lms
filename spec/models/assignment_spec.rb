@@ -1110,11 +1110,6 @@ describe Assignment do
 
     let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
 
-    before do
-      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
-    end
-
     it 'returns a hash of three identifying lti codes' do
       assignment.tool_settings_tool = message_handler
       assignment.save!
@@ -1124,11 +1119,6 @@ describe Assignment do
 
   describe '#tool_settings_tool_name' do
     let(:assignment) { Assignment.create!(name: 'assignment with tool settings', context: course) }
-
-    before do
-      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
-    end
 
     it 'returns the name of the tool proxy' do
       expected_name = 'test name'
@@ -1151,14 +1141,6 @@ describe Assignment do
   end
 
   describe '#tool_settings_tool=' do
-    let(:stub_response){ double(code: 200, body: {}.to_json, parsed_response: {'Id' => 'test-id'}, ok?: true) }
-    let(:subscription_helper){ class_double(Lti::AssignmentSubscriptionsHelper).as_stubbed_const }
-    let(:subscription_helper_instance){ double(destroy_subscription: true, create_subscription: true) }
-
-    before(:each) do
-      allow(subscription_helper).to receive_messages(new: subscription_helper_instance)
-    end
-
     it "should allow ContextExternalTools through polymorphic association" do
       setup_assignment_with_homework
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
@@ -1167,19 +1149,8 @@ describe Assignment do
       expect(@assignment.tool_settings_tool).to eq(tool)
     end
 
-    it 'destroys subscriptions when they exist' do
-      setup_assignment_with_homework
-      expect(subscription_helper_instance).to receive(:destroy_subscription)
-      course.assignments << @assignment
-      @assignment.tool_settings_tool = message_handler
-      @assignment.save!
-      @assignment.tool_settings_tool = nil
-      @assignment.save!
-    end
-
     it "destroys tool unless tool is 'ContextExternalTool'" do
       setup_assignment_with_homework
-      expect(subscription_helper_instance).not_to receive(:destroy_subscription)
       tool = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
       @assignment.tool_settings_tool = tool
       @assignment.save!
@@ -1317,10 +1288,8 @@ describe Assignment do
 
       let(:assignment) { assignment_model }
       let(:lookup) { assignment.assignment_configuration_tool_lookups.first }
-      let(:subscription_helper) { double(create_subscription: SecureRandom.uuid) }
 
       before do
-        allow(Lti::AssignmentSubscriptionsHelper).to receive(:new).and_return(subscription_helper)
         assignment.assignment_configuration_tool_lookups.create!(
           context_type: 'Account',
           tool_vendor_code: product_family.vendor_code,
