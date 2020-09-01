@@ -112,11 +112,23 @@ def postFn(status) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
+    def authorSegment = authorSlackMsg ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
     slackSend(
       channel: getSlackChannel(),
       color: 'danger',
-      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>)"
+    )
+  }
+}
+
+def maybeSlackSendRetrigger() {
+  def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
+
+  if(userCause && userCause[0].shortDescription.contains('Retriggered')) {
+    slackSend(
+      channel: getSlackChannel(),
+      color: 'warning',
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> was re-triggered by ${env.GERRIT_EVENT_ACCOUNT_EMAIL}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
     )
   }
 }
@@ -205,6 +217,11 @@ pipeline {
           if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
             error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
             return
+          }
+
+          // Report retriggers to Slack
+          if(configuration.isChangeMerged()) {
+            maybeSlackSendRetrigger()
           }
 
           // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
