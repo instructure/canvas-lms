@@ -181,8 +181,6 @@ module AccountReports
         headers << I18n.t('%{name} unposted current score', name: gp.title)
         headers << I18n.t('%{name} unposted final score', name: gp.title)
         headers << I18n.t('%{name} override score', name: gp.title) if include_override_score?
-
-        next unless include_grading_scheme_values?
         headers << I18n.t('%{name} current grade', name: gp.title)
         headers << I18n.t('%{name} final grade', name: gp.title)
         headers << I18n.t('%{name} unposted current grade', name: gp.title)
@@ -317,10 +315,6 @@ module AccountReports
       @account.feature_allowed?(:final_grades_override)
     end
 
-    def include_grading_scheme_values?
-      @account.root_account.feature_enabled?(:add_grading_scheme_to_admin_grade_reports)
-    end
-
     def grading_field_headers
       headers = []
 
@@ -330,14 +324,11 @@ module AccountReports
       headers << I18n.t("unposted current score")
       headers << I18n.t("unposted final score")
       headers << I18n.t("override score") if include_override_score?
-
-      if include_grading_scheme_values?
-        headers << I18n.t("current grade")
-        headers << I18n.t("final grade")
-        headers << I18n.t("unposted current grade")
-        headers << I18n.t("unposted final grade")
-        headers << I18n.t("override grade") if include_override_score?
-      end
+      headers << I18n.t("current grade")
+      headers << I18n.t("final grade")
+      headers << I18n.t("unposted current grade")
+      headers << I18n.t("unposted final grade")
+      headers << I18n.t("override grade") if include_override_score?
 
       headers
     end
@@ -354,14 +345,11 @@ module AccountReports
       fields << student["unposted_current_score"]
       fields << student["unposted_final_score"]
       fields << student["override_score"] if include_override_score?
-
-      if include_grading_scheme_values?
-        fields << course&.score_to_grade(student["current_score"])
-        fields << course&.score_to_grade(student["final_score"])
-        fields << course&.score_to_grade(student["unposted_current_score"])
-        fields << course&.score_to_grade(student["unposted_final_score"])
-        fields << course&.score_to_grade(student["override_score"]) if include_override_score?
-      end
+      fields << course&.score_to_grade(student["current_score"])
+      fields << course&.score_to_grade(student["final_score"])
+      fields << course&.score_to_grade(student["unposted_current_score"])
+      fields << course&.score_to_grade(student["unposted_final_score"])
+      fields << course&.score_to_grade(student["override_score"]) if include_override_score?
 
       fields
     end
@@ -373,8 +361,6 @@ module AccountReports
       fields << scores_for_student[:unposted_current_score]
       fields << scores_for_student[:unposted_final_score]
       fields << scores_for_student[:override_score] if include_override_score?
-
-      return fields unless include_grading_scheme_values?
 
       # scores_for_student is either an ersatz Score object (with the expected
       # methods but only a subset of fields) or an empty hash (if we're looking

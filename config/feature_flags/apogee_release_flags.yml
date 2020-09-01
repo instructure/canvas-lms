@@ -5,11 +5,6 @@ new_post_policy_icons:
   description: Updates the display of Post Policy icons in the New Gradebook
     assignment column header.
   applies_to: RootAccount
-add_grading_scheme_to_admin_grade_reports:
-  state: hidden
-  display_name: Add Grading Scheme to Admin Grade Reports
-  description: Includes grade values in the admin grade reports.
-  applies_to: RootAccount
 analytics2_api_access:
   state: hidden
   applies_to: RootAccount
