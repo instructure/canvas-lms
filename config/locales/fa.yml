@@ -2037,6 +2037,7 @@ fa:
   an_error_occurred_while_migrating_405ac0b5: "در هنگام انتقال، خطایی رخ داد."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "هنگام ذخیره سازی رتبه بندی های مهارت حساب خطایی روی داد"
   an_error_occurred_while_saving_associations_bd66f3f4: "هنگام ذخیره سازی انجمن ها خطایی رخ داد"
+  an_error_occurred_while_saving_the_course_post_pol_b48976dc: "هنگام ذخیره کردن سیاست ارسال درس خطایی روی داد."
   an_error_occurred_while_saving_your_settings_b503a31c: "هنگام ذخیره تنظیمات شما خطایی روی داد"
   an_error_occurred_while_starting_migration_8e6015e2: "هنگام شروع انتقال خطایی رخ داد"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "هنگام به روزرسانی وضعیت اطلاعیه‌های قفل شده ، خطایی رخ داد."
@@ -4253,6 +4254,8 @@ fa:
   click_to_test_dropdown_b950974d: "برای آزمایش منوی بازشونده کلیک کنید"
   click_to_view_event_details_b25dc1f3: "برای مشاهده اطلاعات رویداد کلیک کنید"
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "با کلیک کردن روی عنوان ستون ها، ردیف ها بر اساس آن ستون مرتب خواهند شد."
+  clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "با کلیک بر روی کادر بررسی، جدول محدوده‌ها در زیر آشکار می شود."
+  clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "با کلیک بر روی کادر بررسی، جدول محدوده‌ها در زیر ناپدید می شود."
   client_id_cb2502af: "شناسه سرویس گیرنده"
   client_id_is_required_1afd54d1: "شناسه سرویس گیرنده لازم است"
   clone_group_set_c2a40e15: "کپی کردن مجموعه گروه"
@@ -5496,6 +5499,10 @@ fa:
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "قادر به یافتن عنوان های ورود CSV کانواس نیست"
   couldn_t_generate_diff_message_a0528b20: "امکان ایجاد diff: %{message} وجود ندارد"
   couldn_t_update_standards_for_authority_auth_81206187: "امکان بهنگام سازی استانداردها برای مرجع %{auth} وجود ندارد"
+  count_alignments_40fbc23c: 
+    one: "%{count} تطبیق"
+    other: "%{count} تطبیق"
+    zero: "بدون تطبیق"
   count_announcements_found_b7b055b3: "%{count} اطلاعیه یافت شد."
   count_apps_found_f4d86860: "%{count} برنامه یافت شد"
   count_assignments_found_17520826: 
@@ -5603,6 +5610,9 @@ fa:
     one: "%{count} مورد ارسالی به نمره گذاری نیاز دارد"
     other: "%{count} مورد ارسالی به نمره گذاری نیاز دارد"
   count_type_would_be_deleted_and_exceeds_the_set_th_19dc538d: "%{count}%{type} حذف خواهد شد و از آستانه تعیین شده %{change_threshold} فراتر می‌رود"
+  count_unread_messages_99d6bf17: 
+    one: "1 پیام خوانده نشده"
+    other: "%{count}پیام خوانده نشده."
   count_unread_replies_86976ab: "%{count} پاسخ خوانده نشده"
   count_unsynced_changes_1fc147e5: "%{count} تغییر همگام نشده"
   count_users_374d6e47: "(%{count} کاربر)"
@@ -6627,6 +6637,7 @@ fa:
         ratio: "نسبت دانشجویانی که اشتباه پاسخ داده اند"
   csv_de77e441: CSV
   csv_file_8061540e: "فایل CSV"
+  csv_or_json_formats_only_d8ba36d: "تنها فرمت‌های CSV یا JSON "
   current_367624e9: فعلی
   current_courses_d5287d50: "درس های فعلی"
   current_grading_scheme_for_this_assignment_d525463e: "طرح نمره گذاری فعلی برای این درس"
@@ -8889,8 +8900,11 @@ fa:
   grade_low_to_high_1678b713: "نمره - کم به زیاد"
   grade_out_of_percentage_1972bf52: "نمره از %{percentage}"
   grade_out_of_points_d401b79d: "نمره از %{points}"
+  grade_percentage_for_missing_submissions_dc7ccac: "درصد نمره برای موارد  ارسالی از دست رفته"
   grade_point_average_2976cc59: "متوسط امتیاز نمره"
   grade_posting_policy_42c8a94b: "سیاست ارسال نمره"
+  grade_posting_policy_name_a6d6f178: "سیاست ارسال نمره: %{name}"
+  grade_posting_policy_tray_c929cfd: "سیاست ارسال سینی نمره"
   grade_saved_ab539b53: "نمره ذخیره شد."
   grade_selection_table_dcf9d1ea: "جدول انتخاب نمره"
   grade_summary: 
@@ -9541,6 +9555,7 @@ fa:
   grades_view_change_logs_6bc1b959: "نمره‌ها - مشاهده تغییرات گزارش‌‌ها"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "نمرات با موفقیت در دفتر نمره  منتشر شدند."
   grades_will_be_made_visible_to_all_students_1cc4d67e: "نمرات برای همه دانشجویان قابل مشاهده خواهد بود"
+  grades_will_be_made_visible_to_students_with_grade_d83028d5: "نمرات برای دانشجویانی با  موارد ارسالی نمره گذاری شده، قابل مشاهده خواهد بود."
   gradezilla: 
     alerts: 
       scores_updated: 
@@ -9713,6 +9728,7 @@ fa:
   group_group_name_is_for_a_different_section_4d84d256: "گروه %{group_name} برای یک بخش دیگر است"
   group_group_name_is_full_297880d6: "گروه %{group_name} تکمیل شده است"
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: "فقط از طریق دعوت نامه می توان به گروه %{group_name} پیوست"
+  group_group_name_is_not_available_at_this_time_971001c1: "گروه %{group_name} در این زمان فعال نیست. "
   group_guid_has_already_appeared_in_this_import_78f35ff3: "گروه \"%{guid}\" قبلاً در این ورود ظاهر شده است."
   group_is_for_a_different_section_6a843a4d: "گروه برای یک بخش دیگر است"
   group_is_full_56849d78: "گروه تکمیل شده است"
@@ -10390,6 +10406,7 @@ fa:
   import_a_set_of_outcomes_6b782192: "مجموعه‌ای از نتایج را وارد کنید."
   import_content_b2fd6620: "وارد کردن محتوا"
   import_learning_outcomes_36d28a2b: "وارد کردن نتایج یادگیری"
+  import_outcomes_7dda186b: "نتایج را وارد کنید"
   import_sis_data_428cc803: "وارد کردن داده های سامانه اطلاعات دانشجو"
   import_status_b147bd27: "وضعیت ورود"
   import_tutorial_tray_8b92e956: "ورود سینی خودآموز"
@@ -10462,6 +10479,7 @@ fa:
   india_91_6c290107: "هند (+91)"
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "تصویر را فقط برای اهداف تزیینی نشان می دهد و نباید توسط صفحه خوان ها خوانده شود"
   indigo_2035fc55: Indigo
+  individual_assignment_grade_posting_d8322b99: "ارسال نمره تکلیف انفرادی"
   individual_view_81c2f124: "نمای منفرد"
   individual_view_d60b9132: "نمای منفرد"
   indonesia_62_4c35bd62: "اندونزی (+62)"
@@ -11354,6 +11372,7 @@ fa:
   marked_done_9fd646f: "به عنوان انجام شده علامت گذاری شد"
   masquerade_as_name_8bb004c5: "ورود به عنوان %{name}"
   master_lock_590266b6: "قفل اصلی"
+  mastered_34d4c857: مسلط
   mastery_7ec348b5: تسلط
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "تسلط:  %{n_mastery_points_precision_2_str} امتیاز"
   mastery_path_processing_f4471152: "پردازش مسیر تسلط"
@@ -13893,6 +13912,7 @@ fa:
   not_graded_e78bcd50: "نمره گذاری نشده"
   not_graded_yet_82f63c67: "هنوز نمره گذاری نشده است."
   not_installed_37a21a76: "نصب نشده"
+  not_mastered_5c2f9968: "مسلط نیست"
   not_published_73f7079: "منتشر نشده"
   not_signed_47acf472: "امضا نشده"
   not_starred_no_subject_click_to_star_adfefe93: "ستاره‌دار نیست \"(بدون موضوع)\"، برای ستاره‌دار کردن کلیک کنید."
@@ -15270,6 +15290,7 @@ fa:
       GradingAssignment، GradingAssignmentScore را می پذیرد، ارسال نمایند.
   post_grades_to_sis_97ece878: "ارسال نمره ها به سامانه اطلاعات دانشجو"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "«ارسال نمره ها به سامانه اطلاعات دانشجو» به طور پیش فرض برای تکلیف ها، بحث های نمره گذاری شده و آزمون ها فعال شده است"
+  post_grades_tray_83f2fb2e: "ارسال سینی نمره ها"
   post_or_hide_grades_2d1d7815: "ارسال یا پنهان کردن نمره‌ها"
   post_to_961f8937: "ارسال به"
   post_to_students_b02df196: "ارسال به دانشجویان"
@@ -15635,6 +15656,7 @@ fa:
     you_have_no_services: "هیچ سرویس ثبت نشده است، می توانید چند مورد را در صفحه *تنظیمات* بیفزایید."
   profile_6bd2baed: "رخ نما"
   profile_photo_save_failed_too_many_times_e1ebda5: "دخیره سازی  عکس پروفایل بارها شکست خورده است. "
+  profile_tray_bcec5044: "سینی رخ‌نما"
   profiles: 
     avatar_dialog: 
       from_gravatar: "از گرآواتار"
@@ -18211,6 +18233,7 @@ fa:
   select_type_of_prerequisite_8d6fa902: "انتخاب نوع پیش‌نیاز"
   select_video_file_35b61d4e: "انتخاب فایل تصویری"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "آنچه که مایلید در صفحه اصلی نمایش داده شود را انتخاب کنید."
+  select_whether_to_post_for_all_submissions_or_only_b18d681f: "انتخاب کنید که آیا برای همه موارد ارسالی ارسال می شود یا فقط موارد نمره گذاری شده."
   selected_274ce24f: "انتخاب شده"
   selected_all_courses_9cfef57f: "همه درس‌ها انتخاب شده"
   selected_answer: "این پاسخ را انتخاب کرده اید."
@@ -19784,7 +19807,9 @@ fa:
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "موفقیت! نمرات مخفی شد برای قسمتهای %{assignmentName}."
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "موفقیت! نمرات برای قسمتهای منتخب پنهان شده است. %{assignmentName}."
   success_grades_have_been_posted_for_the_selected_s_54c73ef0: "موفقیت! نمرات برای بخش های منتخب ارسال شده است %{assignmentName}."
+  success_grades_have_been_posted_to_postedto_for_as_255bc974: "موفق شدید! نمره‌ها به %{postedTo}  برای %{assignmentName} ارسال شده‌اند."
   success_grades_were_published_to_the_grade_book_da3b4fba: "موفقیت آمیز! نمره ها در دفتر نمره منتشر شدند."
+  success_the_post_policy_for_name_has_been_updated_ea92283f: "موفق شدید! سیاست ارسال برای %{name} به‌هنگام سازی شده است."
   successfully_added_fb3e6008: "با موفقیت افزوده شد."
   successfully_created_a_set_38374719: "یک مجموعه با موفقیت ایجاد شد"
   successfully_deleted_discussion_title_a685f345: "گفتگو %{title} با موفقیت حذف شد"
@@ -20535,6 +20560,7 @@ fa:
   title_is_too_long_must_be_under_length_characters_ab694ae4: "طولانی است، باید کمتر از %{length} نویسه باشد"
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} قفل گشایی شده است. برای قفل کردن کلیک کنید."
   title_separator: ": "
+  title_tray_ec9f7488: "سینی %{title}"
   titles: 
     aligned_items: "موردهای تطبیق داده شده"
     announcement: اطلاعیه
@@ -20731,6 +20757,7 @@ fa:
   unknown_content_type_ae6d08e8: "نوع محتوای ناشناس"
   unknown_event_7a0bcda3: "رخداد نامعلوم"
   unknown_external_tool_c918e9b2: "ابزارهای بیرونی ناشناخته"
+  unknown_manage_discussion_action_encountered_92a8dfc0: "عمل گفتگو مدیریت ناشناخته رخ داده است."
   unknown_question_bank: "مخزن پرسش نامعلوم"
   unknown_quiz: "آزمون نامعلوم"
   unknown_quiz_3892d071: "آزمون نامعلوم"
@@ -20845,6 +20872,7 @@ fa:
   upload_media_ce31135a: "بارگذاری رسانه"
   upload_not_available_for_this_folder_8f8623c6: "بارگیری برای این پوشه در دسترس نیست"
   upload_successful_ca47465f: "بارگذاری موفقیت آمیز"
+  upload_your_outcomes_bceeadbe: "نتایج خود را بارگیری کنید!"
   uploaded_285a2bfb: "بارگذاری شده"
   uploaded_media_bc29db35: "بارگذاری رسانه"
   uploaded_over_time_d59abb68: "بارگذاری شده در طول زمان"
@@ -21739,6 +21767,7 @@ fa:
   you_are_trying_to_launch_insecure_content_from_wit_5c1c692b: "شما سعی دارید یک مطلب ناامن را از یک بخش امن (کانواس) اجرا کنید. بعضی از مرورگرهای وب ممکن است جلوی بارگذاری این محتوا را بگیرند."
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "اشتراک شما لغو شده است و از نظرهای جدید آگاه نخواهید شد. برای اشتراک کلیک کنید"
   you_can_also_manage_access_at_this_time_105a2530: "همچنین می توانید دسترسی را در این زمان مدیریت کنید:"
+  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "با کلیک روی لینک ارسال نمره‌ها، می توانید دوباره ارسال اطلاعیه‌ها را شروع کنید."
   you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "می توانید با کلیک کردن روی این پیوند: %{link}، گروه های دیگر را بررسی کنید"
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "می توانید با کلیک کردن روی این پیوند: %{link}، گروه را بررسی کنید."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "می توانید با کلیک کردن روی این پیوند: %{link}، گروه را بررسی کنید"
@@ -21886,6 +21915,8 @@ fa:
   your_name_7665e1d8: "نام شما"
   your_password_has_been_changed_df0e72aa: "رمزعبور شما تغییر یافته است."
   your_profile_photo_could_not_be_uploaded_you_may_h_1c90540c: "عکس رخ نمای شما قابل بارگذاری نیست. ممکن است از حد بارگذاری تجاوز کرده باشید."
+  your_score_a1fc2fcf: "امتیاز شما"
+  your_score_score_fb785381: "امتیاز شما: %{score}"
   your_search_encountered_the_following_errors_fc3e5e7f: 
     one: "جستجوی شما با خطاهای زیر مواجه شد:"
     other: "جستجوی شما با خطاهای زیر مواجه شد:"
