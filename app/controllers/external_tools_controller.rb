@@ -507,7 +507,10 @@ class ExternalToolsController < ApplicationController
     opts = default_opts.merge(opts)
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
-    expander = variable_expander(assignment: assignment, tool: tool, launch: lti_launch, post_message_token: opts[:launch_token])
+    expander = variable_expander(assignment: assignment,
+      tool: tool, launch: lti_launch,
+      post_message_token: opts[:launch_token],
+      secure_params: params[:secure_params])
 
     adapter = if tool.use_1_3?
       a = Lti::LtiAdvantageAdapter.new(

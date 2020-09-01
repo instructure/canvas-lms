@@ -178,6 +178,11 @@ module Lti::Ims
               expect_any_instance_of(Assignment).to receive(:submit_homework)
               send_request
             end
+
+            it 'uses submission_type of external_tool' do
+              send_request
+              expect(result.submission.reload.submission_type).to eq 'external_tool'
+            end
           end
 
           context 'when "new_submission" extension is false' do
