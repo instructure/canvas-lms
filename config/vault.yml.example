@@ -1,9 +1,25 @@
-production:
-  addr: "https://vault.domain.com"
-  token_path: /path/to/vault/token
-test:
-  addr: "https://vault.test.domain"
-  token_path: s.wOrq9dO9kzOcuvB06CMviJhZ
+# standard vault config, including address of
+# vault server as a string (addr) or in a file (addr_path)
+# and path where vault token can
+# be found (token_path) or the token itself (token)
+# production:
+#   addr_path: /path/to/vault/address
+#   token_path: /path/to/vault/token
+# test:
+#   addr: "https://vault.test.domain"
+#   token: s.wOrq9dO9kzOcuvB06CMviJhZ
+# development:
+#   addr: "https://vault.dev.domain"
+#   token: s.wOrq9dO9kzOcuvB06CMviJhZ
+
+# if you don't want to run vault, you can make use
+# of a "vault_contents.yml" file in this directory and
+# specify "file" as both your addr and token_path.
+# this will make Canvas Vault read from the file
+# contents rather than trying to talk to a vault agent.
 development:
-  addr: "https://vault.dev.domain"
-  token: s.wOrq9dO9kzOcuvB06CMviJhZ
+  addr: file
+  token: file
+test:
+  addr: file
+  token: file

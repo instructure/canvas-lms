@@ -1,0 +1,17 @@
+# this config file is useful if you don't want to run vault
+# agents with canvas.  Local Development is the most common case
+# for this, but a small OSS deployment might have it make sense too.
+# Just provide the results data you want the Vault class to "read",
+# and it will return it when a call for vault data is issued. Data should be
+# shaped like the example below.  Each environment can get a hash,
+# there's a key for each read path, and a hash for the returned data
+development:
+  'sts/testaccount/sts/canvas-shards-lookuper-dev':
+    access_key: 'fake-access-key'
+    secret_key: 'fake-secret-key'
+    security_token: 'fake-security-token'
+test:
+  'sts/testaccount/sts/canvas-shards-lookuper-test':
+    access_key: 'fake-access-key'
+    secret_key: 'fake-secret-key'
+    security_token: 'fake-security-token'
