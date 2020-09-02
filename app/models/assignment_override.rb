@@ -420,6 +420,6 @@ class AssignmentOverride < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= root_account_id
+    self.write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
   end
 end
