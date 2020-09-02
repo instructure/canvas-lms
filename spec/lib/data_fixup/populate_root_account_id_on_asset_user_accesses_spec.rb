@@ -18,21 +18,21 @@
 require 'spec_helper'
 
 describe DataFixup::PopulateRootAccountIdOnAssetUserAccesses do
-  it 'ignores AsssetUserAccesses with Course context' do
+  it 'ignores AssetUserAccesses with Course context' do
     aua = AssetUserAccess.create!(context: course_model)
     aua.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnAssetUserAccesses.populate(aua.id, aua.id)
     expect(aua.reload.root_account_id).to be_nil
   end
 
-  it 'ignores AsssetUserAccesses with Group context' do
+  it 'ignores AssetUserAccesses with Group context' do
     aua = AssetUserAccess.create!(context: group_model)
     aua.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnAssetUserAccesses.populate(aua.id, aua.id)
     expect(aua.reload.root_account_id).to be_nil
   end
 
-  it 'ignores AsssetUserAccesses with Account context' do
+  it 'ignores AssetUserAccesses with Account context' do
     aua = AssetUserAccess.create!(context: account_model)
     aua.update_column(:root_account_id, nil)
     DataFixup::PopulateRootAccountIdOnAssetUserAccesses.populate(aua.id, aua.id)
@@ -77,10 +77,10 @@ describe DataFixup::PopulateRootAccountIdOnAssetUserAccesses do
       expect(@aua.reload.root_account_id).to eq @course.root_account_id
     end
 
-    it 'ignores record from User asset' do
+    it 'sets record from User asset to root_account_id=0' do
       @aua.update!(asset_code: user_model.asset_string)
       DataFixup::PopulateRootAccountIdOnAssetUserAccesses.populate(@aua.id, @aua.id)
-      expect(@aua.reload.root_account_id).to be_nil
+      expect(@aua.reload.root_account_id).to eq(0)
     end
 
     it 'sets root_account_id for multiple records' do

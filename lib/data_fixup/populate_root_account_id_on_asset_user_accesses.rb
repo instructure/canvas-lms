@@ -22,7 +22,7 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
 
     asset_types = %w(attachment calendar_event group course)
 
-    # find any other asset types besides these and "user" (which the backfill ignores)
+    # find any other asset types besides these and "user" (which the backfill fills with 0)
     types_string = [*asset_types, "user"].map{ |t| "'%#{t}%'" }.join(',')
     other_asset_types = to_transform.where("asset_code NOT LIKE ALL (ARRAY[#{types_string}])").
       distinct.
@@ -43,5 +43,8 @@ module DataFixup::PopulateRootAccountIdOnAssetUserAccesses
         in_batches.
         update_all("root_account_id=#{qtn}.root_account_id")
     end
+
+    # Context=user and asset=User records are unfillable. Fill with 0 (dummy root account ID)
+    to_transform.where("asset_code like ?", "%user\\_%").where(root_account_id: nil).update_all("root_account_id=0")
   end
 end
