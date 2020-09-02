@@ -41,6 +41,7 @@ module Canvas::Vault
     end
 
     def api_client
+      return Canvas::Vault::FileClient.get_client if addr == "file"
       Vault::Client.new(address: addr, token: token)
     end
 

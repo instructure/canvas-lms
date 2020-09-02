@@ -38,6 +38,7 @@ module Canvas
       addr_path: addr_path,
       kv_mount: 'app-canvas'
     } }
+    let(:local_config) { { token: 'file', addr: 'file'} }
 
     before do
       LocalCache.clear
@@ -127,7 +128,20 @@ module Canvas
         end
       end
 
-
+      it "reads from disk config if configured to do so" do
+        cred_path = "sts/testaccount/sts/canvas-shards-lookuper-test"
+        creds_hash = {
+          cred_path => {
+            "access_key"=>"fake-access-key",
+            "secret_key"=>"fake-secret-key",
+            "security_token"=>"fake-security-token"
+          }
+        }
+        allow(ConfigFile).to receive(:load).with("vault_contents").and_return(creds_hash)
+        allow(described_class).to receive(:config).and_return(local_config)
+        result = described_class.read(cred_path)
+        expect(result[:security_token]).to eq("fake-security-token")
+      end
     end
   end
 end
