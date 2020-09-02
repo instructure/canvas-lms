@@ -261,7 +261,7 @@ class Group < ActiveRecord::Base
 
   def self.not_in_group_sql_fragment(groups)
     return nil if groups.empty?
-    sanitize_sql([<<-SQL, groups])
+    sanitize_sql([<<~SQL, groups])
       NOT EXISTS (SELECT * FROM #{GroupMembership.quoted_table_name} gm
       WHERE gm.user_id = users.id AND
       gm.workflow_state != 'deleted' AND

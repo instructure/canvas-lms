@@ -674,7 +674,7 @@ class Course < ActiveRecord::Base
             course_account_associations.map(&:account).uniq
           else
             shard.activate do
-              Account.find_by_sql(<<-SQL)
+              Account.find_by_sql(<<~SQL)
                 WITH depths AS (
                   SELECT account_id, MIN(depth)
                   FROM #{CourseAccountAssociation.quoted_table_name}

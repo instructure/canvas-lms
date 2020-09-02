@@ -358,7 +358,7 @@ class User < ActiveRecord::Base
     select_clause = "users.*, #{select_clause}" if select_values.blank?
     scope = select(select_clause).
       # left outer join ensures we get the user even if they don't have a pseudonym
-      joins(sanitize_sql([<<-SQL, root_account_id])).where(:enrollments => { :course_id => course })
+      joins(sanitize_sql([<<~SQL, root_account_id])).where(:enrollments => { :course_id => course })
         LEFT OUTER JOIN #{Pseudonym.quoted_table_name} ON pseudonyms.user_id = users.id AND pseudonyms.account_id = ?
         INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.user_id = users.id
       SQL

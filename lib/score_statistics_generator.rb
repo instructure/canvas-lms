@@ -50,7 +50,7 @@ class ScoreStatisticsGenerator
     # require score then add a filter when the DA feature is on
     statistics = Shackles.activate(:slave) do
       connection = ScoreStatistic.connection
-      connection.select_all(<<-SQL)
+      connection.select_all(<<~SQL)
       WITH want_assignments AS (
         SELECT a.id, a.created_at
         FROM #{Assignment.quoted_table_name} a

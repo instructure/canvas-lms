@@ -124,7 +124,7 @@ module Api::V1::AssignmentGroup
     assignment_ids = assignments.pluck(:id).join(",")
     last_grading_period = grading_periods.order(end_date: :desc).first
 
-    submissions = ActiveRecord::Base.connection.select_all(<<-SQL)
+    submissions = ActiveRecord::Base.connection.select_all(<<~SQL)
       SELECT DISTINCT ON (assignment_id) assignment_id, user_id
       FROM #{Submission.quoted_table_name}
       WHERE

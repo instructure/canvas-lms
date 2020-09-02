@@ -47,7 +47,7 @@ module Quizzes::LogAuditing
     # @return [Hash] Submission data is returned
     #
     def run(quiz_submission_id, attempt, timestamp)
-      sql_string = <<-SQL
+      sql_string = <<~SQL
         quiz_submission_id = :qs_id
         AND attempt = :attempt
         AND event_type IN(:filter)

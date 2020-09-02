@@ -788,7 +788,7 @@ class MessageableUser
         select("group_memberships.group_id AS group_id").
         distinct.
         joins(:user, :group).
-        joins(<<-SQL).
+        joins(<<~SQL).
           INNER JOIN #{Enrollment.quoted_table_name} ON
             enrollments.user_id=users.id AND
             enrollments.course_id=groups.context_id

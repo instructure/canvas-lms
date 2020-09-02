@@ -851,7 +851,7 @@ class Account < ActiveRecord::Base
       shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
       Shackles.activate(shackles_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
-          Account.find_by_sql(<<-SQL)
+          Account.find_by_sql(<<~SQL)
                 WITH RECURSIVE t AS (
                   SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                   UNION
@@ -876,7 +876,7 @@ class Account < ActiveRecord::Base
 
         if starting_account_id
           Shackles.activate(:slave) do
-            ids = Account.connection.select_values(<<-SQL)
+            ids = Account.connection.select_values(<<~SQL)
                   WITH RECURSIVE t AS (
                     SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
                     UNION
@@ -898,7 +898,7 @@ class Account < ActiveRecord::Base
     if connection.adapter_name == 'PostgreSQL'
       original_shard = Shard.current
       Shard.partition_by_shard(starting_account_ids) do |sliced_acc_ids|
-        ids = Account.connection.select_values(<<-SQL)
+        ids = Account.connection.select_values(<<~SQL)
               WITH RECURSIVE t AS (
                 SELECT * FROM #{Account.quoted_table_name} WHERE id IN (#{sliced_acc_ids.join(", ")})
                 UNION
@@ -945,7 +945,7 @@ class Account < ActiveRecord::Base
   # build our own query string
   def sub_accounts_recursive(limit, offset)
     if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
-      Account.find_by_sql([<<-SQL, self.id, limit.to_i, offset.to_i])
+      Account.find_by_sql([<<~SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
             SELECT * FROM #{Account.quoted_table_name}
             WHERE parent_account_id = ? AND workflow_state <>'deleted'

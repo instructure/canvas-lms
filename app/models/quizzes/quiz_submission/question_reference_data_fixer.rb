@@ -59,7 +59,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
           if relink_or_create_questions(quiz_submission)
             modified = true
 
-            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<-SQL
+            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<~SQL
             quiz_data = '#{connection.quote_string(quiz_submission.quiz_data.to_yaml)}',
             submission_data = '#{connection.quote_string(quiz_submission.submission_data.to_yaml)}',
             question_references_fixed = TRUE

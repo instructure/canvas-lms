@@ -494,7 +494,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # 1. belong to this quiz;
     # 2. have been started; and
     # 3. won't lose time through this change.
-    where_clause = <<-END
+    where_clause = <<~END
       quiz_id = ? AND
       started_at IS NOT NULL AND
       finished_at IS NULL AND

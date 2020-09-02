@@ -174,11 +174,11 @@ class Attachments::GarbageCollector
 
     def delete_rows
       raise "Cannot delete rows in dry_run mode" if dry_run
-      null_scope = ContentExport.joins(<<-SQL).
-INNER JOIN #{Attachment.quoted_table_name}
-ON attachments.context_type = 'ContentExport'
-AND content_exports.attachment_id = attachments.id
-SQL
+      null_scope = ContentExport.joins(<<~SQL).
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type = 'ContentExport'
+        AND content_exports.attachment_id = attachments.id
+      SQL
         where(attachments: { workflow_state: 'deleted', file_state: 'deleted' })
       while null_scope.limit(1000).update_all(attachment_id: nil) > 0; end
       super
@@ -198,19 +198,19 @@ SQL
 
     def delete_rows
       raise "Cannot delete rows in dry_run mode" if dry_run
-      ce_null_scope = ContentExport.joins(<<-SQL).
-INNER JOIN #{Attachment.quoted_table_name}
-ON attachments.context_type = 'ContentExport'
-AND content_exports.attachment_id = attachments.id
-SQL
+      ce_null_scope = ContentExport.joins(<<~SQL).
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type = 'ContentExport'
+        AND content_exports.attachment_id = attachments.id
+      SQL
         where(attachments: { workflow_state: 'deleted', file_state: 'deleted' })
       while ce_null_scope.limit(1000).update_all(attachment_id: nil) > 0; end
 
-      cm_null_scope = ContentMigration.joins(<<-SQL).
-INNER JOIN #{Attachment.quoted_table_name}
-ON attachments.context_type IN ('ContentMigration', 'ContentExport')
-AND content_migrations.attachment_id = attachments.id
-SQL
+      cm_null_scope = ContentMigration.joins(<<~SQL).
+        INNER JOIN #{Attachment.quoted_table_name}
+        ON attachments.context_type IN ('ContentMigration', 'ContentExport')
+        AND content_migrations.attachment_id = attachments.id
+      SQL
         where(attachments: { workflow_state: 'deleted', file_state: 'deleted' })
       while cm_null_scope.limit(1000).update_all(attachment_id: nil) > 0; end
 
