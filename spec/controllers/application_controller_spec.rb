@@ -374,6 +374,18 @@ RSpec.describe ApplicationController do
       # this test just verifies the condition in js_env works across updates
       expect(Mime::Type.new("*/*") == "*/*").to be_truthy
     end
+
+    context "disable_keyboard_shortcuts" do
+      it "is false by default" do
+        expect(@controller.js_env[:disable_keyboard_shortcuts]).to be_falsey
+      end
+
+      it "is true if user disables keyboard shortcuts" do
+        user = user_model
+        user.enable_feature!(:disable_keyboard_shortcuts)
+        expect(user.prefers_no_keyboard_shortcuts?).to be_truthy
+      end
+    end
   end
 
   describe "clean_return_to" do
