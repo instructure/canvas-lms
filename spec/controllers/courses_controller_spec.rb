@@ -2233,6 +2233,17 @@ describe CoursesController do
         expect(response.body).to include 'Invalid restrictions'
       end
     end
+
+    it "should update pages' permissions even if course default is nil" do
+      user_session(@teacher)
+      wiki_page = @course.wiki_pages.create! :title => 'Wiki page 1', :editing_roles=> 'teachers'
+      new_permissions = 'teachers,students'
+      put 'update', params: {:id => @course.id, :update_default_pages => true, :course => {:default_wiki_editing_roles => new_permissions}}
+      @course.reload
+      wiki_page.reload
+      expect(@course.default_wiki_editing_roles).to eq new_permissions
+      expect(wiki_page.editing_roles).to eq new_permissions
+    end
   end
 
   describe "POST 'unconclude'" do
