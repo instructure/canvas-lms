@@ -57,6 +57,13 @@
           </div>
         </div>
       <% end %>
+      <% if @domain_root_account.self_registration_captcha? %>
+        <div class="control-group">
+          <div class="controls">
+            <div class="g-recaptcha"></div>
+          </div>
+        </div>
+      <% end %>
     </div>
   </div>
   <div class="ic-Self-enrollment-footer">
