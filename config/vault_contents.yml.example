@@ -6,12 +6,12 @@
 # shaped like the example below.  Each environment can get a hash,
 # there's a key for each read path, and a hash for the returned data
 development:
-  'sts/testaccount/sts/canvas-shards-lookuper-dev':
+  'sts/testaccount/sts/canvas-shards-lookupper-dev':
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
 test:
-  'sts/testaccount/sts/canvas-shards-lookuper-test':
+  'sts/testaccount/sts/canvas-shards-lookupper-test':
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'

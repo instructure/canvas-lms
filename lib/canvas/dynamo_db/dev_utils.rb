@@ -31,11 +31,11 @@ module Canvas
         }
       }.freeze
 
-      def self.initialize_ddb_for_development!(category, table_name, recreate: false, schema: nil)
+      def self.initialize_ddb_for_development!(category, table_name, recreate: false, schema: nil, ddb: nil)
         unless ["development", "test"].include?(Rails.env)
           raise "DynamoDB should not be initialized this way in a real environment!!!"
         end
-        canvas_ddb = Canvas::DynamoDB::DatabaseBuilder.from_config(category)
+        canvas_ddb = ddb || Canvas::DynamoDB::DatabaseBuilder.from_config(category)
         dynamodb = canvas_ddb.client
         local_table_name = canvas_ddb.prefixed_table_name(table_name)
         exists = begin
