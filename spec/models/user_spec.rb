@@ -3408,6 +3408,19 @@ describe User do
     end
   end
 
+  describe "#prefers_no_keyboard_shortcuts?" do
+    let(:user) { user_model }
+
+    it "returns false by default" do
+      expect(user.prefers_no_keyboard_shortcuts?).to eq false
+    end
+
+    it "returns true if user disables keyboard shortcuts" do
+      user.enable_feature!(:disable_keyboard_shortcuts)
+      expect(user.prefers_no_keyboard_shortcuts?).to eq true
+    end
+  end
+
   describe "with_last_login" do
     it "should not double the users select if select values are already present" do
       expect(User.all.order_by_sortable_name.with_last_login.to_sql.scan(".*").count).to eq 1
