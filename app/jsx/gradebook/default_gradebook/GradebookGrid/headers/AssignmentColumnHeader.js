@@ -21,7 +21,7 @@ import {arrayOf, bool, func, instanceOf, number, shape, string} from 'prop-types
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-elements'
-import {IconMoreSolid, IconOffLine, IconOffSolid} from '@instructure/ui-icons'
+import {IconMoreSolid, IconOffLine} from '@instructure/ui-icons'
 import {Grid} from '@instructure/ui-layout'
 import {Menu} from '@instructure/ui-menu'
 import I18n from 'i18n!gradebook'
@@ -54,16 +54,14 @@ function SecondaryDetailLine(props) {
         </Text>
       </span>
 
-      {props.postPoliciesEnabled &&
-        props.newPostPolicyIconsEnabled &&
-        props.assignment.postManually && (
-          <span>
-            &nbsp;
-            <Text size="x-small" transform="uppercase" weight="bold">
-              {I18n.t('Manual')}
-            </Text>
-          </span>
-        )}
+      {props.postPoliciesEnabled && props.assignment.postManually && (
+        <span>
+          &nbsp;
+          <Text size="x-small" transform="uppercase" weight="bold">
+            {I18n.t('Manual')}
+          </Text>
+        </span>
+      )}
 
       {!props.postPoliciesEnabled && props.assignment.muted && (
         <span>
@@ -84,7 +82,6 @@ SecondaryDetailLine.propTypes = {
     pointsPossible: number,
     published: bool.isRequired
   }).isRequired,
-  newPostPolicyIconsEnabled: bool.isRequired,
   postPoliciesEnabled: bool.isRequired
 }
 
@@ -147,7 +144,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       featureEnabled: bool.isRequired,
       hasGradesOrPostableComments: bool.isRequired,
       hasGradesOrCommentsToPost: bool.isRequired,
-      newIconsEnabled: bool.isRequired,
       onSelect: func.isRequired
     }).isRequired,
 
@@ -492,7 +488,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     )
   }
 
-  renderUnpostedSubmissionsIcon(newIconsEnabled) {
+  renderUnpostedSubmissionsIcon() {
     if (!this.props.submissionsLoaded) {
       return null
     }
@@ -500,24 +496,9 @@ export default class AssignmentColumnHeader extends ColumnHeader {
     const submissions = this.props.students.map(student => student.submission)
     const postableSubmissionsPresent = submissions.some(isPostable)
 
-    if (newIconsEnabled) {
-      // Assignment has at least one hidden submission that can be posted
-      // and "new icons" are enabled so use the line version of the icon
-      if (postableSubmissionsPresent) {
-        return <IconOffLine size="x-small" />
-      }
-    } else {
-      // Assignment is manually-posted and has no graded-but-unposted submissions
-      // (i.e., no unposted submissions that are in a suitable state to post)
-      if (this.props.assignment.postManually && !postableSubmissionsPresent) {
-        return <IconOffLine size="x-small" />
-      }
-
-      // Assignment has at least one hidden submission that can be posted
-      // (regardless of whether it's manually or automatically posted)
-      if (postableSubmissionsPresent) {
-        return <IconOffSolid color="warning" size="x-small" />
-      }
+    // Assignment has at least one hidden submission that can be posted
+    if (postableSubmissionsPresent) {
+      return <IconOffLine size="x-small" />
     }
 
     return null
@@ -525,7 +506,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   render() {
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
-    const newPostPolicyIconsEnabled = this.props.postGradesAction.newIconsEnabled
     const postPoliciesEnabled = this.props.postGradesAction.featureEnabled
 
     return (
@@ -539,8 +519,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
             <Grid.Row>
               <Grid.Col textAlign="center" width="auto" vAlign="top">
                 <div className="Gradebook__ColumnHeaderIndicators">
-                  {postPoliciesEnabled &&
-                    this.renderUnpostedSubmissionsIcon(newPostPolicyIconsEnabled)}
+                  {postPoliciesEnabled && this.renderUnpostedSubmissionsIcon()}
                 </div>
               </Grid.Col>
 
@@ -552,7 +531,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
                   <SecondaryDetailLine
                     assignment={this.props.assignment}
-                    newPostPolicyIconsEnabled={newPostPolicyIconsEnabled}
                     postPoliciesEnabled={postPoliciesEnabled}
                   />
                 </span>
