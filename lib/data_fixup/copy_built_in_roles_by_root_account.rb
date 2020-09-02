@@ -28,7 +28,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
       return unless root_account_ids.any?
 
       new_role_data = root_account_ids.flat_map{|id| Role::BASE_TYPES.map{|type| {
-        :name => type, :base_role_type => type, :root_account_id => id, :workflow_state => "built_in"
+        :name => type, :base_role_type => type, :root_account_id => id, :workflow_state => "built_in", :created_at => Time.now.utc, :updated_at => Time.now.utc
       }}}
       Role.bulk_insert(new_role_data)
 
