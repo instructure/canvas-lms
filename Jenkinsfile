@@ -93,6 +93,12 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
+def isPatchsetRetriggered() {
+  def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
+
+  return userCause && userCause[0].shortDescription.contains('Retriggered')
+}
+
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
     try {
@@ -108,7 +114,15 @@ def cleanupFn(status) {
 }
 
 def postFn(status) {
-  if(status == 'FAILURE' && configuration.isChangeMerged()) {
+  if(status == 'FAILURE') {
+    maybeSlackSendFailure()
+  } else if(status == 'SUCCESS') {
+    maybeSlackSendSuccess()
+  }
+}
+
+def maybeSlackSendFailure() {
+  if(configuration.isChangeMerged()) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
@@ -121,10 +135,18 @@ def postFn(status) {
   }
 }
 
-def maybeSlackSendRetrigger() {
-  def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
+def maybeSlackSendSuccess() {
+  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
+    slackSend(
+      channel: getSlackChannel(),
+      color: 'good',
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+    )
+  }
+}
 
-  if(userCause && userCause[0].shortDescription.contains('Retriggered')) {
+def maybeSlackSendRetrigger() {
+  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
     slackSend(
       channel: getSlackChannel(),
       color: 'warning',
@@ -219,10 +241,7 @@ pipeline {
             return
           }
 
-          // Report retriggers to Slack
-          if(configuration.isChangeMerged()) {
-            maybeSlackSendRetrigger()
-          }
+          maybeSlackSendRetrigger()
 
           // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
           // wait for the current steps to complete (even wait to spin up a node), causing
