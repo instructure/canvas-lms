@@ -714,7 +714,7 @@ class ActiveRecord::Base
     end
   end
 
-  scope :non_shadow, ->(key = primary_key) { where("#{key}<=?", Shard::IDS_PER_SHARD) }
+  scope :non_shadow, ->(key = primary_key) { where("#{key}<=? AND #{key}>?", Shard::IDS_PER_SHARD, 0) }
 
   # skips validations, callbacks, and a transaction
   # do _NOT_ improve in the future to handle validations and callbacks - make

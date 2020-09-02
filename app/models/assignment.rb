@@ -2337,12 +2337,16 @@ class Assignment < ActiveRecord::Base
   # for file naming (how we're sending it down to the teacher) is
   # last_name_first_name_user_id_attachment_id.
   # extension
-  def generate_comments_from_files_later(attachment_data, user)
+  def generate_comments_from_files_later(attachment_data, user, attachment_id = nil)
     progress = Progress.create!(context: self, tag: "submissions_reupload") do |p|
       p.user = user
     end
 
-    attachment = user.attachments.create!(attachment_data)
+    if attachment_id.present?
+      attachment = user.attachments.find_by(id: attachment_id)
+    end
+
+    attachment ||= user.attachments.create!(attachment_data)
     progress.process_job(self, :generate_comments_from_files, {}, attachment, user, progress)
     progress
   end

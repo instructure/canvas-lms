@@ -1715,6 +1715,12 @@ describe Attachment do
       expect(Message.where(user_id: @student, notification_name: 'New File Added').first).not_to be_nil
     end
 
+    it "should not send to student on hidden files" do
+      attachment_model(uploaded_data: stub_file_data('file.txt', nil, 'text/html'), content_type: 'text/html', file_state: 'hidden')
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
+    end
+
     it "should send a batch notification" do
       att1 = attachment_model(:uploaded_data => stub_file_data('file1.txt', nil, 'text/html'), :content_type => 'text/html')
       att2 = attachment_model(:uploaded_data => stub_file_data('file2.txt', nil, 'text/html'), :content_type => 'text/html')

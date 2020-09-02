@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2014 - present Instructure, Inc.
+#
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,8 +14,16 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
 
-<body style="height: 100vh; margin:0; padding: 0;">
-  <img src="<%= context_url(@context, :context_file_preview_url, @file.id, :instfs => @file.instfs_hosted?) %>" alt="<%= @file.display_name %>" style="margin: 0; padding:0; max-width: 100%; max-height: 100%; position: absolute; top: 50%; left: 50%; -webkit-transform: translate(-50%, -50%); transform: translate(-50%, -50%);">
-</body>
+class CreateAccount0 < ActiveRecord::Migration[5.2]
+  tag :predeploy
+
+  def up
+    Account.find_or_create_by!(id: 0).
+      update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
+
+  def down
+    Account.where(id: 0).delete_all
+  end
+end

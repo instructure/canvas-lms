@@ -125,7 +125,7 @@ module Assignments
         end
       end
 
-      it "invalidates cache for count query when updated_at is modified" do
+      it "invalidates cache for count query when specifically cleared" do
         @assignment = @course.assignments.create!(
           title: "some assignment",
           submission_types: ['online_text_entry'],
@@ -136,8 +136,10 @@ module Assignments
         expect(querier).to receive(:needs_moderated_grading_count).twice
         enable_cache do
           querier.count
-          @assignment.update_attribute(:updated_at, Time.zone.now + 1.minute)
-          querier.count
+          Timecop.freeze(1.minute.from_now) do
+            @assignment.clear_cache_key(:needs_grading)
+            querier.count
+          end
         end
       end
 

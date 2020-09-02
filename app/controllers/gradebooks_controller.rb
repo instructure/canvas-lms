@@ -482,6 +482,7 @@ class GradebooksController < ApplicationController
       # TODO: remove `submissions_url` with TALLY-831
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
     }
 
@@ -599,6 +600,7 @@ class GradebooksController < ApplicationController
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
+      user_asset_string: @current_user&.asset_string,
       version: params.fetch(:version, nil)
     }
 
@@ -813,14 +815,14 @@ class GradebooksController < ApplicationController
       return
     end
 
-    if !params[:submissions_zip] || params[:submissions_zip].is_a?(String)
-      flash[:error] = t("Could not find file to upload")
+    unless valid_zip_upload_params?
+      flash[:error] = t("Could not find file to upload.")
       redirect_to named_context_url(@context, :context_assignment_url, assignment.id)
       return
     end
 
     submission_zip_params = {uploaded_data: params[:submissions_zip]}
-    assignment.generate_comments_from_files_later(submission_zip_params, @current_user)
+    assignment.generate_comments_from_files_later(submission_zip_params, @current_user, params[:attachment_id])
 
     redirect_to named_context_url(@context, :submissions_upload_context_gradebook_url, assignment.id)
   end
@@ -1077,6 +1079,12 @@ class GradebooksController < ApplicationController
   helper_method :student_groups?
 
   private
+
+  def valid_zip_upload_params?
+    return true if params[:attachment_id].present?
+
+    !!params[:submissions_zip] && !params[:submissions_zip].is_a?(String)
+  end
 
   def outcome_proficiency
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)

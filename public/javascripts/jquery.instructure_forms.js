@@ -212,7 +212,8 @@ $.fn.formSubmit = function(options) {
         formData,
         formDataTarget: options.formDataTarget,
         success: xhrSuccess,
-        error: xhrError
+        error: xhrError,
+        preferFileValueForInputName: options.preferFileValueForInputName
       })
     } else if (doUploadFile && $.handlesHTML5Files && $form.hasClass('handlingHTML5Files')) {
       const args = $.extend({}, formData)
@@ -304,9 +305,12 @@ $.ajaxJSONPreparedFiles = function(options) {
   const list = []
   const $this = this
   const pre_list = options.files || options.file_elements || []
+  const preferFileValueForInputName =
+    options.preferFileValueForInputName == null ? true : options.preferFileValueForInputName
   for (let idx = 0; idx < pre_list.length; idx++) {
     const item = pre_list[idx]
-    item.name = (item.value || item.name).split(/(\/|\\)/).pop()
+    const name = preferFileValueForInputName ? item.value || item.name : item.name || item.value
+    item.name = name.split(/(\/|\\)/).pop()
     list.push(item)
   }
   const attachments = []

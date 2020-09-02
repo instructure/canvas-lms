@@ -162,8 +162,8 @@ class Enrollment::BatchStateUpdater
   end
 
   def self.needs_grading_count_updated(courses)
-    Assignment.where(context_id: courses).find_ids_in_batches(batch_size: 10_000) do |assignment_ids|
-      Assignment.where(id: assignment_ids).touch_all
+    Assignment.where(context_id: courses).find_ids_in_batches(batch_size: 1000) do |assignment_ids|
+      Assignment.clear_cache_keys(assignment_ids, :needs_grading)
     end
   end
 

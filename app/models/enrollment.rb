@@ -148,7 +148,7 @@ class Enrollment < ActiveRecord::Base
     active_student? != active_student?(:was)
   end
 
-  def touch_assignments
+  def clear_needs_grading_count_cache
     Assignment.
       where(context_id: course_id, context_type: 'Course').
       where("EXISTS (?) AND NOT EXISTS (?)",
@@ -161,12 +161,12 @@ class Enrollment < ActiveRecord::Base
         Enrollment.where(Enrollment.active_student_conditions).
           where(user_id: user_id, course_id: course_id).
           where("id<>?", self)).
-      update_all(["updated_at=?", Time.now.utc])
+      clear_cache_keys(:needs_grading)
   end
 
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      touch_assignments
+      clear_needs_grading_count_cache
     end
   end
 

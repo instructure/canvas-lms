@@ -90,7 +90,6 @@ export default function PermissionTray(props) {
                 permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
                 role={role}
-                onChange={props.modifyPermissions}
               />
             ))}
           </RoleTrayTable>
@@ -106,7 +105,6 @@ export default function PermissionTray(props) {
                 permissionName={props.permissionName}
                 permissionLabel={props.label}
                 permission={role.permissions[props.permissionName]}
-                onChange={props.modifyPermissions}
                 role={role}
               />
             ))}
@@ -120,7 +118,6 @@ export default function PermissionTray(props) {
 PermissionTray.propTypes = {
   assignedRoles: arrayOf(permissionPropTypes.role).isRequired,
   hideTray: func.isRequired,
-  modifyPermissions: func.isRequired,
   label: string.isRequired,
   open: bool.isRequired,
   unassignedRoles: arrayOf(permissionPropTypes.role).isRequired,
@@ -173,8 +170,7 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  hideTray: actions.hideAllTrays,
-  modifyPermissions: actions.modifyPermissions
+  hideTray: actions.hideAllTrays
 }
 
 export const ConnectedPermissionTray = connect(mapStateToProps, mapDispatchToProps)(PermissionTray)

@@ -353,25 +353,12 @@ class Submission < ActiveRecord::Base
     !!(self.grader_id && self.grader_id < 0)
   end
 
-  def touch_assignments
-    Assignment.
-      where(id: assignment_id, context_type: 'Course').
-      where("EXISTS (?)",
-        Enrollment.where(Enrollment.active_student_conditions).
-        where(user_id: user_id).
-        where("course_id=assignments.context_id")).
-      update_all(["updated_at=?", Time.now.utc])
-    # TODO: add this to the SQL above when DA is on for everybody
-    # and remove NeedsGradingCountQuery#manual_count
-    # AND EXISTS (SELECT assignment_student_visibilities.* WHERE assignment_student_visibilities.user_id = NEW.user_id AND assignment_student_visibilities.assignment_id = NEW.assignment_id);
-  end
-
   after_create :needs_grading_count_updated, if: :needs_grading?
   after_update :needs_grading_count_updated, if: :needs_grading_changed?
   after_update :update_planner_override
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      touch_assignments
+      self.assignment.clear_cache_key(:needs_grading)
     end
   end
 
