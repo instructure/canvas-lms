@@ -176,12 +176,26 @@ module DataFixup::PopulateRootAccountIdOnModels
   end
 
   # In case we run into other tables that can't fully finish being filled with
-  # root account ids, and they have children who need them to consider them as full
+  # root account ids, and they have children who need them to consider them as full.
   def self.unfillable_criteria
+    # Arguments to where()
     @unfillable_criteria ||= {
       DeveloperKey => 'account_id IS NULL',
       LearningOutcomeGroup => 'context_id IS NULL',
-    }.freeze
+    }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
+  end
+
+  # A better alternative to the above, perhaps not possible in all cases, is to
+  # actually fill it with a dummy root_account of "0". This unlocks
+  # dependencies and simplifies our checking of what is done because the
+  # unfillable row is actually filled with a value.
+  # NOTE: also used in check_if_table_has_root_account() with where(root_account_id: nil)
+  # to check if table is unfilled; be aware of potential performance problems on this check
+  def self.fill_with_zeros_criteria
+    # Arguments to where()
+    @fill_with_zeros_criteria ||= {
+      CalendarEvent => {context_type: 'User', effective_context_code: nil}
+    }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
   def self.ignore_cross_shard_associations_tables
@@ -205,6 +219,15 @@ module DataFixup::PopulateRootAccountIdOnModels
             n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
           },
           table, assoc, min, max)
+        end
+
+        if fill_with_zeros_criteria.key?(table)
+          self.send_later_if_production_enqueue_args(:fill_with_zeros,
+          {
+            priority: Delayed::MAX_PRIORITY,
+            n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
+          },
+          table, min, max)
         end
 
         if populate_overrides.key?(table)
@@ -356,7 +379,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     return false if table.column_names.exclude?(get_column_name(table))
     return empty_root_account_column_scope(table).none? if associations.blank? || dependencies.key?(table)
 
-    associations.all? do |a|
+    return false unless associations.all? do |a|
       reflection = table.reflections[a.to_s]
       scope = empty_root_account_column_scope(table)
 
@@ -380,6 +403,13 @@ module DataFixup::PopulateRootAccountIdOnModels
       # are there any nil root account ids?
       scope.none?
     end
+
+    # These rows can be filled with zeros. If they aren't filled, the table isn't filled
+    if (zeros_criteria = fill_with_zeros_criteria[table])
+      return false if empty_root_account_column_scope(table).where(*zeros_criteria).any?
+    end
+
+    true
   end
 
   # An association may have foreign keys for records on other shards, and to
@@ -410,7 +440,7 @@ module DataFixup::PopulateRootAccountIdOnModels
 
   def self.empty_root_account_column_scope(table)
     if unfillable_criteria[table]
-      table = table.where.not(*Array(unfillable_criteria[table]))
+      table = table.where.not(*unfillable_criteria[table])
     end
 
     if multiple_root_account_ids_tables.include?(table)
@@ -448,6 +478,18 @@ module DataFixup::PopulateRootAccountIdOnModels
     end
 
     unlock_next_backfill_job(table)
+  end
+
+  def self.fill_with_zeros(table, min, max)
+    if (criteria = fill_with_zeros_criteria[table])
+      table.find_ids_in_ranges(start_at: min, end_at: max) do |batch_min, batch_max|
+        table.
+          where(table.primary_key => batch_min..batch_max).
+          where(root_account_id: nil).
+          where(*criteria).
+          update_all('root_account_id = 0')
+      end
+    end
   end
 
   def self.populate_root_account_ids_override(table, override_module, min, max)
