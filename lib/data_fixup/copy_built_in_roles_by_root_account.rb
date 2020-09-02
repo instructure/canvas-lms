@@ -38,17 +38,23 @@ module DataFixup::CopyBuiltInRolesByRootAccount
       [AccountUser, Enrollment, RoleOverride].each do |klass|
         klass.find_ids_in_ranges do |min_id, max_id|
           klass.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
-            joins("INNER JOIN #{Role.quoted_table_name} AS new_roles ON
-              new_roles.base_role_type=roles.base_role_type AND new_roles.root_account_id=#{klass.table_name}.root_account_id").
-            update_all("role_id=new_roles.id")
+            joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+              INNER JOIN #{Role.quoted_table_name} AS new_roles
+              ON new_roles.base_role_type=roles.base_role_type
+              AND new_roles.workflow_state='built_in'
+              AND new_roles.root_account_id=#{klass.table_name}.root_account_id
+            JOIN_SQL
         end
       end
 
       AccountNotificationRole.find_ids_in_ranges do |min_id, max_id|
-        AccountNotificationRole.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).joins(:account_notification => :account).
-          joins("INNER JOIN #{Role.quoted_table_name} AS new_roles ON
-              new_roles.base_role_type=roles.base_role_type AND new_roles.root_account_id=COALESCE(accounts.root_account_id, accounts.id)").
-          update_all("role_id=new_roles.id")
+        AccountNotificationRole.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
+          joins(:account_notification => :account).joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+            INNER JOIN #{Role.quoted_table_name} AS new_roles
+            ON new_roles.base_role_type=roles.base_role_type
+            AND new_roles.workflow_state='built_in'
+            AND new_roles.root_account_id=COALESCE(accounts.root_account_id, accounts.id)
+          JOIN_SQL
       end
     end
   end
