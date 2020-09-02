@@ -31,7 +31,8 @@ describe('setupSubmitHandler', () => {
     sandbox.stub($.fn, 'formSubmit')
     fixture = document.createElement('div')
     document.body.appendChild(fixture)
-    fixture.innerHTML = `<form id="${formId}"><button type="submit">Upload Files</button></form>`
+    fixture.innerHTML = `<form id="${formId}" enctype="multipart/form-data"><input type="file" name="submissions_zip"><button type="submit">Upload Files</button></form>`
+
     const dummySubmit = event => {
       event.preventDefault()
       event.stopPropagation()
@@ -136,15 +137,27 @@ describe('setupSubmitHandler', () => {
       success = setupSubmitHandler(formId, 'user_1').success
     })
 
-    it('adds the attachment ID to the form on success', () => {
+    it('adds the attachment ID to the form', () => {
       success(attachment)
       const input = document.querySelector('input[name="attachment_id"]')
       expect(input.value).toEqual(attachment.id)
     })
 
-    it('submits the form on success', () => {
+    it('submits the form', () => {
       success(attachment)
       expect(formSubmit.callCount).toEqual(1)
+    })
+
+    it('removes the file input', () => {
+      success(attachment)
+      const input = document.querySelectorAll('input[name="submissions_zip"]')
+      expect(input.length).toEqual(0)
+    })
+
+    it('removes the multipart enctype', () => {
+      success(attachment)
+      const enctype = document.getElementById(formId).getAttribute('enctype')
+      expect(enctype).toEqual(null)
     })
   })
 })

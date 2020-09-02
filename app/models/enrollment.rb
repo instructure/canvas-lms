@@ -121,14 +121,14 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.get_built_in_role_for_type(enrollment_type)
-    role = Role.get_built_in_role("StudentEnrollment") if enrollment_type == "StudentViewEnrollment"
-    role ||= Role.get_built_in_role(enrollment_type)
+  def self.get_built_in_role_for_type(enrollment_type, root_account_id:)
+    role = Role.get_built_in_role("StudentEnrollment", root_account_id: root_account_id) if enrollment_type == "StudentViewEnrollment"
+    role ||= Role.get_built_in_role(enrollment_type, root_account_id: root_account_id)
     role
   end
 
   def default_role
-    Enrollment.get_built_in_role_for_type(self.type)
+    Enrollment.get_built_in_role_for_type(self.type, root_account_id: self.course.root_account_id)
   end
 
   # see #active_student?

@@ -243,7 +243,7 @@ module SIS
             next
           end
 
-          role ||= Role.get_built_in_role(type)
+          role ||= Role.get_built_in_role(type, root_account_id: @root_account.id)
 
           if enrollment_info.associated_user_id && type == 'ObserverEnrollment'
             a_pseudo = root_account.pseudonyms.where(sis_user_id: enrollment_info.associated_user_id).take

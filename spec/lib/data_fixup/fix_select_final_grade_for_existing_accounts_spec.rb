@@ -20,6 +20,7 @@ require 'spec_helper'
 describe DataFixup::FixSelectFinalGradeForExistingAccounts do
   before :once do
     @account = Account.create!
+    @ta_role = ta_role(root_account_id: @account.id)
   end
 
   before :each do
@@ -29,36 +30,36 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
   context 'TaEnrollment role' do
     it 'creates a disabled select_final_grade role override for accounts without a moderate grades one' do
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
-      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role_id: ta_role.id)
+      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role_id: @ta_role.id)
       expect(role_override.enabled).to be false
     end
 
     it 'does not create duplicate select_final_grade role override if already existing' do
-      @account.role_overrides.create!(permission: 'select_final_grade', enabled: true, role: ta_role)
+      @account.role_overrides.create!(permission: 'select_final_grade', enabled: true, role: @ta_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
-      role_overrides = @account.role_overrides.where(permission: 'select_final_grade', role_id: ta_role.id)
+      role_overrides = @account.role_overrides.where(permission: 'select_final_grade', role_id: @ta_role.id)
       expect(role_overrides.count).to be 1
     end
 
     it 'does not create a select_final_grade role override when moderate_grades is enabled' do
-      @account.role_overrides.create!(permission: 'moderate_grades', enabled: true, role: ta_role)
+      @account.role_overrides.create!(permission: 'moderate_grades', enabled: true, role: @ta_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
-      role_override = @account.role_overrides.find_by(permission: 'select_final_grade', role: ta_role.id)
+      role_override = @account.role_overrides.find_by(permission: 'select_final_grade', role: @ta_role.id)
       expect(role_override).to be nil
     end
 
     it 'creates a select_final_grade role override when moderate_grades is disabled' do
-      @account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: ta_role)
+      @account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: @ta_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
-      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role: ta_role.id)
+      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role: @ta_role.id)
       expect(role_override.enabled).to be false
     end
 
     it 'gives final say to existing select_final_grade override over existing moderate_grades override' do
-      @account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: ta_role)
-      @account.role_overrides.create!(permission: 'select_final_grade', enabled: true, role: ta_role)
+      @account.role_overrides.create!(permission: 'moderate_grades', enabled: false, role: @ta_role)
+      @account.role_overrides.create!(permission: 'select_final_grade', enabled: true, role: @ta_role)
       DataFixup::FixSelectFinalGradeForExistingAccounts.run
-      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role_id: ta_role.id)
+      role_override = @account.role_overrides.find_by!(permission: 'select_final_grade', role_id: @ta_role.id)
       expect(role_override.enabled).to be true
     end
   end
@@ -110,7 +111,7 @@ describe DataFixup::FixSelectFinalGradeForExistingAccounts do
 
   context 'other roles' do
     before :once do
-      @teacher_role = teacher_role
+      @teacher_role = teacher_role(root_account_id: @account.id)
     end
 
     before :each do

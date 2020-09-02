@@ -21,7 +21,7 @@ describe "Enrollment::QueryBuilder" do
   describe "#conditions" do
     let(:conditions)     { Enrollment::QueryBuilder.new(state, options).conditions }
     let(:options)        { {} }
-    let(:account_id)     { create_record(Account, name: "Account") }
+    let(:account_id)     { Account.create(name: "Account").id }
     let(:term_id)        { create_record(EnrollmentTerm, name: "default", root_account_id: account_id) }
     let(:user)           { create_record(User, {name: "User", workflow_state: "active"}, :record) }
     let(:enrollment_map) { {} }
@@ -53,7 +53,7 @@ describe "Enrollment::QueryBuilder" do
           type: type,
           workflow_state: e_state,
           course_section_id: section_ids[i],
-          role_id: Role.get_built_in_role(type).id,
+          role_id: Role.get_built_in_role(type, root_account_id: account_id).id,
           root_account_id: account_id
         }
       })

@@ -358,7 +358,7 @@ describe RoleOverride do
         context "#{base_role[:name]} enrollments" do
           before do
             @base_role_name = base_role[:name]
-            @base_role = Role.get_built_in_role(@base_role_name)
+            @base_role = Role.get_built_in_role(@base_role_name, root_account_id: @account.resolved_root_account_id)
             @role_name = 'course role'
             @default_perm = RoleOverride.permissions[@permission][:true_for].include?(@base_role_name)
             @parent_account = @account
@@ -379,7 +379,7 @@ describe RoleOverride do
 
           it "should not find override for base type of role" do
             create_override(@role, @default_perm)
-            create_override(Role.get_built_in_role(@base_role_name), !@default_perm)
+            create_override(Role.get_built_in_role(@base_role_name, root_account_id: @account.resolved_root_account_id), !@default_perm)
 
             check_permission(@role, @default_perm)
             check_permission(@base_role, !@default_perm)

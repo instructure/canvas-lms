@@ -35,14 +35,6 @@ describe "permissions index" do
     new_role.id
   end
 
-  def student_role
-    Role.get_built_in_role('StudentEnrollment')
-  end
-
-  def ta_role
-    Role.get_built_in_role('TaEnrollment')
-  end
-
   describe "editing role info" do
     before :each do
       user_session(@admin)

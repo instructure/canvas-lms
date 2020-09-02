@@ -614,7 +614,7 @@ describe "Group Categories API", type: :request do
         let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                               @category_path_options.merge(action:'index',
                                                            account_id: @account.to_param)) }
-        let(:admin) { Role.get_built_in_role("AccountAdmin") }
+        let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
         before :each do
           @user = User.create!(name: 'billy')

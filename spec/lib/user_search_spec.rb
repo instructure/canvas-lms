@@ -175,7 +175,7 @@ describe UserSearch do
           end
 
           it 'will not match against a sis id without :read_sis permission' do
-            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+            RoleOverride.create!(context: Account.default, role: teacher_role,
               permission: 'read_sis', enabled: false)
             expect(UserSearch.for_user_in_context("SOME_SIS", course, user)).to eq []
           end
@@ -193,7 +193,7 @@ describe UserSearch do
           end
 
           it 'will not search login id without permission' do
-            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+            RoleOverride.create!(context: Account.default, role: teacher_role,
               permission: 'view_user_logins', enabled: false)
             expect(UserSearch.for_user_in_context("UNIQUE_ID", course, user)).to eq []
           end
@@ -243,7 +243,7 @@ describe UserSearch do
           end
 
           it 'requires :read_email_addresses permission' do
-            RoleOverride.create!(context: Account.default, role: Role.get_built_in_role('TeacherEnrollment'),
+            RoleOverride.create!(context: Account.default, role: teacher_role,
               permission: 'read_email_addresses', enabled: false)
             expect(UserSearch.for_user_in_context("the.giver", course, user)).to eq []
           end

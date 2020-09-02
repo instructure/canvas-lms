@@ -75,7 +75,7 @@ describe "report helper" do
     before(:once) do
       @user = user_with_pseudonym(active_all: true, account: account, user: user)
       course = account.courses.create!(name: 'reports')
-      role = Enrollment.get_built_in_role_for_type('StudentEnrollment')
+      role = Enrollment.get_built_in_role_for_type('StudentEnrollment', root_account_id: account.resolved_root_account_id)
       @enrollmnent = course.enrollments.create!(user: @user,
                                                 workflow_state: 'active',
                                                 sis_pseudonym: @pseudonym,

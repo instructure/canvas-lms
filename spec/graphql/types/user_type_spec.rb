@@ -184,8 +184,6 @@ describe Types::UserType do
       )
     end
 
-    let(:teacher_role) { Role.get_built_in_role('TeacherEnrollment') }
-
     before(:once) do
       @student.update! email: "cooldude@example.com"
     end

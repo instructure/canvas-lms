@@ -1163,7 +1163,7 @@ module UpdateAndDeleteWithJoins
     join_conditions = []
     joins_sql.strip.split('INNER JOIN')[1..-1].each do |join|
       # this could probably be improved
-      raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/
+      raise "PostgreSQL update_all/delete_all only supports INNER JOIN" unless join.strip =~ /([a-zA-Z0-9'"_\.]+(?:(?:\s+[aA][sS])?\s+[a-zA-Z0-9'"_]+)?)\s+ON\s+(.*)/m
       tables << $1
       join_conditions << $2
     end

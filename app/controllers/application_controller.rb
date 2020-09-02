@@ -32,6 +32,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  define_callbacks :html_render
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -78,7 +80,7 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
-  after_action :add_csp_for_root
+  set_callback :html_render, :before, :add_csp_for_root
   after_action :teardown_live_events_context
 
   # multiple actions might be called on a single controller instance in specs
@@ -1284,15 +1286,13 @@ class ApplicationController < ActionController::Base
   end
 
   def set_page_view
-    return true if !page_views_enabled?
-
-    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
     # We only record page_views for html page requests coming from within the
     # app, or if coming from a developer api request and specified as a
     # page_view.
-    if @current_user && !request.xhr? && request.get?
-      generate_page_view
-    end
+    return unless @current_user && !request.xhr? && request.get? && page_views_enabled?
+
+    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
+    generate_page_view
   end
 
   def require_reacceptance_of_terms
@@ -1385,8 +1385,6 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    return true unless page_views_enabled?
-
     shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
     shard.activate do
       begin
@@ -1411,6 +1409,7 @@ class ApplicationController < ActionController::Base
   def add_interaction_seconds
     updated_fields = params.slice(:interaction_seconds)
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
+    return unless page_views_enabled?
 
     RequestContextGenerator.store_interaction_seconds_update(
       params[:page_view_token],
@@ -1437,7 +1436,7 @@ class ApplicationController < ActionController::Base
     return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
     @access = AssetUserAccess.log(user, @context, @accessed_asset) if @context
 
-    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+    if @page_view.nil? && %w{participate submit}.include?(@accessed_asset[:level]) && page_views_enabled?
       generate_page_view(user)
     end
 
@@ -2225,7 +2224,14 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
-    super
+
+    # _don't_ call before_render hooks if we're not returning HTML
+    unless options.is_a?(Hash) &&
+      (options[:json] || options[:plain] || options[:layout] == false)
+      run_callbacks(:html_render) { super }
+    else
+      super
+    end
   end
 
   # flash is normally only preserved for one redirect; make sure we carry
