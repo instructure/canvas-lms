@@ -51,6 +51,32 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    shared_examples_for 'a datafixup that populates root_account_id to 0' do
+      let(:record) { raise 'set in examples' }
+      before { record.update_columns(root_account_id: nil) }
+      before do
+        # Ensure dummy account exists (done in migration but may be undone by specs)
+        Account.find_or_create_by!(id: 0).
+          update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+      end
+
+      it 'should populate the root_account_id to 0' do
+        expect {
+          DataFixup::PopulateRootAccountIdOnModels.run
+        }.to change { record.reload.root_account_id }.from(nil).to(0)
+      end
+    end
+
+    shared_examples_for 'a datafixup that does not populate root_account_id' do
+      let(:record) { raise 'set in examples' }
+      before { record.update_columns(root_account_id: nil) }
+      it 'should populate the root_account_id to 0' do
+        expect(record.reload.root_account_id).to be_nil
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(record.reload.root_account_id).to be_nil
+      end
+    end
+
     context 'with AccessToken' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) do
@@ -266,6 +292,30 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like 'a datafixup that populates root_account_id' do
           let(:record) { CalendarEvent.create!(context: CourseSection.create!(course: @course)) }
           let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is User' do
+        context 'when effective_context_code is null' do
+          it_behaves_like 'a datafixup that populates root_account_id to 0' do
+            let(:record) { CalendarEvent.create!(context: @user, effective_context_code: nil) }
+          end
+        end
+
+        context 'when effective_context_code is a something else' do
+          it_behaves_like 'a datafixup that does not populate root_account_id' do
+            let(:record) { CalendarEvent.create!(context: @user, effective_context_code: "foobar_123") }
+          end
+        end
+      end
+
+      context 'when context is something unsupported' do
+        it_behaves_like 'a datafixup that does not populate root_account_id' do
+          let(:record) do
+            CalendarEvent.create!(context: @user).tap do |ce|
+              ce.update_columns(context_type: 'Submission', context_id: submission_model.id)
+            end
+          end
         end
       end
     end
