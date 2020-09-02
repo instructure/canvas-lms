@@ -89,6 +89,9 @@
     "course_navigation_dd035109": {
         "message": "پیمایش درس"
     },
+    "current_volume_level_c55ab825": {
+        "message": "سطح حجم فعلی"
+    },
     "custom_6979cd81": {
         "message": "سفارشی"
     },
@@ -388,6 +391,9 @@
     },
     "something_went_wrong_89195131": {
         "message": "اشکالی رخ داده است."
+    },
+    "something_went_wrong_accessing_your_mic_or_webcam_6e3cad12": {
+        "message": "در دسترسی به میکروفون یا وب کم مشکلی پیش آمد."
     },
     "something_went_wrong_d238c551": {
         "message": "مشکلی پیش آمد"
