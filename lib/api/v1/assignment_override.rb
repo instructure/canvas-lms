@@ -381,7 +381,7 @@ module Api::V1::AssignmentOverride
   def invisible_users_and_overrides_for_user(context, user, existing_overrides)
     # get the student overrides the user can't see and ensure those overrides are included
     visible_user_ids = context.enrollments_visible_to(user).select(:user_id)
-    invisible_user_ids = context.users.where.not(id: visible_user_ids).pluck(:id)
+    invisible_user_ids = context.enrollments.where.not(:user_id => visible_user_ids).distinct.pluck(:user_id)
     invisible_override_ids = existing_overrides.select{ |ov|
       ov.set_type == 'ADHOC' &&
       !ov.visible_student_overrides(visible_user_ids)
