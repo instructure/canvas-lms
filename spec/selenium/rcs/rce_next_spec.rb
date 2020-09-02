@@ -23,6 +23,7 @@
 
 require_relative '../helpers/wiki_and_tiny_common'
 require_relative 'pages/rce_next_page'
+require_relative 'pages/rcs_sidebar_page'
 
 # while there's a mix of instui 6 and 7 in canvas we're getting
 # "Warning: [themeable] A theme registry has already been initialized." js errors
@@ -30,6 +31,7 @@ require_relative 'pages/rce_next_page'
 describe 'RCE next tests', ignore_js_errors: true do
   include_context 'in-process server selenium tests'
   include WikiAndTinyCommon
+  include RCSSidebarPage
   include RCENextPage
 
   context 'WYSIWYG generic as a teacher' do
@@ -818,6 +820,27 @@ describe 'RCE next tests', ignore_js_errors: true do
       wait_for_ajaximations
 
       expect(f('iframe[title="embedded content"][src="https://example.com/"]')).to be_displayed # save the page
+    end
+
+    it 'should not load duplicate data when opening sidbar tray multiple times' do
+      user_attachment = @user.attachments.build(filename: 'myimage.png', context: @student)
+      user_attachment.content_type = 'image/png'
+      user_attachment.save!
+
+      visit_new_assignment_page(@course)
+
+      click_images_toolbar_menu_button
+      click_user_images
+
+      expect(user_image_links.count).to eq 1
+      expect(tray_container).to include_text('myimage.png')
+
+      click_close_button
+      click_images_toolbar_menu_button
+      click_user_images
+
+      expect(user_image_links.count).to eq 1
+      expect(tray_container).to include_text('myimage.png')
     end
 
     describe 'keyboard shortcuts' do

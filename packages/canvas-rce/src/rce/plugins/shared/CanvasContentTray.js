@@ -233,9 +233,12 @@ export default function CanvasContentTray(props) {
       onChangeContext({contextType, contextId})
     }
   }
-
   return (
-    <StoreProvider {...props} key={openCount}>
+    <StoreProvider
+      {...props}
+      key={openCount}
+      contextType={filterSettings.contextType || props.contextType}
+    >
       {contentProps => (
         <Tray
           data-mce-component
@@ -268,7 +271,12 @@ export default function CanvasContentTray(props) {
                   </Flex.Item>
 
                   <Flex.Item>
-                    <CloseButton placement="static" variant="icon" onClick={handleDismissTray}>
+                    <CloseButton
+                      placement="static"
+                      variant="icon"
+                      onClick={handleDismissTray}
+                      data-testid="CloseButton_ContentTray"
+                    >
                       {formatMessage('Close')}
                     </CloseButton>
                   </Flex.Item>
