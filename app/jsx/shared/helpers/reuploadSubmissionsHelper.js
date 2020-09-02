@@ -38,8 +38,14 @@ function beforeSubmit({submissions_zip: submissionsZip}) {
 }
 
 function success(attachment) {
+  const $form = $(`#${formId}`)
+  // We've already posted the file data to files#create_pending and have an
+  // attachment that points to the file. That means we no longer need the
+  // submissions_zip input, and we need to add an input with the attachment ID.
+  $form.find('input[name="submissions_zip"]').remove()
+  $form.removeAttr('enctype')
   // xsslint safeString.property id
-  $(`#${formId}`).append(`<input type="hidden" name="attachment_id" value="${attachment.id}">`)
+  $form.append(`<input type="hidden" name="attachment_id" value="${attachment.id}">`)
   // Now that we've generated an attachment and included its ID in the form, submit the form
   // "normally" (don't trigger jQuery submit) to POST to gradebooks#submissions_zip_upload.
   document.getElementById(formId).submit()
