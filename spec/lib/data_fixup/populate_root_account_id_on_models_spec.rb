@@ -23,6 +23,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     @cm = @course.context_modules.create!
     @cm.update_columns(root_account_id: nil)
     user_model
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   # add additional models here as they are calculated and added to migration_tables.

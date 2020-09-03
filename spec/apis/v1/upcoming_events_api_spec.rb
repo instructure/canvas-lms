@@ -21,6 +21,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 describe UsersController, type: :request do
   include Api
 
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
 
   context "without current_user" do
     it "should check for auth" do
