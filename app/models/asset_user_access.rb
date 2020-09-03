@@ -43,7 +43,7 @@ class AssetUserAccess < ActiveRecord::Base
       0
     else
       asset_for_root_account_id.try(:resolved_root_account_id) ||
-        asset_for_root_account_id&.root_account_id
+        asset_for_root_account_id.try(:root_account_id)
       # We could default `asset_for_root_account_id ||= asset`, but AUAs shouldn't
       # ever be created outside of .log(), and calling `asset` would add a DB hit
     end
