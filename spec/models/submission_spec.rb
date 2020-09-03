@@ -5628,7 +5628,6 @@ describe Submission do
         end
 
         it "allows other students in the recipient's group to view their respective comment" do
-          pending "TALLY-667 will fix a bug with this behavior"
           comment = SubmissionComment.find_by(submission: assignment.submission_for_student(student3), author: student1)
 
           expect(comment).to be_grants_right(student3, :read)
