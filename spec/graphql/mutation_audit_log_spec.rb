@@ -85,6 +85,7 @@ describe AuditLogFieldExtension::Logger do
   let(:mutation) { double(graphql_name: "asdf") }
 
   before(:once) do
+    WebMock.enable_net_connect!
     Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
     course_with_teacher(active_all: true)
     @entry = @course.assignments.create! name: "asdf"
