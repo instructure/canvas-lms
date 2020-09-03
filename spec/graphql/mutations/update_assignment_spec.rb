@@ -21,14 +21,19 @@ require_relative "../graphql_spec_helper"
 
 describe Mutations::UpdateAssignment do
   before do
-    skip 'DEMO-32 (9/1/2020)'
-
     @account = Account.create!
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     @student = @course.enroll_student(User.create!, enrollment_state: 'active').user
     @assignment_id = @course.assignments.create!(title: "Example Assignment").id
     @course.enable_feature!(:anonymous_marking)
+  end
+
+  let(:audit_log_field_extension) { class_double(AuditLogFieldExtension).as_stubbed_const }
+
+  before(:each) do
+    # prevent unnecessary calls to dynamo (audit logs)
+    allow(audit_log_field_extension).to receive(:enabled?).and_return false
   end
 
   def execute_with_input(update_input, user_executing=@teacher)
