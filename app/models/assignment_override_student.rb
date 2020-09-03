@@ -127,6 +127,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= assignment&.root_account_id
+    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id
   end
 end
