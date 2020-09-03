@@ -94,6 +94,10 @@ def isPatchsetPublishable() {
 }
 
 def isPatchsetRetriggered() {
+  if(env.IS_AUTOMATIC_RETRIGGER == '1') {
+    return true
+  }
+
   def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
 
   return userCause && userCause[0].shortDescription.contains('Retriggered')
@@ -116,8 +120,32 @@ def cleanupFn(status) {
 def postFn(status) {
   if(status == 'FAILURE') {
     maybeSlackSendFailure()
+    maybeRetrigger()
   } else if(status == 'SUCCESS') {
     maybeSlackSendSuccess()
+  }
+}
+
+def shouldPatchsetRetrigger() {
+  // NOTE: The IS_AUTOMATIC_RETRIGGER check is here to ensure that the parameter is properly defined for the triggering job.
+  // If it isn't, we have the risk of triggering this job over and over in an infinite loop.
+  return env.IS_AUTOMATIC_RETRIGGER == '0' && (
+    env.GERRIT_EVENT_TYPE == 'change-merged' ||
+    configuration.getBoolean('change-merged') && configuration.getBoolean('enable-automatic-retrigger', '0')
+  )
+}
+
+def maybeRetrigger() {
+  if(shouldPatchsetRetrigger() && !isPatchsetRetriggered()) {
+    def retriggerParams = currentBuild.rawBuild.getAction(ParametersAction).getParameters()
+
+    retriggerParams = retriggerParams.findAll { record ->
+      record.name != 'IS_AUTOMATIC_RETRIGGER'
+    }
+
+    retriggerParams << new StringParameterValue('IS_AUTOMATIC_RETRIGGER', "1")
+
+    build(job: env.JOB_NAME, parameters: retriggerParams, propagate: false, wait: false)
   }
 }
 
