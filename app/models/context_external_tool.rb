@@ -946,7 +946,7 @@ end
   end
 
   def clear_tool_domain_cache
-    if self.saved_change_to_domain? || self.saved_change_to_url?
+    if self.saved_change_to_domain? || self.saved_change_to_url? || self.saved_change_to_workflow_state?
       self.context.clear_tool_domain_cache
     end
   end

@@ -144,6 +144,7 @@ module Csp::AccountHelper
   end
 
   def clear_tool_domain_cache
+    Rails.cache.delete([ACCOUNT_TOOL_CACHE_KEY_PREFIX, self.global_id].cache_key)
     Account.send_later_if_production(:invalidate_inherited_caches, self, [ACCOUNT_TOOL_CACHE_KEY_PREFIX])
   end
 

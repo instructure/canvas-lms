@@ -200,8 +200,13 @@ describe Csp do
         expect(@sub2.csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
         root_tool = create_tool(@root, :domain => "example1.com")
         expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq ["example1.com"]
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq ["example1.com"]
         root_tool.update_attribute(:domain, "example2.com")
         expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq ["example2.com"]
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq ["example2.com"]
+        root_tool.update_attribute(:workflow_state, "deleted")
+        expect(Account.find(@sub2.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
+        expect(Account.find(@root.id).csp_whitelisted_domains(include_files: false, include_tools: true)).to eq []
       end
     end
   end
