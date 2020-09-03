@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../api_spec_helper')
 
 describe AppointmentGroupsController, type: :request do
   before :once do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @course1 = @course
     course_with_teacher(:active_all => true, :user => @user)

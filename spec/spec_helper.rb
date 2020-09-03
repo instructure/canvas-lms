@@ -391,6 +391,7 @@ RSpec.configure do |config|
     MultiCache.reset
     Course.enroll_user_call_count = 0
     TermsOfService.skip_automatic_terms_creation = true
+    LiveEvents.clear_context!
     $spec_api_tokens = {}
   end
 

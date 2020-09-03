@@ -19,6 +19,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CalendarEvent do
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
 
   it "should sanitize description" do
     course_model
@@ -311,10 +314,17 @@ describe CalendarEvent do
       expect(appointment.root_account_id).to eq course.root_account_id
     end
 
-    it 'should set the root_acocunt when the context is a user' do
+    it 'should set the root_account when the context is a user if the effective context is set and is not a user' do
+      user = User.create!
+      course = Course.create!
+      appointment = CalendarEvent.create!(title: 'test', context: user, effective_context_code: course.asset_string)
+      expect(appointment.root_account_id).to eq course.root_account_id
+    end
+
+    it 'should set the root_account_id to 0 when the context is a user and there is no effective context' do
       user = User.create!
       appointment = CalendarEvent.create!(title: 'test', context: user)
-      expect(appointment.root_account_id).to eq user.account.id
+      expect(appointment.root_account_id).to eq 0
     end
 
     it 'should set the root_account when the context is a group' do

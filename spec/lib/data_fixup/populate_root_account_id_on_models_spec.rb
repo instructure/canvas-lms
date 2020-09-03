@@ -23,6 +23,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     @cm = @course.context_modules.create!
     @cm.update_columns(root_account_id: nil)
     user_model
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   # add additional models here as they are calculated and added to migration_tables.
@@ -48,6 +49,32 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           DataFixup::PopulateRootAccountIdOnModels.run
         }.to change { record.reload.root_account_id }.from(nil).to(expected_root_account_id)
         expect(expected_root_account_id).to be_present
+      end
+    end
+
+    shared_examples_for 'a datafixup that populates root_account_id to 0' do
+      let(:record) { raise 'set in examples' }
+      before { record.update_columns(root_account_id: nil) }
+      before do
+        # Ensure dummy account exists (done in migration but may be undone by specs)
+        Account.find_or_create_by!(id: 0).
+          update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+      end
+
+      it 'should populate the root_account_id to 0' do
+        expect {
+          DataFixup::PopulateRootAccountIdOnModels.run
+        }.to change { record.reload.root_account_id }.from(nil).to(0)
+      end
+    end
+
+    shared_examples_for 'a datafixup that does not populate root_account_id' do
+      let(:record) { raise 'set in examples' }
+      before { record.update_columns(root_account_id: nil) }
+      it 'should populate the root_account_id to 0' do
+        expect(record.reload.root_account_id).to be_nil
+        DataFixup::PopulateRootAccountIdOnModels.run
+        expect(record.reload.root_account_id).to be_nil
       end
     end
 
@@ -266,6 +293,91 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like 'a datafixup that populates root_account_id' do
           let(:record) { CalendarEvent.create!(context: CourseSection.create!(course: @course)) }
           let(:reference_record) { @course }
+        end
+      end
+
+      context 'when context is User' do
+        context 'when effective_context_code is null' do
+          it_behaves_like 'a datafixup that populates root_account_id to 0' do
+            let(:record) { CalendarEvent.create!(context: @user, effective_context_code: nil) }
+          end
+        end
+
+        context 'when effective_context_code is a something else' do
+          it_behaves_like 'a datafixup that does not populate root_account_id' do
+            let(:record) { CalendarEvent.create!(context: @user, effective_context_code: "foobar_123") }
+          end
+        end
+
+        context 'when effective_context_code is null but root_account_id is already filled' do
+          it "doesn't re-set the root_account_id to 0" do
+            # Some CalendarEvent with nil root_account_id is needed to instigate the backfill
+            other_ce = CalendarEvent.create!(context: @course)
+            other_ce.update_columns(root_account_id: nil)
+
+            # This is what we are testing:
+            ce = CalendarEvent.create!(context: @user, effective_context_code: nil)
+            ce.update_columns(root_account_id: @course.root_account_id)
+            expect(ce.reload.root_account_id).to be > 0
+            DataFixup::PopulateRootAccountIdOnModels.run
+            expect(ce.reload.root_account_id).to eq(@course.root_account_id)
+          end
+        end
+      end
+
+      context 'when context is a Course that does not exist' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) do
+            CalendarEvent.create!(context: @course).tap do |ce|
+              ce.update_columns(context_id: Course.last.id.to_i + 9999)
+            end
+          end
+        end
+      end
+
+      context 'when context is a Course that does not exist but it is already filled' do
+        it "doesn't re-set the root_account_id to 0" do
+          # Some CalendarEvent with nil root_account_id is needed to instigate the backfill
+          other_ce = CalendarEvent.create!(context: @course)
+          other_ce.update_columns(root_account_id: nil)
+
+          # This is what we are testing:
+          ce = CalendarEvent.create!(context: @course)
+          ce.update_columns(context_id: Course.last.id.to_i + 9999)
+          expect(ce.reload.root_account_id).to eq(@course.root_account_id)
+          expect(ce.root_account_id).to be > 0
+          DataFixup::PopulateRootAccountIdOnModels.run
+          expect(ce.reload.root_account_id).to eq(@course.root_account_id)
+        end
+      end
+
+      context 'when context is a CourseSection that does not exist' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) do
+            CalendarEvent.create!(context: CourseSection.create!(course: @course)).tap do |ce|
+              ce.update_columns(context_id: CourseSection.last.id.to_i + 9999)
+            end
+          end
+        end
+      end
+
+      context 'when context is a Group that does not exist' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) do
+            CalendarEvent.create!(context: group_model(context: @course)).tap do |ce|
+              ce.update_columns(context_id: Group.last.id.to_i + 9999)
+            end
+          end
+        end
+      end
+
+      context 'when context is something unsupported' do
+        it_behaves_like 'a datafixup that does not populate root_account_id' do
+          let(:record) do
+            CalendarEvent.create!(context: @user).tap do |ce|
+              ce.update_columns(context_type: 'Submission', context_id: submission_model.id)
+            end
+          end
         end
       end
     end
@@ -1533,6 +1645,46 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(true)
         log2.update_columns(root_account_id: nil)
         expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(false)
+      end
+    end
+  end
+
+  describe '.scope_for_association_does_not_exist' do
+    context 'for specific associations of a polymorphic association' do
+      it "returns the records for when the referenced record doesn't exist" do
+        # Different association, not returned:
+        f1 = Folder.create!(user: @user)
+
+        # Course does not exist. Folder record returned.
+        f2 = Folder.create!(context: @course)
+        f2.update_columns(context_id: Course.last.id + 9999)
+
+        # Cross-shard -- to be ignored (can't tell if it exists or not easily)
+        f3 = Folder.create!(context: @course)
+        f3.update_columns(context_id: (Shard.last&.id.to_i + 99999) * Shard::IDS_PER_SHARD + 1)
+
+        # Course exists. Not returned.
+        f4 = Folder.create!(context: @course)
+        result = described_class.scope_for_association_does_not_exist(Folder, :course).pluck(:id)
+
+        expect(result).to_not include(f1.id)
+        expect(result).to include(f2.id)
+        expect(result).to_not include(f3.id)
+        expect(result).to_not include(f4.id)
+      end
+    end
+
+    context 'for simple associations' do
+      it "returns the records for when the referenced record doesn't exist" do
+        # Just need some simple association w/o an FK constraint to test
+        # this ... root_account on Favorite will do
+        f1 = Favorite.create!(context: @course, user: @user)
+        f1.update_columns(root_account_id: Account.last.id.to_i + 9999)
+        f2 = Favorite.create!(context: @course, user: user_model)
+        expect(f2.root_account_id).to_not be_nil
+        result = described_class.scope_for_association_does_not_exist(Favorite, :root_account).pluck(:id)
+        expect(result).to include(f1.id)
+        expect(result).to_not include(f2.id)
       end
     end
   end

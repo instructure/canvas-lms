@@ -218,13 +218,17 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
-  def set_root_account
-    if context.respond_to?(:root_account)
-      self.root_account = context.root_account # course, section, group
+  def set_root_account(ctx = self.context)
+    if ctx.respond_to?(:root_account)
+      self.root_account = ctx.root_account # course, section, group
     else
-      case context
+      case ctx
       when User
-        self.root_account = context.account
+        if self.effective_context.is_a?(User)
+          self.root_account_id = 0
+        else
+          self.set_root_account(self.effective_context)
+        end
       when AppointmentGroup
         self.root_account = context.context&.root_account
       end
