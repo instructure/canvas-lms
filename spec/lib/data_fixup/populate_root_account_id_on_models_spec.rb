@@ -371,7 +371,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         end
       end
 
-      context 'when context is something unsupported' do
+      context 'when context is something not handled by any of our backfills' do
         it_behaves_like 'a datafixup that does not populate root_account_id' do
           let(:record) do
             CalendarEvent.create!(context: @user).tap do |ce|
