@@ -520,6 +520,19 @@ describe SplitUsers do
         expect(shard1_source_user.reload.linked_observers).to eq [observer2]
       end
 
+      it 'should handle user_observees cross shard' do
+        observee1 = user_model
+        observee2 = user_model
+        add_linked_observer(observee1, restored_user)
+        add_linked_observer(observee2, shard1_source_user)
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(restored_user.linked_observers).to eq []
+        expect(shard1_source_user.as_observer_observation_links.shard(shard1_source_user).map(&:user_id).uniq.sort).to eq [observee1.id, observee2.id].uniq.sort
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(restored_user.reload.as_observer_observation_links.shard(restored_user).map(&:user)).to eq [observee1]
+        expect(shard1_source_user.reload.as_observer_observation_links.map(&:user)).to eq [observee2]
+      end
+
       it 'should handle user_observers cross shard from target shard' do
         observer1 = user_model
         add_linked_observer(restored_user, observer1)
