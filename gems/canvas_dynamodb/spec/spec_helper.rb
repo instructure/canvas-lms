@@ -14,27 +14,22 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+#
 
-class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
-  KEY_SUFFIX = '__no_expire'.freeze
+require "canvas_dynamodb"
+require "yaml"
 
-  def fetch(*, expires_in: nil)
-    return yield if expires_in == 0
-    super
-  end
+RSpec.configure do |config|
+  config.run_all_when_everything_filtered = true
+  config.filter_run :focus
 
-  def fetch_without_expiration(key)
-    fetch(key + KEY_SUFFIX)
-  end
+  # Run specs in random order to surface order dependencies. If you find an
+  # order dependency and want to debug it, you can fix the order by providing
+  # the seed, which is printed after each run.
+  #     --seed 1234
+  config.order = 'random'
 
-  private
-
-  def write_entry(key, entry, options)
-    super(key, entry, options)
-    forever_entry = entry.dup
-    forever_entry.remove_instance_variable(:@expires_in)
-    super(key + KEY_SUFFIX, forever_entry, options.except(:expires_in))
+  config.expect_with :rspec do |c|
+    c.syntax = :expect
   end
 end
-
-LocalCache = FallbackMemoryCache.new
