@@ -2014,4 +2014,8 @@ class Account < ActiveRecord::Base
 
   relation_delegate_class(ActiveRecord::Relation).prepend(DomainRootAccountCache)
   relation_delegate_class(ActiveRecord::AssociationRelation).prepend(DomainRootAccountCache)
+
+  def self.ensure_dummy_root_account
+    Account.find_or_create_by!(id: 0) if Rails.env.test?
+  end
 end
