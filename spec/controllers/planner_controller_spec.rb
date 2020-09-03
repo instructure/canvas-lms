@@ -20,6 +20,7 @@ require_relative '../sharding_spec_helper'
 
 describe PlannerController do
   before :once do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(active_all: true)
     student_in_course(active_all: true)
     @group = @course.assignment_groups.create(:name => "some group")
