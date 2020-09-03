@@ -255,10 +255,20 @@ module SIS
               next
             end
           end
+          roles =
+            if role.built_in?
+              # it's possible we're still migrating the root account ownership - so pull enrollments for all equivalent built in roles
+              # TODO remove after datafixup
+              @root_account.shard.activate do
+                Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).where("root_account_id = ? OR root_account_id IS NULL", @root_account.id).to_a
+              end
+            else
+              [role]
+            end
           enrollment = @section.all_enrollments.where(user_id: user,
                                                       type: type,
                                                       associated_user_id: associated_user_id,
-                                                      role_id: role.id).take
+                                                      role_id: roles).take
 
           unless enrollment
             enrollment = Enrollment.typed_enrollment(type).new
