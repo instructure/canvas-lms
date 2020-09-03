@@ -35,7 +35,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
       # and datafixup references to the old built in roles
       old_role_ids = Role.where(:workflow_state => "built_in", :root_account_id => nil).pluck(:id)
 
-      [AccountUser, Enrollment, RoleOverride].each do |klass|
+      [AccountUser, RoleOverride].each do |klass|
         klass.find_ids_in_ranges do |min_id, max_id|
           klass.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
             joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
@@ -56,6 +56,30 @@ module DataFixup::CopyBuiltInRolesByRootAccount
             AND new_roles.root_account_id=COALESCE(accounts.root_account_id, accounts.id)
           JOIN_SQL
       end
+
+      Enrollment.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
+        # these are taking long enough that we should batch them
+        self.send_later_if_production_enqueue_args(
+          :move_roles_for_enrollments,
+          {
+            priority: Delayed::LOW_PRIORITY,
+            n_strand: ["built_in_roles_copy_fixup_for_enrollments", Shard.current.database_server.id]
+          },
+          old_role_ids, start_at, end_at
+        )
+      end
+    end
+  end
+
+  def self.move_roles_for_enrollments(old_role_ids, start_at, end_at)
+    Enrollment.find_ids_in_ranges(start_at: start_at, end_at: end_at) do |min_id, max_id|
+      Enrollment.where(:id => min_id..max_id, :role_id => old_role_ids).joins(:role).
+        joins(<<~JOIN_SQL).update_all("role_id=new_roles.id")
+              INNER JOIN #{Role.quoted_table_name} AS new_roles
+              ON new_roles.base_role_type=roles.base_role_type
+              AND new_roles.workflow_state='built_in'
+              AND new_roles.root_account_id=enrollments.root_account_id
+      JOIN_SQL
     end
   end
 end
