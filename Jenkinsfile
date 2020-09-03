@@ -150,7 +150,7 @@ def maybeSlackSendRetrigger() {
     slackSend(
       channel: getSlackChannel(),
       color: 'warning',
-      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> was re-triggered by ${env.GERRIT_EVENT_ACCOUNT_EMAIL}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${env.GERRIT_EVENT_ACCOUNT_EMAIL} has been re-triggered. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
     )
   }
 }
