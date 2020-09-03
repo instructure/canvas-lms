@@ -124,18 +124,10 @@ export const SUBMISSION_COMMENT_QUERY = gql`
 `
 
 export const SUBMISSION_HISTORIES_QUERY = gql`
-  query NextSubmission($submissionID: ID!, $cursor: String) {
+  query NextSubmission($submissionID: ID!) {
     node(id: $submissionID) {
       ... on Submission {
-        submissionHistoriesConnection(
-          before: $cursor
-          last: 5
-          filter: {includeCurrentSubmission: false}
-        ) {
-          pageInfo {
-            hasPreviousPage
-            startCursor
-          }
+        submissionHistoriesConnection(filter: {includeCurrentSubmission: false}) {
           nodes {
             ...SubmissionHistory
           }

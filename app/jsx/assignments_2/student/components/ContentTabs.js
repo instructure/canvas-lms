@@ -21,7 +21,7 @@ import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import {Flex} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
-import {getCurrentAttempt} from './Attempt'
+import {getCurrentAttempt} from './AttemptSelect'
 import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
 

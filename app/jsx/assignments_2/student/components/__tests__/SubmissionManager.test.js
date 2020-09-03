@@ -18,6 +18,7 @@
 
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
+import {SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
 import {fireEvent, render} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
@@ -120,11 +121,20 @@ describe('SubmissionManager', () => {
       type: 'online_upload',
       fileIds: ['1']
     }
-    const result = await mockQuery(CREATE_SUBMISSION, {}, variables)
+    const createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
+    const submissionHistoriesResult = await mockQuery(
+      SUBMISSION_HISTORIES_QUERY,
+      {Node: {__typename: 'Submission'}},
+      {submissionID: '1'}
+    )
     const mocks = [
       {
         request: {query: CREATE_SUBMISSION, variables},
-        result
+        result: createSubmissionResult
+      },
+      {
+        request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
+        result: submissionHistoriesResult
       }
     ]
 
