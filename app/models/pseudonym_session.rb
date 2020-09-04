@@ -17,7 +17,9 @@
 #
 
 class PseudonymSession < Authlogic::Session::Base
-  last_request_at_threshold  10.minutes
+  LAST_REQUEST_WINDOW = 10.minutes
+
+  last_request_at_threshold LAST_REQUEST_WINDOW
   verify_password_method :valid_arbitrary_credentials?
   login_field :unique_id
   find_by_login_method :custom_find_by_unique_id
@@ -141,13 +143,29 @@ class PseudonymSession < Authlogic::Session::Base
   end
 
   # this block is pulled from Authlogic::Session::Base.save_record, and does an update_columns in
-  # order to avoid a transaction and its associated db roundtrips
+  # order to avoid a transaction and its associated db roundtrips.
+  # It also gives us a useful place to do a smarter update
+  # when we have last_request_at tweaks piling up
   def save_record(alternate_record = nil)
     r = alternate_record || record
     if r != priority_record
       if r&.has_changes_to_save? && !r.readonly?
-        r.save_without_transaction
+        changed_columns = r.changes_to_save.keys
+        if changed_columns == ["last_request_at"]
+          # we're ONLY updating the last_request_at field.  This
+          # can create a problem when we're trying to do many of these at
+          # once, they pile up waiting on locks and each successful one writes
+          # a new version of the row which is I/O intensive since this happens
+          # a lot.  We want to use the SAME threshold we use for telling authlogic
+          # to not bother incrementing the value to make sure we don't update
+          # here if another process has already done so while we were waiting on the lock
+          time_clause = Pseudonym.arel_table[:last_request_at].lt(LAST_REQUEST_WINDOW.ago)
+          Pseudonym.where(id: r).where(time_clause).update_all(last_request_at: r.last_request_at)
+        else
+          r.save_without_transaction
+        end
       end
     end
   end
 end
+
