@@ -26,7 +26,10 @@
             <span class="screenreader-only"><%= t(:open_report_description, "Open Report Description") %></span>
           </button>
           <div id="<%= "#{report}_report_description" %>" style="display: none" class="report_description">
-            <%= render(:partial => description_partial) %>
+            <%= render(partial: description_partial, locals: {
+              report: report,
+              report_details: details,
+            }) %>
           </div>
         <% end %>
       </td>
@@ -50,7 +53,10 @@
             <div class="report_dialog">
               <form id="<%= report %>_form" class="run_report_form" action="<%= api_v1_account_create_report_path(@account, report) %>">
                 <div class="report_parameters">
-                  <%= render :partial => parameters_partial if parameters_partial %>
+                  <%= render(partial: parameters_partial, locals: {
+                    report: report,
+                    report_details: details,
+                  }) %>
                 </div>
                 <br />
                 <a href="#" id="run_<%= report %>" class="Button Button--primary Button--small run_report_link"><%= t 'links.run_report', 'Run Report' %></a>
