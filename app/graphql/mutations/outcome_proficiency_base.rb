@@ -60,7 +60,7 @@ class Mutations::OutcomeProficiencyBase < Mutations::BaseMutation
   end
 
   def check_permission(context)
-    raise GraphQL::ExecutionError, "insufficient permission" unless context.grants_right? current_user, :manage_outcomes
+    raise GraphQL::ExecutionError, "insufficient permission" unless context.grants_right? current_user, :manage_proficiency_scales
   end
 
   def upsert(input, existing_record = nil)
