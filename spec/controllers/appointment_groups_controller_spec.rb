@@ -20,6 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper')
 
 describe AppointmentGroupsController do
   before :once do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     @course2 = course_factory(active_all: true)
     course_factory(active_all: true)
     student_in_course(active_all: true)
