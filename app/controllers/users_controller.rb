@@ -2778,7 +2778,7 @@ class UsersController < ApplicationController
     @invalid_observee_creds = nil
     @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      @pairing_code = ObserverPairingCode.active.where(code: params[:pairing_code][:code]).first
+      @pairing_code = find_observer_pairing_code(params[:pairing_code][:code])
       if !@pairing_code.nil?
         @observee = @pairing_code.user
       else
@@ -2889,6 +2889,10 @@ class UsersController < ApplicationController
       }
       render :json => errors, :status => :bad_request
     end
+  end
+
+  def find_observer_pairing_code(pairing_code)
+    ObserverPairingCode.active.where(code: pairing_code).first
   end
 
   def validate_recaptcha(recaptcha_response)
