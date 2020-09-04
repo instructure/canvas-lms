@@ -51,10 +51,9 @@ class ObserverAlertThreshold < ActiveRecord::Base
     end
   end
 
-  # TODO: search cross-shard enrollments
   def users_are_still_linked?
     return true if observer.as_observer_observation_links.active.where(student: student).exists?
-    return true if observer.enrollments.active.where(associated_user: student).exists?
+    return true if observer.enrollments.active.where(associated_user: student).shard(observer).exists?
     false
   end
 
@@ -95,7 +94,7 @@ class ObserverAlertThreshold < ActiveRecord::Base
       end
     end
   end
-  
+
   def destroy
     self.workflow_state = 'deleted'
     self.save!
