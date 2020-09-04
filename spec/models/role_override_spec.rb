@@ -567,6 +567,30 @@ describe RoleOverride do
       account_model
     end
 
+    describe 'manage_proficiency_calculations' do
+      let(:permission) { RoleOverride.permissions[:manage_proficiency_calculations] }
+
+      it 'is enabled by default for account admins' do
+        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+      end
+
+      it 'is available to account admins, account memberships, teachers, and designers' do
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+      end
+    end
+
+    describe 'manage_proficiency_scales' do
+      let(:permission) { RoleOverride.permissions[:manage_proficiency_scales] }
+
+      it 'is enabled by default for account admins' do
+        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+      end
+
+      it 'is available to account admins, account memberships, teachers, and designers' do
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+      end
+    end
+
     describe 'select_final_grade' do
       let(:permission) { RoleOverride.permissions[:select_final_grade] }
 

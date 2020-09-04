@@ -615,6 +615,34 @@ class RoleOverride < ActiveRecord::Base
          'AccountAdmin'
        ]
     },
+    :manage_proficiency_calculations => {
+       :label => lambda { t('permissions.manage_proficiency_calculations', "Manage outcome proficiency calculations") },
+       :label_v2 => lambda { t("Outcome Proficiency Calculations - add / edit") },
+       :available_to => [
+         'DesignerEnrollment',
+         'TeacherEnrollment',
+         'TeacherlessStudentEnrollment',
+         'AccountAdmin',
+         'AccountMembership'
+       ],
+       :true_for => [
+         'AccountAdmin'
+       ]
+    },
+    :manage_proficiency_scales => {
+       :label => lambda { t('permissions.manage_proficiency_scales', "Manage outcome proficiency scales") },
+       :label_v2 => lambda { t("Outcome Proficiency Scales - add / edit") },
+       :available_to => [
+         'DesignerEnrollment',
+         'TeacherEnrollment',
+         'TeacherlessStudentEnrollment',
+         'AccountAdmin',
+         'AccountMembership'
+       ],
+       :true_for => [
+         'AccountAdmin'
+       ]
+    },
     :manage_sections => {
         :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
         :label_v2 => lambda { t("Course Sections - add / edit / delete") },

@@ -2504,6 +2504,48 @@ const ltiAddEditPermissions = generateActionTemplates(
   ]
 )
 
+const outcomeProficiencyCalculationsAddEditDeletePermissions = generateActionTemplates(
+  'manage_proficiency_calculations',
+  [
+    {
+      title: I18n.t('Outcome Proficiency Calculations'),
+      description: I18n.t(
+        `Allows user to set outcome proficiency calculations at the account and course levels.`
+      )
+    }
+  ],
+  [],
+  [
+    {
+      title: I18n.t('Outcome Proficiency Calculations'),
+      description: I18n.t(
+        `Allows user to set outcome proficiency calculations at the course level.`
+      )
+    }
+  ],
+  []
+)
+
+const outcomeProficiencyScalesAddEditDeletePermissions = generateActionTemplates(
+  'manage_proficiency_scales',
+  [
+    {
+      title: I18n.t('Outcome Proficiency Scales'),
+      description: I18n.t(
+        `Allows user to set outcome proficiency scales at the account and course levels.`
+      )
+    }
+  ],
+  [],
+  [
+    {
+      title: I18n.t('Outcome Proficiency Scales'),
+      description: I18n.t(`Allows user to set outcome proficiency scales at the course level.`)
+    }
+  ],
+  []
+)
+
 const learningOutcomesAddEditDeletePermissions = generateActionTemplates(
   'manage_outcomes',
   [
@@ -3251,6 +3293,8 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     messagesSentPermissions.ACCOUNT,
     messagesSentEntireClassPermissions.ACCOUNT,
     notificationsPermissions.ACCOUNT,
+    outcomeProficiencyCalculationsAddEditDeletePermissions.ACCOUNT,
+    outcomeProficiencyScalesAddEditDeletePermissions.ACCOUNT,
     pagesAddRemovePermissions.ACCOUNT,
     pairingCodePermissions.ACCOUNT,
     managePermissions.ACCOUNT,
@@ -3322,6 +3366,8 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     pagesAddRemovePermissions.COURSE,
     pairingCodePermissions.COURSE,
     managePermissions.COURSE,
+    outcomeProficiencyCalculationsAddEditDeletePermissions.COURSE,
+    outcomeProficiencyScalesAddEditDeletePermissions.COURSE,
     questionBankPermissions.COURSE,
     rubricsAddPermissions.COURSE,
     sisDataImportPermissions.COURSE,

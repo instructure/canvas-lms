@@ -21,14 +21,16 @@ module DataFixup::AddRoleOverridesForNewPermission
   # (for instance if a custom account admin has :manage_admin_users, they will
   # suddenly no longer be able to add account admins anymore until this is run)
 
-  def self.run(base_permission, new_permission, skip_validation: false)
+  def self.run(base_permission, new_permission, skip_validation: false, base_role_type: nil)
     unless skip_validation
       [base_permission, new_permission].each do |perm|
         raise "#{perm} is not a valid permission" unless RoleOverride.permissions.keys.include?(perm.to_sym)
       end
     end
 
-    RoleOverride.where(:permission => base_permission).find_in_batches do |base_overrides|
+    rel = RoleOverride.where(:permission => base_permission)
+    rel = rel.joins(:role).where(roles: {base_role_type: base_role_type}) if base_role_type
+    rel.find_in_batches do |base_overrides|
       # just in case
       new_overrides = RoleOverride.where(:permission => new_permission, :context_id => base_overrides.map(&:context_id))
 
