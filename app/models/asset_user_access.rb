@@ -222,8 +222,34 @@ class AssetUserAccess < ActiveRecord::Base
     infer_defaults
     self.root_account_id ||= infer_root_account_id(accessed[:asset_for_root_account_id])
 
-    save_without_transaction
+    if self.class.use_log_compaction_for_views? && self.eligible_for_log_path?
+      # Since this is JUST a view bump, we'll write it to the
+      # view log and let periodic jobs compact them later
+      # (this is intentionally trading off more latency for less I/O pressure)
+      AssetUserAccessLog.put_view(self)
+    else
+      save_without_transaction
+    end
     self
+  end
+
+  def eligible_for_log_path?
+    # in general we want writes to go to the table right now.
+    # view count updates happen a LOT though, so if the setting is
+    # configured such that we're allowed to use the log path, check
+    # if this set of changes is "just" a view update.
+    change_hash = self.changes_to_save
+    updated_key_set = self.changes_to_save.keys.to_set
+    return false unless updated_key_set.include?('view_score')
+    return false unless (updated_key_set - Set.new(['updated_at', 'last_access', 'view_score'])).empty?
+    # ASSUMPTION: All view_score updates are a single increment.
+    # If this is violated, rather than failing to capture, we should accept the
+    # write through the row update for now (by returning false from here).
+    view_delta = change_hash['view_score'].compact
+    # ^array with old and new value, which CAN be null, hence compact
+    return false if view_delta.size < 1
+    return view_delta[0] == 1.0 if view_delta.size == 1
+    (view_delta[1] - view_delta[0]).abs == 1 # this is an increment, if true
   end
 
   def log_action(level)
@@ -233,6 +259,14 @@ class AssetUserAccess < ActiveRecord::Base
     if self.action_level != 'participate'
       self.action_level = (level == 'submit') ? 'participate' : level
     end
+  end
+
+  def self.use_log_compaction_for_views?
+    self.view_counting_method.to_s == "log"
+  end
+
+  def self.view_counting_method
+    Canvas::Plugin.find(:asset_user_access_logs).settings[:write_path]
   end
 
   def self.infer_asset(code)

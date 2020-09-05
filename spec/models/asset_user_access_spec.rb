@@ -51,6 +51,37 @@ describe AssetUserAccess do
       expect(asset.context).to eq @course
     end
 
+    describe "configured for log compaction" do
+      it "writes to the log instead for view counts" do
+        allow(AssetUserAccess).to receive(:view_counting_method).and_return("log")
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
+        # updating view level which hasn't been set before,
+        # so this one should write to the table
+        cur_view_count = @asset.view_score
+        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        expect(@asset.reload.view_score).to_not eq(cur_view_count)
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(0)
+        # this time it's just a bump of the views, should get
+        # sent to the log
+        cur_view_count = @asset.view_score
+        AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+        expect(@asset.reload.view_score).to eq(cur_view_count)
+        expect(AssetUserAccessLog.for_today(@asset).count).to eq(1)
+      end
+
+      describe "#eligible_for_log_path?" do
+        it "is eligible only for view bumps" do
+          AssetUserAccess.log @user, @course, { level: 'view', code: @assignment.asset_string }
+          @asset.reload
+          @asset.display_name = "foo_bar"
+          expect(@asset.eligible_for_log_path?).to be_falsey
+          @asset.restore_attributes
+          @asset.view_score = @asset.view_score + 1
+          expect(@asset.eligible_for_log_path?).to be_truthy
+        end
+      end
+    end
+
     describe "for_user" do
       it "should work with a User object" do
         expect(AssetUserAccess.for_user(@user)).to eq [@asset]
@@ -367,6 +398,20 @@ describe AssetUserAccess do
       allow(subject).to receive(:asset_group_code).and_return('quizzes')
 
       expect(subject.corrected_view_score).to eq -4
+    end
+  end
+
+  describe "consuming plugin setting" do
+    it "defaults to normal updates" do
+      expect(AssetUserAccess.view_counting_method).to eq("update")
+    end
+
+    it "reads plugin setting for override" do
+      ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs")
+      ps.inheritance_scope = "shard"
+      ps.settings = { max_log_ids: [0,0,0,0,0,0,0], write_path: 'log' }
+      ps.save!
+      expect(AssetUserAccess.view_counting_method).to eq("log")
     end
   end
 end
