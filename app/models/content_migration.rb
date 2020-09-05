@@ -985,14 +985,15 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def set_root_account_id
-    case self.context
-    when Course, Group
-      self.root_account_id ||= self.context.root_account_id
-    when Account
-      self.root_account_id ||= self.context.resolved_root_account_id
-    when User
-      self.root_account_id ||= 0
-    end
+    self.root_account_id ||=
+      case self.context
+      when Course, Group
+        self.context.root_account_id
+      when Account
+        self.context.resolved_root_account_id
+      when User
+        0 # root account id unknown, use dummy root account id
+      end
     Account.ensure_dummy_root_account if root_account_id == 0
   end
 

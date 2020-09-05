@@ -195,6 +195,7 @@ module DataFixup::PopulateRootAccountIdOnModels
     @fill_with_zeros_criteria ||= {
       CalendarEvent => {context_type: 'User', effective_context_code: nil},
       LearningOutcomeGroup => 'context_id IS NULL',
+      ContentMigration => {context_type: 'User'},
     }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
