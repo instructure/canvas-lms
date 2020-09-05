@@ -419,6 +419,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         expect(cm.reload.root_account_id).to eq @group.root_account_id
       end
 
+      context 'with a User context' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) { @user.content_migrations.create! }
+        end
+      end
+
       context 'with sharding' do
         specs_require_sharding
 
