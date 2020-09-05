@@ -35,8 +35,14 @@
     "assignments_1e02582c": {
         "message": "تکلیف ها"
     },
+    "attributes_963ba262": {
+        "message": "ویژگی ها"
+    },
     "available_folders_694d0436": {
         "message": "پوشه های موجود"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
     },
     "calendar_a8563bb2": {
         "message": "تقویم:"
@@ -46,6 +52,9 @@
     },
     "cancel_caeb1e68": {
         "message": "لغو"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "انتخاب حقوق استفاده..."
     },
     "clear_selected_file_82388e50": {
         "message": "پاک کردن فایل انتخاب شده"
@@ -71,6 +80,9 @@
     "content_type_2cf90d95": {
         "message": "نوع محتوا"
     },
+    "copyright_holder_66ee111": {
+        "message": "دارنده حق نشر:"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
     },
@@ -88,6 +100,9 @@
     },
     "course_navigation_dd035109": {
         "message": "پیمایش درس"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "مجوز کریتیو کامنز:"
     },
     "current_volume_level_c55ab825": {
         "message": "سطح حجم فعلی"
@@ -199,6 +214,12 @@
     },
     "group_navigation_99f191a": {
         "message": "پیمایش گروه"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "مجوز استفاده از این فایل را به دست آورده ام."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "حق نشر دارم"
     },
     "image_8ad06": {
         "message": "تصویر"
@@ -422,6 +443,12 @@
     "text_7f4593da": {
         "message": "متن"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "مطلب در دامنه عمومی است"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "مطلب تحت مجوز کریتیو کامنز است"
+    },
     "time_2b5aac58": {
         "message": "زمان"
     },
@@ -457,6 +484,9 @@
     },
     "url_22a5f3b8": {
         "message": "نشانی اینترنتی"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "حق استفاده:"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "برای حرکت به گزینه ها از کلیدهای جهت دار استفاده کنید."

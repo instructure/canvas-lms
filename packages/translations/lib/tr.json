@@ -113,6 +113,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, hatırlatıcı { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Özellikler"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Ses ve Görüntü kaydı kullanılamaz."
     },
@@ -121,6 +124,9 @@
     },
     "available_folders_694d0436": {
         "message": "Mevcut klasörler"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
     },
     "calendar_a8563bb2": {
         "message": "Takvim:"
@@ -136,6 +142,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Kullanıcı haklarını seçin..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "sıralanmamış listeyi yuvarlak içine al"
@@ -173,6 +182,9 @@
     "content_type_2cf90d95": {
         "message": "İçerik Tipi"
     },
+    "copyright_holder_66ee111": {
+        "message": "Telif Sahibi:"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
     },
@@ -202,6 +214,9 @@
     },
     "course_navigation_dd035109": {
         "message": "Ders Gezinme Menüsü"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons Lisansı:"
     },
     "current_volume_level_c55ab825": {
         "message": "Mevcut Ses Seviyesi"
@@ -358,6 +373,12 @@
     },
     "height_69b03e15": {
         "message": "Yükseklik"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Bu dosyayı kullanmak için iznim var."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Telif hakkı bendedir"
     },
     "image_8ad06": {
         "message": "Görsel"
@@ -560,6 +581,12 @@
     "task_16b0ef38": {
         "message": "Görev"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Bu malzeme genel kullanıma açık"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Bu malzeme Creative Commons a göre lisanslı"
+    },
     "time_2b5aac58": {
         "message": "Süre"
     },
@@ -625,6 +652,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Kullanım Şartları:"
     },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"

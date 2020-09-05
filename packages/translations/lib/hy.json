@@ -29,6 +29,12 @@
     "assignments_1e02582c": {
         "message": "Հանձնարարություններ"
     },
+    "attributes_963ba262": {
+        "message": "Հատկանիշեր"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001թ. Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Օրացույց"
     },
@@ -37,6 +43,9 @@
     },
     "cancel_caeb1e68": {
         "message": "Չեղյալ համարել"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Ընտրել օգտագործման իրավունքները..."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
@@ -56,6 +65,9 @@
     "content_type_2cf90d95": {
         "message": "Բովանդակության տեսակ"
     },
+    "copyright_holder_66ee111": {
+        "message": "Հեղինակային իրավունք ունեցող անձը՝"
+    },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
     },
@@ -73,6 +85,9 @@
     },
     "course_navigation_dd035109": {
         "message": "Նավարկում դասընթացում"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "\"Creative Commons\" լիցենզիա"
     },
     "date_ee500367": {
         "message": "Ամսաթիվ"
@@ -145,6 +160,12 @@
     },
     "group_navigation_99f191a": {
         "message": "Խմբի նավարկում"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Ես թույլտվություն եմ ստացել օգտագործելու այս ֆայլը:"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Ես հեղինակային իրավունք ունեմ"
     },
     "image_8ad06": {
         "message": "Պատկեր"
@@ -284,6 +305,12 @@
     "syllabus_f191f65b": {
         "message": "Դասընթացի ծրագիր"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Նյութը գտնվում է հանրությանը հասանելի դոմենում"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Նյութը արտոնագրված է  Creative Commons կողմից"
+    },
     "time_2b5aac58": {
         "message": "Ժամ"
     },
@@ -307,6 +334,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Օգտագործման իրավունք՝"
     },
     "video_player_b371005": {
         "message": "Տեսաձայնագրության նվագարկիչ"

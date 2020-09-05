@@ -101,6 +101,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, нагадування { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Атрибути"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Запис аудіо та відео не доступний"
     },
@@ -109,6 +112,9 @@
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Початок вашої історії завдань"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
     },
     "calendar_a8563bb2": {
         "message": "Календар:"
@@ -121,6 +127,9 @@
     },
     "canvas_planner_98ed106": {
         "message": "Планувальник Canvas"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Виберіть права використання..."
     },
     "clear_selected_file_82388e50": {
         "message": "Очистити вибраний файл"
@@ -155,6 +164,9 @@
     "content_type_2cf90d95": {
         "message": "Тип вмісту"
     },
+    "copyright_holder_66ee111": {
+        "message": "Правовласник:"
+    },
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# opportunities}\n    one {# opportunity}\n  other {# opportunities}\n}"
     },
@@ -178,6 +190,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "Зробити { course }"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Ліцензія Creative Commons:"
     },
     "custom_6979cd81": {
         "message": "Звичай"
@@ -334,6 +349,15 @@
     },
     "group_navigation_99f191a": {
         "message": "Навігація групи"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Я отримав дозвіл на використання цього файлу."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Я володію авторським правом"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Якщо ви не виберете права використання, цей файл не буде опублікований після його завантаження."
     },
     "image_8ad06": {
         "message": "Зображення"
@@ -620,6 +644,12 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Дата та час, до якого це потрібно виконати"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Матеріал в публічному домені"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Матеріал опубліковано під ліцензією Creative Commons"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "З цим елементом не пов''язані бали"
     },
@@ -664,6 +694,9 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Права використання:"
     },
     "video_player_b371005": {
         "message": "Відеопрогравач"
