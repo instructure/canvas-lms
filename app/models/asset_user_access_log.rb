@@ -138,13 +138,17 @@ class AssetUserAccessLog
           ps.save
         end
       end
-      return AssetUserAccessLog.send_later(:compact, { strand: strand_name } ) unless yesterday_completed
+      return AssetUserAccessLog.reschedule! unless yesterday_completed
     end
     today_completed = compact_partition(ts)
     # it's ok if we didn't complete, we time the job out so that
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
-    AssetUserAccessLog.send_later(:compact, { strand: strand_name }) unless today_completed
+    AssetUserAccessLog.reschedule! unless today_completed
+  end
+
+  def self.reschedule!
+    AssetUserAccessLog.send_later_enqueue_args(:compact, { strand: strand_name })
   end
 
   def self.strand_name
@@ -172,7 +176,7 @@ class AssetUserAccessLog
       # (defends against sequences being reset to the "highest" record in a table and then
       # deciding we already chomped these logs).
       ps = plugin_setting
-      max_log_ids = ps.settings.fetch(:max_log_ids, [0,0,0,0,0,0,0])
+      max_log_ids = ps.reload.settings.fetch(:max_log_ids, [0,0,0,0,0,0,0])
       log_id_bookmark = [(partition_lower_bound-1), (max_log_ids[ts.wday] || 0)].max
       while log_id_bookmark < partition_upper_bound
         Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - processing #{log_id_bookmark} from #{partition_upper_bound}")
@@ -261,8 +265,8 @@ class AssetUserAccessLog
     update_query = <<~SQL
       UPDATE #{AssetUserAccess.quoted_table_name} AS aua
       SET view_score = COALESCE(aua.view_score, 0) + log_segment.view_count,
-        updated_at = GREATEST(aua.updated_at, TO_TIMESTAMP(log_segment.max_updated_at, 'YYYY-MM-DD HH:MI:SS.US')),
-        last_access = GREATEST(aua.last_access, TO_TIMESTAMP(log_segment.max_updated_at, 'YYYY-MM-DD HH:MI:SS.US'))
+        updated_at = GREATEST(aua.updated_at, TO_TIMESTAMP(log_segment.max_updated_at, 'YYYY-MM-DD HH24:MI:SS.US')),
+        last_access = GREATEST(aua.last_access, TO_TIMESTAMP(log_segment.max_updated_at, 'YYYY-MM-DD HH24:MI:SS.US'))
       FROM ( VALUES #{values_list} ) AS log_segment(aua_id, view_count, max_updated_at)
       WHERE aua.id=log_segment.aua_id
     SQL
