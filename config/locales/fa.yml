@@ -4048,6 +4048,7 @@ fa:
   cancel_submitting_comment_2666e98b: "لغو ارسال نظر"
   cancel_updating_comment_6816d855: "لغو به‌روز رسانی نظر"
   cannot_access_group_in_concluded_course_90a8db52: "امکان دسترسی به گروه در درس خاتمه یافته وجود ندارد"
+  cannot_add_role_name_name_already_in_use_a523639c: "نمی توان نام نقش را اضافه کرد  به %{name}:  درحال استفاده است."
   cannot_add_section_to_a_non_section_specific_discu_d2a7f263: "امکان افزودن بخش به بحث غیر خاص بخش وجود ندارد"
   cannot_autograde_at_this_time_a146ad9d: "در حال حاضر نمره‌گذاری خودکار ممکن نیست"
   cannot_be_associated_with_a_different_account_ac863be2: "نمی تواند با یک حساب دیگر در ارتباط باشد"
@@ -5614,6 +5615,9 @@ fa:
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
     other: "%{count} فرد در *%{course_name}* با موفقیت ثبت نام شدند."
+  count_permissions_found_1a926f7d: 
+    one: "یک مجوز موجود است"
+    other: "%{count} مجوز موجود است"
   count_points_4735a2e8: 
     one: "%{count} امتیاز"
     other: "%{count} امتیاز"
@@ -13877,6 +13881,7 @@ fa:
   nickname_1e6da3ad: "نام مستعار"
   nickname_7df95b09: "نام مستعار:"
   no_74e9b590: خیر
+  no_alignments_are_available_for_this_outcome_7f8346f9: "هیچ تطبیقی برای این نتیجه موجود نیست."
   no_announcements_280df147: "بدون اطلاعیه"
   no_assignment_group_assigned_8f1cdb9b: "هیچ گروه تکلیفی اختصاص نیافته است"
   no_assignment_name_adbb215b: "نام تکلیف موجود نیست"
@@ -14669,7 +14674,7 @@ fa:
       find_outcomes: "یافتن نتایج"
   outcomes_and_rubrics_account_course_68d0bf1d: "نتایج و مقالات (حساب / دوره)"
   outcomes_and_rubrics_f893d141: "نتایج و مقالات"
-  outcomes_csv_format_9005acfb: "خروجی‌ها قالب CSV "
+  outcomes_csv_format_9005acfb: "نتایج قالب CSV "
   outcomes_d1b18d33: نتایج
   outcomes_for_student_9f91d4d: "نتیجه مربوط به دانشجو"
   outcomes_import_completed_baff5cb0: "ورود نتیجه‌ها  کامل شد."
@@ -20286,6 +20291,7 @@ fa:
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "در هنگام ارسال به سرویس تشخیص شباهت وجود داشت. لطفا قبل از تماس با پشتیبانی، ارسال دوباره فایل را امتحان کنید."
   there_was_an_error_updating_this_assignment_please_59fc608d: "در هنگام به روزرسانی این تکلیف خطایی رخ داد. لطفا صفحه را از نو سازی کنید و دوباره تلاش کنید."
   there_was_an_error_uploading_the_image_932fc4ce: "در هنگام بارگذاری تصویر خطایی رخ داد"
+  there_was_an_error_uploading_your_file_please_try__ce458566: "هنگام بارگذاری فایل شما خطایی روی داد. لطفا دوباره تلاش کنید."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "خطایی در جستجوی شما رخ داد: لطفا جستجوی دیگری را امتحان کنید"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "یک مشکل غیر منتظره در همگام سازی وجود داشت"
   there_was_an_unknown_error_registering_the_tool_b9a29954: "یک خطای ناشناخته در ثبت ابزار وجود داشت"
@@ -20715,10 +20721,12 @@ fa:
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "برای مشاهده تجزیه و تحلیل دانشجو در تجزیه و تحلیل درس ، نمرات - مشاهده همه نمرات نیز باید فعال باشد"
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "برای مشاهده برگه گزارشات, درسها - گزارش های استفاده نیز باید فعال شوند."
   today_76e10f9c: امروز
+  toggle_alignment_details_for_title_944f605: "جزئیات تطبیق را  برای %{title} تغییر دهید"
   toggle_course_card_color_overlays_b5b8137a: "تغییر پوشش رنگ کارت درس"
   toggle_editing_answer_text_as_html_9a93fe6: "تغییر ویرایش متن پاسخ به عنوان HTML"
   toggle_module_visibility_781a2f6c: "قابلیت مشاهده ماژول را تغییر دهید."
   toggle_option_cfd8b95a: "گزینه را تغییر دهید"
+  toggle_outcomes_for_title_6994b198: "تغییر نتایج برای %{title}"
   toggle_select_course_name_310fdee4: "تغییر وضعیت درس انتخابی %{name}"
   toggle_title_grading_period_visibility_462b2136: "تغییر وضعیت قابلیت مشاهده دوره نمره‌گذاری %{title}"
   toggle_tooltip_1ed3b35e: "راهنمایی ابزار را تغییر دهید"
