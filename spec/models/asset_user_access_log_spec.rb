@@ -148,6 +148,13 @@ describe AssetUserAccessLog do
         end
       end
     end
+
+    it "aborts job immediately if plugin setting is nil" do
+      ps = PluginSetting.where(name: "asset_user_access_logs").delete_all
+      expect(AssetUserAccess).to_not receive(:compact_partition)
+      AssetUserAccessLog.compact
+      expect(@asset_1.reload.view_score).to be_nil
+    end
   end
 
   describe ".reschedule!" do
