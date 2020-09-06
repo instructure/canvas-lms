@@ -35,6 +35,12 @@ describe AssetUserAccessLog do
       AssetUserAccessLog.put_view(@asset, timestamp: dt)
       expect(AssetUserAccessLog::AuaLog5.count).to eq(1)
     end
+
+    it "can do updates with a 24hr clock" do
+      row = {"aua_id" => @asset.id, "view_count" => 12, "max_updated_at" => "2020-09-06 14:01:15"}
+      update_sql = AssetUserAccessLog.compaction_sql([row])
+      expect{ AssetUserAccess.connection.execute(update_sql) }.to_not raise_error
+    end
   end
 
   describe ".compact" do
@@ -141,6 +147,13 @@ describe AssetUserAccessLog do
           expect(@asset_1.reload.last_access > update_ts).to be_truthy
         end
       end
+    end
+  end
+
+  describe ".reschedule!" do
+    it "puts the new job on the right strand" do
+      AssetUserAccessLog.reschedule!
+      expect(Delayed::Job.where(strand: AssetUserAccessLog.strand_name).count).to eq(1)
     end
   end
 end
