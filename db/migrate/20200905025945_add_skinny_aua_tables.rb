@@ -33,6 +33,5 @@ class AddSkinnyAuaTables < ActiveRecord::Migration[5.2]
     drop_table(:aua_logs_4)
     drop_table(:aua_logs_5)
     drop_table(:aua_logs_6)
-    ActiveRecord::Base.connection.execute("DROP SEQUENCE IF EXISTS #{global_sequence_name}")
   end
 end

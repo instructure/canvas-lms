@@ -119,26 +119,43 @@ class AssetUserAccessLog
     yesterday_ts = ts - 1.day
     yesterday_model = log_model(yesterday_ts)
     if yesterday_model.take(1).size > 0
-      compact_partition(yesterday_ts)
-      # we have now compacted all the writes from the previous day.
-      # since the timestamp (now) is into the NEXT utc day, no further
-      # writes can happen to yesterdays partition, and we can truncate it,
-      # and reset our iterator tracking for that day (this is important because
-      # in some cases like in specific restoration scenarios sequences can be
-      # "reset" by looking for the max id value in a table and making it bigger than that.
-      #  Tracking iterator state indefinitely could result in missing writes if a truncated
-      # table gets it's iterator reset).
-      yesterday_model.connection.truncate(yesterday_model.table_name)
+      yesterday_completed = compact_partition(yesterday_ts)
       ps = plugin_setting.reload
-      ps.settings[:max_log_ids][ts.wday] = 0
-      ps.save
+      if yesterday_completed && ps.settings[:max_log_ids][yesterday_ts.wday] >= yesterday_model.maximum(:id)
+        # we have now compacted all the writes from the previous day.
+        # since the timestamp (now) is into the NEXT utc day, no further
+        # writes can happen to yesterdays partition, and we can truncate it,
+        # and reset our iterator tracking for that day (this is important because
+        # in some cases like in specific restoration scenarios sequences can be
+        # "reset" by looking for the max id value in a table and making it bigger than that.
+        #  Tracking iterator state indefinitely could result in missing writes if a truncated
+        # table gets it's iterator reset).
+        Shackles.activate(:deploy) do
+          yesterday_model.connection.truncate(yesterday_model.table_name)
+        end
+        PluginSetting.suspend_callbacks(:clear_cache) do
+          ps.settings[:max_log_ids][yesterday_ts.wday] = 0
+          ps.save
+        end
+      end
+      return AssetUserAccessLog.send_later(:compact, { strand: strand_name } ) unless yesterday_completed
     end
-    compact_partition(ts)
+    today_completed = compact_partition(ts)
+    # it's ok if we didn't complete, we time the job out so that
+    # for things that need to move or hold jobs they don't have to
+    # wait forever.  If we completed compaction, though, just finish.
+    AssetUserAccessLog.send_later(:compact, { strand: strand_name }) unless today_completed
+  end
+
+  def self.strand_name
+    "AssetUserAccessLog.compact:#{Shard.current.database_server.id}"
   end
 
   def self.compact_partition(ts)
     partition_model = log_model(ts)
     log_batch_size = Setting.get("aua_log_batch_size", "10000").to_i
+    max_compaction_time = Setting.get("aua_compaction_time_limit_in_minutes", "5").to_i
+    compaction_start = Time.now.utc
     Shackles.activate(:slave) do
       # select the boundaries of the log segment we're going to iterate.
       # we may still _process_ records bigger than this as part of a single write,
@@ -179,26 +196,38 @@ class AssetUserAccessLog
           Shackles.activate(:master) do
             partition_model.connection.execute(update_query)
           end
-          # Here we want to write a little state onto the plugin setting
-          # so that if the job dies or finishes, the next time we run
-          # we don't have to re-scan log segments we've already compacted.
+          # Here we want to write the iteration state onto the plugin setting
+          # so that we don't double count rows later.  The next time the job
+          # runs it can pick up at this point and only count rows that haven't yet been counted.
           ps.reload
-          ps.settings[:max_log_id] ||= [0,0,0,0,0,0,0] # (just in case...)
-          ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
-          ps.save
+          # also, no need to clear the cache, these are LOCAL
+          # plugin settings, so let's not beat up consul
+          PluginSetting.suspend_callbacks(:clear_cache) do
+            ps.settings[:max_log_ids] ||= [0,0,0,0,0,0,0] # (just in case...)
+            ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
+            ps.save
+          end
           log_id_bookmark = new_iterator_pos
           sleep(intra_batch_pause) if intra_batch_pause > 0.0
         else
           # no records found in this range, we must be paging through an open segment
           # just keep going until the iterator catches up to real records.
-          ps.reload.settings[:max_log_ids][ts.wday] = batch_upper_boundary
-          ps.save
+          PluginSetting.suspend_callbacks(:clear_cache) do
+            ps.reload.settings[:max_log_ids][ts.wday] = batch_upper_boundary
+            ps.save
+          end
           # we don't ever want to set the bookmark PAST the partition we expected
           # to consume
           log_id_bookmark = [batch_upper_boundary, partition_upper_bound].min
         end
+        batch_timestamp = Time.now.utc
+        if (batch_timestamp - compaction_start) > (max_compaction_time * 60)
+          # we ran out of time, let the job get re-scheduled
+          return false
+        end
       end
     end
+    return true # to indicate we didn't bail
   end
 
   # for a given log segment (the records between IDs A and B),
