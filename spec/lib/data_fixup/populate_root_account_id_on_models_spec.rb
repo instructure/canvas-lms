@@ -832,6 +832,16 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         end
       end
 
+      context 'with a global LearningOutcomeGroup (null context)' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) do
+            outcome_group_model(context: @course).tap do |og|
+              og.update_columns(context_id: nil, context_type: nil)
+            end
+          end
+        end
+      end
+
       context 'with LearningOutcomeQuestionResult' do
         it_behaves_like 'a datafixup that populates root_account_id' do
           let(:record) do
@@ -1627,19 +1637,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
         dk3.update_columns(root_account_id: nil)
         expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
-      end
-    end
-
-    context 'LearningOutcomeGroup' do
-      it 'ignores null contexts' do
-        log1 = LearningOutcomeGroup.create!(context: nil, title: 'log')
-        expect(log1.root_account_id).to be_nil
-        log2 = outcome_group_model(context: @course)
-        expect(log2.root_account_id).to_not be_nil
-
-        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(true)
-        log2.update_columns(root_account_id: nil)
-        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(false)
       end
     end
   end
