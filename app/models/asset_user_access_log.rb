@@ -134,12 +134,14 @@ class AssetUserAccessLog
         # "reset" by looking for the max id value in a table and making it bigger than that.
         #  Tracking iterator state indefinitely could result in missing writes if a truncated
         # table gets it's iterator reset).
-        Shackles.activate(:deploy) do
-          yesterday_model.connection.truncate(yesterday_model.table_name)
-        end
-        PluginSetting.suspend_callbacks(:clear_cache) do
-          ps.settings[:max_log_ids][yesterday_ts.wday] = 0
-          ps.save
+        if truncation_enabled?
+          Shackles.activate(:deploy) do
+            yesterday_model.connection.truncate(yesterday_model.table_name)
+          end
+          PluginSetting.suspend_callbacks(:clear_cache) do
+            ps.settings[:max_log_ids][yesterday_ts.wday] = 0
+            ps.save
+          end
         end
       end
       return AssetUserAccessLog.reschedule! unless yesterday_completed
@@ -149,6 +151,16 @@ class AssetUserAccessLog
     # for things that need to move or hold jobs they don't have to
     # wait forever.  If we completed compaction, though, just finish.
     AssetUserAccessLog.reschedule! unless today_completed
+  end
+
+  def self.truncation_enabled?
+    # we can flip this setting when we're pretty sure it's safe to start dropping
+    # data, the iterator state will keep it healthy^
+    Setting.get('aua_log_truncation_enabled', 'false') == 'true'
+  end
+
+  def self.sequence_jumps_allowed?
+    Setting.get('aua_log_seq_jumps_allowed', 'false') == 'true'
   end
 
   def self.reschedule!
@@ -191,7 +203,6 @@ class AssetUserAccessLog
         # to respond to updated settings)
         intra_batch_pause = Setting.get("aua_log_compaction_batch_pause", "0.0").to_f
         batch_upper_boundary = log_id_bookmark + log_batch_size
-        has_compactable_data = partition_model.where("id > ?", log_id_bookmark).take(1)
         agg_sql = aggregation_query(partition_model, log_id_bookmark, batch_upper_boundary)
         log_segment_aggregation = partition_model.connection.execute(agg_sql)
         if log_segment_aggregation.to_a.size > 0
@@ -202,7 +213,9 @@ class AssetUserAccessLog
           update_query = compaction_sql(log_segment_aggregation)
           new_iterator_pos = log_segment_aggregation.map{|r| r["max_id"]}.max
           Shackles.activate(:master) do
+            Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - batch updating (sometimes these queries don't get logged)...")
             partition_model.connection.execute(update_query)
+            Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - ...batch update complete")
             # Here we want to write the iteration state onto the plugin setting
             # so that we don't double count rows later.  The next time the job
             # runs it can pick up at this point and only count rows that haven't yet been counted.
@@ -219,7 +232,23 @@ class AssetUserAccessLog
           sleep(intra_batch_pause) if intra_batch_pause > 0.0
         else
           # no records found in this range, we must be paging through an open segment
-          # just keep going until the iterator catches up to real records.
+          unless sequence_jumps_allowed?
+            # we found no records in this range, and we're nervous about writing
+            # bugs that miss records right now.  The sequence might be compromised
+            # in some way, or the batch code could be buggy.  Warn and reschedule.
+            # TODO: yank this whole block and setting when we're comfortable with this pattern?
+            Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - Found no results in-range, pausing compaction for now")
+            Shackles.activate(:master) do
+              Canvas::Errors.capture("AUA Compaction Missing Segment", {
+                shard: Shard.current.id,
+                partition_model: partition_model.to_s,
+                range_start: log_id_bookmark,
+                range_stop: batch_upper_boundary
+              })
+            end
+            return false
+          end
+            # just keep going until the iterator catches up to real records.
           Shackles.activate(:master) do
             PluginSetting.suspend_callbacks(:clear_cache) do
               ps.reload.settings[:max_log_ids][ts.wday] = batch_upper_boundary
