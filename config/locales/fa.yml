@@ -90,6 +90,7 @@ fa:
     file_retrieval_error: "بازیابی فایل انجام نشد"
     getting_file: "درحال بازیابی فایل..."
     invalid_file_retrieval: "در هنگام بازیابی فایل ارسال شده از این ابزار، اشکالی رخ داد."
+    processing_submission: "کانواس در حال پردازش مورد ارسالی شما است. با خیال راحت می‌توانید از این پیمایش دور شوید و در صورت عدم پردازش ارسال، ما به شما ایمیل خواهیم زد."
   ExternalToolDialog: 
     embed_from_external_tool: "درج محتوا از ابزار بیرونی"
   ExternalToolsPlugin: 
@@ -1070,6 +1071,11 @@ fa:
         penn_harris: 
           parameters: 
             note: "درس های دارای تکلیف های غیر فعال ممکن است نمره های موجود در این گزارش را به طور دقیق منعکس نکنند."
+    proserve_all_versions_submissions_csv_parameters: 
+      account_reports: 
+        proserv: 
+          use_serialized_submission: 
+            check_box: "از تاریخ و زمان مورد ارسالی سریال سازی شده استفاده کنید."
     proservices: 
       provisioning: 
         parameters: 
@@ -2075,6 +2081,7 @@ fa:
   an_error_occurred_while_migrating_405ac0b5: "در هنگام انتقال، خطایی رخ داد."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "هنگام ذخیره سازی رتبه بندی های مهارت حساب خطایی روی داد"
   an_error_occurred_while_saving_associations_bd66f3f4: "هنگام ذخیره سازی انجمن ها خطایی رخ داد"
+  an_error_occurred_while_saving_the_assignment_post_94f1184e: "هنگام ذخیره سیاست ارسال تکلیف خطایی روی داد"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "هنگام ذخیره کردن سیاست ارسال درس خطایی روی داد."
   an_error_occurred_while_saving_your_settings_b503a31c: "هنگام ذخیره تنظیمات شما خطایی روی داد"
   an_error_occurred_while_starting_migration_8e6015e2: "هنگام شروع انتقال خطایی رخ داد"
@@ -3352,6 +3359,7 @@ fa:
   authorize_e3f25bb4: "اجازه دادن"
   authorize_url_f28167a3: "  URLرا مجاز کنید"
   auto_leader_7791c30a: auto_leader
+  autodetect_field_separators_in_compatible_spreadsh_768067e1: "تشخیص خودکار جداکننده قسمت‌ها در صدور صفحه گسترده سازگار"
   automatically_apply_deduction_to_late_submissions_2b68166e: "به طور خودکار به ارسال‌هایی که دیر انجام شده، کسر اعمال شود"
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "به طور خودکار به ارسال‌های از دست رفته، نمره اعمال شود"
   automatically_dff02416: "بطور خودکار"
@@ -9294,6 +9302,9 @@ fa:
   gradebookold: 
     hide_notes: "مخفی کردن ستون یادداشت ها"
     hide_student_names: "مخفی کردن نام دانشجویان"
+    invalid_assignment_groups_warning: 
+      one: "گروه  %{groups} شامل نمره نمی‌شود چرا که آن‌ هیچ امتیازی ندارد."
+      other: "گروه های %{groups} شامل نمره نمی‌شوند چرا که آن‌ها هیچ امتیازی ندارند. "
     no_assignments_have_points_warning: "تا زمانی که یک تکلیف نمره های ممکن داشته باشد، نمره قابل محاسبه نیست"
     notes: "نکته ها"
     percent_of_grade: "%{percentage} از نمره"
@@ -10521,6 +10532,7 @@ fa:
   inactive_enrollments_3b84be3d: "ثبت نام‌های غیرفعال"
   inbox_bb245a60: "صندوق ورودی"
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: "با استفاده از چیزی شبیه به *Jing*، یک پیوند به یک ضبط ویدیویی از صفحه/نماگرفت درج کنید."
+  include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: "علامت By-Order  را در صدور صفحه گسترده سازگار بگنجانید"
   include_course_settings_c4c08764: "شامل کردن تنظیمات درس"
   include_deleted_enrollments_1c87684a: "شامل سازی ثبت نام های حذف شده"
   include_deleted_objects_3cced3b5: "شامل سازی اشیاء حذف شده؛"
@@ -11164,6 +11176,7 @@ fa:
   loading_associations_9da66c4e: "در حال بارگذاری انجمن‌ها"
   loading_associations_complete_b93a9c6e: "بارگذاری انجمن‌ها کامل شد"
   loading_associations_started_1f65d8d: "بارگذاری انجمن‌ها شروع شد"
+  loading_assotiations_ac5f6dbf: "در حال بارگذاری انجمن‌ها..."
   loading_available_scopes_bc29bf98: "در حال بارگیری محدوده‌های موجود"
   loading_bde52856: "در حال بارگذاری"
   loading_change_log_94ac6073: "در حال بارگذاری گزارش ثبت تغییر"
@@ -11380,6 +11393,7 @@ fa:
   lti_2_reregistration_afabde25: "ثبت نام دوباره LTI 2"
   lti_add_and_edit_a359d8da: "افزودن و ویرایش LTI"
   lti_add_edit_delete_15905170: "LTI - افزودن / ویرایش / حذف "
+  lti_advantage_services_c1746cb4: "سرویس‌ها مزیت LTI"
   lti_key_14ad02b1: "کلید LTI"
   lti_report_2b6193ab: "گزارش LTI"
   luxembourg_352_85f4124d: "لوگزامبورگ (+352)"
@@ -13718,6 +13732,7 @@ fa:
   must_have_at_least_1_group_per_section_9809e708: "باید حداقل یک گروه به ازای هر بخش داشته باشد"
   must_have_at_least_as_many_groups_as_sections_to_a_af2a9dfb: "برای اختصاص بر اساس بخش، باید حداقل به تعداد بخش‌ها، گروه وجود داشته باشد"
   must_have_at_least_one_placement_defined_1bc586c6: "باید حداقل یک مکان تعیین شده باشد."
+  must_have_at_least_one_redirect_uri_defined_bb236d38: "حداقل باید یک reduri_uri تعریف شده باشد."
   must_mark_as_done_91cff799: "باید به عنوان انجام شده علامت گذاری شود"
   must_mark_as_done_bf6cc563: "باید به عنوان انجام شده علامت گذاری شود"
   must_mark_this_module_item_done_in_order_to_comple_ca3c390f: "برای تکمیل، این مورد ماژول باید به عنوان انجام شده علامت گذاری شود"
@@ -14005,6 +14020,9 @@ fa:
   not_yet_completed_345a0bca: "هنوز تکمیل نشده است"
   not_yet_graded_40475341: "هنوز نمره گذاری نشده"
   note_8b73ce09: نکته
+  note_associated_tools_are_only_listed_once_even_if_ebae2aba: |-
+      توجه: ابزارهای مرتبط فقط یک بار فهرست می شوند ، حتی اگر داشته باشند
+      در چندین زیرحساب نصب شده است.
   note_for_differentiated_group_topics_some_threads__90adbb21: "توجه: برای موضوع های متمایز گروه، ممکن است هیچ دانشجویی به برخی رشته ها تخصیص داده نشده باشد."
   note_grades_and_notes_will_be_saved_automatically__e3270872: "نکته: نمرات و یادداشت‌ها بعد از خارج شدن از این قسمت، به طور خودکار ذخیره می‌شوند."
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: "توجه: بسته به چرخه تجدید بتا ممکن است تدارک نشانی اینترنتی بتا تا یک هفته طول بکشد."
@@ -14452,6 +14470,7 @@ fa:
   open_the_grade_detail_tray_cea682a5: "باز کردن سینی جزئیات نمره"
   open_this_keyboard_shortcuts_dialog_9658b83a: "باز کردن این کادر گفتکوی میانبرهای صفحه کلید"
   open_title_in_a_new_window_b29fed77: "باز کردن %{title} در یک پنجره جدید"
+  openid_connect_initiation_url_d9037d30: "* OpenID Connect اتصال آغازین Url"
   option_1_dea39f90: "گزینه 1"
   option_2_47aace2a: "گزینه 2"
   option_3_30adfebc: "گزینه 3"
@@ -19429,6 +19448,7 @@ fa:
       aria_stop: "برای خاتمه دادن به ضبط، روی «توقف» کلیک کنید."
     edit_view_rubric: "مشاهده دستورالعمل ارزیابی"
     group: گروه
+    mic_blocked_message: "اجازه استفاده از میکروفن مسدود شده است. برای تغییر، به کروم ://settings/content/microphone برود. "
     mute_assignment: "غیر فعال کردن تکلیف"
     no_submission_time: "زمان مورد ارسالی موجود نیست"
     nodetect_message: "هیچ گفتاری حذف نشده است. ممکن است لازم باشد تنظیمات میکروفن خود را تغییر دهید."
@@ -20026,6 +20046,8 @@ fa:
   take_the_quiz_again_8ea51a6c: "آزمون دادن دوباره"
   take_the_survey_ada59508: "انجام نظرسنجی"
   take_the_survey_again_24ce22c2: "انجام دوباره نظرسنجی"
+  target_link_uri_bbed67d1: "* لینک URI مقصد "
+  target_link_uri_d166858: "لینک URI مقصد "
   teacher_5a73b637: استاد
   teacher_count_teachers_a92f7199: "%{teacher_count} استاد"
   teacher_engagement_report_ec03613d: "گزارش اشتغال استاد"
@@ -20159,6 +20181,11 @@ fa:
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "زبانه فایل ها، محلی برای به اشتراک گذاشتن اسلایدهای سخنرانی، اسناد نمونه، راهنماهای مطالعه -- و هر چیزی است که دانشجویان شما می خواهند بارگیری کنند. بارگذاری و سازمان دهی فایل های شما با استفاده از کانواس آسان است. شیوه کار را به شما نشان خواهیم داد."
   the_following_content_is_partner_provided_ed1da756: "محتوای زیر توسط شریک فراهم شده است"
   the_following_fields_are_invalid_fields_b3565800: "قسمت های زیر معتبر نیستند: %{fields}"
+  the_following_students_have_unsaved_changes_to_the_7762def7: |-
+      دانشجویان زیر تغییرات ذخیره نشده ای در  آزمون‌های ارسالی خود دارند:
+      
+      %{users}
+      با این وجود، ادامه می دهید؟
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "کاربران زیر آماده اضافه شدن به درس هستند."
   the_following_users_could_not_be_created_2573360a: "کاربران زیر نمی‌توانند ایجاد شوند."
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "نام کامل میزبان برای نمونه حساب (برای مثال something.instructure.com)"
@@ -20412,6 +20439,7 @@ fa:
   this_student_was_just_awarded_negative_points_55741a37: "این دانشجو فقط امتیاز منفی گرفته است."
   this_student_wrote_f1a3f22d: "این دانشجو نوشته است که:"
   this_submission_has_already_been_graded_and_is_rea_8ec61c52: "این مورد ارسالی نمره گذاری شده است و برای نظارت آماده است."
+  this_submission_has_plagiarism_data_for_multiple_a_335c881d: "این ارسال برای چندین پیوست دارای داده های سرقت ادبی است. برای دیدن همه گزارش ها ،  نمره گذاری سریع را باز کنید."
   this_submission_is_in_a_closed_grading_period_45a723d3: "این مورد ارسالی در یک دوره نمره گذاری خاتمه یافته است."
   this_submission_is_in_a_closed_grading_period_cc9ecb8a: "این مورد ارسالی در یک دوره نمره گذاری خاتمه یافته است"
   this_submission_is_in_another_grading_period_36bc720b: "این مورد ارسالی در یک دوره نمره گذاری دیگر است"
@@ -21012,6 +21040,7 @@ fa:
   use_remote_version_of_rich_content_editor_52f7fc4b: "استفاده از نسخه از راه دور ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "استفاده از نسخه از راه دور نوار کناری و ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "استفاده از نسخه از راه دور نوار کناری ویرایشگر محتوای غنی در قسمت های پر خطر مانند آزمون ها"
+  use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "برای جداسازی زمینه ها در صدور صفحه گسترده سازگار از نقطه ویرگول استفاده کنید"
   use_the_new_assignments_page_dd292b9d: "استفاده از صفحه جدید تکلیف"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "استفاده از ابزار بیرونی جدید همکاری ها که امکان گزینه های بیشتر برای ابزارها جهت استفاده برای همکاری را فراهم می کند"
   use_the_new_document_annotation_tool_2cbc98d0: "استفاده از ابزار یاددآوری سند جدید"
