@@ -181,7 +181,6 @@ module DataFixup::PopulateRootAccountIdOnModels
     # Arguments to where()
     @unfillable_criteria ||= {
       DeveloperKey => 'account_id IS NULL',
-      LearningOutcomeGroup => 'context_id IS NULL',
     }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
@@ -194,7 +193,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.fill_with_zeros_criteria
     # Arguments to where()
     @fill_with_zeros_criteria ||= {
-      CalendarEvent => {context_type: 'User', effective_context_code: nil}
+      CalendarEvent => {context_type: 'User', effective_context_code: nil},
+      LearningOutcomeGroup => 'context_id IS NULL',
     }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
