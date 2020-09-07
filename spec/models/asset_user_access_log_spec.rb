@@ -46,6 +46,7 @@ describe AssetUserAccessLog do
   describe ".compact" do
     before(:once) do
       Setting.set("aua_log_batch_size", "100")
+      Setting.set("aua_log_truncation_enabled", "true")
       ps = PluginSetting.find_or_initialize_by(name: "asset_user_access_logs", inheritance_scope: "shard")
       ps.settings = { max_log_ids: [0,0,0,0,0,0,0], write_path: 'log' }
       ps.save!
