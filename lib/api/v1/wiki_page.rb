@@ -49,7 +49,7 @@ module Api::V1::WikiPage
     locked_json(hash, wiki_page, current_user, 'page', :deep_check_if_needed => opts[:deep_check_if_needed])
     if include_body && !hash['locked_for_user'] && !hash['lock_info']
       hash['body'] = api_user_content(wiki_page.body, wiki_page.context)
-      wiki_page.increment_view_count(current_user, wiki_page.context)
+      wiki_page.context_module_action(current_user, wiki_page.context, :read)
     end
     if opts[:master_course_status]
       hash.merge!(wiki_page.master_course_api_restriction_data(opts[:master_course_status]))
