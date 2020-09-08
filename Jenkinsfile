@@ -154,11 +154,13 @@ def maybeSlackSendFailure() {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
+    def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} failed against ${branchSegment}"
+    def extra = "Please investigate the cause of the failure, and respond to this message with your diagnosis. If you need help, please don't hesitate to tag @ oncall and our on call will assist in looking at the build. For further details of our post-merge failure process, please see this <${configuration.getFailureWiki()}|link>. Thanks!"
+
     slackSend(
       channel: getSlackChannel(),
       color: 'danger',
-      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>)"
+      message: "${authorSegment}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n\n$extra"
     )
   }
 }
