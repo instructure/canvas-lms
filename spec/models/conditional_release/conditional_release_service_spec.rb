@@ -28,13 +28,21 @@ describe ConditionalRelease::Service do
 
   context 'configuration' do
     it 'reports enabled as true when enabled' do
-      context = double({feature_enabled?: true})
+      context = Course.create!
+      context.enable_feature!(:conditional_release)
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq true
     end
 
+    it 'reports enabled as false if the context is an Account' do
+      context = Account.create!
+      context.enable_feature!(:conditional_release)
+      env = Service.env_for(context)
+      expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
+    end
+
     it 'reports enabled as false if feature flag is off' do
-      context = double({feature_enabled?: false})
+      context = Course.create!
       env = Service.env_for(context)
       expect(env[:CONDITIONAL_RELEASE_SERVICE_ENABLED]).to eq false
     end
