@@ -7,7 +7,7 @@ ARG RUBY=2.6
 FROM instructure/passenger-nginx-alpine:${RUBY} AS dependencies
 LABEL maintainer="Instructure"
 
-ARG POSTGRES_CLIENT=12.2
+ARG POSTGRES_CLIENT=12.4
 ARG ALPINE_MIRROR=http://dl-cdn.alpinelinux.org/alpine
 ARG NODE=10.19.0-r0
 
