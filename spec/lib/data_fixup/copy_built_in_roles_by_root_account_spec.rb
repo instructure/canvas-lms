@@ -95,11 +95,33 @@ describe DataFixup::CopyBuiltInRolesByRootAccount do
     Role.where(workflow_state: 'built_in', root_account: a2).delete_all
     old_role_ids = Role.where(workflow_state: "built_in", root_account_id: a).pluck(:id)
     expect(old_role_ids.count).to eq Role::BASE_TYPES.count
-    
+
     Role.where(:id => old_role_ids).update_all(:root_account_id => nil)
     student_role = Role.find_by(base_role_type: 'StudentEnrollment', workflow_state: 'built_in')
     RoleOverride.create!(permission: "manage_calendar", enabled: true, locked: false, context: a, role_id: student_role)
 
     expect{DataFixup::CopyBuiltInRolesByRootAccount.run}.not_to raise_error
+  end
+
+  it 'should not break the datafix if a user is re-enrolled in a course with an equivalent new role before it finishes' do
+    Role.where(:workflow_state => "built_in", :root_account_id => nil).delete_all # just in case they're leftover
+    a = Account.create!
+    old_role_ids = Hash[Role.where(:workflow_state => "built_in", :root_account_id => a).pluck(:base_role_type, :id)]
+    Role.where(:id => old_role_ids.values).update_all(:root_account_id => nil)
+
+    c = Course.create!(:account => a)
+    u = User.create!
+    e1 = c.enroll_user(u, "StudentEnrollment", :role => Role.find(old_role_ids["StudentEnrollment"])) # enroll with old role
+
+    allow(DataFixup::CopyBuiltInRolesByRootAccount).to receive(:send_later_if_production_enqueue_args) # just "hold" the delayed job
+    DataFixup::CopyBuiltInRolesByRootAccount.run # create the new roles but don't migrate enrollments yet
+
+    # now enroll the student again using the new role
+    new_student_role = Role.where(:workflow_state => "built_in", :root_account_id => a, :base_role_type => "StudentEnrollment").first
+    e2 = c.enroll_user(u, "StudentEnrollment", :role => new_student_role)
+    expect(e1).to eq e2 # shouldn't have made a new enrollment
+
+    DataFixup::CopyBuiltInRolesByRootAccount.move_roles_for_enrollments(old_role_ids.values, nil, nil)
+    expect(e1.reload.role_id).to eq new_student_role.id
   end
 end
