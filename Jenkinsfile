@@ -339,12 +339,12 @@ pipeline {
                       git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
                       # this helps current build issues where cleanup is needed before proceeding.
-                      # however the later git rebase --abort should be enough once this has
-                      # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                      # however the later git rebase --abort should be enough but sometimes isn't.
                       if [ -d .git/rebase-merge ]; then
                         echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
                         git rebase --abort
-                        git checkout $GERRIT_REFSPEC
+                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                          git fetch origin $GERRIT_REFSPEC && git checkout FETCH_HEAD
                       fi
 
                       # store exit_status inline to  ensures the script doesn't exit here on failures
