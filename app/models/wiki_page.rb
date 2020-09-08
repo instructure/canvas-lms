@@ -392,18 +392,6 @@ class WikiPage < ActiveRecord::Base
     res
   end
 
-  def increment_view_count(user, context = nil)
-    Shackles.activate(:master) do
-      unless self.new_record?
-        self.with_versioning(false) do |p|
-          context ||= p.context
-          WikiPage.where(id: p).update_all("view_count=COALESCE(view_count, 0) + 1")
-          p.context_module_action(user, context, :read)
-        end
-      end
-    end
-  end
-
   def can_unpublish?
     return @can_unpublish unless @can_unpublish.nil?
     @can_unpublish = !is_front_page?
