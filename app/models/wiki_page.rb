@@ -87,6 +87,8 @@ class WikiPage < ActiveRecord::Base
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
 
+  self.ignored_columns = %i[view_count]
+
   def ensure_wiki_and_context
     self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
   end
@@ -425,7 +427,6 @@ class WikiPage < ActiveRecord::Base
       :user_id => self.user_id,
       :protected_editing => self.protected_editing,
       :editing_roles => self.editing_roles,
-      :view_count => 0,
       :todo_date => self.todo_date
     })
     if self.assignment && opts_with_default[:duplicate_assignment]
