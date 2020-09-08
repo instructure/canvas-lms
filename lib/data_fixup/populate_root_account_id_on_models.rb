@@ -292,6 +292,10 @@ module DataFixup::PopulateRootAccountIdOnModels
           true
         elsif incomplete_tables.include?(class_name) || tables_in_progress.include?(class_name)
           false
+        elsif table == CommunicationChannel
+          # For single-sharded (OSS) Canvas, if any users have been filled in
+          # and User jobs are complete, we are good to fill in comm channels
+          User.where.not(root_account_ids: nil).any?
         else
           check_if_association_has_root_account(table, assoc_reflection) ? complete_tables << table && true : incomplete_tables << table && false
         end
