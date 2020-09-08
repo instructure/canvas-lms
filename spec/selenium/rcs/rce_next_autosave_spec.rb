@@ -19,7 +19,7 @@ require_relative '../helpers/wiki_and_tiny_common'
 require_relative '../test_setup/common_helper_methods/custom_selenium_actions'
 require_relative 'pages/rce_next_page'
 
-describe 'RCE Next autosave feature' do
+describe 'RCE Next autosave feature', ignore_js_errors: true do
   include_context 'in-process server selenium tests'
   include CustomSeleniumActions
   include RCENextPage
@@ -164,7 +164,7 @@ describe 'RCE Next autosave feature' do
       # simulate a placeholder image
       switch_to_html_view
       f('textarea#discussion-topic-message8').send_keys(
-        "<img data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px; border: solid 1px #8B969E;'/>"
+        "<div data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px;'>svg spinner here</div>"
       )
       switch_to_editor_view
 

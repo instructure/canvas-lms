@@ -104,4 +104,48 @@ iframe[data-media-id] {
   background-color: #eee;
 }
 
+/* the svg and keyframe stuyles are lifted from instui spinner */
+div[data-placeholder-for] {
+  border: solid 1px #8b969e;
+  background-color: #ccc;
+  display: block;
+  max-width: 100%;
+  svg {
+    max-height: 90%;
+    max-width: 90%;
+    animation: 2s linear infinite rotate;
+    circle.c1 {
+      stroke: #f5f5f5;
+    }
+    circle.c2 {
+      stroke: $electric;
+      stroke-dasharray: 148px;
+      animation: 1.75s ease infinite morph;
+      transform-origin: 50px 50px;
+    }
+  }
+}
+
+@keyframes rotate {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes morph {
+  0% {
+    stroke-dashoffset: 190%;
+  }
+
+  50% {
+    stroke-dashoffset: 50%;
+    transform: rotate(90deg);
+  }
+
+  100% {
+    stroke-dashoffset: 190%;
+    transform: rotate(360deg);
+  }
+}
+
 @import 'our_custom_tiny_mce_stuff/_tinymce.editor_box.scss';
