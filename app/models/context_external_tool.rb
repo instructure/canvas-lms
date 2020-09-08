@@ -78,7 +78,8 @@ class ContextExternalTool < ActiveRecord::Base
   Lti::ResourcePlacement::PLACEMENTS.each do |type|
     class_eval <<-RUBY, __FILE__, __LINE__ + 1
       def #{type}(setting=nil)
-        extension_setting(:#{type}, setting)
+        # expose inactive placements to API
+        extension_setting(:#{type}, setting) || extension_setting(:inactive_placements, :#{type})
       end
 
       def #{type}=(hash)
@@ -128,7 +129,8 @@ class ContextExternalTool < ActiveRecord::Base
 
     hash = hash.with_indifferent_access
     hash[:enabled] = Canvas::Plugin.value_to_boolean(hash[:enabled]) if hash[:enabled]
-    settings[type] = {}.with_indifferent_access
+    # merge with existing settings so that no caller can complain
+    settings[type] = (settings[type] || {}).with_indifferent_access
 
     extension_keys = [
       :canvas_icon_class,
@@ -160,6 +162,22 @@ class ContextExternalTool < ActiveRecord::Base
       if hash.has_key?(key) && (!validator || validator.call(hash[key]))
         settings[type][key] = hash[key]
       end
+    end
+
+    # on deactivation, make sure placement data is kept
+    if settings[type].key?(:enabled) && !settings[type][:enabled]
+      settings[:inactive_placements] ||= {}.with_indifferent_access
+      settings[:inactive_placements][type] ||= {}.with_indifferent_access
+      settings[:inactive_placements][type].merge!(settings[type])
+      settings.delete(type)
+      return
+    end
+
+    # on reactivation, use the old placement data
+    if settings[type][:enabled] && settings.dig(:inactive_placements, type)
+      settings[type] = settings.dig(:inactive_placements, type).merge(settings[type])
+      settings[:inactive_placements].delete(type)
+      settings.delete(:inactive_placements) if settings[:inactive_placements].empty?
     end
 
     settings[type]
@@ -476,11 +494,10 @@ class ContextExternalTool < ActiveRecord::Base
     ContextExternalTool.normalize_sizes!(self.settings)
 
     Lti::ResourcePlacement::PLACEMENTS.each do |type|
-      if settings[type]
-        if !(extension_setting(type, :url)) || (settings[type].has_key?(:enabled) && !settings[type][:enabled])
-          settings.delete(type)
-        end
-      end
+      next unless settings[type]
+      next if settings[type].key? :enabled
+
+      settings.delete(type) unless extension_setting(type, :url)
     end
 
     settings.delete(:editor_button) unless editor_button(:icon_url) || editor_button(:canvas_icon_class)

@@ -1068,6 +1068,43 @@ describe ContextExternalTool do
       expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
       end
     end
+
+    describe 'enabling/disabling placements' do
+      let!(:tool) {
+        tool = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+        tool.homework_submission = {enabled: true, selection_height: 300}
+        tool.save
+        tool
+      }
+
+      it 'moves inactive placement data back to active when re-enabled' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission][:enabled]).to be_falsey
+
+        tool.homework_submission = {enabled: true}
+        expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
+        expect(tool.settings.key?(:inactive_placements)).to be_falsey
+      end
+
+      it 'moves placement data to inactive placements when disabled' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+        expect(tool.settings.key?(:homework_submission)).to be_falsey
+      end
+
+      it 'keeps already inactive placement data when disabled again' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+      end
+
+      it 'keeps already active placement data when enabled again' do
+        tool.homework_submission = {enabled: true}
+        expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
+      end
+    end
   end
 
   describe "visible" do
