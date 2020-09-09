@@ -55,6 +55,10 @@ describe Mutations::HideAssignmentGrades do
   end
 
   context "when user has grade permission" do
+    before do
+      skip 'DEMO-37 (9/9/2020)'
+    end
+
     let(:context) { { current_user: teacher } }
 
     it "requires that assignmentId be passed in the query" do
