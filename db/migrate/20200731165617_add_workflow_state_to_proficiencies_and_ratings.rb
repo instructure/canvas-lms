@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2014 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,14 +15,19 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-class EnsureBuiltInRoles < ActiveRecord::Migration[4.2]
+class AddWorkflowStateToProficienciesAndRatings < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    Role.ensure_built_in_roles!
+    add_column :outcome_proficiencies, :workflow_state, :string
+    change_column_default(:outcome_proficiencies, :workflow_state, 'active')
+
+    add_column :outcome_proficiency_ratings, :workflow_state, :string
+    change_column_default(:outcome_proficiency_ratings, :workflow_state, 'active')
   end
 
   def down
-    Role.where(:workflow_state => "built_in").delete_all
+    remove_column :outcome_proficiencies, :workflow_state
+    remove_column :outcome_proficiency_ratings, :workflow_state
   end
 end

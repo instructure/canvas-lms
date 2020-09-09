@@ -73,15 +73,15 @@ describe MediaObjectsController do
       allow_any_instance_of(MediaObject).to receive(:media_sources).and_return([{:url => "whatever man", :bitrate => 12345}])
     end
 
-    it "should retrieve all MediaObjects user has created" do
+    it "should retrieve all MediaObjects user in the user's context" do
       user_factory
       user_session(@user)
-      mo1 = MediaObject.create!(:user_id => @user, :media_id => "test", :media_type => "video")
-      mo2 = MediaObject.create!(:user_id => @user, :media_id => "test2", :media_type => "audio", :title => "The Title")
-      mo3 = MediaObject.create!(:user_id => @user, :media_id => "test3", :user_entered_title => "User Title")
+      mo1 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test", :media_type => "video")
+      mo2 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test2", :media_type => "audio", :title => "The Title")
+      mo3 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test3", :user_entered_title => "User Title")
 
       get 'index'
-      expect(json_parse(response.body)).to eq([
+      expect(json_parse(response.body)).to match_array([
         {
           "can_add_captions"=>true,
           "created_at"=>mo2.created_at.as_json,
@@ -132,9 +132,9 @@ describe MediaObjectsController do
       user1 = user_factory
       user2 = user_factory
       user_session(user1)
-      MediaObject.create!(:user_id => user2, :media_id => "test")
-      MediaObject.create!(:user_id => user2, :media_id => "test2")
-      MediaObject.create!(:user_id => user2, :media_id => "test3")
+      MediaObject.create!(:user_id => user2, :context => user2, :media_id => "test")
+      MediaObject.create!(:user_id => user2, :context => user2, :media_id => "test2")
+      MediaObject.create!(:user_id => user2, :context => user2, :media_id => "test3")
 
       get 'index'
       expect(json_parse(response.body)).to eq([])
@@ -143,7 +143,7 @@ describe MediaObjectsController do
     it "will exclude media_sources if asked to" do
       user_factory
       user_session(@user)
-      mo = MediaObject.create!(:user_id => @user, :media_id => "test", :media_type => "video")
+      mo = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test", :media_type => "video")
 
       get 'index', params: {:exclude => ["sources"]}
       expect(json_parse(response.body)).to eq([
@@ -162,7 +162,7 @@ describe MediaObjectsController do
     it "will exclude media_tracks if asked to" do
       user_factory
       user_session(@user)
-      mo = MediaObject.create!(:user_id => @user, :media_id => "test", :media_type => "video")
+      mo = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test", :media_type => "video")
 
       get 'index', params: {:exclude => ["tracks"]}
       expect(json_parse(response.body)).to eq([
@@ -189,18 +189,94 @@ describe MediaObjectsController do
 
       user_session(teacher1)
 
-      mo = MediaObject.create!(:user_id => teacher2, :context => @course, :media_id => "test")
+      # a media object associated with a canvas attachment
+      mo1 = MediaObject.create!(:user_id => teacher2, :context => @course, :media_id => "test")
       @course.attachments.create!(:media_entry_id => "test", :uploaded_data => stub_png_data)
+      # and a media object that's not
+      mo2 = MediaObject.create!(:user_id => teacher2, :context => @course, :media_id => "another_test")
 
       get 'index', params: {:course_id => @course.id, :exclude => ["sources", "tracks"]}
 
-      expect(json_parse(response.body)).to eq([
+      expect(json_parse(response.body)).to match_array([
         {
           "can_add_captions"=>true,
-          "created_at"=>mo.created_at.as_json,
+          "created_at"=>mo1.created_at.as_json,
           "media_id"=>"test",
           "title"=>"Untitled",
           "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
+        },
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo2.created_at.as_json,
+          "media_id"=>"another_test",
+          "title"=>"Untitled",
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/another_test"
+        }
+      ])
+    end
+
+    it "will paginate user media" do
+      user_factory
+      user_session(@user)
+      mo1 = mo2 = mo3 = nil
+      Timecop.freeze(30.seconds.ago) do
+        mo1 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test", :media_type => "video")
+      end
+      Timecop.freeze(20.seconds.ago) do
+        mo2 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test2", :media_type => "audio", :title => "The Title")
+      end
+      Timecop.freeze(10.seconds.ago) do
+        mo3 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test3", :user_entered_title => "User Title")
+      end
+
+      get 'index', params: {:per_page => 2, :order_by => 'created_at', :order_dir => 'desc'}
+      expect(json_parse(response.body)).to match_array([
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo3.created_at.as_json,
+          "media_id"=>"test3",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
+          "title"=>"User Title",
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test3"
+        },
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo2.created_at.as_json,
+          "media_id"=>"test2",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
+          "title"=>"The Title",
+          "media_type"=>"audio",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test2"
+        }
+      ])
+
+      get 'index', params: {:per_page => 2, :order_by => 'created_at', :order_dir => 'desc', :page => 2}
+      expect(json_parse(response.body)).to match_array([
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo1.created_at.as_json,
+          "media_id"=>"test",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
+          "title"=>"Untitled",
+          "media_type"=>"video",
           "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
         }
       ])
@@ -211,22 +287,100 @@ describe MediaObjectsController do
       mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_att")
       @course.attachments.create!(:media_entry_id => "in_course_with_att", :uploaded_data => stub_png_data)
 
-      MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_deleted_att")
+      # That media objects associated with a deleted attachment are still returned
+      # is an artifact of changes made a long time ago so that Attachments from 
+      # course copy share the media object. 
+      # see commit d27cf9f7d037571b2ee88c61be2ca72f19777b60
+      mo2 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_deleted_att")
       deleted_att = @course.attachments.create!(:media_entry_id => "in_course_with_deleted_att", :uploaded_data => stub_png_data)
+      mo2.attachment_id = deleted_att.id # this normally happens via a delayed_job
+      mo2.save!
       deleted_att.destroy!
 
-      MediaObject.create!(:user_id => @user, :media_id => "not_in_course")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "not_in_course")
 
       get 'index', params: {:course_id => @course.id, :exclude => ["sources", "tracks"]}
 
-      expect(json_parse(response.body)).to eq([
+      expect(json_parse(response.body)).to match_array([
+        {
+          "media_id"=>"in_course_with_att",
+          "media_type"=>nil,
+          "created_at"=>mo1.created_at.as_json,
+          "title"=>"Untitled",
+          "can_add_captions"=>true,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course_with_att"
+        },
+        {
+          "media_id"=>"in_course_with_deleted_att",
+          "media_type"=>nil,
+          "created_at"=>mo2.created_at.as_json,
+          "title"=>"Untitled",
+          "can_add_captions"=>true,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course_with_deleted_att"
+        }
+      ])
+    end
+
+    it "will paginate course media" do
+      course_with_teacher_logged_in
+      mo1 = mo2 = mo3 = nil
+      Timecop.freeze(30.seconds.ago) do
+        mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "test", :media_type => "video")
+      end
+      Timecop.freeze(20.seconds.ago) do
+        mo2 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "test2", :media_type => "audio", :title => "The Title")
+      end
+      Timecop.freeze(10.seconds.ago) do
+        mo3 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "test3", :user_entered_title => "User Title")
+      end
+
+      get 'index', params: {:course_id => @course.id, :per_page => 2, :order_by => 'created_at', :order_dir => 'desc'}
+      expect(json_parse(response.body)).to match_array([
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo3.created_at.as_json,
+          "media_id"=>"test3",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
+          "title"=>"User Title",
+          "media_type"=>nil,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test3"
+        },
+        {
+          "can_add_captions"=>true,
+          "created_at"=>mo2.created_at.as_json,
+          "media_id"=>"test2",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
+          "title"=>"The Title",
+          "media_type"=>"audio",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test2"
+        }
+      ])
+
+      get 'index', params: {:course_id => @course.id, :per_page => 2, :order_by => 'created_at', :order_dir => 'desc', :page => 2}
+      expect(json_parse(response.body)).to match_array([
         {
           "can_add_captions"=>true,
           "created_at"=>mo1.created_at.as_json,
-          "media_id"=>"in_course_with_att",
+          "media_id"=>"test",
+          "media_sources"=>
+          [{"bitrate"=>12345,
+            "label"=>"12 kbps",
+            "src"=>"whatever man",
+            "url"=>"whatever man"}],
+          "media_tracks"=>[],
           "title"=>"Untitled",
-          "media_type"=>nil,
-          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course_with_att"
+          "media_type"=>"video",
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/test"
         }
       ])
     end
@@ -241,22 +395,14 @@ describe MediaObjectsController do
       expect(response.status.to_s).to eq("404")
     end
 
-    it "will return user's media of context_type isn't 'course'" do
+    it "will return user's media if context_type isn't 'course'" do
       course_with_teacher_logged_in
       mo1 = MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course", :user_entered_title => "AAA")
-      mo2 = MediaObject.create!(:user_id => @user, :media_id => "not_in_course", :user_entered_title => "BBB")
+      mo2 = MediaObject.create!(:user_id => @user, :context => @user, :media_id => "not_in_course", :user_entered_title => "BBB")
 
       get 'index', params: {:exclude => ["sources", "tracks"]}
 
       expect(json_parse(response.body)).to eq([
-        {
-          "can_add_captions"=>true,
-          "created_at"=>mo1.created_at.as_json,
-          "media_id"=>"in_course",
-          "title"=>"AAA",
-          "media_type"=>nil,
-          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_course"
-        },
         {
           "can_add_captions"=>true,
           "created_at"=>mo2.created_at.as_json,
@@ -270,9 +416,9 @@ describe MediaObjectsController do
 
     it "will sort by title" do
       course_with_teacher_logged_in
-      MediaObject.create!(:user_id => @user, :media_id => "test",  :title => "ZZZ")
-      MediaObject.create!(:user_id => @user, :media_id => "test2", :title => "YYY")
-      MediaObject.create!(:user_id => @user, :media_id => "test3", :title => "XXX")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test",  :title => "ZZZ")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test2", :title => "YYY")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test3", :title => "XXX")
 
       get 'index', params: {
         :exclude => ["sources", "tracks"],
@@ -288,9 +434,9 @@ describe MediaObjectsController do
 
     it "will sort by title or user_entered_title" do
       course_with_teacher_logged_in
-      MediaObject.create!(:user_id => @user, :media_id => "test",  :title => "AAA", :user_entered_title => "ZZZ")
-      MediaObject.create!(:user_id => @user, :media_id => "test2", :title => "YYY", :user_entered_title => nil)
-      MediaObject.create!(:user_id => @user, :media_id => "test3", :title => "CCC", :user_entered_title => "XXX")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test",  :title => "AAA", :user_entered_title => "ZZZ")
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test2", :title => "YYY", :user_entered_title => nil)
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test3", :title => "CCC", :user_entered_title => "XXX")
 
       get 'index', params: {
         :exclude => ["sources", "tracks"],
@@ -306,9 +452,9 @@ describe MediaObjectsController do
 
     it "will sort by created_at" do
       course_with_teacher_logged_in
-      Timecop.freeze(2.seconds.ago) { MediaObject.create!(:user_id => @user, :media_id => "test",  :title => "AAA") }
-      Timecop.freeze(1.seconds.ago) { MediaObject.create!(:user_id => @user, :media_id => "test2", :title => "BBB") }
-      MediaObject.create!(:user_id => @user, :media_id => "test3", :title => "CCC")
+      Timecop.freeze(2.seconds.ago) { MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test",  :title => "AAA") }
+      Timecop.freeze(1.seconds.ago) { MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test2", :title => "BBB") }
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test3", :title => "CCC")
 
       get 'index', params: {
         :exclude => ["sources", "tracks"],

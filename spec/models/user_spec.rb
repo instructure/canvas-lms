@@ -2772,9 +2772,9 @@ describe User do
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
+        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership', root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
+        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id))
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to be_truthy
       end
@@ -2784,9 +2784,9 @@ describe User do
         # create account on another shard
         account = @shard1.activate{ Account.create! }
         # associate target user with that account
-        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership'))
+        account_admin_user(user: target, account: account, role: Role.get_built_in_role('AccountMembership', root_account_id: account.id))
         # create seeking user as admin on that account
-        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin'))
+        seeker = account_admin_user(account: account, role: Role.get_built_in_role('AccountAdmin', root_account_id: account.id))
         allow(seeker).to receive(:associated_shards).and_return([])
         # ensure seeking user gets permissions it should on target user
         expect(target.grants_right?(seeker, :view_statistics)).to eq true

@@ -205,6 +205,8 @@ describe "assignments" do
 
     it "only allows an assignment editor to edit points and title if assignment " +
            "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+      skip "DEMO-25 (8/21/20)"
+
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
@@ -220,7 +222,9 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      hover_and_click(".edit_assignment")
+      fj("#assignment_#{@assignment.id} a.al-trigger").click
+      wait_for_ajaximations
+      f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       # be_disabled
       expect(f('.multiple_due_dates input')).to be_disabled
@@ -476,6 +480,8 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
+      # wait for jQuery UI sortable to be initialized
+      expect(f(".collectionViewItems.ui-sortable")).to be_displayed
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
@@ -498,6 +504,8 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
+        # wait for jQuery UI sortable to be initialized
+        expect(f(".collectionViewItems.ui-sortable")).to be_displayed
         drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
         wait_for_ajaximations
 

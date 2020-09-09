@@ -393,6 +393,73 @@ describe ContentMigrationsController, type: :request do
         migration = ContentMigration.find json['id']
         expect(migration.source_course).to eq @copy_from
       end
+
+      it "can queue to a cross-shard course for course copy" do
+        @shard1.activate do
+          @other_account = Account.create
+          @copy_to = @other_account.courses.create!
+          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+        end
+
+        @copy_from = @course
+        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer",
+          @params.merge(:course_id => @copy_to.global_id.to_s,
+            :migration_type => 'course_copy_importer',
+            :settings => {'source_course_id' => @copy_from.local_id.to_s}))
+
+        migration = @copy_to.content_migrations.find(json['id'])
+        expect(migration.source_course).to eq @copy_from
+      end
+
+      it "can queue to a cross-shard course for course copy with selective_content" do
+        @shard1.activate do
+          @other_account = Account.create
+          @copy_to = @other_account.courses.create!
+          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+        end
+
+        @copy_from = @course
+        @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
+        @page = @copy_from.wiki_pages.create!(:title => "aaaa")
+        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" +
+          "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&select[pages][]=#{@page.id}",
+          @params.merge(:course_id => @copy_to.global_id.to_s,
+            :migration_type => 'course_copy_importer',
+            :settings => {'source_course_id' => @copy_from.local_id.to_s},
+            :select => {'pages' => [@page.id.to_s]}
+          ))
+
+        migration = @copy_to.content_migrations.find(json['id'])
+        expect(migration.source_course).to eq @copy_from
+        run_jobs
+        expect(@copy_to.wiki_pages.last.title).to eq @page.title
+      end
+
+      it "can queue to a cross-shard course for course copy with selective_content inserted into a module" do
+        @shard1.activate do
+          @other_account = Account.create
+          @copy_to = @other_account.courses.create!
+          @copy_to.enroll_user(@user, "TeacherEnrollment", :enrollment_state => "active")
+          @mod = @copy_to.context_modules.create!
+        end
+
+        @copy_from = @course
+        @copy_from.content_exports.create!(:global_identifiers => false) # turns out this is important to repro-ing a certain terrible bug
+        @page = @copy_from.wiki_pages.create!(:title => "aaaa")
+        json = api_call(:post, "/api/v1/courses/#{@copy_to.global_id}/content_migrations?" +
+          "settings[source_course_id]=#{@copy_from.local_id}&migration_type=course_copy_importer&settings[insert_into_module_id]=#{@mod.global_id}&select[pages][]=#{@page.id}",
+          @params.merge(:course_id => @copy_to.global_id.to_s,
+            :migration_type => 'course_copy_importer',
+            :settings => {'source_course_id' => @copy_from.local_id.to_s, 'insert_into_module_id' => @mod.global_id.to_s},
+            :select => {'pages' => [@page.id.to_s]}
+          ))
+
+        migration = @copy_to.content_migrations.find(json['id'])
+        expect(migration.source_course).to eq @copy_from
+        run_jobs
+        expect(@copy_to.wiki_pages.last.title).to eq @page.title
+        expect(@mod.content_tags.first.content_type).to eq "WikiPage"
+      end
     end
 
     context "migration file upload" do

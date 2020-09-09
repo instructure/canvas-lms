@@ -811,19 +811,19 @@ describe CalendarEvent do
     end
 
     it "should copy the group attributes to the initial appointments" do
-      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello\nworld",
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello world",
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       e = ag.appointments.first
       expect(e.title).to eql 'test'
-      expect(e.description).to eql "hello<br/>\r\nworld"
+      expect(e.description).to eql "hello world"
     end
 
     it "should copy changed group attributes to existing appointments" do
-      @ag.update(:title => 'changed!', :description => "test\n123")
+      @ag.update(:title => 'changed!', :description => "test123")
       e = @ag.appointments.first.reload
       expect(e.title).to eql 'changed!'
-      expect(e.description).to eql "test<br/>\r\n123"
+      expect(e.description).to eql "test123"
     end
 
     it "should not copy group description if appointment is overridden" do

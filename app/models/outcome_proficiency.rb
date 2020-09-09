@@ -18,24 +18,58 @@
 
 class OutcomeProficiency < ApplicationRecord
   extend RootAccountResolver
+  include Canvas::SoftDeletable
   self.ignored_columns = %i[account_id]
+
+  def self.emit_live_events_on_any_update?
+    true
+  end
 
   has_many :outcome_proficiency_ratings, -> { order 'points DESC, id ASC' },
     dependent: :destroy, inverse_of: :outcome_proficiency, autosave: true
   belongs_to :context, polymorphic: %i[account], required: true
-  belongs_to :root_account, class_name: 'Account'
 
-  validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }
-  validate :single_mastery_rating
-  validate :strictly_decreasing_points
+  validates :outcome_proficiency_ratings, presence: { message: t('Missing required ratings') }, unless: :deleted?
+  validate :single_mastery_rating, unless: :deleted?
+  validate :strictly_decreasing_points, unless: :deleted?
   validates :context, presence: true
   validates :context_id, uniqueness: { scope: :context_type }
   resolves_root_account through: :context
+
+  alias original_destroy_permanently! destroy_permanently!
+  private :original_destroy_permanently!
+  def destroy_permanently!
+    self.outcome_proficiency_ratings.delete_all
+    original_destroy_permanently!
+  end
+
+  alias original_undestroy undestroy
+  private :original_undestroy
+  def undestroy
+    transaction do
+      OutcomeProficiencyRating.where(outcome_proficiency: self).update_all(workflow_state: 'active', updated_at: Time.zone.now.utc)
+      self.reload
+      original_undestroy
+    end
+  end
 
   def as_json(_options={})
     {
       'ratings' => self.outcome_proficiency_ratings.map(&:as_json)
     }
+  end
+
+  def replace_ratings(ratings)
+    # update existing ratings & create any new ratings
+    ratings.each_with_index do |val, idx|
+      if idx <= outcome_proficiency_ratings.count - 1
+        outcome_proficiency_ratings[idx].assign_attributes(val.to_hash.symbolize_keys)
+      else
+        outcome_proficiency_ratings.build(val)
+      end
+    end
+    # delete unused ratings
+    outcome_proficiency_ratings[ratings.length..-1].each(&:mark_for_destruction)
   end
 
   private

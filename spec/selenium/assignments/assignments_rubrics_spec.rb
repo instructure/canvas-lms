@@ -142,7 +142,7 @@ describe "assignment rubrics" do
       full_rubric_button = f('.toggle_full_rubric')
       expect(full_rubric_button).to be_displayed
       full_rubric_button.click
-      set_value(f('td.criterion_points input'), '2.5')
+      set_value(f('td[data-testid="criterion-points"] input'), '2.5')
       f('#rubric_holder .save_rubric_button').click
 
       expect(f("span[data-selenium='rubric_total']")).to include_text '2.5'
@@ -241,7 +241,7 @@ describe "assignment rubrics" do
       f('.assess_submission_link').click
       wait_for_animations
       expect(f("span[data-selenium='rubric_total']")).to include_text "0 out of 5"
-      fj("span:contains('Amazing'):visible").click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
       expect(f("span[data-selenium='rubric_total']")).to include_text "5 out of 5"
       scroll_into_view('.save_rubric_button')
       f('.save_rubric_button').click

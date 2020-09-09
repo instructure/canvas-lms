@@ -15,122 +15,124 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Table} from '@instructure/ui-elements'
-import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
 import _ from 'underscore'
 import {fromJS, List} from 'immutable'
-import {fetchProficiency, saveProficiency} from './api'
 import NumberHelper from '../../shared/helpers/numberHelper'
-import SVGWrapper from '../../shared/SVGWrapper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
-
 function unformatColor(color) {
   if (color[0] === '#') {
     return color.substring(1)
   }
   return color
 }
-
+const createRating = (description, points, color, mastery = false, focusField = null) => ({
+  description,
+  points,
+  key: uuid(),
+  color,
+  mastery,
+  focusField
+})
+const configToState = data => {
+  const rows = List(
+    data.proficiencyRatingsConnection.nodes.map(rating =>
+      fromJS(createRating(rating.description, rating.points, rating.color))
+    )
+  )
+  const masteryIndex = data.proficiencyRatingsConnection.nodes.findIndex(rating => rating.mastery)
+  return {
+    masteryIndex,
+    rows,
+    locked: data.locked
+  }
+}
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
-    accountId: PropTypes.string.isRequired,
+    proficiency: PropTypes.object,
+    update: PropTypes.func.isRequired,
     focusTab: PropTypes.func
   }
 
   static defaultProps = {
+    proficiency: {
+      proficiencyRatingsConnection: {
+        nodes: [
+          createRating(I18n.t('Exceeds Mastery'), 4, '127A1B'),
+          createRating(I18n.t('Mastery'), 3, '00AC18', true),
+          createRating(I18n.t('Near Mastery'), 2, 'FAB901'),
+          createRating(I18n.t('Below Mastery'), 1, 'FD5D10'),
+          createRating(I18n.t('Well Below Mastery'), 0, 'EE0612')
+        ]
+      }
+    },
     focusTab: null
   }
 
   constructor(props) {
     super(props)
-    this.state = {
-      loading: true,
-      masteryIndex: 1,
-      rows: List([
-        this.createRating('Exceeds Mastery', 4, '127A1B'),
-        this.createRating('Mastery', 3, '00AC18'),
-        this.createRating('Near Mastery', 2, 'FAB901'),
-        this.createRating('Below Mastery', 1, 'FD5D10'),
-        this.createRating('Well Below Mastery', 0, 'EE0612')
-      ])
-    }
+    this.state = configToState(props.proficiency)
   }
 
-  componentDidMount() {
-    this.fetchRatings()
-  }
-
-  componentDidUpdate() {
+  componentDidUpdate(_prevProps, prevState) {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState({rows: this.state.rows.map(row => row.delete('focusField'))})
+      this.setState(({rows}) => ({rows: rows.map(row => row.delete('focusField'))}))
+    } else if (
+      this.state.masteryIndex !== prevState.masteryIndex ||
+      this.state.rows !== prevState.rows
+    ) {
+      this.validateAndSave()
     }
-  }
-
-  fetchRatings = () => {
-    fetchProficiency(this.props.accountId)
-      .then(response => {
-        if (response.status === 200) {
-          this.configToState(response.data)
-        } else {
-          $.flashError(I18n.t('An error occurred while loading account proficiency ratings'))
-          this.setState({loading: false})
-        }
-      })
-      .catch(e => {
-        // 404 status means no custom ratings, so use defaults without an alert
-        if (e.response && e.response.status !== 404) {
-          $.flashError(
-            I18n.t('An error occurred while loading account proficiency ratings: %{m}', {
-              m: e.response.statusText
-            })
-          )
-        }
-        this.setState({billboard: true, loading: false})
-      })
-  }
-
-  configToState = data => {
-    const rows = List(
-      data.ratings.map(rating => this.createRating(rating.description, rating.points, rating.color))
-    )
-    const masteryIndex = data.ratings.findIndex(rating => rating.mastery)
-    this.setState({
-      loading: false,
-      masteryIndex,
-      rows: fromJS(rows)
-    })
   }
 
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
 
-  createRating = (description, points, color, focusField = null) =>
-    fromJS({description, points, key: uuid(), color, focusField})
-
   addRow = () => {
-    let points = 0.0
-    const last = this.state.rows.last()
-    if (last) {
-      points = last.get('points') - 1.0
+    this.setState(
+      ({rows}) => {
+        let points = 0.0
+        const last = rows.last()
+        if (last) {
+          points = last.get('points') - 1.0
+        }
+        if (points < 0.0 || Number.isNaN(points)) {
+          points = 0.0
+        }
+        const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, null, 'mastery'))
+        return {rows: rows.push(newRow)}
+      },
+      () => {
+        $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
+      }
+    )
+  }
+
+  validateAndSave = _.debounce(() => {
+    if (!this.checkForErrors()) {
+      this.props.update(this.stateToConfig()).catch(e => {
+        $.flashError(
+          I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+            message: e.message
+          })
+        )
+      })
     }
-    if (points < 0.0 || Number.isNaN(points)) {
-      points = 0.0
-    }
-    const newRow = this.createRating('', points, ADD_DEFAULT_COLOR, 'mastery')
-    this.setState({rows: this.state.rows.push(newRow)})
-    $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
+  }, 500)
+
+  componentWillUnmount() {
+    this.validateAndSave.cancel()
   }
 
   handleMasteryChange = _.memoize(index => () => {
@@ -138,27 +140,30 @@ export default class ProficiencyTable extends React.Component {
   })
 
   handleDescriptionChange = _.memoize(index => value => {
-    let rows = this.state.rows
-    if (!this.invalidDescription(value)) {
-      rows = rows.removeIn([index, 'descriptionError'])
-    }
-    rows = rows.setIn([index, 'description'], value)
-    this.setState({rows})
+    this.setState(({rows}) => {
+      if (!this.invalidDescription(value)) {
+        rows = rows.removeIn([index, 'descriptionError'])
+      }
+      rows = rows.setIn([index, 'description'], value)
+      return {rows}
+    })
   })
 
   handlePointsChange = _.memoize(index => value => {
-    const parsed = NumberHelper.parse(value)
-    let rows = this.state.rows
-    if (!this.invalidPoints(parsed) && parsed >= 0) {
-      rows = rows.removeIn([index, 'pointsError'])
-    }
-    rows = rows.setIn([index, 'points'], parsed)
-    this.setState({rows})
+    this.setState(({rows}) => {
+      const parsed = NumberHelper.parse(value)
+      if (!this.invalidPoints(parsed) && parsed >= 0) {
+        rows = rows.removeIn([index, 'pointsError'])
+      }
+      rows = rows.setIn([index, 'points'], parsed)
+      return {rows}
+    })
   })
 
   handleColorChange = _.memoize(index => value => {
-    const rows = this.state.rows.update(index, row => row.set('color', unformatColor(value)))
-    this.setState({rows})
+    this.setState(({rows}) => ({
+      rows: rows.update(index, row => row.set('color', unformatColor(value)))
+    }))
   })
 
   handleDelete = _.memoize(index => () => {
@@ -197,117 +202,49 @@ export default class ProficiencyTable extends React.Component {
       .toJS()
   })
 
-  handleSubmit = () => {
-    if (!this.checkForErrors()) {
-      saveProficiency(this.props.accountId, this.stateToConfig()).then(response => {
-        if (response.status === 200) {
-          $.flashMessage(I18n.t('Account proficiency ratings saved'))
-        } else {
-          $.flashError(I18n.t('An error occurred while saving account proficiency ratings'))
-        }
-      })
-    }
-  }
-
   checkForErrors = () => {
     let previousPoints = null
-    let firstError = true
+    let hasError = false
+    let changed = false
     const rows = this.state.rows.map(row => {
       let r = row
       if (this.invalidDescription(row.get('description'))) {
+        hasError = true
         r = r.set('descriptionError', I18n.t('Missing required description'))
-        if (firstError) {
-          r = r.set('focusField', 'description')
-          firstError = false
-        }
+      } else {
+        r = r.delete('descriptionError')
       }
       if (this.invalidPoints(row.get('points'))) {
+        hasError = true
         previousPoints = null
         r = r.set('pointsError', I18n.t('Invalid points'))
-        if (firstError) {
-          r = r.set('focusField', 'points')
-          firstError = false
-        }
       } else if (row.get('points') < 0) {
+        hasError = true
         r = r.set('pointsError', I18n.t('Negative points'))
-        if (firstError) {
-          r = r.set('focusField', 'points')
-          firstError = false
-        }
       } else {
         const currentPoints = row.get('points')
         if (previousPoints !== null && previousPoints <= currentPoints) {
+          hasError = true
           r = r.set('pointsError', I18n.t('Points must be less than previous rating'))
-          if (firstError) {
-            r = r.set('focusField', 'points')
-            firstError = false
-          }
+        } else {
+          r = r.delete('pointsError')
         }
         previousPoints = currentPoints
       }
+      changed = changed || r !== row
       return r
     })
-    if (!firstError) {
+    if (changed) {
       this.setState({rows})
     }
-    return !firstError
+    return hasError
   }
 
   invalidPoints = points => Number.isNaN(points)
 
   invalidDescription = description => !description || description.trim().length === 0
 
-  removeBillboard = () => {
-    this.setState({billboard: false})
-  }
-
-  renderSpinner() {
-    return (
-      <div style={{textAlign: 'center'}}>
-        <Spinner renderTitle={I18n.t('Loading')} size="large" margin="0 0 0 medium" />
-      </div>
-    )
-  }
-
-  renderBillboard() {
-    const styles = {
-      width: '10rem',
-      margin: '0 auto'
-    }
-    const divStyle = {
-      textAlign: 'center'
-    }
-    return (
-      <div style={divStyle}>
-        <Billboard
-          headingAs="h2"
-          headingLevel="h2"
-          ref={d => {
-            this.triggerRoot = d
-          }}
-          hero={
-            <div style={styles}>
-              <PresentationContent>
-                <SVGWrapper url="/images/trophy.svg" />
-              </PresentationContent>
-            </div>
-          }
-          heading={I18n.t('Customize Learning Mastery Ratings')}
-          message={I18n.t(
-            `
-            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.
-            Adjust number of ratings, mastery level, points, and colors.
-          `
-          ).trim()}
-        />
-        <Button variant="primary" onClick={this.removeBillboard}>
-          {I18n.t('Get Started')}
-        </Button>
-      </div>
-    )
-  }
-
-  renderTable() {
+  render() {
     const masteryIndex = this.state.masteryIndex
     return (
       <div>
@@ -345,32 +282,14 @@ export default class ProficiencyTable extends React.Component {
                 onPointsChange={this.handlePointsChange(index)}
               />
             ))}
-            <tr>
-              <td colSpan="4" style={{textAlign: 'center'}}>
-                <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
-                  <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
-                </Button>
-              </td>
-            </tr>
           </tbody>
         </Table>
-        <div className="save">
-          <Button variant="primary" onClick={this.handleSubmit}>
-            {I18n.t('Save Learning Mastery')}
+        <View width="100%" textAlign="center" padding="small" as="div">
+          <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
+            <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
           </Button>
-        </div>
+        </View>
       </div>
     )
-  }
-
-  render() {
-    const {billboard, loading} = this.state
-    if (loading) {
-      return this.renderSpinner()
-    } else if (billboard) {
-      return this.renderBillboard()
-    } else {
-      return this.renderTable()
-    }
   }
 }

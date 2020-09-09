@@ -419,13 +419,6 @@ new_gradebook_plagiarism_indicator:
   display_name: New Gradebook Plagiarism Indicator
   description: Enables display of plagiarism reports and similarity scores in
     the New Gradebook submission tray.
-unfavorite_course_from_dashboard:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Course Favorites From Dashboard
-  description: This allows the user to unfavorite a course directly from its
-    dashboard card.
-  root_opt_in: true
 commons_favorites:
   state: hidden
   applies_to: RootAccount
@@ -443,3 +436,8 @@ timer_without_autosubmission:
   description: Presents the quiz setting to avoid automatic submission of a timed quiz when the available time has ended.
   applies_to: RootAccount
   state: hidden
+recent_history:
+  state: allowed
+  applies_to: RootAccount
+  display_name: Recent History
+  description: Show a list of recently visited pages in the Canvas global navigation

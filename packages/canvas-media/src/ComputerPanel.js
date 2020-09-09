@@ -27,7 +27,7 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {Text} from '@instructure/ui-elements'
 import {px} from '@instructure/ui-utils'
-import {VideoPlayer} from '@instructure/ui-media-player'
+import {MediaPlayer} from '@instructure/ui-media-player'
 
 import LoadingIndicator from './shared/LoadingIndicator'
 import RocketSVG from './RocketSVG'
@@ -71,8 +71,21 @@ export default function ComputerPanel({
   }, [mediaTracksCheckbox])
 
   const handlePlayerSize = useCallback(
-    player => {
-      const sz = sizeMediaPlayer(player, theFile.type, {width, height})
+    _event => {
+      const player = previewPanelRef.current.querySelector('video')
+      let boundingBox = {width, height}
+      if (document.fullscreenElement || document.webkitFullscreenElement) {
+        boundingBox = {
+          width: window.innerWidth,
+          height: window.innerHeight
+        }
+      }
+      const sz = sizeMediaPlayer(
+        player,
+        theFile.type,
+        boundingBox,
+        !!(document.fullscreenElement || document.webkitFullscreenElement)
+      )
       player.style.width = sz.width
       player.style.height = sz.height
       player.style.margin = '0 auto'
@@ -84,28 +97,34 @@ export default function ComputerPanel({
   )
 
   const handleLoadedMetadata = useCallback(
-    event => {
-      const player = event.target
-      handlePlayerSize(player)
+    _event => {
+      handlePlayerSize()
     },
     [handlePlayerSize]
   )
 
-  // when we go to ui-media-player v7, <MediaPlayer> can listen for onLoadedMetedata
-  // but for now, it doesn't.
+  // // when we go to ui-media-player v7, <MediaPlayer> can listen for onLoadedMetedata
+  // // but for now, it doesn't.
+  // useEffect(() => {
+  //   const player = previewPanelRef?.current?.querySelector('video')
+  //   if (player) {
+  //     if (player.loadedmetadata || player.readyState >= 1) {
+  //       handlePlayerSize()
+  //     } else {
+  //       player.addEventListener('loadedmetadata', handleLoadedMetadata)
+  //       return () => {
+  //         player.removeEventListener('loadedmetadata', handleLoadedMetadata)
+  //       }
+  //     }
+  //   }
+  // }, [handlePlayerSize, handleLoadedMetadata, hasUploadedFile])
+
   useEffect(() => {
-    const player = previewPanelRef?.current?.querySelector('video')
-    if (player) {
-      if (player.loadedmetadata || player.readyState >= 1) {
-        handlePlayerSize()
-      } else {
-        player.addEventListener('loadedmetadata', handleLoadedMetadata)
-        return () => {
-          player.removeEventListener('loadedmetadata', handleLoadedMetadata)
-        }
-      }
+    window.addEventListener('resize', handlePlayerSize)
+    return () => {
+      window.removeEventListener('resize', handlePlayerSize)
     }
-  }, [handlePlayerSize, handleLoadedMetadata, hasUploadedFile])
+  }, [handlePlayerSize])
 
   if (hasUploadedFile) {
     const src = URL.createObjectURL(theFile)
@@ -135,7 +154,11 @@ export default function ComputerPanel({
           </Flex.Item>
         </Flex>
         <View as="div" textAlign="center" margin="0 auto">
-          <VideoPlayer sources={[{label: theFile.name, src}]} controls={renderControls} />
+          <MediaPlayer
+            sources={[{label: theFile.name, src}]}
+            hideFullScreen={!(document.fullscreenEnabled || document.webkitFullscreenEnabled)}
+            onLoadedMetadata={handleLoadedMetadata}
+          />
         </View>
         {isVideo(theFile.type) && (
           <>
@@ -193,31 +216,6 @@ export default function ComputerPanel({
       />
     </div>
   )
-
-  function renderControls(VPC) {
-    if (isAudio(theFile.type)) {
-      return (
-        <VPC>
-          <VPC.PlayPauseButton />
-          <VPC.Timebar />
-          <VPC.Volume />
-          <VPC.PlaybackSpeed />
-          <VPC.TrackChooser />
-        </VPC>
-      )
-    }
-    return (
-      <VPC>
-        <VPC.PlayPauseButton />
-        <VPC.Timebar />
-        <VPC.Volume />
-        <VPC.PlaybackSpeed />
-        <VPC.TrackChooser />
-        <VPC.SourceChooser />
-        {document.fullscreenEnabled && <VPC.FullScreenButton />}
-      </VPC>
-    )
-  }
 }
 
 ComputerPanel.propTypes = {

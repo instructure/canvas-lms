@@ -1705,11 +1705,52 @@ describe GradebooksController do
   end
 
   describe "POST 'submissions_zip_upload'" do
+    before(:once) do
+      @course = course_factory(active_all: true)
+      @assignment = assignment_model(course: @course)
+    end
+
+    let(:zip_params) do
+      {
+        assignment_id: @assignment.id,
+        course_id: @course.id,
+        submissions_zip: fixture_file_upload("docs/txt.txt", "text/plain", true)
+      }
+    end
+
     it "requires authentication" do
-      course_factory
-      assignment_model
-      post 'submissions_zip_upload', params: {:course_id => @course.id, :assignment_id => @assignment.id, :submissions_zip => 'dummy'}
+      post "submissions_zip_upload", params: zip_params
       assert_unauthorized
+    end
+
+    context "with an authenticated user" do
+      before(:each) do
+        user_session(@teacher)
+      end
+
+      it "redirects to the assignment page if the course does not allow score uploads" do
+        @course.update!(large_roster: true)
+        post "submissions_zip_upload", params: zip_params
+        expect(response).to redirect_to(course_assignment_url(@course, @assignment))
+        expect(flash[:error]).to eq "This course does not allow score uploads."
+      end
+
+      it "redirects to the assignment page if the submissions_zip param is invalid (and no attachment_id param)" do
+        post "submissions_zip_upload", params: zip_params.merge(submissions_zip: "an invalid zip")
+        expect(response).to redirect_to(course_assignment_url(@course, @assignment))
+        expect(flash[:error]).to eq "Could not find file to upload."
+      end
+
+      it "redirects to the submission upload page" do
+        post "submissions_zip_upload", params: zip_params
+        expect(response).to redirect_to(show_submissions_upload_course_gradebook_url(@course, @assignment))
+      end
+
+      it "accepts an attachment_id param in place of a submissions_zip param" do
+        attachment = @teacher.attachments.create!(uploaded_data: zip_params[:submissions_zip])
+        post "submissions_zip_upload", params: zip_params.merge(attachment_id: attachment.id).except(:submissions_zip)
+        expect(response).to redirect_to(show_submissions_upload_course_gradebook_url(@course, @assignment))
+      end
     end
   end
 
@@ -1726,13 +1767,6 @@ describe GradebooksController do
     it "assigns the @assignment variable for the template" do
       get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
       expect(assigns[:assignment]).to eql(@assignment)
-    end
-
-    it "assigns the @progress variable for the template" do
-      progress = Progress.new(context: @assignment, completion: 100)
-      allow_any_instance_of(Assignment).to receive(:submission_reupload_progress).and_return(progress)
-      get :show_submissions_upload, params: {course_id: @course.id, assignment_id: @assignment.id}
-      expect(assigns[:progress]).to eql(progress)
     end
 
     it "redirects to the assignment page when the course does not allow gradebook uploads" do

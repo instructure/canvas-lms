@@ -24,6 +24,7 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {Table} from '@instructure/ui-table'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-overlays'
@@ -61,6 +62,8 @@ export default class ProficiencyRating extends React.Component {
     focusField: null,
     pointsError: null
   }
+
+  static displayName = 'Row'
 
   constructor(props) {
     super(props)
@@ -149,8 +152,8 @@ export default class ProficiencyRating extends React.Component {
       pointsError
     } = this.props
     return (
-      <tr>
-        <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
+      <Table.Row>
+        <Table.Cell textAlign="center">
           <div style={{display: 'inline-block'}}>
             <RadioInput
               ref={input => {
@@ -161,8 +164,8 @@ export default class ProficiencyRating extends React.Component {
               onChange={this.handleMasteryChange}
             />
           </div>
-        </td>
-        <td className="description" style={{verticalAlign: 'top'}}>
+        </Table.Cell>
+        <Table.Cell>
           <TextInput
             ref={this.setDescriptionRef}
             renderLabel={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
@@ -170,8 +173,8 @@ export default class ProficiencyRating extends React.Component {
             onChange={this.handleDescriptionChange}
             defaultValue={description}
           />
-        </td>
-        <td className="points" style={{verticalAlign: 'top'}}>
+        </Table.Cell>
+        <Table.Cell>
           <TextInput
             ref={this.setPointsRef}
             renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
@@ -180,49 +183,51 @@ export default class ProficiencyRating extends React.Component {
             defaultValue={I18n.n(points)}
             width="4rem"
           />
-        </td>
-        <td className="color" style={{verticalAlign: 'top'}}>
-          <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
-            <Popover.Trigger>
-              <Button ref={this.setColorRef} variant="link">
-                <div>
-                  <span className="colorPickerIcon" style={{background: formatColor(color)}} />
-                  {I18n.t('Change')}
-                </div>
+        </Table.Cell>
+        <Table.Cell>
+          <span style={{whiteSpace: 'nowrap'}}>
+            <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
+              <Popover.Trigger>
+                <Button ref={this.setColorRef} variant="link">
+                  <div>
+                    <span className="colorPickerIcon" style={{background: formatColor(color)}} />
+                    {I18n.t('Change')}
+                  </div>
+                </Button>
+              </Popover.Trigger>
+              <Popover.Content>
+                <ColorPicker
+                  parentComponent="ProficiencyRating"
+                  colors={PREDEFINED_COLORS}
+                  currentColor={formatColor(color)}
+                  isOpen
+                  hidePrompt
+                  nonModal
+                  hideOnScroll={false}
+                  withAnimation={false}
+                  withBorder={false}
+                  withBoxShadow={false}
+                  withArrow={false}
+                  focusOnMount={false}
+                  afterClose={this.handleMenuClose}
+                  setStatusColor={this.setColor}
+                />
+              </Popover.Content>
+            </Popover>
+            <div className="delete">
+              <Button
+                disabled={disableDelete}
+                buttonRef={this.setTrashRef}
+                onClick={this.handleDelete}
+                variant="icon"
+                icon={<IconTrashLine />}
+              >
+                <ScreenReaderContent>{I18n.t('Delete proficiency rating')}</ScreenReaderContent>
               </Button>
-            </Popover.Trigger>
-            <Popover.Content>
-              <ColorPicker
-                parentComponent="ProficiencyRating"
-                colors={PREDEFINED_COLORS}
-                currentColor={formatColor(color)}
-                isOpen
-                hidePrompt
-                nonModal
-                hideOnScroll={false}
-                withAnimation={false}
-                withBorder={false}
-                withBoxShadow={false}
-                withArrow={false}
-                focusOnMount={false}
-                afterClose={this.handleMenuClose}
-                setStatusColor={this.setColor}
-              />
-            </Popover.Content>
-          </Popover>
-          <div className="delete">
-            <Button
-              disabled={disableDelete}
-              buttonRef={this.setTrashRef}
-              onClick={this.handleDelete}
-              variant="icon"
-              icon={<IconTrashLine />}
-            >
-              <ScreenReaderContent>{I18n.t('Delete proficiency rating')}</ScreenReaderContent>
-            </Button>
-          </div>
-        </td>
-      </tr>
+            </div>
+          </span>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 }

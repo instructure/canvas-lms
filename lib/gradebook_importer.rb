@@ -482,7 +482,7 @@ class GradebookImporter
     importer_submissions = []
     @assignments.each_with_index do |assignment, idx|
       assignment_id = assignment.new_record? ? assignment.id : assignment.previous_id
-      grade = row[idx + @student_columns]
+      grade = row[idx + @student_columns]&.strip
       if !assignment_visible_to_student(student, assignment, assignment_id, @visible_assignments)
         grade = ''
       end

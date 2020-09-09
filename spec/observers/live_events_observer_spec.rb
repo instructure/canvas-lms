@@ -508,4 +508,25 @@ describe LiveEventsObserver do
       link.destroy!
     end
   end
+
+  describe "outcome_proficiency" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_created).once
+      outcome_proficiency_model(account_model)
+    end
+
+    it "posts updated events when ratings are changed" do
+      proficiency = outcome_proficiency_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
+      rating = OutcomeProficiencyRating.new(description: 'new_rating', points: 5, mastery: true, color: 'ff0000')
+      proficiency.outcome_proficiency_ratings = [rating]
+      proficiency.save!
+    end
+
+    it "posts updated events when proficiencies are destroyed" do
+      proficiency = outcome_proficiency_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
+      proficiency.destroy
+    end
+  end
 end

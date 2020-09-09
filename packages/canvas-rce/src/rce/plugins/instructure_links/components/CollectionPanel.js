@@ -51,6 +51,7 @@ export default function CollectionPanel(props) {
           collection={props.collections[props.collection]}
           onLinkClick={props.onLinkClick}
           suppressRenderEmpty={props.suppressRenderEmpty}
+          contextType={props.contextType}
         />
       </AccordionSection>
     </div>

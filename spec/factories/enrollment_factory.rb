@@ -61,14 +61,14 @@ module Factories
 
     section_id = options[:section_id] || options[:section].try(:id) || course.default_section.id
     type = options[:enrollment_type] || "StudentEnrollment"
-    role_id = options[:role].try(:id) || Role.get_built_in_role(type).id
+    role_id = options[:role].try(:id) || Role.get_built_in_role(type, root_account_id: course.root_account_id).id
     result = create_records(Enrollment, user_ids.map { |id|
       {
         course_id: course.id,
         user_id: id,
         type: type,
         course_section_id: section_id,
-        root_account_id: course.root_account.id,
+        root_account_id: course.root_account_id,
         workflow_state: enrollment_state,
         role_id: role_id,
         sis_batch_id: sis_batch_id,

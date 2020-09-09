@@ -109,10 +109,10 @@ describe "Group Categories API", type: :request do
         expect(response.code).to eq '401'
       end
 
-      it "returns an error when search_term is fewer than 3 characters" do
-        json = api_call(:get, api_url, api_route, {:search_term => 'ab'}, {}, :expected_status => 400)
+      it "returns an error when search_term is fewer than 2 characters" do
+        json = api_call(:get, api_url, api_route, {:search_term => 'a'}, {}, :expected_status => 400)
         error = json["errors"].first
-        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+        verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
 
       it "returns a list of users" do
@@ -614,7 +614,7 @@ describe "Group Categories API", type: :request do
         let(:json) { api_call(:get, "/api/v1/accounts/#{@account.to_param}/group_categories.json",
                               @category_path_options.merge(action:'index',
                                                            account_id: @account.to_param)) }
-        let(:admin) { Role.get_built_in_role("AccountAdmin") }
+        let(:admin) { admin_role(root_account_id: @account.resolved_root_account_id) }
 
         before :each do
           @user = User.create!(name: 'billy')

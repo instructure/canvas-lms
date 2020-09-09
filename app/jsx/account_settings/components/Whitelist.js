@@ -21,8 +21,9 @@ import I18n from 'i18n!security_panel'
 import {connect} from 'react-redux'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string, number, element} from 'prop-types'
 import {Alert} from '@instructure/ui-alerts'
-import {Heading, List, Table} from '@instructure/ui-elements'
+import {Heading, List} from '@instructure/ui-elements'
 import {Spinner} from '@instructure/ui-spinner'
+import {Table} from '@instructure/ui-table'
 import {TextInput} from '@instructure/ui-forms'
 import {Flex, View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
@@ -220,20 +221,22 @@ export class Whitelist extends Component {
         {whitelistToShow.length <= 0 ? (
           <Billboard size="small" heading={I18n.t('No allowed domains')} hero={<EmptyDesert />} />
         ) : (
-          <Table caption={<ScreenReaderContent>{I18n.t('Allowed Domains')}</ScreenReaderContent>}>
-            <thead>
-              <tr>
-                <th scope="col">Allowed Domains</th>
-                <th scope="col">
+          <Table caption={I18n.t('Allowed Domains')}>
+            <Table.Head>
+              <Table.Row>
+                <Table.ColHeader id="allowed-domain-name">
+                  {I18n.t('Allowed Domains')}
+                </Table.ColHeader>
+                <Table.ColHeader id="allowed-domain-actions">
                   <ScreenReaderContent>{I18n.t('Actions')}</ScreenReaderContent>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </Table.ColHeader>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
               {whitelistToShow.map(domain => (
-                <tr key={domain}>
-                  <td>{domain}</td>
-                  <td style={{textAlign: 'end'}}>
+                <Table.Row key={domain}>
+                  <Table.Cell>{domain}</Table.Cell>
+                  <Table.Cell textAlign="end">
                     <Button
                       ref={c => (this.deleteButtons[domain] = c)}
                       variant="icon"
@@ -246,10 +249,10 @@ export class Whitelist extends Component {
                         {I18n.t('Remove %{domain} as an allowed domain', {domain})}
                       </ScreenReaderContent>
                     </Button>
-                  </td>
-                </tr>
+                  </Table.Cell>
+                </Table.Row>
               ))}
-            </tbody>
+            </Table.Body>
           </Table>
         )}
         {toolsWhitelistKeys && toolsWhitelistKeys.length > 0 && (
@@ -274,26 +277,26 @@ export class Whitelist extends Component {
                 <ScreenReaderContent>{I18n.t('Associated Tool Domains')}</ScreenReaderContent>
               }
             >
-              <thead>
-                <tr>
-                  <th scope="col">Domain Name</th>
-                  <th scope="col">Associated Tools</th>
-                </tr>
-              </thead>
-              <tbody>
+              <Table.Head>
+                <Table.Row>
+                  <Table.ColHeader id="whitelisted-tools-domain-name">Domain Name</Table.ColHeader>
+                  <Table.ColHeader id="whitelisted-tools-tools">Associated Tools</Table.ColHeader>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
                 {toolsWhitelistKeys.map(domain => (
-                  <tr key={domain}>
-                    <td>{domain}</td>
-                    <td>
+                  <Table.Row key={domain}>
+                    <Table.Cell>{domain}</Table.Cell>
+                    <Table.Cell>
                       <List variant="unstyled">
                         {this.props.whitelistedDomains.tools[domain].map(associatedTool => (
                           <List.Item key={associatedTool.id}>{associatedTool.name}</List.Item>
                         ))}
                       </List>
-                    </td>
-                  </tr>
+                    </Table.Cell>
+                  </Table.Row>
                 ))}
-              </tbody>
+              </Table.Body>
             </Table>
           </View>
         )}

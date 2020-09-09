@@ -1279,4 +1279,16 @@ module ApplicationHelper
     }.deep_merge(options)
     javascript_tag "(window.prefetched_xhrs = (window.prefetched_xhrs || {}))[#{id.to_json}] = fetch(#{url.to_json}, #{opts.to_json})"
   end
+
+  def mastery_scales_js_env
+    if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      js_env(
+        ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        MASTERY_SCALE: {
+          outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
+          outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json
+        }
+      )
+    end
+  end
 end

@@ -182,9 +182,8 @@ class UserMerge
   def copy_favorites
     from_user.favorites.find_each do |f|
       Favorite.unique_constraint_retry do
-        course_id = Shard.relative_id_for(f.context_id, from_user.shard, target_user.shard)
-        fave = target_user.favorites.where(context_type: 'Course', context_id: course_id).take
-        target_user.favorites.create!(context_type: 'Course', context_id: course_id) unless fave
+        fave = target_user.favorites.where(context_type: 'Course', context_id: f.context_id).take
+        target_user.favorites.create!(context_type: 'Course', context_id: f.context_id) unless fave
       end
     end
   end

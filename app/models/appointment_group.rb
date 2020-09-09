@@ -19,7 +19,6 @@
 class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
-  include HtmlTextHelper
 
   has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context }
   # has_many :through on the same table does not alias columns in condition
@@ -393,14 +392,10 @@ class AppointmentGroup < ActiveRecord::Base
     :location_address
   ]
 
-  def description_html
-    format_message(description).first if description
-  end
-
   def update_appointments
     changed = Hash[
       EVENT_ATTRIBUTES.select{ |attr| saved_change_to_attribute?(attr) }.
-      map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
+      map{ |attr| [attr, send(attr)] }
     ]
 
     if @contexts_changed
@@ -408,9 +403,7 @@ class AppointmentGroup < ActiveRecord::Base
       changed[:effective_context_code] = contexts.map(&:asset_string).join(",")
     end
 
-    return unless changed.present?
-
-    desc = changed.delete :description
+    return if changed.blank?
 
     if changed.present?
       appointments.update_all(changed)
@@ -418,12 +411,10 @@ class AppointmentGroup < ActiveRecord::Base
     end
 
     if changed.present?
-      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }).update_all(changed)
-    end
-
-    if desc
-      appointments.where(:description => description_before_last_save).update_all(:description => desc)
-      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }, description: description_before_last_save).update_all(:description => desc)
+      CalendarEvent.joins(:parent_event).where(
+          workflow_state: ['active', 'locked'],
+          parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }
+      ).update_all(changed)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?

@@ -20,6 +20,7 @@ import React from 'react'
 import sinon from 'sinon'
 import {shallow} from 'enzyme'
 import Criterion from '../Criterion'
+import {Table} from '@instructure/ui-table'
 import {rubrics, assessments} from './fixtures'
 
 const criteriaTypes = ['custom', 'outcome']
@@ -116,7 +117,7 @@ describe('Criterion', () => {
       />
     )
 
-    expect(el.find('td')).toHaveLength(1)
+    expect(el.find(Table.Cell)).toHaveLength(1)
   })
 
   it('only shows comments when they exist or editComments is true', () => {

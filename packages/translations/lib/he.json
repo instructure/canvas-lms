@@ -92,9 +92,6 @@
     "canvas_planner_98ed106": {
         "message": "מתכנן קנבס"
     },
-    "canvas_plugins_705a5016": {
-        "message": "תופסי קנבס"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "הקש/י כדי לשלב { imageName }"
     },
@@ -109,6 +106,9 @@
     },
     "collaborations_5c56c15f": {
         "message": "שיתופי פעולה"
+    },
+    "content_1440204b": {
+        "message": "תוכן"
     },
     "content_type_2cf90d95": {
         "message": "סוג תוכן"
@@ -223,6 +223,9 @@
     },
     "excused_cf8792eb": {
         "message": "נסלח"
+    },
+    "external_tools_6e77821": {
+        "message": "כלים חיצוניים"
     },
     "failed_to_delete_to_do_64edff49": {
         "message": "ביטול המטלה לביצוע נכשל"

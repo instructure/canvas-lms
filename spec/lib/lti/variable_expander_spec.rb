@@ -995,6 +995,25 @@ module Lti
           variable_expander.expand_variables!(exp_hash)
           expect(exp_hash[:test]).to eq course.course_code
         end
+          context 'when the course has multiple sections' do
+            # User.new leads to empty/null columns, which causes yet more AR
+            # complaints. The user_factory takes care of this.
+            let(:user) { user_factory }
+
+            before(:each) do
+              # AR complains if you don't save the course to the database first.
+              course.save!
+              enrolled_section = add_section("section one", { course: course })
+              add_section("section two", { course: course })
+              create_enrollment(course, user, { section: enrolled_section })
+            end
+
+            it 'has a substitution for com.instructure.User.sectionNames' do
+              exp_hash = { test: '$com.instructure.User.sectionNames' }
+              variable_expander.expand_variables!(exp_hash)
+              expect(exp_hash[:test]).to match_array ['section one']
+            end
+          end
 
         context 'when the course has groups' do
           let(:course_with_groups) do
@@ -1094,6 +1113,18 @@ module Lti
 
       context 'context is a course and there is a user' do
         let(:variable_expander) { VariableExpander.new(root_account, course, controller, current_user: user, tool: tool) }
+        let(:user) { user_factory }
+
+        it 'has substitution for com.instructure.User.sectionNames' do
+            course.save!
+            first_section = add_section('1', { course: course })
+            second_section = add_section('2', { course: course })
+            create_enrollment(course, user, { section: first_section })
+            create_enrollment(course, user, { section: second_section })
+            exp_hash = { test: '$com.instructure.User.sectionNames' }
+            variable_expander.expand_variables!(exp_hash)
+            expect(exp_hash[:test]).to match_array ['1', '2']
+        end
 
         it 'has substitution for $Canvas.xapi.url' do
           allow(Lti::XapiService).to receive(:create_token).and_return('abcd')

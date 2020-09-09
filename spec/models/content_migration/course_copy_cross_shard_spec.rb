@@ -85,5 +85,20 @@ describe ContentMigration do
       att_to = @copy_to.attachments.where(migration_id: mig_id(att)).first
       expect(att_to.root_attachment).to eq dest_root
     end
+
+    it "should not blow up with usage rights" do
+      ur = @copy_from.usage_rights.create! use_justification: 'used_by_permission', legal_copyright: '(C) 2015 Wyndham Systems'
+      att = @copy_from.attachments.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'),
+        :folder => Folder.unfiled_folder(@copy_from), :usage_rights => ur)
+
+      run_course_copy
+
+      att_to = @copy_to.attachments.where(migration_id: mig_id(att)).first
+      ur_to = att_to.usage_rights
+      expect(ur_to.context).to eq @copy_to
+      [:use_justification, :legal_copyright, :license].each do |k|
+        expect(ur_to.send(k)).to eq ur.send(k)
+      end
+    end
   end
 end

@@ -38,7 +38,8 @@ describe('OutcomeManagement', () => {
 
   it('passes accountId to the ProficiencyTable component', () => {
     const wrapper = shallow(<OutcomeManagement />)
-    expect(wrapper.find('ProficiencyTable').prop('accountId')).toBe('1')
+    expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Account')
+    expect(wrapper.find('MasteryScale').prop('contextId')).toBe('1')
   })
 })
 

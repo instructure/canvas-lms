@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, wait, waitForElementToBeRemoved} from '@testing-library/react'
+import {act, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 
 import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
@@ -61,24 +61,24 @@ describe('RCE Plugins > CanvasContentTray', () => {
     act(() => {
       props.bridge.showTrayForPlugin(plugin, 'editor_id')
     })
-    await wait(getTray, {timeout: 19500})
+    await waitFor(getTray, {timeout: 19500})
   }
 
   function getTrayLabel() {
     return getTray().getAttribute('aria-label')
   }
 
-  describe('Tray Label', () => {
+  describe('Tray Label in course context', () => {
     beforeEach(() => {
       renderComponent()
     })
 
+    // course
     it('is labeled with "Course Links" when using the "links" content type', async () => {
       await showTrayForPlugin('links')
       expect(getTrayLabel()).toEqual('Course Links')
     })
 
-    // course
     it('is labeled with "Course Images" when using the "images" content type', async () => {
       await showTrayForPlugin('course_images')
       expect(getTrayLabel()).toEqual('Course Images')
@@ -108,6 +108,17 @@ describe('RCE Plugins > CanvasContentTray', () => {
     it('is labeled with "User Documents" when using the "user_documents" content type', async () => {
       await showTrayForPlugin('user_documents')
       expect(getTrayLabel()).toEqual('User Documents')
+    })
+  })
+
+  describe('Tray Label in group context', () => {
+    beforeEach(() => {
+      renderComponent({contextType: 'group'})
+    })
+
+    it('is labeled with "Group Links" when using the "links" content type', async () => {
+      await showTrayForPlugin('links')
+      expect(getTrayLabel()).toEqual('Group Links')
     })
   })
 
@@ -155,7 +166,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
       const closeBtn = component.getByText('Close')
       closeBtn.click()
-      // immediatly after being asked to close, INSTUI Tray removes role='dialog' and
+      // immediately after being asked to close, INSTUI Tray removes role='dialog' and
       // adds aria-hidden='true', so the getTray() function above does not work
       await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
 

@@ -2337,12 +2337,16 @@ class Assignment < ActiveRecord::Base
   # for file naming (how we're sending it down to the teacher) is
   # last_name_first_name_user_id_attachment_id.
   # extension
-  def generate_comments_from_files_later(attachment_data, user)
+  def generate_comments_from_files_later(attachment_data, user, attachment_id = nil)
     progress = Progress.create!(context: self, tag: "submissions_reupload") do |p|
       p.user = user
     end
 
-    attachment = user.attachments.create!(attachment_data)
+    if attachment_id.present?
+      attachment = user.attachments.find_by(id: attachment_id)
+    end
+
+    attachment ||= user.attachments.create!(attachment_data)
     progress.process_job(self, :generate_comments_from_files, {}, attachment, user, progress)
     progress
   end
@@ -2388,9 +2392,11 @@ class Assignment < ActiveRecord::Base
         }
       end
 
+      comment_submission = comment.submission
       submission = {
-        user_id: comment.submission.user_id,
-        user_name: comment.submission.user.name
+        user_id: comment_submission.user_id,
+        user_name: comment_submission.user.name,
+        anonymous_id: comment_submission.anonymous_id
       }
 
       results[:comments].push({
@@ -3287,6 +3293,18 @@ class Assignment < ActiveRecord::Base
     return true if final_grader_id == user.id || context.account_membership_allows(user, :select_final_grade)
 
     grader_comments_visible_to_graders?
+  end
+
+  # This only checks whether this assignment allows score statistics to be shown.
+  # You must also check submission.eligible_for_showing_score_statistics
+  def can_view_score_statistics?(user)
+    # The assignment must have points_possible > 0,
+    return false unless (points_possible.present? && points_possible > 0)
+
+    # Students can only see statistics when count >= 5 and not disabled by the instructor
+    # Instructor can see statistics at any time.
+    count = score_statistic&.count || 0
+    context.grants_right?(user, :read_as_admin) || (count >= 5 && !context.hide_distribution_graphs)
   end
 
   def grader_ids_to_anonymous_ids

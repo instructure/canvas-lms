@@ -17,6 +17,7 @@
  */
 
 import $ from 'jquery'
+import _ from 'underscore'
 import round from 'compiled/util/round'
 import I18n from 'i18n!gradebook'
 import {scoreToGrade} from '../../../GradingSchemeHelper'
@@ -96,7 +97,10 @@ function render(options) {
   }
 
   if (options.letterGrade) {
-    letterGrade = `<span class="letter-grade-points">${options.letterGrade}</span>`
+    const escapedGrade = _.escape(options.letterGrade)
+
+    // xsslint safeString.identifier escapedGrade
+    letterGrade = `<span class="letter-grade-points">${escapedGrade}</span>`
   }
 
   // xsslint safeString.identifier tooltip warningIcon grade letterGrade

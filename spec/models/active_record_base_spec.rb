@@ -488,6 +488,16 @@ describe ActiveRecord::Base do
       expect(@p2.reload.unique_id).to eq 'pb'
     end
 
+    it "should do an update all with a join with join conditions spanning multiple lines" do
+      scope = Pseudonym.active.joins("INNER JOIN #{User.quoted_table_name} ON
+        pseudonyms.user_id=users.id AND
+        users.name='a'")
+      expect(scope.update_all(:unique_id => 'pa3')).to eq 1
+      expect(@p1.reload.unique_id).to eq 'pa3'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      expect(@p2.reload.unique_id).to eq 'pb'
+    end
+
     it "should do a delete all with a join" do
       expect(Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).delete_all).to eq 1
       expect { @p1.reload }.to raise_error(ActiveRecord::RecordNotFound)

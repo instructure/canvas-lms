@@ -1803,11 +1803,23 @@ describe EnrollmentsApiController, type: :request do
       it "should show enrollments for courses that aren't published if state[]=current_and_future" do
         course_factory
         @course.claim
-        enrollment = course_factory.enroll_student(@user)
+        enrollment = @course.enroll_student(@user)
         enrollment.update_attribute(:workflow_state, 'active')
 
         json = api_call(:get, @user_path,
                         @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
+        expect(json.map { |e| e['id'] }).to include enrollment.id
+      end
+
+      it "should show enrollments for courses with future start dates if state[]=current_and_future" do
+        course_factory
+        @course.update_attributes(:start_at => 1.week.from_now, :restrict_enrollments_to_course_dates => true)
+        enrollment = @course.enroll_student(@user)
+        enrollment.update_attribute(:workflow_state, 'active')
+        expect(enrollment.enrollment_state.state).to eq "pending_active"
+
+        json = api_call(:get, @user_path,
+          @user_params.merge(:state => %w{current_and_future}, :type => %w{StudentEnrollment}))
         expect(json.map { |e| e['id'] }).to include enrollment.id
       end
 

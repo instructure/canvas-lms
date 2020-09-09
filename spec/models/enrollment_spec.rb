@@ -181,7 +181,8 @@ describe Enrollment do
     end
 
     it "should return the sis enrollment type otherwise" do
-      e = TaEnrollment.new
+      c = Account.default.courses.create!
+      e = TaEnrollment.create(course: c)
       expect(e.sis_role).to eq 'ta'
     end
   end
@@ -1401,7 +1402,7 @@ describe Enrollment do
 
   context "permissions" do
     it "should grant read rights to account members with the ability to read_roster" do
-      role = Role.get_built_in_role("AccountMembership")
+      role = Role.get_built_in_role("AccountMembership", root_account_id: Account.default.id)
       user = account_admin_user(:role => role)
       RoleOverride.create!(:context => Account.default, :permission => :read_roster,
                            :role => role, :enabled => true)

@@ -41,8 +41,14 @@ class Role < ActiveRecord::Base
       end
     end
 
-    def role=(role)
-      super(role&.role_for_shard(self.shard))
+    def self.included(klass)
+      klass.before_save(:resolve_cross_account_role)
+    end
+
+    def resolve_cross_account_role
+      if self.will_save_change_to_role_id? && self.respond_to?(:root_account_id) && self.root_account_id && self.role.root_account_id != self.root_account_id
+        self.role = self.role.role_for_root_account_id(self.root_account_id)
+      end
     end
   end
 
@@ -60,9 +66,9 @@ class Role < ActiveRecord::Base
   validates_exclusion_of :name, :in => KNOWN_TYPES, :unless => :built_in?, :message => 'is reserved'
   validate :ensure_non_built_in_name
 
-  def role_for_shard(target_shard=Shard.current)
-    if self.built_in? && self.shard != target_shard && target_shard_role = Role.get_built_in_role(self.name, target_shard)
-      target_shard_role
+  def role_for_root_account_id(target_root_account_id)
+    if self.built_in? && self.root_account_id != target_root_account_id && target_role = Role.get_built_in_role(self.name, root_account_id: target_root_account_id)
+      target_role
     else
       self
     end
@@ -79,7 +85,7 @@ class Role < ActiveRecord::Base
   end
 
   def ensure_non_built_in_name
-    if !self.built_in? && Role.built_in_roles.map(&:label).include?(self.name)
+    if !self.built_in? && Role.built_in_roles(root_account_id: self.root_account_id).map(&:label).include?(self.name)
       self.errors.add(:label, t(:duplicate_role, 'A role with this name already exists'))
       return false
     end
@@ -109,65 +115,41 @@ class Role < ActiveRecord::Base
     !built_in? && !deleted?
   end
 
-  def self.ensure_built_in_roles!
-    unless built_in_roles(true).count == BASE_TYPES.count
-      BASE_TYPES.each do |base_type|
-        role = Role.new
-        role.name = base_type
-        role.base_role_type = base_type
-        role.workflow_state = :built_in
-        role.save!
+  def self.built_in_roles(root_account_id:)
+    raise "root_account_id required" unless root_account_id
+    # giving up on in-process built-in role caching because it's probably not really worth it anymore
+    RequestCache.cache('built_in_roles', root_account_id) do
+      local_id, shard = Shard.local_id_for(root_account_id)
+      (shard || Shard.current).activate do
+        roles = Role.where(:workflow_state => 'built_in', :root_account_id => local_id).order(:id).to_a
+        # if these haven't been made yet, fall back to old built-in roles
+        roles = Role.where(:workflow_state => 'built_in', :root_account_id => nil).order(:id).to_a if roles.empty? # TODO can remove after datafixup
+        roles
       end
-      built_in_roles(true)
     end
   end
 
-  def self.built_in_roles(reload=false, shard=Shard.current)
-    @built_in_roles ||= {}
-    if @built_in_roles[shard.id].blank? || reload
-      @built_in_roles[shard.id] = shard.activate { Role.where(:workflow_state => 'built_in').to_a }
-    end
-    @built_in_roles[shard.id]
+  def self.built_in_course_roles(root_account_id:)
+    built_in_roles(root_account_id: root_account_id).select{|role| role.course_role?}
   end
 
-  def self.built_in_roles_by_id(reload=false, shard=Shard.current)
-    @built_in_roles_by_id ||= {}
-    @built_in_roles_by_id[shard.id] ||= built_in_roles(reload, shard).index_by(&:id)
-  end
-
-  def self.clear_built_in_roles!
-    @built_in_roles.clear if @built_in_roles
-  end
-
-  def self.built_in_course_roles
-    built_in_roles.select{|role| role.course_role?}
-  end
-
-  def self.built_in_account_roles
-    built_in_roles.select{|role| role.account_role?}
-  end
-
-  def self.visible_built_in_roles
-    built_in_roles.select{|role| role.visible?}
+  def self.visible_built_in_roles(root_account_id:)
+    built_in_roles(root_account_id: root_account_id).select{|role| role.visible?}
   end
 
   def self.get_role_by_id(id)
     return nil unless id
     return nil if id.is_a?(String) && id !~ Api::ID_REGEX
-    # most roles are going to be built in, so don't do a db search every time
-    local_id, shard = Shard.local_id_for(id)
-    shard ||= Shard.current
-    role = built_in_roles_by_id(false, shard)[local_id] || Role.where(:id => id).take
-    role
+    Role.where(:id => id).take # giving up on built-in role caching because it's silly now and we should just preload more
   end
 
-  def self.get_built_in_role(name, shard=Shard.current)
-    built_in_roles(false, shard).detect{|role| role.name == name}
+  def self.get_built_in_role(name, root_account_id:)
+    built_in_roles(root_account_id: root_account_id).detect{|role| role.name == name}
   end
 
   def ==(other_role)
     if other_role.is_a?(Role) && self.built_in? && other_role.built_in?
-      return self.name == other_role.name # be equivalent even if they're on different shards
+      return self.name == other_role.name # be equivalent even if they're on different shards/root_accounts
     else
       super
     end
@@ -249,7 +231,7 @@ class Role < ActiveRecord::Base
     custom_roles = account.available_custom_course_roles(include_inactive)
     RoleOverride.enrollment_type_labels.map do |br|
       new = br.clone
-      new[:id] = Role.get_built_in_role(br[:name]).id
+      new[:id] = Role.get_built_in_role(br[:name], root_account_id: account.resolved_root_account_id).id
       new[:label] = br[:label].call
       new[:plural_label] = br[:plural_label].call
       new[:custom_roles] = custom_roles.select{|cr|cr.base_role_type == new[:base_role_name]}.map do |cr|
@@ -263,10 +245,11 @@ class Role < ActiveRecord::Base
   # counts for the given course to each item
   def self.custom_roles_and_counts_for_course(course, user, include_inactive=false)
     users_scope = course.users_visible_to(user)
-    base_counts = users_scope.where('enrollments.role_id IS NULL OR enrollments.role_id IN (?)',
-                                    Role.built_in_course_roles.map(&:id)).group('enrollments.type').select('users.id').distinct.count
-    role_counts = users_scope.where('enrollments.role_id IS NOT NULL AND enrollments.role_id NOT IN (?)',
-                                    Role.built_in_course_roles.map(&:id)).group('enrollments.role_id').select('users.id').distinct.count
+    built_in_role_ids = Role.built_in_course_roles(root_account_id: course.root_account_id).map(&:id)
+    base_counts = users_scope.where('enrollments.role_id IN (?)', built_in_role_ids).
+      group('enrollments.type').select('users.id').distinct.count
+    role_counts = users_scope.where('enrollments.role_id NOT IN (?)', built_in_role_ids).
+      group('enrollments.role_id').select('users.id').distinct.count
 
     @enrollment_types = Role.all_enrollment_roles_for_account(course.account, include_inactive)
     @enrollment_types.each do |base_type|

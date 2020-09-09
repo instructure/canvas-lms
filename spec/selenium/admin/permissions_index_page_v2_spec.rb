@@ -23,6 +23,7 @@ describe "permissions index" do
 
   before :once do
     @account = Account.default
+    @account.enable_feature!(:granular_permissions_wiki_pages)
     @subaccount = Account.create!(name: "subaccount", parent_account_id: @account.id)
     account_admin_user
   end
@@ -32,14 +33,6 @@ describe "permissions index" do
       :locked => opts[:locked], :context => account, :applies_to_self => true, :applies_to_descendants => true,
       :role_id => role.id, :context_type => 'Account')
     new_role.id
-  end
-
-  def student_role
-    Role.get_built_in_role('StudentEnrollment')
-  end
-
-  def ta_role
-    Role.get_built_in_role('TaEnrollment')
   end
 
   describe "editing role info" do

@@ -49,6 +49,7 @@ import {
 const RestoreAutoSaveModal = React.lazy(() => import('./RestoreAutoSaveModal'))
 
 const ASYNC_FOCUS_TIMEOUT = 250
+const DEFAULT_RCE_HEIGHT = '400'
 
 // we  `require` instead of `import` these 2 css files because the ui-themeable babel require hook only works with `require`
 const styles = require('../skins/skin-delta.css')
@@ -177,7 +178,8 @@ class RCEWrapper extends React.Component {
       })
     ),
     tinymce: PropTypes.object,
-    trayProps
+    trayProps,
+    instRecordDisabled: PropTypes.bool
   }
 
   static defaultProps = {
@@ -665,7 +667,6 @@ class RCEWrapper extends React.Component {
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
-    editor.on('Change', this.doAutoResize)
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
 
@@ -729,16 +730,6 @@ class RCEWrapper extends React.Component {
         this.announcing = 0
       }
     })
-  }
-
-  doAutoResize = e => {
-    const ifr = this.iframe
-    if (ifr) {
-      const contentElm = ifr.contentDocument.documentElement
-      if (contentElm.scrollHeight > contentElm.clientHeight) {
-        this.onResize(e, {deltaY: contentElm.scrollHeight - contentElm.clientHeight})
-      }
-    }
   }
 
   /* ********** autosave support *************** */
@@ -960,12 +951,14 @@ class RCEWrapper extends React.Component {
     const setupCallback = options.setup
 
     const canvasPlugins = ['instructure_links', 'instructure_image', 'instructure_documents']
-    if (!ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED) {
+    if (!this.props.instRecordDisabled) {
       canvasPlugins.splice(2, 0, 'instructure_record')
     }
 
     return {
       ...options,
+
+      height: options.height || DEFAULT_RCE_HEIGHT,
 
       block_formats: [
         `${formatMessage('Heading 2')}=h2`,
@@ -1106,7 +1099,6 @@ class RCEWrapper extends React.Component {
 
         this.mceInstance().show()
         this.mceInstance().focus()
-        this.doAutoResize()
       }
     }
   }

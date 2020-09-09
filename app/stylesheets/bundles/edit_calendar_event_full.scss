@@ -20,49 +20,45 @@
 
 #editCalendarEventFull {
   label.label_with_checkbox {
-    margin-bottom: 10px;
+    margin-top: 10px;
     input[type="checkbox"] {
-      margin: direction-sides(0 5px 0 0);
+      margin: direction-sides(0 4px 0 0);
     }
   }
+  input, select {
+    vertical-align: baseline;
+  }
+  label.row_header {
+    font-weight: bold;
+  }
   .date_start_end_row {
-    @include clearfix;
-    th, td {
-      vertical-align: top;
-      padding: direction-sides(0 5px 0 0);
-      &:first-child {
-        padding-#{direction(left)}: 0px;
-      }
-      label.row_header {
-        padding-top: 10px;
-      }
-    }
-    input[type="text"], div.input-append {
-      margin-bottom: 0px;
-    }
-    span {
-      float: direction(left);
-      padding: 0 5px;
-      min-height: 40px;
-    }
-    label {
-      font-weight: bold;
-    }
+    display: flex;
+    flex-wrap: wrap;
+
     .date_field {
-      width: 120px;
+      width: 7.5rem;
     }
     .time_field {
-      width: 95px;
+      width: 6rem;
     }
     .time_separator {
-      width: 6px;
       line-height: 28px;
       padding: 0px;
       text-align: center;
+      margin: 4px;
     }
-    .datetime_suggest {
-      margin-top: 0px;
-      padding-top: 0px;
+    .date_field_container {
+      margin-bottom: 8px;
+      input {
+        margin-bottom: 3px;
+      }
+      .input-append {
+        margin-bottom: 0px;
+        margin-#{direction(right)}: 8px;
+      }
+    }
+    .time_range_container {
+      display: flex;
     }
   }
   .show_if_using_sections {
@@ -76,48 +72,32 @@
       display: none;
     }
   }
-}
-.duplicate_div{
-  float: direction(left);
-  display: inline-block;
-  margin: 0 5px;
-  line-height: 38px;
-  width: 35px;
-  text-align: direction(right);
-}
-.duplicate_td{
-  vertical-align: top;
-  padding-#{direction(left)}: 20px;
-  min-width: 300px;
-}
-#duplicate_interval{
-  width: 50px;
-  float: direction(left);
-  display: inline-block;
-  margin: 0 5px;
-}
-.duplicate_for_div{
-  float: direction(left);
-  display: inline-block;
-  margin: 0 5px;
-  line-height: 38px;
-  width: 35px;
-  text-align: direction(right);
-}
-#duplicate_count{
-  width: 50px;
-  float: direction(left);
-  display: inline-block;
-  margin: 0 5px;
-}
-.occurences_div{
-  float: direction(left);
-  display: inline-block;
-  margin: 0 5px;
-  line-height: 38px;
-}
-.duplicate_tooltip_td{
-  vertical-align: top;
-  padding-#{direction(left)}: 20px;
-  width: 35px;
+  #duplicate_frequency {
+    width: 7.5rem;
+  }
+  #duplicate_interval {
+    width: 3rem;
+  }
+  #duplicate_count {
+    width: 3rem;
+  }
+  .location_label {
+    width: 5rem;
+  }
+  .duplicate_label {
+    width: 3rem;
+    display: inline-block;
+    text-align: direction(right);
+  }
+  .duplicate_event_row {
+    input {
+      margin: direction-sides(0 4px 0 4px);
+    }
+    .label_with_checkbox {
+      margin-#{direction(left)}: 36px;
+    }
+  }
+  .form-actions .btn {
+    margin-bottom: 5px;
+  }
 }

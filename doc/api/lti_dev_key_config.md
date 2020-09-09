@@ -440,7 +440,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>The display height of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Cavnas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
+<p>The display height of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
 
 <!-- selection_width -->          
     <tr class="request-param ">
@@ -454,7 +454,7 @@ object for placement-specific target_link_uri's</p>
 
       <td class="param-desc">
 
-<p>The display width of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Cavnas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
+<p>The display width of the iframe. This may be ignored or overidden for some LTI placements due to other UI requirements set by Canvas. Tools are advised to experiment with this setting to see what makes the most sense for their application.</p>
 
 <!-- text -->          
       </td>

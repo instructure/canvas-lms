@@ -17,6 +17,10 @@
 #
 
 class Auditors::GradeChange
+  # To avoid inserting null values in Cassandra, substitute a placeholder value
+  # that won't successfully "join" to any other tables.
+  NULL_PLACEHOLDER = 0
+
   class Record < Auditors::Record
     attributes :account_id,
                :grade_after,
@@ -34,7 +38,8 @@ class Auditors::GradeChange
                :score_after,
                :score_before,
                :points_possible_after,
-               :points_possible_before
+               :points_possible_before,
+               :grading_period_id
     attr_accessor :grade_current
 
     def self.generate(submission, event_type=nil)
@@ -96,7 +101,13 @@ class Auditors::GradeChange
       attributes['score_before'] = previous_submission.try(:score)
       attributes['points_possible_after'] = assignment.points_possible
       attributes['points_possible_before'] = previous_assignment.points_possible
+      attributes['grading_period_id'] = id_or_placeholder(@submission.grading_period)
     end
+
+    def id_or_placeholder(record)
+      record.present? ? Shard.global_id_for(record) : Auditors::GradeChange::NULL_PLACEHOLDER
+    end
+    private :id_or_placeholder
 
     def root_account
       account.root_account

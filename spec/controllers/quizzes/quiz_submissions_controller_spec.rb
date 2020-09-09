@@ -114,6 +114,21 @@ describe Quizzes::QuizSubmissionsController do
       put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
       assert_unauthorized
     end
+
+    it "should not allow updating if the student is not assigned the quiz" do
+      # we create an override that does not include "the student"
+      ao = AssignmentOverride.create(
+        assignment: @quiz.assignment,
+        title: 'ADHOC OVERRIDE',
+        workflow_state: 'active',
+        set_type: 'ADHOC'
+      )
+      override_student = ao.assignment_override_students.build
+      override_student.user = student_in_course(course: @course).user
+      override_student.save!
+      put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
+      assert_unauthorized
+    end
   end
 
   describe "PUT 'backup'" do

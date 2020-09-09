@@ -20,6 +20,7 @@ require_relative "../spec_helper"
 require_relative "./graphql_spec_helper"
 
 describe AuditLogFieldExtension do
+
   before do
     if !AuditLogFieldExtension.enabled?
       skip("AuditLog needs to be enabled by configuring dynamodb.yml")
@@ -27,6 +28,7 @@ describe AuditLogFieldExtension do
   end
 
   before(:once) do
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
     course_with_student(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
     MUTATION = <<~MUTATION
@@ -62,9 +64,12 @@ describe AuditLogFieldExtension do
 
   it "fails gracefully (or silently!? when dynamo isn't working" do
     require 'canvas_dynamodb'
-    dynamo = CanvasDynamoDB::Database.new("asdf", "asdf", nil,
-                                          {region: "us-east-1", endpoint: "http://localhost:8000"},
-                                          Rails.logger)
+    dynamo = CanvasDynamoDB::Database.new(
+      "asdf",
+      prefix: "asdf",
+      client_opts: { region: "us-east-1", endpoint: "http://localhost:8000" },
+      logger: Rails.logger
+    )
     expect(dynamo).to receive(:put_item).and_raise(Aws::DynamoDB::Errors::ServiceError.new("two", "arguments"))
     allow(Canvas::DynamoDB::DatabaseBuilder).to receive(:from_config).and_return(dynamo)
     response = CanvasSchema.execute(MUTATION, context: {current_user: @teacher})
@@ -77,6 +82,7 @@ describe AuditLogFieldExtension::Logger do
   let(:mutation) { double(graphql_name: "asdf") }
 
   before(:once) do
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
     course_with_teacher(active_all: true)
     @entry = @course.assignments.create! name: "asdf"
   end

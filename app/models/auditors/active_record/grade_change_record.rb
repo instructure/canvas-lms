@@ -51,6 +51,7 @@ module Auditors::ActiveRecord
         attrs_hash['student_id'] = Shard.relative_id_for(record.student_id, Shard.current, Shard.current)
         attrs_hash['submission_id'] = Shard.relative_id_for(record.submission_id, Shard.current, Shard.current)
         attrs_hash['submission_version_number'] = record.version_number
+        attrs_hash['grading_period_id'] = resolve_id_or_placeholder(record.grading_period_id)
         attrs_hash
       end
     end
@@ -63,5 +64,11 @@ module Auditors::ActiveRecord
     def version_number
       submission_version_number
     end
+
+    def self.resolve_id_or_placeholder(id)
+      return nil if id == Auditors::GradeChange::NULL_PLACEHOLDER
+      Shard.relative_id_for(id, Shard.current, Shard.current)
+    end
+    private_class_method :resolve_id_or_placeholder
   end
 end

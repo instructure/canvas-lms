@@ -3985,6 +3985,53 @@ describe Submission do
     end
   end
 
+  describe "capturing screenshots for online_url submissions" do
+    let_once(:course) { Course.create! }
+    let_once(:student) { course.enroll_student(User.create!, active_all: true).user }
+    let(:assignment) { course.assignments.create!(submission_types: ["online_url"]) }
+    let(:sub) { assignments.find_by(user: student) }
+    let(:submitted_url) { "https://example.com" }
+    let(:get_web_snapshot_jobs) { Delayed::Job.where(tag: "Submission#get_web_snapshot").order(:id) }
+
+    before do
+      allow(CutyCapt).to receive(:enabled?).and_return(true)
+    end
+
+    it "calls #get_web_snapshot when it's the first submission attempt" do
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "calls #get_web_snapshot when it's not the first submission attempt" do
+      assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: "https://example.com/different")
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "calls #get_web_snapshot when it's not the first submission attempt and the url hasn't changed" do
+      assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: submitted_url)
+      }.to change {
+        get_web_snapshot_jobs.count
+      }.by(1)
+    end
+
+    it "does not call #get_web_snapshot when a url is not included" do
+      expect {
+        assignment.submit_homework(student, submission_type: "online_url", url: nil)
+      }.not_to change {
+        get_web_snapshot_jobs.count
+      }
+    end
+  end
+
   describe '#submit_attachments_to_canvadocs' do
     it 'creates crocodoc documents' do
       allow(Canvas::Crocodoc).to receive(:enabled?).and_return true
@@ -4862,10 +4909,40 @@ describe Submission do
       @student_assessment = @submission.rubric_assessments.where(assessor_id: @student).first
     end
 
-    it "returns empty if submission is unposted and user cannot :read_grade" do
-      @assignment.ensure_post_policy(post_manually: true)
-      @viewing_user = @student
-      expect(subject).to be_empty
+    context "when the submission is unposted and the viewing user cannot :read_grade" do
+      before(:once) do
+        @assignment.post_policy.update!(post_manually: true)
+        @viewing_user = @student
+      end
+
+      it "excludes assessments by other users" do
+        expect(subject).not_to include(@teacher_assessment)
+      end
+
+      it "includes assessments authored by the viewing user" do
+        course = Course.create!
+        assessed_student = course.enroll_student(User.create!, workflow_state: "active").user
+        assessing_student = course.enroll_student(User.create!, workflow_state: "active").user
+
+        assignment = course.assignments.create!(peer_reviews: true)
+        rubric_association = rubric_association_model(context: course, association_object: assignment, purpose: "grading")
+
+        submission = assignment.submission_for_student(assessed_student)
+        submission.assessment_requests.create!(
+          user: assessed_student,
+          assessor: assessing_student,
+          assessor_asset: assignment.submission_for_student(assessing_student)
+        )
+        peer_review_assessment = rubric_association.rubric_assessments.create!({
+          artifact: submission,
+          assessment_type: "grading",
+          assessor: assessing_student,
+          rubric: rubric_association.rubric,
+          user: assessed_student
+        })
+
+        expect(submission.visible_rubric_assessments_for(assessing_student)).to include(peer_review_assessment)
+      end
     end
 
     it "returns the rubric assessments if user can :read_grade" do
@@ -4911,6 +4988,14 @@ describe Submission do
       it 'can find historic rubric assessments of older attempts' do
         expect(
           @submission2.visible_rubric_assessments_for(@viewing_user, attempt: @submission.attempt)
+        ).to contain_exactly(@teacher_assessment, @student_assessment)
+      end
+
+      it "returns assessments for every attempt if attempt is nil" do
+        @teacher_assessment.update!(artifact_attempt: 0)
+        @student_assessment.update!(artifact_attempt: 1)
+        expect(
+          @submission2.visible_rubric_assessments_for(@viewing_user, attempt: nil)
         ).to contain_exactly(@teacher_assessment, @student_assessment)
       end
     end

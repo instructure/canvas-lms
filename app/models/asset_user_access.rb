@@ -89,7 +89,7 @@ class AssetUserAccess < ActiveRecord::Base
     "#{self.context_type.underscore}_#{self.context_id}" rescue nil
   end
 
-  def readable_name
+  def readable_name(include_group_name: true)
     if self.asset_code && self.asset_code.match(/\:/)
       split = self.asset_code.split(/\:/)
 
@@ -133,25 +133,32 @@ class AssetUserAccess < ActiveRecord::Base
       elsif (match = split[1].match(/group_(\d+)/)) && (group = Group.where(:id => match[1]).first)
         case split[0]
         when "announcements"
-          t("%{group_name} - Group Announcements", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Announcements", :group_name => group.name) : t('Group Announcements')
         when "calendar_feed"
-          t("%{group_name} - Group Calendar", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Calendar", :group_name => group.name) : t('Group Calendar')
         when "collaborations"
-          t("%{group_name} - Group Collaborations", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Collaborations", :group_name => group.name) : t('Group Collaborations')
         when "conferences"
-          t("%{group_name} - Group Conferences", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Conferences", :group_name => group.name) : t('Group Conferences')
         when "files"
-          t("%{group_name} - Group Files", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Files", :group_name => group.name) : t('Group Files')
         when "home"
-          t("%{group_name} - Group Home", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Home", :group_name => group.name) : t('Group Home')
         when "pages"
-          t("%{group_name} - Group Pages", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Pages", :group_name => group.name) : t('Group Pages')
         when "roster"
-          t("%{group_name} - Group People", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group People", :group_name => group.name) : t('Group People')
         when "topics"
-          t("%{group_name} - Group Discussions", :group_name => group.name)
+          include_group_name ? t("%{group_name} - Group Discussions", :group_name => group.name) : t('Group Discussions')
         else
-          "#{group.name} - Group #{split[0].titleize}"
+          "#{include_group_name ? "#{group.name} - " : ""}Group #{split[0].titleize}"
+        end
+      elsif split[1].match(/user_\d+/)
+        case split[0]
+        when "files"
+          t('User Files')
+        else
+          self.display_name
         end
       else
         self.display_name
@@ -282,7 +289,7 @@ class AssetUserAccess < ActiveRecord::Base
   end
 
   ICON_MAP = {
-    announcements: "icon-announcements",
+    announcements: "icon-announcement",
     assignments: "icon-assignment",
     calendar: "icon-calendar-month",
     files: "icon-download",

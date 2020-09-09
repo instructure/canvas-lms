@@ -1615,7 +1615,7 @@ if (
   document.getElementById('rubric_management') &&
   ENV.NON_SCORING_RUBRICS &&
   ENV.PERMISSIONS.manage_outcomes &&
-  !ENV.ACCOUNT_LEVEL_PROFICIENCIES
+  !ENV.ACCOUNT_LEVEL_MASTERY_SCALES
 ) {
   $('h1').hide()
   const contextId = ENV.context_asset_string.split('_')[1]

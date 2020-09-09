@@ -43,7 +43,10 @@ self.addEventListener('fetch', function(event) {
 
 function eligibleRequest(request) {
   const url = new URL(request.url)
-  return request.method === 'GET' && request.mode !== 'navigate' && eligiblePath(url.pathname)
+  return request.method === 'GET'
+    && request.mode !== 'navigate'
+    && !imagePreviewWithoutInstfs(url)
+    && eligiblePath(url.pathname)
 }
 
 // most files links we care about look like this regex fragment with a context
@@ -52,6 +55,15 @@ const commonFilePath = `/files/[^/]+/(preview|download(.\\w+)?)`
 
 function contextFilePath(context) {
   return new RegExp(`^/${context}/[^/]+${commonFilePath}$`)
+}
+
+function imagePreviewWithoutInstfs(url) {
+  // Image preview without inst-fs (files domain)
+  // causes some CORS issues. We ignore that path here.
+  const previewPath = new RegExp(`/files/[^/]+/preview(.\\w+)?`)
+  return previewPath.test(url.pathname)
+    && url.searchParams.has('instfs')
+    && url.searchParams.get('instfs') == 'false'
 }
 
 const eligiblePaths = [

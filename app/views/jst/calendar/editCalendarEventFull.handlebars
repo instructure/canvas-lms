@@ -37,128 +37,12 @@
     <input type="hidden"
            name="remove_child_events"
            value="{{#unless use_section_dates}}1{{/unless}}" />
-  {{/if}}
 
-  <div class="hide_if_using_sections date_start_end_row">
-    <table>
-      <tbody>
-        <tr>
-          <td>
-            <div class='date_field_container'>
-              <label class='screenreader-only' id='calendar_event_date_accessible_label'>
-                {{#t}}Event Date{{/t}}
-                {{datepickerScreenreaderPrompt 'date'}}
-              </label>
-              <input type="text"
-                     name="start_date"
-                     class="date_field start_date"
-                     value="{{start_date}}"
-                     placeholder="{{#t "date"}}Date{{/t}}"
-                     aria-labelledby='calendar_event_date_accessible_label'
-                     data-tooltip title="{{accessibleDateFormat 'date'}}"/>
-            </div>
-          </td>
-          <td>
-            <div class='date_field_container'>
-              <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
-                {{#t}}Event Start Time{{/t}}
-                {{datepickerScreenreaderPrompt 'time'}}
-              </label>
-              <input type="text"
-                     name="start_time"
-                     class="time_field start_time"
-                     {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
-                     placeholder="{{#t "start_time"}}Start Time{{/t}}"
-                     aria-labelledby='calendar_event_start_time_accessible_label'
-                     data-tooltip title="{{accessibleDateFormat 'time'}}"/>
-            </div>
-          </td>
-          <td><span class="time_separator">-</span></td>
-          <td>
-            <div class='date_field_container'>
-              <label class='screenreader-only' id='calendar_event_end_time_accessible_label'>
-                {{#t}}Event End Time{{/t}}
-                {{datepickerScreenreaderPrompt 'time'}}
-              </label>
-              <input type="text"
-                     name="end_time"
-                     class="time_field end_time"
-                     {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
-                     placeholder="{{#t "end_time"}}End Time{{/t}}"
-                     aria-labelledby='calendar_event_end_time_accessible_label'
-                     data-tooltip title="{{accessibleDateFormat 'time'}}"/>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-  <div>
-    <table id="calendar_event_location_info">
-      <tbody>
-        <tr>
-          <td>
-            <label for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
-            <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
-          </td>
-        </tr>
-        <tr>
-          <td>
-            <label for="calendar_event_location_address">{{#t "location_address"}}Address:{{/t}}</label>
-            <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
-          </td>
-        </tr>
-        {{#if include_conference_selection}}
-          <tr>
-            <td>
-              <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
-              <div id="calendar_event_conference_selection"></div>
-            </td>
-          </tr>
-        {{/if}}
-        <tr class="duplicate_event_toggle_row hide">
-            <td style="vertical-align: top;"><label for="duplicate_event">{{#t "repeat"}}Duplicate{{/t}}</label> <input type="checkbox" id="duplicate_event" name="duplicate" value="true" style="margin-left: 10px;" />
-            </td>
-        </tr>
-        <tr class="duplicate_event_row duplicate_fields" style="display: none">
-            <td class="duplicate_td" colspan="2">
-                <label for="duplicate_interval">
-                    <div class="duplicate_div">{{#t}}Every{{/t}}</div>
-                    <input value="1" disabled="true" id="duplicate_interval" name="duplicate_interval" min="1" />
-                    <select id="duplicate_frequency" style="width: 100px;" name="duplicate_frequency">
-                        <option value="daily">{{#t}}Day(s){{/t}}</option>
-                        <option value="weekly" selected>{{#t}}Week(s){{/t}}</option>
-                        <option value="monthly">{{#t}}Month(s){{/t}}</option>
-                    </select>
-                </label>
-            </td>
-        </tr>
-        <tr class="duplicate_event_row duplicate_fields" style="display: none">
-            <td style="vertical-align: top; padding-left: 20px;" colspan="2">
-                <label for="duplicate_count">
-                    <div class="duplicate_for_div" >{{#t}}For{{/t}}</div>
-                    <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" min="1" max="{{recurringEventLimit}}" />
-                    <div class="occurences_div">{{#t}}additional occurrence(s){{/t}}</div>
-                </label>
-            </td>
-        </tr>
-        <tr class="duplicate_event_row duplicate_fields" style="display: none">
-            <td class="duplicate_tooltip_td"><label data-tooltip title="{{#t}}Appends a number to the end of each event title (e.g. Event 1, Event 2, etc){{/t}}" for="append_iterator">{{#t "count"}}Count:{{/t}}</label>
-                <input data-tooltip title="{{#t}}Appends a number to the end of each event title (e.g. Event 1, Event 2, etc){{/t}}" value="true" disabled="true" type="checkbox" id="append_iterator" name="append_iterator" />
-            </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  {{#if course_sections}}
-    <table class="formtable show_if_using_sections">
+    <div class="show_if_using_sections">
       {{#each course_sections}}
-      <tr class="date_start_end_row">
-        <td colspan="4"><label class="row_header" for="section_{{id}}_start_date">{{name}}</label></td>
-      </tr>
-      <tr class="date_start_end_row">
-        <td>
+      <label class="row_header" for="section_{{id}}_start_date">{{name}}</label>
+      <div class="date_start_end_row">
+        <div class="date_field_container">
           <input type="text"
                  id="section_{{id}}_start_date"
                  name="child_event_data[{{id}}][start_date]"
@@ -166,33 +50,127 @@
                  value="{{tDateToString event.start_at "medium"}}"
                  aria-label="{{#t "date"}}Date{{/t}}"
                  placeholder="{{#t "date"}}Date{{/t}}" />
-        </td>
-        <td>
-          <input type="text"
-                 name="child_event_data[{{id}}][start_time]"
-                 class="time_field start_time"
-                 {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}}
-                 aria-label="{{#t "start_time"}}Start Time{{/t}}"
-                 placeholder="{{#t "start_time"}}Start Time{{/t}}" />
-        </td>
-
-        <td><span class="time_separator">-</span></td>
-
-        <td>
-          <input type="text"
-                 name="child_event_data[{{id}}][end_time]"
-                 class="time_field end_time"
-                 {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}}
-                 aria-label="{{#t "end_time"}}End Time{{/t}}"
-                 placeholder="{{#t "end_time"}}End Time{{/t}}" />
-          <input type="hidden"
-                 name="child_event_data[{{id}}][context_code]"
-                 value="course_section_{{id}}" />
-        </td>
-      </tr>
+        </div>
+        <div class="time_range_container">
+          <div class='date_field_container'>
+            <input type="text"
+                   name="child_event_data[{{id}}][start_time]"
+                   class="time_field start_time"
+                   {{#unless all_day}} value="{{tTimeToString event.start_at "tiny"}}" {{/unless}}
+                   aria-label="{{#t "start_time"}}Start Time{{/t}}"
+                   placeholder="{{#t "start_time"}}Start Time{{/t}}" />
+          </div>
+          <span class="time_separator">-</span>
+          <div class='date_field_container'>
+            <input type="text"
+                   name="child_event_data[{{id}}][end_time]"
+                   class="time_field end_time"
+                   {{#unless all_day}} value="{{tTimeToString event.end_at "tiny"}}" {{/unless}}
+                   aria-label="{{#t "end_time"}}End Time{{/t}}"
+                   placeholder="{{#t "end_time"}}End Time{{/t}}" />
+            <input type="hidden"
+                   name="child_event_data[{{id}}][context_code]"
+                   value="course_section_{{id}}" />
+          </div>
+        </div>
+      </div>
       {{/each}}
-    </table>
+    </div>
   {{/if}}
+
+  <div class="hide_if_using_sections date_start_end_row">
+    <div class="date_field_container">
+      <label class='screenreader-only' id='calendar_event_date_accessible_label'>
+        {{#t}}Event Date{{/t}}
+        {{datepickerScreenreaderPrompt 'date'}}
+      </label>
+      <input type="text"
+             name="start_date"
+             class="date_field start_date"
+             value="{{start_date}}"
+             placeholder="{{#t "date"}}Date{{/t}}"
+             aria-labelledby='calendar_event_date_accessible_label'
+             data-tooltip title="{{accessibleDateFormat 'date'}}"/>
+    </div>
+    <div class="time_range_container">
+      <div class='date_field_container'>
+        <label class='screenreader-only' id='calendar_event_start_time_accessible_label'>
+          {{#t}}Event Start Time{{/t}}
+          {{datepickerScreenreaderPrompt 'time'}}
+        </label>
+        <input type="text"
+               name="start_time"
+               class="time_field start_time"
+               {{#unless all_day}} value="{{tTimeToString start_at "tiny"}}" {{/unless}}
+               placeholder="{{#t "start_time"}}Start Time{{/t}}"
+               aria-labelledby='calendar_event_start_time_accessible_label'
+               data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+      </div>
+      <span class="time_separator">-</span>
+      <div class='date_field_container'>
+        <label class='screenreader-only' id='calendar_event_end_time_accessible_label'>
+          {{#t}}Event End Time{{/t}}
+          {{datepickerScreenreaderPrompt 'time'}}
+        </label>
+        <input type="text"
+               name="end_time"
+               class="time_field end_time"
+               {{#unless all_day}} value="{{tTimeToString end_at "tiny"}}" {{/unless}}
+               placeholder="{{#t "end_time"}}End Time{{/t}}"
+               aria-labelledby='calendar_event_end_time_accessible_label'
+               data-tooltip title="{{accessibleDateFormat 'time'}}"/>
+      </div>
+    </div>
+  </div>
+
+  <fieldset>
+    <label class="location_label" for="calendar_event_location_name">{{#t "location_name"}}Location:{{/t}}</label>
+    <input id="calendar_event_location_name" name="location_name" size="30" maxlength="255" type="text" value="{{location_name}}"/>
+  </fieldset>
+
+  <fieldset>
+    <label class="location_label" for="calendar_event_location_address">{{#t "location_address"}}Address:{{/t}}</label>
+    <input id="calendar_event_location_address" name="location_address" size="30" maxlength="255" type="text" value="{{location_address}}"/>
+  </fieldset>
+
+  {{#if include_conference_selection}}
+  <fieldset>
+    <label for="calendar_event_conference_selection">{{#t}}Conferencing:{{/t}}</label>
+    <div id="calendar_event_conference_selection"></div>
+  </fieldset>
+  {{/if}}
+
+  <label class="label_with_checkbox" for="duplicate_event">
+    <input type="checkbox" id="duplicate_event" name="duplicate" value="true"/>
+    {{#t "repeat"}}Duplicate{{/t}}
+  </label>
+
+  <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <label for="duplicate_interval">
+      <div class="duplicate_label">{{#t}}Every{{/t}}</div>
+      <input value="1" disabled="true" type="number" id="duplicate_interval" name="duplicate_interval" min="1" />
+      <select id="duplicate_frequency" name="duplicate_frequency">
+        <option value="daily">{{#t}}Day(s){{/t}}</option>
+        <option value="weekly" selected>{{#t}}Week(s){{/t}}</option>
+        <option value="monthly">{{#t}}Month(s){{/t}}</option>
+      </select>
+    </label>
+  </div>
+
+  <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <label for="duplicate_count">
+      <div class="duplicate_label" >{{#t}}For{{/t}}</div>
+      <input value="1" disabled="true" type="number" id="duplicate_count" name="duplicate_count" min="1" max="{{recurringEventLimit}}" />
+      <span class="occurences_div">{{#t}}additional occurrence(s){{/t}}</span>
+    </label>
+  </div>
+
+  <div class="duplicate_event_row duplicate_fields" style="display: none">
+    <label for="append_iterator" class="label_with_checkbox" data-tooltip title="{{#t}}Appends a number to the end of each event title (e.g. Event 1, Event 2, etc){{/t}}">
+      <input value="true" disabled="true" type="checkbox" id="append_iterator" name="append_iterator" />
+      {{#t}}Number each event{{/t}}
+    </label>
+  </div>
 
   <div class="form-actions">
     {{#if url}}

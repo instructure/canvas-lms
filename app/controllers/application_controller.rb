@@ -32,6 +32,8 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  define_callbacks :html_render
+
   attr_accessor :active_tab
   attr_reader :context
 
@@ -58,6 +60,7 @@ class ApplicationController < ActionController::Base
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
 
+  before_action :clear_idle_connections
   before_action :annotate_apm
   before_action :check_pending_otp
   before_action :set_user_id_header
@@ -77,7 +80,7 @@ class ApplicationController < ActionController::Base
   before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
-  after_action :add_csp_for_root
+  set_callback :html_render, :before, :add_csp_for_root
   after_action :teardown_live_events_context
 
   # multiple actions might be called on a single controller instance in specs
@@ -212,7 +215,7 @@ class ApplicationController < ActionController::Base
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
-    :direct_share, :assignment_bulk_edit, :responsive_awareness,
+    :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
@@ -574,6 +577,10 @@ class ApplicationController < ActionController::Base
     else
       yield
     end
+  end
+
+  def clear_idle_connections
+    Canvas::Redis.clear_idle_connections
   end
 
   def annotate_apm
@@ -1279,15 +1286,13 @@ class ApplicationController < ActionController::Base
   end
 
   def set_page_view
-    return true if !page_views_enabled?
-
-    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
     # We only record page_views for html page requests coming from within the
     # app, or if coming from a developer api request and specified as a
     # page_view.
-    if @current_user && !request.xhr? && request.get?
-      generate_page_view
-    end
+    return unless @current_user && !request.xhr? && request.get? && page_views_enabled?
+
+    ENV['RAILS_HOST_WITH_PORT'] ||= request.host_with_port rescue nil
+    generate_page_view
   end
 
   def require_reacceptance_of_terms
@@ -1381,8 +1386,6 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    return true unless page_views_enabled?
-
     shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
     shard.activate do
       begin
@@ -1407,6 +1410,7 @@ class ApplicationController < ActionController::Base
   def add_interaction_seconds
     updated_fields = params.slice(:interaction_seconds)
     return unless (request.xhr? || request.put?) && params[:page_view_token] && !updated_fields.empty?
+    return unless page_views_enabled?
 
     RequestContextGenerator.store_interaction_seconds_update(
       params[:page_view_token],
@@ -1433,7 +1437,7 @@ class ApplicationController < ActionController::Base
     return unless @accessed_asset && (@accessed_asset[:level] == 'participate' || !@page_view_update)
     @access = AssetUserAccess.log(user, @context, @accessed_asset) if @context
 
-    if @page_view.nil? && page_views_enabled? && %w{participate submit}.include?(@accessed_asset[:level])
+    if @page_view.nil? && %w{participate submit}.include?(@accessed_asset[:level]) && page_views_enabled?
       generate_page_view(user)
     end
 
@@ -2221,7 +2225,14 @@ class ApplicationController < ActionController::Base
         options[:json] = json
       end
     end
-    super
+
+    # _don't_ call before_render hooks if we're not returning HTML
+    unless options.is_a?(Hash) &&
+      (options[:json] || options[:plain] || options[:layout] == false)
+      run_callbacks(:html_render) { super }
+    else
+      super
+    end
   end
 
   # flash is normally only preserved for one redirect; make sure we carry
@@ -2608,62 +2619,67 @@ class ApplicationController < ActionController::Base
   end
 
   def setup_live_events_context
-    benchmark("setup_live_events_context") do
+    proc = -> do
       ctx = {}
 
-      if @domain_root_account
-        ctx[:root_account_uuid] = @domain_root_account.uuid
-        ctx[:root_account_id] = @domain_root_account.global_id
-        ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+      benchmark("setup_live_events_context") do
+
+        if @domain_root_account
+          ctx[:root_account_uuid] = @domain_root_account.uuid
+          ctx[:root_account_id] = @domain_root_account.global_id
+          ctx[:root_account_lti_guid] = @domain_root_account.lti_guid
+        end
+
+        if @current_pseudonym
+          ctx[:user_login] = @current_pseudonym.unique_id
+          ctx[:user_account_id] = @current_pseudonym.global_account_id
+          ctx[:user_sis_id] = @current_pseudonym.sis_user_id
+        end
+
+        ctx[:user_id] = @current_user.global_id if @current_user
+        ctx[:time_zone] = @current_user.time_zone if @current_user
+        ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
+        ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
+        ctx[:context_type] = @context.class.to_s if @context
+        ctx[:context_id] = @context.global_id if @context
+        ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
+        ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
+
+        if @context_membership
+          ctx[:context_role] =
+            if @context_membership.respond_to?(:role)
+              @context_membership.role.name
+            elsif @context_membership.respond_to?(:type)
+              @context_membership.type
+            else
+              @context_membership.class.to_s
+            end
+        end
+
+        if tctx = Thread.current[:context]
+          ctx[:request_id] = tctx[:request_id]
+          ctx[:session_id] = tctx[:session_id]
+        end
+
+        ctx[:hostname] = request.host
+        ctx[:http_method] = request.method
+        ctx[:user_agent] = request.headers['User-Agent']
+        ctx[:client_ip] = request.remote_ip
+        ctx[:url] = request.url
+        # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
+        ctx[:referrer] = request.referer
+        ctx[:producer] = 'canvas'
+
+        if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
+          ctx[:compact_live_events] = true
+        end
+
+        StringifyIds.recursively_stringify_ids(ctx)
       end
 
-      if @current_pseudonym
-        ctx[:user_login] = @current_pseudonym.unique_id
-        ctx[:user_account_id] = @current_pseudonym.global_account_id
-        ctx[:user_sis_id] = @current_pseudonym.sis_user_id
-      end
-
-      ctx[:user_id] = @current_user.global_id if @current_user
-      ctx[:time_zone] = @current_user.time_zone if @current_user
-      ctx[:developer_key_id] = @access_token.developer_key.global_id if @access_token
-      ctx[:real_user_id] = @real_current_user.global_id if @real_current_user
-      ctx[:context_type] = @context.class.to_s if @context
-      ctx[:context_id] = @context.global_id if @context
-      ctx[:context_sis_source_id] = @context.sis_source_id if @context.respond_to?(:sis_source_id)
-      ctx[:context_account_id] = Context.get_account_or_parent_account_global_id(@context) if @context
-
-      if @context_membership
-        ctx[:context_role] =
-          if @context_membership.respond_to?(:role)
-            @context_membership.role.name
-          elsif @context_membership.respond_to?(:type)
-            @context_membership.type
-          else
-            @context_membership.class.to_s
-          end
-      end
-
-      if tctx = Thread.current[:context]
-        ctx[:request_id] = tctx[:request_id]
-        ctx[:session_id] = tctx[:session_id]
-      end
-
-      ctx[:hostname] = request.host
-      ctx[:http_method] = request.method
-      ctx[:user_agent] = request.headers['User-Agent']
-      ctx[:client_ip] = request.remote_ip
-      ctx[:url] = request.url
-      # The Caliper spec uses the spelling "referrer", so use it in the Canvas output JSON too.
-      ctx[:referrer] = request.referer
-      ctx[:producer] = 'canvas'
-
-      if @domain_root_account&.feature_enabled?(:compact_live_event_payloads)
-        ctx[:compact_live_events] = true
-      end
-
-      StringifyIds.recursively_stringify_ids(ctx)
-      LiveEvents.set_context(ctx)
+      ctx
     end
+    LiveEvents.set_context(proc)
   end
 
   # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb

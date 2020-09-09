@@ -38,9 +38,6 @@
     "cancel_caeb1e68": {
         "message": "Չեղյալ համարել"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas  միացվող մոդուլներ"
-    },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Click to embed { imageName }"
     },
@@ -52,6 +49,9 @@
     },
     "collaborations_5c56c15f": {
         "message": "Համատեղ աշխատանքներ"
+    },
+    "content_1440204b": {
+        "message": "Բովանդակություն"
     },
     "content_type_2cf90d95": {
         "message": "Բովանդակության տեսակ"
@@ -118,6 +118,9 @@
     },
     "excused_cf8792eb": {
         "message": "Ներված է"
+    },
+    "external_tools_6e77821": {
+        "message": "Արտաքին գործիքներ"
     },
     "files_c300e900": {
         "message": "Ֆայլեր"

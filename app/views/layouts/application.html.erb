@@ -77,6 +77,7 @@
   body_classes << "context-#{@context.asset_string}" if @context
   body_classes << "responsive_awareness" if !!@domain_root_account&.feature_enabled?(:responsive_awareness)
   body_classes << "responsive_misc" if !!@domain_root_account&.feature_enabled?(:responsive_misc)
+  body_classes << "responsive_student_grades_page" if !!@domain_root_account&.feature_enabled?(:responsive_student_grades_page)
 -%>
 <body class="<%= (body_classes).uniq.join(" ") %>">
 <%if @current_user && @real_current_user && @real_current_user != @current_user %>

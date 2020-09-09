@@ -1670,8 +1670,8 @@ class UsersController < ApplicationController
       return render(json: { :message => "Invalid Hexcode Provided" }, status: :bad_request)
     end
 
-    colors = user.custom_colors
     user.shard.activate do
+      colors = user.custom_colors
       # translate asset string to be relative to user's shard
       unless params[:hexcode].nil?
         colors[context.asset_string] = normalize_hexcode(params[:hexcode])

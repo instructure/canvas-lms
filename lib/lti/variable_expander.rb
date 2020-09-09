@@ -166,6 +166,17 @@ module Lti
                       COURSE_GUARD,
                       default_name: 'com_instructure_user_observees'
 
+    # Returns an array of the section names that the user is enrolled in, if the
+    # context of the tool launch is within a course.
+    #
+    # @example
+    #   ```
+    #   [ "Section 1", "Section 5", "TA Section"]
+    #   ```
+    register_expansion 'com.instructure.User.sectionNames', [],
+                       -> { Enrollment.active.joins(:course_section).where(user_id: @current_user.id, course_id: @context.id).pluck(:name) },
+                       ENROLLMENT_GUARD,
+                       default_name: 'com_instructure_user_section_names'
 
     # The title of the context
     # @launch_parameter context_title

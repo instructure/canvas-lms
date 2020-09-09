@@ -61,6 +61,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.optionProperty('default_editing_roles')
     this.optionProperty('WIKI_RIGHTS')
+    this.optionProperty('selectedPages')
 
     this.lastFocusField = null
   }
@@ -91,6 +92,9 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (!this.wikiIndexPlacements) this.wikiIndexPlacements = []
 
     this.itemViewOptions.contextName = this.contextName
+
+    if (!this.selectedPages) this.selectedPages = {}
+    this.itemViewOptions.selectedPages = this.selectedPages
 
     this.collection.on('fetch', () => {
       if (!this.fetched) {
@@ -173,14 +177,13 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (ev != null) {
       ev.preventDefault()
     }
-
-    const pageUrls = $('.select-page-checkbox:checked')
-      .map((_i, c) => c.value)
-      .get()
-    if (pageUrls.length > 0) {
+    const pages = Object.values(this.itemViewOptions.selectedPages)
+    if (pages.length > 0) {
+      const titles = pages.map(page => page.get('title'))
+      const urls = pages.map(page => page.get('url'))
       showConfirmDelete({
-        selectedCount: pageUrls.length,
-        onConfirm: () => deletePages(this.contextName, this.contextId, pageUrls),
+        pageTitles: titles,
+        onConfirm: () => deletePages(this.contextName, this.contextId, urls),
         onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error)
       })
     }
@@ -192,6 +195,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         $.flashError(I18n.t('Failed to delete selected pages'))
       } else {
         $.flashMessage(I18n.t('Selected pages have been deleted'))
+        this.itemViewOptions.selectedPages = {}
         this.collection.fetch()
       }
     }

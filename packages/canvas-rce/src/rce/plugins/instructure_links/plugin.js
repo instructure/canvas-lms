@@ -71,7 +71,8 @@ import {CREATE_LINK, EDIT_LINK} from './components/LinkOptionsDialog/LinkOptions
 
 const trayController = new LinkOptionsTrayController()
 
-const PLUGIN_KEY = 'links'
+const COURSE_PLUGIN_KEY = 'course_links'
+const GROUP_PLUGIN_KEY = 'group_links'
 
 tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
   init(ed) {
@@ -94,7 +95,11 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
     ed.ui.registry.addNestedMenuItem('instructure_links', {
       text: formatMessage('Link'),
       icon: 'link',
-      getSubmenuItems: () => ['instructure_external_link', 'instructure_course_link']
+      getSubmenuItems: () => [
+        'instructure_external_link',
+        'instructure_course_link',
+        'instructure_group_link'
+      ]
     })
     ed.ui.registry.addMenuItem('instructure_external_link', {
       text: formatMessage('External Links'),
@@ -106,7 +111,15 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
         text: formatMessage('Course Links'),
         onAction: () => {
           ed.focus(true) // activate the editor without changing focus
-          ed.execCommand('instructureTrayForLinks', false, PLUGIN_KEY)
+          ed.execCommand('instructureTrayForLinks', false, COURSE_PLUGIN_KEY)
+        }
+      })
+    } else if (contextType === 'group') {
+      ed.ui.registry.addMenuItem('instructure_group_link', {
+        text: formatMessage('Group Links'),
+        onAction: () => {
+          ed.focus(true) // activate the editor without changing focus
+          ed.execCommand('instructureTrayForLinks', false, GROUP_PLUGIN_KEY)
         }
       })
     }
@@ -150,12 +163,21 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
           ]
 
           if (contextType === 'course') {
-            items.splice(1, 0, {
+            items.push({
               type: 'menuitem',
               text: formatMessage('Course Links'),
               onAction() {
                 ed.focus(true) // activate the editor without changing focus
-                ed.execCommand('instructureTrayForLinks', false, PLUGIN_KEY)
+                ed.execCommand('instructureTrayForLinks', false, COURSE_PLUGIN_KEY)
+              }
+            })
+          } else if (contextType === 'group') {
+            items.push({
+              type: 'menuitem',
+              text: formatMessage('Group Links'),
+              onAction() {
+                ed.focus(true) // activate the editor without changing focus
+                ed.execCommand('instructureTrayForLinks', false, GROUP_PLUGIN_KEY)
               }
             })
           }

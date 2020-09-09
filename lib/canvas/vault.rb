@@ -17,7 +17,7 @@
 
 require 'vault'
 
-class Canvas::Vault
+module Canvas::Vault
   class << self
     CACHE_KEY_PREFIX = 'vault/'.freeze
 
@@ -41,6 +41,7 @@ class Canvas::Vault
     end
 
     def api_client
+      return Canvas::Vault::FileClient.get_client if addr == "file"
       Vault::Client.new(address: addr, token: token)
     end
 

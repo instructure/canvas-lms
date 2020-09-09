@@ -2306,7 +2306,6 @@ describe UsersController do
       end
 
       it "should load favorites" do
-        Account.default.enable_feature!(:unfavorite_course_from_dashboard)
         @user.favorites.where(:context_type => 'Course', :context_id => @course1).first_or_create!
         get 'user_dashboard'
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]

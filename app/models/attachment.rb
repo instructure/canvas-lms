@@ -311,6 +311,12 @@ class Attachment < ActiveRecord::Base
     excluded_atts += ["locked", "hidden"] if dup == existing && !options[:migration]&.for_master_course_import?
     dup.assign_attributes(self.attributes.except(*excluded_atts))
     dup.context = context
+    if self.usage_rights && self.shard != context.shard
+      attrs = self.usage_rights.attributes.slice('use_justification', 'license', 'legal_copyright')
+      new_rights = context.usage_rights.detect{|ur| attrs.all?{|k, v| ur.attributes[k] == v}}
+      new_rights ||= context.usage_rights.create(attrs)
+      dup.usage_rights = new_rights
+    end
     # avoid cycles (a -> b -> a) and self-references (a -> a) in root_attachment_id pointers
     if dup.new_record? || ![self.id, self.root_attachment_id].include?(dup.id)
       if self.shard == dup.shard
@@ -668,7 +674,7 @@ class Attachment < ActiveRecord::Base
     policy = JSON.parse(Base64.decode64(policy_str))
     return nil unless Time.zone.parse(policy['expiration']) >= Time.now
     attachment = Attachment.find(policy['attachment_id'])
-    return nil unless attachment.try(:state) == :unattached
+    return nil unless [:unattached, :unattached_temporary].include?(attachment.try(:state))
     return policy, attachment
   end
 
@@ -1023,6 +1029,10 @@ class Attachment < ActiveRecord::Base
         folder && folder.visible?
   end
 
+  def notify_only_admins?
+    context.is_a?(Course) && (folder.currently_locked? || currently_locked? || context.tab_hidden?(Course::TAB_FILES))
+  end
+
   # generate notifications for recent file operations
   # (this should be run in a delayed job)
   def self.do_notifications
@@ -1051,7 +1061,7 @@ class Attachment < ActiveRecord::Base
         # now generate the notification
         record = Attachment.find(attachment_id)
         next if record.context.is_a?(Course) && (!record.context.available? || record.context.concluded?)
-        if record.context.is_a?(Course) && (record.folder.locked? || record.locked? || record.context.tab_hidden?(Course::TAB_FILES))
+        if record.notify_only_admins?
           # only notify course students if they are able to access it
           to_list = record.context.participating_admins - [record.user]
         elsif record.context.respond_to?(:participants)
@@ -1315,8 +1325,9 @@ class Attachment < ActiveRecord::Base
   end
 
   def currently_locked
-    self.locked || (self.lock_at && Time.now > self.lock_at) || (self.unlock_at && Time.now < self.unlock_at) || self.file_state == 'hidden'
+    self.locked || (self.lock_at && Time.zone.now > self.lock_at) || (self.unlock_at && Time.zone.now < self.unlock_at) || self.file_state == 'hidden'
   end
+  alias currently_locked? currently_locked
 
   def hidden
     hidden?

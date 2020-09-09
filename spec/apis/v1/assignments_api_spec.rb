@@ -974,6 +974,274 @@ describe AssignmentsApiController, type: :request do
       end
     end
 
+    describe "score statistics" do
+      def setup_course
+        @course_section = @course.course_sections.create
+        @section = @course.course_sections.create!(name: "test section")
+        @students = create_users_in_course(@course, 10, return_type: :record)
+        @students.each do |student|
+          student_in_section(@section, user: student)
+        end
+      end
+
+      def setup_graded_submissions(count=5)
+        @assignment = @course.assignments.create!(title: "title", points_possible: '20.0')
+
+        # Generate an array with min=10, max=18, mean=14
+        scores = [10] + [14] * (count - 2) + [18]
+
+        @students.take(count).each do |student|
+          score = scores.pop().to_s
+          @assignment.grade_student student, grade: score, grader: @teacher
+        end
+
+        ScoreStatisticsGenerator.update_score_statistics(@course.id)
+      end
+
+      context "as a student" do
+        before :each do
+          setup_course
+        end
+
+        it "should show min, max, and mean when include flag set" do
+          setup_graded_submissions
+          user_session @students[0]
+          @user = @students[0]
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to eq({'min' => 10, 'max' => 18, 'mean' => 14})
+        end
+
+        it "should not show score statistics when include flag not set" do
+          setup_graded_submissions
+          user_session @students[0]
+          @user = @students[0]
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['submission']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+
+        it "should not show statistics when there are less than 5 graded submissions" do
+          setup_graded_submissions 4
+          user_session @students[0]
+          @user = @students[0]
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+
+        it "should not show statistics when the student's submission is not graded" do
+          setup_graded_submissions
+
+          # The sixth student will not have a graded assignment
+          ungraded_student = @students[5]
+
+          user_session ungraded_student
+          @user = ungraded_student
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+      end
+
+      context "in a course which has distributions disabled" do
+        before :once do
+          setup_course
+          @course.update(hide_distribution_graphs: true)
+        end
+        it "should not show score statistics to a student" do
+          setup_graded_submissions
+          user_session @students[0]
+          @user = @students[0]
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+
+        it "should should not show score statistics to observers" do
+          setup_graded_submissions
+
+          @observer = User.create!
+          observer_enrollment = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active')
+          observer_enrollment.update_attribute(:associated_user_id, @students[0].id)
+          @user = @observer
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission', 'observed_users']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+      end
+
+      context "as an observer" do
+        before :once do
+          @observers = create_users(10, return_type: :record)
+          @observer_enrollments = create_enrollments(@course, @observers, enrollment_type: 'ObserverEnrollment', return_type: :record)
+        end
+        before :each do
+          @observer = @observers.pop
+          @observer_enrollment = @observer_enrollments.pop
+          setup_course
+        end
+
+        it "should should show score statistics when include flag is set" do
+          setup_graded_submissions
+
+          @observer_enrollment.update_attribute(:associated_user_id, @students[0].id)
+          @user = @observer
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission', 'observed_users']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to eq({'min' => 10, 'max' => 18, 'mean' => 14})
+        end
+
+        it "should should not show score statistics when no observed student has a grade" do
+          setup_graded_submissions
+
+          @observer_enrollment.update_attribute(:associated_user_id, @students[5].id)
+          @user = @observer
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission', 'observed_users']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+
+        it "should should show score statistics when any observed student has a grade" do
+          setup_graded_submissions
+
+          @observer_enrollment.update_attribute(:associated_user_id, @students[5].id)
+
+          Course.enroll_user_call_count -= 2 # Total hack but can't eleminate any of the enroll_user calls -- we need them to test multiple enrollments
+
+          observer_enrollment2 = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          observer_enrollment2.update_attribute(:associated_user_id, @students[3].id)
+          observer_enrollment3 = @course.enroll_user(@observer, 'ObserverEnrollment', :enrollment_state => 'active', :allow_multiple_enrollments => true)
+          observer_enrollment3.update_attribute(:associated_user_id, @students[7].id)
+
+          @user = @observer
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission', 'observed_users']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to eq({'min' => 10, 'max' => 18, 'mean' => 14})
+        end
+
+        it "should should not show score statistics when less than 5 students have a graded assignment" do
+          setup_graded_submissions 4
+
+          @observer_enrollment.update_attribute(:associated_user_id, @students[0].id)
+          @user = @observer
+
+          json = api_call(
+            :get,
+            "/api/v1/courses/#{@course.id}/assignments",
+            {
+              :controller => 'assignments_api',
+              :action => 'index',
+              :format => 'json',
+              :course_id => @course.id.to_s
+            },
+            :include => ['score_statistics', 'submission', 'observed_users']
+          )
+          assign = json.first
+          expect(assign['score_statistics']).to be_nil
+        end
+      end
+    end
+
     it "includes submission info with include flag" do
       course_with_student_logged_in(:active_all => true)
       assignment,submission = create_submitted_assignment_with_user(@user)

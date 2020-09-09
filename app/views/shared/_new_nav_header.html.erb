@@ -143,6 +143,18 @@
               </div>
             </a>
           </li>
+          <% if PageView.page_views_enabled? && @domain_root_account.feature_enabled?(:recent_history) %>
+            <li class="menu-item ic-app-header__menu-list-item" <%= ' ic-app-header__menu-list-item--active' if active_path?('/history') %>>
+              <a id="global_nav_history_link" role="button" href="#history" class="ic-app-header__menu-list-link">
+                <div class="menu-item-icon-container" aria-hidden="true">
+                  <%= render(partial: "shared/svg/svg_icon_history.svg") %>
+                </div>
+                <div class="menu-item__text">
+                  <%= t('History') %>
+                </div>
+              </a>
+            </li>
+          <% end %>
           <% unless @current_user.nil? %>
             <%= render(:partial => 'external_tools/global_nav_menu_items') %>
           <% end %>

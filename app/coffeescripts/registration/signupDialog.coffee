@@ -94,7 +94,8 @@ signupDialog = (id, title, path=null) ->
     height: if screen.height > 750 then 'auto' else screen.height
     open: ->
       $(this).find('a').eq(0).blur()
-      $(this).find(':input').eq(0).focus()
+      # on open, provide focus to first focusable item for ease of accessibility
+      $(this).find('button.ui-dialog-titlebar-close').focus()
       if ENV.ACCOUNT.recaptcha_key
         $(this).find('.g-recaptcha')[0].addEventListener('load', (evt) ->
           # An explicit tabindex is needed for it to be tabbable in the dialog

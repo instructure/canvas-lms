@@ -69,7 +69,7 @@ describe "Roles API", type: :request do
         json = api_call(:get, "/api/v1/accounts/#{@account.id}/roles",
           { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param })
 
-        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles.map(&:name)).sort
+        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:name)).sort
         expect(json.find{|role| role['role'] == "StudentEnrollment"}['workflow_state']).to eq 'built_in'
         expect(json.find{|role| role['role'] == "NewRole"}['workflow_state']).to eq 'active'
       end
@@ -86,13 +86,13 @@ describe "Roles API", type: :request do
                         { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                           :account_id => sub_account.id.to_param, :show_inherited => '1' })
 
-        expect(json.map{|r| r['id']}).to match_array ([role.id] + Role.visible_built_in_roles.map(&:id))
+        expect(json.map{|r| r['id']}).to match_array ([role.id] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
         expect(json.detect{|r| r['id'] == role.id}['account']['id']).to eq @account.id
 
         json2 = api_call(:get, "/api/v1/accounts/#{sub_account.id}/roles",
                         { :controller => 'role_overrides', :action => 'api_index', :format => 'json',
                           :account_id => sub_account.id.to_param })
-        expect(json2.map{|r| r['id']}).to match_array (Role.visible_built_in_roles.map(&:id))
+        expect(json2.map{|r| r['id']}).to match_array (Role.visible_built_in_roles(root_account_id: @account.id).map(&:id))
       end
 
       it "should paginate" do
@@ -105,7 +105,7 @@ describe "Roles API", type: :request do
           { :controller => 'role_overrides', :action => 'api_index', :format => 'json', :account_id => @account.id.to_param, :per_page => '5', :page => '2' })
         expect(response.headers['Link']).to match(%r{<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="prev",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=1.*>; rel="first",<http://www.example.com/api/v1/accounts/#{@account.id}/roles\?.*page=2.*>; rel="last"})
         expect(json.size).to eq 7
-        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles.map(&:name)).sort
+        expect(json.collect{|role| role['role']}.sort).to eq (["NewRole"] + Role.visible_built_in_roles(root_account_id: @account.id).map(&:name)).sort
       end
 
       context "with state parameter" do

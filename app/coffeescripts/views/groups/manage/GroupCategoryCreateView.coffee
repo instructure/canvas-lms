@@ -39,6 +39,7 @@ export default class GroupCategoryCreateView extends GroupCategoryEditView
     '.group-by-section-controls': '$groupBySectionControls'
     '#split_groups': '$splitGroups'
     '.admin-signup-controls input[name=split_groups][value=1]': '$autoGroupSplitControl'
+    '.admin-signup-controls input[name=split_groups][value=2]': '$autoGroupSplitByMemberControl'
 
   events: _.extend {}, GroupCategoryEditView::events,
     'click .admin-signup-controls [name=create_group_count]': 'clickSplitGroups'
@@ -50,7 +51,7 @@ export default class GroupCategoryCreateView extends GroupCategoryEditView
     @setVisibilityOfGroupLeaderControls()
 
   setVisibilityOfGroupLeaderControls: ->
-    splitGroupsChecked = @$autoGroupSplitControl.prop("checked")
+    splitGroupsChecked = @$autoGroupSplitControl.prop("checked") || @$autoGroupSplitByMemberControl.prop("checked")
     show = (@selfSignupIsEnabled() or splitGroupsChecked)
     @$autoGroupLeaderControls.toggle(show)
     @$groupBySectionControls.toggle(ENV.group_user_type == 'student' && splitGroupsChecked)
@@ -75,6 +76,7 @@ export default class GroupCategoryCreateView extends GroupCategoryEditView
     _.extend {},
       super,
       num_groups: '<input name="create_group_count" type="number" min="0" class="input-micro" value="0">'
+      num_members: '<input name="create_group_member_count" type="number" min="0" class="input-micro" value="0">'
       ENV: ENV
 
   ##

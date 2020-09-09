@@ -378,7 +378,7 @@ export class PlannerHeader extends Component {
   }
 
   render() {
-    const verticalRoom = this.getPopupVerticalRoom()
+    let verticalRoom = this.getPopupVerticalRoom()
     let buttonMarginRight = 'medium'
     if (this.props.responsiveSize === 'medium') {
       buttonMarginRight = 'small'
@@ -386,6 +386,20 @@ export class PlannerHeader extends Component {
       buttonMarginRight = 'x-small'
     }
     const buttonMargin = `0 ${buttonMarginRight} 0 0`
+
+    let withArrow = true
+    let positionTarget = null
+    let placement = 'bottom end'
+    let offsetY = 0
+    if (window.innerWidth < 400) {
+      // there's not enough room to position the popover with an arrow, so turn off the arrow,
+      // cover up the header, and center the popover in the window instead
+      withArrow = false
+      positionTarget = document.getElementById('dashboard_header_container')
+      placement = 'bottom center'
+      offsetY = -positionTarget.offsetHeight
+      verticalRoom += positionTarget.offsetHeight
+    }
 
     return (
       <div className={`${styles.root} PlannerHeader`}>
@@ -413,8 +427,11 @@ export class PlannerHeader extends Component {
           onDismiss={this.closeOpportunitiesDropdown}
           show={this.state.opportunitiesOpen}
           on="click"
+          withArrow={withArrow}
+          positionTarget={positionTarget}
           constrain="window"
-          placement="bottom end"
+          placement={placement}
+          offsetY={offsetY}
         >
           <Popover.Trigger>{this.renderOpportunitiesButton(buttonMargin)}</Popover.Trigger>
           <Popover.Content>
@@ -502,7 +519,4 @@ const mapDispatchToProps = {
   scrollToNewActivity
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(NotifierPlannerHeader)
+export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader)

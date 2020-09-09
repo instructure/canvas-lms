@@ -20,9 +20,9 @@ import React, {useState} from 'react'
 import I18n from 'i18n!mutationActivity'
 import {Button} from '@instructure/ui-buttons'
 import {DateInput, TextInput} from '@instructure/ui-forms'
-import {Heading, Table} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {View} from '@instructure/ui-layout'
 
 const AuditLogForm = ({onSubmit}) => {
@@ -125,44 +125,46 @@ const MUTATION_LOG_QUERY = gql`
   }
 `
 const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
-  <tr>
-    <td colSpan={4}>
+  <Table.Row>
+    <Table.Cell colSpan={4}>
       {hasNextPage ? (
         <Button onClick={onClick}>{I18n.t('Load more')}</Button>
       ) : (
         I18n.t('No more results')
       )}
-    </td>
-  </tr>
+    </Table.Cell>
+  </Table.Row>
 )
+LoadMoreButton.displayName = 'Row'
 
 const LogEntry = ({logEntry}) => {
   const [showingParams, setShowingParams] = useState(false)
 
   return (
     <>
-      <tr>
-        <td>{logEntry.timestamp}</td>
-        <td>{logEntry.mutationName}</td>
-        <td>
+      <Table.Row>
+        <Table.Cell>{logEntry.timestamp}</Table.Cell>
+        <Table.Cell>{logEntry.mutationName}</Table.Cell>
+        <Table.Cell>
           <User user={logEntry.user} realUser={logEntry.realUser} />
-        </td>
-        <td>
+        </Table.Cell>
+        <Table.Cell>
           <Button variant="link" onClick={() => setShowingParams(!showingParams)}>
             {showingParams ? I18n.t('Hide params') : I18n.t('Show params')}
           </Button>
-        </td>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
       {showingParams ? (
-        <tr>
-          <td colSpan={4}>
+        <Table.Row>
+          <Table.Cell colSpan={4}>
             <pre>{JSON.stringify(logEntry.params, null, 2)}</pre>
-          </td>
-        </tr>
+          </Table.Cell>
+        </Table.Row>
       ) : null}
     </>
   )
 }
+LogEntry.displayName = 'Row'
 
 const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
   if (!assetString) return null
@@ -184,22 +186,16 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
 
         if (logEntries.length) {
           return (
-            <Table
-              caption={
-                <ScreenReaderContent>
-                  {I18n.t('mutations on %{search}', {search: assetString})}
-                </ScreenReaderContent>
-              }
-            >
-              <thead>
-                <tr>
-                  <th scope="col">{I18n.t('Timestamp')}</th>
-                  <th scope="col">{I18n.t('Mutation')}</th>
-                  <th scope="col">{I18n.t('Performed by')}</th>
-                  <th scope="col">{I18n.t('Parameters')}</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table caption={I18n.t('mutations on %{search}', {search: assetString})}>
+              <Table.Head>
+                <Table.Row>
+                  <Table.ColHeader id="mutations-timestamp">{I18n.t('Timestamp')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-mutation">{I18n.t('Mutation')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-by">{I18n.t('Performed by')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-parms">{I18n.t('Parameters')}</Table.ColHeader>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
                 {logEntries.map(logEntry => (
                   <LogEntry key={logEntry.mutationId} logEntry={logEntry} />
                 ))}
@@ -232,7 +228,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                     })
                   }}
                 />
-              </tbody>
+              </Table.Body>
             </Table>
           )
         } else {
@@ -256,7 +252,7 @@ const AuditLogApp = () => {
         {I18n.t('GraphQL Mutation Activity')}
       </Heading>
 
-      <AuditLogForm onSubmit={auditParams => setAuditParams(auditParams)} />
+      <AuditLogForm onSubmit={setAuditParams} />
 
       <AuditLogResults {...auditParams} pageSize={250} />
     </ApolloProvider>

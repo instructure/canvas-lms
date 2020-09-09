@@ -33,12 +33,14 @@ import {
   IconLockLine,
   IconQuestionLine,
   IconInboxLine,
-  IconCalendarMonthLine
+  IconCalendarMonthLine,
+  IconClockLine
 } from '@instructure/ui-icons'
 import I18n from 'i18n!MobileGlobalMenu'
 import HelpDialog from '../help_dialog/HelpDialog'
 import LogoutButton from './LogoutButton'
 import HighContrastModeToggle from './trays/HighContrastModeToggle'
+import HistoryList from '../history_list/HistoryList'
 
 function ActiveText({children, url}) {
   return window.location.pathname.startsWith(url) ? <Text weight="bold">{children}</Text> : children
@@ -384,6 +386,33 @@ export default class MobileGlobalMenu extends React.Component {
               </Button>
             </List.Item>
           ))}
+
+          {ENV.FEATURES?.recent_history && (
+            <List.Item>
+              <ToggleDetails
+                iconPosition="end"
+                fluidWidth
+                onToggle={ensureLoaded('history')}
+                summary={
+                  <Flex padding="xx-small small">
+                    <Flex.Item width="3rem">
+                      <IconClockLine inline={false} size="small" color="brand" />
+                    </Flex.Item>
+                    <Flex.Item>
+                      <Text color="brand">{I18n.t('History')}</Text>
+                    </Flex.Item>
+                  </Flex>
+                }
+              >
+                <View as="div" margin="0 0 0 xx-large">
+                  <HistoryList
+                    history={this.props.DesktopNavComponent.state.history}
+                    hasLoaded={this.props.DesktopNavComponent.state.historyAreLoaded}
+                  />
+                </View>
+              </ToggleDetails>
+            </List.Item>
+          )}
 
           {true /* TODO: put a check for if we should show help */ && (
             <List.Item>

@@ -250,6 +250,10 @@ Rails.configuration.after_initialize do
     Lti::KeyStorage.rotate_keys
   end
 
+  Delayed::Periodic.cron 'Canvas::Oauth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    Canvas::Oauth::KeyStorage.rotate_keys
+  end
+
   Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
     Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
   end

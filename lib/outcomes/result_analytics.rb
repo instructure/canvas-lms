@@ -71,11 +71,14 @@ module Outcomes
     # excludes - (Optional) Specify additional values to exclude. "missing_user_rollups" excludes
     #            rollups for users without results.
     #
+    # context - (Optional) The current context making the function call which will be used in
+    #            determining the current_method chosen for calculating rollups.
+    #
     # Returns an Array of Rollup objects.
-    def outcome_results_rollups(results, users=[], excludes = [])
+    def outcome_results_rollups(results: , users: [], excludes: [], context: nil)
       ActiveRecord::Associations::Preloader.new.preload(results, :learning_outcome)
       rollups = results.chunk(&:user_id).map do |_, user_results|
-        Rollup.new(user_results.first.user, rollup_user_results(user_results))
+        Rollup.new(user_results.first.user, rollup_user_results(user_results, context))
       end
       if excludes.include? 'missing_user_rollups'
         rollups
@@ -91,14 +94,14 @@ module Outcomes
     #
     # Returns a Rollup.
     def aggregate_outcome_results_rollup(results, context, stat = 'mean')
-      rollups = outcome_results_rollups(results)
+      rollups = outcome_results_rollups(results: results, context: context)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
         scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(result, {aggregate_score: true, aggregate_stat: stat})
+        RollupScore.new(outcome_results: result, opts: {aggregate_score: true, aggregate_stat: stat}, context: context)
       end
       Rollup.new(context, aggregate_rollups)
     end
@@ -110,10 +113,10 @@ module Outcomes
     #                sorted by outcome id.
     #
     # Returns an Array of RollupScore objects
-    def rollup_user_results(user_results)
+    def rollup_user_results(user_results, context = nil)
       filtered_results = user_results.select{|r| !r.score.nil?}
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results)
+        RollupScore.new(outcome_results:outcome_results, opts:{}, context: context)
       end
     end
 

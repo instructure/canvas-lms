@@ -2090,7 +2090,7 @@ class Course < ActiveRecord::Base
     limit_privileges_to_course_section = opts[:limit_privileges_to_course_section] || false
     associated_user_id = opts[:associated_user_id]
 
-    role = opts[:role] || self.shard.activate { Enrollment.get_built_in_role_for_type(type) }
+    role = opts[:role] || self.shard.activate { Enrollment.get_built_in_role_for_type(type, root_account_id: self.root_account_id) }
 
     start_at = opts[:start_at]
     end_at = opts[:end_at]
@@ -2103,12 +2103,23 @@ class Course < ActiveRecord::Base
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
     Course.unique_constraint_retry do
+      roles =
+        if role.built_in?
+          # it's possible we're still migrating the root account ownership - so pull enrollments for all equivalent built in roles
+          # TODO remove after datafixup
+          self.shard.activate do
+            Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).where("root_account_id = ? OR root_account_id IS NULL", self.root_account_id).to_a
+          end
+        else
+          [role]
+        end
+
       if opts[:allow_multiple_enrollments]
-        e = self.all_enrollments.where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id, course_section_id: section.id).first
+        e = self.all_enrollments.where(user_id: user, type: type, role_id: roles, associated_user_id: associated_user_id, course_section_id: section.id).first
       else
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
-          where(user_id: user, type: type, role_id: role.id, associated_user_id: associated_user_id).
+          where(user_id: user, type: type, role_id: roles, associated_user_id: associated_user_id).
           order(Arel.sql("course_section_id<>#{section.id}")).
           first
       end
@@ -3182,6 +3193,7 @@ class Course < ActiveRecord::Base
         fake_student = User.new(:name => t('student_view_student_name', "Test Student"))
         fake_student.preferences[:fake_student] = true
         fake_student.workflow_state = 'registered'
+        fake_student.shard = self.shard
         fake_student.save
         # hash the unique_id so that it's hard to accidently enroll the user in
         # a course by entering something in a user list. :(
@@ -3578,6 +3590,10 @@ class Course < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def resolved_outcome_proficiency
+    account&.resolved_outcome_proficiency
   end
 
   def resolved_outcome_calculation_method

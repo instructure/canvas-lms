@@ -180,6 +180,18 @@ describe 'native canvas conditional release' do
 
       expect(ConditionalReleaseObjects.assignment_exists_in_scoring_range?(1,assignment_for_mp.title)).to be(true)
     end
+
+    it 'should be able see errors for invalid scoring ranges' do
+      assignment = assignment_model(course: @course, points_possible: 100)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      ConditionalReleaseObjects.conditional_release_link.click
+
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "")
+      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to eq(true)
+
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "35")
+      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to eq(true)
+    end
   end
 
   context 'Mastery Path Breakdowns' do

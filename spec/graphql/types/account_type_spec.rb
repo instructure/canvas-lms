@@ -58,13 +58,6 @@ describe Types::AccountType do
         account_type.resolve('outcomeCalculationMethod { _id }')
       ).to eq account.outcome_calculation_method.id.to_s
     end
-
-    it 'requires read permission' do
-      outcome_calculation_method_model(account)
-      expect(
-        account_type.resolve('outcomeCalculationMethod { _id }', current_user: @student)
-      ).to be_nil
-    end
   end
 
   it 'works for courses' do

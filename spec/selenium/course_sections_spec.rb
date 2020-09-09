@@ -99,7 +99,7 @@ describe "course sections" do
 
   context "account admin" do
     before do
-      Account.default.role_overrides.create! role: Role.get_built_in_role('AccountAdmin'), permission: 'manage_sis', enabled: true
+      Account.default.role_overrides.create! role: admin_role, permission: 'manage_sis', enabled: true
       @subaccount = Account.default.sub_accounts.create! name: 'sub'
       course_factory account: @subaccount
       @section = @course.course_sections.create! name: 'sec'

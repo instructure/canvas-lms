@@ -311,6 +311,8 @@ class OutcomeGroupsApiController < ApplicationController
       @outcome_group.destroy
       @context.try(:touch)
       render :json => outcome_group_json(@outcome_group, @current_user, session)
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
+      render :json => e.to_json, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request
     end

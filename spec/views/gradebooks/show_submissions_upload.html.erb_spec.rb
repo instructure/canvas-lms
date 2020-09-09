@@ -21,18 +21,22 @@ require "spec/views/views_helper"
 
 describe "/gradebooks/show_submissions_upload", type: :view do
   let(:assignment) { @course.assignments.create!(title: "Example Assignment") }
-  let(:progress) { Progress.new(context: assignment, completion: 0) }
+  let(:presenter) { Submission::UploadPresenter.for(@course, assignment) }
+  let(:progress) { presenter.progress }
   let(:document) { Nokogiri::HTML.parse(response.body) }
 
   before do
     course_with_student
     view_context
 
+    Progress.create!(context: assignment, completion: 0, tag: "submissions_reupload")
     assign(:assignment, assignment)
+    assign(:presenter, presenter)
   end
 
   describe "when the user has not uploaded submissions" do
     it "displays a message indicating no uploads" do
+      Progress.where(tag: "submissions_reupload").order(created_at: :desc).first.destroy
       render "gradebooks/show_submissions_upload"
       expect(document.css('h2').first.text).to include("No Submissions Have Been Uploaded")
     end
@@ -40,7 +44,6 @@ describe "/gradebooks/show_submissions_upload", type: :view do
 
   describe "when the submissions upload is in progress" do
     it "displays a message indicating upload in progress" do
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('.Alert').first.text).to include("We are currently processing your files.")
     end
@@ -101,20 +104,17 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     end
 
     it "displays a message indicating successful upload" do
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('.Alert').first.text).to include("Done!")
     end
 
     it "displays a message with the number of uploads" do
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('h3').first.text).to include("(3) files were attached")
     end
 
     context "when some files were uploaded" do
       before :each do
-        assign(:progress, progress)
         render "gradebooks/show_submissions_upload"
       end
 
@@ -140,7 +140,6 @@ describe "/gradebooks/show_submissions_upload", type: :view do
     end
 
     it "displays a message with the number of files ignored when some files were ignored" do
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('h3').last.text).to include("(2) files were ignored")
     end
@@ -149,7 +148,6 @@ describe "/gradebooks/show_submissions_upload", type: :view do
       results = progress.results
       results[:ignored_files] = []
       progress.set_results(results)
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('h3').count).to be 1
     end
@@ -158,7 +156,6 @@ describe "/gradebooks/show_submissions_upload", type: :view do
   describe "when the submissions upload has failed" do
     it "displays a message indicating a failed upload" do
       progress.workflow_state = "failed"
-      assign(:progress, progress)
       render "gradebooks/show_submissions_upload"
       expect(document.css('.Alert').first.text).to include("Oops, there was a problem")
     end

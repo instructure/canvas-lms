@@ -1,5 +1,4 @@
-#
-# Copyright (C) 2019 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,29 +13,31 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
 
-class CreateMutationAuditLog < ActiveRecord::Migration[5.1]
+class CassandraAddGradingPeriodIdToGradeChanges < ActiveRecord::Migration[5.2]
   tag :predeploy
 
-  include Canvas::DynamoDB::Migration
+  include Canvas::Cassandra::Migration
 
-  category :auditors
+  def self.cassandra_cluster
+    'auditors'
+  end
 
   def self.up
-    create_table table_name: :graphql_mutations,
-      ttl_attribute: "expires",
-      attribute_definitions: [
-        {attribute_name: "object_id", attribute_type: "S"},
-        {attribute_name: "mutation_id", attribute_type: "S"},
-      ],
-      key_schema: [
-        {attribute_name: "object_id", key_type: "HASH"},
-        {attribute_name: "mutation_id", key_type: "RANGE"},
-      ]
+    unless cassandra_column_exists?('grade_changes', 'grading_period_id')
+      cassandra.execute %{
+        ALTER TABLE grade_changes
+        ADD grading_period_id bigint;
+      }
+    end
   end
 
   def self.down
-    delete_table table_name: :graphql_mutations
+    if cassandra_column_exists?('grade_changes', 'grading_period_id')
+      cassandra.execute %{
+        ALTER TABLE grade_changes
+        DROP grading_period_id;
+      }
+    end
   end
 end

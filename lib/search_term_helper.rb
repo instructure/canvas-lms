@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module SearchTermHelper
-  MIN_SEARCH_TERM_LENGTH = 3
+  MIN_SEARCH_TERM_LENGTH = 2
 
   module ClassMethods
     def search_by_attribute(scope, attr, search_term)

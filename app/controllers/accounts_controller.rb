@@ -1410,7 +1410,7 @@ class AccountsController < ApplicationController
       role = Role.get_role_by_id(role_id)
       raise ActiveRecord::RecordNotFound unless role
     else
-      role = Role.get_built_in_role('AccountAdmin')
+      role = Role.get_built_in_role('AccountAdmin', root_account_id: @context.resolved_root_account_id)
     end
 
     list = UserList.new(params[:user_list],

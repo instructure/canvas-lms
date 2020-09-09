@@ -151,7 +151,7 @@ module Factories
     if user = options[:enroll_user]
       section_ids = create_records(CourseSection, course_ids.map{ |id| {course_id: id, root_account_id: account.id, name: "Default Section", default_section: true}})
       type = options[:enrollment_type] || "TeacherEnrollment"
-      role_id = Role.get_built_in_role(type).id
+      role_id = Role.get_built_in_role(type, root_account_id: account.resolved_root_account_id).id
       result = create_records(Enrollment, course_ids.each_with_index.map{ |id, i| {course_id: id, user_id: user.id, type: type, course_section_id: section_ids[i], root_account_id: account.id, workflow_state: 'active', :role_id => role_id}})
       create_enrollment_states(result, {state: "active"})
       result

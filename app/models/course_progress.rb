@@ -171,8 +171,14 @@ class CourseProgress
   end
 
   def module_reqs_to_complete_count(mod)
-    # this will account for modules that only need to complete one item
-    mod.requirement_count || module_requirements(mod).count
+    visible_req_count = module_requirements(mod).count
+    if visible_req_count > 0
+      # this will account for modules that only need to complete one item
+      mod.requirement_count || visible_req_count
+    else
+      # if the user can't see any requirements then they aren't required to do anything even if the module ostensibly requires 1 to complete
+      0
+    end
   end
 
   def module_completed?(progression)

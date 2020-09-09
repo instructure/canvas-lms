@@ -132,7 +132,9 @@ pt:
       deleteError: "Algo deu errado. Não é possível eliminar neste momento."
       deleteSuccess: "Eliminação efetuada com sucesso"
       error: "Um erro ocorreu. Atualize a página e tente novamente."
+      unexpectedDeleteError: "Algo deu errado. Não é possível eliminar neste momento."
       updateSuccess: "Atualização efetuada com sucesso"
+      userDeleteError: "Grupo de resultados contém um ou mais Resultados que estão atualmente alinhados com o conteúdo."
     length_error: "Deve ter 255 caracteres ou menos"
   OutcomeView: 
     length_error: "Deve ter 255 caracteres ou menos"
@@ -420,7 +422,7 @@ pt:
   account_notification: 
     errors: 
       invalid_account_notification_end_at: "A hora de fim de notificação da conta é anterior à hora de início"
-  account_notification_settings_e96de9b6: "Notificações a nível de conta"
+  account_notification_settings_e96de9b6: "Definições de Notificações da conta"
   account_notification_settings_error_page_66c0bc61: "Página de Erro de Definições de Notificação de Conta"
   account_notification_settings_initial_query_error_f55e1cbf: "Erro inicial de consulta das definições de notificação de conta"
   account_notification_settings_updated_dbabec35: "Definições de notificação de conta atualizadas"
@@ -2481,6 +2483,7 @@ pt:
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ocorreu um erro ao salvar a política de postagem do curso"
   an_error_occurred_while_saving_your_settings_b503a31c: "Ocorreu um erro ao guardar suas configurações"
   an_error_occurred_while_starting_migration_8e6015e2: "Ocorreu um erro ao iniciar migração"
+  an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ocorreu um erro ao tentar mudar a IU"
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: "Ocorreu um erro ao atualizar os anúncios bloqueados."
   an_error_occurred_while_updating_late_policies_a95b707f: "Ocorreu um erro ao atualizar políticas tardias"
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: "Ocorreu um erro ao apagar o grupo agendado"
@@ -2632,6 +2635,7 @@ pt:
   anonymous_off_7985fcaf: "Anónimo desligado"
   anonymous_on_c5fa120d: "Anónimo ligado"
   anonymous_re_submission_assignment_title_d9402721: "Re-Submissão Anónima: %{assignment_title}"
+  anonymous_student_91b9d664: "Aluno anónimo"
   anonymous_submission_annotation_student_id_assignm_25eb88c9: "Anotação de Submissão Anónima: Aluno (%{id}), %{assignment_title}, %{course_name}"
   anonymous_submission_annotation_student_user_id_as_ffca8ce9: "Anotação de Submissão Anónima: Aluno (%{user_id}), %{assignment_title}, %{course_name}"
   anonymous_submission_assignment_title_896654de: "Submissão Anónima: %{assignment_title}"
@@ -2748,6 +2752,7 @@ pt:
   appointments_dcb41d23: Agendamentos
   approved_c3b285d4: Aprovado
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} com precisão %{precision}"
+  apps_54d24a47: Apps
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "As aplicações são uma forma fácil de adicionar novas funcionalidades ao Canvas. Podem ser adicionadas a disciplinas individuais ou a todas as disciplinas incluídas numa conta. Depois de configuradas, pode fazer ligações às aplicações através de módulos de disciplinas e criar tarefas para ferramentas de avaliação."
   appt_calendar_event_dialog: 
     invalid_participants: "Tem de permitir a participação de pelo menos um utilizador"
@@ -4230,24 +4235,24 @@ pt:
     submit_assignment: "Enviar tarefa"
   button_a1577211: botão
   buttons: 
-    add_item: "Adicionar item"
+    add_item: "Adicionar Item"
     apply: Aplicar
     authorize_google_docs: "Autorizar acesso ao Google Docs"
     authorize_google_drive: "Autorizar acesso a Google Drive"
     back_to_outcomes: "Voltar aos resultados"
     cancel: Cancelar
     choose_a_file: "Escolher um ficheiro"
-    delete: Excluir
+    delete: Eliminar
     delete_file: "Eliminar ficheiro %{name}"
-    done: Concluir
+    done: Feito
     filter: Filtro
     find_user: "Localizar utilizador"
     import: Importar
-    login: "Iniciar sessão"
+    login: Login
     manage_rubrics: "Gerenciar protocolos"
     masquerade: "Fazer-se passar por utilizador"
     ok: OK
-    okay: OK
+    okay: Ok
     publish: Publicar
     published: Publicado
     refresh: atualizar
@@ -4258,7 +4263,7 @@ pt:
     sending: "A enviar..."
     sent: Enviado!
     show_all_artifacts: "Exibir todos os artefatos"
-    submit: Enviar
+    submit: Submeter
     unmasquerade: "Parar de se mascarar"
     unpublish: "Anular publicação"
     unpublished: "Não publicado"
@@ -4997,6 +5002,7 @@ pt:
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: "Clique no botão de navegação administrativa para aceder às configurações de conta."
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: "Clicar no botão de navegação dos cursos para aceder aos seus cursos."
   click_proceed_to_continue_b6eeffc6: "Clique em \"Continuar\" para continuar."
+  click_the_admin_navigation_button_to_access_accoun_38d881bf: "Clique no botão de navegação administrativa para aceder às definições da conta."
   click_the_button_above_to_add_content_4c7024a: "Clique no botão acima para adicionar conteúdo"
   click_to_add_a_name_6cf551b0: "Clique para adicionar um nome"
   click_to_change_profile_picture_for_display_name_6a4b41db: "Clique para alterar a imagem do perfil para %{display_name}"
@@ -5052,6 +5058,7 @@ pt:
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: "Clicar nos cabeçalhos das colunas vai organizar as listas por esta coluna."
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: "Clicar na caixa de seleção fará com que a tabela de escopos apareça abaixo"
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: "Clicar na caixa de seleção fará com que a tabela de escopos desapareça abaixo"
+  client_credentials_audience_218f2d93: "Credenciais de Cliente Público"
   client_id_cb2502af: "ID do Cliente"
   client_id_is_required_1afd54d1: "O ID do cliente é obrigatório"
   clone_group_set_c2a40e15: "Duplicar Conjunto de grupo"
@@ -5682,7 +5689,7 @@ pt:
         upload_to: "Carregar para"
       import_quizzes_next_view: 
         import_new_quizzes: "Importar conteúdo da avaliação como Novos testes"
-        import_new_quizzes_help_text: "Novos testes é o novo mecanismo de avaliação do Canvas%{p_p}. Para saber mais, entre em contato com o administrador do sistema ou visite"
+        import_new_quizzes_help_text: "New Quizzes é o novo mecanismo de avaliação para Canvas.%{p_p}Para saber mais, por favor contacte o administrador do seu sistema ou visite"
         import_quizzesNext_help_label: "Importar avaliação como novo Ícone de ajuda de testes"
         import_quizzesNext_help_text: "Quizzes.Next é o novo mecanismo de avaliação para Canvas.%{p_p}Para saber mais, entre em contato com o administrador do sistema ou visite"
         import_quizzesNext_help_title: "Novos testes"
@@ -8044,6 +8051,7 @@ pt:
   deployment_id_fc270280: "ID de implantação"
   deployment_id_for_tool_app_cb59335: "ID de implantação para %{tool} App"
   deployment_id_for_toolname_app_e54a7364: "ID de implantação para %{toolName} App"
+  desc_12ad2869: "%{desc}"
   description_436c48d7: Descrição
   description_61f4296: "* Descrição"
   details_98a31b68: Detalhes
@@ -9013,6 +9021,8 @@ pt:
   ends_at_9a62b528: "Termina em"
   enforce_scopes_be28989c: "Aplicar escopos"
   english_c60612e2: Inglês
+  enhance_color_contrast_of_content_685ddd49: "Aumentar o contraste de cor do conteúdo"
+  enhances_the_color_contrast_of_text_buttons_etc_88e22e61: "Aumenta o contraste de cor do texto, botões, etc."
   enrolled_a6a517cd: Participante
   enrolled_as_272da3b9: "Inscrito como"
   enrollment: 
@@ -11104,10 +11114,12 @@ pt:
       pages: Páginas
       people: Pessoas
   group_a8f5ed9c: Grupo
+  group_announcements_f6e0fc8c: "Anúncios do Grupo"
   group_assignment_7060989f: "Atribuição de grupo"
   group_assignments_can_t_be_anonymously_graded_2dd9be24: "As tarefas do grupo não podem ser classificadas anonimamente"
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: "As atribuições de grupo não podem ser ativadas para tarefas classificadas anonimamente"
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: "Tarefas de grupo não podem ser permitidas para tarefas moderadas"
+  group_calendar_5410c6ae: "Calendário do Grupo"
   group_categories: 
     notices: 
       create_category_success: "Categoria criada com sucesso."
@@ -11134,7 +11146,11 @@ pt:
     self_signup_for_courses: "A auto-inscrição só pode ser ativada para grupos ou comunidades de disciplinas"
   group_category_id_7001cf89: group_category_id
   group_category_locked: "Não é possível alterar a categoria do grupo porque os alunos já fizeram envios relativos a esta tarefa"
+  group_collaborations_b747d43: "Colaborações do Grupo"
+  group_conferences_12866179: "Conferências do grupo"
   group_details_e51122f1: "Detalhes do grupo"
+  group_discussions_17d79aa0: "Discussões de grupo"
+  group_files_4324f3df: "Ficheiros do grupo"
   group_files_82e5dcdb: "Ficheiros de grupo"
   group_group_name_is_for_a_different_section_4d84d256: "O grupo %{group_name} destina-se uma secção diferente"
   group_group_name_is_full_297880d6: "O grupo %{group_name} está cheio"
@@ -11142,6 +11158,7 @@ pt:
   group_group_name_is_not_available_at_this_time_971001c1: "O grupo %{group_name} não está disponível neste momento"
   group_guid_exists_in_incorrect_context_64263138: "Grupo \"%{guid}\" existe em contexto incorreto"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "Grupo \"%{guid}\" já apareceu nesta importação"
+  group_home_249cb392: "Página inicial do grupo"
   group_is_for_a_different_section_6a843a4d: "O grupo destina-se a uma secção diferente"
   group_is_full_56849d78: "O grupo está cheio"
   group_is_joined_by_invitation_only_d00f5a63: "Só é possível aderir ao grupo através de convite"
@@ -11165,6 +11182,8 @@ pt:
   group_name_group_people_e9d548c1: "%{group_name} - Pessoas do Grupo"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} na categoria de grupo %{group_category_name}"
   group_name_is_required_5547bc0b: "É necessário o nome do grupo"
+  group_pages_656556f3: "Páginas do grupo"
+  group_people_50e9785b: "Pessoas do Grupo"
   group_roster_1846bf84: "Rol de grupos"
   group_select_330df8bd: "Seleção de grupo"
   group_set_name_2aed2347: "Definir Nome de Grupo"
@@ -11676,6 +11695,7 @@ pt:
   here_f44564ee: aqui.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Aqui está uma boa oportunidade para ficar a conhecer melhor o calendário e adicionar à disciplina quaisquer eventos que não sejam tarefas que possa ter. Não se preocupe, nós ajudamos."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Aqui ficam algumas dicas rápidas para começar no Canvas!"
+  hi_contrast_373b614f: Alto-contraste
   hidden_14a032a7: Ocultar
   hidden_available_with_a_link_65ef2bda: "Oculto. Disponível com uma ligação"
   hidden_available_with_a_link_click_to_modify_184990e7: "Escondido. Disponível com link - Clique para modificar"
@@ -11722,6 +11742,7 @@ pt:
   highest_28ad71e6: "Mais alto"
   highest_score_e080551e: "Pontuação mais alta"
   hindi_9bcd4b34: Hindi
+  history_cd3f60a9: Histórico
   history_settings_c63dbaaf: "Configurações do Histórico"
   home_351838cd: Início
   home_page_is_not_valid_2e8a25ae: "A página inicial não é válida"
@@ -11774,6 +11795,7 @@ pt:
   how_do_i_find_my_courses_b826e4ce: "Como posso encontrar as minhas disciplinas?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Como importar um pacote de exportação de uma disciplina do Canvas?"
   how_do_i_import_outcomes_for_a_course_8eced1a: "Como posso importar resultados para uma disciplina?"
+  how_do_i_invite_others_to_join_a_meeting_d09bfd6c: "Como convido outros a juntarem-se a uma reunião?"
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: "Como é que sei se os alunos se juntaram à reunião?"
   how_do_i_manage_and_share_the_recording_52fc2993: "Como faço para gerir e partilhar a gravação?"
   how_do_i_manage_rubrics_in_a_course_a5441fb7: "Como é que eu faço a gestão das rubricas de uma disciplina?"
@@ -11910,6 +11932,10 @@ pt:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Quando ligado, os módulos têm a opção de serem marcados completos quando apenas um dos critérios foi cumprido"
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Se habilitado, 'oauth2_access_token_url' será enviado no lançamento do registro LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Se ativado, a assinatura do OAuth 1.0a pode ser usada por ferramentas LTI para aceder a API do Serviço de Membros"
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+      Se ativado, os pontos finais oEmbed exigirão um
+      token  gerado por ferramenta para verificar a origem
+      de um pedido de recurso oEmbed.
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "Quando ligado, o parâmetros de pesquisa não serão copiados para o corpo da PUBLICAÇÃO durante um lançamento LTI."
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "Se ativado, os escopos serão validados nas solicitações de API se a chave do desenvolvedor que está a ser usada exigir escopos."
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Se ativado, os Sourcedids usados pelo Canvas para Resultados Básicos serão criptografados."
@@ -16756,6 +16782,7 @@ pt:
       delete_reminder_failed: "Falha na exclusão"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "As correções dos educadores não podem ser permitidas para tarefas moderadas"
   peer_reviews_e3a55964: "Revisão por colegas"
+  peer_service_6b4828b9: "Serviço de pares"
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: Pendente
   pending_message_2d9a8796: "Pendente: %{message}"
@@ -19572,6 +19599,8 @@ pt:
   recent_activity_51239235: "Atividade recente"
   recent_announcements_8becc59c: "Anúncios Recentes"
   recent_f19e8c64: Recentes
+  recent_history_bcb0f4c0: "História recente"
+  recent_history_tray_241a384e: "Bandeja de história recente"
   recent_student: 
     last_logged_in: "último início de sessão em %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "Média em queda %{recentInt}/%{remainderInt}"
@@ -19673,6 +19702,7 @@ pt:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Lançado pelo Mastery Path: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Lançado pelo Mastery Path: %{path}"
   releasing_grades_31a57dde: "A liberar Notas"
+  reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Recarregue a página ou navegue para uma nova página para que esta alteração tenha efeito."
   remember_my_choice_for_this_course_5a3b7206: "Lembre-se da minha escolha para esta disciplina"
   remind_me_next_time_6402eb7d: "Lembrar-me da próxima vez"
   reminder_ffd21289: Lembrete
@@ -19770,6 +19800,7 @@ pt:
   require_captcha_for_self_registration_b3b2ea02: "Exigir Captcha para Auto-Registo"
   require_group_members_to_be_in_the_same_section_7f6c36af: "Os membros do grupo devem estar na mesma secção"
   require_respondus_lockdown_browser_31425b3a: "É necessário Respondus LockDown Browser"
+  require_signed_token_for_oembed_64883303: "Requerer ficha assinada para oEmbed"
   require_usage_rights_for_uploaded_files_4507865b: "Exigir direitos de utilização para ficheiros carregados"
   required_access_code_592902d7: "Código de Acesso necessário"
   required_email_address_379b2392: "Endereço de e-mail obrigatório"
@@ -20666,10 +20697,10 @@ pt:
   set_name_f83b658: "Definir nome"
   set_of_grading_periods_545b37e9: "Definir Períodos de Classificação"
   set_some_up_now_1749bb44: "Definir agora"
-  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\n\
-      \x20                 Defina como suas Classificações de Proficiência aparecem dentro da Lista de Notas de Maestria em Aprendizagem.\n\n\
-      \x20                 Ajuste o número de classificações, nível de domínio, pontos e cores.\n\n\
-      \x20               "
+  set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
+      \x20           Defina como suas Classificações de Proficiência aparecem dentro da Lista de Notas de Domínio em Aprendizagem.\n\
+      \x20           Ajuste o número de classificações, nível de domínio, pontos e cores.\n\
+      \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Defina como suas classificações de proficiência aparecem dentro do livro de notas de domínio de aprendizagem. Ajuste o número de classificações, nível de domínio, pontos e cores."
   set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
       Estabelecer resultados na sua disciplina, medidos por metas pedagógicas ou objetivos desejados.
@@ -21468,6 +21499,7 @@ pt:
   show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
       Mostrar uma caixa de seleção que opcionalmente permite a um administrador de conta publicar disciplinas
       automaticamente após associar e sincronizar com um plano blueprint
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Mostrar uma lista das páginas recentemente visitadas na navegação global no Canvas"
   show_account_navigation_menu_d97270a9: "Mostrar o Menu de Navegação da Conta"
   show_admin_navigation_menu_92fb579f: "Mostrar o Menu de navegação do administrador"
   show_all_artifacts_34b91a83: "Exibir todos os artefatos"
@@ -22639,6 +22671,10 @@ pt:
       
                 Obrigado,
                 Suporte do Canvas
+  the_message_you_sent_with_the_subject_line_subject_c9a8f654: "A mensagem que enviou com a linha de assunto \"%{subject}\" não foi entregue. Para responder a mensagens do Canvas deste e-mail, deve ser primeiro um canal de comunicação confirmado no seu perfil do Canvas. Por favor visite o seu perfil e reenvie o e-mail de confirmação para este endereço eletrónico. Pode também contactar esta pessoa através da Caixa de Entrada do Canvas. Para ajuda, consulte o capítulo Caixa de entrada para o seu papel de utilizador nos Guias do Canvas. [Ver https://community.canvaslms.com/t5/Canvas/ct-p/canvas].\n\
+      \x20         \n\
+      \x20         Obrigado,\n\
+      \x20         Suporte Canvas "
   the_module_item_is_locked_27fe420b: "O item do módulo está bloqueado."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "As classificações mais recentes por utilizador %{current_user_name} e resultado %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "O próximo agendamento disponível para este curso é em *%{date}*"
@@ -23976,6 +24012,7 @@ pt:
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Use bookmarking para paginação API no Índice de Inscrições"
   use_default_890939b7: "Utilizar predefinição"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Use recursos experimentais antes que eles geralmente sejam ativados na produção"
+  use_high_contrast_ui_a5917282: "Usar IU de Alto Contraste"
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "Use o Gravador HTML5 no Editor de Conteúdo em vez do Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "Use MathMan para converter LaTeX para MathML?"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "Use MathMan para converter LaTeX para SVG?"
@@ -24046,6 +24083,7 @@ pt:
   user_details_2613c079: "Detalhes do utilizador"
   user_details_e9aef9e5: "Detalhes do utilizador"
   user_does_not_have_permission_to_select_final_grad_47560e75: "o utilizador não tem permissão para selecionar a classificação final"
+  user_files_78e21703: "Ficheiros do utilizador"
   user_groups_query_error_bba6a6b7: "Erro de consulta de grupos de utilizadores"
   user_id_8256faeb: user_id
   user_id_bcace870: "ID de utilizador"
@@ -24537,6 +24575,7 @@ pt:
   video_player_b371005: "Reprodutor de vídeo"
   vietnam_84_e50a2a44: "Vietnã (+84)"
   vietnamese_e7a76583: Vietnamita
+  view_all_e13bf0a6: "Ver tudo"
   view_analytics_91a3b7a: "Ver estatísticas"
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: "Ver dados analíticos em tabelas em vez de gráficos"
   view_analytics_for_name_9b31594e: "Ver análises para %{name}"
@@ -24603,6 +24642,7 @@ pt:
   visit_group_group_name_7a816081: "Visitar o grupo %{group_name}"
   visit_zoom_14636084: "Visitar o Zoom"
   waiting_for_attempted_login_6d00cb49: "A aguardar tentativa de acesso"
+  waiting_for_change_to_complete_b75b5e8b: "À espera de mudança para completar"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "A aguardar confirmação para visualizar o código QR"
   waiting_for_selection_ce0398c7: "Esperando a seleção"
   waiting_for_your_qr_code_to_load_809299e5: "À espera do seu Código QR para carregar"
@@ -24706,6 +24746,7 @@ pt:
             à sua disciplina. Você também pode criar grupos de alunos para abrigar tarefas de grupo,
             discussões e ficheiros.
   what_should_the_csv_file_look_like_985a59ac: "Qual seria a aparência do arquivo CSV?"
+  what_storage_options_do_i_have_in_zoom_b79c738e: "Quais opções de armazenamento tenho eu no Zoom?"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Ao adicionar vários utilizadores, use uma vírgula ou quebra de linha para separar os utilizadores."
   when_disabled_students_can_still_send_individual_m_567a911c: "Quando desativado, os alunos ainda podem enviar mensagens individuais para os professores da disciplina, os TAs da disciplina e os alunos que pertencem aos mesmos grupos no nível da conta."
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "Quando ligado, ficheiros completos JS e CSS podem ser carregados no *%{t_theme_editor}*."
@@ -24880,6 +24921,7 @@ pt:
     cannot_update_published: "Não tem permissão para atualizar o estado de publicação desta página wiki"
     cannot_update_title: "Não tem permissão para atualizar o título desta página wiki"
     invalid_editing_roles: "As funções de edição disponibilizadas não são válidas"
+  will_credentials_issued_by_this_key_be_presented_t_68faff8c: "As credenciais emitidas por esta chave serão apresentadas ao Canvas ou a um serviço de pares (por exemplo, Dados Canvas)?"
   will_keep_the_average_of_all_your_scores_d7e6b733: "Será mantida a média de todas as suas pontuações"
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Será mantida a sua pontuação mais alta"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Será mantida a sua pontuação mais recente"

@@ -131,7 +131,9 @@ zh-Hant:
       deleteError: 出現問題。目前無法刪除。
       deleteSuccess: 刪除成功
       error: 發生了一個錯誤。請重新整理頁面，然後重試。
+      unexpectedDeleteError: 出現問題。目前無法刪除。
       updateSuccess: 更新成功
+      userDeleteError: 學習成果群組包含一個或多個已與內容對齊的成果。
     length_error: "必須為 255 個字元或更少"
   OutcomeView: 
     length_error: "必須為 255 個字元或更少"
@@ -2481,6 +2483,7 @@ zh-Hant:
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: 儲存課程公佈政策時發生錯誤
   an_error_occurred_while_saving_your_settings_b503a31c: 儲存設定時發生錯誤
   an_error_occurred_while_starting_migration_8e6015e2: 開始遷移時發生錯誤
+  an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: 嘗試變更使用者介面時發生錯誤
   an_error_occurred_while_updating_announcements_loc_5a1c5dcf: 更新通告鎖定狀態時發生錯誤。
   an_error_occurred_while_updating_late_policies_a95b707f: 更新遲交規則時發生錯誤
   an_error_ocurred_while_deleting_the_appointment_gr_4948bbc5: 刪除預約組時會顯示錯誤
@@ -2629,6 +2632,7 @@ zh-Hant:
   anonymous_off_7985fcaf: 匿名關閉
   anonymous_on_c5fa120d: 匿名開啟
   anonymous_re_submission_assignment_title_d9402721: "匿名重新提交項目：%{assignment_title}"
+  anonymous_student_91b9d664: 匿名學生
   anonymous_submission_annotation_student_id_assignm_25eb88c9: "匿名提交項目注釋：學生 (%{id})，%{assignment_title}，%{course_name}"
   anonymous_submission_annotation_student_user_id_as_ffca8ce9: "匿名提交項目注釋：學生 (%{user_id})，%{assignment_title}，%{course_name}"
   anonymous_submission_assignment_title_896654de: "匿名提交項目：%{assignment_title}"
@@ -2745,6 +2749,7 @@ zh-Hant:
   appointments_dcb41d23: 預約
   approved_c3b285d4: 批准
   approximate_value_with_precision_precision_6b7cc6ef: "%{approximate_value} 數值採用 %{precision} 的準確度"
+  apps_54d24a47: 應用程式
   apps_are_an_easy_way_to_add_new_features_to_canvas_2cbc2531: "應用程式是添加新功能至 Canvas 的簡便方法。您可以添加應用程式到單獨課程中，又或者帳戶中內所有課程。完成配置之後，就可以透過課程單元連接到應用程式，並創建評估工具作業。"
   appt_calendar_event_dialog: 
     invalid_participants: 必須讓至少一個使用者參加
@@ -4230,7 +4235,7 @@ zh-Hant:
     authorize_google_drive: "授權 Google Drive 訪問"
     back_to_outcomes: 返回至成果
     cancel: 取消
-    choose_a_file: 選擇文檔
+    choose_a_file: 選擇檔案
     delete: 刪除
     delete_file: "刪除文檔 %{name}"
     done: 已完成
@@ -4245,9 +4250,9 @@ zh-Hant:
     publish: 發佈
     published: 已發佈
     refresh: 刷新
-    save: 保存
-    search: 搜索
-    send: 發送
+    save: 儲存
+    search: 搜尋
+    send: 傳送
     send_message: 發送訊息
     sending: 正在發送...
     sent: 已發送！
@@ -4990,6 +4995,7 @@ zh-Hant:
   click_on_the_admin_navigation_button_to_access_acc_d0438ab7: 點擊管理員導航工具按鈕以存取帳戶設定。
   click_on_the_courses_navigation_button_to_access_y_138d4dfb: 點擊課程導航工具按鈕以存取您的課程。
   click_proceed_to_continue_b6eeffc6: 點擊「繼續」以繼續。
+  click_the_admin_navigation_button_to_access_accoun_38d881bf: 點擊管理員導航工具按鈕以存取帳戶設定。
   click_the_button_above_to_add_content_4c7024a: 點擊以上的按鈕以添加內容
   click_to_add_a_name_6cf551b0: 點擊以添加名稱
   click_to_change_profile_picture_for_display_name_6a4b41db: "點擊以更換檔案圖片%{display_name}"
@@ -5045,6 +5051,7 @@ zh-Hant:
   clicking_on_the_column_headers_will_sort_the_rows__3a6e9573: 按一下列標頭，可以根據該列排列各行項目
   clicking_the_checkbox_will_cause_scopes_table_to_a_fba5886a: 勾選複選框會令範圍表格在下方出現
   clicking_the_checkbox_will_cause_scopes_table_to_d_dbdbffd3: 勾選複選框會令範圍表格在下方消失
+  client_credentials_audience_218f2d93: 客戶認證對象
   client_id_cb2502af: "用戶端 ID"
   client_id_is_required_1afd54d1: "用戶端 ID 為必填"
   clone_group_set_c2a40e15: 複製群組集合
@@ -5675,7 +5682,7 @@ zh-Hant:
         upload_to: 上傳至
       import_quizzes_next_view: 
         import_new_quizzes: "將評估內容匯入為 New Quizzes"
-        import_new_quizzes_help_text: "New Quizzes 是 Canvas 新的評估引擎。%{p_p}要深入了解更多資訊，請聯絡或訪問您的系統管理員"
+        import_new_quizzes_help_text: "新測驗是 Canvas 新的評估引擎。%{p_p}要深入了解更多資訊，請聯絡或訪問您的系統管理員"
         import_quizzesNext_help_label: "將評估匯入為 New Quizzes 支援圖示"
         import_quizzesNext_help_text: "Quizzes.Next 是 Canvas 新的評估引擎。%{p_p}要了解更多資訊，請聯絡或訪問您的系統管理員。"
         import_quizzesNext_help_title: "New Quizzes"
@@ -8036,6 +8043,7 @@ zh-Hant:
   deployment_id_fc270280: "部署 ID"
   deployment_id_for_tool_app_cb59335: "%{tool} 應用程式的部署 ID"
   deployment_id_for_toolname_app_e54a7364: "%{toolName} 應用程式的部署 ID"
+  desc_12ad2869: "%{desc}"
   description_436c48d7: 說明
   description_61f4296: "* 描述"
   details_98a31b68: 詳細資料
@@ -9002,6 +9010,8 @@ zh-Hant:
   ends_at_9a62b528: 結束時間
   enforce_scopes_be28989c: 強制範圍
   english_c60612e2: 英語
+  enhance_color_contrast_of_content_685ddd49: 提升內容色彩對比度
+  enhances_the_color_contrast_of_text_buttons_etc_88e22e61: 提升文字、按鈕等的色彩對比度
   enrolled_a6a517cd: 已登記入學
   enrolled_as_272da3b9: 已註冊為
   enrollment: 
@@ -11088,10 +11098,12 @@ zh-Hant:
       pages: 頁面
       people: 人員
   group_a8f5ed9c: 群組
+  group_announcements_f6e0fc8c: 群組通告
   group_assignment_7060989f: 群組作業
   group_assignments_can_t_be_anonymously_graded_2dd9be24: 群組作業不能匿名評分
   group_assignments_cannot_be_enabled_for_anonymousl_ed896b1c: 無法將匿名評分作業應用到群組作業中
   group_assignments_cannot_be_enabled_for_moderated__6b2faeef: 無法將分配作業應用到分組作業中
+  group_calendar_5410c6ae: 群組行事曆
   group_categories: 
     notices: 
       create_category_success: 類別已成功創建。
@@ -11118,7 +11130,11 @@ zh-Hant:
     self_signup_for_courses: 僅可針對課程群組或社群啟用自行註冊
   group_category_id_7001cf89: group_category_id
   group_category_locked: 群組類別不能更改，因為學生已經提交了這項任務
+  group_collaborations_b747d43: 群組協作
+  group_conferences_12866179: 群組會議
   group_details_e51122f1: 小組詳細訊息
+  group_discussions_17d79aa0: 群組討論區
+  group_files_4324f3df: 群組檔案
   group_files_82e5dcdb: 群組檔案
   group_group_name_is_for_a_different_section_4d84d256: "%{group_name} 群組適用於另一個班別"
   group_group_name_is_full_297880d6: "%{group_name} 群組已滿"
@@ -11126,6 +11142,7 @@ zh-Hant:
   group_group_name_is_not_available_at_this_time_971001c1: "群組 %{group_name} 目前不可用"
   group_guid_exists_in_incorrect_context_64263138: "群組 \"%{guid}\" 存在於錯誤的內容中"
   group_guid_has_already_appeared_in_this_import_78f35ff3: "群組 \"%{guid}\" 已經出現在此匯入中"
+  group_home_249cb392: 群組主頁
   group_is_for_a_different_section_6a843a4d: 群組適用於另一個班別
   group_is_full_56849d78: 群組已滿
   group_is_joined_by_invitation_only_d00f5a63: 群組僅透過邀請才能加入
@@ -11149,6 +11166,8 @@ zh-Hant:
   group_name_group_people_e9d548c1: "%{group_name} - 群組人員"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_category_name} 群組類別中的 %{group_name}"
   group_name_is_required_5547bc0b: 必須提供群組名稱
+  group_pages_656556f3: 群組頁面
+  group_people_50e9785b: 群組成員
   group_roster_1846bf84: 群組名冊
   group_select_330df8bd: 選擇群組
   group_set_name_2aed2347: 群組集合名稱
@@ -11657,6 +11676,7 @@ zh-Hant:
   here_f44564ee: 此處。
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: 這是一個非常好的機會，讓您能夠了解月曆，并將您所有可能的非作業事件添加到課程之中。請勿擔心，我們將全程支援您。
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "這裡的貼士能助您開始使用 Canvas！"
+  hi_contrast_373b614f: 高對比度
   hidden_14a032a7: 已隱藏
   hidden_available_with_a_link_65ef2bda: 已隱藏。可用連結訪問
   hidden_available_with_a_link_click_to_modify_184990e7: "已隱藏。可透過一個連結使用 - 按一下進行修改"
@@ -11702,6 +11722,7 @@ zh-Hant:
   highest_28ad71e6: 最高
   highest_score_e080551e: 最高得分
   hindi_9bcd4b34: 印地語
+  history_cd3f60a9: 記錄
   history_settings_c63dbaaf: 歷程記錄設定
   home_351838cd: 首頁
   home_page_is_not_valid_2e8a25ae: 無效的主頁
@@ -11754,6 +11775,7 @@ zh-Hant:
   how_do_i_find_my_courses_b826e4ce: 怎樣找到我的課程？
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "我應如何匯入 Canvas 課程匯出軟件包？"
   how_do_i_import_outcomes_for_a_course_8eced1a: 我應如何為課程匯入成果？
+  how_do_i_invite_others_to_join_a_meeting_d09bfd6c: 我應如何邀請他人加入會議？
   how_do_i_know_if_students_have_joined_the_meeting_bbfb1c36: 我可以如何得知學生有否參與會面？
   how_do_i_manage_and_share_the_recording_52fc2993: 我應如何管理及分享錄製片段？
   how_do_i_manage_rubrics_in_a_course_a5441fb7: 我應如何在課程中管理評分標準？
@@ -11888,6 +11910,10 @@ zh-Hant:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 啓用后，模塊將在僅有一項要求滿足時可被標記為完成。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "如果啟用， 'oauth2_access_token_url' 將在 LTI2 註冊後發送。"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "如果啟用，LTI 工具可以使用 OAuth 1.0a 簽名來訪問會員服務 API"
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+      啟用後，oEmbed 端點將要求您提供
+      工具產生的許可證以驗證
+      oEmbed 資源請求的來源。
   if_enabled_query_parameters_will_not_be_copied_to__4c6ed625: "如果啟用此項，查詢參數將不會在 LTI 啓動時寫入 POST 主體部分。"
   if_enabled_scopes_will_be_validated_on_api_request_99cab83f: "如果啟用，並如果正在使用的開發人員金鑰需要範圍，將需要在 API 請求上進行驗證。"
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "如果啟用，由 Canvas 用於基本學習成果的 Sourcedids 將被加密。"
@@ -16728,6 +16754,7 @@ zh-Hant:
       delete_reminder_failed: 刪除失敗
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 無法在調整後的作業中應用學生互評
   peer_reviews_e3a55964: 同儕檢閱
+  peer_service_6b4828b9: 夥伴服務
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: 擱置
   pending_message_2d9a8796: "擱置：%{message}"
@@ -19536,6 +19563,8 @@ zh-Hant:
   recent_activity_51239235: 最近的活動
   recent_announcements_8becc59c: 最近的通告
   recent_f19e8c64: 最近
+  recent_history_bcb0f4c0: 最近歷史記錄
+  recent_history_tray_241a384e: 最近歷史記錄匣
   recent_student: 
     last_logged_in: "上次登入時間為 %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} 衰減平均分"
@@ -19637,6 +19666,7 @@ zh-Hant:
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "從掌握歷程釋放：%{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "從掌握歷程釋放：%{path}"
   releasing_grades_31a57dde: 發佈成績
+  reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: 重新載入頁面或導航至新頁面，以便套用此變更。
   remember_my_choice_for_this_course_5a3b7206: 記住我對此課程的選擇
   remind_me_next_time_6402eb7d: 下次提醒我
   reminder_ffd21289: 提醒
@@ -19734,6 +19764,7 @@ zh-Hant:
   require_captcha_for_self_registration_b3b2ea02: "需要自助註冊的 CAPTCHA"
   require_group_members_to_be_in_the_same_section_7f6c36af: 要求群組成員必須在同一個班別
   require_respondus_lockdown_browser_31425b3a: "需要 Respondus LockDown 瀏覽器"
+  require_signed_token_for_oembed_64883303: "需要 oEmbed 的已簽署許可證"
   require_usage_rights_for_uploaded_files_4507865b: 需要已上傳檔案的使用權限
   required_access_code_592902d7: 需要訪問碼
   required_email_address_379b2392: 所需的電郵地址
@@ -20629,9 +20660,9 @@ zh-Hant:
   set_of_grading_periods_545b37e9: 評分時段組
   set_some_up_now_1749bb44: 現在進行一些設定
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
-      \x20                 設定學習掌握程度成績單內顯示的能力評級的方式。\n\
-      \x20                 調整評級數量、掌握程度級別、分數及顏色。\n\
-      \x20               "
+      \x20           設定學習掌握程度成績單內顯示的能力評級的方式。\n\
+      \x20           調整評級數量、掌握程度級別、分數及顏色。\n\
+      \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: 設定您的能力評級如何出現在學習掌握程度成績單內。調整評級數量、掌握程度級別、分數和顏色。
   set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
       在您的課程內根據教學目標或理想目的設置成果。
@@ -21417,6 +21448,7 @@ zh-Hant:
   show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
       顯示勾選框，讓帳戶管理員可以選擇在
       設定關聯及與藍圖課程同步後自動發佈課程
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "於 Canvas 網站導航顯示最近到訪頁面的列表"
   show_account_navigation_menu_d97270a9: 顯示帳戶導航工具選單
   show_admin_navigation_menu_92fb579f: 顯示管理員導航工具選單
   show_all_artifacts_34b91a83: 顯示所有項目
@@ -22580,6 +22612,11 @@ zh-Hant:
       
       謝謝！
       Canvas 支援團隊
+  the_message_you_sent_with_the_subject_line_subject_c9a8f654: |-
+      您發送的主題為「%{subject}」的訊息未能投遞。如希望透過本郵件回覆 Canvas 訊息，您的 Canvas 個人檔案中必須有經確認的通訊渠道。請瀏覽您的個人檔案並重新發送此電郵地址的確認電郵。您亦可以透過 Canvas 收件匣聯絡此人。如需協助，請參閱 Canvas 指南內有關您的使用者身份的收件匣章節。[參閱 https://community.canvaslms.com/t5/Canvas/ct-p/canvas]。
+                
+                謝謝！
+                Canvas 支援團隊
   the_module_item_is_locked_27fe420b: 該單元項目已鎖定。
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "用户 %{current_user_name} 的最新分数和成果 %{outcome_name}。"
   the_next_available_appointment_in_this_course_is_o_da10316c: "此課程可供選擇的預約是*%{date}*"
@@ -23917,6 +23954,7 @@ zh-Hant:
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "對於註冊學生索引中的 API 分頁使用書籤"
   use_default_890939b7: 使用預設
   use_experimental_features_before_they_are_generall_3dfaddd1: 在實驗功能通常在生產中啟用前使用這些功能。
+  use_high_contrast_ui_a5917282: 使用高對比度使用者介面
   use_html5_recorder_in_content_editor_instead_of_fl_c867ea39: "使用內容編輯器中的 HTML5 Recorder 取代 Flash"
   use_mathman_to_convert_latex_to_mathml_680ef7b0: "使用 MathMan 將 LaTeX 轉換成 MathML？"
   use_mathman_to_convert_latex_to_svg_3f61c9b: "使用 MathMan 將 LaTeX 轉換成 SVG？"
@@ -23987,6 +24025,7 @@ zh-Hant:
   user_details_2613c079: 使用者詳細資料
   user_details_e9aef9e5: 使用者詳細資料
   user_does_not_have_permission_to_select_final_grad_47560e75: 使用者沒有權限選擇最終評分
+  user_files_78e21703: 使用者檔案
   user_groups_query_error_bba6a6b7: 使用者群組查詢錯誤
   user_id_8256faeb: user_id
   user_id_bcace870: "使用者 ID"
@@ -24477,6 +24516,7 @@ zh-Hant:
   video_player_b371005: 視訊播放器
   vietnam_84_e50a2a44: "越南 (+84)"
   vietnamese_e7a76583: 緬甸語
+  view_all_e13bf0a6: 全部檢視
   view_analytics_91a3b7a: 檢視分析
   view_analytics_data_in_tables_instead_of_graphs_8a33f536: 在表格而非圖表中檢視分析性數據
   view_analytics_for_name_9b31594e: "查看分析%{name}"
@@ -24538,6 +24578,7 @@ zh-Hant:
   visit_group_group_name_7a816081: "訪問群組 %{group_name}"
   visit_zoom_14636084: "前往 Zoom"
   waiting_for_attempted_login_6d00cb49: 正在等待嘗試登入
+  waiting_for_change_to_complete_b75b5e8b: 正在等候完成變更
   waiting_for_confirmation_to_display_qr_code_6f904d63: "正在等候確認 QR 碼顯示"
   waiting_for_selection_ce0398c7: 正等候選擇
   waiting_for_your_qr_code_to_load_809299e5: "您的 QR 碼正在載入中"
@@ -24641,6 +24682,7 @@ zh-Hant:
             到您的課程。您亦可以創建學生小組以便指派小組作業、
             討論區以及檔案。
   what_should_the_csv_file_look_like_985a59ac: "CSV 文檔應該是什麼樣的？"
+  what_storage_options_do_i_have_in_zoom_b79c738e: "Zoom 內有什麼儲存選項？"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: 當添加多個使用者時，以逗號或間線分隔使用者。
   when_disabled_students_can_still_send_individual_m_567a911c: 停用後，學生仍能向屬於同一帳戶級別小組的課程教師、課程助教及學生發送個別訊息。
   when_enabled_global_javascript_and_css_files_can_b_ea21d216: "經許可后, 全局JavaScript 和CSS文檔可以上傳到 *%{t_theme_editor}*。"
@@ -24811,6 +24853,7 @@ zh-Hant:
     cannot_update_published: "您無權更新此 Wiki 頁面的已發佈狀態"
     cannot_update_title: "您無權更新此 Wiki 頁面的標題"
     invalid_editing_roles: 所提供的編輯角色無效
+  will_credentials_issued_by_this_key_be_presented_t_68faff8c: "此金鑰發行的認證資料會提供給 Canvas 或其夥伴服務（例如：Canvas Data）嗎？"
   will_keep_the_average_of_all_your_scores_d7e6b733: 將保留您所有分數的平均分
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: 將保留所有分數中的最高分數
   will_keep_the_latest_of_all_your_scores_431d23f9: 將保留所有分數中的最新分數

@@ -44,7 +44,7 @@ For more information on variable substitution, see the <a href="https://www.imsg
 Variable substitutions can be configured for a tool in 3 ways:
 
 ## Via UI
-Custom fields can be <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-an-LTI-key-for-an-account/ta-p/140">configured via UI</a> by editing the tool configuration and adding the
+Custom fields can be <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-configure-a-manual-entry-external-app-for-an-account/ta-p/219">configured via UI</a> by editing the tool configuration and adding the
 desired variable to the Custom Fields text box.
 
 The following would add the domain as a launch parameter called custom_arbitrary_name:
@@ -177,6 +177,16 @@ Returns an empty string otherwise.
 ```
  LTI 1.3: "a6e2e413-4afb-4b60-90d1-8b0344df3e91",
  All Others: "c0ddd6c90cbe1ef0f32fbce5c3bf654204be186c"
+```
+## com.instructure.User.sectionNames
+Returns an array of the section names that the user is enrolled in, if the
+context of the tool launch is within a course.
+
+**Availability**: *when launched from a course*  
+**Launch Parameter**: *com_instructure_user_section_names*  
+
+```
+[ "Section 1", "Section 5", "TA Section"]
 ```
 ## Context.title
 The title of the context.

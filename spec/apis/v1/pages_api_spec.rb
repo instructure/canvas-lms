@@ -175,12 +175,12 @@ describe "Pages API", type: :request do
         expect(urls).to eq new_pages.sort_by(&:id).collect(&:url)
       end
 
-      it "should return an error if the search term is fewer than 3 characters" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=aa",
-                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "aa"},
+      it "should return an error if the search term is fewer than 2 characters" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=a",
+                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "a"},
                         {}, {}, {:expected_status => 400})
         error = json["errors"].first
-        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+        verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
 
       describe "sorting" do

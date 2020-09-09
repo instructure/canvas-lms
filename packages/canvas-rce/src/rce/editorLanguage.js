@@ -21,6 +21,7 @@
 const mapping = {
   ar: 'ar_SA',
   bg: 'bg_BG',
+  ca: 'ca',
   cs: 'cs',
   cy: 'cy',
   da: 'da',

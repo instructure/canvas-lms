@@ -38,6 +38,9 @@ def buildParameters = [
 library "canvas-builds-library"
 
 def skipIfPreviouslySuccessful(name, block) {
+  if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
+    name+="${env.CANVAS_LMS_REFSPEC}"
+  }
   def successes = load('build/new-jenkins/groovy/successes.groovy')
   successes.skipIfPreviouslySuccessful(name, true, block)
 }
@@ -77,7 +80,7 @@ def ignoreBuildNeverStartedError(block) {
 }
 
 // return false if the current patchset tag doesn't match the
-// mainline publishable tag. i.e. ignore ruby-2.6/pg-12 upgrade builds
+// mainline publishable tag. i.e. ignore pg-9.5 builds
 def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
@@ -101,7 +104,7 @@ def postFn(status) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. " : ''
+    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
     slackSend(
       channel: '#canvas_builds',
       color: 'danger',
@@ -148,16 +151,16 @@ pipeline {
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
 
-    // e.g. postgres-9.5-ruby-2.6
+    // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
 
     // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
-    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffixNew()
+    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffix()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
-    // e.g. canvas-lms:01.123456.78-postgres-9.5-ruby-2.6
+    // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
 
     // e.g. canvas-lms:master when not on another branch
@@ -169,21 +172,17 @@ pipeline {
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
-    RUBY_IMAGE = "$BUILD_IMAGE-ruby"
-    RUBY_MERGE_IMAGE = "$RUBY_IMAGE:$GERRIT_BRANCH"
-    RUBY_PATCHSET_IMAGE = "$RUBY_IMAGE:$NAME-$TAG_SUFFIX"
 
-    RUBY_GEMS_IMAGE = "$BUILD_IMAGE-ruby-gems-only"
-    RUBY_GEMS_MERGE_IMAGE = "$RUBY_GEMS_IMAGE:$GERRIT_BRANCH"
-    RUBY_GEMS_PATCHSET_IMAGE = "$RUBY_GEMS_IMAGE:$NAME-$TAG_SUFFIX"
-
-    YARN_IMAGE = "$BUILD_IMAGE-yarn-only"
-    YARN_MERGE_IMAGE = "$YARN_IMAGE:$GERRIT_BRANCH"
-    YARN_PATCHSET_IMAGE = "$YARN_IMAGE:$NAME-$TAG_SUFFIX"
+    DEPENDENCIES_IMAGE = "$BUILD_IMAGE-dependencies"
+    DEPENDENCIES_MERGE_IMAGE = "$DEPENDENCIES_IMAGE:$GERRIT_BRANCH"
+    DEPENDENCIES_PATCHSET_IMAGE = "$DEPENDENCIES_IMAGE:$NAME-$TAG_SUFFIX"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
     POSTGRES_IMAGE_TAG=imageTag.postgres()
+    // This is primarily for the plugin build
+    // for testing canvas-lms changes against plugin repo changes
+    CANVAS_LMS_REFSPEC=configuration.canvasLmsRefspec()
   }
 
   stages {
@@ -204,12 +203,29 @@ pipeline {
             stage('Setup') {
               timeout(time: 5) {
                 cleanAndSetup()
-                checkout scm
+                // If using custom CANVAS_LMS_REFSPEC do custom checkout to get correct code
+                if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
+                  checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: 'FETCH_HEAD']],
+                    doGenerateSubmoduleConfigurations: false,
+                    extensions: [],
+                    submoduleCfg: [],
+                    userRemoteConfigs: [[
+                      credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+                      name: 'origin',
+                      refspec: "$env.CANVAS_LMS_REFSPEC",
+                      url: "ssh://gerrit.instructure.com:29418/canvas-lms.git"
+                    ]]
+                  ])
+                } else {
+                  checkout scm
+                }
 
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
-                if (env.CANVAS_LMS_REFSPEC) {
+                if (currentBuild.projectName.contains("main-from-plugin")) {
                   // the plugin builds require the canvas lms refspec to be different. so only
                   // set this refspec if the main build is requesting it to be set.
                   // NOTE: this is only being set in main-from-plugin build. so main-canvas wont run this.
@@ -293,9 +309,7 @@ pipeline {
                     ]) {
                       sh 'build/new-jenkins/docker-build.sh'
                     }
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_PATCHSET_IMAGE"
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_PATCHSET_IMAGE"
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_PATCHSET_IMAGE"
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_PATCHSET_IMAGE"
                   }
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
                   if (isPatchsetPublishable()) {
@@ -429,16 +443,8 @@ pipeline {
                   // Retriggers won't have an image to tag/push, pull that
                   // image if doesn't exist. If image is not found it will
                   // return NULL
-                  if (!sh (script: 'docker images -q $RUBY_GEMS_PATCHSET_IMAGE')) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_GEMS_PATCHSET_IMAGE'
-                  }
-
-                  if (!sh (script: 'docker images -q $RUBY_PATCHSET_IMAGE')) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_PATCHSET_IMAGE'
-                  }
-
-                  if (!sh (script: 'docker images -q $YARN_PATCHSET_IMAGE')) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_PATCHSET_IMAGE'
+                  if (!sh (script: 'docker images -q $DEPENDENCIES_PATCHSET_IMAGE')) {
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $DEPENDENCIES_PATCHSET_IMAGE'
                   }
 
                   if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
@@ -447,14 +453,10 @@ pipeline {
 
                   // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-                  sh 'docker tag $RUBY_GEMS_PATCHSET_IMAGE $RUBY_GEMS_MERGE_IMAGE'
-                  sh 'docker tag $RUBY_PATCHSET_IMAGE $RUBY_MERGE_IMAGE'
-                  sh 'docker tag $YARN_PATCHSET_IMAGE $YARN_MERGE_IMAGE'
+                  sh 'docker tag $DEPENDENCIES_PATCHSET_IMAGE $DEPENDENCIES_MERGE_IMAGE'
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_GEMS_MERGE_IMAGE'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_MERGE_IMAGE'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_MERGE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_MERGE_IMAGE'
                 }
               }
             }

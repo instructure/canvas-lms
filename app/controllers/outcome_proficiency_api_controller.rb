@@ -141,17 +141,9 @@ class OutcomeProficiencyApiController < ApplicationController
   private
 
   def update_ratings(proficiency, context = nil)
-    # update existing ratings & create any new ratings
-    proficiency_params['ratings'].each_with_index do |val, idx|
-      if idx <= proficiency.outcome_proficiency_ratings.count - 1
-        proficiency.outcome_proficiency_ratings[idx].assign_attributes(val.to_hash.symbolize_keys)
-      else
-        proficiency.outcome_proficiency_ratings.build(val)
-      end
-    end
-    # delete unused ratings
-    proficiency.outcome_proficiency_ratings[proficiency_params['ratings'].length..-1].each(&:mark_for_destruction)
+    proficiency.replace_ratings(proficiency_params['ratings'])
     proficiency.context = context if context
+    proficiency.workflow_state = 'active'
     proficiency.save!
     proficiency
   end

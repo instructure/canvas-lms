@@ -21,8 +21,8 @@ require_dependency "group_categories/params_policy"
 
 module GroupCategories
 
-  MockGroupCategory = Struct.new(:name, :self_signup,
-    :auto_leader, :group_limit, :create_group_count, :assign_unassigned_members, :group_by_section)
+  MockGroupCategory = Struct.new(:name, :self_signup, :auto_leader,
+    :group_limit, :create_group_count, :create_group_member_count, :assign_unassigned_members, :group_by_section)
 
   describe ParamsPolicy do
 
@@ -77,6 +77,11 @@ module GroupCategories
         it 'populates group count' do
           policy.populate_with({enable_self_signup: "1", create_group_count: 2}, populate_options)
           expect(category.create_group_count).to eq 2
+        end
+
+        it 'populates group member count' do
+          policy.populate_with({split_groups: "2", create_group_member_count: 5}, populate_options)
+          expect(category.create_group_member_count).to eq 5
         end
       end
     end

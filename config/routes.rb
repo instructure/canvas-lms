@@ -2278,6 +2278,10 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/mastery_paths/stats/students_per_range', action: 'students_per_range'
       get 'courses/:course_id/mastery_paths/stats/student_details', action: 'student_details'
     end
+
+    scope(controller: :history) do
+      get 'users/:user_id/history', action: 'index', as: :user_history
+    end
   end
 
     # this is not a "normal" api endpoint in the sense that it is not documented or

@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Alineació dreta"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Alineació i sagnia"
-    },
     "all_4321c3a1": {
         "message": "Tot"
     },
@@ -145,9 +142,6 @@
     },
     "canvas_planner_98ed106": {
         "message": "Planificador de Canvas"
-    },
-    "canvas_plugins_705a5016": {
-        "message": "Connectors de Canvas"
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Tria un fitxer de subtítols"
@@ -292,6 +286,9 @@
     },
     "dimensions_45ddb7b7": {
         "message": "Mides"
+    },
+    "directionality_26ae9e08": {
+        "message": "Direccionalitat"
     },
     "disable_in_line_preview_2a675175": {
         "message": "Desactiveu la visualització prèvia en línia."
@@ -473,6 +470,9 @@
     "folder_tree_fbab0726": {
         "message": "Arbre de carpetes"
     },
+    "format_4247a9c5": {
+        "message": "Format"
+    },
     "formatting_5b143aa8": {
         "message": "S''està formatant"
     },
@@ -571,6 +571,9 @@
     },
     "late_2be42b88": {
         "message": "Tardà"
+    },
+    "left_to_right_e9b4fd06": {
+        "message": "Esquerra a dreta"
     },
     "link_7262adec": {
         "message": "Enllaç"
@@ -860,6 +863,9 @@
     "rich_content_editor_2708ef21": {
         "message": "Editor de contingut enriquit"
     },
+    "right_to_left_9cfb092a": {
+        "message": "Dreta a esquerra"
+    },
     "save_11a80ec3": {
         "message": "Desa"
     },
@@ -904,6 +910,9 @@
     },
     "size_b30e1077": {
         "message": "Mida"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "La mida de { file } és superior a la mida màxima de { max } MB permesa pels fitxers."
     },
     "small_b070434a": {
         "message": "Petita"

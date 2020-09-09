@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// These tests got a bit hairy because CanvasMediaPlayer keeps attempting to
+// fetch media_sources on a timer until it gets them. Unless we satisfy its
+// needs, it will fetch even after the component is unmounted.
+
 import React from 'react'
 import {render, wait, fireEvent, act} from '@testing-library/react'
 import {queries as domQueries} from '@testing-library/dom'
@@ -35,250 +40,359 @@ const defaultMediaObject = (overrides = {}) => ({
 })
 
 describe('CanvasMediaPlayer', () => {
-  beforeAll(() => {
-    // put the flash_screenreader_holder into the dom
-    let d = document.createElement('div')
-    d.id = 'flash_screenreader_holder'
-    d.setAttribute('role', 'alert')
-    document.body.appendChild(d)
-    // the specs looking for Alert text found
-    // 2 copies, one in the screenreader message
-    // and 1 in the component. let's give the
-    // component a place to render so the getByText
-    // queries don't look in the flash_screenreader_holder
-    d = document.createElement('div')
-    d.id = 'here'
-    d.innerHTML = '<div></div>'
-    document.body.appendChild(d)
-  })
+  describe('rendering', () => {
+    beforeAll(() => {
+      // put the flash_screenreader_holder into the dom
+      let d = document.createElement('div')
+      d.id = 'flash_screenreader_holder'
+      d.setAttribute('role', 'alert')
+      document.body.appendChild(d)
+      // the specs looking for Alert text found
+      // 2 copies, one in the screenreader message
+      // and 1 in the component. let's give the
+      // component a place to render so the getByText
+      // queries don't look in the flash_screenreader_holder
+      d = document.createElement('div')
+      d.id = 'here'
+      d.innerHTML = '<div></div>'
+      document.body.appendChild(d)
+    })
 
-  beforeEach(() => {
-    fetch.resetMocks()
-    jest.useFakeTimers()
-  })
-  afterEach(async () => {
-    jest.resetAllMocks()
-  })
-  it('renders the component', () => {
-    const {container, getAllByText} = render(
-      <CanvasMediaPlayer
-        media_id="dummy_media_id"
-        media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
-      />
-    )
-    // need queryAll because some of the buttons have tooltip and text
-    expect(getAllByText('Play')[0]).toBeInTheDocument()
-    expect(container.querySelector('video')).toBeInTheDocument()
-  })
-  it('sorts sources by bitrate, ascending', () => {
-    const {container, getAllByText} = render(
-      <CanvasMediaPlayer
-        media_id="dummy_media_id"
-        media_sources={[
-          defaultMediaObject({bitrate: '3000', label: '3000'}),
-          defaultMediaObject({bitrate: '2000', label: '2000'}),
-          defaultMediaObject({bitrate: '1000', label: '1000'})
-        ]}
-      />
-    )
-    const sourceChooser = getAllByText('Source Chooser')[0].closest('button')
-    fireEvent.click(sourceChooser)
-    const sourceList = container.querySelectorAll(
-      'ul[aria-label="Source Chooser"] ul[role="menu"] li'
-    )
-    expect(domQueries.getByText(sourceList[0], '1000')).toBeInTheDocument()
-    expect(domQueries.getByText(sourceList[1], '2000')).toBeInTheDocument()
-    expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
-  })
-  it('handles string-type media_sources', () => {
-    // seen for audio files
-    const {getAllByText} = render(
-      <CanvasMediaPlayer
-        media_id="dummy_media_id"
-        media_sources="http://localhost:3000/files/797/download?download_frd=1"
-        type="audio"
-      />
-    )
-    // just make sure it doesn't blow up and renders the player
-    expect(getAllByText('Play')[0]).toBeInTheDocument()
-  })
-  // this spec causes react to emit " Warning: Can't perform a React state update on an unmounted component."
-  // in the next spec, and I can't figure out why. Everything still passes though.
-  it('renders loading if there are no media sources', async () => {
-    fetch.mockResponse(JSON.stringify({media_sources: []}))
-    await act(async () => {
-      const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />)
-      expect(getByText('Loading')).toBeInTheDocument()
+    beforeEach(() => {
+      fetch.resetMocks()
+      jest.useFakeTimers()
+      fetch.mockResponse([JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}])
     })
-  })
-  it('makes ajax call if no mediaSources are provided on load', async () => {
-    fetch.mockResponse(
-      JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
-    )
-    await act(async () => {
-      render(<CanvasMediaPlayer media_id="dummy_media_id" />)
-      jest.runAllTimers()
-      await wait()
-    })
-    expect(fetch.mock.calls.length).toEqual(1)
-    expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
-  })
-  it('shows error message if fetch for media_sources fails', async () => {
-    fetch.mockResponses([JSON.stringify({error: 'whoops'}), {status: 503}])
-    let component
-    await act(async () => {
-      component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
-        container: document.getElementById('here').firstElementChild
-      })
-      jest.runAllTimers()
-      await wait()
-    })
-    expect(fetch.mock.calls.length).toEqual(1)
-    expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
-  })
-  it('tries ajax call up to MAX times if no media_sources', async () => {
-    fetch.mockResponses(
-      [JSON.stringify({media_sources: []}), {status: 200}],
-      [JSON.stringify({media_sources: []}), {status: 304}],
-      [JSON.stringify({media_sources: []}), {status: 304}],
-      [JSON.stringify({media_sources: []}), {status: 304}],
-      [JSON.stringify({media_sources: []}), {status: 304}],
-      [JSON.stringify({media_sources: []}), {status: 304}]
-    )
-    let component
-    await act(async () => {
-      component = render(
-        <CanvasMediaPlayer
-          media_id="dummy_media_id"
-          MAX_RETRY_ATTEMPTS={5}
-          SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS={2}
-        />,
-        {
-          container: document.getElementById('here').firstElementChild
-        }
-      )
-      expect(component.getByText('Loading')).toBeInTheDocument()
-      jest.runAllTimers() // triggers useEffect
-      await wait() // render
-      expect(component.getByText('Loading')).toBeInTheDocument()
-      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(/Loading/)
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-      await wait()
-      expect(
-        component.getByText('Your media has been uploaded and will appear here after processing.', {
-          exact: false
+    afterEach(async () => {
+      // satisfy CanvasMediaPlayer's desire to keep trying until it finds media sources
+      fetch.mockResponse([JSON.stringify({media_sources: [defaultMediaObject()]}), {status: 200}])
+      await act(async () => {
+        await wait(() => {
+          jest.runOnlyPendingTimers()
         })
-      ).toBeInTheDocument()
-      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
-        /Your media has been uploaded and will appear here after processing./
-      )
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-      await wait()
-      jest.runAllTimers()
-      await wait()
-      // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
-      jest.runAllTimers()
-      await wait()
-
-      expect(fetch.mock.calls.length).toEqual(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
-      expect(
-        component.getByText(
-          'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
-          {exact: false}
-        )
-      ).toBeInTheDocument()
-      expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
-        /Giving up on retrieving media sources. This issue will probably resolve itself eventually./
-      )
-
-      jest.runAllTimers()
-      await wait()
-    })
-  })
-  it('still says "Loading" if we receive no info from backend', async () => {
-    fetch.mockResponse(JSON.stringify({media_sources: []}))
-    await act(async () => {
-      const {getByText} = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
-        container: document.getElementById('here').firstElementChild
       })
-      jest.runAllTimers()
-      await wait()
-
-      expect(getByText('Loading')).toBeInTheDocument()
+      jest.resetAllMocks()
+      jest.useRealTimers()
     })
-  })
-  describe('renders correct set of video controls', () => {
-    it('renders all the buttons', () => {
-      document.fullscreenEnabled = true
-      const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+
+    it('renders the component', () => {
+      const {container, getAllByText} = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
           media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
         />
       )
       // need queryAll because some of the buttons have tooltip and text
-      // (in v7 of the player, so let's just do it now)
       expect(getAllByText('Play')[0]).toBeInTheDocument()
-      expect(getByLabelText('Timebar')).toBeInTheDocument()
-      expect(getAllByText('Unmuted')[0]).toBeInTheDocument()
-      expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-      expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
-      expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
-      expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+      expect(container.querySelector('video')).toBeInTheDocument()
     })
-    it('skips fullscreen button when not enabled', () => {
-      document.fullscreenEnabled = false
-      const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+    it('sorts sources by bitrate, ascending', () => {
+      const {container, getAllByText} = render(
         <CanvasMediaPlayer
           media_id="dummy_media_id"
-          media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
-        />
-      )
-      expect(getAllByText('Play')[0]).toBeInTheDocument()
-      expect(getByLabelText('Timebar')).toBeInTheDocument()
-      expect(getAllByText('Unmuted')[0]).toBeInTheDocument()
-      expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-      expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
-      expect(queryAllByText('Full Screen').length).toBe(0)
-      expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
-    })
-    it('skips source chooser button when there is only 1 source', () => {
-      document.fullscreenEnabled = true
-      const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
-        <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
-      )
-      expect(getAllByText('Play')[0]).toBeInTheDocument()
-      expect(getByLabelText('Timebar')).toBeInTheDocument()
-      expect(getAllByText('Unmuted')[0]).toBeInTheDocument()
-      expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-      expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
-      expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
-      expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
-    })
-    it('includes the CC button when there are subtitle track(s)', () => {
-      const {getAllByText, getByLabelText, queryByLabelText} = render(
-        <CanvasMediaPlayer
-          media_id="dummy_media_id"
-          media_sources={[defaultMediaObject()]}
-          media_tracks={[
-            {label: 'English', language: 'en', src: '/media_objects/more/stuff', type: 'subtitles'}
+          media_sources={[
+            defaultMediaObject({bitrate: '3000', label: '3000'}),
+            defaultMediaObject({bitrate: '2000', label: '2000'}),
+            defaultMediaObject({bitrate: '1000', label: '1000'})
           ]}
         />
       )
-      expect(getAllByText('Play')[0]).toBeInTheDocument()
-      expect(getByLabelText('Timebar')).toBeInTheDocument()
-      expect(getAllByText('Unmuted')[0]).toBeInTheDocument()
-      expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
-      expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
-      expect(getAllByText('Video Track')[0]).toBeInTheDocument() // AKA CC
+      const sourceChooser = getAllByText('Source Chooser')[0].closest('button')
+      fireEvent.click(sourceChooser)
+      const sourceList = container.querySelectorAll(
+        'ul[aria-label="Source Chooser"] ul[role="menu"] li'
+      )
+      expect(domQueries.getByText(sourceList[0], '1000')).toBeInTheDocument()
+      expect(domQueries.getByText(sourceList[1], '2000')).toBeInTheDocument()
+      expect(domQueries.getByText(sourceList[2], '3000')).toBeInTheDocument()
+    })
+    describe('dealing with media_sources', () => {
+      it('handles string-type media_sources', () => {
+        // seen for audio files
+        const {getAllByText} = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources="http://localhost:3000/files/797/download?download_frd=1"
+            type="audio"
+          />
+        )
+        // just make sure it doesn't blow up and renders the player
+        expect(getAllByText('Play')[0]).toBeInTheDocument()
+      })
+      it('renders loading if there are no media sources', async () => {
+        await act(async () => {
+          const {getAllByText} = render(
+            <CanvasMediaPlayer media_id="dummy_media_id" mediaSources={[]} />
+          )
+          expect(getAllByText('Loading')[0]).toBeInTheDocument()
+
+          await wait(() => {
+            jest.runOnlyPendingTimers()
+            expect(fetch.mock.calls.length).toEqual(1)
+          })
+        })
+      })
+      it('makes ajax call if no mediaSources are provided on load', async () => {
+        fetch.mockResponse(
+          JSON.stringify({media_sources: [defaultMediaObject(), defaultMediaObject()]})
+        )
+        await act(async () => {
+          render(<CanvasMediaPlayer media_id="dummy_media_id" />)
+          await wait(() => {
+            jest.runOnlyPendingTimers()
+            expect(fetch.mock.calls.length).toEqual(1)
+          })
+        })
+        expect(fetch.mock.calls.length).toEqual(1)
+        expect(fetch.mock.calls[0][0]).toEqual('/media_objects/dummy_media_id/info')
+      })
+      it('shows error message if fetch for media_sources fails', async () => {
+        fetch.mockResponses([JSON.stringify({error: 'whoops'}), {status: 503}])
+        let component
+        await act(async () => {
+          component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
+            container: document.getElementById('here').firstElementChild
+          })
+          await wait(() => {
+            jest.runOnlyPendingTimers()
+            expect(fetch.mock.calls.length).toEqual(1)
+          })
+        })
+        expect(fetch.mock.calls.length).toEqual(1)
+        expect(component.getByText('Failed retrieving media sources.')).toBeInTheDocument()
+      })
+      it('tries ajax call up to MAX times if no media_sources', async () => {
+        // this spec passes if run alone, but fails as part of the larger suite
+        // what I see happening is fetch.mock.calls is getting reset to 0 because the mock
+        // can't find the instance. see canvas-lms/node_modules/jest-mock/build/index.js
+        // at line 345 where
+        // let state = this._mockState.get(f);
+        // returns undefined
+        // It might be because CanvasMediaPlayer is a function component so each invocation
+        // creates a new fetch mock? (though that doesn't explain why it works when it's the only test run)
+        // it also doesn't explain why this passed before using ui-media-player 7
+        fetch.mockResponses(
+          [JSON.stringify({media_sources: []}), {status: 200}],
+          [JSON.stringify({media_sources: []}), {status: 304}],
+          [JSON.stringify({media_sources: []}), {status: 304}],
+          [JSON.stringify({media_sources: []}), {status: 304}],
+          [JSON.stringify({media_sources: []}), {status: 304}],
+          [JSON.stringify({media_sources: []}), {status: 304}],
+          [JSON.stringify({media_sources: []}), {status: 304}]
+        )
+
+        let component
+        await act(async () => {
+          component = render(
+            <CanvasMediaPlayer
+              media_id="dummy_media_id"
+              MAX_RETRY_ATTEMPTS={5}
+              SHOW_BE_PATIENT_MSG_AFTER_ATTEMPTS={2}
+            />,
+            {
+              container: document.getElementById('here').firstElementChild
+            }
+          )
+
+          expect(component.getByText('Loading')).toBeInTheDocument()
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(1)
+            })
+          })
+          expect(component.getByText('Loading')).toBeInTheDocument()
+          expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
+            /Loading/
+          )
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(2)
+            })
+          })
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(3)
+            })
+          })
+          expect(
+            component.getByText(
+              'Your media has been uploaded and will appear here after processing.',
+              {
+                exact: false
+              }
+            )
+          ).toBeInTheDocument()
+          expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
+            /Your media has been uploaded and will appear here after processing./
+          )
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(4)
+            })
+          })
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(5)
+            })
+          })
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(6)
+            })
+          })
+          // add a 7th iteration just to prove the queries stopped at MAX_RETRY_ATTEMPTS
+          await act(async () => {
+            jest.runOnlyPendingTimers()
+            await wait(() => {})
+          })
+
+          expect(fetch.mock.calls.length).toEqual(6) // initial attempt + 5 MAX_RETRY_ATTEMPTS
+          expect(
+            component.getByText(
+              'Giving up on retrieving media sources. This issue will probably resolve itself eventually.',
+              {exact: false}
+            )
+          ).toBeInTheDocument()
+          expect(document.getElementById('flash_screenreader_holder').textContent).toMatch(
+            /Giving up on retrieving media sources. This issue will probably resolve itself eventually./
+          )
+
+          jest.runOnlyPendingTimers()
+          await wait(() => {})
+        })
+      })
+      it('still says "Loading" if we receive no info from backend', async () => {
+        fetch.mockResponse(JSON.stringify({media_sources: []}), {status: 200})
+
+        let component
+        await act(async () => {
+          component = render(<CanvasMediaPlayer media_id="dummy_media_id" />, {
+            container: document.getElementById('here').firstElementChild
+          })
+          expect(component.getByText('Loading')).toBeInTheDocument()
+
+          await act(async () => {
+            await wait(() => {
+              jest.runOnlyPendingTimers()
+              expect(fetch.mock.calls.length).toEqual(1)
+            })
+          })
+        })
+        expect(component.getByText('Loading')).toBeInTheDocument()
+      })
+    })
+    describe('renders correct set of video controls', () => {
+      it('renders all the buttons', () => {
+        document.fullscreenEnabled = true
+        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+          />
+        )
+        // need queryAll because some of the buttons have tooltip and text
+        // (in v7 of the player, so let's just do it now)
+        expect(getAllByText('Play')[0]).toBeInTheDocument()
+        expect(getByLabelText('Timebar')).toBeInTheDocument()
+        expect(getAllByText('Volume')[0]).toBeInTheDocument()
+        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+      })
+      it('skips fullscreen button when not enabled', () => {
+        document.fullscreenEnabled = false
+        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+          />
+        )
+        expect(getAllByText('Play')[0]).toBeInTheDocument()
+        expect(getByLabelText('Timebar')).toBeInTheDocument()
+        expect(getAllByText('Volume')[0]).toBeInTheDocument()
+        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(queryAllByText('Full Screen').length).toBe(0)
+        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+      })
+      it('skips source chooser button when there is only 1 source', () => {
+        document.fullscreenEnabled = true
+        const {getAllByText, getByLabelText, queryAllByText, queryByLabelText} = render(
+          <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
+        )
+        expect(getAllByText('Play')[0]).toBeInTheDocument()
+        expect(getByLabelText('Timebar')).toBeInTheDocument()
+        expect(getAllByText('Volume')[0]).toBeInTheDocument()
+        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        expect(queryAllByText('Video Track').length).toBe(0) // AKA CC
+      })
+      describe("for safari's fullscreen api", () => {
+        beforeAll(() => {
+          document.fullscreenEnabled = undefined
+        })
+        it('renders all the buttons', () => {
+          document.webkitFullscreenEnabled = true
+          const {getAllByText} = render(
+            <CanvasMediaPlayer
+              media_id="dummy_media_id"
+              media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+            />
+          )
+          expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        })
+        it('skips fullscreen button when not enabled', () => {
+          document.webkitFullscreenEnabled = false
+          const {queryAllByText} = render(
+            <CanvasMediaPlayer
+              media_id="dummy_media_id"
+              media_sources={[defaultMediaObject(), defaultMediaObject(), defaultMediaObject()]}
+            />
+          )
+          expect(queryAllByText('Full Screen').length).toBe(0)
+        })
+        it('skips source chooser button when there is only 1 source', () => {
+          document.webkitFullscreenEnabled = true
+          const {getAllByText} = render(
+            <CanvasMediaPlayer media_id="dummy_media_id" media_sources={[defaultMediaObject()]} />
+          )
+          expect(getAllByText('Full Screen')[0]).toBeInTheDocument()
+        })
+      })
+      it('includes the CC button when there are subtitle track(s)', () => {
+        const {getAllByText, getByLabelText, queryByLabelText} = render(
+          <CanvasMediaPlayer
+            media_id="dummy_media_id"
+            media_sources={[defaultMediaObject()]}
+            media_tracks={[
+              {
+                label: 'English',
+                language: 'en',
+                src: '/media_objects/more/stuff',
+                type: 'subtitles'
+              }
+            ]}
+          />
+        )
+        expect(getAllByText('Play')[0]).toBeInTheDocument()
+        expect(getByLabelText('Timebar')).toBeInTheDocument()
+        expect(getAllByText('Volume')[0]).toBeInTheDocument()
+        expect(getAllByText('Playback Speed')[0]).toBeInTheDocument()
+        expect(queryByLabelText('Source Chooser')).not.toBeInTheDocument()
+        expect(getAllByText('Video Track')[0]).toBeInTheDocument() // AKA CC
+      })
     })
   })
 
-  describe('renders the right size', () => {
+  describe('renders the video element right size', () => {
     const makePlayer = (w, h) => {
       return {
         videoWidth: w,
@@ -352,6 +466,27 @@ describe('CanvasMediaPlayer', () => {
       expect(player.classList.add).toHaveBeenCalledWith('video-player')
       expect(player.style.width).toBe('400px')
       expect(player.style.height).toBe('800px')
+    })
+    describe("for safari's fullscreen api", () => {
+      it('when the video is fullscreen landscape', async () => {
+        const container = document.createElement('div')
+        const player = makePlayer(500, 250)
+        document.webkitFullscreenElement = container
+        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        expect(player.classList.add).toHaveBeenCalledWith('video-player')
+        expect(player.style.width).toBe('1000px')
+        expect(player.style.height).toBe('500px')
+      })
+
+      it('when the video is fullscreen portrait', () => {
+        const container = document.createElement('div')
+        const player = makePlayer(250, 500)
+        document.webkitFullscreenElement = container
+        setPlayerSize(player, 'video/*', {width: 1000, height: 800}, null)
+        expect(player.classList.add).toHaveBeenCalledWith('video-player')
+        expect(player.style.width).toBe('400px')
+        expect(player.style.height).toBe('800px')
+      })
     })
   })
 })

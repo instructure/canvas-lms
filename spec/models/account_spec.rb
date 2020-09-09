@@ -26,11 +26,32 @@ describe Account do
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
   end
 
-  it 'retrieves parent account\'s outcome proficiency' do
-    root_account = Account.create!
-    proficiency = outcome_proficiency_model(root_account)
-    subaccount = root_account.sub_accounts.create!
-    expect(subaccount.resolved_outcome_proficiency).to eq proficiency
+  context "resolved_outcome_proficiency_method" do
+    it "retrieves parent account's outcome proficiency" do
+      root_account = Account.create!
+      proficiency = outcome_proficiency_model(root_account)
+      subaccount = root_account.sub_accounts.create!
+      expect(subaccount.resolved_outcome_proficiency).to eq proficiency
+    end
+
+    it "can be nil" do
+      root_account = Account.create!
+      subaccount = root_account.sub_accounts.create!
+      expect(root_account.outcome_proficiency).to eq nil
+      expect(subaccount.outcome_proficiency).to eq nil
+      expect(root_account.resolved_outcome_proficiency).to eq nil
+      expect(subaccount.resolved_outcome_proficiency).to eq nil
+    end
+
+    it "ignores soft deleted calculation methods" do
+      root_account = Account.create!
+      method = outcome_proficiency_model(root_account)
+      subaccount = root_account.sub_accounts.create!
+      submethod = outcome_proficiency_model(subaccount)
+      submethod.update! workflow_state: :deleted
+      expect(subaccount.outcome_proficiency).to eq submethod
+      expect(subaccount.resolved_outcome_proficiency).to eq method
+    end
   end
 
   context 'resolved_outcome_calculation_method' do
@@ -1300,7 +1321,7 @@ describe Account do
     end
 
     it "should include built-in roles when called" do
-      expect(@sub_account.available_course_roles.sort_by(&:id)).to eq ([ @roleA, @roleB, @roleC ] + Role.built_in_course_roles).sort_by(&:id)
+      expect(@sub_account.available_course_roles.sort_by(&:id)).to eq ([ @roleA, @roleB, @roleC ] + Role.built_in_course_roles(root_account_id: @account.id)).sort_by(&:id)
     end
   end
 
@@ -1355,15 +1376,25 @@ describe Account do
   end
 
   describe "#update_account_associations" do
+    before do
+      @account = Account.default.sub_accounts.create!
+      @c1 = @account.courses.create!
+      @c2 = @account.courses.create!
+      @account.course_account_associations.scope.delete_all
+    end
+
     it "should update associations for all courses" do
-      account = Account.default.sub_accounts.create!
-      c1 = account.courses.create!
-      c2 = account.courses.create!
-      account.course_account_associations.scope.delete_all
-      expect(account.associated_courses).to eq []
-      account.update_account_associations
-      account.reload
-      expect(account.associated_courses.sort_by(&:id)).to eq [c1, c2]
+      expect(@account.associated_courses).to eq []
+      @account.update_account_associations
+      @account.reload
+      expect(@account.associated_courses.sort_by(&:id)).to eq [@c1, @c2]
+    end
+
+    it "can update associations in batch" do
+      expect(@account.associated_courses).to eq []
+      Account.update_all_update_account_associations
+      @account.reload
+      expect(@account.associated_courses.sort_by(&:id)).to eq [@c1, @c2]
     end
   end
 

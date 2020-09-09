@@ -32,7 +32,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
 
     this.optionProperty('wiki_pages_path')
     this.optionProperty('focusOnCancel')
-    this.optionProperty('focusOnDelete')
+    this.optionProperty('onDelete')
   }
 
   wrapperTemplate() {
@@ -93,7 +93,7 @@ export default class WikiPageDeleteDialog extends DialogFormView {
       this.dialog.close()
     }
     if (this.buttonClicked === 'delete') {
-      return this.focusOnDelete != null ? this.focusOnDelete.focus() : undefined
+      return this.onDelete != null ? this.onDelete() : undefined
     } else {
       return this.focusOnCancel != null ? this.focusOnCancel.focus() : undefined
     }

@@ -59,10 +59,11 @@ class QuestionBanksController < ApplicationController
 
   def show
     @bank = @context.assessment_question_banks.find(params[:id])
-    js_env({
+    js_env(
       :CONTEXT_URL_ROOT => polymorphic_path([@context]),
       :ROOT_OUTCOME_GROUP => outcome_group_json(@context.root_outcome_group, @current_user, session)
-    })
+    )
+    mastery_scales_js_env
     rce_js_env
 
     add_crumb(@bank.title)

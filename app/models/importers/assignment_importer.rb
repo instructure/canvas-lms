@@ -388,6 +388,9 @@ module Importers
             tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
             tag.content_id = tool.id if tool
           end
+          if hash[:external_tool_data_json]
+            tag.external_data = JSON.parse(hash[:external_tool_data_json])
+          end
           tag.content_type = 'ContextExternalTool'
           if !tag.save
             if tag.errors["url"]

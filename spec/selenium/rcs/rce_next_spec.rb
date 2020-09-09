@@ -99,6 +99,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     context 'links' do
       it 'should respect selected text when creating a course link in body',
          ignore_js_errors: true do
+        skip 'flakey, LS-1394 (8/26/2020)'
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -270,6 +271,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on sidebar assignment page to create link in body' do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Assignment-Title'
       @assignment = @course.assignments.create!(name: title)
 
@@ -348,6 +350,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Module-Title'
       @module = @course.context_modules.create!(name: title)
 
@@ -461,6 +464,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should click on assignment in sidebar to create link to it in syllabus page' do
+      skip 'flakey, LS-1394 (8/26/2020)'
       title = 'Assignment-Title'
       @assignment = @course.assignments.create!(name: title)
 
@@ -511,23 +515,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it "should link image to selected text" do
-      title = "email.png"
+    it 'should link image to selected text' do
+      title = 'email.png'
       @root_folder = Folder.root_folders(@course).first
-      @image = @root_folder.attachments.build(:context => @course)
+      @image = @root_folder.attachments.build(context: @course)
       path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
 
-      @course.wiki_pages.create!(
-        title: 'title',
-        body: "<p id='para'>select me</p>"
-      )
+      @course.wiki_pages.create!(title: 'title', body: "<p id='para'>select me</p>")
       visit_existing_wiki_edit(@course, 'title')
       wait_for_tiny(edit_wiki_css)
 
       f("##{rce_page_body_ifr_id}").click
-      select_text_of_element_by_id("para")
+      select_text_of_element_by_id('para')
 
       click_images_toolbar_button
       click_course_images
@@ -540,8 +541,8 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it "should open tray when clicking options button on existing image" do
-      page_title = "Page1"
+    it 'should open tray when clicking options button on existing image' do
+      page_title = 'Page1'
       create_wiki_page_with_embedded_image(page_title)
 
       visit_existing_wiki_edit(@course, page_title)
@@ -936,6 +937,61 @@ describe 'RCE next tests', ignore_js_errors: true do
         lti_favorite_button.click
 
         expect(lti_favorite_modal).to be_displayed
+      end
+
+      describe 'Tools menubar menu', ignore_js_errors: true do
+        it 'should include Apps menu item in' do
+          rce_wysiwyg_state_setup(@course)
+
+          menubar_open_menu('Tools')
+          expect(menubar_menu_item('Apps')).to be_displayed
+        end
+
+        it 'should show "View All" in the Tools > Apps submenu', ignore_js_errors: true do
+          rce_wysiwyg_state_setup(@course)
+
+          click_menubar_submenu_item('Tools', 'Apps')
+          expect(menubar_menu_item('View All')).to be_displayed
+          expect(f('body')).not_to contain_css(menubar_menu_item_css('Commons Favorites'))
+        end
+
+        it 'should show MRU tools in the Tools > Apps submenu', ignore_js_errors: true do
+          rce_wysiwyg_state_setup(@course)
+          driver.local_storage['ltimru'] = "[#{@tool.id}]"
+
+          click_menubar_submenu_item('Tools', 'Apps')
+          expect(menubar_menu_item('View All')).to be_displayed
+          expect(f('body')).to contain_css(menubar_menu_item_css('Commons Favorites'))
+          driver.local_storage.clear
+        end
+      end
+    end
+
+    context 'fonts', ignore_js_errors: true do
+      it 'should successfully change to Balsamiq Sans font with menubar options' do
+        text = 'Hello font'
+        rce_wysiwyg_state_setup(@course, text)
+        select_all_in_tiny(f('#wiki_page_body'))
+        click_menubar_submenu_item('Format', 'Fonts')
+        menu_option_by_name('Balsamiq Sans').click
+        fj('button:contains("Save")').click
+        wait_for_ajaximations
+        expect(f('.show-content.user_content p span').attribute('style')).to eq(
+          "font-family: \"Balsamiq Sans\", lato, \"Helvetica Neue\", Helvetica, Arial, sans-serif;"
+        )
+      end
+
+      it 'should successfully change to Architects Daughter font with menubar options' do
+        text = 'Hello font'
+        rce_wysiwyg_state_setup(@course, text)
+        select_all_in_tiny(f('#wiki_page_body'))
+        click_menubar_submenu_item('Format', 'Fonts')
+        menu_option_by_name("Architect's Daughter").click
+        fj('button:contains("Save")').click
+        wait_for_ajaximations
+        expect(f('.show-content.user_content p span').attribute('style')).to eq(
+          "font-family: \"Architects Daughter\", lato, \"Helvetica Neue\", Helvetica, Arial, sans-serif;"
+        )
       end
     end
   end

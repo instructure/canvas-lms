@@ -32,8 +32,8 @@
   "align_right_9bad3ac1": {
     "message": "Align right"
   },
-  "alignment_and_indentation_f7de34bf": {
-    "message": "Alignment and Indentation"
+  "alignment_and_lists_5cebcb69": {
+    "message": "Alignment and Lists"
   },
   "all_4321c3a1": {
     "message": "All"
@@ -146,9 +146,6 @@
   "canvas_planner_98ed106": {
     "message": "Canvas Planner"
   },
-  "canvas_plugins_705a5016": {
-    "message": "Canvas Plugins"
-  },
   "choose_caption_file_9c45bc4e": {
     "message": "Choose caption file"
   },
@@ -190,6 +187,9 @@
   },
   "computer_1d7dfa6f": {
     "message": "Computer"
+  },
+  "content_1440204b": {
+    "message": "Content"
   },
   "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
     "message": "Content is still being uploaded, if you continue it will not be embedded properly."
@@ -422,6 +422,9 @@
   "external_links_3d9f074e": {
     "message": "External Links"
   },
+  "external_tools_6e77821": {
+    "message": "External Tools"
+  },
   "extra_large_b6cdf1ff": {
     "message": "Extra Large"
   },
@@ -517,6 +520,9 @@
   },
   "group_files_82e5dcdb": {
     "message": "Group files"
+  },
+  "group_links_9493129e": {
+    "message": "Group Links"
   },
   "group_navigation_99f191a": {
     "message": "Group Navigation"
@@ -1068,6 +1074,9 @@
   },
   "tomorrow_at_date_b53f2cf1": {
     "message": "Tomorrow at { date }"
+  },
+  "tools_2fcf772e": {
+    "message": "Tools"
   },
   "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
     "message": "{ totalResults } results found, { numDisplayed } results currently displayed"

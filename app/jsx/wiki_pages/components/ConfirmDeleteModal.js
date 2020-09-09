@@ -19,7 +19,7 @@
 import I18n from 'i18n!wiki_pages'
 import React, {Component} from 'react'
 import ReactDOM from 'react-dom'
-import {func, number, instanceOf} from 'prop-types'
+import {func, instanceOf, array} from 'prop-types'
 
 import Modal from '../../shared/components/InstuiModal'
 import {Button} from '@instructure/ui-buttons'
@@ -42,7 +42,7 @@ export function showConfirmDelete(props) {
 
 export default class ConfirmDeleteModal extends Component {
   static propTypes = {
-    selectedCount: number.isRequired,
+    pageTitles: array.isRequired,
     onConfirm: func.isRequired,
     onCancel: func,
     onHide: func,
@@ -100,14 +100,24 @@ export default class ConfirmDeleteModal extends Component {
   }
 
   renderConfirmation() {
-    return I18n.t(
+    const message = I18n.t(
       {
-        one: 'You are about to delete 1 page. Are you sure?',
-        other: 'You are about to delete %{count} pages. Are you sure?'
+        one: '%{count} page selected for deletion',
+        other: '%{count} pages selected for deletion'
       },
       {
-        count: this.props.selectedCount
+        count: this.props.pageTitles.length
       }
+    )
+    return (
+      <>
+        <div className="delete-wiki-pages-header">{message}</div>
+        {this.props.pageTitles.map((title, index) => (
+          <div className="wiki-page-title" key={index}>
+            {title}
+          </div>
+        ))}
+      </>
     )
   }
 

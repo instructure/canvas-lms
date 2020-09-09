@@ -5,9 +5,10 @@
         <input
           type="checkbox"
           class="select-page-checkbox"
+          id={{page_id}}
           aria-label="{{#t}}Select {{title}} for deletion{{/t}}"
           {{#unless deletable}}disabled{{/unless}}
-          value="{{url}}"
+          {{#if isChecked}}{{#if deletable}}checked{{/if}}{{/if}}
         />
       {{/if}}
     {{/unless}}
