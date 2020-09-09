@@ -26,6 +26,12 @@ describe Mutations::HideAssignmentGrades do
   let(:course) { Course.create!(workflow_state: "available") }
   let(:student) { course.enroll_user(User.create!, "StudentEnrollment", enrollment_state: "active").user }
   let(:teacher) { course.enroll_user(User.create!, "TeacherEnrollment", enrollment_state: "active").user }
+  let(:audit_log_field_extension) { class_double(AuditLogFieldExtension).as_stubbed_const }
+
+  before(:each) do
+    # prevent unnecessary calls to dynamo (audit logs)
+    allow(audit_log_field_extension).to receive(:enabled?).and_return false
+  end
 
   def mutation_str(assignment_id: nil, **options)
     input_string = assignment_id ? "assignmentId: #{assignment_id}" : ""
@@ -55,10 +61,6 @@ describe Mutations::HideAssignmentGrades do
   end
 
   context "when user has grade permission" do
-    before do
-      skip 'DEMO-37 (9/9/2020)'
-    end
-
     let(:context) { { current_user: teacher } }
 
     it "requires that assignmentId be passed in the query" do
