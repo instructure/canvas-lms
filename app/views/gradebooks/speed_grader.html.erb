@@ -427,10 +427,12 @@
 <div id="post-assignment-grades-tray"></div>
 
 <span id="aria_name_alert" class="screenreader-only" aria-live="polite"></span>
-<% keyboard_navigation([
-  {:key => t('keycodes.next_student', 'j'), :description => t('keycode_descriptions.next_student', 'Next Student')},
-  {:key => t('keycodes.previous_student', 'k'), :description => t('keycode_descriptions.previous_student', 'Previous Student')},
-  {:key => t('keycodes.leave_comment', 'c'), :description => t('keycode_descriptions.leave_comment', 'Leave Comment')},
-  {:key => t('keycodes.change_grade', 'g'), :description => t('keycode_descriptions.change_grade', 'Change Grade')},
-  {:key => t('keycodes.use_rubric', 'r'), :description => t('keycode_descriptions.use_rubric', 'Use Rubric')}
-]) %>
+<% unless @current_user.try(:prefers_no_keyboard_shortcuts?) %>
+  <% keyboard_navigation([
+    {:key => t('keycodes.next_student', 'j'), :description => t('keycode_descriptions.next_student', 'Next Student')},
+    {:key => t('keycodes.previous_student', 'k'), :description => t('keycode_descriptions.previous_student', 'Previous Student')},
+    {:key => t('keycodes.leave_comment', 'c'), :description => t('keycode_descriptions.leave_comment', 'Leave Comment')},
+    {:key => t('keycodes.change_grade', 'g'), :description => t('keycode_descriptions.change_grade', 'Change Grade')},
+    {:key => t('keycodes.use_rubric', 'r'), :description => t('keycode_descriptions.use_rubric', 'Use Rubric')}
+  ]) %>
+<% end %>

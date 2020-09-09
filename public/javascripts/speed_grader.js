@@ -564,8 +564,10 @@ function setupHeader() {
     },
 
     keyboardShortcutInfoModal() {
-      const questionMarkKeyDown = $.Event('keydown', {keyCode: 191, shiftKey: true})
-      $(document).trigger(questionMarkKeyDown)
+      if (!ENV.disable_keyboard_shortcuts) {
+        const questionMarkKeyDown = $.Event('keydown', {keyCode: 191, shiftKey: true})
+        $(document).trigger(questionMarkKeyDown)
+      }
     },
 
     submitSettingsForm(e) {
@@ -1025,6 +1027,9 @@ function initRubricStuff() {
 }
 
 function initKeyCodes() {
+  if (ENV.disable_keyboard_shortcuts) {
+    return
+  }
   const keycodeOptions = {
     keyCodes: 'j k p n c r g',
     ignore: 'input, textarea, embed, object'
@@ -3679,7 +3684,8 @@ function renderSettingsMenu() {
     openOptionsModal: showOptionsModal,
     openKeyboardShortcutsModal: showKeyboardShortcutsModal,
     showModerationMenuItem: ENV.grading_role === 'moderator',
-    showHelpMenuItem: ENV.show_help_menu_item
+    showHelpMenuItem: ENV.show_help_menu_item,
+    showKeyboardShortcutsMenuItem: !ENV.disable_keyboard_shortcuts
   }
 
   const mountPoint = document.getElementById(SPEED_GRADER_SETTINGS_MOUNT_POINT)
