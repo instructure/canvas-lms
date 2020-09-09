@@ -517,9 +517,14 @@ pipeline {
                   // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
                   sh 'docker tag $DEPENDENCIES_PATCHSET_IMAGE $DEPENDENCIES_MERGE_IMAGE'
+
+                  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                  sh "docker tag \$PUBLISHABLE_TAG \$BUILD_IMAGE:${GIT_REV}"
+                  sh "docker tag \$DEPENDENCIES_PATCHSET_IMAGE \$DEPENDENCIES_IMAGE:${GIT_REV}"
+
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_MERGE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_IMAGE'
                 }
               }
             }
