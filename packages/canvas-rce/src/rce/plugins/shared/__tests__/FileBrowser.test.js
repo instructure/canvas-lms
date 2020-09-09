@@ -49,12 +49,13 @@ describe('RceFileBrowser', () => {
     selectFile({
       name: 'a file',
       src: '/file/download',
-      api: {url: '/file/download', 'content-type': 'application/pdf'}
+      api: {url: '/file/download?download_frd=1', 'content-type': 'application/pdf'}
     })
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
       title: 'a file',
-      href: '/file/download',
+      href: '/file/download?wrap=1',
+      embedded_iframe_url: undefined,
       content_type: 'application/pdf',
       target: '_blank',
       class: 'instructure_file_link instructure_scribd_file'

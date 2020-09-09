@@ -147,7 +147,7 @@ export default class Bridge {
     if (isImage(link.content_type)) {
       return this.insertImage(link)
     } else if (isAudioOrVideo(link.content_type)) {
-      link.embedded_iframe_url = link.href
+      link.embedded_iframe_url = link.embedded_iframe_url || link.href
       return this.embedMedia(link)
     }
     return this.insertLink(link)
