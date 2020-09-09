@@ -83,7 +83,7 @@ class AssetUserAccessLog
     # below when inferring which table to talk to.
     ts = timestamp || Time.now.utc
     log_values = { asset_user_access_id: asset_user_access.id, created_at: ts }
-    log_model(ts).create!(log_values)
+    log_model(ts).new(log_values).save_without_transaction(touch: false)
   end
 
   # mostly useful for verifying writes by using the same
@@ -213,19 +213,21 @@ class AssetUserAccessLog
           update_query = compaction_sql(log_segment_aggregation)
           new_iterator_pos = log_segment_aggregation.map{|r| r["max_id"]}.max
           Shackles.activate(:master) do
-            Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - batch updating (sometimes these queries don't get logged)...")
-            partition_model.connection.execute(update_query)
-            Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - ...batch update complete")
-            # Here we want to write the iteration state onto the plugin setting
-            # so that we don't double count rows later.  The next time the job
-            # runs it can pick up at this point and only count rows that haven't yet been counted.
-            ps.reload
-            # also, no need to clear the cache, these are LOCAL
-            # plugin settings, so let's not beat up consul
-            PluginSetting.suspend_callbacks(:clear_cache) do
-              ps.settings[:max_log_ids] ||= [0,0,0,0,0,0,0] # (just in case...)
-              ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
-              ps.save
+            partition_model.transaction do
+              Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - batch updating (sometimes these queries don't get logged)...")
+              partition_model.connection.execute(update_query)
+              Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - ...batch update complete")
+              # Here we want to write the iteration state onto the plugin setting
+              # so that we don't double count rows later.  The next time the job
+              # runs it can pick up at this point and only count rows that haven't yet been counted.
+              ps.reload
+              # also, no need to clear the cache, these are LOCAL
+              # plugin settings, so let's not beat up consul
+              PluginSetting.suspend_callbacks(:clear_cache) do
+                ps.settings[:max_log_ids] ||= [0,0,0,0,0,0,0] # (just in case...)
+                ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
+                ps.save
+              end
             end
           end
           log_id_bookmark = new_iterator_pos
@@ -240,7 +242,7 @@ class AssetUserAccessLog
             Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - Found no results in-range, pausing compaction for now")
             Shackles.activate(:master) do
               Canvas::Errors.capture("AUA Compaction Missing Segment", {
-                shard: Shard.current.id,
+                shard_id: Shard.current.id,
                 partition_model: partition_model.to_s,
                 range_start: log_id_bookmark,
                 range_stop: batch_upper_boundary
@@ -248,16 +250,22 @@ class AssetUserAccessLog
             end
             return false
           end
-            # just keep going until the iterator catches up to real records.
+          # If we actually have a jump in sequences, there will
+          # be more records greater than the batch, so we will choose
+          # the minimum ID greater than the current bookmark, because it's safe
+          # to advance to that point even under replication lag.
+          next_id = partition_model.where('id > ?', log_id_bookmark).minimum(:id)
+          return false unless next_id.present? # can't find any more records for now, do not advance
+          # make sure we actually process the next record by offsetting
+          # to just under it's ID
+          new_bookmark_id = next_id - 1
           Shackles.activate(:master) do
             PluginSetting.suspend_callbacks(:clear_cache) do
-              ps.reload.settings[:max_log_ids][ts.wday] = batch_upper_boundary
+              ps.reload.settings[:max_log_ids][ts.wday] = new_bookmark_id
               ps.save
             end
           end
-          # we don't ever want to set the bookmark PAST the partition we expected
-          # to consume
-          log_id_bookmark = [batch_upper_boundary, partition_upper_bound].min
+          log_id_bookmark = new_bookmark_id
         end
         batch_timestamp = Time.now.utc
         if (batch_timestamp - compaction_start) > (max_compaction_time * 60)

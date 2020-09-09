@@ -72,6 +72,11 @@ describe AssetUserAccessLog do
       end
     end
 
+    def advance_sequence(model, by_count)
+      sequence_name = model.quoted_table_name.gsub(/"$/, "_id_seq\"")
+      model.connection.execute("ALTER SEQUENCE #{sequence_name} RESTART WITH #{(model.maximum(:id) || 0) + by_count}")
+    end
+
     it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
       expect(@asset_1.view_score).to be_nil
       expect(@asset_5.view_score).to be_nil
@@ -121,6 +126,29 @@ describe AssetUserAccessLog do
         AssetUserAccessLog.compact
         generate_log([@asset_1, @asset_4, @asset_5], 8)
         AssetUserAccessLog.compact
+        generate_log([@asset_1, @asset_4], 16)
+        AssetUserAccessLog.compact
+        expect(@asset_1.reload.view_score).to eq(30.0)
+        expect(@asset_2.reload.view_score).to eq(2.0)
+        expect(@asset_3.reload.view_score).to eq(6.0)
+        expect(@asset_4.reload.view_score).to eq(28.0)
+        expect(@asset_5.reload.view_score).to eq(8.0)
+      end
+    end
+
+    it "can skip over gaps in the sequence" do
+      Timecop.freeze do
+        Setting.set('aua_log_seq_jumps_allowed', 'true')
+        model = AssetUserAccessLog.log_model(Time.now.utc)
+        generate_log([@asset_1, @asset_2, @asset_3], 2)
+        AssetUserAccessLog.compact
+        advance_sequence(model, 200)
+        generate_log([@asset_1, @asset_3, @asset_4], 4)
+        AssetUserAccessLog.compact
+        advance_sequence(model, 200)
+        generate_log([@asset_1, @asset_4, @asset_5], 8)
+        AssetUserAccessLog.compact
+        advance_sequence(model, 200)
         generate_log([@asset_1, @asset_4], 16)
         AssetUserAccessLog.compact
         expect(@asset_1.reload.view_score).to eq(30.0)
