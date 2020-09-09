@@ -31,9 +31,10 @@ export default class GradebookKeyboardNav
       @showSubmissionTray = @preprocessKeydown(@showSubmissionTray)
 
     init: ->
-      for binding in @keyBindings
-        if binding.handler? && binding.key? && @[binding.handler]?
-          $(document.body).keycodes(binding.key, @[binding.handler])
+      unless (ENV.disable_keyboard_shortcuts)
+        for binding in @keyBindings
+          if binding.handler? && binding.key? && @[binding.handler]?
+            $(document.body).keycodes(binding.key, @[binding.handler])
 
     shouldHandleEvent: (e) =>
       for element in @gradebookElements
