@@ -20,7 +20,7 @@
 if CANVAS_RAILS5_2
   gem 'rails', '5.2.4.4'
     gem 'loofah', '2.3.0'
-    gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
+    gem 'sprockets', '4.0.2'
 else
   gem 'rails', '6.0.3.3'
 end
