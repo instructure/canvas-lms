@@ -2359,6 +2359,7 @@ fa:
   are_you_sure_you_want_to_delete_this_page_2185844: "آیا اطمینان دارید که می‌خواهید این صفحه حذف شود؟"
   are_you_sure_you_want_to_delete_this_recording_a4aab14b: "آیا مطمئن هستید که می‌خواهید این مورد ضبط شده را حذف کنید؟"
   are_you_sure_you_want_to_delete_this_rubric_any_co_29d7ac76: "مطمئنید که می خواهید این دستورالعمل ارزیابی حذف شود؟ هر درسی که در حال حاضر با این دستورالعمل ارزیابی ارتباط دارد هنوز هم به آن دسترسی دارد، اما هیچ درس جدیدی قادر به استفاده از آن نخواهد بود."
+  are_you_sure_you_want_to_delete_this_rubric_this_a_d4ff43c7: "آیا مطمئن هستید که می خواهید این دستورالعمل های ارزیابی را حذف کنید؟ این اقدام،  ارتباط دستورالعمل‌های ارزیابی را از کلیه تکالیف درس فعلی حذف می‌کند و تمامی ارزیابی‌های مرتبط موجود حذف  ‌می‌شوند."
   are_you_sure_you_want_to_delete_this_to_do_item_497016ea: "مطمئنید که می خواهید این مورد فهرست اقدام حذف شود؟"
   are_you_sure_you_want_to_delete_this_track_f5a16357: "آیا مطمئن هستید که می خواهید این فایل صوتی را حذف کنید؟"
   are_you_sure_you_want_to_delete_your_copy_of_these_f04442ed: 
@@ -7865,6 +7866,7 @@ fa:
   enable_all_read_only_scopes_3ddc2bb5: " تمام محدوده فقط خواندنی را فعال کنید."
   enable_and_lock_e6099cc2: "فعال کردن و قفل کردن"
   enable_anonymous_grading_of_assignments_e18f75be: "نمره‌گذاری ناشناس تکالیف را فعال کنید."
+  enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: "ویژگی نشانه‌های سطح کاربر byte_order_mark و semi_colon_field_separator را فعال کنید تا برای صدور نتایج روشن یا خاموش شود."
   enable_content_security_policy_8bd0b492: "سیاست امنیت محتوای فعال کنید."
   enable_course_as_a_blueprint_course_8515ffd5: "فعالسازی درس به عنوان دوره طرح"
   enable_dashboard_images_for_courses_5af458b0: "فعالسازی تصاویر داشبورد برای درس ها"
@@ -10865,10 +10867,7 @@ fa:
   just_in_time_provisioning_382a0354: "تدارک به موقع"
   jwk_method_6d5d0c84: "روش * JWK"
   jwts_4f397c85: JWTs
-  k12_description: |-
-      ویژگی ها، تنظیمات و سبک هایی که به طور خاص در یک محیط K-12 معنادارتر
-      هستند. اکنون این مورد فقط
-      در برخی تغییرهای سبک کاربرد دارد، اما ویژگی های بیشتر خاص K-12 ممکن است در آینده افزوده شوند.
+  k12_description: "نمادهای موجود در منوی پیمایش جهانی را که به طور خاص در محیط K-12 بیشتر معنا می دهند، به روز کنید."
   k_2521301c: k
   kazakhstan_7_8fe892c: "قزاقستان (+7)"
   keep_in_mind_this_submission_will_count_for_everyo_bb526d67: "به یاد داشته باشید، این مورد ارسالی برای همه افرادی که در گروه %{groupType} شما هستند، محاسبه خواهد شد."
@@ -14480,6 +14479,7 @@ fa:
   option_name_ba758e08: "%{option_name}"
   option_selected_737b6f72: "گزینه انتخاب شده:"
   option_selected_list_collapsed_70a356b4: "%{option} انتخاب شد. فهرست جمع شد."
+  optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "به صورت اختیاری، علامت سفارش بایت را در صدور صفحه گسترده سازگار بگنجانید تا بتواند برای کاربران برخی از محل‌ها به اکسل وارد شود."
   options: 
     ? "no"
     : خیر
@@ -19282,7 +19282,7 @@ fa:
     buttons: 
       process_data: "پردازش داده ها"
     errors: 
-      import_failed_code: "در هنگام وارد کردن اطلاعات سامانه اطلاعات دانشجو خطایی رخ داد. هیچ سابقه ای وارد نشد. لطفا به مدیر سیستم خود اطلاع دهید و رمز زیر را به او بدهید: \"%{code}\""
+      import_failed_code: "در اینجا هنگام وارد کردن داده‌های سامانه اطلاعات دانشجویی شما خطایی رخ داده است. لطفاً مدیران سیستم خود را مطلع کرده و کد زیر را به آن‌ها بدهید: \"%{code}\""
       import_failed_messages: "عملیات وارد کردن با خطا مواجه شده با نمایش با این پیامها :"
     headers: 
       import_errors: "خطاهایی که از ورود جلوگیری می کنند"
@@ -19381,6 +19381,7 @@ fa:
   snapshots_are_backups_of_your_canvas_trial_taking__f18bd571: "تصاویر لحظه‌ای پشتیبانی از نسخه آزمایشی کانواس هستند. گرفتن تصویر لحظه ‌ای یک نسخه منحصر به فرد و رکورد خوبی از وضعیت نسخه آزمایشی در همان لحظه، ایجاد می‌کند."
   some_assignments_could_not_be_created_because_they_d91f2f21: "برخی تکالیف به علت اینکه در دوره نمره‌گذاری بسته شده قرار دارند نمی‌توانند ایجاد شوند."
   some_conferences_on_this_page_are_hidden_because_o_789684fd: "برخی کنفرانس های موجود در این صفحه به دلیل بروز خطا در هنگام بازیابی وضعیت آنها مخفی هستند"
+  some_custom_columns_could_not_be_changed_because_t_88abc9be: "برخی از ستون‌های سفارشی قابل تغییر نیستند زیرا فقط خواندنی  هستند. تغییرات مربوط به آن ستون‌ها نادیده گرفته شده است."
   some_module_items_could_not_be_published_e4be3c0: "برخی موردهای ماژول نمی‌تواند منتشر شود"
   some_settings_have_been_administratively_locked_9e3ee880: "برخی تنظیمات از لحاظ مدیریتی قفل شده اند."
   some_settings_have_been_disabled_because_the_assig_6b6cc3b4: "برخی تنظیمات به علت قرار گرفتن تکلیف در دوره نمره‌گذاری بسته شده، غیرفعال شده‌اند."
@@ -20392,6 +20393,7 @@ fa:
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "پیش نمایش نسخه منتشر شده آزمون، این است"
   this_is_a_siteadmin_test_feature_flag_3ab5184: "این یک نشانه ویژگی آزمایش مدیر سایت است."
   this_is_a_what_if_score_cbdc04f9: "این یک نمره احتمالی است"
+  this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "این فقط یک ویژگی  dev-only  است که می توانید با روشن کردن آن ، پیش نمایش چگونگی نمایش صفحات در یک محیط RTL را بدون نیاز به تغییر زبان خود به زبان معمول RTL ، دریافت کنید."
   this_is_not_a_valid_grade_9cc2cb8: "این یک نمره معتبر نیست"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "نمره ای که در حال حاضر برای این دانشجو انتخاب شده، این است."
   this_is_the_default_email_address_f3c421fb: "نشانی پست الکترونیکی پیش فرض این است"
@@ -21041,6 +21043,7 @@ fa:
   use_remote_version_of_rich_content_editor_52f7fc4b: "استفاده از نسخه از راه دور ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_a058a664: "استفاده از نسخه از راه دور نوار کناری و ویرایشگر محتوای غنی"
   use_remote_version_of_rich_content_editor_and_side_ebaaa986: "استفاده از نسخه از راه دور نوار کناری ویرایشگر محتوای غنی در قسمت های پر خطر مانند آزمون ها"
+  use_semicolons_instead_of_commas_to_separate_field_62d24565: "برای جدا کردن زمینه ها در صدور صفحه گسترده سازگار، از علامت‌های نقطه‌ویرگول به جای ویرگول استفاده کنید تا برای کاربران در  برخی از محل‌ها در اکسل وارد شود."
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: "برای جداسازی زمینه ها در صدور صفحه گسترده سازگار از نقطه ویرگول استفاده کنید"
   use_the_new_assignments_page_dd292b9d: "استفاده از صفحه جدید تکلیف"
   use_the_new_collaborations_external_tool_enabling__5f0ed73: "استفاده از ابزار بیرونی جدید همکاری ها که امکان گزینه های بیشتر برای ابزارها جهت استفاده برای همکاری را فراهم می کند"
