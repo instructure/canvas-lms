@@ -183,7 +183,7 @@ module Importers
         end
       end
       if hash[:assignment_group_migration_id]
-        item.assignment_group = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
+        item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
       end
       item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
