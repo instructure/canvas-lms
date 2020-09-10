@@ -95,24 +95,46 @@ describe Quizzes::QuizSubmissionsController do
   end
 
   describe "PUT 'update'" do
-    before(:once) { quiz_with_submission }
-    it "should require authentication" do
-      put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
-      assert_unauthorized
+    context 'quiz with submission' do
+      before(:once) { quiz_with_submission }
+
+      it "should require authentication" do
+        put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
+        assert_unauthorized
+      end
+
+      it "should allow updating scores if the teacher is logged in" do
+        user_session(@teacher)
+        put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"}
+        expect(response).to be_redirect
+        expect(assigns[:submission]).not_to be_nil
+        expect(assigns[:submission].submission_data[0][:points]).to eq 2
+      end
+
+      it "should not allow updating if the course is concluded" do
+        @teacher_enrollment.conclude
+        put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
+        assert_unauthorized
+      end
+
+      it "should not allow updating if the student is not assigned the quiz" do
+        user_session(@teacher)
+        allow_any_instance_of(Quizzes::Quiz).to receive(:visible_to_user?).and_return(false)
+        put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
+        assert_forbidden
+      end
     end
 
-    it "should allow updating scores if the teacher is logged in" do
-      user_session(@teacher)
-      put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"}
-      expect(response).to be_redirect
-      expect(assigns[:submission]).not_to be_nil
-      expect(assigns[:submission].submission_data[0][:points]).to eq 2
-    end
+    context 'practice quiz with submission' do
+      before(:once) { practice_quiz_with_submission }
 
-    it "should not allow updating if the course is concluded" do
-      @teacher_enrollment.conclude
-      put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id}
-      assert_unauthorized
+      it "should allow updating scores for a practice quiz" do
+        user_session(@teacher)
+        put 'update', params: {:course_id => @quiz.context_id, :quiz_id => @quiz.id, :id => @qsub.id, "question_score_128" => "2"}
+        expect(response).to be_redirect
+        expect(assigns[:submission]).not_to be_nil
+        expect(assigns[:submission].submission_data[0][:points]).to eq 2
+      end
     end
   end
 
