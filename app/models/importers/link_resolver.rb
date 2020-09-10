@@ -86,7 +86,11 @@ module Importers
           new_url ||= missing_relative_file_url(rel_path)
           link[:missing_url] = new_url
         end
-        node['href'] = new_url
+        if node.name == 'iframe'
+          node['src'] = new_url
+        else
+          node['href'] = new_url
+        end
         link[:new_value] = node.to_xml
       when :file
         rel_path = link[:rel_path]
@@ -186,17 +190,30 @@ module Importers
       new_url
     end
 
+    def media_iframe_url(media_id, media_type = nil)
+      url = "/media_objects_iframe/#{media_id}"
+      url += "?type=#{media_type}" if media_type.present?
+      url
+    end
+
     def resolve_media_comment_data(node, rel_path)
       if file = find_file_in_context(rel_path)
         media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
         if media_id && media_id != 'maybe'
-          node['id'] = "media_comment_#{media_id}"
-          return "/media_objects/#{media_id}"
+          if node.name == 'iframe'
+            node['data-media-id'] = media_id
+            return media_iframe_url(media_id, node['data-media-type'])
+          else
+            node['id'] = "media_comment_#{media_id}"
+            return "/media_objects/#{media_id}"
+          end
         end
       end
 
       if node['id'] && node['id'] =~ /\Amedia_comment_(.+)\z/
         return "/media_objects/#{$1}"
+      elsif node['data-media-id'].present?
+        return media_iframe_url(node['data-media-id'], node['data-media-type'])
       else
         node.delete('class')
         node.delete('id')
