@@ -56,3 +56,14 @@ test('keyboard shortcut modal info hides when it loses focus', function() {
   this.view.$('#keyboard-shortcut-modal-info').blur()
   ok(this.info.css('display') === 'none')
 })
+
+test('keyboard shortcut modal stays hidden when setting disabled', function() {
+  // Stubbing Feature Flag
+  try {
+    window.ENV.DISABLE_KEYBOARD_SHORTCUTS = true
+    this.view.$('#keyboard-shortcut-modal-info').focus()
+    ok(this.info.css('display') === 'none')
+  } finally {
+    window.ENV.DISABLE_KEYBOARD_SHORTCUTS = undefined
+  }
+})
