@@ -294,7 +294,7 @@ module AccountReports
       header_keys = headers.keys
       header_names = headers.values
       host = root_account.domain
-      enable_i18n_features = @account_report.account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
+      enable_i18n_features = true
 
       write_report header_names, enable_i18n_features do |csv|
         total = scope.length

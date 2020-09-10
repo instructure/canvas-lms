@@ -213,10 +213,7 @@ module Api::V1::OutcomeResults
   end
 
   def outcome_results_rollups_csv(current_user, context, rollups, outcomes, outcome_paths)
-    options = {}
-    if context.root_account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
-      options = CsvWithI18n.csv_i18n_settings(current_user)
-    end
+    options = CsvWithI18n.csv_i18n_settings(current_user)
     CsvWithI18n.generate(options) do |csv|
       row = []
       row << I18n.t(:student_name, 'Student name')

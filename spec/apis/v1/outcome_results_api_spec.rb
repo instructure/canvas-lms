@@ -269,7 +269,6 @@ describe "Outcome Results API", type: :request do
         end
 
         it "obeys csv i18n flags" do
-          outcome_course.root_account.enable_feature! :enable_i18n_features_in_outcomes_exports
           @user.enable_feature! :include_byte_order_mark_in_gradebook_exports
           @user.enable_feature! :use_semi_colon_field_separators_in_gradebook_exports
 
