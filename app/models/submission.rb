@@ -1228,7 +1228,12 @@ class Submission < ActiveRecord::Base
   end
 
   def update_assignment
-    self.send_later(:context_module_action) unless @assignment_changed_not_sub
+    unless @assignment_changed_not_sub
+      self.send_later_enqueue_args(:context_module_action, {
+        singleton: "submission_context_module_action_#{self.global_id}",
+        on_conflict: :loose
+      })
+    end
     true
   end
   protected :update_assignment
