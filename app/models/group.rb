@@ -398,7 +398,8 @@ class Group < ActiveRecord::Base
         :workflow_state => 'accepted',
         :moderator => false,
         :created_at => current_time,
-        :updated_at => current_time
+        :updated_at => current_time,
+        :root_account_id => self.root_account_id
     }.merge(options)
     GroupMembership.bulk_insert(users.map{ |user|
       options.merge({:user_id => user.id, :uuid => CanvasSlug.generate_securish_uuid})
