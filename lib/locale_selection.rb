@@ -35,8 +35,8 @@ module LocaleSelection
       -> { context.locale if context.try(:is_a?, Course) },
       -> { user.locale if user && user.locale },
       -> { session_locale if session_locale },
-      -> { context.account.try(:default_locale, true) if context.try(:is_a?, Course) },
-      -> { context.default_locale(true) if context.try(:is_a?, Account) },
+      -> { Account.recursive_default_locale_for_id(context.account_id) if context.try(:is_a?, Course) },
+      -> { Account.recursive_default_locale_for_id(context.id) if context.try(:is_a?, Account) },
       -> { root_account.try(:default_locale) },
       -> {
         if accept_language && locale = infer_browser_locale(accept_language, LocaleSelection.locales_with_aliases)
