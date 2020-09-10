@@ -2015,4 +2015,39 @@ describe Account do
       end
     end
   end
+
+  context "default_locale cached recursive search" do
+    specs_require_cache(:redis_cache_store)
+
+    it "should cache" do
+      sub_acc1 = Account.default.sub_accounts.create!(:default_locale => "es")
+      sub_acc2 = sub_acc1.sub_accounts.create!
+      expect(Account.recursive_default_locale_for_id(sub_acc2.id)).to eq "es"
+      Account.where(:id => sub_acc1).update_all(:default_locale => "de") # directly update db - shouldn't invalidate cache
+      expect(Account.recursive_default_locale_for_id(sub_acc2.id)).to eq "es"
+
+      sub_acc1.update_attribute(:default_locale, "en") # should invalidate cache downstream
+      expect(Account.recursive_default_locale_for_id(sub_acc2.id)).to eq "en"
+    end
+  end
+
+  context "effective_brand_config caching" do
+    specs_require_cache(:redis_cache_store)
+
+    it "should cache the brand config" do
+      @parent_account = Account.default
+      config1 = BrandConfig.create(variables: {"ic-brand-primary" => "#321"})
+      config2 = BrandConfig.create(variables: {"ic-brand-primary" => "#123"})
+      Account.default.update_attribute(:brand_config_md5, config1.md5)
+
+      sub_acc1 = Account.default.sub_accounts.create!
+      sub_acc2 = sub_acc1.sub_accounts.create!
+      expect(sub_acc2.effective_brand_config).to eq config1
+      Account.where(:id => sub_acc1).update_all(:brand_config_md5 => config2.md5) # directly update db - shouldn't invalidate cache
+      expect(Account.find(sub_acc2.id).effective_brand_config).to eq config1
+
+      Account.default.update_attribute(:brand_config_md5, config2.md5) # should invalidate downstream
+      expect(Account.find(sub_acc2.id).effective_brand_config).to eq config2
+    end
+  end
 end
