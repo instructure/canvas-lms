@@ -534,6 +534,8 @@ class ActiveRecord::Base
 
     reflection = super[name.to_s]
 
+    include Canvas::RootAccountCacher if name.to_s == 'root_account'
+
     if reflection.options[:polymorphic].is_a?(Array) ||
         reflection.options[:polymorphic].is_a?(Hash)
       reflection.options[:exhaustive] = exhaustive
