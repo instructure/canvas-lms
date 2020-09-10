@@ -39,7 +39,11 @@ export default function CanvasMediaPlayer(props) {
   const sorted_sources = Array.isArray(props.media_sources)
     ? props.media_sources.sort(byBitrate)
     : props.media_sources
+  const tracks = Array.isArray(props.media_tracks)
+    ? props.media_tracks.map(t => ({locale: t.language, language: t.label}))
+    : null
   const [media_sources, setMedia_sources] = useState(sorted_sources)
+  const [media_tracks] = useState(tracks)
   const [retryAttempt, setRetryAttempt] = useState(0)
   const [mediaObjNetworkErr, setMediaObjNetworkErr] = useState(null)
   // the ability to set these makes testing easier
@@ -189,7 +193,7 @@ export default function CanvasMediaPlayer(props) {
   }
 
   return (
-    <div ref={containerRef}>
+    <div ref={containerRef} data-tracks={JSON.stringify(media_tracks)}>
       {media_sources.length ? (
         <MediaPlayer
           ref={mediaPlayerRef}
