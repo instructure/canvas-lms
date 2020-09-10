@@ -16,8 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "pages/wiki_animations.scss";
-@import "pages/shared/menu_tools.scss";
+@import 'base/environment';
+@import 'pages/wiki_animations.scss';
+@import 'pages/shared/menu_tools.scss';
 
 $subdued-text-color: #696969;
 $darkened-text-color: #4d4d4d;
@@ -120,7 +121,8 @@ $revision-button-color: $ic-color-dark;
       }
       .flex-container {
         display: flex;
-        align-items:center {}
+        align-items:center {
+        }
       }
     }
   }
@@ -174,7 +176,8 @@ $revision-button-color: $ic-color-dark;
       margin-bottom: 0;
       border-collapse: separate;
       border-spacing: 0;
-      td, th {
+      td,
+      th {
         &:first-child {
           padding-#{direction(left)}: 12px;
         }
@@ -182,7 +185,6 @@ $revision-button-color: $ic-color-dark;
           padding-#{direction(right)}: 12px;
         }
       }
-
     }
     .table thead {
       background: $index-background;
@@ -328,15 +330,8 @@ $revision-button-color: $ic-color-dark;
     color: #666;
   }
   .header-bar {
-    .publish-button {
-      margin: direction-sides(0 12px 0 0);
-    }
     .front-page.label {
-      margin: direction-sides(6px 12px 6px 0);
-    }
-    .published, .unpublished {
-      display: inline-block;
-      margin: direction-sides(6px 8px 6px 5px);
+      margin: direction-sides(11px 12px 11px 0);
     }
   }
   .locked-alert ul {
@@ -347,7 +342,9 @@ $revision-button-color: $ic-color-dark;
     overflow-x: auto;
     box-sizing: border-box;
     padding: 0 $ic-sp;
-    @include breakpoint(desktop) { padding: direction-sides(0 $ic-sp*2 0 $ic-sp); }
+    @include breakpoint(desktop) {
+      padding: direction-sides(0 $ic-sp * 2 0 $ic-sp);
+    }
   }
   .floating_links {
     margin-#{direction(right)}: 15px;
@@ -469,7 +466,7 @@ $revision-button-color: $ic-color-dark;
       aside {
         width: $revision-sidebar-width;
         position: fixed;
-        padding-top: $ic-sp*2;
+        padding-top: $ic-sp * 2;
       }
     }
 
@@ -547,7 +544,7 @@ $revision-button-color: $ic-color-dark;
   }
   .revision-nav-buttons {
     position: relative;
-    height: $ic-sp*3;
+    height: $ic-sp * 3;
 
     a {
       user-select: none;
@@ -563,7 +560,7 @@ $revision-button-color: $ic-color-dark;
     .prev-button {
       position: absolute;
       #{direction(left)}: 0;
-      top: 0
+      top: 0;
     }
     .next-button {
       position: absolute;
@@ -574,7 +571,8 @@ $revision-button-color: $ic-color-dark;
 }
 
 @media print {
-  #breadcrumbs, .header-bar-outer-container {
+  #breadcrumbs,
+  .header-bar-outer-container {
     display: none;
   }
   .pages.show.revisions {
@@ -597,7 +595,8 @@ $revision-button-color: $ic-color-dark;
   font-size: 0.8em;
   margin-bottom: 10px;
   margin-#{direction(right)}: 2px;
-  h3, .h3 {
+  h3,
+  .h3 {
     margin: 0px 20px 10px;
     font-size: 1.5em;
     color: #444;
@@ -613,4 +612,71 @@ $revision-button-color: $ic-color-dark;
 #wiki_page_body_parent.mceEditor {
   display: block;
   overflow: auto;
+}
+
+.page-toolbar {
+  display: flex;
+  align-items: stretch;
+  white-space: nowrap;
+
+  &.header-bar {
+    padding-bottom: 6px;
+  }
+
+  .page-toolbar-start {
+    display: flex;
+    flex-grow: 1;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: stretch;
+    align-content: stretch;
+
+    & > div {
+      padding-bottom: 6px;
+    }
+  }
+
+  .page-toolbar-end {
+    display: flex;
+    flex-grow: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: stretch;
+    align-content: stretch;
+
+    & > div {
+      padding-bottom: 6px;
+    }
+  }
+
+  .publishing {
+    display: flex;
+
+    & > div {
+      padding-#{direction(left)}: 4px;
+    }
+  }
+
+  .buttons {
+    margin-#{direction(left)}: 12px;
+  }
+
+  @include breakpoint(mini-tablet, $maximum: true) {
+    .hide-when-small, .publish-text {
+      @include screenreader-only
+    }
+
+    .btn-published {
+      padding-#{direction(right)}: 9px;
+    }
+
+    .publish-button button {
+      padding-#{direction(left)}: 9px;
+    }
+
+    .btn.edit-wiki {
+      padding-#{direction(left)}: 0.5rem;
+      padding-#{direction(right)}: 0.5rem;
+    }
+  }
 }
