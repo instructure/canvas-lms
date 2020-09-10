@@ -180,7 +180,7 @@ module CC::Exporter::WebZip
       module_data = parse_module_data
       @linked_items = find_linked_items(module_data) if any_hidden_tabs?
       course_data = {
-        language: course.locale || user.locale || course.account.default_locale(true) || 'en',
+        language: course.locale || user.locale || Account.recursive_default_locale_for_id(course.account_id) || 'en',
         lastDownload: force_timezone(course.web_zip_exports.where(user: user).last&.created_at),
         title: course.name,
         modules: module_data,

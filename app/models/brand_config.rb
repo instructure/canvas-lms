@@ -34,6 +34,8 @@ class BrandConfig < ActiveRecord::Base
           'save a new one and it will generate the new md5 for you'
   end
 
+  after_save :clear_cache
+
   belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
   has_many :shared_brand_configs, foreign_key: 'brand_config_md5'
@@ -56,6 +58,20 @@ class BrandConfig < ActiveRecord::Base
   MD5_OF_K12_CONFIG = 'a1f113321fa024e7a14cb0948597a2a4'
   def self.k12_config
     find(MD5_OF_K12_CONFIG)
+  end
+
+  def self.cache_key_for_md5(md5)
+    ["brand_configs", md5].cache_key
+  end
+
+  def self.find_cached_by_md5(md5)
+    MultiCache.fetch(cache_key_for_md5(md5)) do
+      BrandConfig.where(md5: md5).take
+    end
+  end
+
+  def clear_cache
+    self.shard.activate { MultiCache.delete(self.class.cache_key_for_md5(self.md5)) }
   end
 
   def default?

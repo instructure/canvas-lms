@@ -129,6 +129,7 @@ class Account < ActiveRecord::Base
   before_save :ensure_defaults
   before_create :enable_sis_imports, if: :root_account?
   after_save :update_account_associations_if_changed
+  after_save :check_downstream_caches
 
   before_save :setup_cache_invalidation
   after_save :invalidate_caches_if_changed
@@ -203,16 +204,20 @@ class Account < ActiveRecord::Base
     MultiCache.delete(root_account_cache_key)
   end
 
-  def default_locale(recurse = false)
-    result = read_attribute(:default_locale)
-    if recurse && !result && parent_account
-      unless instance_variable_defined?(:@cached_parent_locale)
-        @cached_parent_locale = Rails.cache.fetch(['default_locale', self.global_id].cache_key) do
-          parent_account.default_locale(true)
-        end
+  def self.recursive_default_locale_for_id(account_id)
+    local_id, shard = Shard.local_id_for(account_id)
+    (shard || Shard.current).activate do
+      obj = Account.new(id: local_id) # someday i should figure out a better way to avoid instantiating an object instead of tricking cache register
+      Rails.cache.fetch_with_batched_keys('default_locale_for_id', batch_object: obj, batched_keys: [:account_chain, :default_locale]) do
+        # couldn't find the cache so now we actually need to find the account
+        acc = Account.find(local_id)
+        acc.default_locale || (acc.parent_account_id && recursive_default_locale_for_id(acc.parent_account_id))
       end
-      result = @cached_parent_locale
     end
+  end
+
+  def default_locale
+    result = read_attribute(:default_locale)
     result = nil unless I18n.locale_available?(result)
     result
   end
@@ -515,8 +520,21 @@ class Account < ActiveRecord::Base
   def update_account_associations_if_changed
     if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
       self.shard.activate do
-        send_later_if_production(:clear_downstream_caches, :account_chain)
         send_later_if_production(:update_account_associations)
+      end
+    end
+  end
+
+  def check_downstream_caches
+    keys_to_clear = []
+    keys_to_clear << :account_chain if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
+    if self.saved_change_to_brand_config_md5? || (@old_settings && @old_settings[:sub_account_includes] != settings[:sub_account_includes])
+      keys_to_clear << :brand_config
+    end
+    keys_to_clear << :default_locale if self.saved_change_to_default_locale?
+    if keys_to_clear.any?
+      self.shard.activate do
+        send_later_if_production(:clear_downstream_caches, *keys_to_clear)
       end
     end
   end
@@ -695,7 +713,6 @@ class Account < ActiveRecord::Base
       # apparently, the try_rescues are because these columns don't exist on old migrations
       @invalidations += ['default_storage_quota', 'current_quota'] if invalidate_all || self.try_rescue(:default_storage_quota_changed?)
       @invalidations << 'default_group_storage_quota' if invalidate_all || self.try_rescue(:default_group_storage_quota_changed?)
-      @invalidations << 'default_locale' if invalidate_all || self.try_rescue(:default_locale_changed?)
     end
   end
 
