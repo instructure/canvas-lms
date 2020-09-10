@@ -530,6 +530,13 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
 
       const $iframe = document.createElement('iframe')
       $tinymce_iframe_span.appendChild($iframe)
+      $iframe.contentDocument.body.innerHTML = `
+      <div id="player_container">
+        <div data-tracks='[{"locale": "en","language":"English"}]'>
+          <video/>
+        </div>
+      </div>
+      `
 
       $video = $tinymce_iframe_span
     })
@@ -546,8 +553,15 @@ describe('RCE > Plugins > Instructure Image > ImageEmbedOptions', () => {
       expect(getVideoOptions().titleText).toEqual('My Title')
     })
 
-    // that's all we can unit test because we can't fill the iframe
-    // with a video document, and the element doesn't have a size
-    // in jsdom
+    it('gets the tracks', () => {
+      expect(getVideoOptions().tracks).toEqual([{locale: 'en', language: 'English'}])
+    })
+
+    it('gets the preset size', () => {
+      expect(getVideoOptions().videoSize).toEqual('custom') // cuz it's 0x0
+    })
+
+    // that's all we can unit test because we can't fully setup the video,
+    // and the element doesn't have a size in jsdom
   })
 })

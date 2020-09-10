@@ -81,15 +81,16 @@ export function fromVideoEmbed($element) {
   // $element will be the <span> tinymce wraps around the iframe
   // that's hosting the video player
   let $videoElem = null
+  let $videoDoc
   let naturalWidth, naturalHeight
 
   const $videoIframe = $element.tagName === 'IFRAME' ? $element : $element.firstElementChild
   const $tinymceIframeShim = $videoIframe.parentElement
 
   if ($videoIframe.tagName === 'IFRAME') {
-    const videoDoc = $videoIframe.contentDocument
-    if (videoDoc) {
-      $videoElem = videoDoc.querySelector('video')
+    $videoDoc = $videoIframe.contentDocument
+    if ($videoDoc) {
+      $videoElem = $videoDoc.querySelector('video')
     }
     if ($videoElem && ($videoElem.loadedmetadata || $videoElem.readyState >= 1)) {
       naturalWidth = $videoElem.videoWidth
@@ -113,12 +114,15 @@ export function fromVideoEmbed($element) {
     naturalWidth,
     source: $videoElem && $videoElem.querySelector('source')
   }
-  videoOptions.tracks =
-    $videoElem &&
-    Array.prototype.map.call($videoElem.querySelectorAll('track'), t => ({
-      locale: t.getAttribute('srclang'),
-      language: t.getAttribute('label')
-    }))
+
+  try {
+    const trackjson = $videoDoc.querySelector('[data-tracks]')?.getAttribute('data-tracks')
+    if (trackjson) {
+      videoOptions.tracks = JSON.parse(trackjson)
+    }
+  } catch (_ignore) {
+    // bad json?
+  }
 
   videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
 
