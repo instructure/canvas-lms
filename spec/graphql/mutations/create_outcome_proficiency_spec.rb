@@ -27,6 +27,13 @@ describe Mutations::CreateOutcomeProficiency do
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
   end
 
+  let(:audit_log_field_extension) { class_double(AuditLogFieldExtension).as_stubbed_const }
+
+  before(:each) do
+    # prevent unnecessary calls to dynamo (audit logs)
+    allow(audit_log_field_extension).to receive(:enabled?).and_return false
+  end
+
   def execute_with_input(create_input, user_executing: @admin)
     mutation_command = <<~GQL
       mutation {
