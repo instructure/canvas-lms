@@ -193,7 +193,18 @@ class RequestThrottle
   end
 
   def self.dynamic_settings
-    @dynamic_settings ||= YAML.safe_load(Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml'] || '') || {}
+    @dynamic_settings ||= begin
+      yml_config = Canvas::DynamicSettings.find(tree: :private)['request_throttle.yml']
+      res = YAML.safe_load(yml_config || '') || {}
+      if res == true
+        Rails.logger.error("ERROR: invalid value #{yml_config} from DynamicSettings resulted in `true` result")
+        cache_contents = LocalCache.cache.instance_variable_get(:@data)&.map{ |k,v|
+          [k,v] if k.include?("request_throttle")
+        }&.compact
+        Rails.logger.error("LocalCache contents for request_throttle: #{cache_contents.to_s}")
+      end
+      res
+    end
   end
 
   def rate_limit_exceeded
