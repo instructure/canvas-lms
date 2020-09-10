@@ -41,6 +41,8 @@ describe 'enrollment_notification' do
 
       it "should render" do
         generate_message(:enrollment_notification, :email, asset)
+        expect(@message.html_body).to include 'Click here to view the course page'
+        expect(@message.html_body).to include 'Update your notification settings</a>'
       end
     end
   end

@@ -21,11 +21,21 @@ require File.expand_path(File.dirname(__FILE__) + '/messages_helper')
 
 describe 'enrollment_registration' do
   before :once do
-    course_with_student(:active_all => true)
+    course_with_student
+    @user.workflow_state = 'creation_pending'
   end
 
   let(:asset) { @enrollment }
   let(:notification_name) { :enrollment_registration }
 
   include_examples "a message"
+
+  it "displays account name as plain text and removes footer links" do
+    include MessagesCommon
+    msg = generate_message(notification_name, :email, asset)
+    # this means the account name is not enclosed in a link
+    expect(msg.html_body).to include "participate in a class at Default Account."
+    expect(msg.html_body).not_to include "Update your notification settings"
+    expect(msg.html_body).not_to include "Click here to view course page"
+  end
 end
