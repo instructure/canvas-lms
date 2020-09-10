@@ -1918,9 +1918,7 @@ class UsersController < ApplicationController
             return redirect_back fallback_location: user_url(@user)
           end
           format.html { redirect_to user_url(@user) }
-          format.json {
-            render :json => user_json(@user, @current_user, session, includes,
-              @current_user.pseudonym.account) }
+          format.json { render :json => user_json(@user, @current_user, session, includes, @domain_root_account) }
         else
           format.html { render :edit }
           format.json { render :json => @user.errors, :status => :bad_request }
