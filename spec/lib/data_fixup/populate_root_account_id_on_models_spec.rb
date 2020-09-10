@@ -1006,13 +1006,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with Role' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { Role.create!(name: 'Hi', account: reference_record, base_role_type: 'StudentEnrollment') }
-        let(:reference_record) { account_model }
-      end
-    end
-
     context 'with Score' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.scores.create! }
@@ -1504,7 +1497,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    
+
   end
 
   describe '#populate_root_account_ids' do
@@ -1553,7 +1546,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           course_model(id: 12345, account: a1)
           group_model(id: 12345, context: a2)
         end
-        
+
         f1 = Favorite.create!(context: @course, user: user)
         f2 = Favorite.create(context: @group, user: user)
         f1.update_columns(root_account_id: nil)

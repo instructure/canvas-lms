@@ -19,13 +19,15 @@
 # otherwise, we can keep collecting. After we've merged once, when we have new models
 # to run we can just copy this with a new migration ID and run it again
 
-class CopyBuiltInRolesByRootAccount < ActiveRecord::Migration[5.2]
+class MakeRoleRootAccountIdNotNull < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    DataFixup::CopyBuiltInRolesByRootAccount.run
+    Role.where(:root_account_id => nil).delete_all
+    change_column_null :roles, :root_account_id, false
   end
 
   def down
+    change_column_null :roles, :root_account_id, true
   end
 end

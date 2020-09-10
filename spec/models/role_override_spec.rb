@@ -41,7 +41,7 @@ describe RoleOverride do
     a2 = account_model(:parent_account => a1)
     a3 = account_model(:parent_account => a2)
 
-    role = teacher_role
+    role = teacher_role(root_account_id: a1.id)
     RoleOverride.create!(:context => a1, :permission => 'moderate_forum',
                          :role => role, :enabled => false)
     RoleOverride.create!(:context => a2, :permission => 'moderate_forum',

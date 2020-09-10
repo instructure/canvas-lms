@@ -1124,14 +1124,7 @@ class RoleOverride < ActiveRecord::Base
       overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
         # skip loading from site admin if the role is not from site admin
         next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-        if role.built_in?
-          # it's possible we're still migrating the root account ownership - so pull for all equivalent built in roles
-          # TODO remove after datafixup
-          RoleOverride.where(:context_id => accounts, :context_type => 'Account',
-            :role_id => Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).select(:id))
-        else
-          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-        end
+        RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
       end
 
       accounts.reverse!
