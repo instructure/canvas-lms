@@ -27,8 +27,8 @@ class Account < ActiveRecord::Base
 
   include Workflow
   include BrandConfigHelpers
-  belongs_to :parent_account, :class_name => 'Account'
   belongs_to :root_account, :class_name => 'Account'
+  belongs_to :parent_account, :class_name => 'Account'
 
   has_many :courses
   has_many :favorites, inverse_of: :root_account
@@ -495,7 +495,6 @@ class Account < ActiveRecord::Base
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
     self.root_account_id ||= self.parent_account_id
     self.parent_account_id ||= self.root_account_id
-    Account.invalidate_cache(self.id) if self.id && self.root_account?
     true
   end
 
@@ -717,6 +716,18 @@ class Account < ActiveRecord::Base
   end
 
   def invalidate_caches_if_changed
+    if changed?
+      connection.after_transaction_commit do
+        if root_account?
+          Account.invalidate_cache(id)
+        else
+          shard.activate do
+            Rails.cache.delete(["account"/ id].cache_key)
+          end
+        end
+      end
+    end
+
     @invalidations ||= []
     if self.saved_change_to_parent_account_id?
       @invalidations += Account.inheritable_settings # invalidate all of them

@@ -140,7 +140,7 @@ describe RoleOverride do
         role: @role,
         enabled: false
         )
-      altered_id = @account.root_account_id + 1
+      altered_id = Account.create!.id
       override.root_account_id = altered_id
 
       override.enabled = true

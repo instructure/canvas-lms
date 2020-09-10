@@ -535,6 +535,7 @@ class ActiveRecord::Base
     reflection = super[name.to_s]
 
     include Canvas::RootAccountCacher if name.to_s == 'root_account'
+    Canvas::AccountCacher.apply_to_reflections(self)
 
     if reflection.options[:polymorphic].is_a?(Array) ||
         reflection.options[:polymorphic].is_a?(Hash)
@@ -545,20 +546,25 @@ class ActiveRecord::Base
     reflection
   end
 
-  def self.add_polymorph_methods(reflection)
-    unless @polymorph_module
-      @polymorph_module = Module.new
-      include(@polymorph_module)
-    end
-
+  def self.canonicalize_polymorph_list(list)
     specifics = []
-    Array.wrap(reflection.options[:polymorphic]).map do |name|
+    Array.wrap(list).each do |name|
       if name.is_a?(Hash)
         specifics.concat(name.to_a)
       else
         specifics << [name, name.to_s.camelize]
       end
     end
+    specifics
+  end
+
+  def self.add_polymorph_methods(reflection)
+    unless @polymorph_module
+      @polymorph_module = Module.new
+      include(@polymorph_module)
+    end
+
+    specifics = canonicalize_polymorph_list(reflection.options[:polymorphic])
 
     unless reflection.options[:exhaustive] == false
       specific_classes = specifics.map(&:last).sort
