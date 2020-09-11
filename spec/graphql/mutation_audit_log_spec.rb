@@ -22,6 +22,8 @@ require_relative "./graphql_spec_helper"
 describe AuditLogFieldExtension do
 
   before do
+    skip 'DEMO-41 (9/11/2020)'
+
     if !AuditLogFieldExtension.enabled?
       skip("AuditLog needs to be enabled by configuring dynamodb.yml")
     end
@@ -83,6 +85,10 @@ describe AuditLogFieldExtension do
 end
 
 describe AuditLogFieldExtension::Logger do
+  before do
+    skip 'DEMO-41 (9/11/2020)'
+  end
+
   let(:mutation) { double(graphql_name: "asdf") }
 
   before(:once) do
