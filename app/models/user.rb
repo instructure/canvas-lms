@@ -976,6 +976,8 @@ class User < ActiveRecord::Base
     else
       cc = self.communication_channels.email.by_path(e).first ||
            self.communication_channels.email.create!(path: e)
+      # If the email already exists but with different casing this allows us to change it
+      cc.path = e
       cc.user = self
     end
     cc.move_to_top

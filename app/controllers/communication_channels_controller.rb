@@ -191,6 +191,7 @@ class CommunicationChannelsController < ApplicationController
     # Find or create the communication channel.
     @cc ||= @user.communication_channels.by_path(params[:communication_channel][:address]).
       where(path_type: params[:communication_channel][:type]).first
+    @cc.path = params[:communication_channel][:address] if @cc
     @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
       :path_type => params[:communication_channel][:type])
 
