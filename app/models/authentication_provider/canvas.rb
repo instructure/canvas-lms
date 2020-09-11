@@ -29,10 +29,6 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
     [ :self_registration, :enable_captcha ].freeze
   end
 
-  def self.site_admin_params
-    [ :enable_captcha ].freeze
-  end
-
   def self.login_button?
     false
   end
