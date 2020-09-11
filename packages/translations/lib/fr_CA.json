@@ -347,9 +347,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Poignée de déplacement. Utilisez les flèches haut et bas pour redimensionner"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Déposer ou cliquer pour naviguer sur l’ordinateur"
-    },
     "due_5d7267be": {
         "message": "Échéance :"
     },
@@ -1014,7 +1011,7 @@
         "message": "Basculez vers l’éditeur de texte enrichi"
     },
     "syllabus_f191f65b": {
-        "message": "Programme"
+        "message": "Plan de cours"
     },
     "tab_arrows_4cf5abfc": {
         "message": "TABULATION/flèches"
