@@ -24,6 +24,7 @@ QUnit.module('MathML and MathJax test', {
     const mathElem = document.createElement('math')
     mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
     $('body')[0].appendChild(mathElem)
+    window.ENV.locale = 'en'
   }
 })
 
@@ -37,7 +38,11 @@ test('loadMathJax loads mathJax', () => {
 
 test('loadMathJax does not load mathJax', () => {
   sinon.stub($, 'getScript')
-  window.MathJax = {}
+  window.MathJax = {
+    Hub: {
+      Reprocess: () => {}
+    }
+  }
   mathml.loadMathJax('bogus')
   ok(!$.getScript.called)
   $.getScript.restore()
@@ -48,7 +53,7 @@ test('isMathMLOnPage returns true', () => {
 })
 
 test('isMathJaxLoaded return true', () => {
-  window.MathJax = {}
+  window.MathJax = {Hub: {}}
   ok(mathml.isMathJaxLoaded())
 })
 

@@ -214,7 +214,7 @@ class ApplicationController < ActionController::Base
 
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
-  JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites].freeze
+  JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :new_math_equation_handling].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages
@@ -2138,7 +2138,7 @@ class ApplicationController < ActionController::Base
         is_public: is_public
       ).processed_url
     end
-    UserContent.escape(rewriter.translate_content(str), request.host_with_port)
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port, Account.site_admin.feature_enabled?(:new_math_equation_handling))
   end
   helper_method :public_user_content
 
