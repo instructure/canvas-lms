@@ -576,10 +576,13 @@ $(document).ready(function() {
       !!$('.bad_ext_msg:visible').length
     )
   }
+  function getFilename(fileInput) {
+    return fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1')
+  }
   function updateRemoveLinkAltText(fileInput) {
     let altText = I18n.t('remove empty attachment')
     if (fileInput.val()) {
-      const filename = fileInput.val().replace(/^.*?([^\\\/]*)$/, '$1')
+      const filename = getFilename(fileInput)
       altText = I18n.t('remove %{filename}', {filename})
     }
     fileInput
@@ -589,7 +592,12 @@ $(document).ready(function() {
   }
   $('.submission_attachment input[type=file]').live('change', function() {
     updateRemoveLinkAltText($(this))
-    if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1 || $(this).val() == '') return
+    if ($(this).val() === '') return
+
+    $(this).focus()
+    const filename = getFilename($(this))
+    $.screenReaderFlashMessage(I18n.t('File uploaded: %{filename}', {filename}))
+    if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1) return
 
     const ext = $(this)
       .val()

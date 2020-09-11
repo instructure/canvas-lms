@@ -34,7 +34,7 @@
             <%= t 'links.add_another_file', "Add Another File" %>
           </button>
           <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
-            <input aria-labelledby="attachmentLabel" type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
+            <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">
