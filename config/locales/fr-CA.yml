@@ -1002,9 +1002,9 @@ fr-CA:
           enrollment_term_ids: 
             field: "Identifiants des périodes d'inscription"
     eportfolio_moderation: 
-      eportfolio_moderation_crumb: "Modération du portefeuille électronique"
-      page_title: "Modération du portefeuille électronique"
-      title: "Modération du portefeuille électronique"
+      eportfolio_moderation_crumb: "Modération du ePortfolio"
+      page_title: "Modération du ePortfolio"
+      title: "Modération du ePortfolio"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1283,7 +1283,7 @@ fr-CA:
         edit_institution_email: "Les utilisateurs peuvent supprimer leur adresse courriel attribuée par l’institution"
         enable_alerts: "Alertes (bêta)"
         enable_course_catalog: "Afficher une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
-        enable_eportfolios: "Portefeuilles électroniques"
+        enable_eportfolios: ePortfolios
         enable_fullstory: "Permettre le suivi avec FullStory"
         enable_google_analytics: "Autoriser le suivi avec Google Analytics"
         enable_profiles: "Activer les profils"
@@ -2167,7 +2167,7 @@ fr-CA:
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "Permet à l'utilisateur de modifier les notes dans le carnet de notes. Permet à l'utilisateur d'accéder à l'historique de carnet de notes."
   allows_user_to_edit_grading_schemes_98c35117: "Permet à l'utilisateur de modifier les systèmes de notation."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Permet à l'utilisateur de modifier l’ID SIS de cours."
-  allows_user_to_edit_the_course_syllabus_a28ff262: "Permet à l'utilisateur de modifier le programme du cours."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Permet à l'utilisateur de modifier le plan de cours."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permet à l’utilisateur d’exporter le carnet de notes vers un fichier CSV (valeurs séparées par des virgules). Permet à l’utilisateur d’accéder au carnet de notes de la maîtrise d’apprentissage (si activé)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permet à l’utilisateur de filtrer les cours modèle en tant que niveau du compte. Permet à l’utilisateur d’ajouter les cours associés."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
@@ -2327,7 +2327,7 @@ fr-CA:
       Permet à l'utilisateur de voir le lien Discussions dans la Navigation du cours.
       Permet à l'utilisateur de voir les discussions de cours.
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "Permet à l’utilisateur de voir le lien Discussions dans la Navigation du cours. Permet à l’utilisateur de voir les discussions de cours."
-  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Permet à l’utilisateur de voir la page Modération du portefeuille électronique et de gérer le contenu de pourriel du portefeuille électronique."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Permet à l’utilisateur de voir la page Modération du ePortfolio et de gérer le contenu de pourriel du ePortfolio."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Permet à l'utilisateur de voir le lien du journal des enseignants dans la navigation mondiale."
   allows_user_to_view_the_group_home_pages_of_all_st_47f48a3e: "Permet à l’utilisateur de voir les pages d’accueil de groupe de tous les groupes d’étudiant. Permet aux étudiants d’accéder à d’autres groupes d’étudiants au sein d’un ensemble de groupes avec un lien direct."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
@@ -3404,29 +3404,29 @@ fr-CA:
       no_files: "Aucun fichier"
       upload_or_choose_file: "Téléverser un fichier ou choisissez un fichier que vous avez déjà téléversé."
     syllabus: 
-      page_title: "Programme pour %{course}"
+      page_title: "Plan de cours pour %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Mettre à jour le programme"
+        update_syllabus: "Mettre à jour le plan de cours"
       headers: 
         date: Date
         details: Informations
       instructions: 
         syllabus: |-
-            La page du programme présente une vue en tableau du calendrier du cours, et les bases de
+            La page du plan de cours présente une vue en tableau du calendrier du cours, et les bases de
             notation du cours. Vous pouvez y ajouter d'autres commentaires, notes ou idées que vous auriez à propos
             de la structure du cours, de ses politiques ou tout autre chose.
             
             Pour ajouter des commentaires, cliquer le lien « Modifier » situé tout en haut.
       labels: 
         assignments_summary: "Sommaire du cours"
-        syllabus_body: "Description du programme"
+        syllabus_body: "Description du plan de cours"
         syllabus_course_summary: "Afficher le résumé du cours"
       links: 
         edit_syllabus_description: Modifier
         jump_to_today: "Aller à Aujourd’hui"
       titles: 
-        course_syllabus: "Programme du cours"
+        course_syllabus: "Plan de cours"
     titles: 
       add_assignment_group: "Ajouter un groupe de tâches"
       uploading: "Envoi en cours"
@@ -5988,8 +5988,8 @@ fr-CA:
   copy_this_module_to_a_course_ddd12cc7: "Copier ce module dans un cours…"
   copy_title_to_course_2a41a2f4: "Copier %{title} au cours"
   copy_title_to_course_ac71981a: "Copier {%title} au cours"
-  copy_to_64f8456b: "Copier à…"
-  copy_to_a5396a6f: "Copier à..."
+  copy_to_64f8456b: "Copié à…"
+  copy_to_a5396a6f: "Copié à..."
   copy_to_folder_32ecc3c3: "Copier dans le dossier"
   copying_628a9607: "Copie en cours..."
   copyright_and_license_information_must_be_provided_5feffaf: "Les informations sur le droit d'auteur et la licence doivent être fournies avant de publier des fichiers."
@@ -6214,7 +6214,7 @@ fr-CA:
     student_summary: 
       not_sorted: "Tableau récapitulatif de l'étudiant"
     student_view_student_name: "Étudiant test"
-    syllabus: Programme
+    syllabus: "Plan de cours"
     wiki_permissions: 
       all: Tous
       only_teachers: "Uniquement les enseignants"
@@ -6384,7 +6384,7 @@ fr-CA:
       name: Nom
       open_enrollment: "Ouvrir l’inscription"
       public_description: "Description publique"
-      public_syllabus: "Programme public"
+      public_syllabus: "Plan de cours public"
       replacement_course_id: "ID de cours de remplacement"
       restrict_enrollments_to_course_dates: "Restreindre les inscriptions aux dates de cours"
       root_account_id: "ID de compte racine"
@@ -6500,7 +6500,7 @@ fr-CA:
   course_statistics: 
     unknown: inconnu
   course_storage_391e1bd: "Stockage du cours"
-  course_syllabus_5de1b0af: "Programme du cours"
+  course_syllabus_5de1b0af: "Plan de cours"
   course_users: 
     greater_than_three: "Indiquez un élément à rechercher comprenant au moins trois caractères."
     unknown_error: "Erreur lors de votre recherche. Veuillez réessayer."
@@ -7083,7 +7083,7 @@ fr-CA:
     copy_course: "Copier le cours"
     developer_keys: "Clés de développeur"
     discussions: Discussions
-    eportfolio_welcome: "Bienvenue dans votre portefeuille électronique"
+    eportfolio_welcome: "Bienvenue dans votre ePortfolio"
     error_reports: "Rapports d’erreur"
     files: Fichiers
     grades: Notes
@@ -7105,7 +7105,7 @@ fr-CA:
     settings: ~
     site_admin: "Administrateur du site"
     stats: Statistiques
-    syllabus: Programme
+    syllabus: "Plan de cours"
     users: Utilisateurs
     wiki_pages: Pages
   csp_violations_337f8529: "Violations CSP"
@@ -7499,7 +7499,7 @@ fr-CA:
   deleted_content_exceptions_237e809d: "Exceptions de contenu supprimé :"
   deleted_content_referenced_in_this_resource_e42d1998: "Contenu supprimé référencé dans cette ressource :"
   deleting_6421031e: "suppression en cours..."
-  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d’un utilisateur détruira tous ses portefeuilles électroniques. Alternativement, les portefeuilles électroniques peuvent être individuellement marqués comme « pourriel » ou « sécuritaire » pour modifier leur visibilité."
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d’un utilisateur détruira tous ses ePortfolios. Alternativement, les ePortfolios peuvent être individuellement marqués comme « pourriel » ou « sécuritaire » pour modifier leur visibilité."
   deleting_assignment_22d5851d: "suppression de la tâche en cours..."
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Les paramètres Recaptcha doivent être configurés pour les sites de démonstration. Adressez-vous à l’administrateur de votre site pour cette instance de Canvas."
@@ -8565,9 +8565,9 @@ fr-CA:
     confirm_delete_page: "Supprimer cette page et tout son contenu?"
     confirm_delete_section: "Supprimer cette section et toutes ses pages?"
     default_description: "Envoi de ma tâche %{assignment} pour %{course}."
-    eportfolio_settings: "Paramètres du portefeuille électronique"
+    eportfolio_settings: "Paramètres du ePortfolio"
     errors: 
-      compiling: "Erreur lors de la compilation du portefeuille électronique Veuillez réessayer dans quelques instants."
+      compiling: "Erreur lors de la compilation du ePortfolio. Veuillez réessayer dans quelques instants."
       missing_file: "Sélectionnez un fichier."
       name_required: "Le nom doit être spécifié."
       name_too_long: "Le nom est trop long"
@@ -8582,9 +8582,9 @@ fr-CA:
       manage_pages: "Cliquez dans une page pour la modifier, ou faites-la glisser pour la classer"
     titles: 
       add_submission: "Ajouter une page à l’envoi"
-      download_eportfolio: "Télécharger le portefeuille électronique"
+      download_eportfolio: "Télécharger l'ePortfolio"
       section_list: "Faire glisser pour organiser, cliquer pour modifier"
-  eportfolio_3c009f9c: "Portefeuille électronique"
+  eportfolio_3c009f9c: ePortfolio
   eportfolio_categories: 
     default_name: "Nouvelle page"
     errors: 
@@ -8601,8 +8601,8 @@ fr-CA:
     click_through: "Cliquez pour afficher le contenu de la page"
     default_content: "Pas de contenu ajouté"
     default_name: "Nom de la page"
-  eportfolio_moderation_feb0ffd3: "Modération du portefeuille électronique"
-  eportfolio_settings_75ba1f9a: "Paramètres du portefeuille électronique"
+  eportfolio_moderation_feb0ffd3: "Modération du ePortfolio"
+  eportfolio_settings_75ba1f9a: "Paramètres du ePortfolio"
   eportfolios: 
     _page_section: 
       section_types: 
@@ -8610,7 +8610,7 @@ fr-CA:
         html: "Contenu HTML/incorporé"
         rich_text: "Contenu de texte enrichi"
         submission: "Envoi du cours"
-    crumb: "Portefeuilles électroniques"
+    crumb: ePortfolios
     edit_link_text: "%{edit_icon} Modifier cette page"
     eportfolio: 
       entry_count: 
@@ -8668,31 +8668,31 @@ fr-CA:
       buttons: 
         add_comment: "Ajouter un commentaire"
         add_page: "Ajouter une page"
-        delete: "Supprimer un portefeuille"
+        delete: "Supprimer ePortfolio"
         keep_editing: "Garder la modification"
         preview: "Afficher un aperçu"
         save_page: "Enregistrer la page"
         select_submission: "Sélectionner l’envoi"
-        update_eportfolio: "Mettre à jour le portefeuille"
+        update_eportfolio: "Mettre à jour l'ePortfolio"
         upload_file: "Sélectionner/téléverser le fichier"
       current_pages: "Pages actuelles"
       delete_confirm: 
-        one: "Vous avez actuellement 1 page dans ce portefeuille. Voulez-vous vraiment supprimer le portefeuille complet?"
-        other: "Vous avez actuellement %{count} pages dans ce portefeuille. Voulez-vous vraiment supprimer le portefeuille complet?"
+        one: "Vous avez actuellement 1 page dans cet ePortfolio. Voulez-vous vraiment supprimer l'ePortfolio complet?"
+        other: "Vous avez actuellement %{count} pages dans cet ePortfolio. Voulez-vous vraiment supprimer l'ePortfolio complet?"
       headers: 
         add_content: "Ajouter un contenu"
-        export_progress: "Collecte des ressources du portefeuille en cours. L’opération peut nécessiter un certain temps si le nombre de fichiers dans votre portefeuille électronique est élevé."
-        private_eportfolio: "Votre portefeuille électronique est privé"
-        public_eportfolio: "Votre portefeuille électronique est public"
+        export_progress: "Collecte des ressources du ePortfolio en cours. L’opération peut nécessiter un certain temps si le nombre de fichiers dans votre ePortfolio est élevé."
+        private_eportfolio: "Votre ePortfolio est privé"
+        public_eportfolio: "Votre ePortfolio est public"
         recent_submissions: "Envois récents"
-        welcome: "Bienvenue dans votre portefeuille électronique"
+        welcome: "Bienvenue dans votre ePortfolio"
       headings: 
         page_comments: "Commentaires de page"
       labels: 
         add_comment: "Ajouter un commentaire"
         allow_comments: "Autoriser les commentaires sur cette page"
         choose_submission: "Sélectionnez l’envoi d’une tâche à incorporer dans cette page"
-        eportfolio_name: "Nom du portefeuille électronique"
+        eportfolio_name: "Nom du ePortfolio"
         file_select: "Sélectionnez un fichier à inclure dans cette page"
         file_upload: "Ou téléverser un fichier"
         html_content: "Copiez et collez votre code HTML dans la zone ci-dessous"
@@ -8705,14 +8705,14 @@ fr-CA:
       links: 
         back: "Revenir au tableau de bord du portefeuille"
         choose_submission: "Envoi du cours"
-        delete: "Supprimer ce portefeuille électronique"
-        download_eportfolio: "Télécharger le contenu de ce portefeuille électronique sous forme de fichier zip"
+        delete: "Supprimer cet ePortfolio"
+        download_eportfolio: "Télécharger le contenu de cet ePortfolio sous forme de fichier zip"
         download_file: "Cliquez ici pour télécharger %{filename}"
         file_uload: "Téléversement d’une image/d’un fichier"
         html_content: "Contenu HTML/incorporé"
-        portfolio: "Accéder au portefeuille actuel"
+        portfolio: "Accéder au ePortfolio actuel"
         rich_content: "Contenu de texte enrichi"
-        share: "Copiez et partagez ce lien pour que d’autres personnes puissent accéder à votre portefeuille électronique privé :"
+        share: "Copiez et partagez ce lien pour que d’autres personnes puissent accéder à votre ePortfolio privé :"
         view_original: "Afficher le fichier d’origine"
         wizard: "Assistant Démarrage"
       login_required: "Vous devez être *connecté* pour faire des commentaires sur cette page."
@@ -8723,7 +8723,7 @@ fr-CA:
       private_comments: "Actuellement, vous êtes le seul à pouvoir afficher les commentaires pour cette page. Vous pouvez choisir de rendre les commentaires publics en *modifiant les paramètres de cette page*."
       private_eportfolio: "Les utilisateurs ne peuvent trouver ou afficher la page sans autorisation. Vous pouvez l’afficher car il s’agit de votre portefeuille, mais pour laisser d’autres personnes y accéder vous devez copier et partager le lien spécial suivant qui leur permettra d’accéder à votre portefeuille :"
       public_eportfolio: "Les utilisateurs qui connaissent l’adresse de votre portefeuille peuvent l’afficher. Vous pouvez rendre votre portefeuille privé en *modifiant les paramètres de votre portefeuille*."
-      recent_submissions: "Cliquez sur un envoi pour l’ajouter à une nouvelle page de votre portefeuille."
+      recent_submissions: "Cliquez sur un envoi pour l’ajouter à une nouvelle page de votre ePortfolio."
       titles: 
         already_used: "Cet envoi est déjà inclus dans votre portefeuille."
         feed: "Flux Atom du portefeuille électronique"
@@ -8740,35 +8740,35 @@ fr-CA:
       logo: Logo
     title: "Flux de %{portfolio_name}"
     titles: 
-      feed: "Flux Atom du portefeuille électronique"
+      feed: "Flux Atom du ePortfolio"
     user_index: 
       buttons: 
-        add_eportfolio: "Créer un portefeuille électronique"
+        add_eportfolio: "Créer un ePortfolio"
       defaults: 
         eportfolio_name: "Mon portefeuille"
       headers: 
-        add_eportfolio: "Créer un portefeuille électronique"
-        eportfolios: "Portefeuilles électroniques"
-        my_eportfolios: "Mes portefeuilles électroniques"
-        what: "Qu’est-ce qu’un portefeuille électronique?"
+        add_eportfolio: "Créer un ePortfolio"
+        eportfolios: ePortfolios
+        my_eportfolios: "Mes ePortfolios"
+        what: "Qu’est-ce qu’un ePortfolio?"
       labels: 
-        eportfolio_name: "Nom du portefeuille électronique"
+        eportfolio_name: "Nom du ePortfolio"
         make_public: "Rendre public"
       links: 
-        create: "Créer un portefeuille électronique"
-      page_title: "Mes portefeuilles électroniques"
+        create: "Créer un ePortfolio"
+      page_title: "Mes ePortfolios"
       what: 
         details1: |-
-            Les portefeuilles électroniques permettent d’afficher les
+            Les ePortfolios permettent d’afficher les
             envois et les expériences marquants au cours de votre
-            apprentissage. Vous pouvez utiliser le portefeuille électronique pour : 
+            apprentissage. Vous pouvez utiliser un ePortfolio pour : 
             
             * mettre les tâches dont vous êtes fier à la disposition d’autres personnes que votre instructeur ;
             * parler du travail et des recherches impliqués dans les envois de votre classe ;
             * compiler un aperçu de votre parcours scolaire global ;
             * partager votre travail avec vos amis, vos futurs employeurs, etc.
             
-            Les portefeuilles électroniques peuvent devenir publics (consultables par tous) ou privés (consultables uniquement par les personnes
+            Les ePortfolios peuvent devenir publics (consultables par tous) ou privés (consultables uniquement par les personnes
             autorisées), et vous pouvez modifier ce paramètre à tout moment.
             
             Vous êtes prêt à commencer ? Cliquez sur le bouton.
@@ -8778,15 +8778,15 @@ fr-CA:
       headers: 
         finish: Allons-y!
         getting_started: Démarrage
-        instructions: "Utilisation d’un portefeuille électronique"
+        instructions: "Utilisation d’un ePortfolio"
         introduction: Introduction
         page_content: "Contenu de la page"
         pages: "Pages de la section"
         sections: "Sections du portefeuille"
-        settings: "Paramètres du portefeuille électronique"
+        settings: "Paramètres du ePortfolio"
         submissions: "Ajout d’envois"
       introduction: 
-        body: "Les portefeuilles électroniques permettent de montrer votre travail. Ils sont constitués de sections et de pages. La liste des sections se trouve sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages affichées sur le côté droit de la fenêtre (%{showme2})."
+        body: "Les ePortfolios permettent de montrer votre travail. Ils sont constitués de sections et de pages. La liste des sections se trouve sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages affichées sur le côté droit de la fenêtre (%{showme2})."
       links: 
         portfolio: "Afficher le portefeuille"
       page_content: 
@@ -8801,11 +8801,11 @@ fr-CA:
         body1: "Les sections apparaissent dans une liste sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages. Pour organiser ou ajouter des sections, cliquez sur le lien « %{manage_sections} » (%{showme2})."
         body2: "Vous pouvez renommer une section en cliquant sur l’icône %{edit_icon} qui s’affiche, réorganiser les sections en cliquant dessus puis en les déplaçant, ou supprimer des sections en cliquant sur l’icône %{delete_icon}."
       settings: 
-        body: "Pour modifier les paramètres de votre portefeuille, cliquez sur le lien « Paramètres du portefeuille électronique » (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
+        body: "Pour modifier les paramètres de votre ePortfolio, cliquez sur le lien « Paramètres du ePortfolio » (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
       submissions: 
         body1: "Vous avez peut-être remarqué en bas de cette page la liste des envois récents de vos classes (%{showme}). Vous pouvez rapidement ajouter des envois aux nouvelles pages de votre portefeuille à partir de cette page. Cliquez simplement sur l’envoi à ajouter pour afficher une boîte de dialogue."
         body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur Ajouter une page, vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
-  eportfolios_f6dc4579: "Portefeuilles électroniques"
+  eportfolios_f6dc4579: ePortfolios
   eps_81bd3fbf: EPS
   epub_exporting_f5592ff2: "Est exporté au format ePub"
   epub_exports_3822c3f8: "Exportation ePub"
@@ -10923,7 +10923,7 @@ fr-CA:
   how_do_i_download_the_student_app_4a4b8a63: "Comment puis-je télécharger l’application Étudiant?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Comment puis-je télécharger l’application Étudiant et obtenir de l’aide supplémentaire?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Comment puis-je modifier une annonce dans un cours?"
-  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Comment puis-je modifier la description du programme dans un cours?"
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Comment puis-je modifier la description du plan de cours?"
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Comment puis-je saisir et modifier les notes dans le Carnet de notes?"
   how_do_i_find_my_courses_b826e4ce: "Comment puis-je trouver mes cours?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Comment puis-je importer un ensemble d’exportation de cours Canvas?"
@@ -10967,7 +10967,7 @@ fr-CA:
   how_do_i_use_the_pages_index_page_dafb986c: "Comment puis-je utiliser la page d’index des pages?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Comment puis-je utiliser la page des Personnes dans un cours en tant qu’instructeur?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Comment puis-je utiliser la page d’index des questionnaires?"
-  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Comment puis-je utiliser le programme en tant qu’instructeur?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Comment puis-je utiliser le plan de cours en tant qu’instructeur?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Comment puis-je voir une carte de contexte pour un étudiant dans un cours?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Comment puis-je voir les analyses pour un étudiant individuel?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Comment puis-je voir et trier les réponses de discussion en tant qu’instructeur?"
@@ -11799,7 +11799,7 @@ fr-CA:
         learning_outcomes: Acquis
         quizzes: Questionnaires
         rubrics: Barèmes
-        syllabus_body: "Corpus du programme"
+        syllabus_body: "Corpus du plan de cours"
         tool_profiles: "Profils de l'outil"
         wikis: Pages
     cc: 
@@ -12147,7 +12147,7 @@ fr-CA:
   make_key_invisible_e66af89: "Rendre la clé invisible"
   make_key_visible_5c03fa34: "Rendre la clé visible"
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Activer et rendre visible les nouveaux paramètres des intégrations SIS"
-  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Rendre le résumé du cours (liste des tâches et des événements) facultatif dans le programme"
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Rendre le résumé du cours (liste des tâches et des événements) facultatif dans le plan de cours"
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
       Créez votre propre cours! Téléversez une image pour représenter votre
             cours, permettre aux étudiants de gérer les zones de contenu du cours et masquer
@@ -12206,10 +12206,10 @@ fr-CA:
   mark_as_spam_9c613d87: "Marqué comme pourriel"
   mark_as_unread_4a413c41: "Marquer comme non lues"
   mark_done_9d81bcd9: "Marquer « terminé »"
-  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marqué comme sécuritaire ': Un administrateur a examiné ce portefeuille électronique et l’a jugé sécuritaire. Il est visible pour son public cible d’origine."
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marqué comme sécuritaire ': Un administrateur a examiné cet ePortfolio et l’a jugé sécuritaire. Il est visible pour son public cible d’origine."
   marked_as_safe_f7f953df: "Marqué comme sécuritaire"
   marked_as_spam_ab87846d: "Marqué comme pourriel"
-  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Considéré comme pourriel ': Un administrateur a examiné ce portefeuille électronique et l’a marqué comme pourriel. N’est visible que par l’auteur et les administrateurs originaux."
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Considéré comme pourriel ': Un administrateur a examiné cet ePortfolio et l’a marqué comme pourriel. N’est visible que par l’auteur et les administrateurs originaux."
   marked_done_9fd646f: "Marqué « terminé »"
   masquerade_as_name_8bb004c5: "Personnification d’identité en tant que %{name}"
   masquerade_fdbc9594: "Personnification d’identité"
@@ -14383,7 +14383,7 @@ fr-CA:
   need_help_setting_up_your_course_2b763141: "Besoin d'aide pour mettre votre cours en place?"
   needs_grading_9143d47c: "Requiert une notation"
   needs_review_flagged_as_possible_spam_233657fb: "À réviser : signalé comme pourriel potentiel"
-  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'À réviser : marqué comme pourriel potentiel ': Les systèmes d’Instructure ont identifié ce portefeuille électronique comme un pourriel potentiel, et il doit être examiné par l’administrateur. N’est visible que par l’auteur et les administrateurs originaux."
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'À réviser : marqué comme pourriel potentiel ': Les systèmes d’Instructure ont identifié cet ePortfolio comme un pourriel potentiel, et il doit être examiné par l’administrateur. N’est visible que par l’auteur et les administrateurs originaux."
   negative_points_fda45730: "Points négatifs"
   netherlands_31_63e4f1b9: "Hollande (+31)"
   never_df100b49: Jamais
@@ -20576,11 +20576,11 @@ fr-CA:
   switch_to_ea940b5b: "Passer à :"
   switch_to_group_group_name_786b913b: "Passer dans le groupe %{group_name}"
   switzerland_41_f861e414: "Suisse (+41)"
-  syllabus: "Programme du cours"
-  syllabus_course_summary_option_951a8144: "Option de sommaire du cours du programme"
-  syllabus_f191f65b: Programme
-  syllabus_tutorial_tray_97e8ef82: "Tutoriel volant des programmes"
-  syllabus_visibility_options_a81ef419: "Options de visibilité du cursus"
+  syllabus: "Plan de cours"
+  syllabus_course_summary_option_951a8144: "Option de sommaire du plan de cours"
+  syllabus_f191f65b: "Plan de cours"
+  syllabus_tutorial_tray_97e8ef82: "Tutoriel volant des plan de cours"
+  syllabus_visibility_options_a81ef419: "Options de visibilité du plan de cours"
   sync_68e5c167: Synchronisation
   sync_completed_successfully_8f68b542: "Synchronisation terminée avec succès"
   sync_grades_a16622ca: "Synchroniser les notes"
@@ -20626,7 +20626,7 @@ fr-CA:
     course_grades: "Notes du cours"
     course_settings: "Paramètres du cours"
     discussions: Discussions
-    eportfolios: "Portefeuilles électroniques"
+    eportfolios: ePortfolios
     files: Fichiers
     grades: Notes
     home: Accueil
@@ -20640,7 +20640,7 @@ fr-CA:
     quizzes: Questionnaires
     rubrics: Rubriques
     settings: Paramètres
-    syllabus: Programme
+    syllabus: "Plan de cours"
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
     trophy_case: Présentoir
@@ -20790,7 +20790,7 @@ fr-CA:
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La page d’accueil du cours est la première page que les étudiants voient lorsqu’ils ouvrent
             votre cours. La page d’accueil peut afficher le
-            flux d’activités de participation au cours, la page Modules du cours, la liste des tâches du cours, le programme ou
+            flux d’activités de participation au cours, la page Modules du cours, la liste des tâches du cours, le plan de cours ou
             une page que vous concevez comme page d’accueil.
   the_course_link_validator_searches_course_content__563fa215: "Le valideur de lien du cours effectue des recherches de contenu pour les images et les liens non valides ou inaccessibles."
   the_course_link_validator_searches_through_course__76f0bc63: "Le validateur de lien du cours explore le contenu du cours et retourne chaque lien non valide ou non-réactif qu'il rencontre. Veuillez noter que certains liens indiqués comme étant non-réactifs, sont seulement inaccessibles depuis nos serveurs et fonctionneront correctement pour les étudiants. "
@@ -20895,10 +20895,10 @@ fr-CA:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "L’utilisateur spécifié n’est pas un étudiant de ce cours"
   the_state_parameter_is_required_ffadf213: "Le paramètre d’état est obligatoire."
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
-      Le programme vous permet d’accueillir les utilisateurs de votre cours et de partager vos attentes
-            avec vos étudiants. Utilisez la description du programme pour clarifier les objectifs du cours, les méthodes de contact
+      Le plan de cours vous permet d’accueillir les utilisateurs de votre cours et de partager vos attentes
+            avec vos étudiants. Utilisez la description du plan de cours pour clarifier les objectifs du cours, les méthodes de contact
             préférées et d’autres détails, ou téléversez un PDF d’un
-            programme existant. La page du programme peut également afficher tous les événements et toutes les tâches
+            plan de cours existant. La page du plan de cours peut également afficher tous les événements et toutes les tâches
             du cours.
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Impossible d’activer le paramètre Synchroniser avec SIS pour la tâche « %{assignment_name} » sans date d’échéance."
   the_term_has_ended_for_this_course_f0ab367: "Le trimestre a pris fin pour ce cours"
@@ -21067,10 +21067,10 @@ fr-CA:
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Cela active des paramètres de cours afin de permettre aux étudiants d’exporter le cours comme un dossier comprimé (.zip) Web hors ligne"
   this_enables_users_to_generate_and_download_course_4c69c531: "Cela permet aux utilisateurs de générer et de télécharger un cours au format ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Cet environnement est en cours de mise à jour avec une copie des données de production les plus récentes. Veuillez revenir plus tard."
-  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Ce portefeuille électronique a été signalé comme pourriel possible. Jusqu’à ce qu’il ait été examiné par un administrateur, il ne sera visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
-  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Ce portefeuille électronique a été identifié comme un pourriel possible. Il n’est actuellement visible que par les administrateurs et l’auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire. Sinon, vous pouvez le confirmer comme pourriel."
-  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Ce portefeuille électronique a été identifié comme pourriel et n’est visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
-  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Ce portefeuille électronique a été identifié comme pourriel. Il n'est actuellement visible que par les administrateurs et l'auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Cet ePortfolio a été signalé comme pourriel possible. Jusqu’à ce qu’il ait été examiné par un administrateur, il ne sera visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Cet ePortfolio a été identifié comme un pourriel possible. Il n’est actuellement visible que par les administrateurs et l’auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire. Sinon, vous pouvez le confirmer comme pourriel."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Cet ePortfolio a été identifié comme pourriel et n’est visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Cet ePortfolio a été identifié comme pourriel. Il n'est actuellement visible que par les administrateurs et l'auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Cette fonctionnalité permet aux enseignants de copier facilement des éléments individuels d'un cours à un autre, et de partager un seul élément de contenu avec d'autres utilisateurs afin qu'ils puissent importer ces éléments dans leurs cours également."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Cette fonction ne peut pas être désactivée parce qu'il y a au moins un sous-compte ou cours avec cette fonction activée."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Cette fonction ne peut pas être activée tant que la détection automatique des séparateurs de champs est activée"
@@ -22872,7 +22872,7 @@ fr-CA:
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Lors de l'ajout de plusieurs utilisateurs, utilisez une virgule ou un saut de ligne pour séparer les utilisateurs."
   when_disabled_students_can_still_send_individual_m_567a911c: "Lorsque cette option est désactivée, les étudiants peuvent toujours envoyer des messages individuels aux enseignants, aux AE de cours et les étudiants qui appartiennent aux mêmes groupes de niveau du compte."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Lorsque vous masquez les notes pour des tâches anonymes, les notes seront masquées pour tout le monde dans le cours. L'anonymat sera de nouveau appliqué."
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un programme ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un plan de cours ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Lorsque les gens visitent votre cours, ceci est la première page, qu’ils verront.
                 Nous avons configuré votre page d'accueil à Modules, mais vous avez la possibilité de la modifier.
