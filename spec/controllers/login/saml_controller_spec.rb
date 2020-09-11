@@ -448,15 +448,15 @@ describe Login::SamlController do
 
       it "should redirect to default login" do
         get_new
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
       end
 
       it "should use the specified AAC" do
         get_new("#{@aac1.id}")
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
         controller.instance_variable_set(:@aac, nil)
         get_new("#{@aac2.id}")
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac2.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac2.log_in_url)).to be_truthy
       end
 
       it "reject  unknown specified AAC" do
