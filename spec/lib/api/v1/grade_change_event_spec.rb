@@ -177,4 +177,24 @@ describe Api::V1::GradeChangeEvent do
     expect(linked[:users].size).to be_zero
     expect(linked[:page_views].size).to be_zero
   end
+
+  describe "override grade change events" do
+    let(:override_event) do
+      override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+        grader: @teacher,
+        old_grade: nil,
+        old_score: nil,
+        score: @course.student_enrollments.first.find_score
+      )
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    end
+
+    let(:override_event_json) do
+      subject.grade_change_events_compound_json([override_event], @teacher, @session)
+    end
+
+    it "does not link to an assignment" do
+      expect(override_event_json.dig(:events, 0, :links)).not_to have_key(:assignment)
+    end
+  end
 end

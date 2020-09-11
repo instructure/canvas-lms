@@ -26,11 +26,12 @@ import {Table} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
-import _ from 'underscore'
+import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
+
 function unformatColor(color) {
   if (color[0] === '#') {
     return color.substring(1)
@@ -45,6 +46,7 @@ const createRating = (description, points, color, mastery = false, focusField = 
   mastery,
   focusField
 })
+
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
@@ -55,9 +57,11 @@ const configToState = data => {
   return {
     masteryIndex,
     rows,
-    locked: data.locked
+    locked: data.locked,
+    allowSave: false
   }
 }
+
 export default class ProficiencyTable extends React.Component {
   static propTypes = {
     proficiency: PropTypes.object,
@@ -85,17 +89,23 @@ export default class ProficiencyTable extends React.Component {
     this.state = configToState(props.proficiency)
   }
 
-  componentDidUpdate(_prevProps, prevState) {
+  componentDidUpdate(prevProps, prevState) {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(({rows}) => ({rows: rows.map(row => row.delete('focusField'))}))
-    } else if (
-      this.state.masteryIndex !== prevState.masteryIndex ||
-      this.state.rows !== prevState.rows
+    }
+
+    const {masteryIndex, rows, allowSave} = this.state
+
+    if (
+      !allowSave &&
+      !(_.isEqual(prevState.rows, rows) && prevState.masteryIndex === masteryIndex)
     ) {
-      this.validateAndSave()
+      this.enableSaveButton()
     }
   }
+
+  enableSaveButton = () => this.setState({allowSave: true})
 
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
 
@@ -119,20 +129,21 @@ export default class ProficiencyTable extends React.Component {
     )
   }
 
-  validateAndSave = _.debounce(() => {
+  handleSubmit = () => {
     if (!this.checkForErrors()) {
-      this.props.update(this.stateToConfig()).catch(e => {
-        $.flashError(
-          I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
-            message: e.message
+      this.setState({allowSave: false}, () => {
+        this.props
+          .update(this.stateToConfig())
+          .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
+          .catch(e => {
+            $.flashError(
+              I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+                message: e.message
+              })
+            )
           })
-        )
       })
     }
-  }, 500)
-
-  componentWillUnmount() {
-    this.validateAndSave.cancel()
   }
 
   handleMasteryChange = _.memoize(index => () => {
@@ -209,21 +220,33 @@ export default class ProficiencyTable extends React.Component {
     const rows = this.state.rows.map(row => {
       let r = row
       if (this.invalidDescription(row.get('description'))) {
+        if (!hasError) {
+          r = r.set('focusField', 'description')
+        }
         hasError = true
         r = r.set('descriptionError', I18n.t('Missing required description'))
       } else {
         r = r.delete('descriptionError')
       }
       if (this.invalidPoints(row.get('points'))) {
+        if (!hasError) {
+          r = r.set('focusField', 'points')
+        }
         hasError = true
         previousPoints = null
         r = r.set('pointsError', I18n.t('Invalid points'))
       } else if (row.get('points') < 0) {
+        if (!hasError) {
+          r = r.set('focusField', 'points')
+        }
         hasError = true
         r = r.set('pointsError', I18n.t('Negative points'))
       } else {
         const currentPoints = row.get('points')
         if (previousPoints !== null && previousPoints <= currentPoints) {
+          if (!hasError) {
+            r = r.set('focusField', 'points')
+          }
           hasError = true
           r = r.set('pointsError', I18n.t('Points must be less than previous rating'))
         } else {
@@ -245,7 +268,7 @@ export default class ProficiencyTable extends React.Component {
   invalidDescription = description => !description || description.trim().length === 0
 
   render() {
-    const masteryIndex = this.state.masteryIndex
+    const {allowSave, masteryIndex} = this.state
     return (
       <div>
         <Table caption={<ScreenReaderContent>{I18n.t('Proficiency ratings')}</ScreenReaderContent>}>
@@ -284,11 +307,26 @@ export default class ProficiencyTable extends React.Component {
             ))}
           </tbody>
         </Table>
-        <View width="100%" textAlign="center" padding="small" as="div">
-          <Button onClick={this.addRow} icon={<IconPlusLine />} variant="circle-primary">
-            <ScreenReaderContent>{I18n.t('Add proficiency rating')}</ScreenReaderContent>
+        <View
+          width="100%"
+          textAlign="start"
+          padding="small small medium small"
+          as="div"
+          borderWidth="none none small none"
+        >
+          <Button onClick={this.addRow} renderIcon={<IconPlusLine />}>
+            {I18n.t('Add Proficiency Level')}
           </Button>
         </View>
+        <div className="save">
+          <Button
+            variant="primary"
+            interaction={allowSave ? 'enabled' : 'disabled'}
+            onClick={this.handleSubmit}
+          >
+            {I18n.t('Save Mastery Scale')}
+          </Button>
+        </div>
       </div>
     )
   }

@@ -284,7 +284,7 @@ class SisBatch < ActiveRecord::Base
   def fast_update_progress(val)
     return true if val == self.progress
     self.progress = val
-    state = SisBatch.connection.select_value(<<-SQL)
+    state = SisBatch.connection.select_value(<<~SQL)
       UPDATE #{SisBatch.quoted_table_name} SET progress=#{val} WHERE id=#{self.id} RETURNING workflow_state
     SQL
     raise SisBatch::Aborted if state == 'aborted'
@@ -884,7 +884,7 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_sql(type, data)
-    <<-SQL
+    <<~SQL
       UPDATE #{type.constantize.quoted_table_name} AS t
         SET workflow_state = x.workflow_state,
             updated_at = NOW()

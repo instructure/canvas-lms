@@ -42,7 +42,7 @@ class MasterCourses::FolderHelper
 
         if locked_folder_ids.any?
           # now find all parents for locked folders
-          all_ids = Folder.connection.select_values(<<-SQL)
+          all_ids = Folder.connection.select_values(<<~SQL)
             WITH RECURSIVE t AS (
               SELECT id, parent_folder_id FROM #{Folder.quoted_table_name} WHERE id IN (#{locked_folder_ids.to_a.sort.join(",")})
               UNION

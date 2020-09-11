@@ -1582,7 +1582,7 @@ describe Account do
 
   context "inheritable settings" do
     before do
-      @settings = [:restrict_student_future_view, :lock_all_announcements, :lock_outcome_proficiency, :lock_proficiency_calculation]
+      @settings = [:restrict_student_future_view, :lock_all_announcements]
     end
 
     before :each do
@@ -1596,8 +1596,6 @@ describe Account do
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
         expect(a.lock_all_announcements).to eq expected
-        expect(a.lock_outcome_proficiency).to eq expected
-        expect(a.lock_proficiency_calculation).to eq expected
       end
     end
 

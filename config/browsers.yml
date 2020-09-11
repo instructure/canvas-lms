@@ -1,4 +1,11 @@
-# these browsers must also match what's available in test
+# this file only manages the unsupported browser banner that
+# displays in Canvas if a browser being used is below the
+# minimum specified below. it does not manage which browsers are
+# actively supported for Canvas, which is always the last two
+# versions of each browser.
+# this file is updated yearly in q3 to match the latest firefox
+# ESR version and the latest chrome rapid release version.
+# these browsers must also match what's available in test.
 minimums:
   chrome: 83
   safari: 12

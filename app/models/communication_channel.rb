@@ -406,11 +406,16 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
 
+  # the only way this is used is if a user adds a communication channel in their
+  # profile from the default account. In this space, there is currently a
+  # check_box that will allow you to login with the same email. This method is
+  # only ever true for Account.default
+  # see build_pseudonym_for_email in app/views/profile/_ways_to_contact.html.erb
   def consider_building_pseudonym
     if self.build_pseudonym_on_confirm && self.active?
       self.build_pseudonym_on_confirm = false
-      pseudonym = self.user.pseudonyms.build(:unique_id => self.path, :account => Account.default)
-      existing_pseudonym = self.user.pseudonyms.active.find{|p| p.account_id == Account.default.id }
+      pseudonym = Account.default.pseudonyms.build(unique_id: self.path, user: self.user)
+      existing_pseudonym = Account.default.pseudonyms.active.where(user_id: self.user).take
       if existing_pseudonym
         pseudonym.password_salt = existing_pseudonym.password_salt
         pseudonym.crypted_password = existing_pseudonym.crypted_password

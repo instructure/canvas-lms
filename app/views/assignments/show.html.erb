@@ -72,10 +72,10 @@
         <% end %>
 
         <% if @assignment_menu_tools.present? || @can_direct_share %>
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <button class="al-trigger btn" aria-haspopup="true" aria-owns="toolbar-1">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= t('manage', 'Manage') %></span>
-          </a>
+          </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
             <% if @can_direct_share %>
               <li role="presentation">
@@ -194,7 +194,6 @@
           href="<%= context_url(@context, :context_rubrics_url) %>"
           class="add_rubric_link Button icon-plus"
           style="<%= hidden if @assignment.rubric_association %>"
-          role="button"
         >
           <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
           <span class="screenreader-only"><%= t('Add Rubric') %></span>

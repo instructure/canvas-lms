@@ -20,8 +20,8 @@ require File.expand_path(File.dirname(__FILE__) + '/spec_helper')
 
 def truncate_cassandra(config)
   db = Canvas::Cassandra::DatabaseBuilder.from_config(config)
-  tables = db.execute("SELECT columnfamily_name FROM system.schema_columnfamilies WHERE keyspace_name = '#{db.keyspace}'").map{|a| a["columnfamily_name"]}
-  tables.each do |table|
+
+  db.tables.each do |table|
     db.execute("TRUNCATE #{table}")
   end
 end

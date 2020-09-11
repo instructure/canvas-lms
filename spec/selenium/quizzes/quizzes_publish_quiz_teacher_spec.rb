@@ -72,7 +72,7 @@ describe 'publishing a quiz' do
 
         context 'when clicking the cog menu tool' do
           it 'shows updated options', priority: "1", test_id: 398940 do
-            f('.header-group-right a.al-trigger').click
+            f('.header-group-right button.al-trigger').click
             items = ff('ul#toolbar-1 li.ui-menu-item')
             items_text = []
             items.each { |i| items_text << i.text.split("\n")[0] }

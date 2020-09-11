@@ -91,14 +91,18 @@ describe Wiki do
       expect(@course.wiki.grants_right?(@user, :read)).to be_falsey
     end
 
-    it 'should give manage rights to teachers' do
-      course_with_teacher
-      expect(@course.wiki.grants_right?(@teacher, :manage)).to be_truthy
-    end
+    context 'default permissions' do
+      [:update, :create_page, :delete_page, :update_page, :view_unpublished_items].each do |perm|
+        it "should give #{perm} rights to teachers" do
+          course_with_teacher
+          expect(@course.wiki.grants_right?(@teacher, perm)).to be_truthy
+        end
 
-    it 'should give manage rights to admins' do
-      account_admin_user
-      expect(@course.wiki.grants_right?(@admin, :manage)).to be_truthy
+        it "should give #{perm} rights to admins" do
+          account_admin_user
+          expect(@course.wiki.grants_right?(@admin, perm)).to be_truthy
+        end
+      end
     end
 
     it 'should give publish page rights to admins' do

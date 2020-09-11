@@ -134,7 +134,7 @@ module PostgreSQLAdapterExtensions
   def indexes(table_name)
     schema = shard.name if @config[:use_qualified_names]
 
-    result = query(<<-SQL, 'SCHEMA')
+    result = query(<<~SQL, 'SCHEMA')
          SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
          FROM pg_class t
          INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -153,7 +153,7 @@ module PostgreSQLAdapterExtensions
       inddef = row[3]
       oid = row[4]
 
-      columns = Hash[query(<<-SQL, "SCHEMA")]
+      columns = Hash[query(<<~SQL, "SCHEMA")]
         SELECT a.attnum, a.attname
         FROM pg_attribute a
         WHERE a.attrelid = #{oid}
@@ -193,7 +193,7 @@ module PostgreSQLAdapterExtensions
 
       schema = shard.name if use_qualified_names?
 
-      valid = select_value(<<-SQL, 'SCHEMA')
+      valid = select_value(<<~SQL, 'SCHEMA')
             SELECT indisvalid
             FROM pg_class t
             INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -296,7 +296,7 @@ module PostgreSQLAdapterExtensions
   def extension_installed?(extension)
     @extensions ||= {}
     @extensions.fetch(extension) do
-      select_value(<<-SQL)
+      select_value(<<~SQL)
         SELECT nspname
         FROM pg_extension
           INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid
@@ -424,7 +424,7 @@ module PostgreSQLAdapterExtensions
 
   def icu_collations
     return [] if postgresql_version < 120000
-    @collations ||= select_rows <<-SQL, "SCHEMA"
+    @collations ||= select_rows <<~SQL, "SCHEMA"
       SELECT nspname, collname
       FROM pg_collation
       INNER JOIN pg_namespace ON collnamespace=pg_namespace.oid

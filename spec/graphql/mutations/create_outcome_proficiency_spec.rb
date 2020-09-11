@@ -37,7 +37,6 @@ describe Mutations::CreateOutcomeProficiency do
             _id
             contextId
             contextType
-            locked
             proficiencyRatingsConnection(first: 10) {
               nodes {
                 _id
@@ -83,7 +82,6 @@ describe Mutations::CreateOutcomeProficiency do
     expect(record.context).to eq @account
     expect(result.dig('contextType')).to eq 'Account'
     expect(result.dig('contextId')).to eq @account.id
-    expect(result.dig('locked')).to eq false
     ratings = result.dig('proficiencyRatingsConnection', 'nodes')
     expect(ratings.length).to eq 1
     expect(ratings[0]['color']).to eq 'FFFFFF'

@@ -37,6 +37,14 @@ def buildParameters = [
 
 library "canvas-builds-library"
 
+def getDockerWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
+}
+
+def getLocalWorkDir() {
+  return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
+}
+
 def skipIfPreviouslySuccessful(name, block) {
   if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
     name+="${env.CANVAS_LMS_REFSPEC}"
@@ -85,6 +93,12 @@ def isPatchsetPublishable() {
   env.PATCHSET_TAG == env.PUBLISHABLE_TAG
 }
 
+def isPatchsetRetriggered() {
+  def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
+
+  return userCause && userCause[0].shortDescription.contains('Retriggered')
+}
+
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
     try {
@@ -100,15 +114,43 @@ def cleanupFn(status) {
 }
 
 def postFn(status) {
-  if(status == 'FAILURE' && isPatchsetSlackableOnFailure()) {
+  if(status == 'FAILURE') {
+    maybeSlackSendFailure()
+  } else if(status == 'SUCCESS') {
+    maybeSlackSendSuccess()
+  }
+}
+
+def maybeSlackSendFailure() {
+  if(configuration.isChangeMerged()) {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
+    def authorSegment = authorSlackMsg ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
     slackSend(
-      channel: '#canvas_builds',
+      channel: getSlackChannel(),
       color: 'danger',
-      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(<${env.BUILD_URL}|${env.BUILD_NUMBER}>)"
+      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>)"
+    )
+  }
+}
+
+def maybeSlackSendSuccess() {
+  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
+    slackSend(
+      channel: getSlackChannel(),
+      color: 'good',
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> succeeded on re-trigger. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
+    )
+  }
+}
+
+def maybeSlackSendRetrigger() {
+  if(configuration.isChangeMerged() && isPatchsetRetriggered()) {
+    slackSend(
+      channel: getSlackChannel(),
+      color: 'warning',
+      message: "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${env.GERRIT_EVENT_ACCOUNT_EMAIL} has been re-triggered. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>"
     )
   }
 }
@@ -129,9 +171,10 @@ def getPluginVersion(plugin) {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
 }
 
-def isPatchsetSlackableOnFailure() {
-  return env.SLACK_MESSAGE_ON_FAILURE == 'true' && env.GERRIT_EVENT_TYPE == 'change-merged'
+def getSlackChannel() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
+
 // =========
 
 pipeline {
@@ -183,6 +226,8 @@ pipeline {
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
     CANVAS_LMS_REFSPEC=configuration.canvasLmsRefspec()
+    DOCKER_WORKDIR = getDockerWorkDir()
+    LOCAL_WORKDIR = getLocalWorkDir()
   }
 
   stages {
@@ -195,6 +240,8 @@ pipeline {
             error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
             return
           }
+
+          maybeSlackSendRetrigger()
 
           // Use a nospot instance for now to avoid really bad UX. Jenkins currently will
           // wait for the current steps to complete (even wait to spin up a node), causing
@@ -239,13 +286,29 @@ pipeline {
                 gems.each { gem ->
                   if (env.GERRIT_PROJECT == gem) {
                     /* this is the commit we're testing */
-                    pullGerritRepo(gem, env.GERRIT_REFSPEC, 'gems/plugins')
+                    dir(env.LOCAL_WORKDIR) {
+                      checkout([
+                        $class: 'GitSCM',
+                        branches: [[name: 'FETCH_HEAD']],
+                        doGenerateSubmoduleConfigurations: false,
+                        extensions: [],
+                        submoduleCfg: [],
+                        userRemoteConfigs: [[
+                          credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+                          name: 'origin',
+                          refspec: "$env.GERRIT_REFSPEC",
+                          url: "ssh://$GERRIT_URL/${GERRIT_PROJECT}.git"
+                        ]]
+                      ])
+                    }
                   } else {
                     pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
                   }
                 }
                 pullGerritRepo("qti_migration_tool", getPluginVersion('qti_migration_tool'), "vendor")
 
+                // Plugin builds using the checkout above will create this @tmp file, we need to remove it
+                sh(script: 'rm -vr gems/plugins/*@tmp', returnStatus: true)
                 sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
                 sh 'rm -v config/cache_store.yml'
                 sh 'rm -vr gerrit_builder'
@@ -276,12 +339,12 @@ pipeline {
                       git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
                       # this helps current build issues where cleanup is needed before proceeding.
-                      # however the later git rebase --abort should be enough once this has
-                      # been on jenkins for long enough to hit all nodes, maybe a couple days?
+                      # however the later git rebase --abort should be enough but sometimes isn't.
                       if [ -d .git/rebase-merge ]; then
                         echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
                         git rebase --abort
-                        git checkout $GERRIT_REFSPEC
+                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                          git fetch origin $GERRIT_REFSPEC && git checkout FETCH_HEAD
                       fi
 
                       # store exit_status inline to  ensures the script doesn't exit here on failures
@@ -397,7 +460,7 @@ pipeline {
                 echo 'no migrations added, skipping CDC Schema check'
               }
 
-              if (!configuration.isChangeMerged() && (sh(script: 'build/new-jenkins/spec-changes.sh', returnStatus: true) == 0)) {
+              if (!configuration.isChangeMerged() && dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) }) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
@@ -454,9 +517,14 @@ pipeline {
                   // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
                   sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
                   sh 'docker tag $DEPENDENCIES_PATCHSET_IMAGE $DEPENDENCIES_MERGE_IMAGE'
+
+                  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                  sh "docker tag \$PUBLISHABLE_TAG \$BUILD_IMAGE:${GIT_REV}"
+                  sh "docker tag \$DEPENDENCIES_PATCHSET_IMAGE \$DEPENDENCIES_IMAGE:${GIT_REV}"
+
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $MERGE_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_MERGE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $DEPENDENCIES_IMAGE'
                 }
               }
             }

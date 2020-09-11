@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "右揃え"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "配置とリスト"
+    },
     "all_4321c3a1": {
         "message": "すべて"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "コンピュータ"
+    },
+    "content_1440204b": {
+        "message": "コンテンツ"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "コンテンツはまだアップロード中です。続行すると適切に埋め込まれません。"
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "外部リンク"
     },
+    "external_tools_6e77821": {
+        "message": "外部ツール"
+    },
     "extra_large_b6cdf1ff": {
         "message": "特大"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "無効なファイル タイプです"
     },
+    "invalid_url_cbde79f": {
+        "message": "無効な URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } 完了した{ items, plural,\n     =1 {項目}\n  other {項目}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "マイク"
+    },
+    "miscellaneous_e9818229": {
+        "message": "その他"
     },
     "missing_1a256b3b": {
         "message": "欠如"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "他のエディタショートカットは下記をご覧ください"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p }は、ftp, http, https, mailto, skype, telであるか、省略可能である有効なプロトコルではありません。"
+    },
     "page_50c4823d": {
         "message": "ページ"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "前のページ"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "プロトコルは、ftp、http、https、mailto、skype、telであるか、省略可能です"
     },
     "pts_699bd9aa": {
         "message": "ポイント"

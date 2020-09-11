@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "向右對齊"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "對齊及清單"
+    },
     "all_4321c3a1": {
         "message": "全部"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "電腦"
+    },
+    "content_1440204b": {
+        "message": "內容"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "內容仍在上傳中，如果您繼續將無法正確嵌入內容。"
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "外部連結"
     },
+    "external_tools_6e77821": {
+        "message": "外部工具"
+    },
     "extra_large_b6cdf1ff": {
         "message": "超大"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "無效的檔案類型"
     },
+    "invalid_url_cbde79f": {
+        "message": "無效的 URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } 已完成 { items, plural,\n     =1 { 個項目}\n  other { 個項目}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "麥克風"
+    },
+    "miscellaneous_e9818229": {
+        "message": "雜項"
     },
     "missing_1a256b3b": {
         "message": "缺失"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "其他編輯器快速鍵位於"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p }並非有效協議，必須使用 ftp、http、https、mailto、skype、tel 或忽略此項"
+    },
     "page_50c4823d": {
         "message": "頁面"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "上一頁"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "協議必須為 ftp、http、https、mailto、skype、tel 或忽略此項"
     },
     "pts_699bd9aa": {
         "message": "分數"

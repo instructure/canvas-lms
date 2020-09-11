@@ -668,10 +668,6 @@ describe GradebookImporter do
       student_data["custom_column_data"]
     end
 
-    before(:once) do
-      Account.site_admin.enable_feature!(:gradebook_reserved_importer_bugfix)
-    end
-
     before do
       @student = User.create!
       course_with_student(course: @course, user: @student, active_enrollment: true)

@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Allinea a destra"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Allineamento ed elenchi"
+    },
     "all_4321c3a1": {
         "message": "Tutto"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Computer"
+    },
+    "content_1440204b": {
+        "message": "Contenuto"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Il contenuto è ancora in fase di caricamento, se continui non sarà incorporato correttamente."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Link esterni"
     },
+    "external_tools_6e77821": {
+        "message": "Strumenti esterni"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Extra Large"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Tipo file non valido"
     },
+    "invalid_url_cbde79f": {
+        "message": "URL non valido"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } elemento { items, plural,\n     =1 {completato}\n  other {elementi completati}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Microfono"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Varie"
     },
     "missing_1a256b3b": {
         "message": "Mancante"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Altre scorciatoie dell’editor possono essere trovate in"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } Non è un protocollo valido che deve essere ftp, http, https, mailto, skype, tel oppure può essere omesso"
+    },
     "page_50c4823d": {
         "message": "Pagina"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Pagina precedente"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Il protocollo deve essere ftp, http, https, mailto, skype, tel oppure può essere omesso"
     },
     "pts_699bd9aa": {
         "message": "pt"

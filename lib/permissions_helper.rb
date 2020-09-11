@@ -143,7 +143,7 @@ module PermissionsHelper
     account_roles ||= AccountUser.where(user: self).active.preload(:role).to_a
     role_ids = (enrollments.map(&:role_id) + account_roles.map(&:role_id)).uniq
     root_account_ids = courses.map(&:root_account_id).uniq
-    query = <<-SQL
+    query = <<~SQL
       WITH RECURSIVE t(id, name, parent_account_id, role_id, enabled, locked, self, children, permission) AS (
         SELECT accounts.id, name, parent_account_id, ro.role_id, ro.enabled, ro.locked,
           ro.applies_to_self, ro.applies_to_descendants, ro.permission

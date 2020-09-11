@@ -54,6 +54,9 @@ export function getTinymce() {
 
 export function send($target, methodName, ...args) {
   const remoteEditor = $target.data('remoteEditor')
+
+  if (methodName === 'RCEClosed' && !ENV.use_rce_enhancements) return
+
   if (remoteEditor) {
     let ret
     if (methodName === 'get_code' && remoteEditor.isHidden()) {

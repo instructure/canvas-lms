@@ -846,16 +846,16 @@ class AccountsController < ApplicationController
   #   Lock this setting for sub-accounts and courses
   #
   # @argument account[settings][lock_outcome_proficiency][value] [Boolean]
-  #   Restrict instructors from changing mastery scale
+  #   [DEPRECATED] Restrict instructors from changing mastery scale
   #
   # @argument account[lock_outcome_proficiency][locked] [Boolean]
-  #   Lock this setting for sub-accounts and courses
+  #   [DEPRECATED] Lock this setting for sub-accounts and courses
   #
   # @argument account[settings][lock_proficiency_calculation][value] [Boolean]
-  #   Restrict instructors from changing proficiency calculation method
+  #   [DEPRECATED] Restrict instructors from changing proficiency calculation method
   #
   # @argument account[lock_proficiency_calculation][locked] [Boolean]
-  #   Lock this setting for sub-accounts and courses
+  #   [DEPRECATED] Lock this setting for sub-accounts and courses
   #
   # @argument account[services] [Hash]
   #   Give this a set of keys and boolean values to enable or disable services matching the keys
@@ -1541,8 +1541,6 @@ class AccountsController < ApplicationController
                                    :sub_account_includes, :teachers_can_create_courses, :trusted_referers,
                                    :turnitin_host, :turnitin_account_id, :users_can_edit_name,
                                    {:usage_rights_required => [:value, :locked] }.freeze,
-                                   {:lock_outcome_proficiency => [:value, :locked] }.freeze,
-                                   {:lock_proficiency_calculation => [:value, :locked] }.freeze,
                                    :app_center_access_token, :default_dashboard_view, :force_default_dashboard_view,
                                    :smart_alerts_threshold, :enable_fullstory, :enable_google_analytics].freeze
 

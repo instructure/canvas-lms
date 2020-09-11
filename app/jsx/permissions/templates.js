@@ -1006,39 +1006,6 @@ const assignmentsQuizzesPermissions = generateActionTemplates(
   ]
 )
 
-const canvasInsightsPermissions = generateActionTemplates(
-  'view_learning_analytics',
-
-  [
-    {
-      title: I18n.t('Insights'),
-      description: I18n.t(`Allows user to view Canvas Insights.`)
-    }
-  ],
-  [
-    {
-      title: I18n.t('Insights'),
-      description: I18n.t(
-        `This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details.`
-      )
-    }
-  ],
-  [
-    {
-      title: I18n.t('Insights'),
-      description: I18n.t(`Allows user to view Canvas Insights.`)
-    }
-  ],
-  [
-    {
-      title: I18n.t('Insights'),
-      description: I18n.t(
-        `This permission is only supported when Canvas Insights is enabled for an account. Please contact your Customer Success Manager for details.`
-      )
-    }
-  ]
-)
-
 const messagesSentEntireClassPermissions = generateActionTemplates(
   'send_messages_all',
   [
@@ -3250,7 +3217,6 @@ export const PERMISSION_DETAILS_ACCOUNT_TEMPLATES = {
     assignmentsQuizzesPermissions.ACCOUNT,
     assignmentsAndQuizzes.ACCOUNT,
     blueprintCoursePermissions.ACCOUNT,
-    canvasInsightsPermissions.ACCOUNT,
     courseAddDeletePermissions.ACCOUNT,
     courseAddRemovePermissions.ACCOUNT,
     courseAddRemoveDesignerPermissions.ACCOUNT,
@@ -3320,7 +3286,6 @@ export const PERMISSION_DETAILS_COURSE_TEMPLATES = {
     assignmentsQuizzesPermissions.COURSE,
     assignmentsAndQuizzes.COURSE,
     blueprintCoursePermissions.COURSE,
-    canvasInsightsPermissions.COURSE,
     courseAddDeletePermissions.COURSE,
     courseAddRemovePermissions.COURSE,
     courseAddRemoveDesignerPermissions.COURSE,

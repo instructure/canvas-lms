@@ -44,8 +44,8 @@ class ObserverAlert < ActiveRecord::Base
   end
 
   def users_are_still_linked?
-    return true if observer.as_observer_observation_links.active.where(student: student).shard(observer).any?
-    return true if observer.enrollments.active.where(associated_user: student).shard(observer).any?
+    return true if observer.as_observer_observation_links.active.where(student: student).shard(observer).exists?
+    return true if observer.enrollments.active.where(associated_user: student).shard(observer).exists?
     false
   end
 
@@ -56,31 +56,39 @@ class ObserverAlert < ActiveRecord::Base
   def self.create_assignment_missing_alerts
     alerts = []
     Shackles.activate(:slave) do
-      ObserverAlertThreshold.find_ids_in_ranges(:batch_size => 100) do |min_id, max_id|
-        submissions = Submission.active.
-          eager_load(:assignment, user: :as_student_observer_alert_thresholds).
-          where(:observer_alert_thresholds => {:id => min_id..max_id, :alert_type => 'assignment_missing'}).
-          where("observer_alert_thresholds.user_id = submissions.user_id").
-          joins("LEFT OUTER JOIN #{ObserverAlert.quoted_table_name} ON observer_alerts.context_id = submissions.id
-               AND observer_alerts.context_type = 'Submission'
-               AND observer_alerts.alert_type = 'assignment_missing'").
+      last_user_id = nil
+      now = Time.now.utc
+      loop do
+        scope = ObserverAlertThreshold.
+          where(alert_type: 'assignment_missing').
+          order(:user_id).limit(100)
+        scope = scope.where("observer_alert_thresholds.user_id>?", last_user_id) if last_user_id
+        user_ids = scope.distinct.pluck(:user_id)
+        break if user_ids.empty?
+        last_user_id = user_ids.last
+
+        submissions = Submission.
+          select("submissions.id, submissions.assignment_id, assignments.title AS title, assignments.context_id AS course_id, observer_alert_thresholds.id AS observer_alert_threshold_id, observer_alert_thresholds.observer_id, observer_alert_thresholds.user_id, assignments.title").
+          active.
+          joins(:assignment).
+          joins("INNER JOIN #{ObserverAlertThreshold.quoted_table_name} ON observer_alert_thresholds.user_id=submissions.user_id").
+          where(observer_alert_thresholds: { alert_type: 'assignment_missing'}).
+          where(user_id: user_ids).
           for_enrollments(Enrollment.all_active_or_pending).
+          # users_are_still_linked?
+          where("EXISTS (?)", ObserverEnrollment.where("enrollments.course_id=assignments.context_id AND enrollments.user_id=observer_alert_thresholds.observer_id AND enrollments.associated_user_id=submissions.user_id")).
           missing.
           merge(Assignment.submittable).
           merge(Assignment.published).
           where("late_policy_status = 'missing' OR cached_due_date > ?", 1.day.ago).
-          where("observer_alerts.id IS NULL")
+          where("NOT EXISTS (?)", ObserverAlert.where(context_type: 'Submission', alert_type: 'assignment_missing').where("context_id=submissions.id"))
 
-        submissions.find_each do |submission|
-          # we shouldn't need this select with the query condition but may as well just in case
-          submission.user.as_student_observer_alert_thresholds.select{|t| t.alert_type == 'assignment_missing'}.each do |threshold|
-            next unless threshold.users_are_still_linked?
-            next unless threshold.observer.enrollments.where(course_id: submission.assignment.context_id).first.present?
-
-            now = Time.now.utc
-            alerts << { observer_id: threshold.observer.id,
-                        user_id: threshold.student.id,
-                        observer_alert_threshold_id: threshold.id,
+        submissions.find_in_batches do |batch|
+          courses = Course.select(:id, :course_code).find(batch.map(&:course_id)).index_by(&:id)
+          batch.each do |submission|
+            alerts << { observer_id: submission.observer_id,
+                        user_id: submission.user_id,
+                        observer_alert_threshold_id: submission.observer_alert_threshold_id,
                         alert_type: "assignment_missing",
                         context_type: 'Submission',
                         context_id: submission.id,
@@ -88,8 +96,8 @@ class ObserverAlert < ActiveRecord::Base
                         updated_at: now,
                         action_date: now,
                         title: I18n.t('Assignment missing: %{assignment_name} in %{course_code}', {
-                          assignment_name: submission.assignment.title,
-                          course_code: submission.assignment.course.course_code
+                          assignment_name: submission.title,
+                          course_code: courses[submission.course_id].course_code
                         }) }
           end
         end

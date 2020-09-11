@@ -31,8 +31,11 @@ export function mockShare(overrides = {}) {
     read_state: 'read',
     content_export: {
       id: '3',
+      workflow_state: 'exported',
+      created_at: '2019-07-04T12:00:00Z',
       attachment: {
         id: '4',
+        created_at: '2019-07-04T12:00:00Z',
         url: 'https://attachment.url'
       }
     },

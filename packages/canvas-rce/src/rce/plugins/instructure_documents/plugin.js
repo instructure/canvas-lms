@@ -24,10 +24,45 @@ import {isOKToLink} from '../../contentInsertionUtils'
 const COURSE_PLUGIN_KEY = 'course_documents'
 const USER_PLUGIN_KEY = 'user_documents'
 
+function getMenuItems(ed) {
+  const contextType = ed.settings.canvas_rce_user_context.type
+  const items = [
+    {
+      text: formatMessage('Upload Document'),
+      value: 'instructure_upload_document'
+    }
+  ]
+  if (contextType === 'course') {
+    items.push({
+      text: formatMessage('Course Documents'),
+      value: 'instructure_course_document'
+    })
+  }
+  items.push({
+    text: formatMessage('User Documents'),
+    value: 'instructure_user_document'
+  })
+  return items
+}
+
+function doMenuItem(ed, value) {
+  switch (value) {
+    case 'instructure_upload_document':
+      ed.execCommand('mceInstructureDocuments')
+      break
+    case 'instructure_course_document':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForDocuments', false, COURSE_PLUGIN_KEY)
+      break
+    case 'instructure_user_document':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForDocuments', false, USER_PLUGIN_KEY)
+      break
+  }
+}
+
 tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
   init(ed) {
-    const contextType = ed.settings.canvas_rce_user_context.type
-
     // Register commands
     ed.addCommand('mceInstructureDocuments', clickCallback.bind(this, ed, document))
     ed.addCommand('instructureTrayForDocuments', (ui, plugin_key) => {
@@ -38,69 +73,34 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
     ed.ui.registry.addNestedMenuItem('instructure_document', {
       text: formatMessage('Document'),
       icon: 'document',
-      getSubmenuItems: () => [
-        'instructure_upload_document',
-        'instructure_course_document',
-        'instructure_user_document'
-      ]
+      getSubmenuItems: () =>
+        getMenuItems(ed).map(item => {
+          return {
+            type: 'menuitem',
+            text: item.text,
+            onAction: () => doMenuItem(ed, item.value)
+          }
+        })
     })
-    ed.ui.registry.addMenuItem('instructure_upload_document', {
-      text: formatMessage('Upload Document'),
-      onAction: () => ed.execCommand('mceInstructureDocuments')
-    })
-    if (contextType === 'course') {
-      ed.ui.registry.addMenuItem('instructure_course_document', {
-        text: formatMessage('Course Documents'),
-        onAction: () => {
-          ed.focus(true)
-          ed.execCommand('instructureTrayForDocuments', false, COURSE_PLUGIN_KEY)
-        }
-      })
-    }
-    ed.ui.registry.addMenuItem('instructure_user_document', {
-      text: formatMessage('User Documents'),
-      onAction: () => {
-        ed.focus(true)
-        ed.execCommand('instructureTrayForDocuments', false, USER_PLUGIN_KEY)
-      }
-    })
-
-    const menuItems = [
-      {
-        type: 'menuitem',
-        text: formatMessage('Upload Document'),
-        onAction: () => {
-          ed.execCommand('mceInstructureDocuments')
-        }
-      },
-      {
-        type: 'menuitem',
-        text: formatMessage('User Documents'),
-        onAction() {
-          ed.focus(true) // activate the editor without changing focus
-          ed.execCommand('instructureTrayForDocuments', false, USER_PLUGIN_KEY)
-        }
-      }
-    ]
-    if (contextType === 'course') {
-      menuItems.splice(1, 0, {
-        type: 'menuitem',
-        text: formatMessage('Course Documents'),
-        onAction() {
-          ed.focus(true) // activate the editor without changing focus
-          ed.execCommand('instructureTrayForDocuments', false, COURSE_PLUGIN_KEY)
-        }
-      })
-    }
 
     // Register button
-    ed.ui.registry.addMenuButton('instructure_documents', {
+    ed.ui.registry.addSplitButton('instructure_documents', {
       tooltip: formatMessage('Documents'),
       icon: 'document',
       fetch(callback) {
-        const items = menuItems
+        const items = getMenuItems(ed).map(item => {
+          return {
+            type: 'choiceitem',
+            text: item.text,
+            value: item.value
+          }
+        })
         callback(items)
       },
+      onAction() {
+        doMenuItem(ed, 'instructure_upload_document')
+      },
+      onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
       onSetup(api) {
         function handleNodeChange(_e) {
           api.setDisabled(!isOKToLink(ed.selection.getContent()))

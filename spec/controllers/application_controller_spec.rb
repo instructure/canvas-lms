@@ -374,6 +374,18 @@ RSpec.describe ApplicationController do
       # this test just verifies the condition in js_env works across updates
       expect(Mime::Type.new("*/*") == "*/*").to be_truthy
     end
+
+    context "disable_keyboard_shortcuts" do
+      it "is false by default" do
+        expect(@controller.js_env[:disable_keyboard_shortcuts]).to be_falsey
+      end
+
+      it "is true if user disables keyboard shortcuts" do
+        user = user_model
+        user.enable_feature!(:disable_keyboard_shortcuts)
+        expect(user.prefers_no_keyboard_shortcuts?).to be_truthy
+      end
+    end
   end
 
   describe "clean_return_to" do
@@ -960,6 +972,35 @@ RSpec.describe ApplicationController do
 
           context 'assignments' do
             it_behaves_like 'a placement that caches the launch'
+
+            context 'when a 1.3 tool replaces an LTI 1.1 tool' do
+              let(:assignment) { content_tag.context }
+
+              before do
+                # assignments configured with LTI 1.1 will not have
+                # LineItem or ResouceLink records prior to the LTI 1.3
+                # launch.
+                assignment.line_items.destroy_all
+
+                Lti::ResourceLink.where(
+                  resource_link_id: assignment.lti_context_id
+                ).destroy_all
+
+                assignment.update!(lti_context_id: SecureRandom.uuid)
+
+                controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              it 'creates the default line item' do
+                expect(assignment.line_items).to be_present
+              end
+
+              it 'creates the LTI resource link' do
+                expect(
+                  Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)
+                ).to be_present
+              end
+            end
           end
 
           context 'module items' do

@@ -1211,6 +1211,7 @@ class Attachment < ActiveRecord::Base
       "video/3gpp" => "video",
       "video/mp4" => "video",
       "video/webm": "video",
+      "video/avi": "video",
       "application/x-shockwave-flash" => "flash"
     }[content_type] || "file"
   end

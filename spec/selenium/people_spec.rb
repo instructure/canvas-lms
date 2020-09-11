@@ -274,6 +274,21 @@ describe "people" do
       expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
     end
 
+    it "should auto-create groups based on # of students" do
+      enroll_more_students
+      get "/courses/#{@course.id}/groups#new"
+      f("#new_category_name").send_keys("Groups of 2")
+      f("input#num_students").click
+      count_input = f("input[name='create_group_member_count']")
+      count_input.clear
+      count_input.send_keys 2
+      fj("button:contains('Save')").click
+      wait_for_ajax_requests # initiates job request
+      run_jobs
+      wait_for_ajaximations # finishes calculations and repopulates list
+      expect(ff("li.group").size).to eq 3
+    end
+
     it "should edit a student group" do
       get "/courses/#{@course.id}/users"
       new_group_name = "new group edit name"

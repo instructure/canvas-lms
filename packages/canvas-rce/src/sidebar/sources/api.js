@@ -92,8 +92,9 @@ class RceApiSource {
     const headers = headerFor(this.jwt)
     const uri = this.baseUri('session')
     return this.apiReallyFetch(uri, headers)
-      .then(() => {
+      .then(data => {
         this.hasSession = true
+        return data
       })
       .catch(throwConnectionError)
   }

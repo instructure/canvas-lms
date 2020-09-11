@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Høyrejuster"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Tilpasning og lister"
+    },
     "all_4321c3a1": {
         "message": "Alle"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Datamaskin"
+    },
+    "content_1440204b": {
+        "message": "Innhold"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Innhold blir fortsatt lastet opp, fortsetter du vil ikke innholdet bli innebygd riktig."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Eksterne lenker"
     },
+    "external_tools_6e77821": {
+        "message": "Eksterne verktøy"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra stor"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Ugyldig filtype"
     },
+    "invalid_url_cbde79f": {
+        "message": "Ugyldig URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } fullførte { items, plural,\n     =1 {element}\n  other {elementer}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Diverse"
     },
     "missing_1a256b3b": {
         "message": "Mangler"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Andre redigeringssnarveier kan sees på"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } er ikke en gyldig protokoll som må være ftp, http, https, mailto, skype, tel eller kan utelates"
+    },
     "page_50c4823d": {
         "message": "Side"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Forrige side"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Protokollen må være ftp, http, https, mailto, skype, tel eller kan utelates"
     },
     "pts_699bd9aa": {
         "message": "Poeng"

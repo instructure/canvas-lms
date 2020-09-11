@@ -279,6 +279,9 @@ export default class DeveloperKeyModal extends React.Component {
                 tool_configuration={this.toolConfiguration}
                 editing={editing}
                 showRequiredMessages={this.state.submitted}
+                showMissingRedirectUrisMessage={
+                  this.state.submitted && isLtiKey && !this.hasRedirectUris
+                }
                 updateToolConfiguration={this.updateToolConfiguration}
                 updateDeveloperKey={this.updateDeveloperKey}
                 updateToolConfigurationUrl={this.updateToolConfigurationUrl}

@@ -115,7 +115,19 @@ module SIS
         while !@batched_users.empty?
           user_row = @batched_users.shift
           pseudo = @root_account.pseudonyms.where(sis_user_id: user_row.user_id.to_s).take
-          pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
+          if user_row.authentication_provider_id.present?
+            unless @authentication_providers.key?(user_row.authentication_provider_id)
+              begin
+                @authentication_providers[user_row.authentication_provider_id] =
+                  @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
+              rescue ActiveRecord::RecordNotFound
+                @authentication_providers[user_row.authentication_provider_id] = nil
+              end
+            end
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).where(authentication_provider_id: @authentication_providers[user_row.authentication_provider_id]).take
+          else
+            pseudo_by_login = @root_account.pseudonyms.active.by_unique_id(user_row.login_id).take
+          end
           pseudo_by_integration = nil
           pseudo_by_integration = @root_account.pseudonyms.where(integration_id: user_row.integration_id.to_s).take if user_row.integration_id.present?
           status_is_active = !(user_row.status =~ /\Adeleted/i)
@@ -230,14 +242,6 @@ module SIS
 
           pseudo.unique_id = user_row.login_id unless pseudo.stuck_sis_fields.include?(:unique_id)
           if user_row.authentication_provider_id.present?
-            unless @authentication_providers.key?(user_row.authentication_provider_id)
-              begin
-                @authentication_providers[user_row.authentication_provider_id] =
-                  @root_account.authentication_providers.active.find(user_row.authentication_provider_id)
-              rescue ActiveRecord::RecordNotFound
-                @authentication_providers[user_row.authentication_provider_id] = nil
-              end
-            end
             unless (pseudo.authentication_provider = @authentication_providers[user_row.authentication_provider_id])
               message = "unrecognized authentication provider #{user_row.authentication_provider_id} for #{user_row.user_id}, skipping"
               @messages << SisBatch.build_error(user_row.csv, message, sis_batch: @batch, row: user_row.lineno, row_info: user_row.row)

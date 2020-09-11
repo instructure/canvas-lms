@@ -5089,6 +5089,111 @@ describe AssignmentsApiController, type: :request do
       @assignment.anonymous_grading = false
       expect(result['anonymize_students']).to be false
     end
+
+    context 'can_submit value' do
+      before :each do
+        course_with_student_logged_in(:course_name => "Course 1", :active_all => 1)
+        @course.start_at = 14.days.ago
+        @course.save!
+        @assignment = @course.assignments.create!(:title => "Assignment 1",
+                                                  :points_possible => 10,
+                                                  :submission_types => "online_text_entry")
+      end
+
+      def get_assignment
+        api_call(:get,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}?include[]=can_submit",
+                 {:controller => "assignments_api",
+                  :action => "show",
+                  :format => "json",
+                  :course_id => @course.id.to_s,
+                  :id => @assignment.id,
+                  :include => ["can_submit"]})
+      end
+
+      it 'is true for assignment' do
+        @course.conclude_at = 7.days.from_now
+        @course.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_truthy
+      end
+
+      it 'is true for assignment in course that is soft-concluded but not restricted' do
+        @course.conclude_at = 3.days.ago
+        @course.restrict_enrollments_to_course_dates = false
+        @course.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_truthy
+      end
+
+      it 'is false for assignment in course that is soft-concluded and restricted' do
+        @course.conclude_at = 3.days.ago
+        @course.restrict_enrollments_to_course_dates = true
+        @course.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_falsey
+      end
+
+      it 'is false if the assignment has no submission types' do
+        @assignment.submission_types = "none"
+        @assignment.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_falsey
+      end
+
+      it 'is false if the assignment is submitted on paper' do
+        @assignment.submission_types = "on_paper"
+        @assignment.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_falsey
+      end
+
+      it 'is false if the assignment is locked' do
+        @assignment.unlock_at = 2.days.from_now
+        @assignment.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_falsey
+      end
+
+      it 'is false if the allowed_attempts are used' do
+        @assignment.allowed_attempts = 1
+        @assignment.submit_homework(@student, submission_type: "online_text_entry", body: "Assignment submitted")
+        @assignment.save!
+        json = get_assignment
+        expect(json.key?('can_submit')).to be_present
+        expect(json['can_submit']).to be_falsey
+      end
+
+      it 'does not show when getting all assignments' do
+        json = api_call(:get,
+                 "/api/v1/courses/#{@course.id}/assignments/?include[]=can_submit",
+                 {:controller => "assignments_api",
+                  :action => "index",
+                  :format => "json",
+                  :course_id => @course.id.to_s,
+                  :include => ["can_submit"]})
+        expect(json.first.key?('description')).to be_present
+        expect(json.first.key?('can_submit')).not_to be_present
+      end
+
+      it 'does not show when can_submit param is not included' do
+        json = api_call(:get,
+                        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}",
+                        {:controller => "assignments_api",
+                         :action => "show",
+                         :format => "json",
+                         :course_id => @course.id.to_s,
+                         :id => @assignment.id})
+        expect(json.key?('description')).to be_present
+        expect(json.key?('can_submit')).not_to be_present
+      end
+    end
   end
 
   context "update_from_params" do

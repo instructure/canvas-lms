@@ -111,26 +111,12 @@ describe ContextExternalTool do
         it { is_expected.to eq true }
       end
 
-      context 'and the user does not have the needed permission in the context' do
-        let(:required_permission) { 'view_learning_analytics' }
-        let(:launch_type) { 'assignment_selection' }
-
-        it { is_expected.to eq false }
-      end
-
       context 'and the placement is "global_navigation"' do
         context 'and the user has an enrollment with the needed permission' do
           let(:required_permission) { 'view_group_pages' }
           let(:launch_type) { 'global_navigation' }
 
           it { is_expected.to eq true }
-        end
-
-        context 'and the user does not have an enrollment with the needed permission' do
-          let(:required_permission) { 'view_learning_analytics' }
-          let(:launch_type) { 'global_navigation' }
-
-          it { is_expected.to eq false }
         end
       end
     end
@@ -581,6 +567,20 @@ describe ContextExternalTool do
       let(:content_tag_opts) { super().merge({ content_id: tool.id }) }
 
       it { is_expected.to eq tool }
+
+      context 'and an LTI 1.3 tool has a conflicting URL' do
+        let(:arguments) do
+          [content_tag, tool.context]
+        end
+
+        before do
+          lti_1_3_tool = tool.dup
+          lti_1_3_tool.use_1_3 = true
+          lti_1_3_tool.save!
+        end
+
+        it { is_expected.to be_use_1_3 }
+      end
     end
 
     context 'when there are blank arguments' do
@@ -1677,6 +1677,13 @@ describe ContextExternalTool do
       course_with_teacher(:account => @account, :active_all => true)
       expect(ContextExternalTool.global_navigation_granted_permissions(
         root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'admins'
+    end
+
+    it "should not let concluded teachers see admin tools" do
+      course_with_teacher(:account => @account, :active_all => true)
+      @course.enrollment_term.enrollment_dates_overrides.create!(:enrollment_type => "TeacherEnrollment", :end_at => 1.week.ago)
+      expect(ContextExternalTool.global_navigation_granted_permissions(
+        root_account: @account, user: @user, context: @account)[:original_visibility]).to eq 'members'
     end
 
     it "should not let students see admin tools" do

@@ -94,12 +94,10 @@ export default class IndexMenu extends React.Component {
     if (this.props.hasAssignments && this.props.postToSisDefault) {
       return (
         <li role="menuitem">
-          <a
+          <button
             ref={node => {
               this.disableTrigger = node
             }}
-            href="#"
-            role="button"
             id="assignmentDisableSyncCog"
             title={I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
             aria-label={I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
@@ -110,7 +108,7 @@ export default class IndexMenu extends React.Component {
             }}
           >
             {I18n.t('Disable Sync to %{name}', {name: this.props.sisName})}
-          </a>
+          </button>
         </li>
       )
     }
@@ -191,17 +189,16 @@ export default class IndexMenu extends React.Component {
           this.node = node
         }}
       >
-        <a
-          className="al-trigger btn"
+        <button
+          className="al-trigger btn Button"
           id="course_assignment_settings_link"
-          role="button"
           tabIndex="0"
           title={I18n.t('Assignments Settings')}
           aria-label={I18n.t('Assignments Settings')}
         >
           <i className="icon-more" aria-hidden="true" />
           <span className="screenreader-only">{I18n.t('Assignment Options')}</span>
-        </a>
+        </button>
         <ul className="al-options" role="menu">
           {this.props.requestBulkEdit && (
             <li role="menuitem">

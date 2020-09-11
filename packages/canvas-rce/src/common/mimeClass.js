@@ -95,6 +95,7 @@ export function mimeClass(file) {
         'video/3gpp': 'video',
         'video/mp4': 'video',
         'video/webm': 'video',
+        'video/avi': 'video',
         'application/x-shockwave-flash': 'flash'
       }[contentType] ||
       file.mime_class ||

@@ -371,7 +371,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         end
       end
 
-      context 'when context is something unsupported' do
+      context 'when context is something not handled by any of our backfills' do
         it_behaves_like 'a datafixup that does not populate root_account_id' do
           let(:record) do
             CalendarEvent.create!(context: @user).tap do |ce|
@@ -1625,6 +1625,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     context 'DeveloperKey' do
       it 'ignores site admin keys (null account_id) and cross-shard account_id' do
         dk2 = DeveloperKey.create!(account_id: nil)
+        dk2.update_columns(root_account_id: nil)
+
         expect(dk2.root_account_id).to eq(nil)
         dk3 = DeveloperKey.create!(account: @course.account)
         expect(dk3.root_account_id).to_not eq(nil)

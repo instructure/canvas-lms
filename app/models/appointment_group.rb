@@ -195,7 +195,7 @@ class AppointmentGroup < ActiveRecord::Base
               "ON appointment_groups.id = agc.appointment_group_id " \
               "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
-        where(<<-COND, codes[:primary], codes[:secondary])
+        where(<<~COND, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
         AND (
@@ -219,7 +219,7 @@ class AppointmentGroup < ActiveRecord::Base
               "ON appointment_groups.id = agc.appointment_group_id " \
               "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
-        where(<<-COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
+        where(<<~COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
         AND (

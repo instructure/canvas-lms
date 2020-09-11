@@ -41,7 +41,7 @@ module OutcomesService
           body: data.to_json,
           content_type: 'application/json'
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           { export_id: json['id'], course: course }
         else
@@ -55,7 +55,7 @@ module OutcomesService
           content_export_url,
           headers_for(export_data[:course], 'content_migration.export', id: export_data[:export_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           case json['state']
           when 'completed'
@@ -76,7 +76,7 @@ module OutcomesService
           content_export_url,
           headers_for(export_data[:course], 'content_migration.export', id: export_data[:export_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           json['data']
         else
@@ -103,7 +103,7 @@ module OutcomesService
           body: data.to_json,
           content_type: 'application/json'
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           { import_id: json['id'], course: course, content_migration: content_migration }
         else
@@ -117,7 +117,7 @@ module OutcomesService
           content_import_url,
           headers_for(import_data[:course], 'content_migration.import', id: import_data[:import_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           json['missing_alignments']&.each do |missing_alignment|
 

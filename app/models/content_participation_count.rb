@@ -69,7 +69,7 @@ class ContentParticipationCount < ActiveRecord::Base
     Shackles.activate(:slave) do
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
           batch_object: user, batched_keys: :submissions) do
-        submission_conditions = sanitize_sql_for_conditions([<<-SQL, user.id, context.class.to_s, context.id])
+        submission_conditions = sanitize_sql_for_conditions([<<~SQL, user.id, context.class.to_s, context.id])
           submissions.user_id = ? AND
           assignments.context_type = ? AND
           assignments.context_id = ? AND
@@ -85,7 +85,7 @@ class ContentParticipationCount < ActiveRecord::Base
         subs_with_comments = Submission.active.
             joins(:assignment, :submission_comments).
             where(submission_conditions).
-            where(<<-SQL, user).pluck(:id)
+            where(<<~SQL, user).pluck(:id)
               (submission_comments.hidden IS NULL OR NOT submission_comments.hidden)
               AND NOT submission_comments.draft
               AND submission_comments.provisional_grade_id IS NULL

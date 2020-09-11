@@ -69,9 +69,17 @@ class Csp::Domain < ActiveRecord::Base
     ["csp_whitelisted_domains", global_account_id].cache_key
   end
 
-  def self.domains_for_tools(tool_scope)
-    tool_scope.except(:order).distinct.pluck(:domain, :url).map do |domain, url|
-      domain || (Addressable::URI.parse(url).normalize.host rescue nil)
-    end.compact.map(&:downcase).sort
+  def self.domains_for_tool(tool)
+    # some tools stick a URL into the `domain` field, so deal with that first
+    base_domain = domain_from_url(tool.domain)
+    base_domain ||= tool.domain
+    base_domain ||= domain_from_url(tool.url)
+    return [] unless base_domain
+    base_domain = base_domain.downcase
+    [base_domain, "*.#{base_domain}"]
+  end
+
+  def self.domain_from_url(url)
+    Addressable::URI.parse(url).normalize.host rescue nil
   end
 end

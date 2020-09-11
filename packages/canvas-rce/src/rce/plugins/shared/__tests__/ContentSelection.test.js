@@ -27,7 +27,8 @@ import {
   getLinkContentFromEditor,
   isFileLink,
   isImageEmbed,
-  isVideoElement
+  isVideoElement,
+  findVideoPlayerIframe
 } from '../ContentSelection'
 import FakeEditor from './FakeEditor'
 
@@ -286,6 +287,30 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
       editor.setSelectedNode($selectedNode)
       const content = getLinkContentFromEditor(editor)
       expect(content.type).toEqual(LINK_TYPE)
+    })
+  })
+
+  describe('findVideoPlayerIframe', () => {
+    let wrapper, videoIframe, shim
+    beforeEach(() => {
+      wrapper = document.createElement('span')
+      videoIframe = document.createElement('iframe')
+      shim = document.createElement('span')
+      shim.setAttribute('class', 'mce-shim')
+      wrapper.appendChild(videoIframe)
+      wrapper.appendChild(shim)
+    })
+    it('returns the iframe if given the video iframe', () => {
+      const result = findVideoPlayerIframe(videoIframe)
+      expect(result).toEqual(videoIframe)
+    })
+    it('returns the iframe if given the tinymce wrapper span', () => {
+      const result = findVideoPlayerIframe(wrapper)
+      expect(result).toEqual(videoIframe)
+    })
+    it('returns the iframe if given the shim', () => {
+      const result = findVideoPlayerIframe(shim)
+      expect(result).toEqual(videoIframe)
     })
   })
 

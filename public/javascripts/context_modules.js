@@ -2563,98 +2563,100 @@ $(document).ready(function() {
 
   // Keyboard Shortcuts:
   // "k" and "up arrow" move the focus up between modules and module items
-  const $document = $(document)
-  $document.keycodes('k up', event => {
-    const params = {
-      selectWhenModuleFocused: {
-        item:
-          $currentElem &&
-          $currentElem.prev('.context_module').find('.context_module_item:visible:last'),
-        fallbackModule: $currentElem && $currentElem.prev('.context_module')
-      },
-      selectWhenModuleItemFocused: {
-        item: $currentElem && $currentElem.prev('.context_module_item:visible'),
-        fallbackModule: $currentElem && $currentElem.parents('.context_module')
+  if (!ENV.disable_keyboard_shortcuts) {
+    const $document = $(document)
+    $document.keycodes('k up', event => {
+      const params = {
+        selectWhenModuleFocused: {
+          item:
+            $currentElem &&
+            $currentElem.prev('.context_module').find('.context_module_item:visible:last'),
+          fallbackModule: $currentElem && $currentElem.prev('.context_module')
+        },
+        selectWhenModuleItemFocused: {
+          item: $currentElem && $currentElem.prev('.context_module_item:visible'),
+          fallbackModule: $currentElem && $currentElem.parents('.context_module')
+        }
       }
-    }
-    const $elem = selectItem(params)
-    if ($elem.length) $currentElem = $elem
-  })
-
-  // "j" and "down arrow" move the focus down between modules and module items
-  $document.keycodes('j down', event => {
-    const params = {
-      selectWhenModuleFocused: {
-        item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
-        fallbackModule: $currentElem && $currentElem.next('.context_module')
-      },
-      selectWhenModuleItemFocused: {
-        item: $currentElem && $currentElem.next('.context_module_item:visible'),
-        fallbackModule:
-          $currentElem && $currentElem.parents('.context_module').next('.context_module')
-      }
-    }
-    const $elem = selectItem(params)
-    if ($elem.length) $currentElem = $elem
-  })
-
-  // "e" opens up Edit Module Settings form if focus is on Module or Edit Item Details form if focused on Module Item
-  // "d" deletes module or module item
-  // "space" opens up Move Item or Move Module form depending on which item is focused
-  $document.keycodes('e d space', event => {
-    if (!$currentElem) return
-
-    const $elem = getClosestModuleOrItem($currentElem)
-    const $hasClassItemHover = $elem.hasClass('context_module_item_hover')
-
-    if (event.keyString == 'e') {
-      $hasClassItemHover
-        ? $currentElem.find('.edit_item_link:first').click()
-        : $currentElem.find('.edit_module_link:first').click()
-    } else if (event.keyString == 'd') {
-      if ($hasClassItemHover) {
-        $currentElem.find('.delete_item_link:first').click()
-        $currentElem = $currentElem.parents('.context_module')
-      } else {
-        $currentElem.find('.delete_module_link:first').click()
-        $currentElem = null
-      }
-    } else if (event.keyString == 'space') {
-      $hasClassItemHover
-        ? $currentElem.find('.move_module_item_link:first').click()
-        : $currentElem.find('.move_module_link:first').click()
-    }
-
-    event.preventDefault()
-  })
-
-  // "n" opens up the Add Module form
-  $document.keycodes('n', event => {
-    $('.add_module_link:visible:first').click()
-    event.preventDefault()
-  })
-
-  // "i" indents module item
-  // "o" outdents module item
-  $document.keycodes('i o', event => {
-    if (!$currentElem) return
-
-    const $currentElemID = $currentElem.attr('id')
-
-    if (event.keyString == 'i') {
-      $currentElem
-        .find('.indent_item_link:first')
-        .trigger('click', [$currentElem, document.activeElement])
-    } else if (event.keyString == 'o') {
-      $currentElem
-        .find('.outdent_item_link:first')
-        .trigger('click', [$currentElem, document.activeElement])
-    }
-
-    $document.ajaxStop(() => {
-      $currentElem = $('#' + $currentElemID)
+      const $elem = selectItem(params)
+      if ($elem.length) $currentElem = $elem
     })
-  })
+
+    // "j" and "down arrow" move the focus down between modules and module items
+    $document.keycodes('j down', event => {
+      const params = {
+        selectWhenModuleFocused: {
+          item: $currentElem && $currentElem.find('.context_module_item:visible:first'),
+          fallbackModule: $currentElem && $currentElem.next('.context_module')
+        },
+        selectWhenModuleItemFocused: {
+          item: $currentElem && $currentElem.next('.context_module_item:visible'),
+          fallbackModule:
+            $currentElem && $currentElem.parents('.context_module').next('.context_module')
+        }
+      }
+      const $elem = selectItem(params)
+      if ($elem.length) $currentElem = $elem
+    })
+
+    // "e" opens up Edit Module Settings form if focus is on Module or Edit Item Details form if focused on Module Item
+    // "d" deletes module or module item
+    // "space" opens up Move Item or Move Module form depending on which item is focused
+    $document.keycodes('e d space', event => {
+      if (!$currentElem) return
+
+      const $elem = getClosestModuleOrItem($currentElem)
+      const $hasClassItemHover = $elem.hasClass('context_module_item_hover')
+
+      if (event.keyString == 'e') {
+        $hasClassItemHover
+          ? $currentElem.find('.edit_item_link:first').click()
+          : $currentElem.find('.edit_module_link:first').click()
+      } else if (event.keyString == 'd') {
+        if ($hasClassItemHover) {
+          $currentElem.find('.delete_item_link:first').click()
+          $currentElem = $currentElem.parents('.context_module')
+        } else {
+          $currentElem.find('.delete_module_link:first').click()
+          $currentElem = null
+        }
+      } else if (event.keyString == 'space') {
+        $hasClassItemHover
+          ? $currentElem.find('.move_module_item_link:first').click()
+          : $currentElem.find('.move_module_link:first').click()
+      }
+
+      event.preventDefault()
+    })
+
+    // "n" opens up the Add Module form
+    $document.keycodes('n', event => {
+      $('.add_module_link:visible:first').click()
+      event.preventDefault()
+    })
+
+    // "i" indents module item
+    // "o" outdents module item
+    $document.keycodes('i o', event => {
+      if (!$currentElem) return
+
+      const $currentElemID = $currentElem.attr('id')
+
+      if (event.keyString == 'i') {
+        $currentElem
+          .find('.indent_item_link:first')
+          .trigger('click', [$currentElem, document.activeElement])
+      } else if (event.keyString == 'o') {
+        $currentElem
+          .find('.outdent_item_link:first')
+          .trigger('click', [$currentElem, document.activeElement])
+      }
+
+      $document.ajaxStop(() => {
+        $currentElem = $('#' + $currentElemID)
+      })
+    })
+  }
 
   if ($('#context_modules').hasClass('editable')) {
     requestAnimationFrame(modules.initModuleManagement)

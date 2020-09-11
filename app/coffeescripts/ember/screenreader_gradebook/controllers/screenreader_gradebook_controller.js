@@ -1451,10 +1451,8 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   displayName: function() {
     if (this.get('hideStudentNames')) {
       return 'hiddenName'
-    } else if (ENV.GRADEBOOK_OPTIONS.list_students_by_sortable_name_enabled) {
-      return 'sortable_name'
     } else {
-      return 'name'
+      return 'sortable_name'
     }
   }.property('hideStudentNames'),
 

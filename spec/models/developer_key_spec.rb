@@ -666,6 +666,16 @@ describe DeveloperKey do
           end
         end
 
+        context 'when accout is site admin' do
+          subject { developer_key_not_saved.root_account }
+
+          let(:account) { nil }
+
+          before { developer_key_not_saved.update!(account: account) }
+
+          it { is_expected.to eq Account.site_admin }
+        end
+
         context 'when account is root account' do
           let(:account) { account_model }
 

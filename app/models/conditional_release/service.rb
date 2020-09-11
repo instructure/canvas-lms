@@ -49,7 +49,7 @@ module ConditionalRelease
     end
 
     def self.enabled_in_context?(context)
-      Feature.definitions.key?('conditional_release') && context&.feature_enabled?(:conditional_release)
+      Feature.definitions.key?('conditional_release') && context.is_a?(Course) && context.feature_enabled?(:conditional_release)
     end
 
     def self.triggers_mastery_paths?(assignment, current_user, session = nil)

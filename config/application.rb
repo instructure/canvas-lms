@@ -160,7 +160,7 @@ module CanvasRails
     module TypeMapInitializerExtensions
       def query_conditions_for_initial_load
         known_type_names = @store.keys.map { |n| "'#{n}'" } + @store.keys.map { |n| "'_#{n}'" }
-        <<-SQL % [known_type_names.join(", "),]
+        <<~SQL % [known_type_names.join(", "),]
           WHERE
             t.typname IN (%s)
         SQL

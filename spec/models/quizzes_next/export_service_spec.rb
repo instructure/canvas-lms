@@ -94,6 +94,7 @@ describe QuizzesNext::ExportService do
 
   describe '.send_imported_content' do
     let(:new_course) { double('course') }
+    let(:root_account) { double('account') }
     let(:content_migration) { double(:started_at => 1.hour.ago) }
     let(:new_assignment1) { assignment_model(id: 1) }
     let(:new_assignment2) { assignment_model(id: 2) }
@@ -115,6 +116,9 @@ describe QuizzesNext::ExportService do
     before do
       allow(new_course).to receive(:uuid).and_return('100006')
       allow(new_course).to receive(:lti_context_id).and_return('ctx-1234')
+
+      allow(root_account).to receive(:domain).and_return('canvas.instructure.com')
+      allow(new_course).to receive(:root_account).and_return(root_account)
     end
 
     it 'emits live events for each copied assignment' do

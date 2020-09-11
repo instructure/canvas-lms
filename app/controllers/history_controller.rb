@@ -38,6 +38,11 @@
 #           "example": "icon-assignment",
 #           "type": "string"
 #         },
+#         "asset_readable_category": {
+#           "description": "The associated category describing the asset_icon",
+#           "example": "Assignment",
+#           "type": "string"
+#         },
 #         "context_type": {
 #           "description": "The type of context of the item visited. One of 'Course', 'Group', 'User', or 'Account'",
 #           "type": "string",

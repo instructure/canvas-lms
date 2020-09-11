@@ -29,7 +29,8 @@ const props = (overrides = {}) => {
       description: 'asdfsdf',
       target_link_uri: 'http://example.com',
       oidc_initiation_url: 'http://example.com/initiate',
-      public_jwk: '{}',
+      // public_jwk is first stringified in the constructor before being JSON.parse()d again:
+      public_jwk: {kty: 'RSA', alg: 'RSA256', n: '', e: '', kid: '', use: ''},
       ...overrides
     },
     flashError: () => {},
@@ -90,6 +91,14 @@ it('is valid when valid', () => {
 it('is invalid when invalid inputs', () => {
   const flashError = jest.fn()
   const wrapper = mount(<RequiredValues {...props({target_link_uri: '', flashError})} />)
+  expect(wrapper.instance().valid()).toEqual(false)
+  expect(flashError).toHaveBeenCalled()
+})
+
+it('is invalid when the public JWK is missing a field', () => {
+  const flashError = jest.fn()
+  const public_jwk = {kty: 'RSA', alg: 'RSA256', e: '', kid: '', use: ''} // no 'n'
+  const wrapper = mount(<RequiredValues {...props({public_jwk, flashError})} />)
   expect(wrapper.instance().valid()).toEqual(false)
   expect(flashError).toHaveBeenCalled()
 })

@@ -50,20 +50,15 @@ describe('media utilities', () => {
       expect(sz.width).toEqual('175px')
       expect(sz.height).toEqual('250px')
     })
-    it('fullscreen landscape videos fill the available space', () => {
-      const sz = sizeMediaPlayer(
-        {videoWidth: 500, videoHeight: 250},
-        'video',
-        {
-          width: 1000,
-          height: 800
-        },
-        true
-      )
+    it('sizes small landscape videos to fill the available space', () => {
+      const sz = sizeMediaPlayer({videoWidth: 500, videoHeight: 250}, 'video', {
+        width: 1000,
+        height: 800
+      })
       expect(sz.width).toEqual('1000px')
       expect(sz.height).toEqual('500px')
     })
-    it('fullscreen portrait videos fill the available space', () => {
+    it('sizes small portrait videos to fill the available space', () => {
       const sz = sizeMediaPlayer(
         {videoWidth: 250, videoHeight: 500},
         'video',

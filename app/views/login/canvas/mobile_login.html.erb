@@ -51,7 +51,7 @@
       placeholder="<%= @login_handle_name%>"
       type="<%= @login_handle_is_email ? 'email' : 'text' %>"
       name="pseudonym_session[unique_id]"
-      value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" >
+      value="<%= params[:pseudonym_session].try(:[], :unique_id) %>" />
   </div>
   <div class="ic-Form-control">
     <input
@@ -94,8 +94,12 @@
   </div>
   <button
     type="submit"
-    class="Button Button--primary Button--block"
-    data-text-while-loading="<%= t :sending, "Sending..." %>" class="request-password-button"><%= t('buttons.request_password', 'Request Password') %>
+    class="Button Button--primary Button--block request-password-button"
+    data-text-while-loading="<%= t(:sending, "Sending...") %>"
+    data-text-when-loaded="<%= t(:sent, "Sent!") %>"
+    data-text-on-error="<%= t(:error, "An error occurred, please try again later.") %>"
+  >
+    <%= t('buttons.request_password', 'Request Password') %>
   </button>
   <div class="forgotBlock">
     <a tabindex="0" role="link" class="flip-to-front"><%= t('back_to_login', "Back to Login") %></a>

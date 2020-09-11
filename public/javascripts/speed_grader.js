@@ -982,19 +982,21 @@ function initRubricStuff() {
         rubricAssessment.updateRubricAssociation($rubric, response.rubric_association)
         delete response.rubric_association
       }
-      for (let i = 0; i < EG.currentStudent.rubric_assessments.length; i++) {
-        if (response.id === EG.currentStudent.rubric_assessments[i].id) {
-          $.extend(true, EG.currentStudent.rubric_assessments[i], response)
+
+      // If the student has a submission, update it with the data returned,
+      // otherwise we need to create a submission for them.
+      const assessedStudent = EG.setOrUpdateSubmission(response.artifact)
+
+      for (let i = 0; i < assessedStudent.rubric_assessments.length; i++) {
+        if (response.id === assessedStudent.rubric_assessments[i].id) {
+          $.extend(true, assessedStudent.rubric_assessments[i], response)
           found = true
           continue
         }
       }
       if (!found) {
-        EG.currentStudent.rubric_assessments.push(response)
+        assessedStudent.rubric_assessments.push(response)
       }
-
-      // if this student has a submission, update it with the data returned, otherwise we need to create a submission for them
-      EG.setOrUpdateSubmission(response.artifact)
 
       // this next part will take care of group submissions, so that when one member of the group gets assessesed then everyone in the group will get that same assessment.
       $.each(response.related_group_submissions_and_assessments, (i, submissionAndAssessment) => {

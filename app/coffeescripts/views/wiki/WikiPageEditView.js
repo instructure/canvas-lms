@@ -26,6 +26,7 @@ import WikiPageReloadView from './WikiPageReloadView'
 import I18n from 'i18n!pages'
 import KeyboardShortcuts from '../editor/KeyboardShortcuts'
 import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
+import {send} from 'jsx/shared/rce/RceCommandShim'
 import 'jquery.instructure_date_and_time'
 
 RichContentEditor.preloadRemoteModule()
@@ -337,6 +338,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     if (!this.hasUnsavedChanges() || confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
+      send($('textarea[data-rich_text]'), 'RCEClosed')
       return this.trigger('cancel')
     }
   }

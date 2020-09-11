@@ -28,14 +28,9 @@ export function isAudio(type) {
 
 // return the desired size of the video player in CSS units
 // constrained to the container's size
-// Note: Landscape videos are not constrained to the container's height
-//       This is because if the player is in a window, and the window
-//       resizes wider, the container div gets wider, but the height
-//       doesn't grow, so we let the video grow, which will expand its
-//       container's height. This works for the media player use-case
-//       where the player is either in an iframe with the correct aspect
-//       ratio anyway, or is in window.top
-export function sizeMediaPlayer(player, type, container, expandToFill) {
+// If the container is larger than the video, will stretch it to fill
+// the available space
+export function sizeMediaPlayer(player, type, container) {
   if (isAudio(type)) {
     return AUDIO_PLAYER_SIZE
   }
@@ -44,27 +39,12 @@ export function sizeMediaPlayer(player, type, container, expandToFill) {
     width: player.videoWidth,
     height: player.videoHeight
   }
-  if (expandToFill) {
-    if (sz.width > sz.height) {
-      sz.width = container.width
-      sz.height = (player.videoHeight / player.videoWidth) * sz.width
-    } else {
-      sz.height = container.height
-      sz.width = (player.videoWidth / player.videoHeight) * sz.height
-    }
+  if (sz.width > sz.height) {
+    sz.width = container.width
+    sz.height = (player.videoHeight / player.videoWidth) * sz.width
   } else {
-    // scale the player so it does not overflow its container
-    if (sz.width > container.width) {
-      const wscale = container.width / sz.width
-      sz.width *= wscale
-      sz.height *= wscale
-    }
-    // if is a portrait video, may have to scale the height
-    if (sz.height > sz.width && sz.height > container.height) {
-      const hscale = container.height / sz.height
-      sz.width *= hscale
-      sz.height *= hscale
-    }
+    sz.height = container.height
+    sz.width = (player.videoWidth / player.videoHeight) * sz.height
   }
 
   sz.width = `${Math.round(sz.width)}px`

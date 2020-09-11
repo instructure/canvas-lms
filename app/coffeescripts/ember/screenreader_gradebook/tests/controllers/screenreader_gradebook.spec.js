@@ -127,8 +127,12 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       asyncHelper.waitForRequests().then(() => {
         srgb.set('hideStudentNames', true)
         equal(srgb.get('displayName'), 'hiddenName')
+      }))
+
+    test('displayName is sortable_name when hideStudentNames is false', () =>
+      asyncHelper.waitForRequests().then(() => {
         srgb.set('hideStudentNames', false)
-        equal(srgb.get('displayName'), 'name')
+        equal(srgb.get('displayName'), 'sortable_name')
       }))
 
     test('updateSubmission attaches the submission to the student', () =>
@@ -161,7 +165,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       asyncHelper.waitForRequests().then(() => {
         Ember.run(() => srgb.set('selectedSection', srgb.get('sections.lastObject')))
         equal(srgb.get('studentsInSelectedSection.length'), 6)
-        equal(srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy')
+        equal(srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy Baker')
       }))
 
     test('sorting assignments by position', () =>
@@ -357,7 +361,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       gradingPeriodSet = {
         id: '1501',
-        gradingPeriods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+        gradingPeriods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
         weighted: true
       }
     })
@@ -439,7 +446,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('normalizes the grading period set from the env', () => {
       ENV.GRADEBOOK_OPTIONS.grading_period_set = {
         id: '1501',
-        grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+        grading_periods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
         weighted: true
       }
       return asyncHelper.waitForRequests().then(() => {

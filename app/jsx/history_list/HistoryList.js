@@ -45,10 +45,15 @@ export default function HistoryList({hasLoaded, history}) {
           <List.Item key={entry.asset_code}>
             <Flex>
               <Flex.Item align="start" padding="none x-small none none">
-                <i className={entry.asset_icon} />
+                <i className={entry.asset_icon} aria-hidden="true" />
               </Flex.Item>
               <Flex.Item grow>
-                <Link href={entry.visited_url}>{entry.asset_name}</Link>
+                <Link
+                  href={entry.visited_url}
+                  aria-label={`${entry.asset_name}, ${entry.asset_readable_category}`}
+                >
+                  {entry.asset_name}
+                </Link>
                 <Text as="div" transform="uppercase" size="x-small" lineHeight="condensed">
                   {entry.context_name}
                 </Text>

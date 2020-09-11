@@ -326,46 +326,6 @@
                     </tr>
                   <% end %>
                 <% end %>
-
-                <% if @account.root_account.feature_enabled?(:account_level_mastery_scales) %>
-                  <%= settings.fields_for :lock_outcome_proficiency do |r| %>
-                    <% hash = @account.lock_outcome_proficiency %>
-                    <% disabled = hash[:locked] && hash[:inherited] %>
-                    <tr>
-                      <td colspan="2">
-                        <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
-                        <%= r.label :value, t("Restrict instructors from changing mastery scales") %>
-                      </td>
-                    </tr>
-                    <% unless disabled %>
-                      <tr>
-                        <td colspan="2" class="sub_checkbox">
-                          <%= r.check_box :locked, :checked => hash[:locked] %>
-                          <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
-                        </td>
-                      </tr>
-                    <% end %>
-                  <% end %>
-
-                  <%= settings.fields_for :lock_proficiency_calculation do |r| %>
-                    <% hash = @account.lock_proficiency_calculation %>
-                    <% disabled = hash[:locked] && hash[:inherited] %>
-                    <tr>
-                      <td colspan="2">
-                        <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
-                        <%= r.label :value, t("Restrict instructors from changing proficiency calculation method") %>
-                      </td>
-                    </tr>
-                    <% unless disabled %>
-                      <tr>
-                        <td colspan="2" class="sub_checkbox">
-                          <%= r.check_box :locked, :checked => hash[:locked] %>
-                          <%= r.label :locked, :en => "Lock this setting for sub-accounts and courses" %>
-                        </td>
-                      </tr>
-                    <% end %>
-                  <% end %>
-                <% end %>
               <% end %>
             <% end %>
           </table>

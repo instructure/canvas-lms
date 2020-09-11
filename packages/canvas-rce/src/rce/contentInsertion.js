@@ -254,6 +254,14 @@ export function insertVideo(editor, video) {
     // attributes from the iframe, that's why we can't look for those)
     const src = mediaIframeSrcFromFile(video)
     result = result.querySelector(`iframe[src="${src}"]`)
+
+    // When the iframe is inserted, it doesn't allow the video to play
+    // because the wrapping span captures the click events. Setting
+    // contentEditable to false disables this behavior.
+    if (result?.parentElement) {
+      editor.dom.setAttrib(result.parentElement, 'contenteditable', false)
+    }
+
     return result
   } else {
     return insertLink(editor, {...video, href: mediaIframeSrcFromFile(video)})
@@ -265,6 +273,14 @@ export function insertAudio(editor, audio) {
     let result = insertContent(editor, renderAudio(audio))
     const src = mediaIframeSrcFromFile(audio)
     result = result.querySelector(`iframe[src="${src}"]`)
+
+    // When the iframe is inserted, it doesn't allow the audio to play
+    // because the wrapping span captures the click events. Setting
+    // contentEditable to false disables this behavior.
+    if (result?.parentElement) {
+      editor.dom.setAttrib(result.parentElement, 'contenteditable', false)
+    }
+
     return result
   } else {
     return insertLink(editor, {...audio, href: mediaIframeSrcFromFile(audio)})

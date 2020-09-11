@@ -50,6 +50,8 @@ Pact.service_provider PactConfig::Providers::CANVAS_LMS_API do
   # Specify and run a single consumer
   # or have the option to run Pact verification for all consumers
   PactConfig::Consumers::ALL.each do |consumer|
+    next if consumer == PactConfig::Consumers::CANVAS_LMS_API # don't want to run canvas-lms contracts against itself where it would be a consumer and provider
+
     if ENV['PACT_API_CONSUMER'].present? && ENV['PACT_API_CONSUMER'] == consumer
       provider_verification_for(consumer)
     elsif ENV['PACT_API_CONSUMER'].blank?

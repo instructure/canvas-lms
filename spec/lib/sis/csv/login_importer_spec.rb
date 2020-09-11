@@ -38,6 +38,17 @@ describe SIS::CSV::LoginImporter do
     expect(user.communication_channels.count).to eql(2)
   end
 
+  it "finds login within authentication providers" do
+    @account.authentication_providers.create!(auth_type: 'google')
+    # same login_id, on same user with different auth provider.
+    process_csv_data_cleanly(
+      "user_id,login_id,existing_user_id,email,status,authentication_provider_id",
+      "user_1b,user1,user_1,user1@example.com,active,google"
+    )
+    p = @account.pseudonyms.active.where(sis_user_id: 'user_1').first
+    expect(p.user.pseudonyms.active.where(unique_id: 'user1', account: @account).count).to eq(2)
+  end
+
   it "should create new logins on existing users with integration_id" do
     process_csv_data_cleanly(
       "user_id,login_id,existing_integration_id,email",

@@ -44,6 +44,7 @@ gulp.task('rev', () => {
     'rfc822.js',
     'synopsis.js',
     'zones.js',
+    'ca_ES.js',
     'de_DE.js',
     'fr_FR.js',
     'fr_CA.js',

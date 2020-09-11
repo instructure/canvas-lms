@@ -101,6 +101,15 @@ describe 'CommunicationChannels API', type: :request do
         :address => 'new+api@example.com', :type => 'email' }}
     end
 
+    it 'should not create a login on restore of login that was set to build login' do
+      json = api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
+      channel = CommunicationChannel.find(json['id'])
+      channel.update(workflow_state: 'retired', build_pseudonym_on_confirm: true)
+      api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
+      expect(channel.reload.workflow_state).to eq 'active'
+      expect(channel.pseudonym).to be_nil
+    end
+
     it 'should be able to create new channels' do
       json = api_call(:post, @path, @path_options, @post_params.merge({
         :skip_confirmation => 1 }))

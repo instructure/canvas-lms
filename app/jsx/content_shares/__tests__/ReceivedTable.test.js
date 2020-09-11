@@ -20,6 +20,7 @@ import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
 import ReceivedTable from 'jsx/content_shares/ReceivedTable'
 import {
+  mockShare,
   assignmentShare,
   readDiscussionShare,
   unreadDiscussionShare
@@ -122,5 +123,27 @@ describe('content shares table', () => {
     fireEvent.click(getByText(/manage options/i))
     fireEvent.click(getByText('Remove'))
     expect(onRemove).toHaveBeenCalledWith(assignmentShare)
+  })
+
+  it('handles a missing content_export', () => {
+    const brokenShare = mockShare({content_export: null})
+    const {getByText, queryByText, queryByTestId} = render(<ReceivedTable shares={[brokenShare]} />)
+    fireEvent.click(getByText(/manage options/i))
+    expect(queryByText('Remove')).toBeInTheDocument()
+    expect(queryByText('Failed')).toBeInTheDocument()
+    expect(queryByTestId('import-menu-action')).not.toBeInTheDocument()
+    expect(queryByTestId('preview-menu-action')).not.toBeInTheDocument()
+  })
+
+  it('handles an incomplete content_export', () => {
+    const pendingShare = mockShare({content_export: {id: 4, workflow_state: 'exporting'}})
+    const {getByText, queryByText, queryByTestId} = render(
+      <ReceivedTable shares={[pendingShare]} />
+    )
+    fireEvent.click(getByText(/manage options/i))
+    expect(queryByText('Remove')).toBeInTheDocument()
+    expect(queryByText('Pending')).toBeInTheDocument()
+    expect(queryByTestId('import-menu-action')).not.toBeInTheDocument()
+    expect(queryByTestId('preview-menu-action')).not.toBeInTheDocument()
   })
 })

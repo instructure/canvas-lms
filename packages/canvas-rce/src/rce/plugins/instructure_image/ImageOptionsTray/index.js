@@ -142,6 +142,7 @@ export default function ImageOptionsTray(props) {
             handleImageSizeChange={handleImageSizeChange}
             messagesForSize={messagesForSize}
             handleSave={handleSave}
+            flexHeight="100%"
           />
         </Flex.Item>
       </Flex>

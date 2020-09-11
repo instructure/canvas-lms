@@ -39,10 +39,10 @@ describe('render available pronouns input', () => {
     expect(await queryByText('They/Them')).toEqual(null)
   })
 
-  it('adds pronoun "It/That"', async () => {
+  it('trims pronouns before adding them', async () => {
     const {findByText, getByTestId} = render(<PronounInput />)
     const input = getByTestId('test_pronoun_input')
-    fireEvent.change(input, {target: {value: 'It/That'}})
+    fireEvent.change(input, {target: {value: ' It/That '}})
     fireEvent.keyDown(input, {key: 'Enter', code: 13, charCode: 13})
     expect(await findByText('It/That')).toBeVisible()
   })

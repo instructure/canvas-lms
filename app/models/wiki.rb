@@ -153,40 +153,23 @@ class Wiki < ActiveRecord::Base
     can :read and can :create_page and can :update_page
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
       self.context.grants_right?(user, session, :manage_wiki_create)
     end
     can :read and can :create_page and can :view_unpublished_items
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
       self.context.grants_right?(user, session, :manage_wiki_delete)
     end
     can :read and can :delete_page and can :view_unpublished_items
 
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
       self.context.grants_right?(user, session, :manage_wiki_update)
     end
     can :read and can :update and can :update_page and can :view_unpublished_items
 
     # Pages created by a user without this permission will be automatically published
     given do |user, session|
-      self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
       self.context.grants_right?(user, session, :manage_wiki_update) && !self.context.is_a?(Group)
-    end
-    can :publish_page
-
-    given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
-      self.context.grants_right?(user, session, :manage_wiki)
-    end
-    can :manage and can :read and can :update and can :create_page and can :delete_page and can :update_page and can :view_unpublished_items
-
-    # Pages created by a user without this permission will be automatically published
-    given do |user, session|
-      !self.context.root_account.feature_enabled?(:granular_permissions_wiki_pages) &&
-      self.context.grants_right?(user, session, :manage_wiki) && !self.context.is_a?(Group)
     end
     can :publish_page
   end

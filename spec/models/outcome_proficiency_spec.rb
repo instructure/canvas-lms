@@ -52,6 +52,13 @@ describe OutcomeProficiency, type: :model do
       expect(proficiency.context_type).to eq 'Account'
       expect(proficiency.context).to eq account
     end
+
+    it 'can belong to a course' do
+      course = course_model
+      proficiency = outcome_proficiency_model(course)
+      expect(proficiency.context_type).to eq 'Course'
+      expect(proficiency.context).to eq course
+    end
   end
 
   describe 'before save' do

@@ -186,7 +186,7 @@ class SRGB
     end
 
     def select_student(student)
-      click_option(student_dropdown, student.name)
+      click_option(student_dropdown, student.sortable_name)
     end
 
     def select_grading_period(grading_period)

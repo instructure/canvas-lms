@@ -53,7 +53,6 @@ function LoginActionPrompt(props) {
           {props.nonAcceptedEnrollment ? (
             <a
               href={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}
-              role="button"
               className="Button"
               data-method="POST"
               data-url={`/courses/${ENV.COURSE_ID}/enrollment_invitation?accept=true`}

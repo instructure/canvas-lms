@@ -18,11 +18,11 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS5_2
-  gem 'rails', '5.2.4.3'
+  gem 'rails', '5.2.4.4'
     gem 'loofah', '2.3.0'
     gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
 else
-  gem 'rails', '6.0.3.1'
+  gem 'rails', '6.0.3.3'
 end
 
 gem 'academic_benchmarks', '0.0.11', require: false
@@ -74,12 +74,12 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.7.0'
-gem 'inst-jobs', '0.15.22'
+gem 'inst-jobs', '0.16.0'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
 gem 'inst-jobs-autoscaling', '1.0.5'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
-gem 'inst-jobs-statsd', '1.4.0'
+gem 'inst-jobs-statsd', '1.4.1'
 gem 'json', '2.3.1'
 gem 'json_schemer', '0.2.10'
 gem 'json-jwt', '1.11.0', require: false
@@ -119,7 +119,7 @@ gem 'shackles', '1.4.2'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'switchman', '1.15.2'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '1.4.2'
+gem 'switchman-inst-jobs', '1.5.2'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.5'
 gem 'vault', '0.13.0', require: false

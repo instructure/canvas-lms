@@ -537,7 +537,7 @@ describe AccessToken do
 
     it "inherits root_account value from siteadmin context" do
       at = AccessToken.create!(user: user_model, developer_key: site_admin_key)
-      expect(at.root_account_id).to be_nil
+      expect(at.root_account_id).to eq Account.site_admin.id
     end
 
     it "keeps set value if it already exists" do

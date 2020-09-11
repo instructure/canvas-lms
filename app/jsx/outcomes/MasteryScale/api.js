@@ -27,7 +27,6 @@ export const OUTCOME_PROFICIENCY_QUERY = gql`
         _id
         contextId
         contextType
-        locked
         proficiencyRatingsConnection {
           nodes {
             _id
@@ -37,45 +36,6 @@ export const OUTCOME_PROFICIENCY_QUERY = gql`
             points
           }
         }
-      }
-      outcomeCalculationMethod {
-        _id
-        calculationInt
-        calculationMethod
-        contextId
-        contextType
-        locked
-      }
-    }
-  }
-`
-
-export const SET_OUTCOME_CALCULATION_METHOD = gql`
-  mutation SetOutcomeCalculationMethod(
-    $contextType: String!
-    $contextId: ID!
-    $calculationMethod: String!
-    $calculationInt: Int
-  ) {
-    createOutcomeCalculationMethod(
-      input: {
-        contextId: $contextId
-        contextType: $contextType
-        calculationMethod: $calculationMethod
-        calculationInt: $calculationInt
-      }
-    ) {
-      outcomeCalculationMethod {
-        _id
-        calculationMethod
-        calculationInt
-        contextId
-        contextType
-        locked
-      }
-      errors {
-        attribute
-        message
       }
     }
   }

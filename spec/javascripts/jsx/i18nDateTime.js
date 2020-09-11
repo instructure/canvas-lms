@@ -26,6 +26,7 @@ import 'translations/_core'
 import 'translations/_core_en'
 
 import bigeasyLocales from 'timezone/locales'
+import bigeasyLocale_ca_ES from 'custom_timezone_locales/ca_ES'
 import bigeasyLocale_cy_GB from 'custom_timezone_locales/cy_GB'
 import bigeasyLocale_de_DE from 'custom_timezone_locales/de_DE'
 import bigeasyLocale_fr_FR from 'custom_timezone_locales/fr_FR'
@@ -44,6 +45,7 @@ import bigeasyLocale_tr_TR from 'custom_timezone_locales/tr_TR'
 import bigeasyLocale_uk_UA from 'custom_timezone_locales/uk_UA'
 import bigeasyLocale_el_GR from 'custom_timezone_locales/el_GR'
 
+import 'custom_moment_locales/ca'
 import 'custom_moment_locales/de'
 import 'custom_moment_locales/he'
 import 'custom_moment_locales/pl'
@@ -60,6 +62,7 @@ let originalFallbacksMap
 
 const bigeasyLocalesWithCustom = [
   ...bigeasyLocales,
+  bigeasyLocale_ca_ES,
   bigeasyLocale_cy_GB,
   bigeasyLocale_de_DE,
   bigeasyLocale_fr_FR,

@@ -98,8 +98,11 @@ $.timeString = function(date, options) {
 
   // match ruby-side short format on the hour, e.g. `1pm`
   // can't just check getMinutes, cuz not all timezone offsets are on the hour
-  const format =
-    tz.format(date, '%M') === '00' ? 'time.formats.tiny_on_the_hour' : 'time.formats.tiny'
+  const format = tz.hasMeridian() && tz.format(date, '%M') === '00' ? (
+    'time.formats.tiny_on_the_hour'
+  ) : (
+    'time.formats.tiny'
+  )
 
   if (typeof timezone === 'string' || timezone instanceof String) {
     return tz.format(date, format, timezone) || ''

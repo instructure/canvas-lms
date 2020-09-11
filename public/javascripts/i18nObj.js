@@ -51,7 +51,7 @@ I18n.locale = document.documentElement.getAttribute('lang')
 
 I18n.lookup = function(scope, options = {}) {
   const translations = I18n.translations
-  const locales = I18n.getLocaleAndFallbacks(I18n.currentLocale())
+  const locales = I18n.getLocaleAndFallbacks(options.locale || I18n.currentLocale())
   if (typeof scope === 'object') {
     scope = scope.join(this.defaultSeparator)
   }

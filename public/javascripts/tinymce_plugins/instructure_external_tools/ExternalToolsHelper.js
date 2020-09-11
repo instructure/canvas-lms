@@ -141,12 +141,20 @@ export default {
 
   showHideButtons(ed) {
     const label = I18n.t('Apps')
+    const menubutton = ed.$(
+      ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)
+    )
+    const button = ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`))
     if (window.localStorage?.getItem('ltimru')) {
-      ed.$(ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)).show()
-      ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)).hide()
+      menubutton.attr('aria-hidden', 'false')
+      button.attr('aria-hidden', 'true')
+      menubutton.show()
+      button.hide()
     } else {
-      ed.$(ed.editorContainer.querySelector(`.tox-tbtn--select[aria-label="${label}"]`)).hide()
-      ed.$(ed.editorContainer.querySelector(`.tox-tbtn[aria-label="${label}"]`)).show()
+      menubutton.attr('aria-hidden', 'true')
+      button.attr('aria-hidden', 'false')
+      menubutton.hide()
+      button.show()
     }
   },
 
