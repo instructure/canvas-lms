@@ -164,6 +164,8 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "should error if empty post params sent" do
+      skip 'FOO-952 (9/11/2020)'
+
       json = call_create({}, 422)
       expect(json['errors'].first).to eq({
         'field' => 'auth_type',
