@@ -622,7 +622,7 @@ module Canvas::LiveEvents
     context = content_migration.context
     import_quizzes_next =
       content_migration.migration_settings&.[](:import_quizzes_next) == true
-    {
+    payload = {
       content_migration_id: content_migration.global_id,
       context_id: context.global_id,
       context_type: context.class.to_s,
@@ -630,6 +630,12 @@ module Canvas::LiveEvents
       context_uuid: context.uuid,
       import_quizzes_next: import_quizzes_next
     }
+
+    if context.respond_to?(:root_account)
+      payload[:domain] = context.root_account&.domain
+    end
+
+    payload
   end
 
   def self.course_section_created(section)
