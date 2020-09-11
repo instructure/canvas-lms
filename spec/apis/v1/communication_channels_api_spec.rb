@@ -150,6 +150,7 @@ describe 'CommunicationChannels API', type: :request do
     it "doesn't error if the user already has a login with the same e-mail address" do
       @someone.pseudonyms.create!(unique_id: 'new+api@example.com')
       api_call(:post, @path, @path_options, @post_params.merge(skip_confirmation: 1))
+      expect(response).to be_successful
     end
 
     context 'a site admin' do
@@ -217,21 +218,28 @@ describe 'CommunicationChannels API', type: :request do
         expect(response.code).to eql '401'
       end
 
-      context 'push' do
-        before { @post_params.merge!(communication_channel: {token: 'registration_token', type: 'push'}) }
-
+      context 'not configured push' do
         it 'should complain about sns not being configured' do
+          @post_params.merge!(communication_channel: {token: 'registration_token', type: 'push'})
           raw_api_call(:post, @path, @path_options, @post_params)
 
           expect(response.code).to eql '400'
         end
+      end
 
-        it "should work" do
-          client = double()
-          allow(DeveloperKey).to receive(:sns).and_return(client)
+      context 'push' do
+        before { @post_params.merge!(communication_channel: {token: 'registration_token', type: 'push'}) }
+
+        let(:client) { double() }
+        let(:dk) do
           dk = DeveloperKey.default
           dk.sns_arn = 'apparn'
           dk.save!
+          dk
+        end
+
+        it "should work" do
+          allow(DeveloperKey).to receive(:sns).and_return(client)
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
 
@@ -242,11 +250,7 @@ describe 'CommunicationChannels API', type: :request do
         end
 
         it "shouldn't create two push channels regardless of case" do
-          client = double()
           allow(DeveloperKey).to receive(:sns).and_return(client)
-          dk = DeveloperKey.default
-          dk.sns_arn = 'apparn'
-          dk.save!
           $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
           expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
           @post_params[:communication_channel][:token].upcase!
@@ -255,6 +259,27 @@ describe 'CommunicationChannels API', type: :request do
           api_call(:post, @path, @path_options, @post_params)
           expect(@user.notification_endpoints.count).to eq 1
         end
+
+        context 'shards' do
+          specs_require_sharding
+
+          it "should not have unique constraint error for push channel" do
+            allow(DeveloperKey).to receive(:sns).and_return(client)
+            $spec_api_tokens[@user] = @user.access_tokens.create!(developer_key: dk).full_token
+            expect(client).to receive(:create_platform_endpoint).once.and_return(endpoint_arn: 'endpointarn')
+            api_call(:post, @path, @path_options, @post_params)
+            @shard1.activate { @new_user = User.create!(name: 'shard one') }
+            # this is faster than a user_merge
+            @new_user.associate_with_shard(Shard.current)
+            @user.access_tokens.update_all(user_id: @new_user.id)
+            $spec_api_tokens[@new_user] = $spec_api_tokens[@user]
+            @user = @new_user
+            @path_options[:user_id] = @user.id
+            api_call(:post, "/api/v1/users/#{@user.id}/communication_channels", @path_options, @post_params)
+            expect(response).to be_successful
+          end
+        end
+
       end
     end
   end

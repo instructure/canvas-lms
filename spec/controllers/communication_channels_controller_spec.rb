@@ -1387,6 +1387,22 @@ describe CommunicationChannelsController do
         let(:fake_token) { 'insttothemoon' }
         before(:each) { sns_access_token.notification_endpoints.create!(token: fake_token) }
 
+        context "cross-shard user" do
+          specs_require_sharding
+
+          it 'should delete endpoints from all_shards', type: :request do
+            @shard1.activate { @new_user = User.create!(name: 'shard one') }
+            UserMerge.from(@user).into(@new_user)
+            @user = @new_user
+            json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
+                            {controller: 'communication_channels', action: 'delete_push_token', format: 'json',
+                             push_token: fake_token}, {push_token: fake_token})
+            expect(json['success']).to eq true
+            endpoints = @user.notification_endpoints.shard(@user).where("lower(token) = ?", fake_token)
+            expect(endpoints.length).to eq 0
+          end
+        end
+
         it 'should delete a push_token', type: :request do
           json = api_call(:delete, "/api/v1/users/self/communication_channels/push",
                           {controller: 'communication_channels', action: 'delete_push_token', format: 'json',

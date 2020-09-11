@@ -165,7 +165,7 @@ class CommunicationChannelsController < ApplicationController
       end
 
       NotificationEndpoint.unique_constraint_retry do
-        unless @current_user.notification_endpoints.where("lower(token) = lower(?)", params[:communication_channel][:token]).exists?
+        unless @access_token.notification_endpoints.where("lower(token) = lower(?)", params[:communication_channel][:token]).exists?
           @access_token.notification_endpoints.create!(token: params[:communication_channel][:token])
         end
       end
@@ -530,7 +530,7 @@ class CommunicationChannelsController < ApplicationController
     @cc = @current_user.communication_channels.unretired.of_type(CommunicationChannel::TYPE_PUSH).take
     raise ActiveRecord::RecordNotFound unless @cc
 
-    endpoints = @current_user.notification_endpoints.where("lower(token) = ?", params[:push_token].downcase)
+    endpoints = @current_user.notification_endpoints.shard(@current_user).where("lower(token) = ?", params[:push_token].downcase)
     if endpoints&.destroy_all
       @current_user.touch
       return render json: {success: true}
