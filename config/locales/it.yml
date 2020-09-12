@@ -189,6 +189,7 @@ it:
   a_new_assignment_has_been_created_for_your_course__12b72639: "È stato creato un nuovo compito per il tuo corso, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Per utilizzare Academic Benchmarks, è necessario un ID partner"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Per utilizzare Academic Benchmarks, è necessaria una chiave partner"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "È disponibile una versione premium di BigBlueButton che consente conferenze contemporanee sulla base dell’acquisto effettuato (ognuna con 1 host e fino a 99 partecipanti), nessuna limitazione alle registrazioni archiviate e un’infrastruttura dedicata per prestazioni migliori."
   a_problem_occurred_adding_reviewers_57b083d9: "Si è verificato un errore durante l'aggiunta dei revisori."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Un livello di privacy pubblico invierà al provider dello strumento le informazioni di identificazione personale dell’utente che esegue l’avvio. Impostare questa opzione su Privato può influire negativamente sugli strumenti che dipendono da tali informazioni."
   a_redirect_uri_is_required_please_supply_one_471908db: "È necessario fornire un redirect_uri."
@@ -2307,6 +2308,9 @@ it:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Si è verificato un errore durante il tentativo di creare questo tema. Riprova."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Si è verificato un errore durante il tentativo di preparare il download. Riprova."
   an_error_occurred_updating_the_assignment_7391dd3a: "Si è verificato un errore durante l'aggiornamento del compito."
+  an_error_occurred_updating_the_calculation_method_49384084: "Si è verificato un errore durante l'aggiornamento del metodo di calcolo"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Si è verificato un errore durante l'aggiornamento delle valutazioni del livello di preparazione: %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "Si è verificato un errore durante l'aggiornamento delle valutazioni del livello di preparazione"
   an_error_occurred_updating_this_assignment_21287c7e: "Si è verificato un errore durante l'aggiornamento di questo compito."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Si è verificato un errore durante l'impostazione del diritto di utilizzo per %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Si è verificato un errore durante il tentativo di contattare Turnitin."
@@ -2318,10 +2322,13 @@ it:
   an_error_occurred_while_loading_changes_9851b56f: "Si è verificato un errore durante il caricamento delle modifiche"
   an_error_occurred_while_loading_courses_11d4571e: "Si è verificato un errore durante il caricamento dei corsi"
   an_error_occurred_while_loading_late_policies_c415f676: "Si è verificato un errore durante il caricamento delle norme sui ritardi"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Si è verificato un errore durante il caricamento del calcolo del risultato: %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "Si è verificato un errore durante il caricamento delle valutazioni del livello di preparazione: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Si è verificato un errore durante il blocco degli annunci."
   an_error_occurred_while_migrating_405ac0b5: "Si è verificato un errore durante la migrazione."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Si è verificato un errore durante il recupero del tuo codice QR"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Si è verificato un errore durante il salvataggio delle valutazioni del livello di preparazione dell'account"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "Si è verificato un errore durante il salvataggio delle valutazioni del livello di preparazione dell'account: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Si è verificato un errore durante il salvataggio delle associazioni"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Si è verificato un errore durante il salvataggio della politica di pubblicazione compito."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Si è verificato un errore durante il salvataggio della politica di pubblicazione corso"
@@ -3679,6 +3686,7 @@ it:
   being_processed_by_plagiarism_service_2269be71: "In fase di elaborazione da parte del servizio plagio"
   belarusian_b2f19c76: Bielorusso
   belgium_32_e5f5b598: "Belgio (+32)"
+  below_mastery_abd1dca5: "Al di sotto del livello di padronanza"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Sotto questo campo di ricerca c'è un elenco di %{content_type}. Mentre digiti, l'elenco verrà filtrato in base alla tua query. I messaggi delle conversazioni verranno filtrati in base alle opzioni selezionate."
   beta_url_3c7b88ec: "URL beta:"
   between_1_and_5_f2a74bcf: "Tra 1 e 5"
@@ -3924,6 +3932,7 @@ it:
   cache_cleared_successfully_9ab84d5a: "Cache cancellata correttamente"
   calculated_by_4ac40468: "Calcolato da: "
   calculated_by_baa3c8f3: "Calcolato da:"
+  calculation_d82f6181: Calcolo
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' non è un valore valido per questo metodo di calcolo. Il valore deve essere compreso tra '%{valid_calculation_ints_min}' e '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Metodo di calcolo"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method deve essere uno dei seguenti: %{calc_methods}"
@@ -5827,6 +5836,7 @@ it:
   could_not_duplicate_discussion_953ed67f: "Impossibile duplicare la discussione"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Impossibile trovare una configurazione LTI per ID client %{clientId}"
   could_not_find_file_to_upload_2af12953: "Impossibile trovare il file da caricare"
+  could_not_find_file_to_upload_d8a0b228: "Impossibile trovare il file da caricare."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Impossibile trovare utente esistente per login con ID SIS %{user_id}: verrà ignorato"
   could_not_save_chosencolor_741b74ce: "Impossibile salvare '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Impossibile regolare le date sul compito %{name} (ID %{id})"
@@ -5912,6 +5922,9 @@ it:
   count_page_views_b40102b3: 
     one: "1 visualizzazione pagina"
     other: "%{count} visualizzazioni pagina"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count} pagina selezionata per l’eliminazione"
+    other: "%{count} pagine selezionate per l’eliminazione"
   count_participations_ac8f82b7: 
     one: "1 partecipazione"
     other: "%{count} partecipazioni"
@@ -7843,6 +7856,7 @@ it:
   drag_and_drop_your_image_here_or_7fba7c14: "Trascina qui la tua immagine o "
   drag_to_rearrange_sections_637efee3: "Trascina per riorganizzare le sezioni"
   drag_up_or_down_to_reorder_382126ff: "Trascina su e giù per riordinare"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Drastici aumenti nell’utilizzo della versione gratuita di BigBlueButton possono comportare problemi prestazionali."
   drop_files_here_to_add_to_module_236304f5: "Trascina i file qui per aggiungerli al modulo"
   drop_files_here_to_upload_ce0f50f9: "Rilascia i file qui per il caricamento"
   drop_image_62a2a071: "Rilascia immagine"
@@ -8939,6 +8953,7 @@ it:
   final_grader_can_view_other_grader_names_67736530: "L'esaminatore finale può visualizzare i nomi di altri esaminatori"
   final_letter_grade_80dccec1: "Voto in lettere finale"
   final_score_26bcfc20: "Punteggio finale"
+  final_score_53278fd0: "Punteggio finale:"
   final_score_61e15cf3: "punteggio finale"
   findLinkForService: 
     buttons: 
@@ -9902,6 +9917,7 @@ it:
         saving: "Salvataggio in corso..."
         self_signup: "Registrazione automatica"
         split_into_groups: "Dividi gli studenti in %{num_groups} gruppi"
+        split_into_sized_groups: "Dividi gli studenti in gruppi con %{num_members} studenti per gruppo"
       group_category_detail: 
         add_group: "Aggiungi gruppo"
         category_settings: Impostazioni
@@ -10202,7 +10218,7 @@ it:
   hindi_9bcd4b34: Hindi
   history_cd3f60a9: Cronologia
   history_settings_c63dbaaf: "Impostazioni cronologia"
-  home_351838cd: "Home page"
+  home_351838cd: Home
   home_page_is_not_valid_2e8a25ae: "La home page non è valida"
   home_tutorial_tray_66826983: "Riquadro tutorial home page"
   homework_submission_172e8354: "Consegna compiti a casa"
@@ -10304,6 +10320,7 @@ it:
   html_editor_fb2ab713: "Editor HTML"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "Risposta HTTP: %{code}"
   hungarian_fc7d30c9: Ungherese
   hungary_36_cd3e515b: "Ungheria (+36)"
   i_agree_to_the_34aa16ce: "Accetto i"
@@ -10543,6 +10560,7 @@ it:
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Formazione guidata sul prodotto e punti di vista per amministratori, insegnanti e studenti"
   in_progress_13b9e26f: "in corso"
   in_progress_9d1ce8b9: "In corso"
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "Nel caso in cui BigBlueButton non soddisfi le esigenze attuali o future, Canvas collabora anche con Zoom, Google Meet, Microsoft Teams, nonché con altri strumenti per video conferenze."
   inactive_cd40317f: inattivo
   inactive_enrollments_3b84be3d: "Iscrizioni inattive"
   inbox_bb245a60: "Posta in arrivo"
@@ -10771,6 +10789,7 @@ it:
   ip_filter_is_not_valid_152a46d8: "Filtro IP non valido."
   ireland_353_3cd32cc0: "Irlanda (+353)"
   irish_567e109f: Irlandese
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " sta utilizzando una versione gratuita di BigBlueButton che consente 10 video conferenze contemporanee, ognuna delle quali con 1 host e fino a 24 partecipanti. Le registrazioni sono archiviate per 7 giorni."
   israel_972_e671df75: "Israele (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Sembra che il tuo indirizzo email non sia valido: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "È possibile che il tuo contenuto non venga caricato. Puoi utilizzare questo pulsante per provare ad avviarlo in una nuova scheda."
@@ -10786,6 +10805,7 @@ it:
   item_filter_ca3987d7: "Filtro elemento"
   item_incomplete_d6a16040: "(Elemento non completato)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} non è al momento supportato"
+  item_scores_9fbfe956: "Punteggi elemento:"
   item_select_fe0f320a: "Selezione elemento"
   item_type_assignment_13a1132e: "Tipo elemento: Compito"
   item_type_choice_aebcf2ef: "Tipo elemento: Scelta"
@@ -11305,10 +11325,12 @@ it:
         buttons: 
           request_password: "Richiedi password"
         dont_know_password: "Password dimenticata?"
+        error: "Si è verificato un errore, riprova più tardi."
         log_in: Accedi
         login_handle: "Inserisci il tuo %{login_handle_name} e ti invieremo un link per modificare la password."
         password: Password
         sending: "Invio in corso..."
+        sent: Inviato.
       new: 
         page_title: "Accedi a Canvas"
       new_login_content: 
@@ -11441,6 +11463,7 @@ it:
             corso, consenti agli studenti di gestire le aree del contenuto del corso e nascondi i dettagli dei voti
             dagli studenti. Puoi anche regolare il nome del corso e il codice.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Fa apparire un'opzione di collegamento Microsoft Immersive Reader sulle pagine wiki."
+  makes_the_student_grades_page_responsive_c13e00eb: "Rende reattiva la pagina dei voti studente."
   making_a_copy_of_original_assignment_name_8f029a9b: "Copia di \"%{original_assignment_name}\" in corso"
   making_a_copy_of_originalassignmentname_b7268992: "Creazione di una copia di \"%{originalAssignmentName}\""
   malay_f5dddce4: Malese
@@ -13535,6 +13558,7 @@ it:
   must_be_a_valid_number_59f0069: "Deve essere un numero valido"
   must_be_after_start_date_95e251a3: "deve essere successiva alla data di inizio"
   must_be_between_availability_dates_ceaca984: "deve essere compreso tra le date di disponibilità"
+  must_be_between_lower_and_upper_1f501b2a: "Deve essere compreso tra %{lower} e %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "per eseguire tale azione deve aver effettuato l’accesso ed essere registrato"
   must_be_on_or_after_end_date_e4dda631: "deve coincidere con la data di fine o essere successiva"
   must_belong_to_a_root_account_f84323f6: "deve appartenere a un account radice"
@@ -14221,6 +14245,7 @@ it:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "numero compreso tra 1 e 16 inclusi"
+  number_each_event_d934cd65: "Numera ogni evento"
   number_is_too_large_4da4af0a: "il numero è troppo grande"
   number_is_too_small_618a6ca7: "il numero è troppo piccolo"
   number_more_a46966: "%{number} Altro..."
@@ -14422,7 +14447,7 @@ it:
   out_of_pointspossible_3fb5ee20: "Su %{pointsPossible}"
   out_of_pointspossible_c163105a: "su %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Allineamento risultato con contenuto senza punteggio"
-  outcome_da397d20: Risultato
+  outcome_da397d20: Esito
   outcome_details_ce254e89: "Dettagli risultato"
   outcome_export_89229eb4: "Esportazione esiti"
   outcome_group_39fae76f: "Gruppo di esiti"
@@ -14699,6 +14724,7 @@ it:
   panama_507_831fbc99: "Panama (+507)"
   paper_view_7405eeab: "Visualizzazione elaborato"
   paraguay_595_ca58b83a: "Paraguay (+595)"
+  parameter_91ed199: Parametro
   parameters_a13374ec: Parametri
   parent_assignment_is_not_selected_9efb4ac1: "compito principale non selezionato"
   parent_assignment_is_selected_6a2fbca8: "compito principale selezionato"
@@ -14816,6 +14842,7 @@ it:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Consenti ad Arc di accedere alla webcam."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Consenti a Canvas di accedere al tuo microfono e alla tua webcam."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Consenti a Canvas di accedere alla tua webcam."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Contatta l'amministratore LMS per maggiori dettagli."
   please_create_a_group_set_8db6e8fe: "Crea un set di gruppi"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Non rispondere a questa email, non verrà consegnata."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Inserisci una data di scadenza coincidente o successiva a %{earliestDate}"
@@ -15425,6 +15452,8 @@ it:
   processing_2fcc9739: "Elaborazione in corso"
   product_name: Canvas
   product_tours_1e19eb95: "Tour prodotto"
+  proficiency_calculation_57f0bdf: "Calcolo della preparazione"
+  proficiency_calculation_parameters_5f605dec: "Parametri di calcolo della preparazione"
   proficiency_rating_6346119f: "Valutazione di competenza"
   proficiency_rating_deleted_77827473: "Valutazione del livello di preparazione eliminata"
   proficiency_ratings_2bbabdcd: "Valutazioni di competenza"
@@ -15960,6 +15989,7 @@ it:
       update_question_without_regrading: "Aggiorna domanda senza rivalutazione"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Override compiti quiz"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "I tentativi dei quiz le cui date di disponibilità sono scadute continueranno ad aver l’invio automatico anche se il periodo di estensione non è ancora scaduto."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Le date di disponibilità dei quiz passate durante un tentativo, vengono inviate automaticamente anche se il tempo prolungato non è scaduto."
   quiz_duplication_not_implemented_c1495585: "duplicazione quiz non implementata"
   quiz_e0dcce8f: Quiz
@@ -16036,6 +16066,7 @@ it:
            di visualizzare un registro di questi eventi una volta completata la consegna.
   quiz_lti_plugin_a6256549: "Plug-in LTI quiz"
   quiz_menu_4fcd5e61: "Menu Quiz"
+  quiz_not_assigned_to_student_4b1846d5: "Quiz non assegnato ad uno studente"
   quiz_question_1da5198e: "Domanda del Quiz"
   quiz_question_groups_bd0bb222: "Gruppi di domande quiz"
   quiz_questions_ecea3c40: "Domande quiz"
@@ -17419,6 +17450,7 @@ it:
   responsive_global_nav_logo_99488e92: "Logo Nav globale reattivo"
   responsive_layout_54e4ca06: "Layout responsivo"
   responsive_misc_dc572cc0: "Varie reattive"
+  responsive_student_grades_page_324e9c8b: "Pagina voti studente reattiva"
   restart_link_validation_b61286fc: "Riavvia convalida link"
   restore_courses_182e162e: "Ripristina corsi"
   restored_course_association_course_c9e16045: "Associazione corsi ripristinata %{course}"
@@ -18225,6 +18257,7 @@ it:
   set_name_d14182d7: "Imposta nome..."
   set_name_f83b658: "Imposta nome"
   set_of_grading_periods_545b37e9: "Set di periodi di valutazione"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Imposta la scala di padronanza da usare per tutti i corsi in questo account."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Impostare il modo in cui le valutazioni del livello di preparazione appaiono all’interno del registro dei voti sulla padronanza dell’apprendimento.\n\
       \x20           Modificare il numero di valutazioni, il livello di padronanza, i punti e i colori.\n\
@@ -19636,6 +19669,8 @@ it:
       global_support_desk_description: "I nostri ASC rappresentano la tua prima fonte di assistenza e per le questioni che richiedono assistenza aggiuntiva puoi connetterti con il nostro servizio di assistenza globale."
       networking_academy_description: "Visualizza le risposte Cisco alle domande più frequenti."
       networking_academy_faqs: "FAQ Networking Academy"
+      student_support: "NetAcad Supporto- Studente"
+      student_support_description: "Il tuo istruttore è il tuo primo punto di contatto. Può rispondere alle tue domande relative a Networking Academy o contattare per te il servizio di assistenza. Puoi contattare il tuo istruttore utilizzando la funzione Posta in arrivo."
       support_desk_livechat: "Chat dal vivo servizio di assistenza"
   support_favorite_lti_tools_in_the_rce_1680436d: "Supporta gli strumenti LTI preferiti nel RCE"
   svg_d5969386: SVG
@@ -19942,6 +19977,7 @@ it:
   the_next_available_appointment_in_this_course_is_o_da10316c: "Il prossimo appuntamento disponibile nel corso è previsto il giorno *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "I contenuti precedenti sono forniti dal partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Il batch SIS precedente è stato interrotto"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Il calcolo della preparazione è stato impostato dall’amministratore e si applica a tutti i corsi di questo account."
   the_profile_picture_has_been_reported_d609d6dd: "L'immagine del profilo è stata segnalata"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Il file Academic Benchmarks fornito contiene un errore"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Il testo della domanda per la domanda \"%{question_name}\" era troppo lungo."
@@ -20120,6 +20156,7 @@ it:
   this_code_has_expired_41f76642: "Questo codice è scaduto."
   this_conference_may_be_recorded_f76deeeb: "Questa conferenza può essere registrata."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Questo corso non può essere aggiunto al menu dei corsi al momento."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Questo corso non può essere aggiunto al menu dei corsi a meno che il corso non sia attivo."
   this_course_does_not_allow_score_uploads_4b35fe07: "Questo corso non consente caricamenti dei punteggi."
   this_course_has_concluded_7995a84c: "Questo corso è terminato"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Questo corso non è ancora iniziato. Non potrai partecipare a questo corso fino al %{date}."
@@ -21177,9 +21214,11 @@ it:
   upload_data_dc4fa4cb: "Carica dati"
   upload_drop_zone: 
     drop_to_upload: "Rilascia elementi da caricare"
+  upload_error_please_try_again_c6587f48: "Errore di caricamento. Riprova."
   upload_failed_a5dc91ec: "Caricamento non riuscito"
   upload_failed_quota_exceeded_ff3af659: "Caricamento non riuscito, quota superata"
   upload_file_fd2361b8: "Carica File"
+  upload_files_a228f20f: "Carica file"
   upload_gradebook_386a46c8: "Carica registro devi voti"
   upload_image_6120b609: "Carica immagine"
   upload_media_ce31135a: "Carica file multimediali"
@@ -21674,6 +21713,7 @@ it:
   users_add_remove_observers_d1273d9: "Utenti - Aggiungi/Rimuovi osservatori"
   users_add_remove_students_in_courses_efe7e748: "Utenti - Aggiungi/Rimuovi studenti nei corsi"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Utenti - Aggiungi/Rimuovi insegnanti, progettisti del corso o assistenti nei corsi"
+  users_allowed_to_edit_this_page_d6d316d0: "Utenti a cui è consentito modificare questa pagina"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Utenti e trimestri si trovano a livello di account, pertanto l'endpoint SIS conferma sempre le autorizzazioni dell'utente in base all'account. I subaccount hanno solo la proprietà di corsi e sezioni; non possiedono i dati dell'utente.
       Gli amministratori dei subaccount non possono visualizzare le informazioni SIS a meno che non abbiano anche il ruolo di istruttore in un corso. Gli amministratori dei subaccount non possono visualizzare le informazioni SIS senza l'associazione del corso, poiché il ruolo di istruttore ha l'autorizzazione per leggere i dati SIS a livello di account.
@@ -21779,6 +21819,7 @@ it:
   waiting_for_attempted_login_6d00cb49: "In attesa del tentativo di accesso"
   waiting_for_change_to_complete_b75b5e8b: "In attesa del completamento della modifica"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "In attesa di conferma della visualizzazione codice QR"
+  waiting_for_request_to_complete_13cf037a: "In attesa del completamento della richiesta"
   waiting_for_selection_ce0398c7: "In attesa della selezione"
   waiting_for_your_qr_code_to_load_809299e5: "In attesa del caricamento del tuo codice QR"
   warning_6576b5b8: avviso
