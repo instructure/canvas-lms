@@ -185,6 +185,7 @@ sv-x-k12:
   a_new_assignment_has_been_created_for_your_course__12b72639: "En ny uppgift har skapats för din kurs, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Ett partner-ID krävs för att använda akademiska riktmärken"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "En partnernyckel krävs för att använda akademiska riktmärken"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Det finns en premiumversion av BigBlueButton som medger det antal samtidiga konferenser som köpts (var och en med 1 värd och upp till 99 deltagare), utan lagringsbegränsningar för inspelade konferenser och med dedikerad infrastruktur för bättre prestanda."
   a_problem_occurred_adding_reviewers_57b083d9: "Ett problem uppstod när bedömare lades till."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "En offentlig integritetsnivå kommer att skicka den lanserade användarens personligt identifierbara information till verktygsleverantören. Om denna ställs in på Privat kan verktyg påverkas som är beroende av den informationen."
   a_redirect_uri_is_required_please_supply_one_471908db: "En redirect_uri krävs, du måste tillhandahålla en."
@@ -2210,6 +2211,9 @@ sv-x-k12:
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "Ett fel uppstod vid försök att tillämpa det här temat, försök igen."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Ett fel uppstod vid försök att generera det här temat, försök igen."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ett fel uppstod vid förberedelse för nedladdning, försök igen."
+  an_error_occurred_updating_the_calculation_method_49384084: "Ett fel inträffade under uppdatering av beräkningsmetoden"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Ett fel inträffade under uppdatering av kompetensbedömningarna: %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "Ett fel inträffade under uppdatering av kompetensbedömningarna"
   an_error_occurred_updating_this_assignment_21287c7e: "Ett fel uppstod vid uppdatering av den här uppgiften."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Ett fel uppstod när användarens rätt för %{filename} ställdes in"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ett fel inträffade när Turnitin kontaktades."
@@ -2221,10 +2225,13 @@ sv-x-k12:
   an_error_occurred_while_loading_changes_9851b56f: "Ett fel uppstod vid inläsning av ändringarna"
   an_error_occurred_while_loading_courses_11d4571e: "Ett fel uppstod vid inläsningen av kurser"
   an_error_occurred_while_loading_late_policies_c415f676: "Ett fel uppstod vid inläsningen av policyer för sena inlämningar"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Ett fel uppstod vid inläsning av beräkningar av lärandemål: %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "Ett fel uppstod vid inläsning av kompetensbedömningarna: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Ett fel uppstod vid låsning av anslag."
   an_error_occurred_while_migrating_405ac0b5: "Ett fel uppstod vid migreringen."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Ett fel uppstod vid hämtning av din QR-kod"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Ett fel uppstod när färdighetsbedömningar skulle sparas"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "Ett fel uppstod när kontots kompetensbedömningar skulle sparas: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Ett fel uppstod när associationerna skulle sparas"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ett fel uppstod när uppgiftens publiceringspolicy skulle sparas."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ett fel uppstod när kursens publiceringspolicy skulle sparas"
@@ -3545,6 +3552,7 @@ sv-x-k12:
   being_processed_by_plagiarism_service_2269be71: "Behandlas av plagiattjänsten"
   belarusian_b2f19c76: Vitryska
   belgium_32_e5f5b598: "Belgien (+32)"
+  below_mastery_abd1dca5: "Under måluppfyllelse"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Under sökfältet finns en lista med %{content_type}. Medan du skriver kommer listan att filtreras för att matcha din fråga. Konversationsmeddelanden kommer att filtreras efter det alternativ du valt."
   beta_url_3c7b88ec: "Beta URL:"
   between_1_and_5_f2a74bcf: "Mellan 1 och 5"
@@ -3788,6 +3796,7 @@ sv-x-k12:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "Cachen har rensats"
   calculated_by_4ac40468: "Beräknad av: "
+  calculation_d82f6181: Beräkning
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "%{calculation_int} är inte ett giltigt värde för den här beräkningsmetoden. Värdet måste vara mellan \"%{valid_calculation_ints_min}\" och \"%{valid_calculation_ints_max}\""
   calculation_method_fe281f9: Beräkningsmetod
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method måste vara en av följande: %{calc_methods}"
@@ -5633,6 +5642,7 @@ sv-x-k12:
   could_not_duplicate_discussion_953ed67f: "Kunde inte duplicera diskussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Det gick inte att hitta en LTI-konfiguration för klient-ID %{clientId}"
   could_not_find_file_to_upload_2af12953: "Kunde inte hitta en fil att ladda upp"
+  could_not_find_file_to_upload_d8a0b228: "Det gick inte att hitta filen för uppladdning."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Det gick inte att hitta den befintliga användaren för inloggning med SIS-ID:t %{user_id}. Hoppar över."
   could_not_save_chosencolor_741b74ce: "Kunde inte spara \"%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Det gick inte att justera datum för uppgiften %{name} (ID %{id})"
@@ -5714,6 +5724,9 @@ sv-x-k12:
   count_page_views_b40102b3: 
     one: "1 sidvisning"
     other: "%{count} sidvisning"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count} sida har markerats för borttagning"
+    other: "%{count} sidor har markerats för borttagning"
   count_participations_ac8f82b7: 
     one: "1 deltagande"
     other: "%{count} deltagande"
@@ -6695,7 +6708,7 @@ sv-x-k12:
   custom_reports_experimental_features_40bbfe7c: "Anpassade rapporter: Experimentella funktioner"
   customize_configuration_69c22ef3: "Anpassa konfiguration"
   customize_course_details_26fd4afe: "Anpassa kursinformation"
-  customize_learning_mastery_ratings_4ace142a: "Anpassa omdömen för måluppfyllelse"
+  customize_learning_mastery_ratings_4ace142a: "Anpassa bedömningar för måluppfyllelse"
   customize_this_menu_efa72a9: "Anpassa den här menyn"
   cutoff_score_74254c89: "Godkännande gräns"
   cyan_c1d5f68a: Cyan
@@ -7612,6 +7625,7 @@ sv-x-k12:
   drag_and_drop_your_image_here_or_7fba7c14: "Dra och släpp din bild här eller "
   drag_to_rearrange_sections_637efee3: "Dra för att arrangera om sektioner"
   drag_up_or_down_to_reorder_382126ff: "Dra upp eller ner för att omorganisera"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Dramatiska ökningar i användning av kostnadsfria BigBlueButton-versioner kan orsaka prestandaproblem."
   drop_files_here_to_add_to_module_236304f5: "Släpp filer här för att lägga till i modulen"
   drop_files_here_to_upload_ce0f50f9: "Släpp filerna här för uppladdning"
   drop_image_62a2a071: "Släpp bild"
@@ -8685,6 +8699,7 @@ sv-x-k12:
   final_grader_can_view_other_grader_names_67736530: "Slutliga bedömare kan visa namn på övriga bedömare"
   final_letter_grade_80dccec1: "Slutlig bokstavsbedömning"
   final_score_26bcfc20: Slutresultat
+  final_score_53278fd0: "Slutlig poäng:"
   final_score_61e15cf3: Slutresultat
   findLinkForService: 
     buttons: 
@@ -9624,6 +9639,7 @@ sv-x-k12:
         saving: "Sparar ..."
         self_signup: Självregistrering
         split_into_groups: "Dela upp elever i %{num_groups} grupper"
+        split_into_sized_groups: "Dela upp elever i grupper med %{num_members} elever per grupp"
       group_category_detail: 
         add_group: "Lägg till grupp"
         category_settings: Inställningar
@@ -10011,6 +10027,7 @@ sv-x-k12:
   html_editor_fb2ab713: HTML-redigerare
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "HTTP-svar: %{code}"
   hungarian_fc7d30c9: Ungerska
   hungary_36_cd3e515b: "Ungern (+36)"
   i_agree_to_the_34aa16ce: "Jag godkänner"
@@ -10240,6 +10257,7 @@ sv-x-k12:
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Genomgång av produkten med hållpunkter föradministratörer, lärare och elever"
   in_progress_13b9e26f: pågår
   in_progress_9d1ce8b9: Pågår
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "Om BigBlueButton inte kan uppfylla dina nuvarande eller framtida behov, samarbetar Canvas även med Zoom, Google Meet, Microsoft Teams samt andra videokonferensverktyg."
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktiva registreringar"
   inbox_bb245a60: Inkorg
@@ -10463,6 +10481,7 @@ sv-x-k12:
   ip_filter_is_not_valid_152a46d8: "IP-filtret är inte giltigt."
   ireland_353_3cd32cc0: "Irland (+353)"
   irish_567e109f: Irländska
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " använder en kostnadsfri version av BigBlueButton som medger 10 samtidiga videokonferenser, var och en med 1 värd och upp till 24 deltagare. Inspelningar sparas i upp till 7 dagar."
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Det verkar som att du har en ogiltig e-postadress: ”%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Det ser ut som att ditt innehåll inte laddar. Du kan använda den här knappen för att öppna det i en ny flik."
@@ -10478,6 +10497,7 @@ sv-x-k12:
   item_filter_ca3987d7: "Filtrering av objekt"
   item_incomplete_d6a16040: "(objektet ofullständigt)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} stöds inte för tillfället"
+  item_scores_9fbfe956: "Objektpoäng:"
   item_select_fe0f320a: "Val av objekt"
   item_type_assignment_13a1132e: "Typ av objekt: Uppgift"
   item_type_choice_aebcf2ef: "Typ av objekt: Val"
@@ -10987,10 +11007,12 @@ sv-x-k12:
         buttons: 
           request_password: "Begär lösenord"
         dont_know_password: "Glömt lösenordet?"
+        error: "Ett fel inträffade. Försök igen senare."
         log_in: "Logga in"
         login_handle: "Ange ditt %{login_handle_name} så skickar vi en länk som du kan ändra lösenordet med."
         password: Lösenord
         sending: "Skickar ..."
+        sent: Skickat!
       new: 
         page_title: "Logga in på Canvas"
       new_login_content: 
@@ -11119,6 +11141,7 @@ sv-x-k12:
             kurs, låt elever hantera kursinnehållsområden och dölj bedömningsinformation
             från eleverna. Du kanske även kan ändra kursnamnet och koden.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Visar ett länkalternativ för Microsofts Avancerad läsare på wiki-sidor."
+  makes_the_student_grades_page_responsive_c13e00eb: "Gör sidan för elevbedömningar interaktiv."
   making_a_copy_of_original_assignment_name_8f029a9b: "Gör en kopia av \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Gör en kopia av \"%{originalAssignmentName}\""
   malay_f5dddce4: Malajiska
@@ -13164,6 +13187,7 @@ sv-x-k12:
   must_be_a_valid_number_59f0069: "Måste vara en giltig siffra"
   must_be_after_start_date_95e251a3: "måste vara efter startdatum"
   must_be_between_availability_dates_ceaca984: "måste vara mellan datum för tillgänglighet"
+  must_be_between_lower_and_upper_1f501b2a: "Måste infalla mellan %{lower} och %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "måste vara inloggad och registrerad för att utföra den åtgärden"
   must_be_on_or_after_end_date_e4dda631: "måste vara på eller efter slutdatum"
   must_belong_to_a_root_account_f84323f6: "måste tillhöra ett rotkonto"
@@ -13841,6 +13865,7 @@ sv-x-k12:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "nummer mellan 1 och 16 inkluderat"
+  number_each_event_d934cd65: "Numrera varje händelse"
   number_is_too_large_4da4af0a: "siffran är för hög"
   number_is_too_small_618a6ca7: "siffran är för låg"
   number_more_a46966: "%{number} Mer..."
@@ -14304,6 +14329,7 @@ sv-x-k12:
   panama_507_831fbc99: "Panama (+507)"
   paper_view_7405eeab: Pappersvy
   paraguay_595_ca58b83a: "Paraguay (+595)"
+  parameter_91ed199: Parameter
   parameters_a13374ec: Parametrar
   parent_assignment_is_not_selected_9efb4ac1: "överordnad uppgift har inte valts"
   parent_assignment_is_selected_6a2fbca8: "överordnad uppgift har valts"
@@ -14413,6 +14439,7 @@ sv-x-k12:
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Lägg till minst ett icke-blankt svar för varje variabel."
   please_adjust_your_security_preferences_before_con_fd568e8d: "Justera dina säkerhetsinställningar innan du forsätter."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Ge Canvas åtkomst till din mikrofon och webbkamera."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Kontakta din LMS-administratör för ytterligare information."
   please_create_a_group_set_8db6e8fe: "Skapa en gruppuppsättning"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Svara inte på det här e-postmeddelandet, det kommer inte att levereras."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Ange ett inlämningsdatum under eller efter %{earliestDate}"
@@ -15012,6 +15039,8 @@ sv-x-k12:
   processing_2fcc9739: Bearbetar
   product_name: Canvas
   product_tours_1e19eb95: Produktdemo
+  proficiency_calculation_57f0bdf: Kompetensberäkning
+  proficiency_calculation_parameters_5f605dec: "Parametrar för kompetensberäkning"
   proficiency_rating_6346119f: Färdighetsbedömning
   proficiency_rating_deleted_77827473: "Färdighetsbedömning togs bort"
   proficiency_ratings_2bbabdcd: Färdighetsbedömningar
@@ -15536,6 +15565,7 @@ sv-x-k12:
       update_question_without_regrading: "Uppdatera frågan utan ombedömning"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Åsidosätttanden av quizuppgifter"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Quiz-försök vars tillgänglighetsdatum har överskridits skickas ändå in automatiskt även om förlängningen inte har överskridits."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Datum då quiz är tillgängliga som passerar under ett försök kommer fortfarande att lämnas in automatiskt även om den förlängda tiden inte har löpt ut."
   quiz_duplication_not_implemented_c1495585: "kopiering av quiz har inte implementerats"
   quiz_e0dcce8f: Quiz
@@ -15612,6 +15642,7 @@ sv-x-k12:
             visa en logg för händelserna när en inlämning har gjorts.
   quiz_lti_plugin_a6256549: "Quiz LTI plugin"
   quiz_menu_4fcd5e61: Quizmeny
+  quiz_not_assigned_to_student_4b1846d5: "Quizet har inte tilldelats eleven"
   quiz_question_1da5198e: Quizfråga
   quiz_question_groups_bd0bb222: Quiz-frågegrupper
   quiz_questions_ecea3c40: Quizfrågor
@@ -16980,6 +17011,7 @@ sv-x-k12:
   responsive_global_nav_logo_99488e92: "Responsiv logotyp för global navigering"
   responsive_layout_54e4ca06: "Responsiv layout"
   responsive_misc_dc572cc0: "Blandade dynamiska funktioner"
+  responsive_student_grades_page_324e9c8b: "Interaktiv sida för elevbedömningar"
   restart_link_validation_b61286fc: "Starta om länkvalidering"
   restore_courses_182e162e: "Återställ kurser"
   restored_course_association_course_c9e16045: "Kursassociation har återställts %{course}"
@@ -17768,9 +17800,10 @@ sv-x-k12:
   set_name_d14182d7: "Namn på uppsättning ..."
   set_name_f83b658: "Namn på uppsättning"
   set_of_grading_periods_545b37e9: "Uppsättning bedömningsperioder"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Ange den måluppfyllelseskala som ska användas för alla kurser i det här kontot."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Konfigurera hur dina färdighetsbedömningar ska visas i bedömningsöversikten för måluppfyllelse.\n\
-      \x20           Justera antalet omdömen, måluppfyllelsenivå, poäng och färger.\n\
+      \x20           Justera antalet bedömningar, måluppfyllelsenivå, poäng och färger.\n\
       \x20         "
   set_up_how_your_proficiency_ratings_appear_inside__f25d5da8: "Konfigurera hur dina färdighetsbedömningar visas i betygsboken uppfyllande av lärandemål. Justera antalet bedömningar, färdighetsnivå, resultat och färger."
   set_up_outcomes_in_your_course_as_measured_by_peda_34237d17: |-
@@ -19136,6 +19169,8 @@ sv-x-k12:
       global_support_desk_description: "Våra ASC är din första supportinstans och kan koppla dig till vår globala supportdesk för problem som kräver ytterligare assistans."
       networking_academy_description: "Visa Ciscos svar på de vanligaste frågorna."
       networking_academy_faqs: "Networking Academys vanliga frågor"
+      student_support: "NetAcad Support – elev"
+      student_support_description: "Din instruktör är din huvudkontaktperson De kan svara på dina frågor om Networking Academy eller kontakta supporten för din räkning. Du kan kontakta din instruktör via inkorgsfunktionen."
       support_desk_livechat: "Livechatt med supportdesk"
   support_favorite_lti_tools_in_the_rce_1680436d: "Stöd favorit-LTI-verktyg i RCE"
   svg_d5969386: SVG
@@ -19439,6 +19474,7 @@ sv-x-k12:
   the_next_available_appointment_in_this_course_is_o_da10316c: "Nästa tillgängliga möte i denna kurs är den *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "Det föregående innehållet har tillhandahållits av partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Föregående SIS-batch avbröts"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Kompetensberäkningen angavs av din administratör och gäller för alla kurser i det här kontot."
   the_profile_picture_has_been_reported_d609d6dd: "Profilbilden har rapporterats"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den angivna Academic Benchmark-filen har ett fel"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Frågetexten för frågan ”%{question_name}” var för lång."
@@ -19596,6 +19632,7 @@ sv-x-k12:
   this_code_has_expired_41f76642: "Koden har gått ut."
   this_conference_may_be_recorded_f76deeeb: "Konferensen kan spelas in."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Kursen kan inte läggas till i kursmenyn just nu."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Det går inte att lägga till den här kursen till kursmenyn om den inte är aktiv."
   this_course_does_not_allow_score_uploads_4b35fe07: "Den här kursen tillåter inte uppladdning av resultat."
   this_course_has_concluded_7995a84c: "Kursen har avslutats"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Kursen har inte börjat än. Du kommer inte kunna delta i kursen förrän %{date}."
@@ -20622,8 +20659,10 @@ sv-x-k12:
   upload_data_dc4fa4cb: "Ladda upp data"
   upload_drop_zone: 
     drop_to_upload: "Släpp objekt för att ladda upp"
+  upload_error_please_try_again_c6587f48: "Fel vid uppladdning. Försök igen."
   upload_failed_quota_exceeded_ff3af659: "Uppladdning misslyckades, kvoten är överskriden"
   upload_file_fd2361b8: "Ladda upp fil"
+  upload_files_a228f20f: "Ladda upp filer"
   upload_gradebook_386a46c8: "Ladda upp bedömningsöversikt"
   upload_image_6120b609: "Ladda upp bild"
   upload_media_ce31135a: "Ladda upp media"
@@ -21111,6 +21150,7 @@ sv-x-k12:
   users_add_remove_observers_d1273d9: "Användare – lägg till/ta bort observatörer"
   users_add_remove_students_in_courses_efe7e748: "Användare – lägg till/ta bort elever i kurser"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Användare – lägg till/ta bort lärare, kursdesigners eller lärarassistenter i kurser"
+  users_allowed_to_edit_this_page_d6d316d0: "Användare kan redigera den här sidan"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Användare och villkor ligger på kontonivå, så att SIS-slutpunkten alltid bekräftar användarens behörigheter i enlighet med kontot. Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata.
       Administratörer för underkonton kan inte se SIS-information om de inte även har tilldelats en lärarroll för en kurs. Administratörer för underkonton kan inte se SIS-information utan kurskoppling, eftersom lärarrollen har behörigheten att läsa SIS-data på kontonivå.
@@ -21213,6 +21253,7 @@ sv-x-k12:
   waiting_for_attempted_login_6d00cb49: "Väntar på inloggningsförsök"
   waiting_for_change_to_complete_b75b5e8b: "Väntar på att ändringen ska slutföras"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Väntar på bekräftelse för att visa QR-kod"
+  waiting_for_request_to_complete_13cf037a: "Väntar på att begäran ska slutföras"
   waiting_for_selection_ce0398c7: "Väntar på val"
   waiting_for_your_qr_code_to_load_809299e5: "Väntar på att din QR-kod ska läsas in"
   warning_6576b5b8: varning
