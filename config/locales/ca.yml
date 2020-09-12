@@ -173,6 +173,7 @@ ca:
   a_new_assignment_has_been_created_for_your_course__12b72639: "S'ha creat una tasca nova per al vostre curs, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Per utilitzar Academic Benchmarks es requereix un ID de soci"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Per utilitzar Academic Benchmarks es requereix una clau de soci"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Hi ha disponible una versió prèmium de BigBlueButton que permet realitzar videoconferències simultànies en funció de la quantitat que se’n compri (cadascuna amb 1 amfitrió i fins a 99 assistents), sense limitació d’emmagatzematge de les gravacions i amb una infraestructura dedicada que millora el rendiment."
   a_redirect_uri_is_required_please_supply_one_471908db: "Es requereix un redirect_uri, proporcioneu-ne un."
   a_section_is_required_64103992: "Es requereix una secció"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Un estudiant acaba de realitzar una entrega endarrerida de %{assignment_name} al curs %{course_name}"
@@ -1582,6 +1583,9 @@ ca:
   an_error_occurred_trying_to_apply_this_theme_pleas_253d0996: "S'ha produït un error en intentar aplicar aquest tema, torneu-ho a provar."
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "S'ha produït un error en intentar generar aquest tema, torneu-ho a provar."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "S'ha produït un error en intentar preparar la baixada, torneu-ho a provar."
+  an_error_occurred_updating_the_calculation_method_49384084: "S’ha produït un error en actualitzar el mètode de càlcul"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "S’ha produït un error en actualitzar les classificacions de competència: %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "S’ha produït un error en actualitzar les classificacions de competència"
   an_error_occurred_updating_this_assignment_21287c7e: "S'ha produït un error en actualitzar aquesta tasca."
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "S'ha produït un error en intentar contactar amb el Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "S'ha produït un error en comprovar l'estat de la migració"
@@ -1592,10 +1596,13 @@ ca:
   an_error_occurred_while_loading_changes_9851b56f: "S'ha produït un error en carregar els canvis"
   an_error_occurred_while_loading_courses_11d4571e: "S'ha produït un error en carregar els cursos"
   an_error_occurred_while_loading_late_policies_c415f676: "S'ha produït un error en carregar les polítiques d'entrega endarrerida"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "S'ha produït un error en carregar el càlcul dels resultats: %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "S'ha produït un error en carregar les classificacions de competència: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "S'ha produït un error en bloquejar els anuncis."
   an_error_occurred_while_migrating_405ac0b5: "S'ha produït un error en la migració."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "S'ha produït un error en recuperar el vostre codi QR"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "S'ha produït un error en desar les classificacions de competència del compte"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "S'ha produït un error en desar les classificacions de competència del compte: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "S'ha produït un error en desar les associacions"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "S'ha produït un error en desar la política de publicació de la tasca"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "S'ha produït un error en desar la política de publicació del curs"
@@ -2681,6 +2688,7 @@ ca:
   being_processed_by_plagiarism_service_2269be71: "El servei de detecció de plagi l'està processant"
   belarusian_b2f19c76: Bielorús
   belgium_32_e5f5b598: "Bèlgica (+32)"
+  below_mastery_abd1dca5: "Per sota del nivell de domini"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "A sota d'aquest camp de cerca hi ha una llista de %{content_type}. A mesura que escriviu, la llista es filtrarà per coincidir amb la vostra consulta. Els missatges de conversa es filtraran segons l'opció que seleccioneu."
   between_1_and_5_f2a74bcf: "Entre 1 i 5"
   between_1_and_99_d421a4c0: "Entre 1 % i 99 %"
@@ -2778,6 +2786,7 @@ ca:
   c_2001_acme_inc_283f7f80: "(c) 2001 Acme Inc."
   cache_cleared_successfully_9ab84d5a: "La memòria cau s'ha suprimit correctament"
   calculated_by_4ac40468: "Calculat per: "
+  calculation_d82f6181: Càlcul
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' no és un valor vàlid per a aquest mètode de càlcul. El valor ha de ser entre '%{valid_calculation_ints_min}' i '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Mètode de càlcul"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method ha de ser un dels següents: %{calc_methods}"
@@ -4416,6 +4425,7 @@ ca:
   could_not_duplicate_discussion_953ed67f: "No s'ha pogut duplicar el debat"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "No s'ha trobat cap configuració LTI per a l'ID de client %{clientId}"
   could_not_find_file_to_upload_2af12953: "No s'ha trobat cap fitxer per carregar"
+  could_not_find_file_to_upload_d8a0b228: "No s'ha pogut trobar el fitxer que s’ha de penjar."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "No s'ha trobat l'usuari existent per a l'inici de sessió amb l'ID del SIS %{user_id}, s'està ometent"
   could_not_save_chosencolor_741b74ce: "No s'ha pogut desar '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "No s'han pogut ajustar les dates de la tasca %{name} (ID %{id})"
@@ -4489,6 +4499,9 @@ ca:
     one: "1 opció"
     other: "Opcions de l'%{count}"
   count_options_loaded_cd59cc3b: "S'han carregat %{count} opcions."
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count} pàgina seleccionada per suprimir-la"
+    other: "%{count} pàgines seleccionades per suprimir-les"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} s'ha inscrit correctament a *%{course_name}*."
     other: "%{count} persones s'han inscrit correctament a *%{course_name}*."
@@ -6108,6 +6121,7 @@ ca:
   drag_and_drop_or_click_to_browse_your_computer_60772d6d: "Arrossegueu i deixeu anar, o feu clic per navegar per l'ordinador"
   drag_and_drop_your_image_here_or_7fba7c14: "Arrossegueu i deixeu anar la vostra imatge aquí o bé "
   drag_to_rearrange_sections_637efee3: "Arrossegueu per reorganitzar les seccions"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Un augment considerable de l’ús de la versió gratuïta de BigBlueButton pot causar problemes de rendiment."
   drop_files_here_to_add_to_module_236304f5: "Deixeu anar els fitxers aquí per afegir-los al mòdul"
   drop_files_here_to_upload_ce0f50f9: "Deixeu anar fitxers aquí per carregar-los"
   dropdown_changed_state_to_expanded_517689c2: "el desplegable ha canviat l'estat a %{expanded}"
@@ -7053,6 +7067,7 @@ ca:
   final_grade_override_in_gradebook_history_767147c: "Substitució de la qualificació final a l’historial del llibre de qualificacions"
   final_grader_1693103c: "Qualificador final"
   final_grader_can_view_other_grader_names_67736530: "El qualificador final pot veure els noms dels altres qualificadors"
+  final_score_53278fd0: "Puntuació final:"
   final_score_61e15cf3: "puntuació final"
   findLinkForService: 
     buttons: 
@@ -7747,6 +7762,7 @@ ca:
         saving: "S'està desant..."
         self_signup: Autoregistre
         split_into_groups: "Divideix els estudiants en %{num_groups} grups"
+        split_into_sized_groups: "Dividir els estudiants en grups amb %{num_members} estudiants per grup"
       group_category_detail: 
         category_settings: Configuració
         delete_category_option: Suprimeix
@@ -8114,6 +8130,7 @@ ca:
   html_editor_fb2ab713: "Editor d'HTML"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "Resposta HTTP: %{code}"
   hungarian_fc7d30c9: Hongarès
   hungary_36_cd3e515b: "Hongria (+36)"
   i_agree_to_the_34aa16ce: Accepto
@@ -8294,6 +8311,7 @@ ca:
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Visites guiades i tutorials de formació dels productes per a administradors, professors i estudiants"
   in_progress_13b9e26f: "en curs"
   in_progress_9d1ce8b9: "En curs"
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "En cas que BigBlueButton no sigui suficient per satisfer les vostres necessitats actuals o futures, Canvas també és compatible amb Zoom, Google Meet i Microsoft Teams, així com amb altres eines de videoconferència."
   inactive_cd40317f: inactiu
   inactive_enrollments_3b84be3d: "Inscripcions inactives"
   inbox_bb245a60: "Safata d'entrada"
@@ -8440,6 +8458,7 @@ ca:
   ip_filter_is_not_valid_152a46d8: "El filtre d'IP no és vàlid."
   ireland_353_3cd32cc0: "Irlanda (+353)"
   irish_567e109f: Irlandès
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " utilitza una versió gratuïta de BigBlueButton que permet fer 10 videoconferències simultànies, cadascuna amb 1 amfitrió i fins a 24 assistents. Les gravacions es desen durant 7 dies."
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Sembla que teniu una adreça electrònica no vàlida: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Sembla que el vostre contingut no s'està carregant. Podeu utilitzar aquest botó per provar d'iniciar-lo en una pestanya nova."
@@ -8454,6 +8473,7 @@ ca:
   item_count_3c7bae0d: "Element %{count}"
   item_incomplete_d6a16040: "(Element incomplet)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} no s'admet actualment"
+  item_scores_9fbfe956: "Puntuacions dels elements:"
   item_select_fe0f320a: "Element seleccionat"
   item_type_assignment_13a1132e: "Tipus d'element: Tasca"
   item_type_choice_aebcf2ef: "Tipus d'element: Elecció"
@@ -8940,10 +8960,12 @@ ca:
         buttons: 
           request_password: "Sol·licita una contrasenya"
         dont_know_password: "Heu oblidat la contrasenya?"
+        error: "S’ha produït un error; torneu-ho a provar més endavant."
         log_in: "Inicia la sessió"
         login_handle: "Introduïu el vostre %{login_handle_name} i us enviarem un enllaç per canviar la contrasenya."
         password: Contrasenya
         sending: "S'està enviant..."
+        sent: Enviat!
       new: 
         page_title: "Inicia la sessió al Canvas"
       new_login_content: 
@@ -9068,6 +9090,7 @@ ca:
             curs, permeteu que els estudiants administrin les àrees de contingut del curs i amagueu els detalls de
             les qualificacions als estudiants. També podeu ajustar el nom i el codi del curs.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Fa que es mostri un enllaç del Microsoft Immersive Reader a les pàgines wiki."
+  makes_the_student_grades_page_responsive_c13e00eb: "Fa que la pàgina de qualificacions dels estudiants sigui responsiva."
   making_a_copy_of_original_assignment_name_8f029a9b: "S'està fent una còpia de \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "S'està fent una còpia de \"%{originalAssignmentName}\""
   malay_f5dddce4: Malai
@@ -10902,6 +10925,7 @@ ca:
   must_be_a_valid_number_59f0069: "Ha de ser un número vàlid"
   must_be_after_start_date_95e251a3: "ha de ser posterior a la data d'inici"
   must_be_between_availability_dates_ceaca984: "ha de ser entre les dates de disponibilitat"
+  must_be_between_lower_and_upper_1f501b2a: "Ha de ser entre %{lower} i %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "heu d'haver iniciat la sessió i estar registrat per realitzar aquesta acció"
   must_be_on_or_after_end_date_e4dda631: "ha de ser igual o posterior a la data de fi"
   must_belong_to_a_root_account_f84323f6: "ha de pertànyer a un compte arrel"
@@ -11543,6 +11567,7 @@ ca:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "número entre 1 i 16 inclosos"
+  number_each_event_d934cd65: "Numereu cada esdeveniment"
   number_is_too_large_4da4af0a: "el número és massa gran"
   number_is_too_small_618a6ca7: "el número és massa petit"
   number_of_allowed_attempts_3d10b740: "Nombre d'intents permesos"
@@ -11904,6 +11929,7 @@ ca:
   panama_507_831fbc99: "Panamà (+507)"
   paper_view_7405eeab: "Visualització en paper"
   paraguay_595_ca58b83a: "Paraguai (+595)"
+  parameter_91ed199: Paràmetre
   parameters_a13374ec: Paràmetres
   parent_assignment_is_not_selected_9efb4ac1: "tasca principal no seleccionada"
   parent_assignment_is_selected_6a2fbca8: "tasca principal seleccionada"
@@ -11993,6 +12019,7 @@ ca:
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Afegiu com a mínim una resposta que no estigui en blanc per a cada variable."
   please_adjust_your_security_preferences_before_con_fd568e8d: "Ajusteu les vostres preferències de seguretat abans de continuar."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Permeteu al Canvas accedir al vostre micròfon i càmera web."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Per obtenir més informació, poseu-vos en contacte amb l’administrador de la plataforma d’ensenyament virtual."
   please_create_a_group_set_8db6e8fe: "Seleccioneu un conjunt de grups"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "No respongueu aquest correu electrònic, no es lliurarà."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Introduïu una data de venciment igual o posterior al %{earliestDate}"
@@ -12011,7 +12038,7 @@ ca:
   please_select_a_user_role_for_this_link_9fb4e655: "Seleccioneu un rol d'usuari per a aquest enllaç."
   please_select_one_f931e883: "Seleccioneu una opció"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Torneu a provar de restablir la connexió amb l'eina seleccionant una altra vegada l'eina a la interfície de l'element del mòdul o la tasca i desant."
-  please_upload_files_as_a_zip_5a2c799f: "Carregueu els fitxers com a .zip"
+  please_upload_files_as_a_zip_5a2c799f: "Pengeu els fitxers com a .zip"
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Espereu mentre carreguem i processem el vostre fitxer."
   please_wait_e6355980: Espereu
   plugins: 
@@ -12490,6 +12517,8 @@ ca:
   processing_2fcc9739: "S'està processant"
   product_name: Canvas
   product_tours_1e19eb95: "Visites guiades del productes"
+  proficiency_calculation_57f0bdf: "Càlcul de la competència"
+  proficiency_calculation_parameters_5f605dec: "Paràmetres de càlcul de la competència"
   proficiency_rating_6346119f: "Classificació de competència"
   proficiency_rating_deleted_77827473: "S'ha suprimit la classificació de competència"
   proficiency_ratings_2bbabdcd: "Classificacions de competència"
@@ -12978,6 +13007,7 @@ ca:
       some_scores_reduced: "Atorga punts només a la resposta correcta (*pot ser que es redueixin les puntuacions d'alguns estudiants*)"
       update_question_without_regrading: "Actualitza la pregunta sense requalificació"
   quiz_40ee61b1: qüestionari
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Els qüestionaris que s’intentin entregar tot i que les dates de disponibilitat dels quals ja hagin passat encara s’entregaran automàticament fins i tot en el cas que el període d’ampliació no hagi expirat."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Les dates de disponibilitat del qüestionari que passin durant un intent encara s'enviaran automàticament, fins i tot si el temps ampliat no ha caducat."
   quiz_duplication_not_implemented_c1495585: "la duplicació del qüestionari no s'ha implementat"
   quiz_e0dcce8f: Qüestionari
@@ -12987,6 +13017,7 @@ ca:
       Habiliteu el seguiment dels esdeveniments per a l'entrega d'un qüestionari i la capacitat de
             visualitzar un registre d'aquests esdeveniments un cop s'hagi fet una entrega.
   quiz_menu_4fcd5e61: "Menú Qüestionari"
+  quiz_not_assigned_to_student_4b1846d5: "No s’ha assignat el qüestionari a l’estudiant"
   quiz_question_1da5198e: "Pregunta del qüestionari"
   quiz_restrictions_5db831c5: "Restriccions del qüestionari"
   quiz_results_are_protected_for_this_quiz_and_are_n_1ea03502: "Els resultats d'aquest qüestionari estan protegits i no seran visibles per als estudiants."
@@ -14146,6 +14177,7 @@ ca:
   responsive_global_nav_logo_99488e92: "Logotip de navegació global adaptatiu"
   responsive_layout_54e4ca06: "Disseny adaptatiu"
   responsive_misc_dc572cc0: "Diversos adaptatiu"
+  responsive_student_grades_page_324e9c8b: "Pàgina de qualificacions dels estudiants responsiva"
   restart_link_validation_b61286fc: "Reinicia la validació d'enllaços"
   restore_courses_182e162e: "Restaura els cursos"
   restored_course_association_course_c9e16045: "S'ha restaurat l'associació del curs %{course}"
@@ -14836,6 +14868,7 @@ ca:
   set_name_d14182d7: "Nom del conjunt..."
   set_name_f83b658: "Nom del conjunt"
   set_of_grading_periods_545b37e9: "Conjunt de períodes de qualificació"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Establiu l'escala de domini que s’ha d'utilitzar per a tots els cursos d’aquest compte."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Configureu com es mostraran les classificacions de competència dins del llibre de qualificacions de domini de l'aprenentatge.\n\
       \x20           Ajusteu el nombre de classificacions, el nivell domini, els punts i els colors.\n\
@@ -15942,6 +15975,8 @@ ca:
       global_support_desk_description: "Els nostres ASCs són la vostra primera línia d'assistència tècnica i us poden connectar amb el nostre servei d'assistència tècnica global si teniu problemes que requereixin assistència addicional."
       networking_academy_description: "Vegeu les respostes de Cisco a les preguntes més freqüents."
       networking_academy_faqs: "Preguntes freqüents de la Networking Academy"
+      student_support: "NetAcad Assistència - Estudiant"
+      student_support_description: "La primera persona amb qui heu de contactar ha de ser el vostre instructor, ja que pot respondre a les vostres preguntes sobre Networking Academy o posar-se en contacte amb el centre d’assistència en nom vostre. Per contactar amb el vostre instructor, podeu fer servir la funció Safata d’entrada."
       support_desk_livechat: "Xat en directe amb el servei d'assistència tècnica"
   support_favorite_lti_tools_in_the_rce_1680436d: "Admet les eines LTI preferides a l'RCE"
   svg_d5969386: SVG
@@ -16213,6 +16248,7 @@ ca:
   the_next_available_appointment_in_this_course_is_o_da10316c: "La propera cita disponible en aquest curs és el *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "El contingut anterior està proporcionat per proveïdors"
   the_previous_sis_batch_was_aborted_d7d89955: "El lot anterior del SIS s'ha abandonat"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "El vostre administrador ha establert el càlcul de la competència, que s’aplica a tots els cursos d’aquest compte."
   the_profile_picture_has_been_reported_d609d6dd: "S'ha informat sobre la imatge de perfil"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "El text de la pregunta \"%{question_name}\" és massa llarg."
   the_quiz_log_auditing_feature_option_must_be_enabl_77bf321e: "L'opció de la funció Auditoria de registre de qüestionari s'ha d'habilitar a la Configuració del curs."
@@ -16354,6 +16390,7 @@ ca:
   this_code_has_expired_41f76642: "Aquest codi ha caducat."
   this_conference_may_be_recorded_f76deeeb: "Aquesta conferència pot ser enregistrada."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Aquest curs no es pot afegir al menú de cursos en aquests moments."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Aquest curs no es pot afegir al menú de cursos tret que estigui actiu."
   this_course_does_not_allow_score_uploads_4b35fe07: "Aquest curs no permet la càrrega de puntuacions."
   this_course_has_concluded_7995a84c: "Aquest curs ha finalitzat"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Aquest curs encara no ha començat. No podreu participar en aquest curs fins al %{date}."
@@ -17141,7 +17178,9 @@ ca:
   upload_data_dc4fa4cb: "Carrega dades"
   upload_drop_zone: 
     drop_to_upload: "Deixa anar els elements per carregar"
+  upload_error_please_try_again_c6587f48: "Error de penjada. Torneu-ho a provar."
   upload_file_fd2361b8: "Carrega el fitxer"
+  upload_files_a228f20f: "Penja fitxers"
   upload_gradebook_386a46c8: "Carrega el llibre de qualificacions"
   upload_image_6120b609: "Carrega una imatge"
   upload_media_ce31135a: "Carrega elements multimèdia"
@@ -17601,6 +17640,7 @@ ca:
   users_add_remove_observers_d1273d9: "Usuaris - afegeix/suprimeix observadors"
   users_add_remove_students_in_courses_efe7e748: "Usuaris - afegeix/suprimeix estudiants als cursos"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Usuaris - afegeix/suprimeix professors, dissenyadors del curs o auxiliars de professors als cursos"
+  users_allowed_to_edit_this_page_d6d316d0: "Usuaris amb permís per editar aquesta pàgina"
   users_and_terms_are_located_at_the_account_so_the__6896b895: "Els usuaris i els períodes acadèmics es troben al compte, de manera que l'extrem del SIS sempre confirma els permisos de l'usuari en funció del compte. Els comptes secundaris només tenen la propietat dels cursos i les seccions; no són propietaris de les dades dels usuaris. Els administradors de comptes secundaris no poden visualitzar la informació del SIS, tret que també se'ls hagi concedit un rol d'instructor en un curs. Els administradors de comptes secundaris no poden visualitzar la informació del SIS sense l'associació amb el curs, ja que el rol d'instructor té permís per llegir les dades del SIS a nivell del compte."
   users_can_access_and_create_but_not_edit_individua_72b88c41: "Els usuaris poden accedir a rúbriques de tasques individuals i crear-ne de noves (però no editar-les) a través de Tasques si Contingut del curs - visualitza i Tasques i qüestionaris - afegeix/edita/suprimeix estan habilitats."
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Els usuaris poden accedir a rúbriques de tasques individuals i crear-ne de noves (però no editar-les) a través de Tasques si Tasques i qüestionaris - afegeix/edita/suprimeix està habilitat."
@@ -17689,6 +17729,7 @@ ca:
   waiting_for_attempted_login_6d00cb49: "S'està esperant l'inici de sessió intentat"
   waiting_for_change_to_complete_b75b5e8b: "S'està esperant que es completi el canvi"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "S'està esperant la confirmació per visualitzar codis QR"
+  waiting_for_request_to_complete_13cf037a: "S’està esperant que es completi la sol·licitud"
   waiting_for_selection_ce0398c7: "A l'espera de selecció"
   waiting_for_your_qr_code_to_load_809299e5: "S'està esperant que es carregui el vostre codi QR"
   warning_6576b5b8: advertiment
