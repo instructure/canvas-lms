@@ -518,6 +518,9 @@
     "group_files_82e5dcdb": {
         "message": "Fichiers du groupe"
     },
+    "group_links_9493129e": {
+        "message": "Liens de groupe"
+    },
     "group_navigation_99f191a": {
         "message": "Barre de navigation des groupes"
     },
@@ -1011,7 +1014,7 @@
         "message": "Basculez vers l’éditeur de texte enrichi"
     },
     "syllabus_f191f65b": {
-        "message": "Plan de cours"
+        "message": "Programme"
     },
     "tab_arrows_4cf5abfc": {
         "message": "TABULATION/flèches"
@@ -1066,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Demain à { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Outils"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } résultats trouvés, { numDisplayed } résultats actuellement affichés"

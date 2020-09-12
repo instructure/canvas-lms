@@ -518,6 +518,9 @@
     "group_files_82e5dcdb": {
         "message": "Archivos del grupo"
     },
+    "group_links_9493129e": {
+        "message": "Enlaces del grupo"
+    },
     "group_navigation_99f191a": {
         "message": "Navegación del grupo"
     },
@@ -1066,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Mañana a las { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Herramientas"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } resultados encontrados, { numDisplayed } resultados que se muestran actualmente"

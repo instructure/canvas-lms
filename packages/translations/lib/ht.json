@@ -518,6 +518,9 @@
     "group_files_82e5dcdb": {
         "message": "Gwoup fichye"
     },
+    "group_links_9493129e": {
+        "message": "Lyen Gwoup"
+    },
     "group_navigation_99f191a": {
         "message": "Navigasyon Gwoup"
     },
@@ -1066,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Demen a { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Zouti"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "Nou jwenn{ totalResults } rezilta, { numDisplayed } rezilta ki afiche kounye a"
