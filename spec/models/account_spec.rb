@@ -2050,4 +2050,24 @@ describe Account do
       expect(Account.find(sub_acc2.id).effective_brand_config).to eq config2
     end
   end
+
+  context '#roles_with_enabled_permission' do
+    let(:account) { account_model }
+
+    it 'returns expected roles with the given permission' do
+      role = account.roles.create :name => 'AssistantGrader'
+      role.base_role_type = 'TaEnrollment'
+      role.workflow_state = 'active'
+      role.save!
+      RoleOverride.create!(
+        context: account,
+        permission: 'change_course_state',
+        role: role,
+        enabled: true
+      )
+      expect(
+        account.roles_with_enabled_permission(:change_course_state).map(&:name).sort
+      ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
+    end
+  end
 end

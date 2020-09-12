@@ -82,6 +82,23 @@ describe OutcomesController do
         expect(permissions.key?(permission)).to be_truthy
       end
     end
+
+    context 'account_level_mastery_scales feature flag enabled' do
+      before(:once) do
+        @account.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes proficiency roles' do
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+
+        %i[PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES PROFICIENCY_SCALES_ENABLED_ROLES].each do |key|
+          roles = controller.js_env[key]
+          expect(roles.length).to eq 1
+          expect(roles.dig(0, :role)).to eq 'AccountAdmin'
+        end
+      end
+    end
   end
 
   describe "GET 'show'" do

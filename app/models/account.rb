@@ -2035,4 +2035,11 @@ class Account < ActiveRecord::Base
   def self.ensure_dummy_root_account
     Account.find_or_create_by!(id: 0) if Rails.env.test?
   end
+
+  def roles_with_enabled_permission(permission)
+    roles = available_roles
+    roles.select do |role|
+      RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
+    end
+  end
 end

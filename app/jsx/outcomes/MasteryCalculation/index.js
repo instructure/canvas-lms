@@ -18,10 +18,10 @@
 
 import React, {useCallback} from 'react'
 import I18n from 'i18n!MasteryScale'
-import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyCalculation from './ProficiencyCalculation'
+import RoleList from '../RoleList'
 import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from './api'
 import {useQuery, useMutation} from 'react-apollo'
 
@@ -57,11 +57,15 @@ const MasteryCalculation = ({contextType, contextId}) => {
     )
   }
   const {outcomeCalculationMethod} = data.account
+  const roles = ENV.PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES || []
   return (
     <>
-      <Heading level="h5" margin="medium 0">
-        {I18n.t('Set the mastery scale to be used for all courses within this account.')}
-      </Heading>
+      <RoleList
+        description={I18n.t(
+          'Permission to change this mastery calculation is enabled at the account level for:'
+        )}
+        roles={roles}
+      />
       <ProficiencyCalculation
         contextType={contextType}
         contextId={contextId}
