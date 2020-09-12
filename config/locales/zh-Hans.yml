@@ -192,6 +192,7 @@ zh-Hans:
   a_new_assignment_has_been_created_for_your_course__12b72639: "已为您的课程创建了新作业，%{course_name}。"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "需要合作伙伴 ID 才能使用学术基准"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: 需要合作伙伴密钥才能使用学术基准
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "BigBlueButton 提供高级版，它允许同步进行基于购买金额而定的会议数量（每个会议 1 个主持人和最多 99 个参与者），无录制文件存储限制，并且通过专用的基础设施实现更加优越的性能。"
   a_problem_occurred_adding_reviewers_57b083d9: 添加审阅者时出错。
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: 公开隐私级别会将发起用户的个人身份信息发送至工具提供商。将它设置为“隐私”可能会对依赖于该信息的工具造成不利影响。
   a_redirect_uri_is_required_please_supply_one_471908db: redirect_uri必填，请提供。
@@ -2463,6 +2464,9 @@ zh-Hans:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: 出现了尝试生成此主题的错误，请再次尝试。
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: 发生尝试准备下载的错误，请再次尝试。
   an_error_occurred_updating_the_assignment_7391dd3a: 更新作业时出错。
+  an_error_occurred_updating_the_calculation_method_49384084: 更新计算方法时发生错误
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "更新熟练程度评级时发生错误:%{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: 更新熟练程度评级时发生错误
   an_error_occurred_updating_this_assignment_21287c7e: 更新此作业时出错。
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "为 %{filename} 设置使用权限时出错"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: 在尝试联系Turnitin时发生错误
@@ -2474,10 +2478,13 @@ zh-Hans:
   an_error_occurred_while_loading_changes_9851b56f: 加载更改时出错
   an_error_occurred_while_loading_courses_11d4571e: 加载课程时出错
   an_error_occurred_while_loading_late_policies_c415f676: 加载最新策略时出错
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "上传计算结果时发生错误：%{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "加载熟练程度评级时发生错误：%{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: 锁定公告时出错。
   an_error_occurred_while_migrating_405ac0b5: 迁移时出现错误。
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: 获取您的二维码时发生错误
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: 保存帐户能力等级时出错
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "保存帐户熟练程度评级时发生错误：%{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: 保存关联时出错
   an_error_occurred_while_saving_the_assignment_post_94f1184e: 保存作业发布政策时发生错误
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: 保存课程发布政策时出错
@@ -4002,6 +4009,7 @@ zh-Hans:
   belarusian_b2f19c76: 白俄罗斯语
   belgium_32_e5f5b598: 比利时(+32)
   belgium_ef8739b6: 比利时
+  below_mastery_abd1dca5: 未掌握
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "此搜索字段下方是 %{content_type} 列表。当您输入时，将过滤该列表以匹配您的查询。将按照您选择的任何选项来过滤会话消息。"
   beta_url_3c7b88ec: 测试网址：
   better_file_browsing_description: |-
@@ -4275,6 +4283,7 @@ zh-Hans:
   cache_cleared_successfully_9ab84d5a: 已成功清除缓存
   calculated_by_4ac40468: "计算人： "
   calculated_by_baa3c8f3: 计算人：
+  calculation_d82f6181: 计算
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' 不是此计算方法的有效值。该值必须在 '%{valid_calculation_ints_min}' 和 '%{valid_calculation_ints_max}' 之间"
   calculation_method_fe281f9: 计算方法
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method 必须为以下各项之一：%{calc_methods}"
@@ -6349,6 +6358,7 @@ zh-Hans:
   could_not_duplicate_discussion_953ed67f: 无法复制讨论
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "找不到客户端 ID %{clientId} 的 LTI 配置"
   could_not_find_file_to_upload_2af12953: 找不到要上传的文件
+  could_not_find_file_to_upload_d8a0b228: 找不到要上传的文件。
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "目前找不到使用SIS ID%{user_id}登录的用户，正在跳过"
   could_not_save_chosencolor_741b74ce: "无法保存 '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "无法调整作业上的日期%{name} (ID %{id})"
@@ -6436,6 +6446,9 @@ zh-Hans:
   count_page_views_b40102b3: 
     one: "%{count} 个页面查看"
     other: "%{count} 页面视图"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "已选择 %{count} 页进行删除"
+    other: "已选择 %{count} 页进行删除"
   count_participations_ac8f82b7: 
     one: "%{count} 项参与"
     other: "%{count} 参与者"
@@ -8644,6 +8657,7 @@ zh-Hans:
   drag_and_drop_your_image_here_or_7fba7c14: 拖放您的图像到此或
   drag_to_rearrange_sections_637efee3: 拖动重新安排的班级
   drag_up_or_down_to_reorder_382126ff: 向上或向下拖动以重新排序
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "BigBlueButton 的使用量显著增加会导致出现性能问题。"
   drop_files_here_to_add_to_module_236304f5: 将文件拖到此处以添加至模块
   drop_files_here_to_upload_ce0f50f9: 将文件拖到此处以上传
   drop_image_62a2a071: 放下图像
@@ -9956,6 +9970,7 @@ zh-Hans:
   final_grader_can_view_other_grader_names_67736530: 最终评分人可查看其它评分人姓名
   final_letter_grade_80dccec1: 最终字母分数
   final_score_26bcfc20: 最终分数
+  final_score_53278fd0: 最终得分：
   final_score_61e15cf3: 最终分数
   findLinkForService: 
     buttons: 
@@ -11385,6 +11400,7 @@ zh-Hans:
         saving: 正在保存...
         self_signup: 自行注册
         split_into_groups: "把学生分入%{num_groups}小组内"
+        split_into_sized_groups: "将学生分组，每组 %{num_members} 人"
       group_category_detail: 
         add_group: 添加小组
         category_settings: 设置
@@ -11822,6 +11838,7 @@ zh-Hans:
   html_editor_fb2ab713: "HTML 编辑器"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "HTTP 响应：%{code}"
   hungarian_fc7d30c9: 匈牙利语
   hungary_36_cd3e515b: "匈牙利 (+36)"
   i_agree_to_the_34aa16ce: 我同意
@@ -12083,6 +12100,7 @@ zh-Hans:
   in_progress_646a8aef: 进行中
   in_progress_9d1ce8b9: 进行中
   in_progress_icon_6e69c998: 进行中的图标
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "如果 BigBlueButton 无法满足您当前或未来的需求，Canvas 还与 Zoom、Google Meet、Microsoft Teams 以及其他视频会议工具提供商建立了合作伙伴关系。"
   inactivate_user_35f6d9d7: 不活跃用户
   inactive_cd40317f: 不活跃
   inactive_enrollments_3b84be3d: 不活动的注册学员
@@ -12328,6 +12346,7 @@ zh-Hans:
   ireland_353_3cd32cc0: 爱尔兰(+353)
   ireland_f7bb9899: 爱尔兰
   irish_567e109f: 爱尔兰语
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " 正使用 BigBlueButton 免费版，它允许同步进行 10 个视频会议，每个会议 1 个主持人和最多 24 个参与者。录制文件保存 7 天。"
   israel_681bc5a5: 以色列
   israel_972_e671df75: 以色列(+972)
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "您的电邮地址似乎无效：“%{addr}”"
@@ -12346,6 +12365,7 @@ zh-Hans:
   item_incomplete_d6a16040: （项目未完成）
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} 目前不受支持"
   item_past_due_dc6e776: 逾期项目
+  item_scores_9fbfe956: 分项得分：
   item_select_fe0f320a: 项目选择
   item_type_assignment_13a1132e: 项目类型：作业
   item_type_choice_aebcf2ef: 题型：选项
@@ -12904,10 +12924,12 @@ zh-Hans:
         buttons: 
           request_password: 请求密码
         dont_know_password: 忘记了密码？
+        error: 发生错误，请稍后重试。
         log_in: 登录
         login_handle: "输入您的 %{login_handle_name}，我们将向您发送更改密码的链接。"
         password: 密码
         sending: 正在发送...
+        sent: 已发送！
       new: 
         back_to_login: 返回登录
         browse_courses: 浏览课程
@@ -13060,6 +13082,7 @@ zh-Hans:
             课程，允许学生管理课程内容区域，以及对学生隐藏评分
             详细信息。您也可以调整课程名称和代码。
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "在wiki页面显示Microsoft Immersive Reader链接选项。"
+  makes_the_student_grades_page_responsive_c13e00eb: 让学生评分页面响应。
   making_a_copy_of_original_assignment_name_8f029a9b: "制作\"%{original_assignment_name}\"的副本"
   making_a_copy_of_originalassignmentname_b7268992: "制作“%{originalAssignmentName}”的副本"
   malay_f5dddce4: 马来语
@@ -15469,6 +15492,7 @@ zh-Hans:
   must_be_a_valid_number_59f0069: 必须是有效数字
   must_be_after_start_date_95e251a3: 必须在开始日期后
   must_be_between_availability_dates_ceaca984: 必须在可用日期之间
+  must_be_between_lower_and_upper_1f501b2a: "必须介于 %{lower} 和 %{upper} 之间"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: 必须登录并注册后才能执行该操作
   must_be_on_or_after_end_date_e4dda631: 必须在结束日期当日或之后
   must_belong_to_a_root_account_f84323f6: 必须属于一个母帐户
@@ -16195,6 +16219,7 @@ zh-Hans:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "包含在 1 和 16之间的数字"
+  number_each_event_d934cd65: 为每个事件编号
   number_is_too_large_4da4af0a: 数字太大
   number_is_too_small_618a6ca7: 数字太小
   number_more_a46966: "%{number}更多..."
@@ -16704,6 +16729,7 @@ zh-Hans:
   paper_view_7405eeab: 纸张视图
   paraguay_181a5029: 巴拉圭
   paraguay_595_ca58b83a: 巴拉圭(+595)
+  parameter_91ed199: 参数
   parameters_a13374ec: 参数
   parent_assignment_is_not_selected_9efb4ac1: 未选择父级作业
   parent_assignment_is_selected_6a2fbca8: 已选择父级作业
@@ -16829,6 +16855,7 @@ zh-Hans:
   please_allow_arc_to_access_your_webcam_e72e4be4: "请允许 Arc 访问您的网络摄像头。"
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "请允许 Canvas 访问您的麦克风和网络摄像头。"
   please_allow_canvas_to_access_your_webcam_f66bacb1: "请允许 Canvas 访问您的网络摄像头。"
+  please_contact_your_lms_administrator_for_more_det_635afd97: "请联系您的 LMS 管理员以获取更多详情。"
   please_create_a_group_set_8db6e8fe: 请创建组集合
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: 请不要回复此电子邮件，因为邮件不会被递送。
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "请输入该日期或该日期后的截止日期%{earliestDate}"
@@ -17480,6 +17507,8 @@ zh-Hans:
   processing_2fcc9739: 正在处理
   product_name: Canvas
   product_tours_1e19eb95: 产品导览
+  proficiency_calculation_57f0bdf: 熟练程度计算
+  proficiency_calculation_parameters_5f605dec: 熟练程度计算参数
   proficiency_rating_6346119f: 熟练程度评分
   proficiency_rating_deleted_77827473: 熟练等级被删除
   proficiency_ratings_2bbabdcd: 熟练程度评分
@@ -18087,6 +18116,7 @@ zh-Hans:
       update_question_without_regrading: 更新问题而不重新评分
   quiz_40ee61b1: 测验
   quiz_assignment_overrides_cec1973b: 测验作业覆盖
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: 即使延期期限未过，超过可用性日期后的测验尝试也仍然会自动提交。
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: 在尝试期间过期的测验可用性日期将仍然自动提交，即使延时期限未到期也是一样。
   quiz_duplication_not_implemented_c1495585: 未实现测验复制
   quiz_e0dcce8f: 测验
@@ -18164,6 +18194,7 @@ zh-Hans:
   quiz_lti_plugin_a189607f: "测验 LTI 插件"
   quiz_lti_plugin_a6256549: "测验 LTI 的插件"
   quiz_menu_4fcd5e61: 测验菜单
+  quiz_not_assigned_to_student_4b1846d5: 未向学生分配测验
   quiz_question_1da5198e: 测验问题
   quiz_question_groups_bd0bb222: 测验问题组
   quiz_questions_ecea3c40: 测验题
@@ -19789,6 +19820,7 @@ zh-Hans:
   responsive_global_nav_logo_99488e92: 响应式全球导航标志
   responsive_layout_54e4ca06: 自适应布局
   responsive_misc_dc572cc0: 响应性杂项
+  responsive_student_grades_page_324e9c8b: 响应的学生评分页面
   restart_link_validation_b61286fc: 重新启动链接验证
   restore_courses_182e162e: 恢复课程
   restored_course_association_course_c9e16045: "还原的课程关联%{course}"
@@ -20652,6 +20684,7 @@ zh-Hans:
   set_name_f83b658: 设置名称
   set_of_grading_periods_545b37e9: 评分周期的集合
   set_some_up_now_1749bb44: 现在该设置一些
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: 设置要对该帐户中的所有课程使用的掌握程度量表。
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           设置熟练程度评分在学习掌握程度评分册中的显示方式。\n\
       \x20           调整评分、掌握程度、得分和颜色的数量。\n\
@@ -22283,6 +22316,8 @@ zh-Hans:
       global_support_desk_description: "我们的 ASCs 是您的第一线支持，并可以为需要额外帮助的事项连接您到我们的全球支持桌面。"
       networking_academy_description: "查看 Cisco 对最常见问题的答案。"
       networking_academy_faqs: "Networking Academy 常见问题解答"
+      student_support: "NetAcad 支持 - 学生"
+      student_support_description: 你的讲师将是您的第一联络人。他们可以回答您的网络学院问题或为您联系支持服务台。您可以使用收件箱功能联系您的讲师。
       support_desk_livechat: 支持桌面实时聊天
   support_favorite_lti_tools_in_the_rce_1680436d: "RCE 中支持 LTI 工具收藏"
   svg_d5969386: SVG
@@ -22615,6 +22650,7 @@ zh-Hans:
   the_next_available_appointment_in_this_course_is_o_da10316c: "该课程的下一可用预约已启动*%{date}*"
   the_preceding_content_is_partner_provided_d753928c: 以上内容由合作伙伴提供
   the_previous_sis_batch_was_aborted_d7d89955: "上一个 SIS 批次已中止"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 该熟练程度计算方法由您的管理员设置，适用于该帐户的所有课程。
   the_profile_picture_has_been_reported_d609d6dd: 档案照片已被报道
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: 所提供的学术基准文件有一个错误
   the_question_text_for_the_question_question_name_w_3a68a2c7: "\"%{question_name}\"问题的导入文本太长。"
@@ -22801,6 +22837,7 @@ zh-Hans:
   this_code_has_expired_41f76642: 该二维码已过期。
   this_conference_may_be_recorded_f76deeeb: 本次会议可能被记录。
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: 该课程此时无法添加到课程菜单中。
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: 除非本课程处于活跃状态，否则无法将此课程添加到课程菜单。
   this_course_does_not_allow_score_uploads_4b35fe07: 此课程不允许上传分数。
   this_course_has_concluded_7995a84c: 此课程已结束
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "这门课程还没开始。您将不能参加该课程，直到%{date}。"
@@ -23898,9 +23935,11 @@ zh-Hans:
   upload_data_dc4fa4cb: 上传数据
   upload_drop_zone: 
     drop_to_upload: 放下项目即可上传
+  upload_error_please_try_again_c6587f48: 上传错误。请重试。
   upload_failed_a5dc91ec: 上传失败
   upload_failed_quota_exceeded_ff3af659: 上传失败，超出配额
   upload_file_fd2361b8: 上传文件
+  upload_files_a228f20f: 上传文件
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 上传作业提交的文件到一个具体只读提交文件夹里
   upload_gradebook_386a46c8: 上传评分册
   upload_image_6120b609: 上传图像
@@ -24457,6 +24496,7 @@ zh-Hans:
   users_add_remove_observers_d1273d9: "用户 - 添加/删除观察者"
   users_add_remove_students_in_courses_efe7e748: "用户 - 在课程中添加/删除学生"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "用户 - 在课程中添加/删除教师、课程设计者或助教"
+  users_allowed_to_edit_this_page_d6d316d0: 被允许编辑此页面的用户
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       用户和学期位于该帐户，因此SIS端点始终根据帐户确认用户的权限。子帐户只拥有课程和班次的所有权；他们不拥有用户数据。
       子帐户管理员无法查看SIS信息，除非他们在课程中也被授予讲师角色。子帐户管理员无法在没有课程关联的情况下查看SIS信息，因为讲师角色有权在帐户级别读取SIS数据。
@@ -24568,6 +24608,7 @@ zh-Hans:
   waiting_for_attempted_login_6d00cb49: 正等待尝试登录
   waiting_for_change_to_complete_b75b5e8b: 等待完成更改
   waiting_for_confirmation_to_display_qr_code_6f904d63: 等待确认显示二维码
+  waiting_for_request_to_complete_13cf037a: 等待请求完成
   waiting_for_selection_ce0398c7: 等待选择
   waiting_for_your_qr_code_to_load_809299e5: 正在等待加载二维码
   warning_6576b5b8: 警告
