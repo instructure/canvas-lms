@@ -36,13 +36,6 @@ describe Mutations::MarkSubmissionCommentsRead do
     @teacher_comment = @submission.submission_comments.create!(author: @teacher, comment: 'teachers whats up')
   end
 
-  let(:audit_log_field_extension) { class_double(AuditLogFieldExtension).as_stubbed_const }
-
-  before(:each) do
-    # prevent unnecessary calls to dynamo (audit logs)
-    allow(audit_log_field_extension).to receive(:enabled?).and_return false
-  end
-
   def mutation_str(submission_id: nil, submission_comment_ids: [])
     <<~GQL
       mutation {
