@@ -23,8 +23,11 @@ import SubmissionTrayRadioInput from './SubmissionTrayRadioInput'
 import {statusesTitleMap} from '../constants/statuses'
 import I18n from 'i18n!gradebook'
 
-function checkedValue(submission) {
-  if (submission.excused) {
+function checkedValue(submission, assignment) {
+  // If students are anonymized we don't want to leak any information about the submission
+  if (assignment.anonymizeStudents) {
+    return 'none'
+  } else if (submission.excused) {
     return 'excused'
   } else if (submission.missing) {
     return 'missing'
@@ -50,7 +53,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
   }
 
   handleRadioInputChanged = ({target: {value}}) => {
-    const alreadyChecked = checkedValue(this.props.submission) === value
+    const alreadyChecked = checkedValue(this.props.submission, this.props.assignment) === value
     if (alreadyChecked && !this.props.submissionUpdating) {
       return
     }
@@ -71,7 +74,7 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
     const radioOptions = ['none', 'late', 'missing', 'excused'].map(status => (
       <SubmissionTrayRadioInput
         key={status}
-        checked={checkedValue(this.props.submission) === status}
+        checked={checkedValue(this.props.submission, this.props.assignment) === status}
         color={this.props.colors[status]}
         disabled={this.props.disabled}
         latePolicy={this.props.latePolicy}
@@ -98,6 +101,9 @@ export default class SubmissionTrayRadioInputGroup extends React.Component {
 }
 
 SubmissionTrayRadioInputGroup.propTypes = {
+  assignment: shape({
+    anonymizeStudents: bool.isRequired
+  }).isRequired,
   colors: shape({
     late: string.isRequired,
     missing: string.isRequired,

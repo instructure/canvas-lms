@@ -27,6 +27,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
   hooks.beforeEach(() => {
     props = {
       assignment: {
+        anonymizeStudents: false,
         muted: false,
         postManually: false,
         published: true
@@ -67,6 +68,18 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       .filter(node => node.props.text === 'Muted')
 
     strictEqual(mutedPills.length, 1)
+  })
+
+  test('does not show the "Muted" pill when the assignment is muted and students are anonymous', () => {
+    props.assignment.muted = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const mutedPills = wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Muted')
+
+    strictEqual(mutedPills.length, 0)
   })
 
   test('does not show the "Muted" pill when the assignment is not muted', () => {
@@ -113,6 +126,18 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     strictEqual(droppedPills.length, 1)
   })
 
+  test('does not show the "Dropped" pill when the submission is dropped and students are anonymous', () => {
+    props.submission.drop = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const droppedPills = wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Dropped')
+
+    strictEqual(droppedPills.length, 0)
+  })
+
   test('does not show the "Dropped" pill when the submission is not dropped', () => {
     props.submission.drop = false
     wrapper = mountComponent()
@@ -133,6 +158,18 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       .filter(node => node.props.text === 'Excused')
 
     strictEqual(excusedPills.length, 1)
+  })
+
+  test('does not show the "Excused" pill when the submission is excused and students are anonymous', () => {
+    props.submission.excused = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const excusedPills = wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Excused')
+
+    strictEqual(excusedPills.length, 0)
   })
 
   test('does not show the "Excused" pill when the submission is not excused', () => {
@@ -182,6 +219,14 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       wrapper = mountComponent()
       const hiddenPills = getHiddenPills()
       strictEqual(hiddenPills.length, 1)
+    })
+
+    test('does not show the "Hidden" pill when students are anonymized', () => {
+      props.submission.hasPostableComments = true
+      props.assignment.anonymizeStudents = true
+      wrapper = mountComponent()
+      const hiddenPills = getHiddenPills()
+      strictEqual(hiddenPills.length, 0)
     })
 
     test('does not show the "Hidden" pill when the submission is not graded', () => {

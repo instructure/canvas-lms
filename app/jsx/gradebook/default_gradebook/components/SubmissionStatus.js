@@ -33,6 +33,7 @@ export default class SubmissionStatus extends React.Component {
 
   static propTypes = {
     assignment: shape({
+      anonymizeStudents: bool.isRequired,
       muted: bool.isRequired,
       postManually: bool.isRequired,
       published: bool.isRequired
@@ -57,6 +58,22 @@ export default class SubmissionStatus extends React.Component {
     const {assignment, postPoliciesEnabled, submission} = this.props
     const statusPillComponents = []
 
+    if (!assignment.published) {
+      statusPillComponents.push(
+        <Pill
+          key="unpublished-assignment"
+          variant="danger"
+          text={I18n.t('Unpublished')}
+          margin="0 0 x-small"
+        />
+      )
+    }
+
+    // If students are anonymized we don't want to leak any information about the submission
+    if (assignment.anonymizeStudents) {
+      return statusPillComponents
+    }
+
     if (postPoliciesEnabled) {
       if (isPostable(submission)) {
         statusPillComponents.push(
@@ -74,17 +91,6 @@ export default class SubmissionStatus extends React.Component {
           key="muted-assignment"
           variant="default"
           text={I18n.t('Muted')}
-          margin="0 0 x-small"
-        />
-      )
-    }
-
-    if (!assignment.published) {
-      statusPillComponents.push(
-        <Pill
-          key="unpublished-assignment"
-          variant="danger"
-          text={I18n.t('Unpublished')}
           margin="0 0 x-small"
         />
       )
