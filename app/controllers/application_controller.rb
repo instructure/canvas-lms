@@ -1283,7 +1283,7 @@ class ApplicationController < ActionController::Base
 
   def set_no_cache_headers
     response.headers["Pragma"] = "no-cache"
-    response.headers["Cache-Control"] = "no-cache, no-store"
+    response.headers["Cache-Control"] = "no-store"
   end
 
   def set_page_view
