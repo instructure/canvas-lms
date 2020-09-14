@@ -84,7 +84,12 @@ export default function RceFileBrowser(props) {
 
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser allowUpload={false} selectFile={handleFileSelect} mediaFiles={files} />
+      <FileBrowser
+        allowUpload={false}
+        selectFile={handleFileSelect}
+        mediaFiles={files}
+        contentTypes={['**']}
+      />
     </View>
   )
 }
