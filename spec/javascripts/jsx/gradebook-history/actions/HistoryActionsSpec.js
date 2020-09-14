@@ -64,7 +64,10 @@ function defaultResponse() {
             points_possible: 26
           }
         ],
-        users: [{id: 100, name: 'Ms. Twillie Jones'}, {id: 110, name: 'Norval Abbott'}]
+        users: [
+          {id: 100, name: 'Ms. Twillie Jones'},
+          {id: 110, name: 'Norval Abbott'}
+        ]
       }
     },
     headers: {
@@ -98,6 +101,7 @@ test('fetchHistorySuccess creates an action with history items in payload', () =
         muted: false,
         name: 'Rustic Rubber Duck'
       },
+      courseOverrideGrade: false,
       date: '2017-05-30T23:16:59Z',
       displayAsPoints: true,
       gradedAnonymously: false,
@@ -192,6 +196,31 @@ test('fetchHistorySuccess creates an action with history next page link in paylo
   )
 })
 
+test('fetchHistorySuccess returns true for courseOverrideGrade when it is set in the payload', () => {
+  const response = {
+    data: {
+      events: [{course_override_grade: true, links: {}}],
+      linked: {}
+    },
+    headers: {}
+  }
+  const {courseOverrideGrade} = fetchHistorySuccess(
+    response.data,
+    response.headers
+  ).payload.items[0]
+
+  ok(courseOverrideGrade)
+})
+
+test('fetchHistorySuccess returns false for courseOverrideGrade when it is not set in the payload', () => {
+  const response = defaultResponse()
+  const {courseOverrideGrade} = fetchHistorySuccess(
+    response.data,
+    response.headers
+  ).payload.items[0]
+  strictEqual(courseOverrideGrade, false)
+})
+
 test('fetchHistoryFailure creates an action with type FETCH_HISTORY_FAILURE', () => {
   const expectedValue = {
     type: FETCH_HISTORY_FAILURE
@@ -224,6 +253,7 @@ test('fetchHistoryNextPageSuccess creates an action with history items in payloa
         muted: false,
         name: 'Rustic Rubber Duck'
       },
+      courseOverrideGrade: false,
       date: '2017-05-30T23:16:59Z',
       displayAsPoints: true,
       gradedAnonymously: false,

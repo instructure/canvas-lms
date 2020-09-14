@@ -49,6 +49,7 @@ module Api::V1::GradeChangeEvent
     }
 
     json[:grade_current] = event.grade_current if event.grade_current.present?
+    json[:course_override_grade] = true if event.override_grade?
     json
   end
 
