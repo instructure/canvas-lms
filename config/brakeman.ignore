@@ -98,7 +98,7 @@
       },
       "user_input": "params[:context_type]",
       "confidence": "High",
-      "note": "Value is whitelisted"
+      "note": "Value is allowed"
     },
     {
       "warning_type": "SQL Injection",

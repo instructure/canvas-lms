@@ -165,11 +165,11 @@ class GradebooksController < ApplicationController
 
   def save_assignment_order
     if authorized_action(@context, @current_user, :read)
-      whitelisted_orders = {
+      allowed_orders = {
         'due_at' => :due_at, 'title' => :title,
         'module' => :module, 'assignment_group' => :assignment_group
       }
-      assignment_order = whitelisted_orders.fetch(params.fetch(:assignment_order), :due_at)
+      assignment_order = allowed_orders.fetch(params.fetch(:assignment_order), :due_at)
       @current_user.set_preference(:course_grades_assignment_order, @context.id, assignment_order)
       redirect_back(fallback_location: course_grades_url(@context))
     end

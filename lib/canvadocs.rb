@@ -291,7 +291,7 @@ module Canvadocs
     end
 
     def moderated_grading_user_filter(submission, current_user, enrollments)
-      submission.moderation_whitelist_for_user(current_user).map do |user|
+      submission.moderation_allow_list_for_user(current_user).map do |user|
         user_filter_entry(
           user,
           submission,

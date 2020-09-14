@@ -2029,36 +2029,36 @@ class Submission < ActiveRecord::Base
     final ? self.provisional_grades.final.first : self.provisional_grades.not_final.find_by(scorer: scorer)
   end
 
-  def moderated_grading_whitelist(current_user = self.user, loaded_attachments: nil)
+  def moderated_grading_allow_list(current_user = self.user, loaded_attachments: nil)
     return nil unless assignment.moderated_grading? && current_user.present?
 
     has_crocodoc = (loaded_attachments || attachments).any?(&:crocodoc_available?)
-    moderation_whitelist_for_user(current_user).map do |user|
+    moderation_allow_list_for_user(current_user).map do |user|
       user.moderated_grading_ids(has_crocodoc)
     end
   end
 
-  def moderation_whitelist_for_user(current_user)
-    whitelist = []
-    return whitelist unless current_user.present? && assignment.moderated_grading?
+  def moderation_allow_list_for_user(current_user)
+    allow_list = []
+    return allow_list unless current_user.present? && assignment.moderated_grading?
 
     if assignment.grades_published?
-      whitelist.push(self.grader, self.user, current_user)
+      allow_list.push(self.grader, self.user, current_user)
     elsif self.user == current_user
       # Requesting user is the student.
-      whitelist << current_user
+      allow_list << current_user
     elsif assignment.permits_moderation?(current_user)
       # Requesting user is the final grader or an administrator.
-      whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+      allow_list.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
     elsif assignment.can_be_moderated_grader?(current_user)
       # Requesting user is a provisional grader, or eligible to be one.
       if assignment.grader_comments_visible_to_graders
-        whitelist.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
+        allow_list.push(*assignment.moderation_grader_users_with_slot_taken, self.user, current_user)
       else
-        whitelist.push(current_user, self.user)
+        allow_list.push(current_user, self.user)
       end
     end
-    whitelist.compact.uniq
+    allow_list.compact.uniq
   end
 
   def anonymous_identities

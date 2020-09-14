@@ -24,7 +24,7 @@ $menu-item-keyboard-shortcut-color: $ic-font-color-dark;
 [dir=rtl] {
   .mce-container, .mce-container *, .mce-widget, .mce-widget *, .mce-reset {
 
-    text-align: right; /* stylelint-disable-line declaration-property-value-blacklist */
+    text-align: right; /* stylelint-disable-line declaration-property-value-disallowed-list */
   }
 }
 

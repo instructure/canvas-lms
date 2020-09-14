@@ -464,7 +464,7 @@ class SubmissionsController < SubmissionsBaseController
   private :has_file_attached?
 
   def extensions_allowed?
-    # if extensions are being restricted, check that the extension is whitelisted
+    # if extensions are being restricted, check that the extension is allowed
     # The first check here is for web interface submissions that contain only one file
     # The second check is for multiple submissions and API calls that use the uploaded_data parameter to pass a filename
     if @assignment.allowed_extensions.present?

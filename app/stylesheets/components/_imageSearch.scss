@@ -70,7 +70,7 @@
 .ImageSearch__attribution {
   position: absolute;
   bottom: 0;
-  left: 0; /* stylelint-disable-line property-blacklist */
+  left: 0; /* stylelint-disable-line property-disallowed-list */
   width: 100%;
   min-height: 8px;
   opacity: 0;

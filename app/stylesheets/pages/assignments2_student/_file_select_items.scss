@@ -32,8 +32,8 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    left: 0; /* stylelint-disable-line property-blacklist */
-    right: 0; /* stylelint-disable-line property-blacklist */
+    left: 0; /* stylelint-disable-line property-disallowed-list */
+    right: 0; /* stylelint-disable-line property-disallowed-list */
     border: 0.125rem solid $electric;
     border-radius: calc(0.25rem * 1.5);
     transition: all 0.2s;
