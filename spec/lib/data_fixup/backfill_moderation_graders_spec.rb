@@ -20,7 +20,6 @@ require 'spec_helper'
 describe DataFixup::BackfillModerationGraders do
   before(:once) do
     @root_account = account_model
-    @root_account.enable_feature!(:anonymous_moderated_marking)
     course_factory(account: @root_account)
     @student = User.create!
     @course.enroll_student(@student)
