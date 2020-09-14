@@ -192,6 +192,7 @@ ja:
   a_new_assignment_has_been_created_for_your_course__12b72639: "ご利用のコース「%{course_name}」に新しい課題が作成されました"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Academic Benchmarks を使用するには、パートナーIDが必要です"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Academic Benchmarks を使用するには、パートナーキーが必要です"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: BigBlueButtonのプレミアムバージョンが利用可能です。購入量（それぞれ1人の主催者と最大99人の参加者）に基づいて会議を同時に提供し、記録ストレージは無制限で、パフォーマンスを向上させる専用インフラストラクチャを提供しています。
   a_problem_occurred_adding_reviewers_57b083d9: 評価者を追加中に問題が発生しました。
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: 公開プライバシーレベルでは、起動ユーザーの個人識別情報をツールプロバイダに送信します。これをプライベートに設定すると、その情報に依存するツールに悪影響を及ぼす可能性があります。
   a_redirect_uri_is_required_please_supply_one_471908db: redirect_uriが必要です、一つ供給してください。
@@ -2463,6 +2464,9 @@ ja:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: このテーマ生成の準備中にエラーが発生しました。もう一度やり直してください。
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: ダウンロードの準備中にエラーが発生しました。もう一度やり直してください。
   an_error_occurred_updating_the_assignment_7391dd3a: 課題を更新する際にエラーが発生しました。
+  an_error_occurred_updating_the_calculation_method_49384084: 計算方法を更新する際にエラーが発生しました。
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "熟練度評価を更新する際にエラーが発生しました：%{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: 熟練度評価を更新する際にエラーが発生しました。
   an_error_occurred_updating_this_assignment_21287c7e: 課題を更新する際にエラーが発生しました。
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "%{filename} の使用権を設定する際にエラーが発生しました。"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: Turnitinに連絡中にエラーが発生しました。
@@ -2474,10 +2478,13 @@ ja:
   an_error_occurred_while_loading_changes_9851b56f: 変更内容の読み込み中にエラーが発生しました
   an_error_occurred_while_loading_courses_11d4571e: コースの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_late_policies_c415f676: 遅延ポリシーの読み込み中にエラーが発生しました
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "結果の計算の読み込み中にエラーが発生しました：%{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "熟練度評価を読み込み中にエラーが発生しました：%{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: アナウンスメントのロック中にエラーが発生しました。
   an_error_occurred_while_migrating_405ac0b5: 移行中にエラーが発生しました。
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "QR コードの取得中にエラーが発生しました"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: アカウント熟練度評価を保存中にエラーが発生しました。
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "アカウント熟練度の評価の保存中にエラーが発生しました：%{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: 関連付けの保存中にエラーが発生しました
   an_error_occurred_while_saving_the_assignment_post_94f1184e: 課題転記ポリシーの保存中にエラーが発生しました
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: コース投稿ポリシーを保存中にエラーが発生しました
@@ -4006,6 +4013,7 @@ ja:
   belarusian_b2f19c76: ベラルーシ語
   belgium_32_e5f5b598: "ベルギー (+32)"
   belgium_ef8739b6: ベルギー
+  below_mastery_abd1dca5: 熟達スコア未満
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "この検索フィールドの下には、%{content_type} のリストがあります。入力すると、入力内容に応じてリストがフィルタリングされます。会話メッセージは、選択した任意のオプションでフィルタリングされます。"
   beta_url_3c7b88ec: "べータ URL:"
   better_file_browsing_description: |-
@@ -4282,6 +4290,7 @@ ja:
   cache_cleared_successfully_9ab84d5a: キャッシュの消去に成功しました
   calculated_by_4ac40468: "計算者： "
   calculated_by_baa3c8f3: 計算者：
+  calculation_d82f6181: 計算
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' は、この計算メソッドでは有効な値ではありません。値は、'%{valid_calculation_ints_min}' ～ '%{valid_calculation_ints_max}' の範囲であることが必要です"
   calculation_method_fe281f9: 計算メソッド
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method は、次のいずれかであることが必要です: %{calc_methods}"
@@ -4606,7 +4615,7 @@ ja:
   calendar_283a9ed9: カレンダー
   calendar_a8563bb2: "カレンダー:"
   calendar_contextinfo_name_a7d98525: "予定表%{contextInfo.name}"
-  calendar_d14cfc8f: カレンダー
+  calendar_d14cfc8f: 予定表
   calendar_event: 
     errors: 
       duplicate_child_event_contexts: "子イベント コンテキストが重複しています"
@@ -6356,6 +6365,7 @@ ja:
   could_not_duplicate_discussion_953ed67f: ディスカッションを複製できませんでした
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "依頼者 ID %{clientId} の LTI 構成が見つかりませんでした"
   could_not_find_file_to_upload_2af12953: アップロードするファイルが見つかりませんでした
+  could_not_find_file_to_upload_d8a0b228: アップロードするファイルが見つかりませんでした。
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "SIS ID %{user_id} でのログイン用の既存ユーザーが見つかりませんでした。スキップします。"
   could_not_save_chosencolor_741b74ce: "'%{chosenColor}'を保存できませんでした"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "課題 %{name} (ID %{id}) の日付を調整できませんでした"
@@ -6443,6 +6453,9 @@ ja:
   count_page_views_b40102b3: 
     one: "%{count} ページ ビュー"
     other: "%{count} ページビュー"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count}ページ削除するように選択"
+    other: "%{count}ページ削除するように選択"
   count_participations_ac8f82b7: 
     one: "%{count} 回の参加"
     other: "%{count} 参加"
@@ -8653,6 +8666,7 @@ ja:
   drag_and_drop_your_image_here_or_7fba7c14: 画像をここにドラッグ＆ドロップするか
   drag_to_rearrange_sections_637efee3: ドラッグしてセクションを並べ替え
   drag_up_or_down_to_reorder_382126ff: 上下にドラッグして並べ替え
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: 無料バージョンのBigBlueButtonの使用量が劇的に増加すると、パフォーマンスの問題が生じる可能性があります。
   drop_files_here_to_add_to_module_236304f5: ここにファイルをドロップしてモジュールに追加する
   drop_files_here_to_upload_ce0f50f9: アップロードするファイルをここにドロップする
   drop_image_62a2a071: 画像をドロップ
@@ -9966,6 +9980,7 @@ ja:
   final_grader_can_view_other_grader_names_67736530: 最終評価者は他の評価者の名前を見ることができます
   final_letter_grade_80dccec1: 最終的なABC...評価
   final_score_26bcfc20: 最終的なスコア
+  final_score_53278fd0: 最終スコア：
   final_score_61e15cf3: 最終的なスコア
   findLinkForService: 
     buttons: 
@@ -11396,6 +11411,7 @@ ja:
         saving: 保存しています...
         self_signup: "セルフ サインアップ"
         split_into_groups: "受講生を %{num_groups} グループに分割する"
+        split_into_sized_groups: "グループにつき%{num_members}名のグループで、受講生をグループに分ける"
       group_category_detail: 
         add_group: グループの追加
         category_settings: 設定
@@ -11833,6 +11849,7 @@ ja:
   html_editor_fb2ab713: "HTML エディタ"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "HTTP 応答：%{code}"
   hungarian_fc7d30c9: ハンガリー語
   hungary_36_cd3e515b: ハンガリー（+36）
   i_agree_to_the_34aa16ce: 私は～に同意します
@@ -12094,6 +12111,7 @@ ja:
   in_progress_646a8aef: 進行中
   in_progress_9d1ce8b9: 進行中
   in_progress_icon_6e69c998: 進行中のアイコン
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "BigBlueButtonが現在または将来のニーズに対応できない場合、CanvasはZoom、Google Meet、Microsoft Teams、およびその他のビデオ会議ツールとも提携しています。"
   inactivate_user_35f6d9d7: 非アクティブのユーザー
   inactive_cd40317f: 非アクティブ
   inactive_enrollments_3b84be3d: 不活発な登録
@@ -12342,6 +12360,7 @@ ja:
   ireland_353_3cd32cc0: "アイルランド (+353)"
   ireland_f7bb9899: アイルランド
   irish_567e109f: アイルランド語
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " は、BigBlueButtonの無料バージョンを使用しており、それぞれが1人の主催者と最大24人の参加者をもつビデオ会議を10会議、同時に提供することができます。録音は7日間保存されます。"
   israel_681bc5a5: イスラエル
   israel_972_e671df75: "イスラエル (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "無効なメールアドレスのようです：\"%{addr}\""
@@ -12360,6 +12379,7 @@ ja:
   item_incomplete_d6a16040: (完了していない項目)
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} は現在サポートされていません"
   item_past_due_dc6e776: 期限を過ぎたアイテム
+  item_scores_9fbfe956: 項目スコア：
   item_select_fe0f320a: 項目選択
   item_type_assignment_13a1132e: "項目のタイプ: 課題"
   item_type_choice_aebcf2ef: 項目の種類選択肢
@@ -12918,10 +12938,12 @@ ja:
         buttons: 
           request_password: パスワードの要求
         dont_know_password: パスワードを忘れましたか？
+        error: エラーが起こりました。後ほど再試行してください。
         log_in: ログイン
         login_handle: "%{login_handle_name} を入力してください。パスワード変更用のリンクをお送りします。"
         password: パスワード
         sending: 送信しています...
+        sent: 送信されました!
       new: 
         back_to_login: ログインに戻る
         browse_courses: コースの参照
@@ -13074,6 +13096,7 @@ ja:
             受講者がコースコンテンツエリアを管理できるようにする、そして受講者に対して成績の詳細を
             非表示にします。また、コースの名前とコードを調整することも可能です。
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Microsoft Immersive Reader リンクオプションをWikiページに表示します。"
+  makes_the_student_grades_page_responsive_c13e00eb: 受講生の採点ページを応答性の高いものにします。
   making_a_copy_of_original_assignment_name_8f029a9b: "\"%{original_assignment_name}\"のコピーを作成する"
   making_a_copy_of_originalassignmentname_b7268992: "\"%{originalAssignmentName}\"のコピーを作成する"
   malay_f5dddce4: マレー語
@@ -15483,6 +15506,7 @@ ja:
   must_be_a_valid_number_59f0069: 有効な番号でなければなりません
   must_be_after_start_date_95e251a3: 開始日翌日以降でなければなりません
   must_be_between_availability_dates_ceaca984: 利用可能な日付けの間でなければなりません
+  must_be_between_lower_and_upper_1f501b2a: "%{lower} ～ %{upper}の間にある必要があります"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: この操作をするには、先にログインと登録が必要です
   must_be_on_or_after_end_date_e4dda631: 終了日以降でなければなりません
   must_belong_to_a_root_account_f84323f6: ルートアカウントに属していなければなりません
@@ -16209,6 +16233,7 @@ ja:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: 1から16までの間の数
+  number_each_event_d934cd65: 各イベントに番号を付ける
   number_is_too_large_4da4af0a: 数字が大きすぎます
   number_is_too_small_618a6ca7: 数字が小さすぎます
   number_more_a46966: "%{number}更に..."
@@ -16720,6 +16745,7 @@ ja:
   paper_view_7405eeab: 印刷表示
   paraguay_181a5029: パラグアイ
   paraguay_595_ca58b83a: "パラグアイ (+595)"
+  parameter_91ed199: パラメータ
   parameters_a13374ec: パラメーター
   parent_assignment_is_not_selected_9efb4ac1: 親の課題が選択されていません
   parent_assignment_is_selected_6a2fbca8: 親の課題が選択されています
@@ -16844,6 +16870,7 @@ ja:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Arc にあなたのウェブカムを許可してください。"
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Canvas があなたのマイクとウェブカメラにアクセスできるようにしてください。"
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Canvas があなたのウェブカメラにアクセスできるようにしてください。"
+  please_contact_your_lms_administrator_for_more_det_635afd97: 詳細は、LMS管理者にお問い合わせください。
   please_create_a_group_set_8db6e8fe: グループセットを作成してください
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: このメールに返信しないでください。配信されません。
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "締め切り日または締め切り後日を入力してください%{earliestDate}"
@@ -17489,6 +17516,8 @@ ja:
   processing_2fcc9739: 処理中
   product_name: Canvas
   product_tours_1e19eb95: 製品ツアー
+  proficiency_calculation_57f0bdf: 熟達スコア計算
+  proficiency_calculation_parameters_5f605dec: 熟達スコアパラメータ
   proficiency_rating_6346119f: 熟達度評価
   proficiency_rating_deleted_77827473: 熟達度評価が削除されました
   proficiency_ratings_2bbabdcd: 熟達度評価
@@ -18095,6 +18124,7 @@ ja:
       update_question_without_regrading: 再評価せずに問題を更新する
   quiz_40ee61b1: クイズ
   quiz_assignment_overrides_cec1973b: クイズ割当の上書き
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: 有効期限を過ぎたイズの試行は、延長時間が経過していなくても自動送信されます。
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: 試行中に過ぎたクイズの利用可能日は、延長時間が経過していなくても自動送信されます。
   quiz_duplication_not_implemented_c1495585: クイズのコピーが実装されていません
   quiz_e0dcce8f: クイズ
@@ -18172,6 +18202,7 @@ ja:
   quiz_lti_plugin_a189607f: クイズLTIプラグイン
   quiz_lti_plugin_a6256549: クイズLTIプラグイン
   quiz_menu_4fcd5e61: クイズメニュー
+  quiz_not_assigned_to_student_4b1846d5: 受講生に割り当てられていないクイズ
   quiz_question_1da5198e: クイズ質問
   quiz_question_groups_bd0bb222: クイズ質問グループ
   quiz_questions_ecea3c40: クイズ問題
@@ -19797,6 +19828,7 @@ ja:
   responsive_global_nav_logo_99488e92: "Responsive Global Nav ロゴ"
   responsive_layout_54e4ca06: 応答レイアウト
   responsive_misc_dc572cc0: 回答その他
+  responsive_student_grades_page_324e9c8b: 応答性受講生採点ページ
   restart_link_validation_b61286fc: リンクバリデータを再スタートする
   restore_courses_182e162e: コースを復元
   restored_course_association_course_c9e16045: "復元されたコース関連付け%{course}"
@@ -20104,7 +20136,7 @@ ja:
   save_grading_period_daaaddea: 採点期間を保存する
   save_grading_period_set_e029fa88: 採点期間のセットを保存する
   save_key_b4dede06: 鍵の保存
-  save_learning_mastery_82889d8b: 学習熟達度を保存
+  save_learning_mastery_82889d8b: 学習熟達スコアを保存
   save_publish_36440725: 保存して公開
   save_settings_cafe79a5: 設定の保存
   save_successful_b2f64da4: 正常に保存されました。
@@ -20660,6 +20692,7 @@ ja:
   set_name_f83b658: 名前を設定する
   set_of_grading_periods_545b37e9: 採点期間のセット
   set_some_up_now_1749bb44: 今、いくつかを設定する
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: このアカウント内のすべてのコースで使用される熟達スコアスケールを設定します。
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           あなたの熟達評価の学習熟達グレードブック内での表示方法を設定してください。\n\
       \x20           評価数、熟達度、ポイントと色を調整してください。\n\
@@ -22296,6 +22329,8 @@ ja:
       global_support_desk_description: 私たちのASCは、サポートの窓口です。そして、さらにサポートを必要とする問題のためのグローバル・サポートデスクにコネクトします。
       networking_academy_description: "最も一般的な質問に対する Cisco の回答を表示します。"
       networking_academy_faqs: "ネットワーキング アカデミーの FAQ"
+      student_support: "NetAcad サポート - 受講生"
+      student_support_description: "講師が最初の窓口となります。あなたのNetworking Academyに関する質問に回答したり、サポートデスクに連絡したりすることができます。受信トレイ機能を使用して、講師に連絡することができます。"
       support_desk_livechat: "サポート デスクのライブ チャット"
   support_favorite_lti_tools_in_the_rce_1680436d: RCEでお気に入りのLTIツールをサポートする
   svg_d5969386: SVG
@@ -22316,7 +22351,7 @@ ja:
   switzerland_f4f7137c: スイス
   syllabus: コース要綱
   syllabus_course_summary_option_951a8144: シラバスコースサマリーオプション
-  syllabus_f191f65b: 要綱
+  syllabus_f191f65b: シラバス
   syllabus_tutorial_tray_97e8ef82: シラバスチュートリアルトレイ
   syllabus_visibility_options_a81ef419: シラバス可視性オプション
   sync_68e5c167: 同期化
@@ -22631,6 +22666,7 @@ ja:
   the_next_available_appointment_in_this_course_is_o_da10316c: "このコースの次に利用可能な予約は～です*%{date}*"
   the_preceding_content_is_partner_provided_d753928c: 上記のコンテンツはパートナーが提供しています
   the_previous_sis_batch_was_aborted_d7d89955: 以前のSISバッチは中止されました
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: 熟達スコアの計算は管理者によって設定され、このアカウントのすべてのコースに適用されます。
   the_profile_picture_has_been_reported_d609d6dd: プロファイル写真はレポートされています
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "提供された Academic Benchmark ファイルにはエラーがあります。"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "\"%{question_name}\" の質問に対する質問は長過ぎます。"
@@ -22817,6 +22853,7 @@ ja:
   this_code_has_expired_41f76642: このコードは有効期限が切れています。
   this_conference_may_be_recorded_f76deeeb: この会議は、記録される可能性があります。
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "現在、このコースはコース メニューに追加できません。"
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: コースがアクティブでない限り、このコースをコースメニューに追加することはできません。
   this_course_does_not_allow_score_uploads_4b35fe07: このコースではスコアをアップロードできません。
   this_course_has_concluded_7995a84c: このコースは終了しました
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "このコースはまだ開始していません。%{date}日までこのコースには参加できません。"
@@ -23919,9 +23956,11 @@ ja:
   upload_data_dc4fa4cb: データのアップロード
   upload_drop_zone: 
     drop_to_upload: アップロードするアイテムをドロップ
+  upload_error_please_try_again_c6587f48: アップロードエラー。再度試してください。
   upload_failed_a5dc91ec: アップロードに失敗
   upload_failed_quota_exceeded_ff3af659: クォータを超えたので、アップグレードに失敗しました
   upload_file_fd2361b8: ファイルアップロード
+  upload_files_a228f20f: ファイルのアップロード
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: 課題と提出されたファイルを特別読み取り専用の提出フォルダにアップロードしてください
   upload_gradebook_386a46c8: 成績表のアップロード
   upload_image_6120b609: イメージのアップロード
@@ -24479,6 +24518,7 @@ ja:
   users_add_remove_observers_d1273d9: "ユーザー - オブザーバーの追加/削除"
   users_add_remove_students_in_courses_efe7e748: "ユーザー - コースでの受講生の追加/削除"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "ユーザー - コースの講師、コースデザイナー、またはTAの追加/削除"
+  users_allowed_to_edit_this_page_d6d316d0: このページの編集を許可されたユーザー
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       ユーザーと条件はアカウントにあるため、SISエンドポイントはアカウントに基づいてユーザーの権限を常に確認します。サブカウントはコースとセクションの所有権しか持ちません。ユーザーデータは所有していません。
       サブカウント管理者は、コースで講師の役割が与えられていない限り、SIS情報を表示することはできません。サブカウント管理者は、講師の役割がアカウントレベルでSISデータを読み取る権限を持っているため、コース関連なしではSIS情報を表示することはできません。
@@ -24590,6 +24630,7 @@ ja:
   waiting_for_attempted_login_6d00cb49: ログイン中です
   waiting_for_change_to_complete_b75b5e8b: 変更が完了するのを待機中
   waiting_for_confirmation_to_display_qr_code_6f904d63: QRコードを表示するための確認を待機中
+  waiting_for_request_to_complete_13cf037a: リクエストの完了を待っています
   waiting_for_selection_ce0398c7: 選択待ち中
   waiting_for_your_qr_code_to_load_809299e5: "QR コードがロードされるのを待っています"
   warning_6576b5b8: 警告

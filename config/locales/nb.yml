@@ -192,6 +192,7 @@ nb:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Et ny oppgave har blitt opprettet for emnet ditt, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "En partner ID kreves for å bruke Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "En partnernøkkel kreves for å bruke Academic Benchmarks"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "En premiumversjon av BigBlueButton er tilgjengelig og tilbyr flere konferanser samtidig, avhengig av kjøpet (hver med én vert og opptil 99 deltakere), har ingen begrenset lagringsplass for opptak, og en dedikert infrastruktur for bedre ytelse."
   a_problem_occurred_adding_reviewers_57b083d9: "Det oppsto et problem ved tillegging av anmeldere. "
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Et offentlig personvern-nivå vil sende personlige identifiseringsinformasjon for brukeren som åpner til verktøyleverandør. Å stille dette inn til «privat» kan påvirke verktøyet som stoler på informasjonen, negativt."
   a_redirect_uri_is_required_please_supply_one_471908db: "En redirect_uri er nødvendig, vennligst skaff en."
@@ -2461,6 +2462,9 @@ nb:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Det oppstod et avvik ved generering av denne temaet, prøv igjen"
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Det oppstod en avvik ved forbereding av nedlastingen, vennligst prøv igjen."
   an_error_occurred_updating_the_assignment_7391dd3a: "Det oppsto et avvik under oppdatering av oppgaven."
+  an_error_occurred_updating_the_calculation_method_49384084: "Det oppsto en feil ved oppdatering av beregningsmetoden"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Det oppsto en feil ved oppdatering av ferdighetsvurderingene: %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "Det oppsto en feil ved oppdatering av ferdighetsvurderingene"
   an_error_occurred_updating_this_assignment_21287c7e: "Det oppsto et avvik under oppdatering av denne oppgaven."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En avvik oppstod ved innstilling av brukerrettigheter for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "En avvik oppstod under forsøket på å kontakte Turnitin."
@@ -2472,10 +2476,13 @@ nb:
   an_error_occurred_while_loading_changes_9851b56f: "En feil oppsto under lasting av endringer"
   an_error_occurred_while_loading_courses_11d4571e: "Det oppstod en feil ved lasting av kurs"
   an_error_occurred_while_loading_late_policies_c415f676: "En feil oppsto under lasting av for sent-regler"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Det oppsto en feil ved lasting av beregning av læringsmål: %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "Det oppsto et avvik under lasting av ferdighetsvurderingene: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Det oppstod en feil under låsing av kunngjøringer."
   an_error_occurred_while_migrating_405ac0b5: "Det oppstod en feil under flytting"
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Et avvik oppsto under mottak av din QR-kode"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Det oppsto et avvik under lagring av konto ferdighetsvurderinger"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "Det oppsto en feil ved lagring av kontoens ferdighetsvurderinger: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Det oppstod en feil ved lagring av foreninger"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Et avvik oppsto under lagring av oppgavens retningslinjer for postering"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Et avvik oppsto under lagring av retningslinjer for emneposteringer"
@@ -4006,6 +4013,7 @@ nb:
   belarusian_b2f19c76: Hviterussisk
   belgium_32_e5f5b598: "Belgia (+32)"
   belgium_ef8739b6: Belgia
+  below_mastery_abd1dca5: "Under mestring"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedenfor dette søkefeltet er en liste over %{content_type}. Etter hvert som du skriver, vil listen bli filtrert i samsvar med søket. Samtalemeldinger vil bli filtrert av hvilke alternativ du valgte."
   beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: "Et nytt, enklere, mer brukervennlig grensesnitt for å finne filer. Hvis du slår dette på på kursnivå, vil alle brukerne i det kurset se det nye grensesnittet. For å vise det når noen går til sitt personlige filområde ('/files'), må du slå det på på kontoen de er medlem av."
@@ -4275,6 +4283,7 @@ nb:
   cache_cleared_successfully_9ab84d5a: "Cache ble vellykket tømt"
   calculated_by_4ac40468: "Regnet ut av: "
   calculated_by_baa3c8f3: "Regnet ut av:"
+  calculation_d82f6181: Beregning
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' er ikke en gyldig verdi for denne beregnings metoden. Verdien må være mellom '%{valid_calculation_ints_min}' og '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: Beregningsmetode
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method må være en av de følgende: %{calc_methods}"
@@ -6360,6 +6369,7 @@ nb:
   could_not_duplicate_discussion_953ed67f: "Kunne ikke duplisere diskusjonen"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Kunne ikke finne en LTI-konfigurasjon for klient-ID %{clientId}"
   could_not_find_file_to_upload_2af12953: "Fant ingen fil for opplasting"
+  could_not_find_file_to_upload_d8a0b228: "Fant ikke filen som skal lastes oss."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Kunne ikke finne den eksisterende brukeren med SIS-ID %{user_id}, hopper over."
   could_not_save_chosencolor_741b74ce: "Kunne ikke lagre '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Kan ikke justere datoer på oppgave %{name} (ID %{id})"
@@ -6447,6 +6457,9 @@ nb:
   count_page_views_b40102b3: 
     one: "1 sidevisning"
     other: "%{count} sidevisninger"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count} side valgt for sletting"
+    other: "%{count} sider valgt for sletting"
   count_participations_ac8f82b7: 
     one: "1 deltakelse"
     other: "%{count} deltakelser"
@@ -8657,6 +8670,7 @@ nb:
   drag_and_drop_your_image_here_or_7fba7c14: "Dra og slipp bildet ditt her eller "
   drag_to_rearrange_sections_637efee3: "Dra for å reorganisere seksjoner"
   drag_up_or_down_to_reorder_382126ff: "Dra opp eller ned for å endre rekkefølge"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Dramatisk økning i bruk av gratis BigBlueButton kan føre til ytelsesproblemer."
   drop_files_here_to_add_to_module_236304f5: "Slipp filer her for å legge til modul"
   drop_files_here_to_upload_ce0f50f9: "Slipp filer her for å laste opp"
   drop_image_62a2a071: "Slipp bilde"
@@ -9973,6 +9987,7 @@ nb:
   final_grader_can_view_other_grader_names_67736530: "Siste sensor kan se navn til andre sensorer"
   final_letter_grade_80dccec1: "Endelig bokstavkarakter"
   final_score_26bcfc20: Sluttkarakter
+  final_score_53278fd0: "Avsluttende resultat:"
   final_score_61e15cf3: sluttresultat
   findLinkForService: 
     buttons: 
@@ -11412,6 +11427,7 @@ nb:
         saving: Lagrer…
         self_signup: Egenpåmelding
         split_into_groups: "Del studentene opp i %{num_groups} grupper"
+        split_into_sized_groups: "Del studentene inn i grupper med %{num_members} studenter per gruppe"
       group_category_detail: 
         add_group: "Legg til gruppe"
         category_settings: Innstillinger
@@ -11849,6 +11865,7 @@ nb:
   html_editor_fb2ab713: HTML-redigering
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "HTTP-respons: %{code}"
   hungarian_fc7d30c9: Ungarsk
   hungary_36_cd3e515b: "Ungarn (+ 36)"
   i_agree_to_the_34aa16ce: "Jeg er enig i"
@@ -12109,6 +12126,7 @@ nb:
   in_progress_646a8aef: Pågår
   in_progress_9d1ce8b9: Pågår
   in_progress_icon_6e69c998: Pågår-ikon
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "Dersom BigBlueButton ikke er i stand til å møte dine nåværende eller fremtidige behov, er Canvas også partnere med Zoom, Google Meet, Microsoft Teams, samt andre videokonferanseverktøy."
   inactivate_user_35f6d9d7: "Inaktiv bruker"
   inactive_cd40317f: inaktiv
   inactive_enrollments_3b84be3d: "Inaktive innskrivninger"
@@ -12354,6 +12372,7 @@ nb:
   ireland_353_3cd32cc0: "Irland (+353)"
   ireland_f7bb9899: Irland
   irish_567e109f: Irsk
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " bruker en gratis versjon av BigBlueButton som gir ti videokonferanser samtidig, med én vert og opptil 24 deltakere. Opptak oppbevares i syv dager."
   israel_681bc5a5: Israel
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Det ser ut til at du har en ugyldig e-postadresse: \"%{addr}\""
@@ -12372,6 +12391,7 @@ nb:
   item_incomplete_d6a16040: "(Element ikke godkjent)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} støttes ikke for øyeblikket"
   item_past_due_dc6e776: "Elements frist utløpt"
+  item_scores_9fbfe956: "Elementresultat:"
   item_select_fe0f320a: Elementvalg
   item_type_assignment_13a1132e: "Elementtype: oppgave"
   item_type_choice_aebcf2ef: "Elementtype: Valg"
@@ -12930,10 +12950,12 @@ nb:
         buttons: 
           request_password: "Be om passord"
         dont_know_password: "Glemt passord?"
+        error: "Det oppsto en feil, prøv igjen senere."
         log_in: "Logg på"
         login_handle: "Skriv inn %{login_handle_name} og vi vil sende deg en lenke for å endre passord."
         password: Passord
         sending: Sender...
+        sent: Sendt!
       new: 
         back_to_login: "Tilbake til innlogging"
         browse_courses: "Bla gjennom kurs"
@@ -13086,6 +13108,7 @@ nb:
             emne, tillat studentene å administrere emne innholdsområder, og skjul karakter
             detaljer fra studentene. Du kan også justere emnenavn og kode.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Viser lenkevalget til et Microsoft Immersive Reader opp på en wiki-side."
+  makes_the_student_grades_page_responsive_c13e00eb: "Gjør studentkarakterer-siden responsiv."
   making_a_copy_of_original_assignment_name_8f029a9b: "Lager en kopi av \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Lager en kopi av «%{originalAssignmentName}»"
   malay_f5dddce4: Malaysisk
@@ -15493,6 +15516,7 @@ nb:
   must_be_a_valid_number_59f0069: "Må være et ugyldig nummer"
   must_be_after_start_date_95e251a3: "må være etter startdato"
   must_be_between_availability_dates_ceaca984: "Må være mellom tilgjengelige datoer"
+  must_be_between_lower_and_upper_1f501b2a: "Må være mellom %{lower} og %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "må være innlogget og registrert for å kunne utføre den handlingen"
   must_be_on_or_after_end_date_e4dda631: "må være på eller etter sluttdato"
   must_belong_to_a_root_account_f84323f6: "må tilhøre en rotkonto"
@@ -16216,6 +16240,7 @@ nb:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "tall mellom 1 og 16 inkluderende"
+  number_each_event_d934cd65: "Nummer for hver hendelse"
   number_is_too_large_4da4af0a: "tallet er for stort"
   number_is_too_small_618a6ca7: "tallet er for lite"
   number_more_a46966: "%{number} Mer ..."
@@ -16725,6 +16750,7 @@ nb:
   paper_view_7405eeab: Papirvisning
   paraguay_181a5029: Paraguay
   paraguay_595_ca58b83a: "Paraguay (+595)"
+  parameter_91ed199: Parameter
   parameters_a13374ec: Parameter
   parent_assignment_is_not_selected_9efb4ac1: "foreldrevurdering er ikke valgt"
   parent_assignment_is_selected_6a2fbca8: "foreldrevurdering er valgt"
@@ -16850,6 +16876,7 @@ nb:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Gi Arc tilgang til webkameraet."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Gi Canvas tilgang til mikrofonen og webkameraet ditt."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Tillat Canvas tilgang til webkameraet."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Kontakt LMS-administratoren din for flere detaljer."
   please_create_a_group_set_8db6e8fe: "Opprett et gruppesett"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Ikke svar på denne eposten, den vil ikke bli besvart.."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Vennligst tast inn en forfallsdato på eller etter %{earliestDate}"
@@ -17501,6 +17528,8 @@ nb:
   processing_2fcc9739: Behandler
   product_name: Canvas
   product_tours_1e19eb95: "Produkt rundtur"
+  proficiency_calculation_57f0bdf: Ferdighetsberegning
+  proficiency_calculation_parameters_5f605dec: "Parametere for ferdighetsberegning"
   proficiency_rating_6346119f: Ferdighetsvurdering
   proficiency_rating_deleted_77827473: "Ferdighetsgradering slettet"
   proficiency_ratings_2bbabdcd: Ferdighetsvurderinger
@@ -18109,6 +18138,7 @@ nb:
       update_question_without_regrading: "Oppdater spørsmålet uten å sette karakter på nytt"
   quiz_40ee61b1: test
   quiz_assignment_overrides_cec1973b: "Opphev testoppgave"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Testforsøk hvis tilgjengelighetsdato er passert, vil fremdeles sendes inn automatisk, selv om forlenget tid ikke er utløpt."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Quiztilgjengelighetsdatoer som består et forsøk vil fortsatt automatisk sendes inn selv om den utvidede tiden ikke er utløpt."
   quiz_duplication_not_implemented_c1495585: "testduplisering er ikke implementert"
   quiz_e0dcce8f: Test
@@ -18186,6 +18216,7 @@ nb:
   quiz_lti_plugin_a189607f: "Quiz LTI plugin"
   quiz_lti_plugin_a6256549: "Test LTI programtillegg"
   quiz_menu_4fcd5e61: test-meny
+  quiz_not_assigned_to_student_4b1846d5: "Test ikke tildelt student"
   quiz_question_1da5198e: Testspørsmål
   quiz_question_groups_bd0bb222: "Grupper for testspørsmål"
   quiz_questions_ecea3c40: Testspørsmål
@@ -19813,6 +19844,7 @@ nb:
   responsive_global_nav_logo_99488e92: "Responsiv global nav logo"
   responsive_layout_54e4ca06: "Responsive Layout"
   responsive_misc_dc572cc0: "Responsiv diverse"
+  responsive_student_grades_page_324e9c8b: "Responsiv studentkarakterer-side"
   restart_link_validation_b61286fc: "Restart lenkevalidering"
   restore_courses_182e162e: "Gjenopprett emner"
   restored_course_association_course_c9e16045: "Gjenopprettet emneassosiering %{course}"
@@ -20678,6 +20710,7 @@ nb:
   set_name_f83b658: "Navn på sett"
   set_of_grading_periods_545b37e9: "Sett av vurderingsperioder"
   set_some_up_now_1749bb44: "Klargjør noen nå"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Angi mestringsskalaen som skal brukse for alle emner på denne kontoen."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Sett opp hvordan Ferdighetsvurderinger skal vises i Learning Mastery Gradebook.\n\
       \x20           Tilpass antall vurderinger, mestringsnivå, poeng og farger.\n\
@@ -22321,6 +22354,8 @@ nb:
       global_support_desk_description: "Våre ASC-er er her for å hjelpe deg og du kan koble deg med vår verdensstøtte-desk for problemer som krever ytterlig assistanse"
       networking_academy_description: "Vis Cisco sine svar på de vanligst stilte spørsmålene."
       networking_academy_faqs: "Networking Academy FAQs"
+      student_support: "NetAcad Støtte - Student"
+      student_support_description: "Instruktøren din skal være ditt første kontaktpunkt De kan svare deg på spørsmål om Networking Academy eller kontakte kundestøtte for deg. Du kan kontakte instruktøren din ved å bruke innboks-funksjonen."
       support_desk_livechat: "Support Desk Live Chat"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtter foretrukne LTI-verktøy i RCE"
   svg_d5969386: SVG
@@ -22654,6 +22689,7 @@ nb:
   the_next_available_appointment_in_this_course_is_o_da10316c: "Den neste tilgjengelige avtalen i dette emnet er på *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "Det foregående innholdet er gitt av en partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Den tidligere SIS-batchen ble avbrutt"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Ferdighetsberegningen ble satt av administratoren din og gjelder for alle emner på denne kontoen."
   the_profile_picture_has_been_reported_d609d6dd: "Profilbildet har blitt rapportert"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Den medfølgende Academic Benchmark filen har et avvik"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Spørsmålsteksten til spørsmålet \"%{question_name}\", var for lang."
@@ -22840,6 +22876,7 @@ nb:
   this_code_has_expired_41f76642: "Denne koden har utløpt."
   this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette emnet kan ikke legges til emnermeny på dette tidspunktet."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Dette emnet kan ikke legges til i emnemenyen med mindre emnet er aktivt."
   this_course_does_not_allow_score_uploads_4b35fe07: "Dette emnet tillater ikke opplasting av resultater."
   this_course_has_concluded_7995a84c: "Dette emnet er avsluttet"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Dette emnet har ikke begynt enda. Du vil ikke ha anledning til å delta på dette emnet før %{date}."
@@ -23938,9 +23975,11 @@ nb:
   upload_data_dc4fa4cb: "Last opp data"
   upload_drop_zone: 
     drop_to_upload: "Slippe elementer for å laste opp"
+  upload_error_please_try_again_c6587f48: "Opplastingsfeil Prøv på nytt."
   upload_failed_a5dc91ec: "Mislyktes å laste opp"
   upload_failed_quota_exceeded_ff3af659: "Opplasting mislyktes, kvote overskredet"
   upload_file_fd2361b8: "Last opp fil"
+  upload_files_a228f20f: "Last opp filer"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Last opp innsendte filer med oppgaver til en spesiell innleveringsmappe med kun leserettigheter"
   upload_gradebook_386a46c8: "Last opp karakteroversikt"
   upload_image_6120b609: "Last opp bilde"
@@ -24498,6 +24537,7 @@ nb:
   users_add_remove_observers_d1273d9: "Brukere - legg til / fjern observatører"
   users_add_remove_students_in_courses_efe7e748: "Brukere - legg til / fjern studenter i emner"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Brukere - legg til / fjern lærere, emnedesignere eller LA-er i emner"
+  users_allowed_to_edit_this_page_d6d316d0: "Bruker som har tillatelse til å redigere denne siden"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Brukere og semestre ligger i kontoen, slik at SIS-sluttpunktet alltid bekrefter at brukerens tillatelser i samsvar med kontoen. Underkontoer har kun eierskap av emner og seksjoner; de har ikke eierskap over brukerdata.
       Underkontoadministratorer kan ikke vise SIS-informasjon med mindre de også har blitt gitt en instruktørrolle i et emne. Underkontoadministratorer kan ikke vise SIS-informasjon uten tilknytning til emnet, da instruktørrollen har tillatelse til å lese SIS-data på kontonivå.
@@ -24614,6 +24654,7 @@ nb:
   waiting_for_attempted_login_6d00cb49: "Venter på innloggingsforsøk"
   waiting_for_change_to_complete_b75b5e8b: "Venter på at endringen skal fullføres"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Venter på bekreftelse for å vise QR-kode"
+  waiting_for_request_to_complete_13cf037a: "Venter på at forespørselen skal fullføres"
   waiting_for_selection_ce0398c7: "Avventer utvalg"
   waiting_for_your_qr_code_to_load_809299e5: "Venter på at din QR-kode skal laste"
   warning_6576b5b8: advarsel

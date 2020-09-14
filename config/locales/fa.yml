@@ -4213,6 +4213,7 @@ fa:
   changed_item_1d16a85f: "مورد تغییر یافته"
   changes_will_still_apply_if_you_leave_this_page_935cedc6: "در صورتی که از این صفحه خارج شوید، تغییرات باز هم اعمال خواهند شد."
   changes_you_made_may_not_be_saved_4e8db973: "تغییرات انجام شده ممکن است ذخیره نشوند."
+  changing_course_dates_may_override_term_availabili_d92b10de: "تغییر تاریخ درس ممکن است تنظیمات در دسترس بودن نیمسال و قرارگیری در صفحه درس‌ها و داشبورد را جایگزین کند. لطفا قبل از تغییر تاریخ درس، تاریخ‌های ترم را تأیید کنید."
   changing_section_dates_may_override_course_and_ter_6634950e: "تغییر تاریخ‌های بخش ممکن است تنظیمات درس و تنظیمات مدت در دسترس بودن و جای گذاری در صفحه درس‌ها و داشبورد را جایگزین کند. لطفاً قبل از تغییر تاریخ بخش‌، ترم و درس را تأیید کنید."
   changing_the_late_policy_will_affect_previously_gr_49071db7: "با تغییر دادن سیاست تأخیر، موردهای ارسالی که از قبل ارسال شده اند تحت تأثیر قرار خواهند گرفت."
   changing_your_policy_now_will_affect_previously_gr_62063898: "تغییر سیاست شما در حال حاضر،  ارسالهای ارزیابی شده قبل را تحت تاثیر قرار میدهد."
@@ -7125,6 +7126,7 @@ fa:
     identifier: "شناسه: %{id}"
     redirect_uri: "نشانی اینترنتی: %{redirect_uri}"
   developer_key_921ddbae: "کلید توسعه‌دهنده"
+  developer_key_developerkeyid_deleted_focus_moved_t_80fffb4d: "کلید توسعه دهنده%{developerKeyId} حذف شد.  تمرکز به افزودن دکمه کلید توسعه دهنده منتقل شد. "
   developer_key_form: 
     cancel: لغو
     icon_url: "نشانی اینترنتی نماد:"
@@ -10754,6 +10756,7 @@ fa:
   israel_972_e671df75: "اسرائیل (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "به نظر می‌رسد نشانی پست الکترونیکی شما معتبر نیست: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "به نظر می رسد محتوای شما بارگذاری نشود. می توانید از این دکمه برای راه اندازی آن در یک زبانه جدید استفاده کنید."
+  it_s_not_allowed_to_redirect_to_html_files_that_ca_1dbdfb9d: "هنگام اجرای Content-Security-Policy مجاز نیست به پرونده های HTML که نمی توانند پروکسی شوند هدایت شوید."
   it_s_ok_to_leave_this_page_we_ll_email_you_when_th_2dbed7fa: "ترک این صفحه مشکلی نیست ، وقتی ورود  انجام شد برای شما ایمیل ارسال خواهیم کرد."
   it_took_too_long_to_login_please_try_again_c1ed2e28: "ورود طولانی شد. لطفا دوباره تلاش کنید"
   italian_bd3c792d: ایتالیایی
@@ -11148,6 +11151,7 @@ fa:
       feedback: "برای اینکه به ما بگویید چه اتفاقی رخ داد، اینجا کلیک کنید"
     show_me_where: "جای آن را به من نمایش بده"
   links_14b70841: پیوندها
+  links_to_other_courses_in_this_resource_may_not_be_d9f2779: "پیوندها به درس‌های دیگر در این منبع ممکن است توسط دانشجویان این درس قابل دسترسی نباشد:"
   listWithOthers: 
     other: 
       one: "1 نفر دیگر"
@@ -11167,6 +11171,7 @@ fa:
   load_more_a36f9cf9: "بارگذاری بیشتر"
   load_more_results_460f49a9: "Load more results"
   loaded_more_collaborations_13f1d630: "همکاری های بیشتر بارگذاری شد."
+  loaded_more_developer_keys_focus_moved_to_the_name_6e3c3b34: "کلیدهای توسعه دهنده بیشتری بارگیری شدند. تمرکز به نام آخرین کلید توسعه دهنده بارگیری شده در لیست منتقل شد."
   loading_25990131: "در حال بارگذاری..."
   loading_6ac402e1: "درحال بارگذاری..."
   loading_725811ca: "در حال بارگذاری"
@@ -13979,6 +13984,7 @@ fa:
   no_way_to_export_gradebooks_provided_b4c2939d: "راهی برای صدور دفترهای نمره وجود ندارد!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "راهی برای نظارت بر صدور دفتر نمره وجود ندارد!"
   non_canvas_11f36d4a: "بدون کانواس"
+  non_existent_content_referenced_in_this_resource_d86c6bcb: "در این منبع به محتوای غیر موجود ارجاع شده است:"
   non_scoring_rubrics_9f2033ad: "دستورالعمل‌های ارزیابی بدون امتیاز"
   nonce_77113ba4: غیبت
   none_3b5e34d2: "هیچ کدام"
@@ -14429,6 +14435,7 @@ fa:
   on_time_percent_eebffe38: "بموقع: %{percent}"
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
+  once_you_start_debugging_all_info_about_the_next_a_e871403b: "وقتی اشکال زدایی را شروع کردید، تمام اطلاعات مربوط به تلاش بعدی برای ورود به سیستم جمع آوری می‌شود. \"تازه کردن\" را کلیک کنید تا ببینید آیا داده‌های بیشتری جمع آوری شده است یا  اینکه برای پاک کردن اطلاعات جمع آوری شده و توقف تلاش برای رفع اشکال فعلی  \"متوقف کردن اشکال زدایی\" را کلیک کنید."
   once_you_ve_changed_an_answer_you_ll_need_to_choos_7071f728: "هنگامی که یک پاسخ را تغییر داده اید، باید قبل از بهنگام سازی پرسش یک گزینه را انتخاب کنید."
   one_or_more_items_are_currently_being_imported_the_186fe069: "یک یا چند مورد به تازگی در حال وارد شدن است. به محض اینکه در دسترس قرار گیرند، در درس زیر نمایش داده خواهند شد."
   one_per_line_format_name_value_79647700: "یکی در هر خط.. قالب: نام=مقدار"
@@ -17707,6 +17714,7 @@ fa:
   resume_quiz_afeceb87: "از سر گرفتن آزمون"
   resume_survey_58dce775: "از سر گرفتن نظرسنجی"
   resync_grades_to_sis_d4dcfe12: "همگام‌سازی دوباره نمرات به سامانه اطلاعات دانشجو"
+  retrieval_of_received_shares_failed_6c5583e3: " بازیابی محتوا مشترک ناموفق بود. "
   retrieve_timeout: " پیکربندی قابل بازیابی نیست، زمان پاسخ سرور به پایان رسیده است"
   retrieving_content_ed0b9b33: "بازیابی محتوا"
   retry_duplicating_originalassignmentname_884aee1: "دوباره امتحان کنید \"%{originalAssignmentName}\""
@@ -19396,6 +19404,7 @@ fa:
   something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "در دسترسی به میکروفون یا وب کم مشکلی پیش آمد."
   something_went_wrong_creating_the_course_please_tr_431adff5: "در ایجاد درس اشکالی رخ داده است. لطفا دوباره تلاش کنید."
   something_went_wrong_d238c551: "مشکلی پیش آمد"
+  something_went_wrong_please_try_refreshing_the_pag_3f651814: "اشتباهی رخ داده است. لطفا صفحه را از تازه سازی کنید. اگر مشکل همچنان وجود داشت، می‌توانید با استفاده از *تنظیمات درس بزرگ *  یک گروه دانشجویی را در نمره‌گذاری سریع بارگیری کنید."
   something_went_wrong_please_try_refreshing_the_pag_4e14a67: "اشتباهی رخ داده است. لطفا صفحه را از نوسازی کنید. اگر مشکل همچنان وجود داشت ممکن است علت آن وجود تعداد بیش از حد رکورد روی %{assignmentTitle} برای بارگذاری برنامه نمره‌گذاری سریع است."
   something_went_wrong_re_activating_the_user_please_82c3e7a: "در هنگام فعال سازی دوباره کاربر اشکالی رخ داد. لطفا بعدا دوباره سعی کنید."
   something_went_wrong_updating_the_user_s_role_plea_5de95400: "در هنگام بهنگام سازی نقش کاربر اشکالی رخ داد، لطفا بعدا دوباره سعی کنید."
@@ -20150,6 +20159,7 @@ fa:
   that_user_account_has_been_deleted_please_contact__350e0e0: "این حساب کاربری حذف شده است. لطفا با مدیر سیستم خود تماس بگیرید تا حساب شما دوباره فعال شود."
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "امکان کاربران برای دریافت اطلاعیه‌ها  از slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "شناسه حسابی که کاربر گزارش دهنده به آن تعلق دارد"
+  the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "این الگوریتم برای امضای درخواست اعتبارسنجی، درخواست خروج و پاسخ به خروج پیام‌های ارسال شده به IdP  استفاده می شود."
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "اطلاعیه \"%{title}\" نمی تواند به ماژول \"%{mod_title}\" پیوند داده شود"
   the_app_was_activated_a84e055f: "برنامه فعال شد"
   the_app_was_added_58e2836a: "برنامه افزوده شد"
@@ -20391,6 +20401,10 @@ fa:
   this_is_a_message_for_name_7abf1e39: "این پیام مربوط به *%{name}* است"
   this_is_a_preview_of_the_draft_version_of_the_quiz_910a02e0: "پیش نمایش نسخه پیش نویس آزمون، این است"
   this_is_a_preview_of_the_published_version_of_the__70e0c8: "پیش نمایش نسخه منتشر شده آزمون، این است"
+  this_is_a_report_of_all_students_enrolled_in_a_cou_d0137d3c: |-
+      ارائه شدهاین گزارشی از کلیه دانشجویان ثبت نام شده در یک درس در یک نیمسال مشخص است که
+      تکلیف ارائه کرده‌اند. این گزارش به ازای هر دانشجو یک ردیف دارد
+      مورد ارسالی.
   this_is_a_siteadmin_test_feature_flag_3ab5184: "این یک نشانه ویژگی آزمایش مدیر سایت است."
   this_is_a_what_if_score_cbdc04f9: "این یک نمره احتمالی است"
   this_is_just_a_dev_only_feature_you_can_turn_on_to_7f88c58f: "این فقط یک ویژگی  dev-only  است که می توانید با روشن کردن آن ، پیش نمایش چگونگی نمایش صفحات در یک محیط RTL را بدون نیاز به تغییر زبان خود به زبان معمول RTL ، دریافت کنید."
@@ -20433,8 +20447,10 @@ fa:
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: "این ضبط کننده از فلاش استفاده می کند. در نتیجه ممکن است ضبط در دستگاه محلی شما را آسان تر بیابید، و سپس از زبانه بارگذارنده رسانه برای بارگذاری آن استفاده کنید."
   this_report_displays_student_engagement_activity_c1d96b5c: "این گزارش فعالیت  دانشجو را نشان می دهد."
   this_report_displays_teacher_engagement_activity_f_5888d45b: "این گزارش فعالیت اشتغال استاد را برای هر ثبت نام استاد نمایش می‌دهد."
+  this_report_shows_all_learning_outcomes_that_exist_e77bd04b: "این گزارش تمام نتایج یادگیری موجود در این حساب را نشان می‌دهد. پرونده csv حاصل برای هر نتیجه یک ردیف خواهد داشت و جزئیات تمام ویژگی های مرتبط با هر نتیجه را نشان می دهد."
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: "این گزارش همه درس های یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر درس یک ردیف خواهد داشت و شناسه درس، شناسه درس در سامانه اطلاعات دانشجو، نام کوتاه درس، نام درس، شناسه حساب، شناسه حساب در سامانه اطلاعات دانشجو، نام حساب، ذخیره استفاده بر حسب مگابایت و مجموع همه فایل ها بر حسب مگابایت را نشان خواهد داد. ذخیره استفاده شده همه فایل هایی که با سهمیه درس ها در تضاد هستند را نشان می دهد. مجموع همه فایل ها در درس به مجموع همه فایل هایی که صرفنظر از تأثیر در سهمیه درس در درس موجود هستند، گفته می شود."
   this_report_shows_grading_period_grades_and_overal_a86346a: "این گزارش نمره های دوره نمره گذاری (و نمره های کلی درس) برای هر دانشجوی ثبت نام شده در یک نیمسال خاص را نشان می دهد. فایل csv حاصله برای هر ثبت نام یک ردیف خواهد داشت."
+  this_report_shows_the_student_final_grade_results__5a508b55: "این گزارش نتایج نمره نهایی دانشجو برای همه دانشجویان یک نیسمال خاص را نشان می دهد. فایل CSV حاصله برای هر ثبت نام یک ردیف دارد، و نمره فعلی و نهایی که در دفتر نمره درس نمایش داده می‌شود را نشان خواهد داد."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "این صفحه نمونه شامل عناصر رایج واسط کاربر در کانواس برای کمک به شما در ساختن علامت تجاری سفارشی است. وقتی ایجاد تغییرات در مقادیر رنگ و تصاویر موجود در نوار کناری سمت چپ را شروع کنید، یک دکمه *پیش نمایش تغییرات خود* را خواهید دید. برای تجدید این صفحه، روی این دکمه کلیک کنید و ببینید تغییرات شما چطور به نظر می رسند."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "ثبت نام این دانشجو پایان یافته است."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "ثبت نام این دانشجو پایان یافته است."
@@ -21682,6 +21698,7 @@ fa:
       صفحه اصلی شما را روی ماژول‌ها قرار داده ایم، اما می‌توانید آن را تغییر دهید.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "هنگام ارسال نمرات برای تکالیف ناشناس ، نمرات برای همه افراد در درس ارسال می شود. ناشناس بودن حذف می شود."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "زمانی که انتخاب شد، درس در خارج از این زمان در وضعیت فقط خواندن قرار می‌گیرد."
+  when_selected_the_course_is_inaccessible_outside_c_af595406: "در صورت انتخاب، درس خارج از تاریخ درس غیرقابل دسترسی است. اگر تاریخ درس‌ها خالی باشد، این تاریخ های شروع و پایان برای تاریخ‌های نیمسال اعمال می شود."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "زمانی که انتخاب شد، این بخش از درس در خارج از این زمان در وضعیت فقط خواندن قرار می‌گیرد."
   whenever_b943b119: "هر زمان"
   where_would_you_like_to_move_title_fabd6e8f: "می خواهید %{title} را به کجا انتقال دهید؟"

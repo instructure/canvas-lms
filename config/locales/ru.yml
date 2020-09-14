@@ -205,6 +205,7 @@ ru:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Новое задание создано для вашего курса, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Для использования Academic Benchmarks требуется идентификатор партнера"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Для использования Academic Benchmarks требуется ключ партнера"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Доступна премиальная версия BigBlueButton, которая предлагает аналогичные конференции на основе приобретенного количества (каждая с 1 хостом и до 99 участников), без ограничений по хранению записей и выделенные ресурсы для обеспечения более высокой производительности."
   a_problem_occurred_adding_reviewers_57b083d9: "Возникла проблема при добавлении рецензентов."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Уровень общей конфиденциальности передает идентификационную информацию инициирующего пользователя провайдеру инструмента. Ее отправка частному пользователю может негативно сказаться на инструментах, зависящих от этой информации."
   a_redirect_uri_is_required_please_supply_one_471908db: "Требуется redirect_uri, необходимо предоставить."
@@ -2491,6 +2492,9 @@ ru:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Произошла ошибка при генерировании темы. Пожалуйста, повторите попытку."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Произошла ошибка при подготовке к скачиванию. Пожалуйста, повторите попытку."
   an_error_occurred_updating_the_assignment_7391dd3a: "Произошла ошибка при обновлении задания."
+  an_error_occurred_updating_the_calculation_method_49384084: "Произошла ошибка при обновлении метода расчетов"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Произошла ошибка при обновлении уровней профподготовки: %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "Произошла ошибка при обновлении уровней профподготовки"
   an_error_occurred_updating_this_assignment_21287c7e: "При обновлении этого задания произошла ошибка."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Возникла ошибка при установке права на использование для %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "При попытке связаться с Turnitin произошла ошибка."
@@ -2502,10 +2506,13 @@ ru:
   an_error_occurred_while_loading_changes_9851b56f: "Произошла ошибка при загрузке изменений"
   an_error_occurred_while_loading_courses_11d4571e: "Произошла ошибка при загрузке курсов"
   an_error_occurred_while_loading_late_policies_c415f676: "Произошла ошибка при загрузке политик опозданий"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Произошла ошибка при загрузке расчета результатов: %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "Произошла ошибка при загрузке уровней профподготовки: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Произошла ошибка при блокировании объявлений."
   an_error_occurred_while_migrating_405ac0b5: "При переносе данных произошла ошибка."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Произошла ошибка при попытке получения вашего QR-кода"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Произошла ошибка при сохранении оценок по специальной подготовке для учетной записи"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "Произошла ошибка при сохранении уровней профподготовки в учетной записи: %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Произошла ошибка при сохранении ассоциаций"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ошибка при сохранении политики публикации задания"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ошибка при сохранении политики публикации данных для курса"
@@ -4074,6 +4081,7 @@ ru:
   belarusian_b2f19c76: Белорусский
   belgium_32_e5f5b598: "Бельгия (+32)"
   belgium_ef8739b6: Бельгия
+  below_mastery_abd1dca5: "Ниже уровня усвоения"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Под этим поисковым полем находится список %{content_type}. Во время набора список будет фильтроваться в соответствии с вашим запросом. Сообщения из разговора будут фильтроваться по выбранному вами критерию."
   beta_url_3c7b88ec: "Бета URL:"
   better_file_browsing_description: |-
@@ -4344,6 +4352,7 @@ ru:
   cache_cleared_successfully_9ab84d5a: "Кэш успешно очищен"
   calculated_by_4ac40468: "Рассчитал: "
   calculated_by_baa3c8f3: "Рассчитал:"
+  calculation_d82f6181: Расчет
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "'%{calculation_int}' не является допустимым значением для данного метода вычислений. Значение должно быть в диапазоне между '%{valid_calculation_ints_min}' и '%{valid_calculation_ints_max}'"
   calculation_method_fe281f9: "Метод вычисления"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method должен быть одним из следующих: %{calc_methods}"
@@ -4479,7 +4488,7 @@ ru:
         calendar_week: Неделя
         improved_accessibility_recommend_agenda: "Предупреждение. Для улучшения доступности используйте календарь \"Просмотр повестки дня\"."
       loading: Загрузка
-      my_appointment_groups: "Мои групповые встречи"
+      my_appointment_groups: "Мои группы встреч"
     calendar_navigator: 
       enter_navigation_date: "Введите дату, к которой вы хотели бы перейти."
       next: Далее
@@ -6434,6 +6443,7 @@ ru:
   could_not_duplicate_discussion_953ed67f: "Дупликация дискуссии невозможна"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Не удается найти конфигурацию LTI для идентификатора клиента %{clientId}"
   could_not_find_file_to_upload_2af12953: "Не удалось найти файл для загрузки"
+  could_not_find_file_to_upload_d8a0b228: "Не удалось найти файл для загрузки."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Не удалось найти существующего пользователя для входа в систему с идентификатором SIS %{user_id}, пропуск"
   could_not_save_chosencolor_741b74ce: "Не удалось сохранить '%{chosenColor}'"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Не удается настроить даты по заданию %{name} (ID %{id})"
@@ -6553,6 +6563,11 @@ ru:
     many: "%{count} представлений страниц"
     one: "1 представление страницы"
     other: "%{count} представлений страниц"
+  count_pages_selected_for_deletion_1ab0f684: 
+    few: "%{count} страниц(-ы) выбрано(-ы) для удаления"
+    many: "%{count} страниц(-ы) выбрано(-ы) для удаления"
+    one: "%{count} страница выбрана для удаления"
+    other: "%{count} страниц(-ы) выбрано(-ы) для удаления"
   count_participations_ac8f82b7: 
     few: "%{count} случаев участия"
     many: "%{count} случаев участия"
@@ -8856,6 +8871,7 @@ ru:
   drag_and_drop_your_image_here_or_7fba7c14: "Перетащите изображение сюда или "
   drag_to_rearrange_sections_637efee3: "Перетащите для изменения порядка разделов"
   drag_up_or_down_to_reorder_382126ff: "Перетащите вверх или вниз, чтобы изменить порядок следования"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Значительное повышение интенсивности использования BigBlueButton может привести к проблемам с производительностью."
   drop_files_here_to_add_to_module_236304f5: "Поместите файлы сюда для их добавления в модуль"
   drop_files_here_to_upload_ce0f50f9: "Перетащите сюда файлы для загрузки"
   drop_image_62a2a071: "Перетащите изображение"
@@ -10184,6 +10200,7 @@ ru:
   final_grader_can_view_other_grader_names_67736530: "Окончательный оценщик может просматривать имена других оценщиков"
   final_letter_grade_80dccec1: "Итоговая успеваемость"
   final_score_26bcfc20: "Итоговая оценка"
+  final_score_53278fd0: "Итоговая оценка:"
   final_score_61e15cf3: "итоговая оценка"
   findLinkForService: 
     buttons: 
@@ -11648,6 +11665,7 @@ ru:
         saving: Сохранение...
         self_signup: "Самостоятельная регистрация"
         split_into_groups: "Разбить учащихся на %{num_groups} групп(ы)"
+        split_into_sized_groups: "Разделить студентов на группы по %{num_members} студента(-ов) в группе"
       group_category_detail: 
         add_group: "Добавить группу"
         category_settings: Настройки
@@ -12098,6 +12116,7 @@ ru:
   html_editor_fb2ab713: "Редактор HTML"
   html_fc8563c6: html
   http_67e238b4: "http://"
+  http_response_code_832d6baa: "Ответ HTTP: %{code}"
   hungarian_fc7d30c9: Венгерский
   hungary_36_cd3e515b: "Венгрия (+36)"
   i_agree_to_the_34aa16ce: "Я согласен с"
@@ -12360,6 +12379,7 @@ ru:
   in_progress_646a8aef: Выполняется
   in_progress_9d1ce8b9: Выполняется
   in_progress_icon_6e69c998: "иконка \"выполняется\""
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "На случай, если BigBlueButton не сможет соответствовать текущим или будущим потребностям, Canvas также сотрудничает с Zoom, Google Meet, Microsoft Teams, а также с другие сервисами, предоставляющими услуги видеоконференций."
   inactivate_user_35f6d9d7: "Деактивировать пользователя"
   inactive_cd40317f: "не активен"
   inactive_enrollments_3b84be3d: "Неактивные регистрации"
@@ -12622,6 +12642,7 @@ ru:
   ireland_f7bb9899: Ирландия
   irish_567e109f: Ирландский
   is_an_lti_1_3_tool_770480a1: "Является инструментом LTI 1.3."
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " использует бесплатную версию BigBlueButton, которая предоставляет 10 аналогичных видеоконференций, каждая из которых имеет по 1 хосту и до 24 участников. Записи хранятся в течение 7 дней."
   israel_681bc5a5: Израиль
   israel_972_e671df75: "Израиль (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "По-видимому, вы указали недействительный адрес электронной почты: \"%{addr}\""
@@ -12640,6 +12661,7 @@ ru:
   item_incomplete_d6a16040: "(Неполный элемент)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} в настоящее время не поддерживается"
   item_past_due_dc6e776: "Элемент просроченный"
+  item_scores_9fbfe956: "Оценки элементов:"
   item_select_fe0f320a: "Выбор элемента"
   item_type_assignment_13a1132e: "Тип элемента: Задание"
   item_type_choice_aebcf2ef: "Тип элемента: Выбор"
@@ -13208,10 +13230,12 @@ ru:
         buttons: 
           request_password: "Запросить пароль"
         dont_know_password: "Забыли пароль?"
+        error: "Произошла ошибка, попробуйте еще раз."
         log_in: "Вход в систему"
         login_handle: "Введите %{login_handle_name}, после чего вам будет отправлена ссылка на изменение пароля."
         password: Пароль
         sending: Отправка...
+        sent: Отправлено!
       new: 
         back_to_login: "Вернуться ко входу в систему"
         browse_courses: "Искать курсы"
@@ -13364,6 +13388,7 @@ ru:
             учебный курс, позвольте учащимся управлять отдельными областями контента в учебном курсе и скройте от них детали оценки
             . Вы можете также изменять имя и код учебного курса.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Позволяет отображать ссылку на Microsoft Immersive Reader в Википедии."
+  makes_the_student_grades_page_responsive_c13e00eb: "Делает страницу оценок студента адаптивной."
   making_a_copy_of_original_assignment_name_8f029a9b: "Создать копию \"%{original_assignment_name}\""
   making_a_copy_of_originalassignmentname_b7268992: "Выполнение копии \"%{originalAssignmentName}\""
   malay_f5dddce4: Малайский
@@ -15806,6 +15831,7 @@ ru:
   must_be_a_valid_number_59f0069: "Необходимо указать действительное число"
   must_be_after_start_date_95e251a3: "должна наступать после даты начала"
   must_be_between_availability_dates_ceaca984: "должна находиться между доступными датами"
+  must_be_between_lower_and_upper_1f501b2a: "Должно быть в диапазоне от %{lower} до %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "необходимо войти в систему и зарегистрироваться для выполнения этого действия"
   must_be_on_or_after_end_date_e4dda631: "должна наступать не ранее даты окончания"
   must_belong_to_a_root_account_f84323f6: "должен принадлежать к корневой учетной записи"
@@ -16538,6 +16564,7 @@ ru:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "число от 1 до 16 включительно"
+  number_each_event_d934cd65: "Пронумеруйте каждое событие"
   number_is_too_large_4da4af0a: "число слишком велико"
   number_is_too_small_618a6ca7: "число слишком мало"
   number_more_a46966: "%{number} Больше..."
@@ -17056,6 +17083,7 @@ ru:
   paper_view_7405eeab: "Представление документации"
   paraguay_181a5029: Парагвай
   paraguay_595_ca58b83a: "Парагвай (+595)"
+  parameter_91ed199: Параметр
   parameters_a13374ec: Параметры
   parent_assignment_is_not_selected_9efb4ac1: "родительское задание не выбрано"
   parent_assignment_is_selected_6a2fbca8: "выбрано родительское задание"
@@ -17181,6 +17209,7 @@ ru:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Разрешите Arc доступ к вашей веб-камере."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Разрешите Canvas доступ к вашему микрофону и веб-камере."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Предоставить Canvas доступ к вашей веб-камере."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Обратитесь к своему администратору LMS для получения более подробной информации."
   please_create_a_group_set_8db6e8fe: "Пожалуйста, создайте набор групп"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Не отвечайте на это письмо, ответ не будет доставлен."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Пожалуйста, введите дату истечения срока выполнения, наступающую не ранее %{earliestDate}"
@@ -17833,6 +17862,8 @@ ru:
   processing_2fcc9739: "Идет обработка"
   product_name: Canvas
   product_tours_1e19eb95: "Ознакомление с продуктами"
+  proficiency_calculation_57f0bdf: "Расчет уровня профподготовки"
+  proficiency_calculation_parameters_5f605dec: "Параметры расчета уровня профподготовки"
   proficiency_rating_6346119f: "Оценка по специальной подготовке"
   proficiency_rating_deleted_77827473: "Оценка по специальной подготовке удалена"
   proficiency_ratings_2bbabdcd: "Оценки по специальной подготовке"
@@ -18452,6 +18483,7 @@ ru:
       update_question_without_regrading: "Обновить вопросы без повторной оценки"
   quiz_40ee61b1: тест
   quiz_assignment_overrides_cec1973b: "Отмена задания контрольной работы"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Попытки проведения тестов, даты доступности которых назначены, будут все равно отправляться автоматически, даже если продленное время не истекло."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Даты доступных тестов, которые проводятся во время попытки, будут все равно отправляться автоматически, даже если продленное время не истекло."
   quiz_duplication_not_implemented_c1495585: "дублирование тестов не реализовано"
   quiz_e0dcce8f: Тестирование
@@ -18533,6 +18565,7 @@ ru:
   quiz_lti_plugin_a189607f: "LTI плагин для теста"
   quiz_lti_plugin_a6256549: "LTI плагин для теста"
   quiz_menu_4fcd5e61: "Меню Тесты"
+  quiz_not_assigned_to_student_4b1846d5: "Тест не присвоен студенту"
   quiz_question_1da5198e: "Вопрос теста"
   quiz_question_groups_bd0bb222: "Группы вопросов по контрольным работам"
   quiz_questions_ecea3c40: "Вопросы по контрольным работам"
@@ -20242,6 +20275,7 @@ ru:
   responsive_global_nav_logo_99488e92: "Логотип адаптивной глобальной навигации"
   responsive_layout_54e4ca06: "Адаптивный макет"
   responsive_misc_dc572cc0: "Эффективн. разн."
+  responsive_student_grades_page_324e9c8b: "Адаптивная страница оценок студента"
   restart_link_validation_b61286fc: "Заново запустить валидатор ссылок"
   restore_courses_182e162e: "Восстановить курсы"
   restored_course_association_course_c9e16045: "Ассоциация восстановленного курса %{course}"
@@ -21123,6 +21157,7 @@ ru:
   set_name_f83b658: "Установить имя"
   set_of_grading_periods_545b37e9: "Набор Оценочных периодов"
   set_some_up_now_1749bb44: "Установить некоторые сейчас"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Установите шкалу уровня усвоения, которая будет использоваться для всех курсов в рамках этой учетной записи."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Задайте параметры отображения уровня профподготовки в журнале оценок результатов обучения.\n\
       \x20           Настройте количество уровней, уровень профподготовки, баллы и цвета.\n\
@@ -22794,6 +22829,8 @@ ru:
       global_support_desk_description: "Наши Сотрудники службы поддержки - это ваша первая линия поддержки, а также они могут соединить вас с нашей глобальной службы поддержки по вопросам, которые требуют дополнительной помощи."
       networking_academy_description: "Просмотреть ответы Cisco на часто задаваемые вопросы."
       networking_academy_faqs: "Часто задаваемые вопросы Сетевой академии"
+      student_support: "NetAcad Поддержка — студент"
+      student_support_description: "Ваш преподаватель должен быть вашим основным контактным лицом. Он может ответить на ваши вопросы по поводу Networking Academy или передать ваш вопрос в службу поддержки. Вы можете обратиться к своему преподавателю с помощью функции Inbox."
       support_desk_livechat: "Чат в реальном времени со службой технической поддержки"
   support_favorite_lti_tools_in_the_rce_1680436d: "Поддержка избранных инструментов LTI в RCE"
   svg_d5969386: SVG
@@ -22814,7 +22851,7 @@ ru:
   switzerland_f4f7137c: Швейцария
   syllabus: "Программа обучения курса"
   syllabus_course_summary_option_951a8144: "Обзор содержания курса (опция)"
-  syllabus_f191f65b: "Программа обучения"
+  syllabus_f191f65b: "Содержание курса"
   syllabus_tutorial_tray_97e8ef82: "Лоток справки по учебным планам"
   syllabus_visibility_options_a81ef419: "Опции отображения учебной программы"
   sync_68e5c167: Синхронизировать
@@ -23131,6 +23168,7 @@ ru:
   the_next_available_appointment_in_this_course_is_o_da10316c: "Следующая доступная для назначения дата для этого курса - *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "Предыдущий контент предоставляется партнером"
   the_previous_sis_batch_was_aborted_d7d89955: "Предыдущий пакет SIS был прерван"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Расчет уровня профподготовки была задана вашим администратором и применяется ко всем курсам в этой учетной записи."
   the_profile_picture_has_been_reported_d609d6dd: "Была отправлена жалоба на изображение профиля"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Предоставленный файл Academic Benchmark содержит ошибку"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Текст вопроса для этого вопроса \"%{question_name}\" был слишком длинным."
@@ -23323,6 +23361,7 @@ ru:
   this_code_has_expired_41f76642: "Срок действия данного кода истек."
   this_conference_may_be_recorded_f76deeeb: "Эта конференция может записываться."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Этот курс сейчас не может быть добавлен в меню курсов."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Этот курс не может быть добавлен в меню курсов, если курс не активен."
   this_course_does_not_allow_score_uploads_4b35fe07: "Нельзя загружать оценки для этого курса."
   this_course_has_concluded_7995a84c: "Этот курс завершен"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Этот курс еще не начался. Вы не сможете не участвовать в этом курсе до %{date}."
@@ -24427,9 +24466,11 @@ ru:
   upload_data_dc4fa4cb: "Загрузка данных"
   upload_drop_zone: 
     drop_to_upload: "Положить элементы для загрузки"
+  upload_error_please_try_again_c6587f48: "Ошибка загрузки. Попробуйте еще раз."
   upload_failed_a5dc91ec: "Загрузка не выполнена"
   upload_failed_quota_exceeded_ff3af659: "Загрузка не удалась, превышена квота"
   upload_file_fd2361b8: "Загрузить файл"
+  upload_files_a228f20f: "Загрузить файлы"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Загрузить файлы, представленные с заданиями в специальную папку для предоставленных материалов, которая существует только для чтения"
   upload_gradebook_386a46c8: "Загрузить табель успеваемости"
   upload_image_6120b609: "Загрузить изображение"
@@ -25003,6 +25044,7 @@ ru:
   users_add_remove_observers_d1273d9: "Пользователи - добавить / удалить наблюдателей"
   users_add_remove_students_in_courses_efe7e748: "Пользователи - добавить / удалить студентов из курсов"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Курсы - добавить / удалить преподавателей, разработчиков курсов или ассистентов преподавателей из курсов"
+  users_allowed_to_edit_this_page_d6d316d0: "Пользователи могут редактировать эту страницу"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Пользователи и условия находятся в учетной записи, поэтому конечная точка SIS всегда подтверждает разрешения пользователя в соответствии с учетной записью. Субучетные записи могут владеть только курсами и разделами; они не владеют пользовательскими данными.
       Администраторы субучетных записей не могут просматривать информацию SIS, если они не наделены ролью преподавателя в курсе. Администраторы субучетных записей не могут просматривать информацию SIS без ассоциации с курсом, поскольку роль преподавателя имеет разрешение на чтение данных SIS на уровне учетной записи.
@@ -25119,6 +25161,7 @@ ru:
   waiting_for_attempted_login_6d00cb49: "Ожидание попытки входа в систему"
   waiting_for_change_to_complete_b75b5e8b: "Ожидание внесения изменения"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "Ожидание подтверждения для отображения QR-кода"
+  waiting_for_request_to_complete_13cf037a: "Ожидание завершения процедуры запроса"
   waiting_for_selection_ce0398c7: "Ожидание выбора"
   waiting_for_your_qr_code_to_load_809299e5: "Дождитесь загрузки вашего QR-кода"
   warning_6576b5b8: предупреждение

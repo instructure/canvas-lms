@@ -190,6 +190,7 @@ fr-CA:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Un nouveau tâche a été créé pour votre cours, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Une identification de partenaire est exigée pour utiliser Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Une clé de partenaire est exigée pour utiliser Academic Benchmarks"
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Une version Premium de BigBlueButton est disponible qui offre des conférences simultanées selon le montant acheté (chacune avec un hôte et jusqu’à 99 participants), aucune limite de stockage enregistrée et une infrastructure dédiée pour de meilleures performances."
   a_problem_occurred_adding_reviewers_57b083d9: "Un problème est survenu lors de l'ajout d'examinateurs."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Un niveau de confidentialité publique enverra les informations d'identification personnelle de l'utilisateur de lancement au fournisseur de l'outil. Le réglage de ce paramètre à Privé peut affecter négativement les outils qui dépendent de cette information."
   a_redirect_uri_is_required_please_supply_one_471908db: "Un redirect_uri est requis, veuillez en fournir un."
@@ -1002,9 +1003,9 @@ fr-CA:
           enrollment_term_ids: 
             field: "Identifiants des périodes d'inscription"
     eportfolio_moderation: 
-      eportfolio_moderation_crumb: "Modération du ePortfolio"
-      page_title: "Modération du ePortfolio"
-      title: "Modération du ePortfolio"
+      eportfolio_moderation_crumb: "Modération du portefeuille électronique"
+      page_title: "Modération du portefeuille électronique"
+      title: "Modération du portefeuille électronique"
     excelsior_activity_report_csv_parameters: 
       account_reports: 
         excelsior: 
@@ -1283,7 +1284,7 @@ fr-CA:
         edit_institution_email: "Les utilisateurs peuvent supprimer leur adresse courriel attribuée par l’institution"
         enable_alerts: "Alertes (bêta)"
         enable_course_catalog: "Afficher une liste des cours consultable dans ce compte racine avec l’indicateur « Inclure ce cours dans l’index de cours public » activé."
-        enable_eportfolios: ePortfolios
+        enable_eportfolios: "Portefeuilles électroniques"
         enable_fullstory: "Permettre le suivi avec FullStory"
         enable_google_analytics: "Autoriser le suivi avec Google Analytics"
         enable_profiles: "Activer les profils"
@@ -2167,7 +2168,7 @@ fr-CA:
   allows_user_to_edit_grades_in_the_gradebook_allows_b1e33afc: "Permet à l'utilisateur de modifier les notes dans le carnet de notes. Permet à l'utilisateur d'accéder à l'historique de carnet de notes."
   allows_user_to_edit_grading_schemes_98c35117: "Permet à l'utilisateur de modifier les systèmes de notation."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "Permet à l'utilisateur de modifier l’ID SIS de cours."
-  allows_user_to_edit_the_course_syllabus_a28ff262: "Permet à l'utilisateur de modifier le plan de cours."
+  allows_user_to_edit_the_course_syllabus_a28ff262: "Permet à l'utilisateur de modifier le programme du cours."
   allows_user_to_export_the_gradebook_to_a_comma_sep_1c6fefef: "Permet à l’utilisateur d’exporter le carnet de notes vers un fichier CSV (valeurs séparées par des virgules). Permet à l’utilisateur d’accéder au carnet de notes de la maîtrise d’apprentissage (si activé)."
   allows_user_to_filter_for_blueprint_courses_as_the_45dc2c3d: "Permet à l’utilisateur de filtrer les cours modèle en tant que niveau du compte. Permet à l’utilisateur d’ajouter les cours associés."
   allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
@@ -2327,7 +2328,7 @@ fr-CA:
       Permet à l'utilisateur de voir le lien Discussions dans la Navigation du cours.
       Permet à l'utilisateur de voir les discussions de cours.
   allows_user_to_view_the_discussions_link_in_course_eb30f2d0: "Permet à l’utilisateur de voir le lien Discussions dans la Navigation du cours. Permet à l’utilisateur de voir les discussions de cours."
-  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Permet à l’utilisateur de voir la page Modération du ePortfolio et de gérer le contenu de pourriel du ePortfolio."
+  allows_user_to_view_the_eportfolio_moderation_page_5a6be051: "Permet à l’utilisateur de voir la page Modération du portefeuille électronique et de gérer le contenu de pourriel du portefeuille électronique."
   allows_user_to_view_the_faculty_journal_link_in_gl_e3fd6889: "Permet à l'utilisateur de voir le lien du journal des enseignants dans la navigation mondiale."
   allows_user_to_view_the_group_home_pages_of_all_st_47f48a3e: "Permet à l’utilisateur de voir les pages d’accueil de groupe de tous les groupes d’étudiant. Permet aux étudiants d’accéder à d’autres groupes d’étudiants au sein d’un ensemble de groupes avec un lien direct."
   allows_user_to_view_the_group_home_pages_of_all_st_9d747525: |-
@@ -2385,6 +2386,9 @@ fr-CA:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Une erreur s’est produite lors de la création de ce thème, veuillez réessayer."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Une erreur s’est produite lors de la préparation du téléchargement, veuillez réessayer."
   an_error_occurred_updating_the_assignment_7391dd3a: "Une erreur s'est produite lors de la mise à jour de la tâche."
+  an_error_occurred_updating_the_calculation_method_49384084: "Une erreur s’est produite lors de la mise à jour de la méthode de calcul"
+  an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Une erreur s’est produite lors de la mise à jour des notes de compétence : %{message}"
+  an_error_occurred_updating_the_proficiency_ratings_babe7029: "Une erreur s’est produite lors de la mise à jour des notes de compétence"
   an_error_occurred_updating_this_assignment_21287c7e: "Une erreur s'est produite pendant la mise à jour de cette tâche."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Une erreur s’est produite lors de la définition des droits d’utilisation pour %{filename}."
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Une erreur est survenue lors de la tentative de contacter Turnitin."
@@ -2396,10 +2400,13 @@ fr-CA:
   an_error_occurred_while_loading_changes_9851b56f: "Une erreur s'est produite lors du chargement des modifications"
   an_error_occurred_while_loading_courses_11d4571e: "Une erreur s'est produite lors du chargement des cours"
   an_error_occurred_while_loading_late_policies_c415f676: "Une erreur s'est produite lors du chargement des dernières politiques"
+  an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Une erreur s’est produite lors du chargement du calcul des acquis : %{error}"
+  an_error_occurred_while_loading_the_proficiency_ra_98492357: "Une erreur s’est produite lors de la mise à jour des notes de compétence : %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Une erreur s'est produite lors du verrouillage des annonces."
   an_error_occurred_while_migrating_405ac0b5: "Une erreur est survenue lors de la migration."
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: "Une erreur s’est produite lors de la récupération de votre code QR"
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Une erreur est survenue lors de l’enregistrement des notations de compétence de compte"
+  an_error_occurred_while_saving_account_proficiency_9f0f9208: "Une erreur est survenue lors de l’enregistrement des notations de compétence de compte : %{message}"
   an_error_occurred_while_saving_associations_bd66f3f4: "Une erreur s'est produite lors de l’enregistrement des associations"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Une erreur est survenue pendant l'enregistrement de la politique de publication des tâches"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Une erreur est survenue pendant l'enregistrement de la politique de publication des cours"
@@ -3404,29 +3411,29 @@ fr-CA:
       no_files: "Aucun fichier"
       upload_or_choose_file: "Téléverser un fichier ou choisissez un fichier que vous avez déjà téléversé."
     syllabus: 
-      page_title: "Plan de cours pour %{course}"
+      page_title: "Programme pour %{course}"
     syllabus_content: 
       buttons: 
-        update_syllabus: "Mettre à jour le plan de cours"
+        update_syllabus: "Mettre à jour le programme"
       headers: 
         date: Date
         details: Informations
       instructions: 
         syllabus: |-
-            La page du plan de cours présente une vue en tableau du calendrier du cours, et les bases de
+            La page du programme présente une vue en tableau du calendrier du cours, et les bases de
             notation du cours. Vous pouvez y ajouter d'autres commentaires, notes ou idées que vous auriez à propos
             de la structure du cours, de ses politiques ou tout autre chose.
             
             Pour ajouter des commentaires, cliquer le lien « Modifier » situé tout en haut.
       labels: 
         assignments_summary: "Sommaire du cours"
-        syllabus_body: "Description du plan de cours"
+        syllabus_body: "Description du programme"
         syllabus_course_summary: "Afficher le résumé du cours"
       links: 
         edit_syllabus_description: Modifier
         jump_to_today: "Aller à Aujourd’hui"
       titles: 
-        course_syllabus: "Plan de cours"
+        course_syllabus: "Programme du cours"
     titles: 
       add_assignment_group: "Ajouter un groupe de tâches"
       uploading: "Envoi en cours"
@@ -3799,6 +3806,7 @@ fr-CA:
   being_processed_by_plagiarism_service_2269be71: "En cours de traitement par le service de plagiat"
   belarusian_b2f19c76: Biélorusse
   belgium_32_e5f5b598: "Belgique (+32)"
+  below_mastery_abd1dca5: "Inférieur au niveau de maîtrise"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Sous ce champ de recherche se trouve une liste de %{content_type}. Au fur et à mesure que vous saisissez du texte, la liste est filtrée pour correspondre à votre demande. Les messages de conversation sont filtrés en fonction de l’option que vous sélectionnez."
   beta_url_3c7b88ec: "URL bêta :"
   between_1_and_5_f2a74bcf: "Entre 1 et 5"
@@ -4050,6 +4058,7 @@ fr-CA:
   cache_cleared_successfully_9ab84d5a: "Cache effacé avec succès"
   calculated_by_4ac40468: "Calculé par : "
   calculated_by_baa3c8f3: "Calculé par :"
+  calculation_d82f6181: Calcul
   calculation_int_is_not_a_valid_value_for_this_calc_1de6e060: "La valeur « %{calculation_int} » n’est pas valide pour cette méthode de calcul. Cette valeur doit être comprise entre « %{valid_calculation_ints_min} » et « %{valid_calculation_ints_max} »."
   calculation_method_fe281f9: "Méthode de calcul"
   calculation_method_must_be_one_of_the_following_ca_d8ae5dac: "calculation_method doit être l’une des méthodes suivantes : %{calc_methods}"
@@ -5988,8 +5997,8 @@ fr-CA:
   copy_this_module_to_a_course_ddd12cc7: "Copier ce module dans un cours…"
   copy_title_to_course_2a41a2f4: "Copier %{title} au cours"
   copy_title_to_course_ac71981a: "Copier {%title} au cours"
-  copy_to_64f8456b: "Copié à…"
-  copy_to_a5396a6f: "Copié à..."
+  copy_to_64f8456b: "Copier à…"
+  copy_to_a5396a6f: "Copier à..."
   copy_to_folder_32ecc3c3: "Copier dans le dossier"
   copying_628a9607: "Copie en cours..."
   copyright_and_license_information_must_be_provided_5feffaf: "Les informations sur le droit d'auteur et la licence doivent être fournies avant de publier des fichiers."
@@ -6007,6 +6016,7 @@ fr-CA:
   could_not_duplicate_discussion_953ed67f: "Impossible de dupliquer la discussion"
   could_not_find_an_lti_configuration_for_client_id__b7d07b3c: "Impossible de trouver une configuration LTI pour l'ID client %{clientId}"
   could_not_find_file_to_upload_2af12953: "Fichier à téléverser introuvable"
+  could_not_find_file_to_upload_d8a0b228: "Fichier à téléverser introuvable."
   could_not_find_the_existing_user_for_login_with_si_6968e3e6: "Impossible de trouver l'utilisateur existant pour l’ouverture de session avec l'ID SIS %{user_id}, sauter"
   could_not_save_chosencolor_741b74ce: "Sauvegarde de '%{chosenColor}' impossible"
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Impossible de modifier les dates sur la tâche %{name} (ID %{id})"
@@ -6094,6 +6104,9 @@ fr-CA:
   count_page_views_b40102b3: 
     one: "1 consultation de page"
     other: "%{count} consultations de page"
+  count_pages_selected_for_deletion_1ab0f684: 
+    one: "%{count} page sélectionnée pour suppression"
+    other: "%{count} pages sélectionnées pour suppression"
   count_participations_ac8f82b7: 
     one: "1 participation"
     other: "%{count} participations"
@@ -6214,7 +6227,7 @@ fr-CA:
     student_summary: 
       not_sorted: "Tableau récapitulatif de l'étudiant"
     student_view_student_name: "Étudiant test"
-    syllabus: "Plan de cours"
+    syllabus: Programme
     wiki_permissions: 
       all: Tous
       only_teachers: "Uniquement les enseignants"
@@ -6384,7 +6397,7 @@ fr-CA:
       name: Nom
       open_enrollment: "Ouvrir l’inscription"
       public_description: "Description publique"
-      public_syllabus: "Plan de cours public"
+      public_syllabus: "Programme public"
       replacement_course_id: "ID de cours de remplacement"
       restrict_enrollments_to_course_dates: "Restreindre les inscriptions aux dates de cours"
       root_account_id: "ID de compte racine"
@@ -6500,7 +6513,7 @@ fr-CA:
   course_statistics: 
     unknown: inconnu
   course_storage_391e1bd: "Stockage du cours"
-  course_syllabus_5de1b0af: "Plan de cours"
+  course_syllabus_5de1b0af: "Programme du cours"
   course_users: 
     greater_than_three: "Indiquez un élément à rechercher comprenant au moins trois caractères."
     unknown_error: "Erreur lors de votre recherche. Veuillez réessayer."
@@ -7083,7 +7096,7 @@ fr-CA:
     copy_course: "Copier le cours"
     developer_keys: "Clés de développeur"
     discussions: Discussions
-    eportfolio_welcome: "Bienvenue dans votre ePortfolio"
+    eportfolio_welcome: "Bienvenue dans votre portefeuille électronique"
     error_reports: "Rapports d’erreur"
     files: Fichiers
     grades: Notes
@@ -7105,7 +7118,7 @@ fr-CA:
     settings: ~
     site_admin: "Administrateur du site"
     stats: Statistiques
-    syllabus: "Plan de cours"
+    syllabus: Programme
     users: Utilisateurs
     wiki_pages: Pages
   csp_violations_337f8529: "Violations CSP"
@@ -7499,7 +7512,7 @@ fr-CA:
   deleted_content_exceptions_237e809d: "Exceptions de contenu supprimé :"
   deleted_content_referenced_in_this_resource_e42d1998: "Contenu supprimé référencé dans cette ressource :"
   deleting_6421031e: "suppression en cours..."
-  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d’un utilisateur détruira tous ses ePortfolios. Alternativement, les ePortfolios peuvent être individuellement marqués comme « pourriel » ou « sécuritaire » pour modifier leur visibilité."
+  deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d’un utilisateur détruira tous ses portefeuilles électroniques. Alternativement, les portefeuilles électroniques peuvent être individuellement marqués comme « pourriel » ou « sécuritaire » pour modifier leur visibilité."
   deleting_assignment_22d5851d: "suppression de la tâche en cours..."
   delicious_7f9ac66f: Delicious
   demo_sites_require_recaptcha_settings_to_be_config_8bf9c7e3: "Les paramètres Recaptcha doivent être configurés pour les sites de démonstration. Adressez-vous à l’administrateur de votre site pour cette instance de Canvas."
@@ -8152,6 +8165,7 @@ fr-CA:
   drag_and_drop_your_image_here_or_7fba7c14: "Faire glisser et déposer votre image ici ou "
   drag_to_rearrange_sections_637efee3: "Faire glisser pour réarranger les sections"
   drag_up_or_down_to_reorder_382126ff: "Faites glisser vers le haut ou vers le bas pour réorganiser"
+  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: "Des augmentations spectaculaires de l’utilisation de BigBlueButton gratuit peuvent causer des problèmes de performance."
   drop_files_here_to_add_to_module_236304f5: "Déposez les fichiers ici pour les ajouter au module"
   drop_files_here_to_upload_ce0f50f9: "Faire glisser les fichiers ici pour le téléversement"
   drop_image_62a2a071: "Déposer une image"
@@ -8565,9 +8579,9 @@ fr-CA:
     confirm_delete_page: "Supprimer cette page et tout son contenu?"
     confirm_delete_section: "Supprimer cette section et toutes ses pages?"
     default_description: "Envoi de ma tâche %{assignment} pour %{course}."
-    eportfolio_settings: "Paramètres du ePortfolio"
+    eportfolio_settings: "Paramètres du portefeuille électronique"
     errors: 
-      compiling: "Erreur lors de la compilation du ePortfolio. Veuillez réessayer dans quelques instants."
+      compiling: "Erreur lors de la compilation du portefeuille électronique Veuillez réessayer dans quelques instants."
       missing_file: "Sélectionnez un fichier."
       name_required: "Le nom doit être spécifié."
       name_too_long: "Le nom est trop long"
@@ -8582,9 +8596,9 @@ fr-CA:
       manage_pages: "Cliquez dans une page pour la modifier, ou faites-la glisser pour la classer"
     titles: 
       add_submission: "Ajouter une page à l’envoi"
-      download_eportfolio: "Télécharger l'ePortfolio"
+      download_eportfolio: "Télécharger le portefeuille électronique"
       section_list: "Faire glisser pour organiser, cliquer pour modifier"
-  eportfolio_3c009f9c: ePortfolio
+  eportfolio_3c009f9c: "Portefeuille électronique"
   eportfolio_categories: 
     default_name: "Nouvelle page"
     errors: 
@@ -8601,8 +8615,8 @@ fr-CA:
     click_through: "Cliquez pour afficher le contenu de la page"
     default_content: "Pas de contenu ajouté"
     default_name: "Nom de la page"
-  eportfolio_moderation_feb0ffd3: "Modération du ePortfolio"
-  eportfolio_settings_75ba1f9a: "Paramètres du ePortfolio"
+  eportfolio_moderation_feb0ffd3: "Modération du portefeuille électronique"
+  eportfolio_settings_75ba1f9a: "Paramètres du portefeuille électronique"
   eportfolios: 
     _page_section: 
       section_types: 
@@ -8610,7 +8624,7 @@ fr-CA:
         html: "Contenu HTML/incorporé"
         rich_text: "Contenu de texte enrichi"
         submission: "Envoi du cours"
-    crumb: ePortfolios
+    crumb: "Portefeuilles électroniques"
     edit_link_text: "%{edit_icon} Modifier cette page"
     eportfolio: 
       entry_count: 
@@ -8668,31 +8682,31 @@ fr-CA:
       buttons: 
         add_comment: "Ajouter un commentaire"
         add_page: "Ajouter une page"
-        delete: "Supprimer ePortfolio"
+        delete: "Supprimer un portefeuille"
         keep_editing: "Garder la modification"
         preview: "Afficher un aperçu"
         save_page: "Enregistrer la page"
         select_submission: "Sélectionner l’envoi"
-        update_eportfolio: "Mettre à jour l'ePortfolio"
+        update_eportfolio: "Mettre à jour le portefeuille"
         upload_file: "Sélectionner/téléverser le fichier"
       current_pages: "Pages actuelles"
       delete_confirm: 
-        one: "Vous avez actuellement 1 page dans cet ePortfolio. Voulez-vous vraiment supprimer l'ePortfolio complet?"
-        other: "Vous avez actuellement %{count} pages dans cet ePortfolio. Voulez-vous vraiment supprimer l'ePortfolio complet?"
+        one: "Vous avez actuellement 1 page dans ce portefeuille. Voulez-vous vraiment supprimer le portefeuille complet?"
+        other: "Vous avez actuellement %{count} pages dans ce portefeuille. Voulez-vous vraiment supprimer le portefeuille complet?"
       headers: 
         add_content: "Ajouter un contenu"
-        export_progress: "Collecte des ressources du ePortfolio en cours. L’opération peut nécessiter un certain temps si le nombre de fichiers dans votre ePortfolio est élevé."
-        private_eportfolio: "Votre ePortfolio est privé"
-        public_eportfolio: "Votre ePortfolio est public"
+        export_progress: "Collecte des ressources du portefeuille en cours. L’opération peut nécessiter un certain temps si le nombre de fichiers dans votre portefeuille électronique est élevé."
+        private_eportfolio: "Votre portefeuille électronique est privé"
+        public_eportfolio: "Votre portefeuille électronique est public"
         recent_submissions: "Envois récents"
-        welcome: "Bienvenue dans votre ePortfolio"
+        welcome: "Bienvenue dans votre portefeuille électronique"
       headings: 
         page_comments: "Commentaires de page"
       labels: 
         add_comment: "Ajouter un commentaire"
         allow_comments: "Autoriser les commentaires sur cette page"
         choose_submission: "Sélectionnez l’envoi d’une tâche à incorporer dans cette page"
-        eportfolio_name: "Nom du ePortfolio"
+        eportfolio_name: "Nom du portefeuille électronique"
         file_select: "Sélectionnez un fichier à inclure dans cette page"
         file_upload: "Ou téléverser un fichier"
         html_content: "Copiez et collez votre code HTML dans la zone ci-dessous"
@@ -8705,14 +8719,14 @@ fr-CA:
       links: 
         back: "Revenir au tableau de bord du portefeuille"
         choose_submission: "Envoi du cours"
-        delete: "Supprimer cet ePortfolio"
-        download_eportfolio: "Télécharger le contenu de cet ePortfolio sous forme de fichier zip"
+        delete: "Supprimer ce portefeuille électronique"
+        download_eportfolio: "Télécharger le contenu de ce portefeuille électronique sous forme de fichier zip"
         download_file: "Cliquez ici pour télécharger %{filename}"
         file_uload: "Téléversement d’une image/d’un fichier"
         html_content: "Contenu HTML/incorporé"
-        portfolio: "Accéder au ePortfolio actuel"
+        portfolio: "Accéder au portefeuille actuel"
         rich_content: "Contenu de texte enrichi"
-        share: "Copiez et partagez ce lien pour que d’autres personnes puissent accéder à votre ePortfolio privé :"
+        share: "Copiez et partagez ce lien pour que d’autres personnes puissent accéder à votre portefeuille électronique privé :"
         view_original: "Afficher le fichier d’origine"
         wizard: "Assistant Démarrage"
       login_required: "Vous devez être *connecté* pour faire des commentaires sur cette page."
@@ -8723,7 +8737,7 @@ fr-CA:
       private_comments: "Actuellement, vous êtes le seul à pouvoir afficher les commentaires pour cette page. Vous pouvez choisir de rendre les commentaires publics en *modifiant les paramètres de cette page*."
       private_eportfolio: "Les utilisateurs ne peuvent trouver ou afficher la page sans autorisation. Vous pouvez l’afficher car il s’agit de votre portefeuille, mais pour laisser d’autres personnes y accéder vous devez copier et partager le lien spécial suivant qui leur permettra d’accéder à votre portefeuille :"
       public_eportfolio: "Les utilisateurs qui connaissent l’adresse de votre portefeuille peuvent l’afficher. Vous pouvez rendre votre portefeuille privé en *modifiant les paramètres de votre portefeuille*."
-      recent_submissions: "Cliquez sur un envoi pour l’ajouter à une nouvelle page de votre ePortfolio."
+      recent_submissions: "Cliquez sur un envoi pour l’ajouter à une nouvelle page de votre portefeuille."
       titles: 
         already_used: "Cet envoi est déjà inclus dans votre portefeuille."
         feed: "Flux Atom du portefeuille électronique"
@@ -8740,35 +8754,35 @@ fr-CA:
       logo: Logo
     title: "Flux de %{portfolio_name}"
     titles: 
-      feed: "Flux Atom du ePortfolio"
+      feed: "Flux Atom du portefeuille électronique"
     user_index: 
       buttons: 
-        add_eportfolio: "Créer un ePortfolio"
+        add_eportfolio: "Créer un portefeuille électronique"
       defaults: 
         eportfolio_name: "Mon portefeuille"
       headers: 
-        add_eportfolio: "Créer un ePortfolio"
-        eportfolios: ePortfolios
-        my_eportfolios: "Mes ePortfolios"
-        what: "Qu’est-ce qu’un ePortfolio?"
+        add_eportfolio: "Créer un portefeuille électronique"
+        eportfolios: "Portefeuilles électroniques"
+        my_eportfolios: "Mes portefeuilles électroniques"
+        what: "Qu’est-ce qu’un portefeuille électronique?"
       labels: 
-        eportfolio_name: "Nom du ePortfolio"
+        eportfolio_name: "Nom du portefeuille électronique"
         make_public: "Rendre public"
       links: 
-        create: "Créer un ePortfolio"
-      page_title: "Mes ePortfolios"
+        create: "Créer un portefeuille électronique"
+      page_title: "Mes portefeuilles électroniques"
       what: 
         details1: |-
-            Les ePortfolios permettent d’afficher les
+            Les portefeuilles électroniques permettent d’afficher les
             envois et les expériences marquants au cours de votre
-            apprentissage. Vous pouvez utiliser un ePortfolio pour : 
+            apprentissage. Vous pouvez utiliser le portefeuille électronique pour : 
             
             * mettre les tâches dont vous êtes fier à la disposition d’autres personnes que votre instructeur ;
             * parler du travail et des recherches impliqués dans les envois de votre classe ;
             * compiler un aperçu de votre parcours scolaire global ;
             * partager votre travail avec vos amis, vos futurs employeurs, etc.
             
-            Les ePortfolios peuvent devenir publics (consultables par tous) ou privés (consultables uniquement par les personnes
+            Les portefeuilles électroniques peuvent devenir publics (consultables par tous) ou privés (consultables uniquement par les personnes
             autorisées), et vous pouvez modifier ce paramètre à tout moment.
             
             Vous êtes prêt à commencer ? Cliquez sur le bouton.
@@ -8778,15 +8792,15 @@ fr-CA:
       headers: 
         finish: Allons-y!
         getting_started: Démarrage
-        instructions: "Utilisation d’un ePortfolio"
+        instructions: "Utilisation d’un portefeuille électronique"
         introduction: Introduction
         page_content: "Contenu de la page"
         pages: "Pages de la section"
         sections: "Sections du portefeuille"
-        settings: "Paramètres du ePortfolio"
+        settings: "Paramètres du portefeuille électronique"
         submissions: "Ajout d’envois"
       introduction: 
-        body: "Les ePortfolios permettent de montrer votre travail. Ils sont constitués de sections et de pages. La liste des sections se trouve sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages affichées sur le côté droit de la fenêtre (%{showme2})."
+        body: "Les portefeuilles électroniques permettent de montrer votre travail. Ils sont constitués de sections et de pages. La liste des sections se trouve sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages affichées sur le côté droit de la fenêtre (%{showme2})."
       links: 
         portfolio: "Afficher le portefeuille"
       page_content: 
@@ -8801,11 +8815,11 @@ fr-CA:
         body1: "Les sections apparaissent dans une liste sur le côté gauche de la fenêtre (%{showme1}). Chaque section peut contenir plusieurs pages. Pour organiser ou ajouter des sections, cliquez sur le lien « %{manage_sections} » (%{showme2})."
         body2: "Vous pouvez renommer une section en cliquant sur l’icône %{edit_icon} qui s’affiche, réorganiser les sections en cliquant dessus puis en les déplaçant, ou supprimer des sections en cliquant sur l’icône %{delete_icon}."
       settings: 
-        body: "Pour modifier les paramètres de votre ePortfolio, cliquez sur le lien « Paramètres du ePortfolio » (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
+        body: "Pour modifier les paramètres de votre portefeuille, cliquez sur le lien « Paramètres du portefeuille électronique » (%{showme}). Vous pouvez renommer le portefeuille et choisir de le rendre public ou privé. Les portefeuilles privés sont visibles uniquement de ceux auxquels vous avez accordé l’accès."
       submissions: 
         body1: "Vous avez peut-être remarqué en bas de cette page la liste des envois récents de vos classes (%{showme}). Vous pouvez rapidement ajouter des envois aux nouvelles pages de votre portefeuille à partir de cette page. Cliquez simplement sur l’envoi à ajouter pour afficher une boîte de dialogue."
         body2: "Bien. À présent, pour terminer d’ajouter l’envoi, vous devez choisir la section à laquelle l’ajouter et donner un nom à la page. Après avoir cliqué sur Ajouter une page, vous serez dirigé vers la nouvelle page afin de la modifier avec plus de précision si vous le souhaitez."
-  eportfolios_f6dc4579: ePortfolios
+  eportfolios_f6dc4579: "Portefeuilles électroniques"
   eps_81bd3fbf: EPS
   epub_exporting_f5592ff2: "Est exporté au format ePub"
   epub_exports_3822c3f8: "Exportation ePub"
@@ -9280,6 +9294,7 @@ fr-CA:
   final_grader_can_view_other_grader_names_67736530: "Le correcteur final peut voir le nom des autres correcteurs"
   final_letter_grade_80dccec1: "Note finale (en lettre)"
   final_score_26bcfc20: "Note finale"
+  final_score_53278fd0: "Note finale :"
   final_score_61e15cf3: "score final"
   findLinkForService: 
     buttons: 
@@ -10565,6 +10580,7 @@ fr-CA:
         saving: Enregistrement...
         self_signup: "Inscription libre"
         split_into_groups: "Partager les étudiants en %{num_groups} groupes"
+        split_into_sized_groups: "Séparer les étudiants en groupes avec %{num_members} étudiants par groupe"
       group_category_detail: 
         add_group: "Ajouter un groupe"
         category_settings: Paramètres
@@ -10923,7 +10939,7 @@ fr-CA:
   how_do_i_download_the_student_app_4a4b8a63: "Comment puis-je télécharger l’application Étudiant?"
   how_do_i_download_the_student_app_and_get_addition_3604c207: "Comment puis-je télécharger l’application Étudiant et obtenir de l’aide supplémentaire?"
   how_do_i_edit_an_announcement_in_a_course_815c3c60: "Comment puis-je modifier une annonce dans un cours?"
-  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Comment puis-je modifier la description du plan de cours?"
+  how_do_i_edit_the_syllabus_description_in_a_course_57f25a87: "Comment puis-je modifier la description du programme dans un cours?"
   how_do_i_enter_and_edit_grades_in_the_gradebook_5002616f: "Comment puis-je saisir et modifier les notes dans le Carnet de notes?"
   how_do_i_find_my_courses_b826e4ce: "Comment puis-je trouver mes cours?"
   how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Comment puis-je importer un ensemble d’exportation de cours Canvas?"
@@ -10967,7 +10983,7 @@ fr-CA:
   how_do_i_use_the_pages_index_page_dafb986c: "Comment puis-je utiliser la page d’index des pages?"
   how_do_i_use_the_people_page_in_a_course_as_an_ins_b1830b46: "Comment puis-je utiliser la page des Personnes dans un cours en tant qu’instructeur?"
   how_do_i_use_the_quizzes_index_page_cc2e15d3: "Comment puis-je utiliser la page d’index des questionnaires?"
-  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Comment puis-je utiliser le plan de cours en tant qu’instructeur?"
+  how_do_i_use_the_syllabus_as_an_instructor_82f00933: "Comment puis-je utiliser le programme en tant qu’instructeur?"
   how_do_i_view_a_context_card_for_a_student_in_a_co_166c0e59: "Comment puis-je voir une carte de contexte pour un étudiant dans un cours?"
   how_do_i_view_analytics_for_an_individual_student_724134ed: "Comment puis-je voir les analyses pour un étudiant individuel?"
   how_do_i_view_and_sort_discussion_replies_as_an_in_a73217e3: "Comment puis-je voir et trier les réponses de discussion en tant qu’instructeur?"
@@ -10981,6 +10997,7 @@ fr-CA:
   html_editor_fb2ab713: "Éditeur HTML"
   html_fc8563c6: html
   http_67e238b4: "http://demo.theme-sky.com/upstore/"
+  http_response_code_832d6baa: "Réponse HTTP & #160;: %{code}"
   hungarian_fc7d30c9: Hongrois
   hungary_36_cd3e515b: "Hongrie (+36)"
   i_agree_to_the_34aa16ce: "Je suis en accord avec"
@@ -11230,6 +11247,7 @@ fr-CA:
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: "Parcours de formation et visites guidées pour les administrateurs, les enseignants et les étudiants"
   in_progress_13b9e26f: "en cours"
   in_progress_9d1ce8b9: "En cours"
+  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: "Si BigBlueButton n’est pas en mesure de répondre à vos besoins actuels ou futurs, Canvas s’associe également avec Zoom, Google Meet, Microsoft Teams et d’autres outils de vidéoconférence."
   inactive_cd40317f: inactif
   inactive_enrollments_3b84be3d: "Inscriptions inactives"
   inbox_bb245a60: "Boîte de réception"
@@ -11465,6 +11483,7 @@ fr-CA:
   ip_filter_is_not_valid_152a46d8: "Le filtre IP est non valide."
   ireland_353_3cd32cc0: "Irelande (+353)"
   irish_567e109f: Irlandaise
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " utilise une version gratuite de BigBlueButton qui fournit 10 vidéoconférences simultanées, chacune avec 1 hôte et jusqu’à 24 participants. Les enregistrements sont conservés pendant 7 jours."
   israel_972_e671df75: "Israël (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Il semble que vous avez une adresse courriel non valide : « %{addr} »"
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Il semblerait que votre contenu ne se charge pas. Vous pouvez utiliser ce bouton pour essayer de le lancer dans un nouvel onglet."
@@ -11480,6 +11499,7 @@ fr-CA:
   item_filter_ca3987d7: "Filtre de l'élément"
   item_incomplete_d6a16040: "(élément incomplet)"
   item_name_is_not_currently_supported_d0d7dcb: "%{item_name} n'est pas actuellement pris en charge"
+  item_scores_9fbfe956: "Scores de l’élément :"
   item_select_fe0f320a: "Sélection d’éléments"
   item_type_assignment_13a1132e: "Type d'élément : Tâche à faire"
   item_type_choice_aebcf2ef: "Type d'élément : Choix"
@@ -11799,7 +11819,7 @@ fr-CA:
         learning_outcomes: Acquis
         quizzes: Questionnaires
         rubrics: Barèmes
-        syllabus_body: "Corpus du plan de cours"
+        syllabus_body: "Corpus du programme"
         tool_profiles: "Profils de l'outil"
         wikis: Pages
     cc: 
@@ -12012,10 +12032,12 @@ fr-CA:
         buttons: 
           request_password: "Demander le mot de passe"
         dont_know_password: "Mot de passe oublié?"
+        error: "Une erreur s’est produite, veuillez réessayer plus tard."
         log_in: "Se connecter"
         login_handle: "Saisissez votre %{login_handle_name} et nous vous enverrons un lien pour modifier votre mot de passe."
         password: "Mot de passe"
         sending: "Envoi en cours..."
+        sent: Envoyé!
       new: 
         page_title: "Connectez-vous à Canvas"
       new_login_content: 
@@ -12147,12 +12169,13 @@ fr-CA:
   make_key_invisible_e66af89: "Rendre la clé invisible"
   make_key_visible_5c03fa34: "Rendre la clé visible"
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Activer et rendre visible les nouveaux paramètres des intégrations SIS"
-  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Rendre le résumé du cours (liste des tâches et des événements) facultatif dans le plan de cours"
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Rendre le résumé du cours (liste des tâches et des événements) facultatif dans le programme"
   make_your_course_your_own_upload_an_image_to_repre_ec57713e: |-
       Créez votre propre cours! Téléversez une image pour représenter votre
             cours, permettre aux étudiants de gérer les zones de contenu du cours et masquer
             les détails de la note des étudiants. Vous pouvez également ajuster le nom et le code du cours.
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Fait apparaître une option de lien de Lecteur immersif Microsoft (Immersive Reader) sur les pages Wiki."
+  makes_the_student_grades_page_responsive_c13e00eb: "Rends la page des notes de l’étudiant réactive."
   making_a_copy_of_original_assignment_name_8f029a9b: "Copie de « %{original_assignment_name} » en cours"
   making_a_copy_of_originalassignmentname_b7268992: "Effectuer une copie de « %{originalAssignmentName} »"
   malay_f5dddce4: Malais
@@ -12206,10 +12229,10 @@ fr-CA:
   mark_as_spam_9c613d87: "Marqué comme pourriel"
   mark_as_unread_4a413c41: "Marquer comme non lues"
   mark_done_9d81bcd9: "Marquer « terminé »"
-  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marqué comme sécuritaire ': Un administrateur a examiné cet ePortfolio et l’a jugé sécuritaire. Il est visible pour son public cible d’origine."
+  marked_as_safe_an_administrator_has_reviewed_this__4f57f42e: "'Marqué comme sécuritaire ': Un administrateur a examiné ce portefeuille électronique et l’a jugé sécuritaire. Il est visible pour son public cible d’origine."
   marked_as_safe_f7f953df: "Marqué comme sécuritaire"
   marked_as_spam_ab87846d: "Marqué comme pourriel"
-  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Considéré comme pourriel ': Un administrateur a examiné cet ePortfolio et l’a marqué comme pourriel. N’est visible que par l’auteur et les administrateurs originaux."
+  marked_as_spam_an_administrator_has_reviewed_this__9af72a8b: "'Considéré comme pourriel ': Un administrateur a examiné ce portefeuille électronique et l’a marqué comme pourriel. N’est visible que par l’auteur et les administrateurs originaux."
   marked_done_9fd646f: "Marqué « terminé »"
   masquerade_as_name_8bb004c5: "Personnification d’identité en tant que %{name}"
   masquerade_fdbc9594: "Personnification d’identité"
@@ -14265,6 +14288,7 @@ fr-CA:
   must_be_a_valid_number_59f0069: "Doit être un numéro valide"
   must_be_after_start_date_95e251a3: "doit avoir lieu après la date de départ"
   must_be_between_availability_dates_ceaca984: "doit se situer entre les dates de disponibilité"
+  must_be_between_lower_and_upper_1f501b2a: "Doit être compris entre %{lower} et %{upper}"
   must_be_logged_in_and_registered_to_perform_that_a_7e3c8785: "doit se connecter et s'enregistrer pour effectuer cette action"
   must_be_on_or_after_end_date_e4dda631: "doit avoir lieu le jour de ou après la date de fin"
   must_belong_to_a_root_account_f84323f6: "doit appartenir à un compte racine"
@@ -14383,7 +14407,7 @@ fr-CA:
   need_help_setting_up_your_course_2b763141: "Besoin d'aide pour mettre votre cours en place?"
   needs_grading_9143d47c: "Requiert une notation"
   needs_review_flagged_as_possible_spam_233657fb: "À réviser : signalé comme pourriel potentiel"
-  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'À réviser : marqué comme pourriel potentiel ': Les systèmes d’Instructure ont identifié cet ePortfolio comme un pourriel potentiel, et il doit être examiné par l’administrateur. N’est visible que par l’auteur et les administrateurs originaux."
+  needs_review_flagged_as_possible_spam_instructure__5fb1dd92: "'À réviser : marqué comme pourriel potentiel ': Les systèmes d’Instructure ont identifié ce portefeuille électronique comme un pourriel potentiel, et il doit être examiné par l’administrateur. N’est visible que par l’auteur et les administrateurs originaux."
   negative_points_fda45730: "Points négatifs"
   netherlands_31_63e4f1b9: "Hollande (+31)"
   never_df100b49: Jamais
@@ -14970,6 +14994,7 @@ fr-CA:
       format: 
         delimiter: ""
   number_between_1_and_16_inclusive_31f5468d: "nombre compris entre 1 et 16 inclus"
+  number_each_event_d934cd65: "Numéroter chaque événement"
   number_is_too_large_4da4af0a: "le chiffre est trop grand"
   number_is_too_small_618a6ca7: "le chiffre est trop petit"
   number_more_a46966: "%{number} Plus..."
@@ -15460,6 +15485,7 @@ fr-CA:
   panama_507_831fbc99: "Panama (+507)"
   paper_view_7405eeab: "Format copie"
   paraguay_595_ca58b83a: "Paraguay (+595)"
+  parameter_91ed199: Paramètres
   parameters_a13374ec: Paramètres
   parent_assignment_is_not_selected_9efb4ac1: "la tâche parent n’est pas sélectionnée"
   parent_assignment_is_selected_6a2fbca8: "la tâche parent est sélectionnée"
@@ -15581,6 +15607,7 @@ fr-CA:
   please_allow_arc_to_access_your_webcam_e72e4be4: "Veuillez laisser Arc accéder à votre webcam."
   please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Veuillez autoriser Canvas à accéder à votre microphone votre webcam."
   please_allow_canvas_to_access_your_webcam_f66bacb1: "Veuillez autoriser Canvas à accéder à votre webcam."
+  please_contact_your_lms_administrator_for_more_det_635afd97: "Veuillez contacter votre administrateur LMS pour plus de détails."
   please_create_a_group_set_8db6e8fe: "Veuillez créer un ensemble de groupes"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "Veuillez ne pas répondre à ce courriel, il ne sera pas expédié."
   please_enter_a_due_date_on_or_after_earliestdate_b3fe6d29: "Veuillez saisir une date d’échéance sur ou après %{earliestDate}"
@@ -15603,7 +15630,7 @@ fr-CA:
   please_select_an_item_30c287ef: "Veuillez sélectionner un élément"
   please_select_one_f931e883: "Veuillez sélectionner une option"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Veuillez essayer de rétablir la connexion à l’outil en sélectionnant à nouveau l’outil dans l’interface de la tâche ou d’élément de module et en l’enregistrant."
-  please_upload_files_as_a_zip_5a2c799f: "Veuillez téléverser les fichiers sous forme d'un fichier .zip"
+  please_upload_files_as_a_zip_5a2c799f: "Veuillez téléverser les fichiers sous forme d’un fichier .zip"
   please_wait_2b646bc2: "Veuillez attendre."
   please_wait_as_we_upload_and_process_your_file_73c4b5a8: "Veuillez patienter pendant le téléversement et le traitement de votre fichier."
   please_wait_e6355980: "Veuillez patienter..."
@@ -16224,6 +16251,8 @@ fr-CA:
   processing_2fcc9739: "Traitement en cours..."
   product_name: Canvas
   product_tours_1e19eb95: "Visites guidées"
+  proficiency_calculation_57f0bdf: "Calcul de compétence"
+  proficiency_calculation_parameters_5f605dec: "Paramètres de calcul de compétence"
   proficiency_rating_6346119f: "Notation de compétence"
   proficiency_rating_deleted_77827473: "Notation de compétence supprimée"
   proficiency_ratings_2bbabdcd: "Notations de compétence"
@@ -16777,6 +16806,7 @@ fr-CA:
       update_question_without_regrading: "Actualiser la question sans reclassement"
   quiz_40ee61b1: questionnaire
   quiz_assignment_overrides_cec1973b: "Surpassements de tâche de questionnaire"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Les tentatives de questionnaire dont la date de disponibilité est dépassée continueront à se soumettre automatiquement même si le délai prolongé n’a pas expiré."
   quiz_availability_dates_that_pass_during_an_attemp_d6016ff0: "Les dates de disponibilité du questionnaire qui passent au cours d’une tentative continueront de s’envoyer automatiquement même si le délai prolongé n’a pas expiré."
   quiz_duplication_not_implemented_c1495585: "duplication de questionnaire non mis en œuvre"
   quiz_e0dcce8f: Questionnaire
@@ -16853,6 +16883,7 @@ fr-CA:
            de consulter un journal de ces événements une fois l’envoi effectué.
   quiz_lti_plugin_a6256549: "Plugin de questionnaire LTI"
   quiz_menu_4fcd5e61: "Menu du questionnaire"
+  quiz_not_assigned_to_student_4b1846d5: "Questionnaire non attribué à l’étudiant"
   quiz_question_1da5198e: "Question du questionnaire"
   quiz_question_groups_bd0bb222: "Groupes de questions du questionnaire"
   quiz_questions_ecea3c40: "Questions du questionnaire"
@@ -18246,6 +18277,7 @@ fr-CA:
   responsive_global_nav_logo_99488e92: "Logo de navigation mondiale réactive"
   responsive_layout_54e4ca06: "Modèle réactif"
   responsive_misc_dc572cc0: "Divers réactifs"
+  responsive_student_grades_page_324e9c8b: "Page des notes des étudiants réactifs"
   restart_link_validation_b61286fc: "Redémarrer la validation de lien"
   restore_courses_182e162e: "Restaurer les cours"
   restored_course_association_course_c9e16045: "Association de cours restauré %{course}"
@@ -19075,6 +19107,7 @@ fr-CA:
   set_name_d14182d7: "Définir le nom..."
   set_name_f83b658: "Définir le nom"
   set_of_grading_periods_545b37e9: "Ensemble de périodes de notation"
+  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: "Définissez l’échelle de maîtrise à utiliser pour tous les cours au sein de ce compte."
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n\
       \x20           Définissez comment vos notes de compétence apparaissent dans le Carnet de notes de la maîtrise de l’apprentissage.\n\
       \x20           Ajustez le nombre de notes, le niveau de maîtrise, les points et les couleurs.\n\
@@ -20564,6 +20597,8 @@ fr-CA:
       global_support_desk_description: "Nos ASC sont votre première ligne d'assistance, et peuvent vous mettre en contact avec notre bureau d'assistance mondial pour des problèmes qui nécessiteraient de l'assistance supplémentaire."
       networking_academy_description: "Consultez les réponses de Cisco aux questions les plus fréquentes."
       networking_academy_faqs: "FAQ Networking Academy"
+      student_support: "NetAcad Soutien - Étudiant"
+      student_support_description: "Votre instructeur devrait être votre premier point de contact. Ils peuvent répondre à vos questions de Networking Academy ou contacter le soutien technique pour vous. Vous pouvez contacter votre instructeur en utilisant la fonction Boîte de réception."
       support_desk_livechat: "Dialogue en direct avec le service d’assistance"
   support_favorite_lti_tools_in_the_rce_1680436d: "Prend en charge les outils LTI préférés dans le RCE"
   svg_d5969386: SVG
@@ -20576,11 +20611,11 @@ fr-CA:
   switch_to_ea940b5b: "Passer à :"
   switch_to_group_group_name_786b913b: "Passer dans le groupe %{group_name}"
   switzerland_41_f861e414: "Suisse (+41)"
-  syllabus: "Plan de cours"
-  syllabus_course_summary_option_951a8144: "Option de sommaire du plan de cours"
-  syllabus_f191f65b: "Plan de cours"
-  syllabus_tutorial_tray_97e8ef82: "Tutoriel volant des plan de cours"
-  syllabus_visibility_options_a81ef419: "Options de visibilité du plan de cours"
+  syllabus: "Programme du cours"
+  syllabus_course_summary_option_951a8144: "Option de sommaire du cours du programme"
+  syllabus_f191f65b: Programme
+  syllabus_tutorial_tray_97e8ef82: "Tutoriel volant des programmes"
+  syllabus_visibility_options_a81ef419: "Options de visibilité du cursus"
   sync_68e5c167: Synchronisation
   sync_completed_successfully_8f68b542: "Synchronisation terminée avec succès"
   sync_grades_a16622ca: "Synchroniser les notes"
@@ -20626,7 +20661,7 @@ fr-CA:
     course_grades: "Notes du cours"
     course_settings: "Paramètres du cours"
     discussions: Discussions
-    eportfolios: ePortfolios
+    eportfolios: "Portefeuilles électroniques"
     files: Fichiers
     grades: Notes
     home: Accueil
@@ -20640,7 +20675,7 @@ fr-CA:
     quizzes: Questionnaires
     rubrics: Rubriques
     settings: Paramètres
-    syllabus: "Plan de cours"
+    syllabus: Programme
     tab_location_error: "L’emplacement de cet onglet n’est pas valide"
     tab_unmanagable_error: "%{css_class} n’est pas gérable"
     trophy_case: Présentoir
@@ -20790,7 +20825,7 @@ fr-CA:
   the_course_home_page_is_the_first_page_students_se_4dbacd35: |-
       La page d’accueil du cours est la première page que les étudiants voient lorsqu’ils ouvrent
             votre cours. La page d’accueil peut afficher le
-            flux d’activités de participation au cours, la page Modules du cours, la liste des tâches du cours, le plan de cours ou
+            flux d’activités de participation au cours, la page Modules du cours, la liste des tâches du cours, le programme ou
             une page que vous concevez comme page d’accueil.
   the_course_link_validator_searches_course_content__563fa215: "Le valideur de lien du cours effectue des recherches de contenu pour les images et les liens non valides ou inaccessibles."
   the_course_link_validator_searches_through_course__76f0bc63: "Le validateur de lien du cours explore le contenu du cours et retourne chaque lien non valide ou non-réactif qu'il rencontre. Veuillez noter que certains liens indiqués comme étant non-réactifs, sont seulement inaccessibles depuis nos serveurs et fonctionneront correctement pour les étudiants. "
@@ -20867,7 +20902,7 @@ fr-CA:
                 En vous remerciant,
                 L'équipe de soutien de Canvas
   the_message_you_sent_with_the_subject_line_subject_c9a8f654: |-
-      Le message que vous avez envoyé avec la ligne d’objet « %{subject} » n’a pas été livré. Pour répondre aux messages Canvas de ce courriel, il doit d’abord s’agir d’un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse courriel. Vous pouvez également contacter cette personne par le biais de la boîte de réception Canvas. Pour obtenir de l’aide, consultez le chapitre « Boîte de réception » pour votre rôle utilisateur dans les Guides Canvas. [Voir https://community.canvaslms.com/t5/Canvas/ct-p/canvas].
+      Le message que vous avez envoyé avec la ligne d’objet « %{subject} » n’a pas été livré. Pour répondre aux messages Canvas de ce courriel, il doit d’abord s’agir d’un canal de communication confirmé dans votre profil Canvas. Veuillez visiter votre profil et renvoyer le courriel de confirmation pour cette adresse courriel. Vous pouvez également contacter cette personne par le biais de la boîte de réception Canvas. Pour obtenir de l’aide, consultez le chapitre « Boîte de réception » pour votre rôle utilisateur dans les Guides Canvas. [Voir https://community.canvaslms.com/t5/Canvas/ct-p/canvas].
                 
                 Merci,
                 Soutien technique de Canvas
@@ -20876,6 +20911,7 @@ fr-CA:
   the_next_available_appointment_in_this_course_is_o_da10316c: "Le prochain rendez-vous disponible dans ce cours est le *%{date}*"
   the_preceding_content_is_partner_provided_d753928c: "Le contenu précédent est fourni par le partenaire"
   the_previous_sis_batch_was_aborted_d7d89955: "Le précédent lot SIS a été annulé"
+  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Le calcul de compétence a été défini par votre administrateur et s’applique à tous les cours dans ce compte."
   the_profile_picture_has_been_reported_d609d6dd: "L'image du profile a été signalée"
   the_provided_academic_benchmark_file_has_an_error_4ad2c631: "Le fichier Academic Benchmark fourni contient une erreur"
   the_question_text_for_the_question_question_name_w_3a68a2c7: "Le texte de la question « %{question_name} » était trop long."
@@ -20895,10 +20931,10 @@ fr-CA:
   the_specified_user_is_not_a_student_in_this_course_5a81d8a5: "L’utilisateur spécifié n’est pas un étudiant de ce cours"
   the_state_parameter_is_required_ffadf213: "Le paramètre d’état est obligatoire."
   the_syllabus_lets_you_welcome_your_course_users_an_ba74c779: |-
-      Le plan de cours vous permet d’accueillir les utilisateurs de votre cours et de partager vos attentes
-            avec vos étudiants. Utilisez la description du plan de cours pour clarifier les objectifs du cours, les méthodes de contact
+      Le programme vous permet d’accueillir les utilisateurs de votre cours et de partager vos attentes
+            avec vos étudiants. Utilisez la description du programme pour clarifier les objectifs du cours, les méthodes de contact
             préférées et d’autres détails, ou téléversez un PDF d’un
-            plan de cours existant. La page du plan de cours peut également afficher tous les événements et toutes les tâches
+            programme existant. La page du programme peut également afficher tous les événements et toutes les tâches
             du cours.
   the_sync_to_sis_setting_could_not_be_enabled_for_t_b2be4b66: "Impossible d’activer le paramètre Synchroniser avec SIS pour la tâche « %{assignment_name} » sans date d’échéance."
   the_term_has_ended_for_this_course_f0ab367: "Le trimestre a pris fin pour ce cours"
@@ -21056,6 +21092,7 @@ fr-CA:
   this_code_has_expired_41f76642: "Ce code a expiré."
   this_conference_may_be_recorded_f76deeeb: "Cette conférence pourrait être enregistrée."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Il n’est pas possible d’ajouter ce cours au menu des cours pour le moment."
+  this_course_cannot_be_added_to_the_courses_menu_un_c932b9c7: "Ce cours ne peut être ajouté au menu des cours que si le cours est actif."
   this_course_does_not_allow_score_uploads_4b35fe07: "Ce cours ne permet pas de téléverser les notes."
   this_course_has_concluded_7995a84c: "Ce cours est terminé"
   this_course_hasn_t_started_yet_you_will_not_be_abl_c828c423: "Ce cours n'as pas encore débuté. Vous ne pouvez pas participer à ce cours avant le %{date}."
@@ -21067,10 +21104,10 @@ fr-CA:
   this_enables_a_course_setting_to_allow_students_to_fc47219: "Cela active des paramètres de cours afin de permettre aux étudiants d’exporter le cours comme un dossier comprimé (.zip) Web hors ligne"
   this_enables_users_to_generate_and_download_course_4c69c531: "Cela permet aux utilisateurs de générer et de télécharger un cours au format ePub."
   this_environment_is_currently_being_updated_with_a_235f1875: "Cet environnement est en cours de mise à jour avec une copie des données de production les plus récentes. Veuillez revenir plus tard."
-  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Cet ePortfolio a été signalé comme pourriel possible. Jusqu’à ce qu’il ait été examiné par un administrateur, il ne sera visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
-  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Cet ePortfolio a été identifié comme un pourriel possible. Il n’est actuellement visible que par les administrateurs et l’auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire. Sinon, vous pouvez le confirmer comme pourriel."
-  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Cet ePortfolio a été identifié comme pourriel et n’est visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
-  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Cet ePortfolio a été identifié comme pourriel. Il n'est actuellement visible que par les administrateurs et l'auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire."
+  this_eportfolio_has_been_flagged_as_possible_spam__d1285994: "Ce portefeuille électronique a été signalé comme pourriel possible. Jusqu’à ce qu’il ait été examiné par un administrateur, il ne sera visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
+  this_eportfolio_has_been_identified_as_possible_sp_b5eb6605: "Ce portefeuille électronique a été identifié comme un pourriel possible. Il n’est actuellement visible que par les administrateurs et l’auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire. Sinon, vous pouvez le confirmer comme pourriel."
+  this_eportfolio_has_been_identified_as_spam_and_is_8430467: "Ce portefeuille électronique a été identifié comme pourriel et n’est visible que par vous. Veuillez contacter un administrateur si vous avez des questions."
+  this_eportfolio_has_been_identified_as_spam_it_is__f927947b: "Ce portefeuille électronique a été identifié comme pourriel. Il n'est actuellement visible que par les administrateurs et l'auteur. Si vous êtes sûr que ce contenu n’est pas du pourriel, vous pouvez le marquer comme sécuritaire."
   this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "Cette fonctionnalité permet aux enseignants de copier facilement des éléments individuels d'un cours à un autre, et de partager un seul élément de contenu avec d'autres utilisateurs afin qu'ils puissent importer ces éléments dans leurs cours également."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "Cette fonction ne peut pas être désactivée parce qu'il y a au moins un sous-compte ou cours avec cette fonction activée."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "Cette fonction ne peut pas être activée tant que la détection automatique des séparateurs de champs est activée"
@@ -22131,9 +22168,11 @@ fr-CA:
   upload_data_dc4fa4cb: "Téléverser les données"
   upload_drop_zone: 
     drop_to_upload: "Déposer les éléments à mettre en ligne"
+  upload_error_please_try_again_c6587f48: "Erreur de téléversement. Veuillez réessayer."
   upload_failed_a5dc91ec: "Échec du téléversement."
   upload_failed_quota_exceeded_ff3af659: "Téléversement a échoué, quota dépassé"
   upload_file_fd2361b8: "Téléverser le fichier"
+  upload_files_a228f20f: "Téléverser des fichiers"
   upload_files_submitted_with_assignments_to_a_speci_5b4d2df8: "Téléverser les fichiers soumis avec des tâches dans un dossier en lecture seule dédié aux envois"
   upload_gradebook_386a46c8: "Téléverser le relevé de notes"
   upload_image_6120b609: "Téléverser une image"
@@ -22654,6 +22693,7 @@ fr-CA:
   users_add_remove_observers_d1273d9: "Utilisateurs - ajouter/retirer des observateurs"
   users_add_remove_students_in_courses_efe7e748: "Utilisateurs - ajouter/retirer des étudiants dans des cours"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Utilisateurs - ajouter/retirer des enseignants, des concepteurs de cours ou des AE dans des cours."
+  users_allowed_to_edit_this_page_d6d316d0: "Utilisateurs autorisés à éditer cette page"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Les utilisateurs et les durées sont situés sur le compte, de sorte que le point d’extrémité SIS confirme toujours les autorisations de l'utilisateur en fonction du compte. Les sous-comptes disposent seulement de la propriété des cours et des sections; ils ne possèdent pas les données de l'utilisateur.
       Les administrateurs de sous-compte ne sont pas en mesure de voir l'information SIS sauf s’ils ont également un rôle d’instructeur dans un cours. Les administrateurs de sous-compte ne peuvent pas voir l'information SIS sans l’association de cours, puisque le rôle d’instructeur est également autorisé à lire les données SIS au niveau du compte.
@@ -22768,6 +22808,7 @@ fr-CA:
   waiting_for_attempted_login_6d00cb49: "En attente d’identification"
   waiting_for_change_to_complete_b75b5e8b: "En attente de changement"
   waiting_for_confirmation_to_display_qr_code_6f904d63: "En attente de confirmation pour afficher le code QR"
+  waiting_for_request_to_complete_13cf037a: "En attente de l’achèvement de la demande"
   waiting_for_selection_ce0398c7: "En attente de la sélection"
   waiting_for_your_qr_code_to_load_809299e5: "En attente du chargement de votre code QR"
   warning_6576b5b8: avertissement
@@ -22872,7 +22913,7 @@ fr-CA:
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "Lors de l'ajout de plusieurs utilisateurs, utilisez une virgule ou un saut de ligne pour séparer les utilisateurs."
   when_disabled_students_can_still_send_individual_m_567a911c: "Lorsque cette option est désactivée, les étudiants peuvent toujours envoyer des messages individuels aux enseignants, aux AE de cours et les étudiants qui appartiennent aux mêmes groupes de niveau du compte."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "Lorsque vous masquez les notes pour des tâches anonymes, les notes seront masquées pour tout le monde dans le cours. L'anonymat sera de nouveau appliqué."
-  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un plan de cours ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
+  when_people_visit_the_course_this_is_the_page_they_de94acc2: "Lorsque des internautes visitent le cours, ils voient cette page. Vous pouvez y afficher un flux d’activités, la liste des modules du cours, un programme ou une page personnalisée créée par vos soins. Par défaut, c’est le flux d’activités du cours qui est présenté."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
       Lorsque les gens visitent votre cours, ceci est la première page, qu’ils verront.
                 Nous avons configuré votre page d'accueil à Modules, mais vous avez la possibilité de la modifier.
