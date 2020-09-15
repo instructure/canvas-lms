@@ -505,7 +505,7 @@ pipeline {
                 }
               }
 
-              if((sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
+              if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
                 echo 'adding Local Docker Dev Build'
                 stages['Local Docker Dev Build'] = {
                   skipIfPreviouslySuccessful("local-docker-dev-smoke") {
