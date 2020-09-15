@@ -48,7 +48,7 @@ module Api::V1::MasterCourses
     when 'ContextExternalTool'
       course_external_tool_url(:course_id => asset.context.id, :id => asset.id)
     when 'LearningOutcome'
-      course_outcome_url(:course_id => asset.context.id, :id => asset.id)
+      course_outcome_url(:course_id => asset.context&.id || @course.id, :id => asset.id)
     when 'LearningOutcomeGroup'
       course_outcome_group_url(:course_id => asset.context.id, :id => asset.id)
     else
