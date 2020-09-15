@@ -3,7 +3,7 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
-ARG RUBY=2.6
+ARG RUBY=2.6-p6.0.4
 
 FROM busybox AS cache-helper-collect-gems
 RUN mkdir -p /tmp/dst /tmp/dst
