@@ -18,13 +18,14 @@
 
 import React from 'react'
 import PropTypes from 'prop-types'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import I18n from 'i18n!ProficiencyRating'
 import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-overlays'
 import {RadioInput} from '@instructure/ui-forms'
 import {TextInput} from '@instructure/ui-text-input'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Flex} from '@instructure/ui-flex'
 import ColorPicker, {PREDEFINED_COLORS} from '../../shared/ColorPicker'
 
 function formatColor(color) {
@@ -34,7 +35,7 @@ function formatColor(color) {
   return color
 }
 
-export default class ProficiencyRating extends React.Component {
+class ProficiencyRating extends React.Component {
   static propTypes = {
     color: PropTypes.string.isRequired,
     description: PropTypes.string.isRequired,
@@ -48,13 +49,16 @@ export default class ProficiencyRating extends React.Component {
     onMasteryChange: PropTypes.func.isRequired,
     onPointsChange: PropTypes.func.isRequired,
     points: PropTypes.string.isRequired,
-    pointsError: PropTypes.string
+    pointsError: PropTypes.string,
+    isMobileView: PropTypes.bool,
+    position: PropTypes.number.isRequired
   }
 
   static defaultProps = {
     descriptionError: null,
     focusField: null,
-    pointsError: null
+    pointsError: null,
+    isMobileView: false
   }
 
   constructor(props) {
@@ -131,93 +135,166 @@ export default class ProficiencyRating extends React.Component {
     this.props.onDelete()
   }
 
+  renderDescription = () => {
+    const {description, descriptionError, position} = this.props
+    return (
+      <div className="description">
+        <TextInput
+          width="100%"
+          messages={this.errorMessage(descriptionError)}
+          renderLabel={
+            <ScreenReaderContent>
+              {I18n.t(`Change description for proficiency rating %{position}`, {position})}
+            </ScreenReaderContent>
+          }
+          onChange={this.handleDescriptionChange}
+          inputRef={element => this.setDescriptionRef(element)}
+          defaultValue={description}
+        />
+      </div>
+    )
+  }
+
+  renderMastery = () => {
+    const {mastery, position} = this.props
+    return (
+      <div className="mastery">
+        <RadioInput
+          label={
+            <ScreenReaderContent>
+              {I18n.t(`Mastery %{mastery} for proficiency rating %{position}`, {
+                position,
+                mastery
+              })}
+            </ScreenReaderContent>
+          }
+          ref={input => (this.radioInput = input)}
+          checked={mastery}
+          onChange={this.handleMasteryChange}
+        />
+      </div>
+    )
+  }
+
+  renderPointsInput = () => {
+    const {points, pointsError, position, isMobileView} = this.props
+    return (
+      <div className="points">
+        <TextInput
+          type="text"
+          inputRef={this.setPointsRef}
+          messages={this.errorMessage(pointsError)}
+          renderLabel={
+            <ScreenReaderContent>
+              {I18n.t(`Change points for proficiency rating %{position}`, {position})}
+            </ScreenReaderContent>
+          }
+          onChange={this.handlePointChange}
+          defaultValue={I18n.n(points)}
+          width={isMobileView ? '7rem' : '4rem'}
+        />
+        <div className="pointsDescription" aria-hidden="true">
+          {I18n.t('points')}
+        </div>
+      </div>
+    )
+  }
+
+  renderColorPicker = () => {
+    const {color, position} = this.props
+    return (
+      <div className="color">
+        <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
+          <Popover.Trigger>
+            <Button ref={this.setColorRef} variant="link">
+              <div>
+                <span className="colorPickerIcon" style={{background: formatColor(color)}} />
+                <ScreenReaderContent>
+                  {I18n.t(`Change color for proficiency rating %{position}`, {position})}
+                </ScreenReaderContent>
+                <span aria-hidden="true">{I18n.t('Change')}</span>
+              </div>
+            </Button>
+          </Popover.Trigger>
+          <Popover.Content>
+            <ColorPicker
+              parentComponent="ProficiencyRating"
+              colors={PREDEFINED_COLORS}
+              currentColor={formatColor(color)}
+              isOpen
+              hidePrompt
+              nonModal
+              hideOnScroll={false}
+              withAnimation={false}
+              withBorder={false}
+              withBoxShadow={false}
+              withArrow={false}
+              focusOnMount={false}
+              afterClose={this.handleMenuClose}
+              setStatusColor={this.setColor}
+            />
+          </Popover.Content>
+        </Popover>
+      </div>
+    )
+  }
+
+  renderDeleteButton = () => {
+    const {disableDelete, position} = this.props
+    return (
+      <div className="deleteButton">
+        <IconButton
+          withBackground={false}
+          withBorder={false}
+          disabled={disableDelete}
+          elementRef={this.setTrashRef}
+          onClick={this.handleDelete}
+          renderIcon={<IconTrashLine />}
+          screenReaderLabel={I18n.t(`Delete proficiency rating %{position}`, {position})}
+        />
+      </div>
+    )
+  }
+
   errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
-    const {
-      color,
-      description,
-      descriptionError,
-      disableDelete,
-      mastery,
-      points,
-      pointsError
-    } = this.props
+    const {isMobileView} = this.props
     return (
-      <tr>
-        <td style={{textAlign: 'center', verticalAlign: 'top', padding: '1.1rem 0 0 0'}}>
-          <div style={{display: 'inline-block'}}>
-            <RadioInput
-              ref={input => {
-                this.radioInput = input
-              }}
-              label={<ScreenReaderContent>{I18n.t('Change mastery')}</ScreenReaderContent>}
-              checked={mastery}
-              onChange={this.handleMasteryChange}
-            />
-          </div>
-        </td>
-        <td className="description" style={{verticalAlign: 'top'}}>
-          <TextInput
-            ref={this.setDescriptionRef}
-            renderLabel={<ScreenReaderContent>{I18n.t('Change description')}</ScreenReaderContent>}
-            messages={this.errorMessage(descriptionError)}
-            onChange={this.handleDescriptionChange}
-            defaultValue={description}
-          />
-        </td>
-        <td className="points" style={{verticalAlign: 'top'}}>
-          <TextInput
-            ref={this.setPointsRef}
-            renderLabel={<ScreenReaderContent>{I18n.t('Change points')}</ScreenReaderContent>}
-            messages={this.errorMessage(pointsError)}
-            onChange={this.handlePointChange}
-            defaultValue={I18n.n(points)}
-            width="4rem"
-          />
-        </td>
-        <td className="color" style={{verticalAlign: 'top'}}>
-          <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
-            <Popover.Trigger>
-              <Button ref={this.setColorRef} variant="link">
-                <div>
-                  <span className="colorPickerIcon" style={{background: formatColor(color)}} />
-                  {I18n.t('Change')}
-                </div>
-              </Button>
-            </Popover.Trigger>
-            <Popover.Content>
-              <ColorPicker
-                parentComponent="ProficiencyRating"
-                colors={PREDEFINED_COLORS}
-                currentColor={formatColor(color)}
-                isOpen
-                hidePrompt
-                nonModal
-                hideOnScroll={false}
-                withAnimation={false}
-                withBorder={false}
-                withBoxShadow={false}
-                withArrow={false}
-                focusOnMount={false}
-                afterClose={this.handleMenuClose}
-                setStatusColor={this.setColor}
-              />
-            </Popover.Content>
-          </Popover>
-          <div className="delete">
-            <Button
-              disabled={disableDelete}
-              buttonRef={this.setTrashRef}
-              onClick={this.handleDelete}
-              variant="icon"
-              icon={<IconTrashLine />}
-            >
-              <ScreenReaderContent>{I18n.t('Delete proficiency rating')}</ScreenReaderContent>
-            </Button>
-          </div>
-        </td>
-      </tr>
+      <Flex
+        padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}
+        width="100%"
+        alignItems={isMobileView ? 'center' : 'start'}
+      >
+        <Flex.Item textAlign="center" padding="0 medium 0 0" size={isMobileView ? '25%' : '15%'}>
+          {this.renderMastery()}
+        </Flex.Item>
+        <Flex.Item padding="0 small 0 0" size={isMobileView ? '75%' : '40%'} align="start">
+          {this.renderDescription()}
+          {isMobileView && (
+            <>
+              {this.renderPointsInput()}
+              <div className="mobileRow">
+                {this.renderColorPicker()}
+                {this.renderDeleteButton()}
+              </div>
+            </>
+          )}
+        </Flex.Item>
+        {!isMobileView && (
+          <>
+            <Flex.Item size="15%" padding="0 small 0 0" align="start">
+              {this.renderPointsInput()}
+            </Flex.Item>
+            <Flex.Item>{this.renderColorPicker()}</Flex.Item>
+            <Flex.Item size="10%" padding="0 small 0 small">
+              {this.renderDeleteButton()}
+            </Flex.Item>
+          </>
+        )}
+      </Flex>
     )
   }
 }
+
+export default ProficiencyRating

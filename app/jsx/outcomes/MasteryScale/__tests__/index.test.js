@@ -140,7 +140,7 @@ describe('MasteryScale', () => {
       </MockedProvider>
     )
     await wait()
-    expect(getByText('Proficiency Rating')).not.toBeNull()
+    expect(getByText('Mastery')).not.toBeNull()
   })
 
   describe('update outcomeProficiency', () => {

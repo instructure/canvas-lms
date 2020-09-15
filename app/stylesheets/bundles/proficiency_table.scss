@@ -10,12 +10,79 @@
   vertical-align: text-top;
 }
 
+.mastery {
+  @include desktop-only {
+    padding-#{direction(left)}: 16px;
+    padding-top: 10px;
+  }
+}
+
 .delete {
   display: inline-block;
   margin-#{direction(left)}: 20px;
+  @include mobile-only {
+    margin-#{direction(left)}: 0px;
+
+  }
 }
 
 .save {
   padding: 0.75rem 0 0;
   text-align: direction(right);
+}
+
+.points {
+  display: inline-block;
+  @include mobile-only {
+    float: direction(left);
+    display: flex;
+    padding-top: 12px;
+    width:100%;
+  }
+  @include desktop-only {
+    * {
+      // we want any warnings or text rendered from the TextInput component
+      // to not wrap
+      white-space: nowrap;
+    }
+  }
+}
+
+.color {
+  display: inline-block;
+  @include mobile-only {
+    float: direction(left);
+  }
+  @include desktop-only {
+    margin-#{direction(left)}: -10px;
+  }
+}
+
+.pointsDescription {
+  display: none;
+  @include mobile-only {
+    display: inline-block;
+    padding-#{direction(left)}: 8px;
+    padding-top: 6px;
+  }
+}
+
+.header {
+  font-weight:bold;
+}
+
+.deleteButton {
+  display: inline-block;
+  @include mobile-only {
+    margin-#{direction(right)}: -8px;
+  }
+}
+
+.mobileRow {
+  @include mobile-only {
+    margin-#{direction(left)}: -22px;
+    padding-top: 12px;
+    justify-content: space-between;
+    display: flex;
+  }
 }
