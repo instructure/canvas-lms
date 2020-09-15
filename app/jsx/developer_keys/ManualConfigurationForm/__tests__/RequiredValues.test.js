@@ -102,3 +102,11 @@ it('is invalid when the public JWK is missing a field', () => {
   expect(wrapper.instance().valid()).toEqual(false)
   expect(flashError).toHaveBeenCalled()
 })
+
+it('is valid if the public JWK is empty but a URL is given', () => {
+  const flashError = jest.fn()
+  const public_jwk = {}
+  const public_jwk_url = 'https://www.instructure.com/public_key_url'
+  const wrapper = mount(<RequiredValues {...props({public_jwk, flashError, public_jwk_url})} />)
+  expect(wrapper.instance().valid()).toEqual(true)
+})
