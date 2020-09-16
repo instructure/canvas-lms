@@ -2043,7 +2043,7 @@ ja:
   allow_in_mastery_paths_5332c786: 熟練の過程で許可
   allow_include_parameters_bf3d3230: "「パラメーターを含める」を許可する "
   allow_intra_group_peer_reviews_53f1e455: グループ内ピアレビューを許可する
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       ライブイベント購読が
       HTTPS webhooksを介して配信されるように設定できるようにします
   allow_lor_tools: "LOR 用に設定された外部ツールの表示および使用をユーザに許可します。"
@@ -2077,7 +2077,7 @@ ja:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "ユーザーがコースの人物のページのユーザー SIS ID を表示できるようにします。"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: アカウントレベルの習熟度スケールと熟練度の計算ができるようにし、結果ごとのスケールを置き換える
   allows_admin_user_to_view_account_statistics_341f00d9: 管理者ユーザーがアカウントの統計情報を表示できるようにします。
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       管理者が最近実行されたすべての
       GraphQL突然変異に関する情報を含むログを表示できます。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: 結果をスコアのないコンテンツに合わせることができます
@@ -2427,7 +2427,7 @@ ja:
   allows_users_to_edit_conferences_2d3c960c: ユーザーが会議を編集できるようにします。
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "ユーザーは、コース設定ページのコース用 「受講生グループ別にフィルタリングした SpeedGrader の開始」オプションを有効にすることができます。有効になており、また受講生グループが新成績帳で選択されている場合、 SpeedGrader は、選択したグループの受講生のみ読み込みます。"
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: ユーザーがコースレベルの粒度で通知をミュートできるようにします。
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       ユーザーがコースごとに特定の通知設定を上書きできるように
       します。
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: ユーザーが、ユーザーインターフェイスに表示されるときに名前の後に表示される代名詞を選択できるようにします。
@@ -8141,7 +8141,7 @@ ja:
     save_settings: 設定の保存
     saving: 保存しています...
   different_course_b875770e: 異なるコース
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       システム生成とユーザー生成のライブイベントを区別する
       （Canvas データサービス内で）
   differentiated_assignments_description: |-
@@ -8176,7 +8176,7 @@ ja:
   disabled_links_b3bdea99: 無効のリンク
   disabled_not_visible_to_students_2c9d693f: 無効になっています。受講生には非表示。
   disabled_not_visible_to_students_48d4a90d: 無効になっています。受講生には非表示
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       お知らせと成績の変更を除くすべてのタイプの SMS 通知を
       無効化します。
   disabling_f594bda: 無効中...
@@ -8578,10 +8578,10 @@ ja:
   display_totals_for_all_grading_periods_option_4a72586: すべての採点期間の合計を表示するオプション
   display_values_f517c73c: 表示値
   displaying_to_students_b1e92058: 受講生へ表示中
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       コースでリンクバリデータを実行し、問題が見つからなかった講師に
       紙吹雪を表示します。
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       設定された期日
       より前に課題を提出するユーザーには紙吹雪を表示します。
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -8930,7 +8930,7 @@ ja:
   el_salvador_503_b0907d30: エルサルバドル（+503）
   element_option_missing_error_an_element_to_attach__be433478: "`element` オプションの欠落エラー: BBTreeBrowserView で render オプションを true に設定するときは、TreeBrowserView に添付する要素を指定する必要があります"
   elementary_friendly_theme_font_and_limited_course__4dc48217: 小学生向けのテーマフォントと、限定的なコースナビゲーション。
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       初級向けのテーマ、フォント、限定されたコースナビゲーション。
       フォントの更新は、ラテン文字を使用する言語にのみ適用されます。
   email: 
@@ -11899,7 +11899,7 @@ ja:
   idp_logoutresponse_xml_fe65de19: IdPLogoutResponseXML
   idp_metadata_uri_dae5314a: "IdP メタデータ URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: 属性が「準備のみ」としてマークされている場合、「時間通りのプロビジョニング」が新規ユーザーを作成したときのみ使われます。属性はユーザーがログインする度に更新されません。
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       プレースメントで構成されたLTIツールがインストールされている場合、
       課題提出タイプドロップダウンに新しいエントリが表示され、ツールの課題を迅速に構成できます
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "成績 - 編集と成績 - 両方の成績が表示されない場合、グレードブックはコースナビゲーションで非表示となります。"
@@ -11921,7 +11921,7 @@ ja:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: 無効にしても、ユーザーは引き続きコース設定にアクセスできます。ユーザーは、そのコンテンツアイテムに対する適切な許可なしに、個々のコースの内容を管理することはできません。コースの表示がコースに登録されているユーザーに限定されている場合、この権限により、ユーザーはコースに登録されていなくてもコースの内容を表示できるようになります。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "有効にすると、LTI 1.3およびLTI Advantage へのアクセスが有効になります。"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 有効にすると、結果の最大可能スコア以上が規定で許可されます。
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       有効にすると、Canvas はツールがコースモジュールページで、1つのリクエストで複数のコンテンツアイテムを
       返すことを許可します
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "有効にすると、Common CartridgeインポータがHTMLファイルをページに変換します"
@@ -11931,7 +11931,7 @@ ja:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 有効である場合、必須条件の１つを満たした際、モジュールに完了と表示する選択ができます。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "有効にすると、'oauth2_access_token_url' がLTI2登録の開始時に送信されます"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "有効にすると、LTI ツールで OAuth 1.0a 署名を使用してメンバーシップサービ スAPI にアクセスできます"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       有効にした場合、oEmbedエンドポイントは、
       oEmbedリソース要求の発信元を確認するために、
       ツールが生成したトークンを要求します。
@@ -11942,14 +11942,14 @@ ja:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "有効にすると、Quizzes.Next クイズの送信履歴が別々に処理されます。"
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: このオプションを有効にすると、スコアリングされない規定が表示されます。
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: 有効にすると、親のサインアップフォームでは、子のユーザー名とパスワードの代わりに受講生のペアリングコードが必要になります
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       有効になっている場合、サイト管理者の開発者キーのUIは    
       サイト管理者の開発者キーのみを表示します。これは、
       ルートアカウントがサイト管理者アカウントと
       同じシャードにあるCanvasインスタンスにのみ影響することに注意してください。他のインスタンスの動作はすでに
       このように動作していました。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "有効な場合、ユーザは LTI 2 ツールを設定できます。"
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       有効な場合、Lti :: ToolProxyが作成されると、
       課題ではなく、
       toolinに直接ライブイベントサブスクリプションが作成されます。これにより、
@@ -11959,7 +11959,7 @@ ja:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: (ユーザが選択されていない場合は、すべてのサブアカウントのユーザに送信されます)
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: （何も選択されていない場合、サブアカウント全体の全員に表示）
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: （何も選択されていない場合は、アカウント全体の全員に表示）
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       RCE 機能強化も有効になっている場合、
       RCE が作業を自動で保存します
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: 設定されている場合、採点期間終了時に、課題のSISへの掲載機能をオフにします。「新しいSIS統合設定を有効にする」機能が有効な場合にのみ適用されます。
@@ -21483,7 +21483,7 @@ ja:
   short_name_ad9bf84f: 省略名
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "レポーティングユーザのCanvas IDを自明する必要があります。"
   show_76c0ed1c: 表示
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       青写真コースとの関連付けと同期化を行った後で、アカウント管理者が自動的に
       コースを公開できるようにするオプションのチェックボックスを表示します
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: Canvasグローバルナビゲーションに最近アクセスしたページのリストを表示します
@@ -21534,7 +21534,7 @@ ja:
   show_originality_report_to_students_be22f5ee: 受講生に独創性レポートを表示する
   show_params_3401895b: パラメータを表示する
   show_past_account_level_announcements_to_users_3b8208e2: 過去のアカウントレベルのお知らせをユーザーに表示します
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       過去のアカウントレベルのお知らせをユーザーに表示します。
       ユーザーに、終了した、または却下されたアナウンスを表示できるようにします。
   show_question_details_b059df00: 問題の詳細情報の表示
@@ -23926,7 +23926,7 @@ ja:
   updated_permissions_page_f2e91060: 更新された権限ページ
   updated_terms_of_service_82f34148: 更新された利用規約
   updated_ui_for_searching_and_displaying_users_and__6755e08e: アカウント内のユーザーとコースを検索、表示するためにUIを更新する。
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       アカウント通知設定UIを最新
       かつアップデートされたユーザーエクスペリエンスに更新します
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "[新しい成績表の割り当て]列ヘッダーの投稿ポリシーアイコンの表示を更新します。"

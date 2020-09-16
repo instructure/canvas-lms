@@ -2070,7 +2070,7 @@ pl:
   allow_in_mastery_paths_5332c786: "Zezwól na ścieżki mistrzowskie"
   allow_include_parameters_bf3d3230: "Zezwalaj na parametry włączenia "
   allow_intra_group_peer_reviews_53f1e455: "Zezwalaj na wewnątrzgrupowe kontrole"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Zezwalaj na ustawienie subskrypcji Live Event jako dostarczanej 
       przez webhooki HTTPS
   allow_lor_tools: "Zezwól użytkownikom na przeglądanie i korzystanie z zewnętrznych narzędzi skonfigurowanych z LOR."
@@ -2104,7 +2104,7 @@ pl:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Pozwala użytkownikowi na wyświetlanie SIS ID na stronie kursu Ludzie."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Zapewnia skale nauki i obliczenia kompetencji na poziomie konta, zastępując skale wg wyniku"
   allows_admin_user_to_view_account_statistics_341f00d9: "Pozwala administratorowi na wyświetlanie statystyki konta."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Pozwala administratorom wyświetlać dziennik z informacjami o wszystkich ostatnio uruchamianych 
       mutacjach GraphQL
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Umożliwia dostosowanie wyników do zawartości niepodlegającej ocenie"
@@ -2452,7 +2452,7 @@ pl:
   allows_users_to_edit_conferences_2d3c960c: "Pozwala użytkownikom na edytowanie konferencji."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Zezwól użytkownikom na włączenie opcji \"Uruchom SpeedGrader filtrowane wg grupy uczestników\" dla kursów na stronie ustawień kursu. Jeśli ta opcja jest włączona, a w nowym dzienniku ocen wybrano nową grupę uczestników, SpeedGrader wczyta tylko uczestników z wybranej grupy."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Pozwala użytkownikom wyciszać powiadomienia na szczegółowym poziomie kursu."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Pozwala użytkownikom obchodzić określone preferencje dot. powiadomień
       wg kursu.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Umożliwia użytkownikom wybór zaimków, które zostaną wyświetlone za ich nazwiskiem na interfejsie użytkownika."
@@ -8333,7 +8333,7 @@ pl:
     save_settings: "Zapisz ustawienia"
     saving: "Trwa zapisywanie..."
   different_course_b875770e: "inny kurs"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Rozróżniaj między zdarzeniami na żywo generowanymi przez użytkowników i system
        w narzędziu Canvas Data Services
   differentiated_assignments_description: |-
@@ -8368,7 +8368,7 @@ pl:
   disabled_links_b3bdea99: "Wyłączone linki"
   disabled_not_visible_to_students_2c9d693f: "Wyłączono. Niewidoczne dla uczestników."
   disabled_not_visible_to_students_48d4a90d: "Wyłączono. Niewidoczne dla uczestników"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Wyłącza powiadomienia SMS dla wszystkich typów z wyjątkiem ogłoszeń i
       zmiany ocen.
   disabling_f594bda: Wyłączanie...
@@ -8783,10 +8783,10 @@ pl:
   display_totals_for_all_grading_periods_option_4a72586: "Wyświetlaj wartości łączne dla opcji Wszystkie okresy oceniania"
   display_values_f517c73c: "Wyświetl wartości"
   displaying_to_students_b1e92058: "Wyświetlanie uczestnikom"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Wyświetla confetti dla nauczycieli, którzy w ramach walidacji linków w
       kursie nie odnajdują błędów.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Wyświetla confetti dla użytkowników, którzy oddali zadanie
       przed terminem.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Dystrybucja bieżących ocen w kursach między wszystkimi uczestnikami zapisanymi na kursy w działach"
@@ -9137,7 +9137,7 @@ pl:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Błąd braku opcji `element`: element, do którego ma być dołączony widok TreeBrowserView musi zostać określony podczas ustawiania opcji renderowania na wartość 'true' dla widoku BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Podstawowe przyjazne czcionki i motywy oraz ograniczona nawigacja w kursie"
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Podstawowe przyjazne czcionki i motywy oraz ograniczona nawigacja w kursie.
       Aktualizacja czcionek dotyczy tylko języków, które wykorzystują alfabet łaciński.
   email: 
@@ -12158,7 +12158,7 @@ pl:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Jeżeli właściwość jest oznaczona wyłącznie jako zastrzeżona, będzie wykorzystywana tylko jeśli Czasowe Zastrzeżenie utworzy nowego użytkownika i nie będzie aktualizowana przy każdym logowaniu danego użytkownika."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Jeśli zainstalowano narzędzie LTI skonfigurowane z lokalizacją, wyświetlony zostanie nowy zapis w liście rozwijanej typu lokalizacji zadania
       , co pozwala szybko skonfigurować zadanie dla narzędzia.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Jeśli wyłączone są uprawnienia Oceny - Edytuj oraz Oceny - Wyświetl wszystkie oceny, to Dziennik ocen będzie ukryty w strukturze nawigacyjnej kursu."
@@ -12180,7 +12180,7 @@ pl:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "W przypadku wyłączenia, użytkownik nadal ma dostęp do Ustawień kursu. Użytkownik nie może zarządzać zawartością poszczególnych kursów bez odpowiedniego uprawnienia dla tego elementu zawartości. Jeśli widoczność kursu zostanie ograniczona do użytkowników zapisanych na kurs, dzięki temu uprawnieniu użytkownik może wyświetlać zawartość kursu bez zapisywania się na kurs."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Jeśli zostało włączone, dostęp do LTI 1.3 i LTI Advantage będzie możliwy."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "W przypadku włączenia, umożliwia wystawienie wyższej oceny niż maksymalna w rubryce wyników."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Jeśli funkcja jest włączona, Canvas pozwoli narzędziom zwracać wiele elementów zawartości
       w ramach jednego żądania na stronie modułów kursu
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Importery Common Cartridge, o ile są włączone, skonwertują pliki HTML na strony"
@@ -12190,7 +12190,7 @@ pl:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Jeśli opcja jest włączona, moduły można oznaczyć jako zakończone nawet wtedy, gdy tylko jeden warunek został spełniony."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Po włączeniu 'oauth2_access_token_url' zostanie wysłane w pakiecie uruchomienia rejestracji LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jeśli zostanie włączone, do korzystania z interfejsu Membership Service API, przez narzędzia LTI może być używany podpis OAuth 1.0a"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Jeśli funkcja jest włączona, punkty końcowe oEmbed będą
        wymagać wygenerowanego przez narzędzie tokena w celu sprawdzenia 
       żądania dot. zasobu oEmbed.
@@ -12201,14 +12201,14 @@ pl:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Jeśli ta opcja jest włączona, historia przesyłek do testów Quizzes.Next jest zarządzana oddzielnie."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Po włączeniu opcja zostanie przedstawiona tak, jakby nie posiadała rubryk z ocenami."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "W przypadku włączenia tej funkcji, w formularzu zapisu rodzica będzie wymagany kod parowania uczestnika dla nazwy użytkownika i hasła dziecka"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Włączenie tej funkcji powoduje, że tylko interfejs kluczy programisty administratora witryny będzie wyświetlać
       te klucze. Uwaga: ma to wpływ tylko na te
       instancje Canvas, w których konta główne są w tym samym obszarze (shard)
       co konto administratora witryny. Działanie w innych instancjach
       już się zmieniło w ten sposób.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "W przypadku włączenia tej opcji użytkownicy będą mogli skonfigurować narzędzia LTI 2."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       W przypadku włączenia, o ile dostępne jest Lti::ToolProxy, funkcja ta spowoduje
       utworzenie subskrypcji wydarzeń na żywo w narzędziu
       zamiast zadania. Na skutek tego wydarzenia zostaną
@@ -12218,7 +12218,7 @@ pl:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(jeśli nie wybrano, prześlij wszystkim w całym subkoncie)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(jeśli nie wybrano, pokaż wszystkim w całym subkoncie)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(jeśli nie wybrano, pokaż wszystkim w całym koncie)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Jeśli ulepszenia RCE są włączone,
       RCE automatycznie zapisze Twoją pracę na bieżąco
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Funkcja ta pozwala wyłączyć publikowanie w SIS zadań, gdy ich okres oceniania zostanie zamknięty. Dotyczy tylko sytuacji, w której funkcja \"Włącz nowe ustawienia integracji SIS\" jest aktywna."
@@ -21924,7 +21924,7 @@ pl:
   short_name_ad9bf84f: "krótka nazwa"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "powinno być oczywiste, canvas ID użytkownika zgłaszającego"
   show_76c0ed1c: Pokaż
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Wyświetla pole wyboru, które pozwala administratorowi konta publikować kursy
       automatycznie po powiązaniu i zsynchronizowaniu ich z kursem Blueprint
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Pokaż listę ostatnio odwiedzonych stron w globalnej strukturze nawigacji Canvas"
@@ -21975,7 +21975,7 @@ pl:
   show_originality_report_to_students_be22f5ee: "Pokaż raport oryginalności uczestnikom"
   show_params_3401895b: "Pokaż parametry"
   show_past_account_level_announcements_to_users_3b8208e2: "Pokaż użytkownikom wcześniejsze ogłoszenia na poziomie konta"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Pokaż użytkownikom wcześniejsze ogłoszenia na poziomie konta. Zezwól
       użytkownikowi wyświetlać ogłoszenia, które wygasły lub są odrzucone.
   show_question_details_b059df00: "Wyświetl informacje szczegółowe pytania"
@@ -24396,7 +24396,7 @@ pl:
   updated_permissions_page_f2e91060: "Zaktualizowana strona zezwoleń"
   updated_terms_of_service_82f34148: "Zaktualizowane Warunki korzystania z usługi"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Zaktualizowany IU do wyszukiwania i wyświetlania użytkowników i kursów w ramach konta."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Aktualizuje UI preferencji dot. powiadomień na poziomie konta, oferując bardziej
        nowoczesną obsługę
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Aktualizuje wyświetlanie ikony Zasad publikowania w nagłówku kolumny zadań Nowego dziennika ocen."

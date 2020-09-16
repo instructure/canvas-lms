@@ -1799,7 +1799,7 @@ cy:
   allow_in_mastery_paths_5332c786: "Caniatáu mewn llwybrau meistroli"
   allow_include_parameters_bf3d3230: "Caniatáu Cynnwys Paramedrau "
   allow_intra_group_peer_reviews_53f1e455: "Caniatáu adolygiadau gan gyd-fyfyrwyr o fewn y grŵp"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Caniatáu i Danysgrifio i Ddigwyddiad Byw gael ei osod fel ei fod yn cael ei ddarparu
       drwy fachau gwe HTTPS
   allow_lor_tools: "Gadael i ddefnyddwyr weld a defnyddio adnoddau allanol sydd wedi’u ffurfweddu ar gyfer LOR."
@@ -1832,7 +1832,7 @@ cy:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Yn gadael i ddefnyddiwr weld ID SIS defnyddiwr ar dudalen Pobl cwrs."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Yn caniatáu cyfrifiadau medrusrwydd a graddfeydd meistroli lefel y cyfrif, yn lle graddfeydd deilliannau"
   allows_admin_user_to_view_account_statistics_341f00d9: "Yn gadael i ddefnyddiwr gweinyddol weld ystadegau cyfrif."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Yn caniatáu i weinyddwyr weld log yn cynnwys gwybodaeth am yr holl newidiadau
       GraphQL sydd wedi'u rhedeg yn ddiweddar
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Yn caniatáu cysoni deilliannau cynnwys sydd ddim yn cadw sgôr"
@@ -2177,7 +2177,7 @@ cy:
   allows_users_to_edit_conferences_2d3c960c: "Yn gadael i ddefnyddiwr olygu Cynadleddau."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Mae'n gadael i ddefnyddwyr alluogi'r opsiwn \"Lansio SpeedGrader Hidlo yn ôl Grŵp Myfyrwyr\" ar gyfer cyrsiau ar y dudalen gosodiadau cwrs. Pan fo'n weithredol a bod grŵp myfyrwyr wedi cael ei ddewis yn y Llyfr Graddau Newydd, bydd SpeedGrader ond yn llwytho myfyrwyr yn y grŵp dan sylw."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Yn gadael i ddefnyddwyr dewi hysbysiadau ar lefel y cwrs."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Yn gadael i ddefnyddwyr ddiystyru dewisiadau penodol ar gyfer hysbysiadau
       fesul cwrs.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Mae'n gadael i ddefnyddwyr ddewis y rhagenwau fydd yn ymddangos ar ôl eu henwau pan fyddan nhw i'w gweld yn y rhyngwyneb defnyddiwr."
@@ -7293,7 +7293,7 @@ cy:
     save_settings: "Cadw Gosodiadau"
     saving: "Wrthi’n cadw..."
   different_course_b875770e: "cwrs gwahanol"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Gwahaniaethu rhwng digwyddiadau byw sy’n cael eu creu gan systemau ac sy’n cael eu creu gan ddefnyddwyr
       yn yr adnodd Gwasanaethau Data Canvas
   diigo_993c4646: Diigo
@@ -7324,7 +7324,7 @@ cy:
   disabled_links_b3bdea99: "Dolenni wedi’u hanalluogi"
   disabled_not_visible_to_students_2c9d693f: "Wedi analluogi. Ddim i'w weld gan fyfyrwyr."
   disabled_not_visible_to_students_48d4a90d: "Wedi analluogi. Ddim i'w weld gan fyfyrwyr"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Yn analluogi hysbysiadau SMS ar gyfer pob math heblaw am gyhoeddiadau a
       newidiadau i raddau.
   disabling_f594bda: "Wrthi’n analluogi..."
@@ -7682,10 +7682,10 @@ cy:
   display_totals_for_all_grading_periods_option_4a72586: "Dangos y cyfanswm ar gyfer yr opsiwn Pob Cyfnod Graddio"
   display_values_f517c73c: "Dangos Gwerthoedd"
   displaying_to_students_b1e92058: "Arddangos i Fyfyrwyr"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Yn dangos conffeti ar gyfer athrawon sy’n rhedeg y dilysydd dolenni ar
       gwrs lle nad oes problemau’n cael eu canfod.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Yn dangos conffeti i ddefnyddwyr sy’n cyflwyno aseiniad cyn
       y dyddiad erbyn sydd wedi’i osod.
   district_id_6f408184: "ID Ardal"
@@ -7997,7 +7997,7 @@ cy:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Gwall opsiwn `element` ar goll: Mae’n rhaid nodi elfen i atodi TreeBrowserView wrth osod y nodwedd rendro ar yr opsiwn 'gwir’ ar gyfer BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Ffont thema sylfaenol-gyfeillgar a defnydd cyfyngedig o’r ddewislen crwydro’r cwrs."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Ffont thema sylfaenol-gyfeillgar a defnydd cyfyngedig o’r ddewislen crwydro’r cwrs.
       Dydy’r diweddariad ffont ddim ond yn berthnasol i ieithoedd sy’n defnyddio’r Wyddor Ladin.
   email: 
@@ -10254,7 +10254,7 @@ cy:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP URI Metadata"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Os yw priodoledd wedi’i marcio fel un darparu yn unig, dim ond pan fydd Darpariaeth Cyn Pen Dim yn creu defnyddiwr newydd y bydd yn cael ei defnyddio, ac ni fydd yn cael ei diweddaru bob tro y bydd y defnyddiwr yn mewngofnodi."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Os oes adnodd LTI sydd wedi’i ffurfweddu â’r lleoliad wedi cael ei osod, bydd cofnod newydd yn ymddangos yn y
       gwymplen math o aseiniad er mwyn ffurfweddu aseiniad yr adnodd yn gyflym
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Os yw’r adran Graddau - golygu a’r adran Graddau - gweld pob gradd wedi’u hanalluogi, bydd y Llyfr Graddau wedi’i guddio o’r ddewislen crwydro’r cwrs."
@@ -10276,7 +10276,7 @@ cy:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Os yw wedi’i analluogi, bydd defnyddwyr yn dal i gael mynediad at Osodiadau’r Cwrs. Does dim modd i ddefnyddiwr reoli cynnwys cyrsiau unigol heb yr hawl priodol ar gyfer yr eitem cynnwys honnw. Os yw'r opsiwn i weld cwrs wedi'i gyfyngu i ddefnyddwyr sydd wedi ymrestru ar y cwrs, mae'r hawl hwn yn gadael i'r ddefnyddiwr weld cynnwys y cwrs heb orfod bod wedi ymrestru ar y cwrs."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Os yw wedi’i alluogi, bydd mynediad at LTI 1.3 ac LTI Advantage wedi’i alluogi."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Os yw’r nodwedd hon wedi’i galluogi, bydd yn bosib rhoi mwy na’r sgôr uchaf posib ar gyfer Deilliant mewn cyfarwyddyd sgorio."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Os yw wedi’i alluogi, bydd Canvas yn gadael i adnoddau ddychwelyd mwy nag un eitem cynnwys
       mewn un cais ar dudalen fodiwlau’r cwrs
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Os yw’r nodwedd hon wedi’i galluogi, bydd mewngludwyr Common Cartridge yn gallu trosi ffeiliau HTML yn Dudalennau"
@@ -10284,7 +10284,7 @@ cy:
   if_enabled_copyright_and_license_information_must__2a551827: "Os yw’r nodwedd hon wedi’i galluogi, bydd yn rhaid darparu gwybodaeth am hawlfraint a thrwydded ar gyfer ffeiliau cyn eu cyhoeddi."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Os yw wedi’i alluogi, bydd opsiynau rheoli allweddi datblygwyr a sgôp tocynnau yn cael eu defnyddio."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Os yw’r nodwedd hon wedi’i galluogi, mae’n bosib y bydd adnoddau LTI yn defnyddio llofnod OAuth 1.0a i gael mynediad at API y Gwasanaeth Aelodaeth"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Os ydyn nhw wedi’u galluogi, bydd pwyntiau gorffen oEmbed angen
       tocyn wedi’i greu gan adnodd i wirio tarddiad
       cais am adnodd oEmbed.
@@ -10295,13 +10295,13 @@ cy:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Os yw’r nodwedd hon wedi’i galluogi, mae’r hanes cyflwyno ar gyfer cwisiau Quizzes.Next yn cael ei nodi ar wahân."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Os yw wedi’i alluogi, bydd modd dewis cyfarwyddiadau sgorio sydd ddim yn cadw sgôr."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Os yw wedi’i alluogi, bydd angen cod paru myfyriwr ar gyfer ffurflen cofrestru rhieni yn lle enw defnyddiwr a chyfrinair y plentyn"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Os wedi’i alluogi, bydd UI allwedd datblygu gweinyddwr y safle dim ond yn dangos
       allweddi datblygu gweinyddwr y safle. Nodwch fod hyn ond yn effeithio ar achosion
       Canvas ble mae cyfrifon gwraidd ar yr un darn
       â chyfrif gweinyddwr y safle. Roedd ymddygiad mewn achosion eraill
       eisoes yn ymddwyn fel hyn.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Os yw wedi’i alluogi, pan fo Lti::ToolProxy yn cael ei greu, bydd yn
       creu y tanysgrifiad digwyddiad byw yn uniongyrchol ar yr adnodd
       yn hytrach na’r aseiniad. Bydd hyn yn achosi i ddigwyddiadau gael eu
@@ -10311,7 +10311,7 @@ cy:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Os nad oes dim byd wedi’i ddewis, anfon at bawb yn yr isgyfrif cyfan)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Os nad oes dim byd wedi’i ddewis, dangos i bawb yn yr is-gyfrif cyfan)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Os nad oes dim byd wedi’i ddewis, dangos i bawb yn y cyfrif cyfan)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Os bydd Gwelliannau RCE wedi’u galluogi hefyd,
       bydd RCE yn cadw eich gwaith yn awtomatig wrth i chi fynd yn eich blaen
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Os yw wedi’i alluogi, mae’n diffodd swyddogaethau postio i SIS pan for cyfnod graddio’n cau. Dim ond yn berthnasol os ydy’r nodwedd “Galluogi gosodiadau integreiddiad SIS newydd” wedi’i galluogi."
@@ -18792,7 +18792,7 @@ cy:
   short_name_ad9bf84f: "enw byr"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "yn amlwg ynddo'i hun, ID Canvas y defnyddiwr sy’n adrodd"
   show_76c0ed1c: Dangos
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Dangos blwch ticio sy’n gadael i weinyddwr cyfrif gyhoeddi cyrsiau yn
       awtomatig ar ôl cysylltu a chysoni â chwrs glasbrint
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Dangos rhestr o dudalennau diweddar yn Newislen Crwydro'r Safle Cyfan Canvas"
@@ -18834,7 +18834,7 @@ cy:
   show_originality_report_to_students_be22f5ee: "Dangos adroddiad gwreiddioldeb i’r myfyrwyr"
   show_params_3401895b: "Dangos paramedrau"
   show_past_account_level_announcements_to_users_3b8208e2: "Dangos cyhoeddiadau blaenorol ar lefel y cyfrif i ddefnyddwyr"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Dangos cyhoeddiadau blaenorol ar lefel y cyfrif i ddefnyddwyr. Yn gadael i
       ddefnyddiwr weld cyhoeddiadau sydd wedi dod i ben neu wedi cael eu diystyru.
   show_question_details_b059df00: "Dangoswch fanylion y cwestiwn"
@@ -21079,7 +21079,7 @@ cy:
   updated_group_group_name_727b1d98: "Grŵp wedi’i ddiweddaru %{group_name}"
   updated_permissions_page_f2e91060: "Tudalen Hawliau wedi’i diweddaru"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Rhyngwyneb y defnyddiwr wedi’i ddiweddaru ar gyfer dangos a chwilio am ddefnyddwyr a chyrsiau mewn cyfrif."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Yn diweddaru UI dewisiadau ar gyfer hysbysiadau cyfrif er mwyn rhoi profiad mwy cyfredol
       a chyfoes i ddefnyddwyr
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Yn diweddaru dangos eiconau'r Polisi Postio ym mhennawd colofn aseiniadau'r Llyfr Graddau Newydd."

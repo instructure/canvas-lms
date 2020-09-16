@@ -2095,7 +2095,7 @@ ar:
   allow_in_mastery_paths_5332c786: "السماح بذلك في مسارات الإتقان"
   allow_include_parameters_bf3d3230: "السماح بتضمين المعلمات "
   allow_intra_group_peer_reviews_53f1e455: "السماح لمراجعات الأقران داخل المجموعة الواحدة"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       السماح لاشتراك الحدث المباشر ليتم تعيينه لتسليمه
       عبر خطافات ويب HTTPS
   allow_lor_tools: "السماح للمستخدمين بعرض الأدوات الخارجية المكونة واستخدامها لـ LOR."
@@ -2129,7 +2129,7 @@ ar:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "يسمح للمستخدم بعرض معرفات SIS للمستخدم في صفحة الأشخاص الخاصة بالمساق."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "للسماح لمقاييس الإتقان لمستوى الحساب وحسابات الكفاءة واستبدال المقاييس لكل ناتج"
   allows_admin_user_to_view_account_statistics_341f00d9: "يسمح للمستخدم المسؤول بعرض إحصائيات الحساب."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       يمكّن المسؤولين من عرض السجلات التي تحتوي على معلومات عن كل تبديلات 
       GraphQLالجارية
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "لتمكين موائمة النواتج مع المحتوى بدون درجات"
@@ -2477,7 +2477,7 @@ ar:
   allows_users_to_edit_conferences_2d3c960c: "يسمح للمستخدمين بتحرير المؤتمرات."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "تسمح للمستخدمين بتمكين خيار \"تشغيل SpeedGrader قيد التصفية حسب بمجموعة الطلاب\" للمساقات على صفحة إعدادات المساق. في حال النشاط وتحديد مجموعة طلاب في دفتر الدرجات الجديد، SpeedGrader سيتم تحميل الطلاب في المجموعة المحددة فقط."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "للسماح للمستخدمين بحجب الإعلامات حسب مستوى المساق."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       للسماح للمستخدمين باستبدال تفضيلات إعلام معينة على
       أساس كل مساق على حدة.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "للسماح للمستخدمين لاختيار الضمائر التي سيتم عرضها بعد اسمهم عندما تظهر في واجهة المستخدم."
@@ -8510,7 +8510,7 @@ ar:
     save_settings: "حفظ الإعدادات"
     saving: "جارٍ الحفظ..."
   different_course_b875770e: "مساق مختلف"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       فرق بين الأحداث الحية المنشأة بواسطة النظام والمستخدم
       في أداة Canvas Data Services
   differentiated_assignments_description: |-
@@ -8545,7 +8545,7 @@ ar:
   disabled_links_b3bdea99: "ارتباطات معطلة"
   disabled_not_visible_to_students_2c9d693f: "معطل. ليس مرئيًا للطلاب."
   disabled_not_visible_to_students_48d4a90d: "معطل. ليس مرئيًا للطلاب"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       لتعطيل إعلامات الرسائل النصية القصيرة لجميع الأنواع عدا الإعلانات 
       وتغييرات الدرجات.
   disabling_f594bda: "جارٍ التعطيل..."
@@ -8975,10 +8975,10 @@ ar:
   display_totals_for_all_grading_periods_option_4a72586: "عرض القيم الإجمالية لخيار \"كل فترات منح العلامات\""
   display_values_f517c73c: "عرض القيم"
   displaying_to_students_b1e92058: "العرض للطلاب"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       تعرض قصاصات ورقية ملونة للمعلمين الذين يشغلون أداة التحقق من الارتباطات على
       مساق محدد وعدم العثور على مشكلات.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       لعرض قصاصات ورقية ملونة للمستخدمين الذي يرسلوا المهمة قبل
       تاريخ الاستحقاق المحدد.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -9335,7 +9335,7 @@ ar:
   el_salvador_503_b0907d30: "السلفادور (+503)"
   element_option_missing_error_an_element_to_attach__be433478: " خطأ عدم تحديد خيار `العنصر`: يجب تحديد العنصر الذي تريد إقرانه بطريقة العرض TreeBrowserView عند ضبط خيار العرض على \"true\" لطريقة العرض BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "خط نسق ملائم للتعليم الابتدائي وتنقل محدود للمساقات."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       تنقل محدود للمساقات بأنساق وخطوط ملائمة للتعليم الابتدائي.
       لا يسري تحديث الخط إلا على اللغات التي تستخدم الأبجدية اللاتينية.
   email: 
@@ -12419,7 +12419,7 @@ ar:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "عنوان URI لبيانات تعريف موفر الهوية IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "في حال وجود علامة \"التزويد فقط\" على سمة ما، فستستخدم فقط عندما يقوم \"التزويد في الوقت المناسب\" بإنشاء مستخدم جديد ولن يتم تحديثها كلما يقوم المستخدم بتسجيل الدخول."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       إذا تم تثبيت أداة LTI مكونة من خلال التعيين، فسيظهر إدخال جديدة في
       القائمة المنسدلة لنوع إرسال المهمة لتكوين المهمة للأداة بسرعة
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "في حالة تعطيل كيل من الدرجات - تحرير والدرجات - عرض جميع الدرجات، فسيتم إخفاء دفتر الدرجات من لوحة تنقل المساق."
@@ -12441,7 +12441,7 @@ ar:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "في حالة التعطيل، لن يزال بإمكان المستخدم إمكانية الوصول إلى إعدادات المساق. لا يمكن للمستخدم إدارة محتوى المساقات الفردية بدون وجود إذن ملائم لعنصر المحتوى ذلك. تم حصر إمكانية رؤية المساق للمستخدمين المسجلين في المساق، يمكّن هذا الإذن المستخدم من عرض محتوى المساق بدون التسجيل في المساق."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "إذا تم التمكين، سيتم تمكين الوصول إلى ميزة LTI 1.3 وLTI."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "في حالة التمكين، تسمح بأكثر من الحد الأقصى للدرجات المحتملة للناتج المحدد في معايير تقييم."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       إذا تم التمكين، سيسمح Canvas بالأدوات لإعادة عدة عناصر محتوى
       في طلب واحد في صفحة وحدات المساق
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "ستقوم برامج الاستيراد Common Cartridge إذا تم تمكينها، بتحويل ملفات HTML إلى صفحات"
@@ -12451,7 +12451,7 @@ ar:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "في حال تمكينه، سيكون للوحدات خيار وضع علامة تشير إلى أنها اكتملت بمجرد توفر شرط واحد فقط."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "إذا تم التمكين، سيتم إرسال 'oauth2_access_token_url' في تشغيل تسجيل LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "إذا تم التمكين، فإنه يمكن استخدام توقيع OAuth 1.0a من خلال أدوات LTI للوصول إلى API خدمة العضوية"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       إذا تم تمكين هذا الخيار، ستتطلب نقاط نهاية oEmbed
       رمزًا مميزًا منشأ من أداة للتحقق من
       أصل طلب مورد oEmbed.
@@ -12462,14 +12462,14 @@ ar:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "إذا تم التمكين، سيتم التعامل مع محفوظات الإرسال لاختبارات Quizzes.Next الموجزة التالية على نحو مستقل."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "في حالة التمكين، سيتم عرض الخيار وهو يحتوي على معايير تقييم بدون درجات."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "إذا تم تمكينها، سيطالب نموذج تسجيل ولي الأمر برمز إقران الطالب بدلاً من اسم مستخدم وكلمة مرور الطفل."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       في حالة التمكين، لن تظهر واجهة مستخدم مفاتيح المطور لمسؤول الموقع
       إلا مفاتيح مطور مسؤول الموقع. لاحظ أن هذا لا يسري إلا على
       مثيلات Canvas التي توجد حساباتها الجذرية على نفس مقطع
       حساب مسؤول الموقع. السلوك في المثيلات الأخرى
       التي تصرفت بهذه الطريقة.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "في حالة التمكين، سيستطيع المستخدمون تكوين أدوات LTI 2."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       إذا تم تمكينه، عند إنشاء Lti::ToolProxy، سيؤدي هذا إلى
       إنشاء اشتراك حدث حي مباشرة على الأداة
       بدلاً من المهمة. وسيؤدي هذا إلى تكرار
@@ -12479,7 +12479,7 @@ ar:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(في حال عدم تحديد أي شخص، الإرسال إلى الجميع في الحساب الفرعي بأكمله)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(في حال عدم تحديد أي شخص، الإظهار إلى الجميع في الحساب الفرعي بأكمله)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(في حال عدم تحديد أي شخص، الإظهار إلى الجميع في الحساب بأكمله)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       إذا تم أيضاً تمكين تعزيزات محرر المحتوى المنسق،
       سيقوم محرر المحتوى المنسق بالحفظ التلقائي لعملك وأنت تتقدم
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "إذا تم تعيينه، سيؤدي إلى إيقاف تشغلي وظيفة النشر في SIS للمهام أثناء غلق فترة التقييم. لا ينطبق إلا في تم تمكين ميزة \"تمكين إعدادات تكامل SIS جديد\"."
@@ -22361,7 +22361,7 @@ ar:
   short_name_ad9bf84f: "الاسم القصير"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "يفترض أن ذلك بديهي، معرف Canvas المستخدم الذي يقوم بالإبلاغ"
   show_76c0ed1c: إظهار
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       يظهر مربع اختبار يسمح اختيارياً لمسؤول الحساب بنشر المساقات
       تلقائياً بعد الإقران والمزامنة مع مساق مخطط
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "يظهر قائمة الصفحات الأحدث زيارة في التنقل العمومي في Canvas"
@@ -22412,7 +22412,7 @@ ar:
   show_originality_report_to_students_be22f5ee: "إظهار تقرير الأصالة للطلاب"
   show_params_3401895b: "إظهار المعلمات"
   show_past_account_level_announcements_to_users_3b8208e2: "إظهار إعلانات مستوى الحساب السابقة للمستخدمين"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       إظهار إعلانات مستوى الحساب السابقة للمستخدمين السماح
       للمستخدم بمشاهدة الإعلانات التي انتهت أو تم تجاهلها.
   show_question_details_b059df00: "عرض تفاصيل السؤال"
@@ -24859,7 +24859,7 @@ ar:
   updated_permissions_page_f2e91060: "صفحة أذونات محدثة"
   updated_terms_of_service_82f34148: "تحديث شروط الخدمة"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واجهة مستخدم محدّثة للبحث عن المستخدمين والمساقات في الحساب وعرضها."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       لتحديث واجهة مستخدم تفضيلات إعلامات الحساب لتصبح أكثر حداثةt
       وتجربة مستخدم محدثة
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "لتحديث عرض أيقونات سياسة النشر في عنوان عمود مهمة دفتر الدرجات الجديد."

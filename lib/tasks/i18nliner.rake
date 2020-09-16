@@ -19,7 +19,7 @@ module I18nliner
             @translations.line = name.to_s
             value = definition[field]
             if value.is_a?(String)
-              key = I18nliner::CallHelpers.keyify_underscored_crc32(value)
+              key = I18nliner::CallHelpers.infer_key(value)
               @translations[key] = value
             elsif value.is_a?(Hash)
               value.delete(:wrapper)

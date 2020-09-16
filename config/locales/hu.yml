@@ -1764,7 +1764,7 @@ hu:
   allow_the_ability_to_send_notifications_through_ou_13cc8537: "Annak engedélyezése, hogy az értesítések az elküldési soron kerüljenek kiküldésre."
   allow_users_to_comment_45b8f753: "Felhasználói hozzászólások engedélyezése"
   allowed_attempts_4e229caa: "Próbálkozás engedélyezése"
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Lehetővé teszi az adminisztrátorok számára egy napló megtekintését, amiben minden,
       a közelmúltban futtatot GraphQL-mutációról található információ
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Lehetővé teszi, hogy az oktatók kijelöljék a tömegesen a SIS-integrációba exportálandó értékelési adatokat"

@@ -2043,7 +2043,7 @@ nb:
   allow_in_mastery_paths_5332c786: "Tillat i læringsstier"
   allow_include_parameters_bf3d3230: "Tillat Inkluder parameter "
   allow_intra_group_peer_reviews_53f1e455: "Tillat hverandrevurdering innad i gruppen"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Tillat abonnement på live arrangementer som kan settes opp til å bli levert
       via HTTPS webhooks.
   allow_lor_tools: "Tillat brukere å vise og bruke eksterne verktøy som er konfigurert for LOR."
@@ -2077,7 +2077,7 @@ nb:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Lar en bruker vise brukeres SIS-ID-er på et emnes Folk-side."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillater mestringsskalaer og ferdighetsberegninger på gruppenivå, og erstatter skalaer per læringsmål"
   allows_admin_user_to_view_account_statistics_341f00d9: "Lar en admin-bruker vise kontostatistikk."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Lar administratorer se en logg som inneholder informasjon om alle nylige utførelser av
       GraphQL-mutasjoner
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillater å innrette læringsmål til innhold som ikke scorer"
@@ -2425,7 +2425,7 @@ nb:
   allows_users_to_edit_conferences_2d3c960c: "Lar en bruker redigere konferanser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Lar brukere aktivere valget «Lanser SpeedGrader Filtrert etter Studentgruppe» for emnet på innstillings-siden for emnet."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Tillater brukere å dempe varslinger på detaljert emnenivå."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Tillater brukere å oppheve bestemte varselpreferanser
       for hvert enkelt emne.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Gir brukerne mulighet til å velge pronomen som vil vises etter navnet deres når det vises i brukergrensesnittet."
@@ -8145,7 +8145,7 @@ nb:
     save_settings: "Lagre innstillinger"
     saving: Lagrer…
   different_course_b875770e: "forskjellig emne"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Differensier mellom system- og brukergenererte live arrangementer
       i Canvas Data tjenesteverktøy
   differentiated_assignments_description: |-
@@ -8180,7 +8180,7 @@ nb:
   disabled_links_b3bdea99: "Deaktiverte lenker"
   disabled_not_visible_to_students_2c9d693f: "Deaktivert. Ikke synlig for elever."
   disabled_not_visible_to_students_48d4a90d: "Deaktivert. Ikke synlig for elevene"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Deaktiverer SMS-varslinger for alle typer unntatt kunngjøringer og
       karakterendringer.
   disabling_f594bda: Deaktiverer...
@@ -8584,10 +8584,10 @@ nb:
   display_totals_for_all_grading_periods_option_4a72586: "Vis summer for alternativet Alle Vurderingsperioder"
   display_values_f517c73c: "Vis verdier"
   displaying_to_students_b1e92058: "Visning til studenter"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Viser konfetti for lærere som kjøring koblingsvalidator på
       et emne og ingen problemer blir funnet.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Viser konfetti for brukere som leverer oppgaver før
       bestemt forfallsdato.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: "Fordeling av aktuelle karakterer i kurs på tvers av alle innrullerte studenter i organisasjonens kurs."
@@ -8936,7 +8936,7 @@ nb:
   el_salvador_503_b0907d30: "El Salvador (+ 503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element` alternativ manglende feil: Et element for å legge ved TreeBrowserView må spesifiseres når du stiller inn 'valget ‘true' for BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Grunneskolevennlig skrifttype og begrenset emnenavigering."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Grunneskolevennlig skrifttype og begrenset emnenavigering.
       Skrifttype-oppdateringen hjelder kun for språk som bruker det latinske alfabetet.
   email: 
@@ -11915,7 +11915,7 @@ nb:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Hvis en attributt kun er merket som kun klargjøring, da vil den kun brukes når klargjøring i siste liten lager en ny bruker, og vil ikke holdes oppdatert hver gang brukeren logger på."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Hvis et LTI-verktøy konfigurert med plasseringen er installert, vises en ny oppføring i
       rullegardinmenyen for oppgaveinnleveringstype for raskt å konfigurere oppgaven for verktøyet
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Hvis både 'Karakterer - rediger' og 'Karakterer - vis alle karakterer' er deaktiverte vil karakteroversikten være skjult fra emnenavigering."
@@ -11937,7 +11937,7 @@ nb:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis deaktivert vil brukeren fortsatt ha tilgang til emneinnstillinger. Brukeren kan ikke administrere spesifikt emneinnhold uten tilsvarende tillatelser for den innholdsartikkelen. Hvis emnesynlighet er begrenset til brukere som er registrert i emnet vil denne tillatelsen la brukeren vise emneinnhold uten å være registrert i emnet."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Om de er aktivert, vil tilgang til LTI 1,3 og LTI Fordel bli aktivert."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Når aktivert, tillater mer enn maksimalt mulig poeng på et resultat i en rubrikk."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Hvis aktivert, vil Canvas tillate at det vises flere innholdstyper i verktøy
       i en og samme forespørsel på emnemodulsiden
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Hvis aktivert, vil importører av Common Cartridge konvertere HTML-filer til sider"
@@ -11947,7 +11947,7 @@ nb:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiver, vil moduler har muligheten til å bli markert som fullført når kun ett av kravene er møtt."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "'oauth2_access_token_url' vil bli sendt i LTI2 registrering lansering, hvis aktivert."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Om OAuth 1.0a signering er aktivert kan LTI verktøy brukes for å få tilgang til APIer medlems-service"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Hvis den er aktivert, vil sluttpunktene til oEmbed kreve et
       verktøy-generert symbol for å bekrefte opphavet
       til en oEmbed-ressursforespørsel.
@@ -11958,14 +11958,14 @@ nb:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Er det aktivert, er innleveringshistorie for Quizzes.Next tester tatt hånd om separat."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Om den er aktivert, vil valget bli vist til å ha ikke poenggivende vurderingsveiledninger."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Om aktivert, vil registreringsskjema til foreldrene kreve en student paringskode istedenfor barnets brukernavn og passord"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Hvis aktivert, vil brukergrensesnittet for utviklernøkkelen til side-admin kun vise
       side-admins utviklernøkler. Merk at dette kun påvirker
       Canvas-tilfeller der rot-kontoene er på samme skjær
       som side-admin. Atferden i andre tilfeller
       var allerede på denne måten.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Hvis aktivert, vil brukerne kunne konfigurere LTI 2 verktøy."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Hvis aktivert, når en LTI::ToolProxy opprettes, vil den
       opprette abonnementet på live-arrangementer direkte i verktøyet
       i stedet for oppgaven. Dette vil føre til at arrangementet
@@ -11975,7 +11975,7 @@ nb:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(dersom ingen er valgt, send til samtlige i hele underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(dersom ingen er valgt, vis til samtlige i hele underkontoen)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(dersom ingen er valgt, vis til alle i hele kontoen)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Hvis RCE Enhancements også er aktivert,
       vil RCE automatisk lagre arbeidet ditt mens du jobber
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Hvis den er satt, slår du av publiser til SIS-funksjonen for oppgaver når vurderingsperioden lukkes. Gjelden kun hvis funksjonen “Aktiver nye SIS-integrasjonsinnstillinger” er aktivert."
@@ -21510,7 +21510,7 @@ nb:
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bør være selvforklarende, Canvas ID til rapporterende bruker"
   show_76c0ed1c: Vis
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: "Viser en avmerkingsboks som kan la en kontoadmin publisere emner\n\
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: "Viser en avmerkingsboks som kan la en kontoadmin publisere emner\n\
       automatisk etter sammenslutning eller synkronisering med et blueprint emne  "
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Vis en liste over nylig besøkte sider i Canvas global navigasjon"
   show_account_navigation_menu_d97270a9: "Vis menyen for kontonavigering"
@@ -21560,7 +21560,7 @@ nb:
   show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til elevene"
   show_params_3401895b: "Vis parameter"
   show_past_account_level_announcements_to_users_3b8208e2: "Vis tidligere kunngjøringer på kontonivå til brukere"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Vis tidligere kunngjøringen på kontonivå til brukere. Tillater
       en bruker å se kunngjøringer som er avsluttet eller ignorert.
   show_question_details_b059df00: "Vis spørsmålsdetaljer"
@@ -23946,7 +23946,7 @@ nb:
   updated_permissions_page_f2e91060: "Oppdatert side for tillatelser"
   updated_terms_of_service_82f34148: "Oppdatert bruksavtale"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert UI for å kunne søke og vise brukere og emner innenfor en konto."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Oppdaterer varselpreferanser brukergrensesnittoppdatering tl å være en mer
       oppdatert brukeropplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Oppdaterer visningen av Post Personvern-ikon i kolonne-overskriften til oppgave i Ny karakteroversikt."

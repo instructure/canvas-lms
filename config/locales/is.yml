@@ -1948,7 +1948,7 @@ is:
   allow_in_mastery_paths_5332c786: "Heimila í tileinkunarslóðum"
   allow_include_parameters_bf3d3230: "Leyfa láta færibreytur fylgja með "
   allow_intra_group_peer_reviews_53f1e455: "Heimila jafningjamat innan hóps"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Leyfa afhendingu áskriftar að beinum útsendingum
       með HTTPS veftengingum
   allow_lor_tools: "Heimila notendum að skoða og nota ytri tæki stillt fyrir LOR."
@@ -1981,7 +1981,7 @@ is:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gerir notanda kleift að skoða SIS-auðkenni í fólk-síðu námskeiðs."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Leyfir tileiknunarkvarða reikningsstigs og kunnáttuúrreikninga, sem kemur í stað kvarða fyrir hverja útkomu fyrir sig"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gerir notanda kleift að skoða tölfræði reiknings."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Leyfir kerfisstjórum að skoða kladda með upplýsingum um allar
       GraphQL stökkbreytingar sem hafa nýlega verið keyrðar
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Gerir mögulega jöfnun niðurstöðu við efni sem ekki er gefin einkunn fyrir"
@@ -2331,7 +2331,7 @@ is:
   allows_users_to_edit_conferences_2d3c960c: "Gerir notendum kleift að breyta ráðstefnum."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Leyfa notendum að virkja „Ræsa SpeedGrader síað eftir nemendahópum“ valkostinn fyrir námskeið á námskeiðsstillingasíðunni. Þegar virkt og nemendahópur hefur verið valinn í nýrri einkunnabók, hleður SpeedGrader aðeins nemendum í völdum hóp."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Gerir notendum kleift að slökkva á tilkynningum eftir námskeiðsstigi."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Gerir notendum kleift að hnekkja á kjörstillingum sérstakra tilkynninga á
       námskeiði á námskeiðsgrundvelli.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Gerir notendum kleift að velja fornöfn sem verða sýnd á eftir nafninu þeirra þegar það er sýnd í notendaviðmóti."
@@ -7483,7 +7483,7 @@ is:
     save_settings: "Vista stillingar"
     saving: Vista...
   different_course_b875770e: "annað námskeið"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Greindu á milli lifandi atburða sem gerðir eru af kerfi og notendum
       í gagnaþjónustuverkfæri Canvas
   diigo_993c4646: Diigo
@@ -7514,7 +7514,7 @@ is:
   disabled_links_b3bdea99: "Aftengdir tenglar"
   disabled_not_visible_to_students_2c9d693f: "Óvirkt. Ekki sýnilegt nemendum."
   disabled_not_visible_to_students_48d4a90d: "Óvirkt. Ekki sýnilegt nemendum"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Afvirkjar SMS tilkynningar fyrir allar gerðir nema tilkynningar og
       breytingar á einkunn.
   disabling_f594bda: "Er að óvirkja..."
@@ -7865,10 +7865,10 @@ is:
   display_totals_for_all_grading_periods_option_4a72586: "Sýna samtölur fyrir valkostinn Öll einkunnatímabil"
   display_values_f517c73c: "Sýna gildi"
   displaying_to_students_b1e92058: "Sýni nemendum"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Sýnir konfettí fyrir kennara sem keyra tengla staðfestara á
       námskeiði og engin vandamál fundust.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Kastar glitpappír fyrir þá notendur sem skila inn verkefni fyrir
       settan skiladag.
   district_id_6f408184: "Auðkenni héraðs"
@@ -8185,7 +8185,7 @@ is:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`Villa` við vöntun á þætti: Þáttur til að tengja TreeBrowserView þarf skilgreiningu þegar stillt er á 'rétt' fyrir BBTreeBrowserView."
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Elementary vinaleg þema leturgerð og takmarkað yfirlit námskeiðs."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Elementary vinalegt þema, leturgerð og takmarkað yfirlit námskeiðs.
       Uppfærsla leturgerðar á aðeins við tungumál sem nota latínu stafróf.
   email: 
@@ -10490,7 +10490,7 @@ is:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP metagagnaslóð"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Ef eigind er merkt eingöngu til ráðstöfunar verður hún aðeins notuð þegar Just In Time Provisioning stofnar nýjan notanda og verður ekki uppfærð í hvert sinn sem notandi skráir sig inn."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Ef LTI verkfæri með uppstillingarstillingu er uppsett, sést ný færsla í
       tegund skila fellilista verkefnisins til að stilla verkefnið fyrir verkfærið á skjótan hátt
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Ef bæði einkunnir - breyta og einkunnir eru óvirkar, verður einkunnabók falin frá yfirliti námskeiðs."
@@ -10512,7 +10512,7 @@ is:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Ef óvirkt hefur notandi enn aðgang að stillingum námskeiðs. Notandi getur ekki stjórnað efni einstakra námskeiða án viðeigandi leyfis fyrir því efnisatriði. Ef sýnileiki námskeiðs er takmarkað við notendur sem eru innritaðir í námskeiðið gerir þetta leyfi notanda kleift að skoða efni námskeiðs án þess að vera innritaður í námskeiðið."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Ef þetta er virkjað, verður aðgangur að LTI 1.3 og LTI Advantage einnig virkjað."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Ef þessi möguleiki er virkjaður, er hægt að gefa hærri einkunn en matskvarði gerir ráð fyrir."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Ef virkt leyfir Canvas verkfærum að skila mörgum efnisatriðum
       í einni beiðni á einingasíðu námskeiðs
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Ef leyft, Common Cartridge importers munu breyta HTML skjölum í síður"
@@ -10521,7 +10521,7 @@ is:
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Ef þetta er virkjað verður lyklastjórnun forritara og táknkynning notuð."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Ef heimilað verða 'oauth2_access_token_url' send í LTI2 skráningarupphaf"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Ef virkt, getur Oauth 1.0a undirritun verið notuð af LTI verkfærum til að fá aðgang að Membership Service API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Ef það er virkt munu endastöðvar oEmbed krefjast
       lykils sem búinn er til af verkfæri til að staðfesta uppruna
       oEmbed tilfangabeiðni.
@@ -10532,13 +10532,13 @@ is:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Ef virkjað, er innsendingasaga fyrir Quizzes.Next skyndipróf afgreidd sérstaklega."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Ef virkjaður, verður valkosturinn sýndur með matskvarða án einkunnar."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Ef þetta er virkjað mun skráningarblað foreldra krefjast pörunarkóða nemenda í stað notendanafns og aðgangsorðs barns."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Ef virkjað sýnir notendaviðmót forritaralykils svæðisstjórnanda aðeins
       forritunarlykla svæðisstjórnanda. Athugaðu að þetta hefur aðeins áhrif á
       Canvas tilfelli þar sem rótarreikningar eru á sömu sneið
       og svæðisstjórnandareikningurinn. Hegðun í öðrum tilfellum
       hafa þegar hagað sér á þennan hátt.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Ef virkjað, þegar það er Lti::ToolProxy er búið til, mun það
       búa til áskrift að viðburðum í beinni beint á verkfærið
       í stað verkefnisins. Þetta veldur því að viðburðir verða
@@ -10548,7 +10548,7 @@ is:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Ef enginn er valinn, senda á alla í undirreikningnum)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Ef enginn er valinn, sýnt öllum í öllum undiraðganginum)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Ef enginn er valinn, sýnt öllum í öllum aðganginum)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Ef RCE viðbætur eru líka virkar
       mun RCE vista vinnuna þína sjálfvirkt á meðan þú vinnur
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Ef það er stillt slekkur það á eiginleikanum til að birta á SIS fyrir verkefni þegar einkunnatímabilinu lýkur. Gildir aðeins ef eiginleikinn „Virkja nýjar samþættingastillingar fyrir SIS“ er virkjaður."
@@ -19088,7 +19088,7 @@ is:
   short_name_ad9bf84f: stuttnefni
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "á að vera augljóst, Canvas-auðkenni þess sem tilkynnir"
   show_76c0ed1c: Sýna
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Sýna gátreit sem leyfir reikningsstjóra að velja að birta námskeið
       sjálfvirkt eftir tengingu og samstillingu við blueprint námskeið
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Sýna lista yfir nýlega heimsóttar síður í almennu yfirliti Canvas"
@@ -19131,7 +19131,7 @@ is:
   show_originality_report_to_students_be22f5ee: "Sýna námsmönnum frumleikaskýrslu"
   show_params_3401895b: "Sýna færibreytur"
   show_past_account_level_announcements_to_users_3b8208e2: "Sýni notendum fyrir tilkynningar á reikningsstigi"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Sýni notendum fyrir tilkynningar á reikningsstigi Gerir
       notanda kleift að skoða tilkynningar sem er lokið eða verið hafnað.
   show_question_details_b059df00: "Sýna upplýsingar um spurningu"
@@ -21394,7 +21394,7 @@ is:
   updated_permissions_page_f2e91060: "Uppfærð leyfissíða"
   updated_terms_of_service_82f34148: "Uppfærðir þjónustuskilmálar"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Uppfært UI fyrir að leita og sýna notendur og námskeið innan reiknings."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Uppfærir notendaviðmót kjörstillinga fyrir reikningstilkynningar svo notendaupplifunin
       sé nýlegri
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Uppfærir sýningu birtingarstefnutákna í ný einkunnabók dálkfyrirsögn verkefna."

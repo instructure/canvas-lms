@@ -2046,7 +2046,7 @@ en-GB:
   allow_in_mastery_paths_5332c786: "Allow in mastery paths"
   allow_include_parameters_bf3d3230: "Allow Include Parameters "
   allow_intra_group_peer_reviews_53f1e455: "Allow intra-group peer reviews"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Allow Live Event Subscription to be set to be delivered
       via HTTPS webhooks
   allow_lor_tools: "Allow users to view and use external tools configured for LOR."
@@ -2080,7 +2080,7 @@ en-GB:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Allows a user to view user SIS IDs in a course People page."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Allows Account-level mastery scales and proficiency calculations, replacing per-outcome scales"
   allows_admin_user_to_view_account_statistics_341f00d9: "Allows admin user to view account statistics."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Allows admins to view a log containing information about all recently run
       GraphQL mutations
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Allows aligning outcomes to non-scoring content"
@@ -2431,7 +2431,7 @@ en-GB:
   allows_users_to_edit_conferences_2d3c960c: "Allows users to edit Conferences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Allows users to enable the \"Launch SpeedGrader Filtered by Student Group\" option for courses on the course settings page. When active and a student group has been selected in New Gradebook, SpeedGrader will only load students in the selected group."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Allows users to mute notifications on a course level granularity."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Allows users to override specific notification preferences on a
       course by course basis.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Allows users to pick pronouns that will be displayed after their name when it is shown in the user interface."
@@ -8162,7 +8162,7 @@ en-GB:
     save_settings: "Save settings"
     saving: Saving...
   different_course_b875770e: "different course"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Differentiate between system- and user-generated live events
       in the Canvas Data Services tool
   differentiated_assignments_description: |-
@@ -8197,7 +8197,7 @@ en-GB:
   disabled_links_b3bdea99: "Disabled links"
   disabled_not_visible_to_students_2c9d693f: "Disabled. Not visible to students."
   disabled_not_visible_to_students_48d4a90d: "Disabled. Not visible to students"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Disables SMS notifications for all types except announcements and
       grade changes.
   disabling_f594bda: Disabling...
@@ -8601,10 +8601,10 @@ en-GB:
   display_totals_for_all_grading_periods_option_4a72586: "Display totals for all grading periods option"
   display_values_f517c73c: "Display Values"
   displaying_to_students_b1e92058: "Displaying to students"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Displays confetti for teachers that run the link validator on
       a course and no issues are found.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Displays confetti for users that turn in an assignment prior
       to the set due date.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -8953,7 +8953,7 @@ en-GB:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element` option missing error: An element to attach the TreeBrowserView to must be specified when setting the render option to 'true' for BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Elementary friendly theme font and limited course navigation."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Elementary friendly theme, font, and limited course navigation.
       The font update only applies to languages that use the Latin Alphabet.
   email: 
@@ -11929,7 +11929,7 @@ en-GB:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "If an attribute is marked as provisioning only, then it will only be used when Just-in-Time Provisioning creates a new user and will not be kept up to date each time the user logs in."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       If an LTI tool configured with the placement is installed, it will show a new entry in the
       assignment submission type dropdown to quickly configure the assignment for the tool
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "If both grades - edit​ and grades - view all grades are disabled, Gradebook will be hidden from the course navigation."
@@ -11951,7 +11951,7 @@ en-GB:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "If disabled, user will still have access to course settings. User cannot manage individual course content without the appropriate permission for that content item. If course visibility is limited to users enrolled in the course, this permission allows the user to view course content without being enrolled in the course."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "If enabled, access to LTI 1.3 and LTI Advantage will be enabled."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "If enabled, this allows more than the maximum possible score on an outcome to be given on a rubric."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       If enabled, Canvas will allow tools to return multiple content items
       in a single request at the course modules page
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "If enabled, Common Cartridge importers will convert HTML files into pages"
@@ -11961,7 +11961,7 @@ en-GB:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "If enabled, it is possible to mark modules as complete when only one of the requirements is met."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "If enabled, OAuth 1.0a signing may be used by LTI tools to access the Membership Service API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       If enabled, oEmbed endpoints will require a
       tool-generated token to verify the origin
       of an oEmbed resource request.
@@ -11972,14 +11972,14 @@ en-GB:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "If enabled, submission history for Quizzes.Next quizzes is dealt with separately."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "If enabled, the option will be presented to have non-scoring rubrics."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "If enabled, the parent sign-up form will require a student pairing code instead of the child username and password"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       If enabled, the site admin developer key UI will only show
       site admin developer keys. Note that this only affects
       Canvas instances where root accounts are on the same shard
       as the site admin account. Behaviour in other instances
       already behaved in this way.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "If enabled, users will be able to configure LTI 2 tools."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       If enabled, when an Lti::ToolProxy is created, it will
       create the live event subscription directly on the tool
       instead of the assignment. This will cause events to be
@@ -11989,7 +11989,7 @@ en-GB:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(If none are selected, send to everyone in the entire sub-account)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(If none are selected, show to everyone in the entire sub-account)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(If none are selected, show to everyone in the entire account)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       If RCE Enhancements are also enabled,
       the RCE will auto-save your work as you go
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "If set, turns off post-to-SIS functionality for assignments when their grading period closes. Only applies if the \"Enable new SIS integration settings\" feature is enabled."
@@ -21561,7 +21561,7 @@ en-GB:
   short_name_ad9bf84f: "short name"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "should be self-evident, the canvas ID of the reporting user"
   show_76c0ed1c: Show
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Show a checkbox that optionally lets an account admin publish courses
       automatically after associating and syncing with a blueprint course
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Show a list of recently visited pages in the Canvas global navigation"
@@ -21612,7 +21612,7 @@ en-GB:
   show_originality_report_to_students_be22f5ee: "Show originality report to students"
   show_params_3401895b: "Show params"
   show_past_account_level_announcements_to_users_3b8208e2: "Show past account level announcements to users"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Show past account level announcements to users. Allows
       a user to view announcements that have ended or been dismissed.
   show_question_details_b059df00: "Show question details"
@@ -24006,7 +24006,7 @@ en-GB:
   updated_permissions_page_f2e91060: "Updated Permissions Page"
   updated_terms_of_service_82f34148: "Updated Terms of Service"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Updates account notification preferences UI to be a more current
       and updated user experience
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Updates the display of Post Policy icons in the New Gradebook assignment column header."

@@ -1959,7 +1959,7 @@ ht:
   allow_in_mastery_paths_5332c786: "Otorize nan pakou metriz"
   allow_include_parameters_bf3d3230: "Otorize Paramèt Enklizyon yo "
   allow_intra_group_peer_reviews_53f1e455: "pèmèt revizyon kaarad entra gwoup"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Pèmèt Abònman a yon Aktivite an Dirèk konfigire pou li difize
       atravè webhooks HTTPS
   allow_lor_tools: "Pèmèt itilizatè yo pou wè epi itilize zouti ekstèn ki konfigire pou LOR yo."
@@ -1992,7 +1992,7 @@ ht:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Pèmèt yon itilizaté afiche ID SIS yon itilizatè nan paj Kontak kou a."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Otorize echèl metriz nivo kont ak kalkil konpetans, ranplase echèl pa rezilta."
   allows_admin_user_to_view_account_statistics_341f00d9: "Pèmèt itilizatè admin nan afiche estatistik kont lan."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Pèmèt admiin yo wè jounal ki gen enfòmasyon sou tout dènye mitasyon
       GraphQL ki ekzekite yo.
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Pèmèt aliyen rezilta sou kontni ki pa evalye a"
@@ -2340,7 +2340,7 @@ ht:
   allows_users_to_edit_conferences_2d3c960c: "Pèmèt itilizatè a chanje Konferans yo."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Pèmèt itilizatè a aktive opsyon \"Lanse SpeedGrader Filtre pa Gwoup Elèv\" pou kou ki nan paj paramèt kou a. Lè l aktove epi yo seleksyone yon gwoup elèv nan Nouvo Bilten an, se sèlman elèv ki nan gwoup yo seleksyone a SpeedGrader ap monte."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Pèmèt itilizatè yo mete avètisman sou silans nan yon kou nivo granilarite"
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Pèmèt itilizatè yo ranplase preferans notifikasyon espesyal sou yon baz
       kou pa kou.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Pèmèt itilizatè yo chwazi pwonon k ap afiche aprè non yo lè l ap afiche nan entèfas itilizatè a."
@@ -7680,7 +7680,7 @@ ht:
     save_settings: "Anrejistre Paramèt"
     saving: Anrejistreman...
   different_course_b875770e: "diferan kou"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Fè diferans ant aktivite sistèm nan jenere ak aktivite  iilizatè a jenere
       nan zouti  Canvas Data Services la.
   diigo_993c4646: Diigo
@@ -7711,7 +7711,7 @@ ht:
   disabled_links_b3bdea99: "Dezaktive Lyen"
   disabled_not_visible_to_students_2c9d693f: "Dezaktive. Pa vizib pou elèv yo."
   disabled_not_visible_to_students_48d4a90d: "Dezaktive. Pa vizib a etidyan"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Dezaktive notifikasyon SMS pou tout tip eksepte anons ak
       chanjman pwen.
   disabling_f594bda: Dezaktivasyon...
@@ -8066,10 +8066,10 @@ ht:
   display_totals_for_all_grading_periods_option_4a72586: "Afiche total pou opsyon Tout Peryòd Klasman yo"
   display_values_f517c73c: "Afiche Valè"
   displaying_to_students_b1e92058: "Afiche bay Elèv yo"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Afiche confetti pou pwofesè ki itilize validatè lyen nan
       yon kou epi yo pa jwenn okenn pwoblèm nan sa.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Afiche konfiskasyon pou itilizatè ki aktive yon devwa anvan
       delè ki defini an.
   district_id_6f408184: "ID Distri"
@@ -8390,7 +8390,7 @@ ht:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "erè opsyon `eleman`manke: Yo dwe endike yon eleman pou atache TreeBrowserView a ak li lè yo konfigire opsyon rannman an sou ´true´ pou BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Polis karaktè tematik konvivyal elemantè e navigasyon limite nan kou yo."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Tèm amikal elemantè, ekriti karaktè ak navigasyon limite.
       Nizajou ekriti a aplike sèlman a lang ki itilize alfabè laten an.
   email: 
@@ -10817,7 +10817,7 @@ ht:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URI Metadata IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Si yon atribi make kòm apwovisyonman sèlman, l ap itilize sèlman lè Pwovizyonman a Tan kreye yon nouvo itilizatè, e li pa p rete aktyalize chak fwa itilizatè a konekte."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       si gen yon zouti LTI ki konfigire ak plasman an ki enstale, l ap afiche yon nouvo antre nan lis dewoulan tip soumisyon devwa
       pou li kapab konfigire devwa a pou zouti a byen vit.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Si Nòt - chanje epi Nòt - afiche tout nòt yo dezaktive, Bilten an ap kache nan navigasyon kou a."
@@ -10839,7 +10839,7 @@ ht:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Si l dezaktive, itilizatè ka toujou gen aksè a Paramèt Kou yo. Itilizatè a pa kapab jere kontni pèsonèl kou san li pa gen otorizasyon pou eleman sa a nan kontni an. Si vizibilite kou a limite a itilizatè ki enskri nan kou a, pèmisyon sa a pèmèt yon itilizatè afiche kontni kou san li pa enskri nan kou a."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Si l aktive, Aksè a LTI 1.3 ak LTI Advantage ap aktive."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si l aktive, li pèmèt ou fè plis maksimòm pwen posib sou yon Rezilta nan yon ribrik."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Si l aktive, Canvas ap pèmèt zouti a retounen divès eleman kontni
       nan yon sèl demann sou paj modil kou a
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Si l aktive, enpòtatè Common Cartridge yo pa konvèti fichye HTML yo an Paj"
@@ -10848,7 +10848,7 @@ ht:
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Si li aktive, y ap itilize opsyon jesyon kle devlopè ak pòte token yo."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Si l aktive, y ap voye 'oauth2_access_token_url' nan lansman anrejistreman LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si l aktive, zouti LTI yo ka itilize siyati OAuth 1.0a an pou ale sou API Sèvis Enskripsyon an"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Si l aktive,pwen final oEmbed yo ap bezwen yon
       token yon zouti jenere pou ka verifye orijin
       yon demann resous oEmbed.
@@ -10859,13 +10859,13 @@ ht:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Si l aktive, istorik soumisyon quiz Quizzes.Next yo trete separeman."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si li aktive, opsyon an ap prezante pou li ka gen ribrik san notasyon."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Si l aktive, fòmilè enskripsyon paran an ap egzije yon elèv gen kòd kouplaj elèv olye de non itilizatè e modpas timoun nan."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Si l aktive, kle devlopè admin sit la ap sèlman afiche
       kle devlopè administratè sit Nou vle w konnen ke sa afekte sèlman
       ka Canvas kote kont rasin yo sou menm sèvè
       ak kont administratè sit la. Nan lòt ka
       konpòtman an manifeste konsa deja.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Si l aktive, lè yon Lti::ToolProxy kreye, il ap
       kreye abònman nan aktivite an dirèk dirèkteman sou zouti a
       olye de devwa a. L ap pèmèt aktivite a
@@ -10875,7 +10875,7 @@ ht:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(si pa genyen ki seleksyone, voye bay tout moun ki nan sou kont lan)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(si pa genyen ki seleksyone, montre tout moun an antye nan sou kont lan)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(si pa genyen ki seleksyone, montre tout moun ki sou kont lan)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Si Amelyorasyon RCE yo aktive tou,
       RCE a ap anrejistre travay ou a otomatikman toutotan w ap avanse
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Si l aktive, dezaktive fonsyon pibliye nan SIS pou devwa yo lè peryòd klasman yo fini.  Li aplikab sèlman si fonksyon an \"Aktive nouvo paramèt entegrasyon nan SIS\" la aktive."
@@ -19534,7 +19534,7 @@ ht:
   short_name_ad9bf84f: "non kout"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "ta dwe evidan a pwòp tèt ou, ID canvas itilizatè ki rapòte a"
   show_76c0ed1c: Afiche
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: "Afiche yon kazye pou koche k ap bay yon administratè kont opsyon pou\n\
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: "Afiche yon kazye pou koche k ap bay yon administratè kont opsyon pou\n\
       pibliye kou otomatikman aprè yo fin senkwonize epi asosye ak yon kou blueprint  "
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Afiche yon lis ki te vizite pa lontan nan navigasyon global Canvas la"
   show_account_navigation_menu_d97270a9: "Afiche Meni Navigasyon Kont"
@@ -19578,7 +19578,7 @@ ht:
   show_originality_report_to_students_be22f5ee: "Afiche rapò orijinalite bay elèv yo"
   show_params_3401895b: "Afiche paramèt"
   show_past_account_level_announcements_to_users_3b8208e2: "Afiche anons pase yon nan nivo kont pou itilizatè yo"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Afiche anons pase yon nan nivo kont pou itilizatè yo. Pèmèt
       yon itilizatè wè anons ki fini oswa ki te rejte.
   show_question_details_b059df00: "Afiche Detay Kesyon"
@@ -21870,7 +21870,7 @@ ht:
   updated_permissions_page_f2e91060: "Aktyalize Paj Pèmisyon"
   updated_terms_of_service_82f34148: "Tèm Sèvis Aktyalize"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktyalize UI pou rechèch ak afichaj itilizatè e kou sou yon kont."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Mizajou preferans entèfas itilizatè yon kont pou l ka pi modèn
       epi aktyalize eksperyans itilizatè a.
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Mete Ikòn Politik Afichaj yo ajou nan antèt kolonn Nouvo Bilten an."
