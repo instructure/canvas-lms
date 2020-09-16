@@ -29,11 +29,21 @@ module Canvas
       end
 
       describe '.fetch(key, ttl: @default_ttl)' do
+        before(:each) do
+          # use in-memory cache to vaoid redis errors for old expirys.
+          # Using redis for local cache results in `ERR invalid expire time in set`
+          # when we try to write an already expired key
+          allow(ConfigFile).to receive(:load).with("local_cache").and_return({ store: "memory" })
+          LocalCache.reset
+        end
+
         it 'must return nil when no value was found' do
           allow(client).to receive(:get)
             .and_return(
               Imperium::Testing.kv_not_found_response(options: [:stale])
             )
+          allow(Canvas::Errors).to receive(:capture_exception).with(any_args).and_call_original
+          expect(Canvas::Errors).to receive(:capture_exception).with(:dynamic_settings, anything)
           expect(proxy.fetch('baz')).to be_nil
         end
 
