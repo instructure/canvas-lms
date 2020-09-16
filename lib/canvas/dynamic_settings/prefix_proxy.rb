@@ -15,6 +15,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Canvas
   class DynamicSettings
+    class AbsentConfigError < StandardError; end
     # A class for reading values from Consul
     #
     # @attr prefix [String] The prefix to be prepended to keys for querying.
@@ -108,6 +109,8 @@ module Canvas
           end
           return result if result
         end
+        Rails.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
+        Canvas::Errors.capture_exception(:dynamic_settings, AbsentConfigError.new("No Config For Key: #{key}"))
         nil
       rescue Imperium::TimeoutError => exception
         LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
