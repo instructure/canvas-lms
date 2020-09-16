@@ -2351,6 +2351,7 @@ fa:
   are_you_sure_you_want_to_delete_this_assignment_88be6f5e: "آیا مطمئن هستید که می خواهید این تکلیف را حذف کنید؟"
   are_you_sure_you_want_to_delete_this_comment_4ee386d: "مطمئنید که می خواهید این نظر حذف شود؟"
   are_you_sure_you_want_to_delete_this_developer_key_9937481a: "مطمئنید که می خواهید این کلید توسعه دهنده حذف شود؟"
+  are_you_sure_you_want_to_delete_this_developer_key_ce246033: "آیا مطمئن هستید که می خواهید این کلید توسعه دهنده را حذف کنید؟ همچنین با این اقدام کلیه ابزارهای مرتبط با کلید توسعه دهنده در این زمینه حذف خواهد شد."
   are_you_sure_you_want_to_delete_this_discussion_334554e0: "مطمئنید که می خواهید این بحث حذف شود؟"
   are_you_sure_you_want_to_delete_this_event_824b1e33: "مطمئنید که می خواهید این رویداد حذف شود؟"
   are_you_sure_you_want_to_delete_this_grading_perio_380b040d: "مطمئنید که می خواهید این مجموعه دوره نمره گذاری حذف شود؟"
@@ -7127,6 +7128,7 @@ fa:
     redirect_uri: "نشانی اینترنتی: %{redirect_uri}"
   developer_key_921ddbae: "کلید توسعه‌دهنده"
   developer_key_developerkeyid_deleted_focus_moved_t_80fffb4d: "کلید توسعه دهنده%{developerKeyId} حذف شد.  تمرکز به افزودن دکمه کلید توسعه دهنده منتقل شد. "
+  developer_key_developerkeyid_deleted_focus_moved_t_9f5b5198: "کلید توسعه دهنده%{developerKeyId} حذف شد. تمرکز به دکمه حذف کلید توسعه دهنده قبلی در لیست منتقل شد."
   developer_key_form: 
     cancel: لغو
     icon_url: "نشانی اینترنتی نماد:"
@@ -11171,6 +11173,7 @@ fa:
   load_more_a36f9cf9: "بارگذاری بیشتر"
   load_more_results_460f49a9: "Load more results"
   loaded_more_collaborations_13f1d630: "همکاری های بیشتر بارگذاری شد."
+  loaded_more_developer_keys_focus_moved_to_the_dele_f5b867f8: "کلیدهای توسعه دهنده بیشتری بارگیری شد. تمرکز به دکمه حذف آخرین کلید توسعه دهنده بارگذاری شده در لیست منتقل شد."
   loaded_more_developer_keys_focus_moved_to_the_name_6e3c3b34: "کلیدهای توسعه دهنده بیشتری بارگیری شدند. تمرکز به نام آخرین کلید توسعه دهنده بارگیری شده در لیست منتقل شد."
   loading_25990131: "در حال بارگذاری..."
   loading_6ac402e1: "درحال بارگذاری..."
@@ -20791,6 +20794,7 @@ fa:
   tool_not_found_f6366382: "ابزار یافت نشد"
   tool_placements_3f996c24: "جای گذاری ابزارها"
   tool_privacy_level_9d392813: "میزان حریم خصوصی ابزار"
+  tool_supports_deep_linking_at_this_placement_561e1874: "ابزار از Deep Linking در این مکان پشتیبانی می کند"
   tool_toolname_found_for_client_id_clientid_would_y_13f35b91: "ابزار \"%{toolName}\"  شناسه سرویس گیرنده %{clientId} موجود است. آیا می‌خواهید آن را نصب کنید؟"
   tool_type_afa58fcb: "نوع ابزار"
   toolname_logo_6b639926: "لوگوی %{toolName}"
