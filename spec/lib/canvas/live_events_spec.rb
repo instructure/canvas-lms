@@ -1206,7 +1206,8 @@ describe Canvas::LiveEvents do
           context_id: course.global_id.to_s,
           context_type: course.class.to_s,
           context_uuid: course.uuid,
-          import_quizzes_next: true
+          import_quizzes_next: true,
+          domain: course.root_account.domain
         ),
         hash_including(
           context_type: course.class.to_s,
