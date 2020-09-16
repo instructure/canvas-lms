@@ -2043,7 +2043,7 @@ fr:
   allow_in_mastery_paths_5332c786: "Autoriser dans les parcours de maîtrise"
   allow_include_parameters_bf3d3230: "Autoriser les paramètres Include "
   allow_intra_group_peer_reviews_53f1e455: "Autoriser les évaluations entre élèves de même groupe"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Permettre que l'abonnement aux événements en direct soit configuré pour être diffusé
       via HTTPS webhooks
   allow_lor_tools: "Autoriser les utilisateurs à voir et utiliser des outils externes configurés pour LOR."
@@ -2077,7 +2077,7 @@ fr:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Permet à un utilisateur d'afficher les ID SIS de l'utilisateur dans une page Personnes du cours."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Permet les échelles de réussite ainsi que les calculs de maîtrise au niveau du compte. Remplace les échelles par résultat/acquis."
   allows_admin_user_to_view_account_statistics_341f00d9: "Permet à l'utilisateur admin d'afficher les statistiques du compte."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Permet aux administrateurs d'afficher un journal contenant des informations sur toutes les mutations GraphQL
       récemment exécutées
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permet d'aligner les résultats aux contenus sans note"
@@ -2425,7 +2425,7 @@ fr:
   allows_users_to_edit_conferences_2d3c960c: "Permet aux utilisateurs de modifier les Conférences."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet aux utilisateurs d'activer l’option « Lancer SpeedGrader filtré par groupes d'élèves » pour les cours, à partir de la page de paramètres de cours. Lorsque l’option est activée et qu’un groupe d'élèves est sélectionné dans le nouveau carnet de notes, SpeedGrader ne chargera que les élèves du groupe sélectionné."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Permet aux utilisateurs de désactiver les notifications en fonction des cours."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Permet aux utilisateurs de remplacer certaines préférences de notification préférences
       indépendamment pour chaque cours.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Permet aux utilisateurs de choisir les pronoms qui seront affichés après leur nom lorsqu'il sera affiché dans l'interface utilisateur."
@@ -8148,7 +8148,7 @@ fr:
     save_settings: "Enregistrer les paramètres"
     saving: Enregistrement...
   different_course_b875770e: "cours différent"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Différenciez les événements en direct générés par le système et ceux générés par l'utilisateur 
       dans l'outil Canvas Data Services.
   differentiated_assignments_description: |-
@@ -8183,7 +8183,7 @@ fr:
   disabled_links_b3bdea99: "Liens désactivés"
   disabled_not_visible_to_students_2c9d693f: "Désactivé. Non visible par les élèves."
   disabled_not_visible_to_students_48d4a90d: "Désactivé. Non visible par les élèves"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Désactive les notifications par SMS pour tous les types à l’exception des annonces et
       modifications des notes.
   disabling_f594bda: "Désactivation en cours..."
@@ -8587,10 +8587,10 @@ fr:
   display_totals_for_all_grading_periods_option_4a72586: "Afficher les totaux pour l'option Toutes les périodes de notation"
   display_values_f517c73c: "Afficher les valeurs"
   displaying_to_students_b1e92058: "Afficher pour les étudiants"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Affiche des confettis sur l'écran des enseignants qui exécutent le validateur de liens sur
       un cours lorsqu’aucun problème n’est détecté.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Affiche des confettis aux utilisateurs lorsqu'ils rendent un travail avant
       la date d'échéance paramétrée.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -8939,7 +8939,7 @@ fr:
   el_salvador_503_b0907d30: "Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Erreur – option `élément` manquante : un élément auquel associer TreeBrowserView doit être spécifié lorsque l’option de rendu a la valeur « true » pour BBTreeBrowserView."
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Police de caractère adaptée à l’enseignement élémentaire et navigation de cours limitée."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Navigation de cours limitée, police et thème adaptés l’enseignement élémentaire.
       La mise à jour de la police ne s'applique qu’aux langues utilisant l’alphabet latin.
   email: 
@@ -11902,7 +11902,7 @@ fr:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URL des Métadonnées IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Lorsqu'un attribut est marqué comme 'Provisionnement uniquement', il ne sera alors utilisé que lorsque 'Just in Time Provisioning' crée un nouvel utilisateur, et ne sera pas automatiquement mis à jour à chaque connexion de l'utilisateur."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Si un outil LTI configuré avec le placement est installé, une nouvelle entrée s'affichera dans la
       liste déroulante des types de soumission permettant de configurer rapidement le travail pour cet outil.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Si Notes - modifier et Notes - afficher toutes les notes sont désactivés, le Relevé de notes sera caché de la navigation du cours."
@@ -11924,7 +11924,7 @@ fr:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "S'il est désactivé, l'utilisateur aura toujours accès aux Paramètres du cours. L'utilisateur ne peut pas gérer le contenu d'un cours individuel sans l'autorisation appropriée pour cet élément de contenu. Si la visibilité du cours est limitée aux utilisateurs inscrits au cours en question, cette autorisation permet à l’utilisateur de voir le contenu du cours sans avoir à être inscrit à ce cours."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Si activé, l'accès à LTI 1.3 et LTI Advantage seront autorisés."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si cette option est activée, elle permet de donner plus que la note maximale possible pour un acquis sur un barème."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Si cette option est activée, Canvas autorisera les outils à renvoyer plusieurs éléments de contenu
       en une seule requête sur la page des modules de cours.
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Si cette option est activée, Common Cartridge importers convertira les fichiers HTML en pages."
@@ -11934,7 +11934,7 @@ fr:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Si l'option est activée, les modules pourront être marqués comme terminés dès que l'une des exigences sera remplie."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Si activé, « oauth2_access_token_url » sera envoyé au lancement de l'inscription LTI2."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si elle est activée, la signature OAuth 1.0a peut être utilisée par les outils LTI pour accéder à l'API du service d'abonnement."
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       S'ils sont activés, les terminaux oEmbed nécessiteront un
       jeton généré par un outil pour vérifier l'origine
       d'une demande de ressource oEmbed.
@@ -11945,14 +11945,14 @@ fr:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Si coché, l’historique de soumission pour les quiz de Quizzes.Next sera traité séparément."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si cette option est activée, l'option sera présentée pour avoir des barèmes sans notation."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Si cette option est activée, le formulaire d'inscription des parents exigera un code d'appariement des élèves au lieu du nom d'utilisateur et du mot de passe de l'enfant."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Si l’option est activée, l’interface de clé de développeur de l’administrateur n’affichera que
       les clés développeur de l’administrateur du site. Veuillez noter que cela n'affecte que les
       instances Canvas dont les comptes root sont sur le même partition
       que le compte de l’administrateur du site. Le comportement des autres instances
       fonctionnait déjà sur ce principe.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Si cette option est activée, les utilisateurs pourront configurer les outils LTI 2."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Si activé, lorsqu'un Lti::ToolProxy est créé, il entraînera la
       création d'un abonnement à un événement live directement dans l’outil
       plutôt que dans le travail. Cela entraînera la duplication
@@ -11962,7 +11962,7 @@ fr:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(En l’absence de sélection, envoyer à toutes les personnes listées dans le sous-compte)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Si aucun(e) n'est sélectionné(e), affichez-le(la) à tout le monde dans le sous-compte entier)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Si aucun(e) n'est sélectionné(e), affichez-le(la) à tout le monde dans le compte entier)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Si les améliorations de l’ECR sont également activées,
       l’ECR enregistrera automatiquement votre travail au fur et à mesure.
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Si activé, désactive la fonction « Poster vers SiS » pour les travaux lorsque la période de notation se termine. Cela n’est applicable que si la fonction « Activer les nouveaux paramètres d'intégration SIS » est activée."
@@ -21496,7 +21496,7 @@ fr:
   short_name_ad9bf84f: "nom abrégé"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "devrait être évident, L'ID canvas de l'utilisateur effectuant une observation"
   show_76c0ed1c: Afficher
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Affiche une case à cocher facultative qui permet d'autoriser un administrateur de compte à publier des cours
       automatiquement après association et synchronisation avec un projet de cours
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Afficher une liste des pages récemment visitées dans la navigation générale de Canvas"
@@ -21547,7 +21547,7 @@ fr:
   show_originality_report_to_students_be22f5ee: "Montrer le rapport d’originalité aux élèves"
   show_params_3401895b: "Afficher paramètres"
   show_past_account_level_announcements_to_users_3b8208e2: "Afficher les anciennes annonces de niveau compte aux utilisateurs"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Afficher les anciennes annonces de niveau compte aux utilisateurs. Permet à
       un utilisateur de voir les annonces déjà terminées ou ayant été écartées.
   show_question_details_b059df00: "Montrer les détails de la question"
@@ -23937,7 +23937,7 @@ fr:
   updated_permissions_page_f2e91060: "Mise à jour de la page Permissions"
   updated_terms_of_service_82f34148: "Conditions d’utilisation mises à jour"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Une IU mise à jour pour chercher et afficher les utilisateurs et les cours au sein-même d'un compte."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Met à jour l’interface des préférences de notifications de compte pour la rendre plus moderne
       et plus à jour.
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Met à jour l'affichage des icônes Politique d'affichage dans l'en-tête de colonne des travaux du relevé de notes."

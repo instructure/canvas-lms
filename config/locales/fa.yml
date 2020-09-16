@@ -1974,7 +1974,7 @@ fa:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "امکان دادن به این ابزار برای دسترسی به نام های IMS و سرویس Role Provisioning"
   allow_users_to_comment_45b8f753: " به کاربران اجازه ارسال نظر داده شود"
   allowed_attempts_4e229caa: "تلاش های مجاز"
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
       جهش GraphQL
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "امکان ایجاد اطلاعیه برای یک بخش را فراهم می کند"

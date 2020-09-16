@@ -2043,7 +2043,7 @@ zh-Hans:
   allow_in_mastery_paths_5332c786: 在掌握路径上允许
   allow_include_parameters_bf3d3230: "允许包含参数 "
   allow_intra_group_peer_reviews_53f1e455: 允许组内同级评审
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       准许实时事件订阅设置为
       通过HTTPS网络钩子传送
   allow_lor_tools: "允许用户查看和使用针对 LOR 配置的外部工具。"
@@ -2077,7 +2077,7 @@ zh-Hans:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "允许用户在课程的“人员”页面中查看用户SIS ID。"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: 允许帐户级别的掌握程度评分和熟练程度计算，取代按结果评分
   allows_admin_user_to_view_account_statistics_341f00d9: 允许管理员用户查看帐户统计信息。
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       准许管理员查看包含所有近期运行的
       GraphQL突变的信息日志。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: 允许根据非评分内容来调整结果
@@ -2427,7 +2427,7 @@ zh-Hans:
   allows_users_to_edit_conferences_2d3c960c: 允许用户编辑会议。
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "允许用户在课程设置页上为课程启用“Launch SpeedGrader Filtered by Student Group”选项。启用并在新评分册中选择学生组后，SpeedGrader 将仅加载选定组中的学生。"
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: 允许用户在课程级别设置通知免打扰
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       允许用户逐个课程推翻特定的
       通知首选项。
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: 准许用户选择代词，用户姓名显示在用户界面内时，代词将显示在用户姓名后面。
@@ -8132,7 +8132,7 @@ zh-Hans:
     save_settings: 保存设置
     saving: 正在保存...
   different_course_b875770e: 不同的课程
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       在Canvas数据服务工具
       中区分系统生成的和用户生成的活动事件
   differentiated_assignments_description: |-
@@ -8167,7 +8167,7 @@ zh-Hans:
   disabled_links_b3bdea99: 已禁用的链接
   disabled_not_visible_to_students_2c9d693f: 已禁用。对学生不可见。
   disabled_not_visible_to_students_48d4a90d: 已禁用。对学生不可见
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       禁用除公告和评分更改以外的所有类型的
       短信通知。
   disabling_f594bda: 正在禁用...
@@ -8569,10 +8569,10 @@ zh-Hans:
   display_totals_for_all_grading_periods_option_4a72586: 显示“所有评分周期”选项的总计
   display_values_f517c73c: 显示值
   displaying_to_students_b1e92058: 正在显示给学生
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       向教师显示在
       课程上运行链接验证器且没有发现问题的碎屑。
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       为在设定的截止日期之前
       提交作业的用户显示糖果。
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -8921,7 +8921,7 @@ zh-Hans:
   el_salvador_503_b0907d30: "萨尔瓦多共和国 (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element` 选项缺失错误：针对 BBTreeBrowserView 将渲染选项设置为 'true' 时，必须指定 TreeBrowserView 附加到的一个元素"
   elementary_friendly_theme_font_and_limited_course__4dc48217: 基本友好主题字体和限制课程导航。
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       基本友好主题、字体和限制课程导航。
       字体更新仅适用于使用 Latin Alphabet 的语言。
   email: 
@@ -11888,7 +11888,7 @@ zh-Hans:
   idp_logoutresponse_xml_fe65de19: IdPLogoutResponseXML
   idp_metadata_uri_dae5314a: "IdP 元数据 URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: 如果一个属性标志只能配置，那么它就仅可用作创建新用户的临时配置，且不会在用户每次登录时更新。
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       如果安装了使用位置配置的 LTI 工具，将在
       作业提交类型下拉菜单中显示新条目，以便为该工具快速配置作业
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "如果“评分 - 编辑”和“评分 - 查看所有评分”都被禁用，则会从课程导航中隐藏评分册。"
@@ -11910,7 +11910,7 @@ zh-Hans:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: 如果禁用，用户仍可以访问“课程设置”。如果没有内容项的适当权限，用户无法管理单独的课程内容。若课程内容仅限入读课程的用户可见，则该权限允许用户查看课程内容，无需入读课程。
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "如果启用，将启用对 LTI 1.3 和 LTI Advantage 的访问权限。"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: 如果启用，则在评价量规上提供的结果分数允许超出最大可能分数。
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       如果启用，Canvas 将允许工具在一次请求中在课程模块页面
       返回多个内容项
   if_enabled_common_cartridge_importers_will_convert_9bffff09: 如果启用，公共弹夹导入程序会将HTML文件转换为网页
@@ -11920,7 +11920,7 @@ zh-Hans:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 如果启用，当只有一个条件符合时，单元将标记为完成的选项。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "如果已启用，“oauth2_access_token_url”将在 LTI2 注册启动中发送"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "如果启用，LTI 工具可以使用 OAuth 1.0a 签名访问会员服务 API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       如果启用，oEmbed 端点将要求提供
       工具生成的令牌以确认
       oEmbed 资源请求的来源。
@@ -11931,14 +11931,14 @@ zh-Hans:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "如果启用，Quizzes.Next 测验的提交历史记录单独处理。"
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: 如果启用，此选项将显示为非评分评价量规。
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: 如果启用，则父注册表单将需要学生配对代码而非子用户名和密码
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       如果启用，则网站管理员开发人员密钥 UI 仅显示
       网站管理员开发人员密钥。请注意，这仅影响
       根帐户和网站管理员帐户位于相同碎片的
       Canvas 实例。其他实例中的行为
       已经采用此行为。
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "如果启用，用户将能够配置 LTI 2 工具。"
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       如果启用，在创建 Lti::ToolProxy 时，它将
       直接在工具上创建在线活动订阅
       ，而不是在作业上创建。这将导致活动
@@ -11948,7 +11948,7 @@ zh-Hans:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: (如果没有选择，发送给子帐户的所有人)
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: （如果没有选择，则显示给整个子帐户的全体成员）
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: （如果没有选择，则显示给整个帐户的全体成员）
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       如果也启用 RCE 增强，
       RCE 将在您离开时自动保存您的工作
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "如果设置，当作业的评分周期结束时，关闭作业的“发布到 SIS”功能。仅当启用“启用新 SIS 集成设置”功能时适用。"
@@ -21470,7 +21470,7 @@ zh-Hans:
   short_name_ad9bf84f: 简称
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "报告用户的Canvas ID，应该是不言而喻。"
   show_76c0ed1c: 显示
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       显示选择性地允许帐户管理员发布课程的复选框
       在关联和同步蓝图课程后自动
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "在 Canvas 全局导航中显示近期浏览页面的列表"
@@ -21521,7 +21521,7 @@ zh-Hans:
   show_originality_report_to_students_be22f5ee: 向学生显示原创性报告
   show_params_3401895b: 显示参数
   show_past_account_level_announcements_to_users_3b8208e2: 向用户显示过去的帐户级别通知
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       向用户显示过去的帐户级别通知。允许
       用户查看已结束或被拒绝的通知。
   show_question_details_b059df00: 显示问题的详细信息
@@ -23908,7 +23908,7 @@ zh-Hans:
   updated_permissions_page_f2e91060: 更新的权限页面
   updated_terms_of_service_82f34148: 更新的服务条款
   updated_ui_for_searching_and_displaying_users_and__6755e08e: 更新的用户界面用于搜索和显示一个帐户内的用户和课程。
-  updates_account_notification_preferences_ui_to_be__2f1e4718: "将帐户通知首选项 UI 更新到最新"
+  updates_account_notification_preferences_ui_to_be__1765f66a: "将帐户通知首选项 UI 更新到最新"
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: 在新评分册作业列标题中更新显示帖子政策图标。
   updating_6edbab78: 正在更新
   updating_discussion_failed_aadb2d35: 更新讨论失败

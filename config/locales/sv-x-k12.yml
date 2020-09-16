@@ -1815,7 +1815,7 @@ sv-x-k12:
   allow_in_mastery_paths_5332c786: "Tillåt i måluppfyllelsevägar"
   allow_include_parameters_bf3d3230: "Tillåt inkludering av parametrar "
   allow_intra_group_peer_reviews_53f1e455: "Tillåt kamratresponsuppgifter inom gruppen"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Tillåt att prenumerationer på livehändelser konfigureras för leverans
       via HTTPS-webhooks
   allow_lor_tools: "Tillåt användare att visa och använda externa verktyg som konfigurerats för LOR."
@@ -1847,7 +1847,7 @@ sv-x-k12:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gör att användare kan se SIS-ID:t på sidan Personer i en kurs."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillåter skalor för måluppfyllelse på kontonivå och färdighetsberäkningar, ersätter skalor per-resultat"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gör det möjligt för admin att visa statistik för konton."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Låter administratörer visa en logg med information om senast körda
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter justering av lärandemål för innehåll som inte ges poäng"
@@ -2178,7 +2178,7 @@ sv-x-k12:
   allows_users_to_edit_conferences_2d3c960c: "Gör det möjligt för användaren att redigera konferenser."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillåt användare att aktivera alternativet \"Starta SpeedGrader filtrerad efter elevgrupp\" för kurser på sidan kursinställningar. När alternativet är aktiverad och en elevgrupp har valts i nya omdömesboken, SpeedGrader läses endast elever i den valda gruppen in."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Låter användare tysta aviseringar på kursnivå."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Gör att användare kan åsidosättas specifika aviseringsinställningar för en
       kurs på kursbasis.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Låt användare välja pronomen som visas efter deras namn i användargränssnittet."
@@ -7166,7 +7166,7 @@ sv-x-k12:
     save_settings: "Spara inställningarna"
     saving: "Sparar ..."
   different_course_b875770e: "annan kurs"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Differentiera mellan system- och användargenererade livehändelser
       i verktyget Canvas Data Services
   diigo_993c4646: Diigo
@@ -7196,7 +7196,7 @@ sv-x-k12:
   disabled_links_b3bdea99: "Inaktiverade länkar"
   disabled_not_visible_to_students_2c9d693f: "Inaktiverad. Ej synlig för elever."
   disabled_not_visible_to_students_48d4a90d: "Inaktiverad. Ej synlig för elever"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Inaktiverar SMS-aviseringar för alla typer utom meddelanden och
       ändringar i bedömningar.
   disabling_f594bda: "Inaktiverar ..."
@@ -7542,10 +7542,10 @@ sv-x-k12:
   display_totals_for_all_grading_periods_option_4a72586: "Visa totalsumma för alternativet Alla bedömningsperioder"
   display_values_f517c73c: "Visa värden"
   displaying_to_students_b1e92058: "Visar för elever"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Visar konfetti för lärare som kör länkvalidering i
       en kurs för att visa att inga problem föreligger.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Visar konfetti för användare som lämnar in en uppgift före
       inlämningsdatumet.
   district_id_6f408184: "Distrikt ID"
@@ -7855,7 +7855,7 @@ sv-x-k12:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Fel: alternativet ”element” saknas- Ett element att bifoga TreeBrowserView till måste specificeras när renderingsalternativet ställs in som ”sann” för BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Grundläggande tema med användarvänligt teckensnitt och begränsad kursnavigering."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Grundläggande tema med användarvänligt tema, teckensnitt och begränsad kursnavigering.
       Uppdateringen av teckensnittet gäller endast för språk som använder det latinska alfabetet.
   email: 
@@ -10073,7 +10073,7 @@ sv-x-k12:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Om ett attribut är markerat som endast tillhandahållande används det bara när Just in Time-tillhandahållande skapar en ny användare och uppdateras inte varje gång användaren loggar in."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Om ett LTI-verktyg som konfigurerats med placeringen installeras visas en ny post i rullgardinsmenyn för
       uppgiftens inlämningstyp för snabb konfiguration av verktygets uppgift.
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade, döljs bedömningsöversikten i kursnavigeringen."
@@ -10094,14 +10094,14 @@ sv-x-k12:
               användare som inte är registrerade se kursinnehåll med den här behörigheten.
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Om inaktiverad, har användare ändå åtkomst till kursinställningar. Användare kan inte hantera individuellt kursinnehåll utan korrekt behörighet för det innehållsobjektet. Om kurssynligheten är begränsad till användare som registrerat sig för kusen, gör den här behörigheten att användare kan visa kursinnehåll utan att vara registrerad i kursen."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Om alternativet är aktiverat tillåts att mer än högsta möjliga resultat ges för ett lärandemål i en matris."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Om du aktiverar den här inställningen kommer Canvas att tillåta verktyg att returnera flera innehållsobjekt
       i en enda begäran på kursmodulsidan
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Om det är aktiverat konverterar Common Cartridge-importörer HTML-filer till sidor"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktiverad, måste designers tillhandahålla upphovsrätt och licensinformation för filerna innan de publiceras. Gäller endast om Better File Browsing också är aktiverat."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Om de är aktiverade, kommer alternativen för hantering av utvecklarnyckel och tokenavgränsning att användas."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Om detta är aktiverat kan OAuth 1.0a-signering användas av LTI-verktyg för att komma åt medlemstjänstens API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Om aktiverade kräver oEmbed-slutpunkter en
       verktygsgenererad token för att verifiera ursprunget
       för en oEmbed-resursbegäran.
@@ -10110,13 +10110,13 @@ sv-x-k12:
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Om aktiverad hanteras inlämningshistoriken för New Quizzes-quiz separat."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Om alternativet är aktiverat visas alternativet matriser utan poäng."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Om det är aktiverat, kommer förälderns registreringsformulär att kräva en elevparningskod istället för barnets användarnamn och lösenord."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Om aktiverad visar webbplatsadministratörens gränssnitt för utvecklarnycklar endast
       webbplatsadministratörens utvecklingsnycklar. Observera att detta endast påverkar
       Canvas-instanser där rotkonton finns på samma shard
       som webbplatsadministratörens konto. Beteendet i andra instanser
       är redan samma.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Om aktiverad när en Lti::ToolProxy skapas kommer den att
       skapa livehändelsen direkt i verktyget
       istället för i uppgiften. Detta gör att händelser
@@ -10126,7 +10126,7 @@ sv-x-k12:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(om ingen väljs, skicka till alla i hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Om ingen väljs, visa för alla i hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Om ingen väljs, visa för alla i hela kontot)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Om även RCE-förbättring har aktiverats,
       kommer RCE att spara ditt arbete automatiskt under tiden du arbetar
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Inställningen inaktiverar funktionen för publicering till SIS för uppgifter efter att bedömningsperioden stängts. Gäller endast om funktionen Aktivera nya SIS-integrationsinställningar är aktiverad."
@@ -18427,7 +18427,7 @@ sv-x-k12:
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "bör vara självklar, den rapporterande användarens canvas ID"
   show_76c0ed1c: Visa
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Visar en kryssruta som en kontoadministratör kan markera för att publicera kurser
       automatiskt efter koppling och synkronisering med en Blueprint-kurs
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Visar en lista över de senast besökta sidorna i Canvas globala navigering"
@@ -18468,7 +18468,7 @@ sv-x-k12:
   show_originality_report_to_students_be22f5ee: "Visa original rapport för elever"
   show_params_3401895b: "Visa parametrar"
   show_past_account_level_announcements_to_users_3b8208e2: "Visa tidigare kontonivåmeddelanden för användare."
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Visa tidigare kontonivåmeddelanden för användare. Låter
       användare att se meddelanden som avslutats eller som avvisats.
   show_question_details_b059df00: "Visa frågedetaljer"
@@ -20638,7 +20638,7 @@ sv-x-k12:
   updated_group_group_name_727b1d98: "Uppdaterade gruppen %{group_name}"
   updated_permissions_page_f2e91060: "Uppdaterad tillståndssida"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Uppdaterat användargränssnitt för sökning och visning av användare och kurser inom ett konto."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Uppdaterar kontomeddelandepreferenser UI så att den blir en mer aktuell
       och uppdaterad användarupplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Uppdaterade ikoner för publicering av policyer i kolumnrubriken för uppgifter i den nya omdömesboken."
