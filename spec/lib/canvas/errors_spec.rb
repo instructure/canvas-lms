@@ -43,6 +43,25 @@ module Canvas
       end
     end
 
+    describe 'with job context' do
+      it "attaches current job context to error hashes" do
+        fake_job_class = Class.new do
+          def perform; end
+        end
+        exception = details = nil
+        Canvas::Errors.register!(:test_thing) do |e, d|
+          exception = e
+          details = d
+        end
+        job = Delayed::Job.enqueue(fake_job_class.new)
+        allow(Delayed::Worker).to receive(:current_job).and_return(job)
+        Canvas::Errors.capture(RuntimeError.new, { my_tag: "my_value"})
+
+        expect(details[:extra][:my_tag]).to eq("my_value")
+        expect(details[:tags][:job_tag]).to match('#perform')
+      end
+    end
+
     it 'fires callbacks when it handles an exception' do
       called_with = nil
       Canvas::Errors.register!(:test_thing) do |exception|
