@@ -514,23 +514,6 @@ pipeline {
                 }
               }
 
-
-              // // keep this around in case there is changes to the subbuilds that need to happen
-              // // and you have no other way to test it except by running a test build.
-              // stages['Test Subbuild'] = {
-              //   skipIfPreviouslySuccessful("test-subbuild") {
-              //     build(job: '/Canvas/proofs-of-concept/test-subbuild', parameters: buildParameters)
-              //   }
-              // }
-
-              // // Don't run these on all patch sets until we have them ready to report results.
-              // // Uncomment stage to run when developing.
-              // stages['Xbrowser'] = {
-              //   skipIfPreviouslySuccessful("xbrowser") {
-              //     build(job: '/Canvas/proofs-of-concept/xbrowser', propagate: false, parameters: buildParameters)
-              //   }
-              // }
-
               def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
               distribution.stashBuildScripts()
 
