@@ -1313,6 +1313,22 @@ describe "Users API", type: :request do
           expect(new_user.shard).to eq @shard1
           expect(new_user.pseudonym.account).to eq @other_account
         end
+
+        it "should not error when there is not a local pseudonym" do
+          @user = User.create!(name: 'default shard user')
+          @shard1.activate do
+            account = Account.create!
+            @pseudonym = account.pseudonyms.create!(user: @user, unique_id: 'so_unique@example.com')
+          end
+          # We need to return the pseudonym here, or one is created from the api_call method,
+          # or we'd need to setup more stuff in a plugin that would make this return happen without the allow method
+          allow(SisPseudonym).to receive(:for).with(@user, Account.default, type: :implicit, require_sis: false).and_return(@pseudonym)
+          api_call(:put, "/api/v1/users/#{@user.id}",
+                   { controller: 'users', action: 'update', format: 'json', id: @user.id.to_s },
+                   { user: { name: "Test User" } }
+          )
+          expect(response).to be_successful
+        end
       end
 
       it "respects authentication_provider_id" do
