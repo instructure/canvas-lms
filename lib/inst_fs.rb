@@ -255,10 +255,41 @@ module InstFS
 
     private
     def setting(key)
-      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
+      unsafe_setting(key)
     rescue Imperium::TimeoutError => e
+      # capture this to make sure that we have SOME
+      # signal that the problem is continuing, even if our
+      # retries are all successful.
       Canvas::Errors.capture_exception(:inst_fs, e)
-      nil
+      Rails.logger.warn("[INST_FS] Consul timeout hit during settings #{e}, entering retry handling...")
+      retry_limit = Setting.get("inst_fs_config_retry_count", "5").to_i
+      retry_base = Setting.get("inst_fs_config_retry_base_interval", "1.4").to_i
+      retry_count = 1
+      return_value = nil
+      currently_in_job = Delayed::Worker.current_job.present?
+      while retry_count <= retry_limit
+        begin
+          return_value = unsafe_setting(key)
+          break
+        rescue Imperium::TimeoutError => e
+          retry_count += 1
+          # if we're not currently in a job, one retry is all you get,
+          # fail for the user and move on.
+          raise e if !currently_in_job || retry_count > retry_limit
+          backoff_interval = retry_base ** retry_count
+          Rails.logger.warn("[INST_FS] Consul timeout hit during settings, retrying in #{backoff_interval} seconds...")
+          sleep(backoff_interval)
+        end
+      end
+      return_value
+    end
+
+    # this is just to provide a convenient way to wrap
+    # accessing a setting in retries (see #setting),
+    # it should not be used by the rest of the code,
+    # inside this class or otherwise.
+    def unsafe_setting(key)
+      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     end
 
     def service_url(path, query_params=nil)
