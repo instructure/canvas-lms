@@ -1451,6 +1451,46 @@ describe ContextModule do
       @module.restore
       expect(@module.reload).to be_unpublished
     end
+
+    it "should restore module items that were deleted at the same time the module was" do
+      course_factory
+      @module = @course.context_modules.create!
+      @a0 = @course.assignments.create! :name => 'a0'
+      @a1 = @course.assignments.create! :name => 'a1', :workflow_state => 'unpublished'
+      @a2 = @course.assignments.create! :name => 'a2', :workflow_state => 'published'
+      @p1 = @course.wiki_pages.create! :title => 'p1', :workflow_state => 'unpublished'
+      @p2 = @course.wiki_pages.create! :title => 'p2', :workflow_state => 'active'
+      Timecop.travel(2.weeks.ago) do
+        @module.add_item :type => 'sub_header', :title => 'foo'
+        @doomed_header = @module.add_item :type => 'sub_header', :title => 'baz'
+        @doomed_assignment = @module.add_item :type => 'assignment', :id => @a0.id
+      end
+      Timecop.travel(1.week.ago) do
+        @module.add_item :type => 'assignment', :id => @a1.id
+        @module.add_item :type => 'assignment', :id => @a2.id
+        @module.add_item :type => 'wiki_page', :id => @p1.id
+        @module.add_item :type => 'wiki_page', :id => @p2.id
+      end
+      Timecop.travel(6.days.ago) do
+        # these should not be restored because they were deleted before the module was
+        @doomed_header.destroy
+        @doomed_assignment.destroy
+      end
+      Timecop.travel(5.days.ago) do
+        @module.destroy
+      end
+      Timecop.travel(3.days.ago) do
+        @p1.destroy # don't restore tag for deleted asset
+        @p2.title = 'p2-renamed' # test updating restored tag with current asset name
+        @p2.save!
+      end
+      @module.restore
+      tags = @module.content_tags.not_deleted.order(:position).to_a
+      expect(tags.size).to eq 4
+      expect(tags.map(&:content_id)).to eq([0, @a1.id, @a2.id, @p2.id])
+      expect(tags.map(&:title)).to eq(['foo', 'a1', 'a2', 'p2-renamed'])
+      expect(tags.map(&:workflow_state)).to eq(['unpublished', 'unpublished', 'active', 'active'])
+    end
   end
 
   describe "#relock_warning?" do
