@@ -30,7 +30,7 @@ module Canvas
 
       describe '.fetch(key, ttl: @default_ttl)' do
         before(:each) do
-          # use in-memory cache to vaoid redis errors for old expirys.
+          # use in-memory cache to avoid redis errors for old expirys.
           # Using redis for local cache results in `ERR invalid expire time in set`
           # when we try to write an already expired key
           allow(ConfigFile).to receive(:load).with("local_cache").and_return({ store: "memory" })
@@ -64,6 +64,28 @@ module Canvas
           proxy.fetch('baz')
         end
 
+        it "logs the query when enabled" do
+          proxy.query_logging = true
+          allow(client).to receive(:get).and_return(
+            Imperium::Testing.kv_get_response(
+              body: [
+                { Key: "foo/bar/bang", Value: 'qux'},
+              ],
+              options: [:stale],
+            )
+          )
+          expect(Rails.logger).to receive(:debug) do |log_message|
+            expect(log_message).to match("CONSUL")
+            expect(log_message).to match("status:200")
+          end.twice
+          expect(proxy.fetch('bang')).to eq 'qux'
+        end
+
+        it "raises an error on bad statuses" do
+          allow(client).to receive(:get).and_return(double(status: 500, values: nil))
+          expect { proxy.fetch('bang') }.to raise_error(UnexpectedConsulResponse)
+        end
+
         it 'must use the dynamic settings cache for previously fetched values' do
           expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz').ordered
           expect(LocalCache).to receive(:fetch).with(DynamicSettings::CACHE_KEY_PREFIX + '/', expires_in: 3.minutes).ordered
@@ -93,7 +115,8 @@ module Canvas
         end
 
         it "falls back to global settings" do
-          expect(client).to receive(:get).with('', :recurse, :stale).and_return(nil).ordered
+          empty_mock = double(status: 404, values: nil)
+          expect(client).to receive(:get).with('', :recurse, :stale).and_return(empty_mock).ordered
           mock = double(status: 200, values: 42)
           expect(client).to receive(:get).with('global/foo/bar/baz', :stale).and_return(mock).ordered
           expect(proxy.fetch('baz')).to eq 42
