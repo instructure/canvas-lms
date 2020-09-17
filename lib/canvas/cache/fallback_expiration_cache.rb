@@ -16,7 +16,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Canvas
   module Cache
-    class NilCacheEntry < StandardError; end
     # all local cache implementations share a goal of being able to expire
     # cache entries before they're actually gone (think credentials expiring soon, etc),
     # but to hold onto the stale version just in case.
@@ -43,7 +42,6 @@ module Canvas
       def write_entry(key, entry, options)
         if entry.value.nil?
           Rails.logger.warn("[LOCAL_CACHE] Writing nil value for key #{key}")
-          Canvas::Errors.capture_exception(:local_cache, NilCacheEntry.new("No Config For Key: #{key}"))
         end
         super(key, entry, options)
         forever_entry = entry.dup
