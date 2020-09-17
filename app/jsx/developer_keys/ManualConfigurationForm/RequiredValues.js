@@ -64,11 +64,15 @@ export default class RequiredValues extends React.Component {
     return this.state.toolConfiguration.public_jwk
   }
 
+  hasJwkUrl = () => !!this.state.toolConfiguration.public_jwk_url
+
   valid = () => {
     if (this.isMissingValues()) {
       this.props.flashError(I18n.t('Missing required fields. Please fill in all required fields.'))
       return false
-    } else if (this.hasJwk()) {
+      // Only check JWK fields if a JWK field was given,
+      // not a JWK URL.
+    } else if (this.hasJwk() && !this.hasJwkUrl()) {
       let jwk
       try {
         jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
