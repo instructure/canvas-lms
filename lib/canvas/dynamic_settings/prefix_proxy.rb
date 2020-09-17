@@ -108,6 +108,7 @@ module Canvas
           end
           return result if result
         end
+        Rails.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
         nil
       rescue Imperium::TimeoutError => exception
         LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|

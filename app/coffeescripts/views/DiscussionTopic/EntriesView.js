@@ -209,7 +209,7 @@ export default class EntriesView extends Backbone.View {
   handleKeyDown(e) {
     let reverse
     const nodeName = e.target.nodeName.toLowerCase()
-    if (nodeName === 'input' || nodeName === 'textarea') return
+    if (nodeName === 'input' || nodeName === 'textarea' || ENV.DISABLE_KEYBOARD_SHORTCUTS) return
     if (e.which !== 74 && e.which !== 75) return // j, k
     const entry = $(e.target).closest('.entry')
     this.traverse(entry, (reverse = e.which === 75))

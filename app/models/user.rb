@@ -1646,6 +1646,10 @@ class User < ActiveRecord::Base
     !!feature_enabled?(:disable_celebrations)
   end
 
+  def prefers_no_keyboard_shortcuts?
+    !!feature_enabled?(:disable_keyboard_shortcuts)
+  end
+
   def manual_mark_as_read?
     !!preferences[:manual_mark_as_read]
   end

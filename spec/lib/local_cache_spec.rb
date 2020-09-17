@@ -86,5 +86,6 @@ describe LocalCache do
         expect(LocalCache.fetch_without_expiration("test_key")).to eq("test_value")
       end
     end
+
   end
 end

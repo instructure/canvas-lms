@@ -220,6 +220,14 @@ responsive_layout:
   environments:
     development:
       state: 'on'
+disable_keyboard_shortcuts:
+  state: hidden
+  display_name: Disable Keyboard Shortcuts
+  description: |-
+      Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
+      will have an improved experience with these shortcuts turned off.
+  applies_to: User
+  autoexpand: true
 enable_i18n_features_in_outcomes_exports:
   state: hidden
   display_name: Enable i18n features in outcomes exports
