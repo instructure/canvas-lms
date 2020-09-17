@@ -55,9 +55,13 @@ module Canvas
     # with a "tags" key and an "extra" key, it will just group all contextual
     # information under "extra"
     def self.capture(exception, data={})
-      run_callbacks(exception, wrap_in_extra(data))
+      job_info = check_for_job_context
+      error_info = job_info.deep_merge(wrap_in_extra(data))
+      run_callbacks(exception, error_info)
     end
 
+    # convenience method, use this if you want to apply the 'type' tag without
+    # having to pass in a whole hash
     def self.capture_exception(type, exception)
       self.capture(exception, {tags: {type: type.to_s}})
     end
@@ -67,6 +71,14 @@ module Canvas
     # that got fired in initializers and such until the process restarts.
     def self.clear_callback_registry!
       @registry = {}
+    end
+
+    # capturing all the contextual info
+    # like job ID and tag can make attaching this error
+    # to some debug logs later much easier
+    def self.check_for_job_context
+      job = Delayed::Worker.current_job
+      job ? Canvas::Errors::JobInfo.new(job, nil).to_h : {}
     end
 
     def self.run_callbacks(exception, extra)
