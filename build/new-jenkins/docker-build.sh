@@ -8,7 +8,7 @@ PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 
 dependencyArgs=(
   --build-arg BUILDKIT_INLINE_CACHE=1
-  --build-arg POSTGRES_CLIENT="12"
+  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
   --file Dockerfile.jenkins
 )
