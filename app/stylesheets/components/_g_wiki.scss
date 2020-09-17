@@ -147,16 +147,26 @@ $revision-button-color: $ic-color-dark;
   .page-edit-dialog .edit-content {
     margin: 8px 5px;
     .edit-label {
-      padding-top: 5px;
+      padding-top: 8px;
       width: 75px;
       float: direction(left);
       text-align: direction(right);
+      @include mobile-only {
+        width: auto;
+      }
     }
     .edit-controls {
       margin-#{direction(left)}: 85px;
+      @include mobile-only {
+        float: direction(right);
+        margin-#{direction(left)}: 0px;
+      }
     }
     .edit-control-text {
       width: 270px;
+      @include mobile-only {
+        width: 140px;
+      }
     }
   }
   .index-content {
