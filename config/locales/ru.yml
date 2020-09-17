@@ -2070,7 +2070,7 @@ ru:
   allow_in_mastery_paths_5332c786: "Разрешить для пути освоения"
   allow_include_parameters_bf3d3230: "Разрешить включение параметров "
   allow_intra_group_peer_reviews_53f1e455: "Разрешить внутригрупповые коллегиальные рецензии"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Позволяют настроить подписку на «живые» мероприятия для доставки
       посредством веб-хуков HTTPS
   allow_lor_tools: "Разрешить пользователям просматривать и использовать внешние инструменты, сконфигурированные для LOR."
@@ -2104,7 +2104,7 @@ ru:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Позволяет пользователю просматривать идентификаторы SIS пользователя на странице курса «Люди»."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Позволяет выполнять оценивание по шкалам на уровне учетной записи, рассчитывать уровень профподготовки и заменять шкалы порезультатно"
   allows_admin_user_to_view_account_statistics_341f00d9: "Позволяет пользователю с правами администратора просматривать статистику учетной записи."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Позволяет администраторам просматривать журнал, содержащий информацию ибо всех недавно выполненных
       изменениях GraphQL
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Позволяет совмещать результаты с неоцениваемым содержимым"
@@ -2455,7 +2455,7 @@ ru:
   allows_users_to_edit_conferences_2d3c960c: "Позволяет пользователям редактировать конференции."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Позволяет пользователям активировать опцию «Запуск SpeedGrader с фильтрацией по группам студентов» для курсов на странице настройки курсов. В случае активации и выбора группы студентов в Новом журнале оценок SpeedGrader будет загружать только студентов в выбранную группу."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Позволяет пользователям отключать уведомления по уровню детализации информации о курсе."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Разрешает пользователям обходить специальные предпочтения уведомлений на
       покурсовой основе.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Позволяет пользователям выбрать местоимения, которые будут отображаться после их имени при его показе в пользовательском интерфейсе."
@@ -8330,7 +8330,7 @@ ru:
     save_settings: "Сохранить настройки"
     saving: Сохранение...
   different_course_b875770e: "другой курс"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Разделение системных и пользовательских интерактивных событий
       в инструменте Canvas Data Services
   differentiated_assignments_description: |-
@@ -8365,7 +8365,7 @@ ru:
   disabled_links_b3bdea99: "Отключенные ссылки"
   disabled_not_visible_to_students_2c9d693f: "Отключено. Не отображается для студентов."
   disabled_not_visible_to_students_48d4a90d: "Отключено. Не отображается для студентов"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Отключает SMS-уведомления для всех типов, кроме объявлений и
       изменений оценок.
   disabling_f594bda: "Выполняется отключение..."
@@ -8783,10 +8783,10 @@ ru:
   display_totals_for_all_grading_periods_option_4a72586: "Отображаемые суммарные значения для опции «Все периоды оценки успеваемости»"
   display_values_f517c73c: "Отобразить значения"
   displaying_to_students_b1e92058: "Показывается студентам"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Отображает конфетти для учителей, которые запустили средство проверки подлинности ссылок на
       курс, и при этом не были выявлены какие-либо проблемы.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Отображает похвалу для пользователей, которые выполнили отправку до
       установленной даты сдачи.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -9139,7 +9139,7 @@ ru:
   el_salvador_503_b0907d30: "Сальвадор (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "Ошибка отсутствующего параметра `элемент`: элемент, прикрепляемый к TreeBrowserView, необходимо установить как `истинный` для BBTreeBrowserView при определении настроек параметра рендера"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Простой дружеский тематический шрифт и ограниченная навигация по курсу."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Простая дружеская тема, шрифт и ограниченная навигация по курсу.
       Обновление шрифта применяется только для языков, в которых используется латинский алфавит.
   email: 
@@ -12166,7 +12166,7 @@ ru:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URL метаданных IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Если атрибут помечен только инициализации, то он будет использоваться только тогда, когда Just In Time Provisioning создает нового пользователя, а не будет постоянно обновляться каждый раз, когда пользователь входит в систему."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Если установлен сконфигурированный инструмент LTI с размещением, будет показана новая запись в
       ниспадающем списке типов отправки заданий для быстрой конфигурации задания для инструмента
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Если отключены оба параметра «Оценки - редактировать» и «Оценки - просмотреть все оценки», журнал оценок будет скрыт в навигации курса."
@@ -12188,7 +12188,7 @@ ru:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Если отключен, у пользователя все равно будет доступ к настройкам курса. Пользователь не может управлять отдельным содержимым курса без соответствующего разрешения для этого элемента содержимого. Если видимость курса ограничена пользователями, зачисленными на курс, это разрешение позволяет пользователю просматривать контент курса без зачисления на курс."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "После включения будет активирован доступ к LTI 1.3 и LTI Advantage."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "В случае активации позволяет выставлять в рубрике оценку выше максимально возможной."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       В случае активации Canvas позволяет пользователям возвращать несколько элементов курса
       за один запрос на странице модулей курса
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Если включено, модули импорта Common Cartridge преобразуют HTML-файлы в станицы"
@@ -12198,7 +12198,7 @@ ru:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Если опция включена, появится возможность пометить модуль, как выполненный, если будет удовлетворено только одно из требований."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "В случае активации данной функции при запуске процесса регистрации LTI2 будет произведена отправка 'oauth2_access_token_url'"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Если активировано, подписывание OAuth 1.0a может использоваться инструментами LTI для доступа к API Службы членства"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Если активирован, конечные точки oEmbed будут требовать
       сгенерированный с помощью инструмента токен для подтверждения происхождения
       запроса источника oEmbed.
@@ -12209,14 +12209,14 @@ ru:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Если активировано, история отправок для тестирований Quizzes.Next рассматривается отдельно."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Если эта функция активирована, она будет представляться в рубрике без оценок."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Если включено, для формы регистрации родителей потребуется код сопряжения студента вместо имени пользователя и пароля"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Если эта функция включена, то в пользовательском интерфейсе будут отображаться
       только ключи разработчика администратора сайта. Обратите внимание на то, что это влияет
       только на те экземпляры Canvas, где корневые учетные записи находятся в тех же сегментах,
       что и учетная запись администратора сайта. Поведение в других случаях
       уже было таким.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Если включено, пользователи смогут настраивать инструменты LTI 2."
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Если активировано, когда создано Lti::ToolProxy, это
       создаст подписку Интерактивные события непосредственно в инструменте
       вместо задания. Это создаст события, которые необходимо
@@ -12226,7 +12226,7 @@ ru:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Если ничего не выбрано, отправить всем во всем суб-аккаунте)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Если ничего не выбрано, показать всем во всей субучетной записи)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Если ничего не выбрано, показать всем во всей учетной записи)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Если улучшения RCE также активированы,
       RCE будет выполнять автосохранение вашей работы по мере продвижения вперед
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Если установлено, отключает функцию «post-to-SIS» для заданий после закрытия их периода выставления оценок. Действует только в том случае, если активирована функция «Активировать новые настройки интеграции SIS»."
@@ -21965,7 +21965,7 @@ ru:
   short_name_ad9bf84f: "краткое имя"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "должно быть очевидным, Идентификатор canvas отчетного пользователя "
   show_76c0ed1c: Показать
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Указывает флажок, который дополнительно позволяет администратору учетных записей публиковать курсы
       автоматически после присоединения и синхронизации с шаблонным курсом
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Показать список недавно посещенных страниц в глобальной навигации Canvas"
@@ -22016,7 +22016,7 @@ ru:
   show_originality_report_to_students_be22f5ee: "Показать отчет подлинности студентам"
   show_params_3401895b: "Показать параметры"
   show_past_account_level_announcements_to_users_3b8208e2: "Показать пользователям прошлые объявления уровня учетной записи"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Показать пользователям прошлые объявления уровня учетной записи. Позволяет
        пользователю просматривать объявления, срок действия которых истек или которые были удалены.
   show_question_details_b059df00: "Показать сведения о вопросе"
@@ -24437,7 +24437,7 @@ ru:
   updated_permissions_page_f2e91060: "Обновленная страница разрешений"
   updated_terms_of_service_82f34148: "Обновлены Условия предоставления услуг"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Обновленный интерфейс для поиска и отображения пользователей и курсов в аккаунте."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Обновляет пользовательский интерфейс предпочтений уведомлений учетной записи до более актуального уровня
       и повышенный комфорт пользователя
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Обновляет значки Политики публикации в заголовке столбца заданий Нового журнала оценок."

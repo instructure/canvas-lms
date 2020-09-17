@@ -2043,7 +2043,7 @@ nl:
   allow_in_mastery_paths_5332c786: "Toestaan in meesterschapspaden"
   allow_include_parameters_bf3d3230: "Include-parameters toestaan "
   allow_intra_group_peer_reviews_53f1e455: "Peerbeoordelingen binnen groepen toestaan"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Zorg dat abonnementen op live gebeurtenissen ingesteld kunnen worden op geleverd
       via HTTPS-webhooks
   allow_lor_tools: "Gebruikers toestaan om externe tools, die voor LOR geconfigureerd zijn, weer te geven en te gebruiken."
@@ -2077,7 +2077,7 @@ nl:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Hiermee kan een gebruiker de SIS-ID van gebruikers op de pagina Personen in een cursus bekijken."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Bedoeld voor scoringscriteria op accountniveau en berekeningen van vaardigheden, ter vervanging van scores op basis van resultaten"
   allows_admin_user_to_view_account_statistics_341f00d9: "Hiermee kan een beheerder accountstatistieken bekijken."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Hiermee kunnen beheerders een logboek bekijken dat informatie bevat over alle onlangs uitgevoerde
       GraphQL-mutaties
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Hiermee kunnen leerdoelen worden afgestemd op niet-scorende inhoud"
@@ -2425,7 +2425,7 @@ nl:
   allows_users_to_edit_conferences_2d3c960c: "Hiermee kan een gebruiker Vergaderingen bewerken."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Laat gebruikers de optie \"Start SpeedGrader gefilterd door cursistengroep\" inschakelen voor cursussen op de pagina Cursusinstellingen. Wanneer deze optie is ingeschakeld en er een cursistengroep is geselecteerd in de Nieuwe cijferlijst, laadt SpeedGrader alleen cursisten in de geselecteerde groep."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Hiermee kunnen gebruikers meldingen verbergen op cursusniveau."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Hiermee kunnen gebruikers specifieke meldingsvoorkeuren negeren op
       cususniveau.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Hiermee kunnen gebruikers voornaamwoorden kiezen die achter hun naam komen te staan wanneer deze wordt weergegeven in de gebruikersinterface."
@@ -8136,7 +8136,7 @@ nl:
     save_settings: "Instellingen opslaan"
     saving: "Bezig met opslaan..."
   different_course_b875770e: "andere cursus"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Maak onderscheid tussen door het systeem en gebruikers gegenereerde live evenementen
       in de tool Canvas Data Services
   differentiated_assignments_description: |-
@@ -8172,7 +8172,7 @@ nl:
   disabled_links_b3bdea99: "Uitgeschakelde koppelingen"
   disabled_not_visible_to_students_2c9d693f: "Uitgeschakeld. Niet zichtbaar voor cursisten."
   disabled_not_visible_to_students_48d4a90d: "Uitgeschakeld. Niet zichtbaar voor cursisten"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Hiermee worden sms-meldingen voor alle typen uitgeschakeld, met uitzondering van aankondigingen en
       cijferwijzigingen.
   disabling_f594bda: Uitschakelen...
@@ -8574,10 +8574,10 @@ nl:
   display_totals_for_all_grading_periods_option_4a72586: "Toon totalen voor optie Alle beoordelingsperioden"
   display_values_f517c73c: "Waarden weergeven"
   displaying_to_students_b1e92058: "Weergeven aan cursisten"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Toont confetti voor cursusleiders die de linkvalidator uitvoeren voor
       een cursus wanneer er geen problemen worden aangetroffen.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Hiermee geef je confetti weer voor gebruikers die een opdracht eerder inleveren dan
       de ingestelde inleverdatum.
   distribution_of_current_grades_in_courses_across_a_e6c82f5d: |-
@@ -8928,7 +8928,7 @@ nl:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "ontbrekende fout in optie `element`: Een element aan de TreeBrowserView toevoegen moet bepaald worden wanneer de weergave-optie voor BBTreeBrowserView op 'true' (waar) wordt ingesteld"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Elementair vriendelijk themalettertype en beperkt navigeren door cursussen."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Elementair vriendelijk thema, lettertype en beperkte cursusnavigatie.
       De lettertype-update geldt alleen voor de talen die gebruik maken van het Latijnse alfabet.
   email: 
@@ -11894,7 +11894,7 @@ nl:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Als een kenmerk gemarkeerd is als alleen voorzien, dan zal het alleen gebruikt worden als Just in Time Provisioning een nieuwe gebruiker aanmaakt, het zal niet up to date worden gehouden telkens als de gebruiker aanmeldt."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Als een LTI-tool geconfigureerd met de plaatsing wordt geïnstalleerd, wordt een nieuwe invoer getoond in de
       vervolgkeuzelijst voor het opdrachtinleveringstype om de opdracht snel te configureren voor de tool
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Als zowel Cijfers - bewerken als Cijfers - alle cijfers weergeven is uitgeschakeld, blijft de Cijferlijst verborgen in de cursusnavigatie."
@@ -11916,7 +11916,7 @@ nl:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Indien uitgeschakeld, heeft de gebruiker nog wel toegang tot Cursusinstellingen. De gebruiker kan geen specifieke inhoud van cursussen beheren zonder de juiste machtiging voor dat inhoudsitem. Als de zichtbaarheid van een cursus is beperkt tot gebruikers die voor de cursus zijn ingeschreven, kan de gebruiker met deze machtiging cursusinhoud bekijken zonder voor de cursus te zijn ingeschreven."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Indien ingeschakeld, wordt toegang tot LTI 1.3 en LTI Advantage ingeschakeld."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Indien ingeschakeld, is een hogere dan de maximaal mogelijke score die aan een rubriek kan worden gegeven, toegestaan."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Indien ingeschakeld, kunnen tools meerdere inhoudsitems als resultaat geven
       met één aanvraag op de pagina Cursusmodules
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Indien ingeschakeld, worden HTML-pagina's door Common Cartridge bij het importeren geconverteerd naar pagina's"
@@ -11926,7 +11926,7 @@ nl:
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Indien ingeschakeld, zullen modulen de optie hebben als voltooid gemarkeerd te worden als aan slechts een van de vereisten is voldaan."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Indien ingeschakeld, wordt 'oauth2_access_token_url' verzonden in de lancering van de LTI2-registratie"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Indien ingeschakeld, kan OAuth 1.0a door LTI-tools worden gebruikt voor toegang tot de Membership Service API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Indien ingeschakeld, hebben oEmbed-eindpunten een
       digitaal gegenereerde token nodig om de herkomst
       van een verzoek van een oEmbed-bron te verifiëren.
@@ -11937,14 +11937,14 @@ nl:
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Indien ingeschakeld, wordt de inleveringsgeschiedenis voor Quizzes.Next toetsen afzonderlijk behandeld."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Indien ingeschakeld, wordt gemeld dat de optie niet-scorende rubrieken heeft."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Indien ingeschakeld, is er voor het aanmeldingsformulier voor ouders een cursistkoppelingscode vereist in plaats van de gebruikersnaam en het wachtwoord van de cursist"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Indien ingeschakeld, toont de ontwikkelaarssleutel UI van de sitebeheerder alleen
       ontwikkelaarssleutels van de sitebeheerder. Merk op dat dit alleen van invloed is op
       Canvas gevallen waar de hoofdaccounts op dezelfde shard zijn
       als het sitebeheerderaccount. Het gedrag in andere gevallen
       was reeds hetzelfde als dit gedrag.
   if_enabled_users_will_be_able_to_configure_lti_2_t_6293eebd: "Indien ingeschakeld, kunnen gebruikers LT1 2 tools configureren"
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Indien ingeschakeld, zal wanneer een Lti::ToolProxy wordt gemaakt,
       rechtstreeks het abonnement voor live evenementen op de tool worden gemaakt
       in plaats van de opdracht. Dit zorgt ervoor dat evenementen
@@ -11954,7 +11954,7 @@ nl:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Als niemand geselecteerd is, dan aan de hele subaccount toesturen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele subaccount weergeven)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Als er geen wordt geselecteerd, dan aan iedereen in het gehele account weergeven)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Als er ook RCE-verbeteringen zijn ingeschakeld,
       slaat de RCE uw werk automatisch op terwijl u ermee aan het werk bent
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Indien ingesteld, wordt de functionaliteit posten-naar-SIS uitgezet voor opdrachten wanneer hun beoordelingsperiode sluit. Geldt alleen als de functie \"Nieuwe instellingen voor SIS-integratie inschakelen\" is ingeschakeld."
@@ -21491,7 +21491,7 @@ nl:
   short_name_ad9bf84f: "korte naam"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "moet vanzelfsprekend zijn, het Canvas-ID van de rapporterende gebruiker"
   show_76c0ed1c: Tonen
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Hiermee wordt een selectievakje weergegeven waarmee een accountbeheerder naar wens automatisch cursussen kan publiceren
       na koppeling en synchronisatie met een blauwdrukcursus
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Geef een lijst met onlangs bezochte pagina's weer in de globale navigatie van Canvas"
@@ -21542,7 +21542,7 @@ nl:
   show_originality_report_to_students_be22f5ee: "Originaliteitrapport weergeven aan cursisten"
   show_params_3401895b: "Parameters tonen"
   show_past_account_level_announcements_to_users_3b8208e2: "Toon eerdere accountniveau aankondigingen aan gebruikers"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Toon eerdere accountniveau aankondigingen aan gebruikers. Laat
       een gebruiker aankondigingen zien die zijn beëindigd of verwijderd.
   show_question_details_b059df00: "Vraagdetails tonen"
@@ -23928,7 +23928,7 @@ nl:
   updated_permissions_page_f2e91060: "Bijgewerkte machtigingspagina"
   updated_terms_of_service_82f34148: "Bijgewerkte servicevoorwaarden"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Bijgewerkte UI voor zoeken en weergeven van gebruikers en cursussen binnen een account."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Updaten van accountniveau meldingsvoorkeuren UI tot een meer actuele
       en bijgewerkte gebruikerservaring
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Hiermee wordt de weergave van pictogrammen voor Beleid voor posten bijgewerkt in de kop van de toewijzingskolom in Nieuwe cijferlijst."

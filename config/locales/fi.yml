@@ -1411,7 +1411,7 @@ fi:
   allow_in_mastery_paths_5332c786: "Salli personoiduissa oppimispoluissa"
   allow_include_parameters_bf3d3230: "Salli parametrien sisällyttäminen "
   allow_intra_group_peer_reviews_53f1e455: "Salli ryhmän sisäiset vertaisarvioinnit"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Salli Live-tapahtuman tilauksen toimittaminen
       HTTPS- webhookien kautta
   allow_lor_tools: "Salli käyttäjien tarkastelevan ja käyttävän LOR:lle konfiguroituja ulkoisia työkaluja."
@@ -1437,7 +1437,7 @@ fi:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Sallii Toimi käyttäjänä -linkin näkymisen opiskelijan kontekstikortilla"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Sallii tilitason hallinnan suuruusluokat ja tehokkuuslaskelmat, korvaa tuloskohtaiset suuruusluokat"
   allows_admin_user_to_view_account_statistics_341f00d9: "Sallii pääkäyttäjän tarkastella tilin tilastoja."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Sallii pääkäyttäjien tarkastelevan lokia, joka sisältää tiedot kaikista viime aikoina suoritetuista
       GraphQL-muutoksista.
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Sallii osaamistulosten liittämisen ei-pisteytettävään sisältöön"
@@ -1765,7 +1765,7 @@ fi:
   allows_users_to_edit_conferences_2d3c960c: "Sallii käyttäjien muokkaavan konferensseja."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Sallii käyttäjien ottaa käyttöön \"Käynnistä SpeedGrader opiskelijaryhmän perusteella suodatettuna\" -vaihtoehto kursseilla kurssin asetukset-sivulla. Kun tämä valinta on aktiivisena ja uudessa arvosanakirjassa on valittuna opiskelijaryhmä, SpeedGrader lataa vain ne opiskelijat, jotka ovat valitussa ryhmä."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Sallii käyttäjien mykistää ilmoitukset kurssikohtaisesti."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Sallii käyttäjien ohittaa tietyt ilmoitusasetukset
       kurssikohtaisesti.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Mahdollistaa käyttäjien poimivan pronomineja, jotka näytetään heidän nimensä jälkeen, kun se näkyy käyttöliittymässä."
@@ -6271,7 +6271,7 @@ fi:
     cancel: Peruuta
     save_settings: "Tallenna asetukset"
     saving: Tallennetaan...
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Erottele järjestelmän ja käyttäjän luomat live-tapahtumat
       Canvas Data Services -työkalussa
   diigo_993c4646: Diigo
@@ -6301,7 +6301,7 @@ fi:
   disabled_links_b3bdea99: "Käytöstä poistetut linkit"
   disabled_not_visible_to_students_2c9d693f: "Poistettu käytöstä Ei näkyvissä opiskelijoille."
   disabled_not_visible_to_students_48d4a90d: "Poistettu käytöstä Ei näkyvissä opiskelijoille"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Poistaa tekstiviesti-ilmoitukset kaikista muista kuin ilmoituksista ja
       arvosanamuutoksista.
   disabling_f594bda: "Poistetaan käytöstä..."
@@ -6581,10 +6581,10 @@ fi:
   display_totals_for_all_grading_periods_option_4a72586: "Näytä kaikkien arvosanojen antojaksojen summat -asetus"
   display_values_f517c73c: "Näytettävät arvot"
   displaying_to_students_b1e92058: "Näytetään opiskelijoille"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Näyttää konfetin opettajille, jotka pyörittävät linkin vahvistajaa
       kurssilla eikä ongelmia löydy.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Näyttää konfetti-animaation käyttäjille, jotka palauttavat tehtävän ennen
       sen määräpäivää.
   district_id_6f408184: "Alueen tunnus"
@@ -6876,7 +6876,7 @@ fi:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element`-asetus puuttuu -virhe: TreeBrowserView-näkymän liittämisessä käytettävä elementti täytyy määrittää, kun määritetään hahmontamisasetusta arvoon \"tosi\" BBTreeBrowserView-näkymälle"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Elementary-ystävällisen teeman fontti ja rajallinen kurssinavigointi."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Elementary-ystävällisen teeman fontti ja rajallinen kurssinavigointi.
       Fontin päivitystä sovelletaan kielille, jotka käyttävät latinalaisia aakkosia.
   email: 
@@ -8962,7 +8962,7 @@ fi:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Jos määrite merkitään ’vain valmistelu’-ominaisuudeksi, sitä käytetään vain silloin, kun Just-in-time -valmistelu luo uuden käyttäjän, eikä sitä pidetä ajan tasalla joka kerta, kun käyttäjä kirjautuu sisään."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Jos asennettuna on LTI-työkalu paikan kanssa, uusi merkintä näkyy
       tehtävän lähetystyypin pudotusvalikossa, niin että työkalun tehtävä voidaan nopeasti konfiguroida
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Jos sekä Arvosanat - muokkaa ja Arvosanat - tarkastele kaikkia arvosanoja ovat pois käytöstä, arvosanakirja on piilotettu kurssin navigoinnista."
@@ -8984,14 +8984,14 @@ fi:
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Jos tämä on pois käytöstä, käyttäjällä on yhä pääsy kurssin asetuksiin. Käyttäjä ei voi hallita yksittäistä kurssin sisältöä ilman asianmukaisia käyttöoikeuksia kyseiseen sisältökohteeseen. Jos kurssin näkyvyys on rajoitettu kurssille ilmoittautuneille käyttäjille, tämä käyttöoikeus sallii käyttäjän tarkastelevan kurssin sisältöä ilman, että hän on ilmoittautunut kurssille."
   if_enabled_access_to_lti_1_3_and_lti_advantage_wil_1013107c: "Jos käytössä, pääsy LTI 1.3 - ja LTI Advantage -moduuliin otetaan käyttöön."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Jos ominaisuus on käytössä, arviointitaulukossa voi antaa maksimipistemäärää enemmän pisteitä."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Jos käytössä, Canvas sallii työkalujen palauttaa useita sisältökohteita
       yhdessä pyynnössä kurssimoduulien sivulla
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Jos käytössä, Common Cartridge -tuontitoiminnot muuntavat HTML-tiedostot sivuiksi"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Jos käytössä, sisällön suunnittelijoiden täytyy tarjota tekijänoikeuksia ja lisenssitietoja tiedostoille ennen kuin ne julkaistaan. Koskee vain, jos Parempi tiedoston selaus on käytössä."
   if_enabled_copyright_and_license_information_must__2a551827: "Jos käytössä, tekijänoikeutta ja lisenssiä koskevat tiedot täytyy toimittaa tiedostoille ennen niiden julkaisua."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jos käytössä, LTI-työkalut saattavat käyttää OAuth 1.0a -allekirjoitusta käyttääkseen jäsenyyspalvelun API-ohjelmaa."
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Jos käytössä, oEmbedin päätepisteet vaativat 
       työkalun luoman tunnuksen vahvistaakseen Embedin resurssipyynnön alkuperän
       .
@@ -9000,13 +9000,13 @@ fi:
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Jos käytössä, Uudet testit -toiminnolla tehtyjen testien tehtäväpalautushistoria käsitellään erikseen."
   if_enabled_submission_history_for_quizzes_next_qui_fd70161: "Jos käytössä, lähetyshistoria Quizzes.Next-kyselyille käsitellään erikseen."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Jos käytössä, tarjotaan vaihtoehtona myös ei-pisteytettäviä arviointitaulukoita."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Jos käytössä, sivuston järjestelmäkäyttäjän kehittäjän avaimen käyttöliittymä näyttää vain
       sivuston järjestelmäkäyttäjän kehittäjän avaimet. Huomaa, että tämä vaikuttaa vain
       Canvas-esiintymiin, jossa juuritilit ovat samassa palasessa
       kuin sivuston järjestelmäkäyttäjän tili. Toiminto muissa esiintymissä
       toimi jo tällä tavalla.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Jos käytössä, kun Lti::ToolProxy luodaan, se
       luo live-tapahtuman tilauksen suoraan työkaluun
       tehtävän sijasta. Tämä aiheuttaa tapahtumien
@@ -9016,7 +9016,7 @@ fi:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Jos mitään ei valita, lähetä kaikille koko alatilillä)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Jos mitään ei valita, näytä kaikille koko alatilillä)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Jos mitään ei valita, näytä kaikille koko tilillä)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Jos sisältöeditorin laajennukset on myös otettu käyttöön,
       editori tallentaa tekemäsi muutokset automaattisesti.
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Jos tämä on määritetty, Lähetä SIS-ominaisuus -toiminnollisuus tehtäville kytkeytyy pois päältä, kun niiden arvosanojen antojakso sulkeutuu. Koskee vain, jos ”Ota uudet SIS-integraatioasetukset” -toiminto on käytössä."
@@ -16724,7 +16724,7 @@ fi:
   short_name_42f454a1: "Lyhyt nimi"
   short_name_ad9bf84f: "lyhyt nimi"
   show_76c0ed1c: Näytä
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: "Näytä tarkistusruutu, joka antaa vaihtoehtoisesti tilin järjestelmäkäyttäjän julkaista kursseja\n\
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: "Näytä tarkistusruutu, joka antaa vaihtoehtoisesti tilin järjestelmäkäyttäjän julkaista kursseja\n\
       automaattisesti sen jälkeen, kun Blueprint-kurssi on assosioitu ja synkronoitu "
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Näytä luettelo äskettäin käydyistä sivuista Canvasin globaalissa navigaatiossa"
   show_account_navigation_menu_d97270a9: "Näytä tilin navigointivalikko"
@@ -16764,7 +16764,7 @@ fi:
   show_only_blueprint_courses_9fb37b41: "Näytä vain blueprint-kurssit"
   show_params_3401895b: "Näytä muuttujat"
   show_past_account_level_announcements_to_users_3b8208e2: "Näytä menneen tilin tason ilmoituksen käyttäjille"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Näytä menneen tilin tason ilmoituksen käyttäjille. Sallii
       käyttäjän tarkastelevan ilmoituksia, jotka ovat päättyneet tai jotka on ohitettu.
   show_question_details_b059df00: "Näytä kysymyksen tiedot"
@@ -18840,7 +18840,7 @@ fi:
   updated_2c1e8615: Päivitetty
   updated_group_group_name_727b1d98: "Päivitettiin ryhmä %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Päivitetty käyttöliittymä käyttäjien ja kurssien hakuun ja esittämiseen tilillä."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Päivitykset tilin ilmoitusasetuksien käyttöliittymään täytyy olla ajantasaisempia
       ja päivitetty käyttäjäkokemus
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Päivittää lähetyskäytännön kuvakkeiden näytön uuden arvosanakirjan tehtävän sarakeotsikossa."

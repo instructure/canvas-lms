@@ -1818,7 +1818,7 @@ da-x-k12:
   allow_in_mastery_paths_5332c786: "Tillad i læringsstier"
   allow_include_parameters_bf3d3230: "Tillad Inkluder parametre "
   allow_intra_group_peer_reviews_53f1e455: "Tillad interne elev-elev vurderinger"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Tillad, at abonnementer til live-begivenheder indstilles til at blive leveret
       via HTTPS-webhooks
   allow_lor_tools: "Giv brugerne mulighed for at se og bruge eksterne værktøjer, der er konfigureret til LOR."
@@ -1850,7 +1850,7 @@ da-x-k12:
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gør det muligt for en bruger at få vist SIS-ID’er på siden Deltagere i et fag."
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Tillader skalaler for opfyldelse af læringsmål på kontoniveau og færdighedsberegninger og erstatter skalaer pr. læringsudbytte"
   allows_admin_user_to_view_account_statistics_341f00d9: "Gør det muligt for en admin-bruger at få vist kontostatistik."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Lader administratorer se en logfil med oplysninger om alle de nyligt kørte
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillader tilpasning af læringsudbytter for indhold uden vurdering"
@@ -2181,7 +2181,7 @@ da-x-k12:
   allows_users_to_edit_conferences_2d3c960c: "Gør det muligt for brugere at redigere konferencer."
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Tillader brugere at aktivere \"Start SpeedGrader Filtreret efter studiegruppe\" i fag på siden med fagindstillinger. Når aktiveret, og en elevgruppe er valgt i Ny vurderingsoversigt, så vil SpeedGrader kun indlæse elever i den valgte gruppe."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Lader brugere slå feedback fra på fagniveau."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Tillader brugere at tilsidesætte specifikke meddelelsesindstillinger
       fra fag til fag.
   allows_users_to_pick_pronouns_that_will_be_display_4adf5ac: "Lader brugere vælge pronomener, der vises efter deres navn, når det vises i brugergrænsefladen."
@@ -7169,7 +7169,7 @@ da-x-k12:
     save_settings: "Gem indstillinger"
     saving: "Gemmer ..."
   different_course_b875770e: "andet fag"
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Skelne mellem system- og brugergenererede live-begivenheder
       i værktøjet Canvas Data Services
   diigo_993c4646: Diigo
@@ -7199,7 +7199,7 @@ da-x-k12:
   disabled_links_b3bdea99: "Deaktiverede links"
   disabled_not_visible_to_students_2c9d693f: "Deaktiveret. Ikke synlig for eleverne."
   disabled_not_visible_to_students_48d4a90d: "Deaktiveret. Ikke synlig for elever"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Deaktiverer SMS-meddelelser for alle typer undtagen beskeder og
       vurderingsændringer.
   disabling_f594bda: "Deaktiverer ..."
@@ -7545,10 +7545,10 @@ da-x-k12:
   display_totals_for_all_grading_periods_option_4a72586: "Vis muligheden for samlet resultat for alle vurderingsperioder"
   display_values_f517c73c: "Vis værdier"
   displaying_to_students_b1e92058: "Vises til elever"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Viser konfetti for lærere, der bruger linkvalideratoren på
       et fag, og der ikke findes nogen problemer.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Viser konfetti for brugere, der afleverer en opgave forud
       for den indstillede afleveringsdato.
   district_id_6f408184: Distrikt-id
@@ -7858,7 +7858,7 @@ da-x-k12:
   el_salvador_503_b0907d30: "El Salvador (+503)"
   element_option_missing_error_an_element_to_attach__be433478: "`element` indstilling mangler fejl: Der skal specificeres et element til at vedhæfte TreeBrowserView, når gengivelsesindstillingen konfigureres til 'sand' for BBTreeBrowserView"
   elementary_friendly_theme_font_and_limited_course__4dc48217: "Skrifttyper og begrænset fagnavigation til folkeskolen."
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Tema, skrifttype og fagnavigation begrænset til folkeskolen.
       Skrifttypeopdateringen gælder kun for sprog, der bruger det latinske alfabet.
   email: 
@@ -10076,7 +10076,7 @@ da-x-k12:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "IdP Metadata URI"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Hvis en egenskab er markeret som kun ved tilmelding, vil den kun blive brugt, når Just in Time-meldingen opretter en ny bruger og vil ikke blive opdateret, hver gang brugeren logger ind."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Hvis der er installeret et LTI-værktøj, som er konfigureret med placeringen, så viser det en ny mulighed i
       rullemenuen for opgavers afleveringsform for hurtigt at konfigurere opgaven til værktøjet
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Hvis både ’Vurderinger - redigér’ og ’Vurderinger - vis alle vurderinger’ er deaktiveret, bliver vurderingsoversigten skjult for fagnavigationen."
@@ -10097,14 +10097,14 @@ da-x-k12:
               muligt for en bruger at få vist fagindhold uden at være tilmeldt faget.
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Hvis dette er deaktiveret, har brugeren stadig adgang til Fagindstillinger. Brugeren kan ikke administrere enkelt fagindhold uden den passende"
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Hvis aktiveret, tillades mere end det maksimalt mulige resultat på et læringsudbytte, der skal angives på et vurderingskriterie."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Hvis aktiveret, lader Canvas værktøjer returnere flere indholdselementer
       i en enkelt anmodning på siden med fagforløb
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Hvis aktiveret, vil Common Cartridge-importører konvertere HTML-filer til sider"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Hvis aktiveret skal indholdsdesignere oplyse copyright og licensoplysninger for filer, inden de udgives. Gælder kun, hvis Better File Browsing også er aktiveret."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Hvis aktiveret, vil udvikler-nøgle-håndteringsmulighederne og token-omfanget blive brugt."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Hvis aktiveret, kan OAuth 1.0a-signering bruges af LTI-værktøjer for at få adgang til medlemskabstjenestens API"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Hvis aktiveret, kræver oEmbed-slutpunkter et
       værktøjsgenereret token til at verificere oprindelsen
       af en anmodning om en oEmbed-ressource.
@@ -10113,13 +10113,13 @@ da-x-k12:
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Hvis aktiveret, behandles afleveringshistorik for New Quizzes-quizzer separat."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Hvis aktiveret, vil indstillingen blive præsenteret med vurderingskriterier uden resultat."
   if_enabled_the_parent_sign_up_form_will_require_a__a9c32041: "Hvis aktiveret, påkræver forælderens tilmeldingsformular en parringskode for eleven i stedet for barnets brugernavn og adgangskode"
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Hvis aktiveret, viser grænsefladen for site-administratorens udvikler-nøgle kun
       site-administratorens udvikler-nøgler. Bemærk, at dette kun påvirker
       Canvas-forekomster, hvor rodkonti er på samme shard
       som webstedets admin-konto. Adfærd i andre forekomster
       opførte sig allerede på denne måde.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Hvis aktiveret, når der oprettes en Lti::ToolProxy, så opretter den
       abonnementet på live-begivenheden direkte på værktøjet
       i stedet for i opgaven. Dette vil forårsage, at begivenheder
@@ -10129,7 +10129,7 @@ da-x-k12:
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Send til alle i hele underkontoen, hvis der ikke vælges nogen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Vis til alle i hele underkontoen, hvis der ikke vælges noget)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Vis til alle i hele kontoen, hvis der ikke vælges noget)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Hvis RCE-forbedringer også er aktiveret,
       gemmer RCE automatisk dit arbejde hen ad vejen
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Hvis indstillet, skal Slå op til SIS-funktionen deaktiveres for opgaver, når deres vurderingsperiode lukkes. Gælder kun, hvis funktionen \"Aktivér nye SIS-integrationsindstillinger\" er aktiveret."
@@ -18467,7 +18467,7 @@ da-x-k12:
   short_name_ad9bf84f: "kort navn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "skal være selvindlysende, den rapporterende brugers canvas-id"
   show_76c0ed1c: Vis
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Vis et afkrydsningsfelt, der valgfrit lader en kontoadministrator offentliggøre fag
       automatisk efter tilknytning og synkronisering med et blueprint-fag
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Vis en liste over senest besøgte sider i Canvas’ Globale navigation"
@@ -18508,7 +18508,7 @@ da-x-k12:
   show_originality_report_to_students_be22f5ee: "Vis originalitetsrapport til eleverne"
   show_params_3401895b: "Vis parametre"
   show_past_account_level_announcements_to_users_3b8208e2: "Vis tidligere beskeder på kontoniveau til brugere"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Vis tidligere beskeder på kontoniveau til brugere. Lader
       en bruger se beskeder, der er afsluttet eller afvist.
   show_question_details_b059df00: "Vis spørgsmålsoplysninger"
@@ -20682,7 +20682,7 @@ da-x-k12:
   updated_group_group_name_727b1d98: "Opdateret gruppe %{group_name}"
   updated_permissions_page_f2e91060: "Opdateret tilladelsesside"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Opdateret UI til at søge efter og vise brugere og fag i en konto."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Opdaterer kontomeddelelsesindstillinger til at blive en mere aktuel
       og opdateret brugeroplevelse
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Opdaterer visningen af ikoner for opslagspolitikker i kolonneoverskriften Ny vurderingsoversigt-opgave."

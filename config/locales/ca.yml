@@ -1365,7 +1365,7 @@ ca:
   allow_in_mastery_paths_5332c786: "Permet als camins cap al domini"
   allow_include_parameters_bf3d3230: "Permet els paràmetres d'inclusió"
   allow_intra_group_peer_reviews_53f1e455: "Permet les revisions entre companys dins del grup"
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
       Permet configurar la subscripció a esdeveniments en directe perquè es lliuri
       mitjançant webhooks HTTPS
   allow_migration_of_quizzes_during_course_copy_and__35d80756: "Permet la migració de qüestionaris durant la còpia i importació del curs"
@@ -1389,7 +1389,7 @@ ca:
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permet als usuaris accedir a l'enllaç Actua com a usuari a les targetes de context de l'estudiant"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Permet les escales de domini a nivell del compte i els càlculs de competència, substituint les escales per resultats"
   allows_admin_user_to_view_account_statistics_341f00d9: "Permet a l'usuari administrador visualitzar les estadístiques del compte."
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Permet als administradors visualitzar un registre amb informació sobre totes les mutacions GraphQL
       executades recentment
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permet alinear els resultats amb contingut sense puntuació"
@@ -1560,7 +1560,7 @@ ca:
   allows_users_to_add_lti_tools_with_conference_sele_c38545ab: "Permet que els usuaris afegeixin eines d'LTI amb el tipus d'ubicació conference_selection"
   allows_users_to_enable_the_launch_speedgrader_filt_7e1b442: "Permet als usuaris habilitar l'opció \"Inicia SpeedGrader filtrat per grups d'estudiants\" per als cursos a la pàgina de configuració del curs. Si està actiu i se selecciona un grup d'estudiants al Llibre de qualificacions nou, SpeedGrader només carregarà els estudiants del grup seleccionat."
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: "Permet als usuaris ocultar les notificacions amb granularitat de nivell de curs."
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
       Permet als usuaris substituir les preferències de notificació específiques
       curs per curs.
   allows_users_with_international_phone_numbers_to_r_f90f8522: "Permet que els usuaris amb números de telèfon internacionals rebin missatges de text del Canvas."
@@ -5755,7 +5755,7 @@ ca:
     cancel: Cancel·la
     save_settings: "Desa la configuració"
     saving: "S'està desant..."
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
       Permet distingir entre els esdeveniments en directe generats pel sistema i per l'usuari
        a l'eina de Serveis de dades del Canvas
   diigo_993c4646: Diigo
@@ -5782,7 +5782,7 @@ ca:
   disabled_links_b3bdea99: "Enllaços inhabilitats"
   disabled_not_visible_to_students_2c9d693f: "S'ha inhabilitat. No és visible per als estudiants."
   disabled_not_visible_to_students_48d4a90d: "S'ha inhabilitat. No és visible per als estudiants"
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Inhabilita les notificacions per SMS per a tots els tipus excepte els anuncis i els
       canvis a la qualificació.
   disabling_f594bda: "S'està inhabilitant..."
@@ -6043,10 +6043,10 @@ ca:
   display_name_b80c243e: "Nom de visualització"
   display_totals_for_all_grading_periods_option_4a72586: "Opció Mostra els totals per a tots els períodes de qualificació"
   display_values_f517c73c: "Mostra els valors"
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
       Mostra confeti per als professors que executen el validador d'enllaços en
       un curs quan no es troba cap problema.
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
       Mostra confeti als usuaris que entreguin una tasca abans de
       la data de venciment.
   district_id_6f408184: "ID del districte"
@@ -6313,7 +6313,7 @@ ca:
   either_the_url_or_domain_should_be_set_c29cf8c1: "S'ha de definir l'URL o el domini."
   either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "O bé sou un usuari nou o les *condicions d'ús* han canviat des que les veu acceptar. Accepteu les *condicions d'ús* abans de continuar."
   el_salvador_503_b0907d30: "El Salvador (+503)"
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
       Tema, tipus de lletra i navegació del curs limitada per a l'educació primària.
       L'actualització del tipus de lletra només s'aplica als idiomes que fan servir l'alfabet llatí.
   email: 
@@ -8174,7 +8174,7 @@ ca:
   idp_logoutresponse_xml_fe65de19: "IdP LogoutResponse XML"
   idp_metadata_uri_dae5314a: "URI de metadades d'IdP"
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Si un atribut es marca com a només proveïment, només es farà servir quan l'Aprovisionament just a temps creï un nou usuari, i no es mantindrà actualitzat cada vegada que l'usuari iniciï la sessió."
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
       Si s'instal·la una eina LTI (interoperabilitat d'eines d'aprenentatge) configurada amb la ubicació,
       es mostrarà una entrada nova al desplegable de tipus d'entrega de la tasca per configurar ràpidament la tasca per a l'eina
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Si Qualificacions - edita i Qualificacions - visualitza totes les qualificacions estan inhabilitats, el Llibre de qualificacions s'amagarà a la Navegació del curs."
@@ -8183,12 +8183,12 @@ ca:
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Si s'inhabilita, l'usuari encara podrà visualitzar i baixar els fitxers en un fitxer zip."
   if_disabled_user_will_still_have_access_to_course__d78fddc4: "Si s'inhabilita, l'usuari encara podrà accedir a la Configuració del curs. L'usuari no pot administrar el contingut individual del curs sense el permís adequat per a aquest element de contingut. Si la visibilitat del curs està limitada als usuaris inscrits al curs, aquest permís permet a l'usuari visualitzar el contingut del curs sense estar-hi inscrit."
   if_enabled_allows_more_than_the_maximum_possible_s_5d79c0d5: "Si està habilitat, permet oferir més que la puntuació màxima possible en un resultat en una rúbrica."
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
       Si s'habilita, el Canvas permetrà que les eines tornin diversos elements de contingut
       en una mateixa sol·licitud a la pàgina del mòduls del curs
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Si s'habilita, els importadors de Common Cartridge convertiran els fitxers HTML en pàgines"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si s'habilita, les eines d'LTI poden utilitzar la signatura OAuth 1.0a per accedir a l'API del servei de pertinença"
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Si s'habilita, els extrems d’oEmbed requeriran un
       testimoni generat per l’eina per verificar l’origen
       d’una sol·licitud de recurs d’oEmbed.
@@ -8196,13 +8196,13 @@ ca:
   if_enabled_sourcedids_used_by_canvas_for_basic_out_aa2ea4b1: "Si s'habilita, els Sourceids utilitzats pel Canvas per als resultats bàsics es xifraran."
   if_enabled_submission_history_for_new_quizzes_quiz_fc295f42: "Si s'habilita, l'historial d'entrega dels qüestionaris de Qüestionaris nous es gestionarà per separat."
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Si s'habilita, es mostrarà l'opció per a tenir rúbriques sense puntuació."
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
       Si s'habilita, la UI de la clau de desenvolupador de l'administrador del lloc només mostrarà les
       claus de desenvolupador de l'administrador del lloc. Tingueu en compte que això només afecta
       aquelles instàncies del Canvas on els comptes arrel siguin a la mateixa partició
       que el compte de l'administrador del lloc. El comportament d'altres instàncies
       ja era així.
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
       Si s’activa aquesta opció, quan es generi un Lti::ToolProxy, es
       crearà la subscripció a l’esdeveniment en directe directament a l’eina
       en comptes de la tasca. D'aquesta manera, els esdeveniments es
@@ -8210,7 +8210,7 @@ ca:
       tasques de plagi associades.
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Si no se'n selecciona cap, mostra-ho a tothom de tot el compte secundari)"
   if_none_are_selected_show_to_everyone_in_the_entir_72a2ff32: "(Si no se'n selecciona cap, mostra-ho a tothom de tot el compte)"
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Si les millores de l'editor de contingut enriquit (RCE) també estan habilitades,
       l'RCE desarà automàticament la vostra feina a mesura que avanceu
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Si s’habilita aquesta opció, es desactiva la funció POST a SIS per a tasques el període de qualificació de les quals ja s’hagi tancat. Només s’aplica si s’activa l’opció “Habilita la nova configuració d'integració del SIS”."
@@ -15314,7 +15314,7 @@ ca:
   short_name_42f454a1: "Nom curt"
   short_name_ad9bf84f: "nom curt"
   show_76c0ed1c: Mostra
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
       Mostra una casella de selecció que permet opcionalment a un administrador del compte publicar els cursos
       automàticament després que s'associïn i se sincronitzin amb un curs plantilla
   show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Mostra una llista de les pàgines visitades recentment a la navegació global del Canvas"
@@ -15350,7 +15350,7 @@ ca:
   show_only_blueprint_courses_9fb37b41: "Mostra només els cursos plantilla"
   show_params_3401895b: "Mostra els paràmetres"
   show_past_account_level_announcements_to_users_3b8208e2: "Mostra els anuncis del nivell del compte anterior als usuaris"
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
       Mostra els anuncis del nivell del compte anterior als usuaris. Permet
       a un usuari visualitzar els anuncis que han finalitzat o que s'han descartat.
   show_question_details_b059df00: "Mostra els detalls de les preguntes"
@@ -17161,7 +17161,7 @@ ca:
   updated_2c1e8615: Actualitzat
   updated_group_group_name_727b1d98: "S'ha actualitzat el grup %{group_name}"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "IU actualitzada per cercar i visualitzar usuaris i cursos dins d'un compte."
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
       Actualitza la IU de les preferències de notificació del compte per fer que l'experiència de l'usuari sigui més actual
       i actualitzada
   updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: "Actualitza la visualització de les icones de Normativa de publicació a la capçalera de la columna de tasques del Llibre de qualificacions nou."
