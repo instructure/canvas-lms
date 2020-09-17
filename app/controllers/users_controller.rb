@@ -2914,8 +2914,4 @@ class UsersController < ApplicationController
       raise "Error connecting to recaptcha #{response}"
     end
   end
-
-  def recaptcha_enabled?
-    Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'].present? && @domain_root_account.self_registration_captcha?
-  end
 end
