@@ -1978,6 +1978,8 @@ fa:
       به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
       جهش GraphQL
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "امکان ایجاد اطلاعیه برای یک بخش را فراهم می کند"
+  allows_teacher_designer_ta_based_roles_to_access_t_d480279: "به نقش‌های مبتنی بر استاد/ طراح /  دستیار آموزشی  امکان دسترسی به ابزار گفتگو را می دهد."
+  allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "به نقش‌های مبتنی بر استاد / دستیار آموزشی اجازه می‌دهد تا به ابزار حضور و غیاب دسترسی پیدا کنند."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "به اساتید امکان می دهد داده های نمره را برای صدور گروهی به یکپارچه‌سازی‌های سامانه اطلاعات دانشجو، علامت‌گذاری کنند."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "امکان تکرار ماژول ها در کانواس"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "امکان دوتا کردن رویدادهای تقویم"
@@ -1988,17 +1990,34 @@ fa:
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "به کاربر اجازه می دهد تا به لینک کاربران در پیمایش حساب دسترسی پیدا کند."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "به کاربر اجازه می دهد تا مدیر حساب دیگر را اضافه و حذف کند."
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "اجازه دادن به کاربر جهت شرکت در بحث ها در صفحه بحث و گفتگوها"
+  allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "به کاربر اجازه می‌دهد تا رویدادها را در تقویم درس اضافه، ویرایش و حذف کند."
   allows_user_to_add_edit_and_delete_global_announce_8463e383: "به کاربر اجازه می دهد اطلاعیه های عمومی را اضافه ، ویرایش و حذف کند."
+  allows_user_to_add_edit_delete_and_publish_unpubli_bc6374cf: "به کاربر اجازه می دهد آزمون‌ها را اضافه، ویرایش، حذف و انتشار / لغو انتشار کند."
+  allows_user_to_add_new_assignments_to_a_module_51ae198c: "به کاربر اجازه می‌دهد تکالیف جدید را به ماژول اضافه کند."
+  allows_user_to_create_and_manage_appointments_on_t_393e9e84: "به کاربر اجازه می‌دهد با استفاده از زمانبند قرارهای ملاقات را در تقویم ایجاد و مدیریت کند."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "به کاربر اجازه می دهد تا همکاری ایجاد کند. به کاربر اجازه می دهد کنفرانس های ایجاد شده خود را مشاهده ، ویرایش و حذف کند."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "به کاربر اجازه می دهد تا کلیدهای توسعه دهنده برای حساب ها ایجاد کند."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "به کاربر اجازه می دهد گروه های حساب ایجاد ، ویرایش و حذف کند."
   allows_user_to_create_edit_and_delete_rubrics_1c0acc08: "به کاربر اجازه می دهد تا دستورالعمل های ارزیابی را ایجاد، ویرایش و حذف کند."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "به کاربر اجازه می دهد کنفرانس های جدید ایجاد کند. به کاربر اجازه می دهد کنفرانس هایی را که ایجاد کرده شروع کند."
+  allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
+      به کاربر اجازه می دهد دوره ای را به عنوان یک دوره طرح تعیین کند.
+      به کاربر اجازه می دهد تا تنظیمات دوره طرح را در تنظیمات درس مدیریت کند.
+      به کاربر اجازه می دهد درس‌های مرتبط را اضافه کند.
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: "به کاربر اجازه می دهد تکالیف را به تک تک دانش آموزان متمایز کند."
+  allows_user_to_edit_assignment_details_on_individu_3e50993a: "به کاربر اجازه می‌دهد جزئیات تکالیف را در گفتگوهای فردی ویرایش کند. ماژول ها: به کاربر اجازه می‌دهد تکالیف جدید را به یک ماژول اضافه کند."
+  allows_user_to_edit_assignment_details_on_individu_ecf19e63: "به کاربر اجازه می دهد جزئیات تکالیف را در گفتگوهای فردی ویرایش کند."
+  allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "به کاربر اجازه می دهد تا در درس  اصلی طرح، تنظیمات قفل طرح را در صفحه فایل‌ها ویرایش کند."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "به کاربر اجازه می دهد تا تنظیمات برنامه های خارجی اضافه شده دستی را ویرایش کند."
+  allows_user_to_edit_the_course_sis_id_e1eccee3: "به کاربر اجازه می دهد سامانه اطلاعات دانشجویی درس را ویرایش کند."
   allows_user_to_edit_the_course_syllabus_a28ff262: "به کاربر جهت ویرایش سرفصل درس اجازه داده شود."
+  allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "به کاربر اجازه می دهد با استفاده از ابزار ورود درس محتوا را وارد کند."
   allows_user_to_import_learning_outcomes_17fce84a: "به کاربر اجازه می دهد نتایج یادگیری را وارد کند."
   allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "به کاربر اجازه می دهد نتایج یادگیری را به موضوعات وارد کند."
+  allows_user_to_import_sis_data_583b20a5: "به کاربر اجازه می دهد تا اطلاعات سامانه اطلاعات دانشجو را وارد کند."
+  allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
+      به کاربر امکان می دهد ماژول ها را مدیریت کند (ایجاد ، افزودن موارد، ویرایش تنظیمات ماژول،
+      انتشار / لغو انتشار و غیره)
   allows_user_to_manage_rubrics_326eedc2: "به کاربر اجازه بده دستور العمل‌های ارزیابی را مدیریت کند."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "به کاربر اجازه می دهد تا یک برنامه را در تنظیمات حساب به صورت دستی اضافه و حذف کند."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "به کاربر اجازه می دهد تا یک برنامه را در تنظیمات درس به صورت دستی اضافه و حذف کند."
@@ -2014,10 +2033,15 @@ fa:
   allows_user_to_see_the_list_of_recently_started_en_1012704d: "به کاربر اجازه می دهد لیستی از دروس تازه شروع شده / پایان یافته در آمار حساب را مشاهده کند."
   allows_user_to_select_final_grade_for_moderated_as_c5e28a9c: "به کاربر اجازه داده شود که  نمره نهایی برای تکالیف تعدیل شده انتخاب کند."
   allows_user_to_send_a_message_in_conversations_wit_d48abf1a: "به کاربر اجازه می دهد بدون انتخاب یک دوره ، در مکالمات پیام ارسال کند."
+  allows_user_to_send_a_message_to_all_in_course_nam_992e425: "به کاربر اجازه می‌دهد به ”همه در  [course name],“ یا ”همه در [course group]. “ پیام ارسال کند."
+  allows_user_to_send_messages_to_individual_course__9347e1e2: "به کاربر اجازه می دهد تا برای اعضای درس انفردی پیام ارسال کند."
+  allows_user_to_share_a_quiz_to_commons_6746e0da: "به کاربر اجازه می دهد یک آزمون را در نظر به اشتراک بگذارد."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی یک درس را مشاهده کند."
   allows_user_to_view_a_link_to_speedgrader_from_ass_8ed9b342: "به کاربر اجازه می دهد پیوندی نمره گذاری سریع  را از تکالیف مشاهده کند."
   allows_user_to_view_account_analytics_98fbc6ad: "به کاربر اجازه می دهد تجزیه و تحلیل حساب را مشاهده کند."
   allows_user_to_view_and_add_users_in_a_collaborati_9ec3c68b: "به کاربر امکان می دهد کاربران را در یک همکاری مشاهده و اضافه کند."
+  allows_user_to_view_and_edit_the_sis_id_and_integr_f206fdcb: "به کاربر اجازه می دهد شناسه سامانه اطلاعات دانشجو و یکپارچگی  را در جزئیات ورود کاربر مشاهده و ویرایش کند."
+  allows_user_to_view_and_insert_data_in_the_sis_id__921967c: "به کاربر اجازه می دهد داده‌ها را در جای خالی شناسه سامانه اطلاعات دانشجو مشاهده و درج کند."
   allows_user_to_view_and_link_questions_in_a_quiz_t_f6795580: "به کاربر اجازه می‌دهد سوالات خود را در یک آزمون برای بانک‌های سوال در یک سطح حساب، مشاهده و پیوند دهد. "
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "به کاربر امکان می دهد گزینه های تأیید اعتبار را برای کل حساب مشاهده و مدیریت کند."
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "به کاربر اجازه می دهد دوره های موجود در حساب را مشاهده و مدیریت کند."
@@ -2028,16 +2052,27 @@ fa:
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "به کاربر اجازه می دهد تجزیه و تحلیل درس را از طریق داشبورد درس مشاهده کند. به کاربر اجازه می دهد تجزیه و تحلیل دانشجویان  را مشاهده کند."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "به کاربر اجازه می دهد تجزیه و تحلیل درس و دانشجو را از صفحه اصلی درس یا صفحه افراد مشاهده کند."
   allows_user_to_view_course_sis_id_3a1818a5: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی درس را مشاهده کند."
+  allows_user_to_view_course_status_choose_home_page_b97cee14: |-
+      به کاربر اجازه می دهد تا وضعیت درس را مشاهده کند، صفحه اصلی را انتخاب کند و درس را تنظیم کند
+      دکمه های فهرست علامت گذاری در صفحه اصلی.
   allows_user_to_view_enrollments_on_the_sections_ta_6279a03e: "به کاربر اجازه می دهد تا ثبت نام‌ها را در زبانه بخش‌ها مشاهده کند."
   allows_user_to_view_groups_in_a_course_8a95805b: "به کاربر اجازه می دهد گروه ها را در یک درس مشاهده کند."
   allows_user_to_view_last_activity_and_total_activi_786a7286: "اجازه دادن به کاربر جهت مشاهده آخرین فعالیت و اطلاعات کلیه فعالیتها در صفحه فرد"
   allows_user_to_view_list_of_users_in_the_account_1802ad42: "به کاربر اجازه می دهد لیست کاربران موجود در حساب را مشاهده کند."
+  allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
+      به کاربر اجازه می‌دهد تا همکاری‌های ایجاد شده قبلی را مشاهده کند.
+      به کاربر اجازه می‌دهد ویرایش عنوان، شرح یا حذف همکاران را در همه‌ی همکاری‌ها  اجام دهد.
+  allows_user_to_view_published_and_unpublished_cour_25a5dcc0: "به کاربر اجازه می دهد محتوای دوره منتشر شده و منتشر نشده را مشاهده کند."
+  allows_user_to_view_student_context_cards_in_annou_dadef934: "به کاربر اجازه می دهد کارت های زمینه دانشجویی را در  اطلاعیه و پاسخ‌های گفتگو مشاهده کند. "
   allows_user_to_view_student_grades_pages_e0091b20: "به کاربر اجازه می دهد صفحات نمرات دانشجو را مشاهده کند."
   allows_user_to_view_student_quiz_logs_e1c4491: "به کاربر اجازه می دهد گزارش های آزمون دانشجویی را مشاهده کند."
+  allows_user_to_view_the_announcements_link_in_cour_f6b03e9a: "به کاربر اجازه می دهد پیوند اطلاعیه‌ها را در پیمایش درس مشاهده کند. به کاربر اجازه می دهد اطلاعیه‌های درس را مشاهده کند."
   allows_user_to_view_the_course_statistics_button_i_f44b2c7a: "اجازه دادن به کاربران جهت مشاهد دکمه آمار مربوط به درس در تنظیمات دروس"
+  allows_user_to_view_the_new_gradebook_50f53ef0: "به کاربر اجازه می دهد تا دفتر جدید نمرات را مشاهده کند."
   allows_user_to_view_the_people_link_in_course_navi_58b38f5d: "به کاربر اجازه می دهد پیوند افراد را در پیمایش دوره مشاهده کند."
   allows_user_to_view_user_sis_ids_68a9d218: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی کاربر را مشاهده کند."
   allows_user_to_view_user_sis_ids_in_a_course_peopl_fc145ade: "به کاربر اجازه می دهد تا شناسه های سامانه اطلاعات دانشجویی کاربر را در یک صفحه افراد یک درس مشاهده کند."
+  allows_users_to_edit_conferences_2d3c960c: "به کاربران اجازه می دهد کنفرانس ها را ویرایش کنند."
   allows_users_with_international_phone_numbers_to_r_f90f8522: "برای کاربران دارای شماره تلفن بین المللی امکان دریافت پیام های متنی از کانواس را فراهم می کند."
   alumno_88c80e37: دانشجو
   always_3a59e701: همیشه
@@ -7119,6 +7154,11 @@ fa:
   description_61f4296: "* شرح"
   details_98a31b68: اطلاعات
   details_a6f427c3: "جزئیات:"
+  determines_visibility_and_management_of_the_questi_fbf70ba9: "قابلیت مشاهده و مدیریت لینک پیمایش حساب بانک سوالات  را تعیین می کند."
+  determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
+      قابل مشاهده بودن زبانه ورود اطلاعات سامانه اطلاعات دانشجو در پیمایش حساب را تعیین می کند.
+      به کاربر اجازه می دهد تا تاریخ واردات قبلی سامانه اطلاعات دانشجو، خطاها و موارد وارد شده را مشاهده کند.
+  determines_whether_the_course_setup_checklist_opti_fd5a8f70: "تعیین می کند که آیا گزینه فهرست علامتگذاری راه اندازی درس در صفحه اصلی درس گنجانده شده است."
   developer_key: 
     api_key: "کلید: *%{api_key}*"
     created: "ایجاد شد:"
@@ -14003,6 +14043,7 @@ fa:
   not_available_487d3648: "در دسترس نیست"
   not_available_assignment_is_anonymous_94e77edf: "در دسترس نیست؛ تکلیف ناشناس است"
   not_available_at_the_subaccount_level_3fc74ab: "در سطح زیر حساب موجود نیست."
+  not_available_at_the_subaccount_level_6ee9b41f: "در سطح زیر حساب موجود نیست"
   not_available_during_sync_ae645e8c: "در طول همگام‌سازی، موجود نیست"
   not_available_until_date_3c1c73c2: "غیر قابل دسترس تا %{date}"
   not_available_until_next_submission_2175158: "تا مورد ارسالی بعدی در دسترس نیست"
@@ -16027,6 +16068,7 @@ fa:
       select_bank: "مخزن پرسش مقصد برای این پرسش را انتخاب کنید:"
       show_details: "نمایش اطلاعات پرسش"
   question_banks_45bdf347: "مخزن های پرسش"
+  question_banks_account_navigation_9a7ab7c2: "بانک های سوال (پیمایش حساب)"
   question_banks_view_and_link_e6d9cde2: "مخزن پرسش - مشاهده و پیوند"
   question_f06476d1: پرسش
   question_group_837b8014: "گروه پرسش"
@@ -17522,6 +17564,8 @@ fa:
   redirected_to_identity_provider_6c4e17d2: "به ارائه دهنده هویت هدایت شده‌اید."
   reference_code_3e8355dd: "رمز مرجع"
   reference_code_is_required_c32c757f: "رمز مرجع لازم است"
+  regardless_of_whether_this_permission_is_enabled_o_437ee269: "صرف نظر از فعال یا غیرفعال بودن این مجوز، کاربر همچنان قادر به مدیریت رویدادها در تقویم شخصی خود خواهد بود."
+  regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "صرف نظر از فعال یا غیرفعال بودن این مجوز، کاربران همچنان قادر به مدیریت رویدادها در تقویم شخصی خود خواهند بود."
   regenerate_3e4679f8: بازتولید
   regenerate_epub_395c8e56: "ایجاد دوباره ePub"
   region_47e29025: "ناحیه:"
@@ -17994,6 +18038,8 @@ fa:
   saving_the_csp_status_failed_please_try_again_8275aaa4: "ذخیره وضعیت CSP انجام نشد، لطفا مجددا تلاش کنید."
   schedule_student_availability_332154a: "زمان بندی در دسترس بودن دانشجو"
   scheduler_65b5ac91: "زمان بند"
+  scheduler_must_be_enabled_by_your_canvas_admin_7508c8c2: "زمان بند باید توسط مدیر کانواس شما فعال شود."
+  scheduler_must_be_enabled_for_your_account_e6e53972: "زمان بند باید برای حساب شما فعال باشد."
   scheduler_shown_df77ca6f: "زمان بند نمایش داده شده"
   school_of_rock_4b7b1fd0: "School of Rock"
   score_change_notifications_6b94f27f: "اطلاعیه های تغییر نمره"
@@ -20164,11 +20210,13 @@ fa:
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "شناسه حسابی که کاربر گزارش دهنده به آن تعلق دارد"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "این الگوریتم برای امضای درخواست اعتبارسنجی، درخواست خروج و پاسخ به خروج پیام‌های ارسال شده به IdP  استفاده می شود."
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "اطلاعیه \"%{title}\" نمی تواند به ماژول \"%{mod_title}\" پیوند داده شود"
+  the_announcements_tab_is_always_visible_to_admins__eb447785: "زبانه اعلانات همیشه برای مدیران قابل مشاهده است. با این حال ، برای مدیریت اطلاعیه ها ، اطلاعیه های جهانی - افزودن / ویرایش / حذف نیز باید فعال باشد."
   the_app_was_activated_a84e055f: "برنامه فعال شد"
   the_app_was_added_58e2836a: "برنامه افزوده شد"
   the_app_was_added_successfully_3f785a23: "برنامه با موفقیت افزوده شد"
   the_app_was_deactivated_573520ab: "برنامه غیر فعال شد"
   the_app_was_updated_successfully_3d71cd1b: "برنامه با موفقیت بهنگام سازی شد"
+  the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "ابزار حضور و غیاب باید توسط مدیر کانواس شما فعال شود."
   the_beginning_date_for_submissions_9d890f3b: "تاریخ شروع برای موارد ارسالی"
   the_beginning_date_for_the_courses_to_report_on_9c224177: "تاریخ شروع برای درس‌های مورد گزارش"
   the_beginning_date_range_for_the_courses_to_report_82353138: "بازه تاریخ شروع برای درس‌های مورد گزارش"
@@ -20176,9 +20224,11 @@ fa:
       شناسه موجودیت SAML کانواس %{metadata_url} است و
       فراداده ارائه دهنده سرویس
       در نشانی اینترنتی قابل دسترس است.
+  the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "ابزار گفتگو باید توسط مدیر کانواس شما فعال شود."
   the_client_id_clientid_is_disabled_b4a02cb1: "شناسه مشتری %{clientId} غیرفعال است."
   the_course_link_validator_searches_course_content__563fa215: "اعتبار سنجی لینک درس، محتوای درس را برای پیوندها و تصاویر نامعتبر یا غیر قابل دستیابی جستجو می کند."
   the_course_link_validator_searches_through_course__76f0bc63: "تأیید کننده پیوند درس محتوای درس را جستجو می کند و هر پیوند نامعتبر یا غیر فعالی که می یابد را به دست می دهد. لطفا توجه داشته باشید که برخی از پیوندهایی که به عنوان غیر فعال پرچم گذاری شده اند، از سرورهای ما غیر فایل دسترسی هستند ولی برای دانشجویان کار می کنند."
+  the_course_status_buttons_unpublished_and_publishe_e2dca595: "دکمه‌های وضعیت درس (منتشر نشده و منتشر شده) فقط تا زمان دریافت مورد ارسالی دانشجویی نمایش داده می‌شوند. با ارسال‌های دانشجو نمی توان درس‌ها را لغو انتشار کرد."
   the_course_to_report_on_defaults_to_canvas_id_unle_9e1d8f79: "درس مورد گزارش: به صورت پیش فرض شناسه کانواس است مگر اینکه به عنوان SIS در نوع شناسه درس تعیین شده باشد."
   the_date_is_not_valid_b6285fb5: "تاریخ معتبر نیست"
   the_default_report_only_includes_course_section_da_729092f0: "در صورت فعال بودن محدودیت های ثبت نام ، گزارش پیش فرض فقط تاریخ دوره / بخش را شامل می شود"
@@ -20296,6 +20346,7 @@ fa:
   there_was_a_problem_fetching_periods_bdc09a8f: "در هنگام فراخوانی دوره ها اشکالی رخ داد"
   there_was_a_problem_hiding_assignment_grades_1d3fd0c7: "هنگام مخفی کردن نمرات تکالیف مشکلی رخ داد."
   there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: "در هنگام پنهان کردن ستون یادداشت‌های استاد، مشکلی رخ داد."
+  there_was_a_problem_importing_some_of_the_outcomes_482bac10: "هنگام وارد کردن برخی از نتایج در فایل بارگذاری شده مشکلی پیش آمد. برای جزئیات بیشتر ایمیل خود را بررسی کنید."
   there_was_a_problem_loading_final_grade_overrides_e269e08: "هنگام بارگیری درج نمره نهایی مشکلی رخ داد."
   there_was_a_problem_loading_students_5bdb6cf2: "مشکلی در بارگزاری دانشجویان وجود داشت."
   there_was_a_problem_loading_submissions_39855ff0: "هنگام بارگیری موارد ارسالی مشکلی رخ داد."
@@ -20334,6 +20385,7 @@ fa:
   there_was_an_error_updating_this_assignment_please_59fc608d: "در هنگام به روزرسانی این تکلیف خطایی رخ داد. لطفا صفحه را از نو سازی کنید و دوباره تلاش کنید."
   there_was_an_error_uploading_the_image_932fc4ce: "در هنگام بارگذاری تصویر خطایی رخ داد"
   there_was_an_error_uploading_your_file_please_try__ce458566: "هنگام بارگذاری فایل شما خطایی روی داد. لطفا دوباره تلاش کنید."
+  there_was_an_error_with_your_import_please_examine_7b42f29d: "هنگام وارد کردن شما خطایی روی داد، لطفاً فایل خود را بررسی کرده و دوباره بارگذاری را امتحان کنید. برای جزئیات بیشتر ایمیل خود را بررسی کنید."
   there_was_an_error_with_your_query_please_try_a_di_761dff12: "خطایی در جستجوی شما رخ داد: لطفا جستجوی دیگری را امتحان کنید"
   there_was_an_unexpected_problem_with_the_sync_be079a67: "یک مشکل غیر منتظره در همگام سازی وجود داشت"
   there_was_an_unknown_error_registering_the_tool_b9a29954: "یک خطای ناشناخته در ثبت ابزار وجود داشت"
@@ -20441,6 +20493,7 @@ fa:
   this_package_includes_the_question_type_pattern_ma_ce3dadc6: "این بسته شامل نوع پرسش و تطابق الگو است که با کانواس سازگار نیستند. نوع پرسش را برای پر کردن قسمت خالی تبدیل کرده ایم"
   this_page_cannot_be_modified_because_grades_have_a_48646991: "این صفحه نمی تواند تغییر داده شود، زیرا نمره ها ارسال شده اند."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "این پنل کاربران آماده برای افزودن به این درس را فهرست می‌کند."
+  this_permission_only_affects_course_announcements__6bc2b0a5: "این مجوز فقط روی اطلاعیه‌های درس تأثیر می گذارد. برای مدیریت اطلاعیه‌های جهانی، اطلاعیه‌های جهانی - افزودن / ویرایش / حذف باید فعال شود."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "این گروه پرسش برای انتخاب پرسش های بیشتر از حد موجود تعیین شده است."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "این پرسش یک کادر علامت گذاری را در کنار هر پاسخ نشان خواهد داد."
   this_quiz_has_been_excused_d89d2b74: "این آزمون اجرا شده است"
@@ -20479,6 +20532,7 @@ fa:
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "این مورد روی هر سفارش دهنده تأثیر می گذارد. آیا اطمینان دارید؟"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "این امر به شما امکان می دهد تا کانواس را برای ارسال نمره ها به سامانه اطلاعات دانشجو اعتبارسنجی کنید."
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "این امر این زمینه را در کل حساب شما اعمال خواهد کرد. مایلید ادامه دهید؟"
+  this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "با استفاده از این نتیجه که هنوز ارزیابی نشده است، تمام مباحث به روز می شود"
   threshold_pts_45f0e5d8: "آستانه: %{pts}"
   ticket_successfully_submitted_f6254460: "بلیت ارسال شد."
   ticketing_system_52205bff: "سامانه صدور بلیت"
@@ -20728,6 +20782,7 @@ fa:
   to_1126ab55: تا
   to_35c6baa2: به
   to_51406be9: گیرنده
+  to_access_the_assignments_index_page_course_conten_a5b00f98: "برای دسترسی به صفحه فهرست تکلیف‌ها ، محتوای درس - مشاهده باید فعال باشد. برای تمایز تکالیف به تک تک دانشجویان ، لیست نمایش کاربران - نیز باید فعال باشد."
   to_access_the_people_page_and_view_groups_users_vi_43aceac3: "برای دسترسی به صفحه افراد و مشاهده گروه ها ، لیست نمایش کاربران نیز باید فعال شود."
   to_activate_sms_enter_the_four_character_confirmat_3982a3ec: "برای فعالسازی پیامک، رمز تأیید چهار نویسه ای ارسال شده به %{sms_number} را وارد کنید."
   to_activate_this_communication_channel_enter_the_f_f465efc5: "برای فعال کردن این کانال ارتباطی ، کد تأیید چهارنویسه‌ای  را که برای %{sms_number} ارسال شده است ، وارد کنید."
@@ -20746,6 +20801,7 @@ fa:
       اگر ارائه دهنده می تواند نشانی های اینترنتی معتبر فراخوانی یا هدایت مجدد را ارائه دهد، از %{callback_url} استفاده کنید.
   to_date_can_t_come_before_from_date_cf9e18aa: "\"تا تاریخ\" نمی‌تواند قبل از \"از تاریخ\" باشد"
   to_date_cannot_come_before_from_date_3eeb2633: "تاریخ تا نمی تواند قبل از تاریخ از باشد."
+  to_differentiate_assignments_to_individual_student_6cc40fde: "برای تمایز تکالیف به تک تک دانشجویان، لیست نمایش کاربران - نیز باید فعال باشد"
   to_do_1d554f36: "برای اقدام"
   to_do_5526f10a: "برای اقدام:"
   to_do_6ac7b2dc: "برای انجام:"
@@ -20755,19 +20811,32 @@ fa:
   to_do_items_loading_d1cdfcd5: "در حال بارگزاری موارد اقدام"
   to_do_list_dashboard_d741f64e: "داشبورد فهرست اقدام"
   to_do_time_a7e17623: "زمان برای  انجام"
+  to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "برای ویرایش تنظیمات درس، درس - افزودن / ویرایش / حذف باید فعال شوند."
   to_f0e90538: "گیرنده:"
   to_link_the_course_observer_name_to_a_student_star_f993c826: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را در قسمت زیر تایپ کنید تا آنها را بیابید و سپس روی بهنگام سازی کلیک کنید."
+  to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "برای مدیریت تنظیمات دوره طرح در تنظیمات درس‌ها، درس‌ها - افزودن / ویرایش / حذف نیز باید فعال باشند."
+  to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "برای مدیریت اطلاعات  سامانه اطلاعات دانشجو ، سامانه اطلاعات دانشجو - مدیریت نیز باید فعال باشد."
+  to_manage_the_feature_options_tab_feature_options__c478f81: "برای مدیریت زبانه گزینه‌های ویژگی، گزینه‌های ویژگی- فعال / غیرفعال نیز باید فعال باشد."
   to_minscore_43e5452e: "به %{minScore}%"
+  to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "برای تعدیل یک آزمون، نمرات - ویرایش نیز باید فعال باشد."
+  to_moderate_grades_grades_select_final_grade_for_m_8c605763: "برای تعدیل نمرات ، نمرات - انتخاب نمره نهایی برای تعدیل نیز باید فعال باشد."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "برای الصاق یک بحث به بالای صفحه، یک بحث را اینجا بکشید، یا الصاق را از منوی تنظیمات بحث انتخاب کنید."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "برای پیش نمایش علامت تجاری ویرایشگر زمینه، باید *واسط کاربر دارای تضاد زیاد را غیر فعال کنید*."
+  to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
+      برای انتشار و لغو انتشار محتوای ماژول، درس - افزودن / ویرایش / حذف و محتوای درس -مشاهده نیز باید فعال باشد.
+      اگر موارد ارسالی دانشجو وجود داشته باشد ، نمی توان موارد ماژول را منتشر کرد.
+  to_publish_and_unpublish_module_content_courses_ad_fd53792f: "برای انتشار و لغو انتشار محتوای ماژول ، درس- افزودن / ویرایش / حذف و محتوای درس -مشاهده نیز باید فعال باشد."
   to_publish_unpublish_module_content_course_content_efc294d4: "برای انتشار / عدم انتشار محتوای ماژول ، محتوای دوره - افزودن / ویرایش / حذف باید فعال باشد."
   to_restore_a_deleted_course_courses_undelete_and_c_dc2d0470: "برای بازیابی یک درس حذف شده ، درس ها - لغو حذف و مشاهده محتوای درس نیز باید فعال باشد."
   to_restrict_to_users_from_a_specific_clever_distri_dc3b89fb: "برای محدود کردن به کاربران از یک منطقه خاص Clever، شناسه Clever منطقه را در اینجا وارد کنید. این امر برای کار کردن Clever Instant Login در یک محیط چند نفره لازم است. "
   to_restrict_to_users_from_specific_google_apps_dom_3a57f0fd: "برای محدود کردن به کاربران دامنه برنامه های خاص گوگل، دامنه را اینجا وارد کنید."
   to_restrict_to_users_of_your_azure_active_director_df7cdd41: "برای محدود کردن به کاربران دایرکتوری فعال Azure، tenant  خود را اینجا وارد کنید."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "برای جستجوی در گزارش‌های تغییر نمره، نمره‌ها - مشاهده گزارش‌های تغییر نمره نیز باید فعال شوند."
+  to_share_a_discussion_to_commons_discussions_view__df0fd6ac: "برای به اشتراک گذاشتن یک گفتگو  در نظرات،  مشاهده-گفتگوها نیز  باید فعال باشد."
   to_view_all_notifications_sent_to_a_canvas_user_se_6172daa: "برای مشاهده همه اعلان‌هایی که برای یک کاربر کانواس ارسال می‌شود، کاربر و بازه زمانی را برای جستجوی خود انتخاب کنید."
   to_view_grades_in_a_course_grades_view_all_grades__acecd649: "برای مشاهده نمرات در یک درس ، نمرات - مشاهده همه نمرات نیز باید فعال باشد."
+  to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "برای مشاهده یا ویرایش شناسه سامانه اطلاعات دانشجو یا شناسه یکپارچگی کاربر ، کاربران - مشاهده لیست  و کاربران - جزئیات ورود به سیستم  را نیز باید فعال کنند."
+  to_view_recent_announcements_on_the_home_page_cour_ffc52530: "برای مشاهده اطلاعیه‌های اخیر در صفحه اصلی، محتوای درس -مشاهده باید فعال باشد و کادر تأیید نمایش اطلاعیه‌های اخیر در صفحه اصلی درس باید در تنظیمات درس انتخاب شود. برای مدیریت اطلاعیه‌های درس، بحث - تعدیل سازی نیز باید فعال باشد."
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "برای مشاهده تجزیه و تحلیل دانشجو در تجزیه و تحلیل درس ، نمرات - مشاهده همه نمرات نیز باید فعال باشد"
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "برای مشاهده برگه گزارشات, درسها - گزارش های استفاده نیز باید فعال شوند."
   today_76e10f9c: امروز
@@ -21687,6 +21756,7 @@ fa:
   weighted_grading_periods_ae4edd70: "دوره‌های نمر‌ه‌گذاری وزن‌دار"
   welcome_to_the_canvas_theme_editor_73091d1: "به ویرایشگر زمینه کانواس خوش آمدید"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "به درس های خود خوش آمدید! برای سفارشی کردن فهرست درس ها، روی پیوند «همه درس ها» کلیک کنید و درس ها را جهت نمایش ستاره بزنید."
+  welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "به درس‌های خود خوش آمدید! برای شخصی سازی لیست درس‌ها، روی پیوند \"همه درس‌ها\" کلیک کنید و دوره ها را برای نمایش ستاره گذاری کنید."
   well_below_mastery_37664bdc: "پایین تر از سطح تسلط"
   welsh_42ab94b1: ولزی
   what_are_self_sign_up_groups_af1f002a: "گروه های ثبت نام شخصی چه هستند؟"
@@ -21695,6 +21765,7 @@ fa:
   what_it_does_d4debc07: "چکار میکند"
   what_should_the_csv_file_look_like_985a59ac: "فایل CSV باید چطور باشد؟"
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: "در هنگام اضافه کردن چندین کاربر، از ویرگول و یا جدا کننده خط برای جدا کردن کاربرها استفاده کنید."
+  when_disabled_students_can_still_send_individual_m_567a911c: "در صورت غیرفعال شدن، دانشجویان همچنان می‌توانند پیام های فردی را برای اساتید درس، دستیاران آموزشی درس و دانشجویان که در همان گروه‌های سطح حساب هستند، ارسال کنند."
   when_hiding_grades_for_anonymous_assignments_grade_1b0ef682: "هنگام پنهان کردن نمرات برای تکالیف ناشناس ، نمرات برای همه افراد در درس پنهان می شوند. ناشناس بودن دوباره اعمال می شود."
   when_people_visit_the_course_this_is_the_page_they_de94acc2: "وقتی افراد از درس بازدید می کنند، این صفحه را خواهند دید. می توانید آن را برای نمایش جریان فعالیت، فهرست ماژول های درس، سرفصل یا یک صفحه سفارشی که خودتان می نویسید، تنظیم کنید. حالت پیش فرض، نمایش جریان فعالیت است."
   when_people_visit_your_course_this_is_the_first_pa_5093ec45: |-
@@ -22047,6 +22118,7 @@ fa:
   you_ve_been_invited_to_the_course_course_2aac8140: "به درس %{course} دعوت شده اید."
   you_ve_been_invited_to_the_course_course_course_ro_a74d748b: "شما به درس %{course} دعوت شده اید. نقش درس: %{role_type}"
   you_ve_been_reminded_to_assess_rubric_context_70eeb600: "به شما یادآوری شده که ارزیابی کنید %{rubric}، %{context}."
+  you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: "شما معیارهای نمره‌دهی را به روز کرده اید. این روی کلیه دانشجویانی که قبلاً با استفاده از این نتیجه ارزیابی شده اند تأثیر خواهد گذاشت."
   you_will_be_redirected_to_a_login_page_where_you_w_fc8df402: "به یک صفحه ورود که باید با استفاده از اعتبارنامه های فرزند خود وارد شوید، هدایت خواهید شد."
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: "وقتی فایل‌های شما بارگذاری می‌شود، به دفتر نمره هدایت می‌شوید. اگر یک فایل CSV بزرگ داشته باشید ممکن است بهروزرسانی تغییرات شما چند دقیقه طول بکشد. برای جلوگیری از دوباره‌نویسی هرگونه داده، لطفا قبل از ایجاد هر گونه تغییر، کامل شدن بارگذاری و صحت دفتر نمره را تأیید کنید."
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
