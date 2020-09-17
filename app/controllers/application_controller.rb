@@ -2708,4 +2708,8 @@ class ApplicationController < ActionController::Base
         Setting.get("disable_template_streaming_for_#{controller_name}/#{action_name}", "false") != "true"
     end
   end
+
+  def recaptcha_enabled?
+    Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'].present? && @domain_root_account.self_registration_captcha?
+  end
 end

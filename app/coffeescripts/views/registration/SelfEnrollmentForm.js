@@ -39,15 +39,23 @@ export default class SelfEnrollmentForm extends Backbone.View {
       .val()
 
     if (ENV.ACCOUNT.recaptcha_key) {
-      const that = this;
+      const that = this
       $(window).on('load', function() {
         that.dataCaptchaId = grecaptcha.render(that.$el.find('.g-recaptcha')[0], {
           sitekey: ENV.ACCOUNT.recaptcha_key,
-          callback: () => { that.$el.find('#submit_button').prop('disabled', false) },
-          'expired-callback': () => { that.$el.find('#submit_button').prop('disabled', true) }
+          callback: () => {
+            that.recaptchaPassed = true
+            that.$el.find('#submit_button').prop('disabled', false)
+          },
+          'expired-callback': () => {
+            that.recaptchaPassed = false
+            that.$el.find('#submit_button').prop('disabled', true)
+          }
         })
       })
-      this.$el.find('#submit_button').prop('disabled', true)
+      if (this.action == 'create') {
+        this.$el.find('#submit_button').prop('disabled', true)
+      }
     }
     return this.$el.formSubmit({
       beforeSubmit: data => this.beforeSubmit(data),
@@ -60,6 +68,11 @@ export default class SelfEnrollmentForm extends Backbone.View {
 
   changeAction(e) {
     this.action = $(e.target).val()
+    if (ENV.ACCOUNT.recaptcha_key) {
+      this.$el
+        .find('#submit_button')
+        .prop('disabled', this.action === 'create' && !this.recaptchaPassed)
+    }
     this.$el.find('.user_info').hide()
     this.$el.find(`#${this.action}_user_info`).show()
     return this.$el.find('#submit_button').css({visibility: 'visible'})
