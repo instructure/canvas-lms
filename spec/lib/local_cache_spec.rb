@@ -87,15 +87,5 @@ describe LocalCache do
       end
     end
 
-    it "allows writing nil, but will tell on you" do
-      expect(Canvas::Errors).to receive(:capture_exception) do |message, e|
-        expect(message).to eq(:local_cache)
-      end
-      LocalCache.fetch("never_seen_key") do
-        # nil on purpose
-        nil
-      end
-      expect(LocalCache.read("never_seen_key")).to be_nil
-    end
   end
 end
