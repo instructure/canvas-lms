@@ -42,8 +42,6 @@ module Canvas
             .and_return(
               Imperium::Testing.kv_not_found_response(options: [:stale])
             )
-          allow(Canvas::Errors).to receive(:capture_exception).with(any_args).and_call_original
-          expect(Canvas::Errors).to receive(:capture_exception).with(:dynamic_settings, anything)
           expect(proxy.fetch('baz')).to be_nil
         end
 
