@@ -643,7 +643,8 @@ class GradebooksController < ApplicationController
       @body_classes << "full-width padless-content"
       js_bundle :gradebook_history
       js_env(
-        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?
+        COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
+        OVERRIDE_GRADES_ENABLED: Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
       )
 
       render html: "", layout: true

@@ -1689,6 +1689,26 @@ describe GradebooksController do
       get 'history', params: { course_id: @course.id }
       assert_unauthorized
     end
+
+    describe "js_env" do
+      describe "OVERRIDE_GRADES_ENABLED" do
+        before(:each) { user_session(@teacher) }
+
+        let(:override_grades_enabled) { assigns[:js_env][:OVERRIDE_GRADES_ENABLED] }
+
+        it "is set to true if the final_grade_override_in_gradebook_history feature is enabled" do
+          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+
+          get 'history', params: { course_id: @course.id }
+          expect(override_grades_enabled).to be true
+        end
+
+        it "is set to true if the final_grade_override_in_gradebook_history feature is not enabled" do
+          get 'history', params: { course_id: @course.id }
+          expect(override_grades_enabled).to be false
+        end
+      end
+    end
   end
 
   describe "POST 'submissions_zip_upload'" do
