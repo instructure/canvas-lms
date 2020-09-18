@@ -1977,6 +1977,9 @@ fa:
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
       به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
       جهش GraphQL
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
+      جهش GraphQL
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "امکان ایجاد اطلاعیه برای یک بخش را فراهم می کند"
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "به نقش‌های مبتنی بر استاد/ طراح /  دستیار آموزشی  امکان دسترسی به ابزار گفتگو را می دهد."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "به نقش‌های مبتنی بر استاد / دستیار آموزشی اجازه می‌دهد تا به ابزار حضور و غیاب دسترسی پیدا کنند."
