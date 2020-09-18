@@ -856,4 +856,11 @@ describe Group do
       expect(users.first.id).to eq @user.id
     end
   end
+
+  describe 'usage_rights_required' do
+    it 'returns true' do
+      @course.update!(usage_rights_required: true)
+      expect(@group.usage_rights_required).to be true
+    end
+  end
 end

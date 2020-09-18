@@ -35,7 +35,13 @@ import $ from 'jquery'
 import Folder from '../../models/Folder'
 import filesEnv from '../modules/filesEnv'
 
-export default function setUsageRights(items, usageRights, callback) {
+export default function setUsageRights(
+  items,
+  usageRights,
+  callback,
+  overrideContextId = null,
+  overrideContextType = null
+) {
   let contextId, contextType, parentFolder
   if (
     filesEnv.contextType === 'users' &&
@@ -46,6 +52,13 @@ export default function setUsageRights(items, usageRights, callback) {
     contextId = parentFolder.get('context_id')
   } else {
     ;({contextType, contextId} = filesEnv)
+  }
+
+  if (!contextType) {
+    contextType = overrideContextType
+  }
+  if (!contextId) {
+    contextId = overrideContextId
   }
 
   const apiUrl = `/api/v1/${contextType}/${contextId}/usage_rights`

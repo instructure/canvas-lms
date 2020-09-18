@@ -46,12 +46,16 @@ export default {
   copyright: null,
   use_justification: null,
 
-  submit() {
+  submit(deferSaveCallback = null) {
     const values = this.usageSelection.getValues()
 
     // They didn't choose a copyright
     if (values.use_justification === 'choose') {
-      $(this.usageSelection.usageRightSelection).errorBox(I18n.t('You must specify a usage right.'))
+      $(this.usageSelection.usageRightSelection).errorBox(
+        I18n.t('You must specify a usage right.'),
+        null,
+        'fixed'
+      )
       return false
     }
 
@@ -59,6 +63,11 @@ export default {
       use_justification: values.use_justification,
       legal_copyright: values.copyright,
       license: values.cc_license
+    }
+
+    if (deferSaveCallback) {
+      deferSaveCallback(usageRightValue)
+      return this.props.closeModal()
     }
 
     const afterSet = (success, data) => {

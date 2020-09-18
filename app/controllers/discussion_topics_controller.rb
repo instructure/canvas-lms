@@ -501,11 +501,21 @@ class DiscussionTopicsController < ApplicationController
       }
     }
 
+    usage_rights_required = @context.try(:usage_rights_required)
+    include_usage_rights = usage_rights_required &&
+                           @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     unless @topic.new_record?
       add_discussion_or_announcement_crumb
       add_crumb(@topic.title, named_context_url(@context, :context_discussion_topic_url, @topic.id))
       add_crumb t :edit_crumb, "Edit"
-      hash[:ATTRIBUTES] = discussion_topic_api_json(@topic, @context, @current_user, session, override_dates: false)
+      hash[:ATTRIBUTES] = discussion_topic_api_json(
+        @topic,
+        @context,
+        @current_user,
+        session,
+        override_dates: false,
+        include_usage_rights:  include_usage_rights
+      )
     end
     (hash[:ATTRIBUTES] ||= {})[:is_announcement] = @topic.is_announcement
     hash[:ATTRIBUTES][:can_group] = @topic.can_group?
@@ -556,6 +566,10 @@ class DiscussionTopicsController < ApplicationController
       SECTION_LIST: sections.map { |section| { id: section.id, name: section.name } },
       ANNOUNCEMENTS_LOCKED: announcements_locked?,
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
+      USAGE_RIGHTS_REQUIRED: usage_rights_required,
+      PERMISSIONS: {
+        manage_files: @context.grants_right?(@current_user, session, :manage_files)
+      }
     }
 
     post_to_sis = Assignment.sis_grade_export_enabled?(@context)
@@ -1248,14 +1262,26 @@ class DiscussionTopicsController < ApplicationController
         @topic = DiscussionTopic.find(@topic.id)
         @topic.broadcast_notifications(prior_version)
 
+        include_usage_rights = @context.root_account.feature_enabled?(:usage_rights_discussion_topics) &&
+                               @context.try(:usage_rights_required)
         if @context.is_a?(Course)
           render :json => discussion_topic_api_json(@topic,
                                                     @context,
                                                     @current_user,
                                                     session,
-                                                    {include_sections: true, include_sections_user_count: true})
+                                                    {
+                                                      include_sections: true,
+                                                      include_sections_user_count: true,
+                                                      include_usage_rights:  include_usage_rights
+                                                    })
         else
-          render :json => discussion_topic_api_json(@topic, @context, @current_user, session)
+          render :json => discussion_topic_api_json(@topic,
+                                                    @context,
+                                                    @current_user,
+                                                    session,
+                                                    {
+                                                      include_usage_rights: include_usage_rights
+                                                    })
         end
       else
         errors = @topic.errors.as_json[:errors]
@@ -1438,12 +1464,24 @@ class DiscussionTopicsController < ApplicationController
       if attachment
         @attachment = @context.attachments.new
         Attachments::Storage.store_for_attachment(@attachment, attachment)
+        set_default_usage_rights(@attachment)
         @attachment.save!
         @attachment.handle_duplicates(:rename)
         @topic.attachment = @attachment
         @topic.save
       end
     end
+  end
+
+  def set_default_usage_rights(attachment)
+    return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
+    return unless @context.try(:usage_rights_required)
+    return if @context.grants_right?(@current_user, session, :manage_files)
+
+    attachment.usage_rights = @context.usage_rights.find_or_create_by(
+      use_justification:'own_copyright',
+      legal_copyright: ''
+    )
   end
 
   def child_topic

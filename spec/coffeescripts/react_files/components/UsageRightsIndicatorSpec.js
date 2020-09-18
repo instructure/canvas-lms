@@ -85,6 +85,54 @@ test('handleClick opens a modal with UsageRightsDialog', () => {
   ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRI).parentNode)
 })
 
+test('displays publish warning', () => {
+  const props = {
+    model: new File({id: 4}),
+    usageRightsRequiredForContext: true,
+    userCanManageFilesForContext: true,
+    modalOptions: {
+      openModal() {}
+    },
+    suppressWarning: false
+  }
+  const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
+  equal(
+    ReactDOM.findDOMNode(uRI).getAttribute('title'),
+    'Before publishing this file, you must specify usage rights.',
+    'has warning text'
+  )
+  equal(
+    ReactDOM.findDOMNode(uRI).textContent,
+    'Before publishing this file, you must specify usage rights.',
+    'has warning text'
+  )
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRI).parentNode)
+})
+
+test('suppresses publish warning', () => {
+  const props = {
+    model: new File({id: 4}),
+    usageRightsRequiredForContext: true,
+    userCanManageFilesForContext: true,
+    modalOptions: {
+      openModal() {}
+    },
+    suppressWarning: true
+  }
+  const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
+  notEqual(
+    ReactDOM.findDOMNode(uRI).getAttribute('title'),
+    'Before publishing this file, you must specify usage rights.',
+    'has warning text'
+  )
+  notEqual(
+    ReactDOM.findDOMNode(uRI).textContent,
+    'Before publishing this file, you must specify usage rights.',
+    'has warning text'
+  )
+  ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(uRI).parentNode)
+})
+
 QUnit.module('UsageRightsIndicator: Icon Classess & Screenreader text', {
   teardown() {
     ReactDOM.unmountComponentAtNode(ReactDOM.findDOMNode(this.uRI).parentNode)

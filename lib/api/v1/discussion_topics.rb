@@ -88,6 +88,7 @@ module Api::V1::DiscussionTopics
   #   include_all_dates: include all dates associated with the discussion topic (default: false)
   #   override_dates: if the topic is graded, use the overridden dates for the given user (default: true)
   #   root_topic_fields: fields to fill in from root topic (if any) if not already present.
+  #   include_usage_rights: Optionally include usage rights of the topic's file attachment, if any (default: false)
   # root_topics- if you alraedy have the root topics to get the root_topic_data from, pass
   #   them in.  Useful if this is to be called repeatedly and you don't want to make a
   #   db call each time.
@@ -158,7 +159,9 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user, opts={})
-    attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
+    attachment_opts = {}
+    attachment_opts[:include] = ['usage_rights'] if opts[:include_usage_rights]
+    attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
     url         = if topic.podcast_enabled?

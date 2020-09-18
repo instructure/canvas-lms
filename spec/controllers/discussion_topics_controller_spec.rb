@@ -997,6 +997,60 @@ describe DiscussionTopicsController do
         expect(controller.js_env).not_to have_key :dummy
       end
     end
+
+    context 'usage rights - teacher' do
+      before { user_session(@teacher) }
+      before :once do
+        attachment_model
+        @topic_with_file = @course.discussion_topics.create!(title: "some topic", attachment: @attachment)
+      end
+
+      shared_examples_for 'no usage rights returned' do
+        it 'does not return usage rights on discussion topic attachment' do
+          get :edit, params: {course_id: @course.id, id: @topic_with_file.id}
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be false
+        end
+      end
+
+      shared_examples_for 'usage rights returned' do
+        it 'returns usage rights on discussion topic attachment' do
+          get :edit, params: {course_id: @course.id, id: @topic_with_file.id}
+          expect(assigns[:js_env][:DISCUSSION_TOPIC][:ATTRIBUTES]['attachments'][0].key?('usage_rights')).to be true
+        end
+      end
+
+      context 'with usage_rights_discussion_topics disabled' do
+        before { @course.root_account.disable_feature!(:usage_rights_discussion_topics) }
+
+        context 'enabled on course' do
+          before { @course.update!(usage_rights_required: true) }
+
+          include_examples 'no usage rights returned'
+        end
+
+        context 'disabled on course' do
+          before { @course.update!(usage_rights_required: false) }
+
+          include_examples 'no usage rights returned'
+        end
+      end
+
+      context 'with usage_rights_discussion_topics enabled' do
+        before { @course.root_account.enable_feature!(:usage_rights_discussion_topics) }
+
+        context 'enabled on course' do
+          before { @course.update!(usage_rights_required: true) }
+
+          include_examples 'usage rights returned'
+        end
+
+        context 'disabled on course' do
+          before { @course.update!(usage_rights_required: false) }
+
+          include_examples 'no usage rights returned'
+        end
+      end
+    end
   end
 
   context 'student planner' do
@@ -1427,6 +1481,58 @@ describe DiscussionTopicsController do
       post 'create', params: obj_params, :format => :json
       json = JSON.parse response.body
       expect(json['assignment']['anonymous_peer_reviews']).to be_falsey
+    end
+
+    context 'usage rights - student' do
+      let(:data) { fixture_file_upload("docs/txt.txt", "text/plain", true) }
+
+      before { user_session(@student) }
+
+      shared_examples_for 'no usage rights set' do
+        it 'does not return usage rights on discussion topic attachment' do
+          post 'create', params: topic_params(@course, attachment: data), :format => :json
+          expect(Attachment.last.reload.usage_rights).to be_nil
+        end
+      end
+
+      shared_examples_for 'usage rights set' do
+        it 'returns usage rights on discussion topic attachment' do
+          post 'create', params: topic_params(@course, attachment: data), :format => :json
+          expect(Attachment.last.reload.usage_rights).not_to be_nil
+        end
+      end
+
+      context 'with usage_rights_discussion_topics disabled' do
+        before { @course.root_account.disable_feature!(:usage_rights_discussion_topics) }
+
+        context 'enabled on course' do
+          before { @course.update!(usage_rights_required: true) }
+
+          include_examples 'no usage rights set'
+        end
+
+        context 'disabled on course' do
+          before { @course.update!(usage_rights_required: false) }
+
+          include_examples 'no usage rights set'
+        end
+      end
+
+      context 'with usage_rights_discussion_topics enabled' do
+        before { @course.root_account.enable_feature!(:usage_rights_discussion_topics) }
+
+        context 'enabled on course' do
+          before { @course.update!(usage_rights_required: true) }
+
+          include_examples 'usage rights set'
+        end
+
+        context 'disabled on course' do
+          before { @course.update!(usage_rights_required: false) }
+
+          include_examples 'no usage rights set'
+        end
+      end
     end
   end
 

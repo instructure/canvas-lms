@@ -78,7 +78,7 @@
     {{#if canAttach}}
     <div class="control-group" style="margin-left: -75px">
       {{#if lockedItems.content}}
-        <label class="control-label" {{#t "attachment"}}Attachment{{/t}}</label>
+        <label class="control-label">{{#t "attachment"}}Attachment{{/t}}</label>
       {{else}}
         <label class="control-label"
           aria-label="{{#t}}Add Attachment{{/t}}"
@@ -108,6 +108,22 @@
         {{/unless}}
       </div>
     </div>
+    {{#if ENV.FEATURES.usage_rights_discussion_topics }}
+      {{#if ENV.USAGE_RIGHTS_REQUIRED }}
+        {{#if ENV.PERMISSIONS.manage_files }}
+        <div class="control-group" style="margin-left: -75px">
+          <label class="control-label"
+            for="usage_rights_control">
+            {{#t}}Set usage rights{{/t}}
+          </label>
+          <div class="controls">
+            <div id="usage_rights_control" />
+            <div id="usage_rights_modal" />
+          </div>
+        </div>
+        {{/if}}
+      {{/if}}
+    {{/if}}
     {{/if}}
   </fieldset>
 

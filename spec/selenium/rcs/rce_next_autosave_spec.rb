@@ -41,7 +41,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       "{\"autosaveTimestamp\": \"#{time}\", \"content\": \"#{content}\"}"
     end
 
-    def autosave_key(url = driver.current_url, textarea_id = 'discussion-topic-message8')
+    def autosave_key(url = driver.current_url, textarea_id = 'discussion-topic-message10')
       "rceautosave:#{url}:#{textarea_id}"
     end
 
@@ -71,7 +71,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       create_and_edit_announcement
 
       switch_to_html_view
-      f('textarea#discussion-topic-message8').send_keys('html text')
+      f('textarea#discussion-topic-message10').send_keys('html text')
       driver.navigate.refresh
       accept_alert
       wait_for_rce
@@ -81,7 +81,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       driver.local_storage.clear
     end
 
-    it 'should prompt to restore autosaved conent' do
+    it 'should prompt to restore autosaved content' do
       create_and_edit_announcement
       saved_content = driver.local_storage[autosave_key]
       assert(saved_content)
@@ -163,7 +163,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
 
       # simulate a placeholder image
       switch_to_html_view
-      f('textarea#discussion-topic-message8').send_keys(
+      f('textarea#discussion-topic-message10').send_keys(
         "<div data-placeholder-for='someimage.jpg' style='width: 200px; height: 50px;'>svg spinner here</div>"
       )
       switch_to_editor_view
@@ -208,7 +208,7 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
       insert_tiny_text text
     end
 
-    def autosave_key(url = driver.current_url, textarea_id = 'discussion-topic-message8')
+    def autosave_key(url = driver.current_url, textarea_id = 'discussion-topic-message10')
       "rceautosave:#{url}:#{textarea_id}"
     end
     it 'should not prompt to restore autosaved content if the RCE is hidden',

@@ -58,6 +58,17 @@ QUnit.module('UsageRightsDialog', suiteHooks => {
     component = ReactDOM.render(<UsageRightsDialog {...props} />, $container)
   }
 
+  test('displays dialog preview', () => {
+    mountComponent()
+    strictEqual(component.form.querySelectorAll('.DialogPreview__container').length, 1)
+  })
+
+  test('does not display dialog preview', () => {
+    props.hidePreview = true
+    mountComponent()
+    strictEqual(component.form.querySelectorAll('.DialogPreview__container').length, 0)
+  })
+
   test('clicking the close button closes modal', () => {
     props.closeModal = sinon.spy()
     mountComponent()

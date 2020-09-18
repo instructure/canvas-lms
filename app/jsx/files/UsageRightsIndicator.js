@@ -33,7 +33,12 @@ export default class UsageRightsIndicator extends React.Component {
     userCanManageFilesForContext: PropTypes.bool.isRequired,
     userCanRestrictFilesForContext: PropTypes.bool.isRequired,
     usageRightsRequiredForContext: PropTypes.bool.isRequired,
-    modalOptions: PropTypes.object.isRequired
+    modalOptions: PropTypes.object.isRequired,
+    contextType: PropTypes.string,
+    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hidePreview: PropTypes.bool,
+    deferSave: PropTypes.func,
+    suppressWarning: PropTypes.bool
   }
 
   handleClick = event => {
@@ -44,6 +49,10 @@ export default class UsageRightsIndicator extends React.Component {
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={[this.props.model]}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
+        contextType={this.props.contextType}
+        contextId={this.props.contextId}
+        hidePreview={this.props.hidePreview}
+        deferSave={this.props.deferSave}
       />
     )
     this.props.modalOptions.openModal(contents, () => {
@@ -78,10 +87,12 @@ export default class UsageRightsIndicator extends React.Component {
           <button
             className="UsageRightsIndicator__openModal btn-link"
             onClick={this.handleClick}
-            title={this.warningMessage}
+            title={this.props.suppressWarning ? null : this.warningMessage}
             data-tooltip="top"
           >
-            <span className="screenreader-only">{this.warningMessage}</span>
+            {!this.props.suppressWarning && (
+              <span className="screenreader-only">{this.warningMessage}</span>
+            )}
             <i className="UsageRightsIndicator__warning icon-warning" />
           </button>
         )
