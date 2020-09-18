@@ -19,7 +19,7 @@
 import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptSelect from './AttemptSelect'
-import DateTitle from './DateTitle'
+import AssignmentDetails from './AssignmentDetails'
 import {Flex} from '@instructure/ui-layout'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-heading'
@@ -132,7 +132,10 @@ class Header extends React.Component {
           {!this.state.isSticky && <AssignmentGroupModuleNav assignment={this.props.assignment} />}
           <Flex margin={this.state.isSticky ? '0' : '0 0 medium 0'} wrap="wrap" wrapItems>
             <Flex.Item shrink>
-              <DateTitle isSticky={this.state.isSticky} assignment={this.props.assignment} />
+              <AssignmentDetails
+                isSticky={this.state.isSticky}
+                assignment={this.props.assignment}
+              />
             </Flex.Item>
             <Flex.Item grow align="start">
               {this.renderLatestGrade()}
