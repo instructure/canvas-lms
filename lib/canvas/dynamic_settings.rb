@@ -110,7 +110,8 @@ module Canvas
             cluster: cluster,
             default_ttl: default_ttl,
             kv_client: kv_client,
-            data_center: @data_center
+            data_center: @data_center,
+            query_logging: @config.fetch('query_logging', true)
           )
         else
           proxy = root_fallback_proxy

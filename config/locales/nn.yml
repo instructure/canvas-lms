@@ -1981,6 +1981,9 @@ nn:
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Gir administratorar løyve til å vise logg over informasjon om alle nyleg kjøyrde
       GraphQL-mutasjonar.
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Gir administratorar løyve til å vise logg over informasjon om alle nyleg kjøyrde
+      GraphQL-mutasjonar.
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillat å sjå vurderingsloggen i SpeedGrader for anonyme oppgåver eller oppgåver med fleire rettarar eller retteperiodar. "
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gir rollene faglærar/designar/undervisingsassistent tilgang til chatverktøyet."
