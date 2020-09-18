@@ -64,7 +64,7 @@ const filterModel = new DiscussionFilterState()
 ready(() => {
   const discussionTopicToolbarView = new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
-  if (!window.ENV.DISABLE_KEYBOARD_SHORTCUTS) {
+  if (!window.ENV.disable_keyboard_shortcuts) {
     ReactDOM.render(
       <DiscussionTopicKeyboardShortcutModal />,
       document.getElementById('keyboard-shortcut-modal')
