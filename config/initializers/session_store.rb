@@ -38,5 +38,5 @@ config[:logger] = Rails.logger
 Autoextend.hook(:EncryptedCookieStore, :SessionsTimeout)
 
 # after iOS12 is dead, change this back to :encrypted_cookie_store and remove lib/samesite_transition_cookie_store.rb
-CanvasRails::Application.config.session_store(:samesite_transition_cookie_store, config)
+CanvasRails::Application.config.session_store(:samesite_transition_cookie_store, **config)
 CanvasRails::Application.config.secret_token = config[:secret]
