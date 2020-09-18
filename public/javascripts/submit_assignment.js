@@ -596,7 +596,7 @@ $(document).ready(function() {
 
     $(this).focus()
     const filename = getFilename($(this))
-    $.screenReaderFlashMessage(I18n.t('File uploaded: %{filename}', {filename}))
+    $.screenReaderFlashMessage(I18n.t('File selected for upload: %{filename}', {filename}))
     if (ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS.length < 1) return
 
     const ext = $(this)
