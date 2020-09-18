@@ -56,7 +56,8 @@ module Canvas
     # information under "extra"
     def self.capture(exception, data={})
       job_info = check_for_job_context
-      error_info = job_info.deep_merge(wrap_in_extra(data))
+      request_info = check_for_request_context
+      error_info = job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data))
       run_callbacks(exception, error_info)
     end
 
@@ -71,6 +72,11 @@ module Canvas
     # that got fired in initializers and such until the process restarts.
     def self.clear_callback_registry!
       @registry = {}
+    end
+
+    def self.check_for_request_context
+      ctx = Thread.current[:context]
+      ctx.present? ? wrap_in_extra(ctx) : {}
     end
 
     # capturing all the contextual info

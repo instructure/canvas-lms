@@ -51,8 +51,4 @@ class SelfEnrollmentsController < ApplicationController
     # TODO: have a join code field in new.html.erb if none is provided in the url
     raise ActiveRecord::RecordNotFound unless @course
   end
-
-  def recaptcha_enabled?
-    Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'].present? && @domain_root_account.self_registration_captcha?
-  end
 end
