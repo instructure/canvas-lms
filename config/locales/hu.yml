@@ -1767,6 +1767,9 @@ hu:
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
       Lehetővé teszi az adminisztrátorok számára egy napló megtekintését, amiben minden,
       a közelmúltban futtatot GraphQL-mutációról található információ
+  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+      Lehetővé teszi az adminisztrátorok számára egy napló megtekintését, amiben minden,
+      a közelmúltban futtatot GraphQL-mutációról található információ
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Lehetővé teszi, hogy az oktatók kijelöljék a tömegesen a SIS-integrációba exportálandó értékelési adatokat"
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Lehetővé teszi a modulok duplikációját a Canvason belül."
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Naptári eseény megduplázásának engedélyezése"
