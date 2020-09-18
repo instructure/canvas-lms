@@ -309,6 +309,14 @@ describe DiscussionTopicsController do
       expect(assigns[:js_env][:DISCUSSION][:TOPIC][:COURSE_SECTIONS].first[:user_count]).to eq(1)
     end
 
+    it "js_env disable_keyboard_shortcuts should follow feature flag" do
+      @student.enable_feature! :disable_keyboard_shortcuts
+      user_session @student
+      @discussion = @course.discussion_topics.create!(:user => @teacher, message: 'hello')
+      get 'show', params: {:course_id => @course.id, :id => @discussion.id}
+      expect(assigns[:js_env][:disable_keyboard_shortcuts]).to be_truthy
+    end
+
     it "should not work for announcements in a public course" do
       @course.update_attribute(:is_public, true)
       @announcement = @course.announcements.create!(
@@ -769,6 +777,13 @@ describe DiscussionTopicsController do
       end
     end
 
+    it "successfully redirects no authorization for a public course" do
+      @course.update_attributes(is_public: true)
+      course_topic
+      get 'show', params: {:course_id => @course.id, :id => @topic.id}
+      expect(response.code).to eq "302"
+      expect(ErrorReport.last).to be_nil
+    end
   end
 
   describe "GET 'new'" do
