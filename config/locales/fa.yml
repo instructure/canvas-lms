@@ -179,6 +179,7 @@ fa:
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "یک شناسه شریک برای استفاده از معیارهای علمی لازم است."
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "یک شناسه شریک برای استفاده از معیارهای علمی لازم است."
   a_problem_occurred_adding_reviewers_57b083d9: "در هنگام افزودن بازبینی کننده ها، اشکالی رخ داد."
+  a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "یک سطح حریم خصوصی عمومی اطلاعات شناسایی کاربر راه اندازی کننده را به ارائه دهنده ابزار ارسال می کند. تنظیم این گزینه روی خصوصیات ممکن است بر ابزارهایی که به آن اطلاعات بستگی دارند تأثیر منفی بگذارد."
   a_redirect_uri_is_required_please_supply_one_471908db: "یک redirect_uri لازم است، لطفا یکی ارائه کنید."
   a_section_is_required_64103992: "یک بخش لازم است"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "یکپارچه سازی سامانه اطلاعات دانشجو پیکربندی نشده است و ویژگی تنظیمات فعالسازی سامانه جدید اطلاعات دانشجو فعال نیست."
@@ -1974,6 +1975,8 @@ fa:
   allow_this_tool_to_access_the_ims_names_and_role_p_33e16d7f: "امکان دادن به این ابزار برای دسترسی به نام های IMS و سرویس Role Provisioning"
   allow_users_to_comment_45b8f753: " به کاربران اجازه ارسال نظر داده شود"
   allowed_attempts_4e229caa: "تلاش های مجاز"
+  allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "به کاربر امکان می دهد تا به عنوان لینک کاربر در کارتهای زمینه دانشجویی دسترسی پیدا کند."
+  allows_admin_user_to_view_account_statistics_341f00d9: "به کاربر مدیر اجازه می دهد تا آمار حساب را مشاهده کند."
   allows_admins_to_view_a_log_containing_information_128dc85f: |-
       به مدیران اجازه می دهد تا یک گزارش حاوی اطلاعات مربوط به همه مواردی که اخیراً اجرا شده را مشاهده کنند.
       جهش GraphQL
@@ -1991,6 +1994,7 @@ fa:
   allows_user_to_access_the_student_progress_page_aca95197: "به کاربر اجازه می‌دهد تا به صفحه پیشرفت دانشجو دسترسی پیدا کند."
   allows_user_to_access_the_theme_editor_26691f9a: "به کاربر اجازه می دهد تا به ویرایشگر تم دسترسی داشته باشد."
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "به کاربر اجازه می دهد تا به لینک کاربران در پیمایش حساب دسترسی پیدا کند."
+  allows_user_to_act_as_other_users_in_the_account_195628ae: "به کاربر اجازه می دهد مانند سایر کاربران در حساب عمل کند."
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "به کاربر اجازه می دهد تا مدیر حساب دیگر را اضافه و حذف کند."
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "اجازه دادن به کاربر جهت شرکت در بحث ها در صفحه بحث و گفتگوها"
   allows_user_to_add_edit_and_delete_events_in_the_c_14413268: "به کاربر اجازه می‌دهد تا رویدادها را در تقویم درس اضافه، ویرایش و حذف کند."
@@ -2014,6 +2018,10 @@ fa:
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "به کاربر اجازه می دهد تا تنظیمات برنامه های خارجی اضافه شده دستی را ویرایش کند."
   allows_user_to_edit_the_course_sis_id_e1eccee3: "به کاربر اجازه می دهد سامانه اطلاعات دانشجویی درس را ویرایش کند."
   allows_user_to_edit_the_course_syllabus_a28ff262: "به کاربر جهت ویرایش سرفصل درس اجازه داده شود."
+  allows_user_to_filter_for_blueprint_courses_as_the_a67832c8: |-
+      به کاربر اجازه می دهد تا دوره های طرح را به عنوان سطح حساب فیلتر کند.
+      به کاربر اجازه می دهد درس‌های مرتبط را اضافه کند.
+  allows_user_to_generate_login_logout_activity_repo_bba62f2: "به کاربر امکان می‌دهد گزارش فعالیت ورود به سیستم /خروج از سیستم را در ابزارهای مدیریت ایجاد کند."
   allows_user_to_import_content_using_the_course_imp_4a4ec4c7: "به کاربر اجازه می دهد با استفاده از ابزار ورود درس محتوا را وارد کند."
   allows_user_to_import_learning_outcomes_17fce84a: "به کاربر اجازه می دهد نتایج یادگیری را وارد کند."
   allows_user_to_import_learning_outcomes_to_rubrics_45331ded: "به کاربر اجازه می دهد نتایج یادگیری را به موضوعات وارد کند."
@@ -2049,9 +2057,11 @@ fa:
   allows_user_to_view_and_manage_authentication_opti_e1bb0ad3: "به کاربر امکان می دهد گزینه های تأیید اعتبار را برای کل حساب مشاهده و مدیریت کند."
   allows_user_to_view_and_manage_courses_in_the_acco_12333da2: "به کاربر اجازه می دهد دوره های موجود در حساب را مشاهده و مدیریت کند."
   allows_user_to_view_and_manage_permissions_bdc80a1d: "به کاربر اجازه می دهد مجوزها را مشاهده و مدیریت کند."
+  allows_user_to_view_and_manage_quotas_tab_in_accou_935a7874: "به کاربر اجازه می دهد تا زبانه سهمیه‌ها را در تنظیمات حساب مشاهده و مدیریت کند. کاربر می تواند سهمیه درس پیش فرض، کاربر و ذخیره گروه را تنظیم کند."
   allows_user_to_view_and_manage_subaccounts_for_the_37d5120b: "به کاربر امکان می دهد زیر حساب های حساب را مشاهده و مدیریت کند."
   allows_user_to_view_and_manage_terms_for_the_accou_4547d971: "به کاربر اجازه می دهد شرایط  حساب را مشاهده و مدیریت کند."
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: "به کاربر اجازه می دهد تا برگه تنظیمات و اعلان ها را در تنظیمات حساب مشاهده و مدیریت کند."
+  allows_user_to_view_choose_home_page_and_course_se_6fd35f37: "به کاربر اجازه می دهد تا دکمه‌های انتخاب صفحه اصلی و فهرست علامت گذاری تنظیم درس را در صفحه اصلی مشاهده کند."
   allows_user_to_view_course_analytics_through_the_c_5f24ec08: "به کاربر اجازه می دهد تجزیه و تحلیل درس را از طریق داشبورد درس مشاهده کند. به کاربر اجازه می دهد تجزیه و تحلیل دانشجویان  را مشاهده کند."
   allows_user_to_view_course_and_student_analytics_f_5e3dca12: "به کاربر اجازه می دهد تجزیه و تحلیل درس و دانشجو را از صفحه اصلی درس یا صفحه افراد مشاهده کند."
   allows_user_to_view_course_sis_id_3a1818a5: "به کاربر اجازه می دهد شناسه های سامانه اطلاعات دانشجویی درس را مشاهده کند."
@@ -2062,6 +2072,7 @@ fa:
   allows_user_to_view_groups_in_a_course_8a95805b: "به کاربر اجازه می دهد گروه ها را در یک درس مشاهده کند."
   allows_user_to_view_last_activity_and_total_activi_786a7286: "اجازه دادن به کاربر جهت مشاهده آخرین فعالیت و اطلاعات کلیه فعالیتها در صفحه فرد"
   allows_user_to_view_list_of_users_in_the_account_1802ad42: "به کاربر اجازه می دهد لیست کاربران موجود در حساب را مشاهده کند."
+  allows_user_to_view_login_ids_in_a_course_people_p_b2cfd83e: "به کاربر اجازه می دهد تا شناسه های ورود به سیستم را در \"صفحه افراد\"  یک درس  مشاهده کند."
   allows_user_to_view_previously_created_collaborati_31f4cfe2: |-
       به کاربر اجازه می‌دهد تا همکاری‌های ایجاد شده قبلی را مشاهده کند.
       به کاربر اجازه می‌دهد ویرایش عنوان، شرح یا حذف همکاران را در همه‌ی همکاری‌ها  اجام دهد.
@@ -2243,6 +2254,7 @@ fa:
   anonymize_all_annotations_made_by_instructors_on_s_4f2b70a5: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در برنامه نمره گذاری سریع"
   anonymize_all_annotations_made_by_instructors_on_s_5540bc09: "ناشناس گذاشتن تمام یادآوری های ساخته شده توسط مربیان درباره موردهای ارسالی برای این تکلیف در مستندساز"
   anonymize_all_instructor_comments_and_annotations__713924c9: "ناشناس گذاشتن تمام نظرات مربیان و یادداشت‌های داخل مستندساز "
+  anonymous_assignments_are_hidden_by_default_and_wi_c8884e1e: "تکالیف ناشناس به طور پیش فرض پنهان هستند و حتی اگر تنظیمات درس روی خودکار تنظیم شود، باید به صورت دستی ارسال شوند."
   anonymous_assignments_must_be_manually_posted_a13d2ca5: "تکالیف ناشناس باید بصورت دستی ارسال شود"
   anonymous_e1b8ad27: ناشناس
   anonymous_grading_cannot_be_enabled_for_group_assi_faa33494: "نمره‌گذاری ناشناس را نمی‌توان برای تکالیف گروهی فعال کرد."
@@ -2287,6 +2299,7 @@ fa:
   any_sub_account_ec7069f2: "هر گونه زیر حساب"
   any_term_d49af19f: "هر گونه نیمسال"
   anyone_with_the_url_9d7e5e07: "هرکسی که URL دارد"
+  api_7bd66e19: API
   api_key_eeeb2167: "کلید API"
   api_token_scopes_67b11c16: "محدوده نشانه APl"
   app_b157c2b3: برنامه
@@ -2536,6 +2549,10 @@ fa:
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "تکلیف نمره گذاری شد: %{grade} بر %{assignment_name} در %{course_code}"
   assignment_grades_have_already_been_published_ff2d84c6: "نمره های تکلیف منتشر شده اند."
   assignment_grades_have_already_been_released_4c8a91b: "نمره های تکلیف منتشر شده اند."
+  assignment_grades_will_be_visible_to_students_as_s_62975ef6: |-
+      
+      نمرات تکلیف به محض ورود دانش آموزان قابل مشاهده خواهد بود.
+      نمره هایی که قبلاً پنهان شده اند پنهان خواهند ماند
   assignment_group: 
     default_name: "تکلیف ها"
     default_title: "تکلیف ها"
@@ -3294,6 +3311,7 @@ fa:
   attempt_current_attempt_ef626179: "تلاش %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "تلاش %{current_attempt} از %{max_attempts}"
   attempt_number_83dcd86a: "تلاش %{number}"
+  attempt_to_detect_an_appropriate_field_separator_i_bc043389: "سعی کنید بر اساس قالب شماره برای زبان شما، یک جدا کننده زمینه مناسب برای صدور صفحه گسترده سازگار تشخیص دهید."
   attempts_22baad: 
     one: تلاش
     other: "تلاش ها"
@@ -6641,6 +6659,7 @@ fa:
   created_created_at_37c0ec3b: "ایجاد شد: %{created_at}"
   created_created_bf5714b8: "%{created} ایجاد شد"
   created_group_group_name_2097306b: "گروه %{group_name} ایجاد شد"
+  creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "ایجاد گروه هنوز توسط روند تکالیف جدید کنترل نشده است. به صفحه تکالیف قدیمی می‌روید؟"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "ایجاد صدور مورد ارسالی به شما امکان می دهد فایل فشرده همه تکلیف های ارسالی خود را در همه درس های فعلی و قبلی خود بارگیری کنید. این فایل می تواند یک فایل بزرگ باشد و بنابراین ممکن است مدتی طول بکشد. می تواند از صفحه خارج شوید و بعدا برگردید."
   creating_key_8a026e61: "در حال ایجاد کردن کلید"
   creative_commons_714a065f: "کریتیو کامنز"
@@ -7157,6 +7176,7 @@ fa:
   description_61f4296: "* شرح"
   details_98a31b68: اطلاعات
   details_a6f427c3: "جزئیات:"
+  determines_visibility_and_management_of_sis_import_a91ed255: "قابلیت مشاهده و مدیریت زبانه ورود اطلاعات سامانه اطلاعات دانشجو در پیمایش حساب را تعیین می کند."
   determines_visibility_and_management_of_the_questi_fbf70ba9: "قابلیت مشاهده و مدیریت لینک پیمایش حساب بانک سوالات  را تعیین می کند."
   determines_visibility_of_sis_import_tab_in_account_5180b8e8: |-
       قابل مشاهده بودن زبانه ورود اطلاعات سامانه اطلاعات دانشجو در پیمایش حساب را تعیین می کند.
@@ -7710,6 +7730,10 @@ fa:
   due_no_due_date_3c1d1651: "مهلت: بدون تاریخ مهلت"
   due_on_date_5ffb2182: "مهلت در تاریخ"
   due_time_9acd6b69: "مهلت %{time}"
+  due_to_the_size_of_your_course_you_must_select_a_s_f834ba66: |-
+      
+      با توجه به اندازه درس شما قبل از راه اندازی باید یک گروه دانشجویی را انتخاب کنید
+      نمره گذاری سریع
   duplicate_31cec192: "تکرار کردن"
   duplicate_assignment_name_3ca7d753: "تکرار تکلیف %{name}"
   duplicate_discussion_title_43b39959: "تکرار بحث %{title}"
@@ -8304,6 +8328,7 @@ fa:
   error_sending_submission_comment_dc15d24f: "خطا در ارسال کردن نظرهای مربوط به مورد ارسالی"
   error_sending_submission_d32dc075: "خطا در ارسال کردن مورد ارسالی"
   error_starting_content_share_18fb1532: "خطا در شروع به اشتراک گذاری محتوا"
+  error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "خطا در مورد ارسالی به سرویس سرقت ادبی. شما می توانید دوباره از نمره‌گذاری سریع ارسال کنید."
   error_updating_submission_draft_1d40ade7: "خطا در به هنگام سازی ارسال پیش نویس"
   error_uploading_file_e2d31b56: "خطا در بارگذاری فایل."
   error_uploading_video_audio_recording_16d9730a: "خطا در بارگذاری ضبط ویدیو/ صدا."
@@ -9681,6 +9706,10 @@ fa:
   grades_view_audit_trail_cc4c1fcc: "نمره‌ها - مشاهده دنباله حسابرسی"
   grades_view_change_logs_6bc1b959: "نمره‌ها - مشاهده تغییرات گزارش‌‌ها"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "نمرات با موفقیت در دفتر نمره  منتشر شدند."
+  grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: |-
+      
+      نمرات به طور پیش فرض پنهان می شوند. هر نمره ای که قبلاً پست کرده باشد قابل مشاهده خواهد بود.
+      زمان ارسال نمرات برای هر تکلیف را در هر ستون در دفتر نمرات انتخاب کنید.
   grades_will_be_made_visible_to_all_students_1cc4d67e: "نمرات برای همه دانشجویان قابل مشاهده خواهد بود"
   grades_will_be_made_visible_to_students_with_grade_d83028d5: "نمرات برای دانشجویانی با  موارد ارسالی نمره گذاری شده، قابل مشاهده خواهد بود."
   gradezilla: 
@@ -14480,6 +14509,7 @@ fa:
   on_paper_46d0ba36: "روی کاغذ"
   on_time_17ca5ad9: "سر وقت"
   on_time_percent_eebffe38: "بموقع: %{percent}"
+  once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "هنگامی که نمره ای به صورت دستی ارسال می شود ، به طور خودکار اطلاعیه‌های جدید ارسال می کند و برای دانشجویان قابل مشاهده است."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
   once_you_start_debugging_all_info_about_the_next_a_e871403b: "وقتی اشکال زدایی را شروع کردید، تمام اطلاعات مربوط به تلاش بعدی برای ورود به سیستم جمع آوری می‌شود. \"تازه کردن\" را کلیک کنید تا ببینید آیا داده‌های بیشتری جمع آوری شده است یا  اینکه برای پاک کردن اطلاعات جمع آوری شده و توقف تلاش برای رفع اشکال فعلی  \"متوقف کردن اشکال زدایی\" را کلیک کنید."
@@ -14864,6 +14894,7 @@ fa:
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "بازبینی گروهی تکلیف"
   peer_review_for_assignment_ce72fc52: "بازبینی گروهی برای  %{assignment}"
+  peer_reviewed_assignments_are_not_yet_handled_in_t_5eef60fb: "بازبینی گروهی تکالیف در روند تکالیف جدید هنوز انجام نشده است. به صفحه ایجاد تکلیف قدیمی می‌روید؟ "
   peer_reviewed_graded_discussion_b339df5b: "بحث نمره‌گذاری شده با بازبینی گروهی"
   peer_reviews_api: 
     errors: 
@@ -15915,6 +15946,7 @@ fa:
   public_courses_title: "درس های عمومی"
   public_domain_112ed397: "دامنه عمومی"
   public_jwk_ee2d719d: "JWK  عمومی"
+  public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "JWK json عمومی معتبر نیست. لطفا json را با فرمت  مناسب ارسال کنید."
   public_jwk_url_b5564c1d: "نشانی اینترنتی JWK  عمومی"
   public_message_students: 
     send_message: "ارسال پیام"
@@ -17325,6 +17357,7 @@ fa:
     submission_action_take_quiz: "دادن آزمون %{title}"
   quizzes_7e598f57: آزمون‌ها
   quizzes_and_question_banks_9b7569e3: "بانک آزمونها و سوالات"
+  quizzes_are_not_yet_handled_in_the_new_assignments_3898536a: "در روند تکالیف جدید هنوز آزمونی برگزار نمی شود. به صفحه آزمون قدیمی می روید؟"
   quizzes_index: 
     headers: 
       assignment_quizzes: "آزمون های تکلیف"
@@ -17440,6 +17473,7 @@ fa:
     : درست
   quizzes_tutorial_tray_6f87cdd3: "سینی خودآموز آزمون‌ها"
   quizzes_view_submission_log_ec105e3e: "امتحانها - مشاهده گزارش ارسال"
+  quotas_account_settings_22c12b8d: "سهمیه ها (تنظیمات حساب)"
   radio_button_option_1_a8ec51f9: "گزینه دکمه رادیویی 1"
   radio_button_option_2_31e50043: "گزینه دکمه رادیویی 2"
   range_56b2f310: بازه
@@ -18503,6 +18537,7 @@ fa:
   services_api: 
     must_be_logged_in: "برای استفاده از Kaltura، باید وارد شده باشید"
   services_ccd7bca0: سرویس‌ها
+  services_must_be_supported_by_the_tool_in_order_to_1f194a36: "سرویس ها برای کار کردن باید توسط این ابزار پشتیبانی شوند. برای اطمینان از قابلیت‌های خدمات ، با فروشنده ابزار خود تماس بگیرید."
   set_as_default_email_address_bd3b9b8f: "تعیین به عنوان نشانی پست الکترونیکی پیش فرض"
   set_created_createdat_895e2243: "مجموعه ایجاد شد %{createdAt}"
   set_default_email_address_400f70dc: "تعیین نشانی پست الکترونیکی پیش فرض"
@@ -19655,6 +19690,7 @@ fa:
   student_collaborations_create_b9e312c1: "ایجاد - همکاری‌های دانشجویی"
   student_context_card_ad59967e: "کارت زمینه دانشجو"
   student_context_cards_376d2072: "کارت های زمینه دانشجویی"
+  student_context_cards_must_be_enabled_for_an_accou_f84169cb: "کارت‌های زمینه دانشجویی دانشجو باید برای یک حساب توسط یک مدیر فعال شود."
   student_details_49901ceb: "جزئیات دانشجو"
   student_engagement_report_bf958028: "گزارش اشتغال دانشجو"
   student_extensions_d35a907: "تمدیدهای دانشجو"
@@ -19826,6 +19862,7 @@ fa:
   submission_failed_to_submit_8de4efcd: "ارسال موارد ارسالی انجام نشد"
   submission_in_another_grading_period_e754b329: "ارسال در دوره دیگر نمره گذاری"
   submission_index_e960f9bf: "ارسال %{index} "
+  submission_is_being_processed_by_plagiarism_servic_df4aa603: "مورد ارسالی توسط سرویس سرقت ادبی در حال پردازش است."
   submission_items_b2db1b8d: "موردهای ارسالی"
   submission_locked_a6074f8b: "مورد ارسالی قفل شده"
   submission_locked_image_93aced38: "عکس قفل شده ارسالی"
@@ -20248,6 +20285,10 @@ fa:
   the_field_field_must_have_no_spaces_d1c2fc37: "قسمت \"%{field}\" نباید هیچ فاصله ای داشته باشد."
   the_files_tab_is_the_place_to_share_lecture_slides_95a93bce: "زبانه فایل ها، محلی برای به اشتراک گذاشتن اسلایدهای سخنرانی، اسناد نمونه، راهنماهای مطالعه -- و هر چیزی است که دانشجویان شما می خواهند بارگیری کنند. بارگذاری و سازمان دهی فایل های شما با استفاده از کانواس آسان است. شیوه کار را به شما نشان خواهیم داد."
   the_following_content_is_partner_provided_ed1da756: "محتوای زیر توسط شریک فراهم شده است"
+  the_following_domains_have_automatically_been_adde_2c7a1654: |-
+      دامنه های زیر به طور خودکار به شما اضافه می شوند
+      لیست سفید از ابزارهایی است که از قبل در حساب شما موجود است.
+      برای حذف این دامنه ها ، ابزارهای مرتبط را حذف کنید.
   the_following_fields_are_invalid_fields_b3565800: "قسمت های زیر معتبر نیستند: %{fields}"
   the_following_students_have_unsaved_changes_to_the_7762def7: |-
       دانشجویان زیر تغییرات ذخیره نشده ای در  آزمون‌های ارسالی خود دارند:
@@ -20275,6 +20316,7 @@ fa:
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "دانشگاهی که از آن وارد شده اید در این حساب پیکربندی نشده است."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "ابزار راه اندازی شده، یک منبع غیر معتبر را برای این تکلیف برگرداند"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "پیوند مورد استفاده شما منقضی شده است. برای دریافت پیوند جدید برای بازیابی رمز عبور، روی «رمز عبور خود را نمی دانید؟» کلیک کنید."
+  the_list_below_is_content_that_has_been_shared_wit_2b2648bc: "لیست زیر محتوایی است که با شما به اشتراک گذاشته شده است. می توانید محتوا را پیش نمایش کنید ، آن را در درس خود وارد کنید یا آن را از لیست حذف کنید. "
   the_material_is_in_the_public_domain_279c39a3: "مطلب در دامنه عمومی است"
   the_material_is_licensed_under_creative_commons_3242cb5e: "مطلب تحت مجوز کریتیو کامنز است"
   the_material_is_subject_to_fair_use_exception_41bc6a4b: "مطلب مشمول استثناء استفاده منصفانه است"
@@ -20434,6 +20476,7 @@ fa:
   this_enables_an_updated_navigation_new_dashboard_a_8bd4cae: "این امر پیمایش بهنگام شده، داشبورد جدید، و یک ظاهر و حس جدیدتر و ساده تر را میسر می سازد."
   this_enables_users_to_generate_and_download_course_4c69c531: "این امر به کاربران امکان می دهد ePub درس را ایجاد و بارگیری کنند."
   this_environment_is_currently_being_updated_with_a_235f1875: "این محیط در حال حاضر با کپی از آخرین داده‌های تولید به‌هنگام سازی  می‌شود. لطفا بعداً دوباره بررسی کنید."
+  this_feature_allows_teachers_to_easily_copy_single_9d4cdfe: "این ویژگی به استادان این امکان را می دهد تا به راحتی مواردی را از یک درس به درس دیگر کپی کرده و یک محتوا را با سایر کاربران به اشتراک بگذارند تا بتوانند آن موارد را نیز در درس‌های خود وارد کنند."
   this_feature_can_t_be_disabled_because_there_is_at_a015b943: "این ویژگی نمی‌تواند غیرفعال شود زیرا حداقل یک زیر حساب یا درس با این ویژگی وجود دارد."
   this_feature_can_t_be_enabled_while_autodetection__a3552fb4: "این ویژگی مادامی‌که تشخیص خودکار جداکننده  قسمت‌ها فعال باشند، نمی‌تواند فعال شود. "
   this_feature_can_t_be_enabled_while_semicolons_are_2e0adb54: "این ویژگی مادامی‌که اجبار شده سمیکالن‌ها جدا کننده قسمت‌ها باشند، نمی‌تواند فعال شود."
@@ -20447,6 +20490,7 @@ fa:
   this_flag_will_not_cause_any_change_in_behavior_24c0308b: "این نشانه هیچ تغییری در رفتار ایجاد نمی‌کند."
   this_folder_is_currently_locked_and_unavailable_to_f85c451: "این پوشه در حال حاضر قفل است و برای مشاهده قابل دسترسی نیست."
   this_grade_differs_from_the_student_s_view_of_the__56742bd0: "این نمره با نمای نمره دانشجو فرق می کند، زیرا برخی تکلیف ها غیر فعال شده اند"
+  this_grade_differs_from_the_student_s_view_of_the__f78d0023: "این نمره از نمای دانشجو نسبت به نمره متفاوت است زیرا برخی از نمرات تکالیف هنوز ارسال نشده اند."
   this_grade_has_negative_points_496400d4: "این نمره امتیازات منفی دارد"
   this_grade_is_invalid_8ab192c7: "این نمره نامعتبر است"
   this_grade_is_unusually_high_60533c20: "این نمره به طور غیر عادی زیاد است"
@@ -20469,6 +20513,7 @@ fa:
   this_is_not_a_valid_grade_9cc2cb8: "این یک نمره معتبر نیست"
   this_is_the_currently_chosen_grade_for_this_studen_86118eb6: "نمره ای که در حال حاضر برای این دانشجو انتخاب شده، این است."
   this_is_the_default_email_address_f3c421fb: "نشانی پست الکترونیکی پیش فرض این است"
+  this_is_the_new_feature_preview_ui_it_is_currently_9cb4b80e: "این  پیش‌نمایش ویژگی واسط کابر جدید است. در حال حاضر فقط خواندنی است. برای بازگشت به واسط کابر قدیمی ، روی دکمه کلیک کنید. این ویژگی \"ویژگی نشانه‌های جدید\" را غیرفعال کرده و صفحه را تازه می کند."
   this_is_your_course_landing_page_33d445ec: "این صفحه اصلی درس شماست"
   this_is_your_current_theme_4331709b: "زمینه فعلی شما این است"
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "این مورد وقتی یک مورد ارسالی جدید ایجاد شود، دوباره ظاهر خواهد شد."
@@ -20497,6 +20542,7 @@ fa:
   this_page_cannot_be_modified_because_grades_have_a_48646991: "این صفحه نمی تواند تغییر داده شود، زیرا نمره ها ارسال شده اند."
   this_panel_lists_the_users_ready_to_be_added_to_th_79efad22: "این پنل کاربران آماده برای افزودن به این درس را فهرست می‌کند."
   this_permission_only_affects_course_announcements__6bc2b0a5: "این مجوز فقط روی اطلاعیه‌های درس تأثیر می گذارد. برای مدیریت اطلاعیه‌های جهانی، اطلاعیه‌های جهانی - افزودن / ویرایش / حذف باید فعال شود."
+  this_placement_requires_deep_link_support_by_the_v_702d554f: "این جای گذاری نیاز به پشتیبانی Deep Link توسط فروشنده دارد. برای اطمینان از اینکه این کارکرد  را پشتیبانی می کنند، با فروشنده ابزار خود مشورت کنید."
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "این گروه پرسش برای انتخاب پرسش های بیشتر از حد موجود تعیین شده است."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "این پرسش یک کادر علامت گذاری را در کنار هر پاسخ نشان خواهد داد."
   this_quiz_has_been_excused_d89d2b74: "این آزمون اجرا شده است"
@@ -20816,6 +20862,7 @@ fa:
   to_do_time_a7e17623: "زمان برای  انجام"
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "برای ویرایش تنظیمات درس، درس - افزودن / ویرایش / حذف باید فعال شوند."
   to_f0e90538: "گیرنده:"
+  to_import_sis_data_sis_data_import_must_also_be_en_52bdf01: "برای وارد کردن داده های سامانه اطلاعات دانشجو، ورود_سامانه اطلاعات دانشجو نیز باید فعال باشد."
   to_link_the_course_observer_name_to_a_student_star_f993c826: "برای پیوند دادن بییننده درس *%{name}* به یک دانشجو، نام دانشجو را در قسمت زیر تایپ کنید تا آنها را بیابید و سپس روی بهنگام سازی کلیک کنید."
   to_manage_blueprint_course_settings_in_course_sett_c3bfdd4f: "برای مدیریت تنظیمات دوره طرح در تنظیمات درس‌ها، درس‌ها - افزودن / ویرایش / حذف نیز باید فعال باشند."
   to_manage_sis_data_sis_data_manage_must_also_be_en_cc52f042: "برای مدیریت اطلاعات  سامانه اطلاعات دانشجو ، سامانه اطلاعات دانشجو - مدیریت نیز باید فعال باشد."
@@ -20823,6 +20870,7 @@ fa:
   to_minscore_43e5452e: "به %{minScore}%"
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "برای تعدیل یک آزمون، نمرات - ویرایش نیز باید فعال باشد."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "برای تعدیل نمرات ، نمرات - انتخاب نمره نهایی برای تعدیل نیز باید فعال باشد."
+  to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "برای دریافت شناسه سرویس گیرنده، یک مدیر حساب باید یک کلید توسعه دهنده LTI ایجاد کند."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "برای الصاق یک بحث به بالای صفحه، یک بحث را اینجا بکشید، یا الصاق را از منوی تنظیمات بحث انتخاب کنید."
   to_preview_theme_editor_branding_you_will_need_to__462dda1a: "برای پیش نمایش علامت تجاری ویرایشگر زمینه، باید *واسط کاربر دارای تضاد زیاد را غیر فعال کنید*."
   to_publish_and_unpublish_module_content_courses_ad_4c7fc3c9: |-
@@ -20841,7 +20889,10 @@ fa:
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "برای مشاهده یا ویرایش شناسه سامانه اطلاعات دانشجو یا شناسه یکپارچگی کاربر ، کاربران - مشاهده لیست  و کاربران - جزئیات ورود به سیستم  را نیز باید فعال کنند."
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "برای مشاهده اطلاعیه‌های اخیر در صفحه اصلی، محتوای درس -مشاهده باید فعال باشد و کادر تأیید نمایش اطلاعیه‌های اخیر در صفحه اصلی درس باید در تنظیمات درس انتخاب شود. برای مدیریت اطلاعیه‌های درس، بحث - تعدیل سازی نیز باید فعال باشد."
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "برای مشاهده تجزیه و تحلیل دانشجو در تجزیه و تحلیل درس ، نمرات - مشاهده همه نمرات نیز باید فعال باشد"
+  to_view_the_list_of_users_in_an_account_users_view_401b8462: "برای مشاهده لیست کاربران در یک حساب، فهرست کاربران -مشاهده باید فعال باشد."
+  to_view_the_list_of_users_in_an_account_users_view_e08a4f3c: "برای مشاهده لیست کاربران در یک حساب ، فهرست کاربران -مشاهده باید فعال باشد."
   to_view_the_reports_tab_courses_view_usage_reports_d371ec85: "برای مشاهده برگه گزارشات, درسها - گزارش های استفاده نیز باید فعال شوند."
+  to_view_user_page_views_users_view_list_must_also__f4246239: "برای مشاهده بازدیدهای صفحه کاربر، لیست کاربران - مشاهده نیز باید فعال باشد."
   today_76e10f9c: امروز
   toggle_alignment_details_for_title_944f605: "جزئیات تطبیق را  برای %{title} تغییر دهید"
   toggle_course_card_color_overlays_b5b8137a: "تغییر پوشش رنگ کارت درس"
@@ -21775,13 +21826,16 @@ fa:
       این صفحه اولین صفحه‌ای خواهد بود که کاربران در هنگام مشاهده درس شما می‌بینند.
       صفحه اصلی شما را روی ماژول‌ها قرار داده ایم، اما می‌توانید آن را تغییر دهید.
   when_posting_grades_for_anonymous_assignments_grad_b13f3ae6: "هنگام ارسال نمرات برای تکالیف ناشناس ، نمرات برای همه افراد در درس ارسال می شود. ناشناس بودن حذف می شود."
+  when_scope_enforcement_is_disabled_tokens_have_acc_6939182f: "هنگامی که اجرای دامنه غیرفعال است ، نشانه‌ها به همه نقاط نهایی موجود برای کاربر مجاز دسترسی دارند."
   when_selected_the_course_is_in_a_read_only_state_o_5aaeb0d: "زمانی که انتخاب شد، درس در خارج از این زمان در وضعیت فقط خواندن قرار می‌گیرد."
   when_selected_the_course_is_inaccessible_outside_c_af595406: "در صورت انتخاب، درس خارج از تاریخ درس غیرقابل دسترسی است. اگر تاریخ درس‌ها خالی باشد، این تاریخ های شروع و پایان برای تاریخ‌های نیمسال اعمال می شود."
   when_selected_the_course_section_is_in_a_read_only_a7571eb2: "زمانی که انتخاب شد، این بخش از درس در خارج از این زمان در وضعیت فقط خواندن قرار می‌گیرد."
   whenever_b943b119: "هر زمان"
   where_would_you_like_to_move_title_fabd6e8f: "می خواهید %{title} را به کجا انتقال دهید؟"
   which_course_is_this_question_about_f819a158: "این پرسش مربوط به کدام درس است؟"
+  while_the_grades_for_an_assignment_are_set_to_manu_457c38ff: "تازمانی که که نمرات یک تکلیف به صورت دستی تنظیم شده است ، دانشجویان اطلاعیه‌های جدیدی در مورد آن‌ها دریافت نخواهند کرد یا قادر به دیدن آن‌ها نیستند:"
   while_the_grades_for_this_assignment_are_hidden_st_c5d1992b: "مادامی که نمرات این تکلیف  پنهان است ، دانشجویان  اطلاعیه های جدیدی درباره آن دریافت نمی کنند یا قادر به مشاهده آن نخواهند بود:"
+  while_the_grades_for_this_assignment_are_set_to_ma_cb716ede: "تا زمانی که نمرات این تکلیف به صورت دستی تنظیم شده است، دانشجویان اطلاعیه‌های جدیدی در مورد آن‌ها دریافت نخواهند کرد یا قادر به دیدن آنها نیستند:"
   whitelist_count_max_26a270f: "لیست سفید(%{count}/%{max}) "
   whitelist_e88fd8ed: "لیست سفید"
   whitelist_editing_is_disabled_when_security_settin_ab40cc90: "ویرایش لیست سفید زمانی که تنظیمات امنیتی از حساب والد به ارث برده می شوند غیرفعال است."
