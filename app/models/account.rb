@@ -1751,7 +1751,7 @@ class Account < ActiveRecord::Base
       if allowed_service_names.count > 0
         unless [ '+', '-' ].member?(allowed_service_names[0][0,1])
           # This account has a hard-coded list of services, so we clear out the defaults
-          account_allowed_services = { }
+          account_allowed_services = AccountServices::AllowedServicesHash.new
         end
 
         allowed_service_names.each do |service_switch|
