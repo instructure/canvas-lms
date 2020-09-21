@@ -64,3 +64,10 @@ new_math_equation_handling:
     with a MathJax formatted version. This provides better accessibility
     and many options for the reader to interact with the equation on the page.
   applies_to: SiteAdmin
+autocreate_attachment_from_media_object:
+  state: hidden
+  display_name: Create Files After RCE Media Upload/Recording
+  description: |-
+    Creates file objects (initially hidden to students if in a Course) after
+    media is uploaded or recorded through the RCE.
+  applies_to: RootAccount
