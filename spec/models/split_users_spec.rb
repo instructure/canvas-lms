@@ -384,6 +384,23 @@ describe SplitUsers do
           map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
 
+      it "deconflicts duplicated paths where it can" do
+        notification = Notification.where(name: "Report Generated").first_or_create
+        communication_channel(restored_user, {username: 'test@instructure.com'})
+        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+        source_user_ccs = source_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+        UserMerge.from(restored_user).into(source_user)
+        communication_channel(restored_user, {username: 'test@instructure.com', cc_state: 'retired'})
+        SplitUsers.split_db_users(source_user)
+        restored_user.reload
+        source_user.reload
+        expect(restored_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
+        expect(source_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
+      end
     end
 
     it 'should restore submissions' do

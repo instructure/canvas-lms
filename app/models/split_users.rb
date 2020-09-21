@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SplitUsers
+  class UnsafeSplitError < StandardError; end
+
   ENROLLMENT_DATA_UPDATES = [
     {table: 'asset_user_accesses',
      scope: -> { where(context_type: 'Course') }}.freeze,
@@ -210,6 +212,33 @@ class SplitUsers
         ccs.delete_all
       end
     end
+
+    # in cases where there are conflicting records
+    # between the source and target (of merge) comm records,
+    # we can eliminate some errors by detecting these and destroying
+    # the source record if it's already retired (because the one from
+    # the merge is about to overwrite it)
+    cc_records.where(previous_user_id: restored_user).each do |cr|
+      target_cc = cr.context
+      # if this cc didn't get moved, we don't need to worry
+      # about deconflicting it with the source users.
+      next unless target_cc.user_id == source_user.id
+      conflict_cc = restored_user.communication_channels.detect do |c|
+        c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
+      end
+      if conflict_cc
+        # we need to resolve before we can un-merge
+        if conflict_cc.retired? || conflict_cc.unconfirmed?
+          # when the comm channel from the target record gets moved back, it will
+          # get restored to whatever state it needs.  This one is in a useless state,
+          # so we could just blast this one away safely.
+          conflict_cc.destroy_permanently!
+        else
+          raise UnsafeSplitError, "Unsafe to decide automatically which CC to delete (for now): ( #{target_cc.id} , #{conflict_cc.id} ) from merge record #{cr.id}"
+        end
+      end
+    end
+
     # move moved communication channels back
     max_position = restored_user.communication_channels.last.try(:position) || 0
     scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: restored_user).pluck(:context_id))
