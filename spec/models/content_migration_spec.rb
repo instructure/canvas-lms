@@ -230,6 +230,7 @@ describe ContentMigration do
 
     it "should import into a user" do
       cm = setup_zip_import(@user)
+      expect(cm.root_account_id).to eq 0
       test_zip_import(@user, cm)
     end
 

@@ -181,7 +181,6 @@ module DataFixup::PopulateRootAccountIdOnModels
     # Arguments to where()
     @unfillable_criteria ||= {
       DeveloperKey => 'account_id IS NULL',
-      LearningOutcomeGroup => 'context_id IS NULL',
     }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
@@ -194,7 +193,9 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.fill_with_zeros_criteria
     # Arguments to where()
     @fill_with_zeros_criteria ||= {
-      CalendarEvent => {context_type: 'User', effective_context_code: nil}
+      CalendarEvent => {context_type: 'User', effective_context_code: nil},
+      LearningOutcomeGroup => 'context_id IS NULL',
+      ContentMigration => {context_type: 'User'},
     }.transform_values{ |criteria| [criteria].flatten(1) }.freeze
   end
 
@@ -292,6 +293,10 @@ module DataFixup::PopulateRootAccountIdOnModels
           true
         elsif incomplete_tables.include?(class_name) || tables_in_progress.include?(class_name)
           false
+        elsif table == CommunicationChannel
+          # For single-sharded (OSS) Canvas, if any users have been filled in
+          # and User jobs are complete, we are good to fill in comm channels
+          User.where.not(root_account_ids: nil).any?
         else
           check_if_association_has_root_account(table, assoc_reflection) ? complete_tables << table && true : incomplete_tables << table && false
         end

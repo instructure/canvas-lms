@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,22 +15,16 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require 'database_cleaner'
-require_relative '../../../support/test_database_utils'
-
-Pact.configure do |config|
-  config.include Factories
-end
-
-Pact.set_up do
-  DatabaseCleaner.strategy = :transaction
-  DatabaseCleaner.start
-
-  ActiveRecord::Base.connection.tables.each do |t|
-    TestDatabaseUtils.reset_pk_sequence!(t)
+module DataFixup
+  module ClearOldCommunicationChannelRootAccountIds
+    # Gets rid of old filled root_account_ids so the backfill can fill them properly.
+    # Loosely based on DataFixup::BackfillNulls
+    def self.run
+      CommunicationChannel.find_ids_in_ranges(batch_size: 1000) do |start_id, end_id|
+        CommunicationChannel.where(id: start_id..end_id).
+          where.not(root_account_ids: nil).
+          update_all(root_account_ids: nil)
+      end
+    end
   end
-end
-
-Pact.tear_down do
-  DatabaseCleaner.clean
 end
