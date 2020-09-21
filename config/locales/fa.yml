@@ -1991,6 +1991,7 @@ fa:
   allows_the_duplication_of_calendar_events_7bb0d6c5: "امکان دوتا کردن رویدادهای تقویم"
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "امکان زمان بندی رویدادهای تکرار شونده تقویم را فراهم می کند"
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "به کاربر امکان دسترسی و ویرایش تنظیمات مدیر درموارد رایج را می دهد. به کاربر امکان می دهد گروه ها را ایجاد و مدیریت کند. به کاربر اجازه می دهد تا منابع مشترک در حساب را مدیریت کند."
+  allows_user_to_access_the_blueprint_courses_sideba_cb5f6a46: "به کاربر اجازه می دهد تا به نوار کناری دوره‌های طرح دسترسی پیدا کند. به کاربر اجازه می دهد تا تنظیمات محتوای دوره‌های طرح را در تنظیمات درس مدیریت کند. به کاربر اجازه می‌دهد یک درس مرتبط را حذف کند. به کاربر اجازه می دهد تنظیمات قفل طرح را در تکالیف ، صفحات یا گفتگوهای فردی ویرایش کند."
   allows_user_to_access_the_student_progress_page_aca95197: "به کاربر اجازه می‌دهد تا به صفحه پیشرفت دانشجو دسترسی پیدا کند."
   allows_user_to_access_the_theme_editor_26691f9a: "به کاربر اجازه می دهد تا به ویرایشگر تم دسترسی داشته باشد."
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "به کاربر اجازه می دهد تا به لینک کاربران در پیمایش حساب دسترسی پیدا کند."
@@ -2029,6 +2030,7 @@ fa:
   allows_user_to_manage_modules_create_add_items_edi_1afafd65: |-
       به کاربر امکان می دهد ماژول ها را مدیریت کند (ایجاد ، افزودن موارد، ویرایش تنظیمات ماژول،
       انتشار / لغو انتشار و غیره)
+  allows_user_to_manage_observers_associated_with_st_4b45f2be: "به کاربر اجازه می دهد بیننده‌ها مرتبط با دانشجویان را در حساب مدیریت کند."
   allows_user_to_manage_rubrics_326eedc2: "به کاربر اجازه بده دستور العمل‌های ارزیابی را مدیریت کند."
   allows_user_to_manually_add_and_delete_an_app_in_a_402d3d91: "به کاربر اجازه می دهد تا یک برنامه را در تنظیمات حساب به صورت دستی اضافه و حذف کند."
   allows_user_to_manually_add_and_delete_an_app_in_c_18250cad: "به کاربر اجازه می دهد تا یک برنامه را در تنظیمات درس به صورت دستی اضافه و حذف کند."
@@ -2550,6 +2552,10 @@ fa:
   assignment_grades_have_already_been_published_ff2d84c6: "نمره های تکلیف منتشر شده اند."
   assignment_grades_have_already_been_released_4c8a91b: "نمره های تکلیف منتشر شده اند."
   assignment_grades_will_be_visible_to_students_as_s_62975ef6: |-
+      
+      نمرات تکلیف به محض ورود دانش آموزان قابل مشاهده خواهد بود.
+      نمره هایی که قبلاً پنهان شده اند پنهان خواهند ماند
+  assignment_grades_will_be_visible_to_students_as_s_bfbea571: |-
       
       نمرات تکلیف به محض ورود دانش آموزان قابل مشاهده خواهد بود.
       نمره هایی که قبلاً پنهان شده اند پنهان خواهند ماند
@@ -4192,6 +4198,7 @@ fa:
   canvas_cartridge_display: " کارتریج رایج کانواس"
   canvas_cartridge_file_description: "بسته صدور درس کانواس"
   canvas_cartridge_name: "وارد کننده کارتریج کانواس"
+  canvas_catalog_87f39420: "کاتالوگ کانواس"
   canvas_cloud_information_fdd404f2: "اطلاعات ابر کانواس"
   canvas_content_security_policy_c3d7bf2b: "سیاست امنیتی محتوا کانواس"
   canvas_course_id_db4de2b8: شناسه_درس_کانواس
@@ -7960,6 +7967,7 @@ fa:
   enabled_by_default_e530d6ed: "به‌طور پیش فرض فعال شده است"
   enabled_links_be110215: "پیوندهای فعال شده"
   enabled_web_services_f620b2be: "وب سرویس‌های فعال شده"
+  enables_display_of_plagiarism_reports_and_similari_3211dd8b: "نمایش گزارش های سرقت ادبی و نمرات تشابه را در سینی ارسال دفتر نمره گذاری جدید فعال می کند."
   encourage_class_participation_4e069479: "تشویق به مشارکت در کلاس"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Sourcedid های رمزگذاری شده برای نتایج ابتدایی"
   end_course_set_up_tutorial_dialog_5b812ec6: "پایان دادن به کادر گفتگوی خودآموز راه اندازی درس"
@@ -9706,6 +9714,10 @@ fa:
   grades_view_audit_trail_cc4c1fcc: "نمره‌ها - مشاهده دنباله حسابرسی"
   grades_view_change_logs_6bc1b959: "نمره‌ها - مشاهده تغییرات گزارش‌‌ها"
   grades_were_successfully_released_to_the_gradebook_4c3b07d6: "نمرات با موفقیت در دفتر نمره  منتشر شدند."
+  grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: |-
+      
+      نمرات به طور پیش فرض پنهان می شوند. هر نمره ای که قبلاً پست کرده باشد قابل مشاهده خواهد بود.
+      زمان ارسال نمرات برای این تکلیف را در دفتر نمرات انتخاب کنید.
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: |-
       
       نمرات به طور پیش فرض پنهان می شوند. هر نمره ای که قبلاً پست کرده باشد قابل مشاهده خواهد بود.
@@ -14509,6 +14521,10 @@ fa:
   on_paper_46d0ba36: "روی کاغذ"
   on_time_17ca5ad9: "سر وقت"
   on_time_percent_eebffe38: "بموقع: %{percent}"
+  once_a_grade_is_posted_manually_it_will_automatica_26aff290: |-
+      
+      هنگامی که نمره ای به صورت دستی ارسال می‌شود، به طور خودکار اطلاعیه‌های جدید ارسال می‌کند و برای دانشجویان قابل مشاهده است.
+      تغییرات نمرات آتی برای نمرات ارسال شده نیازی به ارسال دستی ندارند.
   once_a_grade_is_posted_manually_it_will_automatica_bb90f67c: "هنگامی که نمره ای به صورت دستی ارسال می شود ، به طور خودکار اطلاعیه‌های جدید ارسال می کند و برای دانشجویان قابل مشاهده است."
   once_this_feature_is_enabled_you_will_not_be_able__ad338dcb: "وقتی این ویژگی فعال شود، نمی توانید آن را دوباره غیر فعال کنید.  قبل از ادامه مطمئن شوید که برای فعالسازی پوشه موردهای ارسالی آماده هستید."
   once_you_have_submitted_an_answer_you_will_not_be__840df9e9: "هنگامی که یک پاسخ ارسال کنید، نمی توانید آن را تغییر دهید. نمی‌توانید پرسش قبلی را مشاهده کنید."
@@ -17746,6 +17762,7 @@ fa:
   require_usage_rights_for_uploaded_files_4507865b: "لازم دانستن حقوق استفاده برای فایل های بارگذاری شده"
   required_access_code_592902d7: "رمز دسترسی لازم است"
   required_email_address_379b2392: "نشانی پست الکترونیکی لازم است"
+  required_fields_include_key_name_owner_email_tool__b8e42174: "قسمت‌های لازم شامل نام کلید، ایمیل مالک، شناسه ابزار ، هدایت نشانی اینترنتی و نشانی اینترنتی نماد است."
   required_to_view_quiz_results_dba7368b: "مشاهده نتایج آزمون لازم است"
   required_values_1eb5841f: "مقادیر لازم"
   requirement_f5b75da1: الزام
@@ -20249,6 +20266,9 @@ fa:
   the_ability_for_users_to_receive_notifications_fro_bbcf487b: "امکان کاربران برای دریافت اطلاعیه‌ها  از slack"
   the_account_id_of_the_account_to_which_the_reporti_93ddb00f: "شناسه حسابی که کاربر گزارش دهنده به آن تعلق دارد"
   the_algorithm_to_use_for_signing_authnrequest_logo_67a75cc9: "این الگوریتم برای امضای درخواست اعتبارسنجی، درخواست خروج و پاسخ به خروج پیام‌های ارسال شده به IdP  استفاده می شود."
+  the_analytics_feature_must_be_enabled_in_account_s_37b80011: |-
+      برای مشاهده صفحات تجزیه و تحلیل، ویژگی تجزیه و تحلیل باید در تنظیمات حساب فعال شود.
+      برای مشاهده پیوند تحلیل‌ها در نوار کناری کاربر از صفحه افراد، رخ‌نماها باید در حساب شما غیرفعال شوند.
   the_announcement_title_could_not_be_linked_to_the__78c747f3: "اطلاعیه \"%{title}\" نمی تواند به ماژول \"%{mod_title}\" پیوند داده شود"
   the_announcements_tab_is_always_visible_to_admins__eb447785: "زبانه اعلانات همیشه برای مدیران قابل مشاهده است. با این حال ، برای مدیریت اطلاعیه ها ، اطلاعیه های جهانی - افزودن / ویرایش / حذف نیز باید فعال باشد."
   the_app_was_activated_a84e055f: "برنامه فعال شد"
