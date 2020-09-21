@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 module Canvas::Vault
+  class VaultConfigError < StandardError; end
   class AwsCredentialProvider
     include ::Aws::CredentialProvider
 
@@ -29,6 +30,7 @@ module Canvas::Vault
     # out of the local redis cache.
     def credentials
       cred_hash = ::Canvas::Vault.read(@_path)
+      raise(VaultConfigError, "failed to read config for #{@_path}") if cred_hash.blank?
       ::Aws::Credentials.new(cred_hash[:access_key], cred_hash[:secret_key], cred_hash[:security_token])
     end
   end
