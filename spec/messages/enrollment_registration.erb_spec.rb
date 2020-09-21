@@ -37,5 +37,6 @@ describe 'enrollment_registration' do
     expect(msg.html_body).to include "participate in a class at Default Account."
     expect(msg.html_body).not_to include "Update your notification settings"
     expect(msg.html_body).not_to include "Click here to view course page"
+    expect(@message.body).not_to include 'To change or turn off email notifications,'
   end
 end

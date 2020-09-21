@@ -37,5 +37,6 @@ describe 'pseudonym_registration' do
     msg = generate_message(notification_name, :email, asset, message_data)
     expect(msg.html_body).to include "for a Canvas account at Default Account!"
     expect(msg.html_body).not_to include "Update your notification settings"
+    expect(msg.body).not_to include 'To change or turn off email notifications,'
   end
 end

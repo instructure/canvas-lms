@@ -43,6 +43,8 @@ describe 'enrollment_notification' do
         generate_message(:enrollment_notification, :email, asset)
         expect(@message.html_body).to include 'Click here to view the course page'
         expect(@message.html_body).to include 'Update your notification settings</a>'
+        # email footer
+        expect(@message.body).to include 'To change or turn off email notifications,'
       end
     end
   end

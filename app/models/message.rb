@@ -534,7 +534,10 @@ class Message < ActiveRecord::Base
       footer_path = Canvas::MessageHelper.find_message_path('_email_footer.email.erb')
       raw_footer_message = File.read(footer_path)
       footer_message = eval(Erubi::Engine.new(raw_footer_message, :bufvar => "@output_buffer").src, nil, footer_path)
-      if footer_message.present?
+      # currently, _email_footer.email.erb only contains a way for users to change notification prefs
+      # they can only change it if they are registered in the first place
+      # do not show this for emails telling users to register
+      if (footer_message.present? && !(self.notification&.name&.downcase.include? 'registration'))
         self.body = <<-END.strip_heredoc
           #{self.body}
 
