@@ -29,6 +29,18 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     @delif = Redis::Scripting::Script.new(File.expand_path("../delif.lua", __FILE__))
   end
 
+  def clear
+    # do it locally
+    super
+    # then if so configured, trigger consul
+    if options[:consul_event]
+      datacenters = Array.wrap(options[:consul_datacenters]).presence || [nil]
+      datacenters.each do |dc|
+        Imperium::Events.fire(options[:consul_event], 'FLUSHDB', dc: dc)
+      end
+    end
+  end
+
   protected
 
   def delete_entry(key, options)
