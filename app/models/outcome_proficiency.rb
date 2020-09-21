@@ -72,6 +72,24 @@ class OutcomeProficiency < ApplicationRecord
     outcome_proficiency_ratings[ratings.length..-1].each(&:mark_for_destruction)
   end
 
+  def ratings_hash
+    outcome_proficiency_ratings.map do |rating|
+      {
+        points: rating.points,
+        mastery: rating.mastery,
+        description: rating.description
+      }
+    end
+  end
+
+  def points_possible
+    outcome_proficiency_ratings.first.points
+  end
+
+  def mastery_points
+    outcome_proficiency_ratings.where(mastery: true).first.points
+  end
+
   private
 
   def next_ratings

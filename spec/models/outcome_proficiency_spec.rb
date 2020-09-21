@@ -106,4 +106,38 @@ describe OutcomeProficiency, type: :model do
     let(:params) { { outcome_proficiency_ratings: [rating1] } }
     let(:creation_arguments) { [ params.merge(context: first_account), params.merge(context: second_account) ] }
   end
+
+  describe 'ratings_hash' do
+    before do
+      rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+      @outcome_proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1], context: account_model)
+    end
+
+    it 'returns the ratings in a hash with the appropriate values' do
+      expect(@outcome_proficiency.ratings_hash).to eq [{:description => 'best', :points => 10, :mastery => true}]
+    end
+  end
+
+  describe 'mastery_points' do
+    before do
+      rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+      @outcome_proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1], context: account_model)
+    end
+
+    it 'returns the points for the mastery rating' do
+      expect(@outcome_proficiency.mastery_points).to eq 10
+    end
+  end
+
+  describe 'points_possible' do
+    before do
+      rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: false, color: '00ff00')
+      rating2 = OutcomeProficiencyRating.new(description: 'okay', points: 5, mastery: true, color: '00ff00')
+      @outcome_proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [rating1, rating2], context: account_model)
+    end
+
+    it 'returns the points for the top rating' do
+      expect(@outcome_proficiency.points_possible).to eq 10
+    end
+  end
 end

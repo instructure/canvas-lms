@@ -67,7 +67,7 @@ describe OutcomeResultsController do
     find_outcome_criterion
   end
 
-  def create_result(user_id, outcome, assignment, score)
+  def create_result(user_id, outcome, assignment, score, opts = {})
     rubric_association = outcome_rubric.associate_with(outcome_assignment, outcome_course, purpose: 'grading')
 
     LearningOutcomeResult.new(
@@ -79,7 +79,8 @@ describe OutcomeResultsController do
         learning_outcome: outcome,
         content_type: 'Assignment',
         content_id: assignment.id
-      })
+      }),
+      **opts
     ).tap do |lor|
       lor.association_object = rubric_association
       lor.context = outcome_course
@@ -261,6 +262,40 @@ describe OutcomeResultsController do
     it 'includes rating percents' do
       json = parse_response(get_rollups(rating_percents: true, include: ['outcomes']))
       expect(json['linked']['outcomes'][0]['ratings'].map { |r| r['percent'] }).to eq [50, 50]
+    end
+
+    context 'with the account_mastery_scales FF' do
+      context 'enabled' do
+        before do
+          @course.account.enable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'uses default outcome values for points scaling if no outcome proficiency exists' do
+          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+        end
+
+        it 'uses resolved_outcome_proficiency for points scaling if one exists' do
+          proficiency = outcome_proficiency_model(@course)
+          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          expect(json['rollups'][0]['scores'][0]['score']).to eq 4 # ( score of 2 / possible 5) * proficiency.points_possible
+        end
+      end
+
+      context 'disabled' do
+        before do
+          @course.account.disable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'ignores the outcome proficiency for points scaling' do
+          proficiency = outcome_proficiency_model(@course)
+          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
+          expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+        end
+      end
     end
 
     context 'sorting' do

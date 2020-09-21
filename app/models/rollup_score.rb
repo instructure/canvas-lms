@@ -28,8 +28,15 @@ class RollupScore
     @median = opts[:aggregate_stat] == 'median'
     @outcome = @outcome_results.first.learning_outcome
     @count = @outcome_results.size
-    @points_possible = @outcome.rubric_criterion[:points_possible]
-    @mastery_points = @outcome.rubric_criterion[:mastery_points]
+    if context.is_a?(Course) && context.root_account.feature_enabled?(:account_level_mastery_scales) && context.resolved_outcome_proficiency.present?
+      ratings = context.resolved_outcome_proficiency
+      @points_possible = ratings.points_possible
+      @mastery_points = ratings.mastery_points
+    else
+      @points_possible = @outcome.rubric_criterion[:points_possible]
+      @mastery_points = @outcome.rubric_criterion[:mastery_points]
+    end
+
     if context.is_a?(Course) && context.root_account.feature_enabled?(:account_level_mastery_scales) && context.resolved_outcome_calculation_method
       @calculation_method = context.resolved_outcome_calculation_method.calculation_method
       @calculation_int = context.resolved_outcome_calculation_method.calculation_int
@@ -101,5 +108,4 @@ class RollupScore
     decaying_avg_score = (latest_weighted + older_avg_weighted).round(PRECISION)
     {score: decaying_avg_score, results: tmp_score_sets.pluck(:result).push(latest[:result])}
   end
-
 end

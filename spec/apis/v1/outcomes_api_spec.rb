@@ -312,6 +312,49 @@ describe "Outcomes API", type: :request do
         json = controller.outcome_json(@outcome, @account_user.user, session, {assessed_outcomes: [@outcome]})
         expect(json["assessed"]).to be true
       end
+
+      describe "with the account_level_mastery_scales FF" do
+        describe "enabled" do
+          before :once do
+            @account.enable_feature!(:account_level_mastery_scales)
+          end
+
+          it "should return the mastery scales values if an outcome_proficiency exists" do
+            proficiency = outcome_proficiency_model(@account)
+            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                            :controller => 'outcomes_api',
+                            :action => 'show',
+                            :id => @outcome.id.to_s,
+                            :format => 'json')
+            expect(json).to eq(outcome_json(@outcome, {
+              :points_possible => proficiency.points_possible,
+              :mastery_points => proficiency.mastery_points,
+              :ratings => proficiency.ratings_hash.map(&:stringify_keys)
+            }))
+          end
+
+          it "should return the outcome's values if no proficiency exists" do
+            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+              :controller => 'outcomes_api',
+              :action => 'show',
+              :id => @outcome.id.to_s,
+              :format => 'json')
+            expect(json).to eq(outcome_json(@outcome))
+          end
+        end
+
+        describe "disabled" do
+          it "should ignore the outcome_proficiency values if one exists" do
+            proficiency = outcome_proficiency_model(@account)
+            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                            :controller => 'outcomes_api',
+                            :action => 'show',
+                            :id => @outcome.id.to_s,
+                            :format => 'json')
+            expect(json).to eq(outcome_json(@outcome))
+          end
+        end
+      end
     end
 
     describe "update" do

@@ -55,9 +55,16 @@ module Api::V1::Outcome
           hash['calculation_int'] = outcome.calculation_int
         end
 
-        hash['points_possible'] = outcome.rubric_criterion[:points_possible]
-        hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
-        hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+        if outcome.context_id && outcome.context.root_account.feature_enabled?(:account_level_mastery_scales) && outcome.context.resolved_outcome_proficiency
+          proficiency = outcome.context.resolved_outcome_proficiency
+          hash['ratings'] = proficiency.ratings_hash
+          hash['points_possible'] = proficiency.points_possible
+          hash['mastery_points'] = proficiency.mastery_points
+        else
+          hash['points_possible'] = outcome.rubric_criterion[:points_possible]
+          hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
+          hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+        end
         hash['ratings']&.each_with_index do |rating, i|
           rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length
         end if opts[:rating_percents]
