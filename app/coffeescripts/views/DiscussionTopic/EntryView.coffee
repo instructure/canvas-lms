@@ -299,7 +299,7 @@ class EntryView extends Backbone.View
 
   handleKeyDown: (e) =>
     nodeName = e.target.nodeName.toLowerCase()
-    return if nodeName == 'input' || nodeName == 'textarea' || ENV.DISABLE_KEYBOARD_SHORTCUTS
+    return if nodeName == 'input' || nodeName == 'textarea' || ENV.disable_keyboard_shortcuts
     if e.which == 68 # d
       @remove()
     else if e.which == 69 # e
