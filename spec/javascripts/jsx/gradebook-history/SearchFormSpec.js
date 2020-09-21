@@ -454,6 +454,37 @@ test('selecting an assignment from options clears options for assignments', func
   strictEqual(this.props.clearSearchOptions.firstCall.args[0], 'assignments')
 })
 
+test('selecting an assignment from options sets showFinalGradeOverridesOnly to false', function() {
+  this.wrapper.setState({
+    selected: {
+      from: {value: '', conversionFailed: false},
+      showFinalGradeOverridesOnly: true,
+      to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+    }
+  })
+
+  this.wrapper.setProps({
+    assignments: {
+      fetchStatus: 'success',
+      items: this.assignments,
+      nextPage: ''
+    }
+  })
+
+  const input = this.wrapper
+    .find('#assignments')
+    .last()
+    .instance()
+  input.click()
+
+  const assignmentNames = this.assignments.map(assignment => assignment.name)
+  ;[...document.getElementsByTagName('span')]
+    .find(span => assignmentNames.includes(span.textContent))
+    .click()
+
+  strictEqual(this.wrapper.state().selected.showFinalGradeOverridesOnly, false)
+})
+
 test('selecting a grader from options clears options for graders', function() {
   this.wrapper.setProps({
     graders: {
@@ -569,14 +600,83 @@ test('no search records found for assignments results in a message instead', fun
 })
 
 QUnit.module('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
-  test('is shown if the OVERRIDE_GRADES_ENABLED environment variable is set to true', () => {
-    fakeENV.setup({OVERRIDE_GRADES_ENABLED: true})
+  QUnit.module('when the OVERRIDE_GRADES_ENABLED environment variable is set to true', hooks => {
+    const clickOverrideGradeCheckbox = wrapper =>
+      wrapper
+        .find('#show_final_grade_overrides_only')
+        .last()
+        .simulate('change')
 
-    const wrapper = mountComponent()
-    ok(wrapper.exists('#show_final_grade_overrides_only'))
-    wrapper.unmount()
+    const fullMount = (props = {}) => mount(<SearchFormComponent {...defaultProps()} {...props} />)
 
-    fakeENV.teardown()
+    const assignmentData = {
+      fetchStatus: 'success',
+      items: [{id: '1', name: 'Just an assignment'}],
+      nextPage: ''
+    }
+
+    const initialState = {
+      selected: {
+        assignment: '1',
+        from: {value: '2017-05-02T00:00:00-05:00', conversionFailed: false},
+        showFinalGradeOverridesOnly: false,
+        to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+      }
+    }
+
+    hooks.beforeEach(() => {
+      fakeENV.setup({OVERRIDE_GRADES_ENABLED: true})
+    })
+
+    hooks.afterEach(() => {
+      fakeENV.teardown()
+    })
+
+    test('is shown', () => {
+      const wrapper = fullMount()
+      ok(wrapper.exists('#show_final_grade_overrides_only'))
+      wrapper.unmount()
+    })
+
+    test('clears the text of the Assignment input when enabled', () => {
+      const wrapper = fullMount({assignments: assignmentData})
+      wrapper.setState(initialState)
+
+      wrapper.find('input#assignments').instance().value = 'a search string'
+      clickOverrideGradeCheckbox(wrapper)
+
+      strictEqual(wrapper.find('input#assignments').instance().value, '')
+      wrapper.unmount()
+    })
+
+    test('sets the value of showFinalGradeOverridesOnly to the corresponding value when clicked', () => {
+      const wrapper = fullMount()
+      clickOverrideGradeCheckbox(wrapper)
+
+      strictEqual(wrapper.state().selected.showFinalGradeOverridesOnly, true)
+      wrapper.unmount()
+    })
+
+    test('clears the selected assignment when checked', () => {
+      const wrapper = fullMount({assignments: assignmentData})
+      wrapper.setState(initialState)
+
+      clickOverrideGradeCheckbox(wrapper)
+
+      strictEqual(wrapper.state().selected.assignment, '')
+      wrapper.unmount()
+    })
+
+    test('calls clearSearchOptions on the list of assignments when checked', () => {
+      const wrapper = fullMount({assignments: assignmentData, clearSearchOptions: sinon.stub()})
+      wrapper.setState(initialState)
+
+      clickOverrideGradeCheckbox(wrapper)
+
+      const [target] = wrapper.prop('clearSearchOptions').firstCall.args
+      strictEqual(target, 'assignments')
+      wrapper.unmount()
+    })
   })
 
   test('is not shown if the OVERRIDE_GRADES_ENABLED environment variable is set to false', () => {

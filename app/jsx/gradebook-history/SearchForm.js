@@ -60,7 +60,8 @@ class SearchFormComponent extends Component {
       grader: '',
       student: '',
       from: {value: '', conversionFailed: false},
-      to: {value: '', conversionFailed: false}
+      to: {value: '', conversionFailed: false},
+      showFinalGradeOverridesOnly: false
     },
     messages: {
       assignments: I18n.t('Type a few letters to start searching'),
@@ -141,14 +142,22 @@ class SearchFormComponent extends Component {
     }))
   }
 
-  setSelectedAssignment = (event, selected) => {
+  setSelectedAssignment = (event, selectedOption) => {
     this.props.clearSearchOptions('assignments')
-    this.setState(prevState => ({
-      selected: {
+    this.setState(prevState => {
+      const selected = {
         ...prevState.selected,
-        assignment: selected ? selected.id : ''
+        assignment: selectedOption ? selectedOption.id : ''
       }
-    }))
+
+      // If we selected an assignment, uncheck the "show final grade overrides
+      // only" checkbox
+      if (selectedOption != null) {
+        selected.showFinalGradeOverridesOnly = false
+      }
+
+      return {selected}
+    })
   }
 
   setSelectedGrader = (event, selected) => {
@@ -222,6 +231,31 @@ class SearchFormComponent extends Component {
 
   handleStudentChange = (_event, value) => {
     this.handleSearchEntry('students', value)
+  }
+
+  handleShowFinalGradeOverridesOnlyChange = _event => {
+    const enabled = !this.state.selected.showFinalGradeOverridesOnly
+
+    if (enabled) {
+      // If we checked the checkbox, clear any assignments we were filtering by
+      this.props.clearSearchOptions('assignments')
+    }
+
+    this.setState(
+      prevState => ({
+        selected: {
+          ...prevState.selected,
+          assignment: enabled ? '' : prevState.selected.assignment,
+          showFinalGradeOverridesOnly: enabled
+        }
+      }),
+      () => {
+        if (enabled) {
+          // Also manually clear the contents of the assignment select input
+          this.assignmentInput.value = ''
+        }
+      }
+    )
   }
 
   handleSearchEntry = (target, searchTerm) => {
@@ -384,8 +418,10 @@ class SearchFormComponent extends Component {
                   vAlign="top"
                 >
                   <Checkbox
+                    checked={this.state.selected.showFinalGradeOverridesOnly}
                     id="show_final_grade_overrides_only"
                     label={I18n.t('Show Final Grade Overrides Only')}
+                    onChange={this.handleShowFinalGradeOverridesOnlyChange}
                   />
                 </FormFieldGroup>
               </Grid.Col>
