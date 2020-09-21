@@ -41,7 +41,7 @@ def appendStagesAsBuildNodes(nodes,
     def stage_name = "$stage_name_prefix ${(index + 1).toString().padLeft(2, '0')}"
     def timeStart = new Date()
     nodes[stage_name] = {
-      protectedNode("canvas-$test_label-docker") {
+      protectedNode("canvas-docker") {
         echo "Running on node ${env.NODE_NAME}"
         def duration = TimeCategory.minus(new Date(), timeStart).toMilliseconds()
         // make sure to unstash
