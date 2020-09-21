@@ -43,6 +43,11 @@ describe LocalCache do
       skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
       allow(ConfigFile).to receive(:load).with("local_cache").and_return(redis_conf_hash)
       LocalCache.reset
+      LocalCache.clear
+    end
+
+    after(:each) do
+      LocalCache.clear
     end
 
     it "uses a redis store" do

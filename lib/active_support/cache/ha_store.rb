@@ -19,6 +19,8 @@
 Bundler.require 'redis'
 
 class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
+  include ActiveSupport::Cache::SafeRedisRaceCondition
+
   def initialize(consul_datacenters: nil,
                  consul_event: nil,
                  **additional_options)
@@ -26,7 +28,6 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     options[:lock_timeout] ||= 5
     options[:consul_datacenters] = consul_datacenters
     options[:consul_event] = consul_event
-    @delif = Redis::Scripting::Script.new(File.expand_path("../delif.lua", __FILE__))
   end
 
   def clear
@@ -77,79 +78,4 @@ class ActiveSupport::Cache::HaStore < ActiveSupport::Cache::RedisCacheStore
     end
   end
 
-  def handle_expired_entry(entry, key, options)
-    return super unless options[:race_condition_ttl]
-    lock_key = "lock:#{key}"
-
-    unless entry
-      while !entry
-        unless (lock_nonce = lock(lock_key, options))
-          # someone else is already generating it; wait for them
-          sleep 0.1
-          entry = read_entry(key, options)
-          next
-        else
-          options[:lock_nonce] = lock_nonce
-          break
-        end
-      end
-      entry
-    else
-      if entry.expired? && (lock_nonce = lock(lock_key, options))
-        options[:lock_nonce] = lock_nonce
-        options[:stale_entry] = entry
-        return nil
-      end
-      # just return the stale value; someone else is busy
-      # regenerating it
-      entry
-    end
-  end
-
-  def save_block_result_to_cache(name, options)
-    super
-  rescue => e
-    raise unless options[:stale_entry]
-    # if we have old stale data, silently swallow any
-    # errors fetching fresh data, and return the stale entry
-    Canvas::Errors.capture(e)
-    return options[:stale_entry].value
-  ensure
-    # only unlock if we have an actual lock nonce, not just "true"
-    # that happens on failure
-    if options[:lock_nonce].is_a?(String)
-      key = normalize_key(name, options)
-      unlock("lock:#{key}", options[:lock_nonce])
-    end
-  end
-
-  def lock(key, options)
-    nonce = SecureRandom.hex(20)
-    case redis.set(key, nonce, raw: true, px: (options[:lock_timeout] * 1000).to_i, nx: true)
-    when true
-      nonce
-    when nil
-      # redis failed for reasons unknown; say "true" that we locked, but the
-      # nonce is useless
-      true
-    when false
-      false
-    end
-  end
-
-  def unlock(key, nonce)
-    raise ArgumentError("nonce can't be nil") unless nonce
-    node = redis
-    node = redis.node_for(key) if redis.is_a?(Redis::Distributed)
-    @delif.run(node, [key], [nonce])
-  end
-
-  # vanilla Rails is weird, and assumes "race_condition_ttl" is 5 minutes; override that to actually do math
-  def write_entry(key, entry, unless_exist: false, raw: false, expires_in: nil, race_condition_ttl: nil, **options)
-    if race_condition_ttl
-      expires_in += race_condition_ttl
-      race_condition_ttl = nil
-    end
-    super
-  end
 end

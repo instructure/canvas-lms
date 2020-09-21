@@ -26,13 +26,13 @@ module Canvas
     let(:token_path){ '/path/to/token' }
     let(:addr) { 'http://vault:8200' }
     let(:addr_path) { '/path/to/addr' }
-    let(:static_config) { 
+    let(:static_config) {
       {
       token: token,
       addr: addr,
       kv_mount: 'app-canvas'
     } }
-    let(:path_config) { 
+    let(:path_config) {
       {
       token_path: token_path,
       addr_path: addr_path,
@@ -46,6 +46,7 @@ module Canvas
     end
 
     after do
+      LocalCache.clear
       WebMock.enable_net_connect!
     end
 
@@ -72,55 +73,38 @@ module Canvas
     end
 
     describe '.read' do
-      it 'Caches the read' do
+      before(:each) do
         allow(described_class).to receive(:config).and_return(static_config)
-        stub = stub_request(:get, "#{addr}/v1/test/path").
+        @stub = stub_request(:get, "#{addr}/v1/test/path").
           to_return(status: 200, body: {
           data: {
             foo: 'bar'
           },
           lease_duration: 3600,
         }.to_json, headers: { 'content-type': 'application/json' })
-
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
-        expect(stub).to have_been_requested.times(1)
-        # uses the cache
-        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
-        expect(stub).to have_been_requested.times(1)
       end
 
+      it 'Caches the read' do
+        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+        expect(@stub).to have_been_requested.times(1)
+        # uses the cache
+        expect(described_class.read('test/path')).to eq({ foo: 'bar' })
+        expect(@stub).to have_been_requested.times(1)
+      end
 
       it 'Caches the read for less than the lease_duration' do
-        allow(described_class).to receive(:config).and_return(static_config)
-        stub = stub_request(:get, "#{addr}/v1/test/path").
-          to_return(status: 200, body: {
-          data: {
-            foo: 'bar'
-          },
-          lease_duration: 3600,
-        }.to_json, headers: { 'content-type': 'application/json' })
-
         expect(described_class.read('test/path')).to eq({ foo: 'bar' })
-        expect(stub).to have_been_requested.times(1)
+        expect(@stub).to have_been_requested.times(1)
         # does not use the cache
         Timecop.travel(Time.zone.now + 3600.seconds) do
           expect(described_class.read('test/path')).to eq({ foo: 'bar' })
-          expect(stub).to have_been_requested.times(2)
+          expect(@stub).to have_been_requested.times(2)
         end
       end
 
       it 'Uses the cache if vault is unavailible' do
-        allow(described_class).to receive(:config).and_return(static_config)
-        stub = stub_request(:get, "#{addr}/v1/test/path").
-          to_return(status: 200, body: {
-          data: {
-            foo: 'bar'
-          },
-          lease_duration: 3600,
-        }.to_json, headers: { 'content-type': 'application/json' })
-
         expect(described_class.read('test/path')).to eq({ foo: 'bar' })
-        expect(stub).to have_been_requested.times(1)
+        expect(@stub).to have_been_requested.times(1)
         # restub to return an error now
         stub_request(:get, "#{addr}/v1/test/path").to_return(status: 500, body: 'error')
         Timecop.travel(Time.zone.now + 3600.seconds) do
@@ -141,6 +125,53 @@ module Canvas
         allow(described_class).to receive(:config).and_return(local_config)
         result = described_class.read(cred_path)
         expect(result[:security_token]).to eq("fake-security-token")
+      end
+
+      describe 'locking and loading' do
+        let(:credential_path){ 'test/vault/creds/path' }
+        let(:lease_duration){ 3600 }
+        let(:credential_data){ { credential_id: 'aabbccdd', credential_secret: 'pampelmousse' } }
+        before(:each) do
+          skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
+          allow(ConfigFile).to receive(:load).with("local_cache").and_return({
+            store: "redis",
+            redis_host: "redis",
+            redis_port: 6379,
+            redis_db: 6 # intentionally one probably not used elsewhere
+          })
+          @lock_stub = stub_request(:get, "#{addr}/v1/#{credential_path}").
+            to_return(status: 200, body: {
+            data: credential_data,
+            lease_duration: lease_duration,
+          }.to_json, headers: { 'content-type': 'application/json' })
+        end
+
+        it "will queue if the lock is taken and there is no value in the cache" do
+          expect(LocalCache.fetch(::Canvas::Vault::CACHE_KEY_PREFIX + credential_path)).to be_nil
+          t1_val = t2_val = t3_val = t4_val = nil
+          threads = [
+            Thread.new { t1_val = described_class.read(credential_path) },
+            Thread.new { t2_val = described_class.read(credential_path) },
+            Thread.new { t3_val = described_class.read(credential_path) },
+            Thread.new { t4_val = described_class.read(credential_path) }
+          ]
+          threads.each{|t| t.join }
+          expect(t1_val).to eq(credential_data)
+          expect(t2_val).to eq(credential_data)
+          expect(t3_val).to eq(credential_data)
+          expect(t4_val).to eq(credential_data)
+          expect(@lock_stub).to have_been_requested.times(1)
+        end
+
+        it "respects the lease duration for expiration" do
+          cache_key = ::Canvas::Vault::CACHE_KEY_PREFIX + credential_path
+          expect(LocalCache.fetch(cache_key)).to be_nil
+          result = described_class.read(credential_path)
+          cache_entry = LocalCache.cache.send(:read_entry, cache_key, {})
+          expiry_approximate = Time.now.utc.to_i + (lease_duration / 2)
+          expiry_delta = (cache_entry.expires_at - expiry_approximate).abs
+          expect(expiry_delta.abs < 30).to be_truthy
+        end
       end
     end
   end
