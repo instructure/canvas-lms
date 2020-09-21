@@ -567,8 +567,8 @@ class Account < ActiveRecord::Base
     {}.freeze
   end
 
-  def domain
-    HostUrl.context_host(self)
+  def domain(current_host = nil)
+    HostUrl.context_host(self, current_host)
   end
 
   def self.find_by_domain(domain)

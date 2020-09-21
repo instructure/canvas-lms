@@ -26,6 +26,14 @@ describe Account do
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
   end
 
+  context "domain_method" do
+    it "retrieves correct account domain" do
+      root_account = Account.create!
+      AccountDomain.create!(:host => 'canvas.instructure.com', :account => root_account)
+      expect(root_account.domain).to eq 'canvas.instructure.com'
+    end
+  end
+
   context "resolved_outcome_proficiency_method" do
     it "retrieves parent account's outcome proficiency" do
       root_account = Account.create!
