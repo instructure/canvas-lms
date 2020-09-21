@@ -135,7 +135,7 @@ describe Folder do
 
     it "shouldn't happen when context is user" do
       folder = @user.folders.create!
-      expect(folder.root_account_id).to be_nil
+      expect(folder.root_account_id).to eq 0
     end
   end
 
