@@ -562,7 +562,7 @@ test('no search records found for assignments results in a message instead', fun
     .click()
 
   const noRecords = [...document.getElementsByTagName('span')].find(
-    span => span.textContent === 'No assignments with that name found'
+    span => span.textContent === 'No artifacts with that name found'
   )
 
   ok(noRecords)

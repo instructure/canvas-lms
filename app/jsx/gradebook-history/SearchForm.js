@@ -82,7 +82,7 @@ class SearchFormComponent extends Component {
       this.setState(prevState => ({
         messages: {
           ...prevState.messages,
-          assignments: I18n.t('No assignments with that name found')
+          assignments: I18n.t('No artifacts with that name found')
         }
       }))
     }
@@ -319,10 +319,10 @@ class SearchFormComponent extends Component {
                     inputRef={ref => {
                       this.assignmentInput = ref
                     }}
-                    label={I18n.t('Assignment')}
+                    label={I18n.t('Artifact')}
                     loadingText={
                       this.props.assignments.fetchStatus === 'started'
-                        ? I18n.t('Loading Assignments')
+                        ? I18n.t('Loading Artifact')
                         : undefined
                     }
                     onBlur={this.promptUserEntry}
