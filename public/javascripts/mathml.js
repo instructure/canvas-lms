@@ -27,7 +27,7 @@ const localConfig = {
 
 export function loadMathJax(configFile = 'TeX-MML-AM_HTMLorMML', cb = null) {
   if (!isMathJaxLoaded()) {
-    const locale = ENV.locale || 'en'
+    const locale = ENV.LOCALE || 'en'
     // signal local config to mathjax as it loads
     window.MathJax = localConfig
     $.getScript(
