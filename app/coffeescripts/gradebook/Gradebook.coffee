@@ -3041,6 +3041,9 @@ export default do ->
       @gradebookGrid.destroy()
       @postPolicies?.destroy()
 
+    viewUngradedAsZero: =>
+      !!(@courseFeatures.allowViewUngradedAsZero && @gridDisplaySettings.viewUngradedAsZero)
+
     ## "PRIVILEGED" methods
 
     # The methods here are intended to support specs, but not intended to be a

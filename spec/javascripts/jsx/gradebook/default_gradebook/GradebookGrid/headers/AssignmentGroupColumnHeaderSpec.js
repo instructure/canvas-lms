@@ -59,6 +59,7 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
         settingKey: 'grade'
       },
 
+      viewUngradedAsZero: false,
       weightedGroups: true
     }
   })
@@ -112,13 +113,26 @@ QUnit.module('GradebookGrid AssignmentGroupColumnHeader', suiteHooks => {
       equal(getSecondaryDetail().textContent, '35.5% of grade')
     })
 
+    test('displays the group weight and "Ungraded as 0" when both apply', () => {
+      props.viewUngradedAsZero = true
+      mountComponent()
+      equal(getSecondaryDetail().textContent, '35.5% of grade/Ungraded as 0')
+    })
+
     test('displays "0%" when group weight is zero', () => {
       props.assignmentGroup.groupWeight = 0
       mountComponent()
       equal(getSecondaryDetail().textContent, '0% of grade')
     })
 
-    test('are not present when groups are not weighted', () => {
+    test('displays "Ungraded as 0" when view ungraded as 0 is selected', () => {
+      props.viewUngradedAsZero = true
+      props.weightedGroups = false
+      mountComponent()
+      equal(getSecondaryDetail().textContent, 'Ungraded as 0')
+    })
+
+    test('are not present when groups are not weighted and not viewing ungraded as 0', () => {
       props.weightedGroups = false
       mountComponent()
       strictEqual(getSecondaryDetail(), null)
