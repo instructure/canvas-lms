@@ -293,6 +293,9 @@ class AssetUserAccess < ActiveRecord::Base
     announcements: ["icon-announcement", t('Announcement')].freeze,
     assignments: ["icon-assignment", t('Assignment')].freeze,
     calendar: ["icon-calendar-month", t('Calendar')].freeze,
+    collaborations: ["icon-document", t('Collaboration')].freeze,
+    conferences: ["icon-group", t('Conference')].freeze,
+    external_tools: ["icon-link", t('App')].freeze,
     files: ["icon-download", t('File')].freeze,
     grades: ["icon-gradebook", t('Grades')].freeze,
     home: ["icon-home", t('Home')].freeze,
@@ -308,11 +311,11 @@ class AssetUserAccess < ActiveRecord::Base
   }.freeze
 
   def icon
-    ICON_MAP[asset_category.to_sym][0] || "icon-question"
+    ICON_MAP[asset_category.to_sym]&.[](0) || "icon-question"
   end
 
   def readable_category
-    ICON_MAP[asset_category.to_sym][1] || ""
+    ICON_MAP[asset_category.to_sym]&.[](1) || ""
   end
 
   private

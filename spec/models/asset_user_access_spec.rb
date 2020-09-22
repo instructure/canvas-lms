@@ -119,6 +119,12 @@ describe AssetUserAccess do
 
         expect(asset.icon).to eq 'icon-quiz'
       end
+
+      it "falls back with an unexpected asset_category" do
+        asset = AssetUserAccess.create asset_category: 'blah'
+        expect(asset.icon).to eq 'icon-question'
+        expect(asset.readable_category).to eq ''
+      end
     end
   end
 
