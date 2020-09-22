@@ -66,8 +66,10 @@ class Folder < ActiveRecord::Base
   def populate_root_account_id
     if self.context_type == "User"
       self.root_account_id = 0
+    elsif context_type == 'Account' && context.root_account?
+      self.root_account_id = self.context_id
     else
-      self.root_account_id = self.context.root_account_id 
+      self.root_account_id = self.context.root_account_id
     end
   end
 
