@@ -21,9 +21,7 @@
 library "canvas-builds-library"
 
 @groovy.transform.Field
-def result_test_count = -1
-@groovy.transform.Field
-def result_node_count = -1
+def partitions = []
 @groovy.transform.Field
 def changed_tests = ''
 @groovy.transform.Field
@@ -77,37 +75,29 @@ def computeTestCount() {
                $PATCHSET_TAG \
         bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
   '''
+
   changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
   echo "raw result from catcher: \n====\n$changed_tests\n===="
-  def test_count = 0
-  if (changed_tests) {
-    test_count = changed_tests.split('\n').length
-  }
-  echo "expected tests to run: $test_count"
-  result_test_count = test_count
-}
 
-def computeDistributedCount() {
-  if (result_test_count < 0)
-    throw IllegalStateException("call computeTestCount() first")
-  // this type of distributed thing always needs a hard cutoff
-  if (env.DISTRIBUTED_CUT_OFF.toInteger() < result_test_count)
+  def changed_tests_arr = changed_tests.split('\n')
+  def test_count = changed_tests_arr.length
+
+  echo "expected tests to run: $test_count"
+
+  if (env.DISTRIBUTED_CUT_OFF.toInteger() < test_count) {
     throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
-  if (result_test_count == 0) {
-    result_node_count = 0
   }
-  else {
-    // force a round down
-    // this will have the following node counts.
-    // test  | nodes
-    // 1-14  | 1
-    // 15-24 | 2
-    // 25-34 | 3
-    // ...
-    def distributed_offset = env.DISTRIBUTED_OFFSET.toInteger()
-    def distributed_factor = env.DISTRIBUTED_FACTOR.toInteger()
-    result_node_count = (int) ((result_test_count + distributed_offset) / distributed_factor)
+
+  def distributed_factor = env.DISTRIBUTED_FACTOR.toInteger()
+
+  for(int i = 0; i < test_count; i += distributed_factor) {
+    def start_i = i
+    def end_i = Math.min(i+distributed_factor, test_count - 1)
+
+    partitions.add(changed_tests_arr[start_i..end_i])
   }
+
+  echo "expected nodes to run on for $test_count tests: ${partitions.size()}"
 }
 
 def executeFlakeySpecCatcher(prefix = 'main') {
@@ -176,9 +166,7 @@ pipeline {
     LOCAL_WORKDIR = getLocalWorkDir()
     FORCE_FAILURE = configuration.forceFailureFSC()
     // there will be a node for every 10 tests
-    DISTRIBUTED_FACTOR = '10'
-    // this causes distribution to trigger at an offset
-    DISTRIBUTED_OFFSET = '5'
+    DISTRIBUTED_FACTOR = '15'
     // if someone is trying to update more than these amount of tests, then just fail.
     // that will be at DISTRIBUTED_CUT_OFF / DISTRIBUTED_FACTOR nodes.
     DISTRIBUTED_CUT_OFF = '300'
@@ -201,32 +189,33 @@ pipeline {
             if(FORCE_FAILURE != '1') {
               stage("Compute Build Distribution") {
                 computeTestCount()
-                computeDistributedCount()
-                echo "expected nodes to run on for $result_test_count tests: $result_node_count"
               }
             }
 
-            if(result_test_count > 0 || FORCE_FAILURE == '1') {
+            if(partitions.size() > 0 || FORCE_FAILURE == '1') {
               stage("Run Flakey Spec Catcher") {
                 if (FORCE_FAILURE == '1') {
                   echo "running force failure"
                   executeFlakeySpecCatcher()
                 }
-                else if (result_node_count <= 1) {
+                else if (partitions.size() <= 1) {
                   echo "running on this node"
-                  executeFlakeySpecCatcher()
+                  withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
+                    executeFlakeySpecCatcher()
+                  }
                 }
                 else {
-                  echo "running on multiple nodes: $result_node_count"
-                  def nodes = [:];
-                  for(int i = 0; i < result_node_count; i++) {
+                  echo "running on multiple nodes: ${partitions.size()}"
+                  def nodes = [:]
+                  for(int i = 0; i < partitions.size(); i++) {
                     // make sure to create a new index variable so this value gets
-                    // captured by the lambda for FSC_NODE_INDEX
+                    // captured by the lambda
                     def index = i
                     def node_number = (index).toString().padLeft(2, '0')
+
                     nodes["flakey set $node_number"] = {
                       protectedNode('canvas-docker') {
-                        withEnv(["FSC_NODE_TOTAL=$result_node_count", "FSC_NODE_INDEX=$index"]) {
+                        withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
                           try {
                             setupNode()
                             executeFlakeySpecCatcher("node$node_number")
