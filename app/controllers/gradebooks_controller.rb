@@ -482,7 +482,8 @@ class GradebooksController < ApplicationController
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
-      version: params.fetch(:version, nil)
+      version: params.fetch(:version, nil),
+      allow_view_ungraded_as_zero: Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
     }
 
     js_env({

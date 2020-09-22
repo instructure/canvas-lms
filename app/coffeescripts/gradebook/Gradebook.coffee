@@ -141,7 +141,8 @@ export default do ->
 
   getCourseFeaturesFromOptions = (options) ->
     {
-      finalGradeOverrideEnabled: options.final_grade_override_enabled
+      finalGradeOverrideEnabled: options.final_grade_override_enabled,
+      allowViewUngradedAsZero: !!options.allow_view_ungraded_as_zero
     }
 
   ## Gradebook Display Settings
@@ -196,6 +197,7 @@ export default do ->
         commentsLoaded: false
         commentsUpdating: false
         editedCommentId: null
+      viewUngradedAsZero: settings.view_ungraded_as_zero == 'true'
     }
 
   ## Gradebook Application State
@@ -1362,6 +1364,9 @@ export default do ->
       onSelectShowUnpublishedAssignments: @toggleUnpublishedAssignments
       onSelectShowStatusesModal: =>
         @statusesModal.open()
+      onSelectViewUngradedAsZero: @toggleViewUngradedAsZero
+      viewUngradedAsZero: @gridDisplaySettings.viewUngradedAsZero
+      allowViewUngradedAsZero: @courseFeatures.allowViewUngradedAsZero
 
     renderViewOptionsMenu: =>
       mountPoint = document.querySelector("[data-component='ViewOptionsMenu']")
@@ -1848,6 +1853,7 @@ export default do ->
       studentColumnDisplayAs = @getSelectedPrimaryInfo(),
       studentColumnSecondaryInfo = @getSelectedSecondaryInfo(),
       sortRowsBy = @getSortRowsBySetting(),
+      viewUngradedAsZero = @gridDisplaySettings.viewUngradedAsZero,
       colors = @getGridColors()
     } = {}, successFn, errorFn) =>
       selectedViewOptionsFilters.push('') unless selectedViewOptionsFilters.length > 0
@@ -1866,6 +1872,7 @@ export default do ->
           sort_rows_by_column_id: sortRowsBy.columnId
           sort_rows_by_setting_key: sortRowsBy.settingKey
           sort_rows_by_direction: sortRowsBy.direction
+          view_ungraded_as_zero: viewUngradedAsZero
           colors: colors
 
       $.ajaxJSON(@options.settings_update_url, 'PUT', data, successFn, errorFn)
@@ -2480,6 +2487,18 @@ export default do ->
 
       @saveSettings(
         { showUnpublishedAssignments: @gridDisplaySettings.showUnpublishedAssignments },
+        () =>, # on success, do nothing since the render happened earlier
+        toggleableAction
+      )
+
+    toggleViewUngradedAsZero: =>
+      toggleableAction = =>
+        @gridDisplaySettings.viewUngradedAsZero = !@gridDisplaySettings.viewUngradedAsZero
+        @updateColumnsAndRenderViewOptionsMenu()
+      toggleableAction()
+
+      @saveSettings(
+        { viewUngradedAsZero: @gridDisplaySettings.viewUngradedAsZero },
         () =>, # on success, do nothing since the render happened earlier
         toggleableAction
       )

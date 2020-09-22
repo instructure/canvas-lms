@@ -45,7 +45,10 @@ function defaultProps({props, filterSettings} = {}) {
     },
     onSelectShowStatusesModal() {},
     onSelectShowUnpublishedAssignments() {},
+    onSelectViewUngradedAsZero() {},
     showUnpublishedAssignments: false,
+    viewUngradedAsZero: false,
+    allowViewUngradedAsZero: false,
     finalGradeOverrideEnabled: false,
     teacherNotes: {
       disabled: false,
@@ -234,6 +237,74 @@ test('onSelect is called with list of selected filters upon any selection change
   strictEqual(onSelect.calledWithExactly(['assignmentGroups', 'sections', 'gradingPeriods']), true)
 })
 
+QUnit.module('ViewOptionsMenu - view ungraded as 0', {
+  mountViewOptionsMenu({
+    viewUngradedAsZero = false,
+    allowViewUngradedAsZero = false,
+    onSelectViewUngradedAsZero = () => {}
+  } = {}) {
+    const props = defaultProps()
+    return mount(
+      <ViewOptionsMenu
+        {...props}
+        viewUngradedAsZero={viewUngradedAsZero}
+        allowViewUngradedAsZero={allowViewUngradedAsZero}
+        onSelectViewUngradedAsZero={onSelectViewUngradedAsZero}
+      />
+    )
+  },
+
+  teardown() {
+    if (this.wrapper) {
+      this.wrapper.unmount()
+    }
+  }
+})
+
+test('"View Ungraded As 0" is shown when allowViewUngradedAsZero is true', function() {
+  this.wrapper = this.mountViewOptionsMenu({allowViewUngradedAsZero: true})
+  this.wrapper.find('button').simulate('click')
+  ok(getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0'))
+})
+
+test('"View Ungraded As 0" is not shown when allowViewUngradedAsZero is false', function() {
+  this.wrapper = this.mountViewOptionsMenu({allowViewUngradedAsZero: false})
+  this.wrapper.find('button').simulate('click')
+  notOk(getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0'))
+})
+
+test('"View Ungraded As 0" is selected when viewUngradedAsZero is true', function() {
+  this.wrapper = this.mountViewOptionsMenu({
+    viewUngradedAsZero: true,
+    allowViewUngradedAsZero: true
+  })
+  this.wrapper.find('button').simulate('click')
+  const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0')
+  strictEqual(menuItem.getAttribute('aria-checked'), 'true')
+})
+
+test('"View Ungraded As 0" is not selected when viewUngradedAsZero is false', function() {
+  this.wrapper = this.mountViewOptionsMenu({
+    viewUngradedAsZero: false,
+    allowViewUngradedAsZero: true
+  })
+  this.wrapper.find('button').simulate('click')
+  const menuItem = getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0')
+  strictEqual(menuItem.getAttribute('aria-checked'), 'false')
+})
+
+test('onSelectViewUngradedAsZero is called when selected', function() {
+  const onSelectViewUngradedAsZeroStub = sinon.stub()
+  this.wrapper = this.mountViewOptionsMenu({
+    viewUngradedAsZero: false,
+    allowViewUngradedAsZero: true,
+    onSelectViewUngradedAsZero: onSelectViewUngradedAsZeroStub
+  })
+  this.wrapper.find('button').simulate('click')
+  getMenuItem(this.wrapper.instance().menuContent, 'View Ungraded as 0').click()
+  strictEqual(onSelectViewUngradedAsZeroStub.callCount, 1)
+})
+
 QUnit.module('ViewOptionsMenu - unpublished assignments', {
   mountViewOptionsMenu({
     showUnpublishedAssignments = true,
@@ -345,7 +416,7 @@ test('Due Date - Oldest to Newest is selected when criterion is due_date and dir
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Due Date - Oldest to Newest is selected when criterion is due_date and direction is ascending', function() {
+test('Due Date - Newest to Oldest is selected when criterion is due_date and direction is descending', function() {
   const wrapper = mountAndOpenOptions(this.props('due_date', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
@@ -365,7 +436,7 @@ test('Points - Lowest to Highest is selected when criterion is points and direct
   strictEqual(menuItem.getAttribute('aria-checked'), 'true')
 })
 
-test('Points - Lowest to Highest is selected when criterion is points and direction is ascending', function() {
+test('Points - Highest to Lowest is selected when criterion is points and direction is descending', function() {
   const wrapper = mountAndOpenOptions(this.props('points', 'descending'))
   const menuItem = getMenuItem(
     wrapper.instance().menuContent,
