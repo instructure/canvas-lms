@@ -43,7 +43,8 @@ export const PERMISSION_DETAIL_SECTIONS = [
 ]
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
-  manage_wiki: () => I18n.t('Create / Delete / Update Pages')
+  manage_wiki: () => I18n.t('Create / Delete / Update Pages'),
+  manage_course_admin_users: () => I18n.t('TAs / Observers / Designers')
 }
 
 export const generateActionTemplates = (

@@ -440,18 +440,9 @@ describe "Roles API", type: :request do
     end
 
     describe "json response" do
-      it "should return the expected json format" do
-        json = api_call_with_settings
-        expect(json.keys.sort).to eq ["account", "base_role_type", "created_at", "id", "label",
-                                      "last_updated_at", "permissions", "role", "workflow_state"]
-        expect(json["account"]["id"]).to eq @account.id
-        expect(json["id"]).to eq @role.id
-        expect(json["role"]).to eq @role_name
-        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
-
-        # make sure all the expected keys are there, but don't assert on a
-        # *only* the expected keys, since plugins may have added more.
-        expect([
+      before :each do
+        @account.root_account.disable_feature!(:granular_permissions_manage_admin_users)
+        @expected_permissions = [
           "become_user", "change_course_state", "create_collaborations",
           "create_conferences", "manage_account_memberships",
           "manage_account_settings", "manage_admin_users", "manage_alerts",
@@ -466,7 +457,56 @@ describe "Roles API", type: :request do
           "read_question_banks", "read_reports", "read_roster",
           "read_sis", "send_messages", "view_all_grades", "view_group_pages",
           "view_statistics"
-        ] - json["permissions"].keys).to be_empty
+        ]
+      end
+
+      it "should return the expected json format with granular admin user permission off" do
+        json = api_call_with_settings
+        expect(json.keys.sort).to eq ["account", "base_role_type", "created_at", "id", "label",
+                                      "last_updated_at", "permissions", "role", "workflow_state"]
+        expect(json["account"]["id"]).to eq @account.id
+        expect(json["id"]).to eq @role.id
+        expect(json["role"]).to eq @role_name
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
+
+        # make sure all the expected keys are there, but don't assert on a
+        # *only* the expected keys, since plugins may have added more.
+        expect(@expected_permissions - json["permissions"].keys).to be_empty
+
+        expect(json["permissions"][@permission]).to eq({
+          "explicit" => false,
+          "readonly" => false,
+          "enabled" => false,
+          "locked" => false
+        })
+      end
+
+      it "should return the expected json format with granular admin user permission on" do
+        @account.root_account.enable_feature!(:granular_permissions_manage_admin_users)
+
+        # no longer have manage_admin_users, instead we have the new ones
+        expected_perms = @expected_permissions - ["manage_admin_users"]
+        expected_perms += [
+          "allow_course_admin_actions",
+          "add_ta_to_course",
+          "add_designer_to_course",
+          "add_observer_to_course",
+          "remove_ta_from_course",
+          "remove_designer_from_course",
+          "remove_observer_from_course"
+        ]
+
+        json = api_call_with_settings
+        expect(json.keys.sort).to eq ["account", "base_role_type", "created_at", "id", "label",
+                                      "last_updated_at", "permissions", "role", "workflow_state"]
+        expect(json["account"]["id"]).to eq @account.id
+        expect(json["id"]).to eq @role.id
+        expect(json["role"]).to eq @role_name
+        expect(json["base_role_type"]).to eq Role::DEFAULT_ACCOUNT_TYPE
+
+        # make sure all the expected keys are there, but don't assert on a
+        # *only* the expected keys, since plugins may have added more.
+        expect(expected_perms - json["permissions"].keys).to be_empty
 
         expect(json["permissions"][@permission]).to eq({
           "explicit" => false,

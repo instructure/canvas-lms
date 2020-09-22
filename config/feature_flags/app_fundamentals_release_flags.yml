@@ -1,0 +1,11 @@
+---
+default_recaptcha_registration_enable:
+  state: hidden
+  display_name: Enable Recaptcha by default for self-registration
+  description: Requires Recaptcha for self-registration by default
+  applies_to: SiteAdmin
+granular_permissions_manage_admin_users:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Granular permissions for Add/Remove admin roles from Course
+  description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
