@@ -122,7 +122,16 @@ describe "/quizzes/quizzes/show" do
     expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
   end
 
-  it 'should not render direct share menu options without manage permission' do
+  it 'should not render direct share menu options for students' do
+    course_with_student(active_all: true)
+    view_context
+    assign(:quiz, @course.quizzes.create!)
+    render 'quizzes/quizzes/show'
+    doc = Nokogiri::HTML(response)
+    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+  end
+
+  it 'should render direct share menu options for user with :read_as_admin, even without manage permission' do
     @account = Account.default
     @account.enable_feature!(:direct_share)
     @role = custom_teacher_role('No Manage')
@@ -132,7 +141,7 @@ describe "/quizzes/quizzes/show" do
     assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
     doc = Nokogiri::HTML(response)
-    expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
+    expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
   end
 
   it 'renders direct share menu items when enabled with permission' do

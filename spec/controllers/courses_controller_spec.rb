@@ -2942,7 +2942,7 @@ describe CoursesController do
 
   describe '#content_share_users' do
     before :once do
-      course_with_teacher(name: 'search teacher')
+      course_with_teacher(name: 'search teacher', :active_all => true)
       @course.root_account.enable_feature!(:direct_share)
     end
 
@@ -2957,7 +2957,7 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       expect(response).to be_unauthorized
 
-      course_with_designer(name: 'course designer', course: @course)
+      course_with_designer(name: 'course designer', course: @course, :active_all => true)
       user_session(@designer)
       get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
       json = json_parse(response.body)
@@ -3093,6 +3093,17 @@ describe CoursesController do
       get 'content_share_users', params: {course_id: a1_course.id, search_term: 'account 2'}
       json = json_parse(response.body)
       expect(json.map{|user| user['name']}).not_to include('account 2 admin', 'account 2 teacher')
+    end
+
+    it 'should still work for teachers whose course is concluded by term' do
+      term = Account.default.enrollment_terms.create!(:name => "long over")
+      term.set_overrides(Account.default, 'TeacherEnrollment' => { start_at: '2014-12-01', end_at: '2014-12-31' })
+      course_with_teacher_logged_in(active_all: true)
+      @course.update(:enrollment_term => term)
+
+      get 'content_share_users', params: {course_id: @course.id, search_term: 'teacher'}
+      json = json_parse(response.body)
+      expect(json[0]).to include({'name' => 'search teacher'})
     end
 
     context "sharding" do

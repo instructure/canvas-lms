@@ -852,16 +852,18 @@ const mapState = (state, ownProps) => {
     canPublish: state.permissions.publish,
     contextType: state.contextType,
     discussionTopicMenuTools: state.discussionTopicMenuTools,
-    displayDeleteMenuItem: !(
-      discussion.is_master_course_child_content && discussion.restricted_by_master_course
-    ),
+    displayDeleteMenuItem:
+      !(discussion.is_master_course_child_content && discussion.restricted_by_master_course) &&
+      discussion.permissions.delete,
     displayDuplicateMenuItem: state.permissions.manage_content,
-    displayLockMenuItem: discussion.can_lock,
+    displayLockMenuItem: discussion.can_lock && discussion.permissions.update,
     displayMasteryPathsMenuItem: cyoe.isCyoeAble,
     displayMasteryPathsLink: cyoe.isTrigger && discussion.permissions.update,
     displayMasteryPathsPill: shouldShowMasteryPathsPill,
     masteryPathsPillLabel: cyoe.releasedLabel,
-    displayManageMenu: discussion.permissions.delete,
+    displayManageMenu:
+      discussion.permissions.delete ||
+      (state.DIRECT_SHARE_ENABLED && state.permissions.read_as_admin),
     displayPinMenuItem: state.permissions.moderate,
     masterCourseData: state.masterCourseData,
     isMasterCourse: masterCourse,

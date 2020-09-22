@@ -1123,7 +1123,7 @@ class CoursesController < ApplicationController
     get_context
     return render json: { message: "Feature disabled" }, status: :forbidden unless @context.root_account.feature_enabled?(:direct_share)
     reject!('Search term required') unless params[:search_term]
-    return unless authorized_action(@context, @current_user, :manage_content)
+    return unless authorized_action(@context, @current_user, :read_as_admin)
 
     users_scope = User.shard(Shard.current).where.not(id: @current_user.id).active.distinct
     union_scope = teacher_scope(name_scope(users_scope), @context.root_account_id).

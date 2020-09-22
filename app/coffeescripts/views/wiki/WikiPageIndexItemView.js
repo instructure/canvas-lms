@@ -80,6 +80,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
 
     json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
+    json.CAN.OPEN_MANAGE_OPTIONS = json.CAN.MANAGE || json.DIRECT_SHARE_ENABLED
 
     if (json.is_master_course_child_content && json.restricted_by_master_course) {
       json.cannot_delete_by_master_course = true

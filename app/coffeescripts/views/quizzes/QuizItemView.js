@@ -360,6 +360,7 @@ export default class ItemView extends Backbone.View {
       this.model.get('restricted_by_master_course')
 
     base.DIRECT_SHARE_ENABLED = ENV.FLAGS && ENV.FLAGS.DIRECT_SHARE_ENABLED
+    base.canOpenManageOptions = this.canManage() || base.DIRECT_SHARE_ENABLED
 
     return base
   }

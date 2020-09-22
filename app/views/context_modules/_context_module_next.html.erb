@@ -21,6 +21,7 @@
   context_module ||= context_module_next
   module_data = context_module ? process_module_data(context_module, @is_student, @current_user, @session) : { published_status: 'unpublished' }
   editable ||= can_do(@context, @current_user, :manage_content)
+  can_direct_share = can_do(@context, @current_user, :read_as_admin) && @domain_root_account&.feature_enabled?(:direct_share)
   workflow_state = context_module && context_module.workflow_state
   @modules ||= []
   module_dnd = @context&.root_account&.feature_enabled?(:module_dnd)
@@ -135,43 +136,49 @@
         <button
           aria-label="<%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %>"
           rel="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/items"
-          class="add_module_item_link Button--icon-action"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span></button>
+          class="add_module_item_link Button--icon-action"><i class="icon-plus"></i><span class="screenreader-only"><%= t('Add Content to %{module_name}', {module_name: context_module ? context_module.name : 'module'}) %></span>
+        </button>
+      <% end %>
+
+      <% if editable || can_direct_share %>
         <button class="Button--icon-action al-trigger" aria-label="<%= t('Manage %{module_name}', {module_name: context_module ? context_module.name : 'module'})  %>">
           <i class="icon-more" aria-hidden="true"></i>
         </button>
         <ul class="al-options">
-          <li role="presentation">
-            <a
-              href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
-              class="icon-edit edit_module_link"
-              title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
-          </li>
-          <li role="presentation">
-            <a
-              href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-              class="move_module_contents_link icon-move-down"
-              title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
-          </li>
-          <li role="presentation">
-            <a
-              href="#<%= context_module ? context_module.id : "{{ id }}" %>"
-              class="move_module_link icon-updown"
-              title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
-          </li>
-          <li role="presentation">
-            <a
-              href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
-              class="delete_module_link icon-trash"
-              title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
-          </li>
-          <li role="presentation" class="duplicate_module_menu_item">
-            <a
-              href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
-              class="duplicate_module_link icon-copy-course"
-              aria-label="<%= t('Duplicate %{module_name}', {module_name: context_module ? context_module.name : 'module'} ) %>"
-              title="<%= t(%{Duplicate this module}) %>"><%= t(%{Duplicate}) %></a>
-          </li>
-          <% if @domain_root_account&.feature_enabled?(:direct_share) %>
+          <% if editable %>
+            <li role="presentation">
+              <a
+                href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
+                class="icon-edit edit_module_link"
+                title="<%= t('links.title.edit_module', %{Edit}) %>"><%= t('links.text.edit_module', %{Edit}) %></a>
+            </li>
+            <li role="presentation">
+              <a
+                href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                class="move_module_contents_link icon-move-down"
+                title="<%= t('Move module contents') %>"><%= t('Move Contents...') %></a>
+            </li>
+            <li role="presentation">
+              <a
+                href="#<%= context_module ? context_module.id : "{{ id }}" %>"
+                class="move_module_link icon-updown"
+                title="<%= t('Move this module') %>"><%= t('Move Module...') %></a>
+            </li>
+            <li role="presentation">
+              <a
+                href="<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>"
+                class="delete_module_link icon-trash"
+                title="<%= t('links.title.delete_module', %{Delete this module}) %>"><%= t('links.text.delete_module', %{Delete}) %></a>
+            </li>
+            <li role="presentation" class="duplicate_module_menu_item">
+              <a
+                href="/api/v1<%= context_url(@context, :context_url) %>/modules/<%= context_module ? context_module.id : "{{ id }}" %>/duplicate"
+                class="duplicate_module_link icon-copy-course"
+                aria-label="<%= t('Duplicate %{module_name}', {module_name: context_module ? context_module.name : 'module'} ) %>"
+                title="<%= t(%{Duplicate this module}) %>"><%= t(%{Duplicate}) %></a>
+            </li>
+          <% end %>
+          <% if can_direct_share %>
             <li role="presentation">
               <a
                 href="#"
@@ -191,8 +198,10 @@
               </a>
             </li>
           <% end %>
-          <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
-          <%= external_tools_menu_items(@module_group_tools, {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+          <% if editable %>
+            <%= external_tools_menu_items(@menu_tools[:module_menu], {link_class: "menu_tool_link", settings_key: :module_menu, in_list: true, url_params: {:modules => [context_module ? context_module.id : "{{ id }}"]}}) %>
+            <%= external_tools_menu_items(@module_group_tools, {link_class: "menu_tray_tool_link", settings_key: :module_group_menu, in_list: true}) %>
+          <% end %>
         </ul>
       <% end %>
       <span style="display: none;">

@@ -407,7 +407,8 @@ class DiscussionTopicsController < ApplicationController
             moderate: user_can_moderate,
             change_settings: user_can_edit_course_settings?,
             manage_content: @context.grants_right?(@current_user, session, :manage_content),
-            publish: user_can_moderate
+            publish: user_can_moderate,
+            read_as_admin: @context.grants_right?(@current_user, session, :read_as_admin),
           },
           discussion_topic_menu_tools: external_tools_display_hashes(:discussion_topic_menu),
           discussion_topic_index_menu_tools: (@domain_root_account&.feature_enabled?(:commons_favorites) ?
@@ -420,7 +421,7 @@ class DiscussionTopicsController < ApplicationController
         append_sis_data(hash)
         js_env(hash)
         js_env({
-          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && @context.grants_right?(@current_user, session, :manage_content) && @domain_root_account&.feature_enabled?(:direct_share)
+          DIRECT_SHARE_ENABLED: @context.is_a?(Course) && hash[:permissions][:read_as_admin] && @domain_root_account&.feature_enabled?(:direct_share)
         }, true)
         set_tutorial_js_env
 
