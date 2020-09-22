@@ -34,6 +34,7 @@ describe 'pseudonym_registration' do
 
   it "removes profile url link" do
     include MessagesCommon
+    Notification.find_or_create_by!(category: "Registration", name: notification_name)
     msg = generate_message(notification_name, :email, asset, message_data)
     expect(msg.html_body).to include "for a Canvas account at Default Account!"
     expect(msg.html_body).not_to include "Update your notification settings"

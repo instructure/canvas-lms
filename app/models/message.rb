@@ -537,7 +537,7 @@ class Message < ActiveRecord::Base
       # currently, _email_footer.email.erb only contains a way for users to change notification prefs
       # they can only change it if they are registered in the first place
       # do not show this for emails telling users to register
-      if (footer_message.present? && !(self.notification&.name&.downcase.include? 'registration'))
+      if footer_message.present? && !self.notification&.registration?
         self.body = <<-END.strip_heredoc
           #{self.body}
 
