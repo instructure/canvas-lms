@@ -27,6 +27,7 @@ import {
   IconBulletListSquareLine,
   IconClearTextFormattingLine,
   IconDocumentLine,
+  IconFullScreenLine,
   IconImageLine,
   IconIndentLine,
   IconItalicLine,
@@ -112,7 +113,18 @@ tinymce.PluginManager.add('instructure-ui-icons', function(editor) {
     'unordered-list': IconBulletListLine,
     ltr: IconTextDirectionLtrLine,
     rtl: IconTextDirectionRtlLine,
-    'chevron-down': IconArrowOpenDownLine
+    'chevron-down': IconArrowOpenDownLine,
+    fullscreen: IconFullScreenLine,
+    // svg copied from StatusBar.js
+    htmlview: {
+      src: `<svg viewBox="0 0 24 24" font-size="16px" width="24" height="24" ">
+        <g role="presentation">
+          <text textAnchor="start" x="0" y="18px">
+            &lt;/&gt;
+          </text>
+        </g>
+      </svg>`
+    }
   }
   Object.keys(icons).forEach(key => {
     editor.ui.registry.addIcon(key, icons[key].src)

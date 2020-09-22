@@ -83,10 +83,14 @@ function configureMenus(editorOptions, instRecordDisabled) {
     insertMenuItems[0].splice(2, 0, 'instructure_media')
   }
 
-  editorOptions.menubar = 'edit insert format tools table'
+  editorOptions.menubar = 'edit view insert format tools table'
   editorOptions.menu = {
     // default menu options listed at https://www.tiny.cloud/docs/configure/editor-appearance/#menu
     // default edit menu is fine
+    view: {
+      title: formatMessage('View'),
+      items: 'fullscreen instructure_html_view'
+    },
     insert: {
       title: formatMessage('Insert'),
       items: insertMenuItems.map(item => item.join(' ')).join(' | ')

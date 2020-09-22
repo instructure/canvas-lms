@@ -27,7 +27,12 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import {Text} from '@instructure/ui-elements'
 import {SVGIcon} from '@instructure/ui-svg-images'
-import {IconA11yLine, IconKeyboardShortcutsLine, IconMiniArrowEndLine} from '@instructure/ui-icons'
+import {
+  IconA11yLine,
+  IconKeyboardShortcutsLine,
+  IconMiniArrowEndLine,
+  IconFullScreenLine
+} from '@instructure/ui-icons'
 import formatMessage from '../format-message'
 import ResizeHandle from './ResizeHandle'
 
@@ -40,7 +45,8 @@ StatusBar.propTypes = {
   isHtmlView: bool,
   onResize: func, // react-draggable onDrag handler.
   onKBShortcutModalOpen: func.isRequired,
-  onA11yChecker: func.isRequired
+  onA11yChecker: func.isRequired,
+  onFullscreen: func.isRequired
 }
 
 /* eslint-enable react/no-unused-prop-types */
@@ -93,10 +99,14 @@ export default function StatusBar(props) {
   }
 
   function handleFocus(event) {
-    // we hide a couple buttons in html view
-    const offset = props.isHtmlView ? 2 : 0
+    // we hide a the 2 icon buttons
+    let offset = props.isHtmlView ? 2 : 0
     const buttons = findFocusable(statusBarRef.current)
     const fidx = buttons.findIndex(b => b === event.target)
+    if (props.isHtmlView && fidx === 4) {
+      // we hide the fullscreen button
+      --offset
+    }
     setFocusedIndex(fidx + offset)
   }
 
@@ -183,8 +193,27 @@ export default function StatusBar(props) {
     )
   }
 
+  function renderFullscreen() {
+    if (props.isHtmlView) return null
+    const fullscreen = formatMessage('Fullscreen')
+    return (
+      <Button
+        variant="link"
+        icon={IconFullScreenLine}
+        title={fullscreen}
+        tabIndex={tabIndexForPosition(3)}
+        onClick={event => {
+          event.target.focus()
+          props.onFullscreen()
+        }}
+      >
+        <ScreenReaderContent>{fullscreen}</ScreenReaderContent>
+      </Button>
+    )
+  }
+
   function renderResizeHandle() {
-    return <ResizeHandle onDrag={props.onResize} tabIndex={tabIndexForPosition(3)} />
+    return <ResizeHandle onDrag={props.onResize} tabIndex={tabIndexForPosition(4)} />
   }
 
   const flexJustify = props.isHtmlView ? 'end' : 'start'
@@ -205,6 +234,7 @@ export default function StatusBar(props) {
         {renderWordCount()}
         <div className={css(styles.separator)} />
         {renderToggleHtml()}
+        {renderFullscreen()}
         {renderResizeHandle()}
       </Flex.Item>
     </Flex>

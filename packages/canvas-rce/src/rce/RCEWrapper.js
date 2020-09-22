@@ -513,7 +513,7 @@ class RCEWrapper extends React.Component {
     return this.state.id
   }
 
-  toggle = () => {
+  toggleView = () => {
     if (this.isHidden()) {
       this.setState({isHtmlView: false})
     } else {
@@ -674,6 +674,15 @@ class RCEWrapper extends React.Component {
     } else if (event.code === 'Escape') {
       // ESC
       this._forceCloseFloatingToolbar()
+      if (this._fullscreenState.isFullscreen) {
+        this.mceInstance().execCommand('mceFullScreen') // turn it off
+      }
+    }
+  }
+
+  handleClickFullscreen = () => {
+    if (!this.state.isHtmlView) {
+      this.mceInstance().execCommand('mceFullScreen')
     }
   }
 
@@ -694,11 +703,31 @@ class RCEWrapper extends React.Component {
     this.getTextarea().style.resize = 'none'
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
+    editor.on('FullscreenStateChanged', this._toggleFullscreen)
 
     this.announceContextToolbars(editor)
 
     if (this.isAutoSaving) {
       this.initAutoSave(editor)
+    }
+  }
+
+  _fullscreenState = {
+    headerDisp: 'static',
+    isFullscreen: false
+  }
+
+  _toggleFullscreen = event => {
+    const header = document.getElementById('header')
+    if (header) {
+      if (event.state) {
+        this._fullscreenState.headerDisp = header.style.display
+        this._fullscreenState.isFullscreen = true
+        header.style.display = 'none'
+      } else {
+        header.style.display = this._fullscreenState.headerDisp
+        this._fullscreenState.isFullscreen = false
+      }
     }
   }
 
@@ -1204,13 +1233,14 @@ class RCEWrapper extends React.Component {
           onNodeChange={this.onNodeChange}
         />
         <StatusBar
-          onToggleHtml={this.toggle}
+          onToggleHtml={this.toggleView}
           path={this.state.path}
           wordCount={this.state.wordCount}
           isHtmlView={this.state.isHtmlView}
           onResize={this.onResize}
           onKBShortcutModalOpen={this.openKBShortcutModal}
           onA11yChecker={this.onA11yChecker}
+          onFullscreen={this.handleClickFullscreen}
         />
         <CanvasContentTray
           key={this.id}
