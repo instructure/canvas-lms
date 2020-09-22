@@ -511,7 +511,7 @@ QUnit.module(
   }
 )
 
-test('aria-announcer', function() {
+QUnit.skip('aria-announcer', function() {
   equal(Ember.$.trim(find('.aria-announcer').text()), '')
 
   click('.student_navigation .next_object:first').then(() => {
