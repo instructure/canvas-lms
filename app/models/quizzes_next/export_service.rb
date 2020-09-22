@@ -76,7 +76,7 @@ module QuizzesNext
               original_course_uuid: imported_content[:original_course_uuid],
               new_course_uuid: new_course.uuid,
               new_course_resource_link_id: new_course.lti_context_id,
-              domain: new_course.root_account&.domain
+              domain: new_course.root_account&.domain(ApplicationController.test_cluster_name)
             }
           )
         end

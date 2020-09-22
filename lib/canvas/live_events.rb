@@ -237,7 +237,7 @@ module Canvas::LiveEvents
       submission_types: assignment.submission_types
     }
     actl = assignment.assignment_configuration_tool_lookups.take
-    domain = assignment.root_account&.domain
+    domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
     if actl && Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
       context: assignment.course,
@@ -632,7 +632,7 @@ module Canvas::LiveEvents
     }
 
     if context.respond_to?(:root_account)
-      payload[:domain] = context.root_account&.domain
+      payload[:domain] = context.root_account&.domain(ApplicationController.test_cluster_name)
     end
 
     payload
