@@ -22,7 +22,7 @@ import classnames from 'classnames'
 import {View} from '@instructure/ui-layout'
 import {mediaObjectShape} from './fileShape'
 import {downloadToWrap} from '../../../common/fileUrl'
-import {isAudioOrVideo, mediaFileUrlToEmbeddedIframeUrl} from './fileTypeUtils'
+import {embedded_iframe_url_fromFile} from './fileTypeUtils'
 
 // TODO: should find a better way to share this code
 import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
@@ -66,16 +66,13 @@ export default function RceFileBrowser(props) {
       instructure_scribd_file: canPreview
     })
     const url = downloadToWrap(fileInfo.api.url)
+    const embedded_iframe_url = embedded_iframe_url_fromFile(fileInfo.api)
 
-    fileInfo.title = fileInfo.name
-    fileInfo.href = fileInfo.api.url
     onFileSelect({
       name: fileInfo.name,
       title: fileInfo.name,
       href: url,
-      embedded_iframe_url: isAudioOrVideo(content_type)
-        ? mediaFileUrlToEmbeddedIframeUrl(url, content_type)
-        : undefined,
+      embedded_iframe_url,
       target: '_blank',
       class: clazz,
       content_type
