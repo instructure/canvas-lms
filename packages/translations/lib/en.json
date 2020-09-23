@@ -530,14 +530,23 @@
   "grades_loaded_5056277c": {
     "message": "Grades Loaded"
   },
+  "group_documents_8bfd6ae6": {
+    "message": "Group Documents"
+  },
   "group_files_4324f3df": {
     "message": "Group Files"
   },
   "group_files_82e5dcdb": {
     "message": "Group files"
   },
+  "group_images_98e0ac17": {
+    "message": "Group Images"
+  },
   "group_links_9493129e": {
     "message": "Group Links"
+  },
+  "group_media_2f3d128a": {
+    "message": "Group Media"
   },
   "group_navigation_99f191a": {
     "message": "Group Navigation"
