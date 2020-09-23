@@ -2779,6 +2779,9 @@ class UsersController < ApplicationController
       @pairing_code = find_observer_pairing_code(params[:pairing_code][:code])
       if !@pairing_code.nil?
         @observee = @pairing_code.user
+        # If the user is using a valid pairing code, we don't need recaptcha
+        # Just clear out any errors it may have generated
+        @recaptcha_errors = nil
       else
         @invalid_observee_code = ObserverPairingCode.new
         @invalid_observee_code.errors.add('code', 'invalid')
