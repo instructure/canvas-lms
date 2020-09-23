@@ -1120,6 +1120,7 @@ class AccountsController < ApplicationController
                       Account.site_admin.grants_right?(@current_user, :read_messages),
        logging: logging
       }
+    js_env enhanced_grade_change_query: Auditors::read_from_postgres? && Account.site_admin.feature_enabled?(:enhanced_grade_change_query)
   end
 
   def confirm_delete_user

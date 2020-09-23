@@ -1121,6 +1121,7 @@ CanvasRails::Application.routes.draw do
           action: :for_course_and_other_parameters, as: 'audit_grade_change_course_grader_student'
       get 'audit/grade_change/courses/:course_id/students/:student_id',
           action: :for_course_and_other_parameters, as: 'audit_grade_change_course_student'
+      get 'audit/grade_change', action: :query, as: 'audit_grade_change'
     end
 
     scope(controller: :course_audit_api) do
