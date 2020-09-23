@@ -59,6 +59,18 @@ module Lti::Ims::Concerns
         id = params.fetch(:userId, params[:user_id])
         id == id.to_i.to_s ? id : nil
       end
+
+      def prepare_line_item_for_ags!
+        return unless params[:resourceLinkId]
+
+        assignment = Assignment.find_by(lti_context_id: params[:resourceLinkId])
+        raise ActiveRecord::RecordNotFound unless assignment
+        if tool == ContextExternalTool.from_content_tag(assignment.external_tool_tag, assignment)
+          assignment.prepare_for_ags_if_needed!(tool)
+          return
+        end
+        render_error('Resource link id points to Tool not associated with this Context', :unprocessable_entity)
+      end
     end
   end
 end
