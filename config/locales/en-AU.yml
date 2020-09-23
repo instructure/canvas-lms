@@ -7169,8 +7169,8 @@ en-AU:
         update_course: "Update Course Details"
       course_conclude_at_warning_message: "The course is currently set to end at midnight, meaning that the previous day will be the last day this course is active."
       course_conclude_at_warning_title: "Course Ending at Midnight"
-      course_open_enrollment: "This course has enabled open enrolment. Students can self-enroll in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
-      course_open_enrollment_without_code: "This course has enabled open enrolment. Students can self-enroll in the course once you share with them this URL: *%{url}*"
+      course_open_enrollment: "This course has enabled open enrolment. Students can self-enrol in the course once you share with them this URL: *%{url}*. Alternatively, they can sign up at *%{url2}* and use the following join code: *%{code}*"
+      course_open_enrollment_without_code: "This course has enabled open enrolment. Students can self-enrol in the course once you share with them this URL: *%{url}*"
       course_overrides_term: "This will override any term availability settings."
       course_settings_title: "Course Settings"
       deatils: 
@@ -7269,8 +7269,8 @@ en-AU:
       none: None
       page_title: "Course Details"
       section_sis_id: "SIS ID: %{section_sis}"
-      self_enrollment: "Let students self-enroll by sharing with them a secret URL or code"
-      self_enrollment_without_code: "Let students self-enroll by sharing with them a secret URL"
+      self_enrollment: "Let students self-enrol by sharing with them a secret URL or code"
+      self_enrollment_without_code: "Let students self-enrol by sharing with them a secret URL"
       set_grading_scheme: "set grading scheme"
       sis_source_id: "SIS ID"
       tab_cant_disable: "This page can't be disabled, only hidden"
@@ -7317,7 +7317,7 @@ en-AU:
     show: 
       change_home_page: Change
       details: 
-        confirm_unenroll: "Are you sure you want to unenroll in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
+        confirm_unenroll: "Are you sure you want to unenrol in this course? You will no longer be able to see the course roster or communicate directly with the teachers, and you will no longer see course events in your stream and as notifications."
       draft_state: 
         buttons: 
           cancel: Cancel
@@ -20659,14 +20659,14 @@ en-AU:
         go_to_dashboard: "Go to your Dashboard"
     authenticate: 
       buttons: 
-        enroll_in_course: "Enroll in Course"
+        enroll_in_course: "Enrol in Course"
         next: Next
       getting_started: "You are enrolling in **%{course}**."
       labels: 
         password: Password
     authenticate_or_register: 
       buttons: 
-        enroll_in_course: "Enroll in Course"
+        enroll_in_course: "Enrol in Course"
         next: Next
       existing_user: "I already have a %{institution_name} login"
       getting_started: "You are enrolling in **%{course}**."
@@ -20676,7 +20676,7 @@ en-AU:
       new_user: "I am a new user"
     confirm_enrollments: 
       buttons: 
-        enroll_in_course: "Enroll in Course"
+        enroll_in_course: "Enrol in Course"
         next: Next
       getting_started: "You are enrolling in **%{course}**"
     course_full: 
@@ -20685,7 +20685,7 @@ en-AU:
       enrollment_is_closed: "Enrolment is closed for **%{course}**."
     new: 
       titles: 
-        course_enrollment: "Enroll in %{course}"
+        course_enrollment: "Enrol in %{course}"
     successfully_enrolled: 
       already_enrolled: "You have successfully enrolled in **%{course}**."
       buttons: 
@@ -24197,7 +24197,7 @@ en-AU:
     users_added: 
       one: "1 user added"
       other: "%{count} users added"
-    users_adding_failed: "Failed to enroll users"
+    users_adding_failed: "Failed to enrol users"
     users_existed: 
       one: "(1 user already existed)"
       other: "(%{count} users already existed)"
@@ -24373,7 +24373,7 @@ en-AU:
       titles: 
         configure_com_prefs: "Configure Communication Preferences"
     confirms: 
-      unenroll_user: "Are you sure you want to unenroll this user?"
+      unenroll_user: "Are you sure you want to unenrol this user?"
     could_not_find_url: "Could not find download URL"
     crumbs: 
       grades: Grades
