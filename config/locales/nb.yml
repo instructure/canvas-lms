@@ -6789,8 +6789,8 @@ nb:
   course_members_are_free_to_join_9b2603d4: "Emnedeltagere kan delta"
   course_modules_795cb95e: "Moduler for emne"
   course_name_45175338: emnenavn
-  course_name_63b973d1: Wmnenavn
-  course_name_is_required_90919349: "Wmnenavn er påkrevd"
+  course_name_63b973d1: Emnenavn
+  course_name_is_required_90919349: "Emnenavn er påkrevd"
   course_name_successfully_added_48116a50: "%{course_name} ble lagt til!"
   course_navigation_dd035109: Emnenavigering
   course_not_found_c248a721: "Emner ikke funnet"
