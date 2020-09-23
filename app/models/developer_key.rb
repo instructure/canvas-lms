@@ -194,9 +194,9 @@ class DeveloperKey < ActiveRecord::Base
       global_id = Shard.global_id_for(id)
       MultiCache.fetch("developer_key/#{global_id}") do
         Shackles.activate(:slave) do
-          DeveloperKey.find(global_id)
+          DeveloperKey.find_by(id: global_id)
         end
-      end
+      end or raise ActiveRecord::RecordNotFound
     end
 
     def by_cached_vendor_code(vendor_code)
