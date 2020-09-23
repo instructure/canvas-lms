@@ -41,6 +41,17 @@ describe DeveloperKey do
     )
   end
 
+  describe '#find_cached' do
+    it "raises error when not found, and caches that" do
+      enable_cache do
+        expect(DeveloperKey).to receive(:find_by).once.and_call_original
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+        # only calls the original once
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
   describe 'site_admin' do
     subject { DeveloperKey.site_admin }
 
