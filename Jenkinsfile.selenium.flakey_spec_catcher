@@ -41,7 +41,10 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-def computeTestCount() {
+def setupNode() {
+  cleanAndSetup()
+  sh 'rm -vrf ./tmp'
+  checkout scm
   if (env.IS_PLUGIN == "1") {
     dir(env.LOCAL_WORKDIR) {
       checkout([
@@ -59,6 +62,9 @@ def computeTestCount() {
       ])
     }
   }
+}
+
+def computeTestCount() {
   // oops, probably should have added an easier way to _count_ tests...
   sh 'rm -vrf $LOCAL_WORKDIR/tmp'
   sh 'mkdir -v $LOCAL_WORKDIR/tmp'
@@ -89,10 +95,6 @@ def computeDistributedCount() {
     throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
   if (result_test_count == 0) {
     result_node_count = 0
-  }
-  else if (env.IS_PLUGIN == "1") {
-    // lets not deal with distributing fsc for plugins unless we have to
-    result_node_count = 1
   }
   else {
     // force a round down
@@ -193,8 +195,7 @@ pipeline {
         script {
           protectedNode('canvas-docker', { status -> cleanupFn(status) }) {
             stage('Setup') {
-              cleanAndSetup()
-              checkout scm
+              setupNode()
             }
 
             if(FORCE_FAILURE != '1') {
@@ -227,9 +228,7 @@ pipeline {
                       protectedNode('canvas-docker') {
                         withEnv(["FSC_NODE_TOTAL=$result_node_count", "FSC_NODE_INDEX=$index"]) {
                           try {
-                            cleanAndSetup()
-                            sh 'rm -vrf ./tmp'
-                            checkout scm
+                            setupNode()
                             executeFlakeySpecCatcher("node$node_number")
                           }
                           finally {
