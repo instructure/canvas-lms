@@ -23366,7 +23366,7 @@ en-GB:
   to_activate_this_communication_channel_enter_the_f_f465efc5: "To activate this communication channel, enter the four-character confirmation code sent to %{sms_number}."
   to_add_announcements_discussions_moderate_must_als_2496cbd7: "To add announcements, Discussions - moderate must also be enabled. To view recent announcements on the homepage, the show recent announcements on course homepage checkbox must be selected in Course Settings."
   to_add_associated_courses_blueprint_courses_add_ed_4c801a6b: "To add associated courses, Blueprint Courses - add / edit / associate / delete and Courses - add / edit / delete must also be enabled."
-  to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "To add bulk users, courses, and enrollments, click SIS Imports."
+  to_add_bulk_users_courses_and_enrollments_click_si_4395c26: "To add bulk users, courses, and enrolments, click SIS Imports."
   to_add_edit_or_delete_groups_groups_add_edit_delet_b826f547: "To add, edit, or delete groups, Groups - add / edit / delete must also be enabled."
   to_add_individual_courses_click_courses_c5355180: "To add individual courses, click Courses."
   to_add_individual_users_click_people_4d6de56a: "To add individual users, click People."
