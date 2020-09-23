@@ -187,7 +187,7 @@ class EffectiveDueDates
       if assignment_collection.empty?
         {}
       else
-        ActiveRecord::Base.connection.select_all(<<-SQL)
+        ActiveRecord::Base.connection.select_all(<<~SQL)
           -- fetch the assignment itself
           WITH models AS (
             SELECT *

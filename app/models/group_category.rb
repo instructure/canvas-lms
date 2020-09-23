@@ -424,8 +424,10 @@ class GroupCategory < ActiveRecord::Base
       'by_group_count'
     end
 
-    InstStatsd::Statsd.increment('groups.auto_create',
-     tags: {split_type: split_type, root_account_id: self.root_account_id})
+    if split_type
+      InstStatsd::Statsd.increment('groups.auto_create',
+       tags: {split_type: split_type, root_account_id: self.root_account&.global_id, root_account_name: self.root_account&.name})
+    end
 
     calculate_group_count_by_membership if @create_group_member_count
     create_groups(@create_group_count) if @create_group_count

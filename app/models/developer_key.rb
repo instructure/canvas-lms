@@ -212,7 +212,12 @@ class DeveloperKey < ActiveRecord::Base
   end
 
   def set_root_account
+    # If the key belongs to a non-site admin account, resolve
+    # the root account through that account. Otherwise use the
+    # site admin account ID if the current shard is the site admin
+    # shard
     self.root_account_id ||= account&.resolved_root_account_id
+    self.root_account_id ||= Account.site_admin.id if Shard.current == Shard.default
   end
 
   def authorized_for_account?(target_account)

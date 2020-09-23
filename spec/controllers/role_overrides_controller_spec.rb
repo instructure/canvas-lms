@@ -100,7 +100,6 @@ describe RoleOverridesController do
 
     describe 'grouped permissions' do
       before :each do
-        @account.root_account.enable_feature!(:granular_permissions_wiki_pages)
         @grouped_permission = 'manage_wiki'
         @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
       end
@@ -339,7 +338,6 @@ describe RoleOverridesController do
 
       context 'with granular permissions' do
         before :each do
-          @account.root_account.enable_feature!(:granular_permissions_wiki_pages)
           @grouped_permission = 'manage_wiki'
           @granular_permissions = ['manage_wiki_create', 'manage_wiki_delete', 'manage_wiki_update']
         end

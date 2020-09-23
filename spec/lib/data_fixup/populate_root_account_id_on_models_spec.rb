@@ -371,7 +371,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         end
       end
 
-      context 'when context is something unsupported' do
+      context 'when context is something not handled by any of our backfills' do
         it_behaves_like 'a datafixup that does not populate root_account_id' do
           let(:record) do
             CalendarEvent.create!(context: @user).tap do |ce|
@@ -417,6 +417,12 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         expect(cm.root_account_id).to be nil
         DataFixup::PopulateRootAccountIdOnModels.run
         expect(cm.reload.root_account_id).to eq @group.root_account_id
+      end
+
+      context 'with a User context' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) { @user.content_migrations.create! }
+        end
       end
 
       context 'with sharding' do
@@ -829,6 +835,16 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         it_behaves_like 'a datafixup that populates root_account_id' do
           let(:record) { outcome_group_model(context: @course) }
           let(:reference_record) { @course }
+        end
+      end
+
+      context 'with a global LearningOutcomeGroup (null context)' do
+        it_behaves_like 'a datafixup that populates root_account_id to 0' do
+          let(:record) do
+            outcome_group_model(context: @course).tap do |og|
+              og.update_columns(context_id: nil, context_type: nil)
+            end
+          end
         end
       end
 
@@ -1625,6 +1641,8 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     context 'DeveloperKey' do
       it 'ignores site admin keys (null account_id) and cross-shard account_id' do
         dk2 = DeveloperKey.create!(account_id: nil)
+        dk2.update_columns(root_account_id: nil)
+
         expect(dk2.root_account_id).to eq(nil)
         dk3 = DeveloperKey.create!(account: @course.account)
         expect(dk3.root_account_id).to_not eq(nil)
@@ -1632,19 +1650,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
         dk3.update_columns(root_account_id: nil)
         expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
-      end
-    end
-
-    context 'LearningOutcomeGroup' do
-      it 'ignores null contexts' do
-        log1 = LearningOutcomeGroup.create!(context: nil, title: 'log')
-        expect(log1.root_account_id).to be_nil
-        log2 = outcome_group_model(context: @course)
-        expect(log2.root_account_id).to_not be_nil
-
-        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(true)
-        log2.update_columns(root_account_id: nil)
-        expect(table_has_root_account_id_filled(LearningOutcomeGroup)).to eq(false)
       end
     end
   end

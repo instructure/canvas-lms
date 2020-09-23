@@ -64,14 +64,18 @@ export default class RequiredValues extends React.Component {
     return this.state.toolConfiguration.public_jwk
   }
 
+  hasJwkUrl = () => !!this.state.toolConfiguration.public_jwk_url
+
   valid = () => {
     if (this.isMissingValues()) {
       this.props.flashError(I18n.t('Missing required fields. Please fill in all required fields.'))
       return false
-    } else if (this.hasJwk()) {
+      // Only check JWK fields if a JWK field was given,
+      // not a JWK URL.
+    } else if (this.hasJwk() && !this.hasJwkUrl()) {
+      let jwk
       try {
-        JSON.parse(this.state.toolConfiguration.public_jwk)
-        return true
+        jwk = JSON.parse(this.state.toolConfiguration.public_jwk)
       } catch (e) {
         if (e instanceof SyntaxError) {
           this.props.flashError(
@@ -80,9 +84,18 @@ export default class RequiredValues extends React.Component {
           return false
         }
       }
-    } else {
-      return true
+      if (
+        typeof jwk !== 'object' ||
+        [jwk.kty, jwk.e, jwk.n, jwk.kid, jwk.alg, jwk.use].some(f => typeof f !== 'string')
+      ) {
+        this.props.flashError(
+          I18n.t('Public JWK json must have the following string fields: kty, e, n, kid, alg, use')
+        )
+        return false
+      }
     }
+
+    return true
   }
 
   handleTitleChange = e => {
@@ -246,7 +259,7 @@ RequiredValues.propTypes = {
     description: PropTypes.string,
     target_link_uri: PropTypes.string,
     oidc_initiation_url: PropTypes.string,
-    public_jwk: PropTypes.string
+    public_jwk: PropTypes.object
   }),
   flashError: PropTypes.func,
   showMessages: PropTypes.bool

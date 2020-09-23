@@ -613,18 +613,13 @@ end
   def self.from_content_tag(tag, context)
     return nil if tag.blank? || context.blank?
 
-    # Always return the object from the hard
-    # association if it is present
-    return tag.content if tag.content.present?
-
-    # If no hard association exists, lookup the
-    # tool by the usual "find_external_tool"
-    # method
+    # Lookup the tool by the usual "find_external_tool"
+    # method. Fall back on the tag's content if
+    # no matches found.
     find_external_tool(
       tag.url,
-      context,
-      tag.content_id
-    )
+      context
+    ) || tag.content
   end
 
   def self.contexts_to_search(context)
@@ -755,7 +750,7 @@ end
 
     # There was only a single match, so return it
     return exact_matches.first if exact_matches.count == 1
-    
+
     version_match = find_exact_version_match(exact_matches, lti_version)
 
     # There is no LTI version preference or no matching
@@ -951,7 +946,7 @@ end
   end
 
   def clear_tool_domain_cache
-    if self.saved_change_to_domain? || self.saved_change_to_url?
+    if self.saved_change_to_domain? || self.saved_change_to_url? || self.saved_change_to_workflow_state?
       self.context.clear_tool_domain_cache
     end
   end
@@ -970,7 +965,7 @@ end
         batch_object: user, batched_keys: [:enrollments, :account_users]) do
       # let them see admin level tools if there are any courses they can manage
       if root_account.grants_right?(user, :manage_content) ||
-        Shackles.activate(:slave) { Course.manageable_by_user(user.id, true).not_deleted.where(:root_account_id => root_account).exists? }
+        Shackles.activate(:slave) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
         'admins'
       else
         'members'

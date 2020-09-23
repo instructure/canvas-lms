@@ -200,9 +200,9 @@ class CommunicationChannelsController < ApplicationController
     end
 
     @cc.user = @user
+    @cc.build_pseudonym_on_confirm = value_to_boolean(params[:build_pseudonym])
     @cc.re_activate! if @cc.retired?
     @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed'
-    @cc.build_pseudonym_on_confirm = value_to_boolean(params[:build_pseudonym])
 
     # Save channel and return response
     if @cc.save

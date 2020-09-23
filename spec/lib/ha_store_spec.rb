@@ -112,6 +112,29 @@ describe ActiveSupport::Cache::HaStore do
       expect(redis.get(secret_key)).to be_nil
       expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
     end
+
+    it "cleared everything with FLUSHDB" do
+      # check that Canvas.redis is equivalent to Redis.new that consume_consule_events uses
+      # I would normally compare against `id`, but that might have localhost vs. 127.0.0.1
+      redis = Redis.new(connect_timeout: 0.5)
+      secret_key = SecureRandom.uuid
+      secret_key2 = SecureRandom.uuid
+      Canvas.redis.set(secret_key, "1", ex: 5)
+      Canvas.redis.set(secret_key2, "1", ex: 5)
+      skip "Can't run this spec unless redis is default configured" unless (redis.get(secret_key) rescue nil) == "1"
+      consul_event_id = SecureRandom.uuid
+
+      Bundler.with_clean_env do
+        payload = [{ ID: consul_event_id, Payload: Base64.strict_encode64('FLUSHDB') }].to_json
+
+        `echo #{Shellwords.escape(payload)} | #{Rails.root}/script/consume_consul_events`
+        expect($?).to be_success
+      end
+      expect(redis.get(secret_key)).to be_nil
+      expect(redis.get(secret_key2)).to be_nil
+      # This is reset after clearing the db, which is important so we don't repeatedly clear
+      expect(redis.zrank("consul_events", consul_event_id)).not_to be_nil
+    end
   end
 
   context "Account cache register" do

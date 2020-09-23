@@ -23,6 +23,7 @@ export const HistoryShape = arrayOf(
     asset_code: string.isRequired,
     asset_name: string.isRequired,
     asset_icon: string,
+    asset_readable_category: string,
     visited_url: string.isRequired,
     visited_at: string.isRequired,
     context_name: string

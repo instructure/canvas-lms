@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Align right"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Alignment and Lists"
+    },
     "all_4321c3a1": {
         "message": "All"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Computer"
+    },
+    "content_1440204b": {
+        "message": "Content"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Content is still being uploaded, if you continue it will not be embedded properly."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "External Links"
     },
+    "external_tools_6e77821": {
+        "message": "External tools"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Extra Large"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Invalid file type"
     },
+    "invalid_url_cbde79f": {
+        "message": "Invalid URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mic"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Miscellaneous"
     },
     "missing_1a256b3b": {
         "message": "Missing"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Other editor shortcuts may be found at"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } is not a valid protocol which must be ftp, http, https, mailto, skype, tel or may be omitted"
+    },
     "page_50c4823d": {
         "message": "Page"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Previous page"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Protocol must be ftp, http, https, mailto, skype, tel or may be omitted"
     },
     "pts_699bd9aa": {
         "message": "pts"

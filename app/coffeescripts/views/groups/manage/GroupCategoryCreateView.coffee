@@ -31,7 +31,7 @@ export default class GroupCategoryCreateView extends GroupCategoryEditView
 
   defaults:
     width: 600
-    height: if ENV.allow_self_signup then 520 else 310
+    height: if ENV.allow_self_signup then 600 else 310
     title: I18n.t('create_group_set', 'Create Group Set')
 
   els: _.extend {}, GroupCategoryEditView::els,
@@ -54,6 +54,7 @@ export default class GroupCategoryCreateView extends GroupCategoryEditView
     splitGroupsChecked = @$autoGroupSplitControl.prop("checked") || @$autoGroupSplitByMemberControl.prop("checked")
     show = (@selfSignupIsEnabled() or splitGroupsChecked)
     @$autoGroupLeaderControls.toggle(show)
+    @$adminSignupControls.toggleClass('dotted-separator', show)
     @$groupBySectionControls.toggle(ENV.group_user_type == 'student' && splitGroupsChecked)
 
   toggleSelfSignup: ->

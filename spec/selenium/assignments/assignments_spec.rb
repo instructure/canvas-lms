@@ -431,7 +431,7 @@ describe "assignments" do
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
-        fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
+        fj("div#assignment_#{@frozen_assign.id} button.al-trigger").click
         wait_for_ajaximations
         expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end

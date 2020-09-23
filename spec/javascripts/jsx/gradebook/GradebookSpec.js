@@ -4563,6 +4563,12 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       saveSettingsStub.restore()
     })
 
+    test('does not escape the grades URL for students', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.enrollments[0].grades.html_url, 'http://example.url/')
+    })
+
     test('returns all students when the assignment is visible to everyone', () => {
       gradebook.gotChunkOfStudents(allStudents)
       const students = gradebook.studentsThatCanSeeAssignment('2301')

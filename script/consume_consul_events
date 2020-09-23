@@ -33,7 +33,14 @@ data.each do |event|
   # only invalidate events we haven't seen yet
   if cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
     key = Base64.decode64(event['Payload'])
-    cache.del(key)
+    # Special-case flushall
+    if key == 'FLUSHDB'
+      cache.flushdb
+      # Readd this event so that it doesn't get forgotten about in the future
+      cache.zadd("consul_events", Time.now.utc.to_f, id, nx: true)
+    else
+      cache.del(key)
+    end
   end
 end
 # limit the set to the 256 newest elements

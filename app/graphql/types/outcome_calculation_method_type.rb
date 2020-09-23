@@ -29,11 +29,5 @@ module Types
     field :calculation_int, Integer, null: true
     field :context_type, String, null: false
     field :context_id, Integer, null: false
-
-    field :locked, Boolean, null: false
-    def locked
-      context = object.context
-      (context.is_a?(Account) ? context : context.account).lock_proficiency_calculation[:locked]
-    end
   end
 end

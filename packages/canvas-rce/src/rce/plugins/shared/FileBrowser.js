@@ -68,7 +68,7 @@ export default function RceFileBrowser(props) {
     onFileSelect({
       name: fileInfo.name,
       title: fileInfo.name,
-      href: fileInfo.src,
+      href: fileInfo.href,
       embedded_file_url: fileInfo.api.embedded_file_url,
       target: '_blank',
       class: clazz,

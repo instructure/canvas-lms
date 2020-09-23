@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Poravnaj desno"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Poravnava in seznami"
+    },
     "all_4321c3a1": {
         "message": "Vse"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Računalnik"
+    },
+    "content_1440204b": {
+        "message": "Vsebina"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Vsebina se še vedno nalaga. Če nadaljujete, ne bo pravilno vdelana."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Zunanje povezave"
     },
+    "external_tools_6e77821": {
+        "message": "Zunanja orodja"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Zelo veliko"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Neveljavna vrsta datoteke"
     },
+    "invalid_url_cbde79f": {
+        "message": "Neveljaven naslov URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } zaključen(-ih) { items, plural,\n     =1 {element}\n  other {elementov}\n}"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Drugo"
     },
     "missing_1a256b3b": {
         "message": "Manjkajoče"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Druge bližnjice urejevalnika je mogoče najti na"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } ni veljaven protokol; ta mora biti ftp, http, https, mailto, skype, tel ali pa ga izpustite"
+    },
     "page_50c4823d": {
         "message": "Stran"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Prejšnja stran"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Protokol mora biti ftp, http, https, mailto, skype, tel ali pa ga izpustite"
     },
     "pts_699bd9aa": {
         "message": "točk"

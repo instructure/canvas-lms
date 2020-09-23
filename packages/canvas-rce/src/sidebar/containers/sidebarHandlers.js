@@ -34,9 +34,11 @@ import {openOrCloseNewPageForm} from '../actions/links'
 import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
 import {fetchInitialMedia, fetchNextMedia, updateMediaObject} from '../actions/media'
 import {changeContext} from '../actions/context'
+import {get as getSession} from '../actions/session'
 
 export default function propsFromDispatch(dispatch) {
   return {
+    loadSession: () => dispatch(getSession),
     onChangeTab: index => dispatch(changeTab(index)),
     onChangeAccordion: index => dispatch(changeAccordion(index)),
     fetchInitialPage: key => dispatch(fetchInitialPage(key)),

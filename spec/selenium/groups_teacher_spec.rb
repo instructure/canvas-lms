@@ -721,7 +721,6 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group to a group with submission" do
-          skip('ADMIN-880')
           group_test_setup(2,1,2)
           # add second student to second test group
           add_user_to_group(@students.last,@testgroup.last)
@@ -742,7 +741,6 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group with submission to a group" do
-          skip('ADMIN-880')
           group_test_setup(2,1,2)
           add_user_to_group(@students.last,@testgroup.last)
           create_and_submit_assignment_from_group(@students.last)

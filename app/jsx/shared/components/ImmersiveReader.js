@@ -23,6 +23,7 @@ import {SVGIcon} from '@instructure/ui-svg-images'
 import I18n from 'i18n!ImmersiveReader'
 import {showFlashError} from '../FlashAlert'
 import {defaultFetchOptions} from '@instructure/js-utils'
+import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg
@@ -53,7 +54,10 @@ function handleClick({title, content}, readerSDK) {
             title,
             chunks: [{content, mimeType: 'text/html'}]
           }
-          launchAsync(token, subdomain, requestContent)
+          const options = {
+            cookiePolicy: CookiePolicy.Enable
+          }
+          launchAsync(token, subdomain, requestContent, options)
         })
         .catch(e => {
           // eslint-disable-next-line no-console

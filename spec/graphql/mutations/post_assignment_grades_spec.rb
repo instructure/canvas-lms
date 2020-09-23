@@ -283,23 +283,14 @@ describe Mutations::PostAssignmentGrades do
       expect(@student1_submission.reload).to be_posted
     end
 
-    it "posts submissions with hidden comments if graded_only is true and post comments feature is enabled" do
-      course.root_account.enable_feature!(:allow_postable_submission_comments)
+    it "posts submissions with hidden comments if graded_only is true" do
       @student2_submission.add_comment(author: teacher, comment: "good work!", hidden: true)
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
       post_submissions_job.invoke_job
       expect(@student2_submission.reload).to be_posted
     end
 
-    it "does not post submissions with hidden comments if graded_only is true and post comments feature is not enabled" do
-      @student2_submission.add_comment(author: teacher, comment: "good work!", hidden: true)
-      execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
-      post_submissions_job.invoke_job
-      expect(@student2_submission.reload).not_to be_posted
-    end
-
-    it "does not post submissions with no hidden comments if graded_only is true and post comments feature is enabled" do
-      course.root_account.enable_feature!(:allow_postable_submission_comments)
+    it "does not post submissions with no hidden comments if graded_only is true" do
       @student2_submission.add_comment(author: student, comment: "good work!", hidden: false)
       execute_query(mutation_str(assignment_id: assignment.id, graded_only: true), context)
       post_submissions_job.invoke_job

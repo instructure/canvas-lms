@@ -77,7 +77,7 @@ systemctl enable docker.service
 
 ### Avoid requiring sudo to run the docker command (optional)
 
-Because docker itelf runs with root privileges, you must be root
+Because docker itself runs with root privileges, you must be root
 in order to command it.  Unfortunately, this is very
 inconvenient and super annoying.  Fortunately, there is an elegant
 work-around that simply involves creating a 'docker' group and

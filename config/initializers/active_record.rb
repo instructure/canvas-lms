@@ -489,7 +489,7 @@ class ActiveRecord::Base
     result = if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
       sql = ''
       sql << "SELECT NULL AS #{column} WHERE EXISTS (SELECT * FROM #{quoted_table_name} WHERE #{column} IS NULL) UNION ALL (" if include_nil
-      sql << <<-SQL
+      sql << <<~SQL
         WITH RECURSIVE t AS (
           SELECT MIN(#{column}) AS #{column} FROM #{quoted_table_name}
           UNION ALL
@@ -1291,7 +1291,7 @@ ActiveRecord::ConnectionAdapters::AbstractAdapter.class_eval do
     keys = records.first.keys
     quoted_keys = keys.map{ |k| quote_column_name(k) }.join(', ')
     records.each do |record|
-      execute <<-SQL
+      execute <<~SQL
         INSERT INTO #{quote_table_name(table_name)}
           (#{quoted_keys})
         VALUES

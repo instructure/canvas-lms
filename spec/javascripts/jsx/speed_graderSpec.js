@@ -2190,9 +2190,16 @@ QUnit.module('SpeedGrader', rootHooks => {
     const assignment = {}
     const student = {
       id: '1',
-      submission_history: []
+      submission_history: [],
+      rubric_assessments: []
+    }
+    const student2 = {
+      id: '2',
+      submission_history: [],
+      rubric_assessments: []
     }
     const enrollment = {user_id: student.id, course_section_id: '1'}
+    const enrollment2 = {user_id: student2.id, course_section_id: '1'}
     const submissionComment = {
       created_at: new Date().toISOString(),
       publishable: false,
@@ -2211,16 +2218,27 @@ QUnit.module('SpeedGrader', rootHooks => {
       submission_comments: [submissionComment],
       submission_history: []
     }
+    const submission2 = {
+      id: '4',
+      user_id: student2.id,
+      grade_matches_current_submission: true,
+      workflow_state: 'active',
+      submitted_at: new Date().toISOString(),
+      grade: 'A',
+      assignment_id: '456',
+      submission_comments: [],
+      submission_history: []
+    }
     const windowJsonData = {
       ...assignment,
       context_id: '123',
       context: {
-        students: [student],
-        enrollments: [enrollment],
+        students: [student, student2],
+        enrollments: [enrollment, enrollment2],
         active_course_sections: [],
         rep_for_student: {}
       },
-      submissions: [submission],
+      submissions: [submission, submission2],
       gradingPeriods: []
     }
 
@@ -2239,12 +2257,14 @@ QUnit.module('SpeedGrader', rootHooks => {
       setupFixtures(`
       <button class="save_rubric_button"></button>
       <div id="speed_grader_comment_textarea_mount_point"></div>
+      <div id="combo_box_container"></div>
     `)
       SpeedGrader.setup()
       window.jsonData = windowJsonData
       SpeedGrader.EG.jsonReady()
       setupCurrentStudent()
       window.jsonData.anonymize_students = false
+      SpeedGrader.EG.domReady()
     })
 
     hooks.afterEach(function() {
@@ -2257,13 +2277,11 @@ QUnit.module('SpeedGrader', rootHooks => {
     })
 
     test('disables the button', function() {
-      SpeedGrader.EG.domReady()
       $('.save_rubric_button').trigger('click')
       strictEqual(disableWhileLoadingStub.callCount, 1)
     })
 
     test('sends the user ID in rubric_assessment[user_id] if the assignment is not anonymous', () => {
-      SpeedGrader.EG.domReady()
       sinon
         .stub(window.rubricAssessment, 'assessmentData')
         .returns({'rubric_assessment[user_id]': '1234'})
@@ -2272,6 +2290,39 @@ QUnit.module('SpeedGrader', rootHooks => {
       const [, , data] = $.ajaxJSON.lastCall.args
       strictEqual(data['rubric_assessment[user_id]'], '1234')
       window.rubricAssessment.assessmentData.restore()
+    })
+
+    test('does not update the assessments for the current student if it belongs to another student', function() {
+      const fakeResponse = {
+        artifact: {user_id: student2.id},
+        related_group_submissions_and_assessments: []
+      }
+      $.ajaxJSON.yields(fakeResponse)
+      sinon.spy(SpeedGrader.EG, 'showRubric')
+
+      $('.save_rubric_button').trigger('click')
+
+      strictEqual(SpeedGrader.EG.currentStudent.rubric_assessments.length, 0)
+
+      SpeedGrader.EG.showRubric.restore()
+      $.ajaxJSON.reset()
+    })
+
+    test('updates the assessments for the current student if it belongs to another student', function() {
+      const fakeResponse = {
+        artifact: {user_id: student2.id},
+        related_group_submissions_and_assessments: []
+      }
+      $.ajaxJSON.yields(fakeResponse)
+      sinon.spy(SpeedGrader.EG, 'showRubric')
+
+      $('.save_rubric_button').trigger('click')
+
+      SpeedGrader.EG.goToStudent(student2.id)
+      deepEqual(SpeedGrader.EG.currentStudent.rubric_assessments[0], fakeResponse)
+
+      SpeedGrader.EG.showRubric.restore()
+      $.ajaxJSON.reset()
     })
   })
 
@@ -2341,7 +2392,8 @@ QUnit.module('SpeedGrader', rootHooks => {
           students: [
             {
               anonymous_id: 'a1b2c',
-              name: 'P. Sextus Rubricius'
+              name: 'P. Sextus Rubricius',
+              rubric_assessments: []
             }
           ],
           enrollments: [
@@ -2387,7 +2439,7 @@ QUnit.module('SpeedGrader', rootHooks => {
 
     test('calls showRubric with no arguments upon receiving a successful response', () => {
       const fakeResponse = {
-        artifact: {user_id: 4},
+        artifact: {anonymous_id: 'a1b2c', user_id: 4},
         related_group_submissions_and_assessments: []
       }
       $.ajaxJSON.yields(fakeResponse)

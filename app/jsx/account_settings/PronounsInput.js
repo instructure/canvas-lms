@@ -74,8 +74,8 @@ export default class PronounsInput extends React.Component {
           if (e.key === 'Enter') {
             e.preventDefault()
             this.setState(prevState => {
-              if (prevState.value && prevState.value !== '') {
-                prevState.pronouns.push(prevState.value)
+              if (prevState.value && prevState.value.trim() !== '') {
+                prevState.pronouns.push(prevState.value.trim())
                 return {pronouns: [...new Set(prevState.pronouns)]}
               }
               return prevState

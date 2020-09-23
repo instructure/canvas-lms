@@ -183,7 +183,7 @@ class Conversation < ActiveRecord::Base
         unless options[:no_messages]
           # give them all messages
           # NOTE: individual messages in group conversations don't have tags
-          self.class.connection.execute(sanitize_sql([<<-SQL, self.id, current_user.id, user_ids]))
+          self.class.connection.execute(sanitize_sql([<<~SQL, self.id, current_user.id, user_ids]))
             INSERT INTO #{ConversationMessageParticipant.quoted_table_name}(conversation_message_id, conversation_participant_id, user_id, workflow_state)
             SELECT conversation_messages.id, conversation_participants.id, conversation_participants.user_id, 'active'
             FROM #{ConversationMessage.quoted_table_name}, #{ConversationParticipant.quoted_table_name}, #{ConversationMessageParticipant.quoted_table_name}

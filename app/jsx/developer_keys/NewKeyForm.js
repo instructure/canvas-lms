@@ -75,6 +75,7 @@ export default class NewKeyForm extends React.Component {
       developerKey,
       editing,
       showRequiredMessages,
+      showMissingRedirectUrisMessage,
       updateToolConfiguration,
       updateToolConfigurationUrl,
       toolConfigurationUrl,
@@ -112,7 +113,7 @@ export default class NewKeyForm extends React.Component {
                   value={developerKey.redirect_uris}
                   onChange={e => updateDeveloperKey('redirect_uris', e.target.value)}
                   resize="both"
-                  messages={showRequiredMessages ? validationMessage : []}
+                  messages={showMissingRedirectUrisMessage ? validationMessage : []}
                 />
                 {!isLtiKey && (
                   <div>
@@ -143,7 +144,7 @@ export default class NewKeyForm extends React.Component {
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                 />
-                {ENV.enableTestClusterChecks ? (
+                {ENV.enableTestClusterChecks && !isLtiKey ? (
                   <Checkbox
                     label={I18n.t('Test Cluster Only')}
                     name="developer_key[test_cluster_only]"
@@ -255,6 +256,7 @@ NewKeyForm.propTypes = {
     oidc_initiation_url: PropTypes.string
   }),
   showRequiredMessages: PropTypes.bool,
+  showMissingRedirectUrisMessage: PropTypes.bool,
   updateToolConfiguration: PropTypes.func,
   updateToolConfigurationUrl: PropTypes.func,
   updateDeveloperKey: PropTypes.func.isRequired,

@@ -696,6 +696,18 @@ describe UserMerge do
   context "sharding" do
     specs_require_sharding
 
+    it "should move past_lti_id to the new user on other shard" do
+      course1 = course_factory(active_all: true)
+      user1 = user_with_pseudonym(:username => 'user1@example.com', :active_all => 1)
+      UserPastLtiId.create!(user: user1, context: course1, user_uuid: 'fake_uuid', user_lti_id: 'fake_lti_id_from_old_merge')
+      @shard1.activate do
+        account = Account.create!
+        @user2 = user_with_pseudonym(:username => 'user2@example.com', :active_all => 1, :account => account)
+        UserMerge.from(user1).into(@user2)
+        expect(@user2.past_lti_ids.shard(@user2).take.user_lti_id).to eq 'fake_lti_id_from_old_merge'
+      end
+    end
+
     it 'should move prefs over with old format' do
       @shard1.activate do
         @user2 = user_model

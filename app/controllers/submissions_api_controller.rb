@@ -470,9 +470,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if params[:grouped].present?
-      if @context.root_account.feature_enabled?(:allow_postable_submission_comments) && @context.post_policies_enabled?
-        includes << "has_postable_comments"
-      end
+      includes << "has_postable_comments"
 
       # student_ids is either a subscope returning students in context visible to the caller,
       # or an array whose contents have been verified to be a subset of these

@@ -2751,7 +2751,7 @@ class CoursesController < ApplicationController
       end
 
       params_for_update[:conclude_at] = params[:course].delete(:end_at) if api_request? && params[:course].has_key?(:end_at)
-      @default_wiki_editing_roles_was = @course.default_wiki_editing_roles
+      @default_wiki_editing_roles_was = @course.default_wiki_editing_roles || "teachers"
 
       if params[:course].has_key?(:blueprint)
         master_course = value_to_boolean(params[:course].delete(:blueprint))

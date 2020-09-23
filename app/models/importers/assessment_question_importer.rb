@@ -153,7 +153,7 @@ module Importers
             workflow_state: 'active', created_at: Time.now.utc, updated_at: Time.now.utc,
             assessment_question_bank_id: bank.id)
       else
-        sql = <<-SQL
+        sql = <<~SQL
           INSERT INTO #{AssessmentQuestion.quoted_table_name} (name, question_data, workflow_state, created_at, updated_at, assessment_question_bank_id, migration_id, root_account_id)
           VALUES (?,?,'active',?,?,?,?,?)
         SQL

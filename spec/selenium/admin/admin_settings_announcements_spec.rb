@@ -180,7 +180,6 @@ describe "settings tabs" do
       it "should be able to re-send messages for an announcement" do
         notification = account_notification(:start_at => 1.day.from_now, :end_at => 5.days.from_now)
         AccountNotification.where(:id => notification).update_all(:send_message => true, :messages_sent_at => 1.day.ago)
-
         get "/accounts/#{Account.default.id}/settings"
         wait_for_ajaximations
         f("#tab-announcements-link").click
@@ -193,10 +192,8 @@ describe "settings tabs" do
 
         f("#edit_notification_form_#{notification.id}").submit
         wait_for_ajax_requests
-        job = Delayed::Job.where(:tag => "AccountNotification#broadcast_messages").last
-        expect(job.run_at.to_i).to eq notification.reload.start_at.to_i
+        expect(AccountNotification.where(:id => notification).last.updated_at).to be > notification.updated_at
       end
-
     end
   end
 end

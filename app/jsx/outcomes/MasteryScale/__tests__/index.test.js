@@ -17,15 +17,13 @@
  */
 
 import React from 'react'
-import {render, cleanup, wait, fireEvent} from '@testing-library/react'
+import {render, wait, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
 import {OUTCOME_PROFICIENCY_QUERY} from '../api'
 import MasteryScale from '../index'
 
 describe('MasteryScale', () => {
-  afterEach(cleanup)
-
   const mocks = [
     {
       request: {
@@ -38,7 +36,6 @@ describe('MasteryScale', () => {
         data: {
           account: {
             __typename: 'Account',
-            outcomeCalculationMethod: null,
             outcomeProficiency: {
               __typename: 'OutcomeProficiency',
               _id: '1',
@@ -94,19 +91,51 @@ describe('MasteryScale', () => {
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })
 
+  it('loads default data when request returns no ratings/method', async () => {
+    const emptyMocks = [
+      {
+        request: {
+          query: OUTCOME_PROFICIENCY_QUERY,
+          variables: {
+            contextId: '11'
+          }
+        },
+        result: {
+          data: {
+            account: {
+              __typename: 'Account',
+              outcomeProficiency: null
+            }
+          }
+        }
+      }
+    ]
+    const {getByText} = render(
+      <MockedProvider mocks={emptyMocks}>
+        <MasteryScale contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    await wait()
+    expect(getByText('Proficiency Rating')).not.toBeNull()
+  })
+
   describe('update outcomeProficiency', () => {
-    beforeEach(() => moxios.install())
-    afterEach(() => moxios.uninstall())
-    it('submits a request when ratings are updated', async () => {
-      const {findAllByLabelText} = render(
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+
+    it('submits a request when ratings are saved', async () => {
+      const {findAllByLabelText, getByText} = render(
         <MockedProvider mocks={mocks}>
           <MasteryScale contextType="Account" contextId="11" />
         </MockedProvider>
       )
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
-      jest.useFakeTimers()
       fireEvent.change(pointsInput, {target: {value: '100'}})
-      jest.advanceTimersByTime(1000)
+      fireEvent.click(getByText('Save Mastery Scale'))
 
       await wait(() => {
         const request = moxios.requests.mostRecent()

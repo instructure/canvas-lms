@@ -56,6 +56,7 @@ module BlankSlateProtection
     r_spec_helper
     add_onceler_hooks
     recreate_persistent_test_shards
+    truncate_all_tables
   ].freeze
 
   class << self

@@ -27,7 +27,7 @@ class ConditionalReleaseObjects
     # Assignment Index Page
 
     def assignment_kebob(page_title)
-      fxpath("//a[.//*[text() = 'Settings for Assignment #{page_title}']]")
+      fxpath("//button[.//*[text() = 'Settings for Assignment #{page_title}']]")
     end
 
     def edit_assignment(page_title)

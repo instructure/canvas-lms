@@ -182,7 +182,7 @@ class NotificationMessageCreator
   def dispatch_immediate_messages(messages)
     Message.transaction do
       # Cancel any that haven't been sent out for the same purpose
-      cancel_pending_duplicate_messages
+      cancel_pending_duplicate_messages if Rails.env.production?
       messages.each do |message|
         message.stage_without_dispatch!
         message.save!

@@ -361,7 +361,7 @@ class GradebookExporter
   # starts with =, quote it so anyone pulling the data into Excel
   # doesn't have a formula execute.
   def student_name(student)
-    name = @course.list_students_by_sortable_name? ? student.sortable_name : student.name
+    name = student.sortable_name
     name = "=\"#{name}\"" if name =~ STARTS_WITH_EQUAL
     name
   end

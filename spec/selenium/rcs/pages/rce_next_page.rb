@@ -139,15 +139,19 @@ module RCENextPage
   end
 
   def links_toolbar_button
-    possibly_hidden_toolbar_button('button[title="Links"]')
+    possibly_hidden_toolbar_button('[role="button"][title="Links"]')
+  end
+
+  def links_toolbar_menu_button
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Links"] .tox-split-button__chevron')
   end
 
   def course_links
-    f('[role="menuitem"][title="Course Links"]')
+    f('[role^="menuitem"][title="Course Links"]')
   end
 
   def external_links
-    f('[role="menuitem"][title="External Links"]')
+    f('[role^="menuitem"][title="External Links"]')
   end
 
   def link_options_button
@@ -163,19 +167,41 @@ module RCENextPage
   end
 
   def images_toolbar_button
-    possibly_hidden_toolbar_button('button[aria-label="Images"]')
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Images"]')
+  end
+
+  def images_toolbar_menu_button
+    possibly_hidden_toolbar_button(
+      '[role="button"][aria-label="Images"] .tox-split-button__chevron'
+    )
   end
 
   def media_toolbar_button
-    possibly_hidden_toolbar_button('button[aria-label="Record/Upload Media"]')
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Record/Upload Media"]')
+  end
+
+  def media_toolbar_menu_button
+    possibly_hidden_toolbar_button(
+      '[role="button"][aria-label="Record/Upload Media"] .tox-split-button__chevron'
+    )
   end
 
   def document_toolbar_button
-    possibly_hidden_toolbar_button('button[aria-label="Documents"]')
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Documents"]')
+  end
+
+  def document_toolbar_menu_button
+    possibly_hidden_toolbar_button(
+      '[role="button"][aria-label="Documents"] .tox-split-button__chevron'
+    )
   end
 
   def lti_tools_button
-    possibly_hidden_toolbar_button('button[aria-label="Apps"')
+    possibly_hidden_toolbar_button('button[aria-label="Apps"][aria-hidden="false"]')
+  end
+
+  def lti_tools_button_with_mru
+    possibly_hidden_toolbar_button('button[aria-label="Apps"][aria-expanded]')
   end
 
   def lti_tools_modal
@@ -191,15 +217,15 @@ module RCENextPage
   end
 
   def course_images
-    f('[role="menuitem"][title="Course Images"]')
+    f('[role^="menuitem"][title="Course Images"]')
   end
 
   def user_images
-    f('[role="menuitem"][title="User Images"]')
+    f('[role^="menuitem"][title="User Images"]')
   end
 
   def upload_image_button
-    f('[role="menuitem"][title="Upload Image"]')
+    f('[role^="menuitem"][title="Upload Image"]')
   end
 
   def upload_image_modal
@@ -215,7 +241,7 @@ module RCENextPage
   end
 
   def upload_media_button
-    f('[role="menuitem"][title="Upload/Record Media"]')
+    f('[role^="menuitem"][title="Upload/Record Media"]')
   end
 
   def upload_media_modal
@@ -223,23 +249,23 @@ module RCENextPage
   end
 
   def course_media
-    f('[role="menuitem"][title="Course Media"]')
+    f('[role^="menuitem"][title="Course Media"]')
   end
 
   def user_media
-    f('[role="menuitem"][title="User Media"]')
+    f('[role^="menuitem"][title="User Media"]')
   end
 
   def upload_document_button
-    f('[role="menuitem"][title="Upload Document"]')
+    f('[role^="menuitem"][title="Upload Document"]')
   end
 
   def course_documents
-    f('[role="menuitem"][title="Course Documents"]')
+    f('[role^="menuitem"][title="Course Documents"]')
   end
 
   def user_documents
-    f('[role="menuitem"][title="User Documents"]')
+    f('[role^="menuitem"][title="User Documents"]')
   end
 
   def upload_document_modal
@@ -383,11 +409,11 @@ module RCENextPage
   end
 
   def user_media_menu_item
-    fj('[role="menuitem"]:contains("User Media")')
+    fj('[role^="menuitem"]:contains("User Media")')
   end
 
   def menu_items_by_menu_id(menu_id)
-    ffj("##{menu_id} [role='menuitem']")
+    ffj("##{menu_id} [role^='menuitem']")
   end
 
   def menu_item_by_menu_id(menu_id, item_label)
@@ -395,7 +421,7 @@ module RCENextPage
   end
 
   def menu_item_by_name(menu_name)
-    fj("button.tox-mbtn:contains('#{menu_name}')")
+    fj("[role='menuitem']:contains('#{menu_name}')")
   end
 
   def menu_option_by_name(menu_option)
@@ -414,13 +440,21 @@ module RCENextPage
     f('.tox-editor-container iframe')['id']
   end
 
+  def insert_link_modal
+    f('[role="dialog"][aria-label="Insert Link"]')
+  end
+
+  def upload_file_modal
+    f('[role="dialog"][aria-label="Upload File"]')
+  end
+
   # ---- menubar items ---
   def menubar_button(menu_name)
-    fj("[role='menubar'] button[role='menuitem']:contains('#{menu_name}')")
+    fj("[role='menubar'] button[role^='menuitem']:contains('#{menu_name}')")
   end
 
   def menubar_menu_item_css(item_name)
-    "[role='menuitem'][title='#{item_name}']"
+    "[role^='menuitem'][title='#{item_name}']"
   end
 
   def menubar_menu_item(item_name)
@@ -508,6 +542,10 @@ module RCENextPage
     links_toolbar_button.click
   end
 
+  def click_links_toolbar_menu_button
+    links_toolbar_menu_button.click
+  end
+
   def click_course_links
     course_links.click
   end
@@ -520,12 +558,24 @@ module RCENextPage
     images_toolbar_button.click
   end
 
+  def click_images_toolbar_menu_button
+    images_toolbar_menu_button.click
+  end
+
   def click_media_toolbar_button
     media_toolbar_button.click
   end
 
+  def click_media_toolbar_menu_button
+    media_toolbar_menu_button.click
+  end
+
   def click_document_toolbar_button
     document_toolbar_button.click
+  end
+
+  def click_document_toolbar_menu_button
+    document_toolbar_menu_button.click
   end
 
   def click_course_images
@@ -715,9 +765,9 @@ module RCENextPage
   end
 
   def create_external_link(text, href)
-    click_links_toolbar_button
+    click_links_toolbar_menu_button
     click_external_links
-    expect(fj('[role="dialog"][aria-label="Insert Link"]')).to be_displayed
+    expect(insert_link_modal).to be_displayed
 
     # linktext.clear doesn't work because it doesn't fire any events to update
     # the react component's state

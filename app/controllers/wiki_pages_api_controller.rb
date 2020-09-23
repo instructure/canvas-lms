@@ -526,7 +526,7 @@ class WikiPagesApiController < ApplicationController
   end
 
   def get_wiki_page
-    Shackles.activate(:slave) do
+    Shackles.activate(%w{update update_front_page}.include?(params[:action]) ? :master : :slave) do
       @wiki = @context.wiki
 
       # attempt to find an existing page

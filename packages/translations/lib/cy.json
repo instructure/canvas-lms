@@ -32,6 +32,9 @@
     "align_right_9bad3ac1": {
         "message": "Alinio i’r dde"
     },
+    "alignment_and_lists_5cebcb69": {
+        "message": "Aliniad a Rhestrau"
+    },
     "all_4321c3a1": {
         "message": "Y cyfan"
     },
@@ -184,6 +187,9 @@
     },
     "computer_1d7dfa6f": {
         "message": "Cyfrifiadur"
+    },
+    "content_1440204b": {
+        "message": "Cynnwys"
     },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Mae cynnwys wrthi''n cael ei llwytho i fyny, os byddwch chi''n parhau ni fydd yn cael ei blannu''n gywir."
@@ -416,6 +422,9 @@
     "external_links_3d9f074e": {
         "message": "Dolenni Allanol"
     },
+    "external_tools_6e77821": {
+        "message": "Adnoddau Allanol"
+    },
     "extra_large_b6cdf1ff": {
         "message": "Mawr Iawn"
     },
@@ -560,6 +569,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Math o ffeil annilys"
     },
+    "invalid_url_cbde79f": {
+        "message": "URL annilys"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } eitem { items, plural,\n     =1 {wedi’i chwblhau}\n  other {eitem}\n} wedi’i chwblhau"
     },
@@ -655,6 +667,9 @@
     },
     "mic_a7f3d311": {
         "message": "Meicroffon"
+    },
+    "miscellaneous_e9818229": {
+        "message": "Amrywiol"
     },
     "missing_1a256b3b": {
         "message": "Ar goll"
@@ -770,6 +785,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Mae bysellau hwylus golygu eraill i''w cael yn"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "Dydy { p } ddim yn brotocol dilys, rhaid iddo fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
+    },
     "page_50c4823d": {
         "message": "Tudalen"
     },
@@ -820,6 +838,9 @@
     },
     "previous_page_928fc112": {
         "message": "Tudalen Flaenorol"
+    },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Rhaid i’r protocol fod yn ftp, http, https, mailto, skype, tel neu gellir ei hepgor"
     },
     "pts_699bd9aa": {
         "message": "pwynt"

@@ -81,11 +81,16 @@ export function fromVideoEmbed($element) {
   // $element will be the <span> tinymce wraps around the iframe
   // that's hosting the video player
   let $videoElem = null
+  let $videoDoc
   let naturalWidth, naturalHeight
-  if ($element.firstElementChild.tagName === 'IFRAME') {
-    const videoDoc = $element.firstElementChild.contentDocument
-    if (videoDoc) {
-      $videoElem = videoDoc.querySelector('video')
+
+  const $videoIframe = $element.tagName === 'IFRAME' ? $element : $element.firstElementChild
+  const $tinymceIframeShim = $videoIframe.parentElement
+
+  if ($videoIframe.tagName === 'IFRAME') {
+    $videoDoc = $videoIframe.contentDocument
+    if ($videoDoc) {
+      $videoElem = $videoDoc.querySelector('video')
     }
     if ($videoElem && ($videoElem.loadedmetadata || $videoElem.readyState >= 1)) {
       naturalWidth = $videoElem.videoWidth
@@ -96,8 +101,8 @@ export function fromVideoEmbed($element) {
   // because tinymce doesn't put the title attribute on the iframe,
   // but maintains it on the span it adds around it.
   const title = (
-    $element.firstElementChild.getAttribute('title') ||
-    $element.getAttribute('data-mce-p-title') ||
+    $videoIframe.getAttribute('title') ||
+    $tinymceIframeShim.getAttribute('data-mce-p-title') ||
     ''
   ).replace(formatMessage('Video player for '), '')
   const rect = $element.getBoundingClientRect()
@@ -109,12 +114,15 @@ export function fromVideoEmbed($element) {
     naturalWidth,
     source: $videoElem && $videoElem.querySelector('source')
   }
-  videoOptions.tracks =
-    $videoElem &&
-    Array.prototype.map.call($videoElem.querySelectorAll('track'), t => ({
-      locale: t.getAttribute('srclang'),
-      language: t.getAttribute('label')
-    }))
+
+  try {
+    const trackjson = $videoDoc.querySelector('[data-tracks]')?.getAttribute('data-tracks')
+    if (trackjson) {
+      videoOptions.tracks = JSON.parse(trackjson)
+    }
+  } catch (_ignore) {
+    // bad json?
+  }
 
   videoOptions.videoSize = imageSizeFromKnownOptions(videoOptions)
 

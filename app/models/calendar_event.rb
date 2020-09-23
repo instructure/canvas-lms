@@ -152,7 +152,7 @@ class CalendarEvent < ActiveRecord::Base
     }.join(" OR ")
     codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
+    where(<<~SQL, all_codes, codes, group_codes, effectively_courses_codes)
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)

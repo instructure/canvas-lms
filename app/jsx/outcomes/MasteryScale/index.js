@@ -21,9 +21,10 @@ import I18n from 'i18n!MasteryScale'
 import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import ProficiencyTable from './ProficiencyTable'
 import {saveProficiency, OUTCOME_PROFICIENCY_QUERY} from './api'
-import {useQuery} from 'react-apollo'
+import {useQuery, useMutation} from 'react-apollo'
 
 const MasteryScale = ({contextType, contextId}) => {
   const {loading, error, data} = useQuery(OUTCOME_PROFICIENCY_QUERY, {
@@ -77,7 +78,7 @@ const MasteryScale = ({contextType, contextId}) => {
         {I18n.t('Set the mastery scale to be used for all courses within this account.')}
       </Heading>
       <ProficiencyTable
-        proficiency={outcomeProficiency}
+        proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
       />

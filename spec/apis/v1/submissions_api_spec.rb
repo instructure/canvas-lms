@@ -1787,7 +1787,6 @@ describe 'Submissions API', type: :request do
       let(:student1_sub) { assignment.submissions.find_by(user: @student1) }
 
       before(:each) do
-        @course.root_account.enable_feature!(:allow_postable_submission_comments)
         assignment.ensure_post_policy(post_manually: true)
       end
 
@@ -1803,11 +1802,6 @@ describe 'Submissions API', type: :request do
           },
           params
         ).first
-      end
-
-      it "is not included when allow_postable_submission_comments feature is not enabled" do
-        @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        expect(student_json.fetch("submissions").first).not_to have_key "has_postable_comments"
       end
 
       it "is not included when params[:grouped] is not present" do

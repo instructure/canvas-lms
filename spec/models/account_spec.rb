@@ -26,6 +26,14 @@ describe Account do
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
   end
 
+  context "domain_method" do
+    it "retrieves correct account domain" do
+      root_account = Account.create!
+      AccountDomain.create!(:host => 'canvas.instructure.com', :account => root_account)
+      expect(root_account.domain).to eq 'canvas.instructure.com'
+    end
+  end
+
   context "resolved_outcome_proficiency_method" do
     it "retrieves parent account's outcome proficiency" do
       root_account = Account.create!
@@ -1582,7 +1590,7 @@ describe Account do
 
   context "inheritable settings" do
     before do
-      @settings = [:restrict_student_future_view, :lock_all_announcements, :lock_outcome_proficiency, :lock_proficiency_calculation]
+      @settings = [:restrict_student_future_view, :lock_all_announcements]
     end
 
     before :each do
@@ -1596,8 +1604,6 @@ describe Account do
       [@account, @sub1, @sub2].each do |a|
         expect(a.restrict_student_future_view).to eq expected
         expect(a.lock_all_announcements).to eq expected
-        expect(a.lock_outcome_proficiency).to eq expected
-        expect(a.lock_proficiency_calculation).to eq expected
       end
     end
 

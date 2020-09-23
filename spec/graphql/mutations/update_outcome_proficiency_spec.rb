@@ -53,7 +53,6 @@ describe Mutations::UpdateOutcomeProficiency do
             _id
             contextId
             contextType
-            locked
             proficiencyRatingsConnection(first: 10) {
               nodes {
                 _id

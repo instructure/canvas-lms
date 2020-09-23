@@ -124,8 +124,14 @@ describe Folder do
     end
 
     it "when context is account" do
-      folder = @course.account.folders.create!
-      expect(folder.root_account_id).to eq @course.account.root_account_id
+      account = @course.account.root_account.manually_created_courses_account
+      folder = account.folders.create!
+      expect(folder.root_account_id).to eq account.root_account_id
+    end
+
+    it "when context is a root account" do
+      folder = @course.root_account.folders.create!
+      expect(folder.root_account_id).to eq @course.root_account_id
     end
 
     it "when context is course" do
@@ -135,7 +141,7 @@ describe Folder do
 
     it "shouldn't happen when context is user" do
       folder = @user.folders.create!
-      expect(folder.root_account_id).to be_nil
+      expect(folder.root_account_id).to eq 0
     end
   end
 

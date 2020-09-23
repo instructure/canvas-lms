@@ -26,22 +26,22 @@
 
       {{#unless is_locked}} <!-- delete is only thing in menu, remove the whole thing if locked -->
         <span id='assignment-gear-button-cr'>
-          <a role="button" class="al-trigger btn" href="#">
+          <button class="btn">
             <span class="screenreader-only">
               {{#t}}Manage Assignment{{/t}}
             </span>
             <i class="icon-more" aria-hidden="true"></i>
-          </a>
+          </button>
           <ul class="al-options">
             <li>
             {{#if canDelete}}
-              <a href="#" class="delete_assignment_link">
+              <button class="delete_assignment_link">
             {{else}}
-              <a href="#" class="delete_assignment_link disabled" aria-disabled=true>
+              <button class="delete_assignment_link disabled" aria-disabled=true>
             {{/if}}
                 <i class="icon-trash"></i>
                 {{#t}}Delete{{/t}}
-              </a>
+              </button>
             </li>
           </ul>
         <span>
@@ -75,10 +75,10 @@
   <div class="header-bar-right">
     {{#unless is_locked}} <!-- delete is only thing in menu, remove the whole thing if locked -->
       <div class="admin-links">
-        <a role="button" class="al-trigger btn" href="#">
+        <button class="al-trigger btn">
           <span class="screenreader-only">{{#t}}Manage Assignment{{/t}}</span>
           <i class="icon-more" aria-hidden="true"></i>
-        </a>
+        </button>
         <ul class="al-options">
           <li>
           {{#if canDelete}}

@@ -19,8 +19,9 @@ class GranularWikiPagePermissions < ActiveRecord::Migration[5.2]
   tag :postdeploy
 
   def up
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_create)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_delete)
-    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_update)
+    # Since the old permission has been removed, skip_validation to support users with slower deploy cycles
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_create, skip_validation: true)
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_delete, skip_validation: true)
+    DataFixup::AddRoleOverridesForNewPermission.run(:manage_wiki, :manage_wiki_update, skip_validation: true)
   end
 end

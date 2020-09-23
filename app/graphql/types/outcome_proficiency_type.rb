@@ -32,11 +32,5 @@ module Types
     def proficiency_ratings_connection
       object.outcome_proficiency_ratings
     end
-
-    field :locked, Boolean, null: false
-    def locked
-      context = object.context
-      (context.is_a?(Account) ? context : context.account).lock_outcome_proficiency[:locked]
-    end
   end
 end

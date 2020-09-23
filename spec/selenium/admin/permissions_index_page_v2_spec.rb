@@ -23,7 +23,6 @@ describe "permissions index" do
 
   before :once do
     @account = Account.default
-    @account.enable_feature!(:granular_permissions_wiki_pages)
     @subaccount = Account.create!(name: "subaccount", parent_account_id: @account.id)
     account_admin_user
   end
@@ -134,19 +133,12 @@ describe "permissions index" do
         expect(r).to be_empty
       end
 
-      context "with granular permissions enabled" do
-        let(:set_granular_permission) do
-          @account.enable_feature!(:granular_permissions_wiki_pages)
-        end
-
-        it "autoscrolls so expanded granular permissions are visible" do
-          set_granular_permission
-          PermissionsIndex.visit(@account)
-          PermissionsIndex.expand_manage_wiki
-          expect(PermissionsIndex.permission_link('manage_wiki_create')).to be_displayed
-          expect(PermissionsIndex.permission_link('manage_wiki_delete')).to be_displayed
-          expect(PermissionsIndex.permission_link('manage_wiki_update')).to be_displayed
-        end
+      it "autoscrolls so expanded granular permissions are visible" do
+        PermissionsIndex.visit(@account)
+        PermissionsIndex.expand_manage_wiki
+        expect(PermissionsIndex.permission_link('manage_wiki_create')).to be_displayed
+        expect(PermissionsIndex.permission_link('manage_wiki_delete')).to be_displayed
+        expect(PermissionsIndex.permission_link('manage_wiki_update')).to be_displayed
       end
     end
 

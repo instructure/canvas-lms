@@ -475,11 +475,15 @@ $(document).ready(function() {
   })
   $('.date_entry').datetime_field({alwaysShowTime: true})
 
-  $().data('current_default_wiki_editing_roles', $('#course_default_wiki_editing_roles').val())
-  $('#course_default_wiki_editing_roles').change(function() {
+  const $default_edit_roles_select = $('#course_default_wiki_editing_roles')
+  $default_edit_roles_select.data(
+    'current_default_wiki_editing_roles',
+    $default_edit_roles_select.val()
+  )
+  $default_edit_roles_select.change(function() {
     const $this = $(this)
     $('.changed_default_wiki_editing_roles').showIf(
-      $this.val() != $().data('current_default_wiki_editing_roles')
+      $this.val() !== $default_edit_roles_select.data('current_default_wiki_editing_roles')
     )
     $('.default_wiki_editing_roles_change').text($this.find(':selected').text())
   })
