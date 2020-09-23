@@ -25,6 +25,7 @@ class TermsOfServiceContent < ActiveRecord::Base
 
   before_validation :ensure_terms_updated_at
   before_save :set_terms_updated_at
+  after_save :clear_cache
 
   def ensure_terms_updated_at
     self.terms_updated_at ||= Time.now.utc
@@ -38,6 +39,13 @@ class TermsOfServiceContent < ActiveRecord::Base
     self.unique_constraint_retry do |retry_count|
       account.reload_terms_of_service_content if retry_count > 0
       account.terms_of_service_content || account.create_terms_of_service_content!(content: "")
+    end
+  end
+
+  def clear_cache
+    Shard.default.activate do
+      key = ["terms_of_service_content", id].cache_key
+      MultiCache.delete(key)
     end
   end
 end

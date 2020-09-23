@@ -68,4 +68,19 @@ class TermsOfService < ActiveRecord::Base
       [t('No Terms'), "no_terms"]
     ]
   end
+
+  class CacheTermsOfServiceContentOnAssociation < ActiveRecord::Associations::BelongsToAssociation
+    def find_target
+      Shard.default.activate do
+        key = ["terms_of_service_content", target_id].cache_key
+        MultiCache.fetch(key) { super }
+      end
+    end  
+  end
+
+  reflections['terms_of_service_content'].instance_eval do
+    def association_class
+      CacheTermsOfServiceContentOnAssociation
+    end
+  end
 end
