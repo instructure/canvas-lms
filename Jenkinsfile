@@ -197,6 +197,10 @@ def getPatchsetTag() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.patchsetDefault() : imageTag.patchset()
 }
 
+def getPublishableTag() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.publishableTagDefault() : imageTag.publishableTag()
+}
+
 def getPluginVersion(plugin) {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
 }
@@ -227,14 +231,12 @@ pipeline {
     // e.g. postgres-12-ruby-2.6
     TAG_SUFFIX = imageTag.suffix()
 
-    // this is found in the PUBLISHABLE_TAG_SUFFIX config file on jenkins
-    PUBLISHABLE_TAG_SUFFIX = configuration.publishableTagSuffix()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PUBLISHABLE_TAG = "$BUILD_IMAGE:$NAME-$PUBLISHABLE_TAG_SUFFIX"
+    PUBLISHABLE_TAG = getPublishableTag()
 
     // e.g. canvas-lms:master when not on another branch
     MERGE_TAG = "$BUILD_IMAGE:$GERRIT_BRANCH"
