@@ -21,14 +21,24 @@ import React from 'react'
 import PeopleSearch from '../people_search'
 
 describe('PeopleSearch', () => {
-  test('renders', () => {
-    const props = {
-      roles: [{a: 'teacher'}, {b: 'student'}],
-      sections: [{a: 'secA'}, {b: 'secB'}]
-    }
+  const props = {
+    roles: [{a: 'teacher'}, {b: 'student'}],
+    sections: [{a: 'secA'}, {b: 'secB'}]
+  }
 
+  test('displays Email Address as default label', () => {
     const wrapper = mount(<PeopleSearch {...props} />)
     expect(wrapper.find('TextArea').exists()).toBeTruthy()
     expect(wrapper.text().includes('Email Addresses (required)')).toBeTruthy()
+  })
+
+  test('displays proper label for sis searchType', () => {
+    const wrapper = mount(<PeopleSearch {...props} searchType="sis_user_id" />)
+    expect(wrapper.text().includes('SIS IDs (required)')).toBeTruthy()
+  })
+
+  test('displays proper label for unique_id searchType', () => {
+    const wrapper = mount(<PeopleSearch {...props} searchType="unique_id" />)
+    expect(wrapper.text().includes('Login IDs (required)')).toBeTruthy()
   })
 })
