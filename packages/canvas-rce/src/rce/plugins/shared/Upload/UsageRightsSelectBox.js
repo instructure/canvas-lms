@@ -108,9 +108,8 @@ const UsageRightsSelectBox = ({
     }
 
     function apiUrl() {
-      return `/api/v1/${
-        contextType === 'course' ? 'courses' : contextType
-      }/${contextId}/content_licenses`
+      const context = contextType.replace(/([^s])$/, '$1s') // pluralize
+      return `/api/v1/${context}/${contextId}/content_licenses`
     }
     getUsageRightsOptions()
   }, [contextType, contextId])
