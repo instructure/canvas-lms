@@ -205,37 +205,38 @@ pipeline {
             stage("Run Flakey Spec Catcher") {
               if(partitions.size() == 0) {
                 return
-              } else if (partitions.size() == 1) {
-                echo "running on this node"
+              }
+
+              def stages = [:]
+
+              stages["flakey set 00"] = {
                 withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
                   executeFlakeySpecCatcher()
                 }
-              } else {
-                echo "running on multiple nodes: ${partitions.size()}"
-                def nodes = [:]
-                for(int i = 0; i < partitions.size(); i++) {
-                  // make sure to create a new index variable so this value gets
-                  // captured by the lambda
-                  def index = i
-                  def node_number = (index).toString().padLeft(2, '0')
+              }
 
-                  nodes["flakey set $node_number"] = {
-                    protectedNode('canvas-docker') {
-                      withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
-                        try {
-                          setupNode()
-                          executeFlakeySpecCatcher("node$node_number")
-                        }
-                        finally {
-                          sh 'rm -vrf ./tmp'
-                          execute 'bash/docker-cleanup.sh --allow-failure'
-                        }
+              for(int i = 1; i < partitions.size(); i++) {
+                // make sure to create a new index variable so this value gets
+                // captured by the lambda
+                def index = i
+                def node_number = (index).toString().padLeft(2, '0')
+
+                stages["flakey set $node_number"] = {
+                  protectedNode('canvas-docker') {
+                    withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
+                      try {
+                        setupNode()
+                        executeFlakeySpecCatcher("node$node_number")
+                      }
+                      finally {
+                        sh 'rm -vrf ./tmp'
+                        execute 'bash/docker-cleanup.sh --allow-failure'
                       }
                     }
                   }
                 }
-                parallel(nodes)
               }
+              parallel(stages)
             }
           }
         }
