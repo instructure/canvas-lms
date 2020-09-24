@@ -68,6 +68,14 @@ past_announcements:
     a user to view announcemnts that have ended or been dismissed.
   applies_to: RootAccount
 
+react_announcement_discussion_edit:
+  state: hidden
+  display_name: Update announcement/discussion edit page to use react/instui
+  description: |-
+    This refactor will make this page more maintainable and easily
+    allow us to make the page more accessible
+  applies_to: RootAccount
+
 smart_alerts:
   state: hidden
   display_name: Smart alerts
