@@ -96,6 +96,17 @@ describe AssetUserAccessLog do
       end
     end
 
+    it "writes iterator state properly" do
+      expect(@asset_1.view_score).to be_nil
+      Timecop.freeze do
+        generate_log([@asset_1, @asset_2, @asset_3], 100)
+        AssetUserAccessLog.compact
+        partition_model = AssetUserAccessLog.log_model(Time.zone.now)
+        compaction_state = AssetUserAccessLog.metadatum_payload
+        expect(compaction_state[:max_log_ids].max).to eq(partition_model.maximum(:id))
+      end
+    end
+
     it "truncates yesterday after compacting changes" do
       Timecop.freeze do
         Timecop.travel(24.hours.ago) do
