@@ -207,15 +207,7 @@ class Auditors::GradeChange
   # This method in its current form is temporary to make sure that we don't ever return
   # override grade changes to the caller from Postgres, even though we record them.
   def self.filter_by_assignment(conditions)
-    # No need to change anything if an assignment ID was specified
-    return conditions if conditions[:assignment_id].present?
-
-    # If the final grade override feature flag is enabled, no need to restrict
-    # results further
-    return conditions if Auditors::GradeChange.return_override_grades?
-
-    # If the flag is not enabled, make sure we don't return override grades
-    ["assignment_id IS NOT NULL", conditions.except(:assignment_id)]
+    conditions
   end
 
   # rubocop:disable Metrics/BlockLength
