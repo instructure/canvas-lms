@@ -24,10 +24,17 @@ describe EventStream::Backend::ActiveRecord do
       class << self
         def reset!
           @recs = []
+          @conditions = []
         end
 
         def written_recs
           @recs ||= []
+        end
+
+        def where(condition)
+          @conditions ||= []
+          @conditions << condition
+          self
         end
 
         def create_from_event_stream!(rec)
@@ -64,7 +71,7 @@ describe EventStream::Backend::ActiveRecord do
         table :items_by_optional_index
         entry_proc lambda{ |record| [record.field, record.id] if record.id > 0 }
         key_proc lambda{ |i1, i2| [i1, i2] }
-        ar_conditions_proc lambda { |v1, v2| {key: :val} }
+        ar_scope_proc lambda { |v1, v2| ar_cls.where({key: :val}) }
       end
     end
     s.raise_on_error = true
