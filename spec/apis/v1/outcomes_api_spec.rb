@@ -333,7 +333,7 @@ describe "Outcomes API", type: :request do
             }))
           end
 
-          it "should return the outcome's values if no proficiency exists" do
+          it "should return the outcome's values if no proficiency or calculation_method exists" do
             json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
               :controller => 'outcomes_api',
               :action => 'show',
@@ -341,11 +341,25 @@ describe "Outcomes API", type: :request do
               :format => 'json')
             expect(json).to eq(outcome_json(@outcome))
           end
+
+          it "should return the calculation method values if an outcome_calculation_method exists" do
+            method = outcome_calculation_method_model(@account)
+            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                            :controller => 'outcomes_api',
+                            :action => 'show',
+                            :id => @outcome.id.to_s,
+                            :format => 'json')
+            expect(json).to eq(outcome_json(@outcome, {
+              :calculation_method => method.calculation_method,
+              :calculation_int => method.calculation_int,
+            }))
+          end
         end
 
         describe "disabled" do
-          it "should ignore the outcome_proficiency values if one exists" do
-            proficiency = outcome_proficiency_model(@account)
+          it "should ignore the outcome_proficiency and calculation_method values if one exists" do
+            outcome_calculation_method_model(@account)
+            outcome_proficiency_model(@account)
             json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
                             :controller => 'outcomes_api',
                             :action => 'show',

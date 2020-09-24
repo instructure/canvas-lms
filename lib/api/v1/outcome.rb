@@ -48,11 +48,16 @@ module Api::V1::Outcome
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
 
-        # existing outcomes that have a nil calculation method should be handled as highest
-        hash['calculation_method'] = outcome.calculation_method || 'highest'
-
-        if ["decaying_average", "n_mastery"].include? outcome.calculation_method
-          hash['calculation_int'] = outcome.calculation_int
+        if outcome.context_id && outcome.context.root_account.feature_enabled?(:account_level_mastery_scales) && outcome.context.resolved_outcome_calculation_method
+          method = outcome.context.resolved_outcome_calculation_method
+          hash['calculation_method'] = method.calculation_method
+          hash['calculation_int'] = method.calculation_int
+        else
+          # existing outcomes that have a nil calculation method should be handled as highest
+          hash['calculation_method'] = outcome.calculation_method || 'highest'
+          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
+            hash['calculation_int'] = outcome.calculation_int
+          end
         end
 
         if outcome.context_id && outcome.context.root_account.feature_enabled?(:account_level_mastery_scales) && outcome.context.resolved_outcome_proficiency
