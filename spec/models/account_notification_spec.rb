@@ -143,6 +143,25 @@ describe AccountNotification do
     expect(@user.get_preference(:closed_notifications)).to eq []
   end
 
+  it "caches queries for root accounts" do
+    enable_cache do
+      Timecop.freeze do
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+        # once for @account, once for site admin
+        allow(AccountNotification).to receive(:where).twice.and_call_original
+
+        expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
+
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
+        expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+
+        # no more calls to `where`; this _must_ be returned from cache
+        expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
+      end
+    end
+  end
+
   describe "sub accounts" do
     before :once do
       @sub_account = Account.default.sub_accounts.create!
