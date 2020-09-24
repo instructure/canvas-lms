@@ -25,6 +25,7 @@ import clickCallback from './clickCallback'
 
 const COURSE_PLUGIN_KEY = 'course_images'
 const USER_PLUGIN_KEY = 'user_images'
+const GROUP_PLUGIN_KEY = 'group_images'
 
 const trayController = new TrayController()
 
@@ -40,6 +41,11 @@ function getMenuItems(ed) {
     items.push({
       text: formatMessage('Course Images'),
       value: 'instructure_course_image'
+    })
+  } else if (contextType === 'group') {
+    items.push({
+      text: formatMessage('Group Images'),
+      value: 'instructure_group_image'
     })
   }
   items.push({
@@ -57,6 +63,10 @@ function doMenuItem(ed, value) {
     case 'instructure_course_image':
       ed.focus(true)
       ed.execCommand('instructureTrayForImages', false, COURSE_PLUGIN_KEY)
+      break
+    case 'instructure_group_image':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForImages', false, GROUP_PLUGIN_KEY)
       break
     case 'instructure_user_image':
       ed.focus(true)
@@ -120,6 +130,10 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
      * Register the Image "Options" button that will open the Image Options
      * tray.
      */
+
+    function canUpdateImageProps(node) {
+      return !node.classList.contains('equation_image') && isImageEmbed(node)
+    }
     const buttonAriaLabel = formatMessage('Show image options')
     editor.ui.registry.addButton('instructure-image-options', {
       onAction(/* buttonApi */) {
@@ -134,7 +148,7 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
     editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
       items: 'instructure-image-options',
       position: 'node',
-      predicate: isImageEmbed,
+      predicate: canUpdateImageProps,
       scope: 'node'
     })
   },

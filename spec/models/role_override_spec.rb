@@ -41,7 +41,7 @@ describe RoleOverride do
     a2 = account_model(:parent_account => a1)
     a3 = account_model(:parent_account => a2)
 
-    role = teacher_role
+    role = teacher_role(root_account_id: a1.id)
     RoleOverride.create!(:context => a1, :permission => 'moderate_forum',
                          :role => role, :enabled => false)
     RoleOverride.create!(:context => a2, :permission => 'moderate_forum',
@@ -140,7 +140,7 @@ describe RoleOverride do
         role: @role,
         enabled: false
         )
-      altered_id = @account.root_account_id + 1
+      altered_id = Account.create!.id
       override.root_account_id = altered_id
 
       override.enabled = true
@@ -565,6 +565,30 @@ describe RoleOverride do
   describe 'specific permissions' do
     before(:once) do
       account_model
+    end
+
+    describe 'manage_proficiency_calculations' do
+      let(:permission) { RoleOverride.permissions[:manage_proficiency_calculations] }
+
+      it 'is enabled by default for account admins' do
+        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+      end
+
+      it 'is available to account admins, account memberships, teachers, and designers' do
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+      end
+    end
+
+    describe 'manage_proficiency_scales' do
+      let(:permission) { RoleOverride.permissions[:manage_proficiency_scales] }
+
+      it 'is enabled by default for account admins' do
+        expect(permission[:true_for]).to match_array %w(AccountAdmin)
+      end
+
+      it 'is available to account admins, account memberships, teachers, and designers' do
+        expect(permission[:available_to]).to match_array %w(AccountAdmin AccountMembership DesignerEnrollment TeacherEnrollment TeacherlessStudentEnrollment)
+      end
     end
 
     describe 'select_final_grade' do

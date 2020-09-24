@@ -53,6 +53,25 @@ tinymce.create('tinymce.plugins.InstructureEquation', {
         return () => ed.off('NodeChange', toggleActive)
       }
     })
+
+    function isEquationImage(node) {
+      return node.tagName === 'IMG' && node.classList.contains('equation_image')
+    }
+
+    ed.ui.registry.addButton('instructure-equation-options', {
+      onAction(/* buttonApi */) {
+        ed.execCommand('instructureEquation')
+      },
+
+      text: formatMessage('Edit Equation')
+    })
+
+    ed.ui.registry.addContextToolbar('instructure-equation-toolbar', {
+      items: 'instructure-equation-options',
+      position: 'node',
+      predicate: isEquationImage,
+      scope: 'node'
+    })
   }
 })
 

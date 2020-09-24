@@ -112,6 +112,11 @@ describe Api::V1::GradeChangeEvent do
     expect(event[:links][:page_view]).to eq @page_view.id
   end
 
+  it "does not include a value for 'course_override_grade'" do
+    event = subject.grade_change_event_json(@event, @student, @session)
+    expect(event).not_to have_key(:course_override_grade)
+  end
+
   it "formats excused submissions" do
     @excused = @assignment.grade_student(@student, grader: @teacher, excused: true).first
     @event = Auditors::GradeChange.record(submission: @excused)
@@ -195,6 +200,10 @@ describe Api::V1::GradeChangeEvent do
 
     it "does not link to an assignment" do
       expect(override_event_json.dig(:events, 0, :links)).not_to have_key(:assignment)
+    end
+
+    it "includes true as the value of 'course_override_grade'" do
+      expect(override_event_json.dig(:events, 0, :course_override_grade)).to be true
     end
   end
 end

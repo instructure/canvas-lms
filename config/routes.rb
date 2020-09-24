@@ -1011,6 +1011,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/folders/:id', controller: :folders, action: :show, as: 'course_folder'
       get 'media_objects', controller: 'media_objects', action: :index, as: :media_objects
       get 'courses/:course_id/media_objects', controller: 'media_objects', action: :index, as: :course_media_objects
+      get 'groups/:group_id/media_objects', controller: 'media_objects', action: :index, as: :group_media_objects
       put 'accounts/:account_id/courses', action: :batch_update
       post 'courses/:course_id/ping', action: :ping, as: 'course_ping'
 
@@ -1206,7 +1207,12 @@ CanvasRails::Application.routes.draw do
         action: :select, as: 'select_provisional_grade'
     end
 
-    post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file, controller: :submission_comments_api
+    scope(controller: :submission_comments_api) do
+      post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/files', action: :create_file
+      put 'courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/:id', action: :update
+      delete 'courses/:course_id/assignments/:assignment_id/submissions/:user_id/comments/:id', action: :destroy
+    end
+
     post '/courses/:course_id/assignments/:assignment_id/submissions/:user_id/annotation_notification', action: :annotation_notification, controller: :submission_comments_api
 
     scope(controller: :gradebook_history_api) do

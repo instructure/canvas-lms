@@ -140,7 +140,7 @@ class ModeratedGrading::ProvisionalGrade < ActiveRecord::Base
     annotators << source_provisional_grade.scorer if source_provisional_grade
     url_opts = {
       enable_annotations: true,
-      moderated_grading_whitelist: annotators.map { |u| u.moderated_grading_ids(true) }
+      moderated_grading_allow_list: annotators.map { |u| u.moderated_grading_ids(true) }
     }
 
     {

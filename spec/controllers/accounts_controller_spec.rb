@@ -920,6 +920,27 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/\"content\":\"custom content\"/)
     end
+
+    it "should return default self_registration_type" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      remove_user_session
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"self_registration_type\":\"none\"/)
+    end
+
+    it "should return other self_registration_type" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+      @account.canvas_authentication_provider.update_attribute(:self_registration, 'observer')
+
+      remove_user_session
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"self_registration_type\":\"observer\"/)
+    end
   end
 
   describe "help links" do

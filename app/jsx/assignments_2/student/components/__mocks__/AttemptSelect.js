@@ -23,7 +23,7 @@ export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1
 }
 
-export default function Attempt() {
+export default function AttemptSelect() {
   return (
     <Text size="medium" weight="bold" data-test-id="attempt">
       Attempt 1

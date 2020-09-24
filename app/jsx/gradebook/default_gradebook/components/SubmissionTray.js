@@ -414,6 +414,7 @@ export default class SubmissionTray extends React.Component {
 
               <View as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                 <SubmissionTrayRadioInputGroup
+                  assignment={this.props.assignment}
                   colors={this.props.colors}
                   disabled={this.props.gradingDisabled}
                   locale={this.props.locale}

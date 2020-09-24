@@ -42,7 +42,7 @@ module AccountReports
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ['ratings']).freeze
 
     def outcome_export
-      enable_i18n_features = @account_report.account.feature_enabled?(:enable_i18n_features_in_outcomes_exports)
+      enable_i18n_features = true
       write_report OUTCOME_EXPORT_HEADERS, enable_i18n_features do |csv|
         export_outcome_groups(csv)
         export_outcomes(csv)

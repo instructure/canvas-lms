@@ -20,7 +20,7 @@ require 'ritex'
 require 'securerandom'
 
 module UserContent
-  def self.escape(str, current_host = nil)
+  def self.escape(str, current_host = nil, use_updated_math_rendering = false)
     html = Nokogiri::HTML::DocumentFragment.parse(str)
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
@@ -55,13 +55,23 @@ module UserContent
 
     find_equation_images(html) do |node|
       equation = node['data-equation-content'] || node['alt']
-      mathml = UserContent.latex_to_mathml(equation)
-      next if mathml.blank?
-
-      mathml_span = Nokogiri::HTML::DocumentFragment.parse(
-        "<span class=\"hidden-readable\">#{mathml}</span>"
-      )
-      node.add_next_sibling(mathml_span)
+      next if equation.blank?
+      if use_updated_math_rendering
+        # replace the equation image with a span containing the
+        # LaTex, which MathJAX will typeset once we're in the browser
+        latex_span = Nokogiri::HTML::DocumentFragment.parse(
+          "<span class=\"math_equation_latex\">\\(#{equation}\\)</span>"
+        )
+        node.replace(latex_span)
+      else
+        mathml = UserContent.latex_to_mathml(equation)
+        next if mathml.blank?
+        
+        mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+          "<span class=\"hidden-readable\">#{mathml}</span>"
+        )
+        node.add_next_sibling(mathml_span)
+      end
     end
 
     html.to_s.html_safe

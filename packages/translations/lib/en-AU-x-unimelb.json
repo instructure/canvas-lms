@@ -347,9 +347,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Drag handle. Use up and down arrows to resize"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Drop and drop, or click to browse your computer"
-    },
     "due_5d7267be": {
         "message": "Due:"
     },
@@ -520,6 +517,9 @@
     },
     "group_files_82e5dcdb": {
         "message": "Group files"
+    },
+    "group_links_9493129e": {
+        "message": "Group Links"
     },
     "group_navigation_99f191a": {
         "message": "Group Navigation"
@@ -1069,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Tomorrow at { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Tools"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } results found, { numDisplayed } results currently displayed"

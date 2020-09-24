@@ -347,9 +347,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Dra handtag. Använd upp- och nedpilarna för att ändra storlek"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Dra och släpp, eller klicka för att söka i din dator"
-    },
     "due_5d7267be": {
         "message": "Inlämningsdatum:"
     },
@@ -520,6 +517,9 @@
     },
     "group_files_82e5dcdb": {
         "message": "Gruppfiler"
+    },
+    "group_links_9493129e": {
+        "message": "Grupplänkar"
     },
     "group_navigation_99f191a": {
         "message": "Gruppnavigering"
@@ -1069,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "I morgon kl. { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Verktyg"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } resultat hittades, { numDisplayed } resultat visas nu"

@@ -18,19 +18,26 @@
 import {ApolloProvider, Query, gql, createClient} from 'jsx/canvas-apollo'
 import React, {useState} from 'react'
 import I18n from 'i18n!mutationActivity'
+import tz from 'timezone'
 import {Button} from '@instructure/ui-buttons'
-import {DateInput, TextInput} from '@instructure/ui-forms'
+import {TextInput} from '@instructure/ui-text-input'
+import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 import {Heading} from '@instructure/ui-elements'
 import {Table} from '@instructure/ui-table'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
+
+function formatDate(date) {
+  return tz.format(date, 'date.formats.medium_with_weekday')
+}
 
 const AuditLogForm = ({onSubmit}) => {
   const [assetString, setAssetString] = useState('')
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
-  const makeDateHandler = setter => (_e, isoDate, _raw, conversionFailed) => {
-    if (!conversionFailed) setter(isoDate)
+  const makeDateHandler = setter => value => {
+    if (value) setter(value)
   }
   const formDisabled = assetString.length === 0
 
@@ -52,29 +59,38 @@ const AuditLogForm = ({onSubmit}) => {
           }}
           required
         />
-        <br />
 
-        <DateInput
-          label={I18n.t('Start Date')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={makeDateHandler(setStartDate)}
-          dateValue={startDate}
-        />
-        <br />
+        <div style={{marginTop: '1.5em'}} />
 
-        <DateInput
-          label={I18n.t('End Date')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={makeDateHandler(setEndDate)}
-          dateValue={endDate}
-        />
-        <br />
-
-        <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
-          {I18n.t('Find')}
-        </Button>
+        <Grid>
+          <Grid.Row>
+            <Grid.Col>
+              <CanvasDateInput
+                renderLabel={I18n.t('Start Date')}
+                onSelectedDateChange={makeDateHandler(setStartDate)}
+                formatDate={formatDate}
+                selectedDate={startDate}
+                placement="top center"
+                withRunningValue
+              />
+            </Grid.Col>
+            <Grid.Col>
+              <CanvasDateInput
+                renderLabel={I18n.t('End Date')}
+                onSelectedDateChange={makeDateHandler(setEndDate)}
+                formatDate={formatDate}
+                selectedDate={endDate}
+                placement="top center"
+                withRunningValue
+              />
+            </Grid.Col>
+            <Grid.Col vAlign="middle">
+              <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
+                {I18n.t('Find')}
+              </Button>
+            </Grid.Col>
+          </Grid.Row>
+        </Grid>
       </form>
     </View>
   )

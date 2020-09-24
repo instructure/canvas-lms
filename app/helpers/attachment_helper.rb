@@ -22,7 +22,7 @@ module AttachmentHelper
     url_opts = {
       anonymous_instructor_annotations: attrs.delete(:anonymous_instructor_annotations),
       enable_annotations: attrs.delete(:enable_annotations),
-      moderated_grading_whitelist: attrs[:moderated_grading_whitelist],
+      moderated_grading_allow_list: attrs[:moderated_grading_allow_list],
       submission_id: attrs.delete(:submission_id)
     }
     url_opts[:enrollment_type] = attrs.delete(:enrollment_type) if url_opts[:enable_annotations]

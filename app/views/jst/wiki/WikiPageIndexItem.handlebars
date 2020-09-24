@@ -1,7 +1,7 @@
 {{#if BULK_DELETE_ENABLED}}
-  <td role="gridcell" class='not_clickable'>
-    {{#unless cannot_delete_by_master_course}}
-      {{#if CAN.DELETE}}
+  {{#if CAN.DELETE}}
+    <td class="not_clickable" role="gridcell">
+      {{#unless cannot_delete_by_master_course}}
         <input
           type="checkbox"
           class="select-page-checkbox"
@@ -10,20 +10,57 @@
           {{#unless deletable}}disabled{{/unless}}
           {{#if isChecked}}{{#if deletable}}checked{{/if}}{{/if}}
         />
-      {{/if}}
-    {{/unless}}
-  </td>
+      {{/unless}}
+    </td>
+  {{/if}}
 {{/if}}
 <td role="gridcell">
-  <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
-  {{#if front_page}}
-    <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
-  {{/if}}
+  <div class="hide-overflow" role="text">
+    <a href="{{html_url}}" id="wiki_page_index_item_title_{{page_id}}" class="wiki-page-link{{#if CAN.PUBLISH}} {{#unless published}}un{{/unless}}published{{/if}}">{{title}}</a>
+    {{#if front_page}}
+      <div><span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span></div>
+    {{/if}}
+  </div>
+  <div class="hide-overflow mobile-column" aria-hidden="true">
+    <span>{{#t}}Created:{{/t}} {{tDateToString created_at "medium"}}</span>
+    {{#if last_edited_by }}
+      <span>{{#t}}Edited:{{/t}} {{tDateToString updated_at "medium"}}</span>
+      <span>{{#t}}By{{/t}} {{last_edited_by.display_name}}</span>
+    {{/if}}
+    {{#if collectionHasTodoDate}}
+      <span>
+        {{#if todo_date}}
+          {{#t}}To-Do Date:{{/t}} {{tDateToString todo_date "date_at_time"}}
+        {{/if}}
+      </span>
+    {{/if}}
+  </div>
 </td>
-<td role="gridcell">{{tDateToString created_at "medium"}}</td>
-<td role="gridcell">{{tDateToString updated_at "medium"}}{{#if last_edited_by.display_name}} by {{last_edited_by.display_name}}{{/if}}</td>
+<td role="gridcell">
+  <div class="mobile-screenreader-only">
+    {{tDateToString created_at "medium"}}
+  </div>
+</td>
+<td role="gridcell">
+  <div class="mobile-screenreader-only">
+    {{#if last_edited_by }}
+      <div style="display: inline" role="text">
+      {{tDateToString updated_at "medium"}}
+        <div class="hide-overflow">
+          {{#t}}By{{/t}} {{last_edited_by.display_name}}
+        </div>
+      </div>
+    {{/if}}
+  </div>
+</td>
 {{#if collectionHasTodoDate}}
-  <td role="gridcell">{{tDateToString todo_date "date_at_time"}}</td>
+  <td role="gridcell">
+    <div class="mobile-screenreader-only">
+      {{#if todo_date}}
+        {{tDateToString todo_date "date_at_time"}}
+      {{/if}}
+    </div>
+  </td>
 {{/if}}
 {{#if CAN.MANAGE}}
   <td role="gridcell" class="master-content-lock-cell"></td>

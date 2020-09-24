@@ -1375,7 +1375,7 @@ class Course < ActiveRecord::Base
   end
 
   def self.destroy_batch(courses, sis_batch: nil, batch_mode: false)
-    enroll_scope = Enrollment.where(course_id: courses, workflow_state: 'deleted')
+    enroll_scope = Enrollment.active.where(course_id: courses)
     enroll_scope.find_in_batches do |e_batch|
       user_ids = e_batch.map(&:user_id).uniq.sort
       data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch,
@@ -2104,23 +2104,12 @@ class Course < ActiveRecord::Base
       enrollment_state = 'creation_pending' if enrollment_state == 'invited' && !self.available?
     end
     Course.unique_constraint_retry do
-      roles =
-        if role.built_in?
-          # it's possible we're still migrating the root account ownership - so pull enrollments for all equivalent built in roles
-          # TODO remove after datafixup
-          self.shard.activate do
-            Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).where("root_account_id = ? OR root_account_id IS NULL", self.root_account_id).to_a
-          end
-        else
-          [role]
-        end
-
       if opts[:allow_multiple_enrollments]
-        e = self.all_enrollments.where(user_id: user, type: type, role_id: roles, associated_user_id: associated_user_id, course_section_id: section.id).first
+        e = self.all_enrollments.where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id, course_section_id: section.id).first
       else
         # order by course_section_id<>section.id so that if there *is* an existing enrollment for this section, we get it (false orders before true)
         e = self.all_enrollments.
-          where(user_id: user, type: type, role_id: roles, associated_user_id: associated_user_id).
+          where(user_id: user, type: type, role_id: role, associated_user_id: associated_user_id).
           order(Arel.sql("course_section_id<>#{section.id}")).
           first
       end

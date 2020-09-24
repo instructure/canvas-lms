@@ -18,12 +18,65 @@
 
 # @API Submission Comments
 #
-# This API can be used to create files to attach to submission comments.  The
-# submission comments themselves can be created using the Submissions API.
+# This API can be used to edit and delete submission comments.
 class SubmissionCommentsApiController < ApplicationController
   before_action :require_context
 
   include Api::V1::Attachment
+  include Api::V1::SubmissionComment
+
+  # @API Edit a submission comment
+  #
+  # Edit the given submission comment.
+  #
+  # @argument comment [String]
+  #   If this argument is present, edit the text of a comment.
+  #
+  # @returns SubmissionComment
+  def update
+    submission_comment = SubmissionComment.find(params[:id])
+    if authorized_action(submission_comment, @current_user, :update)
+      submission_comment.updating_user = @current_user
+      submission_comment.reload unless submission_comment.update(submission_comment_params)
+
+      return render json: submission_comment_json(
+        submission_comment,
+        @current_user
+      )
+    end
+  end
+
+  def submission_comment_params
+    params.permit(:comment)
+  end
+
+  # @API Delete a submission comment
+  #
+  # Delete the given submission comment.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/courses/<course_id>/assignments/<assignment_id>/submissions/<user_id>/comments/<id> \
+  #          -X DELETE \
+  #          -H 'Authorization: Bearer <token>'
+  # @returns SubmissionComment
+  def destroy
+    submission_comment = SubmissionComment.find(params[:id])
+    if authorized_action(submission_comment, @current_user, :delete)
+      comment_data = anonymous_moderated_submission_comments_json(
+        assignment: submission_comment.submission.assignment,
+        course: @context,
+        current_user: @current_user,
+        avatars: service_enabled?(:avatars),
+        submission_comments: [submission_comment],
+        submissions: [submission_comment.submission]
+      )[0]
+
+      submission_comment.updating_user = @current_user
+      submission_comment.destroy!
+
+      return render json: comment_data
+    end
+  end
 
   # @API Upload a file
   #

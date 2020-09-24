@@ -347,9 +347,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Sleep de handgreep. Gebruik de pijltoetsen-omhoog en -omlaag om de grootte te wijzigen"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Slepen en neerzetten of klikken om je computer te doorzoeken"
-    },
     "due_5d7267be": {
         "message": "Inleverdatum:"
     },
@@ -520,6 +517,9 @@
     },
     "group_files_82e5dcdb": {
         "message": "Groepsbestanden"
+    },
+    "group_links_9493129e": {
+        "message": "Groeplinks"
     },
     "group_navigation_99f191a": {
         "message": "Groepsnavigatie"
@@ -1069,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Morgen om { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Tools"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } resultaten gevonden, { numDisplayed } resultaten momenteel weergegeven"

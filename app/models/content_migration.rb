@@ -203,6 +203,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def root_account
+    return super if root_account_id
     self.context.root_account rescue nil
   end
 

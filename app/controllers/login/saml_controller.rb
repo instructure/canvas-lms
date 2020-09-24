@@ -26,9 +26,9 @@ class Login::SamlController < ApplicationController
   before_action :fix_ms_office_redirects, only: :new
 
   def new
-    redirect_to delegated_auth_redirect_uri(aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                parent_registration: session[:parent_registration],
-                                                                                relay_state: Rails.env.development? && params[:RelayState]))
+    redirect_to aac.generate_authn_request_redirect(host: request.host_with_port,
+                                                    parent_registration: session[:parent_registration],
+                                                    relay_state: Rails.env.development? && params[:RelayState])
   end
 
   def create
@@ -327,10 +327,9 @@ class Login::SamlController < ApplicationController
   end
 
   def observee_validation
-    redirect_to delegated_auth_redirect_uri(
+    redirect_to
       @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
                                                                                    parent_registration: session[:parent_registration])
-    )
   end
 
   protected

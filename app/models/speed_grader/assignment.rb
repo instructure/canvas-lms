@@ -198,7 +198,7 @@ module SpeedGrader
         url_opts = {
           anonymous_instructor_annotations: assignment.anonymous_instructor_annotations,
           enable_annotations: !provisional_grader_or_moderator? || assignment.can_be_moderated_grader?(current_user),
-          moderated_grading_whitelist: sub.moderated_grading_whitelist(
+          moderated_grading_allow_list: sub.moderated_grading_allow_list(
             current_user,
             loaded_attachments: attachments_for_submission[sub]
           ),

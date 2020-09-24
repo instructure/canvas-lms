@@ -201,7 +201,7 @@ module Api::V1::Submission
           enable_annotations: true,
           enrollment_type: user_type(context, user),
           include: includes,
-          moderated_grading_whitelist: attempt.moderated_grading_whitelist(user),
+          moderated_grading_allow_list: attempt.moderated_grading_allow_list(user),
           skip_permission_checks: true,
           submission_id: attempt.id
         }

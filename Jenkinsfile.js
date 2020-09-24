@@ -20,7 +20,7 @@
 
 library "canvas-builds-library"
 
-def COFFEE_NODE_COUNT = 2
+def COFFEE_NODE_COUNT = 1
 def DEFAULT_NODE_COUNT = 1
 def JSG_NODE_COUNT = 3
 

@@ -23,6 +23,18 @@ import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
 import MasteryCalculation from '../index'
 
 describe('MasteryCalculation', () => {
+  beforeEach(() => {
+    window.ENV = {
+      PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: [
+        {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
+      ]
+    }
+  })
+
+  afterEach(() => {
+    window.ENV = null
+  })
+
   const mocks = [
     {
       request: {
@@ -59,6 +71,18 @@ describe('MasteryCalculation', () => {
     expect(getByText('Loading')).not.toEqual(null)
     await wait()
     expect(getByDisplayValue(/65/)).not.toEqual(null)
+  })
+
+  it('loads role list', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <MasteryCalculation contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    expect(getByText('Loading')).not.toEqual(null)
+    await wait()
+    expect(getByText(/Permission to change this mastery calculation/)).not.toEqual(null)
+    expect(getByText(/Account Admin/)).not.toEqual(null)
   })
 
   it('displays an error on failed request', async () => {

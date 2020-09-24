@@ -31,7 +31,7 @@ class Login::Oauth2Controller < Login::OauthBaseController
       @aac.debug_set(:authorize_url, authorize_url)
     end
 
-    redirect_to delegated_auth_redirect_uri(authorize_url)
+    redirect_to authorize_url
   end
 
   def create

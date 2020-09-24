@@ -652,11 +652,9 @@ en:
   responsive_layout_54e4ca06: Responsive Layout
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: This is a feature to allow the development of a responsive layout
   disable_keyboard_shortcuts_9db78832: Disable Keyboard Shortcuts
-  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
     Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
     will have an improved experience with these shortcuts turned off.
-  enable_i18n_features_in_outcomes_exports_64bcf82b: Enable i18n features in outcomes exports
-  enable_byte_order_mark_and_semi_colon_field_separa_f4375c16: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled on or off for outcomes exports.
   include_byte_order_mark_in_compatible_spreadsheet__ebd6e18: Include Byte-Order Mark in compatible spreadsheet exports
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: Optionally include a byte-order mark in compatible spreadsheet exports so they can be imported into Excel for users in some locales.
   use_semicolons_to_separate_fields_in_compatible_sp_56e0bdd2: Use semicolons to separate fields in compatible spreadsheet exports
@@ -721,24 +719,20 @@ en:
   quiz_log_auditing_desc: |-
     Enable the tracking of events for a quiz submission, and the ability
           to view a log of those events once a submission is made.
-  anonymous_moderated_marking_801bbb65: Anonymous Moderated Marking
-  anonymous_moderated_marking_allows_teachers_to_sel_af80885d: Anonymous Moderated Marking allows teachers to select moderators to anonymously grade assignments. After which a moderator can select or supply a custom grade.
   anonymous_grading_ccb5045c: Anonymous Grading
   enable_anonymous_grading_of_assignments_e18f75be: Enable anonymous grading of assignments.
   moderated_grading_e6127f72: Moderated Grading
   enable_moderated_grading_bacd20d8: Enable moderated grading.
   graphql_mutation_log_25acc923: GraphQL Mutation Log
-  allows_admins_to_view_a_log_containing_information_5d4eb5e0: |-
+  allows_admins_to_view_a_log_containing_information_128dc85f: |-
     Allows admins to view a log containing information about all recently run
     GraphQL mutations
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: Microsoft Immersive Reader - Free Trial (Wiki Pages)
   makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: Makes a Microsoft Immersive Reader link option show up on wiki pages.
   canvas_elementary_theming_a42fa76f: Canvas Elementary Theming
-  elementary_friendly_theme_font_and_limited_course__b8939e48: |-
+  elementary_friendly_theme_font_and_limited_course__f6746b89: |-
     Elementary friendly theme, font, and limited course navigation.
     The font update only applies to languages that use the Latin Alphabet.
-  new_post_policy_icons_da13a62c: New Post Policy Icons
-  updates_the_display_of_post_policy_icons_in_the_ne_eb9f3314: Updates the display of Post Policy icons in the New Gradebook assignment column header.
   new_analytics_api_access_7eec1ead: New Analytics API Access
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: Enables new API endpoints for the course and user data provided by New Analytics.
   gradebook_export_sort_order_bugfix_tally_219_62bfaacb: Gradebook Export Sort Order Bugfix (Tally-219)
@@ -779,7 +773,7 @@ en:
   custom_reports_experimental_features_40bbfe7c: 'Custom Reports: Experimental Features'
   use_experimental_features_before_they_are_generall_3dfaddd1: Use experimental features before they are generally enabled in production
   rce_auto_save_f004fba9: RCE Auto-Save
-  if_rce_enhancements_are_also_enabled_the_rce_will__2fd293c4: |-
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
     If RCE Enhancements are also enabled,
     the RCE will auto-save your work as you go
   edit_closed_captions_e5fdeb79: Edit Closed Captions
@@ -797,17 +791,22 @@ en:
   bookmarking_for_enrollments_index_api_840be156: Bookmarking for Enrollments Index API
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: Use bookmarking for API pagination in Enrollments Index
   submission_type_lti_placement_b448d5d0: Submission Type LTI Placement
-  if_an_lti_tool_configured_with_the_placement_is_in_41e4244: |-
+  if_an_lti_tool_configured_with_the_placement_is_in_e459892f: |-
     If an LTI tool configured with the placement is installed, will show a new entry in the
     assignment submission type dropdown to quickly configure the assignment for the tool
   syllabus_course_summary_option_951a8144: Syllabus Course Summary Option
   make_the_course_summary_list_of_assignments_and_ev_f739be33: Make the Course Summary (list of assignments and events) optional in the syllabus
   allow_blueprint_publishing_after_association_fae6ba95: Allow Blueprint Publishing After Association
-  show_a_checkbox_that_optionally_lets_an_account_ad_209b2aa6: |-
+  show_a_checkbox_that_optionally_lets_an_account_ad_6446ebfb: |-
     Show a checkbox that optionally lets an account admin publish courses
     automatically after associating and syncing with a blueprint course
   enable_fullstory_5c673a06: Enable fullstory
   include_fullstory_recording_of_the_user_s_session_656d131e: Include FullStory recording of the user's session
+  updated_math_equation_display_583671a8: Updated math equation display
+  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
+    Replaces the existing image of the math equation plus the hidden mathml
+    with a MathJax formatted version. This provides better accessibility
+    and many options for the reader to interact with the equation on the page.
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   reduce_outcome_duplication_on_course_import_26431b40: Reduce outcome duplication on course import
@@ -823,11 +822,11 @@ en:
   account_level_mastery_scales_a5bdff29: Account-level Mastery Scales
   allows_account_level_mastery_scales_and_proficienc_43899cf6: Allows Account-level mastery scales and proficiency calculations, replacing per-outcome scales
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
-  differentiate_between_system_and_user_generated_li_dc466585: |-
+  differentiate_between_system_and_user_generated_li_b5a1c49f: |-
     Differentiate between system- and user-generated live events
     in the Canvas Data Services tool
   live_event_subscription_webhooks_1dae83bb: Live Event Subscription Webhooks
-  allow_live_event_subscription_to_be_set_to_be_deli_ba8d8a9a: |-
+  allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
     Allow Live Event Subscription to be set to be delivered
     via HTTPS webhooks
   live_event_tool_documentation_f6dcc3d7: Live Event Tool Documentation
@@ -835,28 +834,32 @@ en:
   developer_key_include_parameter_support_58cbf874: Developer Key Include Parameter Support
   provides_a_flag_on_the_devloper_key_to_support_inc_4a1ce85a: Provides a flag on the Devloper Key to support Include Parameters on API requests
   process_multiple_content_items_from_course_modules_6de90fd8: Process multiple content items from course modules page
-  if_enabled_canvas_will_allow_tools_to_return_multi_93e87532: |-
+  if_enabled_canvas_will_allow_tools_to_return_multi_fe7b6678: |-
     If enabled, Canvas will allow tools to return multiple content items
     in a single request at the course modules page
   only_show_site_admin_keys_in_the_site_admin_ui_64827f33: Only show site admin keys in the site admin UI
-  if_enabled_the_site_admin_developer_key_ui_will_on_d4b4458b: |-
+  if_enabled_the_site_admin_developer_key_ui_will_on_e4b3dbf0: |-
     If enabled, the site admin developer key UI will only show
     site admin developer keys. Note that this only affects
     Canvas instances where root accounts are on the same shard
     as the site admin account. Behavior in other instances
     already behaved in this way.
   create_live_event_subscriptions_on_toolproxy_7c8378b1: Create live event subscriptions on ToolProxy
-  if_enabled_when_an_lti_toolproxy_is_created_it_wil_d0d0b12: |-
+  if_enabled_when_an_lti_toolproxy_is_created_it_wil_9c2ea3ec: |-
     If enabled, when an Lti::ToolProxy is created, it will
     create the live event subscription directly on the tool
     instead of the assignment. This will cause events to be
     duplicated unless the subscriptions on the associated
     plagiarism assignments are deleted.
   require_signed_token_for_oembed_64883303: Require signed token for oEmbed
-  if_enabled_oembed_endpoints_will_require_a_tool_ge_871baec8: |-
+  if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
     If enabled, oEmbed endpoints will require a
     tool-generated token to verify the origin
     of an oEmbed resource request.
+  disable_authentication_for_graphql_3c019622: Disable authentication for GraphQL
+  if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
+    If enabled, GraphQL queries will not require
+    users to be signed in or use an access token.
   new_quizzes_migration_during_course_import_copy_e9dd124e: New Quizzes migration during course import/copy
   allow_migration_of_quizzes_during_course_copy_and__35d80756: Allow migration of quizzes during course copy and import
   new_quizzes_third_party_importing_1e1b696d: New Quizzes third party importing
@@ -868,15 +871,15 @@ en:
   enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
   requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
   confetti_for_on_time_submissions_394e16ce: Confetti for On-Time Submissions
-  displays_confetti_for_users_that_turn_in_an_assign_6899ccef: |-
+  displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
     Displays confetti for users that turn in an assignment prior
     to the set due date.
   confetti_for_valid_links_7506df83: Confetti for valid links
-  displays_confetti_for_teachers_that_run_the_link_v_d05ec11b: |-
+  displays_confetti_for_teachers_that_run_the_link_v_2d55dfc0: |-
     Displays confetti for teachers that run the link validator on
     a course and no issues are found.
   restrict_sms_to_select_types_9dd6399c: Restrict SMS to Select Types
-  disables_sms_notifications_for_all_types_except_an_3d130ca2: |-
+  disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
     Disables SMS notifications for all types except announcements and
     grade changes.
   hide_course_sections_from_students_b7850d64: Hide Course Sections from Students
@@ -884,15 +887,15 @@ en:
   mute_notifications_by_course_440e18be: Mute notifications by course
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
   course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
-  allows_users_to_override_specific_notification_pre_18cf5b9e: |-
+  allows_users_to_override_specific_notification_pre_ed2f5555: |-
     Allows users to override specific notification preferences on a
     course by course basis.
   account_level_notification_preferences_ui_update_f5e189a4: Account level notification preferences UI update
-  updates_account_notification_preferences_ui_to_be__2f1e4718: |-
+  updates_account_notification_preferences_ui_to_be__1765f66a: |-
     Updates account notification preferences UI to be a more current
     and updated user experience
   show_past_account_level_announcements_to_users_3b8208e2: Show past account level announcements to users
-  show_past_account_level_announcements_to_users_all_6918f8e1: |-
+  show_past_account_level_announcements_to_users_all_36b50d74: |-
     Show past account level announcements to users. Allows
     a user to view announcemnts that have ended or been dismissed.
   smart_alerts_44db622e: Smart alerts
@@ -6996,6 +6999,9 @@ en:
   group_discussions_17d79aa0: Group Discussions
   user_files_78e21703: User Files
   calendar_d14cfc8f: Calendar
+  collaboration_71c024f4: Collaboration
+  conference_36b50fda: Conference
+  app_b157c2b3: App
   file_c851020d: File
   grades_a61eba0a: Grades
   home_351838cd: Home
@@ -7516,6 +7522,7 @@ en:
     no_context_found: The external Learning Outcome couldn't be found for "%{title}", creating a copy.
     no_global_permission: You're not allowed to manage global outcomes, can't add "%{title}"
   embedded_images_598ff8da: embedded_images
+  subtitles_could_not_be_imported_from_file_5de6da0b: Subtitles could not be imported from %{file}
   we_were_unable_to_find_a_tool_profile_match_for_pr_34e6a5d2: We were unable to find a tool profile match for "%{product_name}".
   we_were_unable_to_find_a_tool_profile_match_for_pr_cd98678e: 'We were unable to find a tool profile match for "%{product_name}". If you would like to use this tool please install it using the following registration url: %{registration_url}'
   we_found_a_different_version_of_product_name_insta_3a645773: We found a different version of "%{product_name}" installed for your course. If this tool fails to work as intended, try reregistering or reinstalling it.
@@ -7985,6 +7992,8 @@ en:
       manage_groups: Manage (create / edit / delete) groups
       manage_interaction_alerts: Manage alerts
       manage_outcomes: Manage learning outcomes
+      manage_proficiency_calculations: Manage outcome proficiency calculations
+      manage_proficiency_scales: Manage outcome proficiency scales
       manage_sections: Manage (create / edit / delete) course sections
       manage_students: Add/remove students for the course
       manage_user_notes: Manage faculty journal entries
@@ -8062,6 +8071,8 @@ en:
   groups_add_edit_delete_1536bbb4: Groups - add / edit / delete
   alerts_add_edit_delete_d71091c6: Alerts - add / edit / delete
   learning_outcomes_add_edit_delete_b686457a: Learning Outcomes - add / edit / delete
+  outcome_proficiency_calculations_add_edit_5a2217b7: Outcome Proficiency Calculations - add / edit
+  outcome_proficiency_scales_add_edit_58da6a3: Outcome Proficiency Scales - add / edit
   course_sections_add_edit_delete_c4f4ac19: Course Sections - add / edit / delete
   users_add_remove_students_in_courses_efe7e748: Users - add / remove students in courses
   faculty_journal_manage_entries_efc09599: Faculty Journal - manage entries
@@ -8279,10 +8290,10 @@ en:
         creation_date: Creation date
         last_edit: Last edit
         todo_date: To-Do Date
-      no_pages: No pages created yet.
-      add_page: Add one!
       loading: Loading ...
       loading_more: Loading more ...
+      no_pages: No pages created yet.
+      add_page: Add one!
     wiki_page_index_edit_dialog:
       page_title: Title
     wiki_page_index_item:
@@ -9004,7 +9015,10 @@ en:
   catalog_users_already_exist_2894b8c4: Catalog users already exist
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: Host is unreachable or not pointing to Catalog
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: 'Uh oh! Contact your friendly Catalog Developer. Error message: %{message}'
+  acalanes_union_high_grade_report_ae9bce11: Acalanes Union High Grade Report
+  student_current_grades_report_aeries_san_mateo_2cd8cc5a: Student Current Grades Report - Aeries (San Mateo)
   user_id_user_id_69a9e865: 'User ID: %{user_id}'
+  campbell_union_high_school_district_grade_report_7f3bb801: Campbell Union High School District Grade Report
   student_id_a61d78c7: Student Id
   student_sis_6721040e: Student Sis
   account_name_bff54ed5: Account Name
@@ -9034,7 +9048,6 @@ en:
   the_end_date_for_the_quiz_due_date_38689638: The end date for the quiz due date
   quiz_statistics_e57611c2: Quiz Statistics
   letter_grades_by_section_259aec0e: Letter Grades by Section
-  student_current_grades_report_aeries_san_mateo_2cd8cc5a: Student Current Grades Report - Aeries (San Mateo)
   quiz_submission_data_b3f24182: Quiz Submission Data
   the_beginning_date_for_submissions_9d890f3b: The beginning date for submissions
   the_end_date_for_submissions_66168efa: The end date for submissions
@@ -9279,6 +9292,7 @@ en:
   created_by_sis_b590894c: Created by SIS;
   always_include_dates_74b3721d: Always Include Dates;
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
+  student_current_grades_report_base_86b5962a: Student Current Grades Report - Base
   template_account_21ac8f4f: Template Account
   rce_contents_replace_display_name: RCE Contents Replace
   rce_contents_replace_description: Enable RCE full text replace from LTI's
@@ -10315,8 +10329,7 @@ en:
         details: 'You''ll need to register with Canvas before you can participate in the class.  To get started, visit the course page here:'
         html:
           subject: Course Invitation
-          link: Click here to view the course page
-          body: 'You''ve been invited to participate in a class at %{website}. The class is called %{course}. Course role: %{role_type}'
+          body: 'You''ve been invited to participate in a class at %{account}. The class is called %{course}. Course role: %{role_type}'
           name: Name
           email: Email
           username: Username
@@ -11395,8 +11408,9 @@ en:
   canvas_alert_invited_course_as_role_type_9ed79ce3: 'Canvas Alert - Invited: %{course} as %{role_type}'
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: 'You''ve been enrolled in the course, %{course}. Course role: %{role_type}'
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: You've been enrolled in the course, %{course}.
-  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: 'You''ve been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}'
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: 'You''ve been invited to participate in a class at %{account}.  The class is called %{course}. Course role: %{role_type}'
   you_ve_been_invited_to_course_90764f1: You've been invited to %{course}.
+  you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: 'You''ve been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}'
   canvas_alert_invited_course_as_role_type_ea825937: 'Canvas Alert - Invited: course as %{role_type}'
   event_title_course_name_changed_to_37510fbb: "%{event_title}, %{course_name} changed to"
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: 'You can check out the group by clicking this link: %{link}.'
@@ -12950,6 +12964,7 @@ en:
   the_default_report_only_includes_course_section_da_729092f0: The default report only includes Course/Section dates if Enrollment restrictions are enabled
   this_report_gets_the_submissions_for_courses_d83bb449: This report gets the submissions for courses.
   course_submission_report_data_example_95971ae4: Course Submission Report Data Example
+  include_course_scores_e38e71da: Include course scores
   canvas_cloud_information_fdd404f2: Canvas Cloud Information
   created_by_b39b9c8b: Created By
   delete_domain_domain_c5b68f5: Delete domain %{domain}
@@ -12982,6 +12997,7 @@ en:
         enabled: Enabled (must enable QTI Converter as well)
   provision_a_quiz_next_service_c7c6bd87: Provision a Quiz.Next Service
   provisioned_lti_account_e7f156c1: Provisioned LTI Account
+  assignment_a381313e: 'Assignment #:'
   api_host_ddaf400e: 'API Host:'
   service_c3d74594: 'Service:'
   lti_launch_af082dc3: 'LTI Launch:'
@@ -13935,6 +13951,7 @@ en:
   file_tree_expanded_a1d20c4a: File tree expanded
   file_tree_collapsed_d4b0ae96: File tree collapsed
   remove_filename_87f3781e: remove %{filename}
+  file_selected_for_upload_filename_18ca9b8a: 'File selected for upload: %{filename}'
   the_launched_tool_returned_an_invalid_resource_for_24512878: The launched tool returned an invalid resource for this assignment
   submit_assignment_helper:
     messages:
@@ -15438,10 +15455,12 @@ en:
   user_list_66428346: User list
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: 'It looks like you have an invalid email address: "%{addr}"'
   enter_the_sis_ids_of_the_users_you_would_like_to_a_25e441f1: Enter the SIS IDs of the users you would like to add, separated by commas or line breaks
+  sis_ids_required_125074d9: SIS IDs (required)
   enter_the_login_ids_of_the_users_you_would_like_to_502fcbc5: Enter the login IDs of the users you would like to add, separated by commas or line breaks
+  login_ids_required_ff2273ab: Login IDs (required)
   enter_the_email_addresses_of_the_users_you_would_l_f76448a6: Enter the email addresses of the users you would like to add, separated by commas or line breaks
+  email_addresses_required_14483dc8: Email Addresses (required)
   add_user_s_by_b2549f89: Add user(s) by
-  example_cb3509b8: 'Example:'
   role_13a7be77: Role
   can_interact_with_users_in_their_section_only_48cb8c43: Can interact with users in their section only
   when_adding_multiple_users_use_a_comma_or_line_bre_67f9c87d: When adding multiple users, use a comma or line break to separate users.
@@ -15642,15 +15661,18 @@ en:
   incomplete_95612d72: incomplete
   in_progress_13b9e26f: in-progress
   unavailable_c04e4c93: unavailable
-  view_previous_submission_2b57bb85: View Previous Submission
-  view_next_submission_d2a429d: View Next Submission
   create_new_attempt_19c96c03: Create New Attempt
   missing_1a256b3b: Missing
   late_2be42b88: Late
+  due_5d7267be: 'Due:'
+  count_attempts_d23c69a0:
+    zero: Unlimited Attempts
+    one: 1 Attempt
+    other: "%{count} Attempts"
   more_modules_d9a9f003: More Modules
   now_viewing_attempt_current_attempt_918e616: Now viewing Attempt %{current_attempt}
-  attempt_current_attempt_ef626179: Attempt %{current_attempt}
-  attempt_current_attempt_of_max_attempts_427ed508: Attempt %{current_attempt} of %{max_attempts}
+  attempt_attempt_d3911720: Attempt %{attempt}
+  attempt_f2691284: Attempt
   choose_one_submission_type_cf4eda5b: Choose One Submission Type
   submission_type_a925fc5f: Submission Type
   choose_one_2c4277df: Choose One
@@ -15724,10 +15746,8 @@ en:
   submitted_d5ba370a: 'Submitted:'
   not_submitted_fff47f17: Not submitted
   you_cannot_leave_comments_until_you_submit_the_ass_82c3ad79: You cannot leave comments until you submit the assignment
-  attempt_attempt_d3911720: Attempt %{attempt}
   comments_e07bcbe3: Comments
   rubric_fc39da76: Rubric
-  due_5d7267be: 'Due:'
   ungraded_pointspossible_e2f86bd9: ungraded/%{pointsPossible}
   ungraded_147a0dce: ungraded
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
@@ -15833,9 +15853,6 @@ en:
     one: Attempt
     other: Attempts
   unlimited_attempts_81a37d4: Unlimited Attempts
-  count_attempts_d23c69a0:
-    one: 1 Attempt
-    other: "%{count} Attempts"
   due_available_and_until_dates_f90713da: Due, available, and until dates
   due_a73610f6: Due
   until_4a1f8cda: Until
@@ -15864,7 +15881,6 @@ en:
   mov_329e9416: MOV
   arc_a935e585: ARC
   in_class_23eeca38: In Class
-  app_b157c2b3: App
   non_canvas_11f36d4a: Non Canvas
   add_submission_type_8690db4b: Add submission type
   or_9b70ccaa: Or
@@ -15916,8 +15932,6 @@ en:
   delete_assignment_5d3f3f15: delete assignment
   asset_string_ddeaf719: Asset String
   start_date_e937be8a: Start Date
-  previous_month_bb1e3c84: Previous Month
-  next_month_749b1778: Next Month
   end_date_e0093ed7: End Date
   user1_masquerading_as_user2_4fa5bb55: "%{user1} masquerading as %{user2}"
   load_more_a36f9cf9: Load more
@@ -16227,7 +16241,6 @@ en:
   conference_has_been_updated_title_2bacc5fa: 'Conference has been updated: %{title}'
   conference_has_been_removed_f771cb11: Conference has been removed
   remove_conference_title_207d32c0: 'Remove conference: %{title}'
-  conference_36b50fda: Conference
   zoom_f3e54d69: Zoom
   paste_zoom_into_calendar_events_announcements_disc_d873358e: Paste Zoom into Calendar Events, Announcements, Discussions, and anywhere you use the Rich Content Editor (RCE).
   visit_zoom_14636084: Visit Zoom
@@ -16244,11 +16257,6 @@ en:
     Conferences, powered by BigBlueButton, is unable to handle current demand.  Consider upgrading to
             Premium BigBlueButton or use one of the following video conferencing providers.  Please talk to your local
             admin for additional guidance.
-  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " is using a free version of BigBlueButton that provides 10 concurrent video conferences, each with 1 host and up to 24 attendees. Recordings are stored for 7 days."
-  dramatic_increases_in_usage_of_free_bigbluebutton__d93b784b: Dramatic increases in usage of free BigBlueButton may cause performance issues.
-  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: A premium version of BigBlueButton is available that offers concurrent conferences based on purchased amount (each with 1 host and up to 99 attendees), no recorded storage limitations, and dedicated infrastructure for better performance.
-  in_the_event_that_bigbluebutton_is_unable_to_meet__c41719f9: In the event that BigBlueButton is unable to meet your current or future needs, Canvas also partners with Zoom, Google Meet, Microsoft Teams, as well as other video conferencing tools.
-  please_contact_your_lms_administrator_for_more_det_635afd97: Please contact your LMS Administrator for more details.
   great_work_from_the_canvas_developers_8c23f1c3: Great work! From the Canvas developers
   starting_import_operation_f25745f0: Starting import operation
   import_started_successfully_a3467411: Import started successfully
@@ -16756,7 +16764,6 @@ en:
   assignment_menu_91fe3716: Assignment Menu
   assignments_index_menu_4088a035: Assignments Index Menu
   assignments_group_menu_c2522316: Assignments Group Menu
-  collaboration_71c024f4: Collaboration
   conference_selection_ea4050bb: Conference Selection
   course_assignments_menu_fa6aeb23: Course Assignments Menu
   course_home_sub_navigation_b1ee6b03: Course Home Sub Navigation
@@ -16917,15 +16924,19 @@ en:
   grade_changes_cb5a57a8: Grade Changes
   type_a_few_letters_to_start_searching_3334657b: Type a few letters to start searching
   error_loading_gradebook_history_try_again_19032437: Error loading gradebook history. Try again?
-  no_assignments_with_that_name_found_1d7be1: No assignments with that name found
+  no_artifacts_with_that_name_found_b8679f53: No artifacts with that name found
   no_graders_with_that_name_found_d8204d90: No graders with that name found
   no_students_with_that_name_found_f6004da2: No students with that name found
   from_date_must_be_before_to_date_79f00046: "'From' date must be before 'To' date"
   search_form_fcaa38f7: Search Form
   loading_students_30b71301: Loading Students
   loading_graders_f6a76142: Loading Graders
-  loading_assignments_352ec769: Loading Assignments
+  artifact_f7003de5: Artifact
+  loading_artifact_dc3bfe9f: Loading Artifact
   dates_6e416047: Dates
+  previous_month_bb1e3c84: Previous Month
+  next_month_749b1778: Next Month
+  show_final_grade_overrides_only_c3017aaa: Show Final Grade Overrides Only
   before_44c686b4: Before
   after_4c71e718: After
   more_results_were_added_at_the_bottom_of_the_page_dc323877: More results were added at the bottom of the page.
@@ -17264,8 +17275,9 @@ en:
   manage_grading_schemes_in_context_name_e3678273: Manage grading schemes in %{context_name}
   message_896d2ed0: "%{message}"
   looks_great_e4d883ed: Looks great!
-  a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: A table containing the name of the grading scheme and buttons for editing or deleting the scheme.
-  a_table_that_contains_the_grading_scheme_data_each_fe739bf6: A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.
+  insert_row_in_edit_mode_5976f269: Insert row in edit mode
+  remove_row_in_edit_mode_49c4dc07: Remove row in edit mode
   grading_scheme_saved_85535151: Grading scheme saved
   there_was_a_problem_saving_the_grading_scheme_5e6076e9: There was a problem saving the grading scheme
   are_you_sure_you_want_to_delete_this_grading_schem_df8b75f9: Are you sure you want to delete this grading scheme?
@@ -17301,10 +17313,18 @@ en:
   group_group_name_is_not_available_at_this_time_971001c1: Group %{group_name} is not available at this time
   group_is_joined_by_invitation_only_d00f5a63: Group is joined by invitation only
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: Group %{group_name} is joined by invitation only
+  group_membership_limit_54e165b: Group Membership Limit
+  group_created_successfully_cae99f8c: Group created successfully
+  creating_group_17bd69ce: Creating group
+  error_during_group_creation_f232994b: Error during group creation
+  add_group_c84f9e9d: Add Group
+  group_name_b69c144: Group Name
+  joining_81f8b6c9: Joining
+  invitation_only_9a253f1d: Invitation Only
+  members_are_free_to_join_defa5929: Members are free to join
   group_name_is_required_5547bc0b: Group name is required
   too_many_members_b8b15069: Too many members
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} members out of maximum of %{max_membership}"
-  group_name_b69c144: Group Name
   members_af25c21d: Members
   groups_are_a_good_place_to_collaborate_on_projects_fdfe57a9: |-
     Groups are a good place to collaborate on projects or to figure out schedules for study sessions
@@ -17312,7 +17332,6 @@ en:
                   files.  Groups can collaborate on documents, or even schedule web conferences.
                   It's really like a mini-course where you can work with a smaller number of students on a
                   more focused project.
-  joining_81f8b6c9: Joining
   course_members_are_free_to_join_9b2603d4: Course members are free to join
   membership_by_invitation_only_9bc27199: Membership by invitation only
   invite_5b1fcbcd: Invite
@@ -17752,11 +17771,12 @@ en:
   an_error_occurred_updating_the_calculation_method_49384084: An error occurred updating the calculation method
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: The proficiency calculation was set by your admin and applies to all courses in this account.
   an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: 'An error occurred while loading the outcome calculation: %{error}'
-  set_the_mastery_scale_to_be_used_for_all_courses_w_a95a48a4: Set the mastery scale to be used for all courses within this account.
-  change_mastery_f4d43c07: Change mastery
-  change_description_34c49853: Change description
-  change_points_9e5104ac: Change points
-  delete_proficiency_rating_5436ee08: Delete proficiency rating
+  permission_to_change_this_mastery_calculation_is_e_91e19659: 'Permission to change this mastery calculation is enabled at the account level for:'
+  change_description_for_proficiency_rating_position_97626231: Change description for proficiency rating %{position}
+  mastery_mastery_for_proficiency_rating_position_74aa3b56: Mastery %{mastery} for proficiency rating %{position}
+  change_points_for_proficiency_rating_position_a385c658: Change points for proficiency rating %{position}
+  change_color_for_proficiency_rating_position_48b39bfc: Change color for proficiency rating %{position}
+  delete_proficiency_rating_position_46e205f7: Delete proficiency rating %{position}
   mastery_7ec348b5: Mastery
   below_mastery_abd1dca5: Below Mastery
   added_new_proficiency_rating_e30cab8a: Added new proficiency rating
@@ -17767,14 +17787,15 @@ en:
   invalid_points_8e929c3f: Invalid points
   negative_points_fda45730: Negative points
   points_must_be_less_than_previous_rating_bc627bec: Points must be less than previous rating
-  proficiency_ratings_2bbabdcd: Proficiency ratings
-  proficiency_rating_6346119f: Proficiency Rating
+  proficiency_level_1d05e468: Proficiency Level
   add_proficiency_level_93bd72d0: Add Proficiency Level
   save_mastery_scale_2b4dc13a: Save Mastery Scale
   an_error_occurred_updating_the_proficiency_ratings_babe7029: An error occurred updating the proficiency ratings
   http_response_code_832d6baa: 'HTTP Response: %{code}'
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: 'An error occurred updating the proficiency ratings: %{message}'
   an_error_occurred_while_loading_the_proficiency_ra_98492357: 'An error occurred while loading the proficiency ratings: %{error}'
+  this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: This mastery scale will be used as the default for all courses within your account.
+  permission_to_change_this_mastery_scale_is_enabled_89066fac: 'Permission to change this mastery scale is enabled at the account level for:'
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n              Can't delete alignments based on rubric associations.\n              To remove these associations you need to remove the row from the asset's rubric\"\n            "
   delete_alignment_f33c97d5: Delete alignment
   calculation_d82f6181: Calculation
@@ -18146,6 +18167,12 @@ en:
   external_apps_account_course_settings_78de2b2f: External Apps (Account, Course Settings)
   if_this_permission_is_disabled_users_can_still_ins_4e3cef83: If this permission is disabled, users can still install approved apps through the Canvas App Center (if enabled for your institution). Additionally, if this permission is disabled, users cannot delete manually added external apps.
   external_apps_course_settings_1f045644: External Apps (Course Settings)
+  outcome_proficiency_calculations_5959b681: Outcome Proficiency Calculations
+  allows_user_to_set_outcome_proficiency_calculation_73761bf4: Allows user to set outcome proficiency calculations at the account and course levels.
+  allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: Allows user to set outcome proficiency calculations at the course level.
+  outcome_proficiency_scales_a316bd83: Outcome Proficiency Scales
+  allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: Allows user to set outcome proficiency scales at the account and course levels.
+  allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: Allows user to set outcome proficiency scales at the course level.
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: Determines visibility and management of Outcomes in Account Navigation. Allows user to create, edit, and delete outcomes and outcome groups at the account and course levels.
   to_allow_the_outcomes_page_as_read_only_this_permi_f3c580bd: To allow the Outcomes page as read-only, this permission can be disabled but Course Content - view must be enabled. To import learning outcomes, Learning Outcomes - import must also be enabled.
   allows_user_to_create_edit_and_delete_outcomes_and_1cf52c38: Allows user to create, edit, and delete outcomes and outcome groups at the course level.
@@ -18195,14 +18222,22 @@ en:
   allows_user_to_add_and_remove_students_allows_user_6b31aafc: Allows user to add and remove students. Allows user to add and remove observers. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to edit a student’s section or role. Allows user to resend course invitations from the Course People page.
   if_the_open_registration_account_setting_is_enable_f3b9a75f: If the Open Registration account setting is enabled, users with this permission can add students or observers to a course via email address or login ID even if the student or observer does not already have a Canvas account.
   to_access_the_account_courses_page_courses_view_li_e1da6165: To access the account Courses page, Courses - view list must be enabled.
-  to_view_the_list_of_users_in_the_course_users_view_79e1eb45: To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student's section and course role, Users - view list and Conversations - send messages to individual course members must also be enabled. To unenroll users the user details page, View the list of courses and See the list of users must also be enabled. Allows user to resend course invitations from the Course People page. If the Open Registration account setting is enabled, users with this permission can add students to a course from the Course People page via email addresses if the user does not already have a Canvas account. To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
+  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
+    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student's section and course role, Users - view list and Conversations - send messages to individual course members must also be enabled. To unenroll users the user details page, View the list of courses and See the list of users must also be enabled. Allows user to resend course invitations from the Course People page. If the Open Registration account setting is enabled, users with this permission can add students to a course from the Course People page via email addresses if the user does not already have a Canvas account. To link an observer to a student, Users - manage login details and Conversations - send to individual course members must be enabled.
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: Allows user to add and remove students to the course. Allows user to add and remove observers to the course. Allows user to view login ID information for students. Allows user to view prior enrollments. Allows user to access a user’s settings menu and user details. Allows user to conclude or delete enrollments on a student’s details page. Allows user to resend course invitations.
-  to_access_the_people_page_users_view_list_must_be__1e9e5d75: To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
+  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
+    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+            To access the People Page, Users - view list must be enabled. If the Open Registration account setting is enabled, users with this permission can add students to a course via email address if the user does not already have a Canvas account. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a student’s section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: Allows user to add teachers, course designers, or TAs to a course from the account Courses page.
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view user details for any user. Allows user to edit a user’s section or role.
-  to_view_the_list_of_users_in_the_course_users_view_34c164ea: To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
+  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
+    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
   allows_user_to_add_and_remove_other_teachers_cours_bff27199: Allows user to add and remove other teachers, course designers, or TAs. Allows user to add and remove observers to the course. Allows user to view login ID information for teachers, designers, and TAs. Allows user to view settings menu for teachers, course designers, TAs, and observers. Allows user to view user details for teachers, course designers, and TAs. Allows user to limit students to only view fellow section members.
-  to_view_the_list_of_users_in_the_course_users_view_c44bdef0: To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
+  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
+    Enrollments may be added by your institution student information system (SIS). If an enrollment is created via SIS, only admins can remove the enrollment from the course.
+            To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To edit a teacher or TAs section, Users - view list and Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
   allows_user_to_access_the_users_link_in_account_na_d77e46de: Allows user to access the Users link in Account Navigation.
   allows_user_to_view_login_logout_activity_of_users_e4ff7ca: Allows user to view login/logout activity of users in Admin Tools. Allows user to search grade change logs by grader or student in Admin Tools. (Not available at the subaccount level.)
   allows_user_to_differentiate_assignments_to_indivi_37f701a5: Allows user to differentiate assignments to individual students.
@@ -18290,11 +18325,17 @@ en:
   points_possible_720fc8fd: "%{points} / %{possible}"
   invalid_score_3d247da7: Invalid score
   cannot_give_outcomes_extra_credit_696208f0: Cannot give outcomes extra credit
+  change_mastery_f4d43c07: Change mastery
+  change_description_34c49853: Change description
+  change_points_9e5104ac: Change points
+  delete_proficiency_rating_5436ee08: Delete proficiency rating
   an_error_occurred_while_loading_account_proficienc_d38554c8: An error occurred while loading account proficiency ratings
   an_error_occurred_while_loading_account_proficienc_c7d6568b: 'An error occurred while loading account proficiency ratings: %{m}'
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: An error occurred while saving account proficiency ratings
   customize_learning_mastery_ratings_4ace142a: Customize Learning Mastery Ratings
   set_up_how_your_proficiency_ratings_appear_inside__8139bb81: "\n            Set up how your Proficiency Ratings appear inside of Learning Mastery Gradebook.\n            Adjust number of ratings, mastery level, points, and colors.\n          "
+  proficiency_ratings_2bbabdcd: Proficiency ratings
+  proficiency_rating_6346119f: Proficiency Rating
   add_proficiency_rating_d819f6b8: Add proficiency rating
   save_learning_mastery_82889d8b: Save Learning Mastery
   points_to_endofrangepoints_pts_aad207f0: "%{points} to >%{endOfRangePoints} pts"
@@ -18462,7 +18503,7 @@ en:
   count_options_loaded_cd59cc3b: "%{count} options loaded."
   type_to_search_de63ad38: Type to search
   choose_a_date_cd0263fe: Choose a date
-  that_s_not_a_date_3f350dba: That's not a date!
+  invalid_date_2a10bb7b: Invalid Date
   type_a_date_or_use_arrow_keys_to_navigate_date_pic_61f7cc86: Type a date or use arrow keys to navigate date picker.
   list_expanded_efec2d0: List expanded.
   list_collapsed_dde87718: List collapsed
@@ -19212,7 +19253,6 @@ en:
   change_existing_group_2c91a32b: Change Existing Group
   group_set_name_2aed2347: Group Set Name
   require_group_members_to_be_in_the_same_section_7f6c36af: Require group members to be in the same section
-  add_group_c84f9e9d: Add Group
   module_navigation_97043417: Module Navigation
   previous_module_item_a9e57348: Previous Module Item
   opens_in_new_window_b4b99243: opens in new window
@@ -19370,9 +19410,21 @@ en:
   allow_in_mastery_paths_5332c786: Allow in mastery paths
   delete_selected_pages_7bc50580: Delete selected pages
   pages_settings_968392a3: Pages Settings
+  sort_by_e75f9e3e: Sort By
+  page_title_ascending_b5df950c: 'Page title: Ascending'
+  page_title_descending_70c1483d: 'Page title: Descending'
+  created_ascending_cff48774: 'Created: Ascending'
+  created_descending_e9a1b097: 'Created: Descending'
+  last_edit_ascending_6a18dba4: 'Last Edit: Ascending'
+  last_edit_descending_6b7ee755: 'Last Edit: Descending'
+  to_do_date_ascending_c3a59abb: 'To-Do Date: Ascending'
+  to_do_date_descending_25b2141d: 'To-Do Date: Descending'
   select_page_e93fc123: Select page
   master_lock_590266b6: Master Lock
   select_title_for_deletion_45b08247: Select %{title} for deletion
+  edited_c4fcbdbf: 'Edited:'
+  by_b90c6b6f: By
+  to_do_date_2cb4bf7b: 'To-Do Date:'
   remove_as_front_page_2698aa12: Remove as Front Page
   use_as_front_page_274a488b: Use as Front Page
   send_page_to_another_user_6ef5a7c1: Send page to another user

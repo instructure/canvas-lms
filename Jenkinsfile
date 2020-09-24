@@ -94,6 +94,10 @@ def isPatchsetPublishable() {
 }
 
 def isPatchsetRetriggered() {
+  if(env.IS_AUTOMATIC_RETRIGGER == '1') {
+    return true
+  }
+
   def userCause = currentBuild.getBuildCauses('com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritUserCause')
 
   return userCause && userCause[0].shortDescription.contains('Retriggered')
@@ -116,8 +120,32 @@ def cleanupFn(status) {
 def postFn(status) {
   if(status == 'FAILURE') {
     maybeSlackSendFailure()
+    maybeRetrigger()
   } else if(status == 'SUCCESS') {
     maybeSlackSendSuccess()
+  }
+}
+
+def shouldPatchsetRetrigger() {
+  // NOTE: The IS_AUTOMATIC_RETRIGGER check is here to ensure that the parameter is properly defined for the triggering job.
+  // If it isn't, we have the risk of triggering this job over and over in an infinite loop.
+  return env.IS_AUTOMATIC_RETRIGGER == '0' && (
+    env.GERRIT_EVENT_TYPE == 'change-merged' ||
+    configuration.getBoolean('change-merged') && configuration.getBoolean('enable-automatic-retrigger', '0')
+  )
+}
+
+def maybeRetrigger() {
+  if(shouldPatchsetRetrigger() && !isPatchsetRetriggered()) {
+    def retriggerParams = currentBuild.rawBuild.getAction(ParametersAction).getParameters()
+
+    retriggerParams = retriggerParams.findAll { record ->
+      record.name != 'IS_AUTOMATIC_RETRIGGER'
+    }
+
+    retriggerParams << new StringParameterValue('IS_AUTOMATIC_RETRIGGER', "1")
+
+    build(job: env.JOB_NAME, parameters: retriggerParams, propagate: false, wait: false)
   }
 }
 
@@ -126,11 +154,13 @@ def maybeSlackSendFailure() {
     def branchSegment = env.GERRIT_BRANCH ? "[$env.GERRIT_BRANCH]" : ''
     def authorSlackId = env.GERRIT_EVENT_ACCOUNT_EMAIL ? slackUserIdFromEmail(email: env.GERRIT_EVENT_ACCOUNT_EMAIL, botUser: true, tokenCredentialId: 'slack-user-id-lookup') : ''
     def authorSlackMsg = authorSlackId ? "<@$authorSlackId>" : env.GERRIT_EVENT_ACCOUNT_NAME
-    def authorSegment = authorSlackMsg ? "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg}. Please acknowledge and investigate. " : ''
+    def authorSegment = "Patchset <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> by ${authorSlackMsg} failed against ${branchSegment}"
+    def extra = "Please investigate the cause of the failure, and respond to this message with your diagnosis. If you need help, don't hesitate to tag @ oncall and our on call will assist in looking at the build. Further details of our post-merge failure process can be found at this <${configuration.getFailureWiki()}|link>. Thanks!"
+
     slackSend(
       channel: getSlackChannel(),
       color: 'danger',
-      message: "${branchSegment}${env.JOB_NAME} failed on merge. ${authorSegment}(Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>)"
+      message: "${authorSegment}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n\n$extra"
     )
   }
 }
@@ -460,7 +490,13 @@ pipeline {
                 echo 'no migrations added, skipping CDC Schema check'
               }
 
-              if (!configuration.isChangeMerged() && dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) }) {
+              if (
+                !configuration.isChangeMerged() &&
+                (
+                  dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) } ||
+                  configuration.forceFailureFSC() == '1'
+                )
+              ) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {
@@ -475,21 +511,14 @@ pipeline {
                 }
               }
 
-              // // keep this around in case there is changes to the subbuilds that need to happen
-              // // and you have no other way to test it except by running a test build.
-              // stages['Test Subbuild'] = {
-              //   skipIfPreviouslySuccessful("test-subbuild") {
-              //     build(job: '/Canvas/proofs-of-concept/test-subbuild', parameters: buildParameters)
-              //   }
-              // }
-
-              // // Don't run these on all patch sets until we have them ready to report results.
-              // // Uncomment stage to run when developing.
-              // stages['Xbrowser'] = {
-              //   skipIfPreviouslySuccessful("xbrowser") {
-              //     build(job: '/Canvas/proofs-of-concept/xbrowser', propagate: false, parameters: buildParameters)
-              //   }
-              // }
+              if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
+                echo 'adding Local Docker Dev Build'
+                stages['Local Docker Dev Build'] = {
+                  skipIfPreviouslySuccessful("local-docker-dev-smoke") {
+                    wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
+                  }
+                }
+              }
 
               def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
               distribution.stashBuildScripts()
@@ -540,9 +569,9 @@ pipeline {
               def successes = load 'build/new-jenkins/groovy/successes.groovy'
               successes.markBuildAsSuccessful()
             }
-          }
-        }
-      }
-    }
-  }
-}
+          }//protectedNode
+        }//script
+      }//steps
+    }//environment
+  }//stages
+}//pipline

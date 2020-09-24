@@ -20,13 +20,10 @@
 # to run we can just copy this with a new migration ID and run it again
 
 class CopyBuiltInRolesByRootAccount < ActiveRecord::Migration[5.2]
-  tag :postdeploy
-  disable_ddl_transaction!
+  tag :predeploy
 
   def up
-    DataFixup::CopyBuiltInRolesByRootAccount.send_later_if_production_enqueue_args(:run,
-      priority: Delayed::LOW_PRIORITY,
-      n_strand: ["built_in_roles_copy_fixup", Shard.current.database_server.id])
+    DataFixup::CopyBuiltInRolesByRootAccount.run
   end
 
   def down

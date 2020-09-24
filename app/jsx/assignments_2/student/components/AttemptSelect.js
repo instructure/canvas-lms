@@ -17,17 +17,21 @@
  */
 
 import {AlertManagerContext} from '../../../shared/components/AlertManager'
-import {Assignment} from '../graphqlData/Assignment'
 import I18n from 'i18n!assignments_2'
 import React, {useContext, useEffect} from 'react'
+import PropTypes from 'prop-types'
+import uniqBy from 'lodash/uniqBy'
+import orderBy from 'lodash/orderBy'
 import {Submission} from '../graphqlData/Submission'
-import {Text} from '@instructure/ui-elements'
+import {SimpleSelect} from '@instructure/ui-simple-select'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export const getCurrentAttempt = submission => {
   return submission && submission.attempt !== 0 ? submission.attempt : 1
 }
 
-export default function Attempt({assignment, submission}) {
+export default function AttemptSelect({submission, allSubmissions, onChangeSubmission}) {
   const current_attempt = getCurrentAttempt(submission)
   const {setOnSuccess} = useContext(AlertManagerContext)
 
@@ -35,20 +39,36 @@ export default function Attempt({assignment, submission}) {
     setOnSuccess(I18n.t('Now viewing Attempt %{current_attempt}', {current_attempt}))
   }, [current_attempt, setOnSuccess])
 
+  const attemptList = orderBy(uniqBy(allSubmissions, 'attempt'), 'attempt').map(sub => {
+    return [I18n.t('Attempt %{attempt}', {attempt: sub.attempt || 1}), sub.attempt]
+  })
+
+  function handleSubmissionChange(e, selectedOption) {
+    const attempt = Number(selectedOption.value)
+    onChangeSubmission(attempt)
+  }
+
   return (
-    <Text size="medium" weight="bold" data-test-id="attempt">
-      {!assignment.allowedAttempts
-        ? I18n.t('Attempt %{current_attempt}', {current_attempt})
-        : I18n.t('Attempt %{current_attempt} of %{max_attempts}', {
-            current_attempt,
-            max_attempts: assignment.allowedAttempts.toString()
-          })}
-    </Text>
+    <View as="div" margin="0 0 medium 0">
+      <SimpleSelect
+        renderLabel={<ScreenReaderContent>{I18n.t('Attempt')}</ScreenReaderContent>}
+        width="15rem"
+        value={`${submission.attempt}`}
+        onChange={handleSubmissionChange}
+        data-testid="attemptSelect"
+      >
+        {attemptList.map(([label, attempt]) => (
+          <SimpleSelect.Option key={`${attempt}`} id={`opt-${attempt}`} value={`${attempt}`}>
+            {label}
+          </SimpleSelect.Option>
+        ))}
+      </SimpleSelect>
+    </View>
   )
 }
 
-Attempt.propTypes = {
-  assignment: Assignment.shape,
+AttemptSelect.propTypes = {
+  allSubmissions: PropTypes.arrayOf(Submission.shape),
+  onChangeSubmission: PropTypes.func.isRequired,
   submission: Submission.shape
 }
-

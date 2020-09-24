@@ -68,3 +68,8 @@ export function isAudio(type) {
 export function isText(type) {
   return /^text/.test(type)
 }
+
+export function mediaFileUrlToEmbeddedIframeUrl(media_url, content_type) {
+  const type = content_type.replace(/\/.*$/, '')
+  return `/media_objects_iframe/?type=${type}&mediahref=${encodeURIComponent(media_url)}`
+}

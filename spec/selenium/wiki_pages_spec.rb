@@ -133,7 +133,7 @@ describe "Wiki Pages" do
     it "should edit page title from pages index", priority: "1", test_id: 126849 do
       @course.wiki_pages.create!(title: 'B-Team')
       get "/courses/#{@course.id}/pages"
-      f('.al-trigger').click
+      f('tbody .al-trigger').click
       f('.edit-menu-item').click
       expect(f('.edit-control-text').attribute(:value)).to include('B-Team')
       f('.edit-control-text').clear()
@@ -145,7 +145,7 @@ describe "Wiki Pages" do
     it "should display a warning alert when accessing a deleted page", priority: "1", test_id: 126840 do
       @course.wiki_pages.create!(title: 'deleted')
       get "/courses/#{@course.id}/pages"
-      f('.al-trigger').click
+      f('tbody .al-trigger').click
       f('.delete-menu-item').click
       fj('button:contains("Delete")').click
       wait_for_ajaximations

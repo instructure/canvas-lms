@@ -1117,10 +1117,14 @@ XML
     track_file2 = @copy_to.attachments.create(folder: media_objects_folder, filename: 'media.flv.tlh.subtitles', uploaded_data: StringIO.new("Qapla'"))
     track_file2.migration_id = 'def'
     track_file2.save!
+    bad_track_file = @copy_to.attachments.create!(folder: media_objects_folder, filename: 'media.flv.bad.subtitles', uploaded_data: StringIO.new('<tt xml>'), content_type: 'text/plain')
+    bad_track_file.migration_id = 'ghi'
+    bad_track_file.save!
     data = {
       "media_tracks"=>{
         "xyz"=>[{"migration_id"=>"abc", "kind"=>"subtitles", "locale"=>"en"},
-                {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"}]
+                {"migration_id"=>"def", "kind"=>"subtitles", "locale"=>"tlh"},
+                {"migration_id"=>"ghi", "kind"=>"subtitles", "locale"=>"bad"}]
       }
     }.with_indifferent_access
 
@@ -1131,9 +1135,13 @@ XML
 
     expect(mo.media_tracks.where(locale: 'en').first.content).to eql('pretend this is a track file')
     expect(mo.media_tracks.where(locale: 'tlh').first.content).to eql("Qapla'")
+    expect(mo.media_tracks.where(locale: 'bad').first).to be_nil
+
+    expect(migration.migration_issues.map(&:description)).to include "Subtitles could not be imported from media.flv.bad.subtitles"
 
     expect(@copy_to.attachments.where(migration_id: 'abc').first).to be_deleted
     expect(@copy_to.attachments.where(migration_id: 'def').first).to be_deleted
+    expect(@copy_to.attachments.where(migration_id: 'ghi').first).to be_deleted
   end
 
   context "warnings for missing links in imported html" do

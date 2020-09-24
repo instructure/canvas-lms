@@ -40,42 +40,54 @@ describe "master courses - child courses - wiki page locking" do
     user_session(@teacher)
   end
 
-  it "should not show the edit/delete cog-menu options on the index when locked" do
-    @tag.update(restrictions: {:content => true})
+  describe "on index page" do
+    def options_panel
+      f('tbody .al-options')
+    end
 
-    get "/courses/#{@copy_to.id}/pages"
+    def options_button
+      f('tbody .al-trigger')
+    end
 
-    expect(f('.master-content-lock-cell .icon-blueprint-lock')).to be_displayed
+    it "should not show the edit/delete cog-menu options on the index when locked" do
+      @tag.update(restrictions: {:content => true})
 
-    options_button.click
-    expect(options_panel).not_to contain_css('.edit-menu-item')
-    expect(options_panel).not_to contain_css('.delete-menu-item')
+      get "/courses/#{@copy_to.id}/pages"
+
+      expect(f('.master-content-lock-cell .icon-blueprint-lock')).to be_displayed
+
+      options_button.click
+      expect(options_panel).not_to contain_css('.edit-menu-item')
+      expect(options_panel).not_to contain_css('.delete-menu-item')
+    end
+
+    it "should show the edit/delete cog-menu options on the index when not locked" do
+      get "/courses/#{@copy_to.id}/pages"
+
+      expect(f('.master-content-lock-cell .icon-blueprint')).to be_displayed
+
+      options_button.click
+      expect(options_panel).to contain_css('.edit-menu-item')
+      expect(options_panel).to contain_css('.delete-menu-item')
+    end
   end
 
-  it "should show the edit/delete cog-menu options on the index when not locked" do
-    get "/courses/#{@copy_to.id}/pages"
+  describe "on show page" do
+    it "should not show the delete option when locked" do
+      @tag.update(restrictions: {:points => true})
 
-    expect(f('.master-content-lock-cell .icon-blueprint')).to be_displayed
+      get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-    options_button.click
-    expect(options_panel).to contain_css('.edit-menu-item')
-    expect(options_panel).to contain_css('.delete-menu-item')
-  end
+      options_button.click
+      expect(options_panel).not_to contain_css('.delete_page')
+    end
 
-  it "should not show the delete option on the show page when locked" do
-    @tag.update(restrictions: {:points => true})
+    it "should show the edit/delete cog-menu options when not locked" do
+      get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
 
-    get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
-
-    options_button.click
-    expect(options_panel).not_to contain_css('.delete_page')
-  end
-
-  it "should show the edit/delete cog-menu options on the show page when not locked" do
-    get "/courses/#{@copy_to.id}/pages/#{@page_copy.url}"
-
-    expect(f('#content')).to contain_css('.edit-wiki')
-    options_button.click
-    expect(options_panel).to contain_css('.delete_page')
+      expect(f('#content')).to contain_css('.edit-wiki')
+      options_button.click
+      expect(options_panel).to contain_css('.delete_page')
+    end
   end
 end

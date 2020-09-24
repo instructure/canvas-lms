@@ -136,6 +136,11 @@ require 'csv'
 #           "description": "Content of the Terms of Service",
 #           "example": "To be or not to be that is the question",
 #           "type": "string"
+#         },
+#         "self_registration_type": {
+#           "description": "The type of self registration allowed",
+#           "example": ["none", "observer", "all"],
+#           "type": "string"
 #         }
 #       }
 #     }
@@ -448,6 +453,7 @@ class AccountsController < ApplicationController
     tos = @account.root_account.terms_of_service
     res = tos.attributes.slice(*keys)
     res['content'] = tos.terms_of_service_content&.content
+    res['self_registration_type'] = @account.self_registration_type
     render :json => res
   end
 

@@ -554,6 +554,8 @@ describe User do
 
       account1.parent_account = account2
       account1.save!
+      @course.root_account = account2
+      @course.save!
       expect(@fake_student.reload.user_account_associations).to be_empty
 
       @course.complete!
@@ -1909,6 +1911,16 @@ describe User do
       @user.email = path
       expect(@user.communication_channels.first).to be_unconfirmed
       expect(@user.email).to eq 'john@example.com'
+    end
+
+    it "allows the email casing to be updated" do
+      @user = User.create!
+      @user.email = 'EMAIL@example.com'
+      expect(@user.communication_channels.map(&:path)).to eq ['EMAIL@example.com']
+      expect(@user.email).to eq 'EMAIL@example.com'
+      @user.email = 'email@example.com'
+      expect(@user.communication_channels.map(&:path)).to eq ['email@example.com']
+      expect(@user.email).to eq 'email@example.com'
     end
   end
 

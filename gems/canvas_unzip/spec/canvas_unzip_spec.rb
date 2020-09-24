@@ -114,6 +114,14 @@ describe "CanvasUnzip" do
     end
   end
 
+  describe '.compute_uncompressed_size' do
+    it "uses the sum of sizes inside the archive" do
+      filename =fixture_filename("bigcompression.zip")
+      uncompressed_size = CanvasUnzip.compute_uncompressed_size(filename)
+      expect(uncompressed_size > File.new(filename).size).to be_truthy
+    end
+  end
+
   it_behaves_like 'it extracts archives with extension', 'zip'
   it_behaves_like 'it extracts archives with extension', 'tar'
   it_behaves_like 'it extracts archives with extension', 'tar.gz'

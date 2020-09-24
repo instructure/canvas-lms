@@ -39,7 +39,7 @@ module Canvas
         end
         Canvas::Errors.capture_exception(:core_meltdown, error)
         expect(exception).to eq(error)
-        expect(details).to eq({tags: {type: 'core_meltdown'}})
+        expect(details[:tags][:type]).to eq('core_meltdown')
       end
     end
 
@@ -95,12 +95,12 @@ module Canvas
     end
 
     it "passes through extra information if available wrapped in extra" do
-      extra_info = nil
-      Canvas::Errors.register!(:test_thing) do |_exception, details|
-        extra_info = details
+      details = nil
+      Canvas::Errors.register!(:test_thing) do |_exception, deets|
+        details = deets
       end
       Canvas::Errors.capture(double(), {detail1: 'blah'})
-      expect(extra_info).to eq({extra: {detail1: 'blah'}})
+      expect(details[:extra][:detail1]).to eq('blah')
     end
 
     it 'captures output from each callback according to their registry tag' do

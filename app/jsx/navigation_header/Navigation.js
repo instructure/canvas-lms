@@ -41,7 +41,8 @@ const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversa
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 const TYPE_URL_MAP = {
-  courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
+  courses:
+    '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
   groups: '/api/v1/users/self/groups?include[]=can_access',
   accounts: '/api/v1/accounts',
   profile: '/api/v1/users/self/tabs',

@@ -1,22 +1,29 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the ProficiencyRating component 1`] = `
-<tr>
-  <td
-    style={
-      Object {
-        "padding": "1.1rem 0 0 0",
-        "textAlign": "center",
-        "verticalAlign": "top",
-      }
-    }
+<Flex
+  alignItems="start"
+  as="span"
+  direction="row"
+  display="flex"
+  elementRef={[Function]}
+  justifyItems="start"
+  padding="0 small small small"
+  width="100%"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 medium 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+    textAlign="center"
   >
     <div
-      style={
-        Object {
-          "display": "inline-block",
-        }
-      }
+      className="mastery"
     >
       <RadioInput
         checked={false}
@@ -27,7 +34,7 @@ exports[`renders the ProficiencyRating component 1`] = `
           <ScreenReaderContent
             as="span"
           >
-            Change mastery
+            Mastery false for proficiency rating 1
           </ScreenReaderContent>
         }
         onChange={[Function]}
@@ -37,252 +44,283 @@ exports[`renders the ProficiencyRating component 1`] = `
         variant="simple"
       />
     </div>
-  </td>
-  <td
-    className="description"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="40%"
   >
-    <TextInput
-      defaultValue="Stellar"
-      display="block"
-      inputContainerRef={[Function]}
-      inputRef={[Function]}
-      isRequired={false}
-      messages={null}
-      onBlur={[Function]}
-      onChange={[Function]}
-      onFocus={[Function]}
-      renderLabel={
-        <ScreenReaderContent
-          as="span"
-        >
-          Change description
-        </ScreenReaderContent>
-      }
-      shouldNotWrap={false}
-      size="medium"
-      textAlign="start"
-      type="text"
-    />
-  </td>
-  <td
-    className="points"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
-  >
-    <TextInput
-      defaultValue="10"
-      display="block"
-      inputContainerRef={[Function]}
-      inputRef={[Function]}
-      isRequired={false}
-      messages={null}
-      onBlur={[Function]}
-      onChange={[Function]}
-      onFocus={[Function]}
-      renderLabel={
-        <ScreenReaderContent
-          as="span"
-        >
-          Change points
-        </ScreenReaderContent>
-      }
-      shouldNotWrap={false}
-      size="medium"
-      textAlign="start"
-      type="text"
-      width="4rem"
-    />
-  </td>
-  <td
-    className="color"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
-  >
-    <Popover
-      alignArrow={false}
-      constrain="window"
-      contentRef={[Function]}
-      defaultFocusElement={null}
-      defaultShow={false}
-      insertAt="bottom"
-      label={null}
-      liveRegion={null}
-      mountNode={null}
-      offsetX={0}
-      offsetY={0}
-      on="click"
-      onBlur={[Function]}
-      onClick={[Function]}
-      onDismiss={[Function]}
-      onFocus={[Function]}
-      onMouseOut={[Function]}
-      onMouseOver={[Function]}
-      onPositionChanged={[Function]}
-      onPositioned={[Function]}
-      onShow={[Function]}
-      onToggle={[Function]}
-      placement="bottom center"
-      positionTarget={null}
-      shadow="resting"
-      shouldCloseOnDocumentClick={true}
-      shouldCloseOnEscape={true}
-      shouldContainFocus={false}
-      shouldFocusContentOnTriggerBlur={false}
-      shouldRenderOffscreen={false}
-      shouldReturnFocus={true}
-      show={false}
-      stacking="topmost"
-      trackPosition={true}
-      variant="default"
-      withArrow={true}
-    >
-      <PopoverTrigger>
-        <Button
-          as="button"
-          cursor="pointer"
-          display="inline-block"
-          elementRef={[Function]}
-          margin="0"
-          size="medium"
-          textAlign="center"
-          type="button"
-          variant="link"
-          withBackground={true}
-        >
-          <div>
-            <span
-              className="colorPickerIcon"
-              style={
-                Object {
-                  "background": "#00ff00",
-                }
-              }
-            />
-            Change
-          </div>
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent>
-        <ColorPicker
-          afterClose={[Function]}
-          allowWhite={false}
-          colors={
-            Array [
-              Object {
-                "hexcode": "#BD3C14",
-                "name": "Brick",
-              },
-              Object {
-                "hexcode": "#FF2717",
-                "name": "Red",
-              },
-              Object {
-                "hexcode": "#E71F63",
-                "name": "Magenta",
-              },
-              Object {
-                "hexcode": "#8F3E97",
-                "name": "Purple",
-              },
-              Object {
-                "hexcode": "#65499D",
-                "name": "Deep Purple",
-              },
-              Object {
-                "hexcode": "#4554A4",
-                "name": "Indigo",
-              },
-              Object {
-                "hexcode": "#1770AB",
-                "name": "Blue",
-              },
-              Object {
-                "hexcode": "#0B9BE3",
-                "name": "Light Blue",
-              },
-              Object {
-                "hexcode": "#06A3B7",
-                "name": "Cyan",
-              },
-              Object {
-                "hexcode": "#009688",
-                "name": "Teal",
-              },
-              Object {
-                "hexcode": "#009606",
-                "name": "Green",
-              },
-              Object {
-                "hexcode": "#8D9900",
-                "name": "Olive",
-              },
-              Object {
-                "hexcode": "#D97900",
-                "name": "Pumpkin",
-              },
-              Object {
-                "hexcode": "#FD5D10",
-                "name": "Orange",
-              },
-              Object {
-                "hexcode": "#F06291",
-                "name": "Pink",
-              },
-            ]
-          }
-          currentColor="#00ff00"
-          focusOnMount={false}
-          hideOnScroll={false}
-          hidePrompt={true}
-          isOpen={true}
-          nonModal={true}
-          parentComponent="ProficiencyRating"
-          setStatusColor={[Function]}
-          withAnimation={false}
-          withArrow={false}
-          withBorder={false}
-          withBoxShadow={false}
-          withDarkCheck={false}
-        />
-      </PopoverContent>
-    </Popover>
     <div
-      className="delete"
+      className="description"
     >
-      <Button
+      <TextInput
+        defaultValue="Stellar"
+        display="block"
+        inputContainerRef={[Function]}
+        inputRef={[Function]}
+        isRequired={false}
+        messages={null}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
+          <ScreenReaderContent
+            as="span"
+          >
+            Change description for proficiency rating 1
+          </ScreenReaderContent>
+        }
+        shouldNotWrap={false}
+        size="medium"
+        textAlign="start"
+        type="text"
+        width="100%"
+      />
+    </div>
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+  >
+    <div
+      className="points"
+    >
+      <TextInput
+        defaultValue="10"
+        display="block"
+        inputContainerRef={[Function]}
+        inputRef={[Function]}
+        isRequired={false}
+        messages={null}
+        onBlur={[Function]}
+        onChange={[Function]}
+        onFocus={[Function]}
+        renderLabel={
+          <ScreenReaderContent
+            as="span"
+          >
+            Change points for proficiency rating 1
+          </ScreenReaderContent>
+        }
+        shouldNotWrap={false}
+        size="medium"
+        textAlign="start"
+        type="text"
+        width="4rem"
+      />
+      <div
+        aria-hidden="true"
+        className="pointsDescription"
+      >
+        points
+      </div>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <div
+      className="color"
+    >
+      <Popover
+        alignArrow={false}
+        constrain="window"
+        contentRef={[Function]}
+        defaultFocusElement={null}
+        defaultShow={false}
+        insertAt="bottom"
+        label={null}
+        liveRegion={null}
+        mountNode={null}
+        offsetX={0}
+        offsetY={0}
+        on="click"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDismiss={[Function]}
+        onFocus={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+        onPositionChanged={[Function]}
+        onPositioned={[Function]}
+        onShow={[Function]}
+        onToggle={[Function]}
+        placement="bottom center"
+        positionTarget={null}
+        shadow="resting"
+        shouldCloseOnDocumentClick={true}
+        shouldCloseOnEscape={true}
+        shouldContainFocus={false}
+        shouldFocusContentOnTriggerBlur={false}
+        shouldRenderOffscreen={false}
+        shouldReturnFocus={true}
+        show={false}
+        stacking="topmost"
+        trackPosition={true}
+        variant="default"
+        withArrow={true}
+      >
+        <PopoverTrigger>
+          <Button
+            as="button"
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
+            size="medium"
+            textAlign="center"
+            type="button"
+            variant="link"
+            withBackground={true}
+          >
+            <div>
+              <span
+                className="colorPickerIcon"
+                style={
+                  Object {
+                    "background": "#00ff00",
+                  }
+                }
+              />
+              <ScreenReaderContent
+                as="span"
+              >
+                Change color for proficiency rating 1
+              </ScreenReaderContent>
+              <span
+                aria-hidden="true"
+              >
+                Change
+              </span>
+            </div>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ColorPicker
+            afterClose={[Function]}
+            allowWhite={false}
+            colors={
+              Array [
+                Object {
+                  "hexcode": "#BD3C14",
+                  "name": "Brick",
+                },
+                Object {
+                  "hexcode": "#FF2717",
+                  "name": "Red",
+                },
+                Object {
+                  "hexcode": "#E71F63",
+                  "name": "Magenta",
+                },
+                Object {
+                  "hexcode": "#8F3E97",
+                  "name": "Purple",
+                },
+                Object {
+                  "hexcode": "#65499D",
+                  "name": "Deep Purple",
+                },
+                Object {
+                  "hexcode": "#4554A4",
+                  "name": "Indigo",
+                },
+                Object {
+                  "hexcode": "#1770AB",
+                  "name": "Blue",
+                },
+                Object {
+                  "hexcode": "#0B9BE3",
+                  "name": "Light Blue",
+                },
+                Object {
+                  "hexcode": "#06A3B7",
+                  "name": "Cyan",
+                },
+                Object {
+                  "hexcode": "#009688",
+                  "name": "Teal",
+                },
+                Object {
+                  "hexcode": "#009606",
+                  "name": "Green",
+                },
+                Object {
+                  "hexcode": "#8D9900",
+                  "name": "Olive",
+                },
+                Object {
+                  "hexcode": "#D97900",
+                  "name": "Pumpkin",
+                },
+                Object {
+                  "hexcode": "#FD5D10",
+                  "name": "Orange",
+                },
+                Object {
+                  "hexcode": "#F06291",
+                  "name": "Pink",
+                },
+              ]
+            }
+            currentColor="#00ff00"
+            focusOnMount={false}
+            hideOnScroll={false}
+            hidePrompt={true}
+            isOpen={true}
+            nonModal={true}
+            parentComponent="ProficiencyRating"
+            setStatusColor={[Function]}
+            withAnimation={false}
+            withArrow={false}
+            withBorder={false}
+            withBoxShadow={false}
+            withDarkCheck={false}
+          />
+        </PopoverContent>
+      </Popover>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 small"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="10%"
+  >
+    <div
+      className="deleteButton"
+    >
+      <IconButton
         as="button"
-        buttonRef={[Function]}
+        color="secondary"
         cursor="pointer"
         disabled={false}
-        display="inline-block"
         elementRef={[Function]}
-        icon={<IconTrashLine />}
         margin="0"
         onClick={[Function]}
+        renderIcon={<IconTrashLine />}
+        screenReaderLabel="Delete proficiency rating 1"
+        shape="rectangle"
         size="medium"
-        textAlign="center"
         type="button"
-        variant="icon"
-        withBackground={true}
-      >
-        <ScreenReaderContent
-          as="span"
-        >
-          Delete proficiency rating
-        </ScreenReaderContent>
-      </Button>
+        withBackground={false}
+        withBorder={false}
+      />
     </div>
-  </td>
-</tr>
+  </Item>
+</Flex>
 `;

@@ -23,7 +23,7 @@ import {render} from '@testing-library/react'
 import StudentViewContext from '../Context'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
-jest.mock('../Attempt')
+jest.mock('../AttemptSelect')
 
 it('renders normally', async () => {
   const props = await mockAssignmentAndSubmission()

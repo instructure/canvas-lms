@@ -19,16 +19,16 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
 import I18n from 'i18n!ProficiencyTable'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Table} from '@instructure/ui-elements'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
 import uuid from 'uuid/v1'
 import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
+import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -61,12 +61,12 @@ const configToState = data => {
     allowSave: false
   }
 }
-
-export default class ProficiencyTable extends React.Component {
+class ProficiencyTable extends React.Component {
   static propTypes = {
     proficiency: PropTypes.object,
     update: PropTypes.func.isRequired,
-    focusTab: PropTypes.func
+    focusTab: PropTypes.func,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
@@ -81,7 +81,8 @@ export default class ProficiencyTable extends React.Component {
         ]
       }
     },
-    focusTab: null
+    focusTab: null,
+    breakpoints: {}
   }
 
   constructor(props) {
@@ -263,50 +264,77 @@ export default class ProficiencyTable extends React.Component {
     return hasError
   }
 
+  renderBorder = () => {
+    return (
+      <View
+        width="100%"
+        textAlign="start"
+        margin="0 0 small 0"
+        as="div"
+        borderWidth="none none small none"
+      />
+    )
+  }
+
   invalidPoints = points => Number.isNaN(points)
 
   invalidDescription = description => !description || description.trim().length === 0
 
   render() {
     const {allowSave, masteryIndex} = this.state
+    const {breakpoints} = this.props
+    const isMobileView = breakpoints.mobileOnly
     return (
-      <div>
-        <Table caption={<ScreenReaderContent>{I18n.t('Proficiency ratings')}</ScreenReaderContent>}>
-          <thead>
-            <tr>
-              <th className="masteryCol" scope="col">
-                {I18n.t('Mastery')}
-              </th>
-              <th scope="col">{I18n.t('Proficiency Rating')}</th>
-              <th className="pointsCol" scope="col">
-                {I18n.t('Points')}
-              </th>
-              <th className="colorCol" scope="col">
-                {I18n.t('Color')}
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {this.state.rows.map((rating, index) => (
-              <ProficiencyRating
-                key={rating.get('key')}
-                color={rating.get('color')}
-                description={rating.get('description')}
-                descriptionError={rating.get('descriptionError')}
-                disableDelete={this.state.rows.size === 1}
-                focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
-                points={rating.get('points').toString()}
-                pointsError={rating.get('pointsError')}
-                mastery={index === masteryIndex}
-                onColorChange={this.handleColorChange(index)}
-                onDelete={this.handleDelete(index)}
-                onDescriptionChange={this.handleDescriptionChange(index)}
-                onMasteryChange={this.handleMasteryChange(index)}
-                onPointsChange={this.handlePointsChange(index)}
-              />
-            ))}
-          </tbody>
-        </Table>
+      <>
+        <Flex width="100%" padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}>
+          <Flex.Item size={isMobileView ? '25%' : '15%'} padding="0 medium 0 0">
+            <div aria-hidden="true" className="header">
+              {I18n.t('Mastery')}
+            </div>
+          </Flex.Item>
+          <Flex.Item size={isMobileView ? '75%' : '40%'}>
+            <div aria-hidden="true" className="header">
+              {isMobileView ? I18n.t('Proficiency Level') : I18n.t('Description')}
+            </div>
+          </Flex.Item>
+          {!isMobileView && (
+            <>
+              <Flex.Item size="15%">
+                <div aria-hidden="true" className="header">
+                  {I18n.t('Points')}
+                </div>
+              </Flex.Item>
+              <Flex.Item padding="0 0 0 small">
+                <div aria-hidden="true" className="header">
+                  {I18n.t('Color')}
+                </div>
+              </Flex.Item>
+            </>
+          )}
+        </Flex>
+        {this.renderBorder()}
+        {this.state.rows.map((rating, index) => (
+          <React.Fragment key={rating.get('key')}>
+            <ProficiencyRating
+              color={rating.get('color')}
+              description={rating.get('description')}
+              descriptionError={rating.get('descriptionError')}
+              disableDelete={this.state.rows.size === 1}
+              focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
+              points={rating.get('points').toString()}
+              pointsError={rating.get('pointsError')}
+              mastery={index === masteryIndex}
+              onColorChange={this.handleColorChange(index)}
+              onDelete={this.handleDelete(index)}
+              onDescriptionChange={this.handleDescriptionChange(index)}
+              onMasteryChange={this.handleMasteryChange(index)}
+              onPointsChange={this.handlePointsChange(index)}
+              position={index + 1}
+              isMobileView={isMobileView}
+            />
+            {this.renderBorder()}
+          </React.Fragment>
+        ))}
         <View
           width="100%"
           textAlign="start"
@@ -327,7 +355,8 @@ export default class ProficiencyTable extends React.Component {
             {I18n.t('Save Mastery Scale')}
           </Button>
         </div>
-      </div>
+      </>
     )
   }
 }
+export default WithBreakpoints(ProficiencyTable)

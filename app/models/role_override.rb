@@ -615,6 +615,34 @@ class RoleOverride < ActiveRecord::Base
          'AccountAdmin'
        ]
     },
+    :manage_proficiency_calculations => {
+       :label => lambda { t('permissions.manage_proficiency_calculations', "Manage outcome proficiency calculations") },
+       :label_v2 => lambda { t("Outcome Proficiency Calculations - add / edit") },
+       :available_to => [
+         'DesignerEnrollment',
+         'TeacherEnrollment',
+         'TeacherlessStudentEnrollment',
+         'AccountAdmin',
+         'AccountMembership'
+       ],
+       :true_for => [
+         'AccountAdmin'
+       ]
+    },
+    :manage_proficiency_scales => {
+       :label => lambda { t('permissions.manage_proficiency_scales', "Manage outcome proficiency scales") },
+       :label_v2 => lambda { t("Outcome Proficiency Scales - add / edit") },
+       :available_to => [
+         'DesignerEnrollment',
+         'TeacherEnrollment',
+         'TeacherlessStudentEnrollment',
+         'AccountAdmin',
+         'AccountMembership'
+       ],
+       :true_for => [
+         'AccountAdmin'
+       ]
+    },
     :manage_sections => {
         :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
         :label_v2 => lambda { t("Course Sections - add / edit / delete") },
@@ -1124,14 +1152,7 @@ class RoleOverride < ActiveRecord::Base
       overrides = Shard.partition_by_shard(accounts) do |shard_accounts|
         # skip loading from site admin if the role is not from site admin
         next if shard_accounts == [Account.site_admin] && role_context != Account.site_admin
-        if role.built_in?
-          # it's possible we're still migrating the root account ownership - so pull for all equivalent built in roles
-          # TODO remove after datafixup
-          RoleOverride.where(:context_id => accounts, :context_type => 'Account',
-            :role_id => Role.where(:workflow_state => 'built_in', :base_role_type => role.base_role_type).select(:id))
-        else
-          RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
-        end
+        RoleOverride.where(:context_id => accounts, :context_type => 'Account', :role_id => role)
       end
 
       accounts.reverse!

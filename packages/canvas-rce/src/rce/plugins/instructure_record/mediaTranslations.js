@@ -25,7 +25,7 @@ const uploadMediaTranslations = {
     CLOSED_CAPTIONS_CHOOSE_FILE: formatMessage('Choose caption file'),
     CLOSED_CAPTIONS_SELECT_LANGUAGE: formatMessage('Select Language'),
     COMPUTER_PANEL_TITLE: formatMessage('Computer'),
-    DRAG_DROP_CLICK_TO_BROWSE: formatMessage('Drop and drop, or click to browse your computer'),
+    DRAG_DROP_CLICK_TO_BROWSE: formatMessage('Drag and drop, or click to browse your computer'),
     DRAG_FILE_TEXT: formatMessage('Drag a file here'),
     EMBED_PANEL_TITLE: formatMessage('Embed'),
     EMBED_VIDEO_CODE_TEXT: formatMessage('Embed Code'),

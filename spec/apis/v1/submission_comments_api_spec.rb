@@ -21,6 +21,23 @@ require File.expand_path(File.dirname(__FILE__) + '/../file_uploads_spec_helper'
 
 describe 'Submissions Comment API', type: :request do
 
+  def submission_with_comment
+    course_with_student(:active_all => true)
+    teacher_in_course(:course => @course, :active_all => true)
+    @assignment = @course.assignments.create!(
+      :title => "Test Assignment",
+      :description => "public stuff"
+    )
+    @student = @course.students.first
+    @submission = @assignment.submissions.find_by(
+      :user => @student
+    )
+    @comment = @submission.submission_comments.create!(
+      :comment => "Hello world!",
+      :author => @teacher
+    )
+  end
+
   describe '#create_file' do
     before :once do
       teacher_in_course active_all: true
@@ -191,4 +208,101 @@ describe 'Submissions Comment API', type: :request do
     end
   end
 
+  describe '#update' do
+    before :once do
+      submission_with_comment
+    end
+
+    context "user does not have the permission to edit the comment" do
+      it "does not edit the submission comment" do
+        @user = @student
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/#{@comment.id}",
+                 {
+                   :controller => 'submission_comments_api',
+                   :action => 'update',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :assignment_id => @assignment.id.to_s,
+                   :user_id => @student.id.to_s,
+                   :id => @comment.to_param
+                 },
+                 {
+                   :comment => "Goodbye world!"
+                 },
+                 {},
+                 {:expected_status => 401})
+        expect(@comment.reload.comment).to eq("Hello world!")
+      end
+    end
+
+    context "user has permission to edit the comment" do
+      it "edits the submission comment" do
+        api_call(:put,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/#{@comment.id}",
+                 {
+                   :controller => 'submission_comments_api',
+                   :action => 'update',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :assignment_id => @assignment.id.to_s,
+                   :user_id => @student.id.to_s,
+                   :id => @comment.to_param
+                 },
+                 {
+                   :comment => "Goodbye world!"
+                 },
+                 {},
+                 {:expected_status => 200})
+        expect(@comment.reload.comment).to eq("Goodbye world!")
+      end
+    end
+  end
+
+  describe '#destroy' do
+    before :once do
+      submission_with_comment
+    end
+
+    context "user does not have the permission to delete the comment" do
+      it "does not delete the submission comment" do
+        @user = @student
+        api_call(:delete,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/#{@comment.id}",
+                 {
+                   :controller => 'submission_comments_api',
+                   :action => 'destroy',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :assignment_id => @assignment.id.to_s,
+                   :user_id => @student.id.to_s,
+                   :id => @comment.to_param
+                 },
+                 {},
+                 {},
+                 {:expected_status => 401})
+        expect(@submission.reload.submission_comments.length).to eq(1)
+      end
+    end
+
+    context "user has permission to delete the comment" do
+      it "deletes the submission comment" do
+        api_call(:delete,
+                 "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}/comments/#{@comment.id}",
+                 {
+                   :controller => 'submission_comments_api',
+                   :action => 'destroy',
+                   :format => 'json',
+                   :course_id => @course.id.to_s,
+                   :assignment_id => @assignment.id.to_s,
+                   :user_id => @student.id.to_s,
+                   :id => @comment.to_param
+                 },
+                 {},
+                 {},
+                 {:expected_status => 200})
+        expect(@submission.reload.submission_comments).to be_empty
+      end
+    end
+  end
 end

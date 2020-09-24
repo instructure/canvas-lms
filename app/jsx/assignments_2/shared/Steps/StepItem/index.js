@@ -24,13 +24,7 @@ import React, {Component} from 'react'
 
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Button} from '@instructure/ui-buttons'
-import {
-  IconArrowOpenEndSolid,
-  IconArrowOpenStartSolid,
-  IconCheckMarkSolid,
-  IconLockSolid,
-  IconPlusSolid
-} from '@instructure/ui-icons'
+import {IconCheckMarkSolid, IconLockSolid, IconPlusSolid} from '@instructure/ui-icons'
 import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -45,14 +39,8 @@ export const stepLabels = {
   get newAttempt() {
     return I18n.t('New Attempt')
   },
-  get next() {
-    return I18n.t('Next')
-  },
   get notGradedYet() {
     return I18n.t('Not Graded Yet')
-  },
-  get previous() {
-    return I18n.t('Previous')
   },
   get submit() {
     return I18n.t('Submit')
@@ -138,20 +126,6 @@ class StepItem extends Component {
 
     if (!icon && status === 'button') {
       switch (this.props.label) {
-        case stepLabels.previous:
-          return this.renderButton(
-            IconArrowOpenStartSolid,
-            context.prevButtonAction,
-            I18n.t('View Previous Submission'),
-            'view-previous-attempt-button'
-          )
-        case stepLabels.next:
-          return this.renderButton(
-            IconArrowOpenEndSolid,
-            context.nextButtonAction,
-            I18n.t('View Next Submission'),
-            'view-next-attempt-button'
-          )
         case stepLabels.newAttempt:
           return this.renderButton(
             IconPlusSolid,

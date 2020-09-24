@@ -191,6 +191,7 @@ class CommunicationChannelsController < ApplicationController
     # Find or create the communication channel.
     @cc ||= @user.communication_channels.by_path(params[:communication_channel][:address]).
       where(path_type: params[:communication_channel][:type]).first
+    @cc.path = params[:communication_channel][:address] if @cc
     @cc ||= @user.communication_channels.build(:path => params[:communication_channel][:address],
       :path_type => params[:communication_channel][:type])
 
@@ -262,7 +263,7 @@ class CommunicationChannelsController < ApplicationController
         @user.touch
         flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
         return respond_to do |format|
-          format.html { redirect_back_or_default(user_profile_url(@current_user)) }
+          format.html { redirect_to redirect_back_or_default(user_profile_url(@current_user)) }
           format.json { render :json => cc.as_json(:except => [:confirmation_code] ) }
         end
       end
@@ -475,7 +476,7 @@ class CommunicationChannelsController < ApplicationController
     flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
     @current_user ||= @user # since dashboard_url may need it
     respond_to do |format|
-      format.html { @enrollment ? redirect_to(course_url(@course)) : redirect_back_or_default(dashboard_url) }
+      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(dashboard_url)) }
       format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }
     end
   end

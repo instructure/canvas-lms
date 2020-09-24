@@ -51,20 +51,20 @@ describe InternetImageController do
     end
 
     it 'should update link headers to point to Canvas' do
-      stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").to_return(
+      stub_request(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats").to_return(
         status: 200,
         body: '',
         headers: {
-          'Link' => '<https://api.unsplash.com/search/photos?page=1&query=cats>; rel="first", <https://api.unsplash.com/search/photos?page=1&query=cats>; rel="prev", <https://api.unsplash.com/search/photos?page=3&query=cats>; rel="last", <https://api.unsplash.com/search/photos?page=3&query=cats>; rel="next"'
+          'Link' => '<https://api.unsplash.com/search/photos?content_filter=high&page=1&query=cats>; rel="first", <https://api.unsplash.com/search/photos?content_filter=high&page=1&query=cats>; rel="prev", <https://api.unsplash.com/search/photos?content_filter=high&page=3&query=cats>; rel="last", <https://api.unsplash.com/search/photos?content_filter=high&page=3&query=cats>; rel="next"'
         }
       )
       get 'image_search', params: {query: 'cats'}
       local_url = request.protocol + request.host_with_port
-      expect(response.headers['Link']).to eq "<#{local_url}/api/v1/image_search?page=1&query=cats>; rel=\"first\", <#{local_url}/api/v1/image_search?page=1&query=cats>; rel=\"prev\", <#{local_url}/api/v1/image_search?page=3&query=cats>; rel=\"last\", <#{local_url}/api/v1/image_search?page=3&query=cats>; rel=\"next\""
+      expect(response.headers['Link']).to eq "<#{local_url}/api/v1/image_search?content_filter=high&page=1&query=cats>; rel=\"first\", <#{local_url}/api/v1/image_search?content_filter=high&page=1&query=cats>; rel=\"prev\", <#{local_url}/api/v1/image_search?content_filter=high&page=3&query=cats>; rel=\"last\", <#{local_url}/api/v1/image_search?content_filter=high&page=3&query=cats>; rel=\"next\""
     end
 
     it 'should return only the data we specify' do
-      stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").
+      stub_request(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats").
         to_return(status: 200, body: file_fixture("unsplash.json").read, headers: {'Content-Type' => 'application/json'})
       get 'image_search', params: {query: 'cats'}
       json = JSON.parse(response.body.sub("while(1)\;", '')).first
@@ -83,7 +83,7 @@ describe InternetImageController do
     it 'should send the app key as a client id header' do
       stub_request(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").with(headers: {'Authorization': 'Client-ID key'})
       get 'image_search', params: {query: 'cats'}
-      expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?page=1&per_page=10&query=cats").
+      expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=1&per_page=10&query=cats").
         with(headers: {'Authorization': 'Client-ID key'}).once
     end
 
@@ -92,7 +92,7 @@ describe InternetImageController do
         WebMock::Config.instance.query_values_notation = :flat_array
         stub_request(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats").with(headers: {'Authorization': 'Client-ID key'})
         get 'image_search', params: {"query" => 'cats', "per_page" => 18, "page" => 2, "orientation" => 'landscape'}
-        expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?page=2&per_page=18&query=cats&orientation=landscape").
+        expect(WebMock).to have_requested(:get, "https://api.unsplash.com/search/photos?content_filter=high&page=2&per_page=18&query=cats&orientation=landscape").
           with(headers: {'Authorization': 'Client-ID key'}).once
       ensure
         WebMock::Config.instance.query_values_notation = :subscript

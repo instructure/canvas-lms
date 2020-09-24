@@ -23,7 +23,7 @@
   it cannot use our sass-direction helpers. So we have to handle RTL manually
   by putting direction-specific styles in [dir="ltr"] or [dir="rtl"] blocks.
 */
-/* stylelint-disable property-blacklist, declaration-property-value-blacklist */
+/* stylelint-disable property-disallowed-list, declaration-property-value-disallowed-list */
 
 /* good menu widths */
 .mejs-sourcechooser-selector {
@@ -105,4 +105,4 @@
   color: #21f8f8 !important;
 }
 
-/* stylelint-enable property-blacklist, declaration-property-value-blacklist */
+/* stylelint-enable property-disallowed-list, declaration-property-value-disallowed-list */

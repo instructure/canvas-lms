@@ -43,7 +43,13 @@ module Importers
       content = ''
       file.open { |data| content << data }
       mt.content = content
-      mt.save!
+      begin
+        mt.save!
+      rescue => e
+        er = Canvas::Errors.capture_exception(:import_media_tracks, e)[:error_report]
+        error_message = t('Subtitles could not be imported from %{file}', :file => file.display_name)
+        migration.add_warning(error_message, error_report_id: er)
+      end
       # remove temporary file
       file.destroy if file.full_path.starts_with?(File.join(Folder::ROOT_FOLDER_NAME, CC::CCHelper::MEDIA_OBJECTS_FOLDER) + '/')
     end

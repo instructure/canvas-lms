@@ -347,9 +347,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Dolen lusgo. Defnyddiwch y saethau i fyny ac i lawr i newid maint"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Gallwch ollwng a gollwng, neu glicio i bori drwy’ch cyfrifiadur"
-    },
     "due_5d7267be": {
         "message": "Erbyn:"
     },
@@ -520,6 +517,9 @@
     },
     "group_files_82e5dcdb": {
         "message": "Ffeiliau grŵp"
+    },
+    "group_links_9493129e": {
+        "message": "Dolenni Grwpiau"
     },
     "group_navigation_99f191a": {
         "message": "Dewislen Crwydro Grwpiau"
@@ -1069,6 +1069,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Yfory am { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Adnoddau"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "Wedi dod o hyd i { totalResults } canlyniad, { numDisplayed } canlyniad yn cael ei arddangos ar hyn o bryd"

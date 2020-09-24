@@ -18,7 +18,7 @@
 
 import I18n from 'i18n!app_shared_components_canvas_date_time'
 import React, {useRef, useState} from 'react'
-import {arrayOf, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
+import {arrayOf, bool, element, func, instanceOf, oneOfType, shape, string} from 'prop-types'
 import moment from 'moment-timezone'
 import tz from 'timezone'
 import {DateTime} from '@instructure/ui-i18n'
@@ -37,14 +37,18 @@ CanvasDateInput.propTypes = {
   timezone: string,
   formatDate: func.isRequired,
   onSelectedDateChange: func.isRequired,
-  interaction: string
+  interaction: string,
+  placement: string,
+  withRunningValue: bool
 }
 
 CanvasDateInput.defaultProps = {
   timezone: ENV?.TIMEZONE || DateTime.browserTimeZone(),
   renderLabel: I18n.t('Choose a date'),
   messages: [],
-  interaction: 'enabled'
+  interaction: 'enabled',
+  placement: 'bottom center',
+  withRunningValue: false
 }
 
 export default function CanvasDateInput({
@@ -54,7 +58,9 @@ export default function CanvasDateInput({
   timezone,
   formatDate,
   onSelectedDateChange,
-  interaction
+  interaction,
+  placement,
+  withRunningValue
 }) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate && moment.tz(selectedDate, timezone)
@@ -62,7 +68,7 @@ export default function CanvasDateInput({
   const [inputValue, setInputValue] = useState('')
   const [isShowingCalendar, setIsShowingCalendar] = useState(false)
   const [renderedMoment, setRenderedMoment] = useState(selectedMoment || todayMoment)
-  const [errorMessages, setErrorMessages] = useState([])
+  const [internalMessages, setInternalMessages] = useState([])
 
   const priorSelectedMoment = useRef(null)
   function isDifferentMoment(firstMoment, secondMoment) {
@@ -82,7 +88,7 @@ export default function CanvasDateInput({
   function syncInput(newMoment) {
     const newInputValue = newMoment ? formatDate(newMoment.toDate()) : ''
     setInputValue(newInputValue)
-    setErrorMessages([])
+    setInternalMessages([])
     setRenderedMoment(newMoment || todayMoment)
   }
 
@@ -119,12 +125,13 @@ export default function CanvasDateInput({
     setInputValue(value)
     const newDate = tz.parse(value)
     if (newDate) {
+      const msgs = withRunningValue ? [{type: 'success', text: formatDate(newDate)}] : []
       setRenderedMoment(moment.tz(newDate, timezone))
-      setErrorMessages([])
+      setInternalMessages(msgs)
     } else if (value === '') {
-      setErrorMessages([])
+      setInternalMessages([])
     } else {
-      setErrorMessages([{type: 'error', text: I18n.t("That's not a date!")}])
+      setInternalMessages([{type: 'error', text: I18n.t('Invalid Date')}])
     }
   }
 
@@ -207,7 +214,8 @@ export default function CanvasDateInput({
       value={inputValue}
       onChange={handleChange}
       isInline
-      messages={messages.concat(errorMessages)}
+      placement={placement}
+      messages={messages.concat(internalMessages)}
       isShowingCalendar={isShowingCalendar}
       onBlur={handleBlur}
       onRequestShowCalendar={() => setIsShowingCalendar(true)}

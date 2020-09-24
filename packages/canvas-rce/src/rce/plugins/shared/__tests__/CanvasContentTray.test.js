@@ -120,6 +120,21 @@ describe('RCE Plugins > CanvasContentTray', () => {
       await showTrayForPlugin('links')
       expect(getTrayLabel()).toEqual('Group Links')
     })
+
+    it('is labeled with "Group Images" when using the "images" content type', async () => {
+      await showTrayForPlugin('group_images')
+      expect(getTrayLabel()).toEqual('Group Images')
+    })
+
+    it('is labeled with "Group Media" when using the "media" content type', async () => {
+      await showTrayForPlugin('group_media')
+      expect(getTrayLabel()).toEqual('Group Media')
+    })
+
+    it('is labeled with "Group Documents" when using the "group_documents" content type', async () => {
+      await showTrayForPlugin('group_documents')
+      expect(getTrayLabel()).toEqual('Group Documents')
+    })
   })
 
   describe('content panel', () => {

@@ -25,10 +25,10 @@ import I18n from 'i18n!assignments_2_student_header_date_title'
 import React from 'react'
 import {Text, TruncateText} from '@instructure/ui-elements'
 
-export default function DateTitle({assignment, isSticky}) {
+export default function AssignmentDetails({assignment, isSticky}) {
   return (
     <>
-      <Heading margin="0 small 0 0" level="h1" as="h2" data-test-id="title">
+      <Heading margin="0 small medium 0" level="h1" as="h2" data-test-id="title">
         {/* We put 100 here because using auto maxes out at one line and the input for the assignment name never exeeds 100 */}
         <TruncateText maxLines={isSticky ? 1 : 100} truncate={isSticky ? 'character' : 'word'}>
           {assignment.name}
@@ -44,6 +44,14 @@ export default function DateTitle({assignment, isSticky}) {
           />
         </Text>
       )}
+      <div>
+        <Text size="large">
+          {I18n.t(
+            {zero: 'Unlimited Attempts', one: '1 Attempt', other: '%{count} Attempts'},
+            {count: assignment.allowedAttempts || 0}
+          )}
+        </Text>
+      </div>
       {!isSticky && (
         <div>
           <Text size="small">
@@ -55,7 +63,7 @@ export default function DateTitle({assignment, isSticky}) {
   )
 }
 
-DateTitle.propTypes = {
+AssignmentDetails.propTypes = {
   assignment: Assignment.shape,
   isSticky: bool.isRequired
 }

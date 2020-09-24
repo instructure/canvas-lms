@@ -31,6 +31,7 @@ const defaultProps = (props = {}) => ({
   onMasteryChange: () => {},
   onPointsChange: () => {},
   points: '10.0',
+  position: 1,
   ...props
 })
 
@@ -53,11 +54,9 @@ it('mastery checkbox is checked if mastery', () => {
 
 it('mastery checkbox receives focus', () => {
   const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
-      </tbody>
-    </table>
+    <div>
+      <ProficiencyRating {...defaultProps({focusField: 'mastery'})} />
+    </div>
   )
   expect(
     wrapper
@@ -69,13 +68,7 @@ it('mastery checkbox receives focus', () => {
 
 it('clicking mastery checkbox triggers change', () => {
   const onMasteryChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onMasteryChange})} />
-      </tbody>
-    </table>
-  )
+  const wrapper = mount(<ProficiencyRating {...defaultProps({onMasteryChange})} />)
   wrapper
     .find('RadioInput')
     .find('input')
@@ -91,13 +84,7 @@ it('includes the rating description', () => {
 
 it('changing description triggers change', () => {
   const onDescriptionChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onDescriptionChange})} />
-      </tbody>
-    </table>
-  )
+  const wrapper = mount(<ProficiencyRating {...defaultProps({onDescriptionChange})} />)
   wrapper
     .find('TextInput')
     .at(0)
@@ -114,13 +101,7 @@ it('includes the points', () => {
 
 it('changing points triggers change', () => {
   const onPointsChange = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onPointsChange})} />
-      </tbody>
-    </table>
-  )
+  const wrapper = mount(<ProficiencyRating {...defaultProps({onPointsChange})} />)
   wrapper
     .find('TextInput')
     .at(1)
@@ -131,16 +112,10 @@ it('changing points triggers change', () => {
 
 it('clicking delete button triggers delete', () => {
   const onDelete = jest.fn()
-  const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating {...defaultProps({onDelete})} />
-      </tbody>
-    </table>
-  )
+  const wrapper = mount(<ProficiencyRating {...defaultProps({onDelete})} />)
   wrapper
-    .find('Button')
-    .at(1)
+    .find('IconButton')
+    .at(0)
     .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(1)
 })
@@ -148,20 +123,16 @@ it('clicking delete button triggers delete', () => {
 it('clicking disabled delete button does not triggers delete', () => {
   const onDelete = jest.fn()
   const wrapper = mount(
-    <table>
-      <tbody>
-        <ProficiencyRating
-          {...defaultProps({
-            onDelete,
-            disableDelete: true
-          })}
-        />
-      </tbody>
-    </table>
+    <ProficiencyRating
+      {...defaultProps({
+        onDelete,
+        disableDelete: true
+      })}
+    />
   )
   wrapper
-    .find('Button')
-    .at(1)
+    .find('IconButton')
+    .at(0)
     .simulate('click')
   expect(onDelete).toHaveBeenCalledTimes(0)
 })

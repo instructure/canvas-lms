@@ -326,6 +326,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "should include media objects" do
+      skip 'PHO-360 (9/17/2020)'
+
       @q1 = @course.quizzes.create(:title => 'quiz1')
       @media_object = @course.media_objects.create!(
         :media_id => "some-kaltura-id",

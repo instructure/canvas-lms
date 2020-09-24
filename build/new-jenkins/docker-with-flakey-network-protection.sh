@@ -5,7 +5,7 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 EXIT_CODE=0
 PULL_RESULT=$(docker $1 $2 2>&1) || EXIT_CODE=$?
 
-if [[ $PULL_RESULT =~ (TLS handshake timeout|unknown blob|i/o timeout|Internal Server Error|error pulling image configuration) ]]; then
+if [[ $PULL_RESULT =~ (TLS handshake timeout|unknown blob|i/o timeout|Internal Server Error|error pulling image configuration|exceeded while awaiting headers) ]]; then
   sleep 10
 
   EXIT_CODE=0

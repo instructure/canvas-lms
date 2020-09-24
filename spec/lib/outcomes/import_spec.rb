@@ -430,6 +430,7 @@ RSpec.describe Outcomes::Import do
 
         before do
           context.update! parent_account: parent_context
+          LearningOutcomeGroup.where(root_account: context).update_all(root_account_id: parent_context.id) if parent_context
           existing_outcome.update! context: parent_context
         end
 

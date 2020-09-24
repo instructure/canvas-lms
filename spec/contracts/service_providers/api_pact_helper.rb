@@ -36,4 +36,7 @@ RSpec.configure do |config|
   config.before(:context, :pact) do
     WebMock.disable_net_connect!(allow: ['localhost'])
   end
+  config.after(:context, :pact) do
+    WebMock.enable_net_connect!
+  end
 end

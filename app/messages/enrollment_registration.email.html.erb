@@ -1,23 +1,14 @@
-<% define_content :link do %>
-  <%= course_url(asset.course, invitation: asset.uuid) %>
-<% end %>
-
 <% define_content :subject do %>
   <%= t :subject, "Course Invitation" %>
 <% end %>
 
-<% define_content :footer_link do %>
-  <a href="<%= content(:link) %>">
-    <%= t(:link, "Click here to view the course page") %>
-  </a>
-<% end %>
+<% remove_profile_url_in_layout = true %>
 
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
-<% website = HostUrl.context_host(asset.course) %>
 
 <p>
-  <%= t :body, "You've been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}",
-      :website => website, :course => asset.course.name, :role_type => asset.readable_role_name %>
+  <%= t :body, "You've been invited to participate in a class at %{account}.  The class is called %{course}. Course role: %{role_type}",
+      :account => asset.course.account.name, :course => asset.course.name, :role_type => asset.readable_role_name %>
 </p>
 
 <table border="0" style="font-size: 14px; color: #444444;

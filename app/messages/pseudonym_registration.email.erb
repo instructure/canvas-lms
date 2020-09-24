@@ -8,6 +8,8 @@
   <%= t :subject, "Finish Registration: Canvas" %>
 <% end %>
 
+<% remove_profile_url_in_layout = true %>
+
 <%= t :body, "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process.", :account => p.account.display_name %>
 
 <%= t :link_message, "To finish the registration process, please visit the following url:" %>

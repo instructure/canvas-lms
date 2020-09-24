@@ -31,4 +31,13 @@ describe 'pseudonym_registration' do
   let(:notification_name) { :pseudonym_registration }
 
   include_examples "a message"
+
+  it "removes profile url link" do
+    include MessagesCommon
+    Notification.find_or_create_by!(category: "Registration", name: notification_name)
+    msg = generate_message(notification_name, :email, asset, message_data)
+    expect(msg.html_body).to include "for a Canvas account at Default Account!"
+    expect(msg.html_body).not_to include "Update your notification settings"
+    expect(msg.body).not_to include 'To change or turn off email notifications,'
+  end
 end
