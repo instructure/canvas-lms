@@ -271,16 +271,4 @@ class AccessToken < ActiveRecord::Base
   def manually_created?
     developer_key_id == DeveloperKey.default.id
   end
-
-  class CacheDeveloperKeyOnAssociation < ActiveRecord::Associations::BelongsToAssociation
-    def find_target
-      DeveloperKey.find_cached(target_id)
-    end  
-  end
-
-  reflections['developer_key'].instance_eval do
-    def association_class
-      CacheDeveloperKeyOnAssociation
-    end
-  end
 end

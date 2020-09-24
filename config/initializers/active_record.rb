@@ -534,6 +534,14 @@ class ActiveRecord::Base
 
     reflection = super[name.to_s]
 
+    if name.to_s == 'developer_key'
+      reflection.instance_eval do
+        def association_class
+          DeveloperKey::CacheOnAssociation
+        end
+      end
+    end
+
     include Canvas::RootAccountCacher if name.to_s == 'root_account'
     Canvas::AccountCacher.apply_to_reflections(self)
 
