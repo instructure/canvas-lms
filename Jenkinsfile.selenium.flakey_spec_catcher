@@ -85,6 +85,12 @@ def computeTestCount() {
 
   echo "raw result from catcher: \n====\n$changed_tests\n===="
 
+  if(changed_tests.length() == 0) {
+    echo "no tests found to execute"
+
+    return
+  }
+
   def changed_tests_arr = changed_tests.split('\n')
   def test_count = changed_tests_arr.length
 
