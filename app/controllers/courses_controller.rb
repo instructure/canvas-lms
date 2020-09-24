@@ -3115,6 +3115,8 @@ class CoursesController < ApplicationController
       @fake_student.all_submissions.preload(:all_submission_comments, :submission_drafts, :lti_result, :versions).destroy_all
       @fake_student.quiz_submissions.each{|qs| qs.events.destroy_all}
       @fake_student.quiz_submissions.destroy_all
+      @fake_student.learning_outcome_results.preload(:artifact).each { |lor| lor.artifact.destroy }
+      @fake_student.learning_outcome_results.destroy_all
 
       flash[:notice] = t('notices.reset_test_student', "The test student has been reset successfully.")
       enter_student_view

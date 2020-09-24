@@ -2825,6 +2825,24 @@ describe CoursesController do
 
       expect(assignment.needs_grading_count).to eq original_needs_grading_count - 1
     end
+
+    it 'removes outcome results for the test student' do
+      user_session(@teacher)
+      outcome_with_rubric(course: @course)
+      rubric_association_model(rubric: @rubric)
+
+      test_student = @course.student_view_student
+      session[:become_user_id] = test_student.id
+      rubric_assessment_model(rubric_association: @rubric_association, user: test_student)
+      expect(test_student.learning_outcome_results.size).not_to be_zero
+      expect(@outcome.assessed?).to be_truthy
+
+      delete 'reset_test_student', params: {course_id: @course.id}
+
+      test_student.reload
+      expect(test_student.learning_outcome_results.size).to be_zero
+      expect(@outcome.assessed?).to be_falsey
+    end
   end
 
   describe 'GET #permissions' do
