@@ -20,6 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe Auditors::GradeChange do
+  before(:all) do
+    Auditors::ActiveRecord::Partitioner.process
+  end
 
   let(:request_id) { 42 }
 
