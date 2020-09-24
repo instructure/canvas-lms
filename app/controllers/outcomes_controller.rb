@@ -30,8 +30,7 @@ class OutcomesController < ApplicationController
     log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if (common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil))
-      common_core_group_id = common_core_group_id.to_i
+    if (common_core_group_id = Shard.current.settings[:common_core_outcome_group_id])
       common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
     end
 
