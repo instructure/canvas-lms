@@ -107,12 +107,6 @@ def stashSpecFailures(prefix, index) {
   }
 }
 
-def stashSpecResults(prefix, index) {
-  dir("tmp") {
-    stash name: "${prefix}_spec_results_${index}", includes: 'rspec_results/**/*', allowEmpty: true
-  }
-}
-
 def stashParallelLogs(prefix, index) {
   dir("tmp") {
     stash name: "${prefix}_spec_parallel_${index}", includes: 'parallel_runtime_rspec_tests/**/*.log'
@@ -238,24 +232,6 @@ def extractSnykReports(projectContainer, projectDirectory, destinationDirectory)
     docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
     docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
   """
-}
-
-def publishJunitReport(prefix, total) {
-  def working_dir = "${prefix}_compiled_results"
-  dir("spec_results") {
-    sh "mkdir -p $working_dir"
-    dir("${working_dir}") {
-      for(int index = 0; index < total; index++) {
-        dir ("node_${index}") {
-          try {
-            unstash "${prefix}_spec_results_${index}"
-          } catch(err) {
-            println (err)
-          }
-        }
-      }
-    }
-  }
 }
 
 def copyParallelLogs(rspecTotal, seleniumTotal) {

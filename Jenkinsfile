@@ -111,7 +111,6 @@ def cleanupFn(status) {
   ignoreBuildNeverStartedError {
     try {
       def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-      rspec.uploadJunitReports()
       rspec.uploadSeleniumFailures()
       rspec.uploadRSpecFailures()
       load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()

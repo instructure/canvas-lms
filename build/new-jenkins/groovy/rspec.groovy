@@ -118,7 +118,16 @@ def _runRspecTestSuite(
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
       def reports = load 'build/new-jenkins/groovy/reports.groovy'
       reports.stashSpecFailures(prefix, index)
-      reports.stashSpecResults(prefix, index)
+
+      // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
+      def preStatus = currentBuild.getResult()
+
+      junit allowEmptyResults: true, testResults: "tmp/rspec_results/**/*.xml"
+
+      if(currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
+        currentBuild.rawBuild.@result = preStatus
+      }
+
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
@@ -161,27 +170,6 @@ def _uploadSpecFailures(prefix, total, test_name) {
   def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
   if (!successes.hasSuccessOrBuildIsSuccessful(prefix, total)) {
     reports.appendFailMessageReport("Spec Failure For $prefix", report_url)
-  }
-}
-
-def uploadSeleniumJunit() {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  reports.publishJunitReport('selenium', seleniumConfig().node_total)
-}
-
-def uploadRspecJunit() {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  reports.publishJunitReport('rspec', rspecConfig().node_total)
-}
-
-def uploadJunitReports() {
-  uploadSeleniumJunit()
-  uploadRspecJunit()
-  def preStatus = currentBuild.getResult()
-  junit allowEmptyResults: true, testResults: "spec_results/**/*.xml"
-  // junit publishing will set build status to unstable if failed tests found, if so set it back to SUCCESS
-  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
-    currentBuild.rawBuild.@result = hudson.model.Result.SUCCESS
   }
 }
 
