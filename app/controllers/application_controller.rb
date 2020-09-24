@@ -1738,7 +1738,6 @@ class ApplicationController < ActionController::Base
 
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
-
         @resource_title = @assignment.title
         @module_tag = params[:module_item_id] ?
           @context.context_module_tags.not_deleted.find(params[:module_item_id]) :
@@ -1749,9 +1748,6 @@ class ApplicationController < ActionController::Base
       end
       @resource_url = @tag.url
       @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
-
-      @assignment&.prepare_for_ags_if_needed!(@tool)
-
       tag.context_module_action(@current_user, :read)
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
