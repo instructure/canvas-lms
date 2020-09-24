@@ -154,13 +154,11 @@ module AcademicBenchmark
   def self.set_common_core_setting!
     if (guid = AcademicBenchmark.config[:common_core_guid])
       if (group = LearningOutcomeGroup.where(migration_id: guid).first)
-        Setting.set(common_core_setting_key, group.id)
+        s = Shard.current
+        s.settings[:common_core_outcome_group_id] = group.id
+        s.save!
       end
     end
-  end
-
-  def self.common_core_setting_key
-    "common_core_outcome_group_id:#{Shard.current.id}"
   end
 
   def self.api_handle
