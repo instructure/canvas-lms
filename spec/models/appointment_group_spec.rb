@@ -75,6 +75,17 @@ describe AppointmentGroup do
     end
   end
 
+  context 'broadcast_data' do
+    it 'should include course_id if the context is a course' do
+      course_with_student(:active_all => true)
+      group = AppointmentGroup.new(:title => "test")
+      group.contexts = [@course]
+      group.save!
+
+      expect(group.broadcast_data).to eql({root_account_id: @course.root_account_id, course_id: @course.id})
+    end
+  end
+
   context "add context" do
     let_once(:course1) { course_factory(active_all: true) }
 
