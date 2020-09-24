@@ -28,6 +28,7 @@ class AccountNotification < ActiveRecord::Base
 
   after_save :create_alert
   after_save :queue_message_broadcast
+  after_save :clear_cache
 
   ACCOUNT_SERVICE_NOTIFICATION_FLAGS = %w[account_survey_notifications]
   validates_inclusion_of :required_account_service, in: ACCOUNT_SERVICE_NOTIFICATION_FLAGS, allow_nil: true
@@ -171,37 +172,72 @@ class AccountNotification < ActiveRecord::Base
     end
   end
 
+  def self.cache_key_for_root_account(root_account_id, date)
+    ['root_account_notifications', Shard.global_id_for(root_account_id), date.strftime('%Y-%m-%d')].cache_key
+  end
+
   def self.for_account(root_account, all_visible_account_ids=nil, include_past: false)
-    # Refreshes every 10 minutes at the longest
-    all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
-    Rails.cache.fetch(['account_notifications4', root_account, all_account_ids_hash].cache_key, expires_in: 10.minutes) do
+    account_ids = root_account_ids = root_account.account_chain(include_site_admin: true).map(&:id)
+    if all_visible_account_ids
+      account_ids += all_visible_account_ids
+      account_ids.uniq!
+    end
+    all_visible_account_ids = nil if account_ids == root_account_ids
+
+    block = ->(_key) do
       now = Time.now.utc
+      start_at = include_past ? now : now.end_of_day
+
       end_at = now - 4.months if include_past
-      end_at ||= now
+      end_at ||= start_at
+      end_at = end_at.beginning_of_day
 
       # we always check the given account for the flag, even if the announcement is from the site_admin account
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & root_account.allowed_services_hash.keys.map(&:to_s)
-      account_ids = root_account.account_chain(include_site_admin: true).map(&:id)
-      if all_visible_account_ids
-        account_ids += all_visible_account_ids
-        account_ids.uniq!
+
+      result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
+        load_by_account = ->(slice_account_ids) do
+          scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at).
+            where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
+            order('start_at DESC').
+            preload({:account => :root_account}, account_notification_roles: :role)
+          if Shard.current == root_account.shard
+            if slice_account_ids != [root_account.id]
+              scope = scope.joins(:account).where("domain_specific=? OR COALESCE(accounts.root_account_id, accounts.id)=?", false, root_account.id)
+            end
+          else
+            scope = scope.where(domain_specific: false)
+          end
+          scope.to_a
+        end
+
+        # all root accounts; do them one by one, and MultiCache them
+        if (sharded_account_ids - root_account_ids).empty? && !include_past
+          sharded_account_ids.map do |single_root_account_id|
+            MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at)) do
+              load_by_account.call([single_root_account_id])
+            end
+          end.flatten
+        else
+          load_by_account.call(sharded_account_ids)
+        end
       end
 
-      Shard.partition_by_shard(account_ids) do |sharded_account_ids|
-        scope = AccountNotification.where("account_id IN (?) AND start_at <? AND end_at>?", sharded_account_ids, now, end_at).
-          where("required_account_service IS NULL OR required_account_service IN (?)", enabled_flags).
-          order('start_at DESC').
-          preload({:account => :root_account}, account_notification_roles: :role)
-        if Shard.current == root_account.shard
-          # get the sub-account ids that are directly from the current root account
-          domain_account_ids = Account.where(:id => sharded_account_ids, :root_account_id => root_account.id).pluck(:id) + [root_account.id]
-          scope = scope.where("domain_specific = ? OR account_id IN (?)", false, domain_account_ids)
-        else
-          scope = scope.where(:domain_specific => false)
-        end
-        scope.to_a
+      # need to post-process since the cache covers the entire day
+      unless include_past
+        result.select! { |n| n.start_at <= now && n.end_at >= now }
       end
+      result
+    end
+
+    if all_visible_account_ids || include_past
+      # Refreshes every 10 minutes at the longest    
+      all_account_ids_hash = Digest::MD5.hexdigest all_visible_account_ids.try(:sort).to_s
+      Rails.cache.fetch(['account_notifications5', root_account, all_account_ids_hash, include_past].cache_key, expires_in: 10.minutes, &block)
+    else
+      # no point in doing an additional layer of caching for _only_ root accounts when root accounts are explicitly cached
+      block.call(nil)
     end
   end
 
@@ -253,6 +289,13 @@ class AccountNotification < ActiveRecord::Base
         :singleton => "account_notification_broadcast_messages:#{self.global_id}",
         :max_attempts => 1})
     end
+  end
+
+  def clear_cache
+    # yes, I could be smarter about only clearing this if the date is in range, and a relevant field changed,
+    # but that is several complicated conditions, and these rarely change, so shouldn't be a big deal
+    # to just let the cache clear
+    MultiCache.delete(self.class.cache_key_for_root_account(account_id, Time.now.utc)) if account.root_account?
   end
 
   def self.users_per_message_batch
