@@ -110,8 +110,9 @@ class Auditors::Course
   end
 
   Stream = Auditors.stream do
+    course_ar_type = Auditors::ActiveRecord::CourseRecord
     backend_strategy -> { Auditors.backend_strategy }
-    active_record_type Auditors::ActiveRecord::CourseRecord
+    active_record_type course_ar_type
     database -> { Canvas::Cassandra::DatabaseBuilder.from_config(:auditors) }
     table :courses
     record_type Auditors::Course::Record
@@ -121,14 +122,14 @@ class Auditors::Course
       table :courses_by_course
       entry_proc lambda{ |record| record.course }
       key_proc lambda{ |course| course.global_id }
-      ar_conditions_proc lambda { |course| { course_id: course.id } }
+      ar_scope_proc lambda { |course| course_ar_type.where(course_id: course.id) }
     end
 
     add_index :account do
       table :courses_by_account
       entry_proc lambda{ |record| record.account }
       key_proc lambda{ |account| account.global_id }
-      ar_conditions_proc lambda { |account| { account_id: account.id } }
+      ar_scope_proc lambda { |account| course_ar_type.where(account_id: account.id) }
     end
   end
 

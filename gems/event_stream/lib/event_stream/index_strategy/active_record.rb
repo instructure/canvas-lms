@@ -37,7 +37,7 @@ module EventStream::IndexStrategy
 
     def for_ar_scope(args, options={})
       ar_type = index.event_stream.active_record_type
-      index_scope = ar_type.where(index.ar_conditions_proc.call(*args))
+      index_scope = index.ar_scope_proc.call(*args)
       index_scope = index_scope.where("created_at >= ?", options[:oldest]) if options[:oldest].present?
       index_scope = index_scope.where("created_at <= ?", options[:newest]) if options[:newest].present?
       index_scope = index_scope.select(:id, :created_at) if options[:just_ids] == true
