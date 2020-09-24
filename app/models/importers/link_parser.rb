@@ -171,7 +171,7 @@ module Importers
       file.binmode
       file.write(image_data)
       file.close
-      attachment = FileInContext.attach(context, file.path, filename, @folder, filename, false, md5)
+      attachment = FileInContext.attach(context, file.path, display_name: filename, folder: @folder, explicit_filename: filename, md5: md5)
       resolved("#{context_path}/files/#{attachment.id}/preview")
     rescue
       unresolved(:file, rel_path: "#{folder_name}/#{filename}")

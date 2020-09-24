@@ -2490,6 +2490,72 @@ describe MasterCourses::MasterMigration do
       expect(sub.reload.cached_due_date.to_i).to eq due_at.to_i
     end
 
+    context "attachment migration id preservation" do
+      def run_course_copy(copy_from, copy_to)
+        @cm = ContentMigration.new(:context => copy_to, :user => @user, :source_course => copy_from,
+          :migration_type => 'course_copy_importer', :copy_options => {:everything => "1"})
+        @cm.migration_settings[:import_immediately] = true
+        @cm.set_default_settings
+        @cm.save!
+        worker = Canvas::Migration::Worker::CourseCopyWorker.new
+        worker.perform(@cm)
+      end
+
+      it "should not overwrite blueprint attachment migration ids from other course copies" do
+        att = Attachment.create!(:filename => 'first.txt', :uploaded_data => StringIO.new('ohai'), :folder => Folder.unfiled_folder(@copy_from), :context => @copy_from)
+
+        @copy_to = course_factory(:active_all => true)
+        @sub = @template.add_child_course!(@copy_to)
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).take
+
+        @other_copy_from = course_factory(:active_all => true)
+        run_course_copy(@copy_from, @other_copy_from)
+        impostor_att = @other_copy_from.attachments.last
+
+        run_course_copy(@other_copy_from, @copy_to)
+        expect(att_to.reload.migration_id).to eq mig_id(att) # should not have changed
+
+        impostor_att_to = @copy_to.attachments.where(:migration_id => CC::CCHelper.create_key(impostor_att, global: true)).first
+        expect(impostor_att_to.id).to_not eq att_to.id # should make a copy
+      end
+
+      def import_package(course)
+        cm = ContentMigration.create!(context: course, user: @user)
+        cm.migration_type = 'canvas_cartridge_importer'
+        cm.migration_settings['import_immediately'] = true
+        cm.save!
+
+        package_path = File.join(File.dirname(__FILE__) + "/../../fixtures/migration/canvas_attachment.zip")
+        attachment = Attachment.create!(:context => cm, :uploaded_data => File.open(package_path, 'rb'), :filename => 'file.zip')
+        cm.attachment = attachment
+        cm.save!
+        cm.queue_migration
+        run_jobs
+      end
+
+      it "should not overwrite blueprint attachment migration ids from other canvas package imports" do
+        import_package(@copy_from)
+        att = @copy_from.attachments.first
+
+        course_factory(:active_all => true)
+        @copy_to = @course
+        @sub = @template.add_child_course!(@copy_to)
+
+        run_master_migration
+
+        att_to = @copy_to.attachments.where(:migration_id => mig_id(att)).take
+
+        import_package(@copy_to)
+        expect(att_to.reload.migration_id).to eq mig_id(att) # should not have changed
+
+        impostor_att_to = @copy_to.attachments.where(:migration_id => att.migration_id).first # package should make a copy
+        expect(impostor_att_to.id).to_not eq att_to.id
+      end
+    end
+
     context "caching" do
       specs_require_cache(:redis_cache_store)
 

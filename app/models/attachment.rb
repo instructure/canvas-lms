@@ -300,6 +300,7 @@ class Attachment < ActiveRecord::Base
     existing = context.attachments.active.find_by_id(self)
 
     options[:cloned_item_id] ||= self.cloned_item_id
+    options[:migration_id] ||= CC::CCHelper.create_key(self)
     existing ||= Attachment.find_existing_attachment_for_clone(context, options.merge(:active_only => true))
     return existing if existing && !options[:overwrite] && !options[:force_copy]
     existing ||= Attachment.find_existing_attachment_for_clone(context, options)
@@ -331,7 +332,7 @@ class Attachment < ActiveRecord::Base
       end
     end
     dup.write_attribute(:filename, self.filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
-    dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
+    dup.migration_id = options[:migration_id]
     dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
@@ -355,7 +356,7 @@ class Attachment < ActiveRecord::Base
     if options[:migration_id] && options[:match_on_migration_id]
       scope.where(migration_id: options[:migration_id]).first
     elsif options[:cloned_item_id]
-      scope.where(cloned_item_id: options[:cloned_item_id]).first
+      scope.where(cloned_item_id: options[:cloned_item_id]).where(migration_id: [nil, options[:migration_id]]).first
     end
   end
 

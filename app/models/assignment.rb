@@ -2363,7 +2363,7 @@ class Assignment < ActiveRecord::Base
 
     files_for_user.each do |user, files|
       attachments = files.map do |g|
-        FileInContext.attach(self, g[:filename], g[:display_name])
+        FileInContext.attach(self, g[:filename], display_name: g[:display_name])
       end
 
       comment_attr = {

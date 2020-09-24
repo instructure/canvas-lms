@@ -40,11 +40,23 @@ class FileInContext
       end
     end
 
-    def attach(context, filename, display_name=nil, folder=nil, explicit_filename=nil, allow_rename = false, md5=nil)
+    def attach(context, filename, display_name: nil, folder: nil, explicit_filename: nil, allow_rename: false, md5: nil, migration_id: nil)
       display_name ||= File.split(filename).last
       if md5 && folder && !allow_rename
-        existing_att = context.attachments.where(:display_name => display_name, :folder => folder, :md5 => md5).not_deleted.first
-        return existing_att if existing_att
+        scope = context.attachments.where(:display_name => display_name, :folder => folder, :md5 => md5).not_deleted
+        if migration_id
+          scope = scope.where(:migration_id => [migration_id, nil]) # either find a previous copy or an unassociated match
+        end
+        existing_att = scope.take
+
+        if existing_att
+          if migration_id && existing_att.migration_id.nil? # can set an existing unassociated attachment to the new migration_id
+            existing_att.update_attribute(:migration_id, migration_id)
+          end
+          return existing_att
+        elsif migration_id
+          allow_rename = true # prevent overwriting if there's an existing matching filename that has a different migration_id
+        end
       end
 
       uploaded_data = Rack::Test::UploadedFile.new(filename, Attachment.mimetype(explicit_filename || filename))
@@ -52,6 +64,7 @@ class FileInContext
       @attachment = Attachment.new(:context => context, :display_name => display_name, :folder => folder)
       Attachments::Storage.store_for_attachment(@attachment, uploaded_data)
       @attachment.filename = explicit_filename if explicit_filename
+      @attachment.migration_id = migration_id
       @attachment.set_publish_state_for_usage_rights
       @attachment.save!
 

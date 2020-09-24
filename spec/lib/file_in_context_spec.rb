@@ -39,7 +39,7 @@ describe FileInContext do
       unbound_method = Attachment.instance_method(:filename=)
       class Attachment; def filename=(new_name); write_attribute :filename, sanitize_filename(new_name); end; end
       filename = File.expand_path(File.join(File.dirname(__FILE__), %w(.. fixtures files escaping_test[0].txt)))
-      attachment = FileInContext.attach(@course, filename, nil, @folder)
+      attachment = FileInContext.attach(@course, filename, folder: @folder)
       expect(attachment.filename).to eq 'escaping_test%5B0%5D.txt'
       expect(attachment).to be_published
       Attachment.send(:define_method, :filename=, unbound_method)
