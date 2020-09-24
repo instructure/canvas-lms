@@ -72,7 +72,8 @@ class AssetUserAccessLog
 
   MODEL_BY_DAY_OF_WEEK_INDEX = [
     AuaLog0, AuaLog1, AuaLog2, AuaLog3, AuaLog4, AuaLog5, AuaLog6
-  ]
+  ].freeze
+  METADATUM_KEY = "aua_logs_compaction_state".freeze
 
   def self.put_view(asset_user_access, timestamp: nil)
     # the "timestamp:" argument is useful for testing or backfill/replay
@@ -105,6 +106,14 @@ class AssetUserAccessLog
     PluginSetting.find_by_name(:asset_user_access_logs)
   end
 
+  def self.metadatum_payload
+    CanvasMetadatum.get(METADATUM_KEY, {max_log_ids: [0,0,0,0,0,0,0]})
+  end
+
+  def self.update_metadatum(compaction_state)
+    CanvasMetadatum.set(METADATUM_KEY, compaction_state)
+  end
+
   # This is the job component, taking the inserts that have
   # accumulated and writing them to the AUA records they actually
   # belong to with as few updates as possible.  This should help control
@@ -125,7 +134,11 @@ class AssetUserAccessLog
     if yesterday_model.take(1).size > 0
       yesterday_completed = compact_partition(yesterday_ts)
       ps.reload
-      if yesterday_completed && ps.settings[:max_log_ids][yesterday_ts.wday] >= yesterday_model.maximum(:id)
+      compaction_state = self.metadatum_payload
+      # TODO: once iterator state is fully transitioned to the metadatum, we can remove
+      # the PluginSetting "settings" state entirely.
+      max_yesterday_id = [compaction_state[:max_log_ids][yesterday_ts.wday], ps.settings[:max_log_ids][yesterday_ts.wday]].max
+      if yesterday_completed && max_yesterday_id >= yesterday_model.maximum(:id)
         # we have now compacted all the writes from the previous day.
         # since the timestamp (now) is into the NEXT utc day, no further
         # writes can happen to yesterdays partition, and we can truncate it,
@@ -134,13 +147,19 @@ class AssetUserAccessLog
         # "reset" by looking for the max id value in a table and making it bigger than that.
         #  Tracking iterator state indefinitely could result in missing writes if a truncated
         # table gets it's iterator reset).
-        if truncation_enabled?
-          Shackles.activate(:deploy) do
-            yesterday_model.connection.truncate(yesterday_model.table_name)
-          end
-          PluginSetting.suspend_callbacks(:clear_cache) do
-            ps.settings[:max_log_ids][yesterday_ts.wday] = 0
-            ps.save
+        yesterday_model.transaction do
+          if truncation_enabled?
+            Shackles.activate(:deploy) do
+              yesterday_model.connection.truncate(yesterday_model.table_name)
+            end
+            # TODO: once iterator state is fully transitioned to the metadatum, we can remove
+            # the PluginSetting "settings" state entirely.
+            PluginSetting.suspend_callbacks(:clear_cache) do
+              ps.settings[:max_log_ids][yesterday_ts.wday] = 0
+              ps.save
+            end
+            compaction_state[:max_log_ids][yesterday_ts.wday] = 0
+            self.update_metadatum(compaction_state)
           end
         end
       end
@@ -184,7 +203,7 @@ class AssetUserAccessLog
       # "just a few more"
       partition_upper_bound = partition_model.maximum(:id)
       partition_lower_bound = partition_model.minimum(:id)
-      # fetch from the plugin setting the last compacted log id.  This lets us
+      # fetch from the canvas metadatum compaction state the last compacted log id.  This lets us
       # resume log compaction past the records we've already processed, but without
       # having to delete records as we go (which would churn write IO), leaving the log cleanup
       # to the truncation operation that occurs after finally processing "yesterdays" partition.
@@ -193,7 +212,11 @@ class AssetUserAccessLog
       # deciding we already chomped these logs).
       ps = plugin_setting
       max_log_ids = ps.reload.settings.fetch(:max_log_ids, [0,0,0,0,0,0,0])
-      log_id_bookmark = [(partition_lower_bound-1), (max_log_ids[ts.wday] || 0)].max
+      # TODO: once iterator state is fully transitioned to the metadatum, we can remove
+      # the PluginSetting "settings" state entirely.
+      compaction_state = self.metadatum_payload
+      state_max_log_ids = compaction_state.fetch(:max_log_ids, [0,0,0,0,0,0,0])
+      log_id_bookmark = [(partition_lower_bound-1), (max_log_ids[ts.wday] || 0), (state_max_log_ids[ts.wday])].max
       while log_id_bookmark < partition_upper_bound
         Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - processing #{log_id_bookmark} from #{partition_upper_bound}")
         # maybe we won't need this, but if we need to slow down throughput and don't want to hold
@@ -217,17 +240,21 @@ class AssetUserAccessLog
               Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - batch updating (sometimes these queries don't get logged)...")
               partition_model.connection.execute(update_query)
               Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - ...batch update complete")
-              # Here we want to write the iteration state onto the plugin setting
+              # Here we want to write the iteration state into the database
               # so that we don't double count rows later.  The next time the job
               # runs it can pick up at this point and only count rows that haven't yet been counted.
               ps.reload
               # also, no need to clear the cache, these are LOCAL
               # plugin settings, so let's not beat up consul
+              # TODO: once iterator state is fully transitioned to the metadatum, we can remove
+              # the PluginSetting "settings" state entirely.
               PluginSetting.suspend_callbacks(:clear_cache) do
                 ps.settings[:max_log_ids] ||= [0,0,0,0,0,0,0] # (just in case...)
                 ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
                 ps.save
               end
+              compaction_state[:max_log_ids][ts.wday] = new_iterator_pos
+              self.update_metadatum(compaction_state)
             end
           end
           log_id_bookmark = new_iterator_pos
@@ -260,9 +287,15 @@ class AssetUserAccessLog
           # to just under it's ID
           new_bookmark_id = next_id - 1
           Shackles.activate(:master) do
-            PluginSetting.suspend_callbacks(:clear_cache) do
-              ps.reload.settings[:max_log_ids][ts.wday] = new_bookmark_id
-              ps.save
+            partition_model.transaction do
+              # TODO: once iterator state is fully transitioned to the metadatum, we can remove
+              # the PluginSetting "settings" state entirely.
+              PluginSetting.suspend_callbacks(:clear_cache) do
+                ps.reload.settings[:max_log_ids][ts.wday] = new_bookmark_id
+                ps.save
+              end
+              compaction_state[:max_log_ids][ts.wday] = new_bookmark_id
+              self.update_metadatum(compaction_state)
             end
           end
           log_id_bookmark = new_bookmark_id
