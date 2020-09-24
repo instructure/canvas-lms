@@ -490,7 +490,13 @@ pipeline {
                 echo 'no migrations added, skipping CDC Schema check'
               }
 
-              if (!configuration.isChangeMerged() && dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) }) {
+              if (
+                !configuration.isChangeMerged() &&
+                (
+                  dir(env.LOCAL_WORKDIR){ (sh(script: '${WORKSPACE}/build/new-jenkins/spec-changes.sh', returnStatus: true) == 0) } ||
+                  configuration.forceFailureFSC() == '1'
+                )
+              ) {
                 echo 'adding Flakey Spec Catcher'
                 stages['Flakey Spec Catcher'] = {
                   skipIfPreviouslySuccessful("flakey-spec-catcher") {

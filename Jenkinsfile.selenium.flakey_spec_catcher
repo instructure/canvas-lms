@@ -67,16 +67,22 @@ def computeTestCount() {
   sh 'rm -vrf $LOCAL_WORKDIR/tmp'
   sh 'mkdir -v $LOCAL_WORKDIR/tmp'
   sh 'chmod -vv 777 $LOCAL_WORKDIR/tmp'
-  sh '''
-    docker run --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
-               --volume $(pwd)/$LOCAL_WORKDIR/tmp:$DOCKER_WORKDIR/tmp \
-               --env FSC_IGNORE_FILES \
-               -w=$DOCKER_WORKDIR \
-               $PATCHSET_TAG \
-        bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
-  '''
 
-  changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
+  if (FORCE_FAILURE == '1') {
+    changed_tests = 'spec/force_failure_spec.rb'
+  } else {
+    sh '''
+      docker run --volume $(pwd)/$LOCAL_WORKDIR/.git:$DOCKER_WORKDIR/.git \
+                 --volume $(pwd)/$LOCAL_WORKDIR/tmp:$DOCKER_WORKDIR/tmp \
+                 --env FSC_IGNORE_FILES \
+                 -w=$DOCKER_WORKDIR \
+                 $PATCHSET_TAG \
+          bash -c "flakey_spec_catcher --use-parent --dry-run-quiet > $DOCKER_WORKDIR/tmp/test_list"
+    '''
+
+    changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list").trim()
+  }
+
   echo "raw result from catcher: \n====\n$changed_tests\n===="
 
   def changed_tests_arr = changed_tests.split('\n')
@@ -186,50 +192,43 @@ pipeline {
               setupNode()
             }
 
-            if(FORCE_FAILURE != '1') {
-              stage("Compute Build Distribution") {
-                computeTestCount()
-              }
+            stage("Compute Build Distribution") {
+              computeTestCount()
             }
 
-            if(partitions.size() > 0 || FORCE_FAILURE == '1') {
-              stage("Run Flakey Spec Catcher") {
-                if (FORCE_FAILURE == '1') {
-                  echo "running force failure"
+            stage("Run Flakey Spec Catcher") {
+              if(partitions.size() == 0) {
+                return
+              } else if (partitions.size() == 1) {
+                echo "running on this node"
+                withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
                   executeFlakeySpecCatcher()
                 }
-                else if (partitions.size() <= 1) {
-                  echo "running on this node"
-                  withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
-                    executeFlakeySpecCatcher()
-                  }
-                }
-                else {
-                  echo "running on multiple nodes: ${partitions.size()}"
-                  def nodes = [:]
-                  for(int i = 0; i < partitions.size(); i++) {
-                    // make sure to create a new index variable so this value gets
-                    // captured by the lambda
-                    def index = i
-                    def node_number = (index).toString().padLeft(2, '0')
+              } else {
+                echo "running on multiple nodes: ${partitions.size()}"
+                def nodes = [:]
+                for(int i = 0; i < partitions.size(); i++) {
+                  // make sure to create a new index variable so this value gets
+                  // captured by the lambda
+                  def index = i
+                  def node_number = (index).toString().padLeft(2, '0')
 
-                    nodes["flakey set $node_number"] = {
-                      protectedNode('canvas-docker') {
-                        withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
-                          try {
-                            setupNode()
-                            executeFlakeySpecCatcher("node$node_number")
-                          }
-                          finally {
-                            sh 'rm -vrf ./tmp'
-                            execute 'bash/docker-cleanup.sh --allow-failure'
-                          }
+                  nodes["flakey set $node_number"] = {
+                    protectedNode('canvas-docker') {
+                      withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
+                        try {
+                          setupNode()
+                          executeFlakeySpecCatcher("node$node_number")
+                        }
+                        finally {
+                          sh 'rm -vrf ./tmp'
+                          execute 'bash/docker-cleanup.sh --allow-failure'
                         }
                       }
                     }
                   }
-                  parallel(nodes)
                 }
+                parallel(nodes)
               }
             }
           }
