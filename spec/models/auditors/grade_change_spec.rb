@@ -20,6 +20,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper.r
 require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper')
 
 describe Auditors::GradeChange do
+  before(:all) do
+    Auditors::ActiveRecord::Partitioner.process
+  end
 
   let(:request_id) { 42 }
 
@@ -400,6 +403,40 @@ describe Auditors::GradeChange do
         override_grade_change.score.update!(grading_period_id: grading_period.id)
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
         expect(Auditors::ActiveRecord::GradeChangeRecord.last.grading_period_id).to eq grading_period.id
+      end
+    end
+
+    describe ".filter_by_assignment" do
+      it "only changes the scope for nil assignment ids" do
+        attributes = {
+          assignment_id: @assignment.id,
+          account_id: @account.id,
+          root_account_id: @account.id,
+          student_id: @student.id,
+          context_id: @course.id,
+          context_type: 'Course',
+          excused_after: false,
+          excused_before: false,
+          event_type: 'grade'
+        }
+        r1 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
+          uuid: 'asdf',
+          request_id: 'asdf'
+        }))
+        r2 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
+          assignment_id: nil,
+          uuid: 'fdsa',
+          request_id: 'fdsa'
+        }))
+        scope1 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: @assignment.id)
+        scope2 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: Auditors::GradeChange::NULL_PLACEHOLDER)
+        scope1 = Auditors::GradeChange.filter_by_assignment(scope1)
+        scope2 = Auditors::GradeChange.filter_by_assignment(scope2)
+        expect(r2.reload.assignment_id).to be_nil
+        expect(scope1.pluck(:id)).to include(r1.id)
+        expect(scope1.pluck(:id)).to_not include(r2.id)
+        expect(scope2.pluck(:id)).to_not include(r1.id)
+        expect(scope2.pluck(:id)).to include(r2.id)
       end
     end
   end
