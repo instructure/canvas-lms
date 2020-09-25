@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, påminnelse { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Attributter"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Lyd og videoopptak er ikke tilgjengelig."
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Begynnelsen av din gjøremålshistorie"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Kalender:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Velg undertekst-fil"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Velg bruksrettigheter..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "sirkel uordnet liste"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "Innholdstype"
     },
+    "copyright_holder_66ee111": {
+        "message": "Opphavsrett Innehaver:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 ord}\n    one {1 ord}\n  other {# ord}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } Å GJØRE"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Kreative Allmenninger Lisens:"
     },
     "current_volume_level_c55ab825": {
         "message": "Gjeldende volumnivå"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "Høyde"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Jeg har fått tillatelse til å bruke denne filen."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Jeg har opphavsretten"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Dersom du ikke velger brukerrettigheter nå, vil denne filen være upublisert når den lastes opp."
     },
     "image_8ad06": {
         "message": "Bilde"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Forfalls-dato og -tidspunkt for dette Gjøremål"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Materialet er i det offentlige domenet"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Materialet er lisensiert under Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "Dette materialet er underlagt et unntak - f.eks. korrekt brukt, retten til å sitere eller andre i henhold til gjeldende lover for opphavsrett"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Det er ingen poeng assosiert med dette punktet"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Brukerrettigheter:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Brukerrettigheter (påkrevd)"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Bruk piltaster for å navigere i valgene."

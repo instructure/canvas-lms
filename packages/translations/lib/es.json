@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, recordatorio { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Atributos"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "La grabación de audio y video no está disponible."
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Inicio de su Historial de cosas por hacer"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Calendario:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Elegir archivo de subtítulos"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Elegir derechos de uso..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "marque con un círculo la lista no ordenada"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "Tipo de contenido"
     },
+    "copyright_holder_66ee111": {
+        "message": "Titular de los derechos de autor:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 palabras}\n    one {1 palabra}\n  other {# palabras}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } POR HACER"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Licencia Creative Commons:"
     },
     "current_volume_level_c55ab825": {
         "message": "Nivel de volumen actual"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "Altura"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "He obtenido permiso para utilizar este archivo."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Soy el titular de los derechos de autor"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Si no selecciona los derechos de uso en este momento, se cancelará la publicación de este archivo después de cargarlo."
     },
     "image_8ad06": {
         "message": "Imagen"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Se vence la fecha y la hora de entrega para hacer esto"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "El material es de dominio público"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "El material tiene licencia Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "El material está sujeto a una excepción, como el uso legítimo, el derecho de cita u otros en virtud de las leyes aplicables de derechos de autor."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "No hay puntos asociados con este ítem"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Derecho de uso:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Derechos de uso (obligatorio)"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Use las teclas de flecha para navegar entre las opciones."

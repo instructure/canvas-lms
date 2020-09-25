@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, áminning { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Eiginleikar"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Hljóð- og myndbandsupptaka er ekki tiltæk."
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Upphaf verkefnasögu þinnar"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Dagatal:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Veldu skjátextaskrá"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Velja notkunarréttindi..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "gera hring utan um óraðaðan lista"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "Efnistegund"
     },
+    "copyright_holder_66ee111": {
+        "message": "Handhafi útgáfuréttar:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 orð}\n    one {1 orð}\n  other {# orð}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } VERKEFNI"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons leyfi:"
     },
     "current_volume_level_c55ab825": {
         "message": "Núverandi stig hljóðstyrks"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "Hæð"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Ég hef heimild til að nota þessa skrá."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Ég hef höfundarréttinn"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Ef þú velur ekki notkunarréttindi núna verður þessi skrá óbirt eftir að henni hefur verið hlaðið upp."
     },
     "image_8ad06": {
         "message": "Mynd"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Dagsetning og tími skilafrests þessa verkefnis"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Efnið er öllum heimilt"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Efnið er með leyfisskylt undir Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "Efnið er háð undantekningum - t.d. lögleg notkun, tilvitnunarréttur eða annað undir viðeigandi höfundarréttarlögum"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Það eru engin atriði tengd við þennan hlut"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "Vefslóð"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Notkunarréttindi:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Notkunarréttindi (áskilið)"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Notaðu örvalyklana til að fara á milli valmöguleika."

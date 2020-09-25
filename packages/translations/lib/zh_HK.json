@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }，提醒 { datetime }。"
     },
+    "attributes_963ba262": {
+        "message": "屬性"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "無法使用音訊和影片錄製。"
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "開始您的待辦事項歷程紀錄"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "行事曆："
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "選擇字幕檔案"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "選擇使用權限…"
     },
     "circle_unordered_list_9e3a0763": {
         "message": "圓形無序清單"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "內容類型"
     },
+    "copyright_holder_66ee111": {
+        "message": "版權持有人："
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 個字}\n    one {1 個字}\n  other {# 個字}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } 待辦事項"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "創意共享授權："
     },
     "current_volume_level_c55ab825": {
         "message": "目前音量"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "高度"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "我已經獲得了該文檔的使用權限。"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "我持有該版權"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "如果您現在不選擇使用權，那麼該文檔在其上傳之後將會撤銷發佈。"
     },
     "image_8ad06": {
         "message": "影像"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "待辦日期和時間到期"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "該材料位於公用網域中。"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "該材料在創意共享項下獲得授權"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "可能有適用於此資料的例外情況 - 如：合理使用、引用權，或適用版權法下的其他情況"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "沒有與此項目關聯的分數。"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "使用權："
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "使用權限（需要）"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "使用箭頭鍵導航選項。"

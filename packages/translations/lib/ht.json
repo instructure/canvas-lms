@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, rapèl { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Atribi"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Anrejistreman Odyo/Videyo pa disponib."
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Kòmansman Istwa Tach ou yo"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Kalandriye:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Chwazi fichye soutit"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Itilizasyon dwa itilizasyon..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "Antoure lis ki pa òdone"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "Tip Kontni"
     },
+    "copyright_holder_66ee111": {
+        "message": "Titilè Dwa Otè:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 mo}\n    one {1 mo}\n  other {# mo}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } Pou Fè"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Lisans Creative Commons"
     },
     "current_volume_level_c55ab825": {
         "message": "Nivo Volim Aktyèl"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "Wotè"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Mwen gen otorizasyon pou itilize fichye sa a."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Mwen gen dwa dotè a"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Si w pa chwazi dwa itilizasyon yo kounye a, fichye sa a pa p pibliye aprè w fin transfere li."
     },
     "image_8ad06": {
         "message": "Imaj"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Dat ak lè pou sa fèt la se"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Materyèl la nan domèn piblik la"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Materyèl la distribye sou lisans Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "Materyèl la fè objè de yon ekseksyon - pa egzanp itilizasyon ekitab, dwa pou site oswa lòt dwa daprè lwa sou dwa dotè ki aplikab yo."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Pa gen pwen ki asosye ak eleman sa a"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Dwa Itilizasyon:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Dwa Itilizasyon (obligatwa)"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Itilize tout fllèch yo pou ka navige nan opsyon yo."

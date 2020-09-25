@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType }{ title }，提醒{ datetime }。"
     },
+    "attributes_963ba262": {
+        "message": "属性"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "音频和视频录制不可用。"
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "您的待办事项历史记录的开始"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "日历:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "选择标题文件"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "选择使用权限..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "圆形无序列表"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "内容类型"
     },
+    "copyright_holder_66ee111": {
+        "message": "版权持有者："
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 个字}\n    one {1 个字}\n  other {# 个字}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } 待办"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons 许可证："
     },
     "current_volume_level_c55ab825": {
         "message": "当前音量"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "高度"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "我已获得使用此文件的权限。"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "我持有版权"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "如果您现在不选择使用权限，该文件在上传后不会被发布。"
     },
     "image_8ad06": {
         "message": "图片"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "完成该事项的日期和时间已截止"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "材料在公开域中"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "材料已根据 Creative Commons 许可"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "材料有例外情况——例如，合理使用、引用权，或版权法规定的其他适用的情况"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "没有与此项目相关的分数"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "使用权限："
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "使用权限（必填）"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "使用方向键来导航各选项。"

@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }、リマインダ{ datetime }."
     },
+    "attributes_963ba262": {
+        "message": "属性"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "オーディオとビデオの録音・録画は利用できません。"
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "あなたのタスク履歴の始まり"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "カレンダー:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "キャプションファイルを選択する"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "使用権を選択..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "丸い番号無しリスト"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "コンテンツ タイプ"
     },
+    "copyright_holder_66ee111": {
+        "message": "著作権保有者:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 語}\n    one {1 語}\n  other {# 語}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } タスク"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "クリエイティブ コモンズ ライセンス:"
     },
     "current_volume_level_c55ab825": {
         "message": "現在の音量のレベル"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "高さ"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "このファイルを使用する権限を取得しています。"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "著作権を保有しています"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "今すぐ使用権を選択しないと、このファイルはアップロード後に公開されません。"
     },
     "image_8ad06": {
         "message": "画像"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "これを行う日時が期限を過ぎています"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "この資料はパブリック ドメインです"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "この資料はクリエイティブ コモンズ ライセンスの対象となります"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "素材には例外があります。例：公正使用、引用権、または適用される著作権法に基づくその他"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "このアイテムに関連付けられているポイントはありません。"
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "使用権:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "使用権:（必須）"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "矢印キーを使用してオプションを移動します。"

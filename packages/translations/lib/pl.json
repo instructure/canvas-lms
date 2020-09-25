@@ -116,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, przypomnienie { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Właściwości"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Nagrania audio i wideo nie są dostępne."
     },
@@ -134,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Początek historii listy zadań"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Kalendarz:"
     },
@@ -148,6 +154,9 @@
     },
     "choose_caption_file_9c45bc4e": {
         "message": "Wybierz plik z napisami"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "Wybierz prawa użytkowania..."
     },
     "circle_unordered_list_9e3a0763": {
         "message": "oznacz nieuporządkowaną listę"
@@ -200,6 +209,9 @@
     "content_type_2cf90d95": {
         "message": "Typ zawartości"
     },
+    "copyright_holder_66ee111": {
+        "message": "Właściciel praw autorskich:"
+    },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 słów}\n    one {1 słowo}\n  other {# słowa}\n}"
     },
@@ -238,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "{ course } LISTA ZADAŃ"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Licencja Creative Commons:"
     },
     "current_volume_level_c55ab825": {
         "message": "Bieżący poziom głośności"
@@ -535,6 +550,15 @@
     },
     "height_69b03e15": {
         "message": "Wysokość"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Mam uprawnienie do korzystania z tego pliku."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Posiadam prawa autorskie"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Jeśli nie wybierzesz teraz praw do korzystania, po przesłaniu plik nie zostanie opublikowany."
     },
     "image_8ad06": {
         "message": "Zdjęcie"
@@ -1028,6 +1052,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Minęły już termin i godzina na wykonanie tego zadania"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Materiał znajduje się w domenie publicznej"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Materiał jest objęty licencją Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "Materiały są objęte wyjątkowymi zasadami, np. zasadami dozwolonego użytku, prawa do cytowania lub innymi obowiązującymi przepisami prawa autorskiego"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Brak punktów powiązanych z tym elementem."
     },
@@ -1123,6 +1156,12 @@
     },
     "url_22a5f3b8": {
         "message": "URL"
+    },
+    "usage_right_ff96f3e2": {
+        "message": "Prawo użytkowania:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Prawo użytkowania (wymagane)"
     },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Użyj klawiszy strzałek do nawigowania po opcjach."
