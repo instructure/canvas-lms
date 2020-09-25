@@ -1833,6 +1833,7 @@ en-AU:
   add_people_7ee4b2ec: "Add People"
   add_people_and_courses_to_canvas_5c4bfff9: "Add People and Courses to Canvas"
   add_people_to_coursename_5ea234e1: "Add People to: %{courseName}"
+  add_proficiency_level_93bd72d0: "Add Proficiency Level"
   add_proficiency_rating_d819f6b8: "Add proficiency rating"
   add_pronouns_option_906ff625: "Add pronouns option"
   add_quiz_cebfa28b: "Add Quiz"
@@ -3775,6 +3776,7 @@ en-AU:
   attempt_count_267a4fc5: "Attempt %{count}"
   attempt_current_attempt_ef626179: "Attempt %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Attempt %{current_attempt} of %{max_attempts}"
+  attempt_f2691284: Attempt
   attempt_number_83dcd86a: "Attempt %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Attempt to detect an appropriate field separator in Gradebook exports based on the number format for your language."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Attempt to detect an appropriate field separator in compatible spreadsheet exports based on the number format for your language."
@@ -4282,6 +4284,7 @@ en-AU:
     update: Update
     view_account_roster: "View Account Roster"
     view_course_roster: "View Course Roster"
+  by_b90c6b6f: By
   by_client_id_4f2fe02c: "By Client ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "By default all links are enabled for a course.  Students won't see links to sections that don't have content.  For example, if you haven't created any quizzes, they won't see the quizzes link.  You can sort and explicitly disable these links if there are areas of the course you don't want your students accessing."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7513,12 +7516,14 @@ en-AU:
     required: "Please enter some email addresses"
   created_58b8a75a: Created
   created_6ee36dff: "Created:"
+  created_ascending_cff48774: "Created: Ascending"
   created_at_73839757: "Created at"
   created_by_b39b9c8b: "Created By"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Created by SIS"
   created_created_at_37c0ec3b: "Created: %{created_at}"
   created_created_bf5714b8: "Created %{created}"
+  created_descending_e9a1b097: "Created: Descending"
   created_group_group_name_2097306b: "Created Group %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Creating a group is not yet handled by the new assignments flow. Head to the legacy assignments page?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Creating a Submission Export will allow you to download a zip file of all your assignment submissions in all of your present and past courses. This could be a big file, so it may take a while. You can navigate away from the page and come back later."
@@ -8178,10 +8183,15 @@ en-AU:
       user as much time as they need to read the notification over and dismiss it when they are finished.
   disable_all_read_only_scopes_f9ffdd28: "Disable all read only scopes."
   disable_and_lock_7d0ef0e8: "Disable and Lock"
+  disable_authentication_for_graphql_3c019622: "Disable authentication for GraphQL"
   disable_automatic_submission_8e1d8676: "Disable Automatic Submission"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Disable Canvas keyboard shortcuts. Some users using screenreaders or keyboard navigation
+      will have an improved experience with these shortcuts turned off.
   disable_celebrations_description: "Enabling this feature hides all celebration animations."
   disable_content_security_policy_8660a787: "Disable Content Security Policy"
   disable_extra_filter_options_1d1cdc02: "disable extra filter options"
+  disable_keyboard_shortcuts_9db78832: "Disable Keyboard Shortcuts"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Disable New Quiz importing and migration checkboxes, defaulting them to enabled"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Disable Post to SIS for Assignment in Closed Grading Periods"
   disable_scope_6ba4e4d4: "Disable scope"
@@ -8884,6 +8894,7 @@ en-AU:
   edit_user_details_9af7819b: "Edit user details"
   edit_when_36c1c2c8: "Edit %{when}"
   edit_your_catalog_account_cce59310: "Edit your Catalog Account."
+  edited_c4fcbdbf: "Edited:"
   edited_date_b0455372: "(Edited) %{date}"
   editing_permissions_for_name_3503e235: "Editing permissions for: %{name}"
   editor: 
@@ -11959,6 +11970,9 @@ en-AU:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "If enabled, content designers must provide copyright and license information for files before they are published. This only applies if Better File Browsing is also enabled."
   if_enabled_copyright_and_license_information_must__2a551827: "If enabled, copyright and licence information must be provided for files before they are published."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "If enabled, developer key management options and token scoping will be used."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      If enabled, GraphQL queries will not require
+      users to be signed in or use an access token.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "If enabled, modules will have the option to be marked as complete when only one of the requirements is met."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "If enabled, 'oauth2_access_token_url' will be sent in LTI2 registration launch"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "If enabled, OAuth 1.0a signing may be used by LTI tools to access the Membership Service API"
@@ -12572,6 +12586,8 @@ en-AU:
   last_day_attended_b72d623c: "Last day attended"
   last_download_33ea9bf4: "Last Download:"
   last_e159dbd: Last
+  last_edit_ascending_6a18dba4: "Last Edit: Ascending"
+  last_edit_descending_6b7ee755: "Last Edit: Descending"
   last_enrollment_activity_10fe15ba: "Last Enrolment Activity"
   last_export_899a04c5: "Last Export:"
   last_first_name_95a078f5: "Last, First Name"
@@ -14326,7 +14342,7 @@ en-AU:
         body_teacher: "You've been invited to participate in a class at %{website}.  The class is called %{course}, and you've been invited to participate as a teacher."
         details: "You'll need to register with Canvas before you can participate in the class.  To get started, visit the course page here:"
         html: 
-          body: "You've been invited to participate in a class at %{website}. The class is called %{course}. Course role: %{role_type}"
+          body: "You've been invited to participate in a class at %{account}. The class is called %{course}. Course role: %{role_type}"
           body_designer: "The class is called %{course}, and you've been invited to participate as a designer."
           body_observer: "The class is called %{course}, and you've been invited to participate as an observer."
           body_student: "The class is called %{course}, and you've been invited to participate as a student."
@@ -16731,6 +16747,8 @@ en-AU:
   page_page_59070cd8: "Page %{page}"
   page_pagenum_20dbfeb8: "Page %{pageNum}"
   page_pagenumber_31fe579f: "page %{pageNumber}"
+  page_title_ascending_b5df950c: "Page title: Ascending"
+  page_title_descending_70c1483d: "Page title: Descending"
   page_views: 
     download_filename: "Pageviews For %{user}"
     table: 
@@ -16977,6 +16995,9 @@ en-AU:
     apple_settings: 
       labels: 
         client_id: "Service ID"
+    asset_user_access_logs: 
+      description: "Minimise AUA write pressure"
+      name: "AUA Logger"
     assignment_freezer: 
       description: "Freeze Assignment Properties on Copy"
       name: "Assignment Property Freezer"
@@ -18004,6 +18025,7 @@ en-AU:
   public_jwk_44d1e8a9: "* Public JWK"
   public_jwk_ee2d719d: "Public JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Public JWK json is not valid. Please submit properly formatted json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Public JWK json must have the following string fields: kty, e, n, kid, alg, use"
   public_jwk_url_694edf52: "* Public JWK URL"
   public_jwk_url_b5564c1d: "Public JWK URL"
   public_message_students: 
@@ -20208,6 +20230,7 @@ en-AU:
   save_grading_period_set_e029fa88: "Save Grading Period Set"
   save_key_b4dede06: "Save Key"
   save_learning_mastery_82889d8b: "Save Learning Mastery"
+  save_mastery_scale_2b4dc13a: "Save Mastery Scale"
   save_publish_36440725: "Save & Publish"
   save_settings_cafe79a5: "Save Settings"
   save_successful_b2f64da4: "Save successful."
@@ -21812,6 +21835,7 @@ en-AU:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Sorry, the action performed on this recording failed. Try again later"
   sort_40afa70: "Sort:"
   sort_by_72dbba9c: "Sort by"
+  sort_by_e75f9e3e: "Sort By"
   sort_courses_cf94b8d4: "Sort courses"
   sortable_name_73f707cf: "Sortable Name"
   sortable_name_e25fe66c: "Sortable Name:"
@@ -22371,6 +22395,7 @@ en-AU:
   subscribe_failed_2eb62de0: "Subscribe failed"
   subscribe_to_title_c7d6bbd2: "Subscribe to %{title}"
   subtitle_ee60ca78: Subtitle
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Subtitles could not be imported from %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Success! All users on this domain will now see this branding."
   success_file_uploaded_8174e93f: "Success: File uploaded"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Success! Grades for this assignment are now visible to students."
@@ -23445,8 +23470,11 @@ en-AU:
   to_do_1d554f36: "To Do"
   to_do_5526f10a: "To Do:"
   to_do_6ac7b2dc: "to do:"
+  to_do_date_2cb4bf7b: "To-Do Date:"
+  to_do_date_ascending_c3a59abb: "To-Do Date: Ascending"
   to_do_date_d6b79bfd: "To do %{date}"
   to_do_date_ddfb582c: "To Do Date:"
+  to_do_date_descending_25b2141d: "To-Do Date: Descending"
   to_do_item_d76ecb78: "To Do Item"
   to_do_items_loading_d1cdfcd5: "To Do Items Loading"
   to_do_list_dashboard_d741f64e: "To Do List Dashboard"
@@ -25234,6 +25262,7 @@ en-AU:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "You've been given an account role for the %{account} account at %{website}. Role type: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "You've been invited to %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "You've been invited to %{course}. Course role: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "You've been invited to participate in a class at %{account}.  The class is called %{course}. Course role: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "You've been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "You've been invited to participate in the course, %{course}. Course role: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "You've been invited to peer review %{reviewee}."
