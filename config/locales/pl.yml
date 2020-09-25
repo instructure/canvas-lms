@@ -1859,6 +1859,7 @@ pl:
   add_people_7ee4b2ec: "Dodaj ludzi"
   add_people_and_courses_to_canvas_5c4bfff9: "Dodawać osoby i kursy do Canvas"
   add_people_to_coursename_5ea234e1: "Dodaj osoby do: %{courseName}"
+  add_proficiency_level_93bd72d0: "Dodaj poziom biegłości"
   add_proficiency_rating_d819f6b8: "Dodaj punktację biegłości"
   add_pronouns_option_906ff625: "Dodaj opcję zaimków"
   add_quiz_cebfa28b: "Dodaj test"
@@ -3824,6 +3825,7 @@ pl:
   attempt_count_267a4fc5: "Próba %{count}"
   attempt_current_attempt_ef626179: "Próba %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Próba %{current_attempt} z %{max_attempts}"
+  attempt_f2691284: Próba
   attempt_number_83dcd86a: "Próba %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Próba wykrycia odpowiedniego separatora pół w eksportach dziennika na podstawie formatu liczb w języku użytkownika."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Próba wykrycia odpowiedniego separatora pól w kompatybilnych eksportach arkuszy na podstawie formatu liczb w języku użytkownika."
@@ -4333,6 +4335,7 @@ pl:
     update: Zaktualizuj
     view_account_roster: "Pokaż listę kont"
     view_course_roster: "Pokaż listę kursów"
+  by_b90c6b6f: Przez
   by_client_id_4f2fe02c: "Wg ID klienta"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Domyślnie wszystkie łącza są włączone w kursie. Uczestnicy nie zobaczą łącz do sekcji, w których nie ma zawartości. Na przykład, jeśli nie utworzono żadnych testów, nie zobaczą łącza do testów. Możesz sortować i celowo wyłączać te łącza, jeśli istnieją obszary kursu, do których nie chcesz, aby uczestnicy mieli dostęp."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7647,12 +7650,14 @@ pl:
     required: "Podaj niektóre adresy e-mail"
   created_58b8a75a: Utworzono
   created_6ee36dff: "Utworzono:"
+  created_ascending_cff48774: "Utworzono: Rosnąco"
   created_at_73839757: "Utworzono o:"
   created_by_b39b9c8b: "Stworzone przez"
   created_by_sis_93fbb66b: utworzone_przez_sis
   created_by_sis_e1449c31: "Utworzone przez SIS"
   created_created_at_37c0ec3b: "Utworzono: %{created_at}"
   created_created_bf5714b8: "Utworzono %{created}"
+  created_descending_e9a1b097: "Utworzono: Malejąco"
   created_group_group_name_2097306b: "Uczestnik utworzył grupę %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Tworzenie grupy nie jest jeszcze obsługiwane w nowym przepływie zadań. Przejść do starszej wersji strony zadań?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Stworzenie Exportu złożenia pozwoli na pobranie pliku zip dla wszystkich zgłoszonych zadań dla wszystkich obecnych i uprzednich kursów. Może to być duży plik, więć może to chwilę potrwać. Możesz opuścić stronę i wrócić do niej później."
@@ -8350,10 +8355,15 @@ pl:
       zapewniając użytkownikowi dowolny czas na przeczytanie powiadomienia i odrzucenie go, gdy zakończy czytanie.
   disable_all_read_only_scopes_f9ffdd28: "Wyłącz wszystkie zakresy tylko do odczytu."
   disable_and_lock_7d0ef0e8: "Wyłącz i zablokuj"
+  disable_authentication_for_graphql_3c019622: "Wyłącz uwierzytelnianie dla GraphQL"
   disable_automatic_submission_8e1d8676: "Wyłącz automatyczne przesyłki"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Wyświetl skróty klawiszowe Canvas. Niektórzy użytkownicy, którzy korzystają z czytników ekranowych lub nawigacji za pomocą klawiatury
+      , będą mieć ułatwioną obsługę, jeśli wyłączą skróty.
   disable_celebrations_description: "Włączenie tej funkcji spowoduje ukrycie wszystkich animacji celebrowania."
   disable_content_security_policy_8660a787: "Wyłącz politykę bezpieczeństwa treści"
   disable_extra_filter_options_1d1cdc02: "wyłącz dodatkowe opcje filtra"
+  disable_keyboard_shortcuts_9db78832: "Wyświetl skróty klawiszowe"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Wyłącz importowanie do New Quizzes i pola migracji, włączając je domyślnie"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Wyłącz publikowanie w SIS dla zadań w zamkniętych okresach oceniania"
   disable_scope_6ba4e4d4: "Wyłącz zakres"
@@ -9069,6 +9079,7 @@ pl:
   edit_user_details_9af7819b: "Edytuj szczegóły użytkownika"
   edit_when_36c1c2c8: "Edytuj %{when}"
   edit_your_catalog_account_cce59310: "Edytuj swoje konto katalogowe"
+  edited_c4fcbdbf: "Edytowano:"
   edited_date_b0455372: "(Edytowano) %{date}"
   editing_permissions_for_name_3503e235: "Uprawnienia do edycji posiada: %{name}"
   editor: 
@@ -12187,6 +12198,9 @@ pl:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Jeśli włączone, projektanci treści muszą dostarczyć informacji o prawach autorskich i licencji dla plików zanim zostaną opublikowane. Działa tylko w przypadku uruchomienia Better File Browsing."
   if_enabled_copyright_and_license_information_must__2a551827: "Jeśli funkcja jest włączona, przed opublikowaniem plików należy podać informacje o licencji i ochronie prawem autorskim."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "W przypadku włączenia tej funkcji, użyte zostaną opcje zarządzania kluczami programisty i zakresu tokena."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      W razie włączenia, kwerendy GraphQL nie będą wymagać od
+      użytkowników zalogowania ani użycia tokena dostępu.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Jeśli opcja jest włączona, moduły można oznaczyć jako zakończone nawet wtedy, gdy tylko jeden warunek został spełniony."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Po włączeniu 'oauth2_access_token_url' zostanie wysłane w pakiecie uruchomienia rejestracji LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jeśli zostanie włączone, do korzystania z interfejsu Membership Service API, przez narzędzia LTI może być używany podpis OAuth 1.0a"
@@ -12785,6 +12799,8 @@ pl:
   last_day_attended_b72d623c: "Ostatni dzień uczestnictwa"
   last_download_33ea9bf4: "Ostatnio pobrane:"
   last_e159dbd: Ostatnia
+  last_edit_ascending_6a18dba4: "Ostatnia edycja: Rosnąco"
+  last_edit_descending_6b7ee755: "Ostatnia edycja: Malejąco"
   last_enrollment_activity_10fe15ba: "Ostatnia aktywność zapisów"
   last_export_899a04c5: "Ostatni eksport:"
   last_first_name_95a078f5: "Nazwisko, imię"
@@ -14568,7 +14584,7 @@ pl:
         body_teacher: "Zaproszono Cię do udziału w zajęciach w witrynie %{website}.  Nazwa zajęć to %{course}, a użytkownik otrzymał zaproszenie do pełnienia roli instruktora."
         details: "Aby móc brać udział w zajęciach, należy najpierw zarejestrować się w systemie Canvas.  Na początek należy odwiedzić stronę kursu:"
         html: 
-          body: "Zaproszono Cię do udziału w zajęciach w witrynie %{website}. Nazwa zajęć to %{course}. Rola kursu: %{role_type}"
+          body: "Zaproszono Cię do udziału w klasie o godzinie %{account}. Klasa nosi nazwę %{course}. Rola kursu: %{role_type}"
           body_designer: "Nazwa zajęć to %{course}, a użytkownik otrzymał zaproszenie do pełnienia roli autora."
           body_observer: "Nazwa zajęć to %{course}, a użytkownik otrzymał zaproszenie do pełnienia roli słuchacza."
           body_student: "Nazwa zajęć to %{course}, a użytkownik otrzymał zaproszenie do pełnienia roli uczestnika."
@@ -16996,6 +17012,8 @@ pl:
   page_page_59070cd8: "Strona %{page}"
   page_pagenum_20dbfeb8: "Strona %{pageNum}"
   page_pagenumber_31fe579f: "strona %{pageNumber}"
+  page_title_ascending_b5df950c: "Tytuł strony: Rosnąco"
+  page_title_descending_70c1483d: "Tytuł strony: Malejąco"
   page_views: 
     download_filename: "Liczba wyświetleń dla użytkownika %{user}"
     table: 
@@ -17242,6 +17260,9 @@ pl:
     apple_settings: 
       labels: 
         client_id: "Identyfikator usługi"
+    asset_user_access_logs: 
+      description: "Zminimalizuj nacisk zapisywania AUA"
+      name: "Rejestrator AUA"
     assignment_freezer: 
       description: "Zamróź właściwości zadania dla kopii"
       name: "Zamrażarka właściwości zadania"
@@ -18268,6 +18289,7 @@ pl:
   public_domain_112ed397: "Domena publiczna"
   public_jwk_ee2d719d: "Publiczne klucze JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Publiczny kod JWK JSON nieprawidłowy. Prześlij prawidłowo sformatowany kod JSON."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Publiczny plik JWK json musi posiadać następujące pola łańcucha: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Publiczne klucze JWK – adres URL"
   public_message_students: 
     message_student: "Wiadomość dla uczestników dot %{course_name}"
@@ -20560,6 +20582,7 @@ pl:
   save_grading_period_set_e029fa88: "Zapisz zbiór okresów oceniania"
   save_key_b4dede06: "Zapisz klucz"
   save_learning_mastery_82889d8b: "Zapisz poziom biegłości"
+  save_mastery_scale_2b4dc13a: "Zapisz skalę nauki"
   save_publish_36440725: "Zapisz i opublikuj"
   save_settings_cafe79a5: "Zapisz ustawienia"
   save_successful_b2f64da4: "Zapisano z powodzeniem."
@@ -22171,6 +22194,7 @@ pl:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Niestety, nie udało się wykonać operacji. Spróbuj ponownie później"
   sort_40afa70: "Sortuj:"
   sort_by_72dbba9c: "Sortuj wg"
+  sort_by_e75f9e3e: "Sortuj wg"
   sort_courses_cf94b8d4: "Sortuj kursy"
   sortable_name_73f707cf: "Nazwa na liście"
   sortable_name_e25fe66c: "Sortowalna nazwa:"
@@ -22744,6 +22768,7 @@ pl:
   subscribe_failed_2eb62de0: "Niepowodzenie subskrypcji"
   subscribe_to_title_c7d6bbd2: "Subskrybuj %{title}"
   subtitle_ee60ca78: Podtytuł
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Nie można zaimportować napisów z %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Sukces! Wszyscy użytkownicy tej domeny będą teraz widzieli ninejsze znakowanie."
   success_file_uploaded_8174e93f: "Zakończono powodzeniem: Przesłane pliki"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Zakończono powodzeniem! Oceny z tego zadania są teraz widoczne dla uczestników."
@@ -23829,8 +23854,11 @@ pl:
   to_do_1d554f36: "Lista zadań"
   to_do_5526f10a: "Lista zadań:"
   to_do_6ac7b2dc: "do zrobienia:"
+  to_do_date_2cb4bf7b: "Data listy zadań:"
+  to_do_date_ascending_c3a59abb: "Data listy zadań: Rosnąco"
   to_do_date_d6b79bfd: "Lista zadań %{date}"
   to_do_date_ddfb582c: "Lista zadań:"
+  to_do_date_descending_25b2141d: "Data listy zadań: Malejąco"
   to_do_item_d76ecb78: Zadanie
   to_do_items_loading_d1cdfcd5: "Wczytywanie listy zadań"
   to_do_list_dashboard_d741f64e: "Panel listy zadań"
@@ -25640,8 +25668,9 @@ pl:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "Użytkownik został zapisany na kurs, %{course}."
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Użytkownik został zapisany na kurs, %{course}. Rola kursu: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Użytkownikowi przypisano rolę na koncie %{account}  w witrynie %{website}. Rola typu: %{role_type}."
-  you_ve_been_invited_to_course_90764f1: "Zaproszono cię na kurs %{course}."
+  you_ve_been_invited_to_course_90764f1: "Zaproszono cię na %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Zaproszono cię na kurs  %{course}.  Rola kursu: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Zaproszono Cię do udziału w klasie o godzinie %{account}.  Klasa nosi nazwę %{course}. Rola kursu: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Zaproszono Cię do udziału w zajęciach w witrynie %{website}. Nazwa zajęć to %{course}. Rola kursu: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Zaproszono Cię do udziału w kursie, %{course}. Rola kursu: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Zaproszono Cię do recenzji drugiego uczestnika %{reviewee}."
