@@ -34,4 +34,14 @@ describe Quizzes::QuizSubmissionEvent do
       end
     end
   end
+
+  context 'root_account_id' do
+    it "uses root_account value from quiz_subission" do
+      course_factory
+      quiz = @course.quizzes.create!
+      qs = Quizzes::QuizSubmission.create!(quiz: quiz, attempt: 1)
+      qse = qs.record_creation_event
+      expect(qse.root_account_id).to eq Account.default.id
+    end
+  end
 end
