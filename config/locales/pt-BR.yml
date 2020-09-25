@@ -1832,6 +1832,7 @@ pt-BR:
   add_people_7ee4b2ec: "Adicionar pessoas"
   add_people_and_courses_to_canvas_5c4bfff9: "Adicionar pessoas e cursos ao Canvas"
   add_people_to_coursename_5ea234e1: "Adicionar pessoas a: %{courseName}"
+  add_proficiency_level_93bd72d0: "Adicionar nível de proficiência"
   add_proficiency_rating_d819f6b8: "Adicionar avaliação da proficiência"
   add_pronouns_option_906ff625: "Adicionar opção de pronomes"
   add_quiz_cebfa28b: "Adicionar teste"
@@ -3767,6 +3768,7 @@ pt-BR:
   attempt_count_267a4fc5: "Tentativa %{count}"
   attempt_current_attempt_ef626179: "Tentativa %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Tentativa %{current_attempt} de %{max_attempts}"
+  attempt_f2691284: Tentativa
   attempt_number_83dcd86a: "Tentativa %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Tentativa de detectar um separador apropriado do campo em exportações do Boletim com base no formato de número para o seu idioma."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Tentativa de detectar um separador apropriado do campo em exportações de planilhas compatíveis com base no formato de número para o seu idioma."
@@ -4269,6 +4271,7 @@ pt-BR:
     update: Atualizar
     view_account_roster: "Exibir rol de contas"
     view_course_roster: "Exibir rol de cursos"
+  by_b90c6b6f: Por
   by_client_id_4f2fe02c: "Por ID do Cliente"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Por padrão, todos os links são ativados para um curso.  Os alunos não verão os links para seções que não possuem conteúdo.  Por exemplo, se você não criou nenhum teste, eles não verão o link de testes.  Você pode ordenar e explicitamente desativar esses links, se houver áreas do curso que você não queira que seus alunos acessem."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7487,12 +7490,14 @@ pt-BR:
     required: "Insira alguns endereços de e-mail"
   created_58b8a75a: Criado
   created_6ee36dff: "Criada:"
+  created_ascending_cff48774: "Criada: Crescente"
   created_at_73839757: "Criada às"
   created_by_b39b9c8b: "Criado Por"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Criado por SIS"
   created_created_at_37c0ec3b: "Criada: %{created_at}"
   created_created_bf5714b8: "Criado %{created}"
+  created_descending_e9a1b097: "Criada: Decrescente"
   created_group_group_name_2097306b: "Grupo criado %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "A criação de um grupo ainda não é manuseada no novo fluxo de tarefas. Ir para a página herdada de tarefas?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Criar uma Exportação do Envio permitirá que você baixe um arquivo zip de todos os seus envios de tarefas em todos os seus cursos presentes e passados. Este poderá ser um arquivo grande, por isso pode levar um tempo. Você pode navegar para fora da página e voltar mais tarde."
@@ -8152,10 +8157,15 @@ pt-BR:
       o tempo necessário para ler a notificação e dispensá-la quando terminar.
   disable_all_read_only_scopes_f9ffdd28: "Desabilitar todos os escopos somente leitura."
   disable_and_lock_7d0ef0e8: "Desativar e bloquear"
+  disable_authentication_for_graphql_3c019622: "Desabilitar a autenticação para GraphQL"
   disable_automatic_submission_8e1d8676: "Desativar envio automático"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Desabilite os atalhos de teclado do Canvas. Alguns usuários que usam leitores de tela ou navegação com teclado
+      terão uma experiência aprimorada com esses atalhos desativados.
   disable_celebrations_description: "Habilitar este recurso oculta todas as animações de comemoração."
   disable_content_security_policy_8660a787: "Desabilitar Política de segurança do conteúdo"
   disable_extra_filter_options_1d1cdc02: "desabilitar opções extras de filtro"
+  disable_keyboard_shortcuts_9db78832: "Desabilitar atalhos de teclado"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Desabilitar as caixas de seleção de importação e migração do New Quiz, padronizando-os para habilitado"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Desabilitar Lançamento no SIS para Tarefa em Períodos de Avaliação Terminados"
   disable_scope_6ba4e4d4: "Desabilitar escopo"
@@ -8854,6 +8864,7 @@ pt-BR:
   edit_user_details_9af7819b: "Editar detalhes do usuário"
   edit_when_36c1c2c8: "Editar %{when}"
   edit_your_catalog_account_cce59310: "Editar a sua Conta de Catalog"
+  edited_c4fcbdbf: "Editado:"
   edited_date_b0455372: "(Editado) %{date}"
   editing_permissions_for_name_3503e235: "Permissões de edição para: %{name}"
   editor: 
@@ -11928,6 +11939,9 @@ pt-BR:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Caso for ativado, designers de conteúdo devem fornecer informações de direitos autorais e de licenças para os arquivos antes de serem publicados. Só é aplicável se Melhor Navegação de Arquivos também é habilitado."
   if_enabled_copyright_and_license_information_must__2a551827: "Se habilitado, informações de licença e direitos autorais devem ser fornecidas para arquivos antes que eles sejam publicados."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Se habilitada, as opções de gestão de chaves do desenvolvedor e delimitação de token serão usadas."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Se ativadas, as consultas GraphQL não exigirão
+      que os usuários façam login ou usem um token de acesso.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Caso forem ativados, os módulos terão a opção de serem marcados como concluídos quando apenas um dos requisitos for cumprido."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Se habilitado, ‘oauth2_access_token_url’ será enviado no lançamento do registro LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Se habilitado, a assinatura de OAuth 1.0a pode ser usada pelas ferramentas de LTI para acessar a API de serviço de adesão"
@@ -12521,6 +12535,8 @@ pt-BR:
   last_day_attended_b72d623c: "Última data de participação"
   last_download_33ea9bf4: "Último download:"
   last_e159dbd: Última
+  last_edit_ascending_6a18dba4: "Última edição: Crescente"
+  last_edit_descending_6b7ee755: "Última edição: Decrescente"
   last_enrollment_activity_10fe15ba: "Última atividade de matrícula"
   last_export_899a04c5: "Última exportação:"
   last_first_name_95a078f5: "Sobrenome, primeiro nome"
@@ -14274,7 +14290,7 @@ pt-BR:
         body_teacher: "Você tem um convite para participar de uma aula como professor em %{website}. Esta aula se chama %{course}."
         details: "Você precisará registrar no Canvas antes de poder participar de uma turma.  Para começar, visite a página do curso aqui:"
         html: 
-          body: "Você tem um convite para participar de uma turma em %{website}. A turma se chama %{course}. Papel no curso: %{role_type}"
+          body: "Você tem um convite para participar de uma turma em %{account}. A turma se chama %{course}. Papel no curso: %{role_type}"
           body_designer: "A aula se chama %{course} e você tem um convite para participar como designer."
           body_observer: "A aula se chama %{course} e você tem um convite para participar como observador."
           body_student: "A aula se chama %{course} e você tem um convite para participar como aluno."
@@ -16673,6 +16689,8 @@ pt-BR:
   page_page_59070cd8: "Página %{page}"
   page_pagenum_20dbfeb8: "Página %{pageNum}"
   page_pagenumber_31fe579f: "página  %{pageNumber}"
+  page_title_ascending_b5df950c: "Título da página: Crescente"
+  page_title_descending_70c1483d: "Título da página: Decrescente"
   page_views: 
     download_filename: "Exibições de página para %{user}"
     table: 
@@ -16919,6 +16937,9 @@ pt-BR:
     apple_settings: 
       labels: 
         client_id: "ID do serviço"
+    asset_user_access_logs: 
+      description: "Minimizar pressão de gravação AUA"
+      name: "Registro AUA"
     assignment_freezer: 
       description: "Congelar as propriedades da tarefa na cópia"
       name: "Congelador de propriedade da tarefa"
@@ -17940,6 +17961,7 @@ pt-BR:
   public_domain_112ed397: "Domínio público"
   public_jwk_ee2d719d: "JWK pública"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Json JWK público não é válido. Envie json devidamente formatado."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "O JWK json público deve ter os seguintes campos de string: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "URL JWK pública"
   public_message_students: 
     message_student: "Enviar mensagem aos alunos para %{course_name}"
@@ -20141,6 +20163,7 @@ pt-BR:
   save_grading_period_set_e029fa88: "Salvar Configuração de Período de Pontuação"
   save_key_b4dede06: "Salvar chave"
   save_learning_mastery_82889d8b: "Salvar domínio de aprendizado"
+  save_mastery_scale_2b4dc13a: "Salvar escala de domínio"
   save_publish_36440725: "Salvar e Publicar"
   save_settings_cafe79a5: "Salvar configurações"
   save_successful_b2f64da4: "Salvo com sucesso."
@@ -21741,6 +21764,7 @@ pt-BR:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Desculpe-nos, a ação realizada nesta gravação falhou. Tente novamente mais tarde"
   sort_40afa70: "Ordenar:"
   sort_by_72dbba9c: "Ordenar por"
+  sort_by_e75f9e3e: "Ordenar por"
   sort_courses_cf94b8d4: "Ordenar cursos"
   sortable_name_73f707cf: "Nome ordenável"
   sortable_name_e25fe66c: "Nome ordenável:"
@@ -22294,6 +22318,7 @@ pt-BR:
   subscribe_failed_2eb62de0: "Assinatura falhou"
   subscribe_to_title_c7d6bbd2: "Assinar %{title}"
   subtitle_ee60ca78: Legenda
+  subtitles_could_not_be_imported_from_file_5de6da0b: "As legendas não puderam ser importadas de %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Sucesso! Todos os usuários neste domínio agora verão esse branding."
   success_file_uploaded_8174e93f: "Sucesso: Arquivo carregado"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Sucesso! As notas para essa tarefa agora estão visíveis para os alunos."
@@ -23364,8 +23389,11 @@ pt-BR:
   to_do_1d554f36: "Lista de Tarefas"
   to_do_5526f10a: "Para fazer:"
   to_do_6ac7b2dc: "lista de tarefas:"
+  to_do_date_2cb4bf7b: "Data da lista de tarefas:"
+  to_do_date_ascending_c3a59abb: "Data da lista de tarefas: Crescente"
   to_do_date_d6b79bfd: "Lista de tarefas %{date}"
   to_do_date_ddfb582c: "Data da lista de tarefas:"
+  to_do_date_descending_25b2141d: "Data da lista de tarefas: Decrescente"
   to_do_item_d76ecb78: "Item da lista de tarefas"
   to_do_items_loading_d1cdfcd5: "Itens da lista de tarefas carregando"
   to_do_list_dashboard_d741f64e: "Painel de controle da lista de tarefas"
@@ -25136,6 +25164,7 @@ pt-BR:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Um papel foi-lhe dado para a conta de %{account} no %{website}. Tipo de papel: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Você foi convidado a %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Você foi convidado a %{course}. Função no curso: %{role_type} "
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Você tem um convite para participar de uma turma em %{account}.  A turma se chama %{course}. Papel no curso: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Você tem um convite para participar de uma turma em %{website}.  A turma se chama %{course}. Papel no curso: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Você tem um convite para participar deste curso, %{course}. Papel no curso: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Você foi convidado a fazer uma revisão por pares para %{reviewee}."
