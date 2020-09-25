@@ -93,7 +93,7 @@
 class GroupCategoriesController < ApplicationController
   before_action :get_context
   before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members]
+  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -214,6 +214,67 @@ class GroupCategoriesController < ApplicationController
           render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
         end
       end
+    end
+  end
+
+  # @API Import category groups
+  #
+  # Create Groups in a Group Category through a CSV import
+  #
+  # For more information on the format that's expected here, please see the
+  # "Group Category CSV" section in the API docs.
+  #
+  # @argument attachment
+  #   There are two ways to post group category import data - either via a
+  #   multipart/form-data form-field-style attachment, or via a non-multipart
+  #   raw post request.
+  #
+  #   'attachment' is required for multipart/form-data style posts. Assumed to
+  #   be outcome data from a file upload form field named 'attachment'.
+  #
+  #   Examples:
+  #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories/<category_id>/import'
+  #
+  #   If you decide to do a raw post, you can skip the 'attachment' argument,
+  #   but you will then be required to provide a suitable Content-Type header.
+  #   You are encouraged to also provide the 'extension' argument.
+  #
+  #   Examples:
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
+  #         -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories/<category_id>/import'
+  #
+  # @example_response
+  #    # Progress (default)
+  #    {
+  #        "completion": 0,
+  #        "context_id": 20,
+  #        "context_type": "GroupCategory",
+  #        "created_at": "2013-07-05T10:57:48-06:00",
+  #        "id": 2,
+  #        "message": null,
+  #        "tag": "course_group_import",
+  #        "updated_at": "2013-07-05T10:57:48-06:00",
+  #        "user_id": null,
+  #        "workflow_state": "running",
+  #        "url": "http://localhost:3000/api/v1/progress/2"
+  #    }
+  #
+  # @returns Progress
+  def import
+    if authorized_action(@context, @current_user, :manage_groups)
+      return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
+
+      file_obj = nil
+      if params.has_key?(:attachment)
+        file_obj = params[:attachment]
+      else
+        file_obj = body_file
+      end
+
+      progress = GroupAndMembershipImporter.create_import_with_attachment(@group_category, file_obj)
+      render(:json => progress_json(progress, @current_user, session))
     end
   end
 
@@ -552,4 +613,42 @@ class GroupCategoriesController < ApplicationController
     @context ||= @group_category.context
   end
 
+  private
+  def body_file
+    file_obj = request.body
+
+    file_obj.instance_exec do
+      def set_file_attributes(filename, content_type)
+        @original_filename = filename
+        @content_type = content_type
+      end
+
+      def content_type
+        @content_type
+      end
+
+      def original_filename
+        @original_filename
+      end
+    end
+
+    if params[:extension]
+      file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
+                                   Attachment.mimetype("course_group_import.#{params[:extension]}"))
+    else
+      env = request.env.dup
+      env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+      # copy of request with original content type restored
+      request2 = Rack::Request.new(env)
+      charset = request2.media_type_params['charset']
+      if charset.present? && charset.casecmp('utf-8') != 0
+        raise InvalidContentType
+      end
+      params[:extension] ||= {"text/plain" => "csv",
+                              "text/csv" => "csv"}[request2.media_type] || "csv"
+      file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
+                                   request2.media_type)
+      file_obj
+    end
+  end
 end

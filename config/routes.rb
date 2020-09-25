@@ -1999,6 +1999,7 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/group_categories', action: :index, as: 'course_group_categories'
       post 'accounts/:account_id/group_categories', action: :create
       post 'courses/:course_id/group_categories', action: :create
+      post 'group_categories/:group_category_id/import', action: :import
       get 'group_categories/:group_category_id/groups', action: :groups, as: 'group_category_groups'
       get 'group_categories/:group_category_id/users', action: :users, as: 'group_category_users'
       post 'group_categories/:group_category_id/assign_unassigned_members', action: 'assign_unassigned_members', as: 'group_category_assign_unassigned_members'
