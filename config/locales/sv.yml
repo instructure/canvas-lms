@@ -1835,6 +1835,7 @@ sv:
   add_people_7ee4b2ec: "Lägg till personer"
   add_people_and_courses_to_canvas_5c4bfff9: "Lägger till personer och kurser i Canvas"
   add_people_to_coursename_5ea234e1: "Lägg till personer till: %{courseName}"
+  add_proficiency_level_93bd72d0: "Lägg till kompetensnivå"
   add_proficiency_rating_d819f6b8: "Lägg till färdighetsbedömning"
   add_pronouns_option_906ff625: "Lägg till alternativ för pronomen"
   add_quiz_cebfa28b: "Lägg till quiz"
@@ -3771,6 +3772,7 @@ sv:
   attempt_count_267a4fc5: "Försök %{count}"
   attempt_current_attempt_ef626179: "Försök %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Försök %{current_attempt} av %{max_attempts}"
+  attempt_f2691284: Försök
   attempt_number_83dcd86a: "Försök %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Försök att upptäcka en lämplig fältseparator i exporter av omdömesböcker baserat på nummerformatet för ditt språk."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Försök att upptäcka en lämplig fältseparator i exporter av kompatibla kalkylblad baserat på nummerformatet för ditt språk."
@@ -4283,6 +4285,7 @@ sv:
     update: Uppdatera
     view_account_roster: "Visa konot-roster"
     view_course_roster: "Visa kurs-roster"
+  by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Efter klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Alla länkar är som standard aktiverade för en kurs.  Studenter ser inte länkar till sektioner som saknar innehåll.  Om du exempelvis inte har skapat några quiz kommer de inte att se quizlänkarna.  Du kan sortera och uttryckligen inaktivera dessa länkar om det finns delar av kursen som inte du vill att studenterna ska ha tillgång till."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7512,12 +7515,14 @@ sv:
     required: "Ange några e-postadresser"
   created_58b8a75a: Skapad
   created_6ee36dff: "Skapad:"
+  created_ascending_cff48774: "Skapad: Stigande"
   created_at_73839757: Skapad
   created_by_b39b9c8b: "Skapad av"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Skapad av SIS"
   created_created_at_37c0ec3b: "Skapad: %{created_at}"
   created_created_bf5714b8: "Skapad %{created}"
+  created_descending_e9a1b097: "Skapad: Fallande"
   created_group_group_name_2097306b: "Skapade gruppen %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Skapande av grupper hanteras ännu inte i det nya uppgiftsflödet. Öppna den äldre versionen av sidan för att skapa grupper?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Att skapa en Inlämningsexport gör att du kan ladda ner en zipfil med alla dina uppgiftsinlämningar från alla dina nuvarande och tidigare kurser. Det kan vara en stor fil så det kan ta en stund. Du kan lämna sidan och komma tillbaka senare."
@@ -8177,10 +8182,15 @@ sv:
       användarna den tid som behövs för att läsa aviseringen och stänga den när den är läst.
   disable_all_read_only_scopes_f9ffdd28: "Inaktivera alla skrivskyddade omfattningar"
   disable_and_lock_7d0ef0e8: "Inaktivera och lås"
+  disable_authentication_for_graphql_3c019622: "Inaktivera autentisering för GraphQL"
   disable_automatic_submission_8e1d8676: "Inaktivera automatisk inlämning"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Inaktivera kortkommandon för tangentbord. Användare som använder skärmläsare eller tangentbordsnavigering
+      får en förbättrad upplevelse när kortkommandon inaktiveras.
   disable_celebrations_description: "Om du inaktiverar den här funktionen döljs alla gratulationsanimeringar."
   disable_content_security_policy_8660a787: "Inaktivera säkerhetspolicyn för innehåll"
   disable_extra_filter_options_1d1cdc02: "inaktivera extra filteralternativ"
+  disable_keyboard_shortcuts_9db78832: "Inaktivera kortkommandon för tangentbord"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Avmarkera kryssrutorna för import och migrering för New Quizzes, sätt dem på aktiverade"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Inaktivera Publicera till SIS för uppgift i stängda omdömesperioder"
   disable_scope_6ba4e4d4: "Inaktivera omfattning"
@@ -8881,6 +8891,7 @@ sv:
   edit_user_details_9af7819b: "Redigera användardetaljer"
   edit_when_36c1c2c8: "Redigera %{when}"
   edit_your_catalog_account_cce59310: "Redigera ditt katalog konto"
+  edited_c4fcbdbf: "Redigerad:"
   edited_date_b0455372: "(Redigerad) %{date}"
   editing_permissions_for_name_3503e235: "Redigerar behörigheter för: %{name}"
   editor: 
@@ -11951,6 +11962,9 @@ sv:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktiverad, måste designers tillhandahålla upphovsrätt och licensinformation för filerna innan de publiceras. Gäller endast om Better File Browsing också är aktiverat."
   if_enabled_copyright_and_license_information_must__2a551827: "Om aktiverad, måste copyright- och licensinformation anges för filer innan de publiceras."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Om funktionen är aktiverad används alternativ och omfattningstoken för utvecklarnycklar."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Om aktiverad, behöver inte
+      användare logga in eller använda ett åtkomsttoken.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiverad kommer moduler ha alternativet att bli markerade som färdig även om bara ett krav har uppnåtts."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Om aktiverat, ’’oauth2_access_token_url’ kommer att sändas i LTI2 registreringslansering"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Om detta är aktiverat kan OAuth 1.0a-signering användas av LTI-verktyg för att komma åt medlemstjänstens API"
@@ -12546,6 +12560,8 @@ sv:
   last_day_attended_b72d623c: "Senaste närvarodatum"
   last_download_33ea9bf4: "Senast nedladdad:"
   last_e159dbd: Sista
+  last_edit_ascending_6a18dba4: "Senast redigerad: Stigande"
+  last_edit_descending_6b7ee755: "Senast redigerad: Fallande"
   last_enrollment_activity_10fe15ba: "Senaste registreringsaktivitet"
   last_export_899a04c5: "Senaste export:"
   last_first_name_95a078f5: "Efter-, förnamn"
@@ -14303,7 +14319,7 @@ sv:
         body_teacher: "Du har blivit inbjuden till att medverka i en klass på %{website}. Klassen heter %{course}, och du har blivit inbjuden att medverka som en lärare."
         details: "Du måste registrera dig på Canvas innan du kan delta i kursen.  Kom igång genom att besöka kursens sida här:"
         html: 
-          body: "Du har bjudits in till att delta i en klass på %{website}. Klassen heter %{course}. Kursroll: %{role_type}"
+          body: "Du har bjudits in till att delta i en klass på %{account}. Klassen heter %{course}. Kursroll: %{role_type}"
           body_designer: "Klassen heter %{course}, och du har blivit inbjuden att medverka som en designer."
           body_observer: "Klassen heter %{course}, och du har blivit inbjuden att medverka som en obervatör."
           body_student: "Klassen heter %{course}, och du har blivit inbjuden att medverka som en elev."
@@ -16705,6 +16721,8 @@ sv:
   page_page_59070cd8: "Sida %{page}"
   page_pagenum_20dbfeb8: "Sida %{pageNum}"
   page_pagenumber_31fe579f: "sida %{pageNumber}"
+  page_title_ascending_b5df950c: "Sidtitel: Stigande"
+  page_title_descending_70c1483d: "Sidtitel: Fallande"
   page_views: 
     download_filename: "Sidvisningar för %{user}"
     table: 
@@ -16951,6 +16969,9 @@ sv:
     apple_settings: 
       labels: 
         client_id: Tjänst-ID
+    asset_user_access_logs: 
+      description: "Minska AUA-skrivtryck"
+      name: AUA-loggare
     assignment_freezer: 
       description: "Frys uppgiftsegenskap vid kopiering"
       name: "Frysning av uppgiftsegenskap"
@@ -17970,6 +17991,7 @@ sv:
   public_domain_112ed397: "Offentlig domän"
   public_jwk_ee2d719d: "Offentlig JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Offentlig JWK json är inte giltig. Skicka in en giltigt formaterad json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Offentliga JWK-JSON måste ha följande strängfält: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Offentlig JWK-URL"
   public_message_students: 
     send_message: "Skicka meddelande"
@@ -20168,6 +20190,7 @@ sv:
   save_grading_period_set_e029fa88: "Spara uppsättning bedömningsperioder"
   save_key_b4dede06: "Spara nyckel"
   save_learning_mastery_82889d8b: "Spara måluppfyllelse"
+  save_mastery_scale_2b4dc13a: "Spara måluppfyllelseskala"
   save_publish_36440725: "Spara och publicera"
   save_settings_cafe79a5: "Spara inställningarna"
   save_successful_b2f64da4: Sparades.
@@ -21761,6 +21784,7 @@ sv:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Vi beklagar, den åtgärd som utfördes för den här inspelningen misslyckades. Försök igen senare"
   sort_40afa70: "Sortera:"
   sort_by_72dbba9c: "Sortera efter"
+  sort_by_e75f9e3e: "Sortera efter"
   sort_courses_cf94b8d4: "Sortera kurser"
   sortable_name_73f707cf: "Sorterbart namn"
   sortable_name_e25fe66c: "Sorterbart namn:"
@@ -22316,6 +22340,7 @@ sv:
   subscribe_failed_2eb62de0: "Prenumerationen misslyckades"
   subscribe_to_title_c7d6bbd2: "Prenumerera på %{title}"
   subtitle_ee60ca78: Undertext
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Det gick inte att importera undertexter från %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Lycka! Alla användare i den här domänen kommer du se märkningen."
   success_file_uploaded_8174e93f: "Klart: Filen har laddats upp"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Lyckades! Omdömen för den här uppgiften visas nu för studenter."
@@ -23388,8 +23413,11 @@ sv:
   to_do_1d554f36: "Att göra"
   to_do_5526f10a: "Att göra:"
   to_do_6ac7b2dc: "att göra:"
+  to_do_date_2cb4bf7b: "Att-göra-datum:"
+  to_do_date_ascending_c3a59abb: "Att-göra-datum: Stigande"
   to_do_date_d6b79bfd: "Att göra %{date}"
   to_do_date_ddfb582c: "Att göra-datum:"
+  to_do_date_descending_25b2141d: "Att-göra-datum: Fallande"
   to_do_item_d76ecb78: "Att göra-objekt"
   to_do_items_loading_d1cdfcd5: "Atta göra föremål laddar"
   to_do_list_dashboard_d741f64e: "Översikt över att-göra-lista"
@@ -24876,8 +24904,8 @@ sv:
         last_edit: "Senaste redigering"
         page_title: "Sidans titel"
         todo_date: "Att göra-datum"
-      loading: "Laddar ..."
-      loading_more: "Laddar fler ..."
+      loading: "Läser in ..."
+      loading_more: "Läser in fler ..."
       no_pages: "Inga sidor har skapats än."
       pages_title: Sidor
     wiki_page_index_edit_dialog: 
@@ -25163,6 +25191,7 @@ sv:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du har fått en kontoroll för %{account} kontot på %{website}. Typ av roll: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du har bjudits in till %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du har blivit inbjuden till %{course}. Kursroll: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Du har bjudits in till att delta i en klass på %{account}.  Klassen heter %{course}. Kursroll: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du har bjudits in till att delta i en klass på %{website}.  Klassen heter %{course}. Kursroll: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du har blivit inbjuden att delta i kursen, %{course}. Kursroll: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du har blivit inbjuden att ge kamratrespons %{reviewee}."
