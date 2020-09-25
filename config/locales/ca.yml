@@ -173,7 +173,7 @@ ca:
   a_new_assignment_has_been_created_for_your_course__12b72639: "S'ha creat una tasca nova per al vostre curs, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Per utilitzar Academic Benchmarks es requereix un ID de soci"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Per utilitzar Academic Benchmarks es requereix una clau de soci"
-  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Hi ha disponible una versió prèmium de BigBlueButton que permet realitzar videoconferències simultànies en funció de la quantitat que se’n compri (cadascuna amb 1 amfitrió i fins a 99 assistents), sense limitació d’emmagatzematge de les gravacions i amb una infraestructura dedicada que millora el rendiment."
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Hi ha disponible una versió prèmium de BigBlueButton que permet realitzar videoconferències simultànies en funció de la quantitat que se’n compri (cadascuna amb 1 amfitrió i fins a 99 assistents), sense limitació d’emmagatzematge de les gravacions i amb una infraestructura dedicada que millora el rendiment."
   a_redirect_uri_is_required_please_supply_one_471908db: "Es requereix un redirect_uri, proporcioneu-ne un."
   a_section_is_required_64103992: "Es requereix una secció"
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Un estudiant acaba de realitzar una entrega endarrerida de %{assignment_name} al curs %{course_name}"
@@ -1184,6 +1184,7 @@ ca:
   add_people_7ee4b2ec: "Afegeix persones"
   add_people_and_courses_to_canvas_5c4bfff9: "Afegir persones i cursos al Canvas"
   add_people_to_coursename_5ea234e1: "Afegeix persones a: %{courseName}"
+  add_proficiency_level_93bd72d0: "Afegeix un nivell de competència"
   add_proficiency_rating_d819f6b8: "Afegeix una classificació de competència"
   add_pronouns_option_906ff625: "Afegeix l'opció de pronoms"
   add_quiz_cebfa28b: "Afegeix un qüestionari"
@@ -2512,6 +2513,7 @@ ca:
   attempt_count_267a4fc5: "Intent %{count}"
   attempt_current_attempt_ef626179: "Intent %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Intent %{current_attempt} de %{max_attempts}"
+  attempt_f2691284: Intent
   attempt_number_83dcd86a: "Intent %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Permet intentar detectar un separador de camps apropiat en les exportacions de fulls de càlcul compatibles, en funció del format de número del vostre idioma."
   attempts_22baad: 
@@ -2777,6 +2779,7 @@ ca:
     unpublish: "Anul·la la publicació"
     unpublished: "No publicat"
     update: Actualitza
+  by_b90c6b6f: Per
   by_client_id_4f2fe02c: "Per ID de client"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Per defecte, tots els enllaços d'un curs estan habilitats.  Els estudiants no veuran els enllaços de les seccions que no tinguin contingut.  Per exemple, si no heu creat cap qüestionari, no veuran l'enllaç als qüestionaris.  Podeu ordenar i inhabilitar explícitament aquests enllaços si hi ha àrees del curs a les quals no voleu que els estudiants accedeixin."
   by_default_students_are_able_to_create_groups_to_r_d4901649: "Per defecte, els estudiants poden crear grups; per impedir que els estudiants creïn grups, desseleccioneu la casella de selecció Permet que els estudiants organitzin els seus propis grups a la Configuració del curs."
@@ -4500,8 +4503,8 @@ ca:
     other: "Opcions de l'%{count}"
   count_options_loaded_cd59cc3b: "S'han carregat %{count} opcions."
   count_pages_selected_for_deletion_1ab0f684: 
-    one: "%{count} pàgina seleccionada per suprimir-la"
-    other: "%{count} pàgines seleccionades per suprimir-les"
+    one: "%{count} pàgina seleccionada per suprimir-la"
+    other: "%{count} pàgines seleccionades per suprimir-les"
   count_people_successfully_enrolled_into_course_nam_db8eed18: 
     one: "%{user_name} s'ha inscrit correctament a *%{course_name}*."
     other: "%{count} persones s'han inscrit correctament a *%{course_name}*."
@@ -5268,11 +5271,13 @@ ca:
     required: "Introduïu algunes adreces electròniques"
   created_58b8a75a: Creat
   created_6ee36dff: "Creat:"
+  created_ascending_cff48774: "Creat: Ascendent"
   created_at_73839757: "Creat el"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Creat pel SIS"
   created_created_at_37c0ec3b: "Creat: %{created_at}"
   created_created_bf5714b8: "Creat el %{created}"
+  created_descending_e9a1b097: "Creat: Descendent"
   created_group_group_name_2097306b: "S'ha creat el grup %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "La creació de grups encara no es gestiona al nou flux de tasques. Voleu anar a la pàgina heretada de tasques?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "La creació d'una exportació de l'entrega us permetrà baixar un fitxer zip amb totes les entregues de les vostres tasques de tots els cursos presents i passats. Pot ser que sigui un fitxer gran i que, per tant, trigui una estona. Podeu sortir de la pàgina i tornar-hi més tard."
@@ -5767,10 +5772,15 @@ ca:
       En habilitar aquesta característica, se suprimeix l'esgotament del temps d’espera de les notificacions d'avís que apareixen, de manera que
       l’usuari tingui tot el temps que necessiti per llegir la notificació i descartar-la quan hagi acabat.
   disable_all_read_only_scopes_f9ffdd28: "Inhabilita tots els abastos de només lectura."
+  disable_authentication_for_graphql_3c019622: "Inhabilita l’autenticació per a GraphQL"
   disable_automatic_submission_8e1d8676: "Inhabilita l'entrega automàtica"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Inhabilita les dreceres del teclat del Canvas. Alguns usuaris que fan servir lectors de pantalla o la navegació del teclat
+      tindran una millor experiència amb aquestes dreceres desactivades.
   disable_celebrations_description: "En habilitar aquesta característica, s'amaguen totes les animacions de celebració."
   disable_content_security_policy_8660a787: "Inhabilita la norma de seguretat de contingut"
   disable_extra_filter_options_1d1cdc02: "inhabilita les opcions de filtre addicionals"
+  disable_keyboard_shortcuts_9db78832: "Inhabilita les dreceres del teclat"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Inhabilita les caselles de selecció d'importació i migració de Qüestionaris nous, deixant-les habilitades per defecte"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Desactivar la funció POST a SIS per a tasques en períodes de qualificació tancats"
   disable_scope_6ba4e4d4: "Inhabilita l'abast"
@@ -6276,6 +6286,7 @@ ca:
   edit_toolname_app_23cfbb8: "Edita l'aplicació %{toolName}"
   edit_user_details_4d7b63ff: "Edita els detalls de l'usuari"
   edit_when_36c1c2c8: "Edita %{when}"
+  edited_c4fcbdbf: "Editat:"
   edited_date_b0455372: "(Editat) %{date}"
   editing_permissions_for_name_3503e235: "S'estan editant els permisos de: %{name}"
   editor: 
@@ -7762,7 +7773,7 @@ ca:
         saving: "S'està desant..."
         self_signup: Autoregistre
         split_into_groups: "Divideix els estudiants en %{num_groups} grups"
-        split_into_sized_groups: "Dividir els estudiants en grups amb %{num_members} estudiants per grup"
+        split_into_sized_groups: "Dividir els estudiants en grups amb %{num_members} estudiants per grup"
       group_category_detail: 
         category_settings: Configuració
         delete_category_option: Suprimeix
@@ -8187,6 +8198,9 @@ ca:
       Si s'habilita, el Canvas permetrà que les eines tornin diversos elements de contingut
       en una mateixa sol·licitud a la pàgina del mòduls del curs
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Si s'habilita, els importadors de Common Cartridge convertiran els fitxers HTML en pàgines"
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Si s'habilita, les consultes de GraphQL no requeriran que els
+      usuaris iniciïn la sessió o que utilitzin un testimoni d'accés.
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si s'habilita, les eines d'LTI poden utilitzar la signatura OAuth 1.0a per accedir a l'API del servei de pertinença"
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Si s'habilita, els extrems d’oEmbed requeriran un
@@ -8458,7 +8472,7 @@ ca:
   ip_filter_is_not_valid_152a46d8: "El filtre d'IP no és vàlid."
   ireland_353_3cd32cc0: "Irlanda (+353)"
   irish_567e109f: Irlandès
-  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " utilitza una versió gratuïta de BigBlueButton que permet fer 10 videoconferències simultànies, cadascuna amb 1 amfitrió i fins a 24 assistents. Les gravacions es desen durant 7 dies."
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " utilitza una versió gratuïta de BigBlueButton que permet fer 10 videoconferències simultànies, cadascuna amb 1 amfitrió i fins a 24 assistents. Les gravacions es desen durant 7 dies."
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Sembla que teniu una adreça electrònica no vàlida: \"%{addr}\""
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Sembla que el vostre contingut no s'està carregant. Podeu utilitzar aquest botó per provar d'iniciar-lo en una pestanya nova."
@@ -8608,6 +8622,8 @@ ca:
   last_attempt_7258ebd7: "Últim intent"
   last_changed_b544504d: "Última modificació:"
   last_day_attended_b72d623c: "Últim dia d'assistència"
+  last_edit_ascending_6a18dba4: "Última edició: Ascendent"
+  last_edit_descending_6b7ee755: "Última edició: Descendent"
   last_enrollment_activity_10fe15ba: "Darrera activitat d'inscripció"
   last_export_899a04c5: "Última exportació:"
   last_first_name_95a078f5: "Cognoms, nom"
@@ -9949,7 +9965,7 @@ ca:
       email: 
         details: "Per poder participar a la classe, us haureu de registrar al Canvas.  Per començar, visiteu la pàgina del curs aquí:"
         html: 
-          body: "Us han convidat a participar en una classe a %{website}. La classe s'anomena %{course}. Rol al curs: %{role_type}"
+          body: "Us han convidat a participar en una classe a %{account}. La classe s'anomena %{course}. Rol al curs: %{role_type}"
           details: "Per poder participar a la classe, us haureu de registrar al Canvas."
           email: "Adreça electrònica"
           link: "Feu clic aquí per veure la pàgina del curs"
@@ -11864,6 +11880,8 @@ ca:
   page_not_found_2b0d05f5: "No s'ha trobat la pàgina"
   page_page_59070cd8: "Pàgina %{page}"
   page_pagenum_20dbfeb8: "Pàgina %{pageNum}"
+  page_title_ascending_b5df950c: "Títol de la pàgina: Ascendent"
+  page_title_descending_70c1483d: "Títol de la pàgina: Descendent"
   page_views: 
     download_filename: "Vistes de pàgina per a %{user}"
     table: 
@@ -12061,6 +12079,9 @@ ca:
     apple_settings: 
       labels: 
         client_id: "ID del servei"
+    asset_user_access_logs: 
+      description: "Minimitza la pressió d'escriptura AUA"
+      name: "Registrador d’AUA"
     assignment_freezer: 
       description: "Bloqueig de propietats de tasques en les còpies"
       name: "Bloqueig de propietats de tasques"
@@ -12858,6 +12879,7 @@ ca:
   public_domain_112ed397: "Domini públic"
   public_jwk_ee2d719d: "JWK públic"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "El json de JWK públic no és vàlid. Envieu un json amb format correcte."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "El JWK json públic ha de tenir els següents camps de cadena: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "URL del JWK públic"
   public_message_students: 
     send_message: "Envia un missatge"
@@ -14384,6 +14406,7 @@ ca:
   save_grading_period_daaaddea: "Desa el període de qualificació"
   save_grading_period_set_e029fa88: "Desa el conjunt de períodes de qualificació"
   save_learning_mastery_82889d8b: "Desa el domini de l'aprenentatge"
+  save_mastery_scale_2b4dc13a: "Desa l’escala de domini"
   save_publish_36440725: "Desa i publica"
   save_settings_cafe79a5: "Desa la configuració"
   save_successful_b2f64da4: "S'ha desat correctament."
@@ -15474,6 +15497,7 @@ ca:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "L'acció realitzada en aquest enregistrament ha fallat. Torneu-ho a provar més tard"
   sort_40afa70: "Ordena:"
   sort_by_72dbba9c: "Ordena per"
+  sort_by_e75f9e3e: "Ordena per"
   sort_courses_cf94b8d4: "Ordena els cursos"
   sortable_name_73f707cf: "Nom ordenable"
   sortable_name_e25fe66c: "Nom ordenable:"
@@ -15937,6 +15961,7 @@ ca:
   subscribe_failed_2eb62de0: "No s'ha pogut fer la subscripció"
   subscribe_to_title_c7d6bbd2: "Subscriu-me a %{title}"
   subtitle_ee60ca78: Subtítol
+  subtitles_could_not_be_imported_from_file_5de6da0b: "No s’han pogut importar els subtítols de %{file}"
   success_file_uploaded_8174e93f: "Realitzat correctament: S'ha carregat el fitxer"
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Correcte! S'han amagat les qualificacions per a %{assignmentName}"
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Correcte! S'han amagat les qualificacions per a les seccions seleccionades de %{assignmentName}."
@@ -16789,8 +16814,11 @@ ca:
   to_do_1d554f36: "Tasques pendents"
   to_do_5526f10a: "Tasques pendents:"
   to_do_6ac7b2dc: "tasques pendents:"
+  to_do_date_2cb4bf7b: "Data de la tasca pendent:"
+  to_do_date_ascending_c3a59abb: "Data de la tasca pendent: Ascendent"
   to_do_date_d6b79bfd: "Tasques pendents %{date}"
   to_do_date_ddfb582c: "Data de la tasca pendent:"
+  to_do_date_descending_25b2141d: "Data de la tasca pendent: Descendent"
   to_do_item_d76ecb78: "Element de Tasques pendents"
   to_do_list_dashboard_d741f64e: "Tauler de llista de tasques pendents"
   to_do_time_a7e17623: "Hora de la tasca pendent"
@@ -18124,6 +18152,7 @@ ca:
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Us han inscrit al curs, %{course}. Rol al curs: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Us han donat un rol de compte per al compte %{account} a %{website}. Tipus de rol: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Us han convidat a %{course}."
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Us han convidat a participar en una classe a %{account}.  La classe s'anomena %{course}. Rol al curs: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Us han convidat a participar en una classe a %{website}.  La classe s'anomena %{course}. Rol al curs: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Us han convidat a participar al curs, %{course}. Rol al curs: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Us han convidat a la revisió entre companys %{reviewee}."
