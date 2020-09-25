@@ -1859,7 +1859,8 @@ ru:
   add_people_7ee4b2ec: "Добавить людей"
   add_people_and_courses_to_canvas_5c4bfff9: "Добавлять людей и курсы в Canvas"
   add_people_to_coursename_5ea234e1: "Добавить людей в: %{courseName}"
-  add_proficiency_rating_d819f6b8: "Добавить оценки по специальной подготовке"
+  add_proficiency_level_93bd72d0: "Добавить уровень профессиональной квалификации"
+  add_proficiency_rating_d819f6b8: "Добавить оценки по профессиональной квалификации"
   add_pronouns_option_906ff625: "Добавить опцию местоимений"
   add_quiz_cebfa28b: "Добавить контрольную работу"
   add_quiz_ip_filter_c7b37dc5: "Добавить IP-фильтры контрольной работы"
@@ -3833,6 +3834,7 @@ ru:
   attempt_count_267a4fc5: "Попытка %{count}"
   attempt_current_attempt_ef626179: "Попытка %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Попытка %{current_attempt} из %{max_attempts}"
+  attempt_f2691284: Попытка
   attempt_number_83dcd86a: "Попытка %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Попытка найти подходящий разделитель полей в экспорте журнала оценок на основании формата числа для вашего языка."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Попытка найти подходящий разделитель полей в совместимом экспорте бухучета на основании формата числа для вашего языка."
@@ -4337,6 +4339,7 @@ ru:
     update: Обновить
     view_account_roster: "Просмотреть список учетных записей"
     view_course_roster: "Просмотреть список курсов"
+  by_b90c6b6f: По
   by_client_id_4f2fe02c: "По идентификатору клиента"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "По умолчанию, все ссылки курса активны. Студенты не видят ссылки к пустым разделам. Например, если вы не создали ни одной контрольной работы, они не увидят ссылку на раздел контрольных работ. Вы можете отсортировать и явно скрыть эти ссылки, если в курсе есть области, к которым вы хотите закрыть доступ для студентов."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7644,12 +7647,14 @@ ru:
     required: "Введите несколько адресов электронной почты"
   created_58b8a75a: Создано
   created_6ee36dff: "Создан:"
+  created_ascending_cff48774: "Создан: В порядке возрастания"
   created_at_73839757: "Создано в"
   created_by_b39b9c8b: Автор
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Создано SIS"
   created_created_at_37c0ec3b: "Создан: %{created_at}"
   created_created_bf5714b8: "Создано %{created}"
+  created_descending_e9a1b097: "Создан: В порядке убывания"
   created_group_group_name_2097306b: "Созданная группа %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Создание группы еще не обработано в новом потоке заданий. Перейти на старую страницу заданий?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Создание Экспорта отправленных заданий позволит вам скачать архивный файл всех ваших выполенных и отправленных заданий со всех ваших нынешних и прошлых курсов. Файл может быть большим, поэтому скачивание может занять некоторое время. Вы можете покинуть страницу и вернуться позже."
@@ -8347,10 +8352,15 @@ ru:
       пользователю столько времени, сколько ему нужно для прочтения оповещения и отклонения его после истечения срока его действия.
   disable_all_read_only_scopes_f9ffdd28: "Отключить все диапазоны «только для чтения»."
   disable_and_lock_7d0ef0e8: "Отключить и заблокировать"
+  disable_authentication_for_graphql_3c019622: "Отключить проверку прав доступа для GraphQL"
   disable_automatic_submission_8e1d8676: "Отключить автоматическую отправку"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Отключить клавиши быстрого доступа Canvas. Некоторые пользователи, использующие экранные дикторы или навигацию с помощью клавиатуры,
+      смогут работать более эффективно, отключив эти клавиши быстрого доступа.
   disable_celebrations_description: "Активация этой функции скрывает все праздничные анимации."
   disable_content_security_policy_8660a787: "Отключить политику защиты содержимого"
   disable_extra_filter_options_1d1cdc02: "отключить дополнительные параметры фильтра"
+  disable_keyboard_shortcuts_9db78832: "Отключить клавиши быстрого доступа"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Снимите флажки в окошках импортирования новых тестирований, вернув их к активному состоянию (параметр по умолчанию)"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Отключить функцию «Post to SIS» для задания в закрытых периодах выставления оценок"
   disable_scope_6ba4e4d4: "Отключить диапазон"
@@ -9071,6 +9081,7 @@ ru:
   edit_user_details_9af7819b: "Редактировать сведения о пользователе"
   edit_when_36c1c2c8: "Редактировать %{when}"
   edit_your_catalog_account_cce59310: "Редактируйте аккаунт вашего каталога"
+  edited_c4fcbdbf: "Отредактировано:"
   edited_date_b0455372: "(Отредактировано) %{date}"
   editing_permissions_for_name_3503e235: "Редактирование разрешений для: %{name}"
   editor: 
@@ -12195,6 +12206,9 @@ ru:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Если опция включена, дизайнеры контента должны предоставить информацию об авторских правах и лицензии для файлов, прежде чем они будут опубликованы. Применяется только если также включен Просмотр лучшего файла."
   if_enabled_copyright_and_license_information_must__2a551827: "Если включено, информация об авторских правах и лицензии должна предоставляться для файлов до их публикации."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Если включено, будут использоваться параметры управления ключами разработчика и анализа токена."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Если включено, запросы GraphQL не будут требовать
+      от пользователя входа или использования токена доступа.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Если опция включена, появится возможность пометить модуль, как выполненный, если будет удовлетворено только одно из требований."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "В случае активации данной функции при запуске процесса регистрации LTI2 будет произведена отправка 'oauth2_access_token_url'"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Если активировано, подписывание OAuth 1.0a может использоваться инструментами LTI для доступа к API Службы членства"
@@ -12805,6 +12819,8 @@ ru:
   last_day_attended_b72d623c: "День последнего посещения"
   last_download_33ea9bf4: "Последняя загрузка:"
   last_e159dbd: Последняя
+  last_edit_ascending_6a18dba4: "Последняя редакция: В порядке возрастания"
+  last_edit_descending_6b7ee755: "Последняя редакция: В порядке убывания"
   last_enrollment_activity_10fe15ba: "Последняя активность по зачислению"
   last_export_899a04c5: "Последний экспорт:"
   last_first_name_95a078f5: "Фамилия и имя"
@@ -14589,7 +14605,7 @@ ru:
         body_teacher: "Вы приглашены на участие в занятии на %{website}.  Занятие называется %{course}, и вы приглашены участие участвовать как учитель."
         details: "Для участия в занятии необходимо зарегистрироваться с Canvas.  Для начала работы посетите страницу курса здесь:"
         html: 
-          body: "Вы приглашены на участие в занятии на %{website}.  Занятие называется %{course}. Роль курса: %{role_type}"
+          body: "Вы приглашены к участию в занятии в %{account}. Занятие называется %{course}. Роль курса: %{role_type}"
           body_designer: "Класс называется %{course}, и вы были приглашены к участию в качестве дизайнера."
           body_observer: "Класс называется %{course}, и вы были приглашены к участию в качестве наблюдателя."
           body_student: "Класс называется %{course}, и вы были приглашены к участию в качестве студента."
@@ -17015,6 +17031,8 @@ ru:
   page_page_59070cd8: "Стр. %{page}"
   page_pagenum_20dbfeb8: "Стр. %{pageNum}"
   page_pagenumber_31fe579f: "страница %{pageNumber}"
+  page_title_ascending_b5df950c: "Заголовок страницы: В порядке возрастания"
+  page_title_descending_70c1483d: "Заголовок страницы: В порядке убывания"
   page_views: 
     download_filename: "Просмотры страниц для %{user}"
     table: 
@@ -17261,6 +17279,9 @@ ru:
     apple_settings: 
       labels: 
         client_id: "Идентификатор службы ID"
+    asset_user_access_logs: 
+      description: "Минимизировать давление записи AUA"
+      name: "Средство ведения журнала AUA"
     assignment_freezer: 
       description: "Блокировать свойства задания после копирования"
       name: "Подключаемый модуль для блокировки Assignment Property Freezer"
@@ -18286,6 +18307,7 @@ ru:
   public_jwk_44d1e8a9: "* Публичный JWK"
   public_jwk_ee2d719d: "Публичный JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Публичный JWK json недействителен. Предоставьте правильно отформатированный JSON."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Открытый JWK json должен иметь следующие строковые поля: kty, e, n, kid, alg, use"
   public_jwk_url_694edf52: "* Публичный JWK URL"
   public_jwk_url_b5564c1d: "Публичный JWK URL"
   public_message_students: 
@@ -20588,6 +20610,7 @@ ru:
   save_grading_period_set_e029fa88: "Сохранить набор Периода оценивания"
   save_key_b4dede06: "Сохранить ключ"
   save_learning_mastery_82889d8b: "Сохранить усвоенный материал"
+  save_mastery_scale_2b4dc13a: "Сохранить шкалу мастерства"
   save_publish_36440725: "Сохранить и Опубликовать"
   save_settings_cafe79a5: "Сохранить настройки"
   save_successful_b2f64da4: "Сохранение успешно выполнено."
@@ -22212,6 +22235,7 @@ ru:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "К сожалению, не удалось выполнить действие с этой записью. Попробуйте еще раз позднее"
   sort_40afa70: "Сортировать:"
   sort_by_72dbba9c: "Сортировать по"
+  sort_by_e75f9e3e: "Сортировать по"
   sort_courses_cf94b8d4: "Сортировать курсы"
   sortable_name_73f707cf: "Сортируемое имя"
   sortable_name_e25fe66c: "Сортируемое имя:"
@@ -22785,6 +22809,7 @@ ru:
   subscribe_failed_2eb62de0: "Ошибка подписки"
   subscribe_to_title_c7d6bbd2: "Подписаться на %{title}"
   subtitle_ee60ca78: Подзаголовок
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Невозможно импортировать субтитры из %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Операция выполнена успешно! Все пользователи на этом домене смогут увидеть этот брендинг."
   success_file_uploaded_8174e93f: "Успешно: Файл отправлен"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Успешно! Оценки за это задание теперь видимы для студентов."
@@ -23871,8 +23896,11 @@ ru:
   to_do_1d554f36: Задачи
   to_do_5526f10a: "Задачи:"
   to_do_6ac7b2dc: "выполните:"
+  to_do_date_2cb4bf7b: "Дата выполнения:"
+  to_do_date_ascending_c3a59abb: "Дата выполнения: В порядке возрастания"
   to_do_date_d6b79bfd: "Задачи %{date}"
   to_do_date_ddfb582c: "Дата выполнения:"
+  to_do_date_descending_25b2141d: "Дата выполнения: В порядке убывания"
   to_do_item_d76ecb78: "Элемент задачи"
   to_do_items_loading_d1cdfcd5: "Для выполнения загрузки позиций"
   to_do_list_dashboard_d741f64e: "Панель задач"
@@ -25682,8 +25710,9 @@ ru:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "Вы зарегистрированы на курсе, %{course}."
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Вы зарегистрированы на курсе, %{course}. Роль курса: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Вам дали учетную роль для аккаунта %{account} на %{website}. Тип роли: %{role_type}."
-  you_ve_been_invited_to_course_90764f1: "Вас пригласили на %{course}."
+  you_ve_been_invited_to_course_90764f1: "Вы получили приглашение в %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Вас пригласили на курс %{course}. Роль курса: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Вы приглашены к участию в занятии в %{account}.  Занятие называется %{course}. Роль курса: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Вы приглашены на участие в занятии на %{website}.  Занятие называется %{course}. Роль курса: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Вы приглашены для участия в курсе, %{course}. Роль курса: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "You've been invited to peer review %{reviewee}."
