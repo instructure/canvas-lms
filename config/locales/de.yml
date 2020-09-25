@@ -191,7 +191,7 @@ de:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Eine neue Aufgabe wurde für Ihren Kurs %{course_name} erstellt."
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Für die Verwendung von Academic Benchmarks ist eine Partner-ID erforderlich."
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Für die Verwendung von Academic Benchmarks ist ein Partnerschlüssel erforderlich."
-  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Es ist eine Premiumversion von BigBlueButton verfügbar, die entsprechen der erworbenen Menge gleichzeitige Konferenzen mit jeweils 1 Host und bis zu 99 Teilnehmern bietet – keine Beschränkungen für gespeicherte Aufzeichnungen und eine dedizierte Infrastruktur für eine bessere Performance."
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Es ist eine Premiumversion von BigBlueButton verfügbar, die entsprechen der erworbenen Menge gleichzeitige Konferenzen mit jeweils 1 Host und bis zu 99 Teilnehmern bietet – keine Beschränkungen für gespeicherte Aufzeichnungen und eine dedizierte Infrastruktur für eine bessere Performance."
   a_problem_occurred_adding_reviewers_57b083d9: "Beim Hinzufügen von Prüfern ist ein Problem aufgetreten."
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Eine öffentliche Sicherheitsstufe sendet die persönlichen Identifikationsdaten des startenden Benutzers an den Tool-Anbieter. Eine Einstellung auf Privat kann nachteiligen Einfluss auf Tools haben, die von diesen Daten abhängen."
   a_redirect_uri_is_required_please_supply_one_471908db: "A redirect_uri ist erforderlich. Sorgen Sie bitte dafür."
@@ -1805,6 +1805,7 @@ de:
   add_people_7ee4b2ec: "Personen hinzufügen"
   add_people_and_courses_to_canvas_5c4bfff9: "Personen und Kurse zu Canvas hinzufügen"
   add_people_to_coursename_5ea234e1: "Personen hinzufügen zu: %{courseName}"
+  add_proficiency_level_93bd72d0: "Kompetenzlevel hinzufügen"
   add_proficiency_rating_d819f6b8: "Leistungsstand hinzufügen"
   add_pronouns_option_906ff625: "Option Pronomen hinzufügen"
   add_quiz_cebfa28b: "Quiz hinzufügen"
@@ -3730,11 +3731,12 @@ de:
   attempt_1_7ba3c30f: "Versuch 1"
   attempt_1_grade_484b35e4: "Versuch 1: %{grade}"
   attempt_3dd42b18: Versuch
-  attempt_attempt_d3911720: "Versuch %{attempt}"
+  attempt_attempt_d3911720: "Versuch %{attempt}"
   attempt_attempt_grade_c01f45df: "Versuch %{attempt} %{grade}"
   attempt_count_267a4fc5: "Versuch %{count}"
   attempt_current_attempt_ef626179: "Versuch %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Versuch %{current_attempt}/%{max_attempts}"
+  attempt_f2691284: Versuch
   attempt_number_83dcd86a: "Versuch %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Versuchen Sie, basierend auf dem Zahlenformat Ihrer Sprache ein geeignetes Feldtrennzeichen im Notenbuchexport zu entdecken."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Versuchen Sie, basierend auf dem Zahlenformat Ihrer Sprache ein geeignetes Feldtrennzeichen in Arbeitsblattexporten zu entdecken."
@@ -4239,6 +4241,7 @@ de:
     update: Aktualisieren
     view_account_roster: "Kontenübersicht anzeigen"
     view_course_roster: "Kursübersicht anzeigen"
+  by_b90c6b6f: von
   by_client_id_4f2fe02c: "Nach Client-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Standardmäßig sind alle Links für einen Kurs aktiviert. Den Studenten werden keine Links zu Kursabschnitten angezeigt, die keinen Inhalt haben. Wenn Sie beispielsweise keine Quizze erstellt haben, werden keine Quiz-Links angezeigt. Sie können die Links sortieren und gezielt deaktivieren, wenn Ihre Studenten auf bestimmte Kursbereiche nicht zugreifen sollen."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -6414,8 +6417,8 @@ de:
     one: 1 Seitenansicht
     other: "%{count} Seitenansichten"
   count_pages_selected_for_deletion_1ab0f684: 
-    one: "%{count} Seite wurde zum Löschen ausgewählt."
-    other: "%{count} Seiten wurden zum Löschen ausgewählt."
+    one: "%{count} Seite wurde zum Löschen ausgewählt."
+    other: "%{count} Seiten wurden zum Löschen ausgewählt."
   count_participations_ac8f82b7: 
     one: 1 Teilnahme
     other: "%{count} Teilnahmen"
@@ -7453,12 +7456,14 @@ de:
     required: "Geben Sie einige E-Mail-Adressen ein"
   created_58b8a75a: Erstellt
   created_6ee36dff: "Erstellt:"
+  created_ascending_cff48774: "Erstellt: Aufsteigend"
   created_at_73839757: "Erstellt am"
   created_by_b39b9c8b: "Erstellt von"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Von SIS erzeugt"
   created_created_at_37c0ec3b: "Erstellt: %{created_at}"
   created_created_bf5714b8: "Erstellt %{created}"
+  created_descending_e9a1b097: "Erstellt: Absteigend"
   created_group_group_name_2097306b: "Erstellte Gruppe %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Das Einrichten einer Gruppe wurde im neuen Aufgabenfluss noch nicht berücksichtigt. Zur angestammten Aufgabenseite gehen?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Durch Erstellen von Abgabe-Exporten können Sie eine ZIP-Datei mit all Ihren abgegebenen Aufgaben für alle aktuellen und vergangenen Kurse herunterladen. Da dies eine große Datei sein kann, dauert der Download eventuell eine Weile. Sie können zwischenzeitlich die Seite verlassen und später wieder zu ihr zurückkehren."
@@ -8118,10 +8123,15 @@ de:
       Benutzer genug Zeit hat, um die Textnachricht zu lesen, und sie dann schließen kann.
   disable_all_read_only_scopes_f9ffdd28: "Deaktivieren Sie alle schreibgeschützten Bereiche."
   disable_and_lock_7d0ef0e8: "Deaktivieren und sperren"
+  disable_authentication_for_graphql_3c019622: "Die Authentifizierung für GraphQL deaktivieren"
   disable_automatic_submission_8e1d8676: "Automatische Abgabe deaktivieren"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Canvas-Tastenkombinationen deaktivieren. Die Erfahrung einiger Benutzer, die Screenreader oder die Tastaturnavigation verwenden,
+      wird durch das Ausschalten dieser Tastenkombinationen verbessert.
   disable_celebrations_description: "Mit dieser Funktion werden alle Feieranimationen ausgeblendet."
   disable_content_security_policy_8660a787: "Richtlinie zur Content-Sicherheit deaktivieren"
   disable_extra_filter_options_1d1cdc02: "zusätzliche Filteroptionen deaktivieren"
+  disable_keyboard_shortcuts_9db78832: "Tastenkombinationen deaktivieren"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktivieren der Kontrollkästchen für Neues-Quiz-Import und -Migration, sodass sie standardmäßig aktiviert sind"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Veröffentlichung im SIS für Aufgabe in geschlossenen Benotungszeiträumen deaktivieren"
   disable_scope_6ba4e4d4: "Bereich deaktivieren"
@@ -8821,6 +8831,7 @@ de:
   edit_user_details_9af7819b: "Benutzerdetails bearbeiten"
   edit_when_36c1c2c8: "%{when} ändern"
   edit_your_catalog_account_cce59310: "Ihr Catalog-Konto bearbeiten"
+  edited_c4fcbdbf: "Bearbeitet:"
   edited_date_b0455372: "(Geändert) %{date}"
   editing_permissions_for_name_3503e235: "Änderungsberechtigungen für: %{name}"
   editor: 
@@ -11355,7 +11366,7 @@ de:
         saving: "Speichervorgang läuft ..."
         self_signup: Selbstregistrierung
         split_into_groups: "Studenten in %{num_groups} Gruppen aufteilen"
-        split_into_sized_groups: "Teilen Sie die Schüler in Gruppen mit %{num_members} Schülern pro Gruppe auf."
+        split_into_sized_groups: "Teilen Sie die Schüler in Gruppen mit %{num_members} Schülern pro Gruppe auf."
       group_category_detail: 
         add_group: "Gruppe hinzufügen"
         category_settings: Einstellungen
@@ -11872,6 +11883,9 @@ de:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Falls aktiviert, müssen Content-Designer für die Dateien die Copyright- und Lizenz-Informationen bereitstellen, bevor sie veröffentlicht werden. Gilt nur, wenn „Better File Browsing“ ebenfalls aktiviert ist."
   if_enabled_copyright_and_license_information_must__2a551827: "Falls aktiviert, müssen Copyright- und Lizenzinformationen für Dateien angegeben werden, bevor sie veröffentlicht werden können."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Wenn aktiviert, werden die Verwaltungsoptionen des Entwicklerschlüssels und die Token-Sondierung verwendet."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Falls diese Option aktiviert ist, erfordern GraphQL-Abfragen keine
+      angemeldeten Benutzer zu sein, oder die Verwendung eines Zugriffstokens.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Wenn aktiviert, können die Module als Option auch dann als abgeschlossen markiert werden, wenn nur eine der Anforderungen erfüllt ist."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Wenn diese Option aktiviert ist, wird oauth2_access_token_url beim LTI2-Registrierungsstart gesendet."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Falls aktiviert, kann OAuth 1.0a-Unterzeichnung von LTI-Tools verwendet werden, um auf die Membership Service API zuzugreifen."
@@ -12304,7 +12318,7 @@ de:
   ireland_353_3cd32cc0: "Irland (+353)"
   ireland_f7bb9899: Irland
   irish_567e109f: Irisch
-  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " verwendet eine kostenlose Version von BigBlueButton, die 10 gleichzeitige Videokonferenzen mit jeweils 1 Host und bis zu 24 Teilnehmern bereitstellt. Aufzeichnungen werden 7 Tage lang gespeichert."
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " verwendet eine kostenlose Version von BigBlueButton, die 10 gleichzeitige Videokonferenzen mit jeweils 1 Host und bis zu 24 Teilnehmern bereitstellt. Aufzeichnungen werden 7 Tage lang gespeichert."
   israel_681bc5a5: Israel
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Wie es aussieht, haben Sie eine ungültige E-Mail-Adresse: „%{addr}“"
@@ -12467,6 +12481,8 @@ de:
   last_day_attended_b72d623c: "Letzter Anwesenheitstag"
   last_download_33ea9bf4: "Letzter Download:"
   last_e159dbd: Letzte
+  last_edit_ascending_6a18dba4: "Letzte Bearbeitung: Aufsteigend"
+  last_edit_descending_6b7ee755: "Letzte Bearbeitung: Absteigend"
   last_enrollment_activity_10fe15ba: "Letzte Einschreibungsaktivität"
   last_export_899a04c5: "Letzter Export:"
   last_first_name_95a078f5: "Nachname, Vorname"
@@ -14215,7 +14231,7 @@ de:
         body_teacher: "Sie wurden zur Teilnahme am Unterricht auf %{website} eingeladen.  Der Unterricht hat die Bezeichnung %{course}, und Sie wurden zur Teilnahme als Dozent eingeladen."
         details: "Sie müssen sich bei Canvas registrieren, bevor Sie am Unterricht teilnehmen können. Hier können Sie die Kursseite aufrufen:"
         html: 
-          body: "Sie wurden zur Teilnahme am Unterricht auf %{website} eingeladen. Der Unterricht hat die Bezeichnung %{course}. Kursrolle: %{role_type}"
+          body: "Sie wurden in eine Klasse in %{account} eingeladen. Die Klasse heißt %{course}. Kursrolle: %{role_type}"
           body_designer: "Der Name des Kurses lautet %{course}, und Sie wurden eingeladen, als Designer daran teilnzunehmen."
           body_observer: "Der Name des Kurses lautet %{course}, und Sie wurden eingeladen, als Beobachter daran teilzunehmen."
           body_student: "Der Name des Kurses lautet %{course}, und Sie wurden eingeladen, als Student daran teilzunehmen."
@@ -16612,6 +16628,8 @@ de:
   page_page_59070cd8: "Seite %{page}"
   page_pagenum_20dbfeb8: "Seite %{pageNum}"
   page_pagenumber_31fe579f: "Seite %{pageNumber}"
+  page_title_ascending_b5df950c: "Seitentitel: Aufsteigend"
+  page_title_descending_70c1483d: "Seitentitel: Absteigend"
   page_views: 
     download_filename: "Seitenaufrufe für %{user}"
     table: 
@@ -16851,6 +16869,9 @@ de:
     apple_settings: 
       labels: 
         client_id: Service-ID
+    asset_user_access_logs: 
+      description: "Den AUA-Schreibdruck minimieren"
+      name: "AUA Logger"
     assignment_freezer: 
       description: "Aufgabeneigenschaften beim Kopieren sperren"
       name: Aufgabeneigenschaften-Sperre
@@ -17870,6 +17891,7 @@ de:
   public_domain_112ed397: "Public Domain"
   public_jwk_ee2d719d: "Öffentliches JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Öffentliche JWK-JSON-Datei ist ungültig. Reichen Sie bitte eine korrekt formatierte JSON-Datei ein."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Eine öffentliche JWK-json-Datei muss über folgende Stringfelder verfügen: Kty, E, N, Kid, Alg, Use"
   public_jwk_url_b5564c1d: "Öffentliches JWK (URL)"
   public_message_students: 
     send_message: "Nachricht senden"
@@ -20066,6 +20088,7 @@ de:
   save_grading_period_set_e029fa88: "Benotungszeitraum-Set speichern"
   save_key_b4dede06: "Schlüssel speichern"
   save_learning_mastery_82889d8b: "Erreichtes Leistungsziel speichern"
+  save_mastery_scale_2b4dc13a: "Leistungsziel-Maßstab speichern"
   save_publish_36440725: "Speichern und Veröffentlichen"
   save_settings_cafe79a5: "Einstellungen speichern"
   save_successful_b2f64da4: "Speichern erfolgreich."
@@ -21657,6 +21680,7 @@ de:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Leider ist die Aktion für diese Aufzeichnung fehlgeschlagen.. Später versuchen."
   sort_40afa70: "Sortieren:"
   sort_by_72dbba9c: "Sortieren nach"
+  sort_by_e75f9e3e: "Sortieren nach"
   sort_courses_cf94b8d4: "Kurse sortieren"
   sortable_name_73f707cf: "Sortierbarer Name"
   sortable_name_e25fe66c: "Sortierbarer Name:"
@@ -22207,6 +22231,7 @@ de:
   subscribe_failed_2eb62de0: "Abonnieren fehlgeschlagen"
   subscribe_to_title_c7d6bbd2: "Abonnieren %{title}"
   subtitle_ee60ca78: Untertitel
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Die Untertitel aus %{file} konnten nicht importiert werden."
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Erfolg! Alle Benutzer auf dieser Domain sehen nun diesen Markenaufbau."
   success_file_uploaded_8174e93f: "Erfolg: Datei hochgeladen"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Erfolgreich! Die Noten für diese Aufgabe sind nun für die Studenten sichtbar."
@@ -22251,7 +22276,7 @@ de:
       global_support_desk_description: "Unsere ASCs sind Ihre ersten Support-Ansprechpartner. Zudem können sie Sie mit unserem Global Support Desk bzgl. Problemen verbinden, die zusätzliche Hilfe erfordern."
       networking_academy_description: "Schauen Sie sich die Antworten von Cisco zu den am häufigsten gestellten Fragen an."
       networking_academy_faqs: "Häufig gestellte Fragen zur Networking Academy"
-      student_support: "NetAcad-Support – Student"
+      student_support: "NetAcad-Support – Student"
       student_support_description: "Ihr Kursleiter sollte Ihr erster Ansprechpartner sein. Er/Sie kann Ihre Networking Academy-Fragen beantworten oder sich für Sie an das Support-Desk wenden. Sie können Ihren Kursleiter über die Posteingangsfunktion erreichen."
       support_desk_livechat: Supportdesk-Livechat
   support_favorite_lti_tools_in_the_rce_1680436d: "Unterstützung bevorzugter LTI-Tools im RCE"
@@ -23278,8 +23303,11 @@ de:
   to_do_1d554f36: "Zu erledigen"
   to_do_5526f10a: "Zu erledigen:"
   to_do_6ac7b2dc: "zu erledigen:"
+  to_do_date_2cb4bf7b: "Aufgabendatum:"
+  to_do_date_ascending_c3a59abb: "Aufgabendatum: Aufsteigend"
   to_do_date_d6b79bfd: "Zu erledigen %{date}"
   to_do_date_ddfb582c: "Aufgabendatum:"
+  to_do_date_descending_25b2141d: "Aufgabendatum: Absteigend"
   to_do_item_d76ecb78: "Eintrag in der Aufgabenliste"
   to_do_items_loading_d1cdfcd5: "Zu erledigende Aufgaben werden geladen"
   to_do_list_dashboard_d741f64e: Aufgabenlisten-Dashboard
@@ -24759,8 +24787,8 @@ de:
         last_edit: "Zuletzt bearbeitet"
         page_title: Seitentitel
         todo_date: Aufgabendatum
-      loading: "Wird geladen ..."
-      loading_more: "Weitere werden geladen ..."
+      loading: "Wird geladen ..."
+      loading_more: "Weitere werden geladen ..."
       no_pages: "Noch keine Seiten erstellt"
       pages_title: Seiten
     wiki_page_index_edit_dialog: 
@@ -25046,6 +25074,7 @@ de:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Sie erhielten für das Konto %{account} auf %{website} eine Konto-Rolle. Rollentyp: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Sie wurden zu %{course} eingeladen."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Sie wurden für %{course} eingeladen. Kursrolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Sie wurden in eine Klasse in %{account} eingeladen.  Die Klasse heißt %{course}. Kursrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Sie wurden zur Teilnahme am Unterricht auf %{website} eingeladen. Die Klasse heißt %{course}. Kursrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Sie wurden zur Teilnahme am Kurs %{course} eingeladen. Kursrolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Sie wurden eingeladen, eine Peer-Korrektur für %{reviewee} durchzuführen."
