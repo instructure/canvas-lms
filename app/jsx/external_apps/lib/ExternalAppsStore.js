@@ -122,13 +122,12 @@ store.save = function(configurationType, data, success, error) {
 }
 
 store.setAsFavorite = function(tool, isFavorite, success, error) {
-  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/' + tool.app_id
-  const method = 'PUT'
+  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/rce_favorites/' + tool.app_id
+  const method = isFavorite ? 'POST' : 'DELETE'
 
   $.ajax({
     url,
     contentType: 'application/json',
-    data: JSON.stringify({external_tool: {is_rce_favorite: isFavorite}}),
     type: method,
     success: success.bind(this),
     error: error.bind(this)

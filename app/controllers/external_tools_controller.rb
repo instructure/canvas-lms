@@ -678,6 +678,8 @@ class ExternalToolsController < ApplicationController
   #   multiple times
   #
   # @argument is_rce_favorite [Boolean]
+  #   (Deprecated in favor of {api:ExternalToolsController#add_rce_favorite Add tool to RCE Favorites} and
+  #   {api:ExternalToolsController#remove_rce_favorite Remove tool from RCE Favorites})
   #   Whether this tool should appear in a preferred location in the RCE.
   #   This only applies to tools in root account contexts that have an editor
   #   button placement.
@@ -1036,6 +1038,59 @@ class ExternalToolsController < ApplicationController
     params[:iat] = Time.zone.now.to_i
 
     render json: {jwt_token: Canvas::Security.create_jwt(params, nil, tool.shared_secret)}
+  end
+
+  # @API Add tool to RCE Favorites
+  # Add the specified editor_button external tool to a preferred location in the RCE
+  # for courses in the given account and its subaccounts (if the subaccounts
+  # haven't set their own RCE Favorites). Cannot set more than 2 RCE Favorites.
+  #
+  # @example_request
+  #
+  #   curl -X POST 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
+  #        -H "Authorization: Bearer <token>"
+  def add_rce_favorite
+    if authorized_action(@context, @current_user, :lti_add_edit)
+      @tool = ContextExternalTool.find_external_tool_by_id(params[:id], @context)
+      raise ActiveRecord::RecordNotFound unless @tool
+      unless @tool.can_be_rce_favorite?
+        return render json: {message: "Tool does not have an editor_button placement"}, status: :bad_request
+      end
+
+      favorite_ids = @context.get_rce_favorite_tool_ids
+      favorite_ids << @tool.global_id
+      favorite_ids.uniq!
+      if favorite_ids.length > 2
+        valid_ids = ContextExternalTool.all_tools_for(@context, placements: [:editor_button]).pluck(:id).map{|id| Shard.global_id_for(id)}
+        favorite_ids = favorite_ids & valid_ids # try to clear out any possibly deleted tool references first before causing a fuss
+      end
+      if favorite_ids.length > 2
+        render json: {message: "Cannot have more than 2 favorited tools"}, status: :bad_request
+      else
+        @context.settings[:rce_favorite_tool_ids] = {:value => favorite_ids}
+        @context.save!
+        render json: {rce_favorite_tool_ids: favorite_ids.map{|id| Shard.relative_id_for(id, Shard.current, Shard.current)}}
+      end
+    end
+  end
+
+  # @API Remove tool from RCE Favorites
+  # Remove the specified external tool from a preferred location in the RCE
+  # for the given account
+  #
+  # @example_request
+  #
+  #   curl -X DELETE 'https://<canvas>/api/v1/accounts/<account_id>/external_tools/rce_favorites/<id>' \
+  #        -H "Authorization: Bearer <token>"
+  def remove_rce_favorite
+    if authorized_action(@context, @current_user, :lti_add_edit)
+      favorite_ids = @context.get_rce_favorite_tool_ids
+      if favorite_ids.delete(Shard.global_id_for(params[:id]))
+        @context.settings[:rce_favorite_tool_ids] = {:value => favorite_ids}
+        @context.save!
+      end
+      render json: {rce_favorite_tool_ids: favorite_ids.map{|id| Shard.relative_id_for(id, Shard.current, Shard.current)}}
+    end
   end
 
   private
