@@ -363,3 +363,5 @@ class RequestThrottle
     end
   end
 end
+
+Canvas::Reloader.on_reload { RequestThrottle.reload! }

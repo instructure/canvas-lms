@@ -79,4 +79,6 @@ class Setting < ActiveRecord::Base
     Setting.where(name: name).delete_all
     MultiCache.delete("all_settings")
   end
+
+  Canvas::Reloader.on_reload { reset_cache! }
 end
