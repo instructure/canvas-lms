@@ -167,6 +167,18 @@ describe "Group Categories API", type: :request do
         expect(groups.count).to eq 3
       end
 
+      it "should not allow a teacher to update a category in other courses" do
+        og_course = @course
+        course = course_factory(:course_name => 'Math 101', :account => @account, :active_course => true)
+        category2 = GroupCategory.student_organized_for(course)
+        json = api_call(:put, "/api/v1/group_categories/#{category2.id}",
+                        @category_path_options.merge(action: 'update', group_category_id: category2.to_param),
+                        { name: @name, self_signup: 'enabled', 'create_group_count' => 3, course_id: og_course.id},
+                        {}, {expected_status: 401})
+        expect(json['status']).to eq 'unauthorized'
+        expect(category2.reload.name).to_not eq @name
+      end
+
       it "should allow a teacher to update a category and distribute students to new groups" do
         create_users_in_course(@course, 6)
         json = api_call :put, "/api/v1/group_categories/#{@category.id}",

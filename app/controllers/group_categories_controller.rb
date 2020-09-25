@@ -91,7 +91,6 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :get_context
   before_action :require_context, :only => [:create, :index]
   before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import]
 
@@ -610,7 +609,7 @@ class GroupCategoriesController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
     end
-    @context ||= @group_category.context
+    @context = @group_category.context
   end
 
   private
