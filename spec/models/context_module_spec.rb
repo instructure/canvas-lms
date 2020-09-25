@@ -466,6 +466,14 @@ describe ContextModule do
       expect(m.content_tags.map(&:content_type)).to eq(%w(Quizzes::Quiz DiscussionTopic))
       expect(m.content_tags.map(&:content_id)).to eq([@quiz.id, @topic.id])
     end
+
+    it "doesn't add duplicate items" do
+      @module.add_item(type: 'assignment', id: @assign.id)
+      @module.insert_items([@page, @assign, @quiz])
+      expect(@module.content_tags.pluck(:content_type)).to eq(
+        ['ContextModuleSubHeader', 'ContextModuleSubHeader', 'ContextModuleSubHeader',
+         'Assignment', 'WikiPage', 'Quizzes::Quiz'])
+    end
   end
 
   describe "completion_requirements=" do

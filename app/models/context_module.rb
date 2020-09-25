@@ -721,19 +721,20 @@ class ContextModule < ActiveRecord::Base
   # specify a 1-based position to insert the items at; leave nil to append to the end of the module
   # ignores current module item positions in favor of an objective position
   def insert_items(items, start_pos = nil)
+    tags = content_tags.not_deleted.select(:id, :position, :content_type, :content_id).to_a
     if start_pos
       start_pos = 1 if start_pos < 1
       next_pos = start_pos
-      tags = content_tags.not_deleted.select(:id, :position).to_a
     else
       next_pos = (content_tags.maximum(:position) || 0) + 1
     end
-    
+
     new_tags = []
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
       next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
+      next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
       state = item.respond_to?(:published?) && !item.published? ? 'unpublished' : 'active'
       new_tags << self.content_tags.create!(context: self.context, title: Context.asset_name(item), content: item,
                                             tag_type: 'context_module', indent: 0,
