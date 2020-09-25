@@ -192,7 +192,7 @@ es:
   a_new_assignment_has_been_created_for_your_course__12b72639: "Se ha creado una tarea nueva para su curso, %{course_name}"
   a_partner_id_is_required_to_use_academic_benchmark_adba3df0: "Se requiere un identificador partner para utilizar Academic Benchmarks"
   a_partner_key_is_required_to_use_academic_benchmar_da9f31bd: "Se requiere una clave partner para utilizar Academic Benchmarks"
-  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Existe una versión prémium de BigBlueButton que ofrece conferencias simultáneas en función del monto comprado (cada una con un anfitrión y hasta 99 asistentes), almacenamiento de grabaciones ilimitado y una infraestructura dedicada para tener un mejor rendimiento."
+  a_premium_version_of_bigbluebutton_is_available_th_dbaa900b: "Existe una versión prémium de BigBlueButton que ofrece conferencias simultáneas en función del monto comprado (cada una con un anfitrión y hasta 99 asistentes), almacenamiento de grabaciones ilimitado y una infraestructura dedicada para tener un mejor rendimiento."
   a_problem_occurred_adding_reviewers_57b083d9: "Ha ocurrido un error al agregar los revisores"
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Configurar el nivel de privacidad público hará que el proveedor de la herramienta pueda ver la información de identificación personal del usuario. Establecer esta configuración en privado podría afectar negativamente las herramientas que necesitan esta información."
   a_redirect_uri_is_required_please_supply_one_471908db: "Se requiere un redirect_uri, proporciónelo."
@@ -1832,6 +1832,7 @@ es:
   add_people_7ee4b2ec: "Agregar personas"
   add_people_and_courses_to_canvas_5c4bfff9: "Agregar personas y cursos a Canvas"
   add_people_to_coursename_5ea234e1: "Agregar personas a lo siguiente: %{courseName}"
+  add_proficiency_level_93bd72d0: "Agregar nivel de competencia"
   add_proficiency_rating_d819f6b8: "Agregar clasificación de competencia"
   add_pronouns_option_906ff625: "Agregar opción de pronombres"
   add_quiz_cebfa28b: "Agregar examen"
@@ -3768,6 +3769,7 @@ es:
   attempt_count_267a4fc5: "Intento %{count}"
   attempt_current_attempt_ef626179: "Intento %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Intento %{current_attempt} de %{max_attempts}"
+  attempt_f2691284: Intento
   attempt_number_83dcd86a: "Intento %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Intento de detectar un separador de campo apropiado en las exportaciones del Libro de calificaciones basado en el formato numérico de su idioma."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Intente detectar un separador de campo adecuado en las exportaciones de hojas de cálculo compatibles, según el formato numérico de su idioma."
@@ -4272,6 +4274,7 @@ es:
     update: Actualizar
     view_account_roster: "Ver Nómina de la Cuenta"
     view_course_roster: "Ver Nómina del Curso"
+  by_b90c6b6f: Por
   by_client_id_4f2fe02c: "Por identificación del cliente"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Todos los vínculos están habilitados de manera predeterminada para un curso.  Los estudiantes no verán los vínculos a las secciones que no tienen contenido.  Por ejemplo, si no ha creado ningún examen, no verán el vínculo a ellos.  Puede ordenar y deshabilitar específicamente los vínculos con partes del curso a los que no desea que accedan los estudiantes."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7500,12 +7503,14 @@ es:
     required: "Ingrese algunas direcciones de correo electrónico"
   created_58b8a75a: Creado
   created_6ee36dff: "Creado:"
+  created_ascending_cff48774: "Creado: Ascendente"
   created_at_73839757: "Creado a las"
   created_by_b39b9c8b: "Creado por"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Creado por SIS"
   created_created_at_37c0ec3b: "Creado: %{created_at}"
   created_created_bf5714b8: "Creado %{created}"
+  created_descending_e9a1b097: "Creado: Descendente"
   created_group_group_name_2097306b: "Grupo %{group_name} creado"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Aún no se maneja la creación de grupos en el nuevo estado de flujo de tareas. ¿Desea dirigirse a la página heredada de tareas?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "La creación de una Exportación de entrega le permitirá descargar un archivo zip de todas sus entregas de tarea en todos sus cursos actuales y pasados. Este podría ser un archivo de gran tamaño, por lo que puede demorarse un tiempo. Puede navegar fuera de la página y volver más tarde."
@@ -8164,10 +8169,15 @@ es:
       usuario tiene todo el tiempo que necesite para leer la notificación y descartarla cuando haya terminado.
   disable_all_read_only_scopes_f9ffdd28: "Desactivar todos los ámbitos de solo lectura."
   disable_and_lock_7d0ef0e8: "Deshabilitar y bloquear"
+  disable_authentication_for_graphql_3c019622: "Deshabilitar autenticación para GraphQL"
   disable_automatic_submission_8e1d8676: "Deshabilitar presentación automática"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Deshabilitar los métodos abreviados de teclado de Canvas. Algunos usuarios que usen lectores de pantalla o navegación por teclado
+      tendrán una experiencia mejorada al tener estos métodos abreviados desactivados.
   disable_celebrations_description: "Al habilitar esta función se ocultarán todas las animaciones de celebración."
   disable_content_security_policy_8660a787: "Deshabilitar Política de Seguridad del Contenido"
   disable_extra_filter_options_1d1cdc02: "desactivar opciones de filtros adicionales"
+  disable_keyboard_shortcuts_9db78832: "Deshabilitar los métodos abreviados de teclado"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deshabilitar las casillas de importación y migración de Nuevas evaluaciones, y dejarlas habilitadas como configuración predeterminada"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deshabilitar Publicar en SIS para tareas en períodos de calificación cerrados"
   disable_scope_6ba4e4d4: "Desactivar ámbito"
@@ -8868,6 +8878,7 @@ es:
   edit_user_details_9af7819b: "Editar los detalles del usuario"
   edit_when_36c1c2c8: "Editar %{when}"
   edit_your_catalog_account_cce59310: "Edite su cuenta de catálogo"
+  edited_c4fcbdbf: "Editado:"
   edited_date_b0455372: "(Editado) %{date}"
   editing_permissions_for_name_3503e235: "Editando permisos para lo siguiente: %{name}"
   editor: 
@@ -11414,7 +11425,7 @@ es:
         saving: Guardando...
         self_signup: Autorregistro
         split_into_groups: "Dividir a los estudiantes en %{num_groups} grupos"
-        split_into_sized_groups: "Dividir a los estudiantes en grupos con %{num_members} estudiantes por grupo"
+        split_into_sized_groups: "Dividir a los estudiantes en grupos con %{num_members} estudiantes por grupo"
       group_category_detail: 
         add_group: "Agregar grupo"
         category_settings: Configuraciones
@@ -11928,6 +11939,9 @@ es:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "En caso de estar habilitado, los diseñadores de contenido deben proporcionar los derechos de autor y la información sobre la licencia de los archivos antes de ser publicados. Solo aplica si el explorador Better File también está habilitado."
   if_enabled_copyright_and_license_information_must__2a551827: "Si se habilita, se deberá proporcionar información de licencia y derecho de autor de los archivos antes de su publicación."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Si están habilitados, se usarán las opciones de administración y el alcance del autentificador."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      De estar activadas, las consultas de GraphQL no requerirán
+      que los usuarios hayan iniciado sesión ni que usen un autentificador de acceso.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Si es habilitado, los módulos tendrán la opción de ser marcados como completos cuando se cumple sólo uno  de los requisitos. "
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "En caso de estar habilitado, se enviará \"oauth2_access_token_url\" al iniciar el registro LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si está habilitado, la firma OAuth 1.0a puede ser usada por las herramientas LTI para acceder a la API del servicio de membresía"
@@ -12360,7 +12374,7 @@ es:
   ireland_353_3cd32cc0: "Irlanda (+353)"
   ireland_f7bb9899: Irlanda
   irish_567e109f: Irlandés
-  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " está usando una versión gratuita de BigBlueButton que ofrece 10 videoconferencias simultáneas, cada una con un anfitrión y hasta 24 asistentes. Las grabaciones se almacenan durante 7 días."
+  is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " está usando una versión gratuita de BigBlueButton que ofrece 10 videoconferencias simultáneas, cada una con un anfitrión y hasta 24 asistentes. Las grabaciones se almacenan durante 7 días."
   israel_681bc5a5: Israel
   israel_972_e671df75: "Israel (+972)"
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Parece que tiene una dirección de correo electrónico inválida: \"%{addr}\""
@@ -12523,6 +12537,8 @@ es:
   last_day_attended_b72d623c: "Último día en que asistió"
   last_download_33ea9bf4: "Última descarga:"
   last_e159dbd: Última
+  last_edit_ascending_6a18dba4: "Última edición: Ascendente"
+  last_edit_descending_6b7ee755: "Última edición: Descendente"
   last_enrollment_activity_10fe15ba: "Última actividad de inscripciones"
   last_export_899a04c5: "Última exportación:"
   last_first_name_95a078f5: "Apellido, nombre"
@@ -14273,7 +14289,7 @@ es:
         body_teacher: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}, y ha sido invitado a participar como profesor."
         details: "Necesitará registrarse con Canvas antes de que pueda participar en la clase.  Para comenzar, visite la página del curso aquí:"
         html: 
-          body: "Ha sido invitado a participar en una clase en %{website}. La clase se llama %{course}. Rol del curso: %{role_type}"
+          body: "Ha sido invitado a participar en una clase en %{account}. La clase se llama %{course}. Rol del curso: %{role_type}"
           body_designer: "La clase se llama %{course} y usted ha sido invitado a participar como diseñador."
           body_observer: "La clase se llama %{course} y usted ha sido invitado a participar como observador."
           body_student: "La clase se llama %{course} y usted ha sido invitado a participar como alumno."
@@ -16677,6 +16693,8 @@ es:
   page_page_59070cd8: "Página %{page}"
   page_pagenum_20dbfeb8: "Página %{pageNum}"
   page_pagenumber_31fe579f: "página %{pageNumber}"
+  page_title_ascending_b5df950c: "Título de la página: Ascendente"
+  page_title_descending_70c1483d: "Título de la página: Descendente"
   page_views: 
     download_filename: "Vistas de páginas para %{user}"
     table: 
@@ -16923,6 +16941,9 @@ es:
     apple_settings: 
       labels: 
         client_id: "Identificación de servicio"
+    asset_user_access_logs: 
+      description: "Reducir al mínimo la presión de escritura de AUA"
+      name: "Registrador de AUA"
     assignment_freezer: 
       description: "Congelar las propiedades de la tarea al copiar"
       name: "Congelador de propiedades de tareas"
@@ -17945,6 +17966,7 @@ es:
   public_domain_112ed397: "Dominio público"
   public_jwk_ee2d719d: "Llave web JSON (JWK) pública"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "JWK json pública no es válido. Entregue la presentación en un archivo json con el formato apropiado."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "JSON con JWK pública debe tener los siguientes campos de cadenas de caracteres: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "URL pública de JWK"
   public_message_students: 
     send_message: "Enviar mensaje"
@@ -20143,6 +20165,7 @@ es:
   save_grading_period_set_e029fa88: "Guardar el conjunto de período de calificación"
   save_key_b4dede06: "Guardar la clave"
   save_learning_mastery_82889d8b: "Guardar dominio del aprendizaje"
+  save_mastery_scale_2b4dc13a: "Guardar escala de dominio"
   save_publish_36440725: "Guardar y publicar"
   save_settings_cafe79a5: "Guardar las configuraciones"
   save_successful_b2f64da4: "Guardado con éxito: "
@@ -21733,6 +21756,7 @@ es:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Lo sentimos, la acción realizada en esta grabación falló. Inténtelo más tarde"
   sort_40afa70: "Ordenar:"
   sort_by_72dbba9c: "Ordenar por"
+  sort_by_e75f9e3e: "Ordenar por"
   sort_courses_cf94b8d4: "Ordenar los cursos"
   sortable_name_73f707cf: "Nombre clasificable"
   sortable_name_e25fe66c: "Nombre clasificable:"
@@ -22286,6 +22310,7 @@ es:
   subscribe_failed_2eb62de0: "Ha fallado la suscripción"
   subscribe_to_title_c7d6bbd2: "Suscribirse a %{title}"
   subtitle_ee60ca78: Subtítulo
+  subtitles_could_not_be_imported_from_file_5de6da0b: "No se pudieron importar subtítulos desde %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "¡Exito! Todos los usuarios en este dominio ahora verán esta marca."
   success_file_uploaded_8174e93f: "Éxito: Archivo cargado"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "¡Éxito! Las calificaciones para esta tarea ahora están visibles para los alumnos."
@@ -23354,8 +23379,11 @@ es:
   to_do_1d554f36: "Por hacer"
   to_do_5526f10a: "Para hacer:"
   to_do_6ac7b2dc: "Para hacer:"
+  to_do_date_2cb4bf7b: "Fecha de tareas por hacer:"
+  to_do_date_ascending_c3a59abb: "Fecha de tareas por hacer: Ascendente"
   to_do_date_d6b79bfd: "Por hacer %{date}"
   to_do_date_ddfb582c: "Fecha de las tareas por hacer:"
+  to_do_date_descending_25b2141d: "Fecha de tareas por hacer: Descendente"
   to_do_item_d76ecb78: "Item por hacer"
   to_do_items_loading_d1cdfcd5: "Cargando los elementos por hacer"
   to_do_list_dashboard_d741f64e: "Tablero con lista de tareas por hacer"
@@ -25125,6 +25153,7 @@ es:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Se le ha dado un rol de cuenta para la cuenta de %{account} en %{website}. Tipo de rol: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Ha sido invitado a %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Usted ha sido invitado a %{course}. Rol del curso: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Ha sido invitado a participar en una clase en %{account}.  La clase se llama %{course}. Rol del curso: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Ha sido invitado a participar en una clase en %{website}.  La clase se llama %{course}. Rol del curso: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Ha sido invitado a participar del curso, %{course}. Rol del curso: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Ha sido invitado a una revisión entre pares de %{reviewee}."
