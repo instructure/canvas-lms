@@ -339,6 +339,147 @@ describe ExternalToolsController, type: :request do
     end
   end
 
+  context "rce favoriting" do
+    def create_editor_tool(account)
+      ContextExternalTool.create!(
+        context: account,
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        name: 'test tool',
+        url: 'http://www.tool.com/launch',
+        editor_button: {url: 'http://example.com', icon_url: 'http://example.com'}
+      )
+    end
+
+    describe "#add_rce_favorite" do
+      before :once do
+        @root_tool = create_editor_tool(Account.default)
+        @sub_account = Account.default.sub_accounts.create!
+        @sub_tool = create_editor_tool(@sub_account)
+        account_admin_user(:active_all => true)
+      end
+
+      def add_favorite_tool(account, tool)
+        json = api_call(:post, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
+          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+            :account_id => account.id.to_s, :id => tool.id.to_s}, {}, {}, {expected_status: 200})
+        account.reload
+        json
+      end
+
+      it "requires authorization" do
+        student_in_course(:active_all => true)
+        @user = @student
+        api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 401})
+      end
+
+      it "requires a tool in the context" do
+        api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@sub_tool.id}",
+          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+            :account_id => Account.default.id.to_s, :id => @sub_tool.id.to_s}, {}, {}, {:expected_status => 404})
+      end
+
+      it "doesn't allow adding too many tools" do
+        tool2 = create_editor_tool(Account.default)
+        tool3 = create_editor_tool(Account.default)
+        Account.default.tap do |ra|
+          ra.settings[:rce_favorite_tool_ids] = {value: [tool2.global_id, tool3.global_id]}
+          ra.save!
+        end
+
+        json = api_call(:post, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+          {:controller => 'external_tools', :action => 'add_rce_favorite', :format => 'json',
+            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 400})
+        expect(json['message']).to eq "Cannot have more than 2 favorited tools"
+      end
+
+      it "handles adding a favorite after a previous tool is deleted" do
+        tool2 = create_editor_tool(Account.default)
+        tool3 = create_editor_tool(Account.default)
+        Account.default.tap do |ra|
+          ra.settings[:rce_favorite_tool_ids] = {value: [tool2.global_id, tool3.global_id]}
+          ra.save!
+        end
+        tool3.destroy
+
+        add_favorite_tool(Account.default, @root_tool) # can add it now because the other reference is invalid
+      end
+
+      it "adds to existing favorites configured with old column if not specified on account" do
+        @root_tool.update_attribute(:is_rce_favorite, true)
+        tool2 = create_editor_tool(Account.default)
+        add_favorite_tool(Account.default, tool2)
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq true
+        expect(tool2.is_rce_favorite_in_context?(Account.default)).to eq true
+      end
+
+      it "can add a root account tool as a favorite for a sub-account" do
+        add_favorite_tool(@sub_account, @root_tool)
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
+      end
+
+      it "can add a sub-account tool as a favorite for a sub-account" do
+        add_favorite_tool(@sub_account, @root_tool)
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
+        expect(@root_tool.is_rce_favorite_in_context?(Account.default)).to eq false # didn't affect parent account
+      end
+
+      it "adds to existing favorites for a sub-account inherited from a root account" do
+        add_favorite_tool(Account.default, @root_tool)
+        add_favorite_tool(@sub_account, @sub_tool)
+
+        expect(@root_tool.is_rce_favorite_in_context?(@sub_account)).to eq true # now saved directly on sub-account
+        expect(@sub_tool.is_rce_favorite_in_context?(@sub_account)).to eq true
+      end
+    end
+
+    describe "#remove_rce_favorite" do
+      before :once do
+        @root_tool = create_editor_tool(Account.default)
+        @sub_account = Account.default.sub_accounts.create!
+        @sub_tool = create_editor_tool(@sub_account)
+        account_admin_user(:active_all => true)
+      end
+
+      def remove_favorite_tool(account, tool)
+        json = api_call(:delete, "/api/v1/accounts/#{account.id}/external_tools/rce_favorites/#{tool.id}",
+          {:controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
+            :account_id => account.id.to_s, :id => tool.id.to_s}, {}, {}, {expected_status: 200})
+        account.reload
+        json
+      end
+
+      it "requires authorization" do
+        student_in_course(:active_all => true)
+        @user = @student
+        api_call(:delete, "/api/v1/accounts/#{Account.default.id}/external_tools/rce_favorites/#{@root_tool.id}",
+          {:controller => 'external_tools', :action => 'remove_rce_favorite', :format => 'json',
+            :account_id => Account.default.id.to_s, :id => @root_tool.id.to_s}, {}, {}, {:expected_status => 401})
+      end
+
+      it "works with existing favorites configured with old column if not specified on account" do
+        @root_tool.update_attribute(:is_rce_favorite, true)
+        tool2 = create_editor_tool(Account.default)
+        tool2.update_attribute(:is_rce_favorite, true)
+        remove_favorite_tool(Account.default, @root_tool)
+        expect(Account.default.reload.settings[:rce_favorite_tool_ids][:value]).to eq [tool2.global_id] # saves it onto the account
+      end
+
+      it "removes from sub-account favorites inherited from a root account" do
+        root_tool2 = create_editor_tool(Account.default)
+        Account.default.tap do |ra|
+          ra.settings[:rce_favorite_tool_ids] = {value: [@root_tool.global_id, root_tool2.global_id]}
+          ra.save!
+        end
+
+        remove_favorite_tool(@sub_account, @root_tool)
+        expect(@sub_account.settings[:rce_favorite_tool_ids][:value]).to eq [root_tool2.global_id]
+      end
+    end
+  end
 
   def show_call(context, type="course")
     et = tool_with_everything(context)

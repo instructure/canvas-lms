@@ -344,6 +344,8 @@ class Account < ActiveRecord::Base
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
   add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
 
+  add_setting :rce_favorite_tool_ids, :inheritable => true
+
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
       hash.each do |key, val|
@@ -2065,5 +2067,11 @@ class Account < ActiveRecord::Base
     roles.select do |role|
       RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
     end
+  end
+
+  def get_rce_favorite_tool_ids
+    rce_favorite_tool_ids[:value] ||
+      ContextExternalTool.all_tools_for(self, placements: [:editor_button]). # TODO remove after datafixup and the is_rce_favorite column is removed
+        where(:is_rce_favorite => true).pluck(:id).map{|id| Shard.global_id_for(id)}
   end
 end

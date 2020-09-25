@@ -2102,50 +2102,64 @@ describe ContextExternalTool do
         shared_secret: 'secret',
         name: 'test tool',
         url: 'http://www.tool.com/launch',
+        editor_button: {url: 'http://example.com', icon_url: 'http://example.com'}
       )
     end
 
-    it 'saves is_rce_favorite if can_be_rce_favorite?' do
+    it 'can be an rce favorite if it has an editor_button placement' do
       tool = tool_in_context(@root_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be true
+      expect(tool.can_be_rce_favorite?).to eq true
     end
 
-    it 'does not save is_rce_favorite if no editor_button placement' do
+    it 'cannot be an rce favorite if no editor_button placement' do
       tool = tool_in_context(@root_account)
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'does not set is_rce_favorite if context is not a root account' do
-      sub_account = @root_account.sub_accounts.create!
-      tool = tool_in_context(sub_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'does not set is_rce_favorite if context is not an account' do
-      tool = tool_in_context(@course)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'resets is_rce_favorite if editor_button placement is removed' do
-      tool = tool_in_context(@root_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be true
       tool.editor_button = nil
       tool.save!
-      expect(tool.is_rce_favorite).to be false
+      expect(tool.can_be_rce_favorite?).to eq false
+    end
+
+    it 'does not set tools as an rce favorite for any context by default' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq false
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq false
+    end
+
+    it 'inherits from the old is_rce_favorite column if the accounts have not be seen up yet' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      tool.is_rce_favorite = true
+      tool.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
+    end
+
+    it 'inherits from root account configuration if not set on sub-account' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      @root_account.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
+    end
+
+    it 'overrides with sub-account configuration if specified' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      @root_account.save!
+      sub_account.settings[:rce_favorite_tool_ids] = {value: []}
+      sub_account.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq false
+    end
+
+    it 'can set sub-account tools as favorites' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(sub_account)
+      sub_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      sub_account.save!
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
     end
   end
 end

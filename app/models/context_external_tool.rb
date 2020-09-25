@@ -195,9 +195,19 @@ class ContextExternalTool < ActiveRecord::Base
   end
 
   def can_be_rce_favorite?
-    self.context.respond_to?(:root_account?) &&
-    self.context.root_account? &&
     !self.editor_button.nil?
+  end
+
+  def is_rce_favorite_in_context?(context)
+    context = context.context if context.is_a?(Group)
+    context = context.account if context.is_a?(Course)
+    rce_favorite_tool_ids = context.rce_favorite_tool_ids[:value]
+    if rce_favorite_tool_ids
+      rce_favorite_tool_ids.include?(self.global_id)
+    else
+      # TODO remove after the datafixup and this column is dropped
+      self.is_rce_favorite
+    end
   end
 
   def sync_placements!(placements)
@@ -1076,7 +1086,7 @@ end
       {
           :name => tool.label_for(:editor_button, I18n.locale),
           :id => tool.id,
-          :favorite => tool.is_rce_favorite,
+          :favorite => tool.is_rce_favorite_in_context?(context),
           :url => tool.editor_button(:url),
           :icon_url => tool.editor_button(:icon_url),
           :canvas_icon_class => tool.editor_button(:canvas_icon_class),
