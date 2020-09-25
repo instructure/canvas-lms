@@ -29,7 +29,7 @@ const UNPUBLISHED = 'unpublished'
 export default function CoursesTray({courses, hasLoaded}) {
   const showSplitList =
     window.ENV?.FEATURES?.unpublished_courses && window.ENV.current_user_roles?.includes('teacher')
-
+  courses.sort((lhs, rhs) => (lhs.name > rhs.name ? 1 : -1))
   function renderSplitList() {
     const published = courses.filter(course => course.workflow_state !== UNPUBLISHED)
     const unpublished = courses.filter(course => course.workflow_state === UNPUBLISHED)
