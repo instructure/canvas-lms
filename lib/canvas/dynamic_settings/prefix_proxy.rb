@@ -97,7 +97,12 @@ module Canvas
           # result should always be a KVGetResponse, nil is a problem
           # because it SHOULD be a 404 with a nil
           if result&.status == 200
-            populate_cache(tree_key, result.values, ttl) # only populate recursively when we missed
+            # This is important for race condition.
+            # if the tree JUST expired, we don't want to find
+            # a valid tree, and then no valid subkeys, that makes
+            # nils start popping up in the cache
+            subtree_ttl = ttl * 3
+            populate_cache(tree_key, result.values, subtree_ttl) # only populate recursively when we missed
             true # we don't actually need to save the values in the cache anymore if we're not using them
           elsif result&.status == 404
             # this just means the value doesn't exist in the consul store
