@@ -30,4 +30,12 @@ describe Canvas::Vault::AwsCredentialProvider do
     expect(creds.class).to eq(::Aws::Credentials)
     expect(creds.access_key_id).to eq("AZ12345")
   end
+
+  it "will actually throw an error on failure" do
+    cred_path = "sts/testaccount/sts/some-vault-assumable-role"
+    allow(::Canvas::Vault).to receive(:read).with(cred_path).and_return(nil)
+    expect do
+      Canvas::Vault::AwsCredentialProvider.new(cred_path).credentials
+    end.to raise_error(::Canvas::Vault::VaultConfigError)
+  end
 end
