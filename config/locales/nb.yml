@@ -1832,6 +1832,7 @@ nb:
   add_people_7ee4b2ec: "Legg til personer"
   add_people_and_courses_to_canvas_5c4bfff9: "Legge til personer og emner på Canvas"
   add_people_to_coursename_5ea234e1: "Legg personer til: %{courseName}"
+  add_proficiency_level_93bd72d0: "Legg til ferdighetsnivå"
   add_proficiency_rating_d819f6b8: "Legg til kompetansevurdering"
   add_pronouns_option_906ff625: "Legg til alternative pronomen"
   add_quiz_cebfa28b: "Legg til test"
@@ -3767,6 +3768,7 @@ nb:
   attempt_count_267a4fc5: "Forsøk %{count}"
   attempt_current_attempt_ef626179: "Forsøk %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Forsøk %{current_attempt} av %{max_attempts}"
+  attempt_f2691284: Forsøk
   attempt_number_83dcd86a: "Forsøk %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Forsøk på å oppdage egnet felt-separator i eksport av Karakteroversikten er basert på tallformatet til språket ditt."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Forsøk på å oppdage egnet felt-separator i kompatible eksporter av regneark er basert på tallformatet til språket ditt."
@@ -4268,6 +4270,7 @@ nb:
     update: Oppdater
     view_account_roster: "Se kontodeltagere"
     view_course_roster: "Se kursets deltagere"
+  by_b90c6b6f: Av
   by_client_id_4f2fe02c: "Av klient-ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle koblinger aktivert for et emne. Studentene vil ikke se lenker til seksjoner som ikke har innhold. For eksempel, hvis du ikke har opprettet noen quizer, vil de ikke se denne i menyen. Du kan sortere og eksplisitt deaktivere disse lenkene hvis det er områder i emnet ditt du ikke ønsker at elevene har tilgang til."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7497,12 +7500,14 @@ nb:
     required: "Vennligst skriv inn noen e-postadresser"
   created_58b8a75a: Opprettet
   created_6ee36dff: "Opprettet:"
+  created_ascending_cff48774: "Opprettet: Stigende"
   created_at_73839757: Opprettet
   created_by_b39b9c8b: "Opprettet av"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Opprettet av SIS"
   created_created_at_37c0ec3b: "Opprettet: %{created_at}"
   created_created_bf5714b8: "Opprettet %{created}"
+  created_descending_e9a1b097: "Opprettet: Synkende"
   created_group_group_name_2097306b: "Gruppe Opprettet %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Opprette en gruppe håndteres ikke i den nye oppgaveflyten enda. Gå til den gamle siden for oppgaver?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Ved å opprette Innleveringseksport kan du laste ned en ZIP-fil med alle dine oppgaveinnleveringer i nåværende og tidligere emner. Dette kan være en stor fil, så det kan ta en stund. Du kan navigere bort fra siden og komme tilbake senere."
@@ -8162,10 +8167,15 @@ nb:
       brukeren så mye tid som nødvendig for å lese varslingen og deretter lukke den.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle med omfang kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
+  disable_authentication_for_graphql_3c019622: "Deaktiver autentisering for GraphQL"
   disable_automatic_submission_8e1d8676: "Deaktiver automatisk innlevering"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Deaktiver Canvas tastatursnarveier. Noen brukere som bruker skjermlesere eller tastaturnavigasjon,
+      vil få en forbedret opplevelse når disse snarveiene er slått av.
   disable_celebrations_description: "Når du aktiverer denne funksjonen, vil du skjule alle festanimasjonene."
   disable_content_security_policy_8660a787: "Deaktiver innholdssikkerhetspolikk"
   disable_extra_filter_options_1d1cdc02: "deaktiver valg for ekstra filter"
+  disable_keyboard_shortcuts_9db78832: "Deaktiver tastatursnarveier"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktiver avkrysningsbokser for import og migrasjon av nye tester, og aktiver således valgene som standard"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Publiser til SIS for oppgave i lukkede vurderingsperioder"
   disable_scope_6ba4e4d4: "Deaktiver omfang"
@@ -8868,6 +8878,7 @@ nb:
   edit_user_details_9af7819b: "Rediger brukerinformasjon"
   edit_when_36c1c2c8: "Rediger %{when}"
   edit_your_catalog_account_cce59310: "Rediger din Catalog-konto"
+  edited_c4fcbdbf: "Redigert:"
   edited_date_b0455372: "(Endret) %{date}"
   editing_permissions_for_name_3503e235: "Redigerer rettigheter for: %{name}"
   editor: 
@@ -11944,6 +11955,9 @@ nb:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Dersom aktivert, må innholdsdesignere gi informasjon om opphavsrett og lisens for filer før de publiseres. Gjelder kun om bedre fil-søk er aktivert."
   if_enabled_copyright_and_license_information_must__2a551827: "Om det er aktivert, må det for filer gis opphavsrett og lisensinformasjon før de er publisert."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Om aktivert, vil utviklernøkkelen administrasjonsvalg og symbol rekkevidden bli brukt."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Hvis aktivert, krever ikke GraphQL-spørsmål at
+      brukere må være logget inn eller bruke en tilgangstoken.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Om aktiver, vil moduler har muligheten til å bli markert som fullført når kun ett av kravene er møtt."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "'oauth2_access_token_url' vil bli sendt i LTI2 registrering lansering, hvis aktivert."
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Om OAuth 1.0a signering er aktivert kan LTI verktøy brukes for å få tilgang til APIer medlems-service"
@@ -12535,6 +12549,8 @@ nb:
   last_day_attended_b72d623c: "Dag for siste oppnmøte"
   last_download_33ea9bf4: "Siste nedlasting:"
   last_e159dbd: Siste
+  last_edit_ascending_6a18dba4: "Siste redigering: Stigende"
+  last_edit_descending_6b7ee755: "Siste redigering: Synkende"
   last_enrollment_activity_10fe15ba: "Siste påmeldingsaktivitet"
   last_export_899a04c5: "Siste eksport:"
   last_first_name_95a078f5: "Etternavn, Fornavn"
@@ -14286,7 +14302,7 @@ nb:
         body_teacher: "Du er invitert til å delta i et kurs på %{website}. Kurset heter %{course}, og du er invitert til å delta som faglærer."
         details: "Du må registrere deg i Canvas før du kan delta i emnet. For å komme i gang, besøk emnesiden her:"
         html: 
-          body: "Du har blitt invitert til å delta på et emne på %{website}. Emnet heter %{course}. Emnerolle: %{role_type}"
+          body: "Du har blitt invitert til å delta på et kurs kl. %{account}. Kurset heter %{course}. Emnerolle: %{role_type}"
           body_designer: "Kurset har navnet %{course}, og du har blitt invitert til å delta som designer."
           body_observer: "Klassen er kalt %{course}, og du har blitt invitert til å delta som observatør."
           body_student: "Klassen er kalt %{course}, og du har blitt invitert til å delta som student."
@@ -16682,6 +16698,8 @@ nb:
   page_page_59070cd8: "Side %{page}"
   page_pagenum_20dbfeb8: "Side %{pageNum}"
   page_pagenumber_31fe579f: "side %{pageNumber}"
+  page_title_ascending_b5df950c: "Sidetittel: Stigende"
+  page_title_descending_70c1483d: "Sidetittel: Synkende"
   page_views: 
     download_filename: "Sidevisninger for %{user}"
     table: 
@@ -16928,6 +16946,9 @@ nb:
     apple_settings: 
       labels: 
         client_id: Tjeneste-ID
+    asset_user_access_logs: 
+      description: "Minimer AUAs skrivetrykk"
+      name: AUA-logger
     assignment_freezer: 
       description: "Frys oppgaveverdier i kopien"
       name: "Oppgaveverdier kan \"fryses\""
@@ -17953,6 +17974,7 @@ nb:
   public_domain_112ed397: "Åpent område"
   public_jwk_ee2d719d: "Offentlig JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Offentlig JWK json er ikke gyldig. Send inn korrekt formatert json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Offentlig JWK json må ha følgende strengfelt: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Offentlig JWK URL"
   public_message_students: 
     message_student: "Send beskjed til studenter i %{course_name}"
@@ -20153,6 +20175,7 @@ nb:
   save_grading_period_set_e029fa88: "Lagre settet med vurderingsperiode"
   save_key_b4dede06: "Lagre nøkkel"
   save_learning_mastery_82889d8b: "Lagre læringsmestring"
+  save_mastery_scale_2b4dc13a: "Lagre mestringsskala"
   save_publish_36440725: "Lagre og publiser"
   save_settings_cafe79a5: "Lagre innstillinger"
   save_successful_b2f64da4: "Vellykket lagring."
@@ -21756,6 +21779,7 @@ nb:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Beklager, handlingen utført på dette opptaket feilet. Prøv igjen senere"
   sort_40afa70: "Sorter:"
   sort_by_72dbba9c: "Sorter etter"
+  sort_by_e75f9e3e: "Sortert på"
   sort_courses_cf94b8d4: "Sorter emnene"
   sortable_name_73f707cf: "Navn for sortering"
   sortable_name_e25fe66c: "Sorterbart navn"
@@ -22310,6 +22334,7 @@ nb:
   subscribe_failed_2eb62de0: "Abonnement feilet"
   subscribe_to_title_c7d6bbd2: "Abonner på %{title}"
   subtitle_ee60ca78: Undertittel
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Undertitler kunne ikke importeres fra %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Suksess! Alle brukere på dette domenet skal nå se denne merkingen."
   success_file_uploaded_8174e93f: "Vellykket: File lastet opp"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Vellykket! Karakterer for denne oppgaven er nå synlig for studentene."
@@ -23382,8 +23407,11 @@ nb:
   to_do_1d554f36: "Å gjøre"
   to_do_5526f10a: "Å gjøre:"
   to_do_6ac7b2dc: "gjøremål:"
+  to_do_date_2cb4bf7b: "Gjøremålsdato:"
+  to_do_date_ascending_c3a59abb: "Gjøremålsdato: Stigende"
   to_do_date_d6b79bfd: "Gjøremål %{date}"
   to_do_date_ddfb582c: "Å gjøre dato:"
+  to_do_date_descending_25b2141d: "Gjøremålsdato: Synkende"
   to_do_item_d76ecb78: "A-gjøre element"
   to_do_items_loading_d1cdfcd5: "Å gjøre-elementer laster"
   to_do_list_dashboard_d741f64e: "Gjøremålsliste instrumentpanel"
@@ -25155,6 +25183,7 @@ nb:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du er gitt en kontorolle for %{account}  kontoen på %{website}. Rolletype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du har blitt invitert til %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er invitert til %{course}. Kursrolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Du har blitt invitert til å delta på et kurs kl. %{account}.  Kurset heter %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta på en forelesning på %{website}. Emnet heter %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er invitert til å delta på %{course} emnet. Emnerolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til hverandrevurdering %{reviewee}."
