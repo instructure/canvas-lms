@@ -1216,6 +1216,7 @@ fi:
   add_people_7ee4b2ec: "Lisää henkilöitä"
   add_people_and_courses_to_canvas_5c4bfff9: "lisätä ihmisiä ja kursseja Canvasiin"
   add_people_to_coursename_5ea234e1: "Lisää henkilöitä kohteeseen: %{courseName}"
+  add_proficiency_level_93bd72d0: "Lisää pätevyyden taso"
   add_proficiency_rating_d819f6b8: "Lisää osaamisen luokitus"
   add_pronouns_option_906ff625: "Lisää pronominiasetus"
   add_quiz_cebfa28b: "Lisää testi"
@@ -2826,6 +2827,7 @@ fi:
   attempt_count_267a4fc5: "Yritys %{count}"
   attempt_current_attempt_ef626179: "Yritys %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Yritys %{current_attempt}/%{max_attempts}"
+  attempt_f2691284: Yritys
   attempt_number_83dcd86a: "Yritys %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Yritä havaita asianmukaiset kenttäerottimet Arvosanakirjan vienneissä kielesi numeromuodon mukaisesti."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Yritä havaita asianmukaiset kenttäerottimet yhteensopivissa laskentataulukoiden vienneissä kielesi numeromuodon mukaisesti."
@@ -3164,6 +3166,7 @@ fi:
     unpublish: "Peruuta julkaisu"
     unpublished: Julkaisematon
     update: Päivitä
+  by_b90c6b6f: Tekijä
   by_client_id_4f2fe02c: "Asiakkaan tunnuksen perusteella"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Oletusasetuksena kaikki linkit ovat käytössä kurssilla.  Opiskelijat eivät näe linkkejä niihin osioihin, joissa ei ole sisältöä.  Jos et esimerkiksi ole luonut yhtään testiä, he eivät näe testien linkkiä.  Voit järjestellä linkkejä ja halutessasi poistaa käytöstä sellaiset linkit, jotka liittyvät kurssin alueeseen jota et halua opiskelijoidesi käyttävän."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -5754,11 +5757,13 @@ fi:
     required: "Anna sähköpostiosoitteita"
   created_58b8a75a: Luotu
   created_6ee36dff: "Luotu:"
+  created_ascending_cff48774: "Luotu: Nouseva"
   created_at_73839757: Luotu
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Luoja SIS"
   created_created_at_37c0ec3b: "Luotu: %{created_at}"
   created_created_bf5714b8: "Luotu %{created}"
+  created_descending_e9a1b097: "Luotu: Laskeva"
   created_group_group_name_2097306b: "Luotiin ryhmä %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Ryhmän luomista ei voi vielä tehdä  uudessa tehtävätoiminnossa. Siirrytäänkö vanhalle tehtäväsivulle?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Tehtäväpalautuksen viennin luonti mahdollistaa kaikkien tehtäväpalautustesi lataamisen zip-tiedostona kaikista tämänhetkisistä ja menneistä kursseistasi. Tämä saattaa olla suurikin tiedosto, joten tämä saattaa kestää jonkin aikaa. Voit siirtyä pois sivulta ja palata takaisin myöhemmin."
@@ -6284,10 +6289,15 @@ fi:
       käyttäjällä on ilmoitusten lukemiseen ja niiden ohittamiseen niin paljon aikaa kuin hän haluaa.
   disable_all_read_only_scopes_f9ffdd28: "Poista käytöstä kaikki vain luku -käyttöalat."
   disable_and_lock_7d0ef0e8: "Poista käytöstä ja lukitse"
+  disable_authentication_for_graphql_3c019622: "Poista todennus GraphQL:lle"
   disable_automatic_submission_8e1d8676: "Poista automaattinen lähetys pois käytöstä"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Poista Canvas-pikakuvakkeet käytöstä. Joillakin käyttäjillä, jotka käyttävät näytönlukijoita tai näppäimistöllä siirtymistä
+      saavat paremman kokemuksen, kun nämä pikakuvakkeet on kytketty pois päältä.
   disable_celebrations_description: "Tämän toiminnon aktivointi piilottaa kaikki juhlinta-animaatiot."
   disable_content_security_policy_8660a787: "Poista käytöstä sisällön tietoturvakäytäntö"
   disable_extra_filter_options_1d1cdc02: "poista suodattimen lisävaihtoehdot"
+  disable_keyboard_shortcuts_9db78832: "Poista näppäimistön pikakuvakkeet käytöstä"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Poista käytöstä uusien testien tuonnin ja siirron valintaruudut, niin että ne ovat oletuksena valittuna"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Poista Lähetä SIS-ominaisuus tehtävälle suljetuilla arvosanjoen antojaksoilla"
   disable_scope_6ba4e4d4: "Poista vaikutusalue käytöstä"
@@ -6817,6 +6827,7 @@ fi:
   edit_toolname_app_23cfbb8: "Muokkaa %{toolName} sovellusta"
   edit_user_details_4d7b63ff: "Muokkaa käyttäjän tietoja"
   edit_when_36c1c2c8: "Muokkaa %{when}"
+  edited_c4fcbdbf: "Muokattu:"
   edited_date_b0455372: "(Muokattu) %{date}"
   editing_permissions_for_name_3503e235: "Muokataan käyttöoikeuksia kohteelle: %{name}"
   editor: 
@@ -8990,6 +9001,9 @@ fi:
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Jos käytössä, Common Cartridge -tuontitoiminnot muuntavat HTML-tiedostot sivuiksi"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Jos käytössä, sisällön suunnittelijoiden täytyy tarjota tekijänoikeuksia ja lisenssitietoja tiedostoille ennen kuin ne julkaistaan. Koskee vain, jos Parempi tiedoston selaus on käytössä."
   if_enabled_copyright_and_license_information_must__2a551827: "Jos käytössä, tekijänoikeutta ja lisenssiä koskevat tiedot täytyy toimittaa tiedostoille ennen niiden julkaisua."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Jos se on käytössä, GraphQL-kyselyt eivät vaadi
+      käyttäjiä kirjautumaan sisään tai käyttämään käyttöoikeustunnuksia.
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Jos käytössä, LTI-työkalut saattavat käyttää OAuth 1.0a -allekirjoitusta käyttääkseen jäsenyyspalvelun API-ohjelmaa."
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
       Jos käytössä, oEmbedin päätepisteet vaativat 
@@ -9508,6 +9522,8 @@ fi:
   last_attempt_7258ebd7: "Edellinen yritys"
   last_changed_b544504d: "Muutettu viimeksi:"
   last_day_attended_b72d623c: "Viimeinen osallistumispäivä"
+  last_edit_ascending_6a18dba4: "Edellinen muokkaus: Nouseva"
+  last_edit_descending_6b7ee755: "Edellinen muokkaus: Laskeva"
   last_enrollment_activity_10fe15ba: "Viimeisin ilmoittautumisaktiviteetti"
   last_export_899a04c5: "Viimeinen vienti:"
   last_first_name_95a078f5: "Sukunimi, etunimi"
@@ -10927,7 +10943,7 @@ fi:
       email: 
         details: "Sinun täytyy rekisteröityä Canvasiin ennen kuin voit osallistua.  Jos haluat aloittaa, käy kurssin sivulla:"
         html: 
-          body: "Sinut on kutsuttu osallistumaan kurssille %{website}. Kurssin nimi on %{course}. Rooli kurssilla: %{role_type}"
+          body: "Sinut on kutsuttu osallistumaan luokkaan %{account}. Luokan nimi on %{course}. Rooli kurssilla: %{role_type}"
           details: "Sinun täytyy rekisteröityä Canvasiin ennen kuin voit osallistua kurssille."
           email: Sähköposti
           link: "Tarkastele kurssisivua napsauttamalla tästä"
@@ -12934,6 +12950,8 @@ fi:
   page_not_found_2b0d05f5: "Sivua ei löytynyt"
   page_page_59070cd8: "Sivu %{page}"
   page_pagenum_20dbfeb8: "Sivu %{pageNum}"
+  page_title_ascending_b5df950c: "Sivuotsikko: Nouseva"
+  page_title_descending_70c1483d: "Sivuotsikko: Laskeva"
   page_views: 
     download_filename: "Sivun tarkasteluita kohteelle %{user}"
     table: 
@@ -13138,6 +13156,9 @@ fi:
     apple_settings: 
       labels: 
         client_id: Huolto-ID
+    asset_user_access_logs: 
+      description: "Minimoi AUA-kirjoituspainetta"
+      name: AUA-lokityökalu
     assignment_freezer: 
       description: "Jäädytä tehtäväominaisuudet kopiossa"
       name: "Tehtävän ominaisuuden jäädytin"
@@ -13967,6 +13988,7 @@ fi:
   public_domain_112ed397: "Public Domain (vapaassa käytössä)"
   public_jwk_ee2d719d: "Julkinen JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Julkinen JWK-json ei ole voimassa. Lähetä asianmukaisesti muotoiltu json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Julkisella JWK json:lla täytyy olla seuraavat  merkkijonokentät: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Julkisen JWK:n URL"
   public_message_students: 
     send_message: "Lähetä viesti"
@@ -15659,6 +15681,7 @@ fi:
   save_grading_period_set_e029fa88: "Tallenna arvosanojen antojakson joukko"
   save_key_b4dede06: "Tallenna avain"
   save_learning_mastery_82889d8b: "Tallenna osaamisen hallinta"
+  save_mastery_scale_2b4dc13a: "Tallenna hallinnan suuruusluokka"
   save_publish_36440725: "Tallenna ja julkaise"
   save_settings_cafe79a5: "Tallenna asetukset"
   save_successful_b2f64da4: "Tallennus onnistui."
@@ -16898,6 +16921,7 @@ fi:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Pahoittelut, tälle nauhoitukselle suoritettu toimenpide epäonnistui. Yritä myöhemmin uudelleen"
   sort_40afa70: "Lajittele:"
   sort_by_72dbba9c: Lajitteluperuste
+  sort_by_e75f9e3e: Lajitteluperuste
   sort_courses_cf94b8d4: "Lajittele kursseja"
   sortable_name_73f707cf: "Lajiteltava nimi"
   sortable_name_e25fe66c: "Lajiteltava nimi:"
@@ -17380,6 +17404,7 @@ fi:
   subscribe_failed_2eb62de0: "Tilaus epäonnistui"
   subscribe_to_title_c7d6bbd2: "Tilaa %{title}"
   subtitle_ee60ca78: Tekstitys
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Tekstitysten tuonti ei onnistunut kohteesta %{file}"
   success_file_uploaded_8174e93f: "Onnistui: Tiedosto ladattu"
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Onnistui! Arvosanat on piilotettu kurssilla %{assignmentName}."
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Onnistui! Arvosanat on piilotettu kurssin %{assignmentName} valituissa osioissa."
@@ -18333,8 +18358,11 @@ fi:
   to_do_1d554f36: Tehtävälista
   to_do_5526f10a: "Tehtävälista:"
   to_do_6ac7b2dc: "tehtävä:"
+  to_do_date_2cb4bf7b: "Tehtävä-päivämäärä:"
+  to_do_date_ascending_c3a59abb: "Tehtävä-päivämäärä: Nouseva"
   to_do_date_d6b79bfd: "Tehtävälista %{date}"
   to_do_date_ddfb582c: "Tehtävä-päivämäärä:"
+  to_do_date_descending_25b2141d: "Tehtävä-päivämäärä: Laskeva"
   to_do_item_d76ecb78: "Kohde tehtävälistalla"
   to_do_list_dashboard_d741f64e: "Tehtävälistan koontinäyttö"
   to_do_time_a7e17623: Tehtävä-aika
@@ -19873,6 +19901,7 @@ fi:
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Olet ilmoittautunut kurssille, %{course}. Rooli kurssilla: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Sinulle on annettu tilin rooli %{account} tiliin kohteessa %{website}. Roolityyppi: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Sinut on kutsuttu kohteeseen %{course}."
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Sinut on kutsuttu osallistumaan luokkaan %{account}.  Luokan nimi on %{course}. Rooli kurssilla: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Sinut on kutsuttu osallistumaan luokkaan %{website}.  Luokan nimi on %{course}. Rooli kurssilla: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Sinut on kutsuttu osallistumaan kurssille, %{course}. Rooli kurssilla: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Sinut on kutsuttu vertaisarvioimaan tehtävä, jonka %{reviewee} on tehnyt."
