@@ -1832,6 +1832,7 @@ ja:
   add_people_7ee4b2ec: メンバーの追加
   add_people_and_courses_to_canvas_5c4bfff9: "Canvas に人とコースを追加する"
   add_people_to_coursename_5ea234e1: "...に人々を追加する：%{courseName}"
+  add_proficiency_level_93bd72d0: 熟達度を追加する
   add_proficiency_rating_d819f6b8: 熟達度を追加する
   add_pronouns_option_906ff625: 代名詞オプションを追加
   add_quiz_cebfa28b: クイズを追加
@@ -3765,6 +3766,7 @@ ja:
   attempt_count_267a4fc5: "%{count} 試行"
   attempt_current_attempt_ef626179: "%{current_attempt} 試行"
   attempt_current_attempt_of_max_attempts_427ed508: "試行 %{current_attempt} / %{max_attempts}"
+  attempt_f2691284: 試行
   attempt_number_83dcd86a: "%{number} 試行"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: あなたの言語の数値フォーマットに基づいてGradebookのエクスポートで適切なフィールドセパレータを検出しようとします。
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: ご希望の言語向けの数値形式に基づき、対応するスプレッドシートのエクスポートで、適切なフィールド区切りを検出してみます。
@@ -4275,6 +4277,7 @@ ja:
     update: 更新
     view_account_roster: アカウント名簿の表示
     view_course_roster: コース名簿の表示
+  by_b90c6b6f: 担当者
   by_client_id_4f2fe02c: "依頼者 ID 別"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: デフォルトでは、コースのすべてのリンクが有効になっています。受講生はコンテンツのないセクションへのリンクは参照できません。例えば、クイズを作成していない場合は、受講生はクイズへのリンクを参照できません。コース内に受講生にアクセスさせたくない領域がある場合は、このようなリンクを並べ替えて明示的に無効化することができます。
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7493,12 +7496,14 @@ ja:
     required: "電子メール アドレスを入力してください:"
   created_58b8a75a: 作成日時
   created_6ee36dff: "作成日時:"
+  created_ascending_cff48774: "作成日時:昇順"
   created_at_73839757: 作成日時
   created_by_b39b9c8b: によって作成されました
   created_by_sis_93fbb66b: sis_で_作成
   created_by_sis_e1449c31: SISによって作成されました
   created_created_at_37c0ec3b: "作成日時:%{created_at}"
   created_created_bf5714b8: "作成日時%{created}"
+  created_descending_e9a1b097: "作成日時:降順"
   created_group_group_name_2097306b: "グループ %{group_name} を作成しました"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: 新しい課題フローでは、グループ作成はまだ処理されていません。レガシー作成課題ページに移動しますか？
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 提出のエクスポートを作成すると、すべての現在と過去のコースにおける課題提出のzipファイルをダウンロードすることができます。これは大きなファイルになる可能性があるので、時間がかかる可能性があります。そのページから移動し、後で戻ってくることができます。
@@ -8158,10 +8163,15 @@ ja:
       ユーザーが通知をよく読み、終了時に通知を消すのに必要なだけの時間をユーザーに与えます。
   disable_all_read_only_scopes_f9ffdd28: 読み取り専用スコープをすべて無効にする。
   disable_and_lock_7d0ef0e8: 無効にしてロック
+  disable_authentication_for_graphql_3c019622: GraphQLの認証を無効にする
   disable_automatic_submission_8e1d8676: 自動提出を無効にする
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      [キーボードショートカット] を無効にします。スクリーンリーダーやキーボードナビゲーションを使用しているユーザーの中には、
+      これらのショートカットをオフにすることでエクスペリエンスが向上する人もいるでしょう。
   disable_celebrations_description: この機能を有効化すると、すべてのお祝いアニメーションが非表示になります。
   disable_content_security_policy_8660a787: コンテンツセキュリティポリシーを無効にする
   disable_extra_filter_options_1d1cdc02: 特別フィルタオプションを無効にする
+  disable_keyboard_shortcuts_9db78832: "[キーボードショートカット] を無効にします。"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: 新しいクイズのインポートと移行のチェックボックスを無効にし、デフォルトで有効にします
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: 終了した採点期間の割り当てに対してSISへの投稿を無効にする
   disable_scope_6ba4e4d4: スコープを無効にする
@@ -8862,6 +8872,7 @@ ja:
   edit_user_details_9af7819b: ユーザー詳細を編集する
   edit_when_36c1c2c8: "%{when}を編集する"
   edit_your_catalog_account_cce59310: "Catalog アカウントを編集"
+  edited_c4fcbdbf: 編集日：
   edited_date_b0455372: "（編集済み）：%{date}"
   editing_permissions_for_name_3503e235: "編集権限: %{name}"
   editor: 
@@ -11928,6 +11939,9 @@ ja:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 有効な場合、コンテンツの設計者は公開される前にファイルの著作権とライセンス情報を指定する必要があります。より良いファイルのブラウジングも有効になっている場合にのみ適用されます。
   if_enabled_copyright_and_license_information_must__2a551827: 有効にした場合、ファイルを公開する前に著作権とライセンス情報をファイルに提供しなければなりません。
   if_enabled_developer_key_management_options_and_to_1708ddd3: 有効にすると、開発者キー管理オプションとトークンスコープ設定が使用されます。
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      この機能を有効にすると、GraphQL クエリは
+      ユーザーにサインインやアクセストークンの使用を要求しなくなります。
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 有効である場合、必須条件の１つを満たした際、モジュールに完了と表示する選択ができます。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "有効にすると、'oauth2_access_token_url' がLTI2登録の開始時に送信されます"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "有効にすると、LTI ツールで OAuth 1.0a 署名を使用してメンバーシップサービ スAPI にアクセスできます"
@@ -12523,6 +12537,8 @@ ja:
   last_day_attended_b72d623c: 最終出席日
   last_download_33ea9bf4: 最後のダウンロード：
   last_e159dbd: 最後
+  last_edit_ascending_6a18dba4: 最終編集日：昇順
+  last_edit_descending_6b7ee755: 最終編集日：降順
   last_enrollment_activity_10fe15ba: 最終登録アクティビティ
   last_export_899a04c5: 最後のエクスポート：
   last_first_name_95a078f5: 氏名
@@ -14276,7 +14292,7 @@ ja:
         body_teacher: "%{website} のクラスに招待されています。このクラスの名称は「%{course}」で、講師として招待されています。"
         details: "クラスに参加するには、その前に、Canvas に登録する必要があります。登録を開始するには、次のコース ページにアクセスしてください:"
         html: 
-          body: "%{website} のクラスに招待されています。このクラスの名称は%{course}です。コースの役割は:%{role_type}"
+          body: "あなたは%{account}のクラスに参加するよう招待されています。クラスは%{course}という名前です。コースの役割：%{role_type}"
           body_designer: "このクラスの名称は「%{course}」で、設計者として招待されています。"
           body_observer: "このクラスの名称は「%{course}」で、オブザーバとして招待されています。"
           body_student: "このクラスの名称は「%{course}」で、受講生として招待されています。"
@@ -16677,6 +16693,8 @@ ja:
   page_page_59070cd8: "ページ %{page}"
   page_pagenum_20dbfeb8: "ページ %{pageNum}"
   page_pagenumber_31fe579f: "ページ %{pageNumber}"
+  page_title_ascending_b5df950c: ページ表題：昇順
+  page_title_descending_70c1483d: ページ表題：降順
   page_views: 
     download_filename: "%{user} のページビュー"
     table: 
@@ -16921,6 +16939,9 @@ ja:
     apple_settings: 
       labels: 
         client_id: サービスID
+    asset_user_access_logs: 
+      description: AUA書き込み圧力を最小化
+      name: "AUA ログ者"
     assignment_freezer: 
       description: コピーした課題プロパティを凍結
       name: 課題プロパティ凍結機能
@@ -17939,6 +17960,7 @@ ja:
   public_domain_112ed397: "パブリック ドメイン"
   public_jwk_ee2d719d: 公開JWK
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "公開JWK jsonが無効です。適切にフォーマットされた json を提出してください。"
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "パブリックJWK jsonは以下の文字列フィールドを持たなければなりません： kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "パブリック JWK URL"
   public_message_students: 
     send_message: メッセージを送信
@@ -20137,6 +20159,7 @@ ja:
   save_grading_period_set_e029fa88: 採点期間のセットを保存する
   save_key_b4dede06: 鍵の保存
   save_learning_mastery_82889d8b: 学習熟達スコアを保存
+  save_mastery_scale_2b4dc13a: 習熟度スケールを保存する
   save_publish_36440725: 保存して公開
   save_settings_cafe79a5: 設定の保存
   save_successful_b2f64da4: 正常に保存されました。
@@ -21730,6 +21753,7 @@ ja:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: 申し訳ありませんが、記録で実行された操作は失敗しました。後でまた試してください
   sort_40afa70: "並べ替え:"
   sort_by_72dbba9c: 並べ替え基準
+  sort_by_e75f9e3e: 分類する
   sort_courses_cf94b8d4: コース並べ替え
   sortable_name_73f707cf: 並べ替え可能な名前
   sortable_name_e25fe66c: 並べ替え可能な名前：
@@ -22285,6 +22309,7 @@ ja:
   subscribe_failed_2eb62de0: 定期購読に失敗しました
   subscribe_to_title_c7d6bbd2: "（）を定期購読する%{title}"
   subtitle_ee60ca78: サブタイトル
+  subtitles_could_not_be_imported_from_file_5de6da0b: "%{file}から字幕をインポートできませんでした"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: 成功しました！このドメイン上のすべてのユーザーは、このブランディングを見ることができるようになりました。
   success_file_uploaded_8174e93f: 成功：ファイルをアップロードしました
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: 成功です！この課題の成績は受講生に表示されるようになりました。
@@ -23359,8 +23384,11 @@ ja:
   to_do_1d554f36: タスク
   to_do_5526f10a: タスク：
   to_do_6ac7b2dc: タスク：
+  to_do_date_2cb4bf7b: タスク日付：
+  to_do_date_ascending_c3a59abb: タスク日付：昇順
   to_do_date_d6b79bfd: "タスク%{date}"
   to_do_date_ddfb582c: タスク日付：
+  to_do_date_descending_25b2141d: タスク日付：降順
   to_do_item_d76ecb78: タスクのアイテム
   to_do_items_loading_d1cdfcd5: タスクの読み込み
   to_do_list_dashboard_d741f64e: タスクリストダッシュボード
@@ -25129,8 +25157,9 @@ ja:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "コース、%{course}に登録されています。"
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "コース、%{course}に登録されています。コースの役割: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "%{website}の%{account} アカウントのアカウントロールが与えられています。役割のタイプ: %{role_type}"
-  you_ve_been_invited_to_course_90764f1: "%{course} に招待されています。"
+  you_ve_been_invited_to_course_90764f1: "あなたは%{course}に招待されています。"
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "%{course}に招待されています。コースの役割: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "あなたは%{account}のクラスに参加するよう招待されています。クラスは%{course}という名前です。コースの役割：%{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "%{website} のクラスに招待されています。このクラスの名称は%{course}です。コースの役割: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "%{course}への参加に招待されています。コースの役割: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "%{reviewee} のピア レビューに招待されています。"
