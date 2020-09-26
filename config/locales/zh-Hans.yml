@@ -1832,6 +1832,7 @@ zh-Hans:
   add_people_7ee4b2ec: 添加人员
   add_people_and_courses_to_canvas_5c4bfff9: "在 Canvas 中添加人员和课程"
   add_people_to_coursename_5ea234e1: "将人员添加到：%{courseName}"
+  add_proficiency_level_93bd72d0: 添加熟练程度
   add_proficiency_rating_d819f6b8: 添加熟练程度评分
   add_pronouns_option_906ff625: 添加代词选项
   add_quiz_cebfa28b: 添加测验
@@ -3758,11 +3759,12 @@ zh-Hans:
   attempt_1_7ba3c30f: "尝试次数 1"
   attempt_1_grade_484b35e4: "尝试次数 1：%{grade}"
   attempt_3dd42b18: 尝试
-  attempt_attempt_d3911720: "尝试次数%{attempt}"
+  attempt_attempt_d3911720: "尝试次数 %{attempt}"
   attempt_attempt_grade_c01f45df: "尝试%{attempt}：%{grade}"
   attempt_count_267a4fc5: "尝试次数%{count}"
   attempt_current_attempt_ef626179: "尝试次数%{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "尝试次数 %{current_attempt} 次，共 %{max_attempts} 次"
+  attempt_f2691284: 尝试
   attempt_number_83dcd86a: "尝试次数%{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: 尝试基于您的语言的数字格式检测评分册导出中的适当的字段分隔符。
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: 尝试基于您的语言的数字格式自动检测兼容的数据表报告中的相应字段分隔符。
@@ -4268,6 +4270,7 @@ zh-Hans:
     update: 更新
     view_account_roster: 查看帐户清单
     view_course_roster: 查看课程清单
+  by_b90c6b6f: 按
   by_client_id_4f2fe02c: "按客户端 ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 默认情况下，所有链接都针对课程启用。学生将不会看到不含内容的各班级的链接。例如，如果您没有创建任何测验，他们将不会看到测验链接。如果您不希望学生访问课程的某些区域，则可以排序和明确禁用这些链接。
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7484,12 +7487,14 @@ zh-Hans:
     required: 请输入一些电子邮件地址
   created_58b8a75a: 已创建
   created_6ee36dff: "创建时间:"
+  created_ascending_cff48774: "创建时间:升序"
   created_at_73839757: 创建于
   created_by_b39b9c8b: 创建者为
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: 由SIS创建
   created_created_at_37c0ec3b: "创建时间:%{created_at}"
   created_created_bf5714b8: "已创建%{created}"
+  created_descending_e9a1b097: "创建时间:降序"
   created_group_group_name_2097306b: "已创建组 %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: 正在创建尚未被新作业流处理的组。要转到遗留作业页面吗？
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 创建一个提交导出将允许您下载一个有您的所有目前与先前课程作业提交的压缩文件。这可能是一个大文件，所以可能需要一段时间。您可以导航离开页面并稍后在回来。
@@ -8149,10 +8154,15 @@ zh-Hans:
       使用户有充足的时间阅读通知，并且在阅读完之后取消。
   disable_all_read_only_scopes_f9ffdd28: 禁用所有只读作用域。
   disable_and_lock_7d0ef0e8: 禁用和锁定
+  disable_authentication_for_graphql_3c019622: "对 GraphQL 禁用身份验证"
   disable_automatic_submission_8e1d8676: 禁用自动提交
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      禁用 Canvas 键盘快捷键。使用屏幕阅读器或键盘导航的一些用户
+      禁用这些快捷键将能获得更好的体验。
   disable_celebrations_description: 启用此功能后将隐藏所有庆祝动画。
   disable_content_security_policy_8660a787: 禁用内容安全策略
   disable_extra_filter_options_1d1cdc02: 禁用额外的筛选选项
+  disable_keyboard_shortcuts_9db78832: 禁用键盘快捷键
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: 禁用新测验导入和迁移复选框，默认启用
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "为处于已结束评分周期的作业禁用“发布到 SIS”"
   disable_scope_6ba4e4d4: 禁用作用域
@@ -8853,6 +8863,7 @@ zh-Hans:
   edit_user_details_9af7819b: 编辑用户详情
   edit_when_36c1c2c8: "编辑 %{when}"
   edit_your_catalog_account_cce59310: 编辑您的帐户目录
+  edited_c4fcbdbf: 已编辑：
   edited_date_b0455372: "（已编辑）%{date}"
   editing_permissions_for_name_3503e235: "为%{name}的编辑权限"
   editor: 
@@ -11917,6 +11928,9 @@ zh-Hans:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 如果启用，在发布前内容设计者必须提供版权和许可信息的文件。此仅适用于，如果同时启用更好的文件浏览。
   if_enabled_copyright_and_license_information_must__2a551827: 如果启用，则必须提供文件的版权和许可证信息才能发布。
   if_enabled_developer_key_management_options_and_to_1708ddd3: 如果启用，则将使用开发人员密钥管理选项和标记范围划定。
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      如果启用，GraphQL 查询将不要求
+      用户登录或使用访问令牌。
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 如果启用，当只有一个条件符合时，单元将标记为完成的选项。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "如果已启用，“oauth2_access_token_url”将在 LTI2 注册启动中发送"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "如果启用，LTI 工具可以使用 OAuth 1.0a 签名访问会员服务 API"
@@ -12509,6 +12523,8 @@ zh-Hans:
   last_day_attended_b72d623c: 上次出勤日期
   last_download_33ea9bf4: 上一次下载：
   last_e159dbd: 最后一个
+  last_edit_ascending_6a18dba4: 上次编辑：升序
+  last_edit_descending_6b7ee755: 上次编辑：降序
   last_enrollment_activity_10fe15ba: 最后的登记活动
   last_export_899a04c5: 上次导出：
   last_first_name_95a078f5: 姓名
@@ -14262,7 +14278,7 @@ zh-Hans:
         body_teacher: "我们邀请您参与 %{website} 上的班级。该班级名为 %{course}，我们邀请您作为教师参与。"
         details: "您将需要向 Canvas 注册，然后才能参与班级。要开始使用，请在此处访问课程页面:"
         html: 
-          body: "您已被邀请在%{website}参加课程。此课程称为%{course}。课程角色：%{role_type}"
+          body: "您已收到在 %{account} 参加课程的邀请。该课程称为 %{course}。课程角色：%{role_type}"
           body_designer: "该班级名为 %{course}，我们邀请您作为设计者参与。"
           body_observer: "该班级名为 %{course}，我们邀请您作为观察者参与。"
           body_student: "该班级名为 %{course}，我们邀请您作为学生参与。"
@@ -16661,6 +16677,8 @@ zh-Hans:
   page_page_59070cd8: "页面/%{page}"
   page_pagenum_20dbfeb8: "页面/%{pageNum}"
   page_pagenumber_31fe579f: "页面%{pageNumber}"
+  page_title_ascending_b5df950c: 页面标题：升序
+  page_title_descending_70c1483d: 页面标题：降序
   page_views: 
     download_filename: "%{user} 的浏览量"
     table: 
@@ -16907,6 +16925,9 @@ zh-Hans:
     apple_settings: 
       labels: 
         client_id: "服务 ID"
+    asset_user_access_logs: 
+      description: "最小化 AUA 书写压力"
+      name: "AUA 记录器"
     assignment_freezer: 
       description: 复制时冻结作业属性
       name: 作业属性冻结程序
@@ -17930,6 +17951,7 @@ zh-Hans:
   public_domain_112ed397: 公共域
   public_jwk_ee2d719d: "公共 JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "公共 JWK json 无效。请提交正确格式的 json。"
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "公共 JWK json 必须具有以下字符串字段：kty、e、n、kid、alg、use"
   public_jwk_url_b5564c1d: "公共 JWK URL"
   public_message_students: 
     send_message: 发送消息
@@ -20129,6 +20151,7 @@ zh-Hans:
   save_grading_period_set_e029fa88: 保存评分周期集
   save_key_b4dede06: 保存密钥
   save_learning_mastery_82889d8b: 保存学习掌握程度
+  save_mastery_scale_2b4dc13a: 保存掌握程度范围
   save_publish_36440725: 保存并发布
   save_settings_cafe79a5: 保存设置
   save_successful_b2f64da4: 成功保存。
@@ -21717,6 +21740,7 @@ zh-Hans:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: 抱歉，对此录制文件执行的操作失败。请稍后重试
   sort_40afa70: 排序：
   sort_by_72dbba9c: 排序
+  sort_by_e75f9e3e: 排序
   sort_courses_cf94b8d4: 给课程排序
   sortable_name_73f707cf: 可排序的名称
   sortable_name_e25fe66c: 排序名称：
@@ -22272,6 +22296,7 @@ zh-Hans:
   subscribe_failed_2eb62de0: 订阅失败
   subscribe_to_title_c7d6bbd2: "订阅%{title}"
   subtitle_ee60ca78: 字幕
+  subtitles_could_not_be_imported_from_file_5de6da0b: "无法从 %{file} 导入字幕"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: 成功！在此域中的所有用户现在会看到这个品牌。
   success_file_uploaded_8174e93f: 成功：文件已上传
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: 成功！学生现在可看到此作业的评分。
@@ -23343,8 +23368,11 @@ zh-Hans:
   to_do_1d554f36: 待办事项
   to_do_5526f10a: 待办事项：
   to_do_6ac7b2dc: 待办事项：
+  to_do_date_2cb4bf7b: 待办日期：
+  to_do_date_ascending_c3a59abb: 待办日期：升序
   to_do_date_d6b79bfd: "待办事项%{date}"
   to_do_date_ddfb582c: 待办日期：
+  to_do_date_descending_25b2141d: 待办日期：降序
   to_do_item_d76ecb78: 待办事项列表
   to_do_items_loading_d1cdfcd5: 正在加载待办事项
   to_do_list_dashboard_d741f64e: 待办事项列表仪表板
@@ -25107,8 +25135,9 @@ zh-Hans:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "您已被注册到课程，%{course}。"
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "您已注册了课程，%{course}。课程的角色：%{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "您在 %{website} 的 %{account} 帐户 ，您已被授予一个帐户角色。角色类型：%{role_type}。"
-  you_ve_been_invited_to_course_90764f1: "您已被邀请到%{course}。"
+  you_ve_been_invited_to_course_90764f1: "您已收到 %{course} 的邀请。"
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "您已被邀请到%{course}。课程角色：%{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "您已收到在 %{account} 参加课程的邀请。该课程称为 %{course}。课程角色：%{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "您已被邀请在 %{website} 参加一个课程。此课程被称为 %{course}。课程角色：%{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "您已被邀请参加课程，%{course}。课程角色：%{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "您已被邀请进行同侪评审 %{reviewee}。"

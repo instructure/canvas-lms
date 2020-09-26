@@ -1884,6 +1884,7 @@ ar:
   add_people_7ee4b2ec: "إضافة أشخاص"
   add_people_and_courses_to_canvas_5c4bfff9: "إضافة أشخاص ومساقات إلى Canvas"
   add_people_to_coursename_5ea234e1: "إضافة أشخاص إلى: %{courseName}"
+  add_proficiency_level_93bd72d0: "إضافة مستوى إجادة"
   add_proficiency_rating_d819f6b8: "إضافة تصنيف إجادة"
   add_pronouns_option_906ff625: "إضافة خيار الضمائر"
   add_quiz_cebfa28b: "إضافة اختبار موجز"
@@ -3881,6 +3882,7 @@ ar:
   attempt_count_267a4fc5: "محاولة %{count}"
   attempt_current_attempt_ef626179: "محاولة %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "محاولة %{current_attempt} من %{max_attempts}"
+  attempt_f2691284: المحاولة
   attempt_number_83dcd86a: "محاولة %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "محاولة الكشف عن فاصل حقل مناسب في عمليات تصدير دفتر الدرجات بناءً على تنسيق الأرقام للغتك."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "محاولة الكشف عن فاصل حقل مناسب في عمليات تصدير جداول بيانات متوافقة بناءً على تنسيق الأرقام للغتك."
@@ -4390,6 +4392,7 @@ ar:
     update: تحديث
     view_account_roster: "عرض كشف الحساب"
     view_course_roster: "عرض كشف المساق"
+  by_b90c6b6f: بواسطة
   by_client_id_4f2fe02c: "بواسطة معرف العميل"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "في الوضع الافتراضي، تكون جميع الارتباطات ممكنة للمساق. لن يرى الطلاب الارتباطات التي تنقل إلى أقسام لا محتوىً بها. على سبيل المثال، إن لم تقم بعمل أية اختبارات، فلن يرى الطلاب ارتباط الاختبارات. يمكنك تصنيف هذه الارتباطات ويمكنك تعطيلها صراحةً إذا كانت هناك أجزاء من االمساق لا ترغب في الوصول إليها من قبل الطلاب."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7786,12 +7789,14 @@ ar:
     required: "الرجاء إدخال بعض عناوين البريد الإلكتروني"
   created_58b8a75a: "تم الإنشاء"
   created_6ee36dff: "تاريخ الإنشاء:"
+  created_ascending_cff48774: "تاريخ الإنشاء: تصاعديًا"
   created_at_73839757: "تم الإنشاء في"
   created_by_b39b9c8b: "تم الإنشاء من قِبَل"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "تم الإنشاء من قبل SIS"
   created_created_at_37c0ec3b: "تاريخ الإنشاء: %{created_at}"
   created_created_bf5714b8: "تم الإنشاء %{created}"
+  created_descending_e9a1b097: "تاريخ الإنشاء: تنازليًا"
   created_group_group_name_2097306b: "تم إنشاء المجموعة %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "لم تتم معالجة إنشاء مجموعة حتى الآن في تدفق المهام الجديدة. هل تريد التوجه إلى صفحة المهام القديمة؟"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "سيسمح لك إنشاء \"تصدير إرسال\" بتنزيل ملف Zip يضم كافة إرسالات مهمتك في جميع مساقاتك الحالية والسابقة. قد يكون ملفاً كبيراً، وبالتالي قد يستغرق بعض الوقت. يمكنك الانتقال إلى صفحات أخرى والعودة فيما بعد."
@@ -8527,10 +8532,15 @@ ar:
       المستخدم الوقت الكافي الذي يحتاجون إليه لقراءة الإعلام وإبعاده عندما ينتهون منها.
   disable_all_read_only_scopes_f9ffdd28: "تعطيل جميع نطاقات القراءة فقط."
   disable_and_lock_7d0ef0e8: "تعطيل وتأمين"
+  disable_authentication_for_graphql_3c019622: "تعطيل المصادقة لـ GraphQL"
   disable_automatic_submission_8e1d8676: "تعطيل الإرسال التلقائي"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      تعطيل اختصارات لوحة المفاتيح في Canvas. سيحصل بعض المستخدمين الذين يستخدمون قارئات الشاشة أو تنقل لوحة المفاتيح
+      على تجربة محسنة مع إيقاف تشغيل هذه الاختصارات.
   disable_celebrations_description: "يؤدي تمكين هذه الميزة إلى إخفاء كافة الرسوم المتحركة للاحتفالات."
   disable_content_security_policy_8660a787: "تعطيل استيراد سياسة أمان المحتوى"
   disable_extra_filter_options_1d1cdc02: "تعطيل خيارات التصفية الإضافية"
+  disable_keyboard_shortcuts_9db78832: "تعطيل اختصارات لوحة المفاتيح"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "تعطيل استيراد الاختبارات الموجزة وترحيل مربعات الاختيار، وإعادتها افتراضياً إلى التمكين"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "تعطيل النشر في SIS لمهمة في فترات تقييم الدرجات المغلقة"
   disable_scope_6ba4e4d4: "تعطيل نطاق"
@@ -9267,6 +9277,7 @@ ar:
   edit_user_details_9af7819b: "تحرير تفاصيل المستخدم"
   edit_when_36c1c2c8: "تحرير %{when}"
   edit_your_catalog_account_cce59310: "حرر حساب كتالوج الخاص بك"
+  edited_c4fcbdbf: "تم التحرير:"
   edited_date_b0455372: "(تم التحرير) %{date}"
   editing_permissions_for_name_3503e235: "أذونات التحرير لصالح: %{name}"
   editor: 
@@ -12448,6 +12459,9 @@ ar:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "عند التمكين، يتعين على مصممي المحتوى توفير المعلومات الخاصة بحقوق النشر والتراخيص للملفات قبل نشرها. ينطبق ذلك فقط عند تمكين Better File Browsing \"أفضل استعراض للملفات\" كذلك."
   if_enabled_copyright_and_license_information_must__2a551827: "في حالة التمكين، يجب تزويد معلومات حقوق النشر والترخيص للملفات قبل نشرها."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "إذا تم تمكينها، سيتم استخدام خيارات إدارة مفتاح المطور ونطاق الرمز المميز."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      إذا تم تمكين استعلامات GraphQL، ستتطلب استعلامات GraphQL
+      من المستخدمين تسجيل الدخول أو استخدام رمز وصول مميز.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "في حال تمكينه، سيكون للوحدات خيار وضع علامة تشير إلى أنها اكتملت بمجرد توفر شرط واحد فقط."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "إذا تم التمكين، سيتم إرسال 'oauth2_access_token_url' في تشغيل تسجيل LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "إذا تم التمكين، فإنه يمكن استخدام توقيع OAuth 1.0a من خلال أدوات LTI للوصول إلى API خدمة العضوية"
@@ -13043,6 +13057,8 @@ ar:
   last_day_attended_b72d623c: "آخر يوم حضور"
   last_download_33ea9bf4: "التنزيل الأخير:"
   last_e159dbd: أخيرًا
+  last_edit_ascending_6a18dba4: "آخر تحرير: تصاعديًا"
+  last_edit_descending_6b7ee755: "آخر تحرير: تنازليًا"
   last_enrollment_activity_10fe15ba: "آخر نشاط تسجيل"
   last_export_899a04c5: "عملية التصدير الأخيرة:"
   last_first_name_95a078f5: "اسم العائلة، الاسم الأول"
@@ -14854,7 +14870,7 @@ ar:
         body_teacher: "لقد تمت دعوتك للمشاركة في فصل على الموقع %{website}.  الفصل يسمى %{course}, وقد تمت دعوتك للمشاركة بوصفك معلمًا."
         details: "ستحتاج إلى التسجيل مع Canvas قبل أن تتمكن من المشاركة في الفصل.  للشروع في العمل، تفضل بزيارة صفحة المساق هنا:"
         html: 
-          body: "تمت دعوتك للمشاركة في فصل على %{website}. اسم الفصل %{course}. الدور في الفصل: %{role_type}"
+          body: "تم دعوتك للمشاركة في صف دراسي على %{account}. الصف الدراسي باسم %{course}. دور المساق: %{role_type}"
           body_designer: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك مصممًا."
           body_observer: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك ملاحظًا."
           body_student: "الفصل يسمى %{course}، وقد تمت دعوتك للمشاركة بوصفك طالبًا."
@@ -17298,6 +17314,8 @@ ar:
   page_page_59070cd8: "صفحة %{page}"
   page_pagenum_20dbfeb8: "صفحة %{pageNum}"
   page_pagenumber_31fe579f: "صفحة %{pageNumber}"
+  page_title_ascending_b5df950c: "عنوان الصفحة: تصاعديًا"
+  page_title_descending_70c1483d: "عنوان الصفحة: تنازليًا"
   page_views: 
     download_filename: "طرق عرض الصفحات لـ %{user}"
     table: 
@@ -17544,6 +17562,9 @@ ar:
     apple_settings: 
       labels: 
         client_id: "معرف الخدمة"
+    asset_user_access_logs: 
+      description: "طي ضغط كتابة AUA"
+      name: "مسجل AUA"
     assignment_freezer: 
       description: "تجميد خصائص التعيين عند النسخ"
       name: "أداة تجميد خصائص التعيين"
@@ -18565,6 +18586,7 @@ ar:
   public_domain_112ed397: "المجال العام"
   public_jwk_ee2d719d: "JWK عام"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "JWK json العام غير صالح. يرجى إرسال json بتنسيق سليم."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "يجب أن تحتوي JWK json العام على حقول السلاسل التالية: kty، e، n، kid، alg، use"
   public_jwk_url_b5564c1d: "عنوان URL عام لـ JWK"
   public_message_students: 
     message_student: "مراسلة الطلاب لـ %{course_name}"
@@ -20962,6 +20984,7 @@ ar:
   save_grading_period_set_e029fa88: "حفظ مجموعة فترات تقييم الدرجات"
   save_key_b4dede06: "مفتاح الحفظ"
   save_learning_mastery_82889d8b: "حفظ إتقان التعلم"
+  save_mastery_scale_2b4dc13a: "حفظ مقياس الإجادة"
   save_publish_36440725: "حفظ ونشر"
   save_settings_cafe79a5: "حفظ الإعدادات"
   save_successful_b2f64da4: "نجح الحفظ."
@@ -22608,6 +22631,7 @@ ar:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "عذرًا، فشل الإجراء الذي نُفذ على هذا التسجيل. يرجى إعادة المحاولة"
   sort_40afa70: "الترتيب:"
   sort_by_72dbba9c: "الفزر حسب"
+  sort_by_e75f9e3e: "الفزر حسب"
   sort_courses_cf94b8d4: "ترتيب المساقات"
   sortable_name_73f707cf: "اسم قابل للفرز"
   sortable_name_e25fe66c: "الاسم القابل للفرز:"
@@ -23191,6 +23215,7 @@ ar:
   subscribe_failed_2eb62de0: "فشل الاشتراك"
   subscribe_to_title_c7d6bbd2: "الاشتراك في %{title}"
   subtitle_ee60ca78: "العنوان الفرعي"
+  subtitles_could_not_be_imported_from_file_5de6da0b: "تعذر استيراد شرائط الترجمة من %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "نجاح! سيستطيع جميع مستخدمي هذا المجال مشاهدة هذه العلامة."
   success_file_uploaded_8174e93f: "نجاح: تم تحميل الملف"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "نجاح! أصبحت الدرجات لهذه المهمة ظاهرة للطلاب في الوقت الحالي."
@@ -24291,8 +24316,11 @@ ar:
   to_do_1d554f36: "قائمة مهام"
   to_do_5526f10a: "قائمة مهام:"
   to_do_6ac7b2dc: "قائمة المهام:"
+  to_do_date_2cb4bf7b: "تاريخ قائمة المهام:"
+  to_do_date_ascending_c3a59abb: "تاريخ قائمة المهام: تصاعديًا"
   to_do_date_d6b79bfd: "قائمة المهام %{date}"
   to_do_date_ddfb582c: "تاريخ قائمة المهام:"
+  to_do_date_descending_25b2141d: "تاريخ قائمة المهام: تنازليًا"
   to_do_item_d76ecb78: "عنصر قائمة مهام"
   to_do_items_loading_d1cdfcd5: "تحميل عناصر قائمة المهام"
   to_do_list_dashboard_d741f64e: "لوحة معلومات قائمة المهام"
@@ -26125,6 +26153,7 @@ ar:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "تم منحك دور حساب في الحساب %{account} على %{website}. نوع الدور: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "تمت دعوتك إلى %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "تمت دعوتك إلى %{course}. الدور في المساق: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "تم دعوتك للمشاركة في صف دراسي على %{account}.  الصف الدراسي باسم %{course}. دور المساق: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "تمت دعوتك للمشاركة في فصل على %{website}. اسم الفصل %{course}. الدور في الفصل: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "تمت دعوتك للمشاركة في المساق %{course}. الدور في المساق %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "تمت دعوتك لإجراء مراجعة الأقران لـ %{reviewee}."

@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2015 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,13 +14,10 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
+class RemoveFkConstraintsForQuizQuestions < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-handle_fallbacks = -> do
-  # TODO: restore once we figure out how to do this
-        # in a safe and synchronized way. Doing it at any time
-        # can cause read failures because of the way we check the tree and then everything
-        # else below it
-  # Canvas::DynamicSettings.reset_cache!
+  def change
+    remove_foreign_key :quiz_questions, :accounts, column: :root_account_id, if_exists: true
+  end
 end
-handle_fallbacks.call
-Canvas::Reloader.on_reload(&handle_fallbacks)

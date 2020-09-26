@@ -129,7 +129,13 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
   ) : null
 
   return (
-    <CanvasModal label={I18n.t('Add Group')} size="small" {...modalProps} footer={<Footer />}>
+    <CanvasModal
+      label={I18n.t('Add Group')}
+      size="small"
+      shouldCloseOnDocumentClick={false}
+      footer={<Footer />}
+      {...modalProps}
+    >
       {alert}
       <FormFieldGroup
         description={<ScreenReaderContent>{I18n.t('Add Group')}</ScreenReaderContent>}

@@ -1831,6 +1831,7 @@ da:
   add_people_7ee4b2ec: "Tilføj deltagere"
   add_people_and_courses_to_canvas_5c4bfff9: "tilføjer deltagere og fag til Canvas"
   add_people_to_coursename_5ea234e1: "Tilføj brugere til: %{courseName}"
+  add_proficiency_level_93bd72d0: "Tilføj færdighedsbedømmelse"
   add_proficiency_rating_d819f6b8: "Tilføj færdighedsbedømmelse"
   add_pronouns_option_906ff625: "Tilføj indstilling af pronomen"
   add_quiz_cebfa28b: "Tilføj test"
@@ -3765,6 +3766,7 @@ da:
   attempt_count_267a4fc5: "Forsøg %{count}"
   attempt_current_attempt_ef626179: "Forsøg %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Forsøg %{current_attempt} af %{max_attempts}"
+  attempt_f2691284: Forsøg
   attempt_number_83dcd86a: "Forsøg %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Forsøg at opdage en passende feltseparator i karakteroversigt-eksporten baseret på dit sprogs talformat."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Forsøg at registrere en passende feltseparator i kompatible regnearkseksporter baseret på dit sprogs talformat."
@@ -4270,6 +4272,7 @@ da:
     update: Opdatering
     view_account_roster: "Vis kontoliste"
     view_course_roster: "Vis kursusliste"
+  by_b90c6b6f: Af
   by_client_id_4f2fe02c: "Efter kunde-id"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Som standard er alle links aktiveret til et fag. De studerende kan ikke se links til sektioner uden indhold. Hvis du for eksempel ikke har oprettet nogen test, kan de ikke se testenes link. Du kan sortere og udtrykkeligt deaktivere disse links, hvis der findes områder i faget, som de studerende ikke skal have adgang til."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7492,12 +7495,14 @@ da:
     required: "Indtast nogle e-mailadresser"
   created_58b8a75a: Oprettet
   created_6ee36dff: "Oprettet:"
+  created_ascending_cff48774: "Oprettet: Stigende"
   created_at_73839757: Oprettet
   created_by_b39b9c8b: "Oprettet af"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Oprettet af SIS"
   created_created_at_37c0ec3b: "Oprettet: %{created_at}"
   created_created_bf5714b8: "Oprettet %{created}"
+  created_descending_e9a1b097: "Oprettet: Faldende"
   created_group_group_name_2097306b: "Oprettet gruppe %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Oprettelse af en gruppe anvendes endnu ikke i det nye opgave-flow. Gå til den ældre Opgave-side?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Oprettelse af en afleveringseksport giver dig mulighed for at downloade en fil med alle dine opgaveafleveringer i alle dine nuværende og tidligere fag. Dette kan være en stor fil, så det kan tage lidt tid. Du kan navigere væk fra siden og vende tilbage senere."
@@ -8157,10 +8162,15 @@ da:
       brugeren den nødvendige tid til at læse meddelelsen og afvise den, når den er læst.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle skrivebeskyttede omfang."
   disable_and_lock_7d0ef0e8: "Deaktiver og lås"
+  disable_authentication_for_graphql_3c019622: "Deaktiver godkendelse for GraphQL"
   disable_automatic_submission_8e1d8676: "Deaktiver automatisk aflevering"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Deaktiver tastaturgenveje på Canvas. Nogle brugere, der bruger skærmlæsere eller tastaturnavigation,
+      får en forbedret oplevelse med disse genveje slået fra.
   disable_celebrations_description: "Aktivering af denne funktion skjuler alle fejringsanimationer."
   disable_content_security_policy_8660a787: "Deaktiver politik for indholdsikkerhed"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterindstillinger"
+  disable_keyboard_shortcuts_9db78832: "Deaktiver tastaturgenveje"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Deaktiver afkrydsningsfelter for import og overførsel af New Quizzes, indstil som standard til aktiveret"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Slå op til SIS for opgaver i lukkede karakterperioder."
   disable_scope_6ba4e4d4: "Deaktiver omfang"
@@ -8861,6 +8871,7 @@ da:
   edit_user_details_9af7819b: "Rediger brugerdetaljer"
   edit_when_36c1c2c8: "Rediger %{when}"
   edit_your_catalog_account_cce59310: "Rediger din Catalog-konto"
+  edited_c4fcbdbf: "Redigeret:"
   edited_date_b0455372: "(Redigeret) %{date}"
   editing_permissions_for_name_3503e235: "Redigerer tilladelser til: %{name}"
   editor: 
@@ -11934,6 +11945,9 @@ da:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Hvis aktiveret skal indholdsdesignere oplyse copyright og licensoplysninger for filer, inden de udgives. Gælder kun, hvis Better File Browsing også er aktiveret."
   if_enabled_copyright_and_license_information_must__2a551827: "Hvis aktiveret, skal der gives ophavsrets- og licensoplysninger for filer, før de offentliggøres."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Hvis aktiveret, vil udvikler-nøgle-håndteringsmulighederne og token-omfanget blive brugt."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Hvis aktiveret, påkræver GraphQL-forespørgsler ikke,
+      at brugere logges ind eller bruger et adgangs-token.
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: "Hvis aktiveret, vil moduler have muligheden for at blive markeret som fuldført, når blot et af kravene er opfyldt."
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Hvis aktiveret, sendes 'oauth2_access_token_url' i LTI2 registreringslancering"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Hvis aktiveret, kan OAuth 1.0a-signering bruges af LTI-værktøjer for at få adgang til medlemskabstjenestens API"
@@ -12530,6 +12544,8 @@ da:
   last_day_attended_b72d623c: "Sidste dag tilstedeværende"
   last_download_33ea9bf4: "Sidste download:"
   last_e159dbd: Sidste
+  last_edit_ascending_6a18dba4: "Sidste redigering: Stigende"
+  last_edit_descending_6b7ee755: "Sidste redigering: Faldende"
   last_enrollment_activity_10fe15ba: "Sidste tilmeldingsaktivitet"
   last_export_899a04c5: "Sidste eksport:"
   last_first_name_95a078f5: "Efternavn, fornavn"
@@ -14283,7 +14299,7 @@ da:
         body_teacher: "Du er blevet inviteret som underviser til kurset %{course} på %{website}."
         details: "Du skal tilmelde dig til Canvas, inden du kan deltage i klassen. Gå ind på denne side for at komme i gang:"
         html: 
-          body: "Du er blevet inviteret til at deltage i en klasse på %{website}. Klassens navn er %{course}. Rolle: %{role_type}"
+          body: "Du er blevet inviteret til at deltage i en klasse på %{account}. Klassen hedder %{course}. Fag-rolle:  %{role_type}"
           body_designer: "Du er blevet inviteret som designer til kurset %{course} på %{website}."
           body_observer: "Du er blevet inviteret som observatør til kurset %{course} på %{website}."
           body_student: "Du er blevet inviteret som studerende til kurset %{course} på %{website}."
@@ -16684,6 +16700,8 @@ da:
   page_page_59070cd8: "Side %{page}"
   page_pagenum_20dbfeb8: "Side %{pageNum}"
   page_pagenumber_31fe579f: "side %{pageNumber}"
+  page_title_ascending_b5df950c: "Sidetitel: Stigende"
+  page_title_descending_70c1483d: "Sidetitel: Faldende"
   page_views: 
     download_filename: "Sidevisninger for %{user}"
     table: 
@@ -16930,6 +16948,9 @@ da:
     apple_settings: 
       labels: 
         client_id: Tjeneste-ID
+    asset_user_access_logs: 
+      description: "Minimer AUA's skrivetryk"
+      name: AUA-logger
     assignment_freezer: 
       description: "Lås opgaveegenskaber på kopi"
       name: Opgavelåsning
@@ -17952,6 +17973,7 @@ da:
   public_domain_112ed397: "Offentligt domæne"
   public_jwk_ee2d719d: "Offentlig JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Offentlig JWK json er ikke gyldig. Indsend venligst korrekt formateret json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Offentlig JWK json skal have følgende strengfelter: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Offentlig JWK-URL"
   public_message_students: 
     message_student: "Send besked til studerende for %{course_name}"
@@ -20153,6 +20175,7 @@ da:
   save_grading_period_set_e029fa88: "Gem karakterperiodesæt"
   save_key_b4dede06: "Gem nøgle"
   save_learning_mastery_82889d8b: "Gem opfyldelse af læringsmål"
+  save_mastery_scale_2b4dc13a: "Gem skala for opfyldelse af læringsmål"
   save_publish_36440725: "Gem og offentliggør"
   save_settings_cafe79a5: "Gem indstillinger"
   save_successful_b2f64da4: "Blev gemt."
@@ -21751,6 +21774,7 @@ da:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Beklager, den handling, der blev udført på denne optagelse, mislykkedes. Prøv igen senere"
   sort_40afa70: "Sorter:"
   sort_by_72dbba9c: "Sorter efter"
+  sort_by_e75f9e3e: "Sorter efter"
   sort_courses_cf94b8d4: "Sorter fag"
   sortable_name_73f707cf: "Sorterbart navn"
   sortable_name_e25fe66c: "Navn, der kan sorteres"
@@ -22304,6 +22328,7 @@ da:
   subscribe_failed_2eb62de0: "Abonnement mislykkedes"
   subscribe_to_title_c7d6bbd2: "Abonner på %{title}"
   subtitle_ee60ca78: Undertitel
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Undertekster kunne ikke importeres fra %{file}"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: "Succes! Alle brugere på dette domæne vil nu se denne branding."
   success_file_uploaded_8174e93f: "Succes: Fil overført"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Succes! Karakterer for denne opgave er nu synlige for de studerende."
@@ -23376,8 +23401,11 @@ da:
   to_do_1d554f36: Opgaveliste
   to_do_5526f10a: "Opgaveliste:"
   to_do_6ac7b2dc: "opgaveliste:"
+  to_do_date_2cb4bf7b: "Dato for opgaveliste:"
+  to_do_date_ascending_c3a59abb: "Dato for opgaveliste: Stigende"
   to_do_date_d6b79bfd: "Opgaveliste %{date}"
   to_do_date_ddfb582c: "Opgaveliste dato:"
+  to_do_date_descending_25b2141d: "Dato for opgaveliste: Faldende"
   to_do_item_d76ecb78: Opgaveliste-element
   to_do_items_loading_d1cdfcd5: "Elementer i opgaveliste indlæses"
   to_do_list_dashboard_d741f64e: "Oversigt over opgaveliste"
@@ -25150,6 +25178,7 @@ da:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du er blevet tildelt en kontorolle for %{account}-kontoen på %{website}. Rolletype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du er blevet inviteret til %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er blevet inviteret til %{course}. Kursusrolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Du er blevet inviteret til at deltage i en klasse på %{account}.  Klassen hedder %{course}. Fag-rolle: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er blevet inviteret til at deltage i en klasse på %{website}. Klassens navn er %{course}. Fagrolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er blevet inviteret til at deltage i faget, %{course}. Fagrolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er blevet inviteret til peer review %{reviewee}."

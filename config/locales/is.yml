@@ -1741,6 +1741,7 @@ is:
   add_people_7ee4b2ec: "Bæta við fólki"
   add_people_and_courses_to_canvas_5c4bfff9: "Bætir fólki og námskeiðum við Canvas"
   add_people_to_coursename_5ea234e1: "Bæta fólki við: %{courseName}"
+  add_proficiency_level_93bd72d0: "Bæta við hæfnisstigi"
   add_proficiency_rating_d819f6b8: "Bæta við hæfnieinkunn"
   add_pronouns_option_906ff625: "Bæta við fornafna valkosti"
   add_quiz_cebfa28b: "Bæta við prófi"
@@ -3528,6 +3529,7 @@ is:
   attempt_count_267a4fc5: "Tilraun %{count}"
   attempt_current_attempt_ef626179: "Tilraun %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Tilraun %{current_attempt} af %{max_attempts}"
+  attempt_f2691284: Tilraun
   attempt_number_83dcd86a: "Tilraun %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Tilraun til að finna viðeigandi sviðsskiljara í útflutningum einkunnabóka miðað við númerasnið tungumáls þíns."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Tilraun til að finna viðeigandi sviðsskiljara í samhæfum töflureiknisútflutningum miðað við númerasnið tungumáls þíns."
@@ -3990,6 +3992,7 @@ is:
     unpublish: Fela
     unpublished: Óbirt
     update: Uppfæra
+  by_b90c6b6f: af
   by_client_id_4f2fe02c: "Eftir auðkenni umbjóðanda"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Sjálfgilt er að allir tenglar eru mögulegir fyrir námskeið. Nemendur sjá ekki tengla á hluta sem eru án efnis. Dæmi: Ef þú hefur ekki stofnað nein próf, sjá þeir ekki prófatengilinn. Þú getur raðað og afvirkjað þessa tengla sérstaklega ef þú vilt ekki að nemendur hafi aðgang að tilteknum sviðum námskeiðsins."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -6867,12 +6870,14 @@ is:
     required: "Skráðu netföng"
   created_58b8a75a: Stofnað
   created_6ee36dff: "Stofnað:"
+  created_ascending_cff48774: "Stofnað: Hækkandi"
   created_at_73839757: "Stofnað á"
   created_by_b39b9c8b: "Stofnað af"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Stofnað af SIS"
   created_created_at_37c0ec3b: "Stofnað: %{created_at}"
   created_created_bf5714b8: "Stofnað %{created}"
+  created_descending_e9a1b097: "Stofnað: Lækkandi"
   created_group_group_name_2097306b: "Stofnaði hópinn %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Að búa til hóp er ekki enn meðhöndlað í nýja verkefnaflæðinu. Fara í Legacy verkefnasíðuna?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Stofnun á útflutningi skila gerir þér kleift að hlaða niður zip-skrá með öllum skiluðum verkefnum þínum í námskeiðum fyrr og síðar. Þetta getur orðið stór skrá og tekið tíma í niðurhali. Þú getur farið af síðunni og komið aftur síðar."
@@ -7496,10 +7501,15 @@ is:
       notandanum eins mikinn tíma og hann þarf til að lesa yfir tilkynninguna og loka henni þegar lestri er lokið.
   disable_all_read_only_scopes_f9ffdd28: "Afvirkja öll skrifvarin umföng."
   disable_and_lock_7d0ef0e8: "Aftengja og læsa"
+  disable_authentication_for_graphql_3c019622: "Slökkva á auðkenningu fyrir GraphQL"
   disable_automatic_submission_8e1d8676: "Óvirkja sjálfvirka innsendingu"
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Slökkva á Canvas-flýtilyklum. Sumir notendur sem nota skjálesara eða skoðun með lyklaborði
+      geta bætt upplifun sína með því að slökkva á þessum flýtileiðum.
   disable_celebrations_description: "Virkjun þessa eiginleika felur alla fagnaðarkvikun."
   disable_content_security_policy_8660a787: "Óvirkja efnisöryggisstefnu"
   disable_extra_filter_options_1d1cdc02: "óvirkja auka síuvalkosti"
+  disable_keyboard_shortcuts_9db78832: "Slökkva á flýtilyklum"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Afvirkja innflutning og flutning nýrra prófa gátreitina, sem setur þá sjálfvalið á virkjaðir"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Slökkva á „Birta á SIS“ fyrir verkefni á einkunnatímabilum sem er lokið"
   disable_scope_6ba4e4d4: "Afvirkja umfang"
@@ -8123,6 +8133,7 @@ is:
   edit_user_details_9af7819b: "Breyta upplýsingum um notanda"
   edit_when_36c1c2c8: "Breyta %{when}"
   edit_your_catalog_account_cce59310: "Breyta Catalog-reikningi þínum"
+  edited_c4fcbdbf: "Breytt:"
   edited_date_b0455372: "(Breytt) %{date}"
   editing_permissions_for_name_3503e235: "Breyta heimildum fyrir: %{name}"
   editor: 
@@ -10519,6 +10530,9 @@ is:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Ef heimilað, verða efnishönnuðir að leggja fram höfundarréttar- og leyfisupplýsingar fyrir skrár fyrir birtingu. Gildir bara ef Better File Browsing er líka heimiluð."
   if_enabled_copyright_and_license_information_must__2a551827: "Ef þetta er virkjað þarf að gefa upp höfundarréttar og leyfisupplýsingar fyrir skrár áður en þær eru birtar."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Ef þetta er virkjað verður lyklastjórnun forritara og táknkynning notuð."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Ef kveikt er á munu GraphQL fyrirspurnir ekki krefja
+      notendur um að vera innskráðir eða nota aðgangsmerki.
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Ef heimilað verða 'oauth2_access_token_url' send í LTI2 skráningarupphaf"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Ef virkt, getur Oauth 1.0a undirritun verið notuð af LTI verkfærum til að fá aðgang að Membership Service API"
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
@@ -11087,6 +11101,8 @@ is:
   last_changed_date_82f1ce56: "Síðast breytt %{date}"
   last_day_attended_b72d623c: "Dagsetning síðustu mætingar"
   last_e159dbd: Síðast
+  last_edit_ascending_6a18dba4: "Síðast breytt: Hækkandi"
+  last_edit_descending_6b7ee755: "Síðast breytt: Lækkandi"
   last_enrollment_activity_10fe15ba: "Síðasta innritunarvirkni"
   last_export_899a04c5: "Síðasti útflutningur:"
   last_first_name_95a078f5: "Eftirnafn, fornafn"
@@ -12640,7 +12656,7 @@ is:
       email: 
         details: "Þú þarft að skrá þig á Canvas til að geta tekið þátt í tímum. Heimsæktu síðu námskeiðsins hérna:"
         html: 
-          body: "Þér er boðið í námshópinn á %{website} sem nefnist %{course}. Hlutverk námskeiðsins er: %{role_type}"
+          body: "Þér hefur verið boðið að taka þátt í kennslustund á %{account}. Kennslustundin heitir %{course}. Hlutverk námskeiðs: %{role_type}"
           details: "Þú þarft að skrá þig á Canvas til að geta tekið þátt í tímum."
           email: Netfang
           link: "Smelltu hér til að sjá síðu námskeiðs"
@@ -14800,6 +14816,8 @@ is:
   page_page_59070cd8: "Síða %{page}"
   page_pagenum_20dbfeb8: "Síða %{pageNum}"
   page_pagenumber_31fe579f: "síða %{pageNumber}"
+  page_title_ascending_b5df950c: "Titill síðu: Hækkandi"
+  page_title_descending_70c1483d: "Titill síðu: Lækkandi"
   page_views: 
     download_filename: "Síðuskoðun fyrir %{user}"
     table: 
@@ -15036,6 +15054,9 @@ is:
     apple_settings: 
       labels: 
         client_id: Þjónustukenni
+    asset_user_access_logs: 
+      description: "Minnka AUA skrifþrýsting"
+      name: "AUA skráning"
     assignment_freezer: 
       description: "Læsa eiginleikum verkefnis við afritun"
       name: "Læsing eiginleika verkefnis"
@@ -15984,6 +16005,7 @@ is:
   public_jwk_44d1e8a9: "* Opinber JWK"
   public_jwk_ee2d719d: "Opinber JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Opinber JWK json er ekki gildur. Skilaðu inn almennilega forsniðnu json."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "Opið JWK json verður að hafa eftirfarandi strengjasvæði: kty, e, n, kid, alg, use"
   public_jwk_url_694edf52: "* Opinber JWK URL"
   public_jwk_url_b5564c1d: "Opinber JWK-vefslóð"
   public_message_students: 
@@ -17894,6 +17916,7 @@ is:
   save_grading_period_set_e029fa88: "Vista stillingar einkunnatímabils"
   save_key_b4dede06: "Vista lykil"
   save_learning_mastery_82889d8b: "Vista lærdómsleikni"
+  save_mastery_scale_2b4dc13a: "Vista tileinkunarkvarða"
   save_publish_36440725: "Vista og birta"
   save_settings_cafe79a5: "Vista stillingar"
   save_successful_b2f64da4: "Vistun tókst."
@@ -19293,6 +19316,7 @@ is:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Því miður, aðgerðin sem var gerð á þessari upptöku mistókstReyndu aftur síðar"
   sort_40afa70: "Raða:"
   sort_by_72dbba9c: "Raða eftir"
+  sort_by_e75f9e3e: "Raða eftir"
   sort_courses_cf94b8d4: "Raða námskeiðum"
   sortable_name_73f707cf: "Röðunarhæft nafn"
   sortable_name_e25fe66c: "Raðanlegt nafn:"
@@ -19815,6 +19839,7 @@ is:
   subscribe_failed_2eb62de0: "Áskrift tókst ekki"
   subscribe_to_title_c7d6bbd2: "Áskrifast að  %{title}"
   subtitle_ee60ca78: Skjátexti
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Ekki var hægt að flytja inn skjátexta frá %{file}"
   success_file_uploaded_8174e93f: "Árangur: Skrá var hlaðið upp"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Árangur! Nemendur geta nú séð einkunnir fyrir þetta verkefni."
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Árangur! Einkunnir voru faldar fyrir %{assignmentName}."
@@ -20847,8 +20872,11 @@ is:
   to_do_1d554f36: Verkefni
   to_do_5526f10a: "Verkefni:"
   to_do_6ac7b2dc: "verkefnalisti:"
+  to_do_date_2cb4bf7b: "Dagsetning verkefnis:"
+  to_do_date_ascending_c3a59abb: "Dagsetning verkefnis: Hækkandi"
   to_do_date_d6b79bfd: "Verkefni %{date}"
   to_do_date_ddfb582c: "Dagsetning verkefnis:"
+  to_do_date_descending_25b2141d: "Dagsetning verkefnis: Lækkandi"
   to_do_item_d76ecb78: "Verkefni á verkefnalista"
   to_do_items_loading_d1cdfcd5: "Hleð inn verkefnalista"
   to_do_list_dashboard_d741f64e: "Verkefnalisti á skjáborði"
@@ -22246,8 +22274,8 @@ is:
         last_edit: "Síðasta breyting"
         page_title: "Titill síðu"
         todo_date: "Dagsetning verkefnis"
-      loading: Sæki...
-      loading_more: "Sæki meira..."
+      loading: Hleður...
+      loading_more: "Hleður meiru..."
       no_pages: "Engar síður hafa verið stofnaðar."
       pages_title: Síður
     wiki_page_index_edit_dialog: 
@@ -22516,6 +22544,7 @@ is:
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Þú ert skráð/ur á námskeiðið %{course}. Hlutverk í námskeiði: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Þú ert í reikningshlutverki fyrir %{account} reikning á %{website}. Hlutverk er: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Þér er boðið í %{course}."
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Þér hefur verið boðið að taka þátt í kennslustund á %{account}.  Kennslustundin heitir %{course}. Hlutverk námskeiðs: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Þér er boðin þátttaka í námshópi á %{website}. Sá nefnist %{course}. Hlutverk í námskeiði: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Þér er boðið á námskeiðið %{course}. Hlutverk í námskeiði: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Þér er boðið að jafningjameta %{reviewee}."

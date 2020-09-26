@@ -1832,6 +1832,7 @@ zh-Hant:
   add_people_7ee4b2ec: 添加人員
   add_people_and_courses_to_canvas_5c4bfff9: "添加成員及課程到 Canvas"
   add_people_to_coursename_5ea234e1: "添加成員至：%{courseName}"
+  add_proficiency_level_93bd72d0: 添加能力等級
   add_proficiency_rating_d819f6b8: 添加能力評級
   add_pronouns_option_906ff625: 添加代詞選項
   add_quiz_cebfa28b: 添加測驗
@@ -3765,6 +3766,7 @@ zh-Hant:
   attempt_count_267a4fc5: "嘗試 %{count}"
   attempt_current_attempt_ef626179: "嘗試 %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "第 %{current_attempt} 次嘗試，共可嘗試 %{max_attempts} 次"
+  attempt_f2691284: 嘗試
   attempt_number_83dcd86a: "嘗試 %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: 嘗試根據您的語言的數字格式，在成績單的匯出中檢測適當的欄位分隔符。
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: 嘗試根據您的語言的數字格式，在成績單的匯出中偵測適當的欄位分隔符。
@@ -4272,6 +4274,7 @@ zh-Hant:
     update: 更新
     view_account_roster: 查看帳戶名單
     view_course_roster: 查看課程名單
+  by_b90c6b6f: 編輯人
   by_client_id_4f2fe02c: "依用戶端 ID"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: 預設情況下，所有連結均為一門課程而啟用。學生們不會希望看到所鏈接的部分不含有任何內容。例如，如果您並未創建任何測驗，他們就不希望看到測驗鏈接。如果您不想讓您的學生們訪問課程的某些區域，您可以對這些鏈接進行排序并將其明確關閉。
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7500,12 +7503,14 @@ zh-Hant:
     required: 請輸入一些電郵地址
   created_58b8a75a: 已創建
   created_6ee36dff: 已創建：
+  created_ascending_cff48774: 已建立：升序
   created_at_73839757: 創建日期
   created_by_b39b9c8b: 創建者
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "創建者為 SIS"
   created_created_at_37c0ec3b: "已創建：%{created_at}"
   created_created_bf5714b8: "已創建%{created}"
+  created_descending_e9a1b097: 已建立：降序
   created_group_group_name_2097306b: "已創建 %{group_name} 群組"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: 新作業流態尚未處理創建群組。是否要前往舊版作業頁面？
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 創建『提交件導出』之後，您可以將所有目前和以往課程所涉及的作業作業打包下載。壓縮包可能較大，請稍候。您可以瀏覽其他頁面，稍後回來。
@@ -8165,10 +8170,15 @@ zh-Hant:
       使用者可以有充足時間閱讀通知，然後在閱讀完畢時忽略訊息。
   disable_all_read_only_scopes_f9ffdd28: 停用所有唯讀範圍。
   disable_and_lock_7d0ef0e8: 停用並鎖定
+  disable_authentication_for_graphql_3c019622: "停用 GraphQL 的驗證"
   disable_automatic_submission_8e1d8676: 停用自動提交
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      停用 Canvas 鍵盤快速鍵。有些使用螢幕閱讀器或鍵盤導航的使用者
+      在關閉這些快速鍵功能後將有改善的使用體驗。
   disable_celebrations_description: 啟用此功能會隱藏所有慶祝動畫。
   disable_content_security_policy_8660a787: 停用內容安全政策
   disable_extra_filter_options_1d1cdc02: 停用額外的篩選選項
+  disable_keyboard_shortcuts_9db78832: 停用鍵盤快速鍵
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: 停用新測驗匯入和遷移勾選框，將其預設為啟用
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "封閉評分期中停用作業的「公佈至 SIS」"
   disable_scope_6ba4e4d4: 停用範圍
@@ -8867,6 +8877,7 @@ zh-Hant:
   edit_user_details_9af7819b: 編輯使用者詳細資料
   edit_when_36c1c2c8: "編輯 %{when}"
   edit_your_catalog_account_cce59310: "編輯您的 Catalog 帳戶"
+  edited_c4fcbdbf: 已編輯：
   edited_date_b0455372: "（編輯）%{date}"
   editing_permissions_for_name_3503e235: "編輯權限：%{name}"
   editor: 
@@ -11924,6 +11935,9 @@ zh-Hant:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 若啟用，則內容設計者必須在發佈之前提供文檔的版權和許可信息。僅適用於同時啟用更好的文檔瀏覽的情形。
   if_enabled_copyright_and_license_information_must__2a551827: 如果啟用，必須在發佈前提供檔案的版權與許可資訊。
   if_enabled_developer_key_management_options_and_to_1708ddd3: 如果啟用，會使用開發人員金鑰管理選項和許可證設定範圍。
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      如果啟用，GraphQL 詢問將不需要
+      使用者登入或使用存取權杖。
   if_enabled_modules_will_have_the_option_to_be_mark_a4313e1: 啓用后，模塊將在僅有一項要求滿足時可被標記為完成。
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "如果啟用， 'oauth2_access_token_url' 將在 LTI2 註冊後發送。"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "如果啟用，LTI 工具可以使用 OAuth 1.0a 簽名來訪問會員服務 API"
@@ -12519,6 +12533,8 @@ zh-Hant:
   last_day_attended_b72d623c: 最後一次加入日期
   last_download_33ea9bf4: 最後下載：
   last_e159dbd: 最後一個
+  last_edit_ascending_6a18dba4: 上次編輯：升序
+  last_edit_descending_6b7ee755: 上次編輯：降序
   last_enrollment_activity_10fe15ba: 上次註冊活動
   last_export_899a04c5: 最近的匯出︰
   last_first_name_95a078f5: 姓氏、名字
@@ -14270,7 +14286,7 @@ zh-Hant:
         body_teacher: "您已被邀請參加 %{website} 上的課程。課程名為 %{course}，您已被邀請作為教師參加。"
         details: "您需要在 Canvas 上註冊才可以參加課程。如需開始，請在此處瀏覽課程頁面："
         html: 
-          body: "您已被邀請參加 %{website} 上的課程。課程名為 %{course}，課程角色為： %{role_type}"
+          body: "您已受邀請參加在 %{account} 的班級。此班級稱為 %{course}。課程角色：%{role_type}"
           body_designer: "課程名為 %{course}，您已被邀請作為設計師參加。"
           body_observer: "課程名為 %{course}，您已被邀請作為觀察者參加。"
           body_student: "課程名為 %{course}，您已被邀請作為學生參加。"
@@ -16672,6 +16688,8 @@ zh-Hant:
   page_page_59070cd8: "第 %{page} 頁"
   page_pagenum_20dbfeb8: "第 %{pageNum} 頁"
   page_pagenumber_31fe579f: "頁面%{pageNumber}"
+  page_title_ascending_b5df950c: 頁面標題：升序
+  page_title_descending_70c1483d: 頁面標題：降序
   page_views: 
     download_filename: "%{user} 的頁面瀏覽人數"
     table: 
@@ -16918,6 +16936,9 @@ zh-Hant:
     apple_settings: 
       labels: 
         client_id: "服務 ID"
+    asset_user_access_logs: 
+      description: "最小化 AUA 寫入壓力"
+      name: "AUA 記錄器"
     assignment_freezer: 
       description: 凍結複製作業屬性
       name: 作業屬性凍結程式
@@ -17938,6 +17959,7 @@ zh-Hant:
   public_domain_112ed397: 公用網域
   public_jwk_ee2d719d: "公開的 JWK"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "公開的 JWK json 無效。請提交正確格式的 json。"
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "公用 JWK JSON 必須有以下的字串欄位：kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "公開的 JWK URL"
   public_message_students: 
     send_message: 發送訊息
@@ -20136,6 +20158,7 @@ zh-Hant:
   save_grading_period_set_e029fa88: 保存評分時段組
   save_key_b4dede06: 保存金鑰
   save_learning_mastery_82889d8b: 儲存學習掌握程度
+  save_mastery_scale_2b4dc13a: 儲存掌握程度
   save_publish_36440725: 保存並發佈
   save_settings_cafe79a5: 保存設定
   save_successful_b2f64da4: 儲存成功。
@@ -21725,6 +21748,7 @@ zh-Hant:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: 抱歉，在此錄製上執行的操作失敗。請稍後再試
   sort_40afa70: 分門別類：
   sort_by_72dbba9c: 排序規則為
+  sort_by_e75f9e3e: 排序依據
   sort_courses_cf94b8d4: 將課程分類
   sortable_name_73f707cf: 可排序的名稱
   sortable_name_e25fe66c: 可排序的名稱：
@@ -22278,6 +22302,7 @@ zh-Hant:
   subscribe_failed_2eb62de0: 訂閱失敗
   subscribe_to_title_c7d6bbd2: "訂閱%{title}"
   subtitle_ee60ca78: 字幕
+  subtitles_could_not_be_imported_from_file_5de6da0b: "無法從 %{file} 匯入字幕"
   success_all_users_on_this_domain_will_now_see_this_4681b85d: 成功！所有本域名的用戶都會看到這個標誌。
   success_file_uploaded_8174e93f: 成功：已上載檔案
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: 成功！此作業的成績現在可以讓學生看到。
@@ -23350,8 +23375,11 @@ zh-Hant:
   to_do_1d554f36: 待辦事項
   to_do_5526f10a: 待辦事項：
   to_do_6ac7b2dc: 待辦事項：
+  to_do_date_2cb4bf7b: 待辦日期：
+  to_do_date_ascending_c3a59abb: 待辦日期：升序
   to_do_date_d6b79bfd: "待辦事項%{date}"
   to_do_date_ddfb582c: 待辦日期：
+  to_do_date_descending_25b2141d: 待辦日期：降序
   to_do_item_d76ecb78: 待辦項目
   to_do_items_loading_d1cdfcd5: 正在載入待辦事項
   to_do_list_dashboard_d741f64e: 待辦事項清單控制面板
@@ -25119,8 +25147,9 @@ zh-Hant:
   you_ve_been_enrolled_in_the_course_course_67b2e1b7: "您已被註冊進入課程 %{course}。"
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "您已被註冊進入 課程 %{course}。課程類型為： %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "您已經獲得用於 %{website} 帳戶 %{account}的一個身份。身份角色為： %{role_type}。"
-  you_ve_been_invited_to_course_90764f1: "您已被邀請加入課程 %{course}。"
+  you_ve_been_invited_to_course_90764f1: "您已受邀加入 %{course}。"
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "您已被邀請參加課程 %{course}，課程類型為： %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "您已受邀請參加在 %{account} 的班級。此班級稱為 %{course}。課程角色：%{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "您已被邀請參加 %{website} 上的課程。課程名為 %{course}，課程角色為： %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "您已被邀請參加課程 %{course}。課程角色為： %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "您已受邀參加同行檢閱 %{reviewee}。"
