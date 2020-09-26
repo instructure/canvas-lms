@@ -4104,6 +4104,9 @@ fa:
   can_retrieve_user_data_associated_with_the_context_c5ec482c: "می توانید اطلاعات کاربر را که با زمینه ای که ابزار در آن نصب شده مرتبط است،  بازیابی کنید."
   can_show_subscription_to_data_service_data_688ce3: "می‌تواند در داده سرویس داده پیکربندی را نشان دهد."
   can_t_compute_score_until_an_assignment_has_points_f34dd600: "تا زمانی که یک تکلیف نمره های ممکن داشته باشد، نمره قابل محاسبه نیست"
+  can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n\
+      نمی توان  تطبیق ها را بر اساس ارتباط‌های دستورالعمل ارزیابی حذف کرد.\n\
+      برای حذف این ارتباطات باید ردیف را از دستورالعمل ارزیابی دارایی حذف کنید\" "
   can_t_delete_alignments_based_on_rubric_associatio_d9fd10a3: "نمی توان تطبیق ها را بر اساس ارتباط های دستورالعمل ارزیابی حذف کرد. برای حذف این ارتباط ها، باید ردیف را از دستورالعمل ارزیابی دارایی حذف کنید"
   can_t_enable_anonymous_grading_and_group_assignmen_9938416e: "نمرات ناشناس و تکالیف گروهی را نمی توان با هم فعال کرد"
   can_t_perform_diffing_against_more_than_one_file_o_44475c0d: "امکان اجرای diff در برابر بیش از یک فایل از یک نوع وجود ندارد"
@@ -10535,6 +10538,7 @@ fa:
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "در صورت فعال بودن، گزینه‌ای برای ارائه دستورالعملهای ارزیابی بدون امتیاز ارائه می شود."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(اگر هیج کدام انتخاب نشده است، به همه در کل حساب ارسال شود)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(اگر هیج کدام انتخاب نشده است، به همه در کل زیر حساب ارسال شود)"
+  if_this_permission_is_enabled_and_courses_view_lis_cdf22691: "اگر این مجوز فعال باشد و  درس‌ها-مشاهده لیست غیر فعال باشد ، کاربران می توانند دوره جدیدی را با دکمه اضافه کردم درس جدید در تنظیمات حساب اضافه کنند."
   if_you_change_an_assignment_s_points_possible_exis_505e6015: "اگر امتیازهای ممکن تکلیف را تغییر دهید، نمره های موجود به طور خودکار مقیاس بندی می شوند. "
   if_you_change_an_assignment_s_points_possible_you__25a0edad: "اگر امتیازهای ممکن تکلیف را تغییر دهید، باید تکلیف را دوباره نمره گذاری کنید."
   if_you_change_an_assignment_s_points_possible_you__dba531cb: "اگر امتیازهای ممکن تکلیف را تغییر دهید، باید هر گونه مورد ارسالی را دوباره نمره گذاری کنید."
@@ -20303,6 +20307,12 @@ fa:
       در نشانی اینترنتی قابل دسترس است.
   the_chat_tool_must_be_enabled_by_your_canvas_admin_e3b26123: "ابزار گفتگو باید توسط مدیر کانواس شما فعال شود."
   the_client_id_clientid_is_disabled_b4a02cb1: "شناسه مشتری %{clientId} غیرفعال است."
+  the_content_security_policy_allows_you_to_restrict_197ca4ff: |-
+      سیاست امنیت محتوا به شما امکان می دهد
+      JavaScript سفارشی که در نمونه کانواس شما اجرا می شود را، محدود کنید. می توانید به صورت دستی
+      تا %{max_domains} دامنه‌های لیست سفیدتان اضافه کنید. فرانویسه توصیه می شود.
+      (به عنوان مثال * .instructure.com). دامنه های کانواس و دستورالعمل‌ها  درج شده‎اند
+      به طور خودکار و در برابر محدودیت 50 دامنه خود حساب نکنید.
   the_course_link_validator_searches_course_content__563fa215: "اعتبار سنجی لینک درس، محتوای درس را برای پیوندها و تصاویر نامعتبر یا غیر قابل دستیابی جستجو می کند."
   the_course_link_validator_searches_through_course__76f0bc63: "تأیید کننده پیوند درس محتوای درس را جستجو می کند و هر پیوند نامعتبر یا غیر فعالی که می یابد را به دست می دهد. لطفا توجه داشته باشید که برخی از پیوندهایی که به عنوان غیر فعال پرچم گذاری شده اند، از سرورهای ما غیر فایل دسترسی هستند ولی برای دانشجویان کار می کنند."
   the_course_status_buttons_unpublished_and_publishe_e2dca595: "دکمه‌های وضعیت درس (منتشر نشده و منتشر شده) فقط تا زمان دریافت مورد ارسالی دانشجویی نمایش داده می‌شوند. با ارسال‌های دانشجو نمی توان درس‌ها را لغو انتشار کرد."
