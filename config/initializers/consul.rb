@@ -16,7 +16,11 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 handle_fallbacks = -> do
-  Canvas::DynamicSettings.reset_cache!
+  # TODO: restore once we figure out how to do this
+        # in a safe and synchronized way. Doing it at any time
+        # can cause read failures because of the way we check the tree and then everything
+        # else below it
+  # Canvas::DynamicSettings.reset_cache!
 end
 handle_fallbacks.call
 Canvas::Reloader.on_reload(&handle_fallbacks)
