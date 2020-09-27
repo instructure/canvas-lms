@@ -1163,6 +1163,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Videólejátszó ehhez: { title }"
     },
+    "view_ba339f93": {
+        "message": "Megtekintés"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "A gyors elérés billentyűkombinációk megtekintése"
     },
