@@ -30,13 +30,18 @@ describe LocalCache do
   end
 
   describe "with redis" do
-    before(:each) do
-      allow(ConfigFile).to receive(:load).with("local_cache").and_return({
+    let(:redis_conf_hash) do
+      rc = Canvas.redis_config
+      {
         store: "redis",
-        redis_host: "redis",
-        redis_port: 6379,
-        redis_db: 8 # intentionally one probably not used elsewhere
-      })
+        redis_url: rc.fetch("servers", ["redis://redis"]).first,
+        redis_db: rc.fetch("database", 1)
+      }
+    end
+
+    before(:each) do
+      skip("Must have a local redis available to run this spec") unless Canvas.redis_enabled?
+      allow(ConfigFile).to receive(:load).with("local_cache").and_return(redis_conf_hash)
       LocalCache.reset
     end
 
@@ -60,6 +65,23 @@ describe LocalCache do
       Timecop.travel(5) do
         expect(LocalCache.read("test_key")).to be_nil
         expect(LocalCache.fetch_without_expiration("test_key")).to eq("test_value")
+      end
+    end
+
+    it "writes a set of keys all at once" do
+      data_set = {
+        "keya" => "vala",
+        "keyb" => "valb",
+        "keyc" => "valc",
+      }
+      LocalCache.write_set(data_set, ttl: 1)
+      expect(LocalCache.read("keya")).to eq("vala")
+      expect(LocalCache.read("keyb")).to eq("valb")
+      expect(LocalCache.read("keyc")).to eq("valc")
+      Timecop.travel(5) do
+        expect(LocalCache.read("keya")).to be_nil
+        expect(LocalCache.read("keyb")).to be_nil
+        expect(LocalCache.read("keyc")).to be_nil
       end
     end
   end
@@ -87,5 +109,21 @@ describe LocalCache do
       end
     end
 
+    it "writes a set of keys all at once" do
+      data_set = {
+        "keya" => "vala",
+        "keyb" => "valb",
+        "keyc" => "valc",
+      }
+      LocalCache.write_set(data_set, ttl: 30)
+      expect(LocalCache.read("keya")).to eq("vala")
+      expect(LocalCache.read("keyb")).to eq("valb")
+      expect(LocalCache.read("keyc")).to eq("valc")
+      Timecop.travel(60) do
+        expect(LocalCache.read("keya")).to be_nil
+        expect(LocalCache.read("keyb")).to be_nil
+        expect(LocalCache.read("keyc")).to be_nil
+      end
+    end
   end
 end
