@@ -20,7 +20,12 @@ module Canvas
       include FallbackExpirationCache
 
       def initialize(local_cache_conf)
-        redis = ::Redis.new(host: local_cache_conf[:redis_host], port: local_cache_conf[:redis_port], db: local_cache_conf[:redis_db])
+        redis = ::Redis.new(
+          url: local_cache_conf[:redis_url],
+          host: local_cache_conf[:redis_host],
+          port: local_cache_conf[:redis_port],
+          db: local_cache_conf[:redis_db]
+        )
         super(redis: redis)
       end
 
@@ -45,6 +50,20 @@ module Canvas
         #  box into a bad state if the timing is bad. (lock or something)
         #
         clear
+      end
+
+      def write_set(hash, ttl: nil)
+        opts = {expires_in: ttl}
+        ms = 1000 * Benchmark.realtime do
+          redis.pipelined do # send more commands before awaiting answer
+            redis.multi do # make everything atomic in here
+              hash.each do |k, v|
+                write(k, v, opts)
+              end
+            end
+          end
+        end
+        Rails.logger.debug("  #{"LOCAL REDIS (%.2fms)" % [ms]}  write_set {#{hash.keys.join(',')}}")
       end
     end
   end
