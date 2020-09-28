@@ -243,13 +243,13 @@ describe SIS::CSV::UserImporter do
       expect(user.pronouns).to eq 'mr/man'
     end
 
-    it "should throw an error when pronouns don't match" do
-      importer = process_csv_data(
+    it "should add pronouns when not in account list" do
+      process_csv_data_cleanly(
         "user_id,login_id,full_name,status,pronouns",
         "user_1,user1,tom riddle,active,mr/man"
       )
-      error = "Pronoun does not match account pronoun or pronouns are not enabled for this account, user_1, skipping"
-      expect(importer.errors.map(&:last).first).to eq error
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pronouns).to eq 'mr/man'
     end
 
     it "respects users set pronouns cause it's sticky" do
