@@ -41,7 +41,7 @@ module Canvas
     let(:local_config) { { token: 'file', addr: 'file'} }
 
     before do
-      LocalCache.clear
+      LocalCache.clear(force: true)
       WebMock.disable_net_connect!
     end
 

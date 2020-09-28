@@ -19,6 +19,10 @@ module Canvas
     class FallbackMemoryCache < ActiveSupport::Cache::MemoryStore
       include FallbackExpirationCache
 
+      def clear(force: false)
+        super
+      end
+
       def write_set(hash, ttl: nil)
         opts = {expires_in: ttl}
         hash.each{|k, v| write(k, v, opts) }

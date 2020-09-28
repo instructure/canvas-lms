@@ -27,29 +27,31 @@ module Canvas
           port: local_cache_conf[:redis_port],
           db: local_cache_conf[:redis_db]
         )
+        @debounced_clear = ::Redis::Scripting::Script.new(File.expand_path("../debounced_clear.lua", __FILE__))
         super(redis: redis)
       end
 
       # canvas redis is patched to disallow "flush" operations,
       # but for a local-only cache should be safe.
-      #
-      # FAMOUS LAST WORDS. This is not safe at all.
-      # can cause race conditions unless synchronized against
-      # something because of things like the dynamic settings cache3.
-      def clear
-        Shackles.activate(:deploy){ super }
+      # Worth considering race conditions though.  Make sure
+      # other operations that depend on redis (like dynamic_settings)
+      # can tolerate a clear happening in between any 2 non-pipelined
+      # commands
+      def clear(force: false)
+        if force
+          Shackles.activate(:deploy){ super }
+        else
+          # this makes sure only 1 process on a sighup'd box
+          # will clear the cache, the others will find that the
+          # debounce key is set and will do nothing
+          @debounced_clear.run(redis, ["flush_debounce"], [30])
+        end
       end
 
       # canvas redis is patched to disallow "scan" operations,
       # but clearing the whole thing does technically remove any
       # keys matching this pattern
       def delete_matched(pattern)
-        # this actually can cause a lot of badness, maybe it's no surprise
-        # that canvas banned this operation (particularly race conditions)
-        # like in dynamic settings.
-        # TODO: find a way to clear local redis without putting the
-        #  box into a bad state if the timing is bad. (lock or something)
-        #
         clear
       end
 

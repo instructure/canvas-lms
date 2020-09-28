@@ -19,7 +19,7 @@ require 'spec_helper'
 
 describe LocalCache do
   after(:each) do
-    LocalCache.clear
+    LocalCache.clear(force: true)
     LocalCache.reset
   end
 
@@ -56,7 +56,7 @@ describe LocalCache do
 
     it "will allow you to clear because it's local" do
       LocalCache.write("test_key", "test_value")
-      expect{ LocalCache.clear }.to_not raise_error
+      expect{ LocalCache.clear(force: true) }.to_not raise_error
       expect(LocalCache.read("test_key")).to be_nil
     end
 
@@ -129,6 +129,15 @@ describe LocalCache do
         expect(LocalCache.read("keyb")).to be_nil
         expect(LocalCache.read("keyc")).to be_nil
       end
+    end
+
+    it "doesn't care about the force parameter" do
+      LocalCache.write("test_key", "test_value", expires_in: 2)
+      LocalCache.clear(force: true)
+      expect(LocalCache.read("test_key")).to be_nil
+      LocalCache.write("test_key", "test_value", expires_in: 2)
+      LocalCache.clear(force: false)
+      expect(LocalCache.read("test_key")).to be_nil
     end
   end
 end

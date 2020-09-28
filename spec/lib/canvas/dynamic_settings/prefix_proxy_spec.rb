@@ -25,7 +25,7 @@ module Canvas
       let(:proxy) { PrefixProxy.new('foo/bar', service: nil, tree: nil, default_ttl: 3.minutes, kv_client: client) }
 
       after(:each) do
-        LocalCache.clear
+        LocalCache.clear(force: true)
       end
 
       describe '.fetch(key, ttl: @default_ttl)' do
