@@ -22,8 +22,7 @@ import {
   isVideo,
   isAudio,
   isText,
-  mediaFileUrlToEmbeddedIframeUrl,
-  embedded_iframe_url_fromFile
+  mediaPlayerURLFromFile
 } from '../fileTypeUtils'
 
 describe('fileTypeUtils', () => {
@@ -67,35 +66,23 @@ describe('fileTypeUtils', () => {
     })
   })
 
-  describe('mediaFileUrlToEmbeddedIframeUrl', () => {
-    it('creates iframe URL for audio', () => {
-      const fileurl = 'http://host:port/path/to/file?query=1'
-      const url = mediaFileUrlToEmbeddedIframeUrl(fileurl, 'audio')
-      expect(url).toBe(`/media_objects_iframe/?type=audio&mediahref=${encodeURIComponent(fileurl)}`)
-    })
-
-    it('creates iframe URL for video', () => {
-      const fileurl = 'http://host:port/path/to/file?query=1'
-      const url = mediaFileUrlToEmbeddedIframeUrl(fileurl, 'video')
-      expect(url).toBe(`/media_objects_iframe/?type=video&mediahref=${encodeURIComponent(fileurl)}`)
-    })
-  })
-
-  describe('embedded_iframe_url_fromFile', () => {
-    it("returns url from input file's embedded_iframe_url", () => {
+  describe('mediaPlayerURLFromFile', () => {
+    it("creates url from input file's embedded_iframe_url", () => {
       const file = {
-        embedded_iframe_url: '/media_objects_iframe/m-media_object_id'
+        embedded_iframe_url: '/media_objects_iframe/m-media_object_id',
+        type: 'video/mov'
       }
-      const url = embedded_iframe_url_fromFile(file)
-      expect(url).toBe(file.embedded_iframe_url)
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe/m-media_object_id?type=video')
     })
 
     it("creates url from file's media_entry_id", () => {
       const file = {
-        media_entry_id: 'm-media_id'
+        media_entry_id: 'm-media_id',
+        content_type: 'audio/mp3'
       }
-      const url = embedded_iframe_url_fromFile(file)
-      expect(url).toBe('/media_objects_iframe/m-media_id')
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe/m-media_id?type=audio')
     })
 
     it("creates url from file's url", () => {
@@ -103,10 +90,8 @@ describe('fileTypeUtils', () => {
         'content-type': 'video/mov',
         url: 'http://origin/path/to/file'
       }
-      const url = embedded_iframe_url_fromFile(file)
-      expect(url).toBe(
-        `/media_objects_iframe/?type=video&mediahref=${encodeURIComponent(file.url)}`
-      )
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&type=video')
     })
 
     it("returns undefined if the file isn't media", () => {
@@ -114,8 +99,17 @@ describe('fileTypeUtils', () => {
         'content-type': 'text/palin',
         url: 'http://origin/path/to/file'
       }
-      const url = embedded_iframe_url_fromFile(file)
+      const url = mediaPlayerURLFromFile(file)
       expect(url).toBe(undefined)
+    })
+
+    it("includes the file verifier if it's part of the file's url", () => {
+      const file = {
+        'content-type': 'video/mov',
+        url: 'http://origin/path/to/file?verifier=xyzzy'
+      }
+      const url = mediaPlayerURLFromFile(file)
+      expect(url).toBe('/media_objects_iframe?mediahref=/path/to/file&verifier=xyzzy&type=video')
     })
   })
 })

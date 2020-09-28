@@ -18,21 +18,16 @@
 
 export function fileEmbed(file) {
   const fileMimeClass = mimeClass(file)
-  const fileMediaEntryId = mediaEntryId(file)
 
   if (fileMimeClass === 'image') {
     return {type: 'image'}
   } else if (fileMimeClass === 'video' || fileMimeClass === 'audio') {
-    return {type: fileMimeClass, id: fileMediaEntryId}
+    return {type: fileMimeClass}
   } else if (file.preview_url) {
     return {type: 'scribd'}
   } else {
     return {type: 'file'}
   }
-}
-
-function mediaEntryId(file) {
-  return file.media_entry_id || 'maybe'
 }
 
 export function mimeClass(file) {

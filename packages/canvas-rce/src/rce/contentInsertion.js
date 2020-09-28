@@ -17,13 +17,7 @@
  */
 
 import classnames from 'classnames'
-import {
-  renderImage,
-  renderLinkedImage,
-  renderVideo,
-  renderAudio,
-  mediaIframeSrcFromFile
-} from './contentRendering'
+import {renderImage, renderLinkedImage, renderVideo, renderAudio} from './contentRendering'
 import scroll from '../common/scroll'
 import {
   cleanUrl,
@@ -31,6 +25,7 @@ import {
   isOnlyTextSelected,
   isImageFigure
 } from './contentInsertionUtils'
+import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 
 /** * generic content insertion ** */
 
@@ -252,7 +247,7 @@ export function insertVideo(editor, video) {
     // video iframe. Look for the iframe with the right
     // src attribute. (Aside: tinymce strips the id or data-*
     // attributes from the iframe, that's why we can't look for those)
-    const src = mediaIframeSrcFromFile(video)
+    const src = mediaPlayerURLFromFile(video)
     result = result.querySelector(`iframe[src="${src}"]`)
 
     // When the iframe is inserted, it doesn't allow the video to play
@@ -264,14 +259,14 @@ export function insertVideo(editor, video) {
 
     return result
   } else {
-    return insertLink(editor, {...video, href: mediaIframeSrcFromFile(video)})
+    return insertLink(editor, {...video, href: mediaPlayerURLFromFile(video)})
   }
 }
 
 export function insertAudio(editor, audio) {
   if (editor.selection.isCollapsed()) {
     let result = insertContent(editor, renderAudio(audio))
-    const src = mediaIframeSrcFromFile(audio)
+    const src = mediaPlayerURLFromFile(audio)
     result = result.querySelector(`iframe[src="${src}"]`)
 
     // When the iframe is inserted, it doesn't allow the audio to play
@@ -283,6 +278,6 @@ export function insertAudio(editor, audio) {
 
     return result
   } else {
-    return insertLink(editor, {...audio, href: mediaIframeSrcFromFile(audio)})
+    return insertLink(editor, {...audio, href: mediaPlayerURLFromFile(audio)})
   }
 }

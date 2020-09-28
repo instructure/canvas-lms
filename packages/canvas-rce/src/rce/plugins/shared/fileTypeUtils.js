@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {downloadToWrap} from '../../../common/fileUrl'
+import {parse} from 'url'
 import {
   IconDocumentLine,
   IconMsExcelLine,
@@ -70,24 +70,23 @@ export function isText(type) {
   return /^text/.test(type)
 }
 
-export function mediaFileUrlToEmbeddedIframeUrl(media_url, content_type) {
+export function mediaPlayerURLFromFile(file) {
+  // why oh why aren't we consistent?
+  const content_type = file['content-type'] || file.content_type || file.type
   const type = content_type.replace(/\/.*$/, '')
-  return `/media_objects_iframe/?type=${type}&mediahref=${encodeURIComponent(media_url)}`
-}
 
-export function embedded_iframe_url_fromFile(file) {
   if (file.embedded_iframe_url) {
-    return file.embedded_iframe_url
+    return `${file.embedded_iframe_url}?type=${type}`
   }
 
-  if (file.media_entry_id && file.media_entry_id !== 'maybe') {
-    return `/media_objects_iframe/${file.media_entry_id}`
-  }
-
-  const content_type = file['content-type']
   if (isAudioOrVideo(content_type)) {
-    return mediaFileUrlToEmbeddedIframeUrl(downloadToWrap(file.url), content_type)
-  }
+    if (file.media_entry_id && file.media_entry_id !== 'maybe') {
+      return `/media_objects_iframe/${file.media_entry_id}?type=${type}`
+    }
 
+    const parsed_url = parse(file.url || file.href, true)
+    const verifier = parsed_url.query.verifier ? `&verifier=${parsed_url.query.verifier}` : ''
+    return `/media_objects_iframe?mediahref=${parsed_url.pathname}${verifier}&type=${type}`
+  }
   return undefined
 }
