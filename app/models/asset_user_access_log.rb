@@ -135,9 +135,7 @@ class AssetUserAccessLog
       yesterday_completed = compact_partition(yesterday_ts)
       ps.reload
       compaction_state = self.metadatum_payload
-      # TODO: once iterator state is fully transitioned to the metadatum, we can remove
-      # the PluginSetting "settings" state entirely.
-      max_yesterday_id = [compaction_state[:max_log_ids][yesterday_ts.wday], ps.settings[:max_log_ids][yesterday_ts.wday]].max
+      max_yesterday_id = compaction_state[:max_log_ids][yesterday_ts.wday]
       if yesterday_completed && max_yesterday_id >= yesterday_model.maximum(:id)
         # we have now compacted all the writes from the previous day.
         # since the timestamp (now) is into the NEXT utc day, no further
@@ -151,12 +149,6 @@ class AssetUserAccessLog
           if truncation_enabled?
             Shackles.activate(:deploy) do
               yesterday_model.connection.truncate(yesterday_model.table_name)
-            end
-            # TODO: once iterator state is fully transitioned to the metadatum, we can remove
-            # the PluginSetting "settings" state entirely.
-            PluginSetting.suspend_callbacks(:clear_cache) do
-              ps.settings[:max_log_ids][yesterday_ts.wday] = 0
-              ps.save
             end
             compaction_state[:max_log_ids][yesterday_ts.wday] = 0
             self.update_metadatum(compaction_state)
@@ -176,10 +168,6 @@ class AssetUserAccessLog
     # we can flip this setting when we're pretty sure it's safe to start dropping
     # data, the iterator state will keep it healthy^
     Setting.get('aua_log_truncation_enabled', 'false') == 'true'
-  end
-
-  def self.sequence_jumps_allowed?
-    Setting.get('aua_log_seq_jumps_allowed', 'false') == 'true'
   end
 
   def self.reschedule!
@@ -210,13 +198,9 @@ class AssetUserAccessLog
       # We'd expect them to usually be 0 because we reset the value after truncating the partition
       # (defends against sequences being reset to the "highest" record in a table and then
       # deciding we already chomped these logs).
-      ps = plugin_setting
-      max_log_ids = ps.reload.settings.fetch(:max_log_ids, [0,0,0,0,0,0,0])
-      # TODO: once iterator state is fully transitioned to the metadatum, we can remove
-      # the PluginSetting "settings" state entirely.
       compaction_state = self.metadatum_payload
       state_max_log_ids = compaction_state.fetch(:max_log_ids, [0,0,0,0,0,0,0])
-      log_id_bookmark = [(partition_lower_bound-1), (max_log_ids[ts.wday] || 0), (state_max_log_ids[ts.wday])].max
+      log_id_bookmark = [(partition_lower_bound-1), state_max_log_ids[ts.wday]].max
       while log_id_bookmark < partition_upper_bound
         Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - processing #{log_id_bookmark} from #{partition_upper_bound}")
         # maybe we won't need this, but if we need to slow down throughput and don't want to hold
@@ -243,16 +227,6 @@ class AssetUserAccessLog
               # Here we want to write the iteration state into the database
               # so that we don't double count rows later.  The next time the job
               # runs it can pick up at this point and only count rows that haven't yet been counted.
-              ps.reload
-              # also, no need to clear the cache, these are LOCAL
-              # plugin settings, so let's not beat up consul
-              # TODO: once iterator state is fully transitioned to the metadatum, we can remove
-              # the PluginSetting "settings" state entirely.
-              PluginSetting.suspend_callbacks(:clear_cache) do
-                ps.settings[:max_log_ids] ||= [0,0,0,0,0,0,0] # (just in case...)
-                ps.settings[:max_log_ids][ts.wday] = new_iterator_pos
-                ps.save
-              end
               compaction_state[:max_log_ids][ts.wday] = new_iterator_pos
               self.update_metadatum(compaction_state)
             end
@@ -260,23 +234,7 @@ class AssetUserAccessLog
           log_id_bookmark = new_iterator_pos
           sleep(intra_batch_pause) if intra_batch_pause > 0.0
         else
-          # no records found in this range, we must be paging through an open segment
-          unless sequence_jumps_allowed?
-            # we found no records in this range, and we're nervous about writing
-            # bugs that miss records right now.  The sequence might be compromised
-            # in some way, or the batch code could be buggy.  Warn and reschedule.
-            # TODO: yank this whole block and setting when we're comfortable with this pattern?
-            Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - Found no results in-range, pausing compaction for now")
-            Shackles.activate(:master) do
-              Canvas::Errors.capture("AUA Compaction Missing Segment", {
-                shard_id: Shard.current.id,
-                partition_model: partition_model.to_s,
-                range_start: log_id_bookmark,
-                range_stop: batch_upper_boundary
-              })
-            end
-            return false
-          end
+          # no records found in this range, we must be paging through an open segment.
           # If we actually have a jump in sequences, there will
           # be more records greater than the batch, so we will choose
           # the minimum ID greater than the current bookmark, because it's safe
@@ -287,16 +245,8 @@ class AssetUserAccessLog
           # to just under it's ID
           new_bookmark_id = next_id - 1
           Shackles.activate(:master) do
-            partition_model.transaction do
-              # TODO: once iterator state is fully transitioned to the metadatum, we can remove
-              # the PluginSetting "settings" state entirely.
-              PluginSetting.suspend_callbacks(:clear_cache) do
-                ps.reload.settings[:max_log_ids][ts.wday] = new_bookmark_id
-                ps.save
-              end
-              compaction_state[:max_log_ids][ts.wday] = new_bookmark_id
-              self.update_metadatum(compaction_state)
-            end
+            compaction_state[:max_log_ids][ts.wday] = new_bookmark_id
+            self.update_metadatum(compaction_state)
           end
           log_id_bookmark = new_bookmark_id
         end
