@@ -92,46 +92,46 @@ module Canvas
 
         # okay now pre-cache an entire tree
         tree_key = [tree, service, environment].compact.join("/")
+        # This longer TTL is important for race condition for now.
+        # if the tree JUST expired, we don't want to find
+        # a valid tree, and then no valid subkeys, that makes
+        # nils start popping up in the cache.  Subkeys should
+        # last much longer than it takes to notice the tree key is
+        # expired and trying to replace it.  When the tree writes
+        # are fully atomic, this is much less of a concern,
+        # we could have one ttl again
+        subtree_ttl = ttl * 2
         LocalCache.fetch(CACHE_KEY_PREFIX + tree_key + '/', expires_in: ttl) do
-          result = kv_fetch(tree_key, :recurse, :stale)
-          # result should always be a KVGetResponse, nil is a problem
-          # because it SHOULD be a 404 with a nil
-          if result&.status == 200
-            # This is important for race condition.
-            # if the tree JUST expired, we don't want to find
-            # a valid tree, and then no valid subkeys, that makes
-            # nils start popping up in the cache
-            subtree_ttl = ttl * 3
-            populate_cache(tree_key, result.values, subtree_ttl) # only populate recursively when we missed
-            true # we don't actually need to save the values in the cache anymore if we're not using them
-          elsif result&.status == 404
-            # this just means the value doesn't exist in the consul store
+          values = unpackaged_kv_fetch(tree_key, :recurse, :stale)
+          if values.nil?
+            # no sense trying to populate the subkeys
+            # when there's no tree
             nil
           else
-            # we don't want to store "nil" in the cache if something bad happened
-            # when talking to consul
-            raise(UnexpectedConsulResponse, "Unexpected consul result: #{result}-#{result&.status}")
+            populate_cache(tree_key, values, subtree_ttl)
+            values
           end
         end
 
         keys.each do |full_key|
-          # these keys will have been populated (or not!) above; don't
-          # actually try to fetch them
-          result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key)
-          return result if result
+          # these keys will have been populated (or not!) above
+          cache_result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: subtree_ttl) do
+            # this should rarely happen.  If we JUST populated the parent tree,
+            # the value will already by in the cache.  If it's NOT in the tree, we'll cache
+            # a nil (intentionally) and not hit this fetch over and over.  This protects us
+            # from the race condition where we just expired and filled out the whole tree,
+            # then the cache gets cleared, then we try to fetch one of the things we "know"
+            # is in the cache now.  It's better to fall back to asking consul in those cases.
+            # these values will still get overwritten the next time the parent tree expires,
+            # and they'll still go away eventually if we REMOVE a key from a subtree in consul.
+            unpackaged_kv_fetch(full_key, :stale)
+          end
+          return cache_result if cache_result
         end
 
         fallback_keys.each do |full_key|
           result = LocalCache.fetch(CACHE_KEY_PREFIX + full_key, expires_in: ttl) do
-            result = kv_fetch(full_key, :stale)
-            result.values if result&.status == 200
-            if result&.status == 200 || result&.status == 404
-              result.values
-            else
-              # we don't want to store "nil" in the cache if something bad happened
-              # when talking to consul
-              raise(UnexpectedConsulResponse, "Unexpected consul result: #{result}-#{result&.status}")
-            end
+            unpackaged_kv_fetch(full_key, :stale)
           end
           return result if result
         end
@@ -183,6 +183,26 @@ module Canvas
       end
 
       private
+
+      # useful for making sure the outcome from consul
+      # was one of the expected outcomes (200 or 404) and pulling off the
+      # actual payload so we don't have to repeat
+      # this kind of guard clause on every fetch
+      def unpackaged_kv_fetch(full_key, *options)
+        result = kv_fetch(full_key, *options)
+        # result should always be a KVGetResponse, nil is a problem
+        # because it SHOULD be a 404 with a nil
+        if result&.status == 200 || result&.status == 404
+          # if 404, this just means the value doesn't exist in the consul store
+          # and the values will be nil, so caching nil in that case is safe
+          result.values
+        else
+          # we don't want to store "nil" in the cache if something bad happened
+          # when talking to consul
+          raise(UnexpectedConsulResponse, "Unexpected consul result: #{result}-#{result&.status}")
+        end
+      end
+
       # bit of helper indirection
       # so that we can log actual
       # QUERIES (vs things fetched from the cache)
@@ -213,13 +233,19 @@ module Canvas
       end
 
       def populate_cache(prefix, subtree, ttl)
+        pop_set = construct_population_set(prefix, subtree)
+        LocalCache.write_set(pop_set, ttl: ttl)
+      end
+
+      def construct_population_set(prefix, subtree, accumulator={})
         if subtree.is_a?(Hash)
           subtree.each do |(k, v)|
-            populate_cache("#{prefix}/#{k}", v, ttl)
+            accumulator = construct_population_set("#{prefix}/#{k}", v, accumulator)
           end
         else
-          LocalCache.write(CACHE_KEY_PREFIX + prefix, subtree, expires_in: ttl)
+          accumulator[CACHE_KEY_PREFIX + prefix] = subtree
         end
+        accumulator
       end
     end
   end
