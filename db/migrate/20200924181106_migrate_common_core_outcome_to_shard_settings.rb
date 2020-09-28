@@ -21,7 +21,7 @@ class MigrateCommonCoreOutcomeToShardSettings < ActiveRecord::Migration[5.2]
   def up
     common_core_group_id = Setting.get("common_core_outcome_group_id:#{Shard.current.id}", nil).presence&.to_i
     if common_core_group_id
-      Shard.current.settings[:common_core_outcome_group_id] = common_core_outcome_group_id
+      Shard.current.settings[:common_core_outcome_group_id] = common_core_group_id
       Shard.current.save!
     end
   end
