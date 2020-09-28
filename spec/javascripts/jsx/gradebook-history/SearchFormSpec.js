@@ -20,7 +20,7 @@ import React from 'react'
 import {mount, shallow} from 'enzyme'
 import {SearchFormComponent} from 'jsx/gradebook-history/SearchForm'
 import {Button} from '@instructure/ui-buttons'
-import {DateInput} from '@instructure/ui-forms'
+import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {destroyContainer} from 'jsx/shared/FlashAlert'
 import Fixtures from './Fixtures'
@@ -84,10 +84,10 @@ test('has an Autocomplete with id #assignments', function() {
   ok(input.is('Select'))
 })
 
-test('has DateInputs for from date and to date', function() {
-  const inputs = this.wrapper.find(DateInput)
+test('has date pickers for from date and to date', function() {
+  const inputs = this.wrapper.find(CanvasDateInput)
   equal(inputs.length, 2)
-  ok(inputs.every(DateInput))
+  ok(inputs.every(CanvasDateInput))
 })
 
 test('has a Button for submitting', function() {
