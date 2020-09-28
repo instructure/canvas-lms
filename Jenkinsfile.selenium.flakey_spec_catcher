@@ -107,20 +107,31 @@ def computeTestCount() {
 
   def changed_tests_arr = changed_tests.split('\n')
   def test_count = changed_tests_arr.length
-
-  echo "expected tests to run: $test_count"
-
-  if (env.DISTRIBUTED_CUT_OFF.toInteger() < test_count) {
-    throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
+  def weighted_values = changed_tests_arr.collect {
+    it.startsWith('./spec/selenium') ? env.SELENIUM_RATIO.toInteger() : 1
+  }
+  def weighted_total = weighted_values.inject(0) {
+    acc, item -> acc + item
   }
 
-  def distributed_factor = env.DISTRIBUTED_FACTOR.toInteger()
+  def distributed_factor = env.TESTS_PER_NODE.toInteger()
 
-  for(int i = 0; i < test_count; i += distributed_factor) {
-    def start_i = i
-    def end_i = Math.min(i+distributed_factor, test_count - 1)
+  def i = 0
+  def cur_partition = []
+  def cur_weight = 0
 
-    partitions.add(changed_tests_arr[start_i..end_i])
+  while(i < test_count) {
+    cur_partition.add(changed_tests_arr[i])
+    cur_weight += weighted_values[i]
+
+    if(cur_weight >= distributed_factor) {
+      partitions.add(cur_partition)
+
+      cur_partition = []
+      cur_weight = 0
+    }
+
+    i++
   }
 
   echo "expected nodes to run on for $test_count tests: ${partitions.size()}"
@@ -130,7 +141,7 @@ def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -vrf tmp'
   try {
     timeout(30) {
-      sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
+      sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
     }
   }
   // Don't fail the build for timeouts
@@ -187,16 +198,21 @@ pipeline {
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
     FORCE_FAILURE = configuration.forceFailureFSC()
-    // there will be a node for every 10 tests
-    DISTRIBUTED_FACTOR = '15'
-    // if someone is trying to update more than these amount of tests, then just fail.
-    // that will be at DISTRIBUTED_CUT_OFF / DISTRIBUTED_FACTOR nodes.
-    DISTRIBUTED_CUT_OFF = '300'
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = "gems/.*/spec/"
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20200719"
+
+    // Targeting 10 minutes / node, each node runs DOCKER_PROCESSES threads and
+    // repeats each test FSC_REPEAT_FACTOR times.
+    // Assumption: non-selenium tests take 500ms / test
+    // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
+    DOCKER_PROCESSES = 3
+    FSC_REPEAT_FACTOR = 10
+    MAX_NODES = 10
+    SELENIUM_RATIO = 20
+    TESTS_PER_NODE = 200
   }
 
   stages {
@@ -214,6 +230,10 @@ pipeline {
 
             stage("Run Flakey Spec Catcher") {
               if(partitions.size() == 0) {
+                return
+              } else if(partitions.size() >= env.MAX_NODES.toInteger()) {
+                error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+
                 return
               }
 
