@@ -44,6 +44,15 @@ const keys = {
   },
 }
 
+
+function makeDate(date) {
+  if (date) {
+    return new Date(date).toLocaleDateString()
+  } else {
+    return "N/A"
+  }
+}
+
 // #
 // begin returned function here
 // @param {array} array of enrollments returned from /courses/:course_id/enrollments
@@ -55,6 +64,8 @@ export default data =>
     enrollment.typeLabel = keys[scope][enrollment.type]
     enrollment.permissions = ENV.PERMISSIONS
     enrollment.typeClass = toUnderscore(enrollment.type)
+    enrollment.start_at = makeDate(enrollment.start_at)
+    enrollment.end_at = makeDate(enrollment.end_at)
 
     return enrollment
   })
