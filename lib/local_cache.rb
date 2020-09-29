@@ -20,7 +20,7 @@ class LocalCache
   # should not be stored on the distributed redis cache.  Vaulted credentials
   # are a good example.
   class << self
-    delegate :clear, :delete, :delete_matched, :fetch, :fetch_without_expiration, :read, :write, to: :cache
+    delegate :clear, :delete, :delete_matched, :fetch, :fetch_without_expiration, :read, :write, :write_set, to: :cache
 
     def cache
       unless defined?(@local_cache)
