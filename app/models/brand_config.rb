@@ -71,7 +71,11 @@ class BrandConfig < ActiveRecord::Base
   end
 
   def clear_cache
-    self.shard.activate { MultiCache.delete(self.class.cache_key_for_md5(self.md5)) }
+    self.shard.activate do
+      self.class.connection.after_transaction_commit do
+        MultiCache.delete(self.class.cache_key_for_md5(self.md5))
+      end
+    end
   end
 
   def default?
