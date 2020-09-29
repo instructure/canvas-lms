@@ -65,10 +65,12 @@ export default class FeatureFlagView extends Backbone.View {
 
   applyAction(action) {
     $.when(this.canUpdate(action)).then(
-      $.when(this.checkSiteAdmin()).then(
-        () => this.model.updateState(action),
-        () => this.render() // undo UI change if user cancels
-      )
+      () =>
+        $.when(this.checkSiteAdmin()).then(
+          () => this.model.updateState(action),
+          () => this.render() // undo UI change if user cancels
+        ),
+      () => this.render() // ditto
     )
   }
 

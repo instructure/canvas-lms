@@ -88,6 +88,28 @@ module ConditionalRelease
       rules_data
     end
 
+    def self.release_mastery_paths_content_in_course(course)
+      overrides_scope = AssignmentOverride.where(:set_type => AssignmentOverride::SET_TYPE_NOOP, :set_id => AssignmentOverride::NOOP_MASTERY_PATHS).active
+      assignment_ids = overrides_scope.where.not(:assignment_id => nil).pluck(:assignment_id)
+      assignment_ids.sort.each_slice(100) do |sliced_ids|
+        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).where.not(submission_types: 'wiki_page').to_a.each do |assignment|
+          assignment.update_attribute(:only_visible_to_overrides, false)
+        end
+      end
+      wp_assignment_ids = course.wiki_pages.not_deleted.where.not(:assignment_id => nil).pluck(:assignment_id)
+      wp_assignment_ids.sort.each_slice(100) do |sliced_ids|
+        course.assignments.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true, :submission_types => 'wiki_page').each do |wp_assignment|
+          wp_assignment.update_attribute(:only_visible_to_overrides, false)
+        end
+      end
+      quiz_ids = overrides_scope.where(:assignment_id => nil).where.not(:quiz_id => nil).pluck(:quiz_id)
+      quiz_ids.sort.each_slice(100) do |sliced_ids|
+        course.quizzes.active.where(:id => sliced_ids).where(:only_visible_to_overrides => true).to_a.each do |quiz|
+          quiz.update_attribute(:only_visible_to_overrides, false)
+        end
+      end
+    end
+
     class << self
       private
 

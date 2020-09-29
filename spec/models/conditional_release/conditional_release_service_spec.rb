@@ -216,5 +216,51 @@ describe ConditionalRelease::Service do
         end
       end
     end
+
+    context "releasing content after disabling feature flag" do
+      before :once do
+        Account.default.allow_feature!(:conditional_release)
+        course_with_student(:active_all => true)
+        @course.enable_feature!(:conditional_release)
+        @module = @course.context_modules.create!(:workflow_state => "active")
+      end
+
+      def release_content
+        Feature.definitions['conditional_release'].after_state_change_proc.call(@teacher, @course, 'on', 'off')
+      end
+
+      it "should release mastery paths assigned assignments" do
+        assmt = assignment_model(course: @course, workflow_state: 'published', only_visible_to_overrides: true)
+        assignment_override_model(assignment: assmt,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+        tag = @module.add_item(:id => assmt.id, :type => "assignment")
+        expect(@course.module_items_visible_to(@student).to_a).to eq []
+
+        release_content
+        expect(@course.module_items_visible_to(@student).to_a).to eq [tag]
+      end
+
+      it "should release mastery paths assigned ungraded quizzes" do
+        quiz = quiz_model(course: @course, quiz_type: "survey", only_visible_to_overrides: true)
+        assignment_override_model(quiz: quiz,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+        tag = @module.add_item(:id => quiz.id, :type => "quiz")
+        expect(@course.module_items_visible_to(@student).to_a).to eq []
+
+        release_content
+        expect(@course.module_items_visible_to(@student).to_a).to eq [tag]
+      end
+
+      it "should release mastery paths assigned wiki pages" do
+        wiki_page_assignment_model(course: @course, only_visible_to_overrides: true)
+        tag = @module.add_item(:id => @page.id, :type => "wiki_page")
+        expect(@course.module_items_visible_to(@student).to_a).to eq []
+
+        release_content
+        expect(@course.module_items_visible_to(@student).to_a).to eq [tag]
+      end
+    end
   end
 end

@@ -245,7 +245,11 @@ module Importers
       end
 
       if hash[:assignment_overrides]
+        added_overrides = false
         hash[:assignment_overrides].each do |o|
+          next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
+            o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
+            !context.feature_enabled?(:conditional_release)
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
@@ -256,10 +260,11 @@ module Importers
             override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
+          added_overrides = true
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
-        if hash.has_key?(:only_visible_to_overrides)
+        if hash.has_key?(:only_visible_to_overrides) && added_overrides
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end

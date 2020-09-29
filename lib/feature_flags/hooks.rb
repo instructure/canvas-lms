@@ -80,5 +80,24 @@ module FeatureFlags
         I18n.t("Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course.")
       transitions['off']['reload_page'] = true
     end
+
+    def self.conditional_release_transition_hook(_user, context, _from_state, transitions)
+      if context.is_a?(Course)
+        transitions['off'] ||= {}
+        transitions['off']['message'] =
+          I18n.t("Disabling the Mastery Paths feature will release configured assignments and content to all students.
+                  If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.")
+      end
+    end
+
+    def self.conditional_release_after_change_hook(_user, context, _old_state, new_state)
+      if context.is_a?(Course) && new_state == "off"
+        ConditionalRelease::Service.send_later_if_production_enqueue_args(
+          :release_mastery_paths_content_in_course,
+          {:priority => Delayed::LOW_PRIORITY, :n_strand => ["conditional_release_unassignment", context.global_root_account_id]},
+          context
+        )
+      end
+    end
   end
 end
