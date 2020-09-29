@@ -466,7 +466,6 @@ module AccountReports::ReportHelper
     return false if account_report.account_report_runners.incomplete.exists?
     AccountReport.transaction do
       @account_report.reload(lock: true)
-      return false if account_report.workflow_state == 'error'
       if @account_report.workflow_state == 'running'
         @account_report.workflow_state = 'compiling'
         @account_report.save!
