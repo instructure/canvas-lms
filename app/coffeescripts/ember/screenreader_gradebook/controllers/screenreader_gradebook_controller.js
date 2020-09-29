@@ -1175,16 +1175,42 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
     'submissions.content.length'
   ),
 
-  includeUngradedAssignments: (() =>
-    userSettings.contextGet('include_ungraded_assignments') || false)
+  includeUngradedAssignments: function() {
+    const localValue = userSettings.contextGet('include_ungraded_assignments') || false
+    if (!this.saveViewUngradedAsZeroToServer()) {
+      return localValue
+    }
+
+    // Prefer the setting we got from the server, but fall back to the value in
+    // userSettings if there is no server value
+    const savedValue = get(window, 'ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero')
+    return savedValue != null ? savedValue === 'true' : localValue
+  }
     .property()
     .volatile(),
 
   showAttendance: (() => userSettings.contextGet('show_attendance')).property().volatile(),
 
   updateIncludeUngradedAssignmentsSetting: function() {
+    if (this.saveViewUngradedAsZeroToServer()) {
+      ajax.request({
+        dataType: 'json',
+        type: 'put',
+        url: `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`,
+        data: {
+          gradebook_settings: {
+            view_ungraded_as_zero: this.get('includeUngradedAssignments') ? 'true' : 'false'
+          }
+        }
+      })
+    }
+
     userSettings.contextSet('include_ungraded_assignments', this.get('includeUngradedAssignments'))
   }.observes('includeUngradedAssignments'),
+
+  saveViewUngradedAsZeroToServer() {
+    return !!get(window, 'ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server')
+  },
 
   assignmentGroupsHash() {
     const ags = {}

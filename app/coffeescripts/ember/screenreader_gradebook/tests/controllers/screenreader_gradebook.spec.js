@@ -1107,22 +1107,96 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
   QUnit.module('includeUngradedAssignments', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
+
+      window.ENV.GRADEBOOK_OPTIONS = {}
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
     })
 
-    test('returns true when include_ungraded_assignments is true', () => {
-      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
-      strictEqual(srgb.get('includeUngradedAssignments'), true)
+    QUnit.module('when storing in Gradebook preferences', gbHooks => {
+      gbHooks.beforeEach(() => {
+        window.ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server = true
+      })
+
+      test('returns true when the setting is passed as "true"', () => {
+        window.ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero = 'true'
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false when the setting is passed as "false"', () => {
+        window.ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero = 'false'
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
+
+      test('falls back to the value in localStorage when no setting value is present', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false if no value exists in localStorage or in settings', () => {
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
+
+      test('returns the last-set value after being set', () => {
+        srgb.set('includeUngradedAssignments', true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
     })
 
-    test('returns false when include_ungraded_assignments is false', () => {
-      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
-      strictEqual(srgb.get('includeUngradedAssignments'), false)
+    QUnit.module('when storing settings locally', () => {
+      test('returns true when include_ungraded_assignments is true', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false when include_ungraded_assignments is false', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
     })
   })
 
   QUnit.module('updateIncludeUngradedAssignmentsSetting', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
+    })
+
+    QUnit.module('when storing settings in Gradebook preferences', gbHooks => {
+      gbHooks.beforeEach(() => {
+        window.ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server = true
+
+        const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`
+        ajax.defineFixture(url, {
+          response: [],
+          textStatus: 'success'
+        })
+      })
+
+      test('updateIncludeUngradedAssignmentsSetting uses the Gradebook settings endpoint', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`
+        srgb.set('includeUngradedAssignments', false)
+        strictEqual(ajaxRequestSpy.firstCall.args[0].url, url)
+      })
+
+      test('updateIncludeUngradedAssignmentsSetting passes the updated setting state', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        srgb.set('includeUngradedAssignments', false)
+        deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
+          gradebook_settings: {
+            view_ungraded_as_zero: 'false'
+          }
+        })
+      })
+    })
+
+    QUnit.module('when storing settings locally', () => {
+      test('updateIncludeUngradedAssignmentsSetting does not call the Gradebook settings endpoint', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        srgb.set('includeUngradedAssignments', false)
+        equal(ajaxRequestSpy.callCount, 0)
+      })
     })
 
     test('changing includeUngradedAssignments calls updateIncludeUngradedAssignmentsSetting', () => {
