@@ -154,3 +154,35 @@ it('will render the unavailable pizza tracker if there is a module prereq lock',
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('unavailable-step-container')).toBeInTheDocument()
 })
+
+it('will render a New Attempt button if submitted and there are more attempts', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if not submitted', async () => {
+  const props = await mockAssignmentAndSubmission()
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if the assignment is locked', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {lockInfo: {isLocked: true}},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if there are no more attempts', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {allowedAttempts: 1},
+    Submission: {...SubmissionMocks.submitted}
+  })
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})

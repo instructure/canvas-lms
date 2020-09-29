@@ -107,7 +107,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        const newAttemptButton = getByText('Create New Attempt')
+        const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
         expect(getAllByText('Attempt 2')[0]).toBeInTheDocument()
       })
@@ -119,9 +119,9 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        const newAttemptButton = getByText('Create New Attempt')
+        const newAttemptButton = getByText('New Attempt')
         fireEvent.click(newAttemptButton)
-        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
 
@@ -133,7 +133,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
 
@@ -145,7 +145,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
 
       it('is displayed on the latest submitted attempt', async () => {
@@ -155,7 +155,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Create New Attempt')).toBeInTheDocument()
+        expect(queryByText('New Attempt')).toBeInTheDocument()
       })
 
       it('sets focus on the assignment toggle details when clicked', async () => {
@@ -171,7 +171,7 @@ describe('ViewManager', () => {
         }
         document.querySelector = jest.fn().mockReturnValue(mockElement)
 
-        const newButton = getByText('Create New Attempt')
+        const newButton = getByText('New Attempt')
         fireEvent.click(newButton)
 
         await wait(() => {
@@ -189,7 +189,7 @@ describe('ViewManager', () => {
             <ViewManager {...props} />
           </MockedProvider>
         )
-        expect(queryByText('Create New Attempt')).not.toBeInTheDocument()
+        expect(queryByText('New Attempt')).not.toBeInTheDocument()
       })
     })
   })

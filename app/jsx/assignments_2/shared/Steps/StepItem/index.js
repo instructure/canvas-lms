@@ -16,15 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ButtonContext from '../../../student/components/Context'
 import classNames from 'classnames'
 import {element, oneOf, string} from 'prop-types'
 import I18n from 'i18n!assignments_2_shared_Steps'
 import React, {Component} from 'react'
 
-import {ApplyTheme} from '@instructure/ui-themeable'
-import {Button} from '@instructure/ui-buttons'
-import {IconCheckMarkSolid, IconLockSolid, IconPlusSolid} from '@instructure/ui-icons'
+import {IconCheckMarkSolid, IconLockSolid} from '@instructure/ui-icons'
 import {omitProps} from '@instructure/ui-react-utils'
 import {px} from '@instructure/ui-utils'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
@@ -35,9 +32,6 @@ export const stepLabels = {
   },
   get graded() {
     return I18n.t('Graded')
-  },
-  get newAttempt() {
-    return I18n.t('New Attempt')
   },
   get notGradedYet() {
     return I18n.t('Not Graded Yet')
@@ -84,60 +78,6 @@ class StepItem extends Component {
         return I18n.t('in-progress')
       case 'unavailable':
         return I18n.t('unavailable')
-    }
-  }
-
-  /**
-   * renderButton renders a small, circular, gray button. This button
-   * style is used for the Previous, New Attempt, and Next buttons in
-   * the Assignments 2 pizzatracker, which are used to navigate between
-   * submissions for a single assignment.
-   *
-   * @param ButtonIcon  An instUI icon corresponding to the rendered
-   *                    button's purpose
-   * @param action      The action to be performed when the rendered
-   *                    button is clicked
-   * @param a11yMessage The message to be read by the screen reader
-   *                    when focus is on the rendered button
-   */
-  renderButton(ButtonIcon, action, a11yMessage, id) {
-    const icon = <ButtonIcon size="x-small" />
-    return (
-      <div>
-        <ApplyTheme
-          theme={{
-            [Button.theme]: {
-              iconColor: '$ic-color-medium-darker',
-              borderRadius: '2rem'
-            }
-          }}
-        >
-          <Button id={id} variant="icon" icon={icon} size="small" onClick={action}>
-            <ScreenReaderContent>{a11yMessage} </ScreenReaderContent>
-          </Button>
-        </ApplyTheme>
-      </div>
-    )
-  }
-
-  renderIcon(context) {
-    const icon = this.props.icon
-    const status = this.props.status
-
-    if (!icon && status === 'button') {
-      switch (this.props.label) {
-        case stepLabels.newAttempt:
-          return this.renderButton(
-            IconPlusSolid,
-            context.startNewAttemptAction,
-            I18n.t('Create New Attempt'),
-            'create-new-attempt-button'
-          )
-        default:
-          return null
-      }
-    } else {
-      return <span aria-hidden>{this.selectIcon(icon, status)}</span>
     }
   }
 
@@ -196,15 +136,13 @@ class StepItem extends Component {
             }}
             className="step-item-pin"
           >
-            <ButtonContext.Consumer>{context => this.renderIcon(context)}</ButtonContext.Consumer>
+            <span aria-hidden>{this.selectIcon(this.props.icon, this.props.status)}</span>
           </span>
         </span>
         <span className="step-item-label" aria-hidden>
           {this.props.label}
         </span>
-        {this.props.status !== 'button' && (
-          <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>
-        )}
+        <ScreenReaderContent>{`${this.props.label} ${this.getStatusI18n()}`}</ScreenReaderContent>
       </span>
     )
   }
