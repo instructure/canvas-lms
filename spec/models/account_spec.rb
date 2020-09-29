@@ -42,15 +42,6 @@ describe Account do
       expect(subaccount.resolved_outcome_proficiency).to eq proficiency
     end
 
-    it "can be nil" do
-      root_account = Account.create!
-      subaccount = root_account.sub_accounts.create!
-      expect(root_account.outcome_proficiency).to eq nil
-      expect(subaccount.outcome_proficiency).to eq nil
-      expect(root_account.resolved_outcome_proficiency).to eq nil
-      expect(subaccount.resolved_outcome_proficiency).to eq nil
-    end
-
     it "ignores soft deleted calculation methods" do
       root_account = Account.create!
       method = outcome_proficiency_model(root_account)
@@ -59,6 +50,31 @@ describe Account do
       submethod.update! workflow_state: :deleted
       expect(subaccount.outcome_proficiency).to eq submethod
       expect(subaccount.resolved_outcome_proficiency).to eq method
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      before do
+        @root_account = Account.create!
+        @root_account.enable_feature!(:account_level_mastery_scales)
+      end
+
+      it "returns a OutcomeProficiency default at the root level if no proficiency exists" do
+        subaccount = @root_account.sub_accounts.create!
+        expect(@root_account.outcome_proficiency).to eq nil
+        expect(subaccount.outcome_proficiency).to eq nil
+        expect(subaccount.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
+        expect(@root_account.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(@root_account)
+      end
+    end
+
+    context "with the account_level_mastery_scales FF disabled" do
+      it "can be nil" do
+        root_account = Account.create!
+        root_account.disable_feature!(:account_level_mastery_scales)
+        subaccount = root_account.sub_accounts.create!
+        expect(root_account.resolved_outcome_proficiency).to eq nil
+        expect(subaccount.resolved_outcome_proficiency).to eq nil
+      end
     end
   end
 
@@ -84,15 +100,6 @@ describe Account do
       expect(subaccount.resolved_outcome_calculation_method).to eq submethod
     end
 
-    it "can be nil" do
-      root_account = Account.create!
-      subaccount = root_account.sub_accounts.create!
-      expect(root_account.outcome_calculation_method).to eq nil
-      expect(subaccount.outcome_calculation_method).to eq nil
-      expect(root_account.resolved_outcome_calculation_method).to eq nil
-      expect(subaccount.resolved_outcome_calculation_method).to eq nil
-    end
-
     it "ignores soft deleted calculation methods" do
       root_account = Account.create!
       method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
@@ -100,6 +107,31 @@ describe Account do
       submethod = OutcomeCalculationMethod.create! context: subaccount, calculation_method: :latest, workflow_state: :deleted
       expect(subaccount.outcome_calculation_method).to eq submethod
       expect(subaccount.resolved_outcome_calculation_method).to eq method
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      before do
+        @root_account = Account.create!
+        @root_account.enable_feature!(:account_level_mastery_scales)
+      end
+
+      it "returns a OutcomeCalculationMethod default if no method exists" do
+        subaccount = @root_account.sub_accounts.create!
+        expect(@root_account.outcome_calculation_method).to eq nil
+        expect(subaccount.outcome_calculation_method).to eq nil
+        expect(@root_account.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
+        expect(subaccount.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(@root_account)
+      end
+    end
+
+    context "with the account_level_mastery_scales FF disabled" do
+      it "can be nil" do
+        root_account = Account.create!
+        root_account.disable_feature!(:account_level_mastery_scales)
+        subaccount = root_account.sub_accounts.create!
+        expect(root_account.resolved_outcome_calculation_method).to eq nil
+        expect(subaccount.resolved_outcome_calculation_method).to eq nil
+      end
     end
   end
 

@@ -223,11 +223,23 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    outcome_proficiency&.active? ? outcome_proficiency : parent_account&.resolved_outcome_proficiency
+    if outcome_proficiency&.active?
+      outcome_proficiency
+    elsif parent_account
+      parent_account.resolved_outcome_proficiency
+    elsif self.feature_enabled?(:account_level_mastery_scales)
+      OutcomeProficiency.find_or_create_default!(self)
+    end
   end
 
   def resolved_outcome_calculation_method
-    outcome_calculation_method&.active? ? outcome_calculation_method : parent_account&.resolved_outcome_calculation_method
+    if outcome_calculation_method&.active?
+      outcome_calculation_method
+    elsif parent_account
+      parent_account.resolved_outcome_calculation_method
+    elsif self.feature_enabled?(:account_level_mastery_scales)
+      OutcomeCalculationMethod.find_or_create_default!(self)
+    end
   end
 
   include ::Account::Settings

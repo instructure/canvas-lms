@@ -58,14 +58,23 @@ describe "Outcomes API", type: :request do
                                          presets[:has_updateable_rubrics]
                                        end
 
-    if %w[decaying_average n_mastery].include?(retval["calculation_method"])
+    if @account.feature_enabled?(:account_level_mastery_scales)
+      calculation_method = OutcomeCalculationMethod.find_or_create_default!(@account)
+      retval["calculation_method"] = presets[:calculation_method] || calculation_method.calculation_method
+      retval["calculation_int"] = presets.key?(:calculation_int) ? presets[:calculation_int] : calculation_method.calculation_int
+    elsif %w[decaying_average n_mastery].include?(retval["calculation_method"])
       retval["calculation_int"] = presets[:calculation_int] || outcome.calculation_int
     end
 
-    if criterion = outcome.data && outcome.data[:rubric_criterion]
+    if @account.feature_enabled?(:account_level_mastery_scales)
+      proficiency = OutcomeProficiency.find_or_create_default!(@account)
+      retval["points_possible"] = presets[:points_possible] || proficiency.points_possible
+      retval["mastery_points"]  = presets[:mastery_points]  || proficiency.mastery_points
+      retval["ratings"]         = presets[:ratings]         || proficiency.ratings_hash.map(&:stringify_keys)
+    elsif criterion = (outcome.data && outcome.data[:rubric_criterion])
       retval["points_possible"] = presets[:points_possible] || criterion[:points_possible].to_i
       retval["mastery_points"]  = presets[:mastery_points]  || criterion[:mastery_points].to_i
-      retval["ratings"]         = presets[:ratings]         || criterion[:ratings].map{ |d| d.stringify_keys }
+      retval["ratings"]         = presets[:ratings]         || criterion[:ratings].map(&:stringify_keys)
     end
 
     retval
@@ -319,37 +328,41 @@ describe "Outcomes API", type: :request do
             @account.enable_feature!(:account_level_mastery_scales)
           end
 
-          it "should return the mastery scales values if an outcome_proficiency exists" do
+          it "should return the account's mastery scale and calculation_method if an outcome_proficiency exists" do
             proficiency = outcome_proficiency_model(@account)
-            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
-                            :controller => 'outcomes_api',
-                            :action => 'show',
-                            :id => @outcome.id.to_s,
-                            :format => 'json')
-            expect(json).to eq(outcome_json(@outcome, {
-              :points_possible => proficiency.points_possible,
-              :mastery_points => proficiency.mastery_points,
-              :ratings => proficiency.ratings_hash.map(&:stringify_keys)
-            }))
-          end
-
-          it "should return the outcome's values if no proficiency or calculation_method exists" do
-            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+            method = outcome_calculation_method_model(@account)
+            json = api_call(
+              :get,
+              "/api/v1/outcomes/#{@outcome.id}",
               :controller => 'outcomes_api',
               :action => 'show',
               :id => @outcome.id.to_s,
-              :format => 'json')
-            expect(json).to eq(outcome_json(@outcome))
+              :format => 'json'
+            )
+            expect(json).to eq(outcome_json(@outcome, {
+              :points_possible => proficiency.points_possible,
+              :mastery_points => proficiency.mastery_points,
+              :ratings => proficiency.ratings_hash.map(&:stringify_keys),
+              :calculation_method => method.calculation_method,
+              :calculation_int => method.calculation_int,
+            }))
           end
 
-          it "should return the calculation method values if an outcome_calculation_method exists" do
-            method = outcome_calculation_method_model(@account)
-            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
-                            :controller => 'outcomes_api',
-                            :action => 'show',
-                            :id => @outcome.id.to_s,
-                            :format => 'json')
+          it "should return the default outcome_proficiency and calculation_method if neither exists" do
+            json = api_call(
+              :get,
+              "/api/v1/outcomes/#{@outcome.id}",
+              :controller => 'outcomes_api',
+              :action => 'show',
+              :id => @outcome.id.to_s,
+              :format => 'json'
+            )
+            proficiency = OutcomeProficiency.find_or_create_default!(@account)
+            method = OutcomeCalculationMethod.find_or_create_default!(@account)
             expect(json).to eq(outcome_json(@outcome, {
+              :points_possible => proficiency.points_possible,
+              :mastery_points => proficiency.mastery_points,
+              :ratings => proficiency.ratings_hash.map(&:stringify_keys),
               :calculation_method => method.calculation_method,
               :calculation_int => method.calculation_int,
             }))

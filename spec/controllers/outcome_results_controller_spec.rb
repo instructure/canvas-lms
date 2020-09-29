@@ -270,17 +270,20 @@ describe OutcomeResultsController do
           @course.account.enable_feature!(:account_level_mastery_scales)
         end
 
-        it 'uses default outcome values for points scaling if no outcome proficiency exists' do
-          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+        it 'uses the default outcome proficiency for points scaling if no outcome proficiency exists' do
+          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
-          expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+          points_possible = OutcomeProficiency.find_or_create_default!(@course.account).points_possible
+          score = (2.to_f / 5.to_f) * points_possible
+          expect(json['rollups'][0]['scores'][0]['score']).to eq score
         end
 
         it 'uses resolved_outcome_proficiency for points scaling if one exists' do
           proficiency = outcome_proficiency_model(@course)
-          res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
+          create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
-          expect(json['rollups'][0]['scores'][0]['score']).to eq 4 # ( score of 2 / possible 5) * proficiency.points_possible
+          score = (2.to_f / 5.to_f) * proficiency.points_possible
+          expect(json['rollups'][0]['scores'][0]['score']).to eq score
         end
       end
 

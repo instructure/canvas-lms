@@ -114,7 +114,7 @@ describe OutcomeProficiency, type: :model do
     end
 
     it 'returns the ratings in a hash with the appropriate values' do
-      expect(@outcome_proficiency.ratings_hash).to eq [{:description => 'best', :points => 10, :mastery => true}]
+      expect(@outcome_proficiency.ratings_hash).to eq [{:description => 'best', :points => 10, :mastery => true, :color => '00ff00'}]
     end
   end
 
@@ -138,6 +138,43 @@ describe OutcomeProficiency, type: :model do
 
     it 'returns the points for the top rating' do
       expect(@outcome_proficiency.points_possible).to eq 10
+    end
+  end
+
+  describe 'find_or_create_default!' do
+    before do
+      @account = account_model
+      @default_ratings = OutcomeProficiency.default_ratings
+    end
+
+    it 'creates the default proficiency if one doesnt exist' do
+      proficiency = OutcomeProficiency.find_or_create_default!(@account)
+      expect(proficiency.ratings_hash).to eq @default_ratings
+      expect(proficiency.workflow_state).to eq 'active'
+      expect(proficiency.context).to eq @account
+    end
+
+    it 'finds the proficiency if one exists' do
+      proficiency = outcome_proficiency_model(@account)
+      default = OutcomeProficiency.find_or_create_default!(@account)
+      expect(proficiency).to eq default
+    end
+
+    it 'can reset soft deleted records' do
+      proficiency = outcome_proficiency_model(@account)
+      proficiency.destroy
+      default = OutcomeProficiency.find_or_create_default!(@account)
+      proficiency = proficiency.reload
+      expect(proficiency).to eq default
+      expect(proficiency.workflow_state).to eq 'active'
+      expect(proficiency.ratings_hash).to eq @default_ratings
+    end
+
+    it 'can graciously handle RecordInvalid errors' do
+      proficiency = outcome_proficiency_model(@account)
+      allow(OutcomeProficiency).to receive(:find_by).and_return(nil, proficiency)
+      default = OutcomeProficiency.find_or_create_default!(@account)
+      expect(proficiency).to eq default
     end
   end
 end

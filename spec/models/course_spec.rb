@@ -1604,13 +1604,6 @@ describe Course do
       expect(course.resolved_outcome_proficiency).to eq root_method
     end
 
-    it "can be nil" do
-      root_account = Account.create!
-      course = course_model(account: root_account)
-      expect(course.outcome_proficiency).to eq nil
-      expect(course.resolved_outcome_proficiency).to eq nil
-    end
-
     it "ignores soft deleted proficiencies" do
       root_account = Account.create!
       account_method = outcome_proficiency_model(root_account)
@@ -1619,6 +1612,26 @@ describe Course do
       course_method.destroy
       expect(course.outcome_proficiency).to eq course_method
       expect(course.resolved_outcome_proficiency).to eq account_method
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      it "returns the account default if no record exists" do
+        root_account = Account.create!
+        root_account.enable_feature!(:account_level_mastery_scales)
+        course = course_model(account: root_account)
+        expect(course.outcome_proficiency).to eq nil
+        expect(course.resolved_outcome_proficiency).to eq OutcomeProficiency.find_or_create_default!(root_account)
+      end
+    end
+
+    context "with the account_level_mastery_scales FF disabled" do
+      it "returns nil if no record exists" do
+        root_account = Account.create!
+        root_account.disable_feature!(:account_level_mastery_scales)
+        course = course_model(account: root_account)
+        expect(course.outcome_proficiency).to eq nil
+        expect(course.resolved_outcome_proficiency).to eq nil
+      end
     end
   end
 
@@ -1649,13 +1662,6 @@ describe Course do
       expect(course.resolved_outcome_calculation_method).to eq course_method
     end
 
-    it "can be nil" do
-      root_account = Account.create!
-      course = course_model(account: root_account)
-      expect(course.outcome_calculation_method).to eq nil
-      expect(course.resolved_outcome_calculation_method).to eq nil
-    end
-
     it "ignores soft deleted calculation methods" do
       root_account = Account.create!
       account_method = OutcomeCalculationMethod.create! context: root_account, calculation_method: :highest
@@ -1663,6 +1669,26 @@ describe Course do
       course_method = OutcomeCalculationMethod.create! context: course, calculation_method: :latest, workflow_state: :deleted
       expect(course.outcome_calculation_method).to eq course_method
       expect(course.resolved_outcome_calculation_method).to eq account_method
+    end
+
+    context "with the account_level_mastery_scales FF enabled" do
+      it "returns the account default if no record exists" do
+        root_account = Account.create!
+        root_account.enable_feature!(:account_level_mastery_scales)
+        course = course_model(account: root_account)
+        expect(course.outcome_calculation_method).to eq nil
+        expect(course.resolved_outcome_calculation_method).to eq OutcomeCalculationMethod.find_or_create_default!(root_account)
+      end
+    end
+
+    context "with the account_level_mastery_scales FF disabled" do
+      it "returns nil if no record exists" do
+        root_account = Account.create!
+        root_account.disable_feature!(:account_level_mastery_scales)
+        course = course_model(account: root_account)
+        expect(course.outcome_calculation_method).to eq nil
+        expect(course.resolved_outcome_calculation_method).to eq nil
+      end
     end
   end
 end
