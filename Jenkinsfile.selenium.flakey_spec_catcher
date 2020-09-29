@@ -25,7 +25,7 @@ def partitions = []
 @groovy.transform.Field
 def changed_tests = ''
 @groovy.transform.Field
-def fsc_timeout = false
+def fsc_status = null
 
 def isPlugin() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
@@ -149,17 +149,17 @@ def executeFlakeySpecCatcher(prefix = 'main') {
     timeout(30) {
       sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
     }
-  }
-  // Don't fail the build for timeouts
-  catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (!e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      throw e
-    } else {
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       echo "Not failing the build due to timeouts"
-      fsc_timeout = true
+      fsc_status = 'timeout'
+    } else if(e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
+      echo "Build aborted"
+      fsc_status = 'aborted'
+    } else {
+      throw e
     }
-  }
-  finally {
+  } finally {
     sh "mkdir -vp tmp/$prefix"
     sh(
       script: "docker cp \$(docker ps -q --filter 'name=canvas_'):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
@@ -170,10 +170,10 @@ def executeFlakeySpecCatcher(prefix = 'main') {
 }
 
 def sendSlack(success) {
-  def color = success ? "good" : "danger"
+  def color = fsc_status == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
   def message = "$jobInfo\n$changed_tests"
-  if (fsc_timeout) {
+  if (fsc_status == 'timeout') {
     message = "Timeout Occurred!\n$message"
   }
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
@@ -181,7 +181,9 @@ def sendSlack(success) {
 
 def cleanupFn(status) {
   try {
-    sendSlack(status == 'SUCCESS')
+    if(fsc_status != 'aborted') {
+      sendSlack(status == 'SUCCESS')
+    }
   } finally {
     sh 'rm -vrf ./tmp/'
     execute 'bash/docker-cleanup.sh --allow-failure'
