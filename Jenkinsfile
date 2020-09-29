@@ -209,6 +209,17 @@ def getSlackChannel() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
 }
 
+def getDependenciesMergeImage() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.dependenciesMergeImageDefault() : imageTag.dependenciesMergeImage()
+}
+
+def getDependenciesPatchsetImage() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.dependenciesPatchsetImageDefault() : imageTag.dependenciesPatchsetImage()
+}
+
+def getDependenciesImage() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.dependenciesImageDefault() : configuration.dependenciesImage()
+}
 // =========
 
 pipeline {
@@ -248,9 +259,10 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    DEPENDENCIES_IMAGE = "$BUILD_IMAGE-dependencies"
-    DEPENDENCIES_MERGE_IMAGE = "$DEPENDENCIES_IMAGE:$GERRIT_BRANCH"
-    DEPENDENCIES_PATCHSET_IMAGE = "$DEPENDENCIES_IMAGE:$NAME-$TAG_SUFFIX"
+    DEPENDENCIES_IMAGE = getDependenciesImage()
+    DEPENDENCIES_MERGE_IMAGE = getDependenciesMergeImage()
+    DEPENDENCIES_PATCHSET_IMAGE = getDependenciesPatchsetImage()
+
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
