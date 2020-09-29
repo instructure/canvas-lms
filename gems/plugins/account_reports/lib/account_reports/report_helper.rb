@@ -272,12 +272,12 @@ module AccountReports::ReportHelper
     )
   end
 
-  def write_report(headers, enable_i18n_features = false, &block)
-    file = generate_and_run_report(headers, 'csv', enable_i18n_features, &block)
+  def write_report(headers, enable_i18n_features = false, compile: false, &block)
+    file = generate_and_run_report(headers, 'csv', enable_i18n_features, compile: compile, &block)
     Shackles.activate(:master) { send_report(file) }
   end
 
-  def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false)
+  def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false, compile: false)
     file = AccountReports.generate_file(@account_report, extension)
     options = {}
     if enable_i18n_features
@@ -286,7 +286,7 @@ module AccountReports::ReportHelper
     ExtendedCSV.open(file, "w", options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
-      activate_report_db { yield csv } if block_given?
+      activate_report_db(use_primary: compile) { yield csv } if block_given?
       Shackles.activate(:master) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
@@ -367,8 +367,16 @@ module AccountReports::ReportHelper
     Shackles.activate(:master) { @account_report.write_report_runners }
   end
 
-  def activate_report_db(&block)
-    if !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
+  def activate_report_db(use_primary: false, &block)
+    # for parallel account_reports we write rows to account_report_rows and then
+    # read from account_report_rows to generate the csv file. If this is done on
+    # a replica, it can be lagging and not get all the records. Typical reports,
+    # this would not be a problem because it is old data for a report...
+    # but when we just wrote the data it may not exist, so use the primary
+    # database.
+    if use_primary == true
+      Shackles.activate(:master, &block)
+    elsif !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
       Shackles.activate(:report, &block)
     else
       Shackles.activate(:slave, &block)
@@ -404,8 +412,10 @@ module AccountReports::ReportHelper
   end
 
   def write_report_from_rows(headers)
-    write_report headers do |csv|
-      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_each { |record| csv << record.row }
+    write_report(headers, compile: true) do |csv|
+      @account_report.account_report_rows.order(:account_report_runner_id, :row_number).find_in_batches(strategy: :cursor) do |batch|
+        batch.each { |record| csv << record.row }
+      end
     end
   end
 
@@ -413,11 +423,13 @@ module AccountReports::ReportHelper
     csvs = {}
     files.each do |file, headers_for_file|
       if @account_report.account_report_rows.where(file: file).exists?
-        csvs[file] = generate_and_run_report(headers_for_file) do |csv|
-          @account_report.account_report_rows.where(file: file).order(:account_report_runner_id, :row_number).find_each { |record| csv << record.row }
+        csvs[file] = generate_and_run_report(headers_for_file, compile: true) do |csv|
+          @account_report.account_report_rows.where(file: file).order(:account_report_runner_id, :row_number).find_in_batches(strategy: :cursor) do |batch|
+            batch.each { |record| csv << record.row }
+          end
         end
       else
-        csvs[file] = generate_and_run_report(headers_for_file)
+        csvs[file] = generate_and_run_report(headers_for_file, compile: true)
       end
     end
     send_report(csvs)
