@@ -33,32 +33,52 @@ module DataFixup
   # If specified, only submission that were
   # submitted in the time range will have events
   # retriggered.
-  class ResendPlagiarismEventsAfterShardSplit
+  class ResendPlagiarismEvents
     EVENT_NAME = 'plagiarism_resubmit'.freeze
 
-    def self.run(canvas_domain, start_time = 3.months.ago, end_time = Time.zone.now)
+    def self.run(start_time = 3.months.ago, end_time = Time.zone.now)
       raise 'start_time must be less than end_time' unless start_time < end_time
 
-      trigger_plagiarism_resubmit_for(
-        submissions_missing_reports(start_time, end_time),
-        canvas_domain
+      schedule_resubmit_job(
+        submissions_missing_reports(start_time, end_time).union(
+          submissions_missing_scored_reports(start_time, end_time)
+        )
       )
+    end
 
-      trigger_plagiarism_resubmit_for(
-        submissions_missing_scored_reports(start_time, end_time),
-        canvas_domain
+    def self.schedule_resubmit_job(scope)
+      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      run_at = Delayed::Job.where(strand: "plagiarism_event_resend").order(:run_at).last&.run_at
+      DataFixup::ResendPlagiarismEvents.send_later_if_production_enqueue_args(
+        :trigger_plagiarism_resubmit_for,
+        {
+          priority: Delayed::LOWER_PRIORITY,
+          strand: "plagiarism_event_resend",
+          run_at: (run_at &.+ wait_time.seconds.from_now) || Time.zone.now
+        },
+        scope
       )
     end
 
     # Retriggers the plagiarism resubmit event for the given
     # submission scope.
-    def self.trigger_plagiarism_resubmit_for(submission_scope, canvas_domain)
-      submission_scope.find_each do |submission|
+    def self.trigger_plagiarism_resubmit_for(submission_scope)
+      limit, _ = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      submission_scope = submission_scope.order(:id)
+      limited_scope = submission_scope.limit(limit)
+      limited_scope.each do |submission|
         Canvas::LiveEvents.post_event_stringified(
-          ResendPlagiarismEventsAfterShardSplit::EVENT_NAME,
+          ResendPlagiarismEvents::EVENT_NAME,
           Canvas::LiveEvents.get_submission_data(submission),
-          context_for_event(submission, canvas_domain)
+          context_for_event(submission)
         )
+      end
+
+      # since we're sending these in limited batches, we need to check if we have more
+      # and start a new job for the next batch if there are more
+      last_batch_id = limited_scope.last&.id
+      if last_batch_id &.< submission_scope.maximum(:id)
+        schedule_resubmit_job(submission_scope.where("id > ?", last_batch_id))
       end
     end
     private_class_method :trigger_plagiarism_resubmit_for
@@ -88,16 +108,16 @@ module DataFixup
         where.not(workflow_state: 'unsubmitted').
         where(submitted_at: start_time..end_time).
         joins(assignment: :assignment_configuration_tool_lookups).
-        preload({assignment: {context: :root_account}, user: :pseudonyms})
+        preload(course: :root_account, assignment: :assignment_configuration_tool_lookups, user: :pseudonyms)
     end
     private_class_method :all_configured_submissions
 
-    def self.context_for_event(submission, canvas_domain)
-      context = Canvas::LiveEvents.amended_context(submission.context)
+    def self.context_for_event(submission)
+      context = Canvas::LiveEvents.amended_context(submission.course)
       context[:job_id] = "manual_plagiarism_resubmit:#{SecureRandom.uuid}"
       context[:user_login] = submission.user.pseudonyms&.first&.unique_id || submission.user.name
       context[:user_account_id] = submission.user.pseudonyms&.first&.global_account_id || submission.user.global_id
-      context[:hostname] = "#{canvas_domain}.instructure.com"
+      context[:hostname] = submission.course.root_account.domain
       context[:context_role] = 'StudentEnrollment'
       context[:producer] = 'canvas'
       context

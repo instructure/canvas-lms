@@ -1820,7 +1820,6 @@ class Assignment < ActiveRecord::Base
   end
 
   def clear_tool_settings_tools
-    assignment_configuration_tool_lookups.where(tool_type: 'Lti::MessageHandler').each(&:destroy_subscription)
     assignment_configuration_tool_lookups.clear
   end
 
