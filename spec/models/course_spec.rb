@@ -6011,3 +6011,23 @@ describe Course, "#show_total_grade_as_points?" do
     end
   end
 end
+
+describe Course, "#has_modules?" do
+  before(:once) do
+    @course = Course.create!
+  end
+
+  it "returns false when the course has no modules" do
+    expect(@course).not_to be_has_modules
+  end
+
+  it "returns false when all modules are soft-deleted" do
+    @course.context_modules.create!(workflow_state: "deleted")
+    expect(@course).not_to be_has_modules
+  end
+
+  it "returns true when at least one not-deleted module exists" do
+    @course.context_modules.create!
+    expect(@course).to be_has_modules
+  end
+end

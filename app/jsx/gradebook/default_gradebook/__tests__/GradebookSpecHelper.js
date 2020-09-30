@@ -70,6 +70,7 @@ export function createGradebook(options = {}) {
         title: 'Emoji Grades'
       }
     ],
+    has_modules: true,
     latePolicyStatusDisabled: false,
     locale: 'en',
     new_gradebook_development_enabled: true,

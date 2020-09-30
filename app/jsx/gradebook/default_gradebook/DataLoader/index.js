@@ -60,7 +60,7 @@ export default class DataLoader {
       gradebook,
 
       getAssignmentGroups: true,
-      getContextModules: true,
+      getModules: gradebook.options.has_modules,
       getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
     })
@@ -130,7 +130,7 @@ export default class DataLoader {
       dataLoader.customColumnsLoader.loadCustomColumns()
     }
 
-    if (options.getContextModules) {
+    if (options.getModules) {
       dataLoader.contextModulesLoader.loadContextModules()
     }
 

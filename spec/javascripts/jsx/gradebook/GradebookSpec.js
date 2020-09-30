@@ -2512,6 +2512,22 @@ test('sets teacherNotesUpdating to true before sending the api request', functio
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
+test('sets contextModulesLoaded to false if there are modules', function() {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: true
+  }).contentLoadStates
+  equal(contextModulesLoaded, false)
+})
+
+test('sets contextModulesLoaded to true if there are no modules', function() {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: false
+  }).contentLoadStates
+  equal(contextModulesLoaded, true)
+})
+
 test('re-renders the view options menu after setting teacherNotesUpdating', function() {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)

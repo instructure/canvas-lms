@@ -342,7 +342,13 @@ class Course < ActiveRecord::Base
 
   def module_based?
     Rails.cache.fetch(['module_based_course', self].cache_key) do
-      self.context_modules.active.any?{|m| m.completion_requirements && !m.completion_requirements.empty? }
+      self.context_modules.active.except(:order).any?{|m| m.completion_requirements && !m.completion_requirements.empty? }
+    end
+  end
+
+  def has_modules?
+    Rails.cache.fetch(['course_has_modules', self].cache_key) do
+      self.context_modules.not_deleted.any?
     end
   end
 

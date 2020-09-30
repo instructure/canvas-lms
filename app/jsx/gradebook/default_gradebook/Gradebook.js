@@ -497,7 +497,7 @@ class Gradebook {
       this.options.settings,
       this.options.colors
     )
-    this.contentLoadStates = getInitialContentLoadStates()
+    this.contentLoadStates = getInitialContentLoadStates(this.options)
     this.actionStates = getInitialActionStates()
     this.headerComponentRefs = {}
     this.filteredContentInfo = {
