@@ -29,7 +29,12 @@ export default class AssignmentGroupsLoader {
 
     const params = {
       exclude_assignment_submission_types: ['wiki_page'],
-      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+      exclude_response_fields: [
+        'description',
+        'in_closed_grading_period',
+        'needs_grading_count',
+        'rubric'
+      ],
       include: [
         'assignment_group_id',
         'assignment_visibility',

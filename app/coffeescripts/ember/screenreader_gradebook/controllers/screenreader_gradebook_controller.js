@@ -645,7 +645,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
   subtotal_by_period: false,
 
   fetchAssignmentGroups: function() {
-    const params = {exclude_response_fields: ['in_closed_grading_period']}
+    const params = {exclude_response_fields: ['in_closed_grading_period', 'rubric']}
     const gpId = this.get('selectedGradingPeriod.id')
     if (this.get('has_grading_periods') && gpId !== '0') {
       params.grading_period_id = gpId
