@@ -1015,6 +1015,14 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
+    context 'with Quizzes::QuizSubmissionEvent' do
+      it_behaves_like 'a datafixup that populates root_account_id' do
+        let(:quiz_submission) { quiz_with_submission }
+        let(:record) { quiz_submission.record_creation_event }
+        let(:reference_record) { record.quiz_submission }
+      end
+    end
+
     context 'with RoleOverride' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { RoleOverride.create!(account: reference_record, role: Role.first) }

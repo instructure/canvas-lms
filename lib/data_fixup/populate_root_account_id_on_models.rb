@@ -115,6 +115,7 @@ module DataFixup::PopulateRootAccountIdOnModels
       Quizzes::QuizGroup => :quiz,
       Quizzes::QuizQuestion => :quiz,
       Quizzes::QuizSubmission => :quiz,
+      Quizzes::QuizSubmissionEvent => :quiz_submission,
       Role => :account,
       RoleOverride => :account,
       Rubric => :context,
