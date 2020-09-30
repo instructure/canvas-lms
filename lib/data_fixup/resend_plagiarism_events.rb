@@ -54,7 +54,7 @@ module DataFixup
         {
           priority: Delayed::LOWER_PRIORITY,
           strand: "plagiarism_event_resend",
-          run_at: (run_at &.+ wait_time.seconds.from_now) || Time.zone.now
+          run_at: (run_at &.+ wait_time.seconds) || Time.zone.now
         },
         scope
       )
