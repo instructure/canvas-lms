@@ -58,14 +58,17 @@ describe "Exportable" do
     end
 
     it "should create an epub file" do
+      skip 'PHO-409 (9/30/2020)'
       expect(epub).not_to be_nil
     end
 
     it "should create a zip file" do
+      skip 'PHO-409 (9/30/2020)'
       expect(zip).not_to be_nil
     end
 
     it "creates a zip file whose name includes the cartridge's name" do
+      skip 'PHO-409 (9/30/2020)'
       expect(zip_path).to include('unicode-filename-test')
     end
 
