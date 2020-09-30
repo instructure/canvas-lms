@@ -382,7 +382,7 @@ class GradebookExporter
 
   def select_in_grading_period(assignments)
     if grading_period
-      grading_period.assignments(assignments)
+      grading_period.assignments(@course, assignments)
     else
       assignments
     end

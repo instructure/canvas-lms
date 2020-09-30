@@ -44,6 +44,7 @@ describe AssignmentGroupsController do
         student_override = assignment_with_override.assignment_overrides.new.tap do |override|
           override.title = 'feb override'
           override.due_at = Time.zone.local(2015, 2, 15)
+          override.due_at_overridden = true
         end
         student_override.save!
         student_override.assignment_override_students.create!(user: student)
@@ -52,6 +53,7 @@ describe AssignmentGroupsController do
       let(:student) do
         dora = User.create!(name: "Dora")
         course_with_student(course: course, user: dora, active_enrollment: true)
+        course_with_student(course: course, user: User.create!, active_enrollment: true)
         dora
       end
 

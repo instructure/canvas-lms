@@ -181,7 +181,7 @@ class GradebooksController < ApplicationController
 
       if grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
-        visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
+        visible_assignments = current_period.assignments_for_student(@context, visible_assignments, opts[:student])
       end
 
       visible_assignments.map! do |a|
@@ -1047,7 +1047,10 @@ class GradebooksController < ApplicationController
   def grading_period_assignments
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    grading_period_assignments = GradebookGradingPeriodAssignments.new(@context, gradebook_settings(@context.global_id))
+    grading_period_assignments = GradebookGradingPeriodAssignments.new(
+      @context,
+      course_settings: gradebook_settings(@context.global_id)
+    )
     render json: { grading_period_assignments: grading_period_assignments.to_h }
   end
 
