@@ -90,9 +90,8 @@ export default function(ed, document) {
             onUploadComplete={(err, data) =>
               handleUpload(err, data, contentProps.mediaUploadComplete)
             }
-            onEmbed={embedCode => Bridge.insertEmbedCode(embedCode)}
             onDismiss={handleDismiss}
-            tabs={{embed: true, record: true, upload: true}}
+            tabs={{record: true, upload: true}}
             uploadMediaTranslations={uploadMediaTranslations}
           />
         )}

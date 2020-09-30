@@ -73,7 +73,7 @@ export default class EditorConfig {
       directionality: getDirection(),
       plugins: `autolink,media,paste,table,lists,${
         window.ENV.use_rce_enhancements
-          ? 'hr,fullscreen,instructure-ui-icons,instructure_condensed_buttons,instructure_documents,instructure_html_view'
+          ? 'hr,fullscreen,instructure-ui-icons,instructure_condensed_buttons,instructure_documents,instructure_html_view,instructure_media_embed'
           : 'textcolor'
       },link,directionality,a11y_checker,wordcount`,
       external_plugins: {

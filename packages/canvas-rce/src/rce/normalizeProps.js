@@ -76,7 +76,7 @@ export default function(props, tinymce, MutationObserver) {
 function configureMenus(editorOptions, instRecordDisabled) {
   const insertMenuItems = [
     ['instructure_links', 'instructure_image', 'instructure_document'],
-    ['instructure_equation', 'inserttable'],
+    ['instructure_equation', 'inserttable', 'instructure_media_embed'],
     ['hr']
   ]
   if (!instRecordDisabled) {

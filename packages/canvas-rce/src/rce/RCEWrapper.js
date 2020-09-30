@@ -1081,7 +1081,7 @@ class RCEWrapper extends React.Component {
         },
         {
           name: formatMessage('Miscellaneous'),
-          items: ['removeformat', 'table', 'instructure_equation']
+          items: ['removeformat', 'table', 'instructure_equation', 'instructure_media_embed']
         }
       ],
       contextmenu: '', // show the browser's native context menu

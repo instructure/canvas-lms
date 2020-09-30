@@ -63,7 +63,7 @@ describe('Rce normalizeProps', () => {
       assert.strictEqual(normalized.editorOptions.menubar, 'edit view insert format tools table')
       assert.strictEqual(
         normalized.editorOptions.menu.insert.items,
-        'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable | hr'
+        'instructure_links instructure_image instructure_media instructure_document | instructure_equation inserttable instructure_media_embed | hr'
       )
     })
 
@@ -73,7 +73,7 @@ describe('Rce normalizeProps', () => {
       assert.strictEqual(normalized.editorOptions.menubar, 'edit view insert format tools table')
       assert.strictEqual(
         normalized.editorOptions.menu.insert.items,
-        'instructure_links instructure_image instructure_document | instructure_equation inserttable | hr'
+        'instructure_links instructure_image instructure_document | instructure_equation inserttable instructure_media_embed | hr'
       )
     })
   })

@@ -186,6 +186,10 @@ module RCENextPage
     )
   end
 
+  def embed_toolbar_button
+    possibly_hidden_toolbar_button('button[title="Embed"]')
+  end
+
   def document_toolbar_button
     possibly_hidden_toolbar_button('[role="button"][aria-label="Documents"]')
   end
@@ -429,11 +433,15 @@ module RCENextPage
   end
 
   def embed_code_textarea
-    f('textarea[placeholder="Embed Code"]')
+    fj('label:contains("Embed Code")')
   end
 
   def upload_media_submit_button
     f('[aria-label="Upload Media"] button[type="submit"]')
+  end
+
+  def embed_submit_button
+    f('[aria-label="Embed"] button[type="submit"]')
   end
 
   def tiny_rce_ifr_id
@@ -566,6 +574,10 @@ module RCENextPage
     media_toolbar_button.click
   end
 
+  def click_embed_toolbar_button
+    embed_toolbar_button.click
+  end
+
   def click_media_toolbar_menu_button
     media_toolbar_menu_button.click
   end
@@ -596,11 +608,6 @@ module RCENextPage
   def click_upload_media
     upload_media_button.click
     wait_for_ajaximations
-  end
-
-  def click_embed_media_tab
-    fj('[role="tab"]:contains("Embed")').click
-    wait_for_animations
   end
 
   def click_course_media
@@ -742,6 +749,10 @@ module RCENextPage
 
   def click_upload_media_submit_button
     upload_media_submit_button.click
+  end
+
+  def click_embed_submit_button
+    embed_submit_button.click
   end
 
   def switch_to_html_view

@@ -49,6 +49,7 @@ import './plugins/instructure_record/plugin'
 import './plugins/instructure_links/plugin'
 import './plugins/instructure_documents/plugin'
 import './plugins/instructure_html_view/plugin'
+import './plugins/instructure_media_embed/plugin'
 
 // prevent tinymce from loading language scripts with explicit
 // language_url of 'none'

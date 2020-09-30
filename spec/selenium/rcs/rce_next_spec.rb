@@ -807,13 +807,11 @@ describe 'RCE next tests', ignore_js_errors: true do
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       visit_front_page_edit(@course)
 
-      click_media_toolbar_menu_button
-      click_upload_media
-      click_embed_media_tab
+      click_embed_toolbar_button
       code_box = embed_code_textarea
       code_box.click
       code_box.send_keys('<iframe src="https://example.com/"></iframe>')
-      click_upload_media_submit_button
+      click_embed_submit_button
       wait_for_animations
 
       fj('button:contains("Save")').click
@@ -822,7 +820,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       expect(f('iframe[title="embedded content"][src="https://example.com/"]')).to be_displayed # save the page
     end
 
-    it 'should not load duplicate data when opening sidbar tray multiple times' do
+    it 'should not load duplicate data when opening sidebar tray multiple times' do
       user_attachment = @user.attachments.build(filename: 'myimage.png', context: @student)
       user_attachment.content_type = 'image/png'
       user_attachment.save!

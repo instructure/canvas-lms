@@ -32,12 +32,10 @@ import {StoreProvider} from '../../shared/StoreContext'
 
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
 const ComputerPanel = React.lazy(() => import('../../shared/Upload/ComputerPanel'))
-const EmbedPanel = React.lazy(() => import('./EmbedPanel'))
 
 export const PANELS = {
   COMPUTER: 0,
-  RECORD: 1,
-  EMBED: 2
+  RECORD: 1
 }
 
 const ALERT_TIMEOUT = 5000
@@ -65,22 +63,9 @@ const ACCEPTED_FILE_TYPES = [
 ]
 
 export const handleSubmit = (editor, selectedPanel, uploadData, saveMediaRecording, onDismiss) => {
-  switch (selectedPanel) {
-    case PANELS.COMPUTER: {
-      const {theFile} = uploadData
-      saveMediaRecording('media', theFile)
-      onDismiss()
-      break
-    }
-    case PANELS.EMBED: {
-      const {embedCode} = uploadData
-      editor.insertContent(embedCode)
-      onDismiss()
-      break
-    }
-    default:
-      throw new Error('Selected Panel is invalid') // Should never get here
-  }
+  const {theFile} = uploadData
+  saveMediaRecording('media', theFile)
+  onDismiss()
 }
 
 function renderLoading() {
@@ -114,7 +99,6 @@ export function UploadMedia(props) {
   const [hasUploadedFile, setHasUploadedFile] = useState(false)
   const [selectedPanel, setSelectedPanel] = useState(0)
   const trayProps = Bridge.trayProps.get(props.editor)
-  const [embedCode, setEmbedCode] = useState('')
 
   return (
     <StoreProvider {...trayProps}>
@@ -183,21 +167,6 @@ export function UploadMedia(props) {
                   />
                 </Suspense>
               </Tabs.Panel>
-              <Tabs.Panel title={formatMessage('Embed')}>
-                <Suspense
-                  fallback={
-                    <View as="div" height="100%" width="100%" textAlign="center">
-                      <Spinner
-                        renderTitle={renderLoadingMedia}
-                        size="large"
-                        margin="0 0 0 medium"
-                      />
-                    </View>
-                  }
-                >
-                  <EmbedPanel embedCode={embedCode} setEmbedCode={setEmbedCode} />
-                </Suspense>
-              </Tabs.Panel>
             </Tabs>
           </Modal.Body>
           {selectedPanel !== PANELS.RECORD && (
@@ -209,7 +178,7 @@ export function UploadMedia(props) {
                   handleSubmit(
                     props.editor,
                     selectedPanel,
-                    {embedCode, theFile},
+                    {theFile},
                     contentProps.saveMediaRecording,
                     props.onDismiss
                   )
