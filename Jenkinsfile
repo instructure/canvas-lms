@@ -217,6 +217,14 @@ def getDependenciesPatchsetImage() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.dependenciesPatchsetImageDefault() : imageTag.dependenciesPatchsetImage()
 }
 
+def getMergeTag() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.mergeTagDefault() : imageTag.mergeTag()
+}
+
+def getExternalTag() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.externalTagDefault() : imageTag.externalTag()
+}
+
 def getDependenciesImage() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.dependenciesImageDefault() : configuration.dependenciesImage()
 }
@@ -232,7 +240,6 @@ pipeline {
   environment {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
-    NAME = imageTagVersion()
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
     BUILD_IMAGE = getBuildImage()
     POSTGRES = configuration.postgres()
@@ -250,10 +257,10 @@ pipeline {
     PUBLISHABLE_TAG = getPublishableTag()
 
     // e.g. canvas-lms:master when not on another branch
-    MERGE_TAG = "$BUILD_IMAGE:$GERRIT_BRANCH"
+    MERGE_TAG = getMergeTag();
 
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
-    EXTERNAL_TAG = "$BUILD_IMAGE:$NAME"
+    EXTERNAL_TAG = getExternalTag();
 
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
