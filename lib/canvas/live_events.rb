@@ -351,6 +351,10 @@ module Canvas::LiveEvents
     event
   end
 
+  def self.submission_event(event_type, submission)
+    post_event_stringified(event_type, get_submission_data(submission), amended_context(submission.context))
+  end
+
   def self.get_attachment_data(attachment)
     {
       attachment_id: attachment.global_id,
@@ -368,11 +372,11 @@ module Canvas::LiveEvents
   end
 
   def self.submission_created(submission)
-    post_event_stringified('submission_created', get_submission_data(submission))
+    submission_event('submission_created', submission)
   end
 
   def self.submission_updated(submission)
-    post_event_stringified('submission_updated', get_submission_data(submission))
+    submission_event('submission_updated', submission)
   end
 
   def self.submission_comment_created(comment)
@@ -388,7 +392,7 @@ module Canvas::LiveEvents
   end
 
   def self.plagiarism_resubmit(submission)
-    post_event_stringified('plagiarism_resubmit', get_submission_data(submission))
+    submission_event('plagiarism_resubmit', submission)
   end
 
   def self.get_user_data(user)
