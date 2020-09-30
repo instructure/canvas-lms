@@ -36,6 +36,17 @@ describe Canvas::LiveEvents do
     allow(LiveEvents).to receive(:get_context).and_return({compact_live_events: true})
   end
 
+  let(:course_context) do
+    hash_including(
+      root_account_uuid: @course.root_account.uuid,
+      root_account_id: @course.root_account.global_id.to_s,
+      root_account_lti_guid: @course.root_account.lti_guid.to_s,
+      context_id: @course.global_id.to_s,
+      context_type: 'Course'
+    )
+  end
+
+
   class FakeSettings
     def call
       {
@@ -294,16 +305,6 @@ describe Canvas::LiveEvents do
       @course = Course.create!
     end
 
-    let(:course_context) do
-      hash_including(
-        root_account_uuid: @course.root_account.uuid,
-        root_account_id: @course.root_account.global_id.to_s,
-        root_account_lti_guid: @course.root_account.lti_guid.to_s,
-        context_id: @course.global_id.to_s,
-        context_type: 'Course'
-      )
-    end
-
     it 'should include the course context, current scores and old scores' do
       enrollment_model
       score = Score.new(
@@ -329,16 +330,6 @@ describe Canvas::LiveEvents do
   end
 
   describe ".grade_changed" do
-    let(:course_context) do
-      hash_including(
-        root_account_uuid: @course.root_account.uuid,
-        root_account_id: @course.root_account.global_id.to_s,
-        root_account_lti_guid: @course.root_account.lti_guid.to_s,
-        context_id: @course.global_id.to_s,
-        context_type: 'Course'
-      )
-    end
-
     it "should set the grader to nil for an autograded quiz" do
       quiz_with_graded_submission([])
 
@@ -561,7 +552,8 @@ describe Canvas::LiveEvents do
             lti_user_id: @student.lti_context_id,
             assignment_id: submission.global_assignment_id.to_s,
             lti_assignment_id: submission.assignment.lti_context_id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_created(submission)
       end
 
@@ -571,7 +563,8 @@ describe Canvas::LiveEvents do
         expect_event('submission_created',
           hash_including(
             group_id: group.id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_created(submission)
       end
 
@@ -595,7 +588,8 @@ describe Canvas::LiveEvents do
           expect_event('submission_created',
             hash_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.submission_created(submission)
         end
 
@@ -606,7 +600,8 @@ describe Canvas::LiveEvents do
           expect_event('submission_created',
             hash_not_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.submission_created(submission)
         end
       end
@@ -620,7 +615,8 @@ describe Canvas::LiveEvents do
             lti_user_id: @student.lti_context_id,
             assignment_id: submission.global_assignment_id.to_s,
             lti_assignment_id: submission.assignment.lti_context_id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_updated(submission)
       end
 
@@ -630,7 +626,8 @@ describe Canvas::LiveEvents do
         expect_event('submission_updated',
           hash_including(
             group_id: group.id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_updated(submission)
       end
 
@@ -641,7 +638,8 @@ describe Canvas::LiveEvents do
           hash_including(
             late: false,
             missing: true
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_updated(submission)
       end
 
@@ -652,7 +650,8 @@ describe Canvas::LiveEvents do
         expect_event('submission_updated',
           hash_including(
             posted_at: post_time,
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.submission_updated(submission)
       end
 
@@ -676,7 +675,8 @@ describe Canvas::LiveEvents do
           expect_event('submission_updated',
             hash_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.submission_updated(submission)
         end
 
@@ -687,7 +687,8 @@ describe Canvas::LiveEvents do
           expect_event('submission_updated',
             hash_not_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.submission_updated(submission)
         end
       end
@@ -708,7 +709,7 @@ describe Canvas::LiveEvents do
         expect_event('submission_updated',
           hash_including(
             :submission_id
-          )).exactly(3).times
+          ), course_context).exactly(3).times
 
         Canvas::LiveEvents.submissions_bulk_updated(submissions)
       end
@@ -718,15 +719,15 @@ describe Canvas::LiveEvents do
           expect_event('submission_updated',
             hash_including(
               submission_id: submissions.first.global_id.to_s
-            )).ordered
+            ), course_context).ordered
           expect_event('submission_updated',
             hash_including(
               submission_id: submissions.second.global_id.to_s
-            )).ordered
+            ), course_context).ordered
           expect_event('submission_updated',
             hash_including(
               submission_id: submissions.third.global_id.to_s
-            )).ordered
+            ), course_context).ordered
 
           Canvas::LiveEvents.submissions_bulk_updated(submissions)
         end
@@ -759,7 +760,8 @@ describe Canvas::LiveEvents do
             lti_user_id: @student.lti_context_id,
             assignment_id: submission.global_assignment_id.to_s,
             lti_assignment_id: submission.assignment.lti_context_id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.plagiarism_resubmit(submission)
       end
 
@@ -769,7 +771,8 @@ describe Canvas::LiveEvents do
         expect_event('plagiarism_resubmit',
           hash_including(
             group_id: group.id.to_s
-          ))
+          ),
+          course_context)
         Canvas::LiveEvents.plagiarism_resubmit(submission)
       end
 
@@ -793,7 +796,8 @@ describe Canvas::LiveEvents do
           expect_event('plagiarism_resubmit',
             hash_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.plagiarism_resubmit(submission)
         end
 
@@ -804,7 +808,8 @@ describe Canvas::LiveEvents do
           expect_event('plagiarism_resubmit',
             hash_not_including(
               associated_integration_id: "turnitin.com-turnitin-lti"
-            ))
+            ),
+            course_context)
           Canvas::LiveEvents.plagiarism_resubmit(submission)
         end
       end
