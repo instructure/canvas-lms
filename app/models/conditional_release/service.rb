@@ -100,7 +100,7 @@ module ConditionalRelease
           points_possible: assignment.points_possible,
           grading_type: assignment.grading_type,
           submission_types: assignment.submission_types,
-          grading_scheme: (assignment.grading_scheme if assignment.uses_grading_standard)
+          grading_scheme: assignment.grading_scheme
         }
       end
 

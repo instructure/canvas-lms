@@ -83,17 +83,19 @@ describe ConditionalRelease::Service do
     end
 
     it 'includes a grading scheme when assignment uses it' do
-      assignment_model course: @course, grading_type: 'letter_grade'
+      standard = grading_standard_for(@course)
+      assignment_model course: @course, grading_type: 'letter_grade', grading_standard: standard
       env = Service.env_for(@course, @student, assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
-      expect(cr_env[:assignment][:grading_scheme]).not_to be_nil
+      expect(cr_env[:assignment][:grading_scheme]).to eq standard.grading_scheme
     end
 
-    it 'does not include a grading scheme when the assignment does not use it' do
+    it 'includes a default grading scheme even when the assignment does not use it' do
+      standard = grading_standard_for(@course)
       assignment_model course: @course, grading_type: 'points'
       env = Service.env_for(@course, @student, assignment: @assignment)
       cr_env = env[:CONDITIONAL_RELEASE_ENV]
-      expect(cr_env[:assignment][:grading_scheme]).to be_nil
+      expect(cr_env[:assignment][:grading_scheme]).to eq GradingStandard.default_instance.grading_scheme
     end
 
     it 'includes a relevant rule if includes :rule' do
