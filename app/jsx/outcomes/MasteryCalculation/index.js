@@ -58,20 +58,24 @@ const MasteryCalculation = ({contextType, contextId}) => {
   }
   const {outcomeCalculationMethod} = data.account
   const roles = ENV.PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES || []
+  const canManage = ENV.PERMISSIONS.manage_proficiency_calculations
   return (
     <>
-      <RoleList
-        description={I18n.t(
-          'Permission to change this mastery calculation is enabled at the account level for:'
-        )}
-        roles={roles}
-      />
+      {canManage && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery calculation is enabled at the account level for:'
+          )}
+          roles={roles}
+        />
+      )}
       <ProficiencyCalculation
         contextType={contextType}
         contextId={contextId}
         method={outcomeCalculationMethod || undefined} // send undefined when value is null
         update={setCalculationMethod}
         updateError={setCalculationMethodError}
+        canManage={canManage}
       />
     </>
   )

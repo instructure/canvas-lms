@@ -15,6 +15,12 @@
     padding-#{direction(left)}: 16px;
     padding-top: 10px;
   }
+
+  &.view-only {
+    @include desktop-only {
+      padding-top: 2px;
+    }
+  }
 }
 
 .delete {
@@ -65,6 +71,12 @@
     padding-#{direction(left)}: 8px;
     padding-top: 6px;
   }
+
+  &.view-only {
+    @include mobile-only {
+      padding-top: 0;
+    }
+  }
 }
 
 .header {
@@ -84,5 +96,11 @@
     padding-top: 12px;
     justify-content: space-between;
     display: flex;
+  }
+
+  &.view-only {
+    @include mobile-only {
+      margin-#{direction(left)}: -1px;
+    }
   }
 }

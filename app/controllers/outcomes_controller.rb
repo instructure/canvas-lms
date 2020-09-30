@@ -45,7 +45,9 @@ class OutcomesController < ApplicationController
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),
              :manage_courses => @context.grants_right?(@current_user, session, :manage_courses),
-             :import_outcomes => @context.grants_right?(@current_user, session, :import_outcomes)
+             :import_outcomes => @context.grants_right?(@current_user, session, :import_outcomes),
+             :manage_proficiency_scales => @context.grants_right?(@current_user, session, :manage_proficiency_scales),
+             :manage_proficiency_calculations => @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
            })
 
     set_tutorial_js_env

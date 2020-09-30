@@ -574,4 +574,17 @@ const ColorPicker = createReactClass({
     return this.props.nonModal ? body : this.modalWrapping(body)
   }
 })
+
+ColorPicker.getColorName = colorHex => {
+  const colorWithoutHash = colorHex.replace('#', '')
+
+  const definedColor = PREDEFINED_COLORS.find(
+    color => color.hexcode.replace('#', '') === colorWithoutHash
+  )
+
+  if (definedColor) {
+    return definedColor.name
+  }
+}
+
 export default ColorPicker

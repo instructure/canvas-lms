@@ -28,7 +28,10 @@ describe('MasteryScale', () => {
     window.ENV = {
       PROFICIENCY_SCALES_ENABLED_ROLES: [
         {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
-      ]
+      ],
+      PERMISSIONS: {
+        manage_proficiency_scales: true
+      }
     }
   })
 
@@ -166,6 +169,30 @@ describe('MasteryScale', () => {
         expect(request).not.toBeUndefined()
         expect(request.config.url).toEqual('/api/v1/accounts/11/outcome_proficiency')
       })
+    })
+  })
+
+  describe('can not manage', () => {
+    beforeEach(() => {
+      window.ENV.PERMISSIONS = {
+        manage_proficiency_scales: false
+      }
+    })
+
+    afterEach(() => {
+      window.ENV.PERMISSIONS = null
+    })
+
+    it('hides role list', async () => {
+      const {getByText, queryByText} = render(
+        <MockedProvider mocks={mocks}>
+          <MasteryScale contextType="Account" contextId="11" />
+        </MockedProvider>
+      )
+      expect(getByText('Loading')).not.toEqual(null)
+      await wait()
+      expect(queryByText(/Permission to change this mastery calculation/)).not.toBeInTheDocument()
+      expect(queryByText(/Account Admin/)).not.toBeInTheDocument()
     })
   })
 })
