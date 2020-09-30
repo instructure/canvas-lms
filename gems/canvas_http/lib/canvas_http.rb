@@ -22,12 +22,19 @@ require 'canvas_http/circuit_breaker'
 require 'logger'
 
 module CanvasHttp
-  class Error < ::StandardError; end
+  class Error < ::StandardError
+    attr_reader :body
+
+    def initialize(body = nil)
+      @body = body
+    end
+  end
+
   class TooManyRedirectsError < CanvasHttp::Error; end
   class InvalidResponseCodeError < CanvasHttp::Error
     attr_reader :code
-    def initialize(code)
-      super()
+    def initialize(code, body = nil)
+      super(body)
       @code = code
     end
   end

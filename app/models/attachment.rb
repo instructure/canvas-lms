@@ -39,6 +39,8 @@ class Attachment < ActiveRecord::Base
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state root_account_id}
 
+  CLONING_ERROR_TYPE = 'attachment_clone_url'.freeze
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -1907,6 +1909,19 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def clone_url_error_info(error, url)
+    {
+      tags: {
+        type: CLONING_ERROR_TYPE
+      },
+      extra: {
+        http_status_code: error.try(:code),
+        body: error.try(:body),
+        url: url
+      }.compact
+    }
+  end
+
   def clone_url(url, duplicate_handling, check_quota, opts={})
     begin
       Attachment.clone_url_as_attachment(url, :attachment => self)
@@ -1935,6 +1950,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
       when CanvasHttp::InvalidResponseCodeError
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
+        Canvas::Errors.capture(e, clone_url_error_info(e, url))
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
       when URI::Error, ArgumentError
@@ -1946,6 +1962,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
       else
         self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
+        Canvas::Errors.capture(e, clone_url_error_info(e, url))
       end
 
       if opts[:progress]
@@ -2055,7 +2072,22 @@ class Attachment < ActiveRecord::Base
         end
         return attachment
       else
-        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i)
+        # Grab the first part of the body for error reporting
+        # Just read the first chunk of the body in case it's huge
+        body_head = nil
+
+        begin
+          http_response.read_body do |chunk|
+            body_head = "#{chunk}..." if chunk.present?
+            break
+          end
+        rescue
+          # If an error occured reading the body, don't worry
+          # about attempting to report it
+          body_head = nil
+        end
+
+        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
       end
     end
   end

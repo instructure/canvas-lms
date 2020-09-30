@@ -789,7 +789,10 @@ RSpec.configure do |config|
       @headers = headers
     end
 
-    def read_body(io)
+    def read_body(io = nil)
+      return yield(@body) if block_given?
+      return if io.nil?
+
       io << @body
     end
 
