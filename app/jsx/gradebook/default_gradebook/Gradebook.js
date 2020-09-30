@@ -203,6 +203,7 @@ class Gradebook {
     this.updateSubmissionsFromExternal = this.updateSubmissionsFromExternal.bind(this)
     this.submissionsForStudent = this.submissionsForStudent.bind(this)
     this.calculateStudentGrade = this.calculateStudentGrade.bind(this)
+    this.getStudentGrades = this.getStudentGrades.bind(this)
     // SlickGrid doesn't have a blur event for the grid, so this mimics it in
     // conjunction with a click listener on <body />. When we 'blur' the grid
     // by clicking outside of it, save the current field.
@@ -283,6 +284,8 @@ class Gradebook {
     this.updateRowCellsForStudentIds = this.updateRowCellsForStudentIds.bind(this)
     this.invalidateRowsForStudentIds = this.invalidateRowsForStudentIds.bind(this)
     this.updateTotalGradeColumn = this.updateTotalGradeColumn.bind(this)
+    this.updateAllTotalColumns = this.updateAllTotalColumns.bind(this)
+    this.updateColumnWithId = this.updateColumnWithId.bind(this)
 
     // # Gradebook Bulk UI Update Methods
     this.updateColumns = this.updateColumns.bind(this)
@@ -334,6 +337,7 @@ class Gradebook {
     // # Gradebook Application State Methods
     this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
     this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
+    this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
     this.setAssignmentGroupsLoaded = this.setAssignmentGroupsLoaded.bind(this)
     this.setContextModulesLoaded = this.setContextModulesLoaded.bind(this)
@@ -507,6 +511,7 @@ class Gradebook {
     this.students = {}
     this.studentViewStudents = {}
     this.courseContent.students = new StudentDatastore(this.students, this.studentViewStudents)
+    this.calculatedGradesByStudentId = {}
     this.initPostGradesStore()
     this.initPostGradesLtis()
     return this.checkForUploadComplete()
@@ -1444,49 +1449,51 @@ class Gradebook {
     })
   }
 
-  calculateStudentGrade(student) {
-    let assignmentGroupId,
-      grade,
-      grades,
-      group,
-      hasGradingPeriods,
-      j,
-      len,
-      ref1,
-      ref2,
-      submissionData
-    if (student.loaded && student.initialized) {
-      hasGradingPeriods = this.gradingPeriodSet && this.effectiveDueDates
-      grades = CourseGradeCalculator.calculate(
-        this.submissionsForStudent(student),
-        this.assignmentGroups,
-        this.options.group_weighting_scheme,
-        hasGradingPeriods ? this.gradingPeriodSet : undefined,
-        hasGradingPeriods
-          ? EffectiveDueDates.scopeToUser(this.effectiveDueDates, student.id)
-          : undefined
-      )
-      if (this.isFilteringColumnsByGradingPeriod()) {
-        grades = grades.gradingPeriods[this.getGradingPeriodToShow()]
-      }
-      ref1 = this.assignmentGroups
-      for (assignmentGroupId in ref1) {
-        group = ref1[assignmentGroupId]
-        grade = grades.assignmentGroups[assignmentGroupId]
-        grade = (grade != null ? grade.current : undefined) || {
-          score: 0,
-          possible: 0,
-          submissions: []
-        }
-        student[`assignment_group_${assignmentGroupId}`] = grade
-        ref2 = grade.submissions
-        for (j = 0, len = ref2.length; j < len; j++) {
-          submissionData = ref2[j]
-          submissionData.submission.drop = submissionData.drop
-        }
-      }
-      return (student.total_grade = grades.current)
+  getStudentGrades(student, preferCachedGrades) {
+    if (preferCachedGrades && this.calculatedGradesByStudentId[student.id] != null) {
+      return this.calculatedGradesByStudentId[student.id]
     }
+
+    const hasGradingPeriods = this.gradingPeriodSet && this.effectiveDueDates
+    const grades = CourseGradeCalculator.calculate(
+      this.submissionsForStudent(student),
+      this.assignmentGroups,
+      this.options.group_weighting_scheme,
+      hasGradingPeriods ? this.gradingPeriodSet : undefined,
+      hasGradingPeriods
+        ? EffectiveDueDates.scopeToUser(this.effectiveDueDates, student.id)
+        : undefined
+    )
+    this.calculatedGradesByStudentId[student.id] = grades
+
+    return grades
+  }
+
+  calculateStudentGrade(student, preferCachedGrades = false) {
+    if (!(student.loaded && student.initialized)) {
+      return null
+    }
+
+    let grades = this.getStudentGrades(student, preferCachedGrades)
+    if (this.isFilteringColumnsByGradingPeriod()) {
+      grades = grades.gradingPeriods[this.getGradingPeriodToShow()]
+    }
+
+    const scoreType = this.viewUngradedAsZero() ? 'final' : 'current'
+    Object.keys(this.assignmentGroups).forEach(assignmentGroupId => {
+      let grade = grades.assignmentGroups[assignmentGroupId]
+      grade = grade?.[scoreType] || {
+        score: 0,
+        possible: 0,
+        submissions: []
+      }
+      student[`assignment_group_${assignmentGroupId}`] = grade
+
+      grade.submissions.forEach(submissionData => {
+        submissionData.submission.drop = submissionData.drop
+      })
+    })
+    student.total_grade = grades[scoreType]
   }
 
   // # Grid Styling Methods
@@ -3019,13 +3026,23 @@ class Gradebook {
   }
 
   updateTotalGradeColumn() {
+    this.updateColumnWithId('total_grade')
+  }
+
+  updateAllTotalColumns() {
+    this.updateTotalGradeColumn()
+
+    Object.keys(this.assignmentGroups).forEach(assignmentGroupId => {
+      this.updateColumnWithId(`assignment_group_${assignmentGroupId}`)
+    })
+  }
+
+  updateColumnWithId(id) {
     let j, len, rowIndex
     if (this.gradebookGrid.grid == null) {
       return
     }
-    const columnIndex = this.gradebookGrid.grid.getColumns().findIndex(column => {
-      return column.type === 'total_grade'
-    })
+    const columnIndex = this.gradebookGrid.grid.getColumns().findIndex(column => column.id === id)
     if (columnIndex === -1) {
       return
     }
@@ -3499,6 +3516,11 @@ class Gradebook {
     const toggleableAction = () => {
       this.gridDisplaySettings.viewUngradedAsZero = !this.gridDisplaySettings.viewUngradedAsZero
       this.updateColumnsAndRenderViewOptionsMenu()
+
+      this.courseContent.students.listStudents().forEach(student => {
+        this.calculateStudentGrade(student, true)
+      })
+      this.updateAllTotalColumns()
     }
     toggleableAction()
     this.saveSettings(

@@ -418,7 +418,7 @@ test('calculates grades without grading period data when effective due dates are
   equal(typeof args[4], 'undefined')
 })
 
-test('stores the current grade on the student', function() {
+test('stores the current grade on the student if not viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -430,7 +430,21 @@ test('stores the current grade on the student', function() {
   equal(student.total_grade, this.exampleGrades.current)
 })
 
-test('stores the current grade from the selected grading period', function() {
+test('stores the final grade on the student if viewing ungraded as zero', function() {
+  const gradebook = this.createGradebook()
+  gradebook.courseFeatures.allowViewUngradedAsZero = true
+  gradebook.gridDisplaySettings.viewUngradedAsZero = true
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+  gradebook.calculateStudentGrade(student)
+  equal(student.total_grade, this.exampleGrades.final)
+})
+
+test('stores the current grade from the selected grading period if not viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
@@ -441,6 +455,51 @@ test('stores the current grade from the selected grading period', function() {
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
+})
+
+test('stores the final grade from the selected grading period if viewing ungraded as zero', function() {
+  const gradebook = this.createGradebook()
+  gradebook.courseFeatures.allowViewUngradedAsZero = true
+  gradebook.gridDisplaySettings.viewUngradedAsZero = true
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+  gradebook.calculateStudentGrade(student)
+  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
+})
+
+test('does not repeat the calculation if cached and preferCachedGrades is true', function() {
+  const gradebook = this.createGradebook()
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+
+  gradebook.calculateStudentGrade(student)
+  gradebook.calculateStudentGrade(student, true)
+
+  strictEqual(CourseGradeCalculator.calculate.callCount, 1)
+})
+
+test('does perform the calculation if preferCachedGrades is true and no cached value exists', function() {
+  const gradebook = this.createGradebook()
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+
+  gradebook.calculateStudentGrade(student, true)
+  strictEqual(CourseGradeCalculator.calculate.callCount, 1)
 })
 
 test('does not calculate when the student is not loaded', function() {
@@ -9437,6 +9496,92 @@ QUnit.module('Gradebook#getSubmission', hooks => {
 
   test('returns undefined when the student is not present', () => {
     strictEqual(gradebook.getSubmission('2202', '201'), undefined)
+  })
+})
+
+QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      },
+      settings: {
+        allow_view_ungraded_as_zero: 'true'
+      }
+    })
+
+    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
+      callback()
+    })
+  })
+
+  test('toggles viewUngradedAsZero to true when false', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, true)
+  })
+
+  test('toggles viewUngradedAsZero to false when true', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, false)
+  })
+
+  test('calls updateColumnsAndRenderViewOptionsMenu after toggling', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
+    const stubFn = sandbox
+      .stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      .callsFake(() => {
+        strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, false)
+      })
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(stubFn.callCount, 1)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleViewUngradedAsZero()
+
+    deepEqual(gradebook.saveSettings.firstCall.args[0], {
+      viewUngradedAsZero: true
+    })
+  })
+
+  test('calls calculateStudentGrade once for each student', () => {
+    const allStudents = [
+      {id: '1101', assignment_201: {}, assignment_202: {}},
+      {id: '1102', assignment_201: {}}
+    ]
+    sandbox.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents)
+
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    sandbox.stub(gradebook, 'calculateStudentGrade')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.calculateStudentGrade.callCount, 2)
+  })
+
+  test('calls updateAllTotalColumns', () => {
+    gradebook.students = {
+      1101: {id: '1101', assignment_201: {}, assignment_202: {}},
+      1102: {id: '1102', assignment_201: {}}
+    }
+
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    sandbox.stub(gradebook, 'updateAllTotalColumns')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
   })
 })
 
