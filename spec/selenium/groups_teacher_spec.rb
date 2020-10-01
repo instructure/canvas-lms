@@ -1004,7 +1004,7 @@ describe "new groups" do
 
           select_change_groups_option
 
-          expect(f('.progressbar')).to be_displayed
+          expect(f('.progress-container')).to be_displayed
         end
 
         context "dragging and dropping a student" do
