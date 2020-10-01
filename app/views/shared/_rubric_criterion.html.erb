@@ -25,9 +25,12 @@
   edit_view ||= false
   assessment_rating ||= nil
   range_rating_enabled = @domain_root_account.feature_enabled?(:rubric_criterion_range)
-  range_rating_visible = range_rating_enabled && !criterion.try(:learning_outcome_id)
-
   learning_outcome_criterion = criterion.try(:learning_outcome_id)
+  range_rating_visible = range_rating_enabled && !learning_outcome_criterion
+
+  long_description_text = criterion.try(:long_description) || ''
+  long_description_text = Sanitize.clean(long_description_text) if learning_outcome_criterion
+
   description = criterion.try(:description) || t('defaults.description', "Description of criterion")
 %>
 <tr id="criterion_<%= criterion ? criterion.id : "blank" %>" class="criterion <%= "blank" unless criterion %> <%= 'ignore_criterion_for_scoring' if criterion && criterion.ignore_for_scoring %> <%= 'learning_outcome_criterion' if learning_outcome_criterion %>" style="<%= hidden unless criterion %>">
@@ -45,15 +48,11 @@
           <span class="screenreader-only"><%= t("This criterion is linked to a Learning Outcome") %></span>
         </span>
         <span class="description description_title"><%= description %></span>
-        <span class="learning_outcome_id" style="display: none;"><%= criterion.try(:learning_outcome_id) %></span>
+        <span class="learning_outcome_id" style="display: none;"><%= learning_outcome_criterion %></span>
         <span class="criterion_id" style="display: none;"><%= criterion.try(:id) %></span>
-        <% if !learning_outcome_criterion && !assessing %>
-          <div class="long_description small_description"><%= (criterion.try(:long_description) || '').html_safe %></div>
+        <% if !assessing %>
+          <div class="long_description small_description"><%= long_description_text.html_safe %></div>
         <% end %>
-        <div style="<%= "display: none;" if !learning_outcome_criterion && !assessing %>" class="long_description_holder editing <%= 'empty' if !criterion || criterion.long_description.blank? %>">
-          <a href="#" class="long_description_link <%= "hidden" if !criterion || criterion.long_description.blank? %>"><%= t "view longer description" %></a>
-          <textarea class="long_description" aria-label="<%= t "Long Description" %>" style="display: none;"><%= (criterion.try(:long_description) || '').html_safe %></textarea>
-        </div>
         <div class="hide_when_learning_outcome <%= range_rating_visible ? '' : 'hidden' %>">
           <div class="criterion_use_range_div editing toggle_for_hide_points <%= rubric_association&.hide_points ? 'hidden' : '' %>">
             <label><%= t 'Range' %>
