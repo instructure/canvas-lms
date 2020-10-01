@@ -21,6 +21,12 @@ end
 namespace :canvas do
   desc "Compile javascript and css assets."
   task :compile_assets do |t, args|
+    # running :environment as a prerequisite task is necessary even if we don't
+    # need it for this task: forked processes (through Parallel) that invoke other
+    # Rake tasks may require the Rails environment and for some reason, Rake will
+    # not re-run the environment task when forked
+    require 'config/environment' rescue nil
+
     # opt out
     npm_install = ENV["COMPILE_ASSETS_NPM_INSTALL"] != "0"
     build_api_docs = ENV["COMPILE_ASSETS_API_DOCS"] != "0"
