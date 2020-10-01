@@ -6548,7 +6548,7 @@ ar:
     one: "1 محاولة"
     other: "%{count} من المحاولات"
     two: "تعليقين %{count}"
-    zero: "%{count} تعليق"
+    zero: "0 المحاولات"
   count_comments_cb137ab8: 
     few: "%{count} تعليقات"
     many: "%{count} تعليقاً"
