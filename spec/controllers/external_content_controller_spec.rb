@@ -319,6 +319,19 @@ describe ExternalContentController do
           expect(subject).to be_success
         end
 
+        context 'when a disabled tool shares the same consumer key' do
+          before do
+            disabled_tool = tool.dup
+            disabled_tool.update!(shared_secret: SecureRandom.uuid)
+            disabled_tool.destroy!
+          end
+
+          it 'uses the active tool to verify the signature' do
+            expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
+            expect(subject).to be_success
+          end
+        end
+
         context 'when the user has changed' do
           before { user_session(user_model) }
 
@@ -372,6 +385,12 @@ describe ExternalContentController do
           end
 
           it { is_expected.to be_unauthorized }
+        end
+
+        context 'when no active tool is found' do
+          before { tool.destroy! }
+
+          it { is_expected.to be_not_found }
         end
 
         context 'when the "oembed_token" parameter is empty' do
