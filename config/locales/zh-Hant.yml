@@ -25164,6 +25164,9 @@ zh-Hant:
       您需要 [在Facebook上創建新應用程式](%{facebook_url})，然後進入『高級設置』，允許客戶端 Oauth 登入。
       您需要將 %{callback_url} 配置為有效的 OAuth 重定向URI。
       在您保存應用程式後，保存好您的應用 ID 和密碼，並在此輸入。
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      您需要創建服務 ID [Apple 開發者控制台](%{apple_url})。
+      請啟用透過 Apple 登入，然後添加%{callback_url}為返回 URL。在此輸入標識符。
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       您需要在[Google 開發者控制臺](%{google_url})上創建一個新的線上申請。
       您需要將 %{callback_url} 增添為一個重定向 URL。
