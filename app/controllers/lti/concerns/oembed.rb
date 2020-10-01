@@ -34,7 +34,12 @@ module Lti::Concerns
 
       return if error_message.blank?
 
-      raise OembedAuthorizationError.new jwt_validator.error_message
+      log_error(error_message)
+      raise OembedAuthorizationError.new error_message
+    end
+
+    def log_error(message)
+      logger.warn "[OEmbed] #{message}"
     end
 
     def jwt_validator
@@ -68,8 +73,8 @@ module Lti::Concerns
     end
 
     def associated_tool
-      tool = ContextExternalTool.find_by(consumer_key: unverified_jwt[:iss])
-      return tool if tool&.context&.root_account == @domain_root_account
+      tool = ContextExternalTool.active.where(root_account: @domain_root_account).find_by(consumer_key: unverified_jwt[:iss])
+      return tool if tool.present?
 
       # Could not find matching tool in the current account
       raise ActiveRecord::RecordNotFound
