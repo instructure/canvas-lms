@@ -25089,6 +25089,9 @@ de:
       Sie müssen eine [neue App auf Facebook](%{facebook_url}) erstellen und die Client-OAuth-Anmeldung in den „Erweiterten
       Einstellungen“ aktivieren. Sie sollten %{callback_url} als gültigen OAuth-URL zur Weiterleitung konfigurieren.
       Nachdem Sie Ihre App gespeichert haben, notieren Sie sich App-ID und App-Secret, und geben Sie beide hier ein.
+  you_will_need_to_create_a_service_id_apple_develop_4e684a7a: |-
+      Sie müssen eine Service-ID erstellen [Apple Developer Console](%{apple_url}).
+      Aktivieren Sie das Login mit Apple und fügen Sie %{callback_url} als Return-URL hinzu. Identifizierer hier eingeben
   you_will_need_to_create_a_web_application_in_the_g_43f753ec: |-
       Sie müssen eine Webanwendung in der [Google Developer Console](%{google_url}) erzeugen.
       Sie sollten %{callback_url} als eine URL zur Weiterleitung hinzufügen.
