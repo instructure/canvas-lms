@@ -9921,12 +9921,12 @@ fi:
           verify: Vahvista
         details: 
           mfa_enrollment: |-
-              Monen tekijän todennus lisää tietoturvaa vaatimalla, että voidaksesi kirjautua sisään Canvasiin sinulla on jotakin fyysisessä omistuksessa
-              sen lisäksi, että tiedät salasanan. Tämä ovoi olla laite, joka voi luoda 
-              vahvistuskoodeja tai puhelin, joka vastaanottaa tekstiviestejä. Googlen todennussovellus [iPhone](%{iphone_url}) tai
-              [Android](%{android_url}) voidaan konfiguroida skannaamalla QR-koodi alla. Muut tunnisteet voidaan konfiguroida syöttämällä 
-              salainen avain **%{secret_key}**. Kun olet konfiguroinut monen tekijän todennuksen, suositellaan, että siirryt
-              profiilisivullesi ja tulostat varmuuskopiointikoodin joukon siinä tapauksessa, että normaali monen tekijän todennuslaitteesi ei ole saatavissa.
+              Monimenetelmäinen todentaminen lisää tietoturvaa vaatimalla, että kirjautuaksesi Canvasiin sinulla on jotakin fyysisessä omistuksessasi
+              sen lisäksi, että tiedät salasanan. Tämä voi olla laite, joka voi luoda
+              vahvistuskoodeja tai puhelin, joka vastaanottaa tekstiviestejä. Google Authenticator -todennussovellus [iPhone:lle](%{iphone_url}) tai
+              [Android:lle](%{android_url}) voidaan konfiguroida skannaamalla alla oleva QR-koodi. Muut tunnukset voidaan konfiguroida syöttämällä
+              salainen avain **%{secret_key}**. Kun olet konfiguroinut monimenetelmäisen todentamisen, suositellaan, että siirryt
+              profiilisivullesi ja tulostat joukon varmuuskopiointikoodeja joukon siltä varalta, että normaali monimenetelmäinen todennuslaitteesi ei ole saatavissa.
           mfa_required: "Sinun täytyy määrittää monimenetelmäinen todentaminen."
           otp_on_device: "Anna tunnuksesi esittämä vahvistuskoodi."
           otp_sent_to_phone: "Vahvistuskoodi on lähetetty puhelimeesi. Syötä se tähän."
