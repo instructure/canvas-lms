@@ -835,6 +835,13 @@ describe DiscussionTopicsController do
       get 'new', params: {:course_id => @course.id}
       expect(assigns[:js_env][:SIS_NAME]).to eq('Foo Bar')
     end
+
+    it "js_bundles includes discussion_topics_edit_react when ff is on" do
+      user_session(@teacher)
+      @course.account.enable_feature!(:react_announcement_discussion_edit)
+      get 'new', params: {:course_id => @course.id}
+      expect(assigns[:js_bundles].first).to include(:discussion_topics_edit_react)
+    end
   end
 
   describe "GET 'new'" do

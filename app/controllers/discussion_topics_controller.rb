@@ -609,6 +609,13 @@ class DiscussionTopicsController < ApplicationController
     set_master_course_js_env_data(@topic, @context)
     conditional_release_js_env(@topic.assignment)
 
+    # Render updated UI if feature flag is enabled
+    if @domain_root_account.feature_enabled?(:react_announcement_discussion_edit)
+      js_bundle :discussion_topics_edit_react
+      render html: '', layout: true
+      return
+    end
+
     render :edit
   end
 
