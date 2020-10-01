@@ -36,7 +36,10 @@ describe "Exportable" do
   end
 
   context "#convert_to_epub" do
-
+    before :all do
+      skip 'LS-1504 (9/30/2020)'
+    end
+    
     before do
       @epub_export = ExportableTest.new.convert_to_epub
     end
@@ -58,17 +61,17 @@ describe "Exportable" do
     end
 
     it "should create an epub file" do
-      skip 'PHO-409 (9/30/2020)'
+      skip 'LS-1504 (9/30/2020)'
       expect(epub).not_to be_nil
     end
 
     it "should create a zip file" do
-      skip 'PHO-409 (9/30/2020)'
+      skip 'LS-1504 (9/30/2020)'
       expect(zip).not_to be_nil
     end
 
     it "creates a zip file whose name includes the cartridge's name" do
-      skip 'PHO-409 (9/30/2020)'
+      skip 'LS-1504 (9/30/2020)'
       expect(zip_path).to include('unicode-filename-test')
     end
 
