@@ -67,6 +67,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :folder
   belongs_to :user
   has_one :account_report, inverse_of: :attachment
+  has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
@@ -1405,15 +1406,32 @@ class Attachment < ActiveRecord::Base
         clauses << wildcard('attachments.content_type', type + '/', :type => :right)
       end
     end
-    condition_sql = clauses.join(' OR ')
+    clauses.join(' OR ')
   end
 
-  alias_method :destroy_permanently!, :destroy
+  # this method is used to create attachments from file uploads that are just
+  # data files. Used in multiple importers in canvas.
+  def self.create_data_attachment(context, data, display_name=nil)
+    context.shard.activate do
+      Attachment.new.tap do |att|
+        Attachment.skip_3rd_party_submits(true)
+        att.context = context
+        att.display_name = display_name if display_name
+        Attachments::Storage.store_for_attachment(att, data)
+        att.save!
+      end
+    end
+  ensure
+    Attachment.skip_3rd_party_submits(false)
+  end
+
+  alias destroy_permanently! destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy
     return if self.new_record?
-    self.file_state = 'deleted' #destroy
+
+    self.file_state = 'deleted' # destroy
     self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
     MediaObject.where(:attachment_id => self.id).update_all(:attachment_id => nil, :updated_at => Time.now.utc)

@@ -58,7 +58,7 @@ class OutcomeImport < ApplicationRecord
       user: user
     )
 
-    att = create_data_attachment(import, attachment, "outcome_upload_#{import.global_id}.csv")
+    att = Attachment.create_data_attachment(import, attachment, "outcome_upload_#{import.global_id}.csv")
     import.attachment = att
 
     yield import if block_given?
@@ -66,18 +66,6 @@ class OutcomeImport < ApplicationRecord
     import.save!
 
     import
-  end
-
-  def self.create_data_attachment(import, data, display_name)
-    Attachment.new.tap do |att|
-      Attachment.skip_3rd_party_submits(true)
-      att.context = import
-      att.display_name = display_name
-      Attachments::Storage.store_for_attachment(att, data)
-      att.save!
-    end
-  ensure
-    Attachment.skip_3rd_party_submits(false)
   end
 
   def as_json(_options={})

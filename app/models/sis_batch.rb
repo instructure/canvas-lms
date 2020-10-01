@@ -73,7 +73,7 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = create_data_attachment(batch, attachment)
+      att = Attachment.create_data_attachment(batch, attachment)
       batch.attachment = att
 
       yield batch if block_given?
@@ -82,20 +82,6 @@ class SisBatch < ActiveRecord::Base
 
       batch
     end
-  end
-
-  def self.create_data_attachment(batch, data, display_name=nil)
-    batch.shard.activate do
-      Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
-        att.context = batch
-        att.display_name = display_name if display_name
-        Attachments::Storage.store_for_attachment(att, data)
-        att.save!
-      end
-    end
-  ensure
-    Attachment.skip_3rd_party_submits(false)
   end
 
   def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
@@ -356,7 +342,7 @@ class SisBatch < ActiveRecord::Base
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
-    self.generated_diff = SisBatch.create_data_attachment(
+    self.generated_diff = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
       t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => self.id)
@@ -733,7 +719,7 @@ class SisBatch < ActiveRecord::Base
         csv << row
       end
     end
-    self.errors_attachment = SisBatch.create_data_attachment(
+    self.errors_attachment = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(file, 'csv', true),
       "sis_errors_attachment_#{id}.csv"
