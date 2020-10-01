@@ -9200,7 +9200,7 @@ ca:
     buttons: 
       submit: "Envia el fitxer multimèdia"
     errors: 
-      file_too_large: "* Aquest fitxer és massa gran.* La mida màxima és de %{size} MB."
+      file_too_large: "*Aquest fitxer és massa gran.* La mida màxima és de %{size} MB."
       load_failed: "L'aplicació de comentaris multimèdia no s'ha pogut carregar.  Torneu-ho a provar."
       media_comment_installation_broken: "La càrrega de comentaris multimèdia no s'ha configurat correctament. Poseu-vos en contacte amb l'administrador."
       must_be_logged_in: "Per enregistrar multimèdia, heu d'iniciar la sessió."
@@ -12630,7 +12630,7 @@ ca:
           Els testimonis d'accés són el que permet a les aplicacions de tercers accedir als
           recursos del Canvas en nom vostre. Aquests testimonis normalment es creen automàticament per a
           les aplicacions quan és necessari, però si [esteu desenvolupant un projecte
-          nou o limitat] (%{documentation_url}), només podeu generar el testimoni des d'aquí.
+          nou o limitat](%{documentation_url}), només podeu generar el testimoni des d'aquí.
       google_drive_description: "Quan ens autoritzeu per veure el vostre Google Drive, podreu entregar les tasques directament des del Google Drive, així com crear i compartir documents amb els membres de les vostres classes."
       headers: 
         application_abbrev: Aplicació
@@ -15079,7 +15079,7 @@ ca:
       buttons: 
         accept: "Accepta la invitació"
         reject: "Rebutja la invitació"
-      wander_around_dont_get_lost: "Doneu-hi [una volta] lliurement (%{link_to_course}) per veure com és."
+      wander_around_dont_get_lost: "Doneu-hi [una volta lliurement](%{link_to_course}) per veure com és."
     locale_warning: 
       crowdsourced_warning_message: "L'idioma que heu seleccionat s'ha traduït a través de proveïment participatiu. L'Instructure no ha revisat ni verificat la precisió de la traducció i no accepta cap responsabilitat relacionada amb el vostre ús d'aquesta configuració d'idioma. Utilitzeu-lo a la vostra discreció."
       crowdsourced_warning_title: "Idioma de proveïment participatiu"
