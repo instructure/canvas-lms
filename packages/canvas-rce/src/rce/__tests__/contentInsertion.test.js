@@ -260,7 +260,7 @@ describe('contentInsertion', () => {
 
     it('builds image html from image data', () => {
       contentInsertion.insertImage(editor, image)
-      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path"/>')
+      expect(editor.content).toEqual('<img alt="Here Be Images" src="/some/path/preview"/>')
     })
 
     it('uses url if no href', () => {
@@ -290,7 +290,7 @@ describe('contentInsertion', () => {
 
       contentInsertion.insertImage(ed, image)
       expect(ed.content).toEqual(
-        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path"/></a>'
+        '<a href="http://bogus.edu" data-mce-href="http://bogus.edu"><img alt="Here Be Images" src="/some/path/preview"/></a>'
       )
     })
   })

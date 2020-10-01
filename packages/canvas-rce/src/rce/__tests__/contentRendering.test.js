@@ -96,11 +96,11 @@ describe('contentRendering', () => {
       )
     })
 
-    it('replaces a preview link with download', () => {
+    it('removes /preview when rendering a link', () => {
       link.href = '/users/2/files/17/preview?verifier=xyzzy'
       const rendered = contentRendering.renderLink(link)
       expect(rendered).toEqual(
-        '<a href="/users/2/files/17/download?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Click On Me</a>'
+        '<a href="/users/2/files/17?verifier=xyzzy&amp;wrap=1" title="Here Be Links">Click On Me</a>'
       )
     })
   })

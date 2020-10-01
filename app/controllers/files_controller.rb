@@ -440,13 +440,16 @@ class FilesController < ApplicationController
   #
   def public_url
     @attachment = Attachment.find(params[:id])
+    verifier_checker = Attachments::Verification.new(@attachment)
+
     # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
     # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
     # submission.
     @submission = Submission.active.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
-    if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
+    if ((@submission && authorized_action(@submission, @current_user, :read)) || 
+        ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
       render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end

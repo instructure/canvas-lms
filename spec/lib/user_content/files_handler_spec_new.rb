@@ -1,5 +1,5 @@
 #
-# Copyright (C) 2016 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,6 +15,9 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+
+# This file is a copy of ./files_handler_spec.rb, but runs with the
+# new_file_url_rewriting flag on, while the other files has it off
 
 require 'spec_helper'
 
@@ -42,10 +45,10 @@ describe UserContent::FilesHandler do
       )
     )
   end
-  let(:old_file_url_rewriting) { Account.site_admin.disable_feature!(:new_file_url_rewriting) }
+  let(:new_file_url_rewriting) { Account.site_admin.enable_feature!(:new_file_url_rewriting) }
 
-  context 'with new_file_url_rewriting off' do
-    before(:each) { old_file_url_rewriting }
+  context 'with new_file_url_rewriting on' do
+    before(:each) { new_file_url_rewriting }
 
     describe UserContent::FilesHandler::ProcessedUrl do
       subject(:processed_url) do
@@ -89,6 +92,22 @@ describe UserContent::FilesHandler do
           it 'does not include wrap param' do
             query_string = processed_url.split('?')[1]
             expect(Rack::Utils.parse_nested_query(query_string)).not_to have_key('wrap')
+          end
+        end
+
+        context 'when download_frd=1' do
+          let(:match_part) { '?download_frd=1' }
+
+          it 'includes /download in the url' do
+            expect(processed_url).to match(%r{files\/(\d)+\/download})
+          end
+        end
+
+        context 'when no download_frd' do
+          let(:match_part) { '?wrap=1' }
+
+          it 'omits /download in the url' do
+            expect(processed_url).to match(%r{files\/(\d)+(\?|$)})
           end
         end
 
@@ -138,30 +157,6 @@ describe UserContent::FilesHandler do
             it 'delegates to ProcessedUrl' do
               expect(processed_url).to match(/#{attachment.context_type.tableize}/)
             end
-          end
-        end
-      end
-
-      context 'user cannot access attachment' do
-        let(:subject) do
-          UserContent::FilesHandler.new(
-            match: uri_match,
-            context: attachment.context,
-            user: current_user,
-            preloaded_attachments: preloaded_attachments,
-            is_public: is_public,
-            in_app: in_app
-          )
-        end
-
-        before(:each) { allow(subject).to receive(:user_can_access_attachment?).and_return false }
-
-        context 'url contains invalid uri' do
-          # single quotes will make it valid uri, so keep this in double quotes
-          let(:match_part) { "download?foo=505720\u00A0" }
-
-          it 'handles escape characters' do
-            expect(subject.processed_url).to match(/#{attachment.context_type.tableize}/)
           end
         end
       end
