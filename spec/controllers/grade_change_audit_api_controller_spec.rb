@@ -457,7 +457,7 @@ describe GradeChangeAuditApiController do
           course.save!
 
           get :query, params: params.except(:assignment_id)
-          expect(returned_assignment_ids).to contain_exactly(assignment.id)
+          expect(returned_assignment_ids.uniq).to contain_exactly(assignment.id)
         end
       end
 
@@ -475,7 +475,7 @@ describe GradeChangeAuditApiController do
 
       it "returns only grade changes for the assignment when a legitimate assignment ID is specified" do
         get :query, params: params
-        expect(returned_assignment_ids).to contain_exactly(assignment.id)
+        expect(returned_assignment_ids.uniq).to contain_exactly(assignment.id)
       end
     end
 

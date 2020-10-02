@@ -544,7 +544,8 @@ RSpec.configure do |config|
     opts = lines.extract_options!
     opts.reverse_merge!(allow_printing: false)
     account = opts[:account] || @account || account_model
-    opts[:batch] ||= account.sis_batches.create!
+    user = opts[:user] || @user || user_model
+    opts[:batch] ||= account.sis_batches.create!(user_id: user.id)
 
     path = generate_csv_file(lines)
     opts[:files] = [path]

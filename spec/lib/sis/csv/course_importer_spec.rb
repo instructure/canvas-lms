@@ -659,7 +659,11 @@ describe SIS::CSV::CourseImporter do
   end
 
   it 'should create rollback data' do
-    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    sis_user = user_model
+    batch1 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",
@@ -674,7 +678,10 @@ describe SIS::CSV::CourseImporter do
       "course_id,user_id,role,section_id,status,associated_user_id",
       "data_2,student_user,student,,active,"
     )
-    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    batch2 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",

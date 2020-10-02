@@ -96,8 +96,8 @@ describe Auditors::ActiveRecord::GradeChangeRecord do
       end
 
       let(:ar_override_grade_change) do
-        override_record = Auditors::GradeChange.record(override_grade_change: override_grade_change)
-        Auditors::ActiveRecord::GradeChangeRecord.create_from_event_stream!(override_record)
+        Auditors::GradeChange.record(override_grade_change: override_grade_change)
+        Auditors::ActiveRecord::GradeChangeRecord.last
       end
 
       let(:ar_assignment_grade_change) do

@@ -651,6 +651,9 @@ describe Submission do
   describe "seconds_late" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 1.hour.ago(@date), submission_types: "online_text_entry")
     end
 
@@ -748,6 +751,9 @@ describe Submission do
   describe "#apply_late_policy" do
     before(:once) do
       @date = Time.zone.local(2017, 1, 15, 12)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
       @late_policy = late_policy_model(deduct: 10.0, every: :hour, missing: 80.0)
     end
@@ -987,6 +993,9 @@ describe Submission do
     context "assignment on paper" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "on_paper")
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1073,6 +1082,9 @@ describe Submission do
     context "assignment expecting no submission" do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: 3.hours.ago(@date), points_possible: 1000, submission_types: "none")
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1117,6 +1129,9 @@ describe Submission do
     context 'when submitting to an LTI assignment' do
       before(:once) do
         @date = Time.zone.local(2017, 1, 15, 12)
+        Timecop.travel(@date) do
+          Auditors::ActiveRecord::Partitioner.process
+        end
         @assignment.update!(due_at: @date - 3.hours, points_possible: 1_000, submission_types: 'external_tool')
         @late_policy = late_policy_factory(course: @course, deduct: 10.0, every: :hour, missing: 80.0)
       end
@@ -1176,6 +1191,9 @@ describe Submission do
   describe "#apply_late_policy_before_save" do
     before(:once) do
       @date = Time.zone.local(2017, 3, 25, 11)
+      Timecop.travel(@date) do
+        Auditors::ActiveRecord::Partitioner.process
+      end
       @assignment.update!(due_at: 4.days.ago(@date), points_possible: 1000, submission_types: "online_text_entry")
       @late_policy = late_policy_factory(course: @course, deduct: 5.0, every: :day, missing: 80.0)
     end
@@ -1352,6 +1370,8 @@ describe Submission do
   end
 
   describe "#grade_change_audit" do
+    before(:once) { Auditors::ActiveRecord::Partitioner.process }
+
     let_once(:submission) { @assignment.submissions.find_by(user: @student) }
 
     it "should log submissions with grade changes" do
@@ -1400,7 +1420,7 @@ describe Submission do
     end
 
     it "inserts a grade change audit record by default" do
-      expect(Auditors::GradeChange::Stream).to receive(:insert).once
+      expect(Auditors::GradeChange).to receive(:record).once
       submission.grade_change_audit(force_audit: true)
     end
 
@@ -1642,6 +1662,7 @@ describe Submission do
 
     context "Submission Graded" do
       before :once do
+        Auditors::ActiveRecord::Partitioner.process
         @assignment.ensure_post_policy(post_manually: false)
         Notification.create(:name => 'Submission Graded', :category => 'TestImmediately')
         submission_spec_model(submit_homework: true)
@@ -1803,6 +1824,7 @@ describe Submission do
 
     context "Submission Grade Changed" do
       before :once do
+        Auditors::ActiveRecord::Partitioner.process
         @assignment.ensure_post_policy(post_manually: false)
       end
 
@@ -2914,6 +2936,7 @@ describe Submission do
     end
 
     before :once do
+      Auditors::ActiveRecord::Partitioner.process
       @assignment.update!(submission_types: "online_upload,online_text_entry")
 
       @submission = @assignment.submit_homework(@user, {body: "hello there", submission_type: 'online_text_entry'})
@@ -3177,6 +3200,7 @@ describe Submission do
 
   describe "past_due" do
     before :once do
+      Auditors::ActiveRecord::Partitioner.process
       submission_spec_model
       @submission1 = @submission
 
