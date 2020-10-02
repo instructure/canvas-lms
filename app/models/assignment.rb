@@ -3541,6 +3541,13 @@ class Assignment < ActiveRecord::Base
     end
   end
 
+  def self.from_secure_lti_params(secure_params)
+    lti_context_id = Lti::Security.decoded_lti_assignment_id(secure_params)
+    return nil if lti_context_id.blank?
+
+    self.find_by(lti_context_id: lti_context_id)
+  end
+
   private
 
   def anonymous_grader_identities(index_by:)

@@ -7482,6 +7482,41 @@ describe Assignment do
     end
   end
 
+  describe '.from_secure_lti_params' do
+    subject { Assignment.from_secure_lti_params(secure_params) }
+
+    let_once(:assignment) { assignment_model }
+
+    let(:jwt_body) { { lti_assignment_id: assignment.lti_context_id } }
+    let(:secure_params) { Canvas::Security.create_jwt(jwt_body) }
+
+    it { is_expected.to eq assignment }
+
+    context 'when no matching assignment is found' do
+      before { jwt_body.merge!({lti_assignment_id: SecureRandom.uuid}) }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params are nil' do
+      let(:secure_params) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params have invalid signature' do
+      let(:secure_params) { "#{super()}added" }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params are not a JWT' do
+      let(:secure_params) { 'notajwt' }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe '.remove_user_as_final_grader' do
     it 'calls .remove_user_as_final_grader_immediately in a delayed job' do
       expect(Assignment).to receive(:send_later_if_production_enqueue_args).
