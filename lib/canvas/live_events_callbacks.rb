@@ -49,7 +49,7 @@ module Canvas::LiveEventsCallbacks
     when AssignmentOverride
       Canvas::LiveEvents.assignment_override_created(obj)
     when Submission
-      Canvas::LiveEvents.submission_created(obj)
+      Canvas::LiveEvents.submission_created(obj) if obj.just_submitted?
     when SubmissionComment
       Canvas::LiveEvents.submission_comment_created(obj)
     when UserAccountAssociation
