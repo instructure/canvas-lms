@@ -23,7 +23,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {View} from 'Backbone'
 
-import htmlEscape from 'str/htmlEscape'
 import Slick from 'vendor/slickgrid'
 import Grid from '../../gradebook/OutcomeGradebookGrid'
 import userSettings from '../../userSettings'
@@ -227,8 +226,7 @@ export default class OutcomeGradebookView extends View
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
-      sections = @learningMastery.getSections().map(htmlEscape)
-      Grid.Util.saveSections(sections)
+      Grid.Util.saveSections(@learningMastery.getSections())
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell })
       @columns = columns
       if @$('#no_results_outcomes:checkbox:checked').length == 1
