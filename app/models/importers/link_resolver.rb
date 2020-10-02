@@ -105,6 +105,7 @@ module Importers
         if file_id
           rest = link[:rest].presence || '/preview'
           link[:new_value] = "#{context_path}/files/#{file_id}#{rest}"
+          link[:new_value] = "/media_objects_iframe?mediahref=#{link[:new_value]}" if link[:in_media_iframe]
         end
       else
         raise "unrecognized link_type in unresolved link"
@@ -197,7 +198,7 @@ module Importers
     end
 
     def resolve_media_comment_data(node, rel_path)
-      if file = find_file_in_context(rel_path)
+      if file = find_file_in_context(rel_path[/^[^?]+/]) # strip query string for this search
         media_id = ((file.media_object && file.media_object.media_id) || file.media_entry_id)
         if media_id && media_id != 'maybe'
           if node.name == 'iframe'
