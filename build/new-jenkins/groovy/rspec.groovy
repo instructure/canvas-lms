@@ -142,7 +142,6 @@ def uploadRSpecCoverageIfSuccessful() {
 }
 
 def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
-  def successes = load 'build/new-jenkins/groovy/successes.groovy'
   if (successes.hasSuccess(prefix, total)) {
     def reports = load 'build/new-jenkins/groovy/reports.groovy'
     reports.publishSpecCoverageToS3(prefix, total, coverage_name)
@@ -160,7 +159,7 @@ def uploadRSpecFailures() {
 def _uploadSpecFailures(prefix, total, test_name) {
   def reports = load('build/new-jenkins/groovy/reports.groovy')
   def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
-  if (!load('build/new-jenkins/groovy/successes.groovy').hasSuccessOrBuildIsSuccessful(prefix, total)) {
+  if (!successes.hasSuccessOrBuildIsSuccessful(prefix, total)) {
     reports.appendFailMessageReport("Spec Failure For $prefix", report_url)
   }
 }

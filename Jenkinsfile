@@ -49,8 +49,12 @@ def skipIfPreviouslySuccessful(name, block) {
   if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
     name+="${env.CANVAS_LMS_REFSPEC}"
   }
-  def successes = load('build/new-jenkins/groovy/successes.groovy')
-  successes.skipIfPreviouslySuccessful(name, true, block)
+  if (env.SKIP_CACHE.toBoolean()) {
+    echo "Build cache is disabled; forcing step ${name} to run, even if it was already successful."
+    block()
+  } else {
+    successes.skipIfPreviouslySuccessful(name, block)
+  }
 }
 
 def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
@@ -610,7 +614,6 @@ pipeline {
             }
 
             timedStage('Mark Build as Successful') {
-              def successes = load 'build/new-jenkins/groovy/successes.groovy'
               successes.markBuildAsSuccessful()
             }
           }//protectedNode
