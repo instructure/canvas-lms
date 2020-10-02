@@ -1197,6 +1197,7 @@ class UsersController < ApplicationController
         respond_to do |format|
           format.html do
             @google_analytics_page_title = "User"
+            @body_classes << 'full-width'
             js_env(CONTEXT_USER_DISPLAY_NAME: @user.short_name,
                    USER_ID: @user.id)
           end

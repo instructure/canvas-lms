@@ -16,6 +16,13 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<div id="pageviews_datefilter">
+  <div class="nobr">
+    <label class="ic-Label for="page_view_date"><%= t('Filter by date') %></label>
+    <input type="datetime" class="ic-Input" id="page_view_date"/>
+  </div>
+</div>
+
 <div id="pageviews">
   <table data-user-id="<%= @user.id %>" class="ic-Table ic-Table--hover-row ic-Table--condensed ic-Table--striped">
     <thead class='ui-widget-header'>
