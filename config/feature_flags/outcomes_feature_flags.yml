@@ -39,9 +39,9 @@ bulk_delete_pages:
 account_level_mastery_scales:
   state: hidden
   applies_to: RootAccount
-  display_name: Account-level Mastery Scales
-  description: Allows Account-level mastery scales and proficiency calculations,
-    replacing per-outcome scales
+  display_name: Account and Course Level Outcome Proficiencies
+  description: Allows Account & Course Level mastery scales and calculation,
+    replacing per-outcome criterion ratings & calculation methods
 usage_rights_discussion_topics:
   state: hidden
   applies_to: RootAccount
