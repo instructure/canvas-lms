@@ -30,6 +30,8 @@ import CourseNicknameEdit from './CourseNicknameEdit'
 import classnames from 'classnames'
 import {isRTL} from './helpers/rtlHelper'
 import 'compiled/jquery.rails_flash_notifications'
+import {Tooltip} from '@instructure/ui-overlays'
+import {IconWarningSolid} from '@instructure/ui-icons'
 
 export const PREDEFINED_COLORS = [
   {
@@ -315,6 +317,16 @@ const ColorPicker = createReactClass({
     return validHexRe.test(color)
   },
 
+  warnIfInvalid() {
+    if (!this.isValidHex(this.state.currentColor)) {
+      $.screenReaderFlashMessage(
+        I18n.t("'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving.", {
+          chosenColor: this.state.currentColor
+        })
+      )
+    }
+  },
+
   setCourseNickname() {
     if (this.refs.courseNicknameEdit) {
       return this.refs.courseNicknameEdit.setCourseNickname()
@@ -472,7 +484,9 @@ const ColorPicker = createReactClass({
         tabIndex="-1"
       >
         {!this.isValidHex(this.state.currentColor) && (
-          <i className="icon-warning" role="presentation" />
+          <Tooltip tip={I18n.t('Invalid hexcode')}>
+            <IconWarningSolid color="warning" id="ColorPicker__InvalidHex" />
+          </Tooltip>
         )}
       </div>
     )
@@ -506,12 +520,15 @@ const ColorPicker = createReactClass({
           <TextInput
             label={
               <ScreenReaderContent>
-                {I18n.t('Enter a hexcode here to use a custom color.')}
+                {this.isValidHex(this.state.currentColor)
+                  ? I18n.t('Enter a hexcode here to use a custom color.')
+                  : I18n.t('Invalid hexcode. Enter a valid hexcode here to use a custom color.')}
               </ScreenReaderContent>
             }
             id={inputId}
             value={this.state.currentColor}
             onChange={this.setInputColor}
+            onBlur={this.warnIfInvalid}
             size="small"
             margin="0 0 0 x-small"
             inputRef={r => {
@@ -529,7 +546,7 @@ const ColorPicker = createReactClass({
             id="ColorPicker__Apply"
             size="small"
             onClick={this.onApply.bind(null, this.state.currentColor)}
-            disabled={this.state.saveInProgress}
+            disabled={this.state.saveInProgress || !this.isValidHex(this.state.currentColor)}
             margin="0 0 0 xxx-small"
           >
             {I18n.t('Apply')}
