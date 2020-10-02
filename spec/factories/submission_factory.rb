@@ -18,7 +18,7 @@
 
 module Factories
   def submission_model(opts={})
-    enroll_user = !(opts[:user] && (opts[:assignment] || opts[:course]))
+    enroll_user = !opts[:user] || !(opts[:assignment] || opts[:course])
     assignment = opts[:assignment] || assignment_model(:course => opts[:course])
     @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first
     @course.enroll_student(@student, section: opts[:section], enrollment_state: :active) if enroll_user
@@ -41,5 +41,14 @@ module Factories
     @submission.workflow_state = 'graded'
     @submission.save!
     @submission
+  end
+
+  def unsubmitted_submission_model(opts={})
+    enroll_user = !opts[:user] || !(opts[:assignment] || opts[:course])
+    assignment = opts[:assignment] || assignment_model(:course => opts[:course])
+    @student = opts.delete(:user) || @user = create_users(1, return_type: :record).first
+    @course.enroll_student(@student, section: opts[:section], enrollment_state: :active) if enroll_user
+    assignment.reload # it caches the course pre-student enrollment
+    @submission = Submission.where(user: @student, assignment: assignment).first or raise 'Submission not created'
   end
 end

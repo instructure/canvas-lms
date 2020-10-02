@@ -554,28 +554,33 @@ describe Canvas::LiveEvents do
 
     before { submission }
 
-    describe ".submission_created" do
+    shared_examples_for 'a submission event' do |event_name|
       it "should include the user_id and assignment_id" do
-        expect_event('submission_created',
+        expect_event(
+          event_name,
           hash_including(
+            workflow_state: 'unsubmitted',
             user_id: @student.global_id.to_s,
             lti_user_id: @student.lti_context_id,
             assignment_id: submission.global_assignment_id.to_s,
             lti_assignment_id: submission.assignment.lti_context_id.to_s
           ),
-          course_context)
-        Canvas::LiveEvents.submission_created(submission)
+          course_context
+        )
+        Canvas::LiveEvents.send(event_name.to_sym, submission)
       end
 
       it 'should include the group_id if assignment is a group assignment' do
         submission.update(group: group)
 
-        expect_event('submission_created',
+        expect_event(
+          event_name,
           hash_including(
             group_id: group.id.to_s
           ),
-          course_context)
-        Canvas::LiveEvents.submission_created(submission)
+          course_context
+        )
+        Canvas::LiveEvents.send(event_name.to_sym, submission)
       end
 
       context 'with assignment configuration tool lookup' do
@@ -608,61 +613,50 @@ describe Canvas::LiveEvents do
             resource_type_code: 'resource-type-code'
           )
 
-          expect_event('submission_created',
+          expect_event(
+            event_name,
             hash_including(
               associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
-            course_context)
-          Canvas::LiveEvents.submission_created(submission)
+            course_context
+          )
+          Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
 
         it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
 
-          expect_event('submission_created',
+          expect_event(
+            event_name,
             hash_not_including(
               associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
-            course_context)
-          Canvas::LiveEvents.submission_created(submission)
+            course_context
+          )
+          Canvas::LiveEvents.send(event_name.to_sym, submission)
         end
       end
     end
 
+    describe ".submission_created" do
+      it_behaves_like 'a submission event', 'submission_created'
+    end
+
     describe ".submission_updated" do
-      it "should include the user_id and assignment_id" do
-        expect_event('submission_updated',
-          hash_including(
-            user_id: @student.global_id.to_s,
-            lti_user_id: @student.lti_context_id,
-            assignment_id: submission.global_assignment_id.to_s,
-            lti_assignment_id: submission.assignment.lti_context_id.to_s
-          ),
-          course_context)
-        Canvas::LiveEvents.submission_updated(submission)
-      end
-
-      it 'should include the group_id if assignment is a group assignment' do
-        submission.update(group: group)
-
-        expect_event('submission_updated',
-          hash_including(
-            group_id: group.id.to_s
-          ),
-          course_context)
-        Canvas::LiveEvents.submission_updated(submission)
-      end
+      it_behaves_like 'a submission event', 'submission_updated'
 
       it 'should include late and missing flags' do
         submission.update(late_policy_status: 'missing')
 
-        expect_event('submission_updated',
+        expect_event(
+          'submission_updated',
           hash_including(
             late: false,
             missing: true
           ),
-          course_context)
+          course_context
+        )
         Canvas::LiveEvents.submission_updated(submission)
       end
 
@@ -670,63 +664,14 @@ describe Canvas::LiveEvents do
         post_time = Time.zone.now
         submission.update(posted_at: post_time)
 
-        expect_event('submission_updated',
+        expect_event(
+          'submission_updated',
           hash_including(
             posted_at: post_time,
           ),
-          course_context)
+          course_context
+        )
         Canvas::LiveEvents.submission_updated(submission)
-      end
-
-      context 'with assignment configuration tool lookup' do
-        include_context 'lti2_spec_helper'
-        let(:product_family) do
-          Lti::ProductFamily.create!(
-            vendor_code: 'turnitin.com',
-            product_code: 'turnitin-lti',
-            vendor_name: 'TurnItIn',
-            root_account: account,
-            developer_key: developer_key
-          )
-        end
-
-        it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
-          submission.assignment.assignment_configuration_tool_lookups.create!(
-            tool_product_code: 'turnitin-lti',
-            tool_vendor_code: 'turnitin.com',
-            tool_resource_type_code: 'resource-type-code',
-            tool_type: 'Lti::MessageHandler'
-          )
-
-          tool_proxy = create_tool_proxy(submission.assignment.course)
-          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
-          tool_proxy.save!
-
-          Lti::ResourceHandler.create!(
-            tool_proxy: tool_proxy,
-            name: 'resource_handler',
-            resource_type_code: 'resource-type-code'
-          )
-
-          expect_event('submission_updated',
-            hash_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-            ),
-            course_context)
-          Canvas::LiveEvents.submission_updated(submission)
-        end
-
-        it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
-          submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
-            tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-
-          expect_event('submission_updated',
-            hash_not_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-            ),
-            course_context)
-          Canvas::LiveEvents.submission_updated(submission)
-        end
       end
     end
 
@@ -789,79 +734,7 @@ describe Canvas::LiveEvents do
     end
 
     describe '.plagiarism_resubmit' do
-      it "should include the user_id and assignment_id" do
-        expect_event('plagiarism_resubmit',
-          hash_including(
-            user_id: @student.global_id.to_s,
-            lti_user_id: @student.lti_context_id,
-            assignment_id: submission.global_assignment_id.to_s,
-            lti_assignment_id: submission.assignment.lti_context_id.to_s
-          ),
-          course_context)
-        Canvas::LiveEvents.plagiarism_resubmit(submission)
-      end
-
-      it 'should include the group_id if assignment is a group assignment' do
-        submission.update(group: group)
-
-        expect_event('plagiarism_resubmit',
-          hash_including(
-            group_id: group.id.to_s
-          ),
-          course_context)
-        Canvas::LiveEvents.plagiarism_resubmit(submission)
-      end
-
-      context 'with assignment configuration tool lookup' do
-        include_context 'lti2_spec_helper'
-        let(:product_family) do
-          Lti::ProductFamily.create!(
-            vendor_code: 'turnitin.com',
-            product_code: 'turnitin-lti',
-            vendor_name: 'TurnItIn',
-            root_account: account,
-            developer_key: developer_key
-          )
-        end
-
-        it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
-          submission.assignment.assignment_configuration_tool_lookups.create!(
-            tool_product_code: 'turnitin-lti',
-            tool_vendor_code: 'turnitin.com',
-            tool_resource_type_code: 'resource-type-code',
-            tool_type: 'Lti::MessageHandler'
-          )
-
-          tool_proxy = create_tool_proxy(submission.assignment.course)
-          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
-          tool_proxy.save!
-
-          Lti::ResourceHandler.create!(
-            tool_proxy: tool_proxy,
-            name: 'resource_handler',
-            resource_type_code: 'resource-type-code'
-          )
-
-          expect_event('plagiarism_resubmit',
-            hash_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-            ),
-            course_context)
-          Canvas::LiveEvents.plagiarism_resubmit(submission)
-        end
-
-        it 'should not include the associated_integration_id if there is no longer an installed tool with that id' do
-          submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
-            tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-
-          expect_event('plagiarism_resubmit',
-            hash_not_including(
-              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
-            ),
-            course_context)
-          Canvas::LiveEvents.plagiarism_resubmit(submission)
-        end
-      end
+      it_behaves_like 'a submission event', 'plagiarism_resubmit'
     end
   end
 
