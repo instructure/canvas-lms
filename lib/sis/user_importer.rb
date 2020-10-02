@@ -309,11 +309,11 @@ module SIS
           if user_row.email.present? && EmailAddressValidator.valid?(user_row.email)
             # find all CCs for this user, and active conflicting CCs for all users
             # unless we're deleting this user, then only find CCs for this user
-            if status_is_active
-              cc_scope = CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
-            else
-              cc_scope = user.communication_channels
-            end
+            cc_scope = if status_is_active
+                         CommunicationChannel.where("workflow_state='active' OR user_id=?", user).shard(user.shard)
+                       else
+                         user.communication_channels
+                       end
             cc_scope = cc_scope.email.by_path(user_row.email)
             limit = Setting.get("merge_candidate_search_limit", "100").to_i
             ccs = cc_scope.limit(limit + 1).to_a
@@ -336,7 +336,7 @@ module SIS
               sis_cc.destroy
               sis_cc = nil
             end
-            cc = sis_cc || other_cc || CommunicationChannel.new
+            cc = sis_cc || other_cc || user.communication_channels.new
             cc.user_id = user.id
             cc.pseudonym_id = pseudo.id
             cc.path = user_row.email
