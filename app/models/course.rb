@@ -2399,6 +2399,7 @@ class Course < ActiveRecord::Base
             new_file.folder_id = new_folder_id
             new_file.need_notify = false
             new_file.save_without_broadcasting!
+            new_file.handle_duplicates(:rename)
             cm.add_imported_item(new_file)
             cm.add_imported_item(new_file.folder, key: new_file.folder.id)
             map_merge(file, new_file)

@@ -34,7 +34,9 @@ module Importers
              :migration_id => migration_id,
              :save_without_broadcasting! => true,
              :set_publish_state_for_usage_rights => nil,
-             :mark_as_importing! => nil)
+             :mark_as_importing! => nil,
+             :handle_duplicates => nil
+        )
       end
 
       before :each do

@@ -2520,6 +2520,7 @@ describe MasterCourses::MasterMigration do
 
         impostor_att_to = @copy_to.attachments.where(:migration_id => CC::CCHelper.create_key(impostor_att, global: true)).first
         expect(impostor_att_to.id).to_not eq att_to.id # should make a copy
+        expect(impostor_att_to.display_name).to_not eq att_to.display_name
       end
 
       def import_package(course)
@@ -2553,6 +2554,7 @@ describe MasterCourses::MasterMigration do
 
         impostor_att_to = @copy_to.attachments.where(:migration_id => att.migration_id).first # package should make a copy
         expect(impostor_att_to.id).to_not eq att_to.id
+        expect(impostor_att_to.display_name).to_not eq att_to.display_name
       end
     end
 
