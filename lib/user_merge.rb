@@ -282,7 +282,7 @@ class UserMerge
   end
 
   def handle_communication_channels
-    max_position = target_user.communication_channels.last.try(:position) || 0
+    max_position = target_user.communication_channels.last&.position&.+(1) || 0
     to_retire_ids = []
     known_ccs = target_user.communication_channels.pluck(:id)
     from_user.communication_channels.each do |cc|
@@ -327,7 +327,7 @@ class UserMerge
       scope = scope.where.not(id: to_retire_ids) unless to_retire_ids.empty?
       unless scope.empty?
         merge_data.build_more_data(scope, data: data)
-        scope.update_all(["user_id=?, position=position+?", target_user, max_position])
+        scope.update_all(["user_id=?, position=position+?, root_account_ids='{?}'", target_user, max_position, target_user.root_account_ids])
       end
     end
     merge_data.bulk_insert_merge_data(data) unless data.empty?

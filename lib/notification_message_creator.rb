@@ -75,6 +75,7 @@ class NotificationMessageCreator
         # otherwise it will create a delayed_message. Any message can create a
         # dashboard message in addition to itself.
         channels.each do |channel|
+          channel.set_root_account_ids(persist_changes: true, log: true)
           next unless notifications_enabled_for_context?(user, @course)
           if immediate_policy?(user, channel)
             immediate_messages << build_immediate_message_for(user, channel)
