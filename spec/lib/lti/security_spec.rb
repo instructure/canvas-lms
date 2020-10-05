@@ -51,6 +51,20 @@ describe Lti::Security do
         expect(signed_params.key?('test')).to eq false
       end
 
+      it "logs the oauth base string" do
+        allow(Lti::Logging).to receive(:lti_1_launch_generated)
+
+        url = "http://test.example:3000/launch"
+        signed_params = Lti::Security.signed_post_params(params, url, consumer_key, consumer_secret, true)
+
+        expect(Lti::Logging).to have_received(:lti_1_launch_generated).with(%W{
+          POST&http%3A%2F%2Ftest.example%3A3000%2Flaunch&custom_a%3D1%26custom_b%3D2%26
+          oauth_consumer_key%3Dtest%26
+          oauth_nonce%3D#{signed_params['oauth_nonce']}%26
+          oauth_signature_method%3DHMAC-SHA1%26
+          oauth_timestamp%3D#{signed_params['oauth_timestamp']}%26
+          oauth_version%3D1.0}.join)
+      end
     end
 
     context '#decoded_lti_assignment_id' do
@@ -180,5 +194,21 @@ describe Lti::Security do
 
     end
 
+    it "logs the oauth base string" do
+      allow(Lti::Logging).to receive(:lti_1_launch_generated)
+
+      url = "http://test.example:3000/launch"
+      signed_params = Lti::Security.signed_post_params(params, url, consumer_key, consumer_secret)
+      nonce = signed_params['oauth_nonce']
+      timestamp = signed_params['oauth_timestamp']
+
+      expect(Lti::Logging).to have_received(:lti_1_launch_generated).with(%W{
+        POST&http%3A%2F%2Ftest.example%3A3000%2Flaunch&custom_a%3D1%26custom_b%3D2%26
+        oauth_consumer_key%3Dtest%26oauth_consumer_key%3Dtest%26
+        oauth_nonce%3D#{nonce}%26oauth_nonce%3D#{nonce}%26
+        oauth_signature_method%3DHMAC-SHA1%26oauth_signature_method%3DHMAC-SHA1%26
+        oauth_timestamp%3D#{timestamp}%26oauth_timestamp%3D#{timestamp}%26
+        oauth_version%3D1.0%26oauth_version%3D1.0}.join)
+    end
   end
 end
