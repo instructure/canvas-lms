@@ -165,6 +165,7 @@ module Canvas
         end
 
         it "can handle a cache clear" do
+          skip ('FOO-1030 10/5/2020')
           mock = double(status: 200, values: {
             'test' => {
               'prefix' => {
