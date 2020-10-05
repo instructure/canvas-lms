@@ -502,6 +502,7 @@ class Account < ActiveRecord::Base
   end
 
   def ensure_defaults
+    self.name&.delete!("\r")
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account

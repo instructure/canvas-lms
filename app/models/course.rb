@@ -1003,8 +1003,9 @@ class Course < ActiveRecord::Base
   end
 
   def assert_defaults
-    self.name = nil if self.name && self.name.strip.empty?
+    self.name = nil if self.name&.strip&.empty?
     self.name ||= t('missing_name', "Unnamed Course")
+    self.name.delete!("\r")
     self.course_code = nil if self.course_code == ''
     if !self.course_code && self.name
       res = []

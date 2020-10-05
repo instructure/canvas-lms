@@ -1499,6 +1499,13 @@ describe Account do
       account.ensure_defaults
       expect(account.lti_guid).to eq '12345'
     end
+
+    it "removes carriage returns from the name" do
+      account = Account.new
+      account.name = "Hello\r\nWorld"
+      account.ensure_defaults
+      expect(account.name).to eq "Hello\nWorld"
+    end
   end
 
   it 'should format a referer url' do

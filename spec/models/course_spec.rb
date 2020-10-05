@@ -754,6 +754,13 @@ describe Course do
     expect(code).to_not eql(@course.course_code)
   end
 
+  it "should remove carriage returns from the name" do
+    @course = Course.create_unique
+    @course.name = "Hello\r\nWorld"
+    @course.save
+    expect(@course.name).to eql("Hello\nWorld")
+  end
+
   it "should throw error for long sis id" do
     #should throw rails validation error instead of db invalid statement error
     @course = Course.create_unique
