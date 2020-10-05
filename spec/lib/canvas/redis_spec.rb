@@ -315,6 +315,29 @@ describe "Canvas::Redis" do
       expect(m).to match(/\(local_fake_redis\)/)
       expect(m).to match(/InheritedError/)
     end
+
+    it "tracks failure only briefly for local redis" do
+      local_node = "localhost:9999"
+      expect(Canvas::Redis.redis_failure?(local_node)).to be_falsey
+      Canvas::Redis.last_redis_failure[local_node] = Time.now
+      expect(Canvas::Redis.redis_failure?(local_node)).to be_truthy
+      Timecop.travel(4) do
+        expect(Canvas::Redis.redis_failure?(local_node)).to be_falsey
+      end
+    end
+
+    it "circuit breaks for standard nodes for a different amount of time" do
+      remote_node = "redis-test-node-42:9999"
+      expect(Canvas::Redis.redis_failure?(remote_node)).to be_falsey
+      Canvas::Redis.last_redis_failure[remote_node] = Time.now
+      expect(Canvas::Redis.redis_failure?(remote_node)).to be_truthy
+      Timecop.travel(4) do
+        expect(Canvas::Redis.redis_failure?(remote_node)).to be_truthy
+      end
+      Timecop.travel(400) do
+        expect(Canvas::Redis.redis_failure?(remote_node)).to be_falsey
+      end
+    end
   end
 end
 end

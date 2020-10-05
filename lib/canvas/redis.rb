@@ -69,6 +69,10 @@ module Canvas::Redis
   def self.redis_failure?(redis_name)
     return false unless last_redis_failure[redis_name]
     # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
+    if redis_name =~ /localhost/
+      # talking to local redis should not short ciruit as long
+      return (Time.now - last_redis_failure[redis_name]) < (Setting.get('redis_local_failure_time', '2').to_i rescue 2)
+    end
     return (Time.now - last_redis_failure[redis_name]) < (Setting.get('redis_failure_time', '300').to_i rescue 300)
   end
 
