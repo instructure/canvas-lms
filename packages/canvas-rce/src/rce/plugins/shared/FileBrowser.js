@@ -16,11 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
-import {arrayOf, bool, func, objectOf, shape, string} from 'prop-types'
+import React from 'react'
+import {func} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-layout'
-import {mediaObjectShape} from './fileShape'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
 
@@ -29,35 +28,11 @@ import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
 import {isPreviewable} from './Previewable'
 
 RceFileBrowser.propTypes = {
-  onFileSelect: func.isRequired,
-  fetchInitialMedia: func.isRequired,
-  fetchNextMedia: func.isRequired,
-  media: objectOf(
-    shape({
-      files: arrayOf(shape(mediaObjectShape)).isRequired,
-      bookmark: string,
-      hasMore: bool,
-      isLoading: bool,
-      error: string
-    })
-  ).isRequired
+  onFileSelect: func.isRequired
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect, fetchInitialMedia, fetchNextMedia} = props
-  const media = props.media.user
-  const {hasMore, isLoading, files} = media
-  const [fetchedInitial, setFetchedInitial] = useState(false)
-
-  useEffect(() => {
-    if (!fetchedInitial) {
-      fetchInitialMedia({order: 'asc', sort: 'alphabetical'})
-      setFetchedInitial(true)
-    } else if (hasMore && !isLoading) {
-      fetchNextMedia({order: 'asc', sort: 'alphabeetical'})
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [hasMore, isLoading, fetchedInitial])
+  const {onFileSelect} = props
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api['content-type']
@@ -81,12 +56,7 @@ export default function RceFileBrowser(props) {
 
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser
-        allowUpload={false}
-        selectFile={handleFileSelect}
-        mediaFiles={files}
-        contentTypes={['**']}
-      />
+      <FileBrowser allowUpload={false} selectFile={handleFileSelect} contentTypes={['**']} />
     </View>
   )
 }
