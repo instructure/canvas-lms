@@ -28,7 +28,6 @@ import {View} from '@instructure/ui-view'
 import {Tooltip, Tray} from '@instructure/ui-overlays'
 import {StoreProvider} from '../../shared/StoreContext'
 import {ClosedCaptionPanel} from '@instructure/canvas-media'
-import uploadMediaTranslations from '../mediaTranslations'
 import {
   CUSTOM,
   MIN_WIDTH_VIDEO,
@@ -225,7 +224,7 @@ export default function VideoOptionsTray(props) {
                               locale: st.locale,
                               file: {name: st.language} // this is an artifact of ClosedCaptionCreatorRow's inards
                             }))}
-                            uploadMediaTranslations={uploadMediaTranslations}
+                            uploadMediaTranslations={Bridge.uploadMediaTranslations}
                             languages={Bridge.languages}
                             updateSubtitles={handleUpdateSubtitles}
                             liveRegion={getLiveRegion}
