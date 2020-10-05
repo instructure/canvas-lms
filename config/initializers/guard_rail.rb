@@ -21,18 +21,3 @@ end
 if ENV['RAILS_DATABASE_USER']
   GuardRail.apply_config!(:username => ENV['RAILS_DATABASE_USER'], :password => nil)
 end
-
-# until all code can be updated
-module ShacklesShim
-  def activate(env)
-    env = case env
-      when :master; :primary
-      when :slave; :secondary
-      else; env
-    end
-    super(env)
-  end
-end
-GuardRail.singleton_class.prepend(ShacklesShim)
-
-Shackles = GuardRail
