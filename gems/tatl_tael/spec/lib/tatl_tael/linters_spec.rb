@@ -74,7 +74,7 @@ describe TatlTael::Linters do
         end
       end
 
-      context "filtering by whitelist" do
+      context "filtering by allowlist" do
         let(:added_change_path) { "path/to/foo" }
         let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
@@ -87,9 +87,9 @@ describe TatlTael::Linters do
         end
 
         context "include_regexes exist" do
-          let(:query) { {whitelist: ["**/zoo", "**/foo", "**/bar"]} }
+          let(:query) { {allowlist: ["**/zoo", "**/foo", "**/bar"]} }
 
-          it "returns the changes that don't match any of the whitelists" do
+          it "returns the changes that don't match any of the allowlists" do
             expect(base_linter.changes_matching(query)).to match([modified_change])
           end
         end
