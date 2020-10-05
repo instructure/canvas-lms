@@ -526,6 +526,74 @@ describe Rubric do
         expect(@rubric.criteria[1][:long_description]).to eq '<p>This is <b>awesome</b>.</p>'
       end
     end
+
+    describe "ordering of contents" do
+      let(:rubric) { Rubric.new }
+
+      it "sorts criteria based on the numerical values of their hash keys" do
+        rubric.update_criteria(
+          criteria: {
+            "206000" => {
+              description: "aaaaa",
+              ratings: { '0' => { description: "" } }
+            },
+            "106215" => {
+              description: "bbbbb",
+              ratings: { '0' => { description: "" } }
+            },
+            "6043341" => {
+              description: "ccccc",
+              ratings: { '0' => { description: "" } }
+            },
+            "fred" => {
+              description: "ddddd",
+              ratings: { '0' => { description: "" } }
+            }
+          },
+          title: "my rubric"
+        )
+
+        expect(rubric.criteria.pluck(:description)).to eq ["ddddd", "bbbbb", "aaaaa", "ccccc"]
+      end
+
+      it "sorts ratings within each criterion by the number of points in descending order" do
+        rubric.update_criteria(
+          criteria: {
+            "1" => {
+              description: "aaaaa",
+              ratings: {
+                "0" => { description: "ok", points: 5 },
+                "1" => { description: "good", points: 10 },
+                "2" => { description: "bad" }
+              }
+            }
+          },
+          title: "my rubric"
+        )
+
+        criterion = rubric.criteria.first
+        expect(criterion[:ratings].pluck(:description)).to eq ["good", "ok", "bad"]
+      end
+
+      it "sorts ratings with the same number of points by description" do
+        rubric.update_criteria(
+          criteria: {
+            "1" => {
+              description: "aaaaa",
+              ratings: {
+                "0" => { description: "ok", points: 5 },
+                "1" => { description: "also ok", points: 5 },
+                "2" => { description: "ok too", points: 5 }
+              }
+            }
+          },
+          title: "my rubric"
+        )
+
+        criterion = rubric.criteria.first
+        expect(criterion[:ratings].pluck(:description)).to eq ["also ok", "ok", "ok too"]
+      end
+    end
   end
 
   describe 'create' do

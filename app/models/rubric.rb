@@ -346,7 +346,6 @@ class Rubric < ActiveRecord::Base
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
       criterion[:id] = unique_item_id(criterion_data[:id])
       criterion[:criterion_use_range] = [true, 'true'].include?(criterion_data[:criterion_use_range])
-      ratings = []
       if criterion_data[:learning_outcome_id].present?
         outcome = LearningOutcome.where(id: criterion_data[:learning_outcome_id]).first
         criterion[:long_description] = outcome&.description || ''
@@ -356,16 +355,20 @@ class Rubric < ActiveRecord::Base
           criterion[:ignore_for_scoring] = criterion_data[:ignore_for_scoring] == '1'
         end
       end
-      (criterion_data[:ratings] || {}).each do |jdx, rating_data|
+
+      ratings = (criterion_data[:ratings] || {}).values.map do |rating_data|
         rating_data[:id]&.strip!
-        rating = criterion_rating(rating_data, criterion[:id])
-        ratings[jdx.to_i] = rating
+        criterion_rating(rating_data, criterion[:id])
       end
-      criterion[:ratings] = ratings.select{|r| r}.sort_by{|r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First]}
+      criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }
       criterion[:points] = criterion[:ratings].map{|r| r[:points]}.max || 0
-      criteria[idx.to_i] = criterion
+
+      # Record both the criterion data and the original ID that was passed in
+      # (we'll use the ID when we sort the criteria below)
+      criteria.push([idx, criterion])
     end
-    criteria = criteria.compact
+    criteria = criteria.sort_by { |criterion| criterion.first&.to_i || CanvasSort::First }.
+      map(&:second)
     points_possible = total_points_from_criteria(criteria)&.round(POINTS_POSSIBLE_PRECISION)
     CriteriaData.new(criteria, points_possible, title)
   end
