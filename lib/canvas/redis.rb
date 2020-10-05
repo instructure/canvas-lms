@@ -82,7 +82,10 @@ module Canvas::Redis
 
   def self.handle_redis_failure(failure_retval, redis_name)
     Setting.skip_cache do
-      return failure_retval if redis_failure?(redis_name)
+      if redis_failure?(redis_name)
+        Rails.logger.warn("  [REDIS] Short circuiting due to recent redis failure (#{redis_name})")
+        return failure_retval
+      end
     end
     reply = yield
     raise reply if reply.is_a?(Exception)
@@ -90,7 +93,8 @@ module Canvas::Redis
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
     # spring calls its after_fork hooks _after_ establishing a new db connection
     # after forking. so we don't get a chance to close the connection. just ignore
-    # the error
+    # the error (but lets use logging to make sure we know if it happens)
+    Rails.logger.error("  [REDIS] Query failure #{e.inspect} (#{redis_name})")
     return failure_retval if e.is_a?(::Redis::InheritedError) && defined?(Spring)
 
     # We want to rescue errors such as "max number of clients reached", but not
@@ -156,7 +160,7 @@ module Canvas::Redis
       last_command_args = Array.wrap(last_command)
       last_command = (last_command.respond_to?(:first) ? last_command.first : last_command).to_s
       failure_val = case last_command
-                    when 'keys', 'hmget'
+                    when 'keys', 'hmget', 'mget'
                       []
                     when 'scan'
                       ["0", []]
@@ -166,7 +170,6 @@ module Canvas::Redis
       if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
         failure_val = :failure
       end
-
       Canvas::Redis.handle_redis_failure(failure_val, self.location) do
         super
       end
