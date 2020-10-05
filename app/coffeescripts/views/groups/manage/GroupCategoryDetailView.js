@@ -26,6 +26,7 @@ import GroupCategoryEditView from './GroupCategoryEditView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from 'jst/groups/manage/groupCategoryDetail'
 import GroupModal from 'jsx/groups/components/GroupModal'
+import GroupImportModal from 'jsx/groups/components/GroupImportModal'
 
 export default class GroupCategoryDetailView extends View {
   static initClass() {
@@ -38,6 +39,7 @@ export default class GroupCategoryDetailView extends View {
       'click .edit-category': 'editCategory',
       'click .delete-category': 'deleteCategory',
       'click .add-group': 'addGroup',
+      'click .import-groups': 'importGroups',
       'click .clone-category': 'cloneCategory'
     }
 
@@ -80,6 +82,7 @@ export default class GroupCategoryDetailView extends View {
     json.canMessageMembers = this.model.canMessageUnassignedMembers()
     json.canAssignMembers = this.model.canAssignUnassignedMembers()
     json.locked = this.model.isLocked()
+    json.group_csv_import_enabled = ENV.group_csv_import_enabled
     return json
   }
 
@@ -120,6 +123,12 @@ export default class GroupCategoryDetailView extends View {
       />,
       document.getElementById('group-mount-point')
     )
+  }
+
+  importGroups(e) {
+    if (e) e.preventDefault()
+    const parent = document.getElementById('group-import-modal-mount-point')
+    ReactDOM.render(<GroupImportModal groupCategoryId={this.model.id} parent={parent} />, parent)
   }
 
   editCategory() {
