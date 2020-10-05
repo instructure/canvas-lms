@@ -1928,6 +1928,25 @@ describe MasterCourses::MasterMigration do
       expect(tag2_to.reload.position).to eq 1
     end
 
+    it "should try to properly append on the end even if the destination module item positions are lying" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+      mod = @copy_from.context_modules.create!(:name => "module")
+      tag1 = mod.add_item(type: 'context_module_sub_header', title: 'header')
+      tag2 = mod.add_item(type: 'context_module_sub_header', title: 'header2')
+
+      run_master_migration
+      @copy_to.context_modules.first.content_tags.update_all(:position => 1)
+
+      tag3 = mod.add_item(type: 'context_module_sub_header', title: 'header3') # should add at end
+      Timecop.freeze(2.seconds.from_now) do
+        mod.touch
+      end
+      run_master_migration
+      tag3_to = @copy_to.context_module_tags.where(:migration_id => mig_id(tag3)).first
+      expect(tag3_to.reload.position).to eq 3
+    end
+
     it "should be able to delete modules" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)
