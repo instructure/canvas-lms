@@ -199,7 +199,7 @@ class DeveloperKey < ActiveRecord::Base
     def find_cached(id)
       global_id = Shard.global_id_for(id)
       MultiCache.fetch("developer_key/#{global_id}") do
-        Shackles.activate(:slave) do
+        GuardRail.activate(:secondary) do
           DeveloperKey.find_by(id: global_id)
         end
       end or raise ActiveRecord::RecordNotFound

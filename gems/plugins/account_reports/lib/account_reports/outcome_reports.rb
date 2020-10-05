@@ -298,7 +298,7 @@ module AccountReports
 
       write_report header_names, enable_i18n_features do |csv|
         total = scope.length
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
         scope.each do |row|
           row = row.attributes.dup
 

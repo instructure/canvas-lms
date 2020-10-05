@@ -7521,9 +7521,7 @@ describe Assignment do
 
     it "doesn't reference multiple shards when accessed from a different shard" do
       @assignment = @course.assignments.create! points_possible: 10
-      allow(Assignment.connection).to receive(:use_qualified_names?).and_return(true)
       @shard1.activate do
-        allow(Assignment.connection).to receive(:use_qualified_names?).and_return(true)
         sql = @course.assignments.with_student_submission_count.to_sql
         expect(sql).to be_include(Shard.default.name)
         expect(sql).not_to be_include(@shard1.name)

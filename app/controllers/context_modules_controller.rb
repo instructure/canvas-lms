@@ -28,7 +28,7 @@ class ContextModulesController < ApplicationController
     include ContextModulesHelper
 
     def load_module_file_details
-      attachment_tags = Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').preload(:content => :folder).to_a }
+      attachment_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).where(content_type: 'Attachment').preload(:content => :folder).to_a }
       attachment_tags.inject({}) do |items, file_tag|
         items[file_tag.id] = {
           id: file_tag.id,
@@ -72,7 +72,7 @@ class ContextModulesController < ApplicationController
 
       @menu_tools = {}
       placements = [:assignment_menu, :discussion_topic_menu, :file_menu, :module_menu, :quiz_menu, :wiki_page_menu]
-      tools = Shackles.activate(:slave) do
+      tools = GuardRail.activate(:secondary) do
         ContextExternalTool.all_tools_for(@context, placements: placements,
           :root_account => @domain_root_account, :current_user => @current_user).to_a
       end
@@ -312,7 +312,7 @@ class ContextModulesController < ApplicationController
     if authorized_action(@context, @current_user, :read)
       info = {}
 
-      all_tags = Shackles.activate(:slave) { @context.module_items_visible_to(@current_user).to_a }
+      all_tags = GuardRail.activate(:secondary) { @context.module_items_visible_to(@current_user).to_a }
       user_is_admin = @context.grants_right?(@current_user, session, :read_as_admin)
 
       ActiveRecord::Associations::Preloader.new.preload(all_tags, :content)
@@ -368,7 +368,7 @@ class ContextModulesController < ApplicationController
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
 
       if is_child_course || is_master_course
-        tag_ids = Shackles.activate(:slave) do
+        tag_ids = GuardRail.activate(:secondary) do
           tag_scope = @context.module_items_visible_to(@current_user).where(:content_type => %w{Assignment Attachment DiscussionTopic Quizzes::Quiz WikiPage})
           tag_scope = tag_scope.where(:id => params[:tag_id]) if params[:tag_id]
           tag_scope.pluck(:id)

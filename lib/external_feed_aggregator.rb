@@ -28,14 +28,14 @@ class ExternalFeedAggregator
   end
 
   def process
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       start = Time.now.utc
       loop do
         feeds = ExternalFeed.to_be_polled(start).limit(1000).preload(context: :root_account).to_a
         break if feeds.empty?
 
         feeds.each do |feed|
-          Shackles.activate(:master) do
+          GuardRail.activate(:primary) do
             if feed.inactive?
               feed.update_attribute(:refresh_at, inactive_wait_seconds.seconds.from_now)
               next

@@ -473,7 +473,7 @@ module AccountReports
         # the "start" parameter is purely to
         # force activerecord to use LIMIT/OFFSET
         # rather than a cursor for this iteration
-        # because it often is big enough that the slave
+        # because it often is big enough that the secondary
         # kills it mid-run (http://www.postgresql.org/docs/9.0/static/hot-standby.html)
         enrol.preload(:root_account, :sis_pseudonym).find_in_batches(start: 0) do |batch|
           users = batch.map {|e| User.new(id: e.user_id)}.compact

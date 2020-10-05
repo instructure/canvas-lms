@@ -161,7 +161,7 @@ module Importers
           :sanitize_sql,
           [sql, hash[:question_name], hash.to_yaml, Time.now.utc, Time.now.utc, bank.id, hash[:migration_id], bank.root_account_id]
         )
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           id = AssessmentQuestion.connection.insert(query, "#{name} Create",
             AssessmentQuestion.primary_key, nil, AssessmentQuestion.sequence_name)
           hash['assessment_question_id'] = id

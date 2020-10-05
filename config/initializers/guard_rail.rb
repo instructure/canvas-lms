@@ -16,8 +16,23 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 if ENV['RAILS_DATABASE_ENVIRONMENT']
-  Shackles.activate!(ENV['RAILS_DATABASE_ENVIRONMENT'].to_sym)
+  GuardRail.activate!(ENV['RAILS_DATABASE_ENVIRONMENT'].to_sym)
 end
 if ENV['RAILS_DATABASE_USER']
-  Shackles.apply_config!(:username => ENV['RAILS_DATABASE_USER'], :password => nil)
+  GuardRail.apply_config!(:username => ENV['RAILS_DATABASE_USER'], :password => nil)
 end
+
+# until all code can be updated
+module ShacklesShim
+  def activate(env)
+    env = case env
+      when :master; :primary
+      when :slave; :secondary
+      else; env
+    end
+    super(env)
+  end
+end
+GuardRail.singleton_class.prepend(ShacklesShim)
+
+Shackles = GuardRail

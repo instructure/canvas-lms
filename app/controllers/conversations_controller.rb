@@ -585,7 +585,7 @@ class ConversationsController < ApplicationController
 
     @conversation.update_attribute(:workflow_state, "read") if @conversation.unread? && auto_mark_as_read?
     messages = nil
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       messages = @conversation.messages
       ActiveRecord::Associations::Preloader.new.preload(messages, :asset)
     end
@@ -1027,7 +1027,7 @@ class ConversationsController < ApplicationController
       f.updated = Time.now
       f.id = conversations_url
     end
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @entries = []
       @conversation_contexts = {}
       @current_user.conversations.each do |conversation|

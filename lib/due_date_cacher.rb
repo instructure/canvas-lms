@@ -322,7 +322,7 @@ class DueDateCacher
     @enrollment_counts ||= begin
       counts = EnrollmentCounts.new([], [], [])
 
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         # The various workflow states below try to mimic similarly named scopes off of course
         scope = Enrollment.select(
           :user_id,

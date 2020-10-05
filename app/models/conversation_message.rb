@@ -72,7 +72,7 @@ class ConversationMessage < ActiveRecord::Base
         SQL
       end
 
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         ret = where(base_conditions).
           joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id").
           select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").

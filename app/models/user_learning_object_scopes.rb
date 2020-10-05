@@ -61,7 +61,7 @@ module UserLearningObjectScopes
 
   def course_ids_for_todo_lists(permission_type, course_ids: nil, contexts: nil, include_concluded: false)
     shard.activate do
-      course_ids_result = Shackles.activate(:slave) do
+      course_ids_result = GuardRail.activate(:secondary) do
         if include_concluded
           all_course_ids
         else
@@ -130,7 +130,7 @@ module UserLearningObjectScopes
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
         Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do
-          result = Shackles.activate(:slave) do
+          result = GuardRail.activate(:secondary) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
                 yield(*arguments_for_objects_needing(
@@ -329,7 +329,7 @@ module UserLearningObjectScopes
       if scope_only
         as # This needs the below `select` somehow to work
       else
-        Shackles.activate(:slave) do
+        GuardRail.activate(:secondary) do
           as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
         end
       end

@@ -298,7 +298,7 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = Shackles.activate(:slave) do
+    tools = GuardRail.activate(:secondary) do
       ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user,
       :tool_ids => tool_ids}).to_a
@@ -872,7 +872,7 @@ class ApplicationController < ActionController::Base
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
   def get_context
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id]
           @context = api_find(Course.active, params[:course_id])
@@ -1076,7 +1076,7 @@ class ApplicationController < ActionController::Base
   end
 
   def content_participation_count(context, type, user)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       ContentParticipationCount.create_or_update({context: context, user: user, content_type: type})
     end
   end
@@ -1676,7 +1676,7 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    Shackles.activate(params[:action] == "edit" ? :master : :slave) do
+    GuardRail.activate(params[:action] == "edit" ? :primary : :secondary) do
       @wiki = @context.wiki
 
       @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])

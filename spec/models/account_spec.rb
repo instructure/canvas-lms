@@ -1800,7 +1800,6 @@ describe Account do
       specs_require_sharding
 
       it "should work cross-shard" do
-        allow(ActiveRecord::Base.connection).to receive(:use_qualified_names?).and_return(true)
         @shard1.activate do
           @account = Account.create!
           @user = user_factory(:name => "silly name")

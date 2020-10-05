@@ -464,7 +464,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
 
     max_records = Setting.get('master_courses_history_count', '150').to_i
     items = []
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
     MasterCourses::CONTENT_TYPES_FOR_UNSYNCED_CHANGES.each do |klass|
       item_scope = case klass
       when 'Attachment'

@@ -46,7 +46,7 @@ module Lti
         end
         pagination_args = {max_per_page: 100}
         respond_to do |format|
-          launch_defs = Shackles.activate(:slave) do
+          launch_defs = GuardRail.activate(:secondary) do
             Api.paginate(
               collection,
               self,

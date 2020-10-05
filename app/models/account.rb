@@ -888,8 +888,8 @@ class Account < ActiveRecord::Base
     end
 
     if starting_account_id
-      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
-      Shackles.activate(shackles_env) do
+      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      GuardRail.activate(guard_rail_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
           Account.find_by_sql(<<~SQL)
                 WITH RECURSIVE t AS (
@@ -915,7 +915,7 @@ class Account < ActiveRecord::Base
         end
 
         if starting_account_id
-          Shackles.activate(:slave) do
+          GuardRail.activate(:secondary) do
             ids = Account.connection.select_values(<<~SQL)
                   WITH RECURSIVE t AS (
                     SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
@@ -1009,8 +1009,8 @@ class Account < ActiveRecord::Base
 
   def self.sub_account_ids_recursive(parent_account_id)
     if connection.adapter_name == 'PostgreSQL'
-      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
-      Shackles.activate(shackles_env) do
+      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      GuardRail.activate(guard_rail_env) do
         sql = Account.sub_account_ids_recursive_sql(parent_account_id)
         Account.find_by_sql(sql).map(&:id)
       end
@@ -1284,7 +1284,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
-      @default_enrollment_term = Shackles.activate(:master) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
+      @default_enrollment_term = GuardRail.activate(:primary) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
     end
   end
 

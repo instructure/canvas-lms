@@ -226,30 +226,30 @@ class MessageableUser
       messageable_groups_by_shard.values.flatten
     end
 
-    def self.slave_module
-      @slave_module ||= Module.new.tap { |m| prepend(m) }
+    def self.secondary_module
+      @secondary_module ||= Module.new.tap { |m| prepend(m) }
     end
 
-    def self.slave(method)
-      slave_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+    def self.secondary(method)
+      secondary_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{method}(*)
-          Shackles.activate(:slave) { super }
+          GuardRail.activate(:secondary) { super }
         end
       RUBY
     end
 
-    slave :load_messageable_users
-    slave :messageable_users_in_context
-    slave :messageable_users_in_course
-    slave :messageable_users_in_section
-    slave :messageable_users_in_group
-    slave :count_messageable_users_in_context
-    slave :count_messageable_users_in_course
-    slave :count_messageable_users_in_section
-    slave :count_messageable_users_in_group
-    slave :search_messageable_users
-    slave :messageable_sections
-    slave :messageable_groups
+    secondary :load_messageable_users
+    secondary :messageable_users_in_context
+    secondary :messageable_users_in_course
+    secondary :messageable_users_in_section
+    secondary :messageable_users_in_group
+    secondary :count_messageable_users_in_context
+    secondary :count_messageable_users_in_course
+    secondary :count_messageable_users_in_section
+    secondary :count_messageable_users_in_group
+    secondary :search_messageable_users
+    secondary :messageable_sections
+    secondary :messageable_groups
 
     # ==========================  end of public API  ==========================
     # |                                                                       |

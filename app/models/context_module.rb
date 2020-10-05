@@ -128,7 +128,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def check_for_stale_cache_after_unlocking!
-    Shackles.activate(:master) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
+    GuardRail.activate(:primary) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
   end
 
   def is_prerequisite_for?(mod)
@@ -835,7 +835,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless user
     progression = nil
     self.shard.activate do
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         progression = context_module_progressions.where(user_id: user).first
         if !progression && context.enrollments.except(:preload).where(user_id: user).exists? # check if we should even be creating a progression for this user
           self.class.unique_constraint_retry do |retry_count|

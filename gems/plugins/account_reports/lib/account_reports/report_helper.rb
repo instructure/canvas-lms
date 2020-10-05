@@ -274,7 +274,7 @@ module AccountReports::ReportHelper
 
   def write_report(headers, enable_i18n_features = false, compile: false, &block)
     file = generate_and_run_report(headers, 'csv', enable_i18n_features, compile: compile, &block)
-    Shackles.activate(:master) { send_report(file) }
+    GuardRail.activate(:primary) { send_report(file) }
   end
 
   def generate_and_run_report(headers = nil, extension = 'csv', enable_i18n_features = false, compile: false)
@@ -287,7 +287,7 @@ module AccountReports::ReportHelper
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       activate_report_db(use_primary: compile) { yield csv } if block_given?
-      Shackles.activate(:master) { @account_report.update_attribute(:current_line, csv.lineno) }
+      GuardRail.activate(:primary) { @account_report.update_attribute(:current_line, csv.lineno) }
     end
     file
   end
@@ -360,11 +360,11 @@ module AccountReports::ReportHelper
       @account_report.add_report_runner(batch)
       ids_so_far += batch.length
       if ids_so_far >= Setting.get("ids_per_report_runner_batch", 10_000).to_i
-        Shackles.activate(:master) { @account_report.write_report_runners }
+        GuardRail.activate(:primary) { @account_report.write_report_runners }
         ids_so_far = 0
       end
     end
-    Shackles.activate(:master) { @account_report.write_report_runners }
+    GuardRail.activate(:primary) { @account_report.write_report_runners }
   end
 
   def activate_report_db(use_primary: false, &block)
@@ -375,11 +375,11 @@ module AccountReports::ReportHelper
     # but when we just wrote the data it may not exist, so use the primary
     # database.
     if use_primary == true
-      Shackles.activate(:master, &block)
+      GuardRail.activate(:primary, &block)
     elsif !!Shard.current.database_server.config[:report] && Setting.get('use_report_dbs_for_reports', 'true') == 'true'
-      Shackles.activate(:report, &block)
+      GuardRail.activate(:report, &block)
     else
-      Shackles.activate(:slave, &block)
+      GuardRail.activate(:secondary, &block)
     end
   end
 
@@ -436,7 +436,7 @@ module AccountReports::ReportHelper
   end
 
   def fail_with_error(error)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       # this should leave the runner that caused a failure to be in running or error state.
       @account_report.account_report_runners.in_progress.update_all(workflow_state: 'aborted')
       @account_report.delete_account_report_rows
@@ -468,7 +468,7 @@ module AccountReports::ReportHelper
     updates[:current_line] = current_line if account_report.current_line < current_line
     updates[:progress] = progress if account_report.progress < progress
     unless updates.empty?
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         AccountReport.where(id: account_report).where("progress <?", progress).update_all(updates)
       end
     end
@@ -491,7 +491,7 @@ module AccountReports::ReportHelper
   class ExtendedCSV < CsvWithI18n
     def <<(row)
       if lineno % 1_000 == 0
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           report = self.instance_variable_get(:@account_report).reload
           updates = {}
           updates[:current_line] = lineno
@@ -528,7 +528,7 @@ module AccountReports::ReportHelper
     else
       @account_report.parameters["extra_text"] = text
     end
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       @account_report.save!
     end
   end

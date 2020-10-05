@@ -7,7 +7,7 @@ module Messages
     end
 
     def self.process
-      Shackles.activate(:deploy) do
+      GuardRail.activate(:deploy) do
         log '*' * 80
         log '-' * 80
 
@@ -15,7 +15,7 @@ module Messages
 
         partman.ensure_partitions(precreate_tables)
 
-        Shard.current.database_server.unshackle {partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i)}
+        Shard.current.database_server.unguard {partman.prune_partitions(Setting.get("messages_partitions_keep_weeks", 52).to_i)}
 
         log 'Done. Bye!'
         log '*' * 80

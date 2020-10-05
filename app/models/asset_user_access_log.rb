@@ -147,7 +147,7 @@ class AssetUserAccessLog
         # table gets it's iterator reset).
         yesterday_model.transaction do
           if truncation_enabled?
-            Shackles.activate(:deploy) do
+            GuardRail.activate(:deploy) do
               yesterday_model.connection.truncate(yesterday_model.table_name)
             end
             compaction_state[:max_log_ids][yesterday_ts.wday] = 0
@@ -183,7 +183,7 @@ class AssetUserAccessLog
     log_batch_size = Setting.get("aua_log_batch_size", "10000").to_i
     max_compaction_time = Setting.get("aua_compaction_time_limit_in_minutes", "5").to_i
     compaction_start = Time.now.utc
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       # select the boundaries of the log segment we're going to iterate.
       # we may still _process_ records bigger than this as part of a single write,
       # but will stop loading new batches to pluck AUA ids from when we hit the maximum.
@@ -219,7 +219,7 @@ class AssetUserAccessLog
           # taking the full set of logs in that range)
           update_query = compaction_sql(log_segment_aggregation)
           new_iterator_pos = log_segment_aggregation.map{|r| r["max_id"]}.max
-          Shackles.activate(:master) do
+          GuardRail.activate(:primary) do
             partition_model.transaction do
               Rails.logger.info("[AUA_LOG_COMPACTION:#{Shard.current.id}] - batch updating (sometimes these queries don't get logged)...")
               partition_model.connection.execute(update_query)
@@ -244,7 +244,7 @@ class AssetUserAccessLog
           # make sure we actually process the next record by offsetting
           # to just under it's ID
           new_bookmark_id = next_id - 1
-          Shackles.activate(:master) do
+          GuardRail.activate(:primary) do
             compaction_state[:max_log_ids][ts.wday] = new_bookmark_id
             self.update_metadatum(compaction_state)
           end

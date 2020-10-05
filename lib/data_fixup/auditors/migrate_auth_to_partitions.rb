@@ -19,7 +19,7 @@ module DataFixup::Auditors::MigrateAuthToPartitions
   def self.run(batch_size: 1000, last_run_date_threshold: nil)
     partman = CanvasPartman::PartitionManager.create(::Auditors::ActiveRecord::AuthenticationRecord)
     if partman.migrate_data_to_partitions(timeout: 5.minutes, batch_size: batch_size)
-      Shackles.activate(:deploy) { Message.connection.update("TRUNCATE ONLY #{::Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name}") }
+      GuardRail.activate(:deploy) { Message.connection.update("TRUNCATE ONLY #{::Auditors::ActiveRecord::AuthenticationRecord.quoted_table_name}") }
     else
       self.requeue(batch_size: batch_size, last_run_date_threshold: last_run_date_threshold) # timed out
     end

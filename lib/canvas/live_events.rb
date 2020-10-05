@@ -554,7 +554,7 @@ module Canvas::LiveEvents
       grader_id = submission.global_grader_id
     end
 
-    sis_pseudonym = Shackles.activate(:slave) do
+    sis_pseudonym = GuardRail.activate(:secondary) do
       SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
     end
 

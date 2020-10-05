@@ -128,7 +128,7 @@ class AssignmentGroupsController < ApplicationController
   #
   # @returns [AssignmentGroup]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action(@context.assignment_groups.temp_record, @current_user, :read)
         groups = Api.paginate(@context.assignment_groups.active, self, api_v1_course_assignment_groups_url(@context))
 

@@ -39,7 +39,7 @@ module Canvas
       # commands
       def clear(force: false)
         if force
-          Shackles.activate(:deploy){ super }
+          GuardRail.activate(:deploy){ super }
         else
           # this makes sure only 1 process on a sighup'd box
           # will clear the cache, the others will find that the

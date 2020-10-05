@@ -934,7 +934,7 @@ class Assignment < ActiveRecord::Base
     self.context.require_assignment_group
     self.assignment_group = self.context.assignment_groups.active.first
     if do_save
-      Shackles.activate(:master) { save! }
+      GuardRail.activate(:primary) { save! }
     end
   end
 
@@ -1504,7 +1504,7 @@ class Assignment < ActiveRecord::Base
 
   def touch_on_unlock_if_necessary
     if self.unlock_at && Time.zone.now < self.unlock_at && (Time.zone.now + 1.hour) > self.unlock_at
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         # Because of assignemnt overrides, an assignment can have the same global id but
         # a different unlock_at time, so include that in the singleton key so that different
         # unlock_at times are properly handled.

@@ -94,8 +94,8 @@ class GradebooksController < ApplicationController
 
     @exclude_total = exclude_total?(@context)
 
-    Shackles.activate(:slave) do
-      # run these queries on the slave database for speed
+    GuardRail.activate(:secondary) do
+      # run these queries on the secondary database for speed
       @presenter.assignments
       aggregate_assignments
       @presenter.submissions

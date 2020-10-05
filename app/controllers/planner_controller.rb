@@ -118,7 +118,7 @@ class PlannerController < ApplicationController
   #   }
   #  ]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
 

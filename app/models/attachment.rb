@@ -703,7 +703,7 @@ class Attachment < ActiveRecord::Base
     quota_used = 0
     context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         context.shard.activate do
           quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
           quota = context.quota if (context.respond_to?("quota") && context.quota)
@@ -1284,7 +1284,7 @@ class Attachment < ActiveRecord::Base
 
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       send_later_enqueue_args(:touch, { :run_at => unlock_at,
                                         :singleton => "touch_on_unlock_attachment_#{global_id}" })
     end

@@ -391,8 +391,8 @@ class StreamItem < ActiveRecord::Base
       User.where(:id => user_ids.to_a).touch_all
     end
 
-    Shackles.activate(:deploy) do
-      Shard.current.database_server.unshackle do
+    GuardRail.activate(:deploy) do
+      Shard.current.database_server.unguard do
         StreamItem.vacuum
         StreamItemInstance.vacuum
         ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?

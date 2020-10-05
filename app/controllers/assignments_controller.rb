@@ -40,7 +40,7 @@ class AssignmentsController < ApplicationController
   before_action :normalize_title_param, :only => [:new, :edit]
 
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       return redirect_to(dashboard_url) if @context == @current_user
 
       if authorized_action(@context, @current_user, :read)
@@ -126,7 +126,7 @@ class AssignmentsController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
       if @assignment.deleted?
@@ -149,7 +149,7 @@ class AssignmentsController < ApplicationController
         @unlocked = !@locked || @assignment.grants_right?(@current_user, session, :update)
 
         unless @assignment.new_record? || (@locked && !@locked[:can_view])
-          Shackles.activate(:master) do
+          GuardRail.activate(:primary) do
             @assignment.context_module_action(@current_user, :read)
           end
         end
@@ -161,7 +161,7 @@ class AssignmentsController < ApplicationController
             !@current_user_submission.graded? &&
             !@current_user_submission.submission_type
           if @current_user_submission
-            Shackles.activate(:master) do
+            GuardRail.activate(:primary) do
               @current_user_submission.send_later(:context_module_action)
             end
           end

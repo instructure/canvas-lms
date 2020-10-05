@@ -60,7 +60,7 @@ class GradebookImporter
     @attachment = attachment
     @progress = progress
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @visible_assignments = AssignmentStudentVisibility.visible_assignment_ids_in_course_by_user(
         course_id: @context.id, user_id: @context.all_students.pluck(:id)
       )

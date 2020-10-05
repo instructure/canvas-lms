@@ -169,7 +169,7 @@ module Api::V1::StreamItem
   def api_render_stream_summary(contexts = nil)
     items = []
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @current_user.shard.activate do
         base_scope = @current_user.visible_stream_item_instances(:contexts => contexts).joins(:stream_item)
 

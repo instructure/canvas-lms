@@ -36,7 +36,7 @@ class EnrollmentState < ActiveRecord::Base
   end
 
   def ensure_current_state
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       retry_count = 0
       begin
         self.recalculate_state if self.state_needs_recalculation? || retry_count > 0 # force double-checking on lock conflict

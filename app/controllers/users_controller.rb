@@ -404,7 +404,7 @@ class UsersController < ApplicationController
 
     includes = (params[:include] || []) & %w{avatar_url email last_login time_zone uuid}
     includes << 'last_login' if params[:sort] == 'last_login' && !includes.include?('last_login')
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       users = Api.paginate(users, self, api_v1_account_users_url, page_opts)
       user_json_preloads(users, includes.include?('email'))
       User.preload_last_login(users, @context.resolved_root_account_id) if includes.include?('last_login') && !(params[:sort] == 'last_login')
@@ -560,7 +560,7 @@ class UsersController < ApplicationController
   end
 
   def dashboard_sidebar
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       unless @current_user&.has_student_enrollment? && !@current_user.non_student_enrollment?
         # it's not even using any of this for students - it's just using planner now
         prepare_current_user_dashboard_items
@@ -828,7 +828,7 @@ class UsersController < ApplicationController
   #     },
   #   ]
   def todo_items
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       return render_unauthorized_action unless @current_user
       bookmark = Plannable::Bookmarker.new(Assignment, false, [:due_at, :created_at], :id)
       grading_scope = @current_user.assignments_needing_grading(scope_only: true).
@@ -894,7 +894,7 @@ class UsersController < ApplicationController
   #     assignments_needing_submitting: 10
   #   }
   def todo_item_count
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       return render_unauthorized_action unless @current_user
       grading = @current_user.submissions_needing_grading_count
       submitting = @current_user.assignments_needing_submitting(include_ungraded: true, scope_only: true, limit: nil).size
@@ -974,7 +974,7 @@ class UsersController < ApplicationController
   def upcoming_events
     return render_unauthorized_action unless @current_user
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       prepare_current_user_dashboard_items
 
       events = @upcoming_events.map do |e|
@@ -1002,7 +1002,7 @@ class UsersController < ApplicationController
   #
   # @returns [Assignment]
   def missing_submissions
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       user = api_find(User, params[:user_id])
       return render_unauthorized_action unless @current_user && user.grants_right?(@current_user, :read)
 
@@ -1167,7 +1167,7 @@ class UsersController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       get_context
       @context_account = @context.is_a?(Account) ? @context : @domain_root_account
       @user = params[:id] && params[:id] != 'self' ? User.find(params[:id]) : @current_user

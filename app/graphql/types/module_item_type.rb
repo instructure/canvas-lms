@@ -23,7 +23,7 @@ class ModuleProgressionVisibleLoader < GraphQL::Batch::Loader
   end
 
   def perform(contexts)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       contexts.each do |context|
         # Use sequential_ids to insure the modules are in the correct oreder
         sequential_ids = context.sequential_module_item_ids

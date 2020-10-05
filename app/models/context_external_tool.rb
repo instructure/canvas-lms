@@ -686,7 +686,7 @@ end
   #
   # Tools with exclude_tool_id as their ID will never be returned.
   def self.find_external_tool(url, context, preferred_tool_id=nil, exclude_tool_id=nil, preferred_client_id=nil)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
 
@@ -970,7 +970,7 @@ end
         batch_object: user, batched_keys: [:enrollments, :account_users]) do
       # let them see admin level tools if there are any courses they can manage
       if root_account.grants_right?(user, :manage_content) ||
-        Shackles.activate(:slave) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
+        GuardRail.activate(:secondary) { Course.manageable_by_user(user.id, false).not_deleted.where(:root_account_id => root_account).exists? }
         'admins'
       else
         'members'

@@ -184,6 +184,11 @@ module PostgreSQLAdapterExtensions
     [index_name, index_type, index_columns, index_options, algorithm, using]
   end
 
+  # compatibility until plugins don't call this method anymore
+  def use_qualified_names?
+    true
+  end
+
   def add_index(table_name, column_name, options = {})
     # catch a concurrent index add that fails because it already exists, and is invalid
     if options[:algorithm] == :concurrently || options[:if_not_exists]
@@ -191,7 +196,7 @@ module PostgreSQLAdapterExtensions
       index_name = options[:name].to_s if options.key?(:name)
       index_name ||= index_name(table_name, column_names)
 
-      schema = shard.name if use_qualified_names?
+      schema = shard.name
 
       valid = select_value(<<~SQL, 'SCHEMA')
             SELECT indisvalid
