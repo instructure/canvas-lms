@@ -45,30 +45,62 @@ describe Rubric do
       }
     end
 
-    it "should allow updating learning outcome criteria" do
-      @outcome.short_description = 'alpha'
-      @outcome.description = 'beta'
-      criterion = {
-        :mastery_points => 3,
-        :ratings => [
-          { :points => 7, :description => "Exceeds Expectations" },
-          { :points => 3, :description => "Meets Expectations" },
-          { :points => 0, :description => "Does Not Meet Expectations" }
-        ]
-      }
-      @outcome.rubric_criterion = criterion
-      @rubric.update_learning_outcome_criteria(@outcome)
-      rubric_criterion = @rubric.criteria_object.first
-      expect(rubric_criterion.description).to eq 'alpha'
-      expect(rubric_criterion.long_description).to eq 'beta'
-      expect(rubric_criterion.ratings.length).to eq 3
-      expect(rubric_criterion.ratings.map(&:description)).to eq [
-        'Exceeds Expectations',
-        'Meets Expectations',
-        'Does Not Meet Expectations'
-      ]
-      expect(rubric_criterion.ratings.map(&:points)).to eq [7.0, 3.0, 0.0]
-      expect(@rubric.points_possible).to eq 12
+    context 'updating criteria' do
+      context 'from outcomes' do
+        before do
+          @outcome.short_description = 'alpha'
+          @outcome.description = 'beta'
+          criterion = {
+            :mastery_points => 3,
+            :ratings => [
+              { :points => 7, :description => "Exceeds Expectations" },
+              { :points => 3, :description => "Meets Expectations" },
+              { :points => 0, :description => "Does Not Meet Expectations" }
+            ]
+          }
+          @outcome.rubric_criterion = criterion
+        end
+
+        it "should allow updating learning outcome criteria" do
+          @rubric.update_learning_outcome_criteria(@outcome)
+          rubric_criterion = @rubric.criteria_object.first
+          expect(rubric_criterion.description).to eq 'alpha'
+          expect(rubric_criterion.long_description).to eq 'beta'
+          expect(rubric_criterion.ratings.length).to eq 3
+          expect(rubric_criterion.mastery_points).to eq 3
+          expect(rubric_criterion.ratings.map(&:description)).to eq [
+            'Exceeds Expectations',
+            'Meets Expectations',
+            'Does Not Meet Expectations'
+          ]
+          expect(rubric_criterion.ratings.map(&:points)).to eq [7.0, 3.0, 0.0]
+          expect(@rubric.points_possible).to eq 12
+        end
+
+        it 'should only update learning outcome text when mastery scales are enabled' do
+          Account.default.enable_feature! :account_level_mastery_scales
+          @rubric.update_learning_outcome_criteria(@outcome)
+          rubric_criterion = @rubric.criteria_object.first
+          expect(rubric_criterion.description).to eq 'alpha'
+          expect(rubric_criterion.long_description).to eq 'beta'
+          expect(rubric_criterion.ratings.length).to eq 2
+          expect(@rubric.points_possible).to eq 8
+        end
+      end
+
+      context 'from mastery scales' do
+        it 'should update scale and points from mastery scales' do
+          Account.default.enable_feature! :account_level_mastery_scales
+          outcome_proficiency_model(Account.default)
+          @rubric.update_mastery_scales
+
+          rubric_criterion = @rubric.criteria_object.first
+          expect(rubric_criterion.description).to eq 'Outcome row'
+          expect(rubric_criterion.long_description).to eq @outcome.description
+          expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'worst']
+          expect(@rubric.points_possible).to eq 15
+        end
+      end
     end
 
     it "should allow learning outcome rows in the rubric" do
@@ -513,6 +545,142 @@ describe Rubric do
       sub_account = root_account.sub_accounts.create!
       rubric_model({context: sub_account})
       expect(@rubric.root_account_id).to eq sub_account.root_account_id
+    end
+  end
+
+  context 'scope methods' do
+    before do
+      student_in_course
+    end
+
+    def make_rubric(*attributes, **opts)
+      opts[:context] ||= @course
+      opts[:user] ||= @student
+      rubric = attributes.include?(:aligned) ? outcome_with_rubric(opts) : rubric_model(opts)
+      association = nil
+
+      if (attributes & [:assessed, :associated]).present?
+        (opts[:association_count] || 1).times do
+          assignment = assignment_model(course: @course)
+          association = rubric_association_model(**opts, rubric: rubric, association_object: assignment, purpose: 'grading')
+        end
+      end
+      if attributes.include? :assessed
+        rubric_assessment_model(**opts, rubric: rubric, rubric_association: association)
+      end
+
+      rubric
+    end
+
+    describe 'aligned_to_outcomes' do
+      it 'distinguishes aligned from unaligned' do
+        course_aligned = make_rubric(:aligned)
+        _course_unaligned = make_rubric
+        account_aligned = make_rubric(:aligned, context: @account)
+        _account_unaligned = make_rubric(context: @account)
+        mixed_aligned = make_rubric(:aligned, outcome_context: @account)
+
+        expect(Rubric.aligned_to_outcomes).to contain_exactly(course_aligned, account_aligned, mixed_aligned)
+      end
+
+      it 'returns rubric only once despite multiple alignments' do
+        aligned_twice = make_rubric(:aligned)
+        second_outcome = outcome_model(context: @course)
+        aligned_twice.criteria << {
+          points: 5,
+          **second_outcome.rubric_criterion
+        }
+        aligned_twice.save!
+
+        expect(Rubric.aligned_to_outcomes).to contain_exactly(aligned_twice)
+      end
+
+      it 'mixes with other scopes' do
+        rubric1 = make_rubric(:aligned)
+        rubric2 = make_rubric(:aligned)
+        rubric1.destroy
+        expect(Rubric.active.aligned_to_outcomes).to contain_exactly(rubric2)
+      end
+    end
+
+    describe 'unassessed' do
+      it 'distinguishes assessed from unassessed' do
+        _assessed_account_rubric = make_rubric(:assessed, context: @account)
+        _assessed_course_rubric = make_rubric(:assessed)
+        unassessed_account_rubric = make_rubric(:associated, context: @account)
+        unassessed_course_rubric = make_rubric(:associated)
+        new_account_rubric = make_rubric(context: @account)
+        new_course_rubric = make_rubric
+
+        expect(Rubric.unassessed).to contain_exactly(new_account_rubric, new_course_rubric, unassessed_account_rubric, unassessed_course_rubric)
+      end
+
+      it 'mixes with other scopes' do
+        _assessed_rubric_with_outcome = make_rubric(:aligned, :assessed)
+        _assessed_rubric_without_outcome = make_rubric(:assessed)
+        unassessed_rubric_with_outcome = make_rubric(:aligned, :associated)
+        _unassessed_rubric_without_outcome = make_rubric(:associated)
+        new_rubric_with_outcome = make_rubric(:aligned)
+        _new_rubric_without_outcome = make_rubric
+
+        expect(Rubric.aligned_to_outcomes.unassessed).to contain_exactly(new_rubric_with_outcome, unassessed_rubric_with_outcome)
+
+        new_rubric_with_outcome.destroy
+        expect(Rubric.active.aligned_to_outcomes.unassessed).to contain_exactly(unassessed_rubric_with_outcome)
+      end
+    end
+
+    describe 'with_at_most_one_association' do
+      it 'distinguishes several associations with at most one' do
+        not_associated = make_rubric
+        associated_once = make_rubric(:associated)
+        _associated_twice = make_rubric(:associated, association_count: 2)
+        _associated_three_times = make_rubric(:associated, association_count: 3)
+
+        expect(Rubric.with_at_most_one_association).to contain_exactly(not_associated, associated_once)
+      end
+
+      it 'mixes with other scopes' do
+        not_associated = make_rubric
+        associated_once = make_rubric(:associated)
+        _associated_twice = make_rubric(:associated, association_count: 2)
+        aligned_not_associated = make_rubric(:aligned)
+        aligned_associated_once = make_rubric(:aligned, :associated)
+        _aligned_associated_twice = make_rubric(:aligned, :associated, association_count: 2)
+        _assessed_not_associated = make_rubric(:assessed)
+        _assessed_associated_once = make_rubric(:assessed, :associated)
+        _assessed_associated_twice = make_rubric(:assessed, :associated, association_count: 2)
+        aligned_assessed = make_rubric(:aligned, :assessed)
+        aligned_assessed_associated_once = make_rubric(:aligned, :assessed)
+        _aligned_assessed_associated_twice = make_rubric(:aligned, :assessed, association_count: 2)
+
+        expect(Rubric.aligned_to_outcomes.with_at_most_one_association).to contain_exactly(
+          aligned_not_associated,
+          aligned_associated_once,
+          aligned_assessed,
+          aligned_assessed_associated_once
+        )
+        expect(Rubric.with_at_most_one_association.unassessed).to contain_exactly(
+          not_associated,
+          associated_once,
+          aligned_not_associated,
+          aligned_associated_once
+        )
+        expect(Rubric.with_at_most_one_association.unassessed.aligned_to_outcomes).to contain_exactly(aligned_not_associated, aligned_associated_once)
+      end
+
+      it 'works for rubrics with multiple alignments' do
+        aligned_twice = make_rubric(:aligned, :associated)
+        second_outcome = outcome_model(context: @course)
+        aligned_twice.criteria << {
+          points: 5,
+          **second_outcome.rubric_criterion
+        }
+        aligned_twice.save!
+
+        expect(Rubric.aligned_to_outcomes.with_at_most_one_association).to contain_exactly(aligned_twice)
+      end
+
     end
   end
 end

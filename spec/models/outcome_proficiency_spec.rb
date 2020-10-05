@@ -177,4 +177,135 @@ describe OutcomeProficiency, type: :model do
       expect(proficiency).to eq default
     end
   end
+
+  describe 'updating rubrics' do
+    before(:once) do
+      account.enable_feature! :account_level_mastery_scales
+    end
+
+    let_once(:account) { account_model }
+    let_once(:course) { course_model(account: account) }
+    let_once(:account_rubric) { outcome_with_rubric(context: account) }
+    let_once(:course_rubric) { outcome_with_rubric(context: course) }
+    let_once(:outcome_proficiency) { outcome_proficiency_model(account) }
+    let(:ratings_hash) { outcome_proficiency.ratings_hash }
+
+    it 'updates associated rubrics when changed on an account' do
+      outcome_proficiency.outcome_proficiency_ratings[0].points = 20
+      outcome_proficiency.save!
+      expect(account_rubric.reload.points_possible).to eq 25
+      expect(course_rubric.reload.points_possible).to eq 25
+    end
+
+    it 'updates associated rubrics when changed on a course' do
+      ratings_hash[0][:points] = 30
+      course_proficiency = OutcomeProficiency.new(context: course)
+      course_proficiency.replace_ratings(ratings_hash)
+      course_proficiency.save!
+      expect(course_rubric.reload.points_possible).to eq 35
+      # unchanged
+      expect(account_rubric.reload.points_possible).to eq 15
+    end
+
+    it 'does not update rubrics when not changed' do
+      expect do
+        outcome_proficiency.replace_ratings(ratings_hash)
+        outcome_proficiency.save!
+      end.not_to change { account_rubric.reload.updated_at }
+    end
+
+    it 'does not update assessed rubrics' do
+      student_in_course(course: course)
+      rubric_assessment_model(rubric: course_rubric, context: course, user: @student, purpose: 'grading')
+      outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+      outcome_proficiency.save!
+      expect(course_rubric.reload.points_possible).to eq 15
+      # unassessed, so updated
+      expect(account_rubric.reload.points_possible).to eq 35
+    end
+
+    it 'does not update rubrics associated with multiple assignments' do
+      rubric_association_model(rubric: account_rubric, context: course, purpose: 'grading')
+      rubric_association_model(rubric: course_rubric, context: course, purpose: 'grading')
+      other_course = course_model(account: account)
+      rubric_association_model(rubric: account_rubric, context: other_course, purpose: 'grading')
+
+      outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+      outcome_proficiency.save!
+      expect(account_rubric.reload.points_possible).to eq 15
+      # associated with a single assignment, so updated
+      expect(course_rubric.reload.points_possible).to eq 35
+    end
+
+    context 'with subaccounts' do
+      let_once(:subaccount) { account_model(parent_account: account) }
+      let_once(:subaccount_course) { course_model(account: subaccount) }
+      let_once(:subaccount_rubric) { outcome_with_rubric(context: subaccount) }
+      let_once(:subaccount_course_rubric) { outcome_with_rubric(context: subaccount_course) }
+
+      it 'updates rubrics in subaccounts' do
+        outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+        outcome_proficiency.save!
+
+        expect(subaccount_rubric.reload.points_possible).to eq 35
+        expect(subaccount_course_rubric.reload.points_possible).to eq 35
+      end
+
+      it 'does not update rubrics from parent contexts' do
+        ratings_hash[0][:points] = 30
+        subaccount_proficiency = OutcomeProficiency.new(context: subaccount)
+        subaccount_proficiency.replace_ratings(ratings_hash)
+        subaccount_proficiency.save!
+
+        expect(subaccount_rubric.reload.points_possible).to eq 35
+        expect(subaccount_course_rubric.reload.points_possible).to eq 35
+        # not affected
+        expect(account_rubric.reload.points_possible).to eq 15
+        expect(course_rubric.reload.points_possible).to eq 15
+      end
+
+      it 'does not update rubrics when a subcontext has its own proficiency ratings' do
+        subaccount_proficiency = OutcomeProficiency.new(context: subaccount)
+        subaccount_proficiency.replace_ratings(ratings_hash)
+        subaccount_proficiency.save!
+
+        outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+        outcome_proficiency.save!
+
+        # does not update subaccount
+        expect(subaccount_rubric.reload.points_possible).to eq 15
+        expect(subaccount_course_rubric.reload.points_possible).to eq 15
+        # does update account
+        expect(account_rubric.reload.points_possible).to eq 35
+        expect(course_rubric.reload.points_possible).to eq 35
+      end
+    end
+
+    it 'does not update deleted rubrics' do
+      account_rubric.destroy!
+      outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+      outcome_proficiency.save!
+      expect(account_rubric.reload.points_possible).to eq 15
+    end
+
+    it 'updates associated rubrics when deleted and restored' do
+      ratings_hash[0][:points] = 30
+      course_proficiency = OutcomeProficiency.new(context: course)
+      course_proficiency.replace_ratings(ratings_hash)
+      course_proficiency.save!
+
+      expect(course_rubric.reload.points_possible).to eq 35
+      course_proficiency.destroy!
+      expect(course_rubric.reload.points_possible).to eq 15
+      course_proficiency.undestroy
+      expect(course_rubric.reload.points_possible).to eq 35
+    end
+
+    it 'does not update rubrics when mastery scales disabled' do
+      account.disable_feature! :account_level_mastery_scales
+      outcome_proficiency.outcome_proficiency_ratings[0].points = 30
+      outcome_proficiency.save!
+      expect(account_rubric.reload.points_possible).to eq 15
+    end
+  end
 end

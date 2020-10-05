@@ -45,7 +45,7 @@ class Rubric < ActiveRecord::Base
   scope :publicly_reusable, -> { where(:reusable => true).order(best_unicode_collation_key('title')) }
   scope :matching, lambda { |search| where(wildcard('rubrics.title', search)).order("rubrics.association_count DESC") }
   scope :before, lambda { |date| where("rubrics.created_at<?", date) }
-  scope :active, -> { where("workflow_state<>'deleted'") }
+  scope :active, -> { where.not(workflow_state: 'deleted') }
 
   set_policy do
     given {|user, session| self.context.grants_right?(user, session, :manage_rubrics)}
@@ -80,6 +80,39 @@ class Rubric < ActiveRecord::Base
   workflow do
     state :active
     state :deleted
+  end
+
+  def self.aligned_to_outcomes
+    where(
+      ContentTag.learning_outcome_alignments.
+        active.
+        where(content_type: 'Rubric').
+        where('content_tags.content_id = rubrics.id').
+        arel.exists
+    )
+  end
+
+  def self.with_at_most_one_association
+    joins(<<~JOINS).
+      LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
+      ON rubrics.id = associations_for_count.rubric_id
+      AND associations_for_count.purpose = 'grading'
+    JOINS
+      group('rubrics.id').
+      having('COUNT(rubrics.id) < 2')
+  end
+
+  def self.unassessed
+    joins(<<~JOINS).
+      LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
+      ON rubrics.id = associations_for_unassessed.rubric_id
+      AND associations_for_unassessed.purpose = 'grading'
+    JOINS
+      joins(<<~JOINS).
+        LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
+        ON associations_for_unassessed.id = assessments_for_unassessed.rubric_association_id
+      JOINS
+      where(assessments_for_unassessed: {id: nil})
   end
 
   def default_values
@@ -223,6 +256,29 @@ class Rubric < ActiveRecord::Base
     self
   end
 
+  def update_mastery_scales
+    return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
+
+    mastery_scale = context.resolved_outcome_proficiency
+    return if mastery_scale.nil?
+
+    self.data.each do |criterion|
+      update_criterion_from_mastery_scales(criterion, mastery_scale)
+    end
+    if self.data_changed?
+      self.points_possible = total_points_from_criteria(self.data)
+      self.save!
+    end
+  end
+
+  def update_criterion_from_mastery_scales(criterion, mastery_scale)
+    return unless criterion[:learning_outcome_id].present?
+
+    criterion[:points] = mastery_scale.points_possible
+    criterion[:mastery_points] = mastery_scale.mastery_points
+    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
+  end
+
   def update_learning_outcome_criteria(outcome)
     self.data.each do |criterion|
       update_learning_outcome_criterion(criterion, outcome) if criterion[:learning_outcome_id] == outcome.id
@@ -236,9 +292,11 @@ class Rubric < ActiveRecord::Base
   def update_learning_outcome_criterion(criterion, outcome)
     criterion[:description] = outcome.short_description
     criterion[:long_description] = outcome.description
-    criterion[:points] = outcome.points_possible
-    criterion[:mastery_points] = outcome.mastery_points
-    criterion[:ratings] = outcome.rubric_criterion.nil? ? [] : generate_criterion_ratings(outcome, criterion[:id])
+    unless context.root_account.feature_enabled?(:account_level_mastery_scales)
+      criterion[:points] = outcome.points_possible
+      criterion[:mastery_points] = outcome.mastery_points
+      criterion[:ratings] = outcome.rubric_criterion.nil? ? [] : generate_criterion_ratings(outcome, criterion[:id])
+    end
   end
 
   def generate_criterion_ratings(outcome, criterion_id)
