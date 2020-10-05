@@ -189,7 +189,7 @@ class RequestThrottle
   end
 
   def self.list_from_setting(key)
-    Set.new(Setting.get(key, '').split(',').map(&:strip).reject(&:blank?))
+    Set.new(Setting.get(key, '').split(',').map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.reject(&:blank?))
   end
 
   def self.dynamic_settings

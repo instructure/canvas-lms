@@ -164,6 +164,11 @@ describe 'RequestThrottle' do
       Setting.set('list_test', 'a:x,b:y ,  z ')
       expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
     end
+
+    it "allows and ignores comments" do
+      Setting.set('list_test', 'a:x;for fun,b:y ; just cause,  z ')
+      expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
+    end
   end
 
   describe "cost throttling" do
