@@ -157,6 +157,11 @@ describe "Canvas::Redis" do
         expect(Canvas.redis.setnx('my_key', 5)).to eq nil
       end
 
+      it "returns a non-nil structure for mget" do
+        expect(Canvas.redis._client).to receive(:ensure_connected).and_raise(Redis::TimeoutError).once
+        expect(Canvas.redis.mget(['k1', 'k2', 'k3'])).to eq []
+      end
+
       it "distinguishes between failure and not exists for set nx" do
         Canvas.redis.del('my_key')
         expect(Canvas.redis.set('my_key', 5, nx: true)).to eq true
@@ -282,6 +287,33 @@ describe "Canvas::Redis" do
   describe "Canvas::RedisWrapper" do
     it "should raise on unsupported commands" do
       expect { Canvas.redis.keys }.to raise_error(Canvas::Redis::UnsupportedRedisMethod)
+    end
+  end
+
+  describe "handle_redis_failure" do
+    before do
+      Canvas::Redis.patch
+    end
+
+    after do
+      Canvas::Redis.reset_redis_failure
+    end
+
+    it "logs any redis error when they occur" do
+      messages = []
+      expect(Rails.logger).to receive(:error) do |message|
+        messages << message
+      end.at_least(:once)
+      Canvas::Redis.handle_redis_failure({'failure'=>'val'}, 'local_fake_redis') do
+        raise ::Redis::InheritedError, "intentional failure"
+      end
+      expect(messages.length).to eq(2)
+      msgs = messages.select{|m| m =~ /Query failure/ }
+      expect(msgs.length).to eq(1)
+      m = msgs.first
+      expect(m).to match(/\[REDIS\] Query failure/)
+      expect(m).to match(/\(local_fake_redis\)/)
+      expect(m).to match(/InheritedError/)
     end
   end
 end
