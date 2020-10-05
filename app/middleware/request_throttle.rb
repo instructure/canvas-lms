@@ -55,7 +55,7 @@ class RequestThrottle
     bucket = LeakyBucket.new(client_identifier(request))
 
     up_front_cost = bucket.get_up_front_cost_for_path(path)
-    pre_judged = (whitelisted?(request) || blacklisted?(request))
+    pre_judged = (approved?(request) || blocked?(request))
     cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
       status, headers, response = if !allowed?(request, bucket)
         throttled = true
@@ -79,7 +79,7 @@ class RequestThrottle
     if client_identifier(request) && !client_identifier(request).starts_with?('session')
       headers['X-Request-Cost'] = cost.to_s unless throttled
       headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s
-      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blacklisted?(request)
+      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blocked?(request)
     end
 
     [status, headers, response]
@@ -102,16 +102,16 @@ class RequestThrottle
   end
 
   def subject_to_throttling?(request)
-    self.class.enabled? && Canvas.redis_enabled? && !whitelisted?(request) && !blacklisted?(request)
+    self.class.enabled? && Canvas.redis_enabled? && !approved?(request) && !blocked?(request)
   end
 
   def allowed?(request, bucket)
-    if whitelisted?(request)
+    if approved?(request)
       return true
-    elsif blacklisted?(request)
-      # blacklisting is useful even if throttling is disabled, this is left in intentionally
-      Rails.logger.info("blocking request due to blacklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
-      InstStatsd::Statsd.increment("request_throttling.blacklisted")
+    elsif blocked?(request)
+      # blocking is useful even if throttling is disabled, this is left in intentionally
+      Rails.logger.info("blocking request due to blocklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
+      InstStatsd::Statsd.increment("request_throttling.blocked")
       return false
     else
       if bucket.full?
@@ -127,12 +127,12 @@ class RequestThrottle
     end
   end
 
-  def blacklisted?(request)
-    client_identifiers(request).any? { |id| self.class.blacklist.include?(id) }
+  def blocked?(request)
+    client_identifiers(request).any? { |id| self.class.blocklist.include?(id) }
   end
 
-  def whitelisted?(request)
-    client_identifiers(request).any? { |id| self.class.whitelist.include?(id) }
+  def approved?(request)
+    client_identifiers(request).any? { |id| self.class.approvelist.include?(id) }
   end
 
   def client_identifier(request)
@@ -171,16 +171,16 @@ class RequestThrottle
     request.env['rack.session.options'].try(:[], :id)
   end
 
-  def self.blacklist
-    @blacklist ||= list_from_setting('request_throttle.blacklist')
+  def self.blocklist
+    @blocklist ||= list_from_setting('request_throttle.blocklist')
   end
 
-  def self.whitelist
-    @whitelist ||= list_from_setting('request_throttle.whitelist')
+  def self.approvelist
+    @approvelist ||= list_from_setting('request_throttle.approvelist')
   end
 
   def self.reload!
-    @whitelist = @blacklist = @dynamic_settings = nil
+    @approvelist = @blocklist = @dynamic_settings = nil
     LeakyBucket.reload!
   end
 
