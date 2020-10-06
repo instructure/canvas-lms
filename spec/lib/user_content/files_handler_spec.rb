@@ -140,6 +140,32 @@ describe UserContent::FilesHandler do
           end
         end
       end
+
+      context 'user cannot access attachment' do
+        let(:subject) do
+          UserContent::FilesHandler.new(
+            match: uri_match,
+            context: attachment.context,
+            user: current_user,
+            preloaded_attachments: preloaded_attachments,
+            is_public: is_public,
+            in_app: in_app
+          )
+        end
+
+        before(:each) do
+          allow(subject).to receive(:user_can_access_attachment?).and_return false
+        end
+
+        context 'url contains invalid uri' do
+          # single quotes will make it valid uri, so keep this in double quotes
+          let(:match_part) { "download?foo=505720\u00A0" }
+
+          it 'handles escape characters' do
+            expect(subject.processed_url).to match(/#{attachment.context_type.tableize}/)
+          end
+        end
+      end
     end
   end
 end
