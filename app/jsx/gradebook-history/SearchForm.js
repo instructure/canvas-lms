@@ -374,7 +374,11 @@ class SearchFormComponent extends Component {
               </View>
 
               {environment.overrideGradesEnabled() && (
-                <View as="div" margin="medium 0">
+                <View
+                  as="div"
+                  margin="medium 0"
+                  data-testid="show-final-grade-overrides-only-checkbox"
+                >
                   <Checkbox
                     checked={this.state.selected.showFinalGradeOverridesOnly}
                     id="show_final_grade_overrides_only"

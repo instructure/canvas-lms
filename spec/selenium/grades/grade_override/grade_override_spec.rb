@@ -23,11 +23,18 @@ require_relative '../pages/gradebook/settings'
 require_relative '../pages/gradebook_cells_page'
 require_relative '../pages/srgb_page'
 require_relative '../pages/student_grades_page'
+require_relative '../pages/gradebook_history_page'
+require_relative '../setup/gb_history_search_setup'
 
 describe 'Final Grade Override' do
   include_context 'in-process server selenium tests'
+  include GradebookHistorySetup
 
-  before(:once) do
+  before(:each) do
+    # needed until Jenkins starts using active record and cassandra is killed
+    allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
+    allow(AuditLogFieldExtension).to receive(:enabled?).and_return(false)
+
     course_with_teacher(course_name: "Grade Override", active_course: true,active_enrollment: true,name: "Teacher Boss1",active_user: true)
     @course.update!(grading_standard_enabled: true)
     @students = create_users_in_course(@course, 5, return_type: :record, name_prefix: "Purple")
@@ -47,13 +54,10 @@ describe 'Final Grade Override' do
   end
 
   context "Individual Gradebook" do
-    before(:once) do
+    before(:each) do
       @student = @students.first
       @enrollment = @course.enrollments.find_by(user: @student)
       @enrollment.scores.find_by(course_score: true).update!(override_score: 97.1)
-    end
-
-    before(:each) do
       user_session(@teacher)
       SRGB.visit(@course.id)
       SRGB.allow_final_grade_override_option.click
@@ -103,6 +107,54 @@ describe 'Final Grade Override' do
       user_session(@students.first)
       StudentGradesPage.visit_as_student(@course)
       expect(StudentGradesPage.final_grade.text).to eql "90%"
+    end
+  end
+
+  context "Gradebook History" do
+    before(:each) do
+      @course.update!(allow_final_grade_override: true)
+      @teacher.save
+
+      user_session(@teacher)
+      Gradebook.visit(@course)
+      Gradebook::Cells.edit_override(@students.first, 90.0)
+    end
+
+    context "when final_grade_override_in_gradebook_history flag is enabled" do
+      before(:each) do
+        Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+        GradeBookHistory.visit(@course)
+        wait_for_ajaximations
+      end
+
+      it 'displays checkbox to show final grade overrides only when final_grade_override_in_gradebook_history flag enabled' do
+
+        expect(GradeBookHistory.final_grade_override_checkbox).to be_displayed
+      end
+
+      it 'displays final grade override grade changes when final_grade_override_in_gradebook_history flag is enabled' do
+
+        expect(GradeBookHistory).to be_contains_final_grade_override_entries
+      end
+
+      it 'displays final grade override grade changes only when filter is applied' do
+        GradeBookHistory.search_final_grade_override_only
+
+        expect(GradeBookHistory).to be_contains_only_final_grade_override_entries
+      end
+    end
+
+    context "when final_grade_override_in_gradebook_history flag is disabled" do
+      before(:each) do
+        Account.site_admin.disable_feature!(:final_grade_override_in_gradebook_history)
+        GradeBookHistory.visit(@course)
+        wait_for_ajaximations
+      end
+
+      it 'does not display final grade override grade changes when final_grade_override_in_gradebook_history flag is disabled' do
+
+        expect(GradeBookHistory).not_to be_contains_final_grade_override_entries
+      end
     end
   end
 end
