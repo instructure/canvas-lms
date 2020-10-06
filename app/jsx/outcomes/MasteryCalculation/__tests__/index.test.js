@@ -19,7 +19,11 @@
 import React from 'react'
 import {render, wait, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
+import {
+  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
+  COURSE_OUTCOME_PROFICIENCY_QUERY,
+  SET_OUTCOME_CALCULATION_METHOD
+} from '../api'
 import MasteryCalculation from '../index'
 
 describe('MasteryCalculation', () => {
@@ -38,26 +42,44 @@ describe('MasteryCalculation', () => {
     window.ENV = null
   })
 
+  const outcomeCalculationMethod = {
+    __typename: 'OutcomeCalculationMethod',
+    _id: '1',
+    contextType: 'Account',
+    contextId: 1,
+    calculationMethod: 'decaying_average',
+    calculationInt: 65
+  }
+
   const mocks = [
     {
       request: {
-        query: OUTCOME_PROFICIENCY_QUERY,
+        query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
         variables: {
           contextId: '11'
         }
       },
       result: {
         data: {
-          account: {
+          context: {
             __typename: 'Account',
-            outcomeCalculationMethod: {
-              __typename: 'OutcomeCalculationMethod',
-              _id: '1',
-              contextType: 'Account',
-              contextId: 1,
-              calculationMethod: 'decaying_average',
-              calculationInt: 65
-            }
+            outcomeCalculationMethod
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: COURSE_OUTCOME_PROFICIENCY_QUERY,
+        variables: {
+          contextId: '12'
+        }
+      },
+      result: {
+        data: {
+          context: {
+            __typename: 'Course',
+            outcomeCalculationMethod
           }
         }
       }
@@ -72,6 +94,17 @@ describe('MasteryCalculation', () => {
     )
     expect(getByText('Loading')).not.toEqual(null)
     await waitForElementToBeRemoved(() => queryByText('Loading'))
+    expect(getByDisplayValue(/65/)).not.toEqual(null)
+  })
+
+  it('loads proficiency data for Course', async () => {
+    const {getByText, getByDisplayValue} = render(
+      <MockedProvider mocks={mocks}>
+        <MasteryCalculation contextType="Course" contextId="12" />
+      </MockedProvider>
+    )
+    expect(getByText('Loading')).not.toEqual(null)
+    await wait()
     expect(getByDisplayValue(/65/)).not.toEqual(null)
   })
 
@@ -101,14 +134,14 @@ describe('MasteryCalculation', () => {
     const emptyMocks = [
       {
         request: {
-          query: OUTCOME_PROFICIENCY_QUERY,
+          query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
             contextId: '11'
           }
         },
         result: {
           data: {
-            account: {
+            context: {
               __typename: 'Account',
               outcomeCalculationMethod: null
             }

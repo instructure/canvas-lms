@@ -22,11 +22,18 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyTable from './ProficiencyTable'
 import RoleList from '../RoleList'
-import {saveProficiency, OUTCOME_PROFICIENCY_QUERY} from './api'
+import {
+  saveProficiency,
+  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
+  COURSE_OUTCOME_PROFICIENCY_QUERY
+} from './api'
 import {useQuery} from 'react-apollo'
 
 const MasteryScale = ({contextType, contextId}) => {
-  const {loading, error, data} = useQuery(OUTCOME_PROFICIENCY_QUERY, {
+  const query =
+    contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
+
+  const {loading, error, data} = useQuery(query, {
     variables: {contextId}
   })
 
@@ -70,28 +77,29 @@ const MasteryScale = ({contextType, contextId}) => {
       </Text>
     )
   }
-  const {outcomeProficiency} = data.account
+  const {outcomeProficiency} = data.context
+
   const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
   const canManage = ENV.PERMISSIONS.manage_proficiency_scales
   return (
     <div>
-      {canManage && (
-        <>
-          <p>
-            <Text>
-              {I18n.t(
-                'This mastery scale will be used as the default for all courses within your account.'
-              )}
-            </Text>
-          </p>
-
-          <RoleList
-            description={I18n.t(
-              'Permission to change this mastery scale is enabled at the account level for:'
+      {canManage && contextType === 'Account' && (
+        <p>
+          <Text>
+            {I18n.t(
+              'This mastery scale will be used as the default for all courses within your account.'
             )}
-            roles={roles}
-          />
-        </>
+          </Text>
+        </p>
+      )}
+
+      {canManage && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery scale is enabled at the account level for:'
+          )}
+          roles={roles}
+        />
       )}
 
       <ProficiencyTable

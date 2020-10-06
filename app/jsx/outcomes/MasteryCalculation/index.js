@@ -22,11 +22,17 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import ProficiencyCalculation from './ProficiencyCalculation'
 import RoleList from '../RoleList'
-import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from './api'
+import {
+  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
+  COURSE_OUTCOME_PROFICIENCY_QUERY,
+  SET_OUTCOME_CALCULATION_METHOD
+} from './api'
 import {useQuery, useMutation} from 'react-apollo'
 
 const MasteryCalculation = ({contextType, contextId}) => {
-  const {loading, error, data} = useQuery(OUTCOME_PROFICIENCY_QUERY, {
+  const query =
+    contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
+  const {loading, error, data} = useQuery(query, {
     variables: {contextId}
   })
 
@@ -56,7 +62,7 @@ const MasteryCalculation = ({contextType, contextId}) => {
       </Text>
     )
   }
-  const {outcomeCalculationMethod} = data.account
+  const {outcomeCalculationMethod} = data.context
   const roles = ENV.PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES || []
   const canManage = ENV.PERMISSIONS.manage_proficiency_calculations
   return (

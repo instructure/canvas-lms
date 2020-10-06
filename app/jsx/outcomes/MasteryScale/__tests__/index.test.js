@@ -20,7 +20,7 @@ import React from 'react'
 import {render, wait, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
-import {OUTCOME_PROFICIENCY_QUERY} from '../api'
+import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY, COURSE_OUTCOME_PROFICIENCY_QUERY} from '../api'
 import MasteryScale from '../index'
 
 describe('MasteryScale', () => {
@@ -39,46 +39,64 @@ describe('MasteryScale', () => {
     window.ENV = null
   })
 
+  const outcomeProficiency = {
+    __typename: 'OutcomeProficiency',
+    _id: '1',
+    contextId: 1,
+    contextType: 'Account',
+    locked: false,
+    proficiencyRatingsConnection: {
+      __typename: 'ProficiencyRatingConnection',
+      nodes: [
+        {
+          __typename: 'ProficiencyRating',
+          _id: '2',
+          color: '009606',
+          description: 'Rating A',
+          mastery: false,
+          points: 9
+        },
+        {
+          __typename: 'ProficiencyRating',
+          _id: '6',
+          color: 'EF4437',
+          description: 'Rating B',
+          mastery: false,
+          points: 6
+        }
+      ]
+    }
+  }
+
   const mocks = [
     {
       request: {
-        query: OUTCOME_PROFICIENCY_QUERY,
+        query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
         variables: {
           contextId: '11'
         }
       },
       result: {
         data: {
-          account: {
+          context: {
             __typename: 'Account',
-            outcomeProficiency: {
-              __typename: 'OutcomeProficiency',
-              _id: '1',
-              contextId: 1,
-              contextType: 'Account',
-              locked: false,
-              proficiencyRatingsConnection: {
-                __typename: 'ProficiencyRatingConnection',
-                nodes: [
-                  {
-                    __typename: 'ProficiencyRating',
-                    _id: '2',
-                    color: '009606',
-                    description: 'Rating A',
-                    mastery: false,
-                    points: 9
-                  },
-                  {
-                    __typename: 'ProficiencyRating',
-                    _id: '6',
-                    color: 'EF4437',
-                    description: 'Rating B',
-                    mastery: false,
-                    points: 6
-                  }
-                ]
-              }
-            }
+            outcomeProficiency
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: COURSE_OUTCOME_PROFICIENCY_QUERY,
+        variables: {
+          contextId: '12'
+        }
+      },
+      result: {
+        data: {
+          context: {
+            __typename: 'Course',
+            outcomeProficiency
           }
         }
       }
@@ -89,6 +107,17 @@ describe('MasteryScale', () => {
     const {getByText, getByDisplayValue} = render(
       <MockedProvider mocks={mocks}>
         <MasteryScale contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    expect(getByText('Loading')).not.toEqual(null)
+    await wait()
+    expect(getByDisplayValue(/Rating A/)).not.toEqual(null)
+  })
+
+  it('loads proficiency data to Course', async () => {
+    const {getByText, getByDisplayValue} = render(
+      <MockedProvider mocks={mocks}>
+        <MasteryScale contextType="Course" contextId="12" />
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
@@ -122,14 +151,14 @@ describe('MasteryScale', () => {
     const emptyMocks = [
       {
         request: {
-          query: OUTCOME_PROFICIENCY_QUERY,
+          query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
             contextId: '11'
           }
         },
         result: {
           data: {
-            account: {
+            context: {
               __typename: 'Account',
               outcomeProficiency: null
             }
