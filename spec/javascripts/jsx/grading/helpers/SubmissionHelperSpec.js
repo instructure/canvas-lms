@@ -18,6 +18,7 @@
 
 import {
   isPostable,
+  isHideable,
   extractSimilarityInfo,
   similarityIcon
 } from 'jsx/grading/helpers/SubmissionHelper'
@@ -31,7 +32,8 @@ QUnit.module('SubmissionHelper', suiteHooks => {
       hasPostableComments: false,
       score: null,
       submissionComments: [],
-      workflowState: 'unsubmitted'
+      workflowState: 'unsubmitted',
+      postedAt: null
     }
   })
 
@@ -67,6 +69,17 @@ QUnit.module('SubmissionHelper', suiteHooks => {
         submission.workflowState = 'graded'
         strictEqual(isPostable(submission), false)
       })
+    })
+  })
+
+  QUnit.module('.isHideable', () => {
+    test('is true when submission is posted', () => {
+      submission.postedAt = '2020-10-20T15:24:26Z'
+      strictEqual(isHideable(submission), true)
+    })
+
+    test('is false when submission is not posted', () => {
+      strictEqual(isHideable(submission), false)
     })
   })
 
