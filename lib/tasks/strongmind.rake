@@ -198,6 +198,35 @@ namespace :strongmind do
     puts "3rd party setting is #{value}"
   end
 
+  desc "Generate Prima Term Report"
+  task :generate_prima_term_report, [:term, :length] do |task, args|
+    length = args[:length] ? args[:length].to_i : 2
+
+    if !args[:term]
+      puts "Please supply a term"
+    else
+      Course.where("created_at > ? AND name ILIKE ?", length.months.ago, "%#{args[:term]}%").each do |course|
+        course.student_enrollments.each do |se|
+          user = se.user
+          psu = user.pseudonyms.active.find_by("LENGTH(pseudonyms.integration_id) = 36")
+          next if !psu.email || psu.email.downcase.include?("strongmind") || user.id == 1 || user.name.downcase == "test student"
+
+          identity = HTTParty.get(
+            "https://#{user.identity_domain}/api/accounts/#{psu.integration_id}/withProfile",
+            :headers => {
+              'Authorization' => "Bearer #{user.access_token}"
+            })
+
+          email = identity.fetch("email", nil)
+          name = identity.fetch("username", nil)
+
+          puts "#{user.name},#{name},#{email}" if email && name
+        end
+      end
+    end
+  end
+
+
   desc "Enable Identity Server 2.0"
   task :enable_identity_server, [:key, :secret, :auth_id, :identity_domain] => :environment do |task, args|
     if !args[:key] || !args[:secret]
