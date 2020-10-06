@@ -503,7 +503,7 @@ pipeline {
                 echo 'adding CDC Schema check'
                 stages['CDC Schema Check'] = {
                   build job: '../Canvas/cdc-event-transformer-master', parameters: [
-                    string(name: 'CANVAS_LMS_IMAGE_TAG', value: "${imageTagVersion()}-${env.TAG_SUFFIX}")
+                    string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
                   ]
                 }
               }
