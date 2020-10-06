@@ -32,7 +32,7 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :delayed_messages, :dependent => :destroy
   has_many :messages
 
-  before_create :set_root_account_ids
+  before_save :set_root_account_ids
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
   validates_presence_of :path, :path_type, :user, :workflow_state
@@ -451,23 +451,13 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
 
-  def set_root_account_ids(persist_changes: false)
-    self.root_account_ids = user.root_account_ids&.map do |root_account_id|
-      local_account_id, account_shard = Shard.local_id_for(root_account_id)
-
-      # If the root_account_id from the user was a local ID, assume shard of user
-      account_shard ||= user.shard
-
-      # If the root account's shard is the same as the communication channel's shard,
-      # we want to use a local ID to reference it. Otherwise use a global ID that
-      # points to the root account on a foreign shard
-      if account_shard == self.shard
-        local_account_id
-      else
-        Shard.global_id_for(local_account_id, account_shard)
-      end
+  def set_root_account_ids(persist_changes: false, log: false)
+    # communication_channels always are on the same shard as the user object and
+    # can be used for any root_account, so just set root_account_ids from user.
+    self.root_account_ids = user.root_account_ids
+    if root_account_ids_changed? && log
+      InstStatsd::Statsd.increment("communication_channel.root_account_ids_set", short_stat: 'communication_channel.root_account_ids_set')
     end
-
     save! if persist_changes && root_account_ids_changed?
   end
 

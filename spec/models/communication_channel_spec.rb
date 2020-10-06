@@ -490,51 +490,23 @@ describe CommunicationChannel do
 
         before { user.update_columns(root_account_ids: root_account_ids) }
 
-        context 'when the user belongs to a foreign shard' do
-          let(:user) { @shard2.activate { User.create! } }
+        let(:user) { User.create! }
 
-          before(:each) do
-            shadow_user = User.create
-            shadow_user.update_attribute(:id, user.global_id)
-          end
+        context 'is associated with root accounts on a foreign shard' do
+          let(:globalized_ids) { [Shard.global_id_for(1, @shard2), Shard.global_id_for(2, @shard2)] }
+          let(:root_account_ids) { globalized_ids }
 
-          context 'and is associated with root accounts on the foreign shard' do
-            let(:root_account_ids) { [1, 2] }
-
-            it 'globalizes the foreign root_account_ids' do
-              expect(subject).to match_array root_account_ids.map { |id| Shard.global_id_for(id, user.shard) }
-            end
-          end
-
-          context 'and is associated with root accounts on the local shard' do
-            let(:localized_ids) { [1, 2] }
-            let(:root_account_ids) { localized_ids.map { |id| Shard.global_id_for(id, Shard.current) } }
-
-            it 'localizes the local root_account_ids' do
-              expect(subject).to match_array localized_ids
-            end
+          it 'keeps the root account IDs global' do
+            expect(subject).to match_array globalized_ids
           end
         end
 
-        context 'when the user belongs to the local shard' do
-          let(:user) { User.create! }
+        context 'is associated with root accounts on the local shard' do
+          let(:localized_ids) { [1, 2] }
+          let(:root_account_ids) { localized_ids }
 
-          context 'and is associated with root accounts on a foreign shard' do
-            let(:globalized_ids) { [Shard.global_id_for(1, @shard2), Shard.global_id_for(2, @shard2)] }
-            let(:root_account_ids) { globalized_ids }
-
-            it 'keeps the root account IDs global' do
-              expect(subject).to match_array globalized_ids
-            end
-          end
-
-          context 'and is associated with root accounts on the local shard' do
-            let(:localized_ids) { [1, 2] }
-            let(:root_account_ids) { localized_ids }
-
-            it 'keeps the root account IDs local' do
-              expect(subject).to match_array localized_ids
-            end
+          it 'keeps the root account IDs local' do
+            expect(subject).to match_array localized_ids
           end
         end
       end

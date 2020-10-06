@@ -430,45 +430,32 @@ class User < ActiveRecord::Base
   ensure
     @skip_updating_account_associations = false
   end
+
   def self.skip_updating_account_associations?
     !!@skip_updating_account_associations
   end
 
   # Update the root_account_ids column on the user
-  # and all associated CommunicationChannels
+  # and all the users CommunicationChannels
   def update_root_account_ids
     # See User#associated_shards in MRA for an explanation of
     # shard association levels
     shards = associated_shards(:strong) + associated_shards(:weak)
 
     refreshed_root_account_ids = Set.new
-    communication_channels_to_update = Set.new
 
     Shard.with_each_shard(shards) do
-      UserAccountAssociation.joins(:account).
-        where(user: self, accounts: { parent_account_id: nil }).
-        preload(:account).
-        find_each do |association|
-          refreshed_root_account_ids << association.global_account_id
-        end
-
-      # Users can potentially have communication_channels on
-      # any of their associated shards. Collect those communication
-      # channels here for later root_account_ids updating.
-      communication_channels_to_update.merge(
-        CommunicationChannel.where(user: self)
-      )
+      UserAccountAssociation.for_root_accounts.for_user_id(self.id).each do |uaa|
+        refreshed_root_account_ids << Shard.relative_id_for(uaa.account_id, Shard.current, self.shard)
+      end
     end
 
     # Update the user
-    relative_ids = refreshed_root_account_ids.map do |id|
-      Shard.relative_id_for(id, self.shard, self.shard)
-    end
-    self.update!(root_account_ids: relative_ids)
-
-    # Update each communication channel associated with the user
-    communication_channels_to_update.each do |c|
-      c.set_root_account_ids(persist_changes: true)
+    self.root_account_ids = refreshed_root_account_ids.to_a.sort
+    if root_account_ids_changed?
+      save!
+      # Update each communication channel associated with the user
+      self.communication_channels.update_all(root_account_ids: self.root_account_ids)
     end
   end
 
