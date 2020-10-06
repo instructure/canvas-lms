@@ -32,8 +32,12 @@
       <% context_crumb = crumbs.length > 1 && crumbs[1] %>
       <% if context_crumb %>
         <a class="mobile-header-title <%= 'expandable' if context_crumb %>" href="<%= context_crumb[1] %>" role="button" aria-controls="mobileContextNavContainer">
-          <span><%= context_crumb[0] %></span>
-          <i style="padding-left: 15px;" id="mobileHeaderArrowIcon" class="icon-arrow-open-down"></i>
+          <i style="float: right; margin-top: 2px; padding-right: inherit" id="mobileHeaderArrowIcon" class="icon-arrow-open-down"></i>
+          <div><%= context_crumb[0] %></div>
+        <% if crumbs.length > 2 %>
+          <% sub_context_crumb = crumbs.last %>
+          <div style="padding-right: 30px"><%= sub_context_crumb[0] %></div>
+        <% end %>
         </a>
       <% else %>
         <span class="mobile-header-title"><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></span>
