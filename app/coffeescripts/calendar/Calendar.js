@@ -54,6 +54,10 @@ import 'jqueryui/button'
 // <style> node in ie8
 const $styleContainer = $('<div id="calendar_color_style_overrides" />').appendTo('body')
 
+function isSomethingFullscreen(document) {
+  // safari requires webkit prefix
+  return !!document.fullscreenElement || !!document.webkitFullscreenElement
+}
 export default class Calendar {
   constructor(selector, contexts, manageContexts, dataSource, options) {
     this.contexts = contexts
@@ -65,6 +69,8 @@ export default class Calendar {
     // Display appointment slots for the specified appointment group
     this.displayAppointmentEvents = null
     this.activateEvent = this.options && this.options.activateEvent
+
+    this.somethingIsFullscreen = isSomethingFullscreen(document)
 
     this.activeAjax = 0
 
@@ -315,12 +321,21 @@ export default class Calendar {
     })
   }
 
-  windowResize = view => {
+  windowResize = _view => {
+    if (
+      (!this.somethingIsFullscreen && isSomethingFullscreen(document)) ||
+      (this.somethingIsFullscreen && !isSomethingFullscreen(document))
+    ) {
+      // something just transitioned into or out of fullscreen.
+      // don't close the event popup
+      this.somethingIsFullscreen = isSomethingFullscreen(document)
+      return
+    }
     this.closeEventPopups()
     this.drawNowLine()
   }
 
-  eventRender = (event, element, view) => {
+  eventRender = (event, element, _view) => {
     const $element = $(element)
 
     const startDate = event.startDate()
@@ -415,25 +430,25 @@ export default class Calendar {
         {
           // fake up the jsEvent
           currentTarget: element,
-          pageX: element.offset().left + parseInt(element.width() / 2)
+          pageX: element.offset().left + parseInt(element.width() / 2, 10)
         },
         view
       )
     }
   }
 
-  eventDragStart = (event, jsEvent, ui, view) => {
+  eventDragStart = (event, _jsEvent, _ui, _view) => {
     $('.fc-highlight-skeleton').remove()
     this.lastEventDragged = event
     this.closeEventPopups()
   }
 
-  eventResizeStart = (event, jsEvent, ui, view) => {
+  eventResizeStart = (_event, _jsEvent, _ui, _view) => {
     this.closeEventPopups()
   }
 
   // event triggered by items being dropped from within the calendar
-  eventDrop = (event, delta, revertFunc, jsEvent, ui, view) => {
+  eventDrop = (event, delta, revertFunc, _jsEvent, _ui, _view) => {
     const minuteDelta = delta.asMinutes()
     return this._eventDrop(event, minuteDelta, event.allDay, revertFunc)
   }
@@ -490,7 +505,7 @@ export default class Calendar {
     return true
   }
 
-  eventResize = (event, delta, revertFunc, jsEvent, ui, view) => {
+  eventResize = (event, delta, revertFunc, _jsEvent, _ui, _view) => {
     return event.saveDates(null, revertFunc)
   }
 
@@ -500,7 +515,7 @@ export default class Calendar {
     return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
   }
 
-  addEventClick = (event, jsEvent, view) => {
+  addEventClick = (event, _jsEvent, _view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -512,7 +527,7 @@ export default class Calendar {
     return new EditEventDetailsDialog(event, this.useScheduler).show()
   }
 
-  eventClick = (event, jsEvent, view) => {
+  eventClick = (event, jsEvent, _view) => {
     const $event = $(jsEvent.currentTarget)
     if (!$event.hasClass('event_pending')) {
       if (event.can_change_context) {
@@ -524,7 +539,7 @@ export default class Calendar {
     }
   }
 
-  dayClick = (date, jsEvent, view) => {
+  dayClick = (date, _jsEvent, _view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -553,10 +568,10 @@ export default class Calendar {
     }
     if (changed) {
       const fragment = '#' + $.param(data, this)
-      if (replaceState || location.hash === '') {
-        return history.replaceState(null, '', fragment)
+      if (replaceState || window.location.hash === '') {
+        return window.history.replaceState(null, '', fragment)
       } else {
-        return (location.href = fragment)
+        return (window.location.href = fragment)
       }
     }
   }
@@ -638,7 +653,7 @@ export default class Calendar {
   }
 
   // callback from minicalendar telling us an event from here was dragged there
-  dropOnMiniCalendar(date, allDay, jsEvent, ui) {
+  dropOnMiniCalendar(date, _allDay, _jsEvent, _ui) {
     const event = this.lastEventDragged
     if (!event) {
       return
@@ -671,7 +686,7 @@ export default class Calendar {
 
   // DOM callbacks
 
-  fragmentChange = (event, hash) => {
+  fragmentChange = (_event, _hash) => {
     const data = this.dataFromDocumentHash()
     if ($.isEmptyObject(data)) {
       return
@@ -1039,12 +1054,12 @@ export default class Calendar {
   dataFromDocumentHash = () => {
     let data = {}
     try {
-      const fragment = location.hash.substring(1)
+      const fragment = window.location.hash.substring(1)
       if (fragment.indexOf('=') !== -1) {
-        data = deparam(location.hash.substring(1)) || {}
+        data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
+        data = $.parseJSON($.decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}
