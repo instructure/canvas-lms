@@ -91,10 +91,14 @@ export default function ImportGroupsModal(props) {
         }
       />
       <View as="div" margin="large auto" textAlign="center">
-        <Link href="#">{I18n.t('Download Course Roster CSV')}</Link>
+        <Link href={`/api/v1/group_categories/${props.groupCategoryId}/export`}>
+          {I18n.t('Download Course Roster CSV')}
+        </Link>
       </View>
       <View as="div" margin="large auto" textAlign="center">
-        <Link href="#">{I18n.t('Group Import API Documentation')}</Link>
+        <Link href="/doc/api/file.group_category_csv.html" target="_blank">
+          {I18n.t('Group Import API Documentation')}
+        </Link>
       </View>
     </CanvasModal>
   )
