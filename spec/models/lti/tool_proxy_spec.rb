@@ -618,6 +618,26 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'subscription_id1'
       end
 
+      it 'should not create a subscription if another tool already has one' do
+        ToolProxy.create!(
+          raw_data: {'enabled_capability' => [placement]},
+          subscription_id: 'id',
+          context: course_factory(account: account),
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          workflow_state: 'active'
+        )
+
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+        tool_proxy.context = course_factory(account: account)
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to eq 'id'
+      end
+
       it 'should not create subscriptions for non-plagiarism tools' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
         tool_proxy.raw_data['enabled_capability'] = []
@@ -636,6 +656,8 @@ module Lti
     end
 
     describe '#delete_subscription' do
+      let(:placement) { ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
+
       let(:tool_proxy) do
         create_tool_proxy(raw_data: {
           'tool_profile' => {
@@ -654,6 +676,26 @@ module Lti
       it 'should delete subscriptions' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:destroy_subscription)
         tool_proxy.subscription_id = 'subscription_id1'
+        tool_proxy.save!
+        tool_proxy.destroy
+      end
+
+      it 'should not delete subscriptions if another tool is still using it' do
+        ToolProxy.create!(
+          raw_data: {'enabled_capability' => [placement]},
+          subscription_id: 'id1',
+          context: course_factory(account: account),
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          workflow_state: 'active'
+        )
+
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:destroy_subscription)
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.subscription_id = 'id1'
         tool_proxy.save!
         tool_proxy.destroy
       end

@@ -27,8 +27,8 @@ class ExternalContentController < ApplicationController
   before_action :require_user, only: :oembed_retrieve, if: -> { require_oembed_token? }
   before_action :validate_oembed_token!, only: :oembed_retrieve, if: -> { require_oembed_token? }
 
-  rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do
-    head :unauthorized
+  rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do |error|
+    render json: { message: error.message }, status: :unauthorized
   end
 
   rescue_from JSON::JWT::InvalidFormat do

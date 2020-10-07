@@ -143,6 +143,12 @@ class CanvasUnzip
     end
   end
 
+  def self.compute_uncompressed_size(archive_filename)
+    total_size = 0
+    each_entry(archive_filename){|entry, index| total_size += entry.size }
+    total_size
+  end
+
   class Entry
     attr_reader :entry, :type
 

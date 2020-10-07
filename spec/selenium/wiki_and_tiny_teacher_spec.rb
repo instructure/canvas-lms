@@ -106,7 +106,7 @@ describe "Wiki pages and Tiny WYSIWYG editor" do
 
       wait_for_ajaximations
 
-      f('.header-bar-right .al-trigger').click
+      f('.page-toolbar .buttons .al-trigger').click
       expect_new_page_load { f('.view_page_history').click }
 
       expect(ff('.revision').length).to eq 2

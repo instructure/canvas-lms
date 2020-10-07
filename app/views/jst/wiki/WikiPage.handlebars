@@ -1,73 +1,87 @@
 {{#if CAN.VIEW_TOOLBAR}}
 <div class="header-bar-outer-container">
   <div class="sticky-toolbar" data-sticky>
-    <div class="header-bar flex-container">
-      <div class="header-bar-left header-left-flex">
-        {{#if course_home}}
-        <h2 class="course-title" title="{{course_title}}">{{course_title}}</h2>
-        {{else}}
-          {{#if CAN.VIEW_ALL_PAGES}}
-            <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
-          {{/if}}
-        {{/if}}
-      </div>
-      <div class="header-bar-right header-right-flex">
-        {{#unless course_home}}
-          {{#if front_page}}
-            <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
-          {{/if}}
-          {{#if CAN.PUBLISH}}
-            <span class="publish-button"></span>
+    <div class="header-bar page-toolbar {{#if course_home}}as-course-home{{/if}}">
+      <div class="page-toolbar-start">
+        <div class="page-heading">
+          {{#if course_home}}
+          <h2 class="course-title" title="{{course_title}}">{{course_title}}</h2>
           {{else}}
-            {{#if CAN.VIEW_UNPUBLISHED}}
-              {{#if published}}
-                <span class='published-status published'>
-                  <i class="icon-publish icon-Solid"></i> {{#t 'published_indicator'}}Published{{/t}}
-                </span>
-              {{else}}
-                <span class='published-status unpublished'>
-                  <i class="icon-unpublished"></i> {{#t 'unpublished_indicator'}}Not Published{{/t}}
-                </span>
-              {{/if}}
+            {{#if CAN.VIEW_ALL_PAGES}}
+              <a class="btn{{#if front_page}} btn-primary{{/if}} view_all_pages" href="{{wiki_pages_path}}">{{#t 'buttons.view_all_pages'}}View All Pages{{/t}}</a>
             {{/if}}
           {{/if}}
-        {{/unless}}
-        {{#unless cannot_edit_by_master_course}}
-          {{#if CAN.UPDATE_CONTENT}}
-            <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i> {{#t 'buttons.edit'}}Edit{{/t}}</a>
+        </div>
+        {{#unless course_home}}
+          {{#if front_page}}
+            <div class="front-page">
+              <span class="front-page label">{{#t 'labels.front_page'}}Front Page{{/t}}</span>
+            </div>
           {{/if}}
         {{/unless}}
-        {{#if show_immersive_reader}}
-          <div id="immersive_reader_mount_point" class="inline-block"></div>
-        {{/if}}
-        {{#if CAN.ACCESS_GEAR_MENU}}
-          <div class="inline-block">
-            <a class="btn al-trigger" tabindex="0" role="button" href="#">
-              <i class="icon-more" aria-hidden="true"></i>
-              <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
-            </a>
-            <ul class="al-options">
-              {{#unless cannot_delete_by_master_course}}
-                {{#if CAN.DELETE}}
-                  <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+        </div>
+        <div class="page-toolbar-end">
+          {{#unless course_home}}
+          <div class="blueprint-label"></div>
+          <div class="publishing">
+            <div class="published">
+              {{#if CAN.PUBLISH}}
+                <span class="publish-button"></span>
+              {{else}}
+                {{#if CAN.VIEW_UNPUBLISHED}}
+                  {{#if published}}
+                    <span class='published-status published'>
+                      <i class="icon-publish icon-Solid"></i><span class="hide-when-small"> {{#t 'published_indicator'}}Published{{/t}}</span>
+                    </span>
+                  {{else}}
+                    <span class='published-status unpublished'>
+                      <i class="icon-unpublished"></i><span class="hide-when-small"></span> {{#t 'unpublished_indicator'}}Not Published{{/t}}</span>
+                    </span>
+                  {{/if}}
                 {{/if}}
-              {{/unless}}
-              {{#if CAN.READ_REVISIONS}}
-                <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
               {{/if}}
-              {{#unless front_page}}
-                {{#if CAN.UPDATE_CONTENT}}
-                  <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
-                {{/if}}
-              {{/unless}}
-              {{#if CAN.DIRECT_SHARE}}
-                <li><a href="#" class="icon-user direct-share-send-to-menu-item">{{#t}}Send To...{{/t}}</a></li>
-                <li><a href="#" class="icon-duplicate direct-share-copy-to-menu-item">{{#t}}Copy To...{{/t}}</a></li>
-              {{/if}}
-              {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
-            </ul>
+            </div>
           </div>
-        {{/if}}
+          {{/unless}}
+          <div class="buttons">
+            {{#unless cannot_edit_by_master_course}}
+              {{#if CAN.UPDATE_CONTENT}}
+                <a href="{{wiki_page_edit_path}}" class="btn edit-wiki"><i class="icon-edit"></i><span class="hide-when-small"> {{#t 'buttons.edit'}}Edit{{/t}}</span></a>
+              {{/if}}
+            {{/unless}}
+            {{#if show_immersive_reader}}
+              <div id="immersive_reader_mount_point" class="inline-block"></div>
+            {{/if}}
+            {{#if CAN.ACCESS_GEAR_MENU}}
+              <div class="inline-block">
+                <a class="btn al-trigger" tabindex="0" role="button" href="#">
+                  <i class="icon-more" aria-hidden="true"></i>
+                  <span class="screenreader-only">{{#t 'toolbar_menu.settings'}}Settings{{/t}}</span>
+                </a>
+                <ul class="al-options">
+                  {{#unless cannot_delete_by_master_course}}
+                    {{#if CAN.DELETE}}
+                      <li><a href="#" class="icon-trash delete_page{{#unless deletable}} disabled{{/unless}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>{{#t "delete_wiki"}}Delete{{/t}}</a></li>
+                    {{/if}}
+                  {{/unless}}
+                  {{#if CAN.READ_REVISIONS}}
+                    <li><a href="{{wiki_page_history_path}}" class="icon-clock view_page_history">{{#t "view_page_history_wiki"}}View Page History{{/t}}</a></li>
+                  {{/if}}
+                  {{#unless front_page}}
+                    {{#if CAN.UPDATE_CONTENT}}
+                      <li><a href="#" class="icon-bookmark use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}" title="{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>{{#t 'menu.use_front_page'}}Use as Front Page{{/t}}</a></li>
+                    {{/if}}
+                  {{/unless}}
+                  {{#if CAN.DIRECT_SHARE}}
+                    <li><a href="#" class="icon-user direct-share-send-to-menu-item">{{#t}}Send To...{{/t}}</a></li>
+                    <li><a href="#" class="icon-duplicate direct-share-copy-to-menu-item">{{#t}}Copy To...{{/t}}</a></li>
+                  {{/if}}
+                  {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
+                </ul>
+              </div>
+            {{/if}}
+          </div>
+        </div>
       </div>
     </div>
     <div class="page-changed-alert" role="alert" aria-atomic="true" aria-live="polite"></div>

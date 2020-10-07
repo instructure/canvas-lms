@@ -55,7 +55,7 @@ describe 'CrocodocDocument' do
       })
     end
 
-    it "should only include ids specified in the whitelist" do
+    it "should only include ids specified in the allow list" do
       expect(@crocodoc.permissions_for_user(@teacher, [@teacher.crocodoc_id!, @submitter.crocodoc_id!])).to eq({
         :filter => "#{@teacher.crocodoc_id!},#{@submitter.crocodoc_id!}",
         :admin => true,
@@ -63,9 +63,9 @@ describe 'CrocodocDocument' do
       })
     end
 
-    it "should set :admin and :editable to false if the calling user isn't whitelisted" do
+    it "should set :admin and :editable to false if the calling user isn't allowed" do
       expect(@crocodoc.permissions_for_user(@submitter, [@teacher.crocodoc_id!])).to eq({
-        :filter => "#{@teacher.crocodoc_id!}",
+        :filter => @teacher.crocodoc_id!.to_s,
         :admin => false,
         :editable => false,
       })

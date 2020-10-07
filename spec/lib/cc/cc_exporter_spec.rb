@@ -326,6 +326,8 @@ describe "Common Cartridge exporting" do
     end
 
     it "should include media objects" do
+      skip 'PHO-360 (9/17/2020)'
+
       @q1 = @course.quizzes.create(:title => 'quiz1')
       @media_object = @course.media_objects.create!(
         :media_id => "some-kaltura-id",
@@ -621,8 +623,6 @@ describe "Common Cartridge exporting" do
       include_context "lti2_course_spec_helper"
 
       before(:each) do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
         tool_proxy.context = @course
         tool_proxy.save!
@@ -687,8 +687,6 @@ describe "Common Cartridge exporting" do
       end
 
       before(:each) do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_all_proxies_for_context) { Lti::ToolProxy.where(id: tool_proxy.id) }
 
         assignment = @course.assignments.create! name: 'test assignment', submission_types: 'online_upload'

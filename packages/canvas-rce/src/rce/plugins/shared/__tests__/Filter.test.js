@@ -134,6 +134,14 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByLabelText('Content Type').value).toEqual('Course Files')
     })
 
+    it('has "Group" options', () => {
+      renderComponent({userContextType: 'group'})
+
+      selectContentType('Group Files')
+      expect(currentFilterSettings.contentType).toEqual('group_files')
+      expect(component.getByLabelText('Content Type').value).toEqual('Group Files')
+    })
+
     it('has "User" options', () => {
       renderComponent({userContextType: 'course'})
 

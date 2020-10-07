@@ -1,5 +1,5 @@
-<%
-# Copyright (C) 2011 - present Instructure, Inc.
+#
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -14,4 +14,21 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-%>
+
+class CreateSubscriptionsForPlagiarismTools < ActiveRecord::Migration[5.2]
+  tag :postdeploy
+
+  def up
+    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
+      :create_subscriptions,
+      strand: "plagiarism_subscription_create_#{Shard.current.id}"
+    )
+  end
+
+  def down
+    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
+      :delete_subscriptions,
+      strand: 'plagiarism_subscription_delete'
+    )
+  end
+end

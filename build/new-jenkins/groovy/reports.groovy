@@ -124,7 +124,7 @@ def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
   def failureCategories
   def working_dir = "${prefix}_compiled_failures"
   sh "rm -vrf ./$working_dir"
-  sh "mkdir $working_dir"
+  sh "mkdir -p $working_dir"
 
   dir(working_dir) {
     for(int index = 0; index < ci_node_total; index++) {
@@ -243,7 +243,7 @@ def extractSnykReports(projectContainer, projectDirectory, destinationDirectory)
 def publishJunitReport(prefix, total) {
   def working_dir = "${prefix}_compiled_results"
   dir("spec_results") {
-    sh "mkdir $working_dir"
+    sh "mkdir -p $working_dir"
     dir("${working_dir}") {
       for(int index = 0; index < total; index++) {
         dir ("node_${index}") {

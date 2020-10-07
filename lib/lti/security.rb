@@ -35,7 +35,11 @@ module Lti
     def self.signed_post_params_frd(params, url, key, secret)
       message = IMS::LTI::Models::Messages::Message.generate(params.merge({oauth_consumer_key: key}))
       message.launch_url = url
-      message.signed_post_params(secret).stringify_keys
+      signed_parameters = message.signed_post_params(secret).stringify_keys
+
+      Lti::Logging.lti_1_launch_generated(message.message_authenticator.base_string)
+
+      signed_parameters
     end
     private_class_method :signed_post_params_frd
 
@@ -81,6 +85,11 @@ module Lti
         key, val = param.split(/=/).map { |v| CGI.unescape(v) }
         hash[key] = val
       end
+
+      # note that this base string has duplicate oauth parameters in it when logged,
+      # though these parameters don't affect signature generation and oauth launches (I hope?)
+      Lti::Logging.lti_1_launch_generated(request.oauth_helper.signature_base_string)
+
       hash.stringify_keys
     end
     private_class_method :generate_params_deprecated

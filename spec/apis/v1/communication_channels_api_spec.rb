@@ -110,6 +110,21 @@ describe 'CommunicationChannels API', type: :request do
       expect(channel.pseudonym).to be_nil
     end
 
+    it 'should should casing communication channel restores' do
+      json = api_call(:post, @path, @path_options, @post_params.merge({ skip_confirmation: 1 }))
+      channel = CommunicationChannel.find(json['id'])
+      channel.update(workflow_state: 'retired', build_pseudonym_on_confirm: true)
+      api_call(:post, @path, @path_options, @post_params.merge({
+        skip_confirmation: 1,
+        communication_channel: {
+          address: 'NEW+api@example.com',
+          type: 'email'
+        }
+      }))
+      expect(channel.reload.workflow_state).to eq 'active'
+      expect(channel.path).to eq 'NEW+api@example.com'
+    end
+
     it 'should be able to create new channels' do
       json = api_call(:post, @path, @path_options, @post_params.merge({
         :skip_confirmation => 1 }))

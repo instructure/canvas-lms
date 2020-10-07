@@ -17,7 +17,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require 'sharding_spec_helper'
 require_dependency "lti/ims/access_token_helper"
 
 module Lti
@@ -33,9 +33,6 @@ module Lti
       message_handler.update(message_type: 'basic-lti-launch-request')
       student_in_course active_all: true
       teacher_in_course active_all: true
-
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
 
       @tool = @course.context_external_tools.create(name: "a",
                                                     domain: "google.com",

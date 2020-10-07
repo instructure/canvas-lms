@@ -32,7 +32,7 @@ import React from 'react'
 import StudentViewQuery from '../components/StudentViewQuery'
 import {SubmissionMocks} from '../graphqlData/Submission'
 
-jest.mock('../components/Attempt')
+jest.mock('../components/AttemptSelect')
 
 describe('student view integration tests', () => {
   beforeEach(() => {
@@ -45,7 +45,7 @@ describe('student view integration tests', () => {
   })
 
   describe('StudentViewQuery', () => {
-    function createGraphqlMocks(overrides = {}) {
+    function createGraphqlMocks(createSubmissionDraftOverrides = {}) {
       const mocks = [
         {
           query: STUDENT_VIEW_QUERY,
@@ -53,12 +53,21 @@ describe('student view integration tests', () => {
         },
         {
           query: CREATE_SUBMISSION_DRAFT,
-          variables: {id: '1', activeSubmissionType: 'online_upload', attempt: 1, fileIds: ['1']}
+          variables: {id: '1', activeSubmissionType: 'online_upload', attempt: 1, fileIds: ['1']},
+          overrides: createSubmissionDraftOverrides
+        },
+        {
+          query: SUBMISSION_HISTORIES_QUERY,
+          variables: {submissionID: '1'},
+          overrides: {
+            Node: {__typename: 'Submission'},
+            SubmissionHistoryConnection: {nodes: [{attempt: 3}, {attempt: 4}]}
+          }
         }
       ]
 
       const mockResults = Promise.all(
-        mocks.map(async ({query, variables}) => {
+        mocks.map(async ({query, variables, overrides}) => {
           const result = await mockQuery(query, overrides, variables)
           return {
             request: {query, variables},
@@ -78,7 +87,7 @@ describe('student view integration tests', () => {
         </MockedProvider>
       )
       expect(await findByTestId('assignments-2-student-view')).toBeInTheDocument()
-    })
+    }, 10000)
 
     it('renders loading', async () => {
       const mocks = await createGraphqlMocks()
@@ -168,57 +177,6 @@ describe('student view integration tests', () => {
       fireEvent.change(fileInput, {target: {files}})
       const elements = await findAllByText('Loading')
       expect(elements).toHaveLength(2)
-    })
-  })
-
-  describe('loading more submission histories', () => {
-    function createSubmissionHistoryMocks() {
-      const mocks = [
-        {
-          query: STUDENT_VIEW_QUERY,
-          variables: {assignmentLid: '1', submissionID: '1'},
-          overrides: {
-            Submission: {...SubmissionMocks.graded, attempt: 5}
-          }
-        },
-        {
-          query: SUBMISSION_HISTORIES_QUERY,
-          variables: {submissionID: '1'},
-          overrides: {
-            Node: {__typename: 'Submission'},
-            PageInfo: {hasPreviousPage: true},
-            SubmissionHistoryConnection: {
-              nodes: [{attempt: 3}, {attempt: 4}]
-            }
-          }
-        }
-      ]
-
-      const mockResults = Promise.all(
-        mocks.map(async ({query, variables, overrides}) => {
-          const result = await mockQuery(query, overrides, variables)
-          return {
-            request: {query, variables},
-            result
-          }
-        })
-      )
-      return mockResults
-    }
-
-    it.skip('Displays the previous submission after loading more paginated histories', async () => {
-      // TODO: get this to not timeout with instUI 6
-      const mocks = await createSubmissionHistoryMocks()
-
-      const {findAllByText, findByText} = render(
-        <MockedProvider mocks={mocks} cache={createCache()}>
-          <StudentViewQuery assignmentLid="1" submissionID="1" />
-        </MockedProvider>
-      )
-
-      const prevButton = await findByText('View Previous Submission')
-      fireEvent.click(prevButton)
-      expect((await findAllByText('Attempt 4'))[0]).toBeInTheDocument()
     })
   })
 

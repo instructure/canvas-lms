@@ -232,7 +232,12 @@ class GradeChangeAuditApiController < AuditorApiController
     return render_unauthorized_action unless course_authorized?(course)
 
     args = { course: course }
-    args[:assignment] = api_find(course.assignments, params[:assignment_id]) if params[:assignment_id]
+    restrict_to_override_grades = params[:assignment_id] == "override"
+    if restrict_to_override_grades
+      args[:assignment] = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT
+    elsif params[:assignment_id]
+      args[:assignment] = api_find(course.assignments, params[:assignment_id])
+    end
     args[:grader] = course.all_users.find(params[:grader_id]) if params[:grader_id]
     args[:student] = course.all_users.find(params[:student_id]) if params[:student_id]
 
@@ -253,7 +258,9 @@ class GradeChangeAuditApiController < AuditorApiController
     end
 
     events = Auditors::GradeChange.for_course_and_other_arguments(course, args, query_options)
-    render_events(events, send(url_method, args), course: course, remove_anonymous: params[:student_id].present?)
+
+    route_args = restrict_to_override_grades ? args.merge({assignment: "override"}) : args
+    render_events(events, send(url_method, route_args), course: course, remove_anonymous: params[:student_id].present?)
   end
 
   private
@@ -393,10 +400,6 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def exclude_override_grades?
-    # If we are reading from Cassandra and *not* returning override grades,
-    # filter them out here, since it's not straightforward to do so as part of
-    # fetching the data.  (If we're reading from Postgres, the filtering was
-    # already done as part of the query if needed.)
-    Auditors.read_from_cassandra? && !Auditors::GradeChange.return_override_grades?
+    !Auditors::GradeChange.return_override_grades?
   end
 end

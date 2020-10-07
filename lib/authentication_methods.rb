@@ -329,8 +329,7 @@ module AuthenticationMethods
   protected :store_location
 
   def redirect_back_or_default(default)
-    redirect_to(session[:return_to] || default)
-    session.delete(:return_to)
+    session.delete(:return_to) || default
   end
   protected :redirect_back_or_default
 

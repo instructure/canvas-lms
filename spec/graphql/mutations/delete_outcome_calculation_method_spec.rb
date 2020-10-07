@@ -23,13 +23,13 @@ describe Mutations::DeleteOutcomeCalculationMethod do
   before :once do
     @account = Account.default
     @course = @account.courses.create!
+    @admin = account_admin_user(account: @account)
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
-    @student = @course.enroll_student(User.create!, enrollment_state: 'active').user
   end
 
   let(:original_record) { outcome_calculation_method_model(@course) }
 
-  def execute_with_input(delete_input, user_executing: @teacher)
+  def execute_with_input(delete_input, user_executing: @admin)
     mutation_command = <<~GQL
       mutation {
         deleteOutcomeCalculationMethod(input: {
@@ -74,11 +74,11 @@ describe Mutations::DeleteOutcomeCalculationMethod do
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
-    it "requires manage_outcomes permission" do
+    it "requires manage_proficiency_calculations permission" do
       query = <<~QUERY
         id: #{original_record.id}
       QUERY
-      result = execute_with_input(query, user_executing: @student)
+      result = execute_with_input(query, user_executing: @teacher)
       expect_error(result, 'insufficient permission')
     end
 

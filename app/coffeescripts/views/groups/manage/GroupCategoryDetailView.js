@@ -15,16 +15,17 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!groups'
 import $ from 'jquery'
 import {View} from 'Backbone'
 import MessageStudentsDialog from '../../MessageStudentsDialog'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
-import GroupCreateView from './GroupCreateView'
 import GroupCategoryEditView from './GroupCategoryEditView'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
-import Group from '../../../models/Group'
 import template from 'jst/groups/manage/groupCategoryDetail'
+import GroupModal from 'jsx/groups/components/GroupModal'
 
 export default class GroupCategoryDetailView extends View {
   static initClass() {
@@ -68,6 +69,12 @@ export default class GroupCategoryDetailView extends View {
     return this.createView != null ? this.createView.setTrigger(this.$addGroupButton) : undefined
   }
 
+  refreshCollection() {
+    // fetch a new paginated set of models for this collection from the server
+    // helpul when bypassing Backbone lifecycle events
+    this.collection.fetch()
+  }
+
   toJSON() {
     const json = super.toJSON(...arguments)
     json.canMessageMembers = this.model.canMessageUnassignedMembers()
@@ -78,6 +85,7 @@ export default class GroupCategoryDetailView extends View {
 
   deleteCategory(e) {
     e.preventDefault()
+    // eslint-disable-next-line no-restricted-globals
     if (!confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group set?'))) {
       this.$groupCategoryActions.focus()
       return
@@ -94,20 +102,24 @@ export default class GroupCategoryDetailView extends View {
     })
   }
 
-  addGroup(e) {
-    e.preventDefault()
-    if (this.createView == null) {
-      this.createView = new GroupCreateView({
-        groupCategory: this.model,
-        trigger: this.$addGroupButton
-      })
-    }
-    const newGroup = new Group({group_category_id: this.model.id}, {newAndEmpty: true})
-    newGroup.once('sync', () => {
-      return this.collection.add(newGroup)
-    })
-    this.createView.model = newGroup
-    return this.createView.open()
+  addGroup(e, open = true) {
+    if (e) e.preventDefault()
+    ReactDOM.render(
+      <GroupModal
+        groupCategory={{
+          id: this.model.get('id'),
+          role: this.model.get('role'),
+          group_limit: this.model.get('group_limit')
+        }}
+        open={open}
+        onSave={() => this.refreshCollection()}
+        onDismiss={() => {
+          this.addGroup(null, false)
+          this.$addGroupButton.focus()
+        }}
+      />,
+      document.getElementById('group-mount-point')
+    )
   }
 
   editCategory() {

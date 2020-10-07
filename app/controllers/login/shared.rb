@@ -100,7 +100,7 @@ module Login::Shared
         # assumed that if that URL is found rather than using the default,
         # they must have cookies enabled and we don't need to worry about
         # adding the :login_success param to it.
-        format.html { redirect_back_or_default(dashboard_url(:login_success => '1')) }
+        format.html { redirect_to delegated_auth_redirect_uri(redirect_back_or_default(dashboard_url(:login_success => '1'))) }
       end
       format.json { render :json => pseudonym.as_json(:methods => :user_code), :status => :ok }
     end

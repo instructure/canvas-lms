@@ -523,15 +523,15 @@ class CoursesController < ApplicationController
     end
 
     if @domain_root_account.feature_enabled?(:unpublished_courses)
-      @past_enrollments.sort_by! {|e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name(@current_user))]}
+      @past_enrollments.sort_by! {|e| [e.course.published? ? 0 : 1, Canvas::ICU.collation_key(e.long_name)]}
       [@current_enrollments, @future_enrollments].each do |list|
         list.sort_by! do |e|
-          [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]
+          [e.course.published? ? 0 : 1, e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]
         end
       end
     else
-      @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name(@current_user))}
-      [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name(@current_user))]}}
+      @past_enrollments.sort_by! {|e| Canvas::ICU.collation_key(e.long_name)}
+      [@current_enrollments, @future_enrollments].each {|list| list.sort_by! {|e| [e.active? ? 1 : 0, Canvas::ICU.collation_key(e.long_name)]}}
     end
   end
   helper_method :load_enrollments_for_index

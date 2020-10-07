@@ -24,6 +24,18 @@ import {OUTCOME_PROFICIENCY_QUERY} from '../api'
 import MasteryScale from '../index'
 
 describe('MasteryScale', () => {
+  beforeEach(() => {
+    window.ENV = {
+      PROFICIENCY_SCALES_ENABLED_ROLES: [
+        {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
+      ]
+    }
+  })
+
+  afterEach(() => {
+    window.ENV = null
+  })
+
   const mocks = [
     {
       request: {
@@ -81,6 +93,18 @@ describe('MasteryScale', () => {
     expect(getByDisplayValue(/Rating A/)).not.toEqual(null)
   })
 
+  it('loads role list', async () => {
+    const {getByText} = render(
+      <MockedProvider mocks={mocks}>
+        <MasteryScale contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    expect(getByText('Loading')).not.toEqual(null)
+    await wait()
+    expect(getByText(/Permission to change this mastery scale/)).not.toEqual(null)
+    expect(getByText(/Account Admin/)).not.toEqual(null)
+  })
+
   it('displays an error on failed request', async () => {
     const {getByText} = render(
       <MockedProvider mocks={[]}>
@@ -116,7 +140,7 @@ describe('MasteryScale', () => {
       </MockedProvider>
     )
     await wait()
-    expect(getByText('Proficiency Rating')).not.toBeNull()
+    expect(getByText('Mastery')).not.toBeNull()
   })
 
   describe('update outcomeProficiency', () => {

@@ -230,20 +230,13 @@ class SubmissionComment < ActiveRecord::Base
 
     # Students on the receiving end of an assessment can view assessors' comments
     if assessment_request.present?
-      peer_review_comment = assessment_request.user_id == user.id
-      # For group assignments, peer-review comments left for another user in
-      # this student's group (and were "copied" to this student) should be
-      # visible. If this comment is a copy (as evinced by the group comment ID)
-      # of one left for the group member associated with this comment's
-      # assessment request, treat it as viewable.
+      return true if assessment_request.user_id == user.id
+      # Peer-review comments that belong to a group should be viewable by the
+      # rest of the group.
       if group_comment_id.present?
-        peer_review_comment ||= SubmissionComment.exists?(
-          assessment_request_id: assessment_request_id,
-          group_comment_id: group_comment_id,
-          author_id: assessment_request.user_id
-        )
+        group_user_ids = submission.group&.user_ids || []
+        return true if assessment_request.assessor_id == author_id && group_user_ids.include?(user.id)
       end
-      return true if peer_review_comment
     end
 
     # The student who owns the submission can't see drafts or hidden comments (or,

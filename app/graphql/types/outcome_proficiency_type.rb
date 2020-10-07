@@ -32,5 +32,10 @@ module Types
     def proficiency_ratings_connection
       object.outcome_proficiency_ratings
     end
+
+    field :locked, Boolean, null: false
+    def locked
+      !object.context.grants_right?(current_user, :manage_proficiency_scales)
+    end
   end
 end

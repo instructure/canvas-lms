@@ -18,13 +18,12 @@
 
 import React, {useCallback, useState} from 'react'
 import I18n from 'i18n!MasteryScale'
-import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {View} from '@instructure/ui-view'
 import ProficiencyTable from './ProficiencyTable'
+import RoleList from '../RoleList'
 import {saveProficiency, OUTCOME_PROFICIENCY_QUERY} from './api'
-import {useQuery, useMutation} from 'react-apollo'
+import {useQuery} from 'react-apollo'
 
 const MasteryScale = ({contextType, contextId}) => {
   const {loading, error, data} = useQuery(OUTCOME_PROFICIENCY_QUERY, {
@@ -72,11 +71,22 @@ const MasteryScale = ({contextType, contextId}) => {
     )
   }
   const {outcomeProficiency} = data.account
+  const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
   return (
     <div>
-      <Heading level="h5" margin="medium 0">
-        {I18n.t('Set the mastery scale to be used for all courses within this account.')}
-      </Heading>
+      <p>
+        <Text>
+          {I18n.t(
+            'This mastery scale will be used as the default for all courses within your account.'
+          )}
+        </Text>
+      </p>
+      <RoleList
+        description={I18n.t(
+          'Permission to change this mastery scale is enabled at the account level for:'
+        )}
+        roles={roles}
+      />
       <ProficiencyTable
         proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}

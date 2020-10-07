@@ -48,7 +48,7 @@ describe "new groups" do
       f('.btn.add-group').click
       wait_for_ajaximations
       f('#group_name').send_keys("Test Group")
-      f('#groupEditSaveButton').click
+      submit_form("span[aria-label='Add Group']")
       wait_for_ajaximations
       expect(fj('.collectionViewItems.unstyled.groups-list>li:last-child')).to include_text("Test Group")
     end

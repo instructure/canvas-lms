@@ -212,11 +212,11 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
 
   showDownloadSubmissionsButton: function() {
     const hasSubmittedSubmissions = this.get('selectedAssignment.has_submitted_submissions')
-    const whitelist = ['online_upload', 'online_text_entry', 'online_url']
+    const allowList = ['online_upload', 'online_text_entry', 'online_url']
     const submissionTypes = this.get('selectedAssignment.submission_types')
-    const submissionTypesOnWhitelist = _.intersection(submissionTypes, whitelist)
+    const submissionTypesOnAllowlist = _.intersection(submissionTypes, allowList)
 
-    return hasSubmittedSubmissions && _.some(submissionTypesOnWhitelist)
+    return hasSubmittedSubmissions && _.some(submissionTypesOnAllowlist)
   }.property('selectedAssignment'),
 
   hideStudentNames: false,

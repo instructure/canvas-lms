@@ -7,9 +7,7 @@ RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
 PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 
 dependencyArgs=(
-  --build-arg ALPINE_MIRROR="$ALPINE_MIRROR"
   --build-arg BUILDKIT_INLINE_CACHE=1
-  --build-arg NODE="$NODE"
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
   --file Dockerfile.jenkins

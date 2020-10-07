@@ -56,3 +56,11 @@ enable_fullstory:
   description: |-
     Include FullStory recording of the user's session
   applies_to: SiteAdmin
+new_math_equation_handling:
+  state: hidden
+  display_name: Updated math equation display
+  description: |-
+    Replaces the existing image of the math equation plus the hidden mathml
+    with a MathJax formatted version. This provides better accessibility
+    and many options for the reader to interact with the equation on the page.
+  applies_to: SiteAdmin

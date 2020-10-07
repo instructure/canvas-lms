@@ -159,21 +159,21 @@ describe Attachment do
       expect(@attachment).to be_crocodocable
     end
 
-    it "should include a whitelist of moderated_grading_whitelist in the url blob" do
+    it "should include an allow list of moderated_grading_allow_list in the url blob" do
       crocodocable_attachment_model
-      moderated_grading_whitelist = [user, student].map { |u| u.moderated_grading_ids(true) }
+      moderated_grading_allow_list = [user, student].map { |u| u.moderated_grading_ids(true) }
 
       @attachment.submit_to_crocodoc
       url_opts = {
-        moderated_grading_whitelist: moderated_grading_whitelist
+        moderated_grading_allow_list: moderated_grading_allow_list
       }
       url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
       blob = extract_blob(url["hmac"], url["blob"],
                           "user_id" => user.id,
                           "type" => "crocodoc")
 
-      expect(blob["moderated_grading_whitelist"]).to include(user.moderated_grading_ids.as_json)
-      expect(blob["moderated_grading_whitelist"]).to include(student.moderated_grading_ids.as_json)
+      expect(blob["moderated_grading_allow_list"]).to include(user.moderated_grading_ids.as_json)
+      expect(blob["moderated_grading_allow_list"]).to include(student.moderated_grading_ids.as_json)
     end
 
     it "should always enable annotations when creating a crocodoc url" do

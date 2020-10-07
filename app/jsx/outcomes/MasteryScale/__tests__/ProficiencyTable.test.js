@@ -34,9 +34,12 @@ describe('default proficiency', () => {
     flashMock.mockRestore()
   })
 
-  it('renders the ProficiencyRating component', () => {
+  it('renders the correct headers', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps} />)
-    expect(getByText('Proficiency Rating')).not.toBeNull()
+    expect(getByText('Mastery')).not.toBeNull()
+    expect(getByText('Description')).not.toBeNull()
+    expect(getByText('Points')).not.toBeNull()
+    expect(getByText('Color')).not.toBeNull()
   })
 
   it('renders five ratings', () => {
@@ -47,7 +50,7 @@ describe('default proficiency', () => {
 
   it('sets focus on mastery on first row only', async () => {
     const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
-    const inputs = getAllByLabelText(/Change mastery/)
+    const inputs = getAllByLabelText(/Mastery /)
     const firstMastery = inputs[0]
     await wait(() => expect(document.activeElement).toEqual(firstMastery))
   })
@@ -79,7 +82,7 @@ describe('default proficiency', () => {
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    const error = await within(masteryField.closest('td')).findByText(
+    const error = await within(masteryField.closest('.description')).findByText(
       'Missing required description'
     )
     expect(error).not.toBeNull()
@@ -88,33 +91,30 @@ describe('default proficiency', () => {
 
   it('setting blank points sets error and focus', async () => {
     const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    const error = await within(row).findByText('Invalid points')
+    const error = await within(pointsInput.closest('.points')).findByText('Invalid points')
     expect(error).not.toBeNull()
     expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
   it('setting invalid points sets error and focus', async () => {
     const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    const error = await within(row).findByText('Invalid points')
+    const error = await within(pointsInput.closest('.points')).findByText('Invalid points')
     expect(error).not.toBeNull()
     expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
   it('setting negative points sets error and focus', async () => {
     const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    const error = await within(row).findByText('Negative points')
+    const error = await within(pointsInput.closest('.points')).findByText('Negative points')
     expect(error).not.toBeNull()
     expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
@@ -123,7 +123,7 @@ describe('default proficiency', () => {
     const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
-    const pointsInput = within(masteryField.closest('tr')).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     expect(document.activeElement).toEqual(masteryField.closest('input'))
@@ -156,8 +156,7 @@ describe('default proficiency', () => {
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
     )
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
@@ -168,8 +167,7 @@ describe('default proficiency', () => {
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
     )
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
@@ -180,8 +178,7 @@ describe('default proficiency', () => {
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
     )
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()
@@ -192,8 +189,7 @@ describe('default proficiency', () => {
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
     )
-    const row = getByDisplayValue('Mastery').closest('tr')
-    const pointsInput = within(row).getByLabelText(/Change points/)
+    const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-10'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     expect(updateSpy).not.toHaveBeenCalled()

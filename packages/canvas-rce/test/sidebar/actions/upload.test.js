@@ -33,7 +33,7 @@ const fakeFileReader = {
 
 describe('Upload data actions', () => {
   const results = {id: 47}
-  const file = {url: 'fileurl', thumbnail_url: 'thumbnailurl'}
+  const file = {url: 'http://canvas.test/files/17/download', thumbnail_url: 'thumbnailurl'}
   const successSource = {
     fetchFolders() {
       return Promise.resolve({
@@ -488,6 +488,21 @@ describe('Upload data actions', () => {
   })
 
   describe('handleFailures', () => {
+    const R = global.Response
+    beforeEach(() => {
+      if (typeof Response !== 'function') {
+        global.Response = function(body, status) {
+          this.status = status
+          this.json = () => {
+            return Promise.resolve(JSON.parse(body))
+          }
+        }
+      }
+    })
+    afterEach(() => {
+      global.Response = R
+    })
+
     it('calls quota exceeded when the file size exceeds the quota', () => {
       const fakeDispatch = sinon.spy()
       const error = {

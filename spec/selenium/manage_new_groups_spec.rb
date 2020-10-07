@@ -75,7 +75,7 @@ describe "manage groups" do
       fj(".add-group:visible:first").click
       wait_for_animations
       f("#group_name").send_keys("New Test Group A")
-      f("form.group-edit-dialog").submit
+      submit_form("span[aria-label='Add Group']")
       wait_for_ajaximations
 
       # Add user to the group

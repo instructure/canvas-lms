@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class SplitUsers
+  class UnsafeSplitError < StandardError; end
+
   ENROLLMENT_DATA_UPDATES = [
     {table: 'asset_user_accesses',
      scope: -> { where(context_type: 'Course') }}.freeze,
@@ -210,6 +212,33 @@ class SplitUsers
         ccs.delete_all
       end
     end
+
+    # in cases where there are conflicting records
+    # between the source and target (of merge) comm records,
+    # we can eliminate some errors by detecting these and destroying
+    # the source record if it's already retired (because the one from
+    # the merge is about to overwrite it)
+    cc_records.where(previous_user_id: restored_user).each do |cr|
+      target_cc = cr.context
+      # if this cc didn't get moved, we don't need to worry
+      # about deconflicting it with the source users.
+      next unless target_cc.user_id == source_user.id
+      conflict_cc = restored_user.communication_channels.detect do |c|
+        c.path.downcase == target_cc.path.downcase && c.path_type == target_cc.path_type
+      end
+      if conflict_cc
+        # we need to resolve before we can un-merge
+        if conflict_cc.retired? || conflict_cc.unconfirmed?
+          # when the comm channel from the target record gets moved back, it will
+          # get restored to whatever state it needs.  This one is in a useless state,
+          # so we could just blast this one away safely.
+          conflict_cc.destroy_permanently!
+        else
+          raise UnsafeSplitError, "Unsafe to decide automatically which CC to delete (for now): ( #{target_cc.id} , #{conflict_cc.id} ) from merge record #{cr.id}"
+        end
+      end
+    end
+
     # move moved communication channels back
     max_position = restored_user.communication_channels.last&.position&.+(1) || 0
     scope = source_user.communication_channels.where(id: cc_records.where(previous_user_id: restored_user).pluck(:context_id))
@@ -227,14 +256,17 @@ class SplitUsers
     not_obs = UserObservationLink.where(user_id: [source_user, restored_user], observer_id: [source_user, restored_user])
     obs = UserObservationLink.where(id: records.pluck(:context_id)).where.not(id: not_obs)
 
-    if source_user.shard != restored_user.shard
-      delete_ids = merge_data.records.where(context_type: 'UserObservationLink', previous_workflow_state: 'non_existent', previous_user_id: source_user).pluck(:context_id)
-      restored_user.shard.activate { UserObservationLink.where("user_id=?", source_user.id).where(id: obs).update_all(user_id: restored_user.id) }
-      source_user.shard.activate { UserObservationLink.where(user_id: source_user.id).where(id: delete_ids).delete_all }
-    else
-      source_user.as_student_observation_links.where(id: obs).update_all(user_id: restored_user.id)
+    not_obs.update(workflow_state: 'active')
+    Shard.partition_by_shard(obs) do |shard_obs|
+      UserObservationLink.where(user_id: source_user.id, id: shard_obs).update_all(user_id: restored_user.id)
+      UserObservationLink.where(observer_id: source_user.id, id: shard_obs).update_all(observer_id: restored_user.id)
     end
-    source_user.as_observer_observation_links.where(id: obs).update_all(observer_id: restored_user.id)
+
+    delete_ids = merge_data.records.where(context_type: 'UserObservationLink', previous_workflow_state: 'non_existent', previous_user_id: source_user).pluck(:context_id)
+    Shard.partition_by_shard(delete_ids) do |sharded_ids|
+      UserObservationLink.where(user_id: source_user.id).where(id: sharded_ids).delete_all
+      UserObservationLink.where(observer_id: source_user.id).where(id: sharded_ids).delete_all
+    end
   end
 
   def move_attachments(records)

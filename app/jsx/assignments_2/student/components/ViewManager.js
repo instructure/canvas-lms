@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, func, shape} from 'prop-types'
+import {arrayOf, shape} from 'prop-types'
 import {Assignment, AssignmentSubmissionsConnection} from '../graphqlData/Assignment'
 import React from 'react'
 import StudentContent from './StudentContent'
@@ -83,7 +83,6 @@ class ViewManager extends React.Component {
       ...Assignment.shape.propTypes,
       ...AssignmentSubmissionsConnection.shape.propTypes
     }),
-    loadMoreSubmissionHistories: func,
     // eslint-disable-next-line react/no-unused-prop-types
     submissionHistoriesQueryData: shape({
       submissionHistoriesConnection: shape({
@@ -95,7 +94,6 @@ class ViewManager extends React.Component {
   state = {
     displayedAttempt: null,
     dummyNextSubmission: null,
-    loadingMore: false,
     submissions: []
   }
 
@@ -135,13 +133,6 @@ class ViewManager extends React.Component {
       // was created, or the new attempt button was clicked which triggered a dummy
       // submission to be created.
       nextState.displayedAttempt = currentSubmission.attempt
-    } else if (nextState.submissions.length > prevState.submissions.length) {
-      // Case where we have new submission histories available to display. This will
-      // happen as a result of `this.props.onLoadMore()` call finishing after the
-      // previous submission button was clicked.
-      const nextIndex = nextState.submissions.length - prevState.submissions.length - 1
-      nextState.displayedAttempt = nextState.submissions[nextIndex].attempt
-      nextState.loadingMore = false
     }
 
     return nextState
@@ -190,79 +181,8 @@ class ViewManager extends React.Component {
     return currentIndex !== state.submissions.length - 1
   }
 
-  hasPrevSubmission = (opts = {}) => {
-    const state = opts.state || this.state
-
-    // If we haven't loaded any histories yet (and aren't on attempt 1), or if
-    // we still have more histories to load
-    const pageInfo = this.getPageInfo(opts)
-    if (!pageInfo && state.displayedAttempt > 1) {
-      return true
-    } else if (pageInfo?.hasPreviousPage) {
-      return true
-    }
-
-    const currentIndex = this.getDisplayedSubmissionIndex(opts)
-    const submission = this.getDisplayedSubmission(opts)
-    return currentIndex !== 0 && submission.attempt > 1
-  }
-
-  onNextSubmission = () => {
-    this.setState(
-      (state, props) => {
-        const opts = {state, props}
-        if (!this.hasNextSubmission(opts)) {
-          return null
-        }
-
-        const currentIndex = this.getDisplayedSubmissionIndex(opts)
-        const nextAttempt = state.submissions[currentIndex + 1].attempt
-        return {displayedAttempt: nextAttempt}
-      },
-      () => {
-        const assignment = this.getAssignment()
-        const submission = this.getDisplayedSubmission()
-        if (this.hasNextSubmission()) {
-          document.getElementById('view-next-attempt-button').focus()
-        } else if (
-          ['graded', 'submitted'].includes(submission.state) &&
-          (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
-        ) {
-          document.getElementById('create-new-attempt-button').focus()
-        } else {
-          document.getElementById('view-previous-attempt-button').focus()
-        }
-      }
-    )
-  }
-
-  onPrevSubmission = () => {
-    this.setState(
-      (state, props) => {
-        const opts = {state, props}
-
-        // If we are already loading more submissions histories, we cannot go back
-        // any further until the graphql query is complete
-        if (state.loadingMore || !this.hasPrevSubmission(opts)) {
-          return null
-        }
-
-        const currentIndex = this.getDisplayedSubmissionIndex(opts)
-        if (currentIndex === 0) {
-          props.loadMoreSubmissionHistories()
-          return {loadingMore: true}
-        } else {
-          return {displayedAttempt: state.submissions[currentIndex - 1].attempt}
-        }
-      },
-      () => {
-        if (this.hasPrevSubmission()) {
-          document.getElementById('view-previous-attempt-button').focus()
-        } else {
-          document.getElementById('view-next-attempt-button').focus()
-        }
-      }
-    )
+  onChangeSubmission = attempt => {
+    this.setState({displayedAttempt: attempt})
   }
 
   onStartNewAttempt = () => {
@@ -288,7 +208,7 @@ class ViewManager extends React.Component {
         // which is why we need to save it to the state so isn't forgotten about.
         // Once the user does make a frd submission draft, the dummy submission in
         // the state will be set back to null, and a new dummy submission will be
-        // created from that submission draft instead. See getDerviedStateFromProps.
+        // created from that submission draft instead. See getDerivedStateFromProps.
         const dummyNextSubmission = makeDummyNextSubmission(submission)
         return {
           dummyNextSubmission,
@@ -296,13 +216,9 @@ class ViewManager extends React.Component {
         }
       },
       () => {
-        if (this.hasPrevSubmission()) {
-          document.getElementById('view-previous-attempt-button').focus()
-        } else {
-          document
-            .querySelector('button[data-test-id=assignments-2-assignment-toggle-details]')
-            .focus()
-        }
+        document
+          .querySelector('button[data-test-id=assignments-2-assignment-toggle-details]')
+          .focus()
       }
     )
   }
@@ -315,14 +231,16 @@ class ViewManager extends React.Component {
       <StudentViewContext.Provider
         value={{
           latestSubmission: getInitialSubmission(this.props.initialQueryData),
-          nextButtonAction: this.onNextSubmission,
           nextButtonEnabled: this.hasNextSubmission(),
-          prevButtonAction: this.onPrevSubmission,
-          prevButtonEnabled: this.hasPrevSubmission(),
           startNewAttemptAction: this.onStartNewAttempt
         }}
       >
-        <StudentContent assignment={assignment} submission={submission} />
+        <StudentContent
+          assignment={assignment}
+          submission={submission}
+          allSubmissions={this.state.submissions}
+          onChangeSubmission={this.onChangeSubmission}
+        />
       </StudentViewContext.Provider>
     )
   }

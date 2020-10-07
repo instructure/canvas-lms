@@ -20,7 +20,7 @@
 if CANVAS_RAILS5_2
   gem 'rails', '5.2.4.4'
     gem 'loofah', '2.3.0'
-    gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
+    gem 'sprockets', '4.0.2'
 else
   gem 'rails', '6.0.3.3'
 end
@@ -112,7 +112,7 @@ gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.2.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.0.9'
-  gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
+  gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'shackles', '1.4.2'
@@ -121,7 +121,7 @@ gem 'switchman', '1.15.2'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '1.5.2'
 gem 'twilio-ruby', '5.36.0', require: false
-gem 'tzinfo', '1.2.5'
+gem 'tzinfo', '1.2.7'
 gem 'vault', '0.13.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination

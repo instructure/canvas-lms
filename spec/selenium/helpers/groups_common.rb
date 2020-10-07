@@ -174,7 +174,7 @@ module GroupsCommon
       f('#group_max_membership').send_keys(params[:member_limit])
       wait_for_ajaximations
     end
-    f('#groupEditSaveButton').click
+    submit_form("span[aria-label='Add Group']")
     wait_for_ajaximations
   end
 

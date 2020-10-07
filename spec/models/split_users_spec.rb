@@ -384,6 +384,23 @@ describe SplitUsers do
           map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
       end
 
+      it "deconflicts duplicated paths where it can" do
+        notification = Notification.where(name: "Report Generated").first_or_create
+        communication_channel(restored_user, {username: 'test@instructure.com'})
+        restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+        source_user_ccs = source_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort
+        UserMerge.from(restored_user).into(source_user)
+        communication_channel(restored_user, {username: 'test@instructure.com', cc_state: 'retired'})
+        SplitUsers.split_db_users(source_user)
+        restored_user.reload
+        source_user.reload
+        expect(restored_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq restored_user_ccs
+        expect(source_user.communication_channels.where.not(workflow_state: 'retired').
+          map { |cc| [cc.path, cc.workflow_state] }.sort).to eq source_user_ccs
+      end
     end
 
     it 'should restore submissions' do
@@ -518,6 +535,19 @@ describe SplitUsers do
         SplitUsers.split_db_users(shard1_source_user)
         expect(restored_user.reload.linked_observers).to eq [observer1]
         expect(shard1_source_user.reload.linked_observers).to eq [observer2]
+      end
+
+      it 'should handle user_observees cross shard' do
+        observee1 = user_model
+        observee2 = user_model
+        add_linked_observer(observee1, restored_user)
+        add_linked_observer(observee2, shard1_source_user)
+        UserMerge.from(restored_user).into(shard1_source_user)
+        expect(restored_user.linked_observers).to eq []
+        expect(shard1_source_user.as_observer_observation_links.shard(shard1_source_user).map(&:user_id).uniq.sort).to eq [observee1.id, observee2.id].uniq.sort
+        SplitUsers.split_db_users(shard1_source_user)
+        expect(restored_user.reload.as_observer_observation_links.shard(restored_user).map(&:user)).to eq [observee1]
+        expect(shard1_source_user.reload.as_observer_observation_links.map(&:user)).to eq [observee2]
       end
 
       it 'should handle user_observers cross shard from target shard' do

@@ -1281,7 +1281,7 @@ export default do ->
       @renderStatusesModal()
 
       $('#keyboard-shortcuts').click ->
-        questionMarkKeyDown = $.Event('keydown', keyCode: 191)
+        questionMarkKeyDown = $.Event('keydown', {keyCode: 191, shiftKey: true})
         $(document).trigger(questionMarkKeyDown)
 
     renderGradebookMenus: =>

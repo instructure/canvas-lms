@@ -313,6 +313,13 @@ class SisBatch < ActiveRecord::Base
                                        clear_sis_stickiness: options[:clear_sis_stickiness])
   end
 
+  def compute_file_size(file)
+    CanvasUnzip.compute_uncompressed_size(file.path)
+  rescue CanvasUnzip::UnknownArchiveType
+    # if it's not a zip file, just return the size of the file itself
+    file.size
+  end
+
   def generate_diff
     return if self.diffing_remaster # joined the chain, but don't actually want to diff this one
     return unless self.diffing_data_set_identifier
@@ -329,7 +336,9 @@ class SisBatch < ActiveRecord::Base
     previous_zip = previous_batch.try(:download_zip)
     return unless previous_zip
 
-    if change_threshold && file_diff_percent(@data_file.size, previous_zip.size) > change_threshold
+    current_file_size = compute_file_size(@data_file)
+    previous_zip_size = compute_file_size(previous_zip)
+    if change_threshold && file_diff_percent(current_file_size, previous_zip_size) > change_threshold
       SisBatch.add_error(nil, "Diffing not performed because file size difference exceeded threshold", sis_batch: self)
       return
     end

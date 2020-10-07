@@ -74,7 +74,7 @@ describe Mutations::DeleteOutcomeProficiency do
       expect(errors[0]['message']).to match(/#{message}/)
     end
 
-    it "requires manage_outcomes permission" do
+    it "requires manage_proficiency_scales permission" do
       query = <<~QUERY
         id: #{original_record.id}
       QUERY

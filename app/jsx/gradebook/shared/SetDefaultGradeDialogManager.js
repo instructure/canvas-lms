@@ -67,7 +67,7 @@ class SetDefaultGradeDialogManager {
   }
 
   isDialogEnabled() {
-    return this.submissionsLoaded
+    return this.submissionsLoaded && this.assignment.grades_published
   }
 }
 

@@ -79,9 +79,9 @@ describe('Common file url utils', () => {
       })
 
       it('adds the verifier to user files', () => {
-        // while removing download_frd and does not add wrap
+        // while removing download_frd
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.href, '/users/2/files/17/download?verifier=xyzzy')
+        strictEqual(result.href, '/users/2/files/17/download?wrap=1&verifier=xyzzy')
       })
     })
 
@@ -108,7 +108,7 @@ describe('Common file url utils', () => {
       it('adds the verifier to user files', () => {
         // while removing download_frd and does not add wrap
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.url, '/users/2/files/17/download?verifier=xyzzy')
+        strictEqual(result.url, '/users/2/files/17/download?wrap=1&verifier=xyzzy')
       })
     })
   })
@@ -131,7 +131,7 @@ describe('Common file url utils', () => {
     })
 
     it('does not indescriminetly replace /preview in a url', () => {
-      const url = '/please/download/me'
+      const url = '/please/preview/me'
       strictEqual(prepEmbedSrc(url), url)
     })
   })
@@ -145,17 +145,17 @@ describe('Common file url utils', () => {
 
     it('replaces /preview?some_params with /download?some_params', () => {
       const url = '/users/2/files/17/preview?verifier=xyzzy'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download?verifier=xyzzy')
+      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download?verifier=xyzzy&wrap=1')
     })
 
     it('replaces /preview and no params with /download', () => {
       const url = '/users/2/files/17/preview'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download')
+      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download?wrap=1')
     })
 
     it('does not indescriminetly replace /download in a url', () => {
-      const url = '/please/preview/me'
-      strictEqual(prepLinkedSrc(url), url)
+      const url = '/please/download/me'
+      strictEqual(prepLinkedSrc(url), `${url}?wrap=1`)
     })
   })
 })

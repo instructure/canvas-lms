@@ -32,7 +32,7 @@ class Login::CasController < ApplicationController
     # CAS sends a GET with a ticket when it's doing a login
     return create if params[:ticket]
 
-    redirect_to delegated_auth_redirect_uri(client.add_service_to_login_url(cas_login_url))
+    redirect_to client.add_service_to_login_url(cas_login_url)
   end
 
   def create

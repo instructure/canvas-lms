@@ -364,20 +364,13 @@ describe Auditors::GradeChange do
       end
     end
 
-    it "returns override grade changes if the final_grade_override_in_gradebook_history flag is enabled" do
-      Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+    it "returns override grade changes in results" do
       Auditors::GradeChange.record(override_grade_change: override_grade_change)
 
       expect(course_grade_changes.count).to eq 1
     end
 
-    it "does not return override grade changes if the final_grade_override_in_gradebook_history flag is not enabled" do
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
-
-      expect(course_grade_changes).to be_empty
-    end
-
-    it "stores override grade changes in the database even if the flag is not enabled" do
+    it "stores override grade changes in the database" do
       expect {
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
       }.to change {
@@ -410,6 +403,40 @@ describe Auditors::GradeChange do
         override_grade_change.score.update!(grading_period_id: grading_period.id)
         Auditors::GradeChange.record(override_grade_change: override_grade_change)
         expect(Auditors::ActiveRecord::GradeChangeRecord.last.grading_period_id).to eq grading_period.id
+      end
+    end
+
+    describe ".filter_by_assignment" do
+      it "only changes the scope for nil assignment ids" do
+        attributes = {
+          assignment_id: @assignment.id,
+          account_id: @account.id,
+          root_account_id: @account.id,
+          student_id: @student.id,
+          context_id: @course.id,
+          context_type: 'Course',
+          excused_after: false,
+          excused_before: false,
+          event_type: 'grade'
+        }
+        r1 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
+          uuid: 'asdf',
+          request_id: 'asdf'
+        }))
+        r2 = Auditors::ActiveRecord::GradeChangeRecord.create!(attributes.merge({
+          assignment_id: nil,
+          uuid: 'fdsa',
+          request_id: 'fdsa'
+        }))
+        scope1 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: @assignment.id)
+        scope2 = Auditors::ActiveRecord::GradeChangeRecord.where(assignment_id: Auditors::GradeChange::NULL_PLACEHOLDER)
+        scope1 = Auditors::GradeChange.filter_by_assignment(scope1)
+        scope2 = Auditors::GradeChange.filter_by_assignment(scope2)
+        expect(r2.reload.assignment_id).to be_nil
+        expect(scope1.pluck(:id)).to include(r1.id)
+        expect(scope1.pluck(:id)).to_not include(r2.id)
+        expect(scope2.pluck(:id)).to_not include(r1.id)
+        expect(scope2.pluck(:id)).to include(r2.id)
       end
     end
   end

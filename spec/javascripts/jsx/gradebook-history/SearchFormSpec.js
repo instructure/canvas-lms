@@ -24,6 +24,7 @@ import {DateInput} from '@instructure/ui-forms'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {destroyContainer} from 'jsx/shared/FlashAlert'
 import Fixtures from './Fixtures'
+import fakeENV from 'helpers/fakeENV'
 
 const defaultProps = () => ({
   fetchHistoryStatus: 'started',
@@ -561,8 +562,30 @@ test('no search records found for assignments results in a message instead', fun
     .click()
 
   const noRecords = [...document.getElementsByTagName('span')].find(
-    span => span.textContent === 'No assignments with that name found'
+    span => span.textContent === 'No artifacts with that name found'
   )
 
   ok(noRecords)
+})
+
+QUnit.module('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
+  test('is shown if the OVERRIDE_GRADES_ENABLED environment variable is set to true', () => {
+    fakeENV.setup({OVERRIDE_GRADES_ENABLED: true})
+
+    const wrapper = mountComponent()
+    ok(wrapper.exists('#show_final_grade_overrides_only'))
+    wrapper.unmount()
+
+    fakeENV.teardown()
+  })
+
+  test('is not shown if the OVERRIDE_GRADES_ENABLED environment variable is set to false', () => {
+    fakeENV.setup({OVERRIDE_GRADES_ENABLED: false})
+
+    const wrapper = mountComponent()
+    notOk(wrapper.exists('#show_final_grade_overrides_only'))
+    wrapper.unmount()
+
+    fakeENV.teardown()
+  })
 })

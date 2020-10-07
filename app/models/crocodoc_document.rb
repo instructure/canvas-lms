@@ -98,7 +98,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:user] = user.crocodoc_user
     end
 
-    crocodoc_ids = opts[:moderated_grading_whitelist]&.map {|h| h["crocodoc_id"] }
+    crocodoc_ids = opts[:moderated_grading_allow_list]&.map {|h| h["crocodoc_id"] }
     opts.merge! permissions_for_user(user, crocodoc_ids)
 
     unless annotations_on
@@ -113,7 +113,7 @@ class CrocodocDocument < ActiveRecord::Base
     end
   end
 
-  def permissions_for_user(user, whitelist = nil)
+  def permissions_for_user(user, allow_list = nil)
     opts = {
       :filter => 'none',
       :admin => false,
@@ -140,7 +140,7 @@ class CrocodocDocument < ActiveRecord::Base
       opts[:filter] = 'none'
     end
 
-    apply_whitelist(user, opts, whitelist) if whitelist
+    apply_allow_list(user, opts, allow_list) if allow_list
 
     opts
   end
@@ -148,28 +148,28 @@ class CrocodocDocument < ActiveRecord::Base
   def submissions
     self.canvadocs_submissions.
       preload(submission: :assignment).
-      map &:submission
+      map(&:submission)
   end
 
-  def apply_whitelist(user, opts, whitelist)
-    whitelisted_users = case opts[:filter]
-    when 'all'
-      whitelist
-    when 'none'
-      []
-    else
-      opts[:filter].to_s.split(',').map(&:to_i) & whitelist
-    end
+  def apply_allow_list(user, opts, allow_list)
+    allowed_users = case opts[:filter]
+                    when 'all'
+                      allow_list
+                    when 'none'
+                      []
+                    else
+                      opts[:filter].to_s.split(',').map(&:to_i) & allow_list
+                    end
 
-    unless whitelisted_users.include?(user.crocodoc_id!)
+    unless allowed_users.include?(user.crocodoc_id!)
       opts[:admin] = false
       opts[:editable] = false
     end
 
-    opts[:filter] = if whitelisted_users.empty?
+    opts[:filter] = if allowed_users.empty?
       'none'
     else
-      whitelisted_users.join(',')
+      allowed_users.join(',')
     end
   end
 

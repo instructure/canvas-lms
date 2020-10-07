@@ -218,12 +218,6 @@ disable_keyboard_shortcuts:
       will have an improved experience with these shortcuts turned off.
   applies_to: User
   autoexpand: true
-enable_i18n_features_in_outcomes_exports:
-  state: hidden
-  display_name: Enable i18n features in outcomes exports
-  description: Enable byte_order_mark and semi_colon_field_separator user-level feature flags to be toggled
-    on or off for outcomes exports.
-  applies_to: RootAccount
 include_byte_order_mark_in_gradebook_exports:
   state: allowed
   display_name: Include Byte-Order Mark in compatible spreadsheet exports

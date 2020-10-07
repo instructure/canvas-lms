@@ -414,6 +414,31 @@ describe MediaObjectsController do
       ])
     end
 
+    it "will limit return to group media" do
+      course_with_teacher_logged_in(active_all: true)
+      gcat = @course.group_categories.create!(:name => "My Group Category")
+      @group = Group.create!(:name => "some group", :group_category => gcat, :context => @course)
+      mo1 = MediaObject.create!(:user_id => @user, :context => @group, :media_id => "in_group")
+
+      MediaObject.create!(:user_id => @user, :context => @course, :media_id => "in_course_with_att")
+      @course.attachments.create!(:media_entry_id => "in_course_with_att", :uploaded_data => stub_png_data)
+
+      MediaObject.create!(:user_id => @user, :context => @user, :media_id => "not_in_course")
+
+      get 'index', params: {:group_id => @group.id, :exclude => ["sources", "tracks"]}
+
+      expect(json_parse(response.body)).to match_array([
+        {
+          "media_id"=>"in_group",
+          "media_type"=>nil,
+          "created_at"=>mo1.created_at.as_json,
+          "title"=>"Untitled",
+          "can_add_captions"=>true,
+          "embedded_iframe_url"=>"http://test.host/media_objects_iframe/in_group"
+        }
+      ])
+    end
+
     it "will sort by title" do
       course_with_teacher_logged_in
       MediaObject.create!(:user_id => @user, :context => @user, :media_id => "test",  :title => "ZZZ")

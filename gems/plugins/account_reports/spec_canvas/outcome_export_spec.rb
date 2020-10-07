@@ -69,7 +69,7 @@ describe "Outcome Reports" do
       expect(report[0].headers).to eq AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS
     end
 
-    it 'respects csv i18n settings only when enabled' do
+    it 'respects csv i18n settings' do
       preparsed_report_options = {
         parse_header: true,
         account: account,
@@ -80,15 +80,9 @@ describe "Outcome Reports" do
       expected_headers = ['vendor_guid', 'object_type', 'title']
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 
-      account.disable_feature!(:enable_i18n_features_in_outcomes_exports)
-      preparsed_report_1 = run_report('outcome_export_csv', preparsed_report_options)
-      actual_headers_1 = parse_report(preparsed_report_1, preparsed_report_options.merge('col_sep': ','))[0].headers
-      expect(actual_headers_1[0..2]).to eq(expected_headers)
-
-      account.enable_feature!(:enable_i18n_features_in_outcomes_exports)
-      preparsed_report_2 = run_report('outcome_export_csv', preparsed_report_options)
-      actual_headers_2 = parse_report(preparsed_report_2, preparsed_report_options.merge('col_sep': ';'))[0].headers
-      expect(actual_headers_2[0..2]).to eq(expected_headers)
+      preparsed_report = run_report('outcome_export_csv', preparsed_report_options)
+      actual_headers = parse_report(preparsed_report, preparsed_report_options.merge('col_sep': ';'))[0].headers
+      expect(actual_headers[0..2]).to eq(expected_headers)
     end
 
     context 'with outcome groups' do

@@ -146,16 +146,16 @@ module Lti
     end
 
     def manage_subscription
-      return unless context.root_account.feature_enabled?(:plagiarism_tool_subscriptions)
       # Live Event subscriptions for plagiarism tools were too bulky to keep track
-      # of when created from the individual assignments, so we are creating them at
-      # the tool level. We only want subscriptions for plagiarism tools, though.
+      # of when created from the individual assignments, so we are creating them on
+      # the tool. We only want subscriptions for plagiarism tools, though. These
+      # new subscriptions will get all events for the whole root account, and are
+      # filtered by the vendor code and product code inside the live events
+      # publish tool.
       if subscription_id.blank? && workflow_state == 'active' && plagiarism_tool?
-        subscription_helper = Lti::PlagiarismSubscriptionsHelper.new(self)
-        self.update_columns(subscription_id: subscription_helper.create_subscription)
+        self.update_columns(subscription_id: find_or_create_plagiarism_subscription)
       elsif subscription_id.present? && workflow_state != 'active'
-        Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(self.subscription_id)
-        self.update_columns(subscription_id: nil)
+        delete_subscription
       end
     end
 
@@ -163,9 +163,30 @@ module Lti
       raw_data.try(:dig, 'enabled_capability')&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
     end
 
+    def find_or_create_plagiarism_subscription
+      # Tools with subscriptions and which match the current tool installation's product and vendor codes
+      tool_proxies = Lti::ToolProxy.active.joins(:product_family).
+        where(lti_product_families: {product_code: product_family&.product_code, vendor_code: product_family&.vendor_code}).
+        where.not(subscription_id: nil)
+      # Search the accounts under the same root account to see if a subscription already exists
+      # (we only need one subscription per root account)
+      subscription_id = tool_proxies.joins(:account).
+        find_by("coalesce(accounts.root_account_id, accounts.id) = ?", context&.root_account_id)&.subscription_id
+      # Then search courses in case the tool was only directly installed on a course
+      subscription_id ||= tool_proxies.joins(:course).
+        find_by(courses: {root_account_id: self.context&.root_account_id})&.subscription_id
+      # Then if we haven't found a subscription at all, we'll create a new one
+      subscription_id || Lti::PlagiarismSubscriptionsHelper.new(self)&.create_subscription
+    end
+
     def delete_subscription
       return if subscription_id.blank?
-      Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(self.subscription_id)
+      old_subscription_id = subscription_id
+      self.update_columns(subscription_id: nil)
+      # We'll only delete the subscription from the live events publish tool if there
+      # are no other tools using it
+      return if Lti::ToolProxy.active.where(subscription_id: old_subscription_id).any?
+      Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(old_subscription_id)
     end
   end
 end

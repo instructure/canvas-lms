@@ -94,7 +94,11 @@ module UserContent
       if user_can_access_attachment?
         ProcessedUrl.new(match: match, attachment: attachment, is_public: is_public, in_app: in_app).url
       elsif attachment.previewable_media? && match.url.present?
-        uri = URI.parse(match.url)
+        begin
+          uri = URI.parse(match.url)
+        rescue URI::InvalidURIError
+          uri = URI.parse(Addressable::URI.escape(match.url))
+        end
         uri.query = (uri.query.to_s.split("&") + ["no_preview=1"]).join("&")
         uri.to_s
       end

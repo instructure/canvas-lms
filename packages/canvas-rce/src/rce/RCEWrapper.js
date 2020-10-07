@@ -407,15 +407,28 @@ class RCEWrapper extends React.Component {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
     }
+    // if you're wondering, the &nbsp; scatter about in the svg
+    // is because tinymce will strip empty elements
     const markup = `
-    <img
-      alt="${formatMessage('Loading...')}"
-      src="data:image/gif;base64,R0lGODlhAQABAIAAAMLCwgAAACH5BAAAAAAALAAAAAABAAEAAAICRAEAOw=="
+    <div
+      aria-label="${formatMessage('Loading')}"
       data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
-      style="width: ${width}; height: ${height}; border: solid 1px #8B969E;"
-    />`
+      style="width: ${width}; height: ${height};"
+    >
+    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
+      <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
+        <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+        <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+        &nbsp;
+      </g>
+      &nbsp;
+      </svg>
+    </div>`
 
-    this.insertCode(markup)
+    const editor = this.mceInstance()
+    editor.undoManager.ignore(() => {
+      editor.execCommand('mceInsertContent', false, markup)
+    })
   }
 
   insertVideo(video) {
@@ -435,7 +448,10 @@ class RCEWrapper extends React.Component {
       `[data-placeholder-for="${encodeURIComponent(name)}"]`
     )
     if (placeholder) {
-      placeholder.remove()
+      const editor = this.mceInstance()
+      editor.undoManager.ignore(() => {
+        editor.dom.remove(placeholder)
+      })
     }
   }
 
@@ -816,7 +832,7 @@ class RCEWrapper extends React.Component {
   patchAutosavedContent(content, asText) {
     const temp = document.createElement('div')
     temp.innerHTML = content
-    temp.querySelectorAll('img[data-placeholder-for]').forEach(placeholder => {
+    temp.querySelectorAll('[data-placeholder-for]').forEach(placeholder => {
       placeholder.parentElement.removeChild(placeholder)
     })
     if (asText) return temp.textContent

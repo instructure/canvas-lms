@@ -93,7 +93,7 @@ test('Table has column headers in correct order', () => {
     'Anonymous Grading',
     'Student',
     'Grader',
-    'Assignment',
+    'Artifact',
     'Before',
     'After',
     'Current'

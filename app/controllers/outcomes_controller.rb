@@ -18,6 +18,7 @@
 
 class OutcomesController < ApplicationController
   include Api::V1::Outcome
+  include Api::V1::Role
   before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
@@ -29,8 +30,7 @@ class OutcomesController < ApplicationController
     log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if (common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil))
-      common_core_group_id = common_core_group_id.to_i
+    if (common_core_group_id = Shard.current.settings[:common_core_outcome_group_id])
       common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
     end
 
@@ -50,6 +50,7 @@ class OutcomesController < ApplicationController
 
     set_tutorial_js_env
     mastery_scales_js_env
+    proficiency_roles_js_env
   end
 
   def show
@@ -310,5 +311,24 @@ class OutcomesController < ApplicationController
   protected
   def learning_outcome_params
     params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
+  end
+
+  private
+
+  def proficiency_roles_js_env
+    if @context.is_a?(Account) && @context.root_account.feature_enabled?(:account_level_mastery_scales)
+      proficiency_calculation_roles = []
+      @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
+        proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+      end if @context.grants_right? @current_user, :manage_proficiency_calculations
+      proficiency_scales_roles = []
+      @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
+        proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+      end if @context.grants_right? @current_user, :manage_proficiency_scales
+      js_env(
+        PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
+        PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles
+      )
+    end
   end
 end

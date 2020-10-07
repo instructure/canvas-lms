@@ -87,7 +87,9 @@ class InternetImageController < ApplicationController
   def image_search
     return render json: { error: 'query param is required'}, status: :bad_request unless params[:query]
     search_url = "#{service_url}/search/photos"
-    send_params = {per_page: 10, page: 1}.with_indifferent_access.merge(params.permit(:query, :per_page, :page, :orientation))
+    send_params = {per_page: 10, page: 1, content_filter: 'high'}.with_indifferent_access.merge(
+      params.permit(:query, :per_page, :page, :orientation, :content_filter)
+    )
     search_results = HTTParty.get("#{search_url}?#{send_params.to_query}", {
       headers: {"Authorization" => "Client-ID #{unsplash_config[:access_key]}"}
     })

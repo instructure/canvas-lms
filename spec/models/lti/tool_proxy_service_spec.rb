@@ -16,8 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
-require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
+require 'spec_helper'
+require 'lti2_spec_helper'
 
 require_dependency "lti/tool_proxy_service"
 
@@ -408,75 +408,18 @@ module Lti
     end
 
     describe '#recreate_missing_subscriptions' do
-      before do
-        message_handler.update!(
-          capabilities: [Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2]
-        )
-        message_handler.dup.update!(message_type: 'content-item')
-      end
-
-      it 'recreats subscriptions for each message handler' do
-        expect(AssignmentConfigurationToolLookup).to receive(:send_later_enqueue_args).twice
+      it 'recreates subscriptions directly on the tool' do
+        expect(tool_proxy).to receive(:manage_subscription)
 
         ToolProxyService.recreate_missing_subscriptions(tool_proxy)
       end
     end
 
-    describe '#delete_subscriptions_for' do
-      let(:assignment) { course.assignments.create!(name: 'banana') }
-      let(:assignment_two) do
-        assignment_two = assignment.dup
-        assignment_two.update(lti_context_id: SecureRandom.uuid)
-        assignment_two
-      end
-      let(:subscription_id) { SecureRandom.uuid }
-      let(:stub_response) { double(code: 200, body: '{}', parsed_response: {'Id' => subscription_id}, ok?: true) }
-      let(:sub_service_double) { class_double(Services::LiveEventsSubscriptionService).as_stubbed_const }
+    describe '#delete_subscriptions' do
+      it 'deletes subscriptions directly on the tool' do
+        expect(tool_proxy).to receive(:delete_subscription)
 
-      before(:each) do
-        allow(sub_service_double).to receive_messages(create_tool_proxy_subscription: stub_response)
-        allow(sub_service_double).to receive_messages(available?: true)
-        assignment.tool_settings_tool = message_handler
-        assignment_two.tool_settings_tool = message_handler
-        assignment.save!
-        assignment_two.save!
-      end
-
-      it 'deletes all subscriptions for the spcified tool proxy' do
-        expect(sub_service_double).to receive(:destroy_tool_proxy_subscription).twice
-        tool_proxy_service.delete_subscriptions_for(tool_proxy)
-        run_jobs
-      end
-
-      it 'deletes the correct subscriptions for the specified tool proxy' do
-        expect(sub_service_double).to receive(:destroy_tool_proxy_subscription).twice.with(tool_proxy, subscription_id)
-        tool_proxy_service.delete_subscriptions_for(tool_proxy)
-        run_jobs
-      end
-
-      it 'deletes subscriptions for the tool based on matching product family and context type' do
-        tool_proxy2 = create_tool_proxy(account)
-        expect(sub_service_double).to receive(:destroy_tool_proxy_subscription).twice
-        tool_proxy_service.delete_subscriptions_for(tool_proxy2)
-        run_jobs
-      end
-
-      context 'when the tool was installed to an account but the subscriptions are from a course-level tool' do
-        it 'does not delete subscriptions' do
-          tool_proxy2 = create_tool_proxy(course)
-          expect(sub_service_double).to_not receive(:destroy_tool_proxy_subscription)
-          tool_proxy_service.delete_subscriptions_for(tool_proxy2)
-          run_jobs
-        end
-      end
-
-      context 'when the tool was installed to an course but the subscriptions are from a account-level tool' do
-        it 'does not delete subscriptions' do
-          tool_proxy.update!(context: course)
-          expect(sub_service_double).to_not receive(:destroy_tool_proxy_subscription)
-          tool_proxy_service.delete_subscriptions_for(tool_proxy)
-          run_jobs
-        end
+        ToolProxyService.delete_subscriptions(tool_proxy)
       end
     end
   end

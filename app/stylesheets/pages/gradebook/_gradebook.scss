@@ -837,6 +837,11 @@ $gradebook_checkbox_size: 16px;
   flex: 1 1 auto;
   flex-direction: row;
   justify-content: flex-end;
+
+  @include mobile-only {
+    flex-direction: column;
+    align-items: flex-end;
+  }
 }
 
 .gradebook-filter-container {
@@ -850,7 +855,13 @@ $gradebook_checkbox_size: 16px;
   margin-#{direction(left)}: $ic-sp/2;
 
   input {
-    width: 248px;
+    @include desktop-only {
+      width: 248px;
+    }
+
+    @include mobile-only {
+      padding-#{direction(right)}: 0;
+    }
   }
 }
 

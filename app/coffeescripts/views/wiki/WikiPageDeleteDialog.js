@@ -17,12 +17,12 @@
 
 import $ from 'jquery'
 import I18n from 'i18n!pages'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {getResponsiveWidth} from '../DialogFormView'
 
 const dialogDefaults = {
   fixDialogButtons: false,
   title: I18n.t('delete_dialog_title', 'Delete Page'),
-  width: 400,
+  width: getResponsiveWidth(240, 400),
   height: 'auto'
 }
 

@@ -100,6 +100,16 @@ describe('RCE > Plugins > Shared > Content Selection', () => {
         expect(getContentFromElement($element, editor).type).toEqual(LINK_TYPE)
       })
 
+      it('does not explode when the hostname has bad unicode', () => {
+        $element.href = 'http://invalid%ffhostname.com/'
+        expect(getContentFromElement($element, editor).type).toEqual(LINK_TYPE)
+      })
+
+      it('works with a relative path', () => {
+        $element.href = '/courses/1201/files/8880/download'
+        expect(getContentFromElement($element, editor).type).toEqual(FILE_LINK_TYPE)
+      })
+
       it('returns content of type "none" when the anchor has no href attribute', () => {
         $element.removeAttribute('href')
         expect(getContentFromElement($element, editor).type).toEqual(NONE_TYPE)

@@ -75,6 +75,10 @@ class FavoritesController < ApplicationController
       courses.reject!{|c| mc_ids.include?(c.id)}
     end
 
+    if params[:sort] == "nickname"
+      courses.sort_by!{ |c| [c.primary_enrollment_rank, Canvas::ICU.collation_key(c.nickname_for(@current_user))] }
+    end
+
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, [:read_sis, :manage_sis])
     render :json => courses.map { |course|
       enrollments = nil

@@ -305,7 +305,7 @@ describe('MoreOptions', () => {
       expect(fileSelect).toContainElement(
         (await findAllByText('www.creedthoughts.gov.www/creedthoughts'))[0]
       )
-    })
+    }, 10000)
 
     it('allows folder navigation through breadcrumbs', async () => {
       const overrides = {
@@ -408,5 +408,5 @@ describe('MoreOptions', () => {
 
       expect(selectedCanvasFiles).toEqual(['11'])
     })
-  })
+  }, 10000)
 })

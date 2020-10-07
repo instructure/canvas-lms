@@ -59,14 +59,7 @@ module DataFixup::CopyBuiltInRolesByRootAccount
 
       Enrollment.find_ids_in_ranges(:batch_size => 100_000) do |start_at, end_at|
         # these are taking long enough that we should batch them
-        self.send_later_if_production_enqueue_args(
-          :move_roles_for_enrollments,
-          {
-            priority: Delayed::LOW_PRIORITY,
-            n_strand: ["built_in_roles_copy_fixup_for_enrollments", Shard.current.database_server.id]
-          },
-          old_role_ids, start_at, end_at
-        )
+        self.move_roles_for_enrollments(old_role_ids, start_at, end_at)
       end
     end
   end

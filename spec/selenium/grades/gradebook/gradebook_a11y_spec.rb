@@ -123,6 +123,24 @@ describe "Gradebook" do
     end
   end
 
+  context 'keyboard shortcut dialog is accessible with keyboard shortcut and selection' do
+    before do
+      Gradebook.visit(@course)
+    end
+
+    it 'displays the keyboard shortcuts dialog when shortcut icon is selected' do
+      f('#keyboard-shortcuts').click
+      keyboard_nav = f('#keyboard_navigation')
+      expect(keyboard_nav).to be_displayed
+    end
+
+    it 'keyboard shorcut "SHIFT-?"' do
+      driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+      keyboard_nav = f('#keyboard_navigation')
+      expect(keyboard_nav).to be_displayed
+    end
+  end
+
   context 'keyboard shortcut "c"' do
     before do
       Gradebook.visit(@course)

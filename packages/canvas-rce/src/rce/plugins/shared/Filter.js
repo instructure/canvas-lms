@@ -73,6 +73,13 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
       </option>
     )
   }
+  if (userContextType === 'group' && contentType !== 'links' && contentSubtype !== 'all') {
+    options.push(
+      <option key="group_files" value="group_files" icon={IconFolderLine}>
+        {fileLabelFromContext('group')}
+      </option>
+    )
+  }
   options.push(
     <option key="user_files" value="user_files" icon={IconFolderLine}>
       {fileLabelFromContext(contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user')}
@@ -182,7 +189,7 @@ Filter.propTypes = {
   /**
    * `contentType` is the primary filter setting (e.g. links, files)
    */
-  contentType: oneOf(['links', 'user_files', 'course_files']).isRequired,
+  contentType: oneOf(['links', 'user_files', 'course_files', 'group_files']).isRequired,
 
   /**
    * `onChange` is called when any of the Filter settings are changed

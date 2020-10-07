@@ -285,13 +285,29 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
+    ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => self.deleted_at)
     self.send_later_if_production_enqueue_args(:update_downstreams, { max_attempts: 1, n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY }, self.position)
     save!
     true
   end
 
   def restore
+    if self.workflow_state == 'deleted' && self.deleted_at
+      # only restore tags deleted (approximately) when the module was deleted
+      # (tags are currently set to exactly deleted_at but older deleted modules used the current time on each tag)
+      tags_to_restore = self.content_tags.where(:workflow_state => 'deleted').
+        where('updated_at BETWEEN ? AND ?', self.deleted_at - 5.seconds, self.deleted_at + 5.seconds).
+        preload(:content)
+      tags_to_restore.each do |tag|
+        # don't restore the item if the asset has been deleted too
+        next if tag.asset_workflow_state == 'deleted'
+        # although the module will be restored unpublished, the items should match the asset's published state
+        tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
+        # deal with the possibility that the asset has been renamed after the module was deleted
+        tag.title = Context.asset_name(tag.content) if tag.content && tag.sync_title_to_asset_title?
+        tag.save
+      end
+    end
     self.workflow_state = 'unpublished'
     self.save
   end

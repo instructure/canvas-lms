@@ -18,6 +18,7 @@
 
 import {fromImageEmbed, fromVideoEmbed} from '../instructure_image/ImageEmbedOptions'
 import {isOnlyTextSelected} from '../../contentInsertionUtils'
+import * as url from 'url'
 
 const FILE_DOWNLOAD_PATH_REGEX = /^\/(courses\/\d+\/)?files\/\d+\/download$/
 
@@ -56,8 +57,8 @@ export function asLink($element, editor) {
     return null
   }
 
-  const path = new URL($link.href).pathname
-  const type = FILE_DOWNLOAD_PATH_REGEX.test(path) ? FILE_LINK_TYPE : LINK_TYPE
+  const {pathname} = url.parse($link.href)
+  const type = FILE_DOWNLOAD_PATH_REGEX.test(pathname) ? FILE_LINK_TYPE : LINK_TYPE
   let displayAs = DISPLAY_AS_LINK
   if ($link.classList.contains('auto_open')) {
     displayAs = DISPLAY_AS_EMBED

@@ -4566,7 +4566,7 @@ describe 'Submissions API', type: :request do
     expect(json[0]["attachments"][0]["canvadoc_document_id"]).to eq canvadoc_document_id
   end
 
-  it "includes crocodoc whitelist ids in the preview url for attachments" do
+  it "includes crocodoc allowed ids in the preview url for attachments" do
     allow(Canvas::Crocodoc).to receive(:config).and_return({a: 1})
 
     course_with_teacher_logged_in active_all: true
@@ -4601,8 +4601,8 @@ describe 'Submissions API', type: :request do
     parsed_blob = JSON.parse parsed_params["blob"].first
     expect(parsed.path).to eq "/api/v1/crocodoc_session"
 
-    expect(parsed_blob["moderated_grading_whitelist"]).to include(@student.moderated_grading_ids.as_json)
-    expect(parsed_blob["moderated_grading_whitelist"]).to include(@teacher.moderated_grading_ids.as_json)
+    expect(parsed_blob["moderated_grading_allow_list"]).to include(@student.moderated_grading_ids.as_json)
+    expect(parsed_blob["moderated_grading_allow_list"]).to include(@teacher.moderated_grading_ids.as_json)
   end
 
 

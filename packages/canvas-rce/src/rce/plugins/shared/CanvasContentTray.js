@@ -46,17 +46,17 @@ function getTrayLabel(contentType, contentSubtype, contextType) {
 
   switch (contentSubtype) {
     case 'images':
-      return contentType === 'course_files'
-        ? formatMessage('Course Images')
-        : formatMessage('User Images')
+      if (contentType === 'course_files') return formatMessage('Course Images')
+      if (contentType === 'group_files') return formatMessage('Group Images')
+      return formatMessage('User Images')
     case 'media':
-      return contentType === 'course_files'
-        ? formatMessage('Course Media')
-        : formatMessage('User Media')
+      if (contentType === 'course_files') return formatMessage('Course Media')
+      if (contentType === 'group_files') return formatMessage('Group Media')
+      return formatMessage('User Media')
     case 'documents':
-      return contentType === 'course_files'
-        ? formatMessage('Course Documents')
-        : formatMessage('User Documents')
+      if (contentType === 'course_files') return formatMessage('Course Documents')
+      if (contentType === 'group_files') return formatMessage('Group Documents')
+      return formatMessage('User Documents')
     default:
       return formatMessage('Tray') // Shouldn't ever get here
   }
@@ -107,6 +107,13 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     sortValue: 'date_added',
     sortDir: 'desc'
   },
+  group_documents: {
+    contextType: 'group',
+    contentType: 'group_files',
+    contentSubtype: 'documents',
+    sortValue: 'date_added',
+    sortDir: 'desc'
+  },
   user_images: {
     contextType: 'user',
     contentType: 'user_files',
@@ -121,6 +128,13 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     sortValue: 'date_added',
     sortDir: 'desc'
   },
+  group_images: {
+    contextType: 'group',
+    contentType: 'group_files',
+    contentSubtype: 'images',
+    sortValue: 'date_added',
+    sortDir: 'desc'
+  },
   user_media: {
     contextType: 'user',
     contentType: 'user_files',
@@ -131,6 +145,13 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   course_media: {
     contextType: 'course',
     contentType: 'course_files',
+    contentSubtype: 'media',
+    sortValue: 'date_added',
+    sortDir: 'desc'
+  },
+  group_media: {
+    contextType: 'group',
+    contentType: 'group_files',
     contentSubtype: 'media',
     sortValue: 'date_added',
     sortDir: 'desc'
@@ -224,6 +245,10 @@ export default function CanvasContentTray(props) {
         case 'user_files':
           contextType = 'user'
           contextId = props.containingContext.userId
+          break
+        case 'group_files':
+          contextType = 'group'
+          contextId = props.containingContext.contextId
           break
         case 'course_files':
         case 'links':

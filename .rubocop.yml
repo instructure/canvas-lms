@@ -5,7 +5,7 @@ require:
   - ./gems/rubocop-canvas/lib/rubocop_canvas
 
 AllCops:
-  TargetRubyVersion: 2.3
+  TargetRubyVersion: 2.6
 
 # our style changes: disabling style rules we aren't interested in
 Layout/AlignParameters:

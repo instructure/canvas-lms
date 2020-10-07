@@ -1750,6 +1750,7 @@ ht:
   add_people_7ee4b2ec: "Ajoute Moun"
   add_people_and_courses_to_canvas_5c4bfff9: "Ajoute Kontak ak Kou sou Canvas"
   add_people_to_coursename_5ea234e1: "Ajoute Moun nan: %{courseName}"
+  add_proficiency_level_93bd72d0: "Ajoute Nivo Konesans"
   add_proficiency_rating_d819f6b8: "Ajoute evalyasyon konesans"
   add_pronouns_option_906ff625: "Ajoute opsyon pwonon"
   add_quiz_cebfa28b: "Ajoute Quiz"
@@ -3552,6 +3553,7 @@ ht:
   attempt_count_267a4fc5: "Tantativ: %{count}"
   attempt_current_attempt_ef626179: "Tantativ: %{current_attempt}"
   attempt_current_attempt_of_max_attempts_427ed508: "Tantativ %{current_attempt} sou %{max_attempts}"
+  attempt_f2691284: Tantativ
   attempt_number_83dcd86a: "Tantativ: %{number}"
   attempt_to_detect_an_appropriate_field_separator_i_4e59eb0c: "Eseye detekte yon separatè apwopriye nan ekspòtasyon Gradebook la an fonksyon de fòma nimerik lang ou a."
   attempt_to_detect_an_appropriate_field_separator_i_bc043389: "Eseye detekte yon separatè espas apwopriye nan ekspòtasyon fèy kalkil konpatib yo an fonksyon de fòma nimerik lang ou."
@@ -4034,6 +4036,7 @@ ht:
     unpublish: "Pa Pibliye"
     unpublished: "Pa Pibliye"
     update: Aktyalize
+  by_b90c6b6f: Pa
   by_client_id_4f2fe02c: "Pa ID kliyan"
   by_default_all_links_are_enabled_for_a_course_stud_8e617dbc: "Pa defo tout lyen yo aktive nan yon kou. Elèv yo pa p kapab wè lyen ki mennen nan seksyon ki pa gen kontni yo. Pa egzanp, si w potko kreye okenn quiz, yo pa p kapab wè lyen quiz yo. Ou kapab triye epi dezaktive lyen sa yo klèman si genyen domèn nan kou a ou pa vle elèv yo ale landan yo."
   by_default_students_are_able_to_create_groups_to_r_ba7f2450: |-
@@ -7055,12 +7058,14 @@ ht:
     required: "Tanpri antre kèk adrès imèl"
   created_58b8a75a: Kreye
   created_6ee36dff: "Kreye:"
+  created_ascending_cff48774: "Kreye: Kwasan"
   created_at_73839757: "Kreye le"
   created_by_b39b9c8b: "Kreye pa"
   created_by_sis_93fbb66b: created_by_sis
   created_by_sis_e1449c31: "Kreye pa SIS"
   created_created_at_37c0ec3b: "Kreye: %{created_at}"
   created_created_bf5714b8: "Kreye %{created}"
+  created_descending_e9a1b097: "Kreye: Dekwasan"
   created_group_group_name_2097306b: "Gwoup Kreye %{group_name}"
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Kreyasyon yon gwoup poko trete pa flux nouvo sesyon yo. Ale sou paj eritaj sesyon yo?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Kreyasyon yon Ekspòtasyon Soumisyon ap pèmèt ou telechaje yon fichye zip tout soumisyon sesyon ou yo nan tout kou ou pase e ou genyen kounye a. li kapab yon gwo fichye, kidonk li ka pran ti tan. Ou kapab soti nan paj la epi ou retounen sou li aprè."
@@ -7693,10 +7698,15 @@ ht:
       itilizatè a tout tan li bezwen pou li kapab reli notifikasyon an epi rejte li lè yo fini.
   disable_all_read_only_scopes_f9ffdd28: "Dezaktive tout espas ki lekti sèlman yo."
   disable_and_lock_7d0ef0e8: "Dezaktive epi Bloke"
+  disable_authentication_for_graphql_3c019622: "Dezaktive otantifikasyon pou GraphQL"
   disable_automatic_submission_8e1d8676: "Dezaktive Soumisyon Otomatik."
+  disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Dezaktive Rakousi Klavye Canvas. Kèk itilizatè itilize lektè ekran oswa navigasyon klavye
+      ap gen yon pi bon eksperyans avèk rakousi sa yo dezaktive.
   disable_celebrations_description: "Aktivasyon fonksyon sa a pèmèt ou maske tout animasyon selebrasyon yo."
   disable_content_security_policy_8660a787: "Dezaktive Politik Sekirite Kontni"
   disable_extra_filter_options_1d1cdc02: "dezaktive opsyon filtè siplemantè"
+  disable_keyboard_shortcuts_9db78832: "Dezaktive Rakousi Klavye"
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: "Dezaktive kazye enpòtasyon ak migrasyon Nouvo Quiz, defini yo pa defo pou aktive yo"
   disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Dezaktive Piblikasyon nan SIS pou Devwa nan Peryòd Klasman ki Fèmen an."
   disable_scope_6ba4e4d4: "Dezaktive espas"
@@ -8325,6 +8335,7 @@ ht:
   edit_user_details_9af7819b: "Edite detay itilizatè an"
   edit_when_36c1c2c8: "Modifye %{when}"
   edit_your_catalog_account_cce59310: "Modifye Katalòg Kont ou a"
+  edited_c4fcbdbf: "Chanje:"
   edited_date_b0455372: "(Modifye) %{date}"
   editing_permissions_for_name_3503e235: "Modifikasyon pèmisyon pou: %{name}"
   editor: 
@@ -10846,6 +10857,9 @@ ht:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Si li aktive, kreyatè kontni yo dwe bay dwa dotè e enfòmasyon lisans pou fichye yo anvan yo pibliye yo. Aplike sèlman si Navigasyon Meyè Fichye a aktive tou."
   if_enabled_copyright_and_license_information_must__2a551827: "Si l aktive, yo dwe bay enfòmasyon copiright ak lisans pou fichye yo anvan yo pibliye yo."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Si li aktive, y ap itilize opsyon jesyon kle devlopè ak pòte token yo."
+  if_enabled_graphql_queries_will_not_require_users__85f1740: |-
+      Si l aktive, konsiltasyon GraphQL yo pa p bezwen
+      itilizatè pou konekte oswa itilize yon token.
   if_enabled_oauth2_access_token_url_will_be_sent_in_c21186fd: "Si l aktive, y ap voye 'oauth2_access_token_url' nan lansman anrejistreman LTI2"
   if_enabled_oauth_1_0a_signing_may_be_used_by_lti_t_f2d6da3b: "Si l aktive, zouti LTI yo ka itilize siyati OAuth 1.0a an pou ale sou API Sèvis Enskripsyon an"
   if_enabled_oembed_endpoints_will_require_a_tool_ge_f5518bf8: |-
@@ -11414,6 +11428,8 @@ ht:
   last_day_attended_b72d623c: "Dènye jou prezans"
   last_download_33ea9bf4: "Dènye Telechajman:"
   last_e159dbd: Dènye
+  last_edit_ascending_6a18dba4: "Dènye Chanjman: Kwasan"
+  last_edit_descending_6b7ee755: "Dènye Chanjman: Dekwasan"
   last_enrollment_activity_10fe15ba: "Dènye Aktivite Enskripsyon"
   last_export_899a04c5: "Dènye Ekspotasyon:"
   last_first_name_95a078f5: "Siyati, Non"
@@ -13005,7 +13021,7 @@ ht:
       email: 
         details: "Ou dwe enskri sou Canvas anvan w ka patisipe nan kou a. Pou kòmanse vizite paj kou a la :"
         html: 
-          body: "Ou resevwa envitasyon pou patisipe nan yon kou sou %{website}. Kou a rele %{course}. Wòl kou: %{role_type}"
+          body: "Yo envite w patisipe nan yon kou a %{account} Klas la rete %{course}. Wòl kou: %{role_type}"
           details: "Ou dwe enskri sou Canvas anvan w ka patisipe nan kou a"
           email: Imèl
           link: "Klike la pou afiche paj kou a"
@@ -15195,6 +15211,8 @@ ht:
   page_page_59070cd8: "Paj %{page}"
   page_pagenum_20dbfeb8: "Paj %{pageNum}"
   page_pagenumber_31fe579f: "paj %{pageNumber}"
+  page_title_ascending_b5df950c: "Tit paj: Kwasan"
+  page_title_descending_70c1483d: "Tit paj: Dekwasan"
   page_views: 
     download_filename: "Pageviews Pou %{user}"
     table: 
@@ -15432,6 +15450,9 @@ ht:
     apple_settings: 
       labels: 
         client_id: "ID Sèvis"
+    asset_user_access_logs: 
+      description: "Minimize presyon ekriti AUA"
+      name: "Jounal AUA"
     assignment_freezer: 
       description: "Friz Propriyete Sesyon yo nan Kopi a"
       name: "Konjelatè Pwopriyete Sesyon"
@@ -16401,6 +16422,7 @@ ht:
   public_domain_112ed397: "Domèn Piblik"
   public_jwk_ee2d719d: "JWK Piblik"
   public_jwk_json_is_not_valid_please_submit_properl_31ea2004: "Public JWK json pa valid. Tanpri soumèt yon json ki byen fòmate."
+  public_jwk_json_must_have_the_following_string_fie_5f1a42d6: "JWK json piblik la dwe gen chan espas chèn karaktè sa yo: kty, e, n, kid, alg, use"
   public_jwk_url_b5564c1d: "Piblik JWK URL"
   public_message_students: 
     send_message: "Voye Mesaj"
@@ -18316,6 +18338,7 @@ ht:
   save_grading_period_set_e029fa88: "Anrejistre Anrejistre Peryòd Klasman"
   save_key_b4dede06: "Anrejistre Kle"
   save_learning_mastery_82889d8b: "Sovgade Metriz Aprantisaj"
+  save_mastery_scale_2b4dc13a: "Anrejistre Echèl Metriz"
   save_publish_36440725: "Anrejistre epi Pibliye"
   save_settings_cafe79a5: "Anrejistre Paramèt"
   save_successful_b2f64da4: "Anrejistreman reyisi."
@@ -19747,6 +19770,7 @@ ht:
   sorry_the_action_performed_on_this_recording_faile_2a1badda: "Nou regrèt, aksyon ou fè nan anrejistreman sa a echwe. Eseye ankò"
   sort_40afa70: "Triye:"
   sort_by_72dbba9c: "Klase pa"
+  sort_by_e75f9e3e: "Triye Pa"
   sort_courses_cf94b8d4: "Triye kou"
   sortable_name_73f707cf: "Non Triyab"
   sortable_name_e25fe66c: "Non Triyab:"
@@ -20278,6 +20302,7 @@ ht:
   subscribe_failed_2eb62de0: "Echek enskripsyon"
   subscribe_to_title_c7d6bbd2: "Enskri nan %{title}"
   subtitle_ee60ca78: Soutit
+  subtitles_could_not_be_imported_from_file_5de6da0b: "Soutit yo paka enpòte de %{file}"
   success_file_uploaded_8174e93f: "Reyisi: Fichye transfere"
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Reyisi! Nòt pou tach sa a vizib pou elèv yo kounye a."
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Reyisi! Yo kache nòt yo pou %{assignmentName}."
@@ -21314,8 +21339,11 @@ ht:
   to_do_1d554f36: "Pou Fè"
   to_do_5526f10a: "Tach:"
   to_do_6ac7b2dc: "tach:"
+  to_do_date_2cb4bf7b: "Dat Tach:"
+  to_do_date_ascending_c3a59abb: "Dat Tach: Kwasan"
   to_do_date_d6b79bfd: "tach %{date}"
   to_do_date_ddfb582c: "Dat Tach:"
+  to_do_date_descending_25b2141d: "Dat Tach: Dekwasan"
   to_do_item_d76ecb78: "Eleman Pou Fè"
   to_do_items_loading_d1cdfcd5: "Eleman Lis Tach yo ap Chaje"
   to_do_list_dashboard_d741f64e: "Tablo Lis Tach"
@@ -23008,6 +23036,7 @@ ht:
   you_ve_been_enrolled_in_the_course_course_course_r_2b2f00f9: "Ou enskri nan kou %{course} a. Wòl kou: %{role_type}"
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Yo ba ou yon wòl kont pou kont %{account} sou sit %{website}. Tip wòl: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Yo envite w nan %{course}."
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Yo envite w patisipe nan yon kou a %{account}  Klas la rete %{course}. Wòl kou: %{role_type}"
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Ou resevwa envitasyon pou patisipe nan yon kou sou %{website}. Kou a rele %{course}. Wòl kou: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Ou resevwa envitasyon pou patisipe nan kou %{course}. Wòl kou: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Ou resevwa envitasyon pou fè revizyon kamarad pou %{reviewee}."

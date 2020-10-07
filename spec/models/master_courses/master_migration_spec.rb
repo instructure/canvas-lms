@@ -578,6 +578,28 @@ describe MasterCourses::MasterMigration do
       expect(a2_to).to be_active
     end
 
+    it "shouldn't import into a deleted downstream assignment group" do
+      @copy_to = course_factory
+      sub = @template.add_child_course!(@copy_to)
+
+      ag1 = @copy_from.assignment_groups.create!(:name => "group1")
+      a1 = @copy_from.assignments.create!(:title => "assmt1", :assignment_group => ag1)
+
+      run_master_migration
+
+      ag1_to = @copy_to.assignment_groups.where(:migration_id => mig_id(ag1)).first
+      ag1_to.destroy
+
+      Timecop.freeze(30.seconds.from_now) do
+        @a2 = @copy_from.assignments.create!(:title => "assmt2", :assignment_group => ag1)
+      end
+
+      run_master_migration
+
+      a2_to = @copy_to.assignments.where(:migration_id => mig_id(@a2)).first
+      expect(a2_to.assignment_group).to be_available
+    end
+
     it "shouldn't change assignment group weights and rules if changed downstream" do
       @copy_to = course_factory
       sub = @template.add_child_course!(@copy_to)

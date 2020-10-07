@@ -27,7 +27,7 @@ describe GraphQLController do
   context "graphiql" do
     it "requires a user" do
       get :graphiql
-      expect(response.location).to match /\/login$/
+      expect(response.location).to match(/\/login$/)
     end
 
     it "works in production for normal users" do
@@ -50,10 +50,18 @@ describe GraphQLController do
       get :graphiql
       expect(response.status).to eq 200
     end
+  end
 
+  context "graphql, without a session" do
+    it "requires a user" do
+      post :execute, params: {query: "{}"}
+      expect(response.location).to match(/\/login$/)
+    end
   end
 
   context "graphql" do
+    before { user_session(@student) }
+
     it "works" do
       post :execute, params: {query: "{}"}
       expect(JSON.parse(response.body)["errors"]).not_to be_blank
@@ -64,6 +72,19 @@ describe GraphQLController do
         expect(InstStatsd::Statsd).to receive(:increment).with("graphql.ASDF.count", tags: anything)
         request.headers["GraphQL-Metrics"] = "true"
         post :execute, params: {query: 'query ASDF { course(id: "1") { id } }'}
+      end
+    end
+  end
+
+  context "with release flag require_execute_auth disabled" do
+
+    context "graphql, without a session" do
+      it "works" do
+        expect(Account.site_admin).to(
+          receive(:feature_enabled?).with(:disable_graphql_authentication).and_return(true)
+        )
+        post :execute, params: {query: "{}"}
+        expect(JSON.parse(response.body)["errors"]).not_to be_blank
       end
     end
   end

@@ -37,10 +37,6 @@ class SubmissionHistoriesQuery extends React.Component {
     })
   }
 
-  state = {
-    skipLoadingHistories: true
-  }
-
   getSubmission = () => {
     const submissionsConnection = this.props.initialQueryData.assignment.submissionsConnection
     if (submissionsConnection && submissionsConnection.nodes.length) {
@@ -48,50 +44,6 @@ class SubmissionHistoriesQuery extends React.Component {
     } else {
       return null
     }
-  }
-
-  generateOnLoadMore = ({data, error, loading, fetchMore}) => {
-    const submission = this.getSubmission()
-
-    // Case 1: There are no submissions histories to load
-    if (!submission || submission.attempt <= 1) {
-      return () => {}
-    }
-
-    // Case 2: We are already waiting for some data to finish loading, or there
-    //         was an error loading more data
-    if (loading || error) {
-      return () => {}
-    }
-
-    // Case 3: We haven't loaded any submission histories yet
-    if (this.state.skipLoadingHistories === true) {
-      return () => this.setState({skipLoadingHistories: false})
-    }
-
-    // Case 4: We have loaded some histories but not exhausted pagination
-    const pageInfo = data.node.submissionHistoriesConnection.pageInfo
-    if (pageInfo.hasPreviousPage) {
-      return () =>
-        fetchMore({
-          variables: {cursor: pageInfo.startCursor, submissionID: submission.id},
-          updateQuery: (previousResult, {fetchMoreResult}) => {
-            const newNodes = fetchMoreResult.node.submissionHistoriesConnection.nodes
-            const newPageInfo = fetchMoreResult.node.submissionHistoriesConnection.pageInfo
-
-            const nextResult = JSON.parse(JSON.stringify(previousResult))
-            nextResult.node.submissionHistoriesConnection.pageInfo = newPageInfo
-            nextResult.node.submissionHistoriesConnection.nodes = [
-              ...newNodes,
-              ...nextResult.node.submissionHistoriesConnection.nodes
-            ]
-            return nextResult
-          }
-        })
-    }
-
-    // Case 5: We have loaded all histories
-    return () => {}
   }
 
   render() {
@@ -118,16 +70,11 @@ class SubmissionHistoriesQuery extends React.Component {
       )
     }
 
-    // We have to use the newtork-only fetch policy here, because all the submissions
-    // share the same id which can cause previous query results to be cached in
-    // apollo and cause false-negatives for pagination.
     return (
       <Query
         onError={() => this.context.setOnFailure(I18n.t('Failed to load more submissions'))}
         query={SUBMISSION_HISTORIES_QUERY}
         variables={{submissionID: submission.id}}
-        skip={!submission || this.state.skipLoadingHistories}
-        fetchPolicy="network-only"
       >
         {queryResults => {
           const {data, loading} = queryResults
@@ -135,7 +82,6 @@ class SubmissionHistoriesQuery extends React.Component {
             <ViewManager
               initialQueryData={this.props.initialQueryData}
               submissionHistoriesQueryData={loading ? null : data}
-              loadMoreSubmissionHistories={this.generateOnLoadMore(queryResults)}
             />
           )
         }}

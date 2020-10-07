@@ -35,7 +35,7 @@ const colHeaders = [
   <ScreenReaderContent>{I18n.t('Anonymous Grading')}</ScreenReaderContent>,
   I18n.t('Student'),
   I18n.t('Grader'),
-  I18n.t('Assignment'),
+  I18n.t('Artifact'),
   I18n.t('Before'),
   I18n.t('After'),
   I18n.t('Current')
