@@ -638,6 +638,26 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'id'
       end
 
+      it 'should not create a subscription if a root account tool already has one' do
+        ToolProxy.create!(
+          raw_data: {'enabled_capability' => [placement]},
+          subscription_id: 'id',
+          context: account,
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          workflow_state: 'active'
+        )
+
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
+        tool_proxy.context = account
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to eq 'id'
+      end
+
       it 'should not create subscriptions for non-plagiarism tools' do
         expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).not_to receive(:create_subscription)
         tool_proxy.raw_data['enabled_capability'] = []
