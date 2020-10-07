@@ -111,6 +111,12 @@ def computeTestCount() {
 
   echo "raw result from splitter: \n====\n$changed_tests\n===="
 
+  if(changed_tests.length() == 0) {
+    echo "no tests found to execute"
+
+    return
+  }
+
   def test_count = changed_tests_arr.size()
   def weighted_values = changed_tests_arr.collect {
     it.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
