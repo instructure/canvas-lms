@@ -75,10 +75,10 @@ class EnrollmentTerm < ActiveRecord::Base
   def update_courses_and_states_later(enrollment_type=nil)
     return if new_record?
 
-    self.send_later_if_production(:touch_all_courses) unless @touched_courses
+    self.send_later_if_production_enqueue_args(:touch_all_courses, { singleton: "EnrollmentTerm#touch_all_courses_#{self.global_id}" }) unless @touched_courses
     @touched_courses = true
 
-    EnrollmentState.send_later_if_production(:invalidate_states_for_term, self, enrollment_type)
+    EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_term, { singleton: "EnrollmentState.invalidate_states_for_term_#{self.global_id}_#{enrollment_type}" }, self, enrollment_type)
   end
 
   def self.i18n_default_term_name
