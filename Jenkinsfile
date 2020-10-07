@@ -298,7 +298,7 @@ pipeline {
           // wait for the current steps to complete (even wait to spin up a node), causing
           // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
           protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
-            stage('Setup') {
+            timedStage('Setup') {
               timeout(time: 5) {
                 cleanAndSetup()
                 // If using custom CANVAS_LMS_REFSPEC do custom checkout to get correct code
@@ -377,7 +377,7 @@ pipeline {
             }
 
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
-              stage('Rebase') {
+              timedStage('Rebase') {
                 timeout(time: 2) {
                   credentials.withGerritCredentials({ ->
                     sh '''#!/bin/bash
@@ -411,7 +411,7 @@ pipeline {
               }
             }
 
-            stage('Build Docker Image') {
+            timedStage('Build Docker Image') {
               timeout(time: 30) {
                 skipIfPreviouslySuccessful('docker-build-and-push') {
                   if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
@@ -439,7 +439,7 @@ pipeline {
                 def stages = [:]
                 if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                   echo 'adding Linters'
-                  stages['Linters'] = {
+                  timedStage('Linters', stages, {
                     skipIfPreviouslySuccessful("linters") {
                       credentials.withGerritCredentials {
                         sh 'build/new-jenkins/linters/run-gergich.sh'
@@ -450,18 +450,18 @@ pipeline {
                         }
                       }
                     }
-                  }
+                  })
                 }
 
                 echo 'adding Consumer Smoke Test'
-                stages['Consumer Smoke Test'] = {
+                timedStage('Consumer Smoke Test', stages, {
                   skipIfPreviouslySuccessful("consumer-smoke-test") {
                     sh 'build/new-jenkins/consumer-smoke-test.sh'
                   }
-                }
+                })
 
                 echo 'adding Vendored Gems'
-                stages['Vendored Gems'] = {
+                timedStage('Vendored Gems', stages, {
                   skipIfPreviouslySuccessful("vendored-gems") {
                     wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
@@ -469,28 +469,28 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ], true, "")
                   }
-                }
+                })
 
                 echo 'adding Javascript (Jest)'
-                stages['Javascript (Jest)'] = {
+                timedStage('Javascript (Jest)', stages, {
                   skipIfPreviouslySuccessful("javascript_jest") {
                     wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
                       string(name: 'TEST_SUITE', value: "jest"),
                     ], true, "testReport")
                   }
-                }
+                })
 
                 echo 'adding Javascript (Karma)'
-                stages['Javascript (Karma)'] = {
+                timedStage('Javascript (Karma)', stages, {
                   skipIfPreviouslySuccessful("javascript_karma") {
                     wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
                       string(name: 'TEST_SUITE', value: "karma"),
                     ], true, "testReport")
                   }
-                }
+                })
 
                 echo 'adding Contract Tests'
-                stages['Contract Tests'] = {
+                timedStage('Contract Tests', stages, {
                   skipIfPreviouslySuccessful("contract-tests") {
                     wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
@@ -498,15 +498,15 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ], true, "")
                   }
-                }
+                })
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
-                  stages['CDC Schema Check'] = {
+                  timedStage('CDC Schema Check', stages, {
                     build job: '../Canvas/cdc-event-transformer-master', parameters: [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
                     ]
-                  }
+                  })
                 }
                 else {
                   echo 'no migrations added, skipping CDC Schema check'
@@ -520,7 +520,7 @@ pipeline {
                   )
                 ) {
                   echo 'adding Flakey Spec Catcher'
-                  stages['Flakey Spec Catcher'] = {
+                  timedStage('Flakey Spec Catcher', stages, {
                     skipIfPreviouslySuccessful("flakey-spec-catcher") {
                       def propagate = configuration.fscPropagate()
                       echo "fsc propagation: $propagate"
@@ -530,16 +530,16 @@ pipeline {
                         string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                       ], propagate, "")
                     }
-                  }
+                  })
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
                   echo 'adding Local Docker Dev Build'
-                  stages['Local Docker Dev Build'] = {
+                  timedStage('Local Docker Dev Build', stages, {
                     skipIfPreviouslySuccessful("local-docker-dev-smoke") {
                       wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
                     }
-                  }
+                  })
                 }
 
                 def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
@@ -553,7 +553,7 @@ pipeline {
             }
 
             if(configuration.isChangeMerged() && isPatchsetPublishable()) {
-              stage('Publish Image on Merge') {
+              timedStage('Publish Image on Merge') {
                 timeout(time: 10) {
                   // Retriggers won't have an image to tag/push, pull that
                   // image if doesn't exist. If image is not found it will
@@ -582,13 +582,13 @@ pipeline {
             }
 
             if(configuration.isChangeMerged()) {
-              stage('Dependency Check') {
+              timedStage('Dependency Check') {
                 def reports = load 'build/new-jenkins/groovy/reports.groovy'
                 reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
               }
             }
 
-            stage('Mark Build as Successful') {
+            timedStage('Mark Build as Successful') {
               def successes = load 'build/new-jenkins/groovy/successes.groovy'
               successes.markBuildAsSuccessful()
             }
