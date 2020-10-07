@@ -75,8 +75,10 @@ class SisPseudonym
 
     trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
 
-    # try the user's home shard first
-    unless @in_region && (!user.shard.in_current_region? || !user.shard.default?)
+    # try the user's home shard first if it's fast
+    # the default shard has a replica in every region, so is always fast
+    user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
+    if user_shard_is_in_region
       if type != :trusted || (account_ids = trusted_account_ids[user.shard])
         user.shard.activate do
           result = find_in_trusted_accounts(account_ids)
@@ -92,7 +94,7 @@ class SisPseudonym
     return nil if shards.empty?
 
     Shard.with_each_shard(shards.sort) do
-      next if Shard.current == user.shard
+      next if Shard.current == user.shard && user_shard_is_in_region
       account_ids = trusted_account_ids[Shard.current] if type == :trusted
       result = find_in_trusted_accounts(account_ids)
       return result if result

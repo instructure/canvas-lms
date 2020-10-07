@@ -234,6 +234,19 @@ describe SisPseudonym do
         expect(SisPseudonym.for(@user, Account.default)).to eq @pseudonym
       end
     end
+
+    it "looks in other accounts" do
+      @shard1.activate do
+        @s1root = account_model
+        @user = User.create!
+        @pseudonym = @s1root.pseudonyms.create!(user: @user, unique_id: 'user') do |p|
+          p.sis_user_id = 'abc'
+        end
+        allow_any_instantiation_of(@pseudonym).to receive(:works_for_account?).with(Account.default, true).and_return(true)
+      end
+      expect(SisPseudonym.for(@user, Account.default, type: :implicit)).to eq @pseudonym
+      expect(SisPseudonym.for(@user, Account.default, type: :implicit, in_region: true)).to eq @pseudonym
+    end
   end
 
 end
