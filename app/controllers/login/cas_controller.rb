@@ -64,7 +64,11 @@ class Login::CasController < ApplicationController
       reset_session_for_login
 
       pseudonym = @domain_root_account.pseudonyms.for_auth_configuration(st.user, aac)
-      pseudonym ||= aac.provision_user(st.user) if aac.jit_provisioning?
+      if pseudonym
+        aac.apply_federated_attributes(pseudonym, st.extra_attributes)
+      elsif aac.jit_provisioning?
+        pseudonym = aac.provision_user(st.user, st.extra_attributes)
+      end
 
       if pseudonym
         # Successful login and we have a user

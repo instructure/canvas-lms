@@ -34,6 +34,11 @@ class AuthenticationProvider::CAS < AuthenticationProvider::Delegated
     [ :unknown_user_url ].freeze
   end
 
+  def self.recognized_federated_attributes
+    # we allow any attribute
+    nil
+  end
+
   def self.supports_debugging?
     debugging_enabled?
   end

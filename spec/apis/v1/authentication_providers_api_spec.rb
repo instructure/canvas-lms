@@ -284,6 +284,7 @@ describe "AuthenticationProviders API", type: :request do
       @cas_hash['id'] = aac.id
       @cas_hash['position'] = 1
       @cas_hash['unknown_user_url'] = nil
+      @cas_hash['federated_attributes'] = {}
       expect(json).to eq @cas_hash
     end
 
