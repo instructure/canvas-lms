@@ -53,6 +53,37 @@ describe "Group Categories API", type: :request do
       @category = GroupCategory.student_organized_for(@course)
     end
 
+    describe "export" do
+      let(:api_url) { "/api/v1/group_categories/#{@category.id}/export" }
+      let(:api_route) do
+        {
+          controller: 'group_categories',
+          action: 'export',
+          group_category_id: @category.to_param,
+          format: 'csv'
+        }
+      end
+
+      before :once do
+        5.times do |n|
+          @course.enroll_user(user_with_pseudonym(sis_user_id: "user_#{n}", username: "login_#{n}"), "StudentEnrollment", enrollment_state: 'active')
+          @course.enroll_user(user_factory,'TeacherEnrollment',:enrollment_state => :active)
+        end
+      end
+
+      it "should return users for a group_category" do
+        status = raw_api_call(:get, api_url, api_route)
+        expect(status).to eq 200
+        csv = CSV.parse(response.body)
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.count).to eq(5)
+        5.times do
+          p = Pseudonym.by_unique_id(csv.first[3]).take
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil, nil, nil])
+        end
+      end
+    end
+
     describe "users" do
       let(:api_url) { "/api/v1/group_categories/#{@category2.id}/users.json" }
       let(:api_route) do

@@ -2002,6 +2002,7 @@ CanvasRails::Application.routes.draw do
       post 'group_categories/:group_category_id/import', action: :import
       get 'group_categories/:group_category_id/groups', action: :groups, as: 'group_category_groups'
       get 'group_categories/:group_category_id/users', action: :users, as: 'group_category_users'
+      get 'group_categories/:group_category_id/export', action: :export, as: 'group_category_export', defaults: { format: :csv }
       post 'group_categories/:group_category_id/assign_unassigned_members', action: 'assign_unassigned_members', as: 'group_category_assign_unassigned_members'
     end
 

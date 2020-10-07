@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 # @API Group Categories
 #
 # Group Categories allow grouping of groups together in canvas. There are a few
@@ -92,7 +94,7 @@
 #
 class GroupCategoriesController < ApplicationController
   before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import]
+  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import, :export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -397,6 +399,68 @@ class GroupCategoriesController < ApplicationController
       @groups = Api.paginate(@groups, self, api_v1_group_category_groups_url)
       render :json => @groups.map { |g| group_json(g, @current_user, session) }
     end
+  end
+
+  # @API export groups in and users in category
+  # @beta
+  #
+  # Returns a csv file of users in format ready to import.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id>/export \
+  #          -H 'Authorization: Bearer <token>'
+  def export
+    GuardRail.activate(:secondary) do
+      if authorized_action(@context, @current_user, :manage_groups)
+        include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+        csv_string = CSV.generate do |csv|
+          csv << export_headers(include_sis_id)
+          section_names = @context.course_sections.select(:id, :name).index_by(&:id)
+          users = @context.participating_students_by_date.
+            select("users.id, users.sortable_name,
+                  -- we just want any that have an sis_pseudonym_id populated
+                  MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
+                  -- grab all the section_ids to get the section names
+                  ARRAY_AGG (enrollments.course_section_id) AS course_section_ids").
+            where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
+          gms = GroupMembership.where(group_id: @group_category.groups.select(:id)).
+            joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
+          users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms, include_sis_id) }
+        end
+      end
+      respond_to do |format|
+        format.csv { send_data csv_string, type: 'text/csv', filename: "#{@group_category.name}.csv", disposition: 'attachment' }
+      end
+    end
+  end
+
+  def build_row(user, section_names, group_memberships, include_sis_id)
+    row = []
+    row << user.sortable_name
+    row << user.id
+    e = Enrollment.new(user_id: user.id,
+                       root_account_id: @context.root_account_id,
+                       sis_pseudonym_id: user.sis_pseudonym_id,
+                       course_id: @context.id)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    row << p&.sis_user_id if include_sis_id
+    row << p&.unique_id
+    row << section_names.values_at(*user.course_section_ids).map(&:name).to_sentence
+    row << group_memberships[user.id]&.name
+    row << group_memberships[user.id]&.group_id
+    row << group_memberships[user.id]&.sis_source_id
+  end
+
+  def export_headers(include_sis_id)
+    headers = []
+    headers << I18n.t("name")
+    headers << "canvas_user_id"
+    headers << "user_id" if include_sis_id
+    headers << "login_id"
+    headers << I18n.t("sections")
+    headers << "group_name"
+    headers << "canvas_group_id"
+    headers << "group_id"
   end
 
   include Api::V1::User
