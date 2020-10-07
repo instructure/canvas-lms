@@ -40,6 +40,7 @@ module CanvasHttp
   end
   class RelativeUriError < CanvasHttp::Error; end
   class InsecureUriError < CanvasHttp::Error; end
+  class UnresolvableUriError < CanvasHttp::Error; end
   class CircuitBreakerError < CanvasHttp::Error; end
 
   def self.put(*args, &block)
@@ -180,13 +181,34 @@ module CanvasHttp
 
   def self.insecure_host?(host)
     return unless filters = self.blocked_ip_filters
-    addrs = Resolv.getaddresses(host).map { |ip| ::IPAddr.new(ip) rescue nil}.compact
-    return true unless addrs.any?
-
-    filters.any? do |filter|
-      addr_range = ::IPAddr.new(filter) rescue nil
-      addr_range && addrs.any?{|addr| addr_range.include?(addr)}
+    resolved_addrs = Resolv.getaddresses(host)
+    unless resolved_addrs.any?
+      # this is actually a different condition than the host being insecure,
+      # and having separate telemetry is helpful for understanding transient failures.
+      raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
+    ip_addrs = resolved_addrs.map do |ip|
+      ::IPAddr.new(ip)
+    rescue IPAddr::InvalidAddressError
+      # this should never happen, Resolv should only be passing back IPs, but
+      # let's make sure we can see if the impossible occurs
+      logger.warn("CANVAS_HTTP WARNING | host: #{host} | invalid_ip: #{ip}")
+      nil
+    end.compact
+    unless ip_addrs.any?
+      raise UnresolvableUriError, "#{host} resolves to only unparseable IPs..."
+    end
+
+    filters.each do |filter|
+      addr_range = ::IPAddr.new(filter)
+      ip_addrs.any? do |addr|
+        if addr_range.include?(addr)
+          logger.warn("CANVAS_HTTP WARNING insecure address | host: #{host} | insecure_address: #{addr} | filter: #{filter}")
+          return true
+        end
+      end
+    end
+    false
   end
 
   # returns a Net::HTTP connection object for the given URI object

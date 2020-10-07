@@ -209,19 +209,32 @@ describe "CanvasHttp" do
   end
 
   describe '#insecure_host?' do
+    around(:each) do |example|
+      old_filters = CanvasHttp.blocked_ip_filters
+      CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
+      example.call
+    ensure
+      CanvasHttp.blocked_ip_filters = old_filters
+    end
+
     it "should check for insecure hosts" do
-      begin
-        old_filters = CanvasHttp.blocked_ip_filters
-        CanvasHttp.blocked_ip_filters = -> { ['127.0.0.1/8', '42.42.42.42/16']}
-        expect(CanvasHttp.insecure_host?('example.com')).to eq false
-        expect(CanvasHttp.insecure_host?('localhost')).to eq true
-        expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
-        expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
-        expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
-        expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
-      ensure
-        CanvasHttp.blocked_ip_filters = old_filters
-      end
+      expect(CanvasHttp.insecure_host?('example.com')).to eq false
+      expect(CanvasHttp.insecure_host?('localhost')).to eq true
+      expect(CanvasHttp.insecure_host?('127.0.0.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.42.42')).to eq true
+      expect(CanvasHttp.insecure_host?('42.42.1.1')).to eq true
+      expect(CanvasHttp.insecure_host?('42.1.1.1')).to eq false
+    end
+
+    it "raises an error when URL is not resolveable" do
+      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
+    end
+
+    it "won't continue to process a host with no valid IPs" do
+      bad_url = 'this-should-never-be-a-real-url-registered-by-anyone.fake-tld'
+      expect(Resolv).to receive(:getaddresses).with(bad_url).and_return(["not.an.ip.address"])
+      expect{ CanvasHttp.insecure_host?(bad_url) }.to raise_error(CanvasHttp::UnresolvableUriError)
     end
   end
 
