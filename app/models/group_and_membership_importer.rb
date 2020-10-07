@@ -127,10 +127,18 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     group ||= group_category.groups.where(sis_source_id: group_sis_id).take if group_sis_id
     if group_name
       group ||= group_category.groups.where(name: group_name).take
-      group ||= group_category.groups.create!(name: group_name, context: group_category.context)
+      group ||= create_new_group(group_name)
     end
     seen_groups[key] ||= group
     group
+  end
+
+  def create_new_group(name)
+    InstStatsd::Statsd.increment('groups.auto_create',
+                                 tags: { split_type: 'csv',
+                                         root_account_id: group_category.root_account&.global_id,
+                                         root_account_name: group_category.root_account&.name })
+    group_category.groups.create!(name: name, context: group_category.context)
   end
 
   def group_key(group_id, group_sis_id, group_name)

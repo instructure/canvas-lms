@@ -143,5 +143,15 @@ describe GroupAndMembershipImporter do
       expect(gc1.groups.count).to eq 1
       expect(@user.groups.pluck(:name)).to eq ["manual group"]
     end
+
+    it 'should log stat on new groups' do
+      allow(InstStatsd::Statsd).to receive(:increment)
+      expect(InstStatsd::Statsd).to receive(:increment).with("groups.auto_create",
+                                                             tags: { split_type: 'csv',
+                                                                     root_account_id: gc1.root_account&.global_id,
+                                                                     root_account_name: gc1.root_account&.name })
+      import_csv_data(%{user_id,group_name
+                        user_4,anugroup})
+    end
   end
 end
