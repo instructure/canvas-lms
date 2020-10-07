@@ -101,6 +101,8 @@ def runMigrations() {
     def dynamodbMessage = "Dynamodb migrated image for MD5SUM ${migrationHash()}"
     sh "docker commit -m \"${dynamodbMessage}\" \$(docker ps -q --filter 'name=dynamodb_') ${cachedDynamodbTag}"
     sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push ${cachedDynamodbTag}"
+
+    archiveArtifacts(artifacts: "migrate-*.log")
   } else {
     log('Continuing with previously cached migrations.')
 
