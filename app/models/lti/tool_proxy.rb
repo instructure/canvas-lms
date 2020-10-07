@@ -171,7 +171,8 @@ module Lti
       # Search the accounts under the same root account to see if a subscription already exists
       # (we only need one subscription per root account)
       subscription_id = tool_proxies.joins(:account).
-        find_by("coalesce(accounts.root_account_id, accounts.id) = ?", context&.root_account_id)&.subscription_id
+        # we should replace this with the tool_proxy root_account_id if/when we fill that
+        find_by("coalesce(accounts.root_account_id, accounts.id) = ?", context&.resolved_root_account_id)&.subscription_id
       # Then search courses in case the tool was only directly installed on a course
       subscription_id ||= tool_proxies.joins(:course).
         find_by(courses: {root_account_id: self.context&.root_account_id})&.subscription_id
