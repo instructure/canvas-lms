@@ -40,7 +40,7 @@ group_category.csv
 <td>The canvas id for a user, required to identify a user.</td>
 </tr>
 <tr>
-<td>user_id<td>
+<td>user_id</td>
 <td>text</td>
 <td>✓&#42;</td>
 <td>A unique identifier used to reference users in the enrollments table.
