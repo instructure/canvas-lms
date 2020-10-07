@@ -38,12 +38,17 @@ export default function ImportGroupsModal(props) {
 
   const beginUpload = file => {
     if (file !== null) {
-      apiClient.createImport(props.groupCategoryId, file).catch(() => {
-        showFlashAlert({
-          type: 'error',
-          message: I18n.t('There was an error uploading your file. Please try again.')
+      apiClient
+        .createImport(props.groupCategoryId, file)
+        .then(resp => {
+          props.setProgress(resp.data)
         })
-      })
+        .catch(() => {
+          showFlashAlert({
+            type: 'error',
+            message: I18n.t('There was an error uploading your file. Please try again.')
+          })
+        })
     }
   }
 

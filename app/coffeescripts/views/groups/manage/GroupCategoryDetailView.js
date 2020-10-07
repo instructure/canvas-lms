@@ -125,10 +125,21 @@ export default class GroupCategoryDetailView extends View {
     )
   }
 
+  setProgress(progress) {
+    this.model.progressModel.set(progress)
+  }
+
   importGroups(e) {
     if (e) e.preventDefault()
     const parent = document.getElementById('group-import-modal-mount-point')
-    ReactDOM.render(<GroupImportModal groupCategoryId={this.model.id} parent={parent} />, parent)
+    ReactDOM.render(
+      <GroupImportModal
+        setProgress={this.setProgress.bind(this)}
+        groupCategoryId={this.model.id}
+        parent={parent}
+      />,
+      parent
+    )
   }
 
   editCategory() {

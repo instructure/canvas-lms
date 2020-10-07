@@ -22,7 +22,9 @@ import * as apiClient from '../../apiClient'
 describe('GroupImportModal', () => {
   it('adds an error message when an unsupported filetype is selected', async () => {
     const badFile = new File(['(⌐□_□)'], 'file.png', {type: 'image/png'})
-    const {findByText, findByLabelText} = render(<GroupImportModal groupCategoryId={1} />)
+    const {findByText, findByLabelText} = render(
+      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />
+    )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
@@ -43,7 +45,7 @@ describe('GroupImportModal', () => {
     })
 
     const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
-    const {findByLabelText} = render(<GroupImportModal groupCategoryId={1} />)
+    const {findByLabelText} = render(<GroupImportModal setProgress={jest.fn} groupCategoryId={1} />)
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
@@ -64,7 +66,9 @@ describe('GroupImportModal', () => {
     })
 
     const file = new File(['1,2,3'], 'file.csv', {type: 'text/csv'})
-    const {findByLabelText, findAllByText} = render(<GroupImportModal groupCategoryId={1} />)
+    const {findByLabelText, findAllByText} = render(
+      <GroupImportModal setProgress={jest.fn} groupCategoryId={1} />
+    )
     const fileDrop = await findByLabelText(/Upload CSV File/i)
 
     // Source: https://github.com/testing-library/react-testing-library/issues/93#issuecomment-403887769
