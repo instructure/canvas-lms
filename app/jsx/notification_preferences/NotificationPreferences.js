@@ -32,6 +32,9 @@ import {View} from '@instructure/ui-view'
 
 const NotificationPreferences = props => {
   const [enabled, setEnabled] = useState(props.enabled)
+  const [sendObservedNamesEnabled, setSendObservedNames] = useState(
+    props.notificationPreferences?.sendObservedNamesInNotifications
+  )
 
   const renderMuteToggle = () => {
     if (props.contextType === 'course') {
@@ -113,6 +116,29 @@ const NotificationPreferences = props => {
     </Flex.Item>
   )
 
+  const renderSendObservedNamesInNotificationsToggle = () => {
+    if (
+      props.contextType === 'account' &&
+      props.notificationPreferences.sendObservedNamesInNotifications !== null
+    ) {
+      return (
+        <Flex.Item margin="small 0 small 0" padding="xx-small">
+          <Checkbox
+            data-testid="send-observed-names-toggle"
+            label={I18n.t('Show name of observed students in notifications')}
+            size="small"
+            variant="toggle"
+            checked={sendObservedNamesEnabled}
+            onChange={() => {
+              setSendObservedNames(!sendObservedNamesEnabled)
+              props.updatePreference({sendObservedNamesInNotifications: !sendObservedNamesEnabled})
+            }}
+          />
+        </Flex.Item>
+      )
+    }
+  }
+
   return (
     <Flex direction="column">
       <Flex.Item overflowY="visible" margin="0 0 small 0">
@@ -124,6 +150,7 @@ const NotificationPreferences = props => {
       </Flex.Item>
       {renderNotificationInfoAlert()}
       {renderMuteToggle()}
+      {renderSendObservedNamesInNotificationsToggle()}
       {renderNotificationPreferences()}
     </Flex>
   )
