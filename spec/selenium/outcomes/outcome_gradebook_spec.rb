@@ -56,6 +56,17 @@ describe "outcome gradebook" do
       wait_for_ajaximations
     end
 
+    def median_values
+      f('.al-trigger').click
+      ff('.al-options .ui-menu-item').second.click
+      wait_for_ajax_requests
+      selected_values
+    end
+
+    def selected_values
+      ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+    end
+
     it "should not be visible by default" do
       Gradebook.visit(@course)
       f('.assignment-gradebook-container .gradebook-menus button').click
@@ -216,14 +227,14 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # mean
-          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          means = selected_values
           expect(means).to contain_exactly("2.33", "2.67")
 
           f('#no_results_outcomes').click
           wait_for_ajax_requests
 
           # mean
-          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          means = selected_values
           expect(means).to contain_exactly("2.33", "2.67")
         end
 
@@ -233,14 +244,11 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # mean
-          averages = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          averages = selected_values
           expect(averages).to contain_exactly("2.33", "2.67")
 
           # median
-          f('.al-trigger').click
-          ff('.al-options .ui-menu-item').second.click
-          wait_for_ajax_requests
-          medians = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          medians = median_values
           expect(medians).to contain_exactly("2", "3")
 
           # switch to first section
@@ -248,7 +256,7 @@ describe "outcome gradebook" do
           wait_for_ajax_requests
 
           # median
-          medians = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          medians = selected_values
           expect(medians).to contain_exactly("2.5", "2.5")
 
           # switch to second section
@@ -259,9 +267,121 @@ describe "outcome gradebook" do
           refresh_page
 
           # should remain on second section, with mean
-          means = ff('.outcome-gradebook-container .headerRow_1 .outcome-score').map(&:text)
+          means = selected_values
           expect(means).to contain_exactly("2", "3")
         end
+
+       context 'with learning mastery scales enabled' do
+          before(:once) do
+            @rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
+            @rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')
+            @proficiency = OutcomeProficiency.create!(outcome_proficiency_ratings: [@rating1, @rating2], context: Account.default)
+            @calculation_method = OutcomeCalculationMethod.create!(context: Account.default, calculation_method: 'latest')
+            @second_outcome_assignment = @course.assignments.create!(
+              title: 'Outcome 1 Second Assignment',
+              grading_type: 'points',
+              points_possible: 10,
+              submission_types: 'online_text_entry',
+              due_at: 2.days.ago
+            )
+            align3 = @outcome1.align(@second_outcome_assignment, @course)
+            result(@student_1, align3, 0)
+            result(@student_2, align3, 1)
+            result(@student_3, align3, 2)
+
+          end
+
+        it "Displays the mastery scales and proficiency calculations once enabled" do
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("1.58", "2.33")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("1.7", "2")
+
+          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+          # refresh page
+          refresh_page
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("3.33", "7.78")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("3.33", "6.67")
+        end
+
+        it "Displays changes to the mastery scales and proficiency calculations" do
+
+          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("3.33", "7.78")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("3.33", "6.67")
+
+          # Update the ratings points, and use the highest calculation method so averages will be over 100
+          @rating1.points = 100
+          @rating2.points = 10
+          @calculation_method.calculation_method = 'highest'
+          @calculation_method.save!
+          @proficiency.save!
+
+          # refresh page
+          refresh_page
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("111.11", "77.78")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("100", "66.67")
+        end
+
+        it "Displays the course level outcome values when FF is turned off" do
+
+          Account.default.set_feature_flag!('account_level_mastery_scales', 'on')
+
+          get "/courses/#{@course.id}/gradebook"
+          select_learning_mastery
+          wait_for_ajax_requests
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("3.33", "7.78")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("3.33", "6.67")
+
+          Account.default.set_feature_flag!('account_level_mastery_scales', 'off')
+
+          # refresh page
+          refresh_page
+
+          # mean
+          averages = selected_values
+          expect(averages).to contain_exactly("1.58", "2.33")
+
+          # median
+          medians = median_values
+          expect(medians).to contain_exactly("1.7", "2")
+        end
+       end
       end
 
       context 'with non-scoring results' do
