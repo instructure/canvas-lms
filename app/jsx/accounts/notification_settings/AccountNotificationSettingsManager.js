@@ -51,11 +51,11 @@ export default function AccountNotificationSettingsManager(props) {
         updatePreference({
           variables: {
             accountId: props.accountId,
-            userId: props.userId,
             channelId: data.channel?._id,
             category: data.category?.split(' ').join('_'),
             frequency: data.frequency,
-            sendScoresInEmails: data.sendScoresInEmails
+            sendScoresInEmails: data.sendScoresInEmails,
+            sendObservedNamesInNotifications: data.sendObservedNamesInNotifications
           }
         })
       }
@@ -66,6 +66,5 @@ export default function AccountNotificationSettingsManager(props) {
 
 AccountNotificationSettingsManager.propTypes = {
   accountId: string.isRequired,
-  userId: string.isRequired,
   notificationPreferences: NotificationPreferencesShape
 }

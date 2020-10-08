@@ -24,6 +24,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     @account = Account.default
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
+    @student = @course.enroll_student(User.create!, enrollemnt_state: 'active').user
     @account.enable_feature!(:mute_notifications_by_course)
     communication_channel(@teacher, {username: 'two@example.com', active_cc: true})
     @notification = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'Due Date')
@@ -39,6 +40,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     frequency: nil,
     user_id: nil,
     send_scores_in_emails: nil,
+    send_observed_names_in_notifications: nil,
     is_policy_override: nil
   )
     <<~GQL
@@ -52,6 +54,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
           #{"notificationCategory: #{notification_category}" if notification_category}
           #{"frequency: #{frequency}" if frequency}
           #{"sendScoresInEmails: #{send_scores_in_emails}" unless send_scores_in_emails.nil?}
+          #{"sendObservedNamesInNotifications: #{send_observed_names_in_notifications}" unless send_observed_names_in_notifications.nil?}
           #{"isPolicyOverride: #{is_policy_override}" unless is_policy_override.nil?}
         }) {
           user {
@@ -83,7 +86,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
         #{"accountId: #{account_id}" if account_id}
       )" if context_type && (course_id || account_id)}
       notificationPreferences {
-        #{"sendScoresInEmails(userId: #{user_id}, courseId: #{course_id})" if user_id}
+        sendScoresInEmails(courseId: #{course_id})
+        sendObservedNamesInNotifications
         channels {
           #{"notificationPolicyOverrides(
             contextType: #{context_type},
@@ -113,6 +117,35 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user, request: ActionDispatch::TestRequest.create})
     result.to_h.with_indifferent_access
+  end
+
+  context 'send observed names in notifications' do
+    it 'sets the user preference' do
+      @course.enroll_user(@teacher, "ObserverEnrollment", :associated_user_id => @student.id, :enrollment_state => 'active')
+      result = run_mutation(
+        user_id: @teacher.id,
+        account_id: @account.id,
+        context_type: 'Account',
+        send_observed_names_in_notifications: true
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
+      )).to be true
+      expect(@teacher.preferences[:send_observed_names_in_notifications]).to be true
+
+      result = run_mutation(
+        user_id: @teacher.id,
+        account_id: @account.id,
+        context_type: 'Account',
+        send_observed_names_in_notifications: false
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :sendObservedNamesInNotifications
+      )).to be false
+      expect(@teacher.preferences[:send_observed_names_in_notifications]).to be false
+    end
   end
 
   context 'send scores in emails' do

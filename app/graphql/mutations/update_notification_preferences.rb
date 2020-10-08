@@ -74,6 +74,7 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
   argument :enabled, Boolean, required: false
 
   argument :send_scores_in_emails, Boolean, required: false
+  argument :send_observed_names_in_notifications, Boolean, required: false
 
   argument :communication_channel_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('CommunicationChannel')
   argument :notification_category, NotificationCategoryType, required: false
@@ -96,6 +97,11 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
         current_user.preferences[:send_scores_in_emails] = input[:send_scores_in_emails]
         current_user.save!
       end
+    end
+
+    if !input[:send_observed_names_in_notifications].nil?
+      current_user.preferences[:send_observed_names_in_notifications] = input[:send_observed_names_in_notifications]
+      current_user.save!
     end
 
     # Because we validate the arguments for updating notification policies above we only need to

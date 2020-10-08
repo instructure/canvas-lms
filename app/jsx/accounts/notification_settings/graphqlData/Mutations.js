@@ -20,11 +20,11 @@ import gql from 'graphql-tag'
 export const UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES = gql`
   mutation UpdateAccountNotificationPreferences(
     $accountId: ID
-    $userId: ID!
     $channelId: ID
     $category: NotificationCategoryType
     $frequency: NotificationFrequencyType
     $sendScoresInEmails: Boolean
+    $sendObservedNamesInNotifications: Boolean
   ) {
     updateNotificationPreferences(
       input: {
@@ -34,12 +34,14 @@ export const UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES = gql`
         notificationCategory: $category
         frequency: $frequency
         sendScoresInEmails: $sendScoresInEmails
+        sendObservedNamesInNotifications: $sendObservedNamesInNotifications
       }
     ) {
       user {
         _id
         notificationPreferences {
-          sendScoresInEmails(userId: $userId)
+          sendScoresInEmails
+          sendObservedNamesInNotifications
           channels(channelId: $channelId) {
             _id
             path
