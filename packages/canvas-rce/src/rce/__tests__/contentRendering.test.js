@@ -173,7 +173,7 @@ describe('contentRendering', () => {
       const video = videoFromTray()
       const html = contentRendering.renderVideo(video)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;`
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
       )
     })
 
@@ -181,7 +181,7 @@ describe('contentRendering', () => {
       const video = videoFromUpload()
       const html = contentRendering.renderVideo(video)
       expect(html).toEqual(
-        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;`
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>`
       )
     })
 
@@ -194,7 +194,7 @@ describe('contentRendering', () => {
       }
       const html = contentRendering.renderVideo(file)
       expect(html).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>'
       )
     })
   })
@@ -204,7 +204,7 @@ describe('contentRendering', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
       )
     })
 
@@ -212,7 +212,7 @@ describe('contentRendering', () => {
       const audio = audioFromUpload()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+        '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
       )
     })
 
@@ -225,7 +225,7 @@ describe('contentRendering', () => {
       }
       const html = contentRendering.renderAudio(file)
       expect(html).toEqual(
-        '<iframe data-media-id="17" data-media-type="audio" src="/media_objects_iframe?mediahref=/files/17&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+        '<iframe data-media-id="17" data-media-type="audio" src="/media_objects_iframe?mediahref=/files/17&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>'
       )
     })
   })

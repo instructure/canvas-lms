@@ -213,7 +213,6 @@ class RCEWrapper extends React.Component {
       wordCount: 0,
       isHtmlView: false,
       KBShortcutModalOpen: false,
-      focused: false,
       messages: [],
       announcement: null,
       confirmAutoSave: false,
@@ -551,12 +550,11 @@ class RCEWrapper extends React.Component {
   // these focus and blur event handlers work together so that RCEWrapper
   // can report focus and blur events from the RCE at-large
   get focused() {
-    return this.state.focused
+    return this === bridge.getEditor()
   }
 
   handleFocus(_event) {
-    if (!this.state.focused) {
-      this.setState({focused: true})
+    if (!this.focused) {
       bridge.focusEditor(this)
       this._forceCloseFloatingToolbar()
       this.props.onFocus && this.props.onFocus(this)
@@ -574,7 +572,7 @@ class RCEWrapper extends React.Component {
   handleBlur(event) {
     if (this.blurTimer) return
 
-    if (this.state.focused) {
+    if (this.focused) {
       // because the old active element fires blur before the next element gets focus
       // we often need a moment to see if focus comes back
       event && event.persist && event.persist()
@@ -592,11 +590,10 @@ class RCEWrapper extends React.Component {
         }
 
         const activeClass = document.activeElement && document.activeElement.getAttribute('class')
-        if (activeClass && activeClass.includes('tox-')) {
+        if (event.target.id === event.focusedEditor?.id && activeClass?.includes('tox-')) {
           // if a toolbar button has focus, then the user clicks on the "more" button
           // focus jumps to the body, then eventually to the popped up toolbar. This
-          // catches that case, but could also fail to blur an rce if the user clicked from
-          // one rce on the page to another.  I think this is the lesser of the 2 evils
+          // catches that case.
           return
         }
 
@@ -610,16 +607,15 @@ class RCEWrapper extends React.Component {
           // one of our popups has focus
           return
         }
-        this.setState({focused: false})
+
+        bridge.blurEditor(this)
         this.props.onBlur && this.props.onBlur(event)
       }, ASYNC_FOCUS_TIMEOUT)
     }
   }
 
   handleFocusRCE = event => {
-    if (this._elementRef && !this._elementRef.contains(event.relatedTarget)) {
-      this.handleFocus(event)
-    }
+    this.handleFocus(event)
   }
 
   handleBlurRCE = event => {
@@ -676,6 +672,8 @@ class RCEWrapper extends React.Component {
       this._forceCloseFloatingToolbar()
       if (this._fullscreenState.isFullscreen) {
         this.mceInstance().execCommand('mceFullScreen') // turn it off
+      } else {
+        bridge.hideTrays()
       }
     }
   }
@@ -1000,6 +998,7 @@ class RCEWrapper extends React.Component {
       this.destroy()
     }
     this._elementRef.removeEventListener('keydown', this.handleKey, true)
+    this.observer.disconnect()
   }
 
   // Get top 2 favorited LTI Tools
@@ -1140,6 +1139,23 @@ class RCEWrapper extends React.Component {
     if (this.ltiToolFavorites.length > 0) {
       import('./plugins/instructure_external_tools/components/LtiToolsModal')
     }
+
+    // .tox-tinymce-aux is where tinymce puts the floating toolbar when
+    // the user clicks the More... button
+    // Tinymce doesn't fire onFocus when the user clicks More... from somewhere
+    // outside, so we'll handle that here by watching for the floating toolbar
+    // to come and go.
+    const portals = document.querySelectorAll('.tox-tinymce-aux')
+    // my portal will be the last one in the doc because tinyumce appends them
+    const tinymce_floating_toolbar_portal = portals[portals.length - 1]
+    this.observer = new MutationObserver((mutationList, _observer) => {
+      mutationList.forEach(mutation => {
+        if (mutation.type === 'childList') {
+          this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
+        }
+      })
+    })
+    this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
   }
 
   componentDidUpdate(_prevProps, prevState) {

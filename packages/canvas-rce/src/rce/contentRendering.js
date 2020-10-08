@@ -114,7 +114,7 @@ export function renderVideo(video) {
   };display:inline-block;"
       title="${formatMessage('Video player for {title}', {
         title: video.title || video.name || video.text
-      })}"></iframe>&nbsp;
+      })}"></iframe>
   `
     .trim()
     .replace(/\s+/g, ' ')
@@ -132,7 +132,7 @@ export function renderAudio(audio) {
   };display:inline-block;"
       title="${formatMessage('Audio player for {title}', {
         title: audio.title || audio.name || audio.text
-      })}"></iframe>&nbsp;
+      })}"></iframe>
   `
     .trim()
     .replace(/\s+/g, ' ')

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useCallback, useEffect, useState} from 'react'
+import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
@@ -184,28 +184,38 @@ const FILTER_SETTINGS_BY_PLUGIN = {
  * from Canvas.  It is essentially the main component.
  */
 export default function CanvasContentTray(props) {
+  // should the tray be rendered open?
   const [isOpen, setIsOpen] = useState(false)
-  const [openCount, setOpenCount] = useState(0)
+  // has the tray fully opened. we use this to defer rendering the content
+  // until the tray is open.
   const [hasOpened, setHasOpened] = useState(false)
+  // should we close the tray after the user clicks on something in it?
+  const [hidingTrayOnAction, setHidingTrayOnAction] = useState(true)
 
+  const trayRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
 
   const {bridge, editor, onTrayClosing} = {...props}
 
   const handleDismissTray = useCallback(() => {
-    bridge.focusEditor(editor)
-    onTrayClosing && onTrayClosing(true) // tell RCEWrapper we're closing
+    onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
-  }, [editor, bridge, onTrayClosing])
+  }, [onTrayClosing])
 
   useEffect(() => {
     const controller = {
       showTrayForPlugin(plugin) {
+        // increment a counter that's used as the key when rendering
+        // this gets us a new instance everytime, which is necessary
+        // to get the queries run so we have up to date data.
+        ++CanvasContentTray.globalOpenCount
         setFilterSettings(FILTER_SETTINGS_BY_PLUGIN[plugin])
         setIsOpen(true)
       },
-      hideTray() {
-        handleDismissTray()
+      hideTray(forceClose) {
+        if (forceClose || hidingTrayOnAction) {
+          handleDismissTray()
+        }
       }
     }
 
@@ -216,18 +226,16 @@ export default function CanvasContentTray(props) {
     }
     // it's OK the setFilterSettings is not a dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editor.id, bridge, handleDismissTray])
+  }, [editor.id, bridge, handleDismissTray, hidingTrayOnAction])
 
   function handleExitTray() {
     onTrayClosing && onTrayClosing(true) // tell RCEWrapper we're closing
   }
 
   function handleCloseTray() {
+    // return focus to the RCE
     bridge.focusActiveEditor(false)
-    // increment a counter that's used a the key when rendering
-    // this gets us a new instance everytime, which is necessary
-    // to get the queries run so we have up to date data.
-    setOpenCount(openCount + 1)
+
     setHasOpened(false)
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
@@ -261,7 +269,7 @@ export default function CanvasContentTray(props) {
   return (
     <StoreProvider
       {...props}
-      key={openCount}
+      key={CanvasContentTray.globalOpenCount}
       contextType={filterSettings.contextType || props.contextType}
     >
       {contentProps => (
@@ -278,7 +286,7 @@ export default function CanvasContentTray(props) {
           size="regular"
           shouldContainFocus
           shouldReturnFocus={false}
-          shouldCloseOnDocumentClick
+          shouldCloseOnDocumentClick={false}
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
           onExit={handleExitTray}
@@ -286,9 +294,30 @@ export default function CanvasContentTray(props) {
             bridge.focusEditor(editor)
             setHasOpened(true)
           }}
+          onEntered={() => {
+            const c = document.querySelector('[role="main"]')
+            const target_w = c ? c.offsetWidth - trayRef.current?.offsetWidth : 0
+            if (target_w >= 320) {
+              c.style.boxSizing = 'border-box'
+              c.style.width = `${target_w}px`
+            }
+            setHidingTrayOnAction(target_w < 320)
+          }}
+          onExiting={() => {
+            const c = document.querySelector('[role="main"]')
+            if (c) c.style.width = ''
+          }}
+          contentRef={el => (trayRef.current = el)}
         >
           {isOpen && hasOpened ? (
-            <Flex direction="column" display="block" height="100vh" overflowY="hidden">
+            <Flex
+              direction="column"
+              display="block"
+              height="100vh"
+              overflowY="hidden"
+              tabIndex="-1"
+              data-canvascontenttray-content
+            >
               <Flex.Item padding="medium" shadow="above">
                 <Flex margin="none none medium none">
                   <Flex.Item grow shrink>
@@ -316,7 +345,7 @@ export default function CanvasContentTray(props) {
                 />
               </Flex.Item>
 
-              <Flex.Item grow shrink margin="xx-small 0 0 0">
+              <Flex.Item grow shrink margin="xx-small xxx-small 0">
                 <ErrorBoundary>
                   <DynamicPanel
                     contentType={filterSettings.contentType}
@@ -333,6 +362,8 @@ export default function CanvasContentTray(props) {
     </StoreProvider>
   )
 }
+
+CanvasContentTray.globalOpenCount = 0
 
 function requiredWithoutSource(props, propName, componentName) {
   if (props.source == null && props[propName] == null) {

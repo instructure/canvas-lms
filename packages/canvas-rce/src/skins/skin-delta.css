@@ -713,4 +713,9 @@
     width: 10px;
     height: 10px;
   }
+
+  /* not part of tinymce, but a convenient place to add a style I need */
+  [data-canvascontenttray-content]:focus {
+    outline-color: var(--canvasFocusBorderColor);
+  }
 }
