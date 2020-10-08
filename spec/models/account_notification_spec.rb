@@ -666,5 +666,31 @@ describe AccountNotification do
         expect(AccountNotification.for_user_and_account(@user, @account1)).to eq [@visible]
       end
     end
+
+    it "caches queries for root accounts" do
+      # need to make sure switchman doesn't add a namespace to the cache store, so don't just use
+      # enable_cache
+      allow(MultiCache).to receive(:cache).and_return(ActiveSupport::Cache::MemoryStore.new)
+      Timecop.freeze do
+        @shard1.activate do
+          @account = Account.create!
+          account_notification(account: @account)
+          user_factory
+
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to be_nil
+          # once for @account, once for site admin
+          allow(AccountNotification).to receive(:where).twice.and_call_original
+
+          expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
+
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(@account.id, Time.now))).to_not be_nil
+          expect(MultiCache.fetch(AccountNotification.cache_key_for_root_account(Account.site_admin.id, Time.now))).to_not be_nil
+
+          # no more calls to `where`; this _must_ be returned from cache
+          expect(AccountNotification.for_user_and_account(@user, @account)).to eq [@announcement]
+        end
+      end
+    end
   end
 end
