@@ -11,9 +11,6 @@
     "address_3159962f": {
         "message": "כתובת:"
     },
-    "alignment_and_lists_5cebcb69": {
-        "message": "תוכן"
-    },
     "all_4321c3a1": {
         "message": "כל"
     },
@@ -81,13 +78,13 @@
         "message": "{ assignmentType } { title }, מזכורת { datetime }."
     },
     "attributes_963ba262": {
-        "message": "זכויות שימוש"
+        "message": "מאפיינים"
     },
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "התחלת ההיסטוריה של המטלות לביצוע שלך"
     },
     "c_2001_acme_inc_283f7f80": {
-        "message": "החומר הנו ברשות הציבור"
+        "message": "(c) 2001 Acme Inc."
     },
     "calendar_a8563bb2": {
         "message": "יומן:"
@@ -100,6 +97,9 @@
     },
     "canvas_planner_98ed106": {
         "message": "מתכנן קנבס"
+    },
+    "choose_usage_rights_33683854": {
+        "message": "בחירה של זכויות שימוש..."
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "הקש/י כדי לשלב { imageName }"
@@ -117,13 +117,13 @@
         "message": "שיתופי פעולה"
     },
     "content_1440204b": {
-        "message": "כלים חיצוניים"
+        "message": "תוכן"
     },
     "content_type_2cf90d95": {
         "message": "סוג תוכן"
     },
     "copyright_holder_66ee111": {
-        "message": "קיבלתי הרשאות להשתמש בקובץ זה"
+        "message": "בעלים של זכויות יוצרים:"
     },
     "count_plural_0_opportunities_one_opportunity_other_765e27fa": {
         "message": "{ count, plural,\n     =0 {# הזדמנויות}\n    one {הזדמנות #}\n  other {# הזדמנויות}\n}"
@@ -150,7 +150,7 @@
         "message": "{ course } לביצוע"
     },
     "creative_commons_license_725584ae": {
-        "message": "בעלים של זכויות יוצרים:"
+        "message": "זכויות במסגרת Creative Commons"
     },
     "custom_6979cd81": {
         "message": "ידני"
@@ -184,9 +184,6 @@
     },
     "dimensions_45ddb7b7": {
         "message": "ממדים"
-    },
-    "directionality_26ae9e08": {
-        "message": "כתובת דף אינטרנט לא תקינה"
     },
     "discussion_6719c51d": {
         "message": "דיון"
@@ -242,6 +239,9 @@
     "excused_cf8792eb": {
         "message": "נסלח"
     },
+    "external_tools_6e77821": {
+        "message": "כלים חיצוניים"
+    },
     "failed_to_delete_to_do_64edff49": {
         "message": "ביטול המטלה לביצוע נכשל"
     },
@@ -262,6 +262,9 @@
     },
     "files_index_af7c662b": {
         "message": "אינדקס קבצים"
+    },
+    "format_4247a9c5": {
+        "message": "פורמט"
     },
     "generating_preview_45b53be0": {
         "message": "מכין תצוגה מקדימה..."
@@ -284,14 +287,17 @@
     "group_files_82e5dcdb": {
         "message": "קבצי קבוצה"
     },
-    "group_links_9493129e": {
-        "message": "מאפיינים"
-    },
     "group_navigation_99f191a": {
         "message": "ניווט בקבוצה"
     },
     "i_have_obtained_permission_to_use_this_file_6386f087": {
-        "message": "זכויות היוצרים של החומר במסגרת כללי נחלת הכלל - Creative Commons"
+        "message": "קיבלתי הרשאות להשתמש בקובץ זה"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "זכויות היוצרים הן שלי"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "אם לא תבחר/י את סוג זכויות השימוש כעת, קובץ זה לא יפורסם בתום העלאתו"
     },
     "image_8ad06": {
         "message": "תמונה"
@@ -317,6 +323,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "סוג קובץ לא חוקי"
     },
+    "invalid_url_cbde79f": {
+        "message": "כתובת דף אינטרנט לא תקינה"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } completed { items, plural,\n     =1 {item}\n  other {items}\n}"
     },
@@ -325,9 +334,6 @@
     },
     "late_2be42b88": {
         "message": "איחור"
-    },
-    "left_to_right_e9b4fd06": {
-        "message": "פורמט"
     },
     "link_7262adec": {
         "message": "קישור"
@@ -497,9 +503,6 @@
     "quizzes_7e598f57": {
         "message": "בחנים"
     },
-    "raw_html_editor_e3993e41": {
-        "message": "תצוגה"
-    },
     "record_7c9448b": {
         "message": "הקלטה"
     },
@@ -573,13 +576,10 @@
         "message": "התאריך והשעה של פריט משימה זו הגיע"
     },
     "the_material_is_in_the_public_domain_279c39a3": {
-        "message": "זכויות במסגרת Creative Commons"
+        "message": "החומר הנו ברשות הציבור"
     },
     "the_material_is_licensed_under_creative_commons_3242cb5e": {
-        "message": "אם לא תבחר/י את סוג זכויות השימוש כעת, קובץ זה לא יפורסם בתום העלאתו"
-    },
-    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
-        "message": "זכויות היוצרים הן שלי"
+        "message": "זכויות היוצרים של החומר במסגרת כללי נחלת הכלל - Creative Commons"
     },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "אין נקודות המשויכות לפריט זה"
@@ -630,13 +630,13 @@
         "message": "כתובת דף אינטרנט"
     },
     "usage_right_ff96f3e2": {
-        "message": "בחירה של זכויות שימוש..."
-    },
-    "usage_rights_required_5fe4dd68": {
-        "message": "(c) 2001 Acme Inc."
+        "message": "זכויות שימוש"
     },
     "video_player_b371005": {
         "message": "נגן הוידאו"
+    },
+    "view_ba339f93": {
+        "message": "תצוגה"
     },
     "wiki_home_9cd54d0": {
         "message": "דף הבית של וויקי"
