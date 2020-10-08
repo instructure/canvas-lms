@@ -1218,7 +1218,9 @@ class Assignment < ActiveRecord::Base
       event :finish_duplicating, :transitions_to => :unpublished
       event :fail_to_duplicate, :transitions_to => :failed_to_duplicate
     end
-    state :failed_to_duplicate
+    state :failed_to_duplicate do
+      event :finish_duplicating, :transitions_to => :unpublished
+    end
     state :importing do
       event :finish_importing, :transitions_to => :unpublished
       event :fail_to_import, :transitions_to => :fail_to_import

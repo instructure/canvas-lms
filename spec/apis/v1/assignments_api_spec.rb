@@ -5406,6 +5406,16 @@ describe AssignmentsApiController, type: :request do
 
         it { is_expected.to have_received(:fail_to_duplicate) }
       end
+
+      context "when duplicated_successfully is true after timeout" do
+        before do
+          @assignment.update(workflow_state: 'failed_to_duplicate')
+        end
+
+        let(:duplicated_successfully) { true }
+
+        it { is_expected.to have_received(:finish_duplicating) }
+      end
     end
 
     context "with the cc_imported_successfully parameter" do

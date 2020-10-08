@@ -1425,6 +1425,40 @@ describe Assignment do
     end
   end
 
+  describe "event: failed_to_duplicate" do
+    subject { described_class }
+
+    let(:duplicating_assignment) do
+      @course.assignments.create!(workflow_state: 'duplicating', **assignment_valid_attributes)
+    end
+
+    describe ".finish_duplicating" do
+      it "update to published" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.finish_duplicating
+        expect(duplicating_assignment.workflow_state).to eq 'unpublished'
+      end
+    end
+
+    describe ".fail_to_duplicate" do
+      it "update to failed_to_duplicate" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.fail_to_duplicate
+        expect(duplicating_assignment.workflow_state).to eq 'failed_to_duplicate'
+      end
+    end
+
+    describe ".fail_to_duplicate and .finish_duplicating" do
+      it "update to failed_to_duplicate" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.fail_to_duplicate
+        expect(duplicating_assignment.workflow_state).to eq 'failed_to_duplicate'
+        duplicating_assignment.finish_duplicating
+        expect(duplicating_assignment.workflow_state).to eq 'unpublished'
+      end
+    end
+  end
+
   describe "scope: migrating_for_too_long" do
     subject { described_class.migrating_for_too_long }
 
