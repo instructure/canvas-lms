@@ -228,6 +228,9 @@ def getExternalTag() {
 def getDependenciesImage() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.dependenciesImageDefault() : configuration.dependenciesImage()
 }
+def getCanvasLmsRefspec() {
+  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
+}
 // =========
 
 pipeline {
@@ -276,7 +279,7 @@ pipeline {
     POSTGRES_IMAGE_TAG=imageTag.postgres()
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
-    CANVAS_LMS_REFSPEC=configuration.canvasLmsRefspec()
+    CANVAS_LMS_REFSPEC = getCanvasLmsRefspec()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
   }
