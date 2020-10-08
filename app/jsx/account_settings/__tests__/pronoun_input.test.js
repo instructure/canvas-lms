@@ -25,6 +25,17 @@ describe('render available pronouns input', () => {
     ENV.PRONOUNS_LIST = ['She/Her', 'He/Him', 'They/Them']
   })
 
+  it('renders tooltip when focused', () => {
+    const {getAllByText, getByTestId} = render(<PronounInput />)
+    const icon = getByTestId('pronoun_info')
+    fireEvent.focus(icon)
+    expect(
+      getAllByText(
+        'These pronouns will be available to Canvas users in your account to choose from.'
+      )[0]
+    ).toBeVisible()
+  })
+
   it('with defaults in view', () => {
     const {getByText} = render(<PronounInput />)
     expect(getByText('She/Her')).toBeVisible()
