@@ -436,7 +436,7 @@ pipeline {
 
             def migrations = load('build/new-jenkins/groovy/migrations.groovy')
 
-            stage ('Run Migrations') {
+            timedStage('Run Migrations') {
               timeout(time: 10) {
                 skipIfPreviouslySuccessful('run-migrations') {
                   withEnv([
