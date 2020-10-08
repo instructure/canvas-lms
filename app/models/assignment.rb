@@ -3503,10 +3503,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.disable_post_to_sis_if_grading_period_closed
-    return unless Account.site_admin.feature_enabled?(:new_sis_integrations)
-
     eligible_root_accounts = Account.root_accounts.active.select do |account|
       account.feature_enabled?(:disable_post_to_sis_when_grading_period_closed) &&
+        account.feature_enabled?(:new_sis_integrations) &&
         account.disable_post_to_sis_when_grading_period_closed?
     end
     return unless eligible_root_accounts.any?

@@ -2034,27 +2034,27 @@ describe Account do
     let(:subaccount) { Account.create!(root_account: root_account) }
 
     it "returns false if the account is not a root account" do
-      Account.site_admin.enable_feature!(:new_sis_integrations)
+      root_account.enable_feature!(:new_sis_integrations)
       root_account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
 
       expect(subaccount).not_to be_allow_disable_post_to_sis_when_grading_period_closed
     end
 
     context "for a root account" do
-      it "returns false if the site admin account does not enable new_sis_integrations" do
+      it "returns false if the root account does not enable the relevant feature flag" do
         root_account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
 
         expect(root_account).not_to be_allow_disable_post_to_sis_when_grading_period_closed
       end
 
-      it "returns false if this account does not enable the relevant feature flag" do
-        Account.site_admin.enable_feature!(:new_sis_integrations)
+      it "returns false if this account does not enable the new_sis_integrations feature flag" do
+        root_account.enable_feature!(:new_sis_integrations)
 
         expect(root_account).not_to be_allow_disable_post_to_sis_when_grading_period_closed
       end
 
       it "returns true when the relevant feature flags are enabled" do
-        Account.site_admin.enable_feature!(:new_sis_integrations)
+        root_account.enable_feature!(:new_sis_integrations)
         root_account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
 
         expect(root_account).to be_allow_disable_post_to_sis_when_grading_period_closed

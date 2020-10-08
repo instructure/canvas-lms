@@ -9172,7 +9172,7 @@ describe Assignment do
 
     context "when the account has SIS-related features active and the setting enabled" do
       before(:once) do
-        Account.site_admin.enable_feature!(:new_sis_integrations)
+        account.enable_feature!(:new_sis_integrations)
         account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
         account.settings[:disable_post_to_sis_when_grading_period_closed] = true
         account.save!
@@ -9280,7 +9280,7 @@ describe Assignment do
       end
     end
 
-    it "does not run when the site-admin 'new_sis_integrations' flag is not enabled" do
+    it "does not run when the root account 'new_sis_integrations' flag is not enabled" do
       account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
       account.settings[:disable_post_to_sis_when_grading_period_closed] = true
       account.save!
@@ -9291,7 +9291,7 @@ describe Assignment do
     end
 
     it "does not run when the feature flag governing the setting is not enabled for the account" do
-      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.enable_feature!(:new_sis_integrations)
       account.settings[:disable_post_to_sis_when_grading_period_closed] = true
       account.save!
 
@@ -9301,7 +9301,7 @@ describe Assignment do
     end
 
     it "does not run when the account does not have the setting enabled" do
-      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.enable_feature!(:new_sis_integrations)
       account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
 
       expect {

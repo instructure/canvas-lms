@@ -2029,9 +2029,8 @@ class Account < ActiveRecord::Base
 
   def allow_disable_post_to_sis_when_grading_period_closed?
     return false unless root_account?
-    return false unless feature_enabled?(:disable_post_to_sis_when_grading_period_closed)
 
-    Account.site_admin.feature_enabled?(:new_sis_integrations)
+    feature_enabled?(:disable_post_to_sis_when_grading_period_closed) && feature_enabled?(:new_sis_integrations)
   end
 
   class << self
