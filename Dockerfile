@@ -16,17 +16,12 @@ ENV LANGUAGE en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-WORKDIR $APP_HOME
-COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
-COPY --chown=docker:docker Gemfile   ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-
-COPY --chown=docker:docker gems      ${APP_HOME}gems
-
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
+
+WORKDIR $APP_HOME
 
 USER root
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
@@ -55,6 +50,13 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 USER docker
+
+COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
+COPY --chown=docker:docker Gemfile   ${APP_HOME}
+COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
+
+COPY --chown=docker:docker gems      ${APP_HOME}gems
+
 RUN set -eux; \
   \
   # set up bundle config options \
