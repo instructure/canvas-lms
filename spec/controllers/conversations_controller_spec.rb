@@ -345,6 +345,14 @@ describe ConversationsController do
       expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
     end
 
+    it "allows Observers to message linked students" do
+      observer = user_with_pseudonym
+      add_linked_observer(@student, observer, root_account: @course.root_account)
+      user_session(observer)
+      post 'create', params: { recipients: [@student.id.to_s], body: "Hello there", context_code: @course.asset_string }
+      expect(response).to be_successful
+    end
+
     context "group conversations" do
       before :once do
         @old_count = Conversation.count
