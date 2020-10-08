@@ -758,7 +758,9 @@ class Account < ActiveRecord::Base
         @invalidations.each do |key|
           Rails.cache.delete([key, self.global_id].cache_key)
         end
-        Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
+        Account.send_later_if_production_enqueue_args(:invalidate_inherited_caches,
+         { singleton: "Account.invalidate_inherited_caches_#{global_id}" },
+          self, @invalidations)
       end
     end
   end
