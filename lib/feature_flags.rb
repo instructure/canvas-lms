@@ -138,7 +138,7 @@ module FeatureFlags
       account
     end
     (accounts + [self]).each do |context|
-      flag = context.feature_flag(feature, skip_cache: skip_cache)
+      flag = context.feature_flag(feature, skip_cache: context == self && skip_cache)
       next unless flag
       retval = flag
       break unless flag.allowed?
