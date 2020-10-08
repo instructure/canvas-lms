@@ -196,6 +196,7 @@ class AccountNotification < ActiveRecord::Base
       # this allows us to make a global announcement that is filtered to only accounts with this flag
       enabled_flags = ACCOUNT_SERVICE_NOTIFICATION_FLAGS & root_account.allowed_services_hash.keys.map(&:to_s)
 
+      base_shard = Shard.current
       result = Shard.partition_by_shard(account_ids) do |sharded_account_ids|
         load_by_account = ->(slice_account_ids) do
           scope = AccountNotification.where("account_id IN (?) AND start_at <=? AND end_at >=?", slice_account_ids, start_at, end_at).
@@ -213,7 +214,9 @@ class AccountNotification < ActiveRecord::Base
         end
 
         # all root accounts; do them one by one, and MultiCache them
-        if (sharded_account_ids - root_account_ids).empty? && !include_past
+        this_shard_root_account_ids = Shard.current == base_shard ? root_account_ids :
+          root_account_ids.map { |id| Shard.relative_id_for(id, base_shard, Shard.current) }
+        if (sharded_account_ids - this_shard_root_account_ids).empty? && !include_past
           sharded_account_ids.map do |single_root_account_id|
             MultiCache.fetch(cache_key_for_root_account(single_root_account_id, end_at)) do
               load_by_account.call([single_root_account_id])
