@@ -178,6 +178,20 @@ module Lti
                        ENROLLMENT_GUARD,
                        default_name: 'com_instructure_user_section_names'
 
+    # returns all observee ids linked to this observer as an String separated by `,`
+    # @launch_parameter com_instructure_observee_ids
+    # @example
+    #   ```
+    #   "A123,B456,..."
+    #   ```
+    register_expansion 'com.instructure.Observee.sisIds', [],
+                        -> do
+                          observed_users = ObserverEnrollment.observed_students(@context, @current_user).keys
+                          observed_users&.collect { |user| find_sis_user_id_for(user) }&.compact&.join(',')
+                        end,
+                        COURSE_GUARD,
+                        default_name: 'com_instructure_observee_sis_ids'
+
     # The title of the context
     # @launch_parameter context_title
     # @example
@@ -1438,6 +1452,11 @@ module Lti
     def sis_pseudonym
       context = @enrollment || @context
       @sis_pseudonym ||= SisPseudonym.for(@current_user, context, type: :trusted, require_sis: false, root_account: @root_account) if @current_user
+    end
+
+    def find_sis_user_id_for(user)
+      context = @enrollment || @context
+      SisPseudonym.for(user, context, type: :trusted, require_sis: false, root_account: @root_account)&.sis_user_id
     end
 
     def expand_substring_variables(value)
