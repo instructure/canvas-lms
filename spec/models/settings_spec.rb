@@ -48,6 +48,15 @@ describe Setting do
         expect(Setting.get('my_new_setting', '0', expires_in: 1.minute)).to eq '1'
       end
     end
+
+    it "doesn't need to query if all settings are already cached, even when skipping cache" do
+      Setting.reset_cache!
+      Setting.get('setting1', nil)
+      expect(Setting).to receive(:find_by).never
+      expect(Setting).to receive(:pluck).never
+      expect(MultiCache).to receive(:fetch).never
+      Setting.skip_cache { Setting.get('setting2', nil) }
+    end
   end
 
   context "setting" do
