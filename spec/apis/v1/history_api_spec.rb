@@ -141,6 +141,61 @@ describe HistoryController, type: :request do
         expect(json.map { |e| e['asset_name'] }).to match_array(['Group Pages', 'Course People', 'Assign 1'])
       end
     end
+
+    context "page view filtering" do
+      it "excludes file downloads" do
+        a1 = attachment_model context: @course
+        page_view_for url: "http://example.com/api/v1/courses/#{@course.id}/files/#{a1.id}/download", context: @course, created_at: @dates[2],
+                      asset_category: 'attachments', asset_code: a1.asset_string
+        a2 = attachment_model context: @course
+        page_view_for url: "http://localhost:3000/courses/#{@course.id}/files/#{a2.id}/file_preview?annotate=0", context: @course, created_at: @dates[2],
+                      asset_category: 'attachments', asset_code: a2.asset_string
+
+        @user = @student
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                        format: 'json', user_id: 'self')
+
+        asset_codes = json.map { |e| e['asset_code'] }
+        expect(asset_codes).not_to include a1.asset_string
+        expect(asset_codes).to include a2.asset_string
+      end
+
+      it "excludes API calls" do
+        other_course = @course
+        page_view_for url: "http://example.com/courses/#{other_course.id}/modules", context: other_course, created_at: @dates[1],
+                      asset_category: 'modules', asset_code: "modules:#{other_course.asset_string}"
+        course_with_student(user: @student)
+        page_view_for url: "http://example.com/api/v1/courses/#{@course.id}/modules", context: @course, created_at: @dates[1],
+                      asset_category: 'modules', asset_code: "modules:#{@course.asset_string}"
+
+        @user = @student
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                        format: 'json', user_id: 'self')
+
+        asset_codes = json.map { |e| e['asset_code'] }
+        expect(asset_codes).not_to include "modules:#{@course.asset_string}"
+        expect(asset_codes).to include "modules:#{other_course.asset_string}"
+      end
+
+      it "excludes unparseable URLs" do
+        page1 = @course.wiki_pages.create! title: 'test-page-1'
+        page_view_for url: 'this is not a url', created_at: @dates[0],
+                      asset_category: 'wiki_pages', asset_code: page1.asset_string
+
+        page2 = @course.wiki_pages.create! title: 'test-page-2'
+        page_view_for url: "http://example.com/courses/#{@course.id}/pages/test-page-2", created_at: @dates[0],
+                      asset_category: 'wiki_pages', asset_code: page2.asset_string
+
+        @user = @student
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                        format: 'json', user_id: 'self')
+
+        asset_codes = json.map { |e| e['asset_code'] }
+        expect(asset_codes).not_to include page1.asset_string
+        expect(asset_codes).to include page2.asset_string
+      end
+
+    end
   end
 end
 
