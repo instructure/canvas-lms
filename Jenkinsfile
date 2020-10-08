@@ -438,14 +438,12 @@ pipeline {
 
             timedStage('Run Migrations') {
               timeout(time: 10) {
-                skipIfPreviouslySuccessful('run-migrations') {
-                  withEnv([
-                    "COMPOSE_FILE=docker-compose.new-jenkins.yml",
-                    "POSTGRES_PASSWORD=sekret"
-                  ]) {
-                    migrations.runMigrations()
-                    sh 'docker-compose down --remove-orphans'
-                  }
+                withEnv([
+                  "COMPOSE_FILE=docker-compose.new-jenkins.yml",
+                  "POSTGRES_PASSWORD=sekret"
+                ]) {
+                  migrations.runMigrations()
+                  sh 'docker-compose down --remove-orphans'
                 }
               }
             }
