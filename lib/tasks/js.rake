@@ -68,4 +68,12 @@ namespace :js do
     end
   end
 
+  desc "Revision static assets"
+  task :gulp_rev do
+    system 'yarn run gulp rev'
+
+    unless $?.success?
+      raise 'error running gulp rev'
+    end
+  end
 end

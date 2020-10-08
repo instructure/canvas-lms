@@ -40,13 +40,13 @@ namespace :canvas do
     build_dev_js = !build_prod_js || ENV['JS_BUILD_NO_UGLIFY'] != "1"
 
     batches = Rake::TaskGraph.draw do
-      task 'css:compile' => [ 'gulp:rev' ] if build_css
+      task 'css:compile' => [ 'js:gulp_rev' ] if build_css
       task 'css:styleguide' if build_styleguide
       task 'doc:api' if build_api_docs
       task 'js:yarn_install' if npm_install
-      task 'gulp:rev' do |name|
-        { name: name, runner: -> { system('yarn run gulp rev') } }
-      end
+      task 'js:gulp_rev' => [
+        ('js:yarn_install' if npm_install)
+      ].compact
 
       task 'i18n:generate_js' => [
         # canvas_quizzes is quirky in that we can only extract its phrases from
