@@ -27,9 +27,10 @@ module Lti
     def self.iframe_allowances(user_agent = nil)
       browser = Browser.new(user_agent)
 
-      if user_agent.blank? || browser.chrome? || browser.firefox?(">= 74")
+      if user_agent.blank? || browser.chrome? || browser.firefox?('>= 74') || browser.edge?('>= 79')
         return FRAME_ALLOWANCES.map { |s| "#{s} *" }
       end
+
       FRAME_ALLOWANCES
     end
 
