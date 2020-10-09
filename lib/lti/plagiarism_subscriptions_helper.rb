@@ -55,7 +55,7 @@ module Lti
         Format: format,
         TransportType: transport_type,
         TransportMetadata: transport_metadata,
-        AssociatedIntegrationId: "#{product_family.vendor_code}-#{product_family.product_code}"
+        AssociatedIntegrationId: [product_family.vendor_code, product_family.product_code, tool_proxy.event_endpoint].join('_')
       }.with_indifferent_access
       sub[:SystemEventTypes] = EVENT_TYPES if enabled
       sub[:UserEventTypes] = EVENT_TYPES if enabled
