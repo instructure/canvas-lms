@@ -1200,8 +1200,7 @@ class AccountsController < ApplicationController
     pseudonym.update!(workflow_state: 'active')
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
-    user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
-    user.touch
+    user.clear_caches
     render json: user || {}
   end
 

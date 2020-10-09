@@ -1013,6 +1013,11 @@ class User < ActiveRecord::Base
     deleted?
   end
 
+  def clear_caches
+    self.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
+    self.touch
+  end
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.remove_from_root_account(:all)
