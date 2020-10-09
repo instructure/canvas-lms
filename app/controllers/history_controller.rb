@@ -113,8 +113,8 @@ class HistoryController < ApplicationController
   def include_page_view?(pv)
     return false unless pv.asset_user_access_id.present?
 
-    # masquerading users don't see the target user's history and vice versa
-    return false unless pv.real_user_id == @real_current_user&.id
+    # activity done while masquerading is invisible
+    return false unless pv.real_user_id.nil?
 
     url = URI.parse(pv.url)
     return false if url.path =~ %r{^/api/v1/} # exclude API calls

@@ -126,12 +126,12 @@ describe HistoryController, type: :request do
                       asset_code: @a2.asset_string, real_user: @admin
       end
 
-      it "shows the masquerader only her own history on behalf of the user" do
+      it "shows the masquerader the target user's history and not her own" do
         @user = @admin
         json = api_call(:get, "/api/v1/users/self/history?as_user_id=#{@student.id}",
                         controller: 'history', action: 'index', format: 'json', user_id: 'self',
                         as_user_id: @student.to_param)
-        expect(json.map { |e| e['asset_name'] }).to match_array(['Assign 2'])
+        expect(json.map { |e| e['asset_name'] }).to match_array(['Group Pages', 'Course People', 'Assign 1'])
       end
 
       it "does not show the target user the masquerader's actions" do
