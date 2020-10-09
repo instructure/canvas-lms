@@ -222,15 +222,19 @@ module Interfaces::SubmissionInterface
   def body
     Loaders::AssociationLoader.for(Submission, :assignment).load(submission).then do |assignment|
       Loaders::AssociationLoader.for(Assignment, :context).load(assignment).then do
-        Loaders::ApiContentAttachmentLoader.for(assignment.context).load(object.body).then do |preloaded_attachments|
-          GraphQLHelpers::UserContent.process(
-            object.body,
-            context: assignment.context,
-            in_app: context[:in_app],
-            request: context[:request],
-            preloaded_attachments: preloaded_attachments,
-            user: current_user
-          )
+        # The "body" of submissions for (old) quiz assignments includes grade
+        # information, so exclude it if the caller can't see the grade
+        if !assignment.quiz? || submission.user_can_read_grade?(current_user, session)
+          Loaders::ApiContentAttachmentLoader.for(assignment.context).load(object.body).then do |preloaded_attachments|
+            GraphQLHelpers::UserContent.process(
+              object.body,
+              context: assignment.context,
+              in_app: context[:in_app],
+              request: context[:request],
+              preloaded_attachments: preloaded_attachments,
+              user: current_user
+            )
+          end
         end
       end
     end
