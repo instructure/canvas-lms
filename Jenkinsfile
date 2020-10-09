@@ -648,8 +648,7 @@ pipeline {
 
             if(configuration.isChangeMerged()) {
               timedStage('Dependency Check') {
-                def reports = load 'build/new-jenkins/groovy/reports.groovy'
-                reports.snykCheckDependencies("$PATCHSET_TAG", "/usr/src/app/")
+                snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
               }
             }
 

@@ -185,55 +185,6 @@ def buildIndexPage(failureCategories) {
   writeFile file: "index.html", text: indexHtml
 }
 
-def snykCheckDependencies(projectImage, projectDirectory) {
-  def projectContainer = sh(script: "docker run -d -it -v snyk_volume:${projectDirectory} ${projectImage}", returnStdout: true).trim()
-  runSnyk(
-    projectContainer,
-    projectDirectory,
-    'canvas-lms:ruby',
-    'snyk/snyk-cli:rubygems',
-    'Gemfile.lock',
-    './snyk_ruby'
-  )
-  archiveArtifacts(artifacts: '**/snyk*')
-  sh 'rm -vr ./snyk_ruby'
-}
-
-def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
-  credentials.withSnykCredentials {
-    def RC = sh(
-      script: """
-        set -o errexit -o nounset -o xtrace
-        docker run --rm \
-          -v snyk_volume:/project \
-          -eSNYK_TOKEN \
-          -e"MONITOR=true" \
-           ${snykImage} test \
-          --project-name=${projectName} \
-          --file=${packageManagerFile}
-      """,
-      returnStatus: true
-    )
-    // Snyk returns a 1 if vulnerabilities are found; we don't want this to fail the build
-    // If the return code is not 0 or 1, it's a build error and should throw an exception
-    if(RC != 0 && RC != 1) {
-      error "Snyk dependency check for ${projectName} failed with an unrecognized return code: $RC"
-    }
-  }
-  this.extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
-}
-
-def extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
-  sh """
-    set -o errexit -o nounset -o xtrace
-    mkdir -vp ${destinationDirectory}
-    docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
-    docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
-    docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
-    docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
-  """
-}
-
 def copyParallelLogs(rspecTotal, seleniumTotal) {
   dir('parallel_logs') {
     for(int index = 0; index < rspecTotal; index++) {
