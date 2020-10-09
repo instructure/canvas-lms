@@ -83,5 +83,27 @@ describe OutcomesService::Service do
         )
       end
     end
+
+    describe '.toggle_feature_flag' do
+      def expect_post(url)
+        expect(CanvasHttp).to receive(:post).with(
+          url,
+          hash_including('Authorization'),
+          form_data: {
+            feature_flag: 'fake_flag'
+          }
+        )
+      end
+
+      it 'enables feature flag' do
+        expect_post('http://canvas.test/api/features/enable')
+        Service.toggle_feature_flag(root_account, 'fake_flag', true)
+      end
+
+      it 'disables feature flag' do
+        expect_post('http://canvas.test/api/features/disable')
+        Service.toggle_feature_flag(root_account, 'fake_flag', false)
+      end
+    end
   end
 end

@@ -47,7 +47,31 @@ module OutcomesService
         end
       end
 
+      def toggle_feature_flag(root_account, feature_flag, state)
+        feature_flag_url = "#{url(root_account)}/api/features/#{state ? 'enable' : 'disable'}"
+        response = CanvasHttp.post(
+          feature_flag_url,
+          headers_for(root_account, 'features.manage'),
+          form_data: {
+            feature_flag: feature_flag
+          }
+        )
+        return unless response && response.code != '204'
+
+        Canvas::Errors.capture(
+          "Unexpected response from Outcomes Service toggling feature flag",
+          status_code: response.code,
+          body: response.body
+        )
+      end
+
       private
+
+      def headers_for(context, scope, overrides = {})
+        {
+          'Authorization' => OutcomesService::Service.jwt(context, scope, overrides: overrides)
+        }
+      end
 
       def settings(context)
         context.root_account.settings.dig(:provision, 'outcomes') || {}
