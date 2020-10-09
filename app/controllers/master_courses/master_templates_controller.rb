@@ -515,6 +515,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
   def migrations_index
     # sort id desc
     migrations = Api.paginate(@template.master_migrations.order("id DESC"), self, api_v1_course_blueprint_migrations_url)
+    ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
     render :json => migrations.map{|migration| master_migration_json(migration, @current_user, session) }
   end
 
@@ -591,6 +592,7 @@ class MasterCourses::MasterTemplatesController < ApplicationController
       where(:migration_type => 'master_course_import', :child_subscription_id => @subscription).
       order('id DESC')
     migrations = Api.paginate(migrations, self, api_v1_course_blueprint_imports_url)
+    ActiveRecord::Associations::Preloader.new.preload(migrations, :user)
     render :json => migrations.map{ |migration| master_migration_json(migration.master_migration, @current_user,
                                                                       session, :child_migration => migration,
                                                                       :subscription => @subscription) }

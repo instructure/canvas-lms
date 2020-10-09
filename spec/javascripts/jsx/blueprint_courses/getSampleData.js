@@ -18,8 +18,14 @@
 
 export default function getSampleData() {
   return {
-    terms: [{id: '1', name: 'Term One'}, {id: '2', name: 'Term Two'}],
-    subAccounts: [{id: '1', name: 'Account One'}, {id: '2', name: 'Account Two'}],
+    terms: [
+      {id: '1', name: 'Term One'},
+      {id: '2', name: 'Term Two'}
+    ],
+    subAccounts: [
+      {id: '1', name: 'Account One'},
+      {id: '2', name: 'Account Two'}
+    ],
     childCourse: {
       id: '1',
       enrollment_term_id: '1',
@@ -67,6 +73,9 @@ export default function getSampleData() {
         id: '2',
         workflow_state: 'completed',
         created_at: '2013-08-28T23:59:00-06:00',
+        user: {
+          display_name: 'Bob Jones'
+        },
         changes: [
           {
             asset_id: '2',
