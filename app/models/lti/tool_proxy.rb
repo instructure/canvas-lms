@@ -163,9 +163,24 @@ module Lti
       raw_data.try(:dig, 'enabled_capability')&.include?(Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2)
     end
 
+    def event_endpoint
+      raw_data.try(:dig, 'tool_profile', 'service_offered')&.find do |service|
+        service['@id'].include?('#vnd.Canvas.SubmissionEvent')
+      end&.dig('endpoint')
+    end
+
+    scope :with_event_endpoint, -> (endpoint) do
+      where("raw_data like '%vnd.Canvas.SubmissionEvent%'").
+        # This is not a good way to do this.  Yaml serialization can change, but right now it's all I've got.
+        # We should put this into a real field.
+        where("raw_data like '%endpoint: #{endpoint}%'")
+    end
+
     def find_or_create_plagiarism_subscription
-      # Tools with subscriptions and which match the current tool installation's product and vendor codes
+      # Tools with subscriptions and which match the current tool installation's product code, vendor code, and
+      # SubmissionEvent endpoint
       tool_proxies = Lti::ToolProxy.active.joins(:product_family).
+        with_event_endpoint(event_endpoint).
         where(lti_product_families: {product_code: product_family&.product_code, vendor_code: product_family&.vendor_code}).
         where.not(subscription_id: nil)
       # Search the accounts under the same root account to see if a subscription already exists
