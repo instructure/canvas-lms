@@ -239,12 +239,14 @@ module Canvas::LiveEvents
     actl = assignment.assignment_configuration_tool_lookups.take
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
-    if actl && Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-      context: assignment.course,
-      vendor_code: actl.tool_vendor_code,
-      product_code: actl.tool_product_code
-    ).any?
-      event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}"
+    if actl
+      if (tool_proxy = Lti::ToolProxy.find_all_proxies_for_context_by_context_order_by_vendor_product_code(
+        context: assignment.course,
+        vendor_code: actl.tool_vendor_code,
+        product_code: actl.tool_product_code
+      ).first)
+        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+      end
     end
     event
   end
@@ -341,12 +343,14 @@ module Canvas::LiveEvents
       posted_at: submission.posted_at,
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
-    if actl && Lti::ToolProxy.find_active_proxies_for_context_by_vendor_code_and_product_code(
-      context: submission.course,
-      vendor_code: actl.tool_vendor_code,
-      product_code: actl.tool_product_code
-    ).any?
-      event[:associated_integration_id] = "#{actl.tool_vendor_code}-#{actl.tool_product_code}"
+    if actl
+      if (tool_proxy = Lti::ToolProxy.find_all_proxies_for_context_by_context_order_by_vendor_product_code(
+        context: submission.course,
+        vendor_code: actl.tool_vendor_code,
+        product_code: actl.tool_product_code
+      ).first)
+        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+      end
     end
     event
   end
