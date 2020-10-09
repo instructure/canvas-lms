@@ -185,6 +185,10 @@ module CanvasHttp
     unless resolved_addrs.any?
       # this is actually a different condition than the host being insecure,
       # and having separate telemetry is helpful for understanding transient failures.
+      if host =~ /inst-fs/
+        resolution_output = `dig #{host}`
+        logger.warn("INST_FS_RESOLUTION_FAILURE: #{resolution_output}")
+      end
       raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
     ip_addrs = resolved_addrs.map do |ip|
