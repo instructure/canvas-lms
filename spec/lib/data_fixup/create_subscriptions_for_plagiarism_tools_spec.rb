@@ -32,7 +32,9 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
 
   let(:tool_proxy) do
     allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return(nil)
-    create_tool_proxy(account)
+    tool = create_tool_proxy(account)
+    tool.update_attributes(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
+    tool
   end
 
   let(:placement) { Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2 }
@@ -53,9 +55,12 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       expect(tool_proxy.reload.subscription_id).to be_nil
     end
 
-    it 'should only create one subscription if there are 2 tool installations with the same product and vendor code' do
+    it 'should only create one subscription if there are 2 tools with the same product code, vendor code and SubmissionEvent endpoint' do
       tool_proxy2 = Lti::ToolProxy.create!(
-        raw_data: {'enabled_capability' => [placement]},
+        raw_data: {
+          'enabled_capability' => [placement],
+          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+        },
         subscription_id: 'id',
         context: course_factory(account: account),
         shared_secret: 'shared_secret',
@@ -77,7 +82,10 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
 
     it 'should not create a subscription if there are two tools and one tool already has a subscription' do
       tool_proxy2 = Lti::ToolProxy.create!(
-        raw_data: {'enabled_capability' => [placement]},
+        raw_data: {
+          'enabled_capability' => [placement],
+          'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+        },
         subscription_id: 'id3',
         context: course_factory(account: account),
         shared_secret: 'shared_secret',
@@ -94,6 +102,29 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
       DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
       expect(tool_proxy.reload.subscription_id).to eq('id3')
       expect(tool_proxy2.reload.subscription_id).to eq('id3')
+    end
+
+    it 'should create a subscription if there are two tools, but one has a different SubmissionEvent endpoint' do
+      tool_proxy2 = Lti::ToolProxy.create!(
+        raw_data: {
+          'enabled_capability' => [placement],
+          'tool_profile' => {'service_offered' => [{'endpoint' => 'yoyo.ma', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+        },
+        subscription_id: 'id3',
+        context: course_factory(account: account),
+        shared_secret: 'shared_secret',
+        guid: 'guid',
+        product_version: '1.0beta',
+        lti_version: 'LTI-2p0',
+        product_family: product_family,
+        workflow_state: 'active'
+      )
+      tool_proxy.raw_data['enabled_capability'] = [placement]
+      tool_proxy.save!
+
+      expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('id4')
+      DataFixup::CreateSubscriptionsForPlagiarismTools.create_subscriptions
+      expect(tool_proxy.reload.subscription_id).to eq('id4')
     end
   end
 

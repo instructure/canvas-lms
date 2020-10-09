@@ -595,7 +595,7 @@ module Lti
               {
                 "endpoint" => 'endpoint',
                 "action" => ["POST", "GET"],
-                "@id" => 'id',
+                "@id" => '#vnd.Canvas.SubmissionEvent',
                 "@type" => "RestService"
               }
             ]
@@ -618,9 +618,12 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'subscription_id1'
       end
 
-      it 'should not create a subscription if another tool already has one' do
+      it 'should not create a subscription if another matching tool already has one' do
         ToolProxy.create!(
-          raw_data: {'enabled_capability' => [placement]},
+          raw_data: {
+            'enabled_capability' => [placement],
+            'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          },
           subscription_id: 'id',
           context: course_factory(account: account),
           shared_secret: 'shared_secret',
@@ -638,9 +641,12 @@ module Lti
         expect(tool_proxy.subscription_id).to eq 'id'
       end
 
-      it 'should not create a subscription if a root account tool already has one' do
+      it 'should not create a subscription if a matching root account tool already has one' do
         ToolProxy.create!(
-          raw_data: {'enabled_capability' => [placement]},
+          raw_data: {
+            'enabled_capability' => [placement],
+            'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          },
           subscription_id: 'id',
           context: account,
           shared_secret: 'shared_secret',
@@ -656,6 +662,29 @@ module Lti
         tool_proxy.raw_data['enabled_capability'] = [placement]
         tool_proxy.save!
         expect(tool_proxy.subscription_id).to eq 'id'
+      end
+
+      it "should create a new subscription if the #vnd.Canvas.SubmissionEvent endpoint doesn't match" do
+        ToolProxy.create!(
+          raw_data: {
+            'enabled_capability' => [placement],
+            'tool_profile' => {'service_offered' => [{'endpoint' => 'hi.url', '@id' => '#vnd.Canvas.SubmissionEvent'}]},
+          },
+          subscription_id: 'id',
+          context: course_factory(account: account),
+          shared_secret: 'shared_secret',
+          guid: 'guid',
+          product_version: '1.0beta',
+          lti_version: 'LTI-2p0',
+          product_family: product_family,
+          workflow_state: 'active'
+        )
+
+        expect_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return('id1')
+        tool_proxy.context = course_factory(account: account)
+        tool_proxy.raw_data['enabled_capability'] = [placement]
+        tool_proxy.save!
+        expect(tool_proxy.subscription_id).to eq 'id1'
       end
 
       it 'should not create subscriptions for non-plagiarism tools' do
