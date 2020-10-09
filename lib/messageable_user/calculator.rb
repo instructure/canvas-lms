@@ -472,6 +472,9 @@ class MessageableUser
 
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
+          # bail early if user doesn't have permission to message group members
+          return if group&.context&.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
+
           group_user_scope.where('group_memberships.group_id' => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
