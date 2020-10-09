@@ -195,6 +195,51 @@ module Lti
           end
         end
 
+        describe '#find_all_proxies_for_context_by_context_order_by_vendor_product_code' do
+          let(:course) { course_model(account: sub_account_2_1) }
+
+          it 'returns tool proxies in context hierarchy order' do
+            tool_proxy1 = create_tool_proxy(context: root_account)
+            tool_proxy1.bindings.create!(context: root_account)
+            tool_proxy2 = create_tool_proxy(context: sub_account_2_1)
+            tool_proxy2.bindings.create!(context: sub_account_2_1)
+            tool_proxy3 = create_tool_proxy(context: course)
+            tool_proxy3.bindings.create!(context: course)
+
+            tools = described_class.find_all_proxies_for_context_by_context_order_by_vendor_product_code(context: course, vendor_code: '123', product_code: 'abc')
+            expect(tools.map(&:id)).to eq([tool_proxy3.id, tool_proxy2.id, tool_proxy1.id])
+          end
+
+          it 'returns the newest tool when there are 2 in a context' do
+            tool_proxy1 = create_tool_proxy(context: root_account)
+            tool_proxy1.bindings.create!(context: root_account)
+            tool_proxy2 = create_tool_proxy(context: root_account)
+            tool_proxy2.bindings.create!(context: root_account)
+            tool_proxy3 = create_tool_proxy(context: course)
+            tool_proxy3.bindings.create!(context: course)
+            tool_proxy4 = create_tool_proxy(context: course)
+            tool_proxy4.bindings.create!(context: course)
+
+            tools = described_class.find_all_proxies_for_context_by_context_order_by_vendor_product_code(context: course, vendor_code: '123', product_code: 'abc')
+            expect(tools.map(&:id)).to eq([tool_proxy4.id, tool_proxy3.id, tool_proxy2.id, tool_proxy1.id])
+          end
+
+          it "doesn't return tool_proxies when closest ancestor is disabled" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1)
+            tool_proxy.bindings.create!(context: sub_account_2_1, enabled: false)
+            tool_proxy.bindings.create!(context: sub_account_1_1)
+            proxies = described_class.find_all_proxies_for_context_by_context_order_by_vendor_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abc')
+            expect(proxies.count).to eq 0
+          end
+
+          it "doesn't return deleted tool proxies" do
+            tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'deleted')
+            tool_proxy.bindings.create!(context: sub_account_2_1)
+            proxies = described_class.find_all_proxies_for_context_by_context_order_by_vendor_product_code(context: sub_account_2_1, vendor_code: '123', product_code: 'abc')
+            expect(proxies.count).to eq 0
+          end
+        end
+
         describe "#find_active_proxies_for_context_by_vendor_code_and_product_code" do
           it "doesn't return tool_proxies that are disabled" do
             tool_proxy = create_tool_proxy(context: sub_account_2_1, workflow_state: 'disabled')

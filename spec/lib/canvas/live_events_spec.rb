@@ -20,6 +20,16 @@ require 'spec_helper'
 require 'lti2_spec_helper'
 
 describe Canvas::LiveEvents do
+  let(:submission_event_endpoint){ 'test.com/submission' }
+  let(:submission_event_service) do
+    {
+      'endpoint' => submission_event_endpoint,
+      'format' => ['application/json'],
+      'action' => ['POST'],
+      '@id' => 'http://test.service.com/service#vnd.Canvas.SubmissionEvent',
+      '@type' => 'RestService'
+    }
+  end
   # The only methods tested in here are ones that have any sort of logic happening.
 
   def expect_event(event_name, event_body, event_context = nil)
@@ -583,11 +593,13 @@ describe Canvas::LiveEvents do
         it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-          create_tool_proxy(submission.assignment.course)
+          tool_proxy = create_tool_proxy(submission.assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
 
           expect_event('submission_created',
             hash_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.submission_created(submission)
@@ -599,7 +611,7 @@ describe Canvas::LiveEvents do
 
           expect_event('submission_created',
             hash_not_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.submission_created(submission)
@@ -670,11 +682,13 @@ describe Canvas::LiveEvents do
         it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-          create_tool_proxy(submission.assignment.course)
+          tool_proxy = create_tool_proxy(submission.assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
 
           expect_event('submission_updated',
             hash_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.submission_updated(submission)
@@ -686,7 +700,7 @@ describe Canvas::LiveEvents do
 
           expect_event('submission_updated',
             hash_not_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.submission_updated(submission)
@@ -791,11 +805,13 @@ describe Canvas::LiveEvents do
         it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
           submission.assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
             tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-          create_tool_proxy(submission.assignment.course)
+          tool_proxy = create_tool_proxy(submission.assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
 
           expect_event('plagiarism_resubmit',
             hash_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.plagiarism_resubmit(submission)
@@ -807,7 +823,7 @@ describe Canvas::LiveEvents do
 
           expect_event('plagiarism_resubmit',
             hash_not_including(
-              associated_integration_id: "turnitin.com-turnitin-lti"
+              associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
             ),
             course_context)
           Canvas::LiveEvents.plagiarism_resubmit(submission)
@@ -973,11 +989,13 @@ describe Canvas::LiveEvents do
       it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-        create_tool_proxy(@assignment.course)
+        tool_proxy = create_tool_proxy(@assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
 
         expect_event('assignment_created',
           hash_including(
-            associated_integration_id: "turnitin.com-turnitin-lti"
+            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
           ))
         Canvas::LiveEvents.assignment_created(@assignment)
       end
@@ -988,7 +1006,7 @@ describe Canvas::LiveEvents do
 
         expect_event('assignment_created',
           hash_not_including(
-            associated_integration_id: "turnitin.com-turnitin-lti"
+            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
           ))
         Canvas::LiveEvents.assignment_created(@assignment)
       end
@@ -1040,11 +1058,13 @@ describe Canvas::LiveEvents do
       it 'should include the associated_integration_id if there is an installed tool proxy with that id' do
         @assignment.assignment_configuration_tool_lookups.create!(tool_product_code: 'turnitin-lti',
           tool_vendor_code: 'turnitin.com', tool_type: 'Lti::MessageHandler')
-        create_tool_proxy(@assignment.course)
+        tool_proxy = create_tool_proxy(@assignment.course)
+          tool_proxy[:raw_data]['tool_profile'] = {'service_offered' => [submission_event_service]}
+          tool_proxy.save!
 
         expect_event('assignment_updated',
           hash_including(
-            associated_integration_id: "turnitin.com-turnitin-lti"
+            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
           ))
         Canvas::LiveEvents.assignment_updated(@assignment)
       end
@@ -1055,7 +1075,7 @@ describe Canvas::LiveEvents do
 
         expect_event('assignment_updated',
           hash_not_including(
-            associated_integration_id: "turnitin.com-turnitin-lti"
+            associated_integration_id: "turnitin.com_turnitin-lti_test.com/submission"
           ))
         Canvas::LiveEvents.assignment_updated(@assignment)
       end
