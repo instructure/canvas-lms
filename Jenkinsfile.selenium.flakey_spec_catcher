@@ -25,7 +25,7 @@ def partitions = []
 @groovy.transform.Field
 def changed_tests = ''
 @groovy.transform.Field
-def fsc_timeout = false
+def fsc_status = null
 
 def isPlugin() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
@@ -60,6 +60,11 @@ def setupNode() {
       ])
     }
   }
+
+  sh 'build/new-jenkins/docker-compose-pull.sh'
+  sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
+  sh 'build/new-jenkins/docker-compose-build-up.sh'
+  sh 'build/new-jenkins/docker-compose-setup-databases.sh'
 }
 
 def computeTestCount() {
@@ -91,22 +96,54 @@ def computeTestCount() {
     return
   }
 
-  def changed_tests_arr = changed_tests.split('\n')
-  def test_count = changed_tests_arr.length
-
-  echo "expected tests to run: $test_count"
-
-  if (env.DISTRIBUTED_CUT_OFF.toInteger() < test_count) {
-    throw IllegalStateException("unable to process more than ${env.DISTRIBUTED_CUT_OFF} tests")
+  def changed_tests_arr = changed_tests.split('\n').collect {
+    "$DOCKER_WORKDIR/$it"
   }
 
-  def distributed_factor = env.DISTRIBUTED_FACTOR.toInteger()
+  sh """
+    docker-compose --project-name canvas-lms0 run --rm -v \$(pwd)/\$LOCAL_WORKDIR/tmp:\$DOCKER_WORKDIR/tmp \
+      canvas \
+      bash -c "bundle exec rspec --dry-run ${changed_tests_arr.join(' ')} --require ./build/new-jenkins/rspec_location.rb --format RSpecLocationFormatter --out ${env.DOCKER_WORKDIR}/tmp/test_list_split"
+  """
 
-  for(int i = 0; i < test_count; i += distributed_factor) {
-    def start_i = i
-    def end_i = Math.min(i+distributed_factor, test_count - 1)
+  changed_tests = readFile("$env.LOCAL_WORKDIR/tmp/test_list_split").trim()
+  changed_tests_arr = changed_tests.split('\n')
 
-    partitions.add(changed_tests_arr[start_i..end_i])
+  echo "raw result from splitter: \n====\n$changed_tests\n===="
+
+  if(changed_tests.length() == 0) {
+    echo "no tests found to execute"
+
+    return
+  }
+
+  def test_count = changed_tests_arr.size()
+  def weighted_values = changed_tests_arr.collect {
+    it.contains('selenium') ? env.SELENIUM_RATIO.toInteger() : 1
+  }
+
+  def distributed_factor = env.TESTS_PER_NODE.toInteger()
+
+  def i = 0
+  def cur_partition = []
+  def cur_weight = 0
+
+  while(i < test_count) {
+    cur_partition.add(changed_tests_arr[i])
+    cur_weight += weighted_values[i]
+
+    if(cur_weight >= distributed_factor) {
+      partitions.add(cur_partition)
+
+      cur_partition = []
+      cur_weight = 0
+    }
+
+    i++
+  }
+
+  if(cur_partition.size() > 0) {
+    partitions.add(cur_partition)
   }
 
   echo "expected nodes to run on for $test_count tests: ${partitions.size()}"
@@ -116,23 +153,19 @@ def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -vrf tmp'
   try {
     timeout(30) {
-      sh 'build/new-jenkins/docker-compose-pull.sh'
-      sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-      sh 'build/new-jenkins/docker-compose-build-up.sh'
-      sh 'build/new-jenkins/docker-compose-setup-databases.sh'
-      sh 'build/new-jenkins/rspec-flakey-spec-catcher.sh'
+      sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
     }
-  }
-  // Don't fail the build for timeouts
-  catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
-    if (!e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      throw e
-    } else {
+  } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
+    if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
       echo "Not failing the build due to timeouts"
-      fsc_timeout = true
+      fsc_status = 'timeout'
+    } else if(e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
+      echo "Build aborted"
+      fsc_status = 'aborted'
+    } else {
+      throw e
     }
-  }
-  finally {
+  } finally {
     sh "mkdir -vp tmp/$prefix"
     sh(
       script: "docker cp \$(docker ps -q --filter 'name=canvas_'):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
@@ -143,10 +176,10 @@ def executeFlakeySpecCatcher(prefix = 'main') {
 }
 
 def sendSlack(success) {
-  def color = success ? "good" : "danger"
+  def color = fsc_status == 'timeout' ? 'warning' : (success ? 'good' : 'danger')
   def jobInfo = "<https://gerrit.instructure.com/$env.GERRIT_CHANGE_NUMBER|Gerrit> | <$env.BUILD_URL|Jenkins>"
   def message = "$jobInfo\n$changed_tests"
-  if (fsc_timeout) {
+  if (fsc_status == 'timeout') {
     message = "Timeout Occurred!\n$message"
   }
   slackSend channel: '#flakey_spec_catcher_noisy', color: color, message: message
@@ -154,7 +187,9 @@ def sendSlack(success) {
 
 def cleanupFn(status) {
   try {
-    sendSlack(status == 'SUCCESS')
+    if(fsc_status != 'aborted') {
+      sendSlack(status == 'SUCCESS')
+    }
   } finally {
     sh 'rm -vrf ./tmp/'
     execute 'bash/docker-cleanup.sh --allow-failure'
@@ -177,16 +212,21 @@ pipeline {
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
     FORCE_FAILURE = configuration.forceFailureFSC()
-    // there will be a node for every 10 tests
-    DISTRIBUTED_FACTOR = '15'
-    // if someone is trying to update more than these amount of tests, then just fail.
-    // that will be at DISTRIBUTED_CUT_OFF / DISTRIBUTED_FACTOR nodes.
-    DISTRIBUTED_CUT_OFF = '300'
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = "gems/.*/spec/"
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20200719"
+
+    // Targeting 10 minutes / node, each node runs DOCKER_PROCESSES threads and
+    // repeats each test FSC_REPEAT_FACTOR times.
+    // Assumption: non-selenium tests take 500ms / test
+    // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
+    DOCKER_PROCESSES = 3
+    FSC_REPEAT_FACTOR = 10
+    MAX_NODES = 10
+    SELENIUM_RATIO = 20
+    TESTS_PER_NODE = 200
   }
 
   stages {
@@ -205,37 +245,42 @@ pipeline {
             stage("Run Flakey Spec Catcher") {
               if(partitions.size() == 0) {
                 return
-              } else if (partitions.size() == 1) {
-                echo "running on this node"
+              } else if(partitions.size() >= env.MAX_NODES.toInteger()) {
+                error "Refusing to use more than ${env.MAX_NODES} nodes to catch flakey specs. Consider breaking this change into smaller pieces."
+
+                return
+              }
+
+              def stages = [:]
+
+              stages["flakey set 00"] = {
                 withEnv(["FSC_TESTS=${partitions[0].join(',')}"]) {
                   executeFlakeySpecCatcher()
                 }
-              } else {
-                echo "running on multiple nodes: ${partitions.size()}"
-                def nodes = [:]
-                for(int i = 0; i < partitions.size(); i++) {
-                  // make sure to create a new index variable so this value gets
-                  // captured by the lambda
-                  def index = i
-                  def node_number = (index).toString().padLeft(2, '0')
+              }
 
-                  nodes["flakey set $node_number"] = {
-                    protectedNode('canvas-docker') {
-                      withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
-                        try {
-                          setupNode()
-                          executeFlakeySpecCatcher("node$node_number")
-                        }
-                        finally {
-                          sh 'rm -vrf ./tmp'
-                          execute 'bash/docker-cleanup.sh --allow-failure'
-                        }
+              for(int i = 1; i < partitions.size(); i++) {
+                // make sure to create a new index variable so this value gets
+                // captured by the lambda
+                def index = i
+                def node_number = (index).toString().padLeft(2, '0')
+
+                stages["flakey set $node_number"] = {
+                  protectedNode('canvas-docker') {
+                    withEnv(["FSC_TESTS=${partitions[index].join(',')}"]) {
+                      try {
+                        setupNode()
+                        executeFlakeySpecCatcher("node$node_number")
+                      }
+                      finally {
+                        sh 'rm -vrf ./tmp'
+                        execute 'bash/docker-cleanup.sh --allow-failure'
                       }
                     }
                   }
                 }
-                parallel(nodes)
               }
+              parallel(stages)
             }
           }
         }

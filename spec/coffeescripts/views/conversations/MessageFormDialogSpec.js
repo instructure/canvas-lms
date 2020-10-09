@@ -84,3 +84,26 @@ test('recipient ids are not parsed as numbers', function() {
   const parent = dialog.$el.parent()[0]
   document.body.removeChild(parent)
 })
+
+test('fires a SR event on file attachment', function() {
+  dialog = new MessageFormDialog({
+    courses: {
+      favorites: new FavoriteCourseCollection(),
+      all: new CourseCollection(),
+      groups: new GroupCollection()
+    }
+  })
+
+  const spy = sandbox.spy($, 'screenReaderFlashMessageExclusive')
+  const e = {
+    currentTarget: {
+      value: dialog.$el.find('.file_input'),
+      files: [new File(['foo'], 'foo.txt', {type: 'text/plain'})]
+    }
+  }
+  dialog.show(null, {})
+  dialog.handleAttachment(e)
+  this.clock.tick(1000)
+
+  ok(spy.calledOnce)
+})

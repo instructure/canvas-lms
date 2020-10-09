@@ -88,6 +88,10 @@ const UploadFileModal = React.forwardRef(
     const [altText, setAltText] = useState('')
     const [isDecorativeImage, setIsDecorativeImage] = useState(false)
     const [displayAs, setDisplayAs] = useState('embed')
+    // even though usage rights might be required by the course, canvas has no place
+    // on the user to store it. Only Group and Course.
+    const requiresUsageRights =
+      contentProps?.session?.usageRightsRequired && /(?:course|group)/.test(trayProps.contextType)
 
     function handleAltTextChange(event) {
       setAltText(event.target.value)
@@ -104,7 +108,7 @@ const UploadFileModal = React.forwardRef(
     const submitDisabled = shouldBeDisabled(
       {fileUrl, theFile, unsplashData, error},
       selectedPanel,
-      contentProps?.session?.usageRightsRequired && usageRightsState.usageRight === 'choose'
+      requiresUsageRights && usageRightsState.usageRight === 'choose'
     )
 
     // Load the necessary session values, if not already loaded
@@ -233,7 +237,7 @@ const UploadFileModal = React.forwardRef(
           {// We shouldn't show the accordions until the session data is loaded.
           Object.keys(contentProps.session || {}).length > 0 && (
             <>
-              {selectedPanel === 'COMPUTER' && contentProps?.session?.usageRightsRequired && (
+              {selectedPanel === 'COMPUTER' && requiresUsageRights && (
                 <View
                   as="div"
                   role="group"
@@ -264,7 +268,7 @@ const UploadFileModal = React.forwardRef(
                   padding="medium"
                 >
                   <ToggleDetails
-                    defaultExpanded={!contentProps?.session?.usageRightsRequired}
+                    defaultExpanded={!requiresUsageRights}
                     summary={<Text size="x-large">{formatMessage('Attributes')}</Text>}
                   >
                     <ImageOptionsForm

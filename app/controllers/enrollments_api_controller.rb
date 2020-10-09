@@ -416,7 +416,7 @@ class EnrollmentsApiController < ApplicationController
   #
   # @returns [Enrollment]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
       return unless enrollments = @context.is_a?(Course) ?
@@ -515,7 +515,7 @@ class EnrollmentsApiController < ApplicationController
   #  The ID of the enrollment object
   # @returns Enrollment
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       enrollment = @context.all_enrollments.find(params[:id])
       if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
         render :json => enrollment_json(enrollment, @current_user, session)

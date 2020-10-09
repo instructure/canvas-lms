@@ -20,7 +20,13 @@ import axios from 'axios'
 
 function getGradebookHistory(courseId, input) {
   let url = `/api/v1/audit/grade_change/courses/${courseId}`
-  url += input.assignment ? `/assignments/${input.assignment}` : ''
+
+  if (input.showFinalGradeOverridesOnly) {
+    url += `/assignments/override`
+  } else if (input.assignment) {
+    url += `/assignments/${input.assignment}`
+  }
+
   url += input.grader ? `/graders/${input.grader}` : ''
   url += input.student ? `/students/${input.student}` : ''
 

@@ -69,7 +69,7 @@ module PostgreSQLAdapterExtensions
     foreign_key_name = foreign_key_name(from_table, options)
 
     if if_not_exists || delay_validation
-      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      schema = quote(shard.name)
       valid = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}", "SCHEMA")
       return if valid == true && if_not_exists
     end
@@ -132,7 +132,7 @@ module PostgreSQLAdapterExtensions
   # (for instance when using functions like LOWER)
   # this will lead to problems if we try to remove the index (index_exists? will return false)
   def indexes(table_name)
-    schema = shard.name if @config[:use_qualified_names]
+    schema = shard.name
 
     result = query(<<~SQL, 'SCHEMA')
          SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
@@ -191,7 +191,7 @@ module PostgreSQLAdapterExtensions
       index_name = options[:name].to_s if options.key?(:name)
       index_name ||= index_name(table_name, column_names)
 
-      schema = shard.name if use_qualified_names?
+      schema = shard.name
 
       valid = select_value(<<~SQL, 'SCHEMA')
             SELECT indisvalid

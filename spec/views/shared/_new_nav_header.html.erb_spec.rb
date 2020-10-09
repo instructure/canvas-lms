@@ -26,7 +26,7 @@ describe "/shared/_new_nav_header" do
     render "shared/_new_nav_header"
     doc = Nokogiri::HTML(response.body)
 
-    expect(doc.at_css("#global_nav_courses_link")['href']).to eq '/courses'
+    expect(doc.at_css("#global_nav_courses_link")).not_to be_nil
   end
 
   it "should not render courses when not logged in" do

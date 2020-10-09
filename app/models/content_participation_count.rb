@@ -66,7 +66,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def self.unread_submission_count_for(context, user)
     return 0 unless context.is_a?(Course) && context.user_is_student?(user)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       potential_ids = Rails.cache.fetch_with_batched_keys(["potential_unread_submission_ids", context.global_id].cache_key,
           batch_object: user, batched_keys: :submissions) do
         submission_conditions = sanitize_sql_for_conditions([<<~SQL, user.id, context.class.to_s, context.id])
@@ -110,7 +110,7 @@ class ContentParticipationCount < ActiveRecord::Base
 
   def refresh_unread_count
     self.unread_count = ContentParticipationCount.unread_count_for(content_type, context, user)
-    Shackles.activate(:master) {self.save} if self.changed?
+    GuardRail.activate(:primary) {self.save} if self.changed?
   end
 
   def set_root_account_id

@@ -48,7 +48,7 @@ class ScoreStatisticsGenerator
     # note: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
-    statistics = Shackles.activate(:slave) do
+    statistics = GuardRail.activate(:secondary) do
       connection = ScoreStatistic.connection
       connection.select_all(<<~SQL)
       WITH want_assignments AS (
@@ -120,7 +120,7 @@ SQL
   def self.update_course_score_statistic(course_id)
     current_scores = []
     enrollment_ids = []
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited]).
         find_in_batches { |batch| enrollment_ids.concat(batch) }
       # The grade calculator ensures all enrollments for the same user have the same score, so we only need one

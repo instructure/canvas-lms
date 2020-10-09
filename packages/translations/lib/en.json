@@ -188,6 +188,9 @@
   "close_opportunity_center_popup_9907d981": {
     "message": "Close Opportunity Center popup"
   },
+  "closed_captions_subtitles_e6aaa016": {
+    "message": "Closed Captions/Subtitles"
+  },
   "collaborations_5c56c15f": {
     "message": "Collaborations"
   },
@@ -407,9 +410,6 @@
   "embed_video_a97a64af": {
     "message": "Embed Video"
   },
-  "embed_video_code_703e10f2": {
-    "message": "Embed Video Code"
-  },
   "embedded_content_aaeb4d3d": {
     "message": "embedded content"
   },
@@ -505,6 +505,9 @@
   },
   "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
     "message": "Found { count, plural,\n     =0 {# results}\n    one {# result}\n  other {# results}\n}"
+  },
+  "fullscreen_873bf53f": {
+    "message": "Fullscreen"
   },
   "generating_preview_45b53be0": {
     "message": "Generating preview..."
@@ -727,9 +730,6 @@
   "my_grades_98834476": {
     "message": "My Grades"
   },
-  "my_media_82bade11": {
-    "message": "My Media"
-  },
   "navigate_through_the_menu_or_toolbar_415a4e50": {
     "message": "Navigate through the menu or toolbar"
   },
@@ -894,6 +894,9 @@
   },
   "quizzes_7e598f57": {
     "message": "Quizzes"
+  },
+  "raw_html_editor_e3993e41": {
+    "message": "Raw HTML Editor"
   },
   "reading_a_media_track_file_failed_aborting_be051b20": {
     "message": "Reading a media track file failed. Aborting."
@@ -1215,6 +1218,9 @@
   },
   "video_player_for_title_ffd9fbc4": {
     "message": "Video player for { title }"
+  },
+  "view_ba339f93": {
+    "message": "View"
   },
   "view_keyboard_shortcuts_34d1be0b": {
     "message": "View keyboard shortcuts"

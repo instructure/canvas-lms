@@ -398,9 +398,6 @@
     "embed_video_a97a64af": {
         "message": "Integrer video"
     },
-    "embed_video_code_703e10f2": {
-        "message": "Sett inn videokode"
-    },
     "embedded_content_aaeb4d3d": {
         "message": "innebygd innhald"
     },
@@ -694,9 +691,6 @@
     },
     "my_grades_98834476": {
         "message": "Mine vurderingar"
-    },
-    "my_media_82bade11": {
-        "message": "Mine media"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Naviger gjennom menyen eller verktøylinja"
@@ -1162,6 +1156,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Videospelar for { title }"
+    },
+    "view_ba339f93": {
+        "message": "Vis"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Sjå hurtigtastar"

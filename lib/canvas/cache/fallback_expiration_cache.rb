@@ -28,7 +28,7 @@ module Canvas
     module FallbackExpirationCache
       KEY_SUFFIX = '__no_expire'.freeze
 
-      def fetch(*, expires_in: nil)
+      def fetch(*, expires_in: nil, race_condition_ttl: nil)
         return yield if expires_in == 0
         super
       end

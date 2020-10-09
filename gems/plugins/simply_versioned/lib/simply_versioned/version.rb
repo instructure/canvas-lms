@@ -83,7 +83,7 @@ class Version < ActiveRecord::Base #:nodoc:
   def self.preload_version_number(versionables)
     versionables = Array(versionables).select(&:persisted?)
     return unless versionables.any?
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       Shard.partition_by_shard(versionables) do |shard_objs|
         shard_objs.each_slice(100) do |sliced_objs|
           values = sliced_objs.map{|o| "(#{o.id}, '#{o.class.base_class.name}')"}.join(",")

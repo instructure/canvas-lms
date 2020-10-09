@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2019 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -17,24 +17,7 @@
  */
 
 import React from 'react'
-import {string, func} from 'prop-types'
-import {TextArea} from '@instructure/ui-forms'
-import formatMessage from '../../../../format-message'
 
-export default function EmbedPanel({embedCode, setEmbedCode}) {
-  return (
-    <TextArea
-      maxHeight="10rem"
-      label={formatMessage('Embed Video Code')}
-      value={embedCode}
-      onChange={e => {
-        setEmbedCode(e.target.value)
-      }}
-    />
-  )
-}
-
-EmbedPanel.propTypes = {
-  embedCode: string.isRequired,
-  setEmbedCode: func.isRequired
+export default function DiscussionTopicEdit() {
+  return <div>page coming soon</div>
 }

@@ -20,7 +20,6 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
-import uploadMediaTranslations from './mediaTranslations'
 import formatMessage from '../../../format-message'
 
 export default function(ed, document) {
@@ -55,7 +54,7 @@ export default function(ed, document) {
     }
 
     const handleUpload = (error, uploadData, onUploadComplete) => {
-      let err_msg = error && uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
       if (error?.file?.size > error?.maxFileSize * 1024 * 1024) {
         err_msg = formatMessage(
           'Size of {file} is greater than the maximum {max} MB allowed file size.',
@@ -90,10 +89,9 @@ export default function(ed, document) {
             onUploadComplete={(err, data) =>
               handleUpload(err, data, contentProps.mediaUploadComplete)
             }
-            onEmbed={embedCode => Bridge.insertEmbedCode(embedCode)}
             onDismiss={handleDismiss}
-            tabs={{embed: true, record: true, upload: true}}
-            uploadMediaTranslations={uploadMediaTranslations}
+            tabs={{record: true, upload: true}}
+            uploadMediaTranslations={Bridge.uploadMediaTranslations}
           />
         )}
       </StoreProvider>,

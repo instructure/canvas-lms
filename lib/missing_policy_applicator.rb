@@ -21,7 +21,7 @@ class MissingPolicyApplicator
   end
 
   def apply_missing_deductions
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       recently_missing_submissions.find_in_batches do |submissions|
         filtered_submissions = submissions.reject { |s| s.grading_period&.closed? }
         filtered_submissions.group_by(&:assignment).each(&method(:apply_missing_deduction))
@@ -49,7 +49,7 @@ class MissingPolicyApplicator
     grade = assignment.score_to_grade(score)
     now = Time.zone.now
 
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       Submission.active.where(id: submissions).update_all(
         score: score,
         grade: grade,

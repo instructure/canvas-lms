@@ -42,3 +42,9 @@ account_level_mastery_scales:
   display_name: Account-level Mastery Scales
   description: Allows Account-level mastery scales and proficiency calculations,
     replacing per-outcome scales
+usage_rights_discussion_topics:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Usage Rights on Discussion Topics
+  description: On courses with usage rights enabled, enforces usage rights
+    selection on discussion topic file attachments

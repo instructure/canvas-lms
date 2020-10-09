@@ -273,7 +273,7 @@ still be provided.</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns. Accepted values are determined by the account settings.</td>
+<td>User's preferred pronouns.</td>
 </tr>
 <tr>
 <td>status</td>

@@ -225,13 +225,13 @@ module Api::V1::OutcomeResults
         row << I18n.t(:outcome_path_mastery_points, "%{path} mastery points", :path => path)
       end
       csv << row
+      mastery_points = @context.root_account.feature_enabled?(:account_level_mastery_scales) && @context.resolved_outcome_proficiency&.mastery_points
       rollups.each do |rollup|
         row = [rollup.context.name, rollup.context.id]
         outcomes.each do |outcome|
           score = rollup.scores.find{|x| x.outcome == outcome}
-          criterion = outcome.data && outcome.data[:rubric_criterion]
           row << (score ? score.score : nil)
-          row << (criterion ? criterion[:mastery_points] : nil)
+          row << (mastery_points || outcome&.data&.dig(:rubric_criterion, :mastery_points))
         end
         csv << row
       end

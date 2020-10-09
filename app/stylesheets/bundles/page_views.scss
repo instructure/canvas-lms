@@ -17,7 +17,7 @@
  */
 
 #pageviews {
-  height: 400px;
+  height: 600px;
   width: 100%;
   table {
     width: 100%;
@@ -26,4 +26,13 @@
     }
   }
   overflow-y: scroll;
+}
+
+#pageviews_datefilter {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 8px;
+  input {
+    display: inline;
+  }
 }

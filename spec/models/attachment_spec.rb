@@ -2129,12 +2129,6 @@ describe Attachment do
       expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
     end
 
-    it "should not raise on non-200 responses" do
-      url = "http://example.com/test.png"
-      expect(CanvasHttp).to receive(:get).with(url).and_yield(double('code' => '401'))
-      expect { Attachment.clone_url_as_attachment(url) }.to raise_error(CanvasHttp::InvalidResponseCodeError)
-    end
-
     it "should use an existing attachment if passed in" do
       url = "http://example.com/test.png"
       a = attachment_model
@@ -2164,6 +2158,109 @@ describe Attachment do
       att.context = Account.default
       att.save!
       expect(att.open.read).to eq 'this is a jpeg'
+    end
+
+    context 'with non-200 responses' do
+      subject { Attachment.clone_url_as_attachment(url) }
+
+      let(:url) { "http://example.com/test.png" }
+      let(:body) { "body content" }
+      let(:http_response) { FakeHttpResponse.new(401, body) } 
+
+      before { allow(CanvasHttp).to receive(:get).with(url).and_yield(http_response) }
+
+      it "should raise on non-200 responses" do
+        expect { subject }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+      end
+
+      it "should include the body in the reaised error" do
+        expect { subject }.to raise_error(
+          an_instance_of(
+            CanvasHttp::InvalidResponseCodeError
+          ).and having_attributes(body: "#{body}...")
+        )
+      end
+
+      context 'and an error reading the response body' do
+        before { allow(http_response).to receive(:read_body).and_raise StandardError }
+
+        it 'raises the invalid response error' do
+          expect { subject }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+        end
+      end
+    end
+  end
+
+  describe '.clone_url' do
+    subject { attachment.clone_url(url, handling, check_quota, opts) }
+
+    let(:attachment) { attachment_model }
+    let(:url) { 'https://www.test.com/file.jpg' }
+    let(:handling) { nil }
+    let(:check_quota) { nil }
+    let(:opts) { {} }
+
+
+    context 'when an error retrieving the file occurs' do
+      before { allow(Attachment).to receive(:clone_url_as_attachment).and_raise error }
+
+      context 'and the error was an invalid response code' do
+        let(:error) { CanvasHttp::InvalidResponseCodeError.new(code, body) }
+        let(:code) { 400 }
+        let(:body) { "response body" }
+
+        it 'captures the error' do
+          expect(Canvas::Errors).to receive(:capture).with(
+            error, attachment.clone_url_error_info(error, url)
+          )
+          subject
+        end
+      end
+
+      context 'and the error was unkown' do
+        let(:error) { StandardError }
+
+        it 'captures the error' do
+          expect(Canvas::Errors).to receive(:capture).with(
+            error, attachment.clone_url_error_info(error, url)
+          )
+          subject
+        end
+      end
+    end
+  end
+
+  describe '.clone_url_error_info' do
+    subject { attachment.clone_url_error_info(error, url) }
+
+    let(:attachment) { attachment_model }
+    let(:url) { 'https://www.test.com/file.jpg' }
+    let(:error) { StandardError.new }
+
+    it 'includes the proper type tag' do
+      expect(subject.dig(:tags, :type)).to eq Attachment::CLONING_ERROR_TYPE
+    end
+
+    it 'includes the url of the failed download' do
+      expect(subject.dig(:extra, :url)).to eq url
+    end
+
+    context 'when the exception includes a code' do
+      let(:error) { CanvasHttp::InvalidResponseCodeError.new(code, nil) }
+      let(:code) { 400 }
+
+      it 'includes the code from the error' do
+        expect(subject.dig(:extra, :http_status_code)).to eq code
+      end
+    end
+
+    context 'when the exception includes a body' do
+      let(:error) { CanvasHttp::InvalidResponseCodeError.new(nil, body) }
+      let(:body) { 'body content' }
+
+      it 'includes the code from the error' do
+        expect(subject.dig(:extra, :body)).to eq body
+      end
     end
   end
 

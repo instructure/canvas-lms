@@ -38,7 +38,7 @@ describe "Gradebook History Page" do
 
     it "and shows error message on entering backward dates", test_id: 3308866, priority: "1" do
       GradeBookHistory.enter_start_date('October 7, 2017')
-      GradeBookHistory.enter_end_date(['October 4, 2017', :enter])
+      GradeBookHistory.enter_end_date(['October 4, 2017', :tab])
       expect(GradeBookHistory.error_text_invalid_dates).to be_displayed
     end
 

@@ -843,6 +843,19 @@ describe GradebooksController do
         end
       end
 
+      describe "view ungraded as zero" do
+        it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
+          Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
+        end
+
+        it "sets allow_view_ungraded_as_zero in the ENV to false if the feature is not enabled" do
+          get :show, params: { course_id: @course.id }
+          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
+        end
+      end
+
       describe "dataloader_improvements" do
         # TODO: remove this entire block with TALLY-831
 

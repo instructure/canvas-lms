@@ -39,6 +39,8 @@ class Attachment < ActiveRecord::Base
   EXCLUDED_COPY_ATTRIBUTES = %w{id root_attachment_id uuid folder_id user_id
                                 filename namespace workflow_state root_account_id}
 
+  CLONING_ERROR_TYPE = 'attachment_clone_url'.freeze
+
   include HasContentTags
   include ContextModuleItem
   include SearchTermHelper
@@ -65,6 +67,7 @@ class Attachment < ActiveRecord::Base
   belongs_to :folder
   belongs_to :user
   has_one :account_report, inverse_of: :attachment
+  has_one :group_and_membership_importer, inverse_of: :attachment
   has_one :media_object
   has_many :submission_draft_attachments, inverse_of: :attachment
   has_many :submissions, -> { active }
@@ -300,6 +303,7 @@ class Attachment < ActiveRecord::Base
     existing = context.attachments.active.find_by_id(self)
 
     options[:cloned_item_id] ||= self.cloned_item_id
+    options[:migration_id] ||= CC::CCHelper.create_key(self)
     existing ||= Attachment.find_existing_attachment_for_clone(context, options.merge(:active_only => true))
     return existing if existing && !options[:overwrite] && !options[:force_copy]
     existing ||= Attachment.find_existing_attachment_for_clone(context, options)
@@ -331,7 +335,7 @@ class Attachment < ActiveRecord::Base
       end
     end
     dup.write_attribute(:filename, self.filename) unless dup.read_attribute(:filename) || dup.root_attachment_id?
-    dup.migration_id = options[:migration_id] || CC::CCHelper.create_key(self)
+    dup.migration_id = options[:migration_id]
     dup.mark_as_importing!(options[:migration]) if options[:migration]
     if context.respond_to?(:log_merge_result)
       context.log_merge_result("File \"#{dup.folder && dup.folder.full_name}/#{dup.display_name}\" created")
@@ -355,7 +359,7 @@ class Attachment < ActiveRecord::Base
     if options[:migration_id] && options[:match_on_migration_id]
       scope.where(migration_id: options[:migration_id]).first
     elsif options[:cloned_item_id]
-      scope.where(cloned_item_id: options[:cloned_item_id]).first
+      scope.where(cloned_item_id: options[:cloned_item_id]).where(migration_id: [nil, options[:migration_id]]).first
     end
   end
 
@@ -700,7 +704,7 @@ class Attachment < ActiveRecord::Base
     quota_used = 0
     context = context.quota_context if context.respond_to?(:quota_context) && context.quota_context
     if context
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         context.shard.activate do
           quota = Setting.get('context_default_quota', 50.megabytes.to_s).to_i
           quota = context.quota if (context.respond_to?("quota") && context.quota)
@@ -1281,7 +1285,7 @@ class Attachment < ActiveRecord::Base
 
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       send_later_enqueue_args(:touch, { :run_at => unlock_at,
                                         :singleton => "touch_on_unlock_attachment_#{global_id}" })
     end
@@ -1402,15 +1406,32 @@ class Attachment < ActiveRecord::Base
         clauses << wildcard('attachments.content_type', type + '/', :type => :right)
       end
     end
-    condition_sql = clauses.join(' OR ')
+    clauses.join(' OR ')
   end
 
-  alias_method :destroy_permanently!, :destroy
+  # this method is used to create attachments from file uploads that are just
+  # data files. Used in multiple importers in canvas.
+  def self.create_data_attachment(context, data, display_name=nil)
+    context.shard.activate do
+      Attachment.new.tap do |att|
+        Attachment.skip_3rd_party_submits(true)
+        att.context = context
+        att.display_name = display_name if display_name
+        Attachments::Storage.store_for_attachment(att, data)
+        att.save!
+      end
+    end
+  ensure
+    Attachment.skip_3rd_party_submits(false)
+  end
+
+  alias destroy_permanently! destroy
   # file_state is like workflow_state, which was already taken
   # possible values are: available, deleted
   def destroy
     return if self.new_record?
-    self.file_state = 'deleted' #destroy
+
+    self.file_state = 'deleted' # destroy
     self.deleted_at = Time.now.utc
     ContentTag.delete_for(self)
     MediaObject.where(:attachment_id => self.id).update_all(:attachment_id => nil, :updated_at => Time.now.utc)
@@ -1906,6 +1927,19 @@ class Attachment < ActiveRecord::Base
     end
   end
 
+  def clone_url_error_info(error, url)
+    {
+      tags: {
+        type: CLONING_ERROR_TYPE
+      },
+      extra: {
+        http_status_code: error.try(:code),
+        body: error.try(:body),
+        url: url
+      }.compact
+    }
+  end
+
   def clone_url(url, duplicate_handling, check_quota, opts={})
     begin
       Attachment.clone_url_as_attachment(url, :attachment => self)
@@ -1934,6 +1968,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_too_many_redirects, "Too many redirects"
       when CanvasHttp::InvalidResponseCodeError
         self.upload_error_message = t :upload_error_invalid_response_code, "Invalid response code, expected 200 got %{code}", :code => e.code
+        Canvas::Errors.capture(e, clone_url_error_info(e, url))
       when CanvasHttp::RelativeUriError
         self.upload_error_message = t :upload_error_relative_uri, "No host provided for the URL: %{url}", :url => url
       when URI::Error, ArgumentError
@@ -1945,6 +1980,7 @@ class Attachment < ActiveRecord::Base
         self.upload_error_message = t :upload_error_over_quota, "file size exceeds quota limits: %{bytes} bytes", :bytes => self.size
       else
         self.upload_error_message = t :upload_error_unexpected, "An unknown error occurred downloading from %{url}", :url => url
+        Canvas::Errors.capture(e, clone_url_error_info(e, url))
       end
 
       if opts[:progress]
@@ -2054,7 +2090,22 @@ class Attachment < ActiveRecord::Base
         end
         return attachment
       else
-        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i)
+        # Grab the first part of the body for error reporting
+        # Just read the first chunk of the body in case it's huge
+        body_head = nil
+
+        begin
+          http_response.read_body do |chunk|
+            body_head = "#{chunk}..." if chunk.present?
+            break
+          end
+        rescue
+          # If an error occured reading the body, don't worry
+          # about attempting to report it
+          body_head = nil
+        end
+
+        raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i, body_head)
       end
     end
   end

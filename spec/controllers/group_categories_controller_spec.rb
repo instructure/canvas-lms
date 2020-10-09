@@ -259,4 +259,64 @@ describe GroupCategoriesController do
     end
   end
 
+  describe 'POST import' do
+    before :once do
+      1.upto(5) do |n|
+        @course.enroll_user(user_with_pseudonym(username: "user#{n}"), "StudentEnrollment", enrollment_state: 'active')
+      end
+      @category = @course.group_categories.create(name: 'Group Category')
+    end
+
+    it 'should require authorization' do
+      post 'import', params: {
+        course_id: @course.id,
+        group_category_id: @category.id,
+        attachment: fixture_file_upload('files/group_categories/test_group_categories.csv', 'text/csv')
+      }
+      assert_unauthorized
+    end
+
+    it 'should render progress_json' do
+      user_session(@teacher)
+      post 'import', params: {
+        course_id: @course.id,
+        group_category_id: @category.id,
+        attachment: fixture_file_upload('files/group_categories/test_group_categories.csv', 'text/csv')
+      }
+      expect(response).to be_successful
+      json = JSON.parse(response.body)
+      expect(json['context_type']).to eq 'GroupCategory'
+      expect(json['tag']).to eq 'course_group_import'
+      expect(json['completion']).to eq 0
+    end
+
+    it 'should create the groups and add users as specified in the csv' do
+      user_session(@teacher)
+      post 'import', params: {
+        course_id: @course.id,
+        group_category_id: @category.id,
+        attachment: fixture_file_upload('files/group_categories/test_group_categories.csv', 'text/csv')
+      }
+      expect(response).to be_successful
+
+      run_jobs
+
+      group_1 = Group.where(name: 'group1').first
+      expect(group_1).not_to be_nil
+      expect(group_1.users.count).to eq 2
+      expect(group_1.users).to include(Pseudonym.where(unique_id: 'user1').first.user)
+      expect(group_1.users).to include(Pseudonym.where(unique_id: 'user2').first.user)
+
+      group_2 = Group.where(name: 'group2').first
+      expect(group_2).not_to be_nil
+      expect(group_2.users.count).to eq 2
+      expect(group_2.users).to include(Pseudonym.where(unique_id: 'user3').first.user)
+      expect(group_2.users).to include(Pseudonym.where(unique_id: 'user4').first.user)
+
+      group_3 = Group.where(name: 'group3').first
+      expect(group_3).not_to be_nil
+      expect(group_3.users.count).to eq 1
+      expect(group_3.users).to include(Pseudonym.where(unique_id: 'user5').first.user)
+    end
+  end
 end

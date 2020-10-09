@@ -59,7 +59,7 @@ class Quizzes::QuizzesController < ApplicationController
   QUIZ_TYPE_SURVEYS = ['survey', 'graded_survey'].freeze
 
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       return unless authorized_action(@context, @current_user, :read)
       return unless tab_enabled?(@context.class::TAB_QUIZZES)
 
@@ -126,7 +126,7 @@ class Quizzes::QuizzesController < ApplicationController
           # TODO: remove this since it's set in application controller
           # Will need to update consumers of this in the UI to bring down
           # this permissions check as well
-          DIRECT_SHARE_ENABLED: can_manage && @domain_root_account.try(:feature_enabled?, :direct_share),
+          DIRECT_SHARE_ENABLED: (can_manage || @context.grants_right?(@current_user, session, :read_as_admin)) && @domain_root_account.try(:feature_enabled?, :direct_share),
         },
         :quiz_menu_tools => external_tools_display_hashes(:quiz_menu),
         :quiz_index_menu_tools => (@domain_root_account&.feature_enabled?(:commons_favorites) ?
@@ -202,7 +202,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @context_module_tag = ContextModuleItem.find_tag_with_preferred([@quiz, @quiz.assignment], params[:module_item_id])
       @sequence_asset = @context_module_tag.try(:content)
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         @quiz.context_module_action(@current_user, :read) unless @locked && !@locked_reason[:can_view]
       end
 
@@ -213,7 +213,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @just_graded = false
       if @submission && @submission.needs_grading?(!!params[:take])
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           Quizzes::SubmissionGrader.new(@submission).grade_submission(
             finished_at: @submission.finished_at_fallback
           )
@@ -253,7 +253,7 @@ class Quizzes::QuizzesController < ApplicationController
 
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         if params[:take] && @can_take
           return false if @quiz.require_lockdown_browser? && !check_lockdown_browser(:highest, named_context_url(@context, 'context_quiz_take_url', @quiz.id))
           # allow starting the quiz via a GET request, but only when using a lockdown browser

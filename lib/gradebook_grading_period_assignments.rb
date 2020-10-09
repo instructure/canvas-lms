@@ -42,7 +42,7 @@ class GradebookGradingPeriodAssignments
   end
 
   def the_query
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       Submission.
         active.
         joins(:assignment).

@@ -71,7 +71,7 @@ export default class WikiPage extends Backbone.Model
   parse: (response, options) ->
     if response.wiki_page
       response = _.extend _.omit(response, 'wiki_page'), response.wiki_page
-    response.set_assignment = response.assignment?
+    response.set_assignment = response.assignment? && response.assignment.only_visible_to_overrides
     assign_attributes = response.assignment || {}
     response.assignment = @createAssignment(assign_attributes)
     response

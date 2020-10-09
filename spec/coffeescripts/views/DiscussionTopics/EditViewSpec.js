@@ -372,6 +372,30 @@ QUnit.module(
   })
 )
 
+QUnit.module('EditView - Usage Rights', {
+  setup() {
+    fakeENV.setup()
+    ENV.FEATURES.usage_rights_discussion_topics = true
+    ENV.USAGE_RIGHTS_REQUIRED = true
+    ENV.PERMISSIONS.manage_files = true
+    this.server = sinon.fakeServer.create({respondImmediately: true})
+    sandbox.fetch.mock('http://api/folders?contextType=user&contextId=1', 200)
+    sandbox.fetch.mock('path:/api/session', 200)
+  },
+  teardown() {
+    this.server.restore()
+    fakeENV.teardown()
+  },
+  editView() {
+    return editView.apply(this, arguments)
+  }
+})
+
+test('renders usage rights control', function() {
+  const view = this.editView({permissions: {CAN_ATTACH: true}})
+  equal(view.$el.find('#usage_rights_control').length, 1)
+})
+
 QUnit.module('EditView - ConditionalRelease', {
   setup() {
     fakeENV.setup()

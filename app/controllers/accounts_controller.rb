@@ -687,7 +687,7 @@ class AccountsController < ApplicationController
     page_opts[:total_entries] = nil if params[:search_term] # doesn't calculate a total count
 
     all_precalculated_permissions = nil
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @courses = Api.paginate(@courses, self, api_v1_account_courses_url, page_opts)
 
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
@@ -1120,6 +1120,7 @@ class AccountsController < ApplicationController
                       Account.site_admin.grants_right?(@current_user, :read_messages),
        logging: logging
       }
+    js_env enhanced_grade_change_query: Auditors::read_from_postgres? && Account.site_admin.feature_enabled?(:enhanced_grade_change_query)
   end
 
   def confirm_delete_user
@@ -1374,7 +1375,7 @@ class AccountsController < ApplicationController
     return unless authorized_action(@context, @current_user, :read_roster)
     @root_account = @context.root_account
     @query = params[:term]
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @users = @context.users_name_like(@query)
       @users = @users.paginate(:page => params[:page])
 

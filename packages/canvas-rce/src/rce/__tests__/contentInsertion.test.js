@@ -417,7 +417,7 @@ describe('contentInsertion', () => {
       const audio = audioFromTray()
       const result = contentInsertion.insertAudio(editor, audio)
       expect(editor.insertContent).toHaveBeenCalledWith(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
       )
       expect(result).toEqual('the inserted iframe')
     })

@@ -52,7 +52,7 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
 
     modified = false
 
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       connection = quiz_submission.class.connection
       connection.transaction do
         Quizzes::QuizQuestion.transaction(requires_new: true) do

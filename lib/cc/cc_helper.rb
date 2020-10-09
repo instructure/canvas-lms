@@ -321,6 +321,18 @@ module CCHelper
         end
       end
 
+      # process new RCE media iframes too
+      doc.css('iframe[data-media-id]').each do |iframe|
+        media_id = iframe['data-media-id']
+        obj = MediaObject.by_media_id(media_id).take
+        if obj && migration_id = @key_generator.create_key(obj)
+          @used_media_objects << obj
+          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          @media_object_infos[obj.id] = info
+          iframe['src'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+        end
+      end
+
       # prepend the Canvas domain to remaining absolute paths that are missing the host
       # (those in the course are already "$CANVAS_COURSE_REFERENCE$/...", but links
       #  outside the course need a domain to be meaningful in the export)

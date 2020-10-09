@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// IMPORTANT!
+// Do not import this file directly, but get it via Bridge.uploadMediaTranslations
+// This is because the locale, which is lazy imported, has to be loaded and
+// format-message initialized before this file gets evaluated.
 import formatMessage from '../../../format-message'
 
 const uploadMediaTranslations = {

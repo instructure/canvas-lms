@@ -21,20 +21,23 @@ import PropTypes from 'prop-types'
 import moment from 'moment'
 import axios from 'axios'
 import I18n from 'i18n!last_attended'
+import tz from 'timezone'
 
 import {View} from '@instructure/ui-layout'
-import {DateInput} from '@instructure/ui-forms'
 import {Text} from '@instructure/ui-elements'
 import {Spinner} from '@instructure/ui-spinner'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-
+import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 import {showFlashError} from '../shared/FlashAlert'
+
+function formatDate(date) {
+  return tz.format(date, 'date.formats.medium_with_weekday')
+}
 
 export default class StudentLastAttended extends React.Component {
   static propTypes = {
     defaultDate: PropTypes.string,
-    courseID: PropTypes.number.isRequired,
-    studentID: PropTypes.number.isRequired
+    courseID: PropTypes.string.isRequired,
+    studentID: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -43,10 +46,10 @@ export default class StudentLastAttended extends React.Component {
 
   constructor(props) {
     super(props)
-    const currentDate = new Date(moment(this.props.defaultDate).toString())
+    const defaultDate = moment(this.props.defaultDate)
+    const currentDate = defaultDate.isValid() ? defaultDate.toISOString() : null
     this.state = {
-      selectedDate: currentDate || null,
-      messages: [],
+      selectedDate: currentDate,
       loading: false
     }
   }
@@ -55,14 +58,11 @@ export default class StudentLastAttended extends React.Component {
     this.createCancelToken()
   }
 
-  onDateSubmit = (e, isoValue) => {
-    const currentDate = new Date(isoValue)
-    const messages = this.checkDateValidations(currentDate)
-    if (!messages.length) {
-      this.postDateToBackend(currentDate)
-    } else {
-      this.setState({messages})
-    }
+  onDateSubmit = d => {
+    if (!d) return
+    const currentMoment = moment(d)
+    if (moment(this.state.selectedDate).isSame(currentMoment)) return // No change, no need to hit the back end
+    this.postDateToBackend(d.toISOString())
   }
 
   componentWillUnMount() {
@@ -75,14 +75,6 @@ export default class StudentLastAttended extends React.Component {
     this.source = cancelToken.source()
   }
 
-  checkDateValidations(date) {
-    if (date.toString() === 'Invalid Date') {
-      return [{text: I18n.t('Enter a valid date'), type: 'error'}]
-    } else {
-      return []
-    }
-  }
-
   postDateToBackend(currentDate) {
     this.setState({loading: true})
     axios
@@ -90,8 +82,8 @@ export default class StudentLastAttended extends React.Component {
         date: currentDate,
         cancelToken: this.source.token
       })
-      .then(() => {
-        this.setState({loading: false, selectedDate: currentDate})
+      .then(r => {
+        this.setState({loading: false, selectedDate: r?.data?.date})
       })
       .catch(() => {
         this.setState({loading: false})
@@ -125,19 +117,13 @@ export default class StudentLastAttended extends React.Component {
     return (
       <View display="block" margin="small x-small">
         {this.renderTitle()}
-        <DateInput
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          label={<ScreenReaderContent>{I18n.t('Set Last Attended Date')}</ScreenReaderContent>}
-          onDateChange={this.onDateSubmit}
+        <CanvasDateInput
+          renderLabel={I18n.t('Set Last Attended Date')}
+          onSelectedDateChange={this.onDateSubmit}
+          formatDate={formatDate}
           invalidDateMessage={value => I18n.t('%{value} is not a valid date', {value})}
-          messages={this.state.messages}
-          dateValue={
-            !this.state.selectedDate || this.state.selectedDate.toString() === 'Invalid Date'
-              ? null
-              : this.state.selectedDate.toISOString()
-          }
-          validationFeedback={false}
+          selectedDate={this.state.selectedDate}
+          withRunningValue
         />
       </View>
     )

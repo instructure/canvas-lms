@@ -73,7 +73,7 @@ class WikiPagesController < ApplicationController
   end
 
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action(@context.wiki, @current_user, :read) && tab_enabled?(@context.class::TAB_PAGES)
         log_asset_access([ "pages", @context ], "pages", "other")
         js_env((ConditionalRelease::Service.env_for(@context)))
@@ -85,7 +85,7 @@ class WikiPagesController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if @page.new_record?
         if @page.grants_any_right?(@current_user, session, :update, :update_content)
           flash[:info] = t('notices.create_non_existent_page', 'The page "%{title}" does not exist, but you can create it below', :title => @page.title)

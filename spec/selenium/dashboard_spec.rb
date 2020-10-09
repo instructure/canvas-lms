@@ -232,10 +232,6 @@ describe "dashboard" do
         expect(list).to_not include_text(other_group.name)
       end
 
-      it "should present /courses as the href of the courses nav item", priority: "2", test_id: 215612 do
-        expect(f('#global_nav_courses_link').attribute('href')).to match(/\/courses$/)
-      end
-
       it "should go to a course when clicking a course link from the menu", priority: "1", test_id: 215614 do
         f('#global_nav_courses_link').click
         fj("[aria-label='Courses tray'] li a:contains('#{@course.name}')").click

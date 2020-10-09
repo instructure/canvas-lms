@@ -40,7 +40,8 @@ namespace :css do
         puts "--> no DB connection, skipping generation of brand_config files"
       end
       BrandableCSS.save_default_files!
-      raise "error running brandable_css" unless system('yarn run build:css')
+      system('yarn run build:css')
+      fail "error running brandable_css" unless $?.success?
     end
     puts "--> Finished: 'css:compile' in #{time}"
   end

@@ -277,7 +277,6 @@ describe AssignmentOverrideApplicator do
 
           @adhoc_override = assignment_override_model(:assignment => @assignment)
           @adhoc_override.assignment_override_students.create!(:user => @student)
-          allow(ActiveRecord::Base.connection).to receive(:use_qualified_names?).and_return(true)
 
           @shard1.activate do
             ovs = AssignmentOverrideApplicator.overrides_for_assignment_and_user(@assignment, @teacher)

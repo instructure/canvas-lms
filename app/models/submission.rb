@@ -2545,7 +2545,7 @@ class Submission < ActiveRecord::Base
     unless posted? || grants_right?(viewing_user, :read_grade)
       # If this submission is unposted and the viewer can't view the grade,
       # show only that viewer's assessments
-      return rubric_assessments_for_attempt(attempt: attempt).filter do |assessment|
+      return rubric_assessments_for_attempt(attempt: attempt).select do |assessment|
         assessment.assessor_id == viewing_user.id
       end
     end

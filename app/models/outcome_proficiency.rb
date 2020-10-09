@@ -72,6 +72,56 @@ class OutcomeProficiency < ApplicationRecord
     outcome_proficiency_ratings[ratings.length..-1].each(&:mark_for_destruction)
   end
 
+  def ratings_hash
+    outcome_proficiency_ratings.map do |rating|
+      {
+        points: rating.points,
+        mastery: rating.mastery,
+        description: rating.description,
+        color: rating.color
+      }
+    end
+  end
+
+  def points_possible
+    outcome_proficiency_ratings.first.points
+  end
+
+  def mastery_points
+    outcome_proficiency_ratings.where(mastery: true).first.points
+  end
+
+  def self.default_ratings
+    ratings = []
+    ratings << {description: I18n.t('Exceeds Mastery'), points: 4, mastery: false, color: '008EE2'}
+    ratings << {description: I18n.t('Mastery'), points: 3, mastery: true, color: '00AC18'}
+    ratings << {description: I18n.t('Near Mastery'), points: 2, mastery: false, color: 'FAB901'}
+    ratings << {description: I18n.t('Below Mastery'), points: 1, mastery: false, color: 'D97900'}
+    ratings << {description: I18n.t('No Evidence'), points: 0, mastery: false, color: 'EE0612'}
+    ratings
+  end
+
+  def self.find_or_create_default!(context)
+    proficiency = OutcomeProficiency.find_by(context: context)
+    if proficiency&.workflow_state == 'active'
+      return proficiency
+    end
+
+    OutcomeProficiency.transaction do
+      proficiency ||= OutcomeProficiency.new(context: context)
+      proficiency.workflow_state = 'active'
+      proficiency.replace_ratings(self.default_ratings)
+      proficiency.save!
+      proficiency
+    end
+  rescue ActiveRecord::RecordNotUnique
+    retry
+  rescue ActiveRecord::RecordInvalid => e
+    raise unless e.record.errors[:context_id] == ['has already been taken']
+
+    retry
+  end
+
   private
 
   def next_ratings

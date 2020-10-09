@@ -228,12 +228,30 @@ describe OutcomeProficiencyApiController, type: :request do
     end
 
     context 'no outcome proficiency' do
-      it 'returns 404 status' do
-        raw_api_call(:get,
+      it 'returns 404 status if the FF is disabled' do
+        @account.disable_feature!(:account_level_mastery_scales)
+        raw_api_call(
+          :get,
           "/api/v1/accounts/#{@account.id}/outcome_proficiency",
-          { :controller => 'outcome_proficiency_api', :action => 'show',
-            :format => 'json', :account_id => @account.id.to_s })
+          {
+            :controller => 'outcome_proficiency_api', :action => 'show',
+            :format => 'json', :account_id => @account.id.to_s
+          }
+        )
         assert_status(404)
+      end
+
+      it 'returns the default proficiency if the FF is enabled' do
+        @account.enable_feature!(:account_level_mastery_scales)
+        @json = api_call(
+          :get,
+          "/api/v1/accounts/#{@account.id}/outcome_proficiency",
+          {
+            :controller => 'outcome_proficiency_api', :action => 'show',
+            :format => 'json', :account_id => @account.id.to_s
+          }
+        )
+        expect(@json).to eq OutcomeProficiency.find_or_create_default!(@account).as_json
       end
     end
 

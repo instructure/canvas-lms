@@ -22,8 +22,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import Modal from '../../shared/components/InstuiModal'
 import store from '../lib/ExternalAppsStore'
-import 'compiled/jquery.rails_flash_notifications'
-import {Button} from '@instructure/ui-buttons'
+import $ from 'compiled/jquery.rails_flash_notifications'
+import {Button, ToggleButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
+import {IconCheckMarkSolid, IconEndSolid} from '@instructure/ui-icons'
 
 export default class ExternalToolPlacementButton extends React.Component {
   static propTypes = {
@@ -75,6 +77,33 @@ export default class ExternalToolPlacementButton extends React.Component {
     this.props.returnFocus()
   }
 
+  /**
+   * toggle the status of a given placement in the tool
+   * cb will be called after state has been updated,
+   * and can use this.state.tool
+   * @param {String} placement required
+   * @param {Function} cb optional
+   */
+  togglePlacement = (placement, cb = () => {}) => {
+    this.setState(({tool}) => {
+      tool[placement].enabled = !tool[placement].enabled
+      return {tool}
+    }, cb)
+  }
+
+  handleTogglePlacement = placement => {
+    this.togglePlacement(placement, () => {
+      store.togglePlacement({
+        tool: this.state.tool,
+        placement,
+        onError: () => {
+          $.flashError(I18n.t('Unable to toggle placement'))
+          this.togglePlacement(placement)
+        }
+      })
+    })
+  }
+
   placements = () => {
     const allPlacements = {
       account_navigation: I18n.t('Account Navigation'),
@@ -115,18 +144,49 @@ export default class ExternalToolPlacementButton extends React.Component {
     }
 
     const tool = this.state.tool
-    let hasPlacements = false
-    const appliedPlacements = _.map(allPlacements, (value, key) => {
-      if (
-        tool[key] ||
-        (tool.resource_selection && key == 'assignment_selection') ||
-        (tool.resource_selection && key == 'link_selection')
-      ) {
-        hasPlacements = true
-        return <div>{value}</div>
+    const is_1_1_tool = tool.version === '1.1'
+    const canUpdateTool = ENV.PERMISSIONS && ENV.PERMISSIONS.create_tool_manually
+    const isEditableContext =
+      ENV.CONTEXT_BASE_URL &&
+      tool.context &&
+      ENV.CONTEXT_BASE_URL.includes(tool.context.toLowerCase())
+
+    const appliedPlacements = Object.keys(allPlacements).filter(
+      placement =>
+        tool[placement] ||
+        (tool.resource_selection && placement === 'assignment_selection') ||
+        (tool.resource_selection && placement === 'link_selection')
+    )
+    if (appliedPlacements.length === 0) {
+      return
+    }
+    return appliedPlacements.map(key => {
+      const value = allPlacements[key]
+      const enabled = tool[key].enabled
+      if (!is_1_1_tool || !isEditableContext || !canUpdateTool) {
+        return <div key={key}>{value}</div>
       }
+
+      return (
+        <Flex justifyItems="space-between" key={key}>
+          <Flex.Item>{value}</Flex.Item>
+          <Flex.Item>
+            <ToggleButton
+              status={enabled ? 'unpressed' : 'pressed'}
+              color={enabled ? 'success' : 'secondary'}
+              renderIcon={enabled ? IconCheckMarkSolid : IconEndSolid}
+              screenReaderLabel={
+                enabled
+                  ? I18n.t('Placement active; click to deactivate')
+                  : I18n.t('Placement inactive; click to activate')
+              }
+              renderTooltipContent={enabled ? I18n.t('Active') : I18n.t('Inactive')}
+              onClick={() => this.handleTogglePlacement(key)}
+            />
+          </Flex.Item>
+        </Flex>
+      )
     })
-    return hasPlacements ? appliedPlacements : null
   }
 
   getModal = () => (

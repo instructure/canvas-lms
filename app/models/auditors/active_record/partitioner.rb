@@ -26,13 +26,13 @@ module Auditors::ActiveRecord
     end
 
     def self.process
-      Shackles.activate(:deploy) do
+      GuardRail.activate(:deploy) do
         AUDITOR_CLASSES.each do |auditor_cls|
           log '*' * 80
           log '-' * 80
           partman = CanvasPartman::PartitionManager.create(auditor_cls)
           partman.ensure_partitions(precreate_tables)
-          Shard.current.database_server.unshackle do
+          Shard.current.database_server.unguard do
             partman.prune_partitions(retention_months)
           end
           log '*' * 80

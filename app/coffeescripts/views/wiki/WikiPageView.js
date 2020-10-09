@@ -256,7 +256,7 @@ export default class WikiPageView extends Backbone.View {
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
     }
-    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED && json.CAN.UPDATE_CONTENT
+    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
     json.CAN.VIEW_TOOLBAR =
       json.CAN.VIEW_PAGES ||

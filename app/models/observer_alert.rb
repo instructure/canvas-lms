@@ -55,7 +55,7 @@ class ObserverAlert < ActiveRecord::Base
 
   def self.create_assignment_missing_alerts
     alerts = []
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       last_user_id = nil
       now = Time.now.utc
       loop do

@@ -10,7 +10,7 @@ describe TatlTael::Linters::SimpleLinter do
       "Precondition" => {
         "Statuses" => %w[added deleted],
         "Include" => ["**/yarg/**"],
-        "Whitelist" => ["**/yarg/blargh/**"],
+        "Allowlist" => ["**/yarg/blargh/**"],
       }
     }
   end
@@ -103,7 +103,7 @@ describe TatlTael::Linters::SimpleLinter do
         {
           "Statuses" => %w[modified deleted],
           "Include" => ["**/reeee/**"],
-          "Whitelist" => ["**/reeee/blarghy/**"],
+          "Allowlist" => ["**/reeee/blarghy/**"],
         }
       end
       let(:config_with_requirement) { config.merge("Requirement" => requirement) }

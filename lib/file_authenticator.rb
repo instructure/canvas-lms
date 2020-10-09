@@ -103,17 +103,17 @@ class FileAuthenticator
     #
     # switching to master if not already there is necessary for the update; a
     # common ancestor call site is FilesController#show which switches to the
-    # slave. there's a potential race condition where the attachment was loaded
-    # from the slave which didn't have a novel instfs_uuid yet while the master
+    # secondary. there's a potential race condition where the attachment was loaded
+    # from the secondary which didn't have a novel instfs_uuid yet while the master
     # did. since we don't reload, we'll import the attachment again; this isn't
     # ideal, but is safe and rare enough that paying that accidental cost is
     # preferrable to paying a reload cost every check
     #
-    # (the inverse race, where the slave knows of an instfs_uuid that would be
+    # (the inverse race, where the secondary knows of an instfs_uuid that would be
     # nil on a reload from master _shouldn't_ occur, and if it does just means
     # we delay re-importing until next time)
     return unless InstFS.migrate_attachment?(attachment)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       attachment.instfs_uuid = InstFS.export_reference(attachment)
       attachment.save!
     end

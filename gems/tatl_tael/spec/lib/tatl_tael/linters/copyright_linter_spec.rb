@@ -102,7 +102,7 @@ describe TatlTael::Linters::CopyrightLinter do
     end
   end
 
-  context "whitelisted file" do
+  context "allowed file" do
     # doesn't need to exist cuz it'll be ignored before attempting to read
     let(:fixture_path) { Consts::PUBLIC_VENDOR_JS_PATH }
     include_examples "does not comment"

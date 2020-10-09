@@ -49,12 +49,14 @@ def makeKarmaStage(group, ciNode, ciTotal) {
 }
 
 def cleanupFn() {
-  try {
-    archiveArtifacts artifacts: 'tmp/**/*.xml'
-    junit "tmp/**/*.xml"
-    sh 'find ./tmp -path "*.xml"'
-  } finally {
-    execute 'bash/docker-cleanup.sh --allow-failure'
+  timeout(time: 5) {
+    try {
+      archiveArtifacts artifacts: 'tmp/**/*.xml'
+      junit "tmp/**/*.xml"
+      sh 'find ./tmp -path "*.xml"'
+    } finally {
+      execute 'bash/docker-cleanup.sh --allow-failure'
+    }
   }
 }
 

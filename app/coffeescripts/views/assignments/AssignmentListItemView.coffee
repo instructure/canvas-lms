@@ -223,6 +223,7 @@ export default class AssignmentListItemView extends Backbone.View
     data.quizzesRespondusEnabled = @model.quizzesRespondusEnabled()
 
     data.DIRECT_SHARE_ENABLED = !!ENV.DIRECT_SHARE_ENABLED
+    data.canOpenManageOptions = @canOpenManageOptions()
 
     if data.canManage
       data.spanWidth      = 'span3'
@@ -393,6 +394,9 @@ export default class AssignmentListItemView extends Backbone.View
 
   canManage: ->
     ENV.PERMISSIONS.manage
+
+  canOpenManageOptions: ->
+    ENV.PERMISSIONS.manage || ENV.DIRECT_SHARE_ENABLED
 
   isGraded: ->
     submission_types = @model.get('submission_types')

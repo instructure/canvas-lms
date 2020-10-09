@@ -63,3 +63,9 @@ responsive_student_grades_page:
   applies_to: RootAccount
   display_name: Responsive Student Grades Page
   description: Makes the student grades page responsive.
+view_ungraded_as_zero:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: View Ungraded as Zero View in Gradebook
+  description: The Gradebook will factor in ungraded submissions as if they were given a score of zero for
+    calculations. This is just a view for the teacher, and does not affect actual scoring.

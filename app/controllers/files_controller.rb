@@ -285,7 +285,7 @@ class FilesController < ApplicationController
   #
   # @returns [File]
   def api_index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       get_context
       verify_api_id unless @context.present?
       @folder = Folder.from_context_or_id(@context, params[:id])
@@ -486,7 +486,7 @@ class FilesController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context

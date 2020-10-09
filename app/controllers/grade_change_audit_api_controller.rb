@@ -123,7 +123,7 @@
 class GradeChangeAuditApiController < AuditorApiController
   include Api::V1::GradeChangeEvent
 
-  # @API Query by assignment.
+  # @API Query by assignment
   #
   # List grade change events for a given assignment.
   #
@@ -147,7 +147,7 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, polymorphic_url([:api_v1, :audit_grade_change, @assignment]))
   end
 
-  # @API Query by course.
+  # @API Query by course
   #
   # List grade change events for a given course.
   #
@@ -173,7 +173,7 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, polymorphic_url([:api_v1, :audit_grade_change, course]), course: course)
   end
 
-  # @API Query by student.
+  # @API Query by student
   #
   # List grade change events for a given student.
   #
@@ -197,7 +197,7 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, api_v1_audit_grade_change_student_url(@student), remove_anonymous: true)
   end
 
-  # @API Query by grader.
+  # @API Query by grader
   #
   # List grade change events for a given grader.
   #
@@ -221,6 +221,70 @@ class GradeChangeAuditApiController < AuditorApiController
     render_events(events, api_v1_audit_grade_change_grader_url(@grader))
   end
 
+  # @API Advanced query
+  #
+  # List grade change events satisfying all given parameters. Teachers may query for events in courses they teach.
+  # Queries without +course_id+ require account administrator rights.
+  #
+  # At least one of +course_id+, +assignment_id+, +student_id+, or +grader_id+ must be specified.
+  #
+  # @argument course_id [Optional, Integer]
+  #   Restrict query to events in the specified course.
+  #
+  # @argument assignment_id [Optional, Integer]
+  #   Restrict query to the given assignment. If "override" is given, query the course final grade override instead.
+  #
+  # @argument student_id [Optional, Integer]
+  #   User id of a student to search grading events for.
+  #
+  # @argument grader_id [Optional, Integer]
+  #   User id of a grader to search grading events for.
+  #
+  # @argument start_time [DateTime]
+  #   The beginning of the time range from which you want events.
+  #
+  # @argument end_time [DateTime]
+  #   The end of the time range from which you want events.
+  #
+  # @returns [GradeChangeEvent]
+  #
+  def query
+    unless Auditors::read_from_postgres?
+      return render json: { message: "Advanced query is unsupported on this instance" }, status: :not_implemented
+    end
+
+    assignment = Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT if params[:assignment_id] == 'override'
+
+    if params[:course_id].present?
+      course = api_find(Course, params[:course_id])
+      return render_unauthorized_action unless course_authorized?(course)
+
+      student = api_find(course.all_users, params[:student_id]) if params[:student_id].present?
+      grader = api_find(User.active, params[:grader_id]) if params[:grader_id].present?
+      assignment ||= api_find(course.assignments, params[:assignment_id]) if params[:assignment_id].present?
+    else
+      return render_unauthorized_action unless admin_authorized?
+
+      student = api_find(User.active, params[:student_id]) if params[:student_id].present?
+      grader = api_find(User.active, params[:grader_id]) if params[:grader_id].present?
+      assignment ||= api_find(Assignment, params[:assignment_id]) if params[:assignment_id].present?
+    end
+
+    conditions = {}
+    conditions.merge!(context_id: course.id, context_type: 'Course') if course
+    conditions.merge!(student_id: student.id) if student
+    conditions.merge!(grader_id: grader.id) if grader
+    conditions.merge!(assignment_id: assignment.id) if assignment
+    if conditions.empty?
+      return render json: { message: "Must specify at least one query condition" }, status: :bad_request
+    end
+
+    events = Auditors::GradeChange.for_scope_conditions(conditions, query_options)
+    render_events(events, api_v1_audit_grade_change_url, course: course, remove_anonymous: params[:student_id].present?)
+  end
+
+  # TODO remove Cassandra cruft and make Gradebook History use the admin search above
+  # once OSS users have been given the opportunity to migrate to Postgres auditors
   def for_course_and_other_parameters
     begin
       course = Course.find(params[:course_id])

@@ -102,7 +102,7 @@ class SearchController < ApplicationController
   #   permissions that the context grants the current user, e.g.
   #   { send_messages: true }
   def recipients
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       # admins may not be able to see the course listed at the top level (since
       # they aren't enrolled in it), but if they search within it, we want
       # things to work, so we set everything up here

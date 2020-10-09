@@ -117,7 +117,7 @@ class SubmissionCommentsApiController < ApplicationController
   #
   # returns {}, status 200
   def annotation_notification
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action?(Account.site_admin, @current_user, :send_messages)
         assignment = api_find(@context.assignments.active, params[:assignment_id])
         author = api_find(@context.all_current_users, params[:author_id])
@@ -181,7 +181,7 @@ class SubmissionCommentsApiController < ApplicationController
     notification_type = teacher ? "Annotation Teacher Notification" : "Annotation Notification"
     notification = BroadcastPolicy.notification_finder.by_name(notification_type)
 
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       BroadcastPolicy.notifier.send_notification(submission, notification_type, notification, to_list, data)
     end
   end

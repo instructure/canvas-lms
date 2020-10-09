@@ -52,7 +52,7 @@ module Courses
     end
 
     def get_visibilities_for_user_ids(item_type, user_ids)
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         opts = {user_id: user_ids, course_id: [self.id]}
         case item_type
         when :assignment

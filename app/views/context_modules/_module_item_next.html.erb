@@ -22,6 +22,7 @@
   item_data ||= { published_status: 'unpublished' }
   completion_criteria ||= nil
   editable ||= false
+  can_direct_share = can_do(@context, @current_user, :read_as_admin) && @domain_root_account&.feature_enabled?(:direct_share)
   criterion = completion_criteria && completion_criteria.find{|c| c[:id] == module_item.id}
 
   @module_item_image_tags ||= {
@@ -210,35 +211,37 @@
     <% if !editable %>
       <div class="module-item-status-icon"></div> <%# going to set this in JS-land, not here %>
     <% end %>
-    <% if editable || module_item.nil? %>
+    <% if editable || module_item.nil? || can_direct_share && module_item.direct_shareable? %>
       <div class="ig-admin">
-        <span
-          data-module-item-id="<%= module_item && module_item.id %>"
-          data-module-type="<%= module_item && module_item.content_type_class %>"
-          data-content-id="<%= module_item && module_item.content_id %>"
-          class="lock-icon"
-        >
-        </span>
-        <span
-          data-module-item-name="<%= module_item && module_item.title %>"
-          data-module-type="<%= module_item && module_item.content_type_class %>"
-          data-content-id="<%= module_item && module_item.content_id %>"
-          data-id="<%= module_item_publishable_id(module_item) %>"
-          data-course-id="<%= module_item && module_item.context_id %>"
-          data-module-id="<%= module_item && module_item.context_module_id %>"
-          data-module-item-id="<%= module_item && module_item.id %>"
-          data-assignment-id="<%= module_item && module_item.assignment.try(:id) %>"
-          data-is-cyoeable="<%= module_item && cyoe_able?(module_item) %>"
-          data-published="<%= module_item && item_data[:published_status] == 'published' %>"
-          data-publishable="<%= module_item_publishable?(module_item) %>"
-          data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
-          data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
-          title=""
-          data-tooltip
-          class="publish-icon <%= item_data[:published_status] %>"
-        >
-          <i class="icon-<%= item_data[:published_status] %>"></i>
-        </span>
+        <% if editable || module_item.nil? %>
+          <span
+            data-module-item-id="<%= module_item && module_item.id %>"
+            data-module-type="<%= module_item && module_item.content_type_class %>"
+            data-content-id="<%= module_item && module_item.content_id %>"
+            class="lock-icon"
+          >
+          </span>
+          <span
+            data-module-item-name="<%= module_item && module_item.title %>"
+            data-module-type="<%= module_item && module_item.content_type_class %>"
+            data-content-id="<%= module_item && module_item.content_id %>"
+            data-id="<%= module_item_publishable_id(module_item) %>"
+            data-course-id="<%= module_item && module_item.context_id %>"
+            data-module-id="<%= module_item && module_item.context_module_id %>"
+            data-module-item-id="<%= module_item && module_item.id %>"
+            data-assignment-id="<%= module_item && module_item.assignment.try(:id) %>"
+            data-is-cyoeable="<%= module_item && cyoe_able?(module_item) %>"
+            data-published="<%= module_item && item_data[:published_status] == 'published' %>"
+            data-publishable="<%= module_item_publishable?(module_item) %>"
+            data-unpublishable="<%= module_item_unpublishable?(module_item) %>"
+            data-publish-title="<%= module_item && module_item.title ? module_item.title : '' %>"
+            title=""
+            data-tooltip
+            class="publish-icon <%= item_data[:published_status] %>"
+          >
+            <i class="icon-<%= item_data[:published_status] %>"></i>
+          </span>
+        <% end %>
 
         <div class="inline-block cog-menu-container">
           <a class="al-trigger al-trigger-gray" role="button" tabindex="0" href="#">
@@ -247,19 +250,21 @@
           </a>
 
           <ul class="al-options">
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
-            <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
-            <li role="presentation">
-              <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
-                aria-label="<%= t('Move this item') %>"
-                class="move_module_item_link icon-updown"
-                title="<%= t('Move this item') %>"
-              ><%= t("Move to...") %></a>
-            </li>
-            <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
-            <% if @domain_root_account&.feature_enabled?(:direct_share) && (!module_item || module_item.direct_shareable?) %>
+            <% if editable || module_item.nil? %>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="outdent_item_link" title="<%= t('Decrease indent') %>"><%= @module_item_image_tags['outdent'] %> <%= t('Decrease indent') %></a></li>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="indent_item_link" title="<%= t('Increase indent') %>"><%= @module_item_image_tags['indent'] %> <%= t('Increase indent') %></a></li>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="edit_item_link edit_link" title="<%= t('Edit item details') %>"><%= @module_item_image_tags['edit'] %> <%= t('Edit') %></a></li>
+              <li class="dupe-option" role="presentation"><a href="/api/v1<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>/duplicate" class="duplicate_item_link" title="<%= t('Duplicate Item') %>"><%= @module_item_image_tags['duplicate'] %> <%= t('Duplicate') %></a></li>
+              <li role="presentation">
+                <a href="#<%= module_item ? module_item.id : "{{ id }}" %>"
+                  aria-label="<%= t('Move this item') %>"
+                  class="move_module_item_link icon-updown"
+                  title="<%= t('Move this item') %>"
+                ><%= t("Move to...") %></a>
+              </li>
+              <li role="presentation"><a href="<%= context_url(@context, :context_url) %>/modules/items/<%= module_item ? module_item.id : "{{ id }}" %>" class="delete_item_link delete_link" title="<%= t('Remove this item from the module') %>"><i class="icon-trash"></i> <%= t('Remove') %></a></li>
+            <% end %>
+            <% if can_direct_share && (!module_item || module_item.direct_shareable?) %>
               <li role="presentation">
                 <a
                   href="#"
@@ -283,17 +288,19 @@
                 </a>
               </li>
             <% end %>
-            <% menu_type_to_class.each do |menu_type, content_class| %>
-              <% if !module_item || module_item.content.is_a?(content_class) %>
-                <%
-                  launch_options = {}
-                  if menu_type == :file_menu
-                    launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
-                  else
-                    launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
-                  end
-                %>
-                <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+            <% if editable || module_item.nil? %>
+              <% menu_type_to_class.each do |menu_type, content_class| %>
+                <% if !module_item || module_item.content.is_a?(content_class) %>
+                  <%
+                    launch_options = {}
+                    if menu_type == :file_menu
+                      launch_options[:files] = [module_item ? module_item.content_id : "{{ content_id }}"]
+                    else
+                      launch_options[:module_items] = [module_item ? module_item.id : "{{ id }}"]
+                    end
+                  %>
+                  <%= external_tools_menu_items(@menu_tools[menu_type], {link_class: "menu_tool_link", settings_key: menu_type, in_list: true, url_params: launch_options}) %>
+                <% end %>
               <% end %>
             <% end %>
           </ul>

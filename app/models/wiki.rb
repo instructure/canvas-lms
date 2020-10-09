@@ -175,7 +175,7 @@ class Wiki < ActiveRecord::Base
   end
 
   def self.wiki_for_context(context)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       context.transaction do
         # otherwise we lose dirty changes
         context.save! if context.changed?

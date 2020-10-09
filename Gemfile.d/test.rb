@@ -38,9 +38,10 @@ group :test do
   gem 'shoulda-matchers', '4.3.0'
 
   gem 'rubocop-canvas', require: false, path: 'gems/rubocop-canvas'
-    gem 'rubocop', '0.52.1', require: false
+    gem 'rubocop', '0.68.0', require: false
       gem 'rainbow', '3.0.0', require: false
-  gem 'rubocop-rspec', '1.22.2', require: false
+  gem 'rubocop-rspec', '1.33.0', require: false
+  gem 'rubocop-performance', '1.3.0', require: false
 
   gem 'once-ler', '0.1.4'
   gem 'sauce_whisk', '0.2.2'

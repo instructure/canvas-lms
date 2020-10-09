@@ -30,7 +30,7 @@ test('renders the NotFoundArtwork component', () => {
 test('renders the NotFoundArtwork renders correct header', () => {
   const tree = mount(<NotFoundArtwork {...defaultProps()} />)
   const node = tree.find('Heading')
-  expect(node.text()).toBe('Woops... Looks like nothing is here!')
+  expect(node.text()).toBe('Whoops... Looks like nothing is here!')
 })
 
 test('renders the NotFoundArtwork component help description', () => {

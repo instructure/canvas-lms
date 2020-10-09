@@ -30,7 +30,7 @@ gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
-gem 'after_transaction_commit', '2.0.0'
+gem 'after_transaction_commit', '2.1.0'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.90.1', require: false
@@ -115,11 +115,11 @@ gem 'saml2', '3.0.9'
   gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
-gem 'shackles', '1.4.2'
+gem 'guardrail', '2.0.0'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '1.15.2'
+gem 'switchman', '2.0.0'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '1.5.2'
+gem 'switchman-inst-jobs', '2.0.0'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
 gem 'vault', '0.13.0', require: false

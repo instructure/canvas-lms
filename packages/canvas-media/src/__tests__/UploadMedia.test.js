@@ -27,8 +27,6 @@ const uploadMediaTranslations = {
     COMPUTER_PANEL_TITLE: 'Computer',
     DRAG_DROP_CLICK_TO_BROWSE: 'Drag and drop, or click to browse your computer',
     DRAG_FILE_TEXT: 'Drag a file here',
-    EMBED_PANEL_TITLE: 'Embed',
-    EMBED_VIDEO_CODE_TEXT: 'Embed Code',
     INVALID_FILE_TEXT: 'Invalid File',
     LOADING_MEDIA: 'Loading...',
     RECORD_PANEL_TITLE: 'Record',
@@ -49,7 +47,7 @@ function renderComponent(overrideProps = {}) {
       onStartUpload={() => {}}
       onComplete={() => {}}
       onDismiss={() => {}}
-      tabs={{embed: false, record: false, upload: true}}
+      tabs={{record: false, upload: true}}
       uploadMediaTranslations={uploadMediaTranslations}
       {...overrideProps}
     />
@@ -59,21 +57,14 @@ function renderComponent(overrideProps = {}) {
 describe('Upload Media', () => {
   describe('renders the selected tabs', () => {
     it('renders Computer', () => {
-      const {getByText} = renderComponent({tabs: {embed: false, record: false, upload: true}})
+      const {getByText} = renderComponent({tabs: {record: false, upload: true}})
       expect(getByText('Computer')).toBeInTheDocument()
     })
 
-    it('renders Computer and Embed', () => {
-      const {getByText} = renderComponent({tabs: {embed: true, record: false, upload: true}})
-      expect(getByText('Computer')).toBeInTheDocument()
-      expect(getByText('Embed')).toBeInTheDocument()
-    })
-
-    it('renders Computer, Record, and Embed', () => {
-      const {getByText} = renderComponent({tabs: {embed: true, record: true, upload: true}})
+    it('renders Computer and Record', () => {
+      const {getByText} = renderComponent({tabs: {record: true, upload: true}})
       expect(getByText('Computer')).toBeInTheDocument()
       expect(getByText('Record')).toBeInTheDocument()
-      expect(getByText('Embed')).toBeInTheDocument()
     })
   })
 
@@ -99,21 +90,6 @@ describe('Upload Media', () => {
       expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
     })
 
-    it('is disabled before EmbedPanel has a value', () => {
-      const {getByText} = renderComponent({
-        tabs: {embed: true}
-      })
-      expect(getByText('Submit').closest('button')).toHaveAttribute('disabled')
-    })
-
-    it('is enabled once EmbedPanel has a value', () => {
-      const {getByText} = renderComponent({
-        tabs: {embed: true},
-        embedCode: 'embed me'
-      })
-      expect(getByText('Submit').closest('button')).not.toHaveAttribute('disabled')
-    })
-
     // the submit button is not rendered for the record tab
   })
 
@@ -134,18 +110,6 @@ describe('Upload Media', () => {
 
       fireEvent.click(getByText('Submit'))
       expect(onStartUpload).toHaveBeenCalled()
-    })
-
-    it('calls onEmbed when embedding', async () => {
-      const onEmbed = jest.fn()
-      const {getByText} = renderComponent({
-        onEmbed,
-        tabs: {embed: true},
-        embedCode: 'some embed code'
-      })
-
-      fireEvent.click(getByText('Submit'))
-      expect(onEmbed).toHaveBeenCalled()
     })
 
     // the rest is tested via saveMediaRecording.test.js

@@ -170,7 +170,7 @@ class AssignmentConfigurationTools extends React.Component {
       value={this.state.selectedToolValue}
     >
       <option title="Plagiarism Review Tool" data-launch="about:blank" data-type="none">
-        None
+        {I18n.t('None')}
       </option>
       {this.state.tools.map(tool => (
         <option
@@ -243,7 +243,7 @@ class AssignmentConfigurationTools extends React.Component {
     return (
       <div>
         <div className="form-column-left">
-          <label htmlFor="similarity_detection_tool">Plagiarism Review</label>
+          <label htmlFor="similarity_detection_tool">{I18n.t('Plagiarism Review')}</label>
         </div>
 
         <div className="form-column-right">

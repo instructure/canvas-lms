@@ -383,7 +383,7 @@ class NotificationMessageCreator
   # data can get out of sync if messages are cancelled for being repeats...
   # not sure if we care about that...
   def recent_messages_for_users(users)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       Hash.new(0).merge(Message.more_recent_than(24.hours.ago).where(user_id: users, to_email: true).group(:user_id).count)
     end
   end

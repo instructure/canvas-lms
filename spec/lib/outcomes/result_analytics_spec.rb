@@ -62,6 +62,14 @@ describe Outcomes::ResultAnalytics do
   describe "#find_outcome_results" do
     before(:once) do
       course_with_student
+
+      names = %w[Gamma Alpha Beta]
+      @students = create_users(3.times.map{ |i| {name: "User #{i+1}", sortable_name: "#{names[i]}, User"} }, return_type: :record)
+
+      course_with_user('StudentEnrollment', course: @course, user: @students[0])
+      course_with_user('StudentEnrollment', course: @course, user: @students[1])
+      course_with_user('StudentEnrollment', course: @course, user: @students[2])
+
       course_with_teacher(course: @course)
       rubric = outcome_with_rubric context: @course
       @assignment = assignment_model
@@ -69,13 +77,18 @@ describe Outcomes::ResultAnalytics do
       @rubric_association = rubric.associate_with(@assignment, @course, purpose: 'grading')
       lor
       lor(hidden: true)
+      lor({ hidden: true }, @students[0])
+      lor({ hidden: true }, @students[1])
+      lor({ hidden: true }, @students[2])
     end
 
-    def lor(opts = {})
+    def lor(opts = {}, user = nil)
+      user ||= @student
+
       LearningOutcomeResult.create!(
         context: @course,
         learning_outcome: @outcome,
-        user: @student,
+        user: user,
         alignment: @alignment,
         association_type: 'RubricAssociation',
         association_id: @rubric_association.id,
@@ -102,6 +115,16 @@ describe Outcomes::ResultAnalytics do
     it 'order results by id on matching learning outcome id and user id' do
       results = ra.find_outcome_results(@teacher, users: [@student], context: @course, outcomes: [@outcome], include_hidden: true)
       expect(results.first.id).to be < results.second.id
+    end
+
+    it 'orders results by user sortable name' do
+      results = ra.find_outcome_results(@teacher, users: @students << @student,
+                                                  context: @course,
+                                                  outcomes: [@outcome],
+                                                  include_hidden: true)
+
+      sortable_names = results.collect {|r| r.user.sortable_name }
+      expect(sortable_names).to eq ['Alpha, User', 'Beta, User', 'Gamma, User', 'User', 'User']
     end
   end
 

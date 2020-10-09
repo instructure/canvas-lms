@@ -17,17 +17,24 @@
  */
 
 import $ from 'jquery'
+import 'jquery.instructure_date_and_time'
+import moment from 'moment'
 import PageViewCollection from 'compiled/collections/PageViewCollection'
 import PageViewView from 'compiled/views/contexts/PageViewView'
 import ready from '@instructure/ready'
 
-ready(() => {
+function renderTable(date) {
   const $container = $('#pageviews')
   const $table = $container.find('table')
   const userId = $table.attr('data-user-id')
 
   const pageViews = new PageViewCollection()
   pageViews.url = `/api/v1/users/${userId}/page_views`
+  if (date) {
+    const start_time = $.unfudgeDateForProfileTimezone(date)
+    const end_time = moment(start_time).add(1, 'days')
+    pageViews.url += `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
+  }
 
   const fetchOptions = {reset: true}
 
@@ -43,4 +50,18 @@ ready(() => {
   // Fetch page views
   const fetchParams = {per_page: 100}
   pageViewsView.$el.disableWhileLoading(pageViews.fetch({data: fetchParams}))
+
+  return pageViewsView
+}
+
+ready(() => {
+  let view = renderTable()
+  $('#page_view_date')
+    .datetime_field({dateOnly: true})
+    .change(event => {
+      const date = $(event.target).data('date')
+      view.stopPaginationListener()
+      $('#page_view_results').empty()
+      view = renderTable(date)
+    })
 })

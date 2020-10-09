@@ -217,7 +217,8 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :new_math_equation_handling].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
-    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages
+    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages,
+    :usage_rights_discussion_topics
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
@@ -298,7 +299,7 @@ class ApplicationController < ActionController::Base
     return [] if context.is_a?(Group)
 
     context = context.account if context.is_a?(User)
-    tools = Shackles.activate(:slave) do
+    tools = GuardRail.activate(:secondary) do
       ContextExternalTool.all_tools_for(context, {:placements => type,
       :root_account => @domain_root_account, :current_user => @current_user,
       :tool_ids => tool_ids}).to_a
@@ -872,7 +873,7 @@ class ApplicationController < ActionController::Base
   # Also assigns @context_membership to the membership type of @current_user
   # if @current_user is a member of the context.
   def get_context
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       unless @context
         if params[:course_id]
           @context = api_find(Course.active, params[:course_id])
@@ -1076,7 +1077,7 @@ class ApplicationController < ActionController::Base
   end
 
   def content_participation_count(context, type, user)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       ContentParticipationCount.create_or_update({context: context, user: user, content_type: type})
     end
   end
@@ -1676,7 +1677,7 @@ class ApplicationController < ActionController::Base
   # Retrieving wiki pages needs to search either using the id or
   # the page title.
   def get_wiki_page
-    Shackles.activate(params[:action] == "edit" ? :master : :slave) do
+    GuardRail.activate(params[:action] == "edit" ? :primary : :secondary) do
       @wiki = @context.wiki
 
       @page_name = params[:wiki_page_id] || params[:id] || (params[:wiki_page] && params[:wiki_page][:title])
@@ -1738,6 +1739,7 @@ class ApplicationController < ActionController::Base
 
       if @tag.context.is_a?(Assignment)
         @assignment = @tag.context
+
         @resource_title = @assignment.title
         @module_tag = params[:module_item_id] ?
           @context.context_module_tags.not_deleted.find(params[:module_item_id]) :
@@ -1748,6 +1750,9 @@ class ApplicationController < ActionController::Base
       end
       @resource_url = @tag.url
       @tool = ContextExternalTool.find_external_tool(tag.url, context, tag.content_id)
+
+      @assignment&.prepare_for_ags_if_needed!(@tool)
+
       tag.context_module_action(@current_user, :read)
       if !@tool
         flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"

@@ -51,7 +51,7 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(4)
+      expect(buttons.length).toEqual(5)
 
       buttons[0].focus()
       expect(document.activeElement).toBe(buttons[0])
@@ -67,9 +67,9 @@ describe('RCE StatusBar', () => {
       const {container, getByTestId} = renderStatusBar()
       const statusbar = getByTestId('RCEStatusBar')
       const buttons = container.querySelectorAll('button, *[tabindex]')
-      expect(buttons.length).toEqual(4)
+      expect(buttons.length).toEqual(5)
 
-      buttons[3].focus()
+      buttons[4].focus()
       expect(document.activeElement).toBe(buttons[buttons.length - 1])
       // wraps to the left
       for (let i = 1; i <= buttons.length; ++i) {

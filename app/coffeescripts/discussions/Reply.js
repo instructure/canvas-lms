@@ -70,6 +70,14 @@ class Reply {
         .toggle()
     })
     this.form.delegate('.alert .close', 'click', preventDefault(this.hideNotification))
+    this.form.on('change', 'ul.discussion-reply-attachments input[type=file]', e => {
+      this.form.find('ul.discussion-reply-attachments input[type=file]').focus()
+      if (e.target.files.length > 0) {
+        $.screenReaderFlashMessage(
+          I18n.t('File selected for upload: %{filename}', {filename: e.target.files[0].name})
+        )
+      }
+    })
     this.editing = false
 
     _.defer(this.attachKeyboardShortcuts)

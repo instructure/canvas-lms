@@ -30,6 +30,10 @@ s
 end).new
 
 RSpec.describe "Api::V1::Outcome" do
+  before do
+    course_with_teacher(active_all: true)
+  end
+
   def new_outcome(creation_params = {})
     creation_params.reverse_merge!({
       :title => 'TMNT Beats',
@@ -44,12 +48,8 @@ RSpec.describe "Api::V1::Outcome" do
     @outcome
   end
 
-  def new_outcome_link(creation_params = {}, course = nil)
+  def new_outcome_link(creation_params = {}, course = @course)
     outcome = new_outcome(creation_params) # sets @outcome
-    unless course
-      course_with_teacher(active_all: true)  # sets @course
-      course = @course
-    end
     course.root_outcome_group.add_outcome(outcome)
   end
 
@@ -95,6 +95,35 @@ RSpec.describe "Api::V1::Outcome" do
         outcomes = []
         10.times{ outcomes.push(new_outcome) }
         lib.outcomes_json(outcomes, nil, nil, opts).each { |o| check_outcome_json.call(o) }
+      end
+
+      describe "with the account_level_mastery_scales FF" do
+        describe "enabled" do
+          before do
+            @course.root_account.enable_feature!(:account_level_mastery_scales)
+            @proficiency = outcome_proficiency_model(@course)
+            @calculation_method = outcome_calculation_method_model(@course)
+          end
+
+          it "returns the outcome proficiency and calculation method values" do
+            json = lib.outcome_json(new_outcome(({**outcome_params, :context => @course})), nil, nil)
+            expect(json['calculation_method']).to eq(@calculation_method.calculation_method)
+            expect(json['calculation_int']).to eq(@calculation_method.calculation_int)
+            expect(json['ratings']).to eq(@proficiency.ratings_hash.map(&:stringify_keys))
+          end
+        end
+
+        describe "disabled" do
+          before do
+            @course.root_account.disable_feature!(:account_level_mastery_scales)
+            @proficiency = outcome_proficiency_model(@course)
+            @calculation_method = outcome_calculation_method_model(@course)
+          end
+
+          it "ignores the resolved_outcome_proficiency and resolved_calculation_method" do
+            check_outcome_json.call(lib.outcome_json(new_outcome(({**outcome_params, :context => @course})), nil, nil, opts))
+          end
+        end
       end
     end
 

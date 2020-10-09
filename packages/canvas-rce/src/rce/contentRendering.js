@@ -24,7 +24,7 @@ import {
   VIDEO_SIZE_DEFAULT,
   AUDIO_PLAYER_SIZE
 } from './plugins/instructure_record/VideoOptionsTray/TrayController'
-import {isAudio} from './plugins/shared/fileTypeUtils'
+import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 import {prepEmbedSrc, prepLinkedSrc} from '../common/fileUrl'
 
 export function renderLink(data, contents) {
@@ -100,16 +100,8 @@ export function renderImage(image, opts) {
   return renderToStaticMarkup(constructJSXImageElement(image, opts))
 }
 
-export function mediaIframeSrcFromFile(fileProps) {
-  const type = isAudio(fileProps.content_type || fileProps.type) ? 'audio' : 'video'
-  if (fileProps.embedded_iframe_url) {
-    return `${fileProps.embedded_iframe_url}?type=${type}`
-  }
-  return `/media_objects_iframe?mediahref=${encodeURIComponent(fileProps.href)}&type=${type}`
-}
-
 export function renderVideo(video) {
-  const src = mediaIframeSrcFromFile(video)
+  const src = mediaPlayerURLFromFile(video)
   return `
   <iframe
       allow="fullscreen"
@@ -129,7 +121,7 @@ export function renderVideo(video) {
 }
 
 export function renderAudio(audio) {
-  const src = mediaIframeSrcFromFile(audio)
+  const src = mediaPlayerURLFromFile(audio)
   return `
   <iframe
       data-media-id="${audio.media_id || audio.id || audio.file_id}"

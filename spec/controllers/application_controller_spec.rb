@@ -314,6 +314,22 @@ RSpec.describe ApplicationController do
         end
       end
 
+      context "usage_rights_discussion_topics" do
+        before(:each) do
+          controller.instance_variable_set(:@domain_root_account, Account.default)
+        end
+
+        it 'is false if the feature flag is off' do
+          Account.default.disable_feature!(:usage_rights_discussion_topics)
+          expect(controller.js_env[:FEATURES][:usage_rights_discussion_topics]).to be_falsey
+        end
+
+        it 'is true if the feature flag is on' do
+          Account.default.enable_feature!(:usage_rights_discussion_topics)
+          expect(controller.js_env[:FEATURES][:usage_rights_discussion_topics]).to be_truthy
+        end
+      end
+
       context "unpublished_courses" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)
@@ -972,6 +988,35 @@ RSpec.describe ApplicationController do
 
           context 'assignments' do
             it_behaves_like 'a placement that caches the launch'
+
+            context 'when a 1.3 tool replaces an LTI 1.1 tool' do
+              let(:assignment) { content_tag.context }
+
+              before do
+                # assignments configured with LTI 1.1 will not have
+                # LineItem or ResouceLink records prior to the LTI 1.3
+                # launch.
+                assignment.line_items.destroy_all
+
+                Lti::ResourceLink.where(
+                  resource_link_id: assignment.lti_context_id
+                ).destroy_all
+
+                assignment.update!(lti_context_id: SecureRandom.uuid)
+
+                controller.send(:content_tag_redirect, course, content_tag, nil)
+              end
+
+              it 'creates the default line item' do
+                expect(assignment.line_items).to be_present
+              end
+
+              it 'creates the LTI resource link' do
+                expect(
+                  Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)
+                ).to be_present
+              end
+            end
           end
 
           context 'module items' do

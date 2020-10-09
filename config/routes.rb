@@ -1121,6 +1121,7 @@ CanvasRails::Application.routes.draw do
           action: :for_course_and_other_parameters, as: 'audit_grade_change_course_grader_student'
       get 'audit/grade_change/courses/:course_id/students/:student_id',
           action: :for_course_and_other_parameters, as: 'audit_grade_change_course_student'
+      get 'audit/grade_change', action: :query, as: 'audit_grade_change'
     end
 
     scope(controller: :course_audit_api) do
@@ -1290,6 +1291,9 @@ CanvasRails::Application.routes.draw do
     end
 
     scope(controller: :external_tools) do
+      post "/accounts/:account_id/external_tools/rce_favorites/:id", action: :add_rce_favorite, as: :account_external_tools_add_rce_favorite
+      delete "/accounts/:account_id/external_tools/rce_favorites/:id", action: :remove_rce_favorite, as: :account_external_tools_remove_rce_favorite
+
       %w(course account).each do |context|
         get "#{context}s/:#{context}_id/external_tools/sessionless_launch", action: :generate_sessionless_launch, as: "#{context}_external_tool_sessionless_launch"
         get "#{context}s/:#{context}_id/external_tools/:external_tool_id", action: :show, as: "#{context}_external_tool_show"
@@ -1998,8 +2002,10 @@ CanvasRails::Application.routes.draw do
       get 'courses/:course_id/group_categories', action: :index, as: 'course_group_categories'
       post 'accounts/:account_id/group_categories', action: :create
       post 'courses/:course_id/group_categories', action: :create
+      post 'group_categories/:group_category_id/import', action: :import
       get 'group_categories/:group_category_id/groups', action: :groups, as: 'group_category_groups'
       get 'group_categories/:group_category_id/users', action: :users, as: 'group_category_users'
+      get 'group_categories/:group_category_id/export', action: :export, as: 'group_category_export', defaults: { format: :csv }
       post 'group_categories/:group_category_id/assign_unassigned_members', action: 'assign_unassigned_members', as: 'group_category_assign_unassigned_members'
     end
 

@@ -86,7 +86,7 @@ module DataFixup::RebuildQuizSubmissionsFromQuizSubmissionEvents
   end
 
   def self.find_and_run
-    ids = Shackles.activate(:slave) do
+    ids = GuardRail.activate(:secondary) do
       find_missing_submissions_on_current_shard
     end
     ids.map do |id|

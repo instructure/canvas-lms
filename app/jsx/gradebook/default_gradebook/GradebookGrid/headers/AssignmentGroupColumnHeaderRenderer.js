@@ -60,6 +60,7 @@ function getProps(column, gradebook, options) {
       settingKey: sortRowsBySetting.settingKey
     },
 
+    viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     weightedGroups: gradebook.weightedGroups()
   }
 }
