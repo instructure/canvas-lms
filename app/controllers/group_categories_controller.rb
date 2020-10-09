@@ -423,7 +423,7 @@ class GroupCategoriesController < ApplicationController
                   -- grab all the section_ids to get the section names
                   ARRAY_AGG (enrollments.course_section_id) AS course_section_ids").
             where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
-          gms = GroupMembership.where(group_id: @group_category.groups.select(:id)).
+          gms = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id)).
             joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
           users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms, include_sis_id) }
         end

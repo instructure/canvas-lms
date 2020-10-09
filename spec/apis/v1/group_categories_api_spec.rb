@@ -82,6 +82,41 @@ describe "Group Categories API", type: :request do
           expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil, nil, nil])
         end
       end
+
+      it "should return active group_memberships" do
+        g1 = @category.groups.create!(name: 'g1', context: @course)
+        g2 = @category.groups.create!(name: 'g2', sis_source_id: 'g2sis', context: @course)
+        u1 = Pseudonym.by_unique_id('login_0').take.user
+        gm1 = g1.add_user(u1)
+        gm1.destroy
+        g2.add_user(u1)
+        status = raw_api_call(:get, api_url, api_route)
+        expect(status).to eq 200
+        csv = CSV.parse(response.body)
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.count).to eq(5)
+        5.times do
+          p = Pseudonym.by_unique_id(csv.first[3]).take
+          next unless p.unique_id == 'login_0'
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, 'g2', g2.id.to_s, 'g2sis'])
+        end
+      end
+
+      it "should return group_memberships in active groups" do
+        g1 = @category.groups.create!(name: 'g1', context: @course)
+        u1 = Pseudonym.by_unique_id('login_0').take.user
+        g1.add_user(u1)
+        g1.destroy
+        status = raw_api_call(:get, api_url, api_route)
+        expect(status).to eq 200
+        csv = CSV.parse(response.body)
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.count).to eq(5)
+        5.times do
+          p = Pseudonym.by_unique_id(csv.first[3]).take
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil, nil, nil])
+        end
+      end
     end
 
     describe "users" do
