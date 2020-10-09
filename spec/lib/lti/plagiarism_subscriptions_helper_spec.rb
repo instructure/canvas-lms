@@ -127,6 +127,22 @@ describe Lti::PlagiarismSubscriptionsHelper do
 
   end
 
+  describe '#plagiarism_subscription' do
+    let(:subscription_helper) { Lti::PlagiarismSubscriptionsHelper.new(tool_proxy) }
+
+    it 'should have associated fields' do
+      expect(subscription_helper.plagiarism_subscription(tool_proxy, tool_proxy.product_family)).to eq({
+        'EventTypes' => Lti::PlagiarismSubscriptionsHelper::EVENT_TYPES,
+        'ContextType' => 'root_account',
+        'ContextId' => tool_proxy.context.root_account.uuid,
+        'Format' => 'live-event',
+        'TransportType' => 'https',
+        'TransportMetadata' => {'Url' => "test.com/submission"},
+        'AssociatedIntegrationId' => 'com.instructure.test_abc_test.com/submission'
+      })
+    end
+  end
+
   describe '#destroy_subscription' do
     let(:subscription_helper){ Lti::PlagiarismSubscriptionsHelper.new(tool_proxy) }
 
