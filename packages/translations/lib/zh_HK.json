@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "編輯"
     },
+    "edit_equation_f5279959": {
+        "message": "編輯方程式"
+    },
     "edit_link_7f53bebb": {
         "message": "編輯連結"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "找到 { count, plural,\n     =0 {# 個結果 }\n    one {# 個結果 }\n  other {# 個結果 }\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "全螢幕"
+    },
     "generating_preview_45b53be0": {
         "message": "產生預覽中..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "已載入成績"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "群組文件"
+    },
     "group_files_4324f3df": {
         "message": "群組檔案"
     },
     "group_files_82e5dcdb": {
         "message": "群組檔案"
     },
+    "group_images_98e0ac17": {
+        "message": "群組圖像"
+    },
     "group_links_9493129e": {
         "message": "群組連結"
+    },
+    "group_media_2f3d128a": {
+        "message": "群組媒體"
     },
     "group_navigation_99f191a": {
         "message": "群組導航"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "測驗"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "原始 HTML 編輯器"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "讀取媒體音軌文件失敗。正在中止。"
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title } 的影片播放器"
+    },
+    "view_ba339f93": {
+        "message": "檢視"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "檢視鍵盤快速鍵"

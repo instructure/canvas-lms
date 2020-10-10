@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Breyta"
     },
+    "edit_equation_f5279959": {
+        "message": "Breyta jöfnu"
+    },
     "edit_link_7f53bebb": {
         "message": "Breyta tengli"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Fann { count, plural,\n     =0 {# niðurstöður}\n    one {# niðurstaða}\n  other {# niðurstöður}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Allur skjárinn"
+    },
     "generating_preview_45b53be0": {
         "message": "Býr til forskoðun..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Einkunnir eru hlaðnar inn"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Skjöl hóps"
+    },
     "group_files_4324f3df": {
         "message": "Hópskrár"
     },
     "group_files_82e5dcdb": {
         "message": "Hópskrár"
     },
+    "group_images_98e0ac17": {
+        "message": "Myndir hóps"
+    },
     "group_links_9493129e": {
         "message": "Hóptenglar"
+    },
+    "group_media_2f3d128a": {
+        "message": "Miðlar hóps"
     },
     "group_navigation_99f191a": {
         "message": "Leiðarstýring hóps"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Próf"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Óunninn HTML-ritill"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Ekki tókst að lesa margmiðlunarrásarskrá. Hætt við."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Myndbandsspilari fyrir { title }"
+    },
+    "view_ba339f93": {
+        "message": "Skoða"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Skoða flýtileiðir lyklaborð"

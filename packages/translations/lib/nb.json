@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Rediger"
     },
+    "edit_equation_f5279959": {
+        "message": "Rediger likning"
+    },
     "edit_link_7f53bebb": {
         "message": "Rediger lenke"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Fant { count, plural,\n     =0 {# resultater}\n    one {# resultat}\n  other {# resultater}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Fullskjerm"
+    },
     "generating_preview_45b53be0": {
         "message": "Genererer forhåndsvisning..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Karakterene er lastet inn"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Gruppedokumenter"
+    },
     "group_files_4324f3df": {
         "message": "Gruppefiler"
     },
     "group_files_82e5dcdb": {
         "message": "Gruppefiler"
     },
+    "group_images_98e0ac17": {
+        "message": "Gruppebilder"
+    },
     "group_links_9493129e": {
         "message": "Gruppelenker"
+    },
+    "group_media_2f3d128a": {
+        "message": "Gruppemedia"
     },
     "group_navigation_99f191a": {
         "message": "Gruppenavigering"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Tester"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Rå HTML-redigerer"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Lesing av mediasporingsfil feilet. Avbryter."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Video avspiller for { title }"
+    },
+    "view_ba339f93": {
+        "message": "Vis"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Vis tastatur-snarveier"

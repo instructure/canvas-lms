@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Redigér"
     },
+    "edit_equation_f5279959": {
+        "message": "Rediger ligning"
+    },
     "edit_link_7f53bebb": {
         "message": "Rediger link"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Fandt { count, plural,\n     =0 {# resultater}\n    one {# resultat}\n  other {# resultater}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Fuld skærm"
+    },
     "generating_preview_45b53be0": {
         "message": "Genererer forhåndsvisning ..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Karakterer indlæst"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Gruppens dokumenter"
+    },
     "group_files_4324f3df": {
         "message": "Gruppefiler"
     },
     "group_files_82e5dcdb": {
         "message": "Gruppefiler"
     },
+    "group_images_98e0ac17": {
+        "message": "Gruppens billeder"
+    },
     "group_links_9493129e": {
         "message": "Gruppelinks"
+    },
+    "group_media_2f3d128a": {
+        "message": "Gruppens medier"
     },
     "group_navigation_99f191a": {
         "message": "Gruppenavigation"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Test"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Rå HTML-editor"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Læsning af en medie-track-fil mislykkedes. Afbryder."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Videoafspiller til { title }"
+    },
+    "view_ba339f93": {
+        "message": "Vis"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Se tastaturgenveje"

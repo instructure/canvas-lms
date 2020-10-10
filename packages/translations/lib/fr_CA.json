@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Modifier"
     },
+    "edit_equation_f5279959": {
+        "message": "Modifier l’équation"
+    },
     "edit_link_7f53bebb": {
         "message": "Modifier le lien"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Trouvé { count, plural,\n     =0 {# résultats}\n    one {# résultat}\n  other {# résultats}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Plein écran"
+    },
     "generating_preview_45b53be0": {
         "message": "Création de l''aperçu en cours..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Les notes sont chargées"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Documents de groupe"
+    },
     "group_files_4324f3df": {
         "message": "Fichiers du groupe"
     },
     "group_files_82e5dcdb": {
         "message": "Fichiers du groupe"
     },
+    "group_images_98e0ac17": {
+        "message": "Images de groupe"
+    },
     "group_links_9493129e": {
         "message": "Liens de groupe"
+    },
+    "group_media_2f3d128a": {
+        "message": "Média de Groupes"
     },
     "group_navigation_99f191a": {
         "message": "Barre de navigation des groupes"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Questionnaires"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Éditeur HTML brut"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Échec de lecture d''un fichier de piste multimédia. Annulation en cours."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Lecteur vidéo pour { title }"
+    },
+    "view_ba339f93": {
+        "message": "Voir"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Voir les raccourcis clavier"
