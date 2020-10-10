@@ -200,6 +200,7 @@ sv-x-k12:
   a_table_containing_the_name_of_the_grading_scheme__8e6d32f8: "En tabell som innehåller namnet på bedömningsschemat och knappar för att redigera eller ta bort schemat."
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "En tabell över svar och sammanfattande statistik om elevers svarsalternativ."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "En tabell som innehåller data för bedömningsschema. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "En tabell som innehåller data för bedömningsschema. Först visas bedömningsschemats namn och knappar för redigering och borttagning av schemat. Varje rad innehåller ett namn, ett maximalt procenttal och ett minsta procenttal. Dessutom innehåller varje rad en knapp för att lägga till en ny rad nedan, och en knapp för att ta bort nuvarande rad."
   a_z_243c3301: A–Ö
   a_z_29d8e67c: A–Z
   about_this_service_b10bc808: "Om denna tjänst"
@@ -1852,6 +1853,7 @@ sv-x-k12:
       Låter administratörer visa en logg med information om senast körda
       GraphQL-mutationer
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Tillåter justering av lärandemål för innehåll som inte ges poäng"
+  allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Tillåt att elevgrupper i en kurs skapas med en uppladdad CSV-fil"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillåter att skapa meddelanden för en viss sektion"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillåter att skapa diskussioner för en viss sektion"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gör att hjälplänkar kan taggas som befintliga eller nya och visar tydligt befintliga hjälplänkar i hjälpmenyn."
@@ -2062,6 +2064,10 @@ sv-x-k12:
       Gör det möjligt för användaren att skicka ett meddelande till "Alla i [course group]".
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Gör det möjligt för användaren att skicka ett meddelande till \"Alla i [course name]\" eller \"Alla i [course group].\""
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Gör det möjligt för användaren att skicka ett meddelande till enskilda kursdeltagare."
+  allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "Gör att användare kan ange beräkningar för lärandemålskompetenser på kursnivå."
+  allows_user_to_set_outcome_proficiency_calculation_73761bf4: "Gör att användare kan ange beräkningar för lärandemålskompetenser på konto- och kursnivå."
+  allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Gör att användare kan ange skalor för lärandemålskompetenser på konto- och kursnivå."
+  allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: "Gör att användare kan ange skalor för lärandemålskompetenser på kursnivå."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Gör det möjligt för användaren att dela ett quiz på Commons."
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Låter användare dela kursobjekt direkt med andra användare. Låter användare kopiera individuella kursobjekt till en annan kurs."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Gör det möjligt för användaren att se en kurs SIS-ID."
@@ -2548,6 +2554,7 @@ sv-x-k12:
   arrange_columns_by_assignment_group_59bbddd0: "Ordna kolumner efter uppgiftsgrupp"
   arrange_columns_by_due_date_f74f9e2d: "Ordna kolumner enligt sista inlämningsdatum"
   arrange_columns_by_points_48da9ba3: "Ordna kolumner efter poäng"
+  artifact_f7003de5: Artefakt
   artist_info_for_username_for_description_12d5d862: "Artistinformation för %{userName} för %{description}"
   as_of_a036fa2e: "Från och med"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Medan du skriver i det här filtret kommer listan av grupper automatiskt att filtreras så att den endast inkluderar grupper med namn som matchar det du skriver."
@@ -4374,9 +4381,11 @@ sv-x-k12:
   certificate_fingerprint_b376df90: "Fingeravtryck för certifikat"
   change_applied_89d1aa5a: "Tillämpad ändring"
   change_beginning_date_to_39dbd06e: "Ändra startdatumet till"
+  change_color_for_proficiency_rating_position_48b39bfc: "Ändra färg för kompetensbedömning %{position}"
   change_course_visibility_eaa2ffc: "Ändra kursens synlighet"
   change_dcaa253a: Ändra
   change_description_34c49853: "Ändra beskrivning"
+  change_description_for_proficiency_rating_position_97626231: "Andra beskrivning för kompetensbedömning %{position}"
   change_ending_date_to_d2cebd54: "Ändra slutdatumet till"
   change_existing_group_2c91a32b: "Ändra befintlig grupp"
   change_groups_4e2ab6c3: "Ändra grupper"
@@ -4384,6 +4393,7 @@ sv-x-k12:
   change_name_c8cce76c: "Ändra namn"
   change_name_to_568374c8: "Ändra \"%{name}\" till"
   change_points_9e5104ac: "Ändra poäng"
+  change_points_for_proficiency_rating_position_a385c658: "Ändra poäng för kompetensbedömning %{position}"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Om du låter uppgiftens poängsumma bli %{assignmentPoints} och matrisens poängsumma %{rubricPoints} leder det till ett högsta möjliga resultat på %{toPercentage_pointRatio} för elevers inlämningar som bedömts med matrisen."
@@ -5673,6 +5683,7 @@ sv-x-k12:
   count_attempts_d23c69a0: 
     one: "1 försök"
     other: "%{count} försök"
+    zero: "Obegränsade försök"
   count_comments_cb137ab8: 
     one: "1 kommentar"
     other: "%{count} kommentarer"
@@ -6547,6 +6558,7 @@ sv-x-k12:
   create_discussion_topics_8330d52b: "Skapa diskussionsämnen"
   create_educational_resources_8219326e: "Skapa utbildningsresurser"
   create_failed_15d07ad4: "Skapandet misslyckades"
+  create_files_after_rce_media_upload_recording_77d75a96: "Skapa filer efter RCE-medieuppladdning eller -inspelning"
   create_interactive_course_content_76665336: "Skapa interaktivt kursinnehåll"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Skapa prenumerationer på livehändelser på ToolProxy"
   create_new_attempt_19c96c03: "Skapa nytt försök"
@@ -6571,9 +6583,13 @@ sv-x-k12:
   created_created_bf5714b8: "Skapad %{created}"
   created_descending_e9a1b097: "Skapad: Fallande"
   created_group_group_name_2097306b: "Skapade gruppen %{group_name}"
+  creates_file_objects_initially_hidden_to_students__7f333bf0: |-
+      Skapar filobjekt (till en början dolda för elever om detta är i en kurs) efter att
+      mediefiler har laddats upp eller spelats in via RCE.
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Skapande av grupper hanteras ännu inte i det nya uppgiftsflödet. Öppna den äldre versionen av sidan för att skapa grupper?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Att skapa en Inlämningsexport gör att du kan ladda ner en zipfil med alla dina uppgiftsinlämningar från alla dina nuvarande och tidigare kurser. Det kan vara en stor fil så det kan ta en stund. Du kan lämna sidan och komma tillbaka senare."
   creating_conference_95b59116: "Skapar konferensen"
+  creating_group_17bd69ce: "Skapar grupp"
   creating_key_8a026e61: "Skapar nyckel"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons-licens:"
@@ -6969,6 +6985,7 @@ sv-x-k12:
   delete_prerequisite_5e97bdf4: "Ta bort förutsättning"
   delete_prerequisite_title_19741947: "Ta bort förutsättning %{title}"
   delete_proficiency_rating_5436ee08: "Ta bort färdighetsbedömning"
+  delete_proficiency_rating_position_46e205f7: "Ta bort kompetensbedömning %{position}"
   delete_quiz_142b8099: "Radera quiz"
   delete_rating_24876355: "Radera ranking"
   delete_requirement_bce2d943: "Radera krav"
@@ -7187,6 +7204,9 @@ sv-x-k12:
   disable_authentication_for_graphql_3c019622: "Inaktivera autentisering för GraphQL"
   disable_automatic_submission_8e1d8676: "Inaktivera automatisk inlämning"
   disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Inaktivera kortkommandon för tangentbord. Användare som använder skärmläsare eller tangentbordsnavigering
+      får en förbättrad upplevelse när kortkommandon inaktiveras.
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
       Inaktivera kortkommandon för tangentbord. Användare som använder skärmläsare eller tangentbordsnavigering
       får en förbättrad upplevelse när kortkommandon inaktiveras.
   disable_celebrations_description: "Om du inaktiverar den här funktionen döljs alla gratulationsanimeringar."
@@ -7644,7 +7664,7 @@ sv-x-k12:
   dropdown_option_2_9766a346: "Rullgardinsmenyns alternativ 2"
   dropped_38031953: Borttagen
   dropped_for_grading_purposes_46256461: "Utelämnad i bedömningssyfte"
-  due_5d7267be: "Inlämningsdatum::"
+  due_5d7267be: "Inlämningsdatum:"
   due_639f281d: "Inlämningsdatum: "
   due_a73610f6: Inlämningsdatum
   due_assignment_due_date_time_5acdf3cf: "Inlämnas den: %{assignment_due_date_time}"
@@ -7877,6 +7897,7 @@ sv-x-k12:
   email_address_a1b97a39: E-postadress
   email_address_optional_72795076: "E-postadress (valfritt)"
   email_addresses_893faeb2: E-postadresser
+  email_addresses_required_14483dc8: "E-postadresser (krävs)"
   email_already_in_use_330248e: "E-postadressen används redan"
   email_e366fa29: e-post
   email_is_invalid_e0d982eb: "E-posten är ogiltig!"
@@ -7987,6 +8008,18 @@ sv-x-k12:
   enrollment_term_7bfe840: Registreringstermin
   enrollment_terms_8753ec11: Registreringsvillkor
   enrollments_e250c9c3: Registreringar
+  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
+      Registreringar kan läggas till av din institutions elevinformationssystemet (Student Information System). Om en registrering skapas via SIS, kan endast administratörer ta bort registreringen för kursen.
+              För att få åtkomst till sidan Personer, användare – måste visningslistan vara aktiverad. Om kontoinställningen Öppen registrering är inaktiverad kan användare med den här behörigheten lägga till elever i en kurs med hjälp av e-postadresser även om användaren inte har ett Canvas-konto. För att hantera SIS-ID måste SIS-Data – läsa aktiveras. För att lägga till en användares till en kurs via SIS-ID måste även SIS-Data – hantera aktiveras. För att redigera en elevs avsnitt måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare aktiverase. För att länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare aktiveras.
+  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
+      Registreringar kan läggas till av din institutions elevinformationssystemet (Student Information System). Om en registrering skapas via SIS, kan endast administratörer ta bort registreringen för kursen.
+              För att se användarlistan för kursen – måste visningslistan vara aktiverad. För att hantera SIS-ID måste SIS-Data – läsa aktiveras. För att redigera en lärares eller en TA:s avsnitt måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare aktiverase. För att länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare aktiveras.
+  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
+      Registreringar kan läggas till av din institutions elevinformationssystemet (Student Information System). Om en registrering skapas via SIS, kan endast administratörer ta bort registreringen för kursen.
+              För att se användarlistan för kursen – måste visningslistan vara aktiverad. För att hantera SIS-ID måste SIS-Data – läsa aktiveras. För att lägga till en användares till en kurs via SIS-ID måste även SIS-Data – hantera aktiveras. För att redigera en elevs sektion och kursroll måste även Användare – visa lista och Konversationer – skicka meddelanden till enskilda kursdeltagare aktiveras. För att avregistrera användare på användarinformationssidan måste även Visa lista över kurser och Se listan över användare aktiveras. Gör det möjligt för användaren att skicka om kursinbjudningar från sidan Personer i kursen. Om kontoinställningen Öppen registrering är aktiverad kan användare med den här behörigheten lägga till elever i en kurs från sidan Personer i kurser med hjälp av e-postadresser om användaren inte har ett Canvas-konto. För att länka en observatör till en elev måste även Användare – hantera inloggningsuppgifter och Konversationer – skicka till enskilda kursdeltagare aktiverase.
+  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
+      Registreringar kan läggas till av din institutions elevinformationssystemet (Student Information System). Om en registrering skapas via SIS, kan endast administratörer ta bort registreringen för kursen.
+              För att se användarlistan för kursen – måste visningslistan vara aktiverad. För att hantera SIS-ID måste SIS-Data – läsa aktiveras. För att lägga till en användares till en kurs via SIS-ID måste även SIS-Data – hantera aktiveras. För att redigera en lärares eller en TA:s avsnitt måste även Konversationer – skicka meddelanden till enskilda kursdeltagare aktiveras. För att länka en observatör till en elevs måste även Konversationer – skicka meddelanden till enskilda kursdeltagare aktiveras.
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Ser till att lärandemål som redan importerats i en kurs inte dupliceras om de importeras igen."
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ser till att användare utan behörigheter för Importera lärandemål inte kan se knappen på fliken Lärandemål"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Ange en hexkod här för att använda en anpassad färg."
@@ -8265,6 +8298,7 @@ sv-x-k12:
   error_associating_assignment_assignment_name_with__d92e9acf: "Ett fel inträffade när uppgiften ”%{assignment_name}” associerades med ett LTI-verktyg."
   error_deleting_name_reason_11f9d399: "Fel vid radering av %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fel vid duplicering av modulen"
+  error_during_group_creation_f232994b: "Ett fel inträffade när gruppen skapades"
   error_exporting_gradebook_msg_6ea31e2f: "Ett fel uppstod vid export av bedömningsöversikt: %{msg}"
   error_fetching_access_token_1445a9e3: "Fel vid hämtning av åtkomsttoken"
   error_fetching_user_details_7c85d23: "Fel vid hämtning av användarinformation"
@@ -8622,6 +8656,7 @@ sv-x-k12:
   file_s_will_be_included_on_all_pages_in_the_canvas_80569935: "Filen/filerna kommer att inkluderas på alla sidor i Canvas skrivbordsprogram."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Filen/filerna kommer att inkluderas när användarinnehållet visas i Canvas iOS eller Android-appar, eller i tredjepartsappar som skapats med vår API."
   file_select_filename_folder_contents_9146bab7: "Filval, mappinnehåll för %{filename}"
+  file_selected_for_upload_filename_18ca9b8a: "Fil som valts för uppladdning: %{filename}"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} användares filkvot tillämpas"
   file_status: 
     hidden_status: "Dold. Tillgänglig via länk"
@@ -9513,6 +9548,7 @@ sv-x-k12:
   group_category_locked: "Den här gruppkategorin kan inte ändras eftersom studenter redan har gjort inlämningar på uppgiften"
   group_collaborations_b747d43: Gruppsamarbeten
   group_conferences_12866179: Gruppkonferenser
+  group_created_successfully_cae99f8c: "Gruppen skapades"
   group_details_e51122f1: Gruppdetaljer
   group_discussions_17d79aa0: Gruppdiskussioner
   group_files_4324f3df: Gruppfiler
@@ -9533,6 +9569,7 @@ sv-x-k12:
     errors: 
       group_full: "Gruppen är full."
       not_in_group_section: "%{student} delar inte sektion med de andra medlemmarna i gruppen %{group}."
+  group_membership_limit_54e165b: "Gräns för gruppmedlemskap"
   group_name_b69c144: Gruppnamn
   group_name_group_announcements_5ce81c6d: "%{group_name} – Gruppanslag"
   group_name_group_calendar_7f10e0ed: "%{group_name} – Gruppkalender"
@@ -10111,6 +10148,9 @@ sv-x-k12:
   if_enabled_common_cartridge_importers_will_convert_9bffff09: "Om det är aktiverat konverterar Common Cartridge-importörer HTML-filer till sidor"
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Om aktiverad, måste designers tillhandahålla upphovsrätt och licensinformation för filerna innan de publiceras. Gäller endast om Better File Browsing också är aktiverat."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Om de är aktiverade, kommer alternativen för hantering av utvecklarnyckel och tokenavgränsning att användas."
+  if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
+      Om aktiverad, behöver inte
+      användare logga in eller använda ett åtkomsttoken.
   if_enabled_graphql_queries_will_not_require_users__85f1740: |-
       Om aktiverad, behöver inte
       användare logga in eller använda ett åtkomsttoken.
@@ -10221,6 +10261,7 @@ sv-x-k12:
   import_a_set_of_outcomes_6b782192: "Importera en uppsättning lärandemål"
   import_commons_favorites_e68fce81: "Importera Commons-favoriter"
   import_content_b2fd6620: "Importera innehåll"
+  import_course_student_groups_by_csv_d2cde97d: "Importera elevgrupper i en kurs efter CSV-fil"
   import_e929507b: Importera...
   import_learning_outcomes_36d28a2b: "Importera läranderesultat"
   import_outcomes_7dda186b: "Importera lärandemål"
@@ -10338,6 +10379,7 @@ sv-x-k12:
   insert_math_equation_57c6e767: "För in en matematisk ekvation"
   insert_row_below_25187f89: "Lägg till en rad under"
   insert_row_below_name_a5b3bd41: "Infoga rad nedan %{name}"
+  insert_row_in_edit_mode_5976f269: "Infoga rad i redigeringsläge"
   insights_b514ad8d: Insikter
   install_c54fad9b: Installera
   installed_7b284a91: Installerad
@@ -10460,6 +10502,7 @@ sv-x-k12:
   invalid_csv_file_2c076da5: "Ogiltig CSV-fil"
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Ogiltig CSV-fil. Omdömena kan inte uppdateras."
   invalid_custom_fields_c66dcdb6: "Ogiltiga anpassade fält."
+  invalid_date_2a10bb7b: "Ogiltigt datum"
   invalid_date_and_time_1a42d206: "Ogiltigt datum och tid"
   invalid_date_or_datetime_for_field_b38fe386: "Ogiltigt datum eller datumtid för %{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Ogiltigt datum eller tid för %{attr}"
@@ -10491,6 +10534,7 @@ sv-x-k12:
   invalid_value_for_name_i_4a7c601a: "Ogiltigt värde för %{name}: ”%{i}\""
   invalid_xml_configuration_9c3f6bcf: "Ogiltig XML-konfiguration"
   invalid_xml_syntax: "Ogiltig xml-syntax"
+  invitation_only_9a253f1d: "Endast inbjudan"
   invite_5b1fcbcd: "Bjud in"
   ip_filter_is_not_valid_152a46d8: "IP-filtret är inte giltigt."
   ireland_353_3cd32cc0: "Irland (+353)"
@@ -10939,6 +10983,7 @@ sv-x-k12:
   loading_725811ca: "läser in"
   loading_additional_items_ed5f672d: "Läser in ytterligare objekt..."
   loading_announcements_b927a86c: "Läser in anslag"
+  loading_artifact_dc3bfe9f: "Läser in artefakt"
   loading_assessment_audit_trail_5cf4c10: "Läser in redovisningsspårning för bedömningar"
   loading_assignments_352ec769: "Läser in uppgifter"
   loading_assignments_b3b248be: "Läser in uppgifter"
@@ -11094,6 +11139,7 @@ sv-x-k12:
   login_handle_is_required_90ab7fe0: "%{login_handle} krävs"
   login_id_12109693: Inloggnings-ID
   login_id_bc943b97: "Inloggnings-ID:"
+  login_ids_required_ff2273ab: "Inloggnings-ID:en (krävs)"
   login_info_d1d9f11e: Inloggningsinformation
   login_instructure_logo_8f2332db: "Inloggning Instructure-logotyp"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Ogiltigt användarnamn: måste vara alfanumeriskt eller en e-postadress"
@@ -11219,6 +11265,7 @@ sv-x-k12:
   mastered_34d4c857: "Uppfyllt mål"
   mastery_7ec348b5: Måluppfyllelse
   mastery_connect_64598f55: "Mastery Connect"
+  mastery_mastery_for_proficiency_rating_position_74aa3b56: "Måluppfyllelse %{mastery} för kompetensbedömning %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Måluppfyllelse: %{n_mastery_points_precision_2_str} poäng"
   mastery_path_processing_f4471152: "Bearbetning av måluppfyllelse"
   mastery_paths_breakdown_6e0b5fce: "Detaljerad information om måluppfyllelse"
@@ -11332,6 +11379,7 @@ sv-x-k12:
   meets_mastery_754e1c06: "Möter måluppfyllelse"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} medlemmar av det maximala antalet %{max_membership}"
   members_af25c21d: Medlemmar
+  members_are_free_to_join_defa5929: "Medlemmar får gå med"
   membership_by_invitation_only_9bc27199: "Medlemskap enbart genom inbjudan"
   membership_service_configuration_d8ba5a74: "Konfigurering av medlemsservice"
   message: 
@@ -13419,6 +13467,7 @@ sv-x-k12:
   no_allowed_domains_b6633d12: "Inga tillåtna domäner"
   no_announcements_280df147: "Inga anslag"
   no_announcements_to_display_fbf9ed1e: "Inga meddelanden att visa"
+  no_artifacts_with_that_name_found_b8679f53: "Hittade inga artefakter med det namnet"
   no_assignment_group_assigned_8f1cdb9b: "Ingen uppgiftsgrupp har tilldelats"
   no_assignment_name_adbb215b: "Inget namn på uppgift"
   no_assignments_with_that_name_found_1d7be1: "Inga uppgifter med det namnet hittades"
@@ -14087,6 +14136,10 @@ sv-x-k12:
   outcome_imports_c496a81f: Resultatimporter
   outcome_path_mastery_points: "%{path} poäng för måluppfyllelse"
   outcome_path_result: "%{path} resultat"
+  outcome_proficiency_calculations_5959b681: "Beräkningar för lärandemålskompetenser"
+  outcome_proficiency_calculations_add_edit_5a2217b7: "Beräkningar för lärandemålskompetenser – Lägg till/redigera"
+  outcome_proficiency_scales_a316bd83: "Skalor för lärandemålskompetenser"
+  outcome_proficiency_scales_add_edit_58da6a3: "Skalor för lärandemålskompetenser – Lägg till/redigera"
   outcome_results: 
     outcomes_filename: Lärandemål
   outcome_results_23a0a117: "Lärandemål resultat"
@@ -14411,6 +14464,8 @@ sv-x-k12:
   performed_by_70b3ce96: "Genomförd av"
   permission_must_be_enabled_for_someone_397e1ce3: "Tillstånd måste aktiveras för någon"
   permission_not_found_620b80d1: "Behörighet hittades inte"
+  permission_to_change_this_mastery_calculation_is_e_91e19659: "Behörighet att ändra den här måluppfyllelseberäkningen har aktiverats på kontonivå för:"
+  permission_to_change_this_mastery_scale_is_enabled_89066fac: "Behörighet att ändra den här måluppfyllelseskalan har aktiverats på kontonivå för:"
   permissions: 
     manage_webhooks: "Hantera beteendemönster för webbsida"
     provision_catalog: "Provisera en Katalog"
@@ -15062,6 +15117,7 @@ sv-x-k12:
   product_tours_1e19eb95: Produktdemo
   proficiency_calculation_57f0bdf: Kompetensberäkning
   proficiency_calculation_parameters_5f605dec: "Parametrar för kompetensberäkning"
+  proficiency_level_1d05e468: Kompetensnivå
   proficiency_rating_6346119f: Färdighetsbedömning
   proficiency_rating_deleted_77827473: "Färdighetsbedömning togs bort"
   proficiency_ratings_2bbabdcd: Färdighetsbedömningar
@@ -16949,6 +17005,7 @@ sv-x-k12:
   remove_recipient_name_a6b83cef: "Ta bort mottagaren %{name}"
   remove_role_filter_label_a27b6797: "Ta bort rollfilter %{label}"
   remove_row_c198da5a: "Ta bort rad"
+  remove_row_in_edit_mode_49c4dc07: "Ta bort rad i redigeringsläge"
   remove_row_name_c053f5ae: "Ta bort rad %{name}"
   remove_row_row_167c424a: "Ta bort rad %{row}"
   remove_student_from_recipients_4b206e35: "Ta bort %{student} från mottagare"
@@ -16975,6 +17032,10 @@ sv-x-k12:
         minute: min
   replace_e61834a7: Ersätt
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Ersätt mappträdet med ett nytt, mer tillgängligt och funktionsfyllt mappträd."
+  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
+      Ersätter den befintliga bilden av ekvationen samt den dolda MathML
+      med en MathJax formaterad version. Detta ökar tillgängligheten
+      och ger läsaren många möjligheter att interagera med ekvationen på sidan.
   reply_389d6fb9: Svara
   reply_from_name: "%{name} via Canvas-aviseringar"
   reply_to_comment_72d96728: "Svara på kommentar"
@@ -17108,6 +17169,8 @@ sv-x-k12:
       manage_interaction_alerts: "Hantera notiser"
       manage_links: "Hantera roll och lita på -länkar"
       manage_outcomes: "Hantera lärandemål"
+      manage_proficiency_calculations: "Hantera beräkningar för lärandemålskompetenser"
+      manage_proficiency_scales: "Hantera skalor för lärandemålskompetenser"
       manage_role_overrides: "Hantera behörigheter"
       manage_rubrics: "Skapa och redigera bedömningsmatriser"
       manage_sections: "Hantera (skapa/redigera/radera) kurssektioner"
@@ -18476,6 +18539,7 @@ sv-x-k12:
   show_details_194cf390: "Visa detaljer"
   show_embedded_documentation_in_live_events_lti_too_cbe229f3: "Visa inbäddad dokumentation i LTI-verktyget för livehändelser"
   show_exceptions_270ea1c5: "Visa undantag"
+  show_final_grade_overrides_only_c3017aaa: "Visa endast åsidosättningar av slutliga bedömningar"
   show_groups_navigation_menu_1521d38d: "Visa grupp-navigeringsmeny"
   show_inactive_enrollments_8f4c4824: "Visa inaktiva registreringar"
   show_key_1fbf0c64: "Visa nyckel"
@@ -18533,6 +18597,7 @@ sv-x-k12:
   sis_id_4495a887: "SIS ID"
   sis_id_70eda157: "SIS-ID:"
   sis_id_8c2029e1: "sis id"
+  sis_ids_required_125074d9: "SIS-ID:en (krävs)"
   sis_import: 
     buttons: 
       process_data: "Bearbeta data"
@@ -19717,6 +19782,7 @@ sv-x-k12:
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Detta objekt kommer visas igen när en ny inlämning görs."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Detta objekt kommer visas igen när det finns nya"
   this_login_is_for_provider_6f17462: "Den här inloggningen är för %{provider}"
+  this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: "Måluppfyllelseskalan används som standard för alla kurser i ditt konto."
   this_may_take_a_bit_48fe4235: "Detta kan ta en stund ..."
   this_may_take_a_bit_c061d0f6: "det här kan ta en stund ..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Meddelandet innehåller mediakommentarer. Klicka på den här länken för att lyssna eller svara: %{link}."
@@ -20664,6 +20730,7 @@ sv-x-k12:
   update_your_notification_settings_ed9564f3: "Uppdatera aviseringsinställningar"
   updated_2c1e8615: Uppdaterad
   updated_group_group_name_727b1d98: "Uppdaterade gruppen %{group_name}"
+  updated_math_equation_display_583671a8: "Uppdatera visningen för ekvation"
   updated_permissions_page_f2e91060: "Uppdaterad tillståndssida"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Uppdaterat användargränssnitt för sökning och visning av användare och kurser inom ett konto."
   updates_account_notification_preferences_ui_to_be__1765f66a: |-
@@ -21485,8 +21552,8 @@ sv-x-k12:
         last_edit: "Senaste redigering"
         page_title: "Sidans titel"
         todo_date: "Att göra-datum"
-      loading: Laddar ...
-      loading_more: "Laddar fler ..."
+      loading: "Laddar ..."
+      loading_more: "Laddar fler ..."
       no_pages: "Inga sidor har skapats än."
       pages_title: Sidor
     wiki_page_index_edit_dialog: 
