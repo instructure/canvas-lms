@@ -69,7 +69,7 @@ module Lti
       ToolProxy.joins("JOIN (#{subquery}) bindings on lti_tool_proxies.id = bindings.tool_proxy_id").where('bindings.enabled = true')
     end
 
-    def self.find_all_proxies_for_context_by_context_order_by_vendor_product_code(context:, vendor_code:, product_code:)
+    def self.proxies_in_order_by_codes(context:, vendor_code:, product_code:, resource_type_code:)
       account_ids = context.account_chain.map { |a| a.id }
 
       # Added i+1 on this to ensure that the x.ordering later doesn't have 2 0's
@@ -89,12 +89,13 @@ module Lti
         select('lti_tool_proxies.*, bindings.enabled AS binding_enabled').
         # changed this from eager_load, because eager_load likes to wipe out custom select attributes
         joins(:product_family).
-        preload(:product_family).
+        joins(:resources).
         # changed the order to go from the special ordering set up (to make sure we're going from the course to the
         # root account in order of parent accounts) and then takes the most recently installed tool
         order('ordering, lti_tool_proxies.id DESC').
         where('lti_tool_proxies.workflow_state = ?', 'active').
-        where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code)
+        where('lti_product_families.vendor_code = ? AND lti_product_families.product_code = ?', vendor_code, product_code).
+        where('lti_resource_handlers.resource_type_code = ?', resource_type_code)
       # You can disable a tool_binding somewhere in the account chain, and anything below that that reenables it should be
       # available, but nothing above it, so we're getting rid of anything that is disabled and above
       tools.split{|tool| !tool.binding_enabled}.first
