@@ -240,10 +240,11 @@ module Canvas::LiveEvents
     domain = assignment.root_account&.domain(ApplicationController.test_cluster_name)
     event[:domain] = domain if domain
     if actl
-      if (tool_proxy = Lti::ToolProxy.find_all_proxies_for_context_by_context_order_by_vendor_product_code(
+      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
         context: assignment.course,
         vendor_code: actl.tool_vendor_code,
-        product_code: actl.tool_product_code
+        product_code: actl.tool_product_code,
+        resource_type_code: actl.tool_resource_type_code
       ).first)
         event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
       end
@@ -344,10 +345,11 @@ module Canvas::LiveEvents
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
     if actl
-      if (tool_proxy = Lti::ToolProxy.find_all_proxies_for_context_by_context_order_by_vendor_product_code(
+      if (tool_proxy = Lti::ToolProxy.proxies_in_order_by_codes(
         context: submission.course,
         vendor_code: actl.tool_vendor_code,
-        product_code: actl.tool_product_code
+        product_code: actl.tool_product_code,
+        resource_type_code: actl.tool_resource_type_code
       ).first)
         event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
       end

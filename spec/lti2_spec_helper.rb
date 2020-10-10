@@ -108,6 +108,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       },
       lti_version: '1'
     )
+
     Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp
