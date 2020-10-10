@@ -210,6 +210,7 @@ es:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Una tabla de respuestas y breves estadísticas con respecto a las opciones de respuesta del alumno."
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Una tabla que contiene información sobre el esquema de calificación. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un icono para añadir más filas debajo y otro icono para borrar la línea actual."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Una tabla que contiene información sobre el esquema de calificaciones. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para agregar más filas debajo y otro botón para eliminar la fila actual."
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Una tabla que contiene información sobre el esquema de calificaciones. Primero aparece un nombre del esquema de calificaciones y luego botones para editar y eliminar el esquema. Cada fila incluye un nombre, un porcentaje máximo y un porcentaje mínimo. Además, cada fila incorpora un botón para agregar más filas debajo y otro botón para eliminar la fila actual."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A-Z
   about_this_service_b10bc808: "Acerca de este servicio"
@@ -2083,6 +2084,7 @@ es:
       GraphQL realizadas recientemente
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Permite alinear las competencias con el contenido sin puntaje"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Permite a los evaluadores ver la bandeja de auditorías para evaluaciones en SpeedGrader para asignaciones anónimas o moderadas."
+  allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Permite crear grupos de estudiantes del curso mediante la carga de CSV"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Permite crear anuncios para una sección específica"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Permite crear foros para una sección específica"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Permite que los enlaces de ayuda se etiqueten como Destacados o Nuevos y muestra a la vista el enlace de ayuda destacado en el menú Ayuda."
@@ -2306,6 +2308,10 @@ es:
       Permite al usuario enviar un mensaje a “Todos en [course group]”.
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Permite al usuario enviar un mensaje a “Todos en [course name]” o a “Todos en [course group]”."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Permite al usuario enviar mensajes a miembros individuales del curso."
+  allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "Le permite al usuario establecer cálculos de competencia de resultados a nivel del curso."
+  allows_user_to_set_outcome_proficiency_calculation_73761bf4: "Le permite al usuario establecer cálculos de competencia de resultados a nivel de la cuenta y del curso."
+  allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Le permite al usuario establecer escalas de competencia de resultados a nivel de la cuenta y del curso."
+  allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: "Le permite al usuario establecer escalas de competencia de resultados a nivel del curso."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Permite al usuario compartir un examen en Commons."
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Permite que el usuario comparta ítems del curso directamente con otros usuarios. Permite que el usuario copie ítems individuales de un curso a otro curso."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Permite al usuario ver la identificación del SIS de un curso."
@@ -2828,6 +2834,7 @@ es:
   arrange_columns_by_due_date_888f2551: "Arreglar las columnas por hora límite de entrega"
   arrange_columns_by_due_date_f74f9e2d: "Arreglar las columnas por fecha de entrega"
   arrange_columns_by_points_48da9ba3: "Disponer columnas por puntos"
+  artifact_f7003de5: Artefacto
   artist_info_for_username_for_description_12d5d862: "Información del artista para %{userName} para %{description}"
   as_of_a036fa2e: "A partir de"
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Al escribir en este campo, la lista de grupos se filtrará automáticamente para incluir solo aquellos cuyo nombre coincida con su entrada."
@@ -4908,9 +4915,11 @@ es:
   certificate_fingerprint_b376df90: "Huella digital certificada"
   change_applied_89d1aa5a: "Cambio aplicado"
   change_beginning_date_to_39dbd06e: "Cambiar fecha de comienzo a"
+  change_color_for_proficiency_rating_position_48b39bfc: "Cambiar color de la calificación de competencia %{position}"
   change_course_visibility_eaa2ffc: "Cambiar la visibilidad del curso"
   change_dcaa253a: Cambiar
   change_description_34c49853: "Modificar descripción"
+  change_description_for_proficiency_rating_position_97626231: "Cambiar descripción de la calificación de competencia %{position}"
   change_ending_date_to_d2cebd54: "Cambiar fecha de finalización a"
   change_existing_group_2c91a32b: "Modificar el grupo existente"
   change_groups_4e2ab6c3: "Cambiar grupos"
@@ -4920,6 +4929,7 @@ es:
   change_name_c8cce76c: "Cambiar nombre"
   change_name_to_568374c8: "Cambiar \"%{name}\" a"
   change_points_9e5104ac: "Cambiar puntos"
+  change_points_for_proficiency_rating_position_a385c658: "Cambiar puntos de la calificación de competencia %{position}"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "El dejar los puntos totales de la tarea en %{assignmentPoints} y los puntos totales de la rúbrica en %{rubricPoints} dará lugar a un puntaje máximo posible de %{toPercentage_pointRatio} para las entregas de los estudiantes calificados con la rúbrica."
@@ -6399,8 +6409,9 @@ es:
     other: "%{count} tareas con errores"
     zero: "No hay tareas sin errores. Haga clic en Continuar"
   count_attempts_d23c69a0: 
-    one: "1 intento"
+    one: 1 intento
     other: "%{count} intentos"
+    zero: "Intentos ilimitados"
   count_comments_cb137ab8: 
     one: "1 comentario"
     other: "%{count} comentarios"
@@ -7472,6 +7483,7 @@ es:
   create_edit_line_item_scores_116482c7: "Crear/editar los puntajes de los elementos de línea"
   create_educational_resources_8219326e: "Crear recursos educativos"
   create_failed_15d07ad4: "La creación no se pudo completar"
+  create_files_after_rce_media_upload_recording_77d75a96: "Crear archivos luego de la grabación/carga de elementos multimedia mediante el RCE"
   create_interactive_course_content_76665336: "Cree contenido interactivo del curso"
   create_item_base: 
     there_was_an_error: "Se produjo un error al guardar \"%{title}\". Inténtelo de nuevo."
@@ -7512,9 +7524,13 @@ es:
   created_created_bf5714b8: "Creado %{created}"
   created_descending_e9a1b097: "Creado: Descendente"
   created_group_group_name_2097306b: "Grupo %{group_name} creado"
+  creates_file_objects_initially_hidden_to_students__7f333bf0: |-
+      Crea objetos de archivos (ocultos inicialmente para los estudiantes si están en un curso) después
+      de cargar o grabar elementos multimedia mediante el RCE.
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Aún no se maneja la creación de grupos en el nuevo estado de flujo de tareas. ¿Desea dirigirse a la página heredada de tareas?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "La creación de una Exportación de entrega le permitirá descargar un archivo zip de todas sus entregas de tarea en todos sus cursos actuales y pasados. Este podría ser un archivo de gran tamaño, por lo que puede demorarse un tiempo. Puede navegar fuera de la página y volver más tarde."
   creating_conference_95b59116: "Creando conferencia"
+  creating_group_17bd69ce: "Creando grupo"
   creating_key_8a026e61: "Creando clave"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Licencia Creative Commons:"
@@ -7934,6 +7950,7 @@ es:
   delete_prerequisite_5e97bdf4: "Eliminar el prerrequisito"
   delete_prerequisite_title_19741947: "Eliminar el prerrequisito %{title}"
   delete_proficiency_rating_5436ee08: "Borrar clasificación de competencia"
+  delete_proficiency_rating_position_46e205f7: "Eliminar calificación de competencia %{position}"
   delete_quiz_142b8099: "Eliminar examen"
   delete_rating_24876355: "Eliminar calificación"
   delete_requirement_bce2d943: "Eliminar requisito"
@@ -8172,6 +8189,9 @@ es:
   disable_authentication_for_graphql_3c019622: "Deshabilitar autenticación para GraphQL"
   disable_automatic_submission_8e1d8676: "Deshabilitar presentación automática"
   disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Deshabilitar los métodos abreviados de teclado de Canvas. Algunos usuarios que usen lectores de pantalla o navegación por teclado
+      tendrán una experiencia mejorada al tener estos métodos abreviados desactivados.
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
       Deshabilitar los métodos abreviados de teclado de Canvas. Algunos usuarios que usen lectores de pantalla o navegación por teclado
       tendrán una experiencia mejorada al tener estos métodos abreviados desactivados.
   disable_celebrations_description: "Al habilitar esta función se ocultarán todas las animaciones de celebración."
@@ -8958,6 +8978,7 @@ es:
   email_address_a1b97a39: "Dirección de correo electrónico"
   email_address_optional_72795076: "Dirección de correo electrónico (opcional)"
   email_addresses_893faeb2: "Direcciones de correo electrónico"
+  email_addresses_required_14483dc8: "Direcciones de correo electrónico (obligatorio)"
   email_already_in_use_330248e: "El correo electrónico ya está en uso"
   email_e366fa29: "correo electrónico"
   email_is_invalid_e0d982eb: "El correo electrónico no es válido"
@@ -9082,6 +9103,18 @@ es:
   enrollment_term_7bfe840: "Período de inscripción"
   enrollment_terms_8753ec11: "Términos de la inscripción"
   enrollments_e250c9c3: Inscripciones
+  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
+      Pueden agregarse inscripciones desde el sistema de información del estudiante (SIS) de su institución. Si se crea una inscripción mediante SIS, únicamente los administradores pueden eliminar la inscripción del curso.
+              Para acceder a la página Personas, debe estar habilitado Usuarios: ver lista (Users - view list). Si la configuración de la cuenta Inscripción abierta está habilitada, los usuarios con este permiso pueden agregar estudiantes a un curso mediante la dirección de correo electrónico si el usuario aún no tiene una cuenta de Canvas. Para ver las identificaciones de SIS, debe estar habilitado Datos de SIS: leer (SIS Data - read). Para agregar un usuario a un curso mediante la identificación de SIS, también debe estar habilitado Datos de SIS: administrar (SIS Data - manage). Para editar la sección de un estudiante, también deben estar habilitados Usuarios: ver lista (Users - view list) y Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members). Para vincular un observador con un estudiante, también debe estar habilitado Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
+      Pueden agregarse inscripciones desde el sistema de información del estudiante (SIS) de su institución. Si se crea una inscripción mediante SIS, únicamente los administradores pueden eliminar la inscripción del curso.
+              Para acceder a la página Personas, Usuarios: ver lista (Users - view list) debe estar habilitado. Para ver las identificaciones de SIS, debe estar habilitado Datos de SIS: leer (SIS Data - read). Para editar la sección de un profesor o profesor asistente, también deben estar habilitados Usuarios: ver lista (Users - view list) y Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members). Para vincular un observador con un estudiante, también debe estar habilitado Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
+      Pueden agregarse inscripciones desde el sistema de información del estudiante (SIS) de su institución. Si se crea una inscripción mediante SIS, únicamente los administradores pueden eliminar la inscripción del curso.
+              Para ver la lista de los usuarios en el curso, debe estar habilitado Usuarios: ver lista (Users - view list). Para ver las identificaciones de SIS, debe estar habilitado Datos de SIS: leer (SIS Data - read). Para agregar un usuario a un curso mediante la identificación de SIS, también debe estar habilitado Datos de SIS: administrar (SIS Data - manage). Para editar la sección de un estudiante y el rol en el curso, también deben estar habilitados Usuarios: ver lista (Users - view list) y Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members). Para anular la inscripción de usuarios en la página de detalles del usuario, también deben estar habilitados Ver la lista de cursos (View the list of courses) y Ver la lista de usuarios (See the list of users). Permite al usuario reenviar invitaciones del curso desde la página Personas del curso. Si la configuración de la cuenta Inscripción abierta está habilitada, los usuarios con este permiso pueden agregar estudiantes a un curso desde la página de Personas del curso mediante direcciones de correo electrónico si el usuario aún no tiene una cuenta de Canvas. Para vincular un observador con un estudiante, deben estar habilitados Usuarios: administrar detalles de inicio de sesión (Users - manage login details) y Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
+  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
+      Pueden agregarse inscripciones desde el sistema de información del estudiante (SIS) de su institución. Si se crea una inscripción mediante SIS, únicamente los administradores pueden eliminar la inscripción del curso.
+              Para acceder a la página Personas, Usuarios: ver lista (Users - view list) debe estar habilitado. Para ver las identificaciones de SIS, debe estar habilitado Datos de SIS: leer (SIS Data - read). Para agregar un usuario a un curso mediante la identificación de SIS, también debe estar habilitado Datos de SIS: administrar (SIS Data - manage). Para editar la sección de un profesor o de un profesor asistente, también debe estar habilitado Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members). Para vincular un observador con un estudiante, también debe estar habilitado Mensajería: enviar mensajes a miembros individuales del curso (Conversations - send messages to individual course members).
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Garantiza que no se dupliquen las competencias que ya se importaron a un curso si se vuelven a importar"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Garantiza que los usuarios que no cuenten con autorización para importar competencias no vean el botón dentro de la pestaña Competencias (Outcomes)"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Ingresar aquí un código hex para usar un color personalizado."
@@ -9383,6 +9416,7 @@ es:
   error_associating_assignment_assignment_name_with__d92e9acf: "Error al asociar la tarea \"%{assignment_name}\" con una herramienta LTI."
   error_deleting_name_reason_11f9d399: "Error al eliminar %{name}: %{reason}"
   error_duplicating_module_4b023042: "Error al duplicar el módulo"
+  error_during_group_creation_f232994b: "Error durante la creación del grupo"
   error_exporting_gradebook_msg_6ea31e2f: "Error al exportar libro de calificaciones: %{msg}"
   error_fetching_access_token_1445a9e3: "Error al obtener el token de acceso"
   error_fetching_user_details_7c85d23: "Error al obtener los detalles del usuario"
@@ -9877,6 +9911,7 @@ es:
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "El archivo(s) será incluído cuando el contenido del usuario sea visualizado dentro de las aplicaciones de iOS o Android de Canvas."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "El archivo(s) será incluido cuando el contenido del usuario sea visualizado dentro de las aplicaciones de iOS o Android de Canvas y en aplicaciones de terceros basadas en nuestra API."
   file_select_filename_folder_contents_9146bab7: "Selección del archivo, contenido de la carpeta de %{filename}"
+  file_selected_for_upload_filename_18ca9b8a: "Archivo seleccionado para su carga: %{filename}"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} aplica la capacidad de almacenamiento de archivos de usuario"
   file_status: 
     hidden_status: "Oculto. Disponible con un vínculo"
@@ -11159,6 +11194,7 @@ es:
   group_category_locked: "No se puede modificar la categoría del grupo porque los alumnos ya han realizado presentaciones a esta tarea"
   group_collaborations_b747d43: "Colaboraciones del grupo"
   group_conferences_12866179: "Conferencias del grupo"
+  group_created_successfully_cae99f8c: "Grupo creado correctamente"
   group_details_e51122f1: "Detalles del grupo"
   group_discussions_17d79aa0: "Foros de discusión del grupo"
   group_files_4324f3df: "Archivos del grupo"
@@ -11181,6 +11217,7 @@ es:
     errors: 
       group_full: "El grupo está lleno."
       not_in_group_section: "%{student} no comparte una sección con otros miembros de %{group}."
+  group_membership_limit_54e165b: "Límite de membresía del grupo"
   group_name_b69c144: "Nombre del grupo"
   group_name_group_announcements_5ce81c6d: "%{group_name}-Anuncios del grupo"
   group_name_group_calendar_7f10e0ed: "%{group_name}-Calendario del grupo"
@@ -11939,6 +11976,9 @@ es:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "En caso de estar habilitado, los diseñadores de contenido deben proporcionar los derechos de autor y la información sobre la licencia de los archivos antes de ser publicados. Solo aplica si el explorador Better File también está habilitado."
   if_enabled_copyright_and_license_information_must__2a551827: "Si se habilita, se deberá proporcionar información de licencia y derecho de autor de los archivos antes de su publicación."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Si están habilitados, se usarán las opciones de administración y el alcance del autentificador."
+  if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
+      De estar activadas, las consultas de GraphQL no requerirán
+      que los usuarios hayan iniciado sesión ni que usen un autentificador de acceso.
   if_enabled_graphql_queries_will_not_require_users__85f1740: |-
       De estar activadas, las consultas de GraphQL no requerirán
       que los usuarios hayan iniciado sesión ni que usen un autentificador de acceso.
@@ -12067,6 +12107,7 @@ es:
   import_a_set_of_outcomes_6b782192: "Importar un conjunto de resultados"
   import_commons_favorites_e68fce81: "Importar favoritos de Commons"
   import_content_b2fd6620: "Importar contenido"
+  import_course_student_groups_by_csv_d2cde97d: "Importar grupos de estudiantes del curso mediante CSV"
   import_e929507b: Importar...
   import_learning_outcomes_36d28a2b: "Importar resultados del aprendizaje"
   import_outcomes_7dda186b: "Importar resultados"
@@ -12207,6 +12248,7 @@ es:
   insert_math_equation_57c6e767: "Insertar la ecuación matemática"
   insert_row_below_25187f89: "Insertar fila debajo"
   insert_row_below_name_a5b3bd41: "Insertar fila debajo de %{name}"
+  insert_row_in_edit_mode_5976f269: "Insertar fila en el modo de edición"
   insights_b514ad8d: Estadísticas
   install_c54fad9b: Instalar
   installed_7b284a91: Instalada
@@ -12336,6 +12378,7 @@ es:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "Archivo CSV no válido No se pudieron actualizar las calificaciones."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Archivo csv inválido, las notas no pudieron ser actualizadas."
   invalid_custom_fields_c66dcdb6: "Campos personalizados inválidos."
+  invalid_date_2a10bb7b: "Fecha inválida"
   invalid_date_and_time_1a42d206: "Fecha y hora inválidas"
   invalid_date_or_datetime_for_field_b38fe386: "Fecha o fecha/hora inválida para %{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Fecha no válida o fecha y hora no válida para %{attr}"
@@ -12369,6 +12412,7 @@ es:
   invalid_value_for_name_i_4a7c601a: "Valor inválido para %{name}: \"%{i}\""
   invalid_xml_configuration_9c3f6bcf: "Configuración XML no válida."
   invalid_xml_syntax: "Sintaxis xml inválida"
+  invitation_only_9a253f1d: "Solo con invitación"
   invite_5b1fcbcd: Invitar
   ip_filter_is_not_valid_152a46d8: "El filtro IP no es válido."
   ireland_353_3cd32cc0: "Irlanda (+353)"
@@ -12852,6 +12896,7 @@ es:
   loading_725811ca: cargando
   loading_additional_items_ed5f672d: "Cargando ítems adicionales..."
   loading_announcements_b927a86c: "Cargando anuncios"
+  loading_artifact_dc3bfe9f: "Cargando artefacto"
   loading_assessment_audit_trail_5cf4c10: "Cargando el informe de auditoría de la evaluación"
   loading_assignments_352ec769: "Cargando tareas"
   loading_assignments_b3b248be: "Cargando tareas"
@@ -13041,6 +13086,7 @@ es:
   login_handle_is_required_90ab7fe0: "%{login_handle} es obligatorio"
   login_id_12109693: "Identificador de inicio de sesión"
   login_id_bc943b97: "Identificador de ingreso:"
+  login_ids_required_ff2273ab: "ID de inicio de sesión (obligatorio)"
   login_info_d1d9f11e: "Información de inicio de sesión"
   login_instructure_logo_8f2332db: "Logotipo de Instructure del inicio de sesión"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "El ingreso es inválido: debe ser alfanumérico o una dirección de correo electrónico"
@@ -13180,6 +13226,7 @@ es:
   mastered_34d4c857: Dominado
   mastery_7ec348b5: Dominio
   mastery_connect_64598f55: "Conexión de dominio"
+  mastery_mastery_for_proficiency_rating_position_74aa3b56: "Dominio %{mastery} de la calificación de competencia %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Dominio: %{n_mastery_points_precision_2_str} Puntos"
   mastery_path_processing_f4471152: "Procesamiento del camino hacia el dominio"
   mastery_paths_breakdown_6e0b5fce: "Desglose de los caminos del dominio"
@@ -13298,6 +13345,7 @@ es:
   meets_mastery_754e1c06: "Reúne el dominio"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} miembros de un máximo de %{max_membership}"
   members_af25c21d: Miembros
+  members_are_free_to_join_defa5929: "Cualquier miembro puede unirse"
   membership_by_invitation_only_9bc27199: "Membresía solo por invitación"
   membership_service_configuration_d8ba5a74: "Configuración del servicio de membresía"
   menu: 
@@ -15757,6 +15805,7 @@ es:
   no_allowed_domains_b6633d12: "No hay dominios permitidos"
   no_announcements_280df147: "No hay anuncios"
   no_announcements_to_display_fbf9ed1e: "No hay anuncios para mostrar"
+  no_artifacts_with_that_name_found_b8679f53: "No se encontraron artefactos con ese nombre"
   no_assignment_group_assigned_8f1cdb9b: "No se asignó ningún grupo de tareas"
   no_assignment_name_adbb215b: "La tarea no tiene nombre"
   no_assignments_with_that_name_found_1d7be1: "No se encontraron tareas con ese nombre"
@@ -16491,6 +16540,10 @@ es:
   outcome_imports_c496a81f: "Importaciones de resultados"
   outcome_path_mastery_points: "%{path} puntos de dominio"
   outcome_path_result: "%{path} resultado"
+  outcome_proficiency_calculations_5959b681: "Cálculos de competencia de resultados"
+  outcome_proficiency_calculations_add_edit_5a2217b7: "Cálculos de competencia de resultados: agregar/editar"
+  outcome_proficiency_scales_a316bd83: "Escalas de competencia de resultados"
+  outcome_proficiency_scales_add_edit_58da6a3: "Escalas de competencia de resultados: agregar/editar"
   outcome_results: 
     outcomes_filename: Competencias
   outcome_results_23a0a117: "Determinar resultados"
@@ -16834,6 +16887,8 @@ es:
   performed_by_70b3ce96: "Realizada por"
   permission_must_be_enabled_for_someone_397e1ce3: "El permiso debe ser habilitado para alguien"
   permission_not_found_620b80d1: "No se han encontrado los permisos"
+  permission_to_change_this_mastery_calculation_is_e_91e19659: "El permiso para cambiar este cálculo de dominio está habilitado a nivel de la cuenta para:"
+  permission_to_change_this_mastery_scale_is_enabled_89066fac: "El permiso para cambiar esta escala de dominio está habilitado a nivel de la cuenta para:"
   permissions: 
     manage_webhooks: "Webhooks - administrar"
     provision_catalog: "Proporcionar un catálogo"
@@ -17546,6 +17601,7 @@ es:
   product_tours_1e19eb95: "Recorrido del producto"
   proficiency_calculation_57f0bdf: "Cálculo de dominio"
   proficiency_calculation_parameters_5f605dec: "Parámetros de cálculo de dominio"
+  proficiency_level_1d05e468: "Nivel de competencia"
   proficiency_rating_6346119f: "Calificación de competencia"
   proficiency_rating_deleted_77827473: "Calificación de aptitud eliminada"
   proficiency_ratings_2bbabdcd: "Calificaciones de competencia"
@@ -19769,6 +19825,7 @@ es:
   remove_role_filter_label_a27b6797: "Eliminar filtro de rol %{label}"
   remove_row_c198da5a: "Eliminar fila"
   remove_row_f9d59cba: "Eliminar fila"
+  remove_row_in_edit_mode_49c4dc07: "Eliminar fila en el modo de edición"
   remove_row_name_c053f5ae: "Eliminar fila %{name}"
   remove_row_row_167c424a: "Eliminar fila %{row}"
   remove_student_from_recipients_4b206e35: "Eliminar %{student} desde los destinatarios"
@@ -19798,6 +19855,10 @@ es:
         minute: min
   replace_e61834a7: Reemplazar
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Reemplaza el árbol de carpetas actual con una nuevo árbol de carpetas accesible y función más rica."
+  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
+      Reemplaza la imagen existente de la ecuación matemática y el MathML oculto
+      con una versión formateada de MathJax. Esto permite tener una mejor accesibilidad
+      y le proporciona muchas opciones al lector para interactuar con la ecuación en la página.
   reply_389d6fb9: Respuesta
   reply_from_name: "%{name} a través de Notificaciones de Canvas"
   reply_to_comment_72d96728: "Responder al comentario"
@@ -19949,6 +20010,8 @@ es:
       manage_interaction_alerts: "Administrar alertas"
       manage_links: "Gestionar enlances de rol y confianza"
       manage_outcomes: "Administrar los resultados del aprendizaje"
+      manage_proficiency_calculations: "Administrar cálculos de competencia de resultados"
+      manage_proficiency_scales: "Administrar escalas de competencia de resultados"
       manage_role_overrides: "Administrar los permisos"
       manage_rubrics: "Crear y editar rúbricas de evaluación"
       manage_sections: "Administrar (crear/editar/eliminar) secciones del curso"
@@ -21542,6 +21605,7 @@ es:
   show_exceptions_270ea1c5: "Mostrar excepciones"
   show_final_grade_a95e14dc: "Mostrar calificación final"
   show_final_grade_override_8cde5803: "Mostrar la anulación de la calificación final"
+  show_final_grade_overrides_only_c3017aaa: "Mostrar únicamente anulaciones de calificación final"
   show_groups_navigation_menu_1521d38d: "Mostrar menú de navegación de grupos"
   show_inactive_enrollments_8f4c4824: "Mostrar las inscripciones inactivas"
   show_key_1fbf0c64: "Mostrar clave"
@@ -21608,6 +21672,7 @@ es:
   sis_id_4495a887: "Identificación del SIS"
   sis_id_70eda157: "Identificación del SIS"
   sis_id_8c2029e1: "Identificación del SIS"
+  sis_ids_required_125074d9: "ID de SIS (obligatorio)"
   sis_import: 
     buttons: 
       process_data: "Procesar la Información"
@@ -22943,6 +23008,7 @@ es:
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Este item volverá a aparecer cuando se haga una nueva entrega."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Este item volverá a aparecer cuando haya nuevas calificaciones que moderar."
   this_login_is_for_provider_6f17462: "Este acceso es para %{provider}"
+  this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: "Esta escala de dominio se usará como la opción predeterminada para todos los cursos dentro de su cuenta."
   this_may_take_a_bit_48fe4235: "Esto puede tomar un tiempo..."
   this_may_take_a_bit_c061d0f6: "esto puede tomar un tiempo..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Este mensaje incluye comentarios de multimedia. Para escuchar o responder, haga clic en este vínculo: %{link}."
@@ -23946,6 +24012,7 @@ es:
   updated_current_grade_to_be_empty_c2ce1d13: "Se actualizó la calificación actual para que quede vacía"
   updated_current_grade_to_currentgrade_bfe2ea14: "Se actualizó la calificación actual a %{currentGrade}"
   updated_group_group_name_727b1d98: "Se ha actualizado el grupo %{group_name}"
+  updated_math_equation_display_583671a8: "Visualización de la ecuación matemática actualizada"
   updated_permissions_page_f2e91060: "Página de permisos actualizados"
   updated_terms_of_service_82f34148: "Términos de servicio actualizados"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Interfaz del usuario actualizada para la búsqueda y visualización de los usuarios y cursos dentro de una cuenta."
