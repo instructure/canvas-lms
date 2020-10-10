@@ -125,12 +125,18 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     group = seen_groups[key]
     group ||= group_category.groups.where(id: group_id).take if group_id
     group ||= group_category.groups.where(sis_source_id: group_sis_id).take if group_sis_id
+    restore_group(group) if group&.deleted?
     if group_name
-      group ||= group_category.groups.where(name: group_name).take
+      group ||= group_category.groups.active.where(name: group_name).take
       group ||= create_new_group(group_name)
     end
     seen_groups[key] ||= group
     group
+  end
+
+  def restore_group(group)
+    group.workflow_state = 'available'
+    group.save!
   end
 
   def create_new_group(name)
