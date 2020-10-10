@@ -209,6 +209,7 @@ de:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: "Eine Liste mit Antworten und einer kurzen Statistik in Bezug auf die Antworten der Studenten"
   a_table_that_contains_the_grading_scheme_data_each_d461c205: "Eine Tabelle mit den Daten des Benotungssystems. Jede Zeile enthält einen Namen sowie einen Prozentsatz für das Maximum und das Minimum. Darüber hinaus enthält jede Zeile ein Symbol zum Hinzufügen einer neuen Zeile unterhalb der aktuellen Zeile und ein Symbol zum Löschen der aktuellen Zeile."
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: "Eine Tabelle mit den Daten des Benotungsschemas. Jede Zeile enthält einen Namen sowie einen maximalen und minimalen Prozentwert. Zudem verfügt jede Zeile über eine Schaltfläche, um unten eine neue Zeile hinzuzufügen sowie eine Schaltfläche, um die aktuelle Zeile zu löschen."
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: "Eine Tabelle, die Benotungsschemadaten enthält Am Anfang stehen der Name des Benotungsschemas und der Schaltflächen zum Bearbeiten und Löschen des Schemas. Jede Zeile enthält einen Namen, einen maximalen und einen minimalen Prozentsatz. Außerdem enthält jede Zeile eine Schaltfläche zum Hinzufügen einer neuen Zeile darunter und eine Schaltfläche zum Löschen der aktuellen Zeile."
   a_z_243c3301: A–Z
   a_z_29d8e67c: A–Z
   about_this_service_b10bc808: "Über diesen Service"
@@ -2055,6 +2056,7 @@ de:
       GraphQL-Mutationen anzuzeigen.
   allows_aligning_outcomes_to_non_scoring_content_537ce399: "Erlaubt die Ausrichtung von Ergebnissen an Inhalten ohne Bewertung"
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Bewertern die Anzeige des Bewertungsaudit-Fachs in SpeedGrader für anonyme oder moderierte Aufgaben erlauben."
+  allows_course_student_groups_to_be_created_by_csv__bb0c8456: "Ermöglicht das Einrichten von studentischen Gruppen per CSV-Upload"
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Ermöglicht das Erzeugen von Ankündigungen für einen bestimmten Abschnitt"
   allows_creating_discussions_for_a_specific_section_6bf44036: "Ermöglicht das Erzeugen von Diskussionen für einen bestimmten Abschnitt"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Ermöglicht es, Hilfelinks als Ausgewählt oder Neu zu markieren und zeigt die ausgewählten Hilfelinks im Hilfe-Menü an prominenter Stelle an."
@@ -2277,6 +2279,10 @@ de:
       Erlaubt dem Benutzer, eine Nachricht an „Alle in [course group]“ zu senden.
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Erlaubt dem Benutzer, eine Nachricht an „Alle in [course name]“ oder „Alle in [course group]“ zu senden."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Erlaubt dem Benutzer, eine Nachricht an einzelne Kursteilnehmer zu senden."
+  allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "Erlaubt dem Benutzer das Festlegen der Berechnungen des Kenntnisstands auf Kursebene."
+  allows_user_to_set_outcome_proficiency_calculation_73761bf4: "Erlaubt dem Benutzer das Festlegen der Berechnungen des Kenntnisstands auf Konto- und Kursebene."
+  allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Erlaubt dem Benutzer das Festlegen der Kenntnisstandsskalen auf Konto- und Kursebene."
+  allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: "Erlaubt dem Benutzer das Festlegen der Berechnungen des Kenntnisstands auf der Kursebene."
   allows_user_to_share_a_quiz_to_commons_6746e0da: "Erlaubt dem Benutzer, ein Quiz für Commons freizugeben."
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: "Erlaubt dem Benutzer, Kurselemente direkt mit anderen Nutzern zu teilen. Erlaubt dem Benutzer, einzelne Kurselemente in einen anderen Kurs zu kopieren."
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "Erlaubt dem Benutzer, die SIS-ID eines Kurses anzuzeigen."
@@ -2799,6 +2805,7 @@ de:
   arrange_columns_by_due_date_888f2551: "Spalten nach Abgabefrist sortieren"
   arrange_columns_by_due_date_f74f9e2d: "Spalten nach Abgabefrist sortieren"
   arrange_columns_by_points_48da9ba3: "Spalten nach Punkten ordnen"
+  artifact_f7003de5: Artefakt
   artist_info_for_username_for_description_12d5d862: "Künstlerinfo für %{userName} für %{description}"
   as_of_a036fa2e: Ab
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: "Wenn Sie etwas in dieses Feld eingeben, wird die Liste der Gruppen automatisch nach den Gruppen gefiltert, deren Namen mit Ihrer Eingabe übereinstimmen."
@@ -3731,7 +3738,7 @@ de:
   attempt_1_7ba3c30f: "Versuch 1"
   attempt_1_grade_484b35e4: "Versuch 1: %{grade}"
   attempt_3dd42b18: Versuch
-  attempt_attempt_d3911720: "Versuch %{attempt}"
+  attempt_attempt_d3911720: "Versuch %{attempt}"
   attempt_attempt_grade_c01f45df: "Versuch %{attempt} %{grade}"
   attempt_count_267a4fc5: "Versuch %{count}"
   attempt_current_attempt_ef626179: "Versuch %{current_attempt}"
@@ -4875,9 +4882,11 @@ de:
   certificate_fingerprint_b376df90: "Certificate Fingerprint"
   change_applied_89d1aa5a: "Änderung übernommen"
   change_beginning_date_to_39dbd06e: "Anfangsdatum ändern auf"
+  change_color_for_proficiency_rating_position_48b39bfc: "Farbe für die Kompetenzeinstufung %{position} ändern"
   change_course_visibility_eaa2ffc: "Sichtbarkeit des Kurses ändern"
   change_dcaa253a: Ändern
   change_description_34c49853: "Beschreibung ändern"
+  change_description_for_proficiency_rating_position_97626231: "Ändern der Beschreibung für die Kompetenzeinstufung %{position}"
   change_ending_date_to_d2cebd54: "Enddatum ändern auf"
   change_existing_group_2c91a32b: "Vorhandene Gruppe ändern"
   change_groups_4e2ab6c3: "Gruppen ändern"
@@ -4887,6 +4896,7 @@ de:
   change_name_c8cce76c: "Name ändern"
   change_name_to_568374c8: "„%{name}“ ändern in"
   change_points_9e5104ac: "Punkte ändern"
+  change_points_for_proficiency_rating_position_a385c658: "Punkte für die Kompetenzeinstufung %{position} ändern"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "Bleibt die Gesamtpunktzahl der Aufgabe bei %{assignmentPoints} und die Gesamtpunktzahl des Bewertungsschemas bei %{rubricPoints}, führt dies zu einem maximalen Punktwert von %{toPercentage_pointRatio} der von Studenten abgegebenen Aufgaben, die nach dem Bewertungsschema benotet wurden."
@@ -5054,7 +5064,7 @@ de:
   col_is_sorted_descending_1cef74aa: "%{col} Ist absteigend sortiert"
   collaboration: 
     default_title: "Unbenannte Kollaboration"
-  collaboration_71c024f4: Collaboration
+  collaboration_71c024f4: Zusammenarbeit
   collaboration_ce3e2bac: "+ Arbeitsgruppe"
   collaboration_creation_failed_95ff831f: "Einrichtung der Arbeitsgruppe fehlgeschlagen"
   collaboration_update_failed_eb6622f3: "Arbeitsgruppenaktualisierung fehlgeschlagen"
@@ -6356,8 +6366,9 @@ de:
     other: "%{count} Aufgaben mit Fehlern"
     zero: "Keine Aufgaben mit Fehlern. Klicken Sie auf „Fortfahren“"
   count_attempts_d23c69a0: 
-    one: "1 Versuch"
-    other: "%{count} Versuche"
+    one: 1 Versuch
+    other: "%{count} Versuche"
+    zero: "Anzahl der Versuche unbegrenzt"
   count_comments_cb137ab8: 
     one: "1 Kommentar"
     other: "%{count} Kommentare"
@@ -7425,6 +7436,7 @@ de:
   create_edit_line_item_scores_116482c7: "Punktzahlen für Positionen erstellen/ändern"
   create_educational_resources_8219326e: "Erstellen von pädagogischen Ressourcen."
   create_failed_15d07ad4: "Erstellung fehlgeschlagen"
+  create_files_after_rce_media_upload_recording_77d75a96: "Dateien nach dem Hochladen/Aufzeichnen von RCE-Medien erstellen"
   create_interactive_course_content_76665336: "Interaktive Kursinhalte erstellen"
   create_item_base: 
     there_was_an_error: "Beim Speichern von \"%{title}\" ist ein Fehler aufgetreten. Versuchen Sie es erneut."
@@ -7465,9 +7477,13 @@ de:
   created_created_bf5714b8: "Erstellt %{created}"
   created_descending_e9a1b097: "Erstellt: Absteigend"
   created_group_group_name_2097306b: "Erstellte Gruppe %{group_name}"
+  creates_file_objects_initially_hidden_to_students__7f333bf0: |-
+      Erstellt Dateiobjekte (zunächst für Studenten im Kurs unsichtbar), nachdem
+      Medien durch den RCE hochgeladen oder aufgezeichnet wurden.
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: "Das Einrichten einer Gruppe wurde im neuen Aufgabenfluss noch nicht berücksichtigt. Zur angestammten Aufgabenseite gehen?"
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: "Durch Erstellen von Abgabe-Exporten können Sie eine ZIP-Datei mit all Ihren abgegebenen Aufgaben für alle aktuellen und vergangenen Kurse herunterladen. Da dies eine große Datei sein kann, dauert der Download eventuell eine Weile. Sie können zwischenzeitlich die Seite verlassen und später wieder zu ihr zurückkehren."
   creating_conference_95b59116: "Konferenz wird erstellt"
+  creating_group_17bd69ce: "Gruppe erstellen"
   creating_key_8a026e61: "Schlüssel wird erstellt"
   creative_commons_714a065f: "Creative Commons"
   creative_commons_license_725584ae: "Creative Commons-Lizenz:"
@@ -7886,7 +7902,8 @@ de:
   delete_pages_ab60f58: "Seiten löschen"
   delete_prerequisite_5e97bdf4: "Voraussetzung löschen"
   delete_prerequisite_title_19741947: "Voraussetzung %{title} löschen"
-  delete_proficiency_rating_5436ee08: "Leistungsstand löschen"
+  delete_proficiency_rating_5436ee08: "Kompetenzeinstufung löschen"
+  delete_proficiency_rating_position_46e205f7: "Kompetenzeinstufung %{position} löschen"
   delete_quiz_142b8099: "Quiz löschen"
   delete_rating_24876355: "Bewertung löschen"
   delete_requirement_bce2d943: "Anforderung löschen"
@@ -8126,6 +8143,9 @@ de:
   disable_authentication_for_graphql_3c019622: "Die Authentifizierung für GraphQL deaktivieren"
   disable_automatic_submission_8e1d8676: "Automatische Abgabe deaktivieren"
   disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      Canvas-Tastenkombinationen deaktivieren. Die Erfahrung einiger Benutzer, die Screenreader oder die Tastaturnavigation verwenden,
+      wird durch das Ausschalten dieser Tastenkombinationen verbessert.
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
       Canvas-Tastenkombinationen deaktivieren. Die Erfahrung einiger Benutzer, die Screenreader oder die Tastaturnavigation verwenden,
       wird durch das Ausschalten dieser Tastenkombinationen verbessert.
   disable_celebrations_description: "Mit dieser Funktion werden alle Feieranimationen ausgeblendet."
@@ -8911,6 +8931,7 @@ de:
   email_address_a1b97a39: E-Mail-Adresse
   email_address_optional_72795076: "E-Mail-Adresse (optional)"
   email_addresses_893faeb2: E-Mail-Adressen
+  email_addresses_required_14483dc8: "E-Mail-Adressen (erforderlich)"
   email_already_in_use_330248e: "E-Mail wird bereits verwendet."
   email_e366fa29: E-Mail
   email_is_invalid_e0d982eb: "Die E-Mail ist ungültig."
@@ -9034,6 +9055,18 @@ de:
   enrollment_term_7bfe840: Einschreibungssemester
   enrollment_terms_8753ec11: Einschreibungsbedingungen
   enrollments_e250c9c3: Einschreibungen
+  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
+              Für den Zugriff auf die Seite „Teilnehmer“ muss „Benutzer – Liste anzeigen“ aktiviert sein. Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten über die E-Mail-Adresse zu einem Kurs hinzufügen, auch wenn der Benutzer noch kein Canvas-Konto hat. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Studenten zu bearbeiten, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
+              Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um den Abschnitt eines Lehrers oder TAs zu ändern, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
+              Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Studenten und seine Kursrolle zu ändern, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um Benutzer auf der Detailseite abzumelden, müssen die Optionen „Die Kursliste anzeigen“ und „Die Benutzerliste sehen“ ebenfalls aktiviert sein. Erlaubt dem Benutzer, auf der Seite „Kurse und Teilnehmer“ Kurseinladungen erneut zu versenden. Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite „Kursteilnehmer“ Studenten über die E-Mail-Adressen zu einem Kurs hinzufügen, auch wenn der Benutzer noch kein Canvas-Konto hat. Um einen Beobachter mit einem Student zu verknüpfen, müssen „Benutzer – Anmeldedetails verwalten“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
+              Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Lehrers oder TAs zu ändern, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Stellt sicher, dass Lernziele, die bereits in einen Kurs importiert wurden, bei einem erneuten Import nicht dupliziert werden"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Stellt sicher, dass Benutzer ohne die Berechtigung zum Import von Lernzielen die Schaltfläche in der Registerkarte \"Lernziele\" nicht sehen können"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Zur Verwendung einer benutzerdefinierten Farbe, bitte hier einen Hexcode eingeben."
@@ -9335,6 +9368,7 @@ de:
   error_associating_assignment_assignment_name_with__d92e9acf: "Fehler beim Verknüpfen von „%{assignment_name}“ mit einem LTI-Tool"
   error_deleting_name_reason_11f9d399: "Fehler beim Löschen von %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fehler beim Duplizieren des Moduls"
+  error_during_group_creation_f232994b: "Fehler beim Erstellen der Gruppe"
   error_exporting_gradebook_msg_6ea31e2f: "Fehler beim Exportieren der Notenbuchs: %{msg}"
   error_fetching_access_token_1445a9e3: "Fehler beim Abrufen des Zugriffs-Token"
   error_fetching_user_details_7c85d23: "Fehler beim Abrufen der Benutzerdaten"
@@ -9829,6 +9863,7 @@ de:
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "Datei(en) werden aufgenommen, wenn Benutzer-Content in Canvas iOS- oder Android-Apps angezeigt wird."
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "Dateien werden aufgenommen, wenn Benutzerinhalte in Canvas iOS- oder Android-Apps und in Apps Dritter angezeigt werden, die auf unserer API aufgebaut sind."
   file_select_filename_folder_contents_9146bab7: "Dateiauswahl, %{filename} Ordnerinhalte"
+  file_selected_for_upload_filename_18ca9b8a: "Zum Hochladen ausgewählte Datei: %{filename}"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit} Benutzerdateiquote gilt"
   file_status: 
     hidden_status: "Ausgeblendet. Über einen Link verfügbar"
@@ -11106,6 +11141,7 @@ de:
   group_category_locked: "Die Gruppenkategorie kann nicht geändert werden, da Studenten diese Aufgabe bereits abgegeben haben."
   group_collaborations_b747d43: Gruppezusammenarbeiten
   group_conferences_12866179: Gruppenkonferenzen
+  group_created_successfully_cae99f8c: "Gruppe wurde erfolgreich erstellt."
   group_details_e51122f1: Gruppendetails
   group_discussions_17d79aa0: Gruppendiskussionen
   group_files_4324f3df: Gruppendateien
@@ -11128,6 +11164,7 @@ de:
     errors: 
       group_full: "Die Gruppe ist voll."
       not_in_group_section: "%{student} nutzt keinen Kursabschnitt gemeinsam mit den anderen Mitgliedern von %{group}."
+  group_membership_limit_54e165b: Gruppenmitgliedschaftsbegrenzung
   group_name_b69c144: Gruppenname
   group_name_group_announcements_5ce81c6d: "%{group_name} – Gruppenankündigungen"
   group_name_group_calendar_7f10e0ed: "%{group_name} – Gruppenkalender"
@@ -11883,6 +11920,9 @@ de:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: "Falls aktiviert, müssen Content-Designer für die Dateien die Copyright- und Lizenz-Informationen bereitstellen, bevor sie veröffentlicht werden. Gilt nur, wenn „Better File Browsing“ ebenfalls aktiviert ist."
   if_enabled_copyright_and_license_information_must__2a551827: "Falls aktiviert, müssen Copyright- und Lizenzinformationen für Dateien angegeben werden, bevor sie veröffentlicht werden können."
   if_enabled_developer_key_management_options_and_to_1708ddd3: "Wenn aktiviert, werden die Verwaltungsoptionen des Entwicklerschlüssels und die Token-Sondierung verwendet."
+  if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
+      Falls diese Option aktiviert ist, erfordern GraphQL-Abfragen keine
+      angemeldeten Benutzer zu sein, oder die Verwendung eines Zugriffstokens.
   if_enabled_graphql_queries_will_not_require_users__85f1740: |-
       Falls diese Option aktiviert ist, erfordern GraphQL-Abfragen keine
       angemeldeten Benutzer zu sein, oder die Verwendung eines Zugriffstokens.
@@ -12011,6 +12051,7 @@ de:
   import_a_set_of_outcomes_6b782192: "Importieren einer Reihe von Ergebnissen"
   import_commons_favorites_e68fce81: "Commons-Favoriten importieren"
   import_content_b2fd6620: "Content importieren"
+  import_course_student_groups_by_csv_d2cde97d: "Studentische Kursgruppen per CSV importieren"
   import_e929507b: "Importieren ..."
   import_learning_outcomes_36d28a2b: "Importieren von Lernergebnissen"
   import_outcomes_7dda186b: "Ergebnisse importieren"
@@ -12151,6 +12192,7 @@ de:
   insert_math_equation_57c6e767: "Math. Gleichung einfügen"
   insert_row_below_25187f89: "Zeile unten einfügen"
   insert_row_below_name_a5b3bd41: "Zeile einfügen nach %{name}"
+  insert_row_in_edit_mode_5976f269: "Zeile im Bearbeitungsmodus einfügen"
   insights_b514ad8d: Einblicke
   install_c54fad9b: Installieren
   installed_7b284a91: Installiert
@@ -12280,6 +12322,7 @@ de:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "CSV-Datei ungültig Noten konnten nicht aktualisiert werden."
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: "Ungültige. CSV-Datei, Noten konnten nicht aktualisiert werden."
   invalid_custom_fields_c66dcdb6: "Benutzerdefinierte Felder ungültig"
+  invalid_date_2a10bb7b: "Ungültiges Datum"
   invalid_date_and_time_1a42d206: "Datum und Uhrzeit ungültig"
   invalid_date_or_datetime_for_field_b38fe386: "Datum oder Datum/Uhrzeit ungültig für %{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "Datum, oder Datum/Uhrzeit ungültig für %{attr}"
@@ -12313,6 +12356,7 @@ de:
   invalid_value_for_name_i_4a7c601a: "Ungültiger Wert für %{name}: „%{i}“"
   invalid_xml_configuration_9c3f6bcf: "XML-Konfiguration ungültig"
   invalid_xml_syntax: "Ungültiger XML-Syntax"
+  invitation_only_9a253f1d: "Nur auf Einladung"
   invite_5b1fcbcd: Einladen
   ip_filter_is_not_valid_152a46d8: "IP-Filter ist nicht gültig."
   ireland_353_3cd32cc0: "Irland (+353)"
@@ -12794,6 +12838,7 @@ de:
   loading_725811ca: "Ladevorgang läuft"
   loading_additional_items_ed5f672d: "Zusätzliche Elemente werden geladen ..."
   loading_announcements_b927a86c: "Ankündigungen laden"
+  loading_artifact_dc3bfe9f: "Artefakt laden"
   loading_assessment_audit_trail_5cf4c10: "Prüfpfad für Bewertung wird geladen"
   loading_assignments_352ec769: "Aufgaben laden"
   loading_assignments_b3b248be: "Laden von Aufgaben"
@@ -12980,6 +13025,7 @@ de:
   login_handle_is_required_90ab7fe0: "%{login_handle} ist erforderlich"
   login_id_12109693: Anmelde-ID
   login_id_bc943b97: "Anmelde-ID:"
+  login_ids_required_ff2273ab: "Anmelde-IDs (erforderlich)"
   login_info_d1d9f11e: Anmeldeinfo
   login_instructure_logo_8f2332db: "Instructure-Logo für Anmeldung"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "Anmeldung ist ungültig: muss alphanumerisch oder eine E-Mail-Adresse sein"
@@ -13119,6 +13165,7 @@ de:
   mastered_34d4c857: "Leistungsziel erreicht"
   mastery_7ec348b5: Leistungsziel
   mastery_connect_64598f55: Leistungszielverknüpfung
+  mastery_mastery_for_proficiency_rating_position_74aa3b56: "Leistungsziel %{mastery} für die Kompetenzeinstufung %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Leistungsziel: %{n_mastery_points_precision_2_str} Punkte"
   mastery_path_processing_f4471152: "Leistungsziel-Pfad wird bearbeitet"
   mastery_paths_breakdown_6e0b5fce: "Übersicht der Leistungsziel-Pfade"
@@ -13237,6 +13284,7 @@ de:
   meets_mastery_754e1c06: "Leistungsziel erreicht"
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} Mitglieder von maximal %{max_membership}"
   members_af25c21d: Mitglieder
+  members_are_free_to_join_defa5929: "Mitglieder dürfen beitreten"
   membership_by_invitation_only_9bc27199: "Mitgliedschaft nur auf Einladung möglich"
   membership_service_configuration_d8ba5a74: "Membership Service-Konfiguration"
   menu: 
@@ -15695,6 +15743,7 @@ de:
   no_allowed_domains_b6633d12: "Keine erlaubten Domänen."
   no_announcements_280df147: "Keine Ankündigungen"
   no_announcements_to_display_fbf9ed1e: "Keine Ankündigungen anzuzeigen"
+  no_artifacts_with_that_name_found_b8679f53: "Keine Artefakte mit diesem Namen gefunden"
   no_assignment_group_assigned_8f1cdb9b: "Es wurde keine Aufgabengruppe zugewiesen."
   no_assignment_name_adbb215b: "Kein Aufgabenname"
   no_assignments_with_that_name_found_1d7be1: "Keine Aufgaben mit diesem Namen"
@@ -16426,6 +16475,10 @@ de:
   outcome_imports_c496a81f: Lernzielimporte
   outcome_path_mastery_points: "%{path}-Leistungszielpunkte"
   outcome_path_result: "%{path}-Ergebnis"
+  outcome_proficiency_calculations_5959b681: "Berechnungen des Kenntnisstands"
+  outcome_proficiency_calculations_add_edit_5a2217b7: "Berechnungen des Kenntnisstands – hinzufügen/bearbeiten"
+  outcome_proficiency_scales_a316bd83: Kenntnisstandsskalen
+  outcome_proficiency_scales_add_edit_58da6a3: "Kenntnisstandsskalen – hinzufügen/bearbeiten"
   outcome_results: 
     outcomes_filename: Lernziele
   outcome_results_23a0a117: Lernzielergebnisse
@@ -16767,6 +16820,8 @@ de:
   performed_by_70b3ce96: "Durchgeführt von"
   permission_must_be_enabled_for_someone_397e1ce3: "Die Berechtigung muss für jemanden aktiviert werden"
   permission_not_found_620b80d1: "Berechtigung wurde nicht gefunden"
+  permission_to_change_this_mastery_calculation_is_e_91e19659: "Die Berechtigung zum Ändern dieser Leistungszielberechnung ist auf der Kontoebene aktiviert für:"
+  permission_to_change_this_mastery_scale_is_enabled_89066fac: "Die Berechtigung zum Ändern dieser Leistungszielskala ist auf der Kontoebene aktiviert für:"
   permissions: 
     manage_webhooks: "Webhooks – verwalten"
     provision_catalog: "Einen Catalog bereitstellen"
@@ -17472,6 +17527,7 @@ de:
   product_tours_1e19eb95: Produkt-Touren
   proficiency_calculation_57f0bdf: Kompetenzberechnung
   proficiency_calculation_parameters_5f605dec: "Parameter für die Kompetenzberechnung"
+  proficiency_level_1d05e468: Kompetenzstufe
   proficiency_rating_6346119f: Kompetenzeinstufung
   proficiency_rating_deleted_77827473: "Kompetenzeinstufung gelöscht"
   proficiency_ratings_2bbabdcd: Kompetenzeinstufungen
@@ -19692,6 +19748,7 @@ de:
   remove_role_filter_label_a27b6797: "Rollenfilter entfernen %{label}"
   remove_row_c198da5a: "Zeile entfernen"
   remove_row_f9d59cba: "Zeile entfernen"
+  remove_row_in_edit_mode_49c4dc07: "Zeile im Bearbeitungsmodus entfernen"
   remove_row_name_c053f5ae: "Zeile %{name} entfernen"
   remove_row_row_167c424a: "Zeile %{row} entfernen"
   remove_student_from_recipients_4b206e35: "%{student} aus den Empfängern entfernen"
@@ -19721,6 +19778,10 @@ de:
         minute: min.
   replace_e61834a7: Ersetzen
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Ersetzt den aktuellen Ordnerbaum mit einem neuen, abrufbaren Ordnerbaum mit mehr Funktionen."
+  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
+      Ersetzt die bestehende Abbildung der mathematischen Gleichung plus die versteckten MathML
+      durch eine MathJax-formatierte Version Dies verbessert die Zugänglichkeit
+      und viele Optionen für den Leser, um mit der Gleichung auf der Seite zu interagieren.
   reply_389d6fb9: Antworten
   reply_from_name: "%{name} über Canvas-Benachrichtigungen"
   reply_to_comment_72d96728: "Auf Kommentar antworten"
@@ -19872,6 +19933,8 @@ de:
       manage_interaction_alerts: "Benachrichtigungen verwalten"
       manage_links: "Rolle und vertrauenswürdige Links verwalten"
       manage_outcomes: "Lernziele verwalten"
+      manage_proficiency_calculations: "Verwalten von Berechnungen des Kenntnisstands"
+      manage_proficiency_scales: "Verwalten von Kenntnisstandsskalen"
       manage_role_overrides: "Berechtigungen verwalten"
       manage_rubrics: "Leistungstest-Bewertungsschemata erstellen und bearbeiten"
       manage_sections: "Kursabschnitte verwalten (hinzufügen/bearbeiten/löschen)"
@@ -21467,6 +21530,7 @@ de:
   show_exceptions_270ea1c5: "Ausnahmen anzeigen"
   show_final_grade_a95e14dc: "Gesamtnote anzeigen"
   show_final_grade_override_8cde5803: "Überschreiben der Gesamtnote zeigen"
+  show_final_grade_overrides_only_c3017aaa: "Nur Gesamtnotenänderungen anzeigen"
   show_groups_navigation_menu_1521d38d: "Gruppen-Navigationsmenü einblenden"
   show_inactive_enrollments_8f4c4824: "Nicht aktive Einschreibungen anzeigen"
   show_key_1fbf0c64: "Schlüssel anzeigen"
@@ -21532,6 +21596,7 @@ de:
   sis_id_4495a887: SIS-ID
   sis_id_70eda157: "SIS-ID:"
   sis_id_8c2029e1: SIS-ID
+  sis_ids_required_125074d9: "SIS-IDs (erforderlich)"
   sis_import: 
     buttons: 
       process_data: "Daten verarbeiten"
@@ -22866,6 +22931,7 @@ de:
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: "Dieses Element erscheint erneut, sobald eine neue Abgabe erfolgt."
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: "Dieses Element erscheint erneut, sobald neue Noten zu moderieren sind."
   this_login_is_for_provider_6f17462: "Diese Anmeldung ist für %{provider}."
+  this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: "Diese Leistungszielskala wird als Standard für alle Kurse in Ihrem Konto verwendet."
   this_may_take_a_bit_48fe4235: "Dieser Vorgang kann einige Minuten dauern ..."
   this_may_take_a_bit_c061d0f6: "Dieser Vorgang kann einige Minuten dauern ..."
   this_message_includes_media_comments_to_listen_or__5fc98641: "Diese Nachricht enthält Medienkommentare. Um diese anzuhören oder darauf zu antworten, klicken Sie auf diesen Link: %{link}."
@@ -23865,6 +23931,7 @@ de:
   updated_current_grade_to_be_empty_c2ce1d13: "Aktualisierte Note soll leer sein."
   updated_current_grade_to_currentgrade_bfe2ea14: "Aktualisierte Note für %{currentGrade}"
   updated_group_group_name_727b1d98: "Aktualisierte Gruppe %{group_name}"
+  updated_math_equation_display_583671a8: "Anzeigen der aktualisierten mathematischen Gleichung"
   updated_permissions_page_f2e91060: "Aktualisierte Berechtigungsseite"
   updated_terms_of_service_82f34148: "Aktualisierte Servicebedingungen"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktualisierte UI zur Suche und Anzeige von Benutzern und Kursen innerhalb eines Kontos."
@@ -24787,8 +24854,8 @@ de:
         last_edit: "Zuletzt bearbeitet"
         page_title: Seitentitel
         todo_date: Aufgabendatum
-      loading: "Wird geladen ..."
-      loading_more: "Weitere werden geladen ..."
+      loading: "Wird geladen ..."
+      loading_more: "Weitere werden geladen ..."
       no_pages: "Noch keine Seiten erstellt"
       pages_title: Seiten
     wiki_page_index_edit_dialog: 
