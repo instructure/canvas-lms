@@ -888,6 +888,17 @@ describe CalendarEvent do
       expect(child.reload).to be_deleted
     end
 
+    it "deletes the parent event after the last child event is deleted" do
+      calendar_event_model
+      sec2 = @course.course_sections.create! name: 'sec2'
+      child1 = @event.child_events.create! context: @course.default_section, start_at: 1.day.from_now
+      child2 = @event.child_events.create! context: sec2, start_at: 2.days.from_now
+      child1.destroy
+      expect(@event.reload).to be_active
+      child2.destroy
+      expect(@event.reload).to be_deleted
+    end
+
     context "bulk updating" do
       before :once do
         course_with_teacher

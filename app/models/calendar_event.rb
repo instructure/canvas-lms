@@ -389,8 +389,8 @@ class CalendarEvent < ActiveRecord::Base
         appointment_group.clear_cached_available_slots!
         appointment_group.save!
       end
-      if parent_event && parent_event.locked? && parent_event.child_events.size == 0
-        parent_event.workflow_state = 'active'
+      if parent_event && parent_event.child_events.size == 0
+        parent_event.workflow_state = parent_event.locked? ? 'active' : 'deleted'
         parent_event.save!
       end
       true
