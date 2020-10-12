@@ -163,7 +163,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override with no due at' do
           let(:override_property) { nil }
           it 'does not select assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end
@@ -172,7 +172,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_with_no_due_at_and_an_override_in_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_no_due_at_and_an_override_in_range]
           end
@@ -181,7 +181,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override outside the range' do
           let(:override_property) { :out }
           it 'does not select the assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end
@@ -193,7 +193,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { nil }
           it 'selects the assignment' do
             assignment_in_range = assignment_graph_builder
-              .call(builder_params)
+              .call(**builder_params)
             expect(assignments).to eql [assignment_in_range]
           end
         end
@@ -202,7 +202,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_in_range_with_an_override_in_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_in_range_with_an_override_in_range]
           end
@@ -212,7 +212,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :out }
           it 'selects the assignment' do
             assignment_in_range_and_override_outside_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_in_range_and_override_outside_range]
           end
@@ -225,7 +225,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override with no due at' do
           let(:override_property) { nil }
           it 'does not select assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end
@@ -234,7 +234,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_with_override_in_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_override_in_range]
           end
@@ -243,7 +243,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override outside the range' do
           let(:override_property) { :out }
           it 'does not select the assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end
@@ -260,7 +260,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { nil }
           it 'selects the assignment' do
             assignment_with_override_and_no_due_ats =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_override_and_no_due_ats]
           end
@@ -270,7 +270,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_with_no_due_at_and_override_in_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_no_due_at_and_override_in_range]
           end
@@ -279,7 +279,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override outside the range' do
           let(:override_property) { :out }
           it 'does not select the assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to be_empty
           end
@@ -289,7 +289,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :none }
           it 'selects the assignment' do
             assignment_with_no_due_at_and_no_override =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_no_due_at_and_no_override]
           end
@@ -303,7 +303,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { nil }
           it 'selects the assignment' do
             assignment_in_date_range_and_override_with_no_due_at =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_in_date_range_and_override_with_no_due_at]
           end
@@ -313,7 +313,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_with_override_both_inside_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_with_override_both_inside_range]
           end
@@ -323,7 +323,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :out }
           it 'selects the assignment' do
             assignment_inside_range_and_override_outside_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_inside_range_and_override_outside_range]
           end
@@ -333,7 +333,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_in_range_and_no_override =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_in_range_and_no_override]
           end
@@ -347,7 +347,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { nil }
           it 'selects the assignment' do
             assignment_outside_date_range_and_override_with_no_due_at =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_outside_date_range_and_override_with_no_due_at]
           end
@@ -356,7 +356,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given no override' do
           let(:override_property) { :none }
           it 'selects the assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end
@@ -365,7 +365,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
           let(:override_property) { :in }
           it 'selects the assignment' do
             assignment_outside_and_override_inside_range =
-              assignment_graph_builder.call(builder_params)
+              assignment_graph_builder.call(**builder_params)
             expect(assignments)
               .to eql [assignment_outside_and_override_inside_range]
           end
@@ -374,7 +374,7 @@ describe Assignment::FilterWithOverridesByDueAtForClass do
         context 'given an override outside the range' do
           let(:override_property) { :out }
           it 'does not select the assignment' do
-            assignment_graph_builder.call(builder_params)
+            assignment_graph_builder.call(**builder_params)
             expect(assignments).to be_empty
           end
         end

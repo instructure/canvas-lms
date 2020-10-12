@@ -33,7 +33,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
   end
 
   it 'should delete developer keys that have associated access tokens with deleted users' do
-    user_model.update_attributes(workflow_state: 'deleted')
+    user_model.update(workflow_state: 'deleted')
     AccessToken.create!(user: @user, developer_key: @dk)
 
     DataFixup::CleanupCrossShardDeveloperKeys.run
@@ -44,7 +44,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
     @shard1.activate do
       @user1 = user_model
     end
-    user_model.update_attributes(id: @user1.global_id)
+    user_model.update(id: @user1.global_id)
     AccessToken.create!(user: @user, developer_key: @dk)
 
     DataFixup::CleanupCrossShardDeveloperKeys.run
@@ -52,7 +52,7 @@ describe DataFixup::CleanupCrossShardDeveloperKeys do
   end
 
   it "should delete all of the developer key's associated objects" do
-    user_model.update_attributes(workflow_state: 'deleted')
+    user_model.update(workflow_state: 'deleted')
     at = AccessToken.create!(user: @user, developer_key: @dk)
     dkab = DeveloperKeyAccountBinding.create!(developer_key: @dk, account: account_model)
     cet = ContextExternalTool.create!(developer_key: @dk, account: Account.default, name: 'hi',

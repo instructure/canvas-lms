@@ -82,7 +82,7 @@ class BookmarkedCollection::Collection < Array
     if page == first_page
       nil
     else
-      if page =~ /^bookmark:/
+      if page.is_a?(String) && page =~ /^bookmark:/
         begin
           ::JSONToken.decode(page.gsub(/^bookmark:/, ''))
         rescue

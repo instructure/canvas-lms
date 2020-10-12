@@ -1090,9 +1090,7 @@ class Attachment < ActiveRecord::Base
   protected :infer_display_name
 
   def readable_size
-    h = ActionView::Base.new
-    h.extend ActionView::Helpers::NumberHelper
-    h.number_to_human_size(self.size) rescue "size unknown"
+    ActiveSupport::NumberHelper.number_to_human_size(size) rescue "size unknown"
   end
 
   def disposition_filename

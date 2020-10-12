@@ -28,7 +28,7 @@ describe SIS::Models::Enrollment do
         notify: 'true'
       }
     end
-    let(:subject) { described_class.new(params) }
+    let(:subject) { described_class.new(**params) }
 
     it 'sets nil defaults to all params' do
       expect(subject.user_integration_id).to be_nil

@@ -50,7 +50,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
   context 'when there is no resource link' do
     it 'sets coupled to false' do
       line_item = assignment.line_items.first
-      line_item.update_attributes(lti_resource_link_id: nil)
+      line_item.update(lti_resource_link_id: nil)
       described_class.run
       line_item.reload
       expect(line_item.coupled).to be(false)
@@ -69,7 +69,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
   context "when the line item has extensions" do
     it 'sets coupled to false' do
       line_item = assignment.line_items.first
-      line_item.update_attributes!(extensions: {foo: 'bar'})
+      line_item.update!(extensions: {foo: 'bar'})
       described_class.run
       line_item.reload
       expect(line_item.coupled).to be(false)
@@ -79,7 +79,7 @@ describe DataFixup::SetLtiLineItemsCoupled do
   context "when the line item is the default line item for a manually-created assignment" do
     it 'sets coupled as true' do
       line_item = assignment.line_items.first
-      line_item.update_attributes!(coupled: false)
+      line_item.update!(coupled: false)
       described_class.run
       line_item.reload
       expect(line_item.coupled).to be(true)

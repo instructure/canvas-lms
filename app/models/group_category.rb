@@ -375,7 +375,7 @@ class GroupCategory < ActiveRecord::Base
     Group.where(id: groups).touch_all
     if context_type == 'Course'
       opts = { assignments: Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id) }
-      DueDateCacher.recompute_course(context_id, opts)
+      DueDateCacher.recompute_course(context_id, **opts)
     end
   end
 

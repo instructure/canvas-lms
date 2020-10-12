@@ -141,7 +141,7 @@ module SIS
 
       def count_rows(csv, importer, create_importers:)
         rows = 0
-        ::CSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
+        ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS) do |faster_csv|
           while faster_csv.shift
             unless @read_only
               if create_importers && rows % @rows_for_parallel == 0
@@ -346,7 +346,7 @@ module SIS
             return
           end
           begin
-            ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
+            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
               row.each {|header| header&.downcase!}
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
@@ -381,7 +381,7 @@ module SIS
         Dir.mktmpdir do |tmp_dir|
           path = File.join(tmp_dir, File.basename(csv[:fullpath]).sub(/\.csv$/i, "_filtered.csv"))
           new_csv = ::CSV.open(path, 'wb', headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
-          ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS) do |row|
+          ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS) do |row|
             HEADERS_TO_EXCLUDE_FOR_DOWNLOAD.each do |header|
               row.delete(header)
             end

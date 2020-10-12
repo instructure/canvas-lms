@@ -67,6 +67,6 @@ group :test do
 
   gem 'parallel_tests'
   gem 'flakey_spec_catcher', require: false
-  gem 'factory_bot', '5.2.0', require: false
+  gem 'factory_bot', '6.1.0', require: false
   gem 'rspec_junit_formatter', require: false
 end

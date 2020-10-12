@@ -45,8 +45,8 @@ module ConditionalRelease
     end
 
     scope :with_assignments, -> do
-      having_assignments = joins(preload_associations).group(Arel.sql("conditional_release_rules.id"))
-      preload(preload_associations).where(id: having_assignments.pluck(:id))
+      having_assignments = joins(Rule.preload_associations).group(Arel.sql("conditional_release_rules.id"))
+      preload(Rule.preload_associations).where(id: having_assignments.pluck(:id))
     end
 
     def self.preload_associations

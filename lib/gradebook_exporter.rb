@@ -111,7 +111,7 @@ class GradebookExporter
     should_show_totals = show_totals?
     include_sis_id = @options[:include_sis_id]
 
-    CsvWithI18n.generate(@options.slice(:encoding, :col_sep, :include_bom)) do |csv|
+    CsvWithI18n.generate(**@options.slice(:encoding, :col_sep, :include_bom)) do |csv|
       # First row
       header = ["Student", "ID"]
       header << "SIS User ID" if include_sis_id

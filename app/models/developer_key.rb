@@ -76,7 +76,7 @@ class DeveloperKey < ActiveRecord::Base
       lti_key_ids = Lti::ToolConfiguration.joins(:developer_key).
         where(developer_keys: { id: site_admin_key_ids }).
         pluck(:developer_key_id)
-      DeveloperKey.where(id: lti_key_ids)
+      self.where(id: lti_key_ids)
     end
   end
 
