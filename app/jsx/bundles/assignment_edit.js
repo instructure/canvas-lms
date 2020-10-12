@@ -65,10 +65,6 @@ const peerReviewsSelector = new PeerReviewsSelector({
   parentModel: assignment
 })
 
-const headerEl = ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED
-  ? '#edit_assignment_header-cr'
-  : '#edit_assignment_header'
-
 const editView = new EditView({
   el: '#edit_assignment_form',
   model: assignment,
@@ -89,7 +85,7 @@ const editView = new EditView({
 })
 
 const editHeaderView = new EditHeaderView({
-  el: headerEl,
+  el: '#edit_assignment_header',
   model: assignment,
   userIsAdmin,
   views: {
