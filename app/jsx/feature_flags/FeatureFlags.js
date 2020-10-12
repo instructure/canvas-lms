@@ -16,104 +16,78 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
-import axios from 'axios'
+import React, {useState} from 'react'
 import I18n from 'i18n!feature_flags'
-import {Text} from '@instructure/ui-elements'
 import {Spinner} from '@instructure/ui-spinner'
-import {Button} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
-import {Tooltip} from '@instructure/ui-overlays'
-import {IconInfoLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {Table} from '@instructure/ui-table'
+import useFetchApi from 'jsx/shared/effects/useFetchApi'
+import {groupBy} from 'lodash'
+import FeatureFlagTable from './FeatureFlagTable'
 
-const {Head, Body, ColHeader, Row, Cell} = Table
+export default function FeatureFlags({hiddenFlags, disableDefaults}) {
+  const [isLoading, setLoading] = useState(false)
+  const [features, setFeatures] = useState([])
 
-export default class FeatureFlags extends React.Component {
-  constructor(props) {
-    super(props)
-    this.state = {
-      isLoading: false,
-      features: []
+  useFetchApi({
+    success: setFeatures,
+    loading: setLoading,
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features`,
+    fetchAllPages: true,
+    params: {
+      hide_inherited_enabled: true,
+      per_page: 50
     }
-  }
+  })
 
-  componentWillMount() {
-    this.retrieveFlagsConfig()
-  }
-
-  retrieveFlagsConfig() {
-    this.setState({isLoading: true})
-    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features?hide_inherited_enabled=true`
-    axios.get(url).then(response => this.loadData(response.data))
-  }
-
-  loadData(features) {
-    this.setState({features, isLoading: false})
-  }
-
-  revert = () => {
-    const url = `/api/v1/accounts/${window.ENV.ACCOUNT.id}/features/flags/new_features_ui`
-    return axios.put(url, {state: 'off'}).then(() => {
-      window.location.reload(true)
-    })
-  }
-
-  renderFeatureRows() {
-    return this.state.features.map(feature => {
-      return (
-        <Row key={feature.feature}>
-          <Cell>{feature.display_name}</Cell>
-          <Cell>
-            <Tooltip tip={feature.description} on={['click', 'hover', 'focus']} variant="inverse">
-              <Button variant="icon" icon={IconInfoLine}>
-                <ScreenReaderContent>{I18n.t('toggle tooltip')}</ScreenReaderContent>
-              </Button>
-            </Tooltip>
-          </Cell>
-          <Cell />
-          <Cell />
-          <Cell />
-        </Row>
-      )
-    })
-  }
-
-  render() {
-    return (
-      <View as="div">
-        <View as="div">
-          <Text>
-            {I18n.t(
-              'This is the new Feature Preview UI. It is currently read-only. To revert to old UI, click the ' +
-                'button. This will disable the "New Feature Flags" feature and refresh the page.'
-            )}
-          </Text>
-        </View>
-        <Button onClick={this.revert} margin="small 0">
-          {I18n.t('Revert to old UI')}
-        </Button>
-
-        <View as="div" width="80%">
-          {this.state.isLoading ? (
-            <Spinner renderTitle={I18n.t('Loading features')} />
-          ) : (
-            <Table caption={I18n.t('Feature Preview')} margin="medium 0 0">
-              <Head>
-                <Row>
-                  <ColHeader id="display_name">{I18n.t('Feature')}</ColHeader>
-                  <ColHeader id="description">{I18n.t('Info')}</ColHeader>
-                  <ColHeader id="expiration">{I18n.t('Preview Removal')}</ColHeader>
-                  <ColHeader id="level">{I18n.t('Level')}</ColHeader>
-                  <ColHeader id="state">{I18n.t('State')}</ColHeader>
-                </Row>
-              </Head>
-              <Body>{this.renderFeatureRows()}</Body>
-            </Table>
-          )}
-        </View>
-      </View>
+  const groupedFeatures = groupBy(
+    features.filter(feat => !hiddenFlags || !hiddenFlags.includes(feat.feature)),
+    'applies_to'
+  )
+  if (groupedFeatures.Account || groupedFeatures.RootAccount) {
+    groupedFeatures.Account = (groupedFeatures.Account || []).concat(
+      groupedFeatures.RootAccount || []
     )
   }
+  const categories = [
+    {
+      id: 'SiteAdmin',
+      title: I18n.t('Site Admin')
+    },
+    {
+      id: 'Account',
+      title: I18n.t('Account')
+    },
+    {
+      id: 'Course',
+      title: I18n.t('Course')
+    },
+    {
+      id: 'User',
+      title: I18n.t('User')
+    }
+  ]
+
+  return (
+    <View as="div">
+      {isLoading ? (
+        <Spinner renderTitle={I18n.t('Loading features')} />
+      ) : (
+        <>
+          {categories.map(cat => {
+            if (!groupedFeatures[cat.id]?.length) {
+              return null
+            }
+            return (
+              <FeatureFlagTable
+                key={cat.id}
+                title={cat.title}
+                rows={groupedFeatures[cat.id]}
+                disableDefaults={disableDefaults}
+              />
+            )
+          })}
+        </>
+      )}
+    </View>
+  )
 }

@@ -1401,7 +1401,8 @@ class CoursesController < ApplicationController
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
-        COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions
+        COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
+        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui)
       })
 
       set_tutorial_js_env

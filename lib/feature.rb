@@ -29,7 +29,7 @@ class Feature
     @state = 'allowed'
     opts.each do |key, val|
       next unless ATTRS.include?(key)
-      next if key == :state && !%w(hidden off allowed on).include?(val)
+      next if key == :state && !%w(hidden off allowed on allowed_on).include?(val)
       instance_variable_set "@#{key}", val
     end
     # for RootAccount features, "allowed" state is redundant; show "off" instead
@@ -45,15 +45,15 @@ class Feature
   end
 
   def locked?(query_context)
-    query_context.blank? || !allowed? && !hidden?
+    query_context.blank? || !can_override? && !hidden?
   end
 
   def enabled?
-    @state == 'on'
+    @state == STATE_ON || @state == STATE_DEFAULT_ON
   end
 
-  def allowed?
-    @state == 'allowed'
+  def can_override?
+    @state == STATE_DEFAULT_OFF || @state == STATE_DEFAULT_ON
   end
 
   def hidden?
@@ -118,7 +118,14 @@ class Feature
   #     # queue a delayed_job to perform any nontrivial processing
   #     after_state_change_proc:  ->(user, context, old_state, new_state) { ... }
   #   }
-  VALID_STATES = %w(on allowed hidden disabled).freeze
+  STATE_OFF = 'off'
+  STATE_ON = 'on'
+  STATE_DEFAULT_OFF = 'allowed'
+  STATE_DEFAULT_ON = 'allowed_on'
+  STATE_HIDDEN = 'hidden'
+  STATE_DISABLED = 'disabled'
+
+  VALID_STATES = [STATE_ON, STATE_DEFAULT_OFF, STATE_DEFAULT_ON, STATE_HIDDEN, STATE_DISABLED].freeze
   VALID_APPLIES_TO = %w(Course Account RootAccount User SiteAdmin).freeze
   VALID_ENVS = %i(development ci beta test production).freeze
 
@@ -130,7 +137,7 @@ class Feature
       apply_environment_overrides!(feature_name, attrs)
       feature = feature_name.to_s
       validate_attrs(attrs, feature)
-      if attrs[:state] == 'disabled'
+      if attrs[:state] == STATE_DISABLED
         @features[feature] = DISABLED_FEATURE
       else
         @features[feature] = Feature.new({ feature: feature }.merge(attrs))
@@ -206,10 +213,10 @@ class Feature
   end
 
   def default_transitions(context, orig_state)
-    valid_states = %w(off on)
-    valid_states << 'allowed' if context.is_a?(Account)
+    valid_states = [STATE_OFF, STATE_ON]
+    valid_states += [STATE_DEFAULT_OFF, STATE_DEFAULT_ON] if context.is_a?(Account)
     (valid_states - [orig_state]).inject({}) do |transitions, state|
-      transitions[state] = { 'locked' => (state == 'allowed' && (@applies_to == 'RootAccount' &&
+      transitions[state] = { 'locked' => ([STATE_DEFAULT_OFF, STATE_DEFAULT_ON].include?(state) && (@applies_to == 'RootAccount' &&
         context.is_a?(Account) && context.root_account? && !context.site_admin? || @applies_to == "SiteAdmin")) }
       transitions
     end

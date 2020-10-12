@@ -81,11 +81,7 @@
     <% end %>
     <% if can_do(@context, @current_user, :view_feature_flags) %>
       <li><a href="#tab-features" id="tab-features-link">
-        <% if @account.root_account.feature_enabled?(:new_features_ui) %>
-          <%= t(:feature_preview, "Feature Preview") %>
-        <% else %>
           <%= t(:feature_options, "Feature Options") %>
-        <% end %>
         </a>
       </li>
     <% end %>

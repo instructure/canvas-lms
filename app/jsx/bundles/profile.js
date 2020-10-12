@@ -25,6 +25,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import GeneratePairingCode from '../profiles/GeneratePairingCode'
 import ready from '@instructure/ready'
+import FeatureFlags from '../feature_flags/FeatureFlags'
 
 ready(() => {
   const hiddenFlags = []
@@ -32,8 +33,16 @@ ready(() => {
     hiddenFlags.push('new_user_tutorial_on_off')
   }
 
-  const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
-  view.collection.fetchAll()
+  if (window.ENV.NEW_FEATURES_UI) {
+    ReactDOM.render(
+      <FeatureFlags hiddenFlags={hiddenFlags} disableDefaults />,
+      // There is only one of these
+      document.querySelector('.feature-flag-wrapper')
+    )
+  } else {
+    const view = new FeatureFlagAdminView({el: '.feature-flag-wrapper', hiddenFlags})
+    view.collection.fetchAll()
+  }
 
   const container = document.querySelector('#pairing-code')
   if (container) {

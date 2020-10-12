@@ -764,7 +764,7 @@ describe AccountsController do
       end
 
       it 'passes on correct value for new feature flags ui' do
-        account.root_account.enable_feature!(:new_features_ui)
+        Account.site_admin.enable_feature!(:new_features_ui)
         get 'settings', params: {account_id: account.id}
         expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end

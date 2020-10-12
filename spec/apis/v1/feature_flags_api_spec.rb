@@ -65,8 +65,9 @@ describe "Feature Flags API", type: :request do
            "feature_flag"=>
                {"feature"=>"account_feature",
                 "state"=>"on",
+                "parent_state" => "on",
                 "locked"=>true,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}},
           {"feature"=>"course_feature",
            "applies_to"=>"Course",
            "release_notes_url"=>"http://example.com",
@@ -78,8 +79,9 @@ describe "Feature Flags API", type: :request do
                 "locking_account_id"=>nil,
                 "feature"=>"course_feature",
                 "state"=>"on",
+                "parent_state" => "allowed",
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>false}, "off"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}},
           {"applies_to"=>"RootAccount",
             "feature"=>"compact_live_event_payloads",
             "feature_flag"=>
@@ -89,7 +91,8 @@ describe "Feature Flags API", type: :request do
               "locked"=>false,
               "locking_account_id"=>nil,
               "state"=>"off",
-              "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}}},
+              "parent_state" => "off",
+              "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>true}}},
             "root_opt_in"=>true},
           {"feature"=>"root_account_feature",
            "applies_to"=>"RootAccount",
@@ -100,8 +103,9 @@ describe "Feature Flags API", type: :request do
                 "locking_account_id"=>nil,
                 "feature"=>"root_account_feature",
                 "state"=>"off",
+                "parent_state" => "off",
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}}}},
+                "transitions"=>{"allowed"=>{"locked"=>true}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>true}}}},
           {"feature"=>"root_opt_in_feature",
            "applies_to"=>"Course",
            "root_opt_in"=>true,
@@ -110,9 +114,10 @@ describe "Feature Flags API", type: :request do
                 "context_type"=>"Account",
                 "feature"=>"root_opt_in_feature",
                 "state"=>"off",
+                "parent_state" => "off",
                 "locking_account_id"=>nil,
                 "locked"=>false,
-                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}}}}])
+                "transitions"=>{"allowed"=>{"locked"=>false}, "on"=>{"locked"=>false}, "allowed_on"=>{"locked"=>false}}}}])
     end
 
     it "should paginate" do
@@ -249,12 +254,12 @@ describe "Feature Flags API", type: :request do
     it "should return the correct format" do
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      expect(json).to eql({"feature"=>"user_feature", "state"=>"allowed", "locked"=>false, "transitions"=>{"on"=>{"locked"=>false}, "off"=>{"locked"=>false}}})
+      expect(json).to eql({"feature"=>"user_feature", "state"=>"allowed", "parent_state" => "allowed", "locked"=>false, "transitions"=>{"on"=>{"locked"=>false}, "off"=>{"locked"=>false}}})
 
       t_teacher.feature_flags.create! feature: 'user_feature', state: 'on'
       json = api_call_as_user(t_teacher, :get, "/api/v1/users/#{t_teacher.id}/features/flags/user_feature",
                       { controller: 'feature_flags', action: 'show', format: 'json', user_id: t_teacher.to_param, feature: 'user_feature' })
-      expect(json).to eql({"feature"=>"user_feature", "state"=>"on", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil,
+      expect(json).to eql({"feature"=>"user_feature", "state"=>"on", "parent_state" => "allowed", "context_type"=>"User", "context_id"=>t_teacher.id, "locked"=>false, "locking_account_id"=>nil,
                        "transitions"=>{"off"=>{"locked"=>false}}})
     end
 
@@ -337,7 +342,7 @@ describe "Feature Flags API", type: :request do
       api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/root_opt_in_feature?state=allowed",
                { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'root_opt_in_feature', state: 'allowed' })
       flag = t_root_account.feature_flag('root_opt_in_feature')
-      expect(flag).to be_allowed
+      expect(flag.state).to eq("allowed")
       expect(flag).not_to be_new_record
     end
 
@@ -499,6 +504,7 @@ describe "Feature Flags API", type: :request do
            "feature_flag"=>
                {"feature"=>"custom_feature",
                 "state"=>"allowed",
+                "parent_state" => "allowed",
                 "locked"=>false,
                 "transitions"=>{"on"=>{"locked"=>false,"message"=>"this is permanent?!"},"off"=>{"locked"=>false}}}}])
     end
@@ -512,7 +518,7 @@ describe "Feature Flags API", type: :request do
         json = api_call_as_user(t_teacher, :get, "/api/v1/courses/#{t_course.id}/features/flags/custom_feature",
            { controller: 'feature_flags', action: 'show', format: 'json', course_id: t_course.id, feature: 'custom_feature' })
         expect(json).to eql({"context_id"=>t_course.id,"context_type"=>"Course","feature"=>"custom_feature",
-                         "locking_account_id"=>nil,"state"=>"on", "locked"=>false,
+                         "locking_account_id"=>nil,"state"=>"on", "locked"=>false, "parent_state" => "allowed",
                          "transitions"=>{"off"=>{"locked"=>true,"message"=>"don't ever turn this off"}}})
       end
 

@@ -1,0 +1,192 @@
+/*
+ * Copyright (C) 2020 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+import React, {useState, useRef} from 'react'
+import {bool, object} from 'prop-types'
+import I18n from 'i18n!feature_flags'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
+import {
+  IconPublishSolid,
+  IconTroubleLine,
+  IconLockSolid,
+  IconUnlockLine
+} from '@instructure/ui-icons'
+import {Menu} from '@instructure/ui-menu'
+import {IconButton} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
+import {Popover} from '@instructure/ui-popover'
+import doFetchApi from 'jsx/shared/effects/doFetchApi'
+import {showFlashAlert} from 'jsx/shared/FlashAlert'
+
+import * as flagUtils from './util'
+
+function setFlag(flagName, state) {
+  return doFetchApi({
+    method: 'PUT',
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/${flagName}`,
+    body: {state}
+  })
+}
+
+function removeFlag(flagName) {
+  return doFetchApi({
+    method: 'DELETE',
+    path: `/api/v1${ENV.CONTEXT_BASE_URL}/features/flags/${flagName}`
+  })
+}
+
+export default function FeatureFlagButton({featureFlag, disableDefaults}) {
+  const [updatedFlag, setUpdatedFlag] = useState(undefined)
+  const [apiBusy, setApiBusy] = useState(false)
+  const popoverEl = useRef(null)
+  const effectiveFlag = updatedFlag || featureFlag
+
+  async function updateFlag(state) {
+    if (apiBusy) return
+    setApiBusy(true)
+    try {
+      if (flagUtils.shouldDelete(effectiveFlag, allowsDefaults, state)) {
+        const {json} = await removeFlag(effectiveFlag.feature)
+        // Update to match the new state since this returns the old version not the new one
+        json.state = json.parent_state
+        setUpdatedFlag(json)
+      } else {
+        const {json} = await setFlag(effectiveFlag.feature, state)
+        setUpdatedFlag(json)
+      }
+    } catch (e) {
+      showFlashAlert({
+        message: I18n.t('An error occured updating the flag'),
+        err: null,
+        type: 'error'
+      })
+    } finally {
+      setApiBusy(false)
+    }
+  }
+
+  const isReadonly = ENV.PERMISSIONS?.manage_feature_flags === false || effectiveFlag.locked
+  const isEnabled = flagUtils.isEnabled(effectiveFlag)
+
+  // Only some FFs at some levels can be be overriden at lower levels
+  // Show the appropriate text depending
+  // Also if we are in a course context then our FFs can't ever be inherited
+  const allowsDefaults = flagUtils.doesAllowDefaults(effectiveFlag, disableDefaults)
+  const description = flagUtils.buildDescription(effectiveFlag, allowsDefaults)
+
+  const isLocked = flagUtils.isLocked(effectiveFlag)
+
+  // Hidden should just render as off...
+  const isSelected = state =>
+    state === (effectiveFlag.state === 'hidden' ? 'off' : effectiveFlag.state)
+
+  const transitions = flagUtils.buildTransitions(effectiveFlag, allowsDefaults)
+
+  function hidePopover() {
+    if (popoverEl.current) {
+      popoverEl.current.hide()
+    }
+  }
+
+  // The popover is lifted out of Menu to prevent stupid scrolling to the top of the page
+  return (
+    <Flex direction="row">
+      <Popover
+        placement="bottom center"
+        on={['click']}
+        shouldContainFocus
+        shouldReturnFocus
+        // This ensures we don't get the funky scroll behavior (i don't know why, but it works)
+        shouldRenderOffscreen
+        renderTrigger={
+          <IconButton
+            interaction={isReadonly || apiBusy ? 'disabled' : 'enabled'}
+            size="medium"
+            withBackground={false}
+            withBorder={false}
+            color={isEnabled ? 'success' : 'danger'}
+            screenReaderLabel={description}
+          >
+            {isEnabled ? IconPublishSolid : IconTroubleLine}
+          </IconButton>
+        }
+        ref={popoverEl}
+      >
+        <Menu placement="bottom center" defaultShow>
+          <Menu.Item
+            value={transitions.enabled}
+            selected={isSelected(transitions.enabled) || isSelected('allowed_on')}
+            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.enabled)}
+            onSelect={() => {
+              hidePopover()
+              updateFlag(transitions.enabled)
+            }}
+            type="checkbox"
+          >
+            {I18n.t('Enabled')}
+          </Menu.Item>
+          <Menu.Item
+            value={transitions.disabled}
+            selected={isSelected(transitions.disabled) || isSelected('allowed')}
+            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.disabled)}
+            onSelect={() => {
+              hidePopover()
+              updateFlag(transitions.disabled)
+            }}
+            type="checkbox"
+          >
+            {I18n.t('Disabled')}
+          </Menu.Item>
+          {allowsDefaults ? <Menu.Separator /> : null}
+          {allowsDefaults ? (
+            <Menu.Item
+              value={transitions.lock}
+              selected={isLocked}
+              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.lock)}
+              onSelect={() => {
+                hidePopover()
+                updateFlag(transitions.lock)
+              }}
+              type="checkbox"
+            >
+              {I18n.t('Lock')}
+            </Menu.Item>
+          ) : null}
+        </Menu>
+      </Popover>
+      <Flex direction="column" margin="none none none xx-small">
+        {allowsDefaults && (
+          <Flex.Item size="24px">
+            <Text color="primary">{isLocked ? <IconLockSolid /> : <IconUnlockLine />}</Text>
+          </Flex.Item>
+        )}
+        {apiBusy && (
+          <Flex.Item size="24px" overflowX="visible" overflowY="visible">
+            <Spinner size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
+          </Flex.Item>
+        )}
+      </Flex>
+    </Flex>
+  )
+}
+
+FeatureFlagButton.propTypes = {
+  featureFlag: object.isRequired,
+  disableDefaults: bool
+}
