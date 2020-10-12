@@ -34,20 +34,18 @@ describe "Gradebook History Page" do
     GradeBookHistory.visit(@course)
   end
 
-  context "has filter button disabled" do
-
-    it "and shows error message on entering backward dates", test_id: 3308866, priority: "1" do
+  describe "date pickers" do
+    it "disables the filter button when the 'To' date precedes the 'From' date", test_id: 3308866, priority: "1" do
       GradeBookHistory.enter_start_date('October 7, 2017')
       GradeBookHistory.enter_end_date(['October 4, 2017', :tab])
       expect(GradeBookHistory.error_text_invalid_dates).to be_displayed
     end
 
-    it "on entering invalid dates", test_id: 3308867, priority: "1" do
-      GradeBookHistory.enter_start_date('bad date')
+    it "clears the value of the field when entering an invalid date and moving away from the field" do
       GradeBookHistory.enter_end_date('invalid date')
       GradeBookHistory.enter_end_date(:tab)
-      filter_button_updated=GradeBookHistory.filter_button
-      expect(element_value_for_attr(filter_button_updated, 'disabled')).to eq('true')
+
+      expect(element_value_for_attr(GradeBookHistory.end_date_textfield, "value")).to eq ""
     end
   end
 end
