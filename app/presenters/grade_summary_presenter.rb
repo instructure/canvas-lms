@@ -145,7 +145,7 @@ class GradeSummaryPresenter
     includes = [:assignment_overrides, :post_policy]
     includes << :assignment_group if @assignment_order == :assignment_group
     AssignmentGroup.
-      visible_assignments(student, @context, all_groups, includes).
+      visible_assignments(student, @context, all_groups, includes: includes).
       where.not(submission_types: %w(not_graded wiki_page)).
       except(:order)
   end

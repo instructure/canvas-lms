@@ -54,7 +54,7 @@ function getProps(column, gradebook, options) {
   const assignment = gradebook.getAssignment(column.assignmentId)
 
   const gradeSortDataLoaded =
-    gradebook.contentLoadStates.assignmentsLoaded &&
+    gradebook.assignmentsLoadedForCurrentView() &&
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 

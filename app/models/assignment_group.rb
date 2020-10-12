@@ -226,19 +226,30 @@ class AssignmentGroup < ActiveRecord::Base
     effective_due_dates.any_in_closed_grading_period?
   end
 
-  def visible_assignments(user, includes=[])
-    self.class.visible_assignments(user, self.context, [self], includes)
+  def visible_assignments(user, includes: [], assignment_ids: [])
+    self.class.visible_assignments(
+      user,
+      self.context,
+      [self],
+      includes: includes,
+      assignment_ids: assignment_ids
+    )
   end
 
-  def self.visible_assignments(user, context, assignment_groups, includes = [])
-    if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
-      scope = context.active_assignments.where(:assignment_group_id => assignment_groups)
+  def self.visible_assignments(user, context, assignment_groups, includes: [], assignment_ids: [])
+    scope = if context.grants_any_right?(user, :manage_grades, :read_as_admin, :manage_assignments)
+      context.active_assignments.where(:assignment_group_id => assignment_groups)
     elsif user.nil?
-      scope = context.active_assignments.published.where(:assignment_group_id => assignment_groups)
+      context.active_assignments.published.where(:assignment_group_id => assignment_groups)
     else
-      scope = user.assignments_visible_in_course(context).
-              where(:assignment_group_id => assignment_groups).published
+      user.assignments_visible_in_course(context).
+        where(:assignment_group_id => assignment_groups).published
     end
+
+    if assignment_ids&.any?
+      scope = scope.where(id: assignment_ids)
+    end
+
     includes.any? ? scope.preload(includes) : scope
   end
 

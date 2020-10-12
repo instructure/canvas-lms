@@ -25,7 +25,7 @@ function getProps(column, gradebook, gridSupport, options) {
   const sortRowsBySetting = gradebook.getSortRowsBySetting()
 
   const gradeSortDataLoaded =
-    gradebook.contentLoadStates.assignmentsLoaded &&
+    gradebook.assignmentsLoadedForCurrentView() &&
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 

@@ -734,18 +734,21 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       equal(component.props.sortBySetting.direction, 'ascending')
     })
 
-    test('sets the "Sort by" disabled setting to true when assignments are not loaded', () => {
-      buildGradebook()
-      gradebook.setAssignmentsLoaded(false)
-      gradebook.setStudentsLoaded(true)
-      gradebook.setSubmissionsLoaded(true)
-      render()
-      strictEqual(component.props.sortBySetting.disabled, true)
-    })
+    QUnit.test(
+      'sets the "Sort by" disabled setting to true when assignments are not loaded',
+      () => {
+        buildGradebook()
+        gradebook.contentLoadStates.assignmentsLoaded.all = false
+        gradebook.setStudentsLoaded(true)
+        gradebook.setSubmissionsLoaded(true)
+        render()
+        strictEqual(component.props.sortBySetting.disabled, true)
+      }
+    )
 
     test('sets the "Sort by" disabled setting to true when anonymize_students is true', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       assignment.anonymize_students = true
@@ -755,7 +758,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to true when students are not loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(false)
       gradebook.setSubmissionsLoaded(true)
       render()
@@ -764,7 +767,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to true when submissions are not loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(false)
       render()
@@ -773,7 +776,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to false when necessary data are loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       render()

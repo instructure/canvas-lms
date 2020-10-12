@@ -51,7 +51,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
       }
     }
     sinon.stub(gradebook, 'isFilteringColumnsByGradingPeriod').returns(false)
-    sinon.stub(gradebook, 'getGradingPeriodToShow').returns('1501')
+    gradebook.gradingPeriodId = '1501'
   })
 
   suiteHooks.afterEach(() => {
@@ -152,7 +152,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
       })
 
       test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
-        gradebook.getGradingPeriodToShow.returns('1502')
+        gradebook.gradingPeriodId = '1502'
         equal(getGrade(), '–')
       })
     })
@@ -182,7 +182,7 @@ QUnit.module('GradebookGrid TotalGradeOverrideCellFormatter', suiteHooks => {
       })
 
       test('renders "–" (en dash) when the student has no grade override for the selected grading period', () => {
-        gradebook.getGradingPeriodToShow.returns('1502')
+        gradebook.gradingPeriodId = '1502'
         equal(getGrade(), '–')
       })
     })
