@@ -20,7 +20,7 @@ class CsvWithI18n < CSV
 
   def initialize(data, **options)
     @include_bom = options.delete(:include_bom)
-    super(data, options)
+    super(data, **options)
     raise 'include_bom and write_headers cannot both be true' if self.write_headers? && @include_bom
   end
 

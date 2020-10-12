@@ -43,24 +43,24 @@ module CanvasHttp
   class UnresolvableUriError < CanvasHttp::Error; end
   class CircuitBreakerError < CanvasHttp::Error; end
 
-  def self.put(*args, &block)
-    CanvasHttp.request(Net::HTTP::Put, *args, &block)
+  def self.put(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &block)
   end
 
-  def self.delete(*args, &block)
-    CanvasHttp.request(Net::HTTP::Delete, *args, &block)
+  def self.delete(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &block)
   end
 
-  def self.head(*args, &block)
-    CanvasHttp.request(Net::HTTP::Head, *args, &block)
+  def self.head(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &block)
   end
 
-  def self.get(*args, &block)
-    CanvasHttp.request(Net::HTTP::Get, *args, &block)
+  def self.get(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &block)
   end
 
-  def self.post(*args, &block)
-    CanvasHttp.request(Net::HTTP::Post, *args, &block)
+  def self.post(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &block)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle

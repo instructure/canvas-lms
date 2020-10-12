@@ -147,7 +147,7 @@ class GroupCategory < ActiveRecord::Base
                  context.group_categories.build(name: name_for_role(role),
                                                 role: role,
                                                 root_account: context.root_account)
-      category.save({:validate => false}) if category.new_record?
+      category.save(validate: false) if category.new_record?
       category
     end
   end

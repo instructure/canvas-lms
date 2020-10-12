@@ -655,7 +655,7 @@ describe Canvas::LiveEvents do
       end
 
       it 'should include late and missing flags' do
-        submission.update_attributes(late_policy_status: 'missing')
+        submission.update(late_policy_status: 'missing')
 
         expect_event('submission_updated',
           hash_including(
@@ -668,7 +668,7 @@ describe Canvas::LiveEvents do
 
       it 'should include posted_at' do
         post_time = Time.zone.now
-        submission.update_attributes(posted_at: post_time)
+        submission.update(posted_at: post_time)
 
         expect_event('submission_updated',
           hash_including(

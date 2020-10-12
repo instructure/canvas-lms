@@ -178,7 +178,7 @@ module PostgreSQLAdapterExtensions
 
   # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
   # but _only_ if there isn't another transaction in the stack
-  def add_index_options(_table_name, _column_name, _options = {})
+  def add_index_options(_table_name, _column_name, **)
     index_name, index_type, index_columns, index_options, algorithm, using = super
     algorithm = nil if Rails.env.test? && algorithm == "CONCURRENTLY" && !ActiveRecord::Base.in_transaction_in_test?
     [index_name, index_type, index_columns, index_options, algorithm, using]

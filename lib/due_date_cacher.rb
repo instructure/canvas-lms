@@ -97,7 +97,7 @@ class DueDateCacher
       executing_user: executing_user
     }
 
-    recompute_course(assignment.context, opts)
+    recompute_course(assignment.context, **opts)
   end
 
   def self.recompute_course(course, assignments: nil, inst_jobs_opts: {}, run_immediately: false, update_grades: false, original_caller: caller(1..1).first, executing_user: nil)
