@@ -282,13 +282,14 @@ class Account < ActiveRecord::Base
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
+  add_setting :can_change_pronouns, :boolean => true, :root_only => true, :default => true
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
-  add_setting :users_can_edit_name, :boolean => true, :root_only => true
+  add_setting :users_can_edit_name, :boolean => true, :root_only => true, :default => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false

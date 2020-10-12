@@ -2614,7 +2614,7 @@ class User < ActiveRecord::Base
   def user_can_edit_name?
     accounts = pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
-    accounts.any? { |a| a.settings[:users_can_edit_name] != false }
+    accounts.any? { |a| a.users_can_edit_name? }
   end
 
   def limit_parent_app_web_access?
