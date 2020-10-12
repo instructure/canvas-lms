@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import * as apiClient from '../apiClient'
+import CanvasModal from 'jsx/shared/components/CanvasModal'
+import I18n from 'i18n!groups'
 import React, {useState} from 'react'
 import ReactDOM from 'react-dom'
-import I18n from 'i18n!groups'
-import CanvasModal from 'jsx/shared/components/CanvasModal'
-import {FileDrop} from '@instructure/ui-forms'
-import {Billboard} from '@instructure/ui-billboard'
-import {Link} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
-import {PresentationContent} from '@instructure/ui-a11y'
 import SVGWrapper from 'jsx/shared/SVGWrapper'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
-import * as apiClient from '../apiClient'
+
+import {Billboard} from '@instructure/ui-billboard'
+import {FileDrop} from '@instructure/ui-forms'
+import {Link} from '@instructure/ui-elements'
+import {PresentationContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-layout'
 
 export default function ImportGroupsModal(props) {
   const [messages, setMessages] = useState([])
@@ -90,10 +92,15 @@ export default function ImportGroupsModal(props) {
           </div>
         }
       />
-      <View as="div" margin="large auto" textAlign="center">
+      <View as="div" margin="large auto xx-small auto" textAlign="center">
         <Link href={`/api/v1/group_categories/${props.groupCategoryId}/export`}>
           {I18n.t('Download Course Roster CSV')}
         </Link>
+      </View>
+      <View as="div" textAlign="center">
+        <Text>
+          {I18n.t('To assign students to a group, enter group names in the "group_name" column.')}
+        </Text>
       </View>
       <View as="div" margin="large auto" textAlign="center">
         <Link href="/doc/api/file.group_category_csv.html" target="_blank">
