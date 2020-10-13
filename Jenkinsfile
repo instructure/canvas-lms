@@ -188,6 +188,31 @@ def maybeSlackSendRetrigger() {
   }
 }
 
+def slackSendCacheAvailable(blockName = '') {
+  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+
+  slackSend(
+    channel: '#jenkins_cache_noisy',
+    color: 'good',
+    message: "Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> with HEAD ${GIT_REV} uploaded ${blockName} image cache"
+  )
+}
+
+def slackSendCacheBuild(blockName = '', block) {
+  def buildStartTime = System.currentTimeMillis()
+
+  block()
+
+  def buildEndTime = System.currentTimeMillis()
+
+  def PARENT_GIT_REV = sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+
+  slackSend(
+    channel: '#jenkins_cache_noisy',
+    message: "Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> with HEAD^ ${PARENT_GIT_REV} built ${blockName} in ${buildEndTime - buildStartTime}ms"
+  )
+}
+
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
@@ -424,11 +449,13 @@ pipeline {
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                     sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                   } else {
-                    withEnv([
-                      "CACHE_TAG=${configuration.isChangeMerged() ? env.MERGE_TAG : env.CACHE_IMAGE}",
-                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
-                    ]) {
-                      sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                    slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
+                      withEnv([
+                        "CACHE_TAG=${configuration.isChangeMerged() ? env.MERGE_TAG : env.CACHE_IMAGE}",
+                        "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
+                      ]) {
+                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      }
                     }
                   }
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
@@ -470,8 +497,12 @@ pipeline {
                         "CACHE_TAG=${env.CACHE_IMAGE}",
                         "JS_BUILD_NO_UGLIFY=1"
                       ]) {
-                        sh "build/new-jenkins/docker-build.sh $CACHE_IMAGE"
+                        slackSendCacheBuild('pre-merge') {
+                          sh "build/new-jenkins/docker-build.sh $CACHE_IMAGE"
+                        }
+
                         sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $CACHE_IMAGE"
+                        slackSendCacheAvailable('pre-merge')
                       }
                     }
                   }
@@ -610,6 +641,7 @@ pipeline {
 
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
+                  slackSendCacheAvailable('post-merge')
                 }
               }
             }
