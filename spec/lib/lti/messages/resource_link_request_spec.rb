@@ -157,20 +157,33 @@ describe Lti::Messages::ResourceLinkRequest do
         let(:api_message) { 'Assignment not configured for launches with specified tool' }
 
         before do
-          assignment.update!(external_tool_tag_attributes: { content: different_tool })
+          assignment.update!(external_tool_tag_attributes: { content: different_tool, url: different_tool.url })
         end
 
         it_behaves_like 'launch error check'
       end
 
-      context 'because the resource link tool binding does not match the launching tool' do
-        let(:api_message) { 'Mismatched assignment vs resource link tool configurations' }
-
-        before do
-          assignment.line_items.find(&:assignment_line_item?).resource_link.update!(context_external_tool: different_tool)
+      context 'because the assignment tool URL does not exactly match the declared tool URL' do
+        let(:tag_url) { "http://www.example.com/launch/content/ae846212-4ca6-3f3b-8e4a-f78e27ca7043/5?productId=2044737" }
+        let(:api_message) { 'Assignment not configured for launches with specified tool' }
+        let(:duplicate_tool) do
+          t = tool.dup
+          t.save!
+          t
         end
 
-        it_behaves_like 'launch error check'
+        context 'but the tool is associated with the assignment (i.e. an upgrade or reinstallation occured)' do
+          before do
+            assignment.line_items
+              .find(&:assignment_line_item?)
+              .resource_link
+              .update!(context_external_tool: duplicate_tool)
+          end
+
+          it 'allows the LTI launch to occur' do
+            expect { jws }.not_to raise_error
+          end
+        end
       end
     end
 
