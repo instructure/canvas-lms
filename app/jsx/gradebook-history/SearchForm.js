@@ -297,104 +297,118 @@ class SearchFormComponent extends Component {
         <Grid>
           <Grid.Row>
             <Grid.Col>
-              <FormFieldGroup
-                description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
-                as="div"
-                layout="columns"
-                colSpacing="small"
-                vAlign="top"
-                startAt="large"
-              >
+              <View as="div">
                 <FormFieldGroup
-                  description={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}
+                  description={<ScreenReaderContent>{I18n.t('Search Form')}</ScreenReaderContent>}
                   as="div"
                   layout="columns"
+                  colSpacing="small"
                   vAlign="top"
-                  startAt="medium"
+                  startAt="large"
                 >
-                  <Select
-                    editable
-                    id="students"
-                    allowEmpty
-                    emptyOption={this.state.messages.students}
-                    filter={this.filterNone}
-                    label={I18n.t('Student')}
-                    loadingText={
-                      this.props.students.fetchStatus === 'started'
-                        ? I18n.t('Loading Students')
-                        : undefined
-                    }
-                    onBlur={this.promptUserEntry}
-                    onChange={this.setSelectedStudent}
-                    onInputChange={this.handleStudentChange}
+                  <FormFieldGroup
+                    description={<ScreenReaderContent>{I18n.t('Users')}</ScreenReaderContent>}
+                    as="div"
+                    layout="columns"
+                    vAlign="top"
+                    startAt="medium"
                   >
-                    {this.renderAsOptions(this.props.students.items)}
-                  </Select>
-                  <Select
-                    editable
-                    id="graders"
-                    allowEmpty
-                    emptyOption={this.state.messages.graders}
-                    filter={this.filterNone}
-                    label={I18n.t('Grader')}
-                    loadingText={
-                      this.props.graders.fetchStatus === 'started'
-                        ? I18n.t('Loading Graders')
-                        : undefined
-                    }
-                    onBlur={this.promptUserEntry}
-                    onChange={this.setSelectedGrader}
-                    onInputChange={this.handleGraderChange}
-                  >
-                    {this.renderAsOptions(this.props.graders.items)}
-                  </Select>
-                  <Select
-                    editable
-                    id="assignments"
-                    allowEmpty
-                    emptyOption={this.state.messages.assignments}
-                    filter={this.filterNone}
-                    inputRef={ref => {
-                      this.assignmentInput = ref
-                    }}
-                    label={I18n.t('Artifact')}
-                    loadingText={
-                      this.props.assignments.fetchStatus === 'started'
-                        ? I18n.t('Loading Artifact')
-                        : undefined
-                    }
-                    onBlur={this.promptUserEntry}
-                    onChange={this.setSelectedAssignment}
-                    onInputChange={this.handleAssignmentChange}
-                  >
-                    {this.renderAsOptions(this.props.assignments.items)}
-                  </Select>
-                </FormFieldGroup>
+                    <Select
+                      editable
+                      id="students"
+                      allowEmpty
+                      emptyOption={this.state.messages.students}
+                      filter={this.filterNone}
+                      label={I18n.t('Student')}
+                      loadingText={
+                        this.props.students.fetchStatus === 'started'
+                          ? I18n.t('Loading Students')
+                          : undefined
+                      }
+                      onBlur={this.promptUserEntry}
+                      onChange={this.setSelectedStudent}
+                      onInputChange={this.handleStudentChange}
+                    >
+                      {this.renderAsOptions(this.props.students.items)}
+                    </Select>
+                    <Select
+                      editable
+                      id="graders"
+                      allowEmpty
+                      emptyOption={this.state.messages.graders}
+                      filter={this.filterNone}
+                      label={I18n.t('Grader')}
+                      loadingText={
+                        this.props.graders.fetchStatus === 'started'
+                          ? I18n.t('Loading Graders')
+                          : undefined
+                      }
+                      onBlur={this.promptUserEntry}
+                      onChange={this.setSelectedGrader}
+                      onInputChange={this.handleGraderChange}
+                    >
+                      {this.renderAsOptions(this.props.graders.items)}
+                    </Select>
+                    <Select
+                      editable
+                      id="assignments"
+                      allowEmpty
+                      emptyOption={this.state.messages.assignments}
+                      filter={this.filterNone}
+                      inputRef={ref => {
+                        this.assignmentInput = ref
+                      }}
+                      label={I18n.t('Artifact')}
+                      loadingText={
+                        this.props.assignments.fetchStatus === 'started'
+                          ? I18n.t('Loading Artifact')
+                          : undefined
+                      }
+                      onBlur={this.promptUserEntry}
+                      onChange={this.setSelectedAssignment}
+                      onInputChange={this.handleAssignmentChange}
+                    >
+                      {this.renderAsOptions(this.props.assignments.items)}
+                    </Select>
+                  </FormFieldGroup>
 
-                <FormFieldGroup
-                  description={<ScreenReaderContent>{I18n.t('Dates')}</ScreenReaderContent>}
-                  layout="columns"
-                  startAt="small"
-                  vAlign="top"
-                  messages={this.dateInputErrors()}
-                >
-                  <CanvasDateInput
-                    renderLabel={I18n.t('Start Date')}
-                    formatDate={formatDate}
-                    selectedDate={this.state.selected.from.value}
-                    onSelectedDateChange={this.setSelectedFrom}
-                    withRunningValue
-                  />
-                  <CanvasDateInput
-                    renderLabel={I18n.t('End Date')}
-                    formatDate={formatDate}
-                    selectedDate={this.state.selected.to.value}
-                    onSelectedDateChange={this.setSelectedTo}
-                    withRunningValue
-                  />
+                  <FormFieldGroup
+                    description={<ScreenReaderContent>{I18n.t('Dates')}</ScreenReaderContent>}
+                    layout="columns"
+                    startAt="small"
+                    vAlign="top"
+                    messages={this.dateInputErrors()}
+                  >
+                    <CanvasDateInput
+                      renderLabel={I18n.t('Start Date')}
+                      formatDate={formatDate}
+                      selectedDate={this.state.selected.from.value}
+                      onSelectedDateChange={this.setSelectedFrom}
+                      withRunningValue
+                    />
+                    <CanvasDateInput
+                      renderLabel={I18n.t('End Date')}
+                      formatDate={formatDate}
+                      selectedDate={this.state.selected.to.value}
+                      onSelectedDateChange={this.setSelectedTo}
+                      withRunningValue
+                    />
+                  </FormFieldGroup>
                 </FormFieldGroup>
-              </FormFieldGroup>
+              </View>
+
+              {environment.overrideGradesEnabled() && (
+                <View as="div" margin="medium 0">
+                  <Checkbox
+                    checked={this.state.selected.showFinalGradeOverridesOnly}
+                    id="show_final_grade_overrides_only"
+                    label={I18n.t('Show Final Grade Overrides Only')}
+                    onChange={this.handleShowFinalGradeOverridesOnlyChange}
+                  />
+                </View>
+              )}
             </Grid.Col>
+
             <Grid.Col width="auto">
               <div style={{margin: '1.9rem 0 0 0'}}>
                 <Button
@@ -408,31 +422,6 @@ class SearchFormComponent extends Component {
               </div>
             </Grid.Col>
           </Grid.Row>
-
-          {environment.overrideGradesEnabled() && (
-            <Grid.Row>
-              <Grid.Col>
-                <FormFieldGroup
-                  as="div"
-                  description={
-                    <ScreenReaderContent>
-                      {I18n.t('Show Final Grade Overrides Only')}
-                    </ScreenReaderContent>
-                  }
-                  layout="columns"
-                  startAt="small"
-                  vAlign="top"
-                >
-                  <Checkbox
-                    checked={this.state.selected.showFinalGradeOverridesOnly}
-                    id="show_final_grade_overrides_only"
-                    label={I18n.t('Show Final Grade Overrides Only')}
-                    onChange={this.handleShowFinalGradeOverridesOnlyChange}
-                  />
-                </FormFieldGroup>
-              </Grid.Col>
-            </Grid.Row>
-          )}
         </Grid>
       </View>
     )
