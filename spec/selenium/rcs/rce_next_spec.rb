@@ -102,9 +102,12 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'links' do
+      after :each do
+        driver.session_storage.clear
+      end
+
       it 'should respect selected text when creating a course link in body',
          ignore_js_errors: true do
-        skip 'flakey, LS-1394 (8/26/2020)'
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -273,225 +276,219 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect(wiki_body_anchor.attribute('class')).to include 'inline_disabled'
         end
       end
-    end
+      it 'should click on sidebar assignment page to create link in body' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
 
-    it 'should click on sidebar assignment page to create link in body' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
+        visit_front_page_edit(@course)
 
-      visit_front_page_edit(@course)
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_assignments_accordion
+        click_course_item_link(title)
 
-      click_assignments_accordion
-      click_course_item_link(title)
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+            @course,
+            @assignment
+          )
+        end
+      end
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
+      it 'should click on sidebar quizzes page to create link in body' do
+        title = 'Quiz-Title'
+        @quiz = @course.quizzes.create!(workflow_state: 'available', title: title)
+
+        visit_front_page_edit(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_quizzes_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include quiz_id_path(@course, @quiz)
+        end
+      end
+
+      it 'should click on sidebar announcements page to create link in body' do
+        title = 'Announcement-Title'
+        message = 'Announcement 1 detail'
+        @announcement = @course.announcements.create!(title: title, message: message)
+
+        visit_front_page_edit(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_announcements_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
+            @course,
+            @announcement
+          )
+        end
+      end
+
+      it 'should click on sidebar discussions page to create link in body' do
+        title = 'Discussion-Title'
+        @discussion = @course.discussion_topics.create!(title: title)
+
+        visit_front_page_edit(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_discussions_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
+            @course,
+            @discussion
+          )
+        end
+      end
+
+      it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
+        title = 'Module-Title'
+        @module = @course.context_modules.create!(name: title)
+
+        visit_front_page_edit(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_modules_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+        end
+      end
+
+      it 'should click on sidebar course navigation page to create link in body',
+         ignore_js_errors: true do
+        title = 'Files'
+        visit_front_page_edit(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_navigation_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include course_file_path(@course)
+        end
+      end
+
+      it 'should click on assignment in sidebar to create link to it in announcement page',
+         ignore_js_errors: true do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+
+        visit_new_announcement_page(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_assignments_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+            @course,
+            @assignment
+          )
+        end
+      end
+
+      it 'should click on module in sidebar to create link to it in assignment page',
+         ignore_js_errors: true do
+        title = 'Module-Title'
+        @module = @course.context_modules.create!(name: title)
+
+        visit_new_assignment_page(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_modules_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+        end
+      end
+
+      it 'should click on assignment in sidebar to create link to it in discussion page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+
+        visit_new_discussion_page(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+        click_assignments_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+            @course,
+            @assignment
+          )
+        end
+      end
+
+      it 'should click on assignment in sidebar to create link to it in quiz page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+        @quiz = @course.quizzes.create!
+
+        visit_new_quiz_page(@course, @quiz)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_assignments_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+            @course,
+            @assignment
+          )
+        end
+      end
+
+      it 'should click on assignment in sidebar to create link to it in syllabus page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+
+        visit_syllabus(@course)
+        click_edit_syllabus
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_assignments_accordion
+        click_course_item_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+            @course,
+            @assignment
+          )
+        end
       end
     end
 
-    it 'should click on sidebar quizzes page to create link in body' do
-      title = 'Quiz-Title'
-      @quiz = @course.quizzes.create!(workflow_state: 'available', title: title)
 
-      visit_front_page_edit(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_quizzes_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include quiz_id_path(@course, @quiz)
-      end
-    end
-
-    it 'should click on sidebar announcements page to create link in body' do
-      title = 'Announcement-Title'
-      message = 'Announcement 1 detail'
-      @announcement = @course.announcements.create!(title: title, message: message)
-
-      visit_front_page_edit(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_announcements_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-                  @course,
-                  @announcement
-                )
-      end
-    end
-
-    it 'should click on sidebar discussions page to create link in body' do
-      title = 'Discussion-Title'
-      @discussion = @course.discussion_topics.create!(title: title)
-
-      visit_front_page_edit(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_discussions_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-                  @course,
-                  @discussion
-                )
-      end
-    end
-
-    it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Module-Title'
-      @module = @course.context_modules.create!(name: title)
-
-      visit_front_page_edit(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_modules_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
-      end
-    end
-
-    it 'should click on sidebar course navigation page to create link in body',
-       ignore_js_errors: true do
-      title = 'Files'
-      visit_front_page_edit(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_navigation_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include course_file_path(@course)
-      end
-    end
-
-    it 'should click on assignment in sidebar to create link to it in announcement page',
-       ignore_js_errors: true do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
-
-      visit_new_announcement_page(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_assignments_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-      end
-    end
-
-    it 'should click on module in sidebar to create link to it in assignment page',
-       ignore_js_errors: true do
-      title = 'Module-Title'
-      @module = @course.context_modules.create!(name: title)
-
-      visit_new_assignment_page(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_modules_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
-      end
-    end
-
-    it 'should click on assignment in sidebar to create link to it in discussion page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
-
-      visit_new_discussion_page(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_assignments_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-      end
-    end
-
-    it 'should click on assignment in sidebar to create link to it in quiz page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
-      @quiz = @course.quizzes.create!
-
-      visit_new_quiz_page(@course, @quiz)
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_assignments_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-      end
-    end
-
-    it 'should click on assignment in sidebar to create link to it in syllabus page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
-
-      visit_syllabus(@course)
-      click_edit_syllabus
-
-      click_links_toolbar_menu_button
-      click_course_links
-
-      click_assignments_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-      end
-    end
 
     it 'should click on sidebar images tab' do
       skip('Unskip in CORE-2629')
