@@ -1205,6 +1205,11 @@ class User < ActiveRecord::Base
     given { |user| self.check_courses_right?(user, :manage_user_notes) }
     can :create_user_notes and can :read_user_notes
 
+    [:read_email_addresses, :read_sis, :manage_sis].each do |permission|
+      given {|user| self.check_courses_right?(user, permission) }
+      can permission
+    end
+
     given { |user| self.check_courses_right?(user, :generate_observer_pairing_code, enrollments.not_deleted) }
     can :generate_observer_pairing_code
 

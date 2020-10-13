@@ -1519,7 +1519,10 @@ class Course < ActiveRecord::Base
     can :read_syllabus
 
     RoleOverride.permissions.each do |permission, details|
-      given {|user| (self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) || self.account_membership_allows(user, permission)) }
+      given do |user|
+        self.active_enrollment_allows(user, permission, !details[:restrict_future_enrollments]) ||
+          self.account_membership_allows(user, permission)
+      end
       can permission
     end
 

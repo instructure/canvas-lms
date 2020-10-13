@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
+require 'spec_helper'
 require_relative "../graphql_spec_helper"
 
 describe Types::UserType do
@@ -115,18 +115,34 @@ describe Types::UserType do
       )
     end
 
-    let(:admin) { account_admin_user }
-    let(:user_type_as_admin) do
-      GraphQLTypeTester.new(@student, current_user: admin, domain_root_account: @course.account.root_account,
-        request: ActionDispatch::TestRequest.create)
+    context 'as admin' do
+      let(:admin) { account_admin_user }
+      let(:user_type_as_admin) do
+        GraphQLTypeTester.new(@student, current_user: admin, domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create)
+      end
+
+      it "returns the sis user id if the user has permissions to read it" do
+        expect(user_type_as_admin.resolve("sisId")).to eq "a.ham"
+      end
+
+      it "returns nil if the user does not have permission to read the sis user id" do
+        account_admin_user_with_role_changes(role_changes: {read_sis: false, manage_sis: false})
+        admin_type = GraphQLTypeTester.new(@student, current_user: @admin, domain_root_account: @course.account.root_account,
+          request: ActionDispatch::TestRequest.create)
+        expect(admin_type.resolve("sisId")).to be_nil
+      end
     end
 
-    it "returns the sis user id if the user has permissions to read it" do
-      expect(user_type_as_admin.resolve("sisId")).to eq "a.ham"
-    end
+    context 'as teacher' do
+      it 'returns the sis user id if the user has permissions to read it' do
+        expect(user_type.resolve("sisId")).to eq "a.ham"
+      end
 
-    it "returns null if the user does not have permission to read the sis user id" do
-      expect(user_type.resolve("sisId")).to be_nil
+      it 'returns null if the user does not have permission to read the sis user id' do
+        @teacher.enrollments.find_by(course: @course).role.role_overrides.create!(permission: 'read_sis', enabled: false, account: @course.account)
+        expect(user_type.resolve("sisId")).to be_nil
+      end
     end
   end
 
@@ -176,23 +192,32 @@ describe Types::UserType do
       )
     end
 
-    let!(:account_user) do
-      AccountUser.create!(
-        account: @teacher.account,
-        user: @teacher,
-        role: teacher_role
-      )
-    end
+    let!(:admin) { account_admin_user }
 
     before(:once) do
       @student.update! email: "cooldude@example.com"
     end
 
-    it "returns email for teachers/admins" do
+    it 'returns email for admins' do
+      admin_tester = GraphQLTypeTester.new(
+        @student,
+        current_user: admin,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+
+      expect(admin_tester.resolve("email")).to eq @student.email
+
+      # this is for the cached branch
+      allow(@student).to receive(:email_cached?).and_return(true)
+      expect(admin_tester.resolve("email")).to eq @student.email
+    end
+
+    it "returns email for teachers" do
       expect(user_type.resolve("email")).to eq @student.email
 
       # this is for the cached branch
-      allow(@student).to receive(:email_cached?) { true }
+      allow(@student).to receive(:email_cached?).and_return(true)
       expect(user_type.resolve("email")).to eq @student.email
     end
 
