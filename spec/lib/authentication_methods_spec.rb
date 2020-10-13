@@ -24,13 +24,14 @@ describe AuthenticationMethods do
     include Canvas::RequestForgeryProtection
     include AuthenticationMethods
 
-    attr_reader :redirects, :params, :session, :request
+    attr_accessor :redirects, :params, :session, :request, :render_hash
 
-    def initialize(root_account, req, params_hash = {})
+    def initialize(request:, root_account: Account.default, params: {})
+      @request = request
       @domain_root_account = root_account
-      @request = req
+      @params = params
       @redirects = []
-      @params = params_hash
+      @render_hash = nil
       reset_session
     end
 
@@ -42,6 +43,14 @@ describe AuthenticationMethods do
       @redirects << url
     end
 
+    def render(render_hash)
+      @render_hash = render_hash
+    end
+
+    def api_find(klass, id)
+      klass.find(id)
+    end
+
     def cas_login_url; ''; end
 
     def zendesk_delegated_auth_pass_through_url(options)
@@ -51,21 +60,26 @@ describe AuthenticationMethods do
     def cookies
       @cookies ||= {}
     end
+
+    class MockLogger
+      def info(*); end
+      def warn(*); end
+    end
+
+    def logger
+      MockLogger.new
+    end
   end
 
   describe "#load_user" do
-    before do
-      @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                      :format =>double(:json? => false),
-                      :host_with_port => "")
-      @controller = MockController.new(nil, @request)
-      allow(@controller).to receive(:load_pseudonym_from_access_token)
-      allow(@controller).to receive(:api_request?).and_return(false)
-      allow(@controller).to receive(:logger).and_return(double(info: nil))
-    end
-
     context "with active session" do
       before do
+        @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
+                        :format =>double(:json? => false),
+                        :host_with_port => "")
+        @controller = MockController.new(request: @request)
+        allow(@controller).to receive(:load_pseudonym_from_access_token)
+        allow(@controller).to receive(:api_request?).and_return(false)
         user_with_pseudonym
         @pseudonym_session = double(record: @pseudonym)
         allow(PseudonymSession).to receive(:find_with_validation).and_return(@pseudonym_session)
@@ -101,12 +115,71 @@ describe AuthenticationMethods do
         expect(@controller.cookies['_csrf_token']).not_to be nil
       end
     end
+
+    context "with an access token" do
+      before do
+        enable_default_developer_key!
+        user_with_pseudonym
+        @real_user = @user
+        Account.site_admin.account_users.create!(user: @real_user)
+        user_with_pseudonym
+      end
+
+      def setup_with_token(token)
+        request = double(authorization: "Bearer #{token.full_token}",
+                         format: double(:json? => true),
+                         host_with_port: "",
+                         url: "",
+                         method: "GET")
+        controller = MockController.new(request: request)
+        allow(controller).to receive(:api_request?).and_return(true)
+        controller
+      end
+
+      it "finds a user by access token" do
+        token = AccessToken.create!(user: @user)
+        controller = setup_with_token(token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_user)).to eq @user
+      end
+
+      it "sets {real_,}current_user from token" do
+        token = AccessToken.create!(user: @user, real_user: @real_user)
+        controller = setup_with_token(token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_user)).to eq @user
+        expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+      end
+
+      it "accepts as_user_id on a masquerading token if masquerade matches" do
+        token = AccessToken.create!(user: @user, real_user: @real_user)
+        controller = setup_with_token(token)
+        controller.params[:as_user_id] = @user.id
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_user)).to eq @user
+        expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+      end
+
+      it "rejects as_user_id on a masquerading token if masquerade dose not match" do
+        @other_user = @user
+        user_with_pseudonym
+        token = AccessToken.create!(user: @user, real_user: @real_user)
+        controller = setup_with_token(token)
+        controller.params[:as_user_id] = @other_user.id
+
+        expect(controller.send(:load_user)).to eq false
+        expect(controller.render_hash[:json][:errors]).to eq "Cannot change masquerade"
+      end
+    end
   end
 
   describe "#masked_authenticity_token" do
     before do
       @request = double(host_with_port: "")
-      @controller = MockController.new(nil, @request)
+      @controller = MockController.new(request: @request)
       @session_options = {}
       expect(CanvasRails::Application.config).to receive(:session_options).at_least(:once).and_return(@session_options)
     end
@@ -150,7 +223,7 @@ describe AuthenticationMethods do
     let(:dev_key) {DeveloperKey.create!(account: account)}
     let(:access_token) {AccessToken.create!(developer_key: dev_key)}
     let(:request) {double(format: double(:json? => false), host_with_port:"")}
-    let(:controller) {MockController.new(account, request)}
+    let(:controller) {MockController.new(request: request, root_account: account)}
 
     it "doesn't call '#get_context' if the Dev key is owned by the domain root account" do
       expect(controller).not_to receive(:get_context)
