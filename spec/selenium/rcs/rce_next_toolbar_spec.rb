@@ -56,6 +56,22 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         document_toolbar_button.enabled? &&
           document_toolbar_button.attribute('aria-disabled') == 'false'
       ).to be is_enabled
+
+      click_link_menubar_button
+      expect(external_link_menubar_button.enabled? && external_link_menubar_button.attribute('aria-disabled') == 'false').to be is_enabled
+      click_insert_menu_button
+
+      click_image_menubar_button
+      expect(image_menubar_button.enabled? && image_menubar_button.attribute('aria-disabled') == 'false').to be is_enabled
+      click_insert_menu_button
+
+      click_media_menubar_button
+      expect(media_menubar_button.enabled? && media_menubar_button.attribute('aria-disabled') == 'false').to be is_enabled
+      click_insert_menu_button
+
+      click_document_menubar_button
+      expect(document_menubar_button.enabled? && document_menubar_button.attribute('aria-disabled') == 'false').to be is_enabled
+      click_insert_menu_button
     end
 
     it 'should add bullet lists' do

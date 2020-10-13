@@ -470,6 +470,22 @@ module RCENextPage
     f(menubar_menu_item_css(item_name))
   end
 
+  def external_link_menubar_button
+    menu_option_by_name('External Links')
+  end
+
+  def image_menubar_button
+    menu_option_by_name('Upload Image')
+  end
+
+  def media_menubar_button
+    menu_option_by_name('Course Media')
+  end
+
+  def document_menubar_button
+    menu_option_by_name('Upload Document')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -807,6 +823,30 @@ module RCENextPage
     menu_item_by_name('Format').click
     menu_option_by_name('Directionality').click
     menu_option_by_name('Right-to-Left').click
+  end
+
+  def click_insert_menu_button
+    menu_item_by_name('Insert').click
+  end
+
+  def click_link_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Link').click
+  end
+
+  def click_image_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Image').click
+  end
+
+  def click_media_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Media').click
+  end
+
+  def click_document_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Document').click
   end
 
   def select_text_of_element_by_id(id)

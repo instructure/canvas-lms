@@ -93,7 +93,11 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
           return {
             type: 'menuitem',
             text: item.text,
-            onAction: () => doMenuItem(ed, item.value)
+            onAction: () => doMenuItem(ed, item.value),
+            onSetup: api => {
+              api.setDisabled(!isOKToLink(ed.selection.getContent()))
+              return () => {}
+            }
           }
         })
     })

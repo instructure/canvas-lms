@@ -88,7 +88,11 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
           return {
             type: 'menuitem',
             text: item.text,
-            onAction: () => doMenuItem(ed, item.value)
+            onAction: () => doMenuItem(ed, item.value),
+            onSetup: api => {
+              api.setDisabled(!isOKToLink(ed.selection.getContent()))
+              return () => {}
+            }
           }
         })
     })
