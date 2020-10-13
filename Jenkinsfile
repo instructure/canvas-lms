@@ -303,6 +303,9 @@ pipeline {
           protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             timedStage('Setup') {
               timeout(time: 5) {
+                echo "Files leftover from previous run------------------------------"
+                sh 'find .'
+                echo "--------------------------------------------------------------"
                 cleanAndSetup()
                 // If using custom CANVAS_LMS_REFSPEC do custom checkout to get correct code
                 if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
