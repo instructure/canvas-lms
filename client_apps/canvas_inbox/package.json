@@ -18,6 +18,7 @@
     "react-is": "^16.13.1"
   },
   "dependencies": {
+    "@instructure/canvas-theme": "6",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   }
