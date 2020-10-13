@@ -98,8 +98,8 @@ test('disables the submit button if To date is before From date', function() {
   this.wrapper.setState(
     {
       selected: {
-        from: {value: '2017-05-02T00:00:00-05:00', conversionFailed: false},
-        to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+        from: {value: '2017-05-02T00:00:00-05:00'},
+        to: {value: '2017-05-01T00:00:00-05:00'}
       }
     },
     () => {
@@ -113,43 +113,13 @@ test('does not disable the submit button if To date is after From date', functio
   this.wrapper.setState(
     {
       selected: {
-        from: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false},
-        to: {value: '2017-05-02T00:00:00-05:00', conversionFailed: false}
+        from: {value: '2017-05-01T00:00:00-05:00'},
+        to: {value: '2017-05-02T00:00:00-05:00'}
       }
     },
     () => {
       const button = this.wrapper.find(Button)
       notOk(button.props().disabled)
-    }
-  )
-})
-
-test('disables the submit button if the To date DateInput conversion failed', function() {
-  this.wrapper.setState(
-    {
-      selected: {
-        from: {value: '', conversionFailed: false},
-        to: {value: '2017-05-02T00:00:00-05:00', conversionFailed: true}
-      }
-    },
-    () => {
-      const button = this.wrapper.find(Button)
-      ok(button.props().disabled)
-    }
-  )
-})
-
-test('disables the submit button if the From date DateInput conversion failed', function() {
-  this.wrapper.setState(
-    {
-      selected: {
-        from: {value: '2017-05-02T00:00:00-05:00', conversionFailed: true},
-        to: {value: '', conversionFailed: false}
-      }
-    },
-    () => {
-      const button = this.wrapper.find(Button)
-      ok(button.props().disabled)
     }
   )
 })
@@ -166,8 +136,8 @@ test('does not disable the submit button when only from date is entered', functi
   this.wrapper.setState(
     {
       selected: {
-        from: {value: '1994-04-08T00:00:00-05:00', conversionFailed: false},
-        to: {value: '', conversionFailed: false}
+        from: {value: '1994-04-08T00:00:00-05:00'},
+        to: {value: ''}
       }
     },
     () => {
@@ -181,8 +151,8 @@ test('does not disable the submit button when only to date is entered', function
   this.wrapper.setState(
     {
       selected: {
-        from: {value: '', conversionFailed: false},
-        to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+        from: {value: ''},
+        to: {value: '2017-05-01T00:00:00-05:00'}
       }
     },
     () => {
@@ -215,8 +185,8 @@ test('dispatches with the state of input', function() {
     assignment: '1',
     grader: '2',
     student: '3',
-    from: {value: '2017-05-20T00:00:00-05:00', conversionFailed: false},
-    to: {value: '2017-05-21T00:00:00-05:00', conversionFailed: false}
+    from: {value: '2017-05-20T00:00:00-05:00'},
+    to: {value: '2017-05-21T00:00:00-05:00'}
   }
 
   this.wrapper.setState(
@@ -457,9 +427,9 @@ test('selecting an assignment from options clears options for assignments', func
 test('selecting an assignment from options sets showFinalGradeOverridesOnly to false', function() {
   this.wrapper.setState({
     selected: {
-      from: {value: '', conversionFailed: false},
+      from: {value: ''},
       showFinalGradeOverridesOnly: true,
-      to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+      to: {value: '2017-05-01T00:00:00-05:00'}
     }
   })
 
@@ -618,9 +588,9 @@ QUnit.module('SearchForm "Show Final Grade Overrides Only" checkbox', () => {
     const initialState = {
       selected: {
         assignment: '1',
-        from: {value: '2017-05-02T00:00:00-05:00', conversionFailed: false},
+        from: {value: '2017-05-02T00:00:00-05:00'},
         showFinalGradeOverridesOnly: false,
-        to: {value: '2017-05-01T00:00:00-05:00', conversionFailed: false}
+        to: {value: '2017-05-01T00:00:00-05:00'}
       }
     }
 

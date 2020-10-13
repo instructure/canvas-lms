@@ -63,8 +63,8 @@ class SearchFormComponent extends Component {
       assignment: '',
       grader: '',
       student: '',
-      from: {value: '', conversionFailed: false},
-      to: {value: '', conversionFailed: false},
+      from: {value: ''},
+      to: {value: ''},
       showFinalGradeOverridesOnly: false
     },
     messages: {
@@ -119,31 +119,33 @@ class SearchFormComponent extends Component {
   }
 
   setSelectedFrom = from => {
-    const conversionFailed = !from
-    const value = conversionFailed
-      ? null
-      : moment(from)
-          .startOf('day')
-          .toISOString()
+    const value =
+      from == null
+        ? null
+        : moment(from)
+            .startOf('day')
+            .toISOString()
+
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from: {value, conversionFailed}
+        from: {value}
       }
     }))
   }
 
   setSelectedTo = to => {
-    const conversionFailed = !to
-    const value = conversionFailed
-      ? null
-      : moment(to)
-          .endOf('day')
-          .toISOString()
+    const value =
+      to == null
+        ? null
+        : moment(to)
+            .endOf('day')
+            .toISOString()
+
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to: {value, conversionFailed}
+        to: {value}
       }
     }))
   }
@@ -196,11 +198,7 @@ class SearchFormComponent extends Component {
   }
 
   hasDateInputErrors() {
-    return (
-      this.dateInputErrors().length > 0 ||
-      this.state.selected.from.conversionFailed ||
-      this.state.selected.to.conversionFailed
-    )
+    return this.dateInputErrors().length > 0
   }
 
   dateInputErrors = () => {

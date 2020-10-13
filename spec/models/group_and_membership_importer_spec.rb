@@ -111,6 +111,30 @@ describe GroupAndMembershipImporter do
       expect(progress.workflow_state).to eq 'completed'
     end
 
+    it 'should restore deleted groups when sis id is passed in' do
+      group1.destroy
+      import_csv_data(%{user_id,group_id
+                        user_4,#{group1.sis_source_id}})
+      expect(group1.reload.workflow_state).to eq 'available'
+    end
+
+    it 'should restore deleted groups when id is passed in' do
+      group1.destroy
+      import_csv_data(%{user_id,canvas_group_id
+                        user_4,#{group1.id}})
+      expect(group1.reload.workflow_state).to eq 'available'
+    end
+
+    it 'should create new group when named group is deleted' do
+      group1.destroy
+      import_csv_data(%{user_id,group_name
+                        user_4,#{group1.name}})
+      expect(group1.reload.workflow_state).to eq 'deleted'
+      expect(gc1.groups.count).to eq 2
+      expect(gc1.groups.active.count).to eq 1
+      expect(@user.groups.pluck(:name)).to eq [group1.name]
+    end
+
     it 'should find users by id' do
       import_csv_data(%{canvas_user_id,group_name
                         #{@user.id}, first group})

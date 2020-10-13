@@ -210,6 +210,7 @@ ja:
   a_table_of_answers_and_brief_statistics_regarding__f516e98f: 受講生の解答の選択の答えの表と簡単な統計
   a_table_that_contains_the_grading_scheme_data_each_d461c205: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するアイコンも含まれています。
   a_table_that_contains_the_grading_scheme_data_each_fe739bf6: 採点スキームのデータを含む表です。各行には、名前、最大のパーセンテージ、最低のパーセンテージが含まれています。さらに、下に行を追加するためのアイコンと現在の行を削除するボタンも含まれています。
+  a_table_that_contains_the_grading_scheme_data_firs_90d2e30d: 採点スキームデータを含む表。1つ目は、採点スキームの名前と、スキームを編集・削除するためのボタンです。各行には、名前、最大パーセンテージ、最小パーセンテージが含まれます。さらに、各行には、下に新しい行を追加するためのボタンと、現在の行を削除するためのボタンが含まれています。
   a_z_243c3301: A–Z
   a_z_29d8e67c: "A - Z"
   about_this_service_b10bc808: このサービスについて
@@ -2083,6 +2084,7 @@ ja:
       GraphQL突然変異に関する情報を含むログを表示できます。
   allows_aligning_outcomes_to_non_scoring_content_537ce399: 結果をスコアのないコンテンツに合わせることができます
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: 査定担当者は、匿名または司会の割り当てに対してSpeedGrader評価監査トレイを表示できます。
+  allows_course_student_groups_to_be_created_by_csv__bb0c8456: コースの受講生グループをcsvアップロードで作成できるようにする
   allows_creating_announcements_for_a_specific_secti_14e0a63d: 特定のセクションのアナウンスメント作成を許可します
   allows_creating_discussions_for_a_specific_section_6bf44036: 特定のセクションのディスカッションの作成を許可します
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: 注目のリンク、または新しいリンクとしてヘルプリンクをタグ付けして、ヘルプメニューで注目のヘルプリンクを人目に付くように表示できるようにします。
@@ -2306,6 +2308,10 @@ ja:
       ユーザーが「すべての[course group]」にメッセージを送信できるようにします。
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "ユーザーが「すべての[course name]またはすべての[course group]にメッセージを送信できるようにします。"
   allows_user_to_send_messages_to_individual_course__9347e1e2: ユーザーが個々のコースメンバーにメッセージを送信できるようにします。
+  allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: ユーザーがアカウントおよびコースレベルで成果熟達度の計算を設定できるようにします。
+  allows_user_to_set_outcome_proficiency_calculation_73761bf4: ユーザーがアカウントおよびコースレベルで成果熟達度の計算を設定できるようにします。
+  allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: ユーザーがアカウントおよびコースレベルで成果熟達度スケールを設定できるようにします。
+  allows_user_to_set_outcome_proficiency_scales_at_t_c3b3cc71: ユーザーがアカウントおよびコースレベルで成果熟達度のスケールを設定できるようにします。
   allows_user_to_share_a_quiz_to_commons_6746e0da: "ユーザーが Commons にクイズを共有できるようにします。"
   allows_user_to_share_course_items_directly_with_ot_b5a68ecc: ユーザーが他のユーザーと直接、コースアイテムを共有できるようにします。ユーザーが個々のコースアイテムを別のコースにコピーできます。
   allows_user_to_view_a_course_s_sis_id_5c4a4c50: "ユーザーがコースの SIS ID を表示できるようにします。"
@@ -2827,6 +2833,7 @@ ja:
   arrange_columns_by_due_date_888f2551: 期日で列を並べ替え
   arrange_columns_by_due_date_f74f9e2d: 期日で列を並べ替え
   arrange_columns_by_points_48da9ba3: ポイントで列を調整する
+  artifact_f7003de5: アーティファクト
   artist_info_for_username_for_description_12d5d862: "%{userName} の %{description} に対するアーティスト情報"
   as_of_a036fa2e: （）現在
   as_you_type_in_this_field_the_list_of_groups_will__16688a5f: このフィールドに入力すると、グループのリストが自動的にフィルタリングされて、入力した文字に一致する名前のグループのみが表示されます。
@@ -4911,9 +4918,11 @@ ja:
   certificate_fingerprint_b376df90: 証明書の指紋
   change_applied_89d1aa5a: 変更内容が適用されました
   change_beginning_date_to_39dbd06e: 開始日の変更
+  change_color_for_proficiency_rating_position_48b39bfc: "熟達度評価の色を変更 %{position}"
   change_course_visibility_eaa2ffc: コースの可視性を変更する
   change_dcaa253a: 変更
   change_description_34c49853: 説明を変更
+  change_description_for_proficiency_rating_position_97626231: "習熟度評価の説明を変更する %{position}"
   change_ending_date_to_d2cebd54: 終了日の変更
   change_existing_group_2c91a32b: 既存のグループを変更
   change_groups_4e2ab6c3: グループを変更
@@ -4923,6 +4932,7 @@ ja:
   change_name_c8cce76c: 名前の変更
   change_name_to_568374c8: "「%{name}」を次に変更"
   change_points_9e5104ac: 変更点
+  change_points_for_proficiency_rating_position_a385c658: "熟達度評価の変更点 %{position}"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
       update_assignment_points: "%{assignmentPoints}に課題の合計ポイントと%{rubricPoints}にルブリックの合計ポイントを残すことは、ルブリックの採点された受講生の提出物にとって %{toPercentage_pointRatio}の最高得点になる可能性があります。"
@@ -6395,8 +6405,9 @@ ja:
     other: "%{count} 件の課題にエラーがあります"
     zero: "課題にエラーはありません。[続行] をクリックしてください"
   count_attempts_d23c69a0: 
-    one: "%{count} 回の試行"
+    one: 1回の試行
     other: "%{count} 回の試行"
+    zero: 試行回数の制限なし
   count_comments_cb137ab8: 
     one: "%{count} 件のコメント"
     other: "%{count} 件のコメント"
@@ -7465,6 +7476,7 @@ ja:
   create_edit_line_item_scores_116482c7: ライン項目スコアの作成/編集
   create_educational_resources_8219326e: 教育リソースを作成する
   create_failed_15d07ad4: 作成に失敗しました
+  create_files_after_rce_media_upload_recording_77d75a96: RCEメディアのアップロード/記録後にファイルを作成する
   create_interactive_course_content_76665336: インタラクティブなコースコンテンツを作成する
   create_item_base: 
     there_was_an_error: "「%{title}」の保存中にエラーが発生しました。もう一度やり直してください。"
@@ -7505,9 +7517,13 @@ ja:
   created_created_bf5714b8: "作成日時%{created}"
   created_descending_e9a1b097: "作成日時:降順"
   created_group_group_name_2097306b: "グループ %{group_name} を作成しました"
+  creates_file_objects_initially_hidden_to_students__7f333bf0: |-
+      メディアがRCE経由でアップロードまたは記録された後に、
+      ファイルオブジェクト（コース内の場合は最初は受講生に非表示）を作成します。
   creating_a_group_is_not_yet_handled_by_the_new_ass_3360471d: 新しい課題フローでは、グループ作成はまだ処理されていません。レガシー作成課題ページに移動しますか？
   creating_a_submission_export_will_allow_you_to_dow_b4b1a658: 提出のエクスポートを作成すると、すべての現在と過去のコースにおける課題提出のzipファイルをダウンロードすることができます。これは大きなファイルになる可能性があるので、時間がかかる可能性があります。そのページから移動し、後で戻ってくることができます。
   creating_conference_95b59116: 会議を作成中
+  creating_group_17bd69ce: グループを作成
   creating_key_8a026e61: キーの作成
   creative_commons_714a065f: "クリエイティブ コモンズ"
   creative_commons_license_725584ae: "クリエイティブ コモンズ ライセンス:"
@@ -7927,6 +7943,7 @@ ja:
   delete_prerequisite_5e97bdf4: 前提条件を削除
   delete_prerequisite_title_19741947: "前提条件%{title}を削除"
   delete_proficiency_rating_5436ee08: 熟達度評価を削除する
+  delete_proficiency_rating_position_46e205f7: "熟達度評価を削除 %{position}"
   delete_quiz_142b8099: クイズの削除
   delete_rating_24876355: 評価を削除
   delete_requirement_bce2d943: 要件を削除
@@ -8166,6 +8183,9 @@ ja:
   disable_authentication_for_graphql_3c019622: GraphQLの認証を無効にする
   disable_automatic_submission_8e1d8676: 自動提出を無効にする
   disable_canvas_keyboard_shortcuts_some_users_using_36675b3c: |-
+      [キーボードショートカット] を無効にします。スクリーンリーダーやキーボードナビゲーションを使用しているユーザーの中には、
+      これらのショートカットをオフにすることでエクスペリエンスが向上する人もいるでしょう。
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
       [キーボードショートカット] を無効にします。スクリーンリーダーやキーボードナビゲーションを使用しているユーザーの中には、
       これらのショートカットをオフにすることでエクスペリエンスが向上する人もいるでしょう。
   disable_celebrations_description: この機能を有効化すると、すべてのお祝いアニメーションが非表示になります。
@@ -8952,6 +8972,7 @@ ja:
   email_address_a1b97a39: メールアドレス
   email_address_optional_72795076: "メールアドレス リスト（オプション）"
   email_addresses_893faeb2: "電子メール アドレス"
+  email_addresses_required_14483dc8: メールアドレス（必須）
   email_already_in_use_330248e: メールは既に使用されています
   email_e366fa29: 電子メール
   email_is_invalid_e0d982eb: 電子メールが無効です!
@@ -9078,6 +9099,18 @@ ja:
   enrollment_term_7bfe840: 登録期間
   enrollment_terms_8753ec11: 登録規約
   enrollments_e250c9c3: 登録
+  enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
+      登録は、所属機関の受講生情報システム（SIS）によって追加される場合があります。SIS経由で登録が作成された場合、管理者のみがコースから登録を削除できます。
+              「人々」ページにアクセスするにはユーザー - リストの表示を有効にする必要があります。オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、ユーザーが Canvas アカウントをまだ持っていない場合でも、電子メールアドレスを使用してコースに追加することができます。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。受講生のセクションを編集するには、ユーザー - 表示リストと会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
+  enrollments_may_be_added_by_your_institution_stude_690188ae: |-
+      登録は、所属機関の受講生情報システム（SIS）によって追加される場合があります。SIS経由で登録が作成された場合、管理者のみがコースから登録を削除できます。
+              コース内のユーザーリストを表示するには、ユーザー - リストの表示を有効にする必要があります。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。講師またはTAのセクションを編集するには、ユーザー - 表示リストと会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
+  enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
+      登録は、所属機関の受講生情報システム（SIS）によって追加される場合があります。SIS経由で登録が作成された場合、管理者のみがコースから登録を削除できます。
+              コース内のユーザーリストを表示するには、ユーザー - リストの表示を有効にする必要があります。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。受講生のセクションとコース役割を編集するには、ユーザー - 表示リストと会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。ユーザーの登録を解除するには、ユーザーの詳細ページ、コースリストの表示、およびユーザーリスト参照も有効にされていなければなりません。ユーザーがコースの人物のページからコース招待状を再送することができるようにします。オープン登録アカウント設定を有効にすると、この権限を持つユーザーは、ユーザーが Canvas アカウントをまだ持っていない場合でも、電子メールアドレスを使用してコースの人物のページからコースに追加することができます。オブザーバーを受講生にリンクするには、ユーザー - ログインの詳細と会話を管理する - 個々のコースメンバーに送信するも有効にされていなければなりません。
+  enrollments_may_be_added_by_your_institution_stude_cb313429: |-
+      登録は、所属機関の受講生情報システム（SIS）によって追加される場合があります。SIS経由で登録が作成された場合、管理者のみがコースから登録を削除できます。
+              コース内のユーザーリストを表示するには、ユーザー - リストの表示を有効にする必要があります。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。講師またはTAのセクションを編集するには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: コースに既にインポートされている結果が再度インポートされた場合、重複しないようにします
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: 「成果のインポート」権限のないユーザーが「成果」タブ内のボタンを表示できないようにします
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: ここにhexcordを入力して、カスタムカラーを使用してください。
@@ -9381,6 +9414,7 @@ ja:
   error_associating_assignment_assignment_name_with__d92e9acf: "課題 \"%{assignment_name}\" を LTI ツールと関連づけようとしてエラーが発生しました"
   error_deleting_name_reason_11f9d399: "%{name} の削除時にエラーが発生しました: %{reason}"
   error_duplicating_module_4b023042: モジュール重複時にエラー
+  error_during_group_creation_f232994b: グループ作成中にエラーが発生しました
   error_exporting_gradebook_msg_6ea31e2f: "グレードブックエクスポート中にエラーが発生しました：%{msg}"
   error_fetching_access_token_1445a9e3: アクセストークン取得中のエラー
   error_fetching_user_details_7c85d23: ユーザーの詳細取得中のエラー
@@ -9876,6 +9910,7 @@ ja:
   file_s_will_be_included_when_user_content_is_displ_4e16dc3c: "ファイル(救数も)は、ユーザーのコンテンツがCanvas iOS、またはAndroid アプリに表示される場合を含みます。"
   file_s_will_be_included_when_user_content_is_displ_5e1fa73d: "ファイル(複数の場合も)は、ユーザーコンテンツがCanvas iOS または Android アプリ、そしてAPIに作成された第三者のアプリに表示される場合を含みます。"
   file_select_filename_folder_contents_9146bab7: "ファイル選択、%{filename}フォルダーの中身は"
+  file_selected_for_upload_filename_18ca9b8a: "アップロード用に選択されたファイル：%{filename}"
   file_size_limit_user_file_quota_applies_19b9b466: "%{file_size_limit}のユーザーファイルの割り当てを適用"
   file_status: 
     hidden_status: 非表示です。リンクで利用できます
@@ -11157,6 +11192,7 @@ ja:
   group_category_locked: "受講生がこの課題に対して既に提出を完了しているため、グループ カテゴリを変更できません"
   group_collaborations_b747d43: グループコラボレーション
   group_conferences_12866179: グループ会議
+  group_created_successfully_cae99f8c: グループが正常に作成されました・・・
   group_details_e51122f1: グループ詳細
   group_discussions_17d79aa0: グループディスカッション
   group_files_4324f3df: グループファイル
@@ -11181,6 +11217,7 @@ ja:
     errors: 
       group_full: グループに空きがありません。
       not_in_group_section: "%{student} は、%{group} の他のメンバーと、どのセクションも共有していません。"
+  group_membership_limit_54e165b: グループメンバーシップの制限
   group_name_b69c144: グループ名
   group_name_group_announcements_5ce81c6d: "%{group_name} - グループ発表"
   group_name_group_calendar_7f10e0ed: "%{group_name} - グループカレンダー"
@@ -11939,6 +11976,9 @@ ja:
   if_enabled_content_designers_must_provide_copyrigh_eca21f5e: 有効な場合、コンテンツの設計者は公開される前にファイルの著作権とライセンス情報を指定する必要があります。より良いファイルのブラウジングも有効になっている場合にのみ適用されます。
   if_enabled_copyright_and_license_information_must__2a551827: 有効にした場合、ファイルを公開する前に著作権とライセンス情報をファイルに提供しなければなりません。
   if_enabled_developer_key_management_options_and_to_1708ddd3: 有効にすると、開発者キー管理オプションとトークンスコープ設定が使用されます。
+  if_enabled_graphql_queries_will_not_require_users__46a8b655: |-
+      この機能を有効にすると、GraphQL クエリは
+      ユーザーにサインインやアクセストークンの使用を要求しなくなります。
   if_enabled_graphql_queries_will_not_require_users__85f1740: |-
       この機能を有効にすると、GraphQL クエリは
       ユーザーにサインインやアクセストークンの使用を要求しなくなります。
@@ -12067,6 +12107,7 @@ ja:
   import_a_set_of_outcomes_6b782192: 成果のセットをインポートする
   import_commons_favorites_e68fce81: Commonsお気に入りをインポートする
   import_content_b2fd6620: コンテンツのインポート
+  import_course_student_groups_by_csv_d2cde97d: コースの受講生グループをcsvでインポートする
   import_e929507b: インポート...
   import_learning_outcomes_36d28a2b: 学習成果をインポートする
   import_outcomes_7dda186b: 成果のインポート
@@ -12207,6 +12248,7 @@ ja:
   insert_math_equation_57c6e767: 数学数式を挿入
   insert_row_below_25187f89: 下に行を挿入
   insert_row_below_name_a5b3bd41: "%{name}の下に行を挿入"
+  insert_row_in_edit_mode_5976f269: 編集モードで行を挿入
   insights_b514ad8d: Insights
   install_c54fad9b: インストール
   installed_7b284a91: インストール済み
@@ -12336,6 +12378,7 @@ ja:
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: "無効な CSV ファイル。成績を更新することができませんでした。"
   invalid_csv_file_grades_could_not_be_updated_6ebdeca4: 無効なcsvファイルです。等級は更新されませんでした。
   invalid_custom_fields_c66dcdb6: カスタムフィールドが無効です。
+  invalid_date_2a10bb7b: 無効な日付
   invalid_date_and_time_1a42d206: 日付と時間が無効です
   invalid_date_or_datetime_for_field_b38fe386: "無効な日付または（）を判断%{field}"
   invalid_date_or_invalid_datetime_for_attr_6661103f: "無効な日付または無効な日時%{attr}"
@@ -12369,6 +12412,7 @@ ja:
   invalid_value_for_name_i_4a7c601a: "%{name}の無効な値：\"%{i}\""
   invalid_xml_configuration_9c3f6bcf: "無効な XML 設定"
   invalid_xml_syntax: "無効な XML 構文"
+  invitation_only_9a253f1d: 招待でのみ
   invite_5b1fcbcd: 招待
   ip_filter_is_not_valid_152a46d8: "IP フィルタは無効です。"
   ireland_353_3cd32cc0: "アイルランド (+353)"
@@ -12852,6 +12896,7 @@ ja:
   loading_725811ca: 読み込み中
   loading_additional_items_ed5f672d: 追加のアイテムを読み込む...
   loading_announcements_b927a86c: アナウンスの読み込み
+  loading_artifact_dc3bfe9f: アーティファクトを読み込み中
   loading_assessment_audit_trail_5cf4c10: アセスメント監査証跡を読み込み中
   loading_assignments_352ec769: 課題を読み込み中
   loading_assignments_b3b248be: 課題の読込み中
@@ -13041,6 +13086,7 @@ ja:
   login_handle_is_required_90ab7fe0: "%{login_handle}必須です。"
   login_id_12109693: "ログイン ID"
   login_id_bc943b97: "ログインID:"
+  login_ids_required_ff2273ab: ログインID（必須）
   login_info_d1d9f11e: 読み込み情報
   login_instructure_logo_8f2332db: "Instructure ロゴ"
   login_is_invalid_must_be_alphanumeric_or_an_email__ae4499b3: "ログインは無効です: アルファベット、もしくはメールアドレスである必要があります。　"
@@ -13180,6 +13226,7 @@ ja:
   mastered_34d4c857: 熟達
   mastery_7ec348b5: 熟達スコア
   mastery_connect_64598f55: 習熟度コネクト
+  mastery_mastery_for_proficiency_rating_position_74aa3b56: "熟達度 %{mastery} （習熟度評価の） %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "達成：%{n_mastery_points_precision_2_str} ポイント"
   mastery_path_processing_f4471152: 習得パス処理中
   mastery_paths_breakdown_6e0b5fce: 熟達の過程の内訳
@@ -13298,6 +13345,7 @@ ja:
   meets_mastery_754e1c06: 熟達を満たしている
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "最大 %{max_membership} 人中 %{member_count} 人"
   members_af25c21d: メンバー
+  members_are_free_to_join_defa5929: メンバーは自由に参加できる
   membership_by_invitation_only_9bc27199: 招待によるメンバーシップのみ
   membership_service_configuration_d8ba5a74: メンバーシップサービス設定
   menu: 
@@ -15758,6 +15806,7 @@ ja:
   no_allowed_domains_b6633d12: 許可されていないドメイン
   no_announcements_280df147: アナウンスメントなし
   no_announcements_to_display_fbf9ed1e: 表示する通知なし
+  no_artifacts_with_that_name_found_b8679f53: その名前のアーティファクトは見つかりませんでした
   no_assignment_group_assigned_8f1cdb9b: 割り当てられた課題グループなし
   no_assignment_name_adbb215b: 課題名なし
   no_assignments_with_that_name_found_1d7be1: その名前の課題は見つかりませんでした
@@ -16491,6 +16540,10 @@ ja:
   outcome_imports_c496a81f: 成果のインポート
   outcome_path_mastery_points: "%{path} 熟達度"
   outcome_path_result: "%{path} 結果"
+  outcome_proficiency_calculations_5959b681: 成果の習熟度の計算
+  outcome_proficiency_calculations_add_edit_5a2217b7: "成果の習熟度を計算 - 追加 / 編集"
+  outcome_proficiency_scales_a316bd83: 成果熟達度スケール
+  outcome_proficiency_scales_add_edit_58da6a3: "成果習熟度スケール - 追加 / 編集"
   outcome_results: 
     outcomes_filename: 成果
   outcome_results_23a0a117: 成果の結果
@@ -16833,6 +16886,8 @@ ja:
   performed_by_70b3ce96: 実行者
   permission_must_be_enabled_for_someone_397e1ce3: 誰かのために許可を有効にする必要があります
   permission_not_found_620b80d1: 権限が見つかりません
+  permission_to_change_this_mastery_calculation_is_e_91e19659: この習熟度計算を変更する権限は、次のアカウントレベルで有効です：
+  permission_to_change_this_mastery_scale_is_enabled_89066fac: この習熟度スケールを変更する権限は、次のアカウントレベルで有効です：
   permissions: 
     manage_webhooks: "Webhooks - 管理する"
     provision_catalog: Catalogへの準備
@@ -17539,6 +17594,7 @@ ja:
   product_tours_1e19eb95: 製品ツアー
   proficiency_calculation_57f0bdf: 熟達スコア計算
   proficiency_calculation_parameters_5f605dec: 熟達スコアパラメータ
+  proficiency_level_1d05e468: 熟達度
   proficiency_rating_6346119f: 熟達度評価
   proficiency_rating_deleted_77827473: 熟達度評価が削除されました
   proficiency_ratings_2bbabdcd: 熟達度評価
@@ -19763,6 +19819,7 @@ ja:
   remove_role_filter_label_a27b6797: "役割フィルタを削除する%{label}"
   remove_row_c198da5a: 行を削除
   remove_row_f9d59cba: 行を削除
+  remove_row_in_edit_mode_49c4dc07: 編集モードで行を削除
   remove_row_name_c053f5ae: "行%{name}を削除"
   remove_row_row_167c424a: "行%{row}を削除"
   remove_student_from_recipients_4b206e35: "受信者から%{student}を削除する"
@@ -19792,6 +19849,10 @@ ja:
         minute: 最小
   replace_e61834a7: 置換
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 現在のフォルダツリーを新しいアクセスで、より機能が豊富なフォルダツリーに置き換えます。
+  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
+      数学方程式の既存の画像と非表示のmathmlを
+      フォーマットされたバージョン MathJax に置き換えます。これにより、読者がページ上の方程式を操作するためのアクセス性
+      と多数のオプションが向上します。
   reply_389d6fb9: 返信
   reply_from_name: "%{name} (Canvas のお知らせから)"
   reply_to_comment_72d96728: コメントに返信
@@ -19943,6 +20004,8 @@ ja:
       manage_interaction_alerts: アラートの管理
       manage_links: 役割の管理とリンクの信頼
       manage_outcomes: 学習成果の管理
+      manage_proficiency_calculations: 成果の習熟度の計算を管理
+      manage_proficiency_scales: 成果の習熟度スケールを管理
       manage_role_overrides: 権限の管理
       manage_rubrics: アセスメント注釈の作成および編集
       manage_sections: "コース セクションの管理 (作成 / 編集 / 削除)"
@@ -21539,6 +21602,7 @@ ja:
   show_exceptions_270ea1c5: 例外を表示
   show_final_grade_a95e14dc: 最終成績を表示
   show_final_grade_override_8cde5803: 最終的な成績オーバーライドを表示
+  show_final_grade_overrides_only_c3017aaa: 最終的な成績オーバーライドのみを表示
   show_groups_navigation_menu_1521d38d: グループナビゲーションメニューを表示する
   show_inactive_enrollments_8f4c4824: 非アクティブの登録を表示
   show_key_1fbf0c64: キーを表示する
@@ -21605,6 +21669,7 @@ ja:
   sis_id_4495a887: "SIS ID"
   sis_id_70eda157: "SIS ID:"
   sis_id_8c2029e1: "SIS ID"
+  sis_ids_required_125074d9: "SIS ID（必須）"
   sis_import: 
     buttons: 
       process_data: データの処理
@@ -22947,6 +23012,7 @@ ja:
   this_item_will_reappear_when_a_new_submission_is_m_fcccfc76: このアイテムは、新しい提出があれば表示されます。
   this_item_will_reappear_when_there_are_new_grades__8f9e5383: このアイテムは、管理する新しい成績があれば表示されます。
   this_login_is_for_provider_6f17462: "%{provider}のためのログイン"
+  this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: この習熟度スケールは、アカウント内のすべてのコースのデフォルトとして使用されます。
   this_may_take_a_bit_48fe4235: 少し時間がかかります...
   this_may_take_a_bit_c061d0f6: 少し時間がかかる場合があります。
   this_message_includes_media_comments_to_listen_or__5fc98641: "このメッセージにはメディア コメントが含まれています。再生または返信するには、下のリンクをクリックしてください: %{link}"
@@ -23951,6 +24017,7 @@ ja:
   updated_current_grade_to_be_empty_c2ce1d13: 現在の成績を空に更新しました
   updated_current_grade_to_currentgrade_bfe2ea14: "現在のグレードを更新しました%{currentGrade}"
   updated_group_group_name_727b1d98: "更新されたグループ %{group_name}"
+  updated_math_equation_display_583671a8: 数学方程式の表示を更新
   updated_permissions_page_f2e91060: 更新された権限ページ
   updated_terms_of_service_82f34148: 更新された利用規約
   updated_ui_for_searching_and_displaying_users_and__6755e08e: アカウント内のユーザーとコースを検索、表示するためにUIを更新する。
