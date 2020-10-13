@@ -338,21 +338,20 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = [
-    :all_discussion_topics, :assignments, :assignment_groups,
-    :enrollments, :rubrics, :collaborations, :quizzes, :context_modules, :wiki_pages
-  ].freeze
-  ITEM_TYPES = WORKFLOW_TYPES + [:attachments].freeze
+  WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
+                    :collaborations, :context_modules, :enrollments, :groups,
+                    :quizzes, :rubrics, :wiki_pages].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.
-          map { |type| @context.association(type).reader }
+      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.map { |type| @context.association(type).reader }
 
       @deleted_items = []
       @item_types.each do |scope|
         @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
       end
       @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
+      @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a if @context.grants_right?(@current_user, :manage_groups)
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
@@ -365,8 +364,13 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
+      type = 'all_group_category' if type == 'group_category'
+      if ['all_group_category', 'group'].include?(type)
+        return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_groups)
+      end
       type = type.pluralize
       raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
+
       @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item
