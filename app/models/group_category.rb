@@ -225,6 +225,12 @@ class GroupCategory < ActiveRecord::Base
     self.save
   end
 
+  def restore
+    self.groups.where(deleted_at: [self.deleted_at - 10.minutes..self.deleted_at]).update_all(workflow_state: 'available', deleted_at: nil)
+    self.deleted_at = nil
+    self.save!
+  end
+
   # We can't reassign existing group members, groups can have different maximum limits, and we want
   # the groups to be as evenly sized as possible. Think of this like pouring water into an oddly
   # shaped glass. The shape of the glass is determined by existing members and max group sizes,

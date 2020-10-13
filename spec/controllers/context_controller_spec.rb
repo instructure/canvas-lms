@@ -421,12 +421,56 @@ describe ContextController do
       expect(response).to be_successful
       expect(assigns[:deleted_items]).to include(@assignment)
     end
+
+    it 'should show group_categories' do
+      user_session(@teacher)
+      category = GroupCategory.student_organized_for(@course)
+      category.destroy
+
+      get :undelete_index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:deleted_items]).to include(category)
+    end
+
+    it 'should show groups' do
+      user_session(@teacher)
+      category = GroupCategory.student_organized_for(@course)
+      g1 = category.groups.create!(context: @course, name: 'group_a')
+      g1.destroy
+
+      get :undelete_index, params: { course_id: @course.id }
+      expect(response).to be_successful
+      expect(assigns[:deleted_items]).to include(g1)
+    end
   end
 
   describe "POST 'undelete_item'" do
+    it 'allows undeleting groups' do
+      user_session(@teacher)
+      category = GroupCategory.student_organized_for(@course)
+      g1 = category.groups.create!(context: @course, name: 'group_a')
+      g1.destroy
+
+      post :undelete_item, params: { course_id: @course.id, asset_string: g1.asset_string }
+      expect(g1.reload.workflow_state).to eq 'available'
+      expect(g1.deleted_at).to be_nil
+    end
+
+    it 'allows undeleting group_categories' do
+      user_session(@teacher)
+      category = GroupCategory.student_organized_for(@course)
+      g1 = category.groups.create!(context: @course, name: 'group_a')
+      category.destroy
+
+      post :undelete_item, params: { course_id: @course.id, asset_string: category.asset_string }
+      expect(category.reload.deleted_at).to be_nil
+      expect(g1.reload.deleted_at).to be_nil
+      expect(g1.workflow_state).to eq 'available'
+    end
+
     it 'does not allow dangerous sends' do
       user_session(@teacher)
-      expect_any_instantiation_of(@course).to receive(:teacher_names).never
+      expect_any_instantiation_of(@course).not_to receive(:teacher_names)
       post :undelete_item, params: { course_id: @course.id, asset_string: 'teacher_name_1' }
       expect(response.status).to eq 500
     end

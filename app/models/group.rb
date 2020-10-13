@@ -286,6 +286,12 @@ class Group < ActiveRecord::Base
     self.save
   end
 
+  def restore
+    self.workflow_state = 'available'
+    self.deleted_at = nil
+    self.save!
+  end
+
   Bookmarker = BookmarkedCollection::SimpleBookmarker.new(Group, :name, :id)
 
   scope :active, -> { where("groups.workflow_state<>'deleted'") }
