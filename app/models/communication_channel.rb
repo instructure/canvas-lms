@@ -391,21 +391,6 @@ class CommunicationChannel < ActiveRecord::Base
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
   scope :of_type, lambda { |type| where(:path_type => type) }
 
-  def move_to_user(user, migrate=true)
-    return unless user
-    if self.pseudonym && self.pseudonym.unique_id == self.path
-      self.pseudonym.move_to_user(user, migrate)
-    else
-      old_user_id = self.user_id
-      self.user_id = user.id
-      self.save!
-      if old_user_id
-        Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
-        User.where(:id => [old_user_id, user]).touch_all
-      end
-    end
-  end
-
   # the only way this is used is if a user adds a communication channel in their
   # profile from the default account. In this space, there is currently a
   # check_box that will allow you to login with the same email. This method is
