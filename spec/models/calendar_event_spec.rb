@@ -1017,6 +1017,27 @@ describe CalendarEvent do
         e1.update :remove_child_events => true
         expect(e1.child_events.reload).to be_empty
       end
+
+      it "unsets all_day when deleting child events" do
+        s2 = @course.course_sections.create!
+        e1 = @course.calendar_events.create!({
+          title: 'foo',
+          start_at: "2020-10-29T00:00:00.000Z",
+          end_at: "2020-10-29T00:00:00.000Z",
+          updating_user: @user,
+          child_event_data: [
+            { start_at: "2020-10-27T10:00:00.000Z", end_at: "2020-10-27T11:00:00.000Z", context_code: @course.default_section.asset_string},
+            { start_at: "2020-10-27T14:00:00.000Z", end_at: "2020-10-27T15:00:00.000Z", context_code: s2.asset_string}
+          ]
+        })
+        e1 = CalendarEvent.find(e1.id)
+        e1.update({
+          start_at: "2020-10-27T10:00:00.000Z",
+          end_at: "2020-10-27T15:00:00.000Z",
+          remove_child_events: true
+        })
+        expect(e1.reload).not_to be_all_day
+      end
     end
 
     context "cascading" do
