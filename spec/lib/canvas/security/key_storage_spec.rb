@@ -24,6 +24,7 @@ describe Canvas::Security::KeyStorage do
       Canvas::Security::KeyStorage::PRESENT => Canvas::Security::KeyStorage.new_key,
       Canvas::Security::KeyStorage::FUTURE => Canvas::Security::KeyStorage.new_key
     })
+
     allow(Canvas::DynamicSettings).to receive(:kv_proxy).and_return(@fallback_proxy)
     @key_storage = Canvas::Security::KeyStorage.new('mocked')
   end
@@ -35,41 +36,66 @@ describe Canvas::Security::KeyStorage do
   end
 
   describe "#rotate_keys" do
-    it 'rotates the past key' do
+    context 'when run more than min_rotation_period after last run' do 
+      before do
+        allow(@key_storage).to receive(:min_rotation_period).and_return(0)
+      end
+
+      it 'rotates the past key' do
+        keys_before = @key_storage.retrieve_keys
+        past = keys_before[Canvas::Security::KeyStorage::PAST].to_json
+        present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
+        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PAST] }.
+          from(past).to(present)
+      end
+
+      it 'rotates the present key' do
+        keys_before = @key_storage.retrieve_keys
+        present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
+        future = keys_before[Canvas::Security::KeyStorage::FUTURE].to_json
+        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }.
+          from(present).to(future)
+      end
+
+      it 'rotates the future key' do
+        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::FUTURE] }
+      end
+
+      it 'initialize the keys if no keys are present' do
+        @fallback_proxy.data.clear
+        @key_storage.rotate_keys
+        expect(
+          @fallback_proxy.data.values_at(
+            Canvas::Security::KeyStorage::PAST,
+            Canvas::Security::KeyStorage::PRESENT,
+            Canvas::Security::KeyStorage::FUTURE
+          )
+        ).not_to include nil
+      end
+
+      it 'resets the cache after setting the keys' do
+        expect(Canvas::DynamicSettings).to receive(:reset_cache!)
+        @key_storage.rotate_keys
+      end
+    end
+
+    it 'only rotates if more than 1 hour has passed since last rotating' do
       keys_before = @key_storage.retrieve_keys
-      past = keys_before[Canvas::Security::KeyStorage::PAST].to_json
-      present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
-      expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PAST] }.
-        from(past).to(present)
-    end
+      # We rely on the fact the the kid is the time the key was generated.
+      # Double-check that here.
+      future_key_time = Time.zone.parse(keys_before[Canvas::Security::KeyStorage::FUTURE]['kid'])
+      expect(future_key_time).to be_within(29).of(Time.zone.now)
 
-    it 'rotates the present key' do
-      keys_before = @key_storage.retrieve_keys
-      present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
-      future = keys_before[Canvas::Security::KeyStorage::FUTURE].to_json
-      expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }.
-        from(present).to(future)
-    end
+      Timecop.freeze(future_key_time + 59.minutes) do
+        expect { @key_storage.rotate_keys }.not_to change { @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }
+      end
 
-    it 'rotates the future key' do
-      expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::FUTURE] }
-    end
-
-    it 'initialize the keys if no keys are present' do
-      @fallback_proxy.data.clear
-      @key_storage.rotate_keys
-      expect(
-        @fallback_proxy.data.values_at(
-          Canvas::Security::KeyStorage::PAST,
-          Canvas::Security::KeyStorage::PRESENT,
-          Canvas::Security::KeyStorage::FUTURE
-        )
-      ).not_to include nil
-    end
-
-    it 'resets the cache after setting the keys' do
-      expect(Canvas::DynamicSettings).to receive(:reset_cache!)
-      @key_storage.rotate_keys
+      Timecop.freeze(future_key_time + 61.minutes) do
+        present = keys_before[Canvas::Security::KeyStorage::PRESENT].to_json
+        future = keys_before[Canvas::Security::KeyStorage::FUTURE].to_json
+        expect{ @key_storage.rotate_keys }.to change{ @fallback_proxy.data[Canvas::Security::KeyStorage::PRESENT] }.
+          from(present).to(future)
+      end
     end
   end
 

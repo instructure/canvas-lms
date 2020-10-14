@@ -22,6 +22,7 @@ module Canvas::Security
     PRESENT = 'jwk-present.json'.freeze
     FUTURE = 'jwk-future.json'.freeze
     MAX_CACHE_AGE = 10.days.to_i
+    MIN_ROTATION_PERIOD = 1.hour
 
     def initialize(prefix)
       @prefix = prefix
@@ -34,6 +35,13 @@ module Canvas::Security
       { PAST => get_key(PAST), PRESENT => get_key(PRESENT), FUTURE => get_key(FUTURE) }
     end
 
+    # Do not rotate keys unless this much time has passed since last rotation.
+    # Prevents accidental multiple rotation if the job to rotate has been
+    # enqueued multiple times.
+    def min_rotation_period
+      MIN_ROTATION_PERIOD
+    end
+
     # Rotate the keys
     #   The present key becomes the past key; the future key becomes
     #   present; and a newly generated key becomes the future one
@@ -42,6 +50,8 @@ module Canvas::Security
       if keys.values.compact.blank?
         initialize_keys
       else
+        return if (Time.zone.now - Time.zone.parse(keys.dig(FUTURE, 'kid'))) < min_rotation_period.to_i
+
         kvs = {
           PAST => keys[PRESENT].to_json,
           PRESENT => keys[FUTURE].to_json,
