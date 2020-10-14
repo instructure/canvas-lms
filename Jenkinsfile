@@ -194,7 +194,7 @@ def slackSendCacheAvailable(blockName = '') {
   slackSend(
     channel: '#jenkins_cache_noisy',
     color: 'good',
-    message: "Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> with HEAD ${GIT_REV} uploaded ${blockName} image cache"
+    message: "Uploaded New Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nRevision: ${GIT_REV}\nInstance: ${env.NODE_NAME}"
   )
 }
 
@@ -209,7 +209,7 @@ def slackSendCacheBuild(blockName = '', block) {
 
   slackSend(
     channel: '#jenkins_cache_noisy',
-    message: "Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> with HEAD^ ${PARENT_GIT_REV} built ${blockName} in ${buildEndTime - buildStartTime}ms"
+    message: "Built Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nParent: ${PARENT_GIT_REV}\nDuration: ${buildEndTime - buildStartTime}ms\nInstance: ${env.NODE_NAME}"
   )
 }
 

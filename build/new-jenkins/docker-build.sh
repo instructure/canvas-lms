@@ -11,6 +11,9 @@ dependencyArgs=(
   --file Dockerfile.jenkins
 )
 
+echo "Cache manifest before building"
+DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $CACHE_TAG || true
+
 # shellcheck disable=SC2086
 DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   --pull \
@@ -20,3 +23,9 @@ DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
   --tag "$1" \
   --target webpack-final \
   "$WORKSPACE"
+
+echo "Cache manifest after building"
+DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $CACHE_TAG || true
+
+echo "Built image"
+docker image inspect $1
