@@ -207,6 +207,14 @@ shared_context "in-process server selenium tests" do
       # we want to ignore selenium errors when attempting to wait here
     end
 
+    # we don't want to combine this into the above block to avoid x-test pollution
+    # if a previous step fails
+    begin
+      driver.session_storage.clear
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
+
     if SeleniumDriverSetup.saucelabs_test_run?
       job_id = driver.session_id
       job = SauceWhisk::Jobs.fetch job_id

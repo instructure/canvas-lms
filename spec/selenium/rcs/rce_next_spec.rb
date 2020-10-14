@@ -102,10 +102,6 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'links' do
-      after :each do
-        driver.session_storage.clear
-      end
-
       it 'should respect selected text when creating a course link in body',
          ignore_js_errors: true do
         title = 'test_page'
