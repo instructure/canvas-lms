@@ -1519,15 +1519,26 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     # remove_foreign_key :table, column: :stuff, if_exists: stuff
     options = args.last
     options = {} unless options.is_a?(Hash)
-    options_or_to_table = args.first || {}
 
-    # have to account for if options is a hash, if_exists will just get wrapped up
-    # in it
-    if options.delete(:if_exists)
-      fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
-      return if fk_name_to_delete.nil?
+    if CANVAS_RAILS5_2
+      # when removing this, simplify the whole method signature to `to_table = nil, **options`
+      options_or_to_table = args.first || {}
+
+      if options.delete(:if_exists)
+        fk_name_to_delete = foreign_key_for(from_table, options_or_to_table)&.name
+        return if fk_name_to_delete.nil?
+      else
+        fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
+      end
     else
-      fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
+      options[:to_table] = args.first if args.length == 2
+
+      if options.delete(:if_exists)
+        fk_name_to_delete = foreign_key_for(from_table, **options)&.name
+        return if fk_name_to_delete.nil?
+      else
+        fk_name_to_delete = foreign_key_for!(from_table, **options).name        
+      end
     end
 
     at = create_alter_table from_table
