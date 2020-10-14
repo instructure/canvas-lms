@@ -18,62 +18,62 @@
 
 import React, {useEffect, useState} from 'react'
 import I18n from 'i18n!groups'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import {NumberInput} from '@instructure/ui-number-input'
 
 const MIN = 1
 const MAX = 100000
 
 GroupMembershipInput.propTypes = {
-  onChange: func.isRequired
+  onChange: func.isRequired,
+  value: string
 }
 
-export default function GroupMembershipInput({onChange, ...props}) {
+export default function GroupMembershipInput({onChange, value, ...props}) {
   const [messages, setMessages] = useState([])
-  const [number, setNumber] = useState('')
+  const [groupLimit, setGroupLimit] = useState('')
 
   useEffect(() => {
-    onChange(number)
-  }, [number, onChange])
+    onChange(groupLimit)
+  }, [groupLimit, onChange])
 
   function handleIncrement() {
-    if (Number.isNaN(Number(number))) return
-    if (number === '') return validateAndSetNumber(MIN)
-    if (Number.isInteger(number)) return validateAndSetNumber(number + 1)
-    return validateAndSetNumber(Math.ceil(number))
+    // will allow increment from an empty string
+    if (value === '') return validateAndSetGroupLimit(parseInt(value + 1, 10))
+    if (parseInt(value, 10)) return validateAndSetGroupLimit(parseInt(value, 10) + 1)
   }
 
   function handleDecrement() {
-    if (Number.isNaN(Number(number))) return
-    if (number === '') return validateAndSetNumber(MIN)
-    if (Number.isInteger(number)) return validateAndSetNumber(number - 1)
-    return validateAndSetNumber(Math.floor(number))
+    // won't allow decrement from an empty string; we'll throw an error instead
+    if (value === '') return validateAndSetGroupLimit(parseInt(value - 1, 10))
+    if (parseInt(value, 10)) return validateAndSetGroupLimit(parseInt(value, 10) - 1)
   }
 
-  function handleChange(_, value) {
-    if (Number.isNaN(Number(value))) {
-      setNumber('')
-      return setMessages([{text: `'${value}' is not a valid number.`, type: 'error'}])
+  function handleChange(_, input) {
+    if (Number.isNaN(Number(input))) {
+      setGroupLimit('')
+      return setMessages([{text: `'${input}' is not a valid number.`, type: 'error'}])
     }
-    if (value === '') return value
-    return validateAndSetNumber(Math.round(value))
+    if (input === '') return input
+    return validateAndSetGroupLimit(Math.round(input))
   }
 
   function handleKeyDown(e) {
-    if (e.key === 'Backspace' && number < 10) {
-      setNumber('')
+    if (e.key === 'Backspace' && value < 10) {
+      setGroupLimit('')
+      onChange(groupLimit)
     }
   }
 
-  function validateAndSetNumber(n) {
+  function validateAndSetGroupLimit(v) {
     setMessages([])
-    if (n < MIN || n > MAX) {
-      setNumber('')
+    if (v < MIN || v > MAX) {
+      setGroupLimit('')
       return setMessages([
         {text: `Number must be between ${MIN} and ${I18n.n(MAX)}`, type: 'error'}
       ])
     } else {
-      return setNumber(n)
+      return setGroupLimit(v)
     }
   }
 
@@ -83,6 +83,7 @@ export default function GroupMembershipInput({onChange, ...props}) {
       id="group_max_membership"
       renderLabel={I18n.t('Group Membership Limit')}
       messages={messages}
+      value={value}
       onChange={handleChange}
       onKeyDown={handleKeyDown}
       onIncrement={handleIncrement}
