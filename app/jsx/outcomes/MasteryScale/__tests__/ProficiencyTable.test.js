@@ -120,6 +120,18 @@ describe('default proficiency', () => {
     expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
 
+  it('setting duplicate point values sets error and focus', async () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const pointsInput = getByDisplayValue('3')
+    fireEvent.change(pointsInput, {target: {value: '4'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    const error = await within(pointsInput.closest('.points')).findByText(
+      'Ratings must have a unique point value'
+    )
+    expect(error).not.toBeNull()
+    expect(document.activeElement).toEqual(pointsInput.closest('input'))
+  })
+
   it('only sets focus on the first error', () => {
     const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
     const masteryField = getByDisplayValue('Mastery')
@@ -187,7 +199,7 @@ describe('default proficiency', () => {
     expect(updateSpy).not.toHaveBeenCalled()
   })
 
-  it('increasing rating points does not call update', () => {
+  it('increasing rating points does call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
@@ -195,7 +207,8 @@ describe('default proficiency', () => {
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    expect(updateSpy).not.toHaveBeenCalled()
+    fireEvent.click(getByText('Save'))
+    expect(updateSpy).toHaveBeenCalled()
   })
 
   it('negative rating points does not call update', () => {
@@ -213,6 +226,20 @@ describe('default proficiency', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps} />)
     const saveButton = getByText('Save Mastery Scale').closest('button')
     expect(saveButton.disabled).toEqual(true)
+  })
+
+  it('save errors do not disable the save button', () => {
+    const updateSpy = jest.fn(() => Promise.reject())
+    const {getByText, getByDisplayValue} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
+
+    const pointsInput = getByDisplayValue('3')
+    fireEvent.change(pointsInput, {target: {value: '100'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+
+    const saveButton = getByText('Save Mastery Scale').closest('button')
+    expect(saveButton.disabled).toEqual(false)
   })
 })
 
@@ -243,6 +270,154 @@ describe('custom proficiency', () => {
     const deleteButtons = getAllByText(/Delete proficiency rating/).map(el => el.closest('button'))
     expect(deleteButtons.length).toEqual(2)
     expect(deleteButtons.some(btn => btn.disabled)).toEqual(false)
+  })
+
+  describe('ratings are automatically sorted', () => {
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const defaultColor = 'EF4437'
+    const defaultRating1 = {
+      description: 'Great',
+      points: 10,
+      color: '0000ff',
+      mastery: false
+    }
+    const defaultRating2 = {
+      description: 'Average',
+      points: 5,
+      color: '00ff00',
+      mastery: true
+    }
+    const defaultRating3 = {
+      description: 'Poor',
+      points: 3,
+      color: 'ff0000',
+      mastery: false
+    }
+    const customProficiencyProps = {
+      ...defaultProps,
+      proficiency: {
+        proficiencyRatingsConnection: {
+          nodes: [defaultRating1, defaultRating2, defaultRating3]
+        }
+      }
+    }
+
+    it('by point value when a new rating is added', () => {
+      const {getAllByLabelText, getByText, getByDisplayValue} = render(
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+      )
+      const button = getByText(/Add Proficiency Level/)
+      fireEvent.click(button)
+
+      const pointsInput = getByDisplayValue('2')
+      const descriptionInput = getAllByLabelText(/Change description/)[3]
+
+      fireEvent.change(pointsInput, {target: {value: '9'}})
+      fireEvent.change(descriptionInput, {target: {value: 'Almost Perfect'}})
+      fireEvent.click(getByText('Save Mastery Scale'))
+      fireEvent.click(getByText('Save'))
+
+      const proficiencyDescriptions = getAllByLabelText(/Change description/).map(el => el.value)
+      const proficiencyPoints = getAllByLabelText(/Change points/).map(el => el.value)
+
+      const sortedDescriptions = ['Great', 'Almost Perfect', 'Average', 'Poor']
+      const sortedPoints = ['10', '9', '5', '3']
+
+      expect(proficiencyDescriptions).toEqual(sortedDescriptions)
+      expect(proficiencyPoints).toEqual(sortedPoints)
+
+      const addedRating = {
+        description: 'Almost Perfect',
+        points: 9,
+        color: defaultColor,
+        mastery: false
+      }
+      const expectedRatings = [defaultRating1, addedRating, defaultRating2, defaultRating3]
+      expect(updateSpy).toHaveBeenCalledWith({ratings: expectedRatings})
+
+      const saveButton = getByText('Save Mastery Scale').closest('button')
+      expect(saveButton.disabled).toEqual(true)
+    })
+
+    it('masteryIndex is incremented when sorting causes a rating to be put above the current mastery', () => {
+      const {getAllByLabelText, getByText, getByDisplayValue} = render(
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+      )
+
+      const pointsInput = getByDisplayValue('3')
+      fireEvent.change(pointsInput, {target: {value: '20'}})
+      fireEvent.click(getByText('Save Mastery Scale'))
+      fireEvent.click(getByText('Save'))
+
+      const masteryRatings = getAllByLabelText(/Mastery.*for proficiency rating/).map(
+        el => el.checked
+      )
+      const expectedMasteryRatings = [false, false, true]
+      expect(masteryRatings).toEqual(expectedMasteryRatings)
+
+      const updatedRating = {...defaultRating3}
+      updatedRating.points = 20
+      const expectedRatings = [updatedRating, defaultRating1, defaultRating2]
+      expect(updateSpy).toHaveBeenCalledWith({ratings: expectedRatings})
+
+      const saveButton = getByText('Save Mastery Scale').closest('button')
+      expect(saveButton.disabled).toEqual(true)
+    })
+
+    it('masteryIndex is not incremented when adding a new rating that is less than the current mastery', () => {
+      const {getAllByLabelText, getByText} = render(
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+      )
+      const button = getByText(/Add Proficiency Level/)
+      fireEvent.click(button)
+
+      const descriptionInput = getAllByLabelText(/Change description/)[3]
+      fireEvent.change(descriptionInput, {target: {value: 'Pretty Poor'}})
+      fireEvent.click(getByText('Save Mastery Scale'))
+      fireEvent.click(getByText('Save'))
+
+      const masteryRatings = getAllByLabelText(/Mastery.*for proficiency rating/).map(
+        el => el.checked
+      )
+      const expectedMasteryRatings = [false, true, false, false]
+      expect(masteryRatings).toEqual(expectedMasteryRatings)
+
+      const addedRating = {
+        description: 'Pretty Poor',
+        points: 2,
+        color: defaultColor,
+        mastery: false
+      }
+      const expectedRatings = [defaultRating1, defaultRating2, defaultRating3, addedRating]
+      expect(updateSpy).toHaveBeenCalledWith({ratings: expectedRatings})
+
+      const saveButton = getByText('Save Mastery Scale').closest('button')
+      expect(saveButton.disabled).toEqual(true)
+    })
+
+    it('masteryIndex remains at the correct index when sorting and deleting in a single update', () => {
+      const {getByText, getAllByText, getByDisplayValue} = render(
+        <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
+      )
+
+      const pointsInput = getByDisplayValue('3')
+      const masteryButton = getAllByText(/Mastery.*for proficiency rating/)[2].closest('label')
+      const deleteButton = getAllByText(/Delete proficiency rating/)[0].closest('button')
+
+      fireEvent.change(pointsInput, {target: {value: '20'}})
+      fireEvent.click(masteryButton)
+      fireEvent.click(deleteButton)
+      fireEvent.click(getByText('Save Mastery Scale'))
+      fireEvent.click(getByText('Save'))
+
+      const updatedRating1 = {...defaultRating3, mastery: true, points: 20}
+      const updatedRating2 = {...defaultRating2, mastery: false}
+      const expectedRatings = [updatedRating1, updatedRating2]
+      expect(updateSpy).toHaveBeenLastCalledWith({ratings: expectedRatings})
+
+      const saveButton = getByText('Save Mastery Scale').closest('button')
+      expect(saveButton.disabled).toEqual(true)
+    })
   })
 
   it('renders one rating that is not deletable', () => {

@@ -51,13 +51,12 @@ const createRating = (description, points, color, mastery = false, focusField = 
 const configToState = data => {
   const rows = List(
     data.proficiencyRatingsConnection.nodes.map(rating =>
-      fromJS(createRating(rating.description, rating.points, rating.color))
+      fromJS(createRating(rating.description, rating.points, rating.color, rating.mastery))
     )
   )
-  const masteryIndex = data.proficiencyRatingsConnection.nodes.findIndex(rating => rating.mastery)
   return {
-    masteryIndex,
     rows,
+    savedRows: rows,
     allowSave: false,
     showConfirmation: false
   }
@@ -94,23 +93,18 @@ class ProficiencyTable extends React.Component {
     this.state = configToState(props.proficiency)
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate() {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
       this.setState(({rows}) => ({rows: rows.map(row => row.delete('focusField'))}))
     }
-
-    const {masteryIndex, rows, allowSave} = this.state
-
-    if (
-      !allowSave &&
-      !(_.isEqual(prevState.rows, rows) && prevState.masteryIndex === masteryIndex)
-    ) {
-      this.enableSaveButton()
-    }
   }
 
-  enableSaveButton = () => this.setState({allowSave: true})
+  allowSave = () => {
+    const {rows, savedRows} = this.state
+
+    return !_.isEqual(rows, savedRows)
+  }
 
   hideConfirmationModal = () => this.setState({showConfirmation: false})
 
@@ -127,7 +121,7 @@ class ProficiencyTable extends React.Component {
         if (points < 0.0 || Number.isNaN(points)) {
           points = 0.0
         }
-        const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, null, 'mastery'))
+        const newRow = fromJS(createRating('', points, ADD_DEFAULT_COLOR, false, 'mastery'))
         return {rows: rows.push(newRow)}
       },
       () => {
@@ -143,22 +137,41 @@ class ProficiencyTable extends React.Component {
   }
 
   handleSubmit = () => {
-    this.setState({allowSave: false, showConfirmation: false}, () => {
-      this.props
-        .update(this.stateToConfig())
-        .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
-        .catch(e => {
-          $.flashError(
-            I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
-              message: e.message
-            })
-          )
-        })
-    })
+    let oldRows
+    this.setState(
+      ({savedRows}) => {
+        oldRows = savedRows
+        const sortedRows = this.sortRows()
+        return {
+          showConfirmation: false,
+          rows: sortedRows,
+          savedRows: sortedRows
+        }
+      },
+      () => {
+        this.props
+          .update(this.stateToConfig())
+          .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
+          .catch(e => {
+            $.flashError(
+              I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+                message: e.message
+              })
+            )
+            this.setState({savedRows: oldRows})
+          })
+      }
+    )
   }
 
   handleMasteryChange = _.memoize(index => () => {
-    this.setState({masteryIndex: index})
+    this.setState(({rows}) => {
+      const masteryIndex = rows.findIndex(row => row.get('mastery'))
+      const adjustedRows = rows
+        .setIn([masteryIndex, 'mastery'], false)
+        .setIn([index, 'mastery'], true)
+      return {rows: adjustedRows}
+    })
   })
 
   handleDescriptionChange = _.memoize(index => value => {
@@ -189,11 +202,17 @@ class ProficiencyTable extends React.Component {
   })
 
   handleDelete = _.memoize(index => () => {
-    const masteryIndex = this.state.masteryIndex
-    const rows = this.state.rows.delete(index)
-    if (masteryIndex >= index && masteryIndex > 0) {
-      this.setState({masteryIndex: masteryIndex - 1})
+    const masteryIndex = this.state.rows.findIndex(row => row.get('mastery'))
+    let rows = this.state.rows.delete(index)
+
+    if (masteryIndex === index) {
+      if (masteryIndex > 0) {
+        rows = rows.setIn([masteryIndex - 1, 'mastery'], true)
+      } else {
+        rows = rows.setIn([masteryIndex, 'mastery'], true)
+      }
     }
+
     if (index === 0) {
       this.setState({rows})
       if (this.props.focusTab) {
@@ -215,20 +234,22 @@ class ProficiencyTable extends React.Component {
 
   stateToConfig = () => ({
     ratings: this.state.rows
-      .map((row, idx) => ({
+      .map(row => ({
         description: row.get('description'),
         points: row.get('points'),
-        mastery: idx === this.state.masteryIndex,
+        mastery: row.get('mastery'),
         color: row.get('color')
       }))
       .toJS()
   })
 
+  sortRows = () => this.state.rows.sortBy(row => -row.get('points'))
+
   checkForErrors = () => {
-    let previousPoints = null
     let hasError = false
     let changed = false
-    const rows = this.state.rows.map(row => {
+    const allPoints = this.state.rows.map(row => row.get('points'))
+    const rows = this.state.rows.map((row, index) => {
       let r = row
       if (this.invalidDescription(row.get('description'))) {
         if (!hasError) {
@@ -244,7 +265,6 @@ class ProficiencyTable extends React.Component {
           r = r.set('focusField', 'points')
         }
         hasError = true
-        previousPoints = null
         r = r.set('pointsError', I18n.t('Invalid points'))
       } else if (row.get('points') < 0) {
         if (!hasError) {
@@ -254,16 +274,16 @@ class ProficiencyTable extends React.Component {
         r = r.set('pointsError', I18n.t('Negative points'))
       } else {
         const currentPoints = row.get('points')
-        if (previousPoints !== null && previousPoints <= currentPoints) {
+        const firstIndex = allPoints.findIndex(points => points === currentPoints)
+        if (index !== firstIndex) {
           if (!hasError) {
             r = r.set('focusField', 'points')
           }
           hasError = true
-          r = r.set('pointsError', I18n.t('Points must be less than previous rating'))
+          r = r.set('pointsError', I18n.t('Ratings must have a unique point value'))
         } else {
           r = r.delete('pointsError')
         }
-        previousPoints = currentPoints
       }
       changed = changed || r !== row
       return r
@@ -291,7 +311,7 @@ class ProficiencyTable extends React.Component {
   invalidDescription = description => !description || description.trim().length === 0
 
   render() {
-    const {allowSave, masteryIndex, showConfirmation} = this.state
+    const {showConfirmation} = this.state
     const {breakpoints, canManage, contextType} = this.props
     const isMobileView = breakpoints.mobileOnly
     return (
@@ -333,7 +353,7 @@ class ProficiencyTable extends React.Component {
               focusField={rating.get('focusField') || (index === 0 ? 'mastery' : null)}
               points={rating.get('points').toString()}
               pointsError={rating.get('pointsError')}
-              mastery={index === masteryIndex}
+              mastery={rating.get('mastery')}
               onColorChange={this.handleColorChange(index)}
               onDelete={this.handleDelete(index)}
               onDescriptionChange={this.handleDescriptionChange(index)}
@@ -363,7 +383,7 @@ class ProficiencyTable extends React.Component {
             <div className="save">
               <Button
                 variant="primary"
-                interaction={allowSave ? 'enabled' : 'disabled'}
+                interaction={this.allowSave() ? 'enabled' : 'disabled'}
                 onClick={this.confirmSubmit}
               >
                 {I18n.t('Save Mastery Scale')}
