@@ -160,34 +160,65 @@ export default class ExternalToolPlacementButton extends React.Component {
     if (appliedPlacements.length === 0) {
       return
     }
-    return appliedPlacements.map(key => {
-      const value = allPlacements[key]
-      const enabled = tool[key].enabled
-      if (!is_1_1_tool || !isEditableContext || !canUpdateTool) {
-        return <div key={key}>{value}</div>
-      }
 
-      return (
-        <Flex justifyItems="space-between" key={key}>
-          <Flex.Item>{value}</Flex.Item>
-          <Flex.Item>
-            <ToggleButton
-              status={enabled ? 'unpressed' : 'pressed'}
-              color={enabled ? 'success' : 'secondary'}
-              renderIcon={enabled ? IconCheckMarkSolid : IconEndSolid}
-              screenReaderLabel={
-                enabled
-                  ? I18n.t('Placement active; click to deactivate')
-                  : I18n.t('Placement inactive; click to activate')
-              }
-              renderTooltipContent={enabled ? I18n.t('Active') : I18n.t('Inactive')}
-              onClick={() => this.handleTogglePlacement(key)}
-            />
-          </Flex.Item>
-        </Flex>
-      )
-    })
+    // keep the old behavior of only displaying active placements when
+    // toggles aren't present
+    if (!is_1_1_tool || !isEditableContext || !canUpdateTool) {
+      return appliedPlacements
+        .filter(key =>
+          tool.resource_selection && (key === 'assignment_selection' || key === 'link_selection')
+            ? tool.resource_selection.enabled
+            : tool[key].enabled
+        )
+        .map(key => <div key={key}>{allPlacements[key]}</div>)
+    }
+
+    // temporary fix:
+    // the `resource_selection` placment is deprecated, and will be removed.
+    // the `assignment_selection` and `link_selection` placements together
+    // serve the same purpose, so that's what is normally displayed. When
+    // toggling placements, the tool still has only `resource_selection`,
+    // so add and display that while hiding the "real" placements.
+    // Goal: remove `resource_selection` entirely from the tool model,
+    // then remove this code and the filter on `resource_selection` above.
+    if (tool.resource_selection) {
+      return [...appliedPlacements, 'resource_selection']
+        .filter(key => key !== 'assignment_selection' && key !== 'link_selection')
+        .map(key =>
+          this.placementToggle(
+            key,
+            key === 'resource_selection'
+              ? I18n.t('Assignment and Link Selection')
+              : allPlacements[key],
+            tool[key].enabled
+          )
+        )
+    }
+
+    return appliedPlacements.map(key =>
+      this.placementToggle(key, allPlacements[key], tool[key].enabled)
+    )
   }
+
+  placementToggle = (key, value, enabled) => (
+    <Flex justifyItems="space-between" key={key}>
+      <Flex.Item>{value}</Flex.Item>
+      <Flex.Item>
+        <ToggleButton
+          status={enabled ? 'unpressed' : 'pressed'}
+          color={enabled ? 'success' : 'secondary'}
+          renderIcon={enabled ? IconCheckMarkSolid : IconEndSolid}
+          screenReaderLabel={
+            enabled
+              ? I18n.t('Placement active; click to deactivate')
+              : I18n.t('Placement inactive; click to activate')
+          }
+          renderTooltipContent={enabled ? I18n.t('Active') : I18n.t('Inactive')}
+          onClick={() => this.handleTogglePlacement(key)}
+        />
+      </Flex.Item>
+    </Flex>
+  )
 
   getModal = () => (
     <Modal

@@ -107,8 +107,64 @@ describe('ExternalToolPlacementButton', () => {
       expectAllPlacements(p => expect(p.type).toBe('div'))
     })
 
+    it('does not show deactivated placements when toggle buttons omitted', () => {
+      global.ENV.PERMISSIONS.create_tool_manually = false
+      render({homework_submission: {enabled: false}})
+      expect(instance.placements().map(p => p != null && p.key)).toEqual(['editor_button'])
+    })
+
+    it('does show deactivated placements with toggle buttons', () => {
+      render({homework_submission: {enabled: false}})
+      expect(instance.placements().map(p => p != null && p.key)).toEqual([
+        'editor_button',
+        'homework_submission'
+      ])
+    })
+
     it('renders toggle buttons for each placement', () => {
       expectAllPlacements(p => expect(p.type.displayName).toBe('Flex'))
+    })
+
+    it('renders special placements for resource_selection when toggle buttons omitted', () => {
+      global.ENV.CONTEXT_BASE_URL = '/courses/1'
+      render({resource_selection: {enabled: true}})
+      const placements = mount(<div>{instance.placements()}</div>)
+      const assignmentSelection = placements.findWhere(p => p.key() === 'assignment_selection')
+      const linkSelection = placements.findWhere(p => p.key() === 'link_selection')
+      expect(assignmentSelection.text()).toMatch('Assignment Selection')
+      expect(linkSelection.text()).toMatch('Link Selection')
+    })
+
+    it('omits both placements for resource_selection when toggle buttons omitted', () => {
+      global.ENV.CONTEXT_BASE_URL = '/courses/1'
+      render({resource_selection: {enabled: false}})
+      expect(instance.placements().map(p => p != null && p.key)).toEqual(['editor_button'])
+    })
+
+    it('renders assignment_ and link_selection normally when toggle buttons omitted', () => {
+      global.ENV.CONTEXT_BASE_URL = '/courses/1'
+      render({assignment_selection: {enabled: true}, link_selection: {enabled: true}})
+      expect(instance.placements().map(p => p != null && p.key)).toEqual([
+        'assignment_selection',
+        'editor_button',
+        'link_selection'
+      ])
+    })
+
+    it('renders special text for resource_selection toggle button', () => {
+      render({resource_selection: {enabled: true}})
+      const placements = mount(<div>{instance.placements()}</div>)
+      const resourceSelection = placements.findWhere(p => p.key() === 'resource_selection')
+      expect(resourceSelection.text()).toMatch('Assignment and Link Selection')
+    })
+
+    it('renders assignment_ and link_selection normally with toggle buttons', () => {
+      render({assignment_selection: {enabled: true}, link_selection: {enabled: true}})
+      const placements = mount(<div>{instance.placements()}</div>)
+      const assignmentSelection = placements.findWhere(p => p.key() === 'assignment_selection')
+      const linkSelection = placements.findWhere(p => p.key() === 'link_selection')
+      expect(assignmentSelection.text()).toMatch('Assignment Selection')
+      expect(linkSelection.text()).toMatch('Link Selection')
     })
   })
 })
