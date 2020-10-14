@@ -38,7 +38,8 @@ module LtiAdvantage::Messages
           deep_link_return_url: 'http://test.com/return_url'
         ),
         roles: ['foo'],
-        target_link_uri: 'https://www.example.com'
+        target_link_uri: 'https://www.example.com',
+        lti11_legacy_user_id: 'bcf1466791073638f61073818abf1d32331fc893'
       )
     end
 
