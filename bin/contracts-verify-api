@@ -3,7 +3,7 @@
 set -e
 
 if [ -f "config/consul.yml" ]; then # canvas is running in docker
-  docker-compose run --rm --no-deps \
+  docker-compose run --rm \
     -e RAILS_ENV=test \
     -e RUN_API_CONTRACT_TESTS=1 \
     web bundle exec rake pact:verify
