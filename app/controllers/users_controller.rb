@@ -413,6 +413,7 @@ class UsersController < ApplicationController
         if api_request?
           search_term = params[:search_term].presence
           assign_observers = params[:assign_observers].presence
+          no_students = params[:no_students].presence
           page_opts = {}
           if search_term
             users = UserSearch.for_user_in_context(search_term, @context, @current_user, session,
@@ -420,7 +421,8 @@ class UsersController < ApplicationController
                 order: params[:order],
                 sort: params[:sort],
                 role_filter_id: params[:role_filter_id],
-                assign_observers: assign_observers
+                assign_observers: assign_observers,
+                no_students: no_students
               })
             page_opts[:total_entries] = nil # doesn't calculate a total count
           else

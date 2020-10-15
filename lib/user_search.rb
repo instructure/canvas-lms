@@ -50,7 +50,11 @@ module UserSearch
         base_scope = base_scope.where("#{options[:role_filter_id]} IN 
                             (SELECT role_id FROM #{Enrollment.quoted_table_name}
                             WHERE #{Enrollment.quoted_table_name}.user_id = #{User.quoted_table_name}.id)")
+      elsif options[:assign_observers] && options[:no_students]
+        base_scope = base_scope.left_joins(:enrollments)
+                     .where("enrollments.role_id IS NULL OR enrollments.role_id != ?", 3).distinct
       end
+
       base_scope
     end
   end
