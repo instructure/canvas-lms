@@ -169,7 +169,7 @@ def _uploadSpecFailures(prefix, total, test_name) {
   def reports = load('build/new-jenkins/groovy/reports.groovy')
   def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
   if (!successes.hasSuccessOrBuildIsSuccessful(prefix, total)) {
-    reports.appendFailMessageReport("Spec Failure For $prefix", report_url)
+    failureReport.append("Spec Failure For $prefix", report_url)
   }
 }
 

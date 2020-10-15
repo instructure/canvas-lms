@@ -125,7 +125,7 @@ pipeline {
           def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
           rspec.uploadSeleniumFailures()
           rspec.uploadRSpecFailures()
-          load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+          failureReport.submit()
         }
       }
     }

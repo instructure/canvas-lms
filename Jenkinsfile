@@ -68,7 +68,7 @@ def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
     if (failure != null) {
       def downstream = failure.getDownstreamBuild()
       def url = downstream.getAbsoluteUrl() + urlExtra
-      load('build/new-jenkins/groovy/reports.groovy').appendFailMessageReport(jobName, url)
+      failureReport.append(jobName, url)
     }
     throw ex
   }
@@ -113,7 +113,7 @@ def cleanupFn(status) {
       def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
       rspec.uploadSeleniumFailures()
       rspec.uploadRSpecFailures()
-      load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+      failureReport.submit()
     } finally {
       execute 'bash/docker-cleanup.sh --allow-failure'
     }

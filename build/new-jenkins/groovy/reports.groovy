@@ -61,44 +61,6 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
   cleanupCoverage(prefix)
 }
 
-def appendFailMessageReport(message, link) {
-  if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
-    echo "build not associated with a PS... not sending message"
-  }
-  dir ("_buildmeta") {
-    def message_file = "failure-messages-${BUILD_NUMBER}.txt"
-    if (!fileExists(message_file)) {
-      sh "echo 'failure links:' >> $message_file"
-    }
-    sh "echo '$message' >> $message_file"
-    sh "echo '$link' >> $message_file"
-  }
-  archiveArtifacts(artifacts: '_buildmeta/*')
-}
-
-def sendFailureMessageIfPresent() {
-  def message_file = "_buildmeta/failure-messages-${BUILD_NUMBER}.txt"
-  if (fileExists(message_file)) {
-    echo "sending failure message"
-    sh "cat $message_file"
-    if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
-      echo "build not associated with a PS... not sending message"
-    }
-    else {
-      credentials.withGerritCredentials {
-        sh """
-          gerrit_message=`cat $message_file`
-          ssh -i "\$SSH_KEY_PATH" -l "\$SSH_USERNAME" -p \$GERRIT_PORT \
-            \$GERRIT_HOST gerrit review -m "'\$gerrit_message'" \$GERRIT_CHANGE_NUMBER,\$GERRIT_PATCHSET_NUMBER
-        """
-      }
-    }
-  }
-  else {
-    echo "no failure messages to send"
-  }
-}
-
 // this method is to ensure that the stashing is done in a way that
 // is expected in publishSpecFailuresAsHTML
 def stashSpecFailures(prefix, index) {
