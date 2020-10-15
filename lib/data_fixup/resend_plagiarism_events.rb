@@ -37,51 +37,67 @@ module DataFixup
     EVENT_NAME = 'plagiarism_resubmit'.freeze
 
     def self.run(start_time = 3.months.ago, end_time = Time.zone.now)
-      raise 'start_time must be less than end_time' unless start_time < end_time
+      limit, = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      max_id = resend_scope(start_time, end_time).maximum(:id)
+      return unless max_id
 
-      schedule_resubmit_job(
-        submissions_missing_reports(start_time, end_time).union(
-          submissions_missing_scored_reports(start_time, end_time)
-        )
-      )
+      # We're going to create all of the jobs that need to run with some far future run date
+      # (so we know what they all are and we won't run them all at once and overwhelm our partners) and
+      # then we're going to start the first one.
+      id = 0
+      while id <= max_id
+        last_id = resend_scope(start_time, end_time).where("id >= ?", id).limit(limit).pluck(:id).last
+        schedule_resubmit_job_by_id(start_time, end_time, id, last_id)
+        id = last_id + 1
+      end
+      run_next_job_at(Time.zone.now)
     end
 
-    def self.schedule_resubmit_job(scope)
-      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
-      run_at = Delayed::Job.where(strand: "plagiarism_event_resend").order(:run_at).last&.run_at
+    def self.resend_scope(start_time, end_time)
+      raise 'start_time must be less than end_time' unless start_time < end_time
+
+      submissions_missing_reports(start_time, end_time).union(
+        submissions_missing_scored_reports(start_time, end_time)
+      ).order(:id)
+    end
+
+    def self.schedule_resubmit_job_by_id(start_time, end_time, start_id, end_id)
       DataFixup::ResendPlagiarismEvents.send_later_if_production_enqueue_args(
-        :trigger_plagiarism_resubmit_for,
+        :trigger_plagiarism_resubmit_by_id,
         {
           priority: Delayed::LOWER_PRIORITY,
           strand: "plagiarism_event_resend",
-          run_at: (run_at &.+ wait_time.seconds) || Time.zone.now
+          run_at: 1.year.from_now
         },
-        scope
+        start_time,
+        end_time,
+        start_id,
+        end_id
       )
+    end
+
+    def self.run_next_job_at(time)
+      Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil).
+        order(:id).first&.update_attributes(run_at: time)
     end
 
     # Retriggers the plagiarism resubmit event for the given
     # submission scope.
-    def self.trigger_plagiarism_resubmit_for(submission_scope)
-      limit, _ = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
-      submission_scope = submission_scope.order(:id)
-      limited_scope = submission_scope.limit(limit)
-      limited_scope.each do |submission|
+    def self.trigger_plagiarism_resubmit_by_id(start_time, end_time, start_id, end_id)
+      submission_scope = resend_scope(start_time, end_time).where(id: start_id..end_id)
+      submission_scope.each do |submission|
         Canvas::LiveEvents.post_event_stringified(
           ResendPlagiarismEvents::EVENT_NAME,
           Canvas::LiveEvents.get_submission_data(submission),
           context_for_event(submission)
         )
       end
-
-      # since we're sending these in limited batches, we need to check if we have more
-      # and start a new job for the next batch if there are more
-      last_batch_id = limited_scope.last&.id
-      if last_batch_id &.< submission_scope.maximum(:id)
-        schedule_resubmit_job(submission_scope.where("id > ?", last_batch_id))
-      end
+    ensure
+      # After we finish any job, we need to set the next one to run after the specified
+      # wait time
+      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
+      run_next_job_at(wait_time.seconds.from_now)
     end
-    private_class_method :trigger_plagiarism_resubmit_for
 
     # Returns all submissions configured with a plagiarism
     # platform assignment that lack a scored originality
