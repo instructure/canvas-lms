@@ -398,6 +398,7 @@ class AssignObservers extends React.Component {
       currentObserversObservees: [],
       step: 1,
       searchTerm: '',
+      searchQueue: [],
       addDisabled: false,
       removeDisabled: false,
       removeAllDisabled: false,
@@ -806,7 +807,10 @@ class AssignObservers extends React.Component {
     }
 
     return axios.get(path + queryParams).then(response => {
-      this.parseResponseLinks(response)
+      this.state.searchQueue.pop();
+      if (!this.state.searchQueue.length) {
+        this.parseResponseLinks(response);
+      }
     })
   }
 
@@ -827,6 +831,7 @@ class AssignObservers extends React.Component {
 
   debouncedFilterBySearch(search_term) {
     this.setState({searchTerm: search_term});
+    this.state.searchQueue.push(new Date());
     let debouncedFilter = this.debounce(this.filterBySearch, 250).bind(this);
     return debouncedFilter();
   }
