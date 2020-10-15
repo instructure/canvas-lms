@@ -617,7 +617,6 @@ $revision-button-color: $ic-color-dark;
 .page-toolbar {
   display: flex;
   align-items: stretch;
-  white-space: nowrap;
 
   &.header-bar {
     padding-bottom: 6px;
@@ -642,7 +641,8 @@ $revision-button-color: $ic-color-dark;
     flex-wrap: wrap;
     justify-content: flex-end;
     align-items: stretch;
-    align-content: stretch;
+    align-content: center;
+    white-space: nowrap;
 
     & > div {
       padding-bottom: 6px;
