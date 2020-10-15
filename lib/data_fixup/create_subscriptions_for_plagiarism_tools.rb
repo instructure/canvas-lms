@@ -21,12 +21,14 @@ module DataFixup::CreateSubscriptionsForPlagiarismTools
       where("raw_data like '%#{Lti::ResourcePlacement::SIMILARITY_DETECTION_LTI2}%'").
       group(:product_code, :vendor_code).
       select("array_agg(lti_tool_proxies.id) as tool_ids").each do |tools|
-        endpoints = Lti::ToolProxy.where(id: tools.tool_ids).map{|tool| tool.event_endpoint}.uniq.compact
+        endpoints = Lti::ToolProxy.where(id: tools.tool_ids).map(&:event_endpoint).uniq.compact
         endpoints.each do |endpoint|
           tools_with_endpoint = Lti::ToolProxy.where(id: tools.tool_ids).with_event_endpoint(endpoint)
           subscription_id = Lti::ToolProxy.where.not(subscription_id: nil).find_by(id: tools_with_endpoint)&.subscription_id
           subscription_id ||= Lti::PlagiarismSubscriptionsHelper.new(tools_with_endpoint.take).create_subscription
           Lti::ToolProxy.active.where(id: tools_with_endpoint, subscription_id: nil).update_all(subscription_id: subscription_id)
+        rescue
+          next
         end
     end
   end
