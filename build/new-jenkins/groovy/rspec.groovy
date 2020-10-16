@@ -125,7 +125,7 @@ def _runRspecTestSuite(
       junit allowEmptyResults: true, testResults: "tmp/rspec_results/**/*.xml"
 
       if(currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
-        currentBuild.rawBuild.@result = preStatus
+        currentBuild.rawBuild.@result = hudson.model.Result.fromString(preStatus)
       }
 
       if (env.COVERAGE == '1') {
