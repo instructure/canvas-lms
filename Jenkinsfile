@@ -410,6 +410,8 @@ pipeline {
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               timedStage('Rebase') {
                 timeout(time: 2) {
+                  def beforeHash = sh(script: 'md5sum Jenkinsfile', returnStdout: true).trim()
+
                   credentials.withGerritCredentials({ ->
                     sh '''#!/bin/bash
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
@@ -438,6 +440,12 @@ pipeline {
                       fi
                     '''
                   })
+
+                  def afterHash = sh(script: 'md5sum Jenkinsfile', returnStdout: true).trim()
+
+                  if(beforeHash != afterHash) {
+                    error "Jenkinsfile has been updated. Please rebase your patchset for the latest updates."
+                  }
                 }
               }
             }
