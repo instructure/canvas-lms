@@ -3,18 +3,26 @@
   "version": "0.0.1",
   "scripts": {
     "storybook": "start-storybook -p 6006",
-    "build-storybook": "build-storybook"
+    "build-storybook": "build-storybook",
+    "test": "jest"
   },
   "description": "An application for Canvas Conversations",
   "repository": "https://github.com/instructure/canvas-lms.git",
   "licenses": [],
   "devDependencies": {
-    "@babel/core": "^7.11.6",
+    "@babel/core": "^7.0.0",
+    "@babel/preset-env": "^7.0.0",
+    "@babel/preset-react": "^7.0.0",
     "@storybook/addon-actions": "^6.0.26",
     "@storybook/addon-essentials": "^6.0.26",
     "@storybook/addon-links": "^6.0.26",
     "@storybook/react": "^6.0.26",
-    "babel-loader": "^8.1.0",
+    "@testing-library/jest-dom": "^4",
+    "@testing-library/react": "^9",
+    "babel-jest": "^24",
+    "babel-loader": "^8",
+    "identity-obj-proxy": "^3.0.0",
+    "jest": "^24",
     "react-is": "^16.13.1"
   },
   "dependencies": {
