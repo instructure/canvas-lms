@@ -342,6 +342,7 @@ module Canvas::LiveEvents
       lti_assignment_id: submission.assignment.lti_context_id,
       group_id: submission.group_id,
       posted_at: submission.posted_at,
+      workflow_state: submission.workflow_state,
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
     if actl

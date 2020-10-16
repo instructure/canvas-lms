@@ -588,10 +588,25 @@ describe AssignmentsController do
             url: launch_url
           )
         end
+
+        let(:key) do
+          DeveloperKey.create!(
+            scopes: [
+              TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
+              TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_SCORE_SCOPE
+            ]
+          )
+        end
+
         let(:external_tool) do
           tool = external_tool_model(
             context: assignment.course,
-            opts: { url: launch_url }
+            opts: {
+              url: launch_url,
+              developer_key: key
+            }
           )
           tool.settings[:use_1_3] = true
           tool.save!
@@ -608,8 +623,14 @@ describe AssignmentsController do
           external_tool
         end
 
-        it 'renders a helpful error to the user' do
-          expect(subject).to render_template 'shared/errors/error_with_details'
+        it { is_expected.to be_success }
+
+        it 'creates the default line item' do
+          expect {
+            subject
+          }.to change {
+            Lti::LineItem.where(assignment: assignment).count
+          }.from(0).to(1)
         end
       end
     end
