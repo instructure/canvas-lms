@@ -646,7 +646,8 @@ class GradebooksController < ApplicationController
       js_bundle :gradebook_history
       js_env(
         COURSE_IS_CONCLUDED: @context.is_a?(Course) && @context.completed?,
-        OVERRIDE_GRADES_ENABLED: Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
+        OVERRIDE_GRADES_ENABLED: @context.try(:allow_final_grade_override?) &&
+          Account.site_admin.feature_enabled?(:final_grade_override_in_gradebook_history)
       )
 
       render html: "", layout: true

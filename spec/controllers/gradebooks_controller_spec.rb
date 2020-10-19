@@ -1726,14 +1726,35 @@ describe GradebooksController do
 
         let(:override_grades_enabled) { assigns[:js_env][:OVERRIDE_GRADES_ENABLED] }
 
-        it "is set to true if the final_grade_override_in_gradebook_history feature is enabled" do
-          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+        context "when the final_grade_override_in_gradebook_history feature is enabled" do
+          before(:each) { Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history) }
 
-          get 'history', params: { course_id: @course.id }
-          expect(override_grades_enabled).to be true
+          it "is set to true if the final_grade_override flag is enabled and the course setting is on" do
+            @course.enable_feature!(:final_grades_override)
+            @course.allow_final_grade_override = true
+            @course.save!
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be true
+          end
+
+          it "is set to false if the final_grade_override flag is disabled" do
+            @course.allow_final_grade_override = true
+            @course.save!
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be false
+          end
+
+          it "is set to false if the course setting is off" do
+            @course.enable_feature!(:final_grades_override)
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be false
+          end
         end
 
-        it "is set to true if the final_grade_override_in_gradebook_history feature is not enabled" do
+        it "is set to false if the final_grade_override_in_gradebook_history feature is not enabled" do
           get 'history', params: { course_id: @course.id }
           expect(override_grades_enabled).to be false
         end
