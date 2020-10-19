@@ -732,13 +732,13 @@ class Account < ActiveRecord::Base
   end
 
   def invalidate_caches_if_changed
-    if changed?
-      connection.after_transaction_commit do
-        if root_account?
-          Account.invalidate_cache(id)
-        else
-          shard.activate do
-            Rails.cache.delete(["account"/ id].cache_key)
+    if saved_changes?
+      shard.activate do
+        self.class.connection.after_transaction_commit do
+          if root_account?
+            Account.invalidate_cache(id)
+          else
+            Rails.cache.delete(["account2", id].cache_key)
           end
         end
       end
