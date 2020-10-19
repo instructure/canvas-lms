@@ -189,7 +189,7 @@ function insertUndecoratedLink(editor, linkProps) {
   }
 
   editor.focus()
-  if (anchorElm) {
+  if (anchorElm && !editor.selection.isCollapsed()) {
     updateLink(editor, anchorElm, linkText, linkAttrs)
   } else if (selectedContent) {
     if (linkProps.userText && selectedPlainText !== linkText) {
