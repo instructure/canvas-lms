@@ -338,7 +338,7 @@ class GradeChangeAuditApiController < AuditorApiController
   end
 
   def render_events(events, route, course: nil, remove_anonymous: false)
-    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } if exclude_override_grades?
+    events = BookmarkedCollection.filter(events) { |event| !event.override_grade? } unless include_override_grades?(course: course)
     events = Api.paginate(events, self, route)
 
     if params.fetch(:include, []).include?("current_grade")
@@ -463,7 +463,7 @@ class GradeChangeAuditApiController < AuditorApiController
     ids.map { |id| Shard.relative_id_for(id, Shard.current, Shard.current) }
   end
 
-  def exclude_override_grades?
-    !Auditors::GradeChange.return_override_grades?
+  def include_override_grades?(course: nil)
+    Auditors::GradeChange.return_override_grades? && (course.blank? || course.allow_final_grade_override?)
   end
 end
