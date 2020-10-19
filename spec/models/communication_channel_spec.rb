@@ -31,6 +31,59 @@ describe CommunicationChannel do
     factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
   end
 
+  describe '::trusted_confirmation_redirect?' do
+    before do
+      @cc_redirect_trust_policies = CommunicationChannel.instance_variable_get(:@redirect_trust_policies)
+      CommunicationChannel.instance_variable_set(:@redirect_trust_policies, nil)
+    end
+
+    after do
+      CommunicationChannel.instance_variable_set(:@redirect_trust_policies, @cc_redirect_trust_policies)
+    end
+
+    let(:account) { double('Account') }
+    let(:url) { 'http://some.place' }
+
+    it 'should be falsey by default' do
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_falsey
+    end
+
+    it 'should be falsey if no policies return true' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { false }
+
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_falsey
+    end
+
+    it 'should be truthy if any given policy returns true' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { false }
+      CommunicationChannel.add_confirmation_redirect_trust_policy { true }
+
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_truthy
+    end
+
+    it 'should be falsey for non-http(s) URLs' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { true }
+
+      mailto = 'mailto:bill@microsoft.net'
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, mailto)).to be_falsey
+    end
+
+    it 'should pass the given params to the policies' do
+      root_account_param = nil
+      uri_param = nil
+
+      CommunicationChannel.add_confirmation_redirect_trust_policy do |root_account, uri|
+        root_account_param = root_account
+        uri_param = uri
+      end
+
+      CommunicationChannel.trusted_confirmation_redirect?(account, url)
+
+      expect(root_account_param).to eq(account)
+      expect(uri_param).to eq(URI(url))
+    end
+  end
+
   describe 'imported?' do
     it 'should default to false' do
       expect(CommunicationChannel.new).not_to be_imported

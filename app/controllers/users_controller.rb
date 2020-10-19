@@ -2731,6 +2731,9 @@ class UsersController < ApplicationController
         includes << 'confirmation_url' if value_to_boolean(cc_params[:confirmation_url])
       end
 
+      if CommunicationChannel.trusted_confirmation_redirect?(@domain_root_account, cc_params[:confirmation_redirect])
+        cc_confirmation_redirect = cc_params[:confirmation_redirect]
+      end
     else
       cc_type = CommunicationChannel::TYPE_EMAIL
       cc_addr = params[:pseudonym].delete(:path) || params[:pseudonym][:unique_id]
@@ -2827,6 +2830,7 @@ class UsersController < ApplicationController
             @user.communication_channels.build(:path_type => cc_type, :path => cc_addr)
       @cc.user = @user
       @cc.workflow_state = skip_confirmation ? 'active' : 'unconfirmed' unless @cc.workflow_state == 'confirmed'
+      @cc.confirmation_redirect = cc_confirmation_redirect
     end
 
     if @recaptcha_errors.nil? && @user.valid? && @pseudonym.valid? && @invalid_observee_creds.nil? & @invalid_observee_code.nil?

@@ -540,6 +540,34 @@ describe UsersController do
         expect(Time.parse(accepted_terms)).to be_within(1.minute.to_i).of(Time.now.utc)
       end
 
+      it "should store a confirmation_redirect url if it's trusted" do
+        allow(CommunicationChannel).to receive(:trusted_confirmation_redirect?).
+          with(Account.default, 'https://benevolent.place').
+          and_return(true)
+
+        post 'create', params: {
+          :pseudonym => { :unique_id => 'jacob@instructure.com' },
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
+          :communication_channel => { :confirmation_redirect => 'https://benevolent.place' }
+        }
+        expect(response).to be_successful
+        expect(CommunicationChannel.last.confirmation_redirect).to eq('https://benevolent.place')
+      end
+
+      it "should not store a confirmation_redirect url if it's not trusted" do
+        allow(CommunicationChannel).to receive(:trusted_confirmation_redirect?).
+          with(Account.default, 'https://nasty.place').
+          and_return(false)
+
+        post 'create', params: {
+          :pseudonym => { :unique_id => 'jacob@instructure.com' },
+          :user => { :name => 'Jacob Fugal', :terms_of_use => '1' },
+          :communication_channel => { :confirmation_redirect => 'https://nasty.place' }
+        }
+        expect(response).to be_successful
+        expect(CommunicationChannel.last.confirmation_redirect).to be_nil
+      end
+
       it "should create a registered user if the skip_registration flag is passed in" do
         post('create', params: {
           :pseudonym => { :unique_id => 'jacob@instructure.com'},

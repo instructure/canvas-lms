@@ -569,6 +569,27 @@ class CommunicationChannel < ActiveRecord::Base
     return path if path =~ /^\+\d+$/
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
+
     "+#{carrier['country_code']}#{match[:number]}"
+  end
+
+  class << self
+    def trusted_confirmation_redirect?(root_account, redirect_url)
+      uri = begin
+              URI.parse(redirect_url)
+            rescue URI::InvalidURIError
+              nil
+            end
+      return false unless uri && ['http','https'].include?(uri.scheme)
+
+      @redirect_trust_policies&.any? do |policy|
+        policy.call(root_account, uri)
+      end
+    end
+
+    def add_confirmation_redirect_trust_policy(&block)
+      @redirect_trust_policies ||= []
+      @redirect_trust_policies << block
+    end
   end
 end
