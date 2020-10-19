@@ -43,7 +43,7 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
         _id
         notificationPreferencesEnabled(contextType: Course, courseId: $courseId)
         notificationPreferences {
-          sendScoresInEmails(userId: $userId, courseId: $courseId)
+          sendScoresInEmails(courseId: $courseId)
           channels(channelId: $channelId) {
             _id
             path
