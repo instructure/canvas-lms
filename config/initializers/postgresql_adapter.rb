@@ -281,8 +281,8 @@ module PostgreSQLAdapterExtensions
     super(table_name, column_name, type, **options)
   end
 
-  def remove_column(table_name, column_name, type = nil, options = {})
-    return if options.is_a?(Hash) && options[:if_exists] && !column_exists?(table_name, column_name)
+  def remove_column(table_name, column_name, type = nil, if_exists: false, **options)
+    return if if_exists && !column_exists?(table_name, column_name)
     super
   end
 
