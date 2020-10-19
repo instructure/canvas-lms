@@ -418,22 +418,18 @@ pipeline {
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
                       GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                        git fetch origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+
+                      if ! git merge-base HEAD origin/master; then
+                        echo "Error: your branch is over 100 commits behind, please rebase your branch manually."
+                        exit $exit_status
+                      fi
 
                       git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
                       git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-                      # this helps current build issues where cleanup is needed before proceeding.
-                      # however the later git rebase --abort should be enough but sometimes isn't.
-                      if [ -d .git/rebase-merge ]; then
-                        echo "A previous build's rebase failed and the build exited without cleaning up. Aborting the previous rebase now..."
-                        git rebase --abort
-                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                          git fetch origin $GERRIT_REFSPEC && git checkout FETCH_HEAD
-                      fi
-
                       # store exit_status inline to  ensures the script doesn't exit here on failures
-                      git rebase --preserve-merges origin/$GERRIT_BRANCH; exit_status=$?
+                      git rebase --preserve-merges --stat origin/$GERRIT_BRANCH; exit_status=$?
                       if [ $exit_status != 0 ]; then
                         echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
                         git rebase --abort
