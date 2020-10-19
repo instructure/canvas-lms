@@ -3,7 +3,7 @@
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"' \
-    git fetch --depth 1 --no-tags origin "$GERRIT_BRANCH"
+    git fetch --no-tags origin "$GERRIT_BRANCH":"$GERRIT_BRANCH"
 
 inputs=()
 inputs+=("--volume $(pwd)/.git:/usr/src/app/.git")
