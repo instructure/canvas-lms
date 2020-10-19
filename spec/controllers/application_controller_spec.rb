@@ -2068,7 +2068,7 @@ RSpec.describe ApplicationController, '#teardown_live_events_context' do
   end
 
   it 'sets the context to nil after request' do
-    Thread.current[:live_events_ctx] = "something"
+    Thread.current[:live_events_ctx] = {}
 
     get :index, format: :html
 
