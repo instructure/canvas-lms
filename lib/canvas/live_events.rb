@@ -721,17 +721,22 @@ module Canvas::LiveEvents
     }
   end
 
-  def self.course_completed(context_module_progression)
-    post_event_stringified('course_completed', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
+  def self.course_completed(context_module_progression, overridden_requirements_met: nil)
+    post_event_stringified('course_completed',
+      get_course_completed_data(
+        context_module_progression.context_module.course,
+        context_module_progression.user,
+        overridden_requirements_met: overridden_requirements_met
+      ))
   end
 
   def self.course_progress(context_module_progression)
     post_event_stringified('course_progress', get_course_completed_data(context_module_progression.context_module.course, context_module_progression.user))
   end
 
-  def self.get_course_completed_data(course, user)
+  def self.get_course_completed_data(course, user, overridden_requirements_met: nil)
     {
-      progress: CourseProgress.new(course, user, read_only: true).to_json,
+      progress: CourseProgress.new(course, user, read_only: true, overridden_requirements_met: overridden_requirements_met).to_json,
       user: user.slice(%i[id name email]),
       course: course.slice(%i[id name account_id sis_source_id])
     }

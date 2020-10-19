@@ -427,18 +427,18 @@ describe LiveEventsObserver do
       let(:context_module_progression) { context_module.context_module_progressions.create!(user_id: user_model.id) }
 
       it "posts update events if module and course are complete" do
-        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(true)
         context_module_progression.update_attribute(:workflow_state, 'completed')
       end
 
       it "does not post update events if module is not complete" do
-        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
         context_module_progression.update_attribute(:workflow_state, 'in_progress')
       end
 
       it "does not post update events if course is not complete" do
-        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(false)
         context_module_progression.update_attribute(:workflow_state, 'completed')
       end
@@ -449,7 +449,7 @@ describe LiveEventsObserver do
         context_module.completion_requirements = {tag.id => {:type => 'must_view'}}
         context_module.save!
 
-        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(any_args)
         ContextModuleProgression.transaction(requires_new: true) do
           # complete it
           context_module_progression.update(:workflow_state => 'completed',
