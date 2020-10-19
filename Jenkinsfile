@@ -297,7 +297,8 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    CACHE_IMAGE = "$BUILD_IMAGE-cache:$GERRIT_BRANCH"
+    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:$GERRIT_BRANCH"
+    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:$GERRIT_BRANCH"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -459,17 +460,25 @@ pipeline {
                   } else {
                     slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
                       withEnv([
-                        "CACHE_TAG=${configuration.isChangeMerged() ? env.MERGE_TAG : env.CACHE_IMAGE}",
+                        "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
                         "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                       ]) {
                         sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                       }
                     }
                   }
+
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+
                   if (isPatchsetPublishable()) {
                     sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
+                  }
+
+                  if (configuration.isChangeMerged()) {
+                    sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
+                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
+                    slackSendCacheAvailable('post-merge')
                   }
                 }
               }
@@ -502,14 +511,14 @@ pipeline {
                   stages['Build Docker Image Cache'] = {
                     skipIfPreviouslySuccessful("build-docker-cache") {
                       withEnv([
-                        "CACHE_TAG=${env.CACHE_IMAGE}",
+                        "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
                         "JS_BUILD_NO_UGLIFY=1"
                       ]) {
                         slackSendCacheBuild('pre-merge') {
-                          sh "build/new-jenkins/docker-build.sh $CACHE_IMAGE"
+                          sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
                         }
 
-                        sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $CACHE_IMAGE"
+                        sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
                         slackSendCacheAvailable('pre-merge')
                       }
                     }
@@ -649,7 +658,6 @@ pipeline {
 
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
-                  slackSendCacheAvailable('post-merge')
                 }
               }
             }
