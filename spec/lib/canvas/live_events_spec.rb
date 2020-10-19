@@ -1807,6 +1807,43 @@ describe Canvas::LiveEvents do
     end
   end
 
+  describe 'outcome_calculation_method' do
+    before do
+      @account = account_model
+      @calculation_method = outcome_calculation_method_model(@account)
+    end
+
+    context 'created' do
+      it 'should trigger an outcome_calculation_method_created live event' do
+        expect_event('outcome_calculation_method_created', {
+          outcome_calculation_method_id: @calculation_method.id.to_s,
+          calculation_int: @calculation_method.calculation_int,
+          calculation_method: @calculation_method.calculation_method,
+          workflow_state: @calculation_method.workflow_state,
+          context_id: @calculation_method.context_id.to_s,
+          context_type: @calculation_method.context_type
+        }.compact).once
+
+        Canvas::LiveEvents.outcome_calculation_method_created(@calculation_method)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger an outcome_calculation_method_updated live event' do
+        expect_event('outcome_calculation_method_updated', {
+          outcome_calculation_method_id: @calculation_method.id.to_s,
+          calculation_int: @calculation_method.calculation_int,
+          calculation_method: @calculation_method.calculation_method,
+          workflow_state: @calculation_method.workflow_state,
+          context_id: @calculation_method.context_id.to_s,
+          context_type: @calculation_method.context_type,
+          updated_at: @calculation_method.updated_at,
+        }.compact).once
+        Canvas::LiveEvents.outcome_calculation_method_updated(@calculation_method)
+      end
+    end
+  end
+
   describe 'grade_override' do
     it 'does not send event when score does not change' do
       course_model

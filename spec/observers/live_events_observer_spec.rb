@@ -554,4 +554,17 @@ describe LiveEventsObserver do
       proficiency.destroy
     end
   end
+
+  describe "calculation_method" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_created).once
+      outcome_calculation_method_model(account_model)
+    end
+
+    it "posts updated events" do
+      calculation_method = outcome_calculation_method_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_updated).once
+      calculation_method.destroy
+    end
+  end
 end
