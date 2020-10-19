@@ -2116,4 +2116,20 @@ describe Account do
       ).to eq %w[AccountAdmin AssistantGrader DesignerEnrollment TeacherEnrollment]
     end
   end
+
+  describe '#invalidate_caches_if_changed' do
+    it 'works for root accounts' do
+      Account.default.name = 'Something new'
+      expect(Account).to receive(:invalidate_cache).with(Account.default.id).at_least(1)
+      Account.default.save!
+    end
+
+    it 'works for sub accounts' do
+      a = Account.default.manually_created_courses_account
+      a.name = 'something else'
+      expect(Rails.cache).to receive(:delete).with("short_name_lookup/account_#{a.id}").ordered
+      expect(Rails.cache).to receive(:delete).with(["account2", a.id].cache_key).ordered
+      a.save!
+    end
+  end
 end
