@@ -624,7 +624,7 @@ describe FilesController do
         get "show_relative", params: {file_id: @file.id, course_id: @course.id, file_path: @file.full_display_path, inline: 1, download: 1}
         expect(response).to be_successful
         expect(response.body).to eq 'hello'
-        expect(response.content_type).to eq 'text/html'
+        expect(response.media_type).to eq 'text/html'
       end
 
       it "redirects for large html files" do
@@ -1116,7 +1116,7 @@ describe FilesController do
     end
 
     before :each do
-      @content = Rack::Test::UploadedFile.new(File.join(ActionController::TestCase.fixture_path, 'courses.yml'), '')
+      @content = Rack::Test::UploadedFile.new(File.join(RSpec.configuration.fixture_path, 'courses.yml'), '')
       request.env['CONTENT_TYPE'] = 'multipart/form-data'
       enable_forgery_protection
     end
@@ -1129,7 +1129,7 @@ describe FilesController do
       @attachment.reload
       # the file is not available until the third api call is completed
       expect(@attachment.file_state).to eq 'deleted'
-      expect(@attachment.open.read).to eq File.read(File.join(ActionController::TestCase.fixture_path, 'courses.yml'))
+      expect(@attachment.open.read).to eq File.read(File.join(RSpec.configuration.fixture_path, 'courses.yml'))
     end
 
     it "opens up cors headers" do

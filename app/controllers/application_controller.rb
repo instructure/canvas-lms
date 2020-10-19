@@ -1461,7 +1461,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && (((response.content_type || "").to_s.match(/html/)) ||
+    if @page_view && !request.xhr? && request.get? && (((response.media_type || "").to_s.match(/html/)) ||
       (Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?)
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
@@ -2698,8 +2698,8 @@ class ApplicationController < ActionController::Base
   end
 
   # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb
-  def prefetch_xhr(*args)
-    (@xhrs_to_prefetch_from_controller ||= []) << args
+  def prefetch_xhr(*args, **kwargs)
+    (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
 
   def teardown_live_events_context

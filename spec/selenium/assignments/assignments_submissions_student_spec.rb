@@ -350,8 +350,7 @@ describe "submissions" do
 
     describe 'uploaded files for submission' do
       def fixture_file_path(file)
-        path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
-        return "#{path}#{file}"
+        RSpec.configuration.fixture_path.join(file).to_s
       end
 
       def make_folder_actions_visible

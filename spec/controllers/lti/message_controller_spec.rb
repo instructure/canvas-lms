@@ -120,7 +120,7 @@ module Lti
 
       it 'does not 500 if tool registration fails' do
         get 'registration_return', params: {course_id: course.id, status: 'failure'}
-        expect(response).to be_succes
+        expect(response).to be_successful
       end
     end
 

@@ -200,7 +200,7 @@ describe ConversationsController do
       it "returns starred conversations with no received messages" do
         course_with_student_logged_in(:active_all => true)
         conv = @user.initiate_conversation([])
-        conv.update_attributes(starred: true, message_count: 1)
+        conv.update(starred: true, message_count: 1)
 
         get 'index', params: {:scope => 'starred'}, :format => 'json'
         expect(response).to be_successful

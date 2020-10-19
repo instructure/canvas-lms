@@ -131,7 +131,7 @@ describe Lti::Ims::AuthenticationController do
             },
             (1.year.from_now)
           )
-          jws.first(-1)
+          jws[0...-1]
         end
 
         it_behaves_like 'lti_message_hint error'
@@ -156,7 +156,7 @@ describe Lti::Ims::AuthenticationController do
         assigns[:oidc_error]
       end
 
-      it { is_expected.to be_success }
+      it { is_expected.to be_successful }
 
       it 'has a descriptive error message' do
         expect(error_object[:error_description]).to eq expected_message

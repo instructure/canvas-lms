@@ -541,25 +541,25 @@ class CommunicationChannelsController < ApplicationController
 
   def bouncing_channel_report
     generate_bulk_report do
-      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(**bulk_action_args)
     end
   end
 
   def bulk_reset_bounce_counts
     perform_bulk_action do
-      CommunicationChannel::BulkActions::ResetBounceCounts.new(bulk_action_args)
+      CommunicationChannel::BulkActions::ResetBounceCounts.new(**bulk_action_args)
     end
   end
 
   def unconfirmed_channel_report
     generate_bulk_report do
-      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
+      CommunicationChannel::BulkActions::Confirm.new(**bulk_action_args)
     end
   end
 
   def bulk_confirm
     perform_bulk_action do
-      CommunicationChannel::BulkActions::Confirm.new(bulk_action_args)
+      CommunicationChannel::BulkActions::Confirm.new(**bulk_action_args)
     end
   end
 

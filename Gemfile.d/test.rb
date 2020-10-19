@@ -17,7 +17,7 @@
 
 group :test do
   gem 'rails-dom-testing', '2.0.3'
-  gem 'rails-controller-testing', '1.0.4'
+  gem 'rails-controller-testing', '1.0.5'
 
   gem 'gergich', '1.2.0', require: false
   gem 'dotenv', '2.7.5', require: false
@@ -30,7 +30,7 @@ group :test do
 
   gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
-  gem 'rspec-rails', '3.9.0'
+  gem 'rspec-rails', '4.0.1'
   gem 'rspec-collection_matchers', '1.2.0'
   gem 'rspec-support', '3.9.2'
   gem 'rspec-expectations', '3.9.0'

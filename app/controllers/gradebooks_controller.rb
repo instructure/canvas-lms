@@ -1247,9 +1247,9 @@ class GradebooksController < ApplicationController
   def grade_summary_presenter
     options = presenter_options
     if options.key?(:grading_period_id)
-      GradingPeriodGradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+      GradingPeriodGradeSummaryPresenter.new(@context, @current_user, params[:id], **options)
     else
-      GradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+      GradeSummaryPresenter.new(@context, @current_user, params[:id], **options)
     end
   end
 

@@ -163,8 +163,7 @@ class FilesController < ApplicationController
   def quota
     get_quota
     if authorized_action(@context.attachments.temp_record, @current_user, :create)
-      h = ActionView::Base.new
-      h.extend ActionView::Helpers::NumberHelper
+      h = ActiveSupport::NumberHelper
       result = {
         :quota => h.number_to_human_size(@quota),
         :quota_used => h.number_to_human_size(@quota_used),
