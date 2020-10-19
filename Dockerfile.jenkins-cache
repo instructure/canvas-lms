@@ -1,0 +1,27 @@
+# syntax = docker/dockerfile:1.0-experimental
+
+FROM busybox AS cache-helper-collect-gems
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
+
+FROM busybox AS cache-helper-collect-yarn
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+
+FROM busybox AS cache-helper-collect-webpack
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems -type d -not -path "gems/plugins/*" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "app/jsx" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "app/views/jst" -exec cp -rf --parents {} /tmp/dst \;

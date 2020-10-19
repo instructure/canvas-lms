@@ -4,28 +4,17 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 WORKSPACE=${WORKSPACE:-$(pwd)}
 
-dependencyArgs=(
-  --build-arg BUILDKIT_INLINE_CACHE=1
-  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
-  --build-arg RUBY="$RUBY"
-  --file Dockerfile.jenkins
-)
-
-echo "Cache manifest before building"
-DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $CACHE_TAG || true
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
 # shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
-  --pull \
-  ${dependencyArgs[@]} \
+docker pull $CACHE_TAG || true
+docker build \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
+  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
+  --build-arg RUBY="$RUBY" \
   --cache-from $CACHE_TAG \
+  --file Dockerfile.jenkins \
   --tag "$1" \
-  --target webpack-final \
   "$WORKSPACE"
-
-echo "Cache manifest after building"
-DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $CACHE_TAG || true
-
-echo "Built image"
-docker image inspect $1

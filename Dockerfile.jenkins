@@ -1,37 +1,10 @@
-# syntax = docker/dockerfile:1.0-experimental
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
 ARG RUBY=2.6-p6.0.4
 
-FROM busybox AS cache-helper-collect-gems
-RUN mkdir -p /tmp/dst /tmp/dst
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
-
-FROM busybox AS cache-helper-collect-yarn
-RUN mkdir -p /tmp/dst /tmp/dst
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-
-FROM busybox AS cache-helper-collect-webpack
-RUN mkdir -p /tmp/dst /tmp/dst
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems -type d -not -path "gems/plugins/*" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/jsx" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
-
-FROM instructure/ruby-passenger:$RUBY AS webpack-final
+FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
@@ -82,7 +55,7 @@ COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/ca
 COPY --chown=docker:docker Gemfile   ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
 
-COPY --chown=docker:docker --from=cache-helper-collect-gems /tmp/dst ${APP_HOME}
+COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
 
 RUN set -eux; \
   \
@@ -98,7 +71,7 @@ RUN set -eux; \
 COPY --chown=docker:docker package.json ${APP_HOME}
 COPY --chown=docker:docker yarn.lock    ${APP_HOME}
 
-COPY --chown=docker:docker --from=cache-helper-collect-yarn /tmp/dst ${APP_HOME}
+COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
 
 RUN set -eux; \
   mkdir -p .yardoc \
@@ -156,7 +129,7 @@ COPY --chown=docker:docker client_apps ${APP_HOME}client_apps
 COPY --chown=docker:docker config ${APP_HOME}config
 COPY --chown=docker:docker db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb ${APP_HOME}db/migrate/
 COPY --chown=docker:docker frontend_build ${APP_HOME}frontend_build
-COPY --chown=docker:docker --from=cache-helper-collect-webpack /tmp/dst ${APP_HOME}
+COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
 COPY --chown=docker:docker lib ${APP_HOME}lib
 COPY --chown=docker:docker public ${APP_HOME}public
 COPY --chown=docker:docker Rakefile ${APP_HOME}
