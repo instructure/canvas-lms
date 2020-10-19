@@ -11,6 +11,7 @@
   "licenses": [],
   "devDependencies": {
     "@babel/core": "^7.11.6",
+    "@babel/plugin-proposal-class-properties": "^7.12.1",
     "@babel/preset-env": "^7.11.6",
     "@babel/preset-react": "^7.11.6",
     "@sheerun/mutationobserver-shim": "0.3.2",
@@ -26,10 +27,14 @@
   "dependencies": {
     "@instructure/canvas-theme": "6",
     "@instructure/ui-a11y-content": "6",
+    "@instructure/ui-alerts": "6",
     "@instructure/ui-checkbox": "6",
     "@instructure/ui-flex": "6",
+    "@instructure/ui-select": "6",
     "@instructure/ui-text": "6",
     "@instructure/ui-text-input": "6",
+    "core-js": "^3.6.5",
+    "prop-types": "^15",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   },

@@ -15,19 +15,5 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-module.exports = {
-  presets: [
-    [
-      '@babel/preset-env',
-      {
-        targets: {
-          node: '10'
-        },
-        useBuiltIns: 'usage',
-        corejs: 3
-      }
-    ],
-    '@babel/preset-react'
-  ],
-  plugins: [['@babel/plugin-proposal-class-properties', {loose: true}]]
-}
+
+import '@testing-library/jest-dom/extend-expect'
