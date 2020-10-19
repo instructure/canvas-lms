@@ -5,7 +5,6 @@ assignments_2_student:
   description: Use the new assignments student page
   applies_to: Course
   root_opt_in: true
-  beta: true
 assignments_2_teacher:
   state: hidden
   display_name: Assignments 2 Teacher View
