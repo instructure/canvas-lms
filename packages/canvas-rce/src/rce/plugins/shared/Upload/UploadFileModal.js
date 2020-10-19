@@ -41,7 +41,7 @@ function shouldBeDisabled(
   selectedPanel,
   usageRightNotSet
 ) {
-  if (error || usageRightNotSet) {
+  if (error || (usageRightNotSet && selectedPanel === 'COMPUTER')) {
     return true
   }
   switch (selectedPanel) {
