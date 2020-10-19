@@ -165,7 +165,7 @@ describe "instfs file uploads" do
     end
 
     it "should upload a file to instfs on the files page", priority: "1", test_id: 3399288 do
-      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
+      file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/files"
       wait_for_ajaximations
       f(".ef-actions input[type=file]").send_keys(file_path)
@@ -177,7 +177,7 @@ describe "instfs file uploads" do
 
     it "should display a thumbnail from instfs", priority: "1", test_id: 3399295 do
       filename = "files/instructure.png"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
       get "/files"
       wait_for_ajaximations
@@ -189,7 +189,7 @@ describe "instfs file uploads" do
     end
 
     it "should download an instfs file with instfs disabled", priority: "1", test_id: 3399305 do
-      file_path = File.join(ActionController::TestCase.fixture_path, "files/cn_image.jpg")
+      file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       upload_file_to_instfs(file_path, admin_guy, admin_guy, folder)
       get "/files"
       wait_for_ajaximations
@@ -204,7 +204,6 @@ describe "instfs file uploads" do
 
     it "should upload a file to instfs with content exports", priority: "1", test_id: 3399292 do
       get "/courses/#{@course.id}/content_exports"
-      yield if block_given?
       submit_form('#exporter_form')
       @export = keep_trying_until { ContentExport.last }
       @export.export_without_send_later
@@ -228,7 +227,7 @@ describe "instfs file uploads" do
 
     it 'should allow the teacher to see the uploaded file on speedgrader', priority: "1", test_id: 3399286 do
       filename = "files/instructure.png"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
       student_file_id = get_file_id_from_response(response)
       attachment = Attachment.find(student_file_id)
@@ -243,7 +242,7 @@ describe "instfs file uploads" do
     it "should allow Rich Content Editor to access InstFS files", priority: "1", test_id: 3399287 do
       course_folder = Folder.root_folders(@course).first
       filename = "test_image.jpg"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       upload_file_to_instfs(file_path, @course, @teacher, course_folder)
       get "/courses/#{@course.id}/assignments/#{@ass.id}/edit"
       wait_for_ajaximations
@@ -258,7 +257,7 @@ describe "instfs file uploads" do
 
     it "should upload course image cards to instfs", priority: "1", test_id: 3455114 do
       Account.default.enable_feature!(:course_card_images)
-      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
+      file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       get "/courses/#{@course.id}/settings"
       wait_for_ajaximations
       f(".CourseImageSelector").click
@@ -271,7 +270,7 @@ describe "instfs file uploads" do
 
     it 'should allow the teacher to see the uploaded file on submissions page', priority: "1", test_id: 3399291 do
       filename = "test_image.jpg"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       response = upload_file_to_instfs(file_path, @student, @student, @student_folder)
       student_file_id = get_file_id_from_response(response)
       attachment = Attachment.find(student_file_id)
@@ -291,7 +290,7 @@ describe "instfs file uploads" do
 
     it "should display an attached instfs file in a discussion for the student", priority: "1", test_id: 3455116 do
       filename = "files/instructure.png"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       discussion = @course.discussion_topics.create!(user: @teacher, title: 'cool stuff', message: 'cool message')
       get "/courses/#{@course.id}/discussion_topics/#{discussion.id}"
       wait_for_ajaximations
@@ -322,7 +321,7 @@ describe "instfs file uploads" do
       get "/courses/#{@course.id}/assignments/#{ass.id}/submissions/#{@student.id}"
       wait_for_ajaximations
       filename = "file_mail.txt"
-      file_path = File.join(ActionController::TestCase.fixture_path, filename)
+      file_path = File.join(RSpec.configuration.fixture_path, filename)
       f(".attach_comment_file_link").click
       wait_for_ajaximations
       f(".comment_attachments input").send_keys(file_path)
@@ -340,7 +339,7 @@ describe "instfs file uploads" do
     end
 
     it 'should allow the teacher to see the uploaded file on a quiz submission', priority: "1", test_id: 3399299 do
-      file_path = File.join(ActionController::TestCase.fixture_path, "files/instructure.png")
+      file_path = File.join(RSpec.configuration.fixture_path, "files/instructure.png")
       quiz = @course.quizzes.create
       quiz.workflow_state = "available"
       quiz.quiz_questions.create!(:question_data => {
@@ -376,7 +375,7 @@ describe "instfs file uploads" do
     end
 
     it 'should display instfs images on course modules', priority: "1", test_id: 3455117 do
-      file_path = File.join(ActionController::TestCase.fixture_path, "files/cn_image.jpg")
+      file_path = File.join(RSpec.configuration.fixture_path, "files/cn_image.jpg")
       get "/courses/#{@course.id}/modules"
       wait_for_ajaximations
       add_module('FileModule')
@@ -406,7 +405,7 @@ describe "instfs file uploads" do
     end
 
     it "should upload avatar images to instfs", priority: "1", test_id: 3455115 do
-      file_path = File.join(ActionController::TestCase.fixture_path, "test_image.jpg")
+      file_path = File.join(RSpec.configuration.fixture_path, "test_image.jpg")
       Account.default.enable_service(:avatars)
       Account.default.save!
       get "/profile/settings"
