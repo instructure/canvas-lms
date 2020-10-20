@@ -300,7 +300,7 @@ class OutcomesApiController < ApplicationController
         joins("INNER JOIN #{Assignment.quoted_table_name} assignments ON assignments.id = content_tags.content_id AND content_tags.content_type = 'Assignment'").
         joins("INNER JOIN #{Submission.quoted_table_name} submissions ON submissions.assignment_id = assignments.id AND submissions.user_id = #{student_id} AND submissions.workflow_state <> 'deleted'").
         where('assignments.workflow_state NOT IN (?)', assignment_states).
-        to_sql).to_hash
+        to_sql).to_a
       alignments.each{|a| a[:url] = "#{polymorphic_url([course, :assignments])}/#{a['assignment_id']}"}
 
       quizzes = Quizzes::Quiz.active

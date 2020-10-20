@@ -491,7 +491,7 @@ class SubmissionsApiController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(
         submissions,
         :submission_comments,
-        {select: [:hidden, :submission_id]}
+        SubmissionComment.select(:hidden, :submission_id)
       )
 
       bulk_load_attachments_and_previews(submissions)

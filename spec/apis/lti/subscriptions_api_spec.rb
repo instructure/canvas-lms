@@ -133,7 +133,7 @@ module Lti
       it 'gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
         delete delete_endpoint, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'requires JWT Access token' do
@@ -171,7 +171,7 @@ module Lti
       it 'gives gives 404 if subscription does not exist' do
         allow(subscription_service).to receive_messages(destroy_tool_proxy_subscription: not_found_response)
         get show_endpoint, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'requires JWT Access token' do

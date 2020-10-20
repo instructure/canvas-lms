@@ -93,7 +93,7 @@ describe Quizzes::QuizSubmissionUsersController, type: :request do
     it "does not allow students to view information at the endpoint" do
       @user = @student1
       get_submitted_users
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "allows teachers to see submitted students with ?submitted=true" do

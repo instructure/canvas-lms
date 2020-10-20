@@ -1404,10 +1404,10 @@ class Submission < ActiveRecord::Base
 
   def check_for_media_object
     if self.media_comment_id.present? && self.saved_change_to_media_comment_id?
-      MediaObject.ensure_media_object(self.media_comment_id, {
-        :user => self.user,
-        :context => self.user,
-      })
+      MediaObject.ensure_media_object(self.media_comment_id,
+        user: self.user,
+        context: self.user,
+      )
     end
   end
 
