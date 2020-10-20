@@ -406,7 +406,7 @@ describe "security" do
 
     user_session(@student)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
-    expect(response).not_to be_success
+    expect(response).not_to be_successful
 
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}

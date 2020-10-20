@@ -90,7 +90,7 @@ describe FilesController do
 
       get location
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -99,7 +99,7 @@ describe FilesController do
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get "http://test.host/users/#{@me.id}/files/#{@att.id}/download"
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
     end
@@ -139,7 +139,7 @@ describe FilesController do
         get return_location
         # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
         expect(response).to be_successful
-        expect(response.content_type).to eq 'text/html'
+        expect(response.media_type).to eq 'text/html'
         doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
@@ -151,7 +151,7 @@ describe FilesController do
         location = response['Location']
         expect(URI.parse(location).path).to eq "/users/#{@me.id}/files/#{@att.id}"
         get location
-        expect(response.content_type).to eq 'text/html'
+        expect(response.media_type).to eq 'text/html'
         doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
@@ -253,7 +253,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -275,7 +275,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     # ensure that the user wasn't logged in by the normal means
     expect(controller.instance_variable_get(:@current_user)).to be_nil
   end
@@ -297,7 +297,7 @@ describe FilesController do
     # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
     expect(response).to be_successful
-    expect(response.content_type).to eq 'text/html'
+    expect(response.media_type).to eq 'text/html'
     doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
     location = doc.at_css('iframe#file_content')['src']
 
@@ -335,7 +335,7 @@ describe FilesController do
 
       get location
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       # ensure that the user wasn't logged in by the normal means
       expect(controller.instance_variable_get(:@current_user)).to be_nil
     end
@@ -354,7 +354,7 @@ describe FilesController do
       allow(HostUrl).to receive(:file_host).and_return('test.host')
       get url
       expect(response).to be_successful
-      expect(response.content_type).to eq 'image/png'
+      expect(response.media_type).to eq 'image/png'
       expect(response['Pragma']).to be_nil
       expect(response['Cache-Control']).not_to match(/no-cache/)
     end
@@ -388,7 +388,7 @@ describe FilesController do
 
     get location
     expect(response).to be_successful
-    expect(response.content_type).to eq 'image/png'
+    expect(response.media_type).to eq 'image/png'
     expect(controller.instance_variable_get(:@current_user)).to be_nil
     expect(controller.instance_variable_get(:@context)).to be_nil
   end
