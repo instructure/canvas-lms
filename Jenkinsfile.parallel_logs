@@ -40,7 +40,6 @@ def ignoreBuildNeverStartedError(block) {
 }
 
 def getMigrationsTag(name) {
-  def migrations = load 'build/new-jenkins/groovy/migrations.groovy'
 
   (env.GERRIT_REFSPEC.contains('master')) || !migrations.cacheLoadFailed() ? migrations.imageMergeTag(name) : migrations.imagePatchsetTag(name)
 }
