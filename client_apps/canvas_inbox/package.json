@@ -20,10 +20,15 @@
     "babel-loader": "^8",
     "identity-obj-proxy": "^3.0.0",
     "jest": "^24",
+    "prop-types": "^15",
     "react-is": "^16.13.1"
   },
   "dependencies": {
     "@instructure/canvas-theme": "6",
+    "@instructure/ui-a11y-content": "6",
+    "@instructure/ui-flex": "6",
+    "@instructure/ui-text": "6",
+    "@instructure/ui-text-input": "6",
     "react": "^16.9.0",
     "react-dom": "^16.9.0"
   },

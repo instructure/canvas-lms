@@ -3048,7 +3048,7 @@
   resolved "https://registry.yarnpkg.com/@instructure/redux-service-middleware/-/redux-service-middleware-1.0.0.tgz#16e18ad18d28a24e8f6f8e5eae66c0e638dd75d5"
   integrity sha512-Bb/GzXhgWXnCI5UPjEwsVHHsTKIq1PwU8GXVH9dqkkp+0vzQzpFLsVUy2AUasxdMIHphe1bKq/+aR34/x7/PEw==
 
-"@instructure/ui-a11y-content@^6.22.0", "@instructure/ui-a11y-content@^6.24.0", "@instructure/ui-a11y-content@^6.26.0", "@instructure/ui-a11y-content@^6.27.0":
+"@instructure/ui-a11y-content@6", "@instructure/ui-a11y-content@^6.22.0", "@instructure/ui-a11y-content@^6.24.0", "@instructure/ui-a11y-content@^6.26.0", "@instructure/ui-a11y-content@^6.27.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-a11y-content/-/ui-a11y-content-6.27.0.tgz#0ffaa4201efdef7a063a29b6cbcbe5fe3d969642"
   integrity sha512-J5ukQlCIFNrxXWB3+vj+j/CBnI4YDFrJZ8/m/fQrn8xquWVYPEPoCcMmIze872Mn0qbfGexd650wleHFEcfTGQ==

@@ -35,7 +35,10 @@ if (!('MutationObserver' in window)) {
 const globalError = console.error
 const ignoredErrors = []
 const globalWarn = console.warn
-const ignoredWarnings = [/Warning: \[SimpleSelect\] is experimental.*/]
+const ignoredWarnings = [
+  /Warning: \[SimpleSelect\] is experimental.*/,
+  /Warning: \[themeable\] component styles require setting a \'dir\'*/
+]
 global.console = {
   log: console.log,
   error: error => {
