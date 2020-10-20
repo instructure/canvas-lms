@@ -581,7 +581,7 @@ describe AssignmentsApiController, type: :request do
           }
         )
 
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
         json = JSON.parse response.body
         expect(json["errors"]["bucket"].first["message"]).to eq "bucket name must be one of the following: past, overdue, undated, ungraded, unsubmitted, upcoming, future"
       end
@@ -2677,7 +2677,7 @@ describe AssignmentsApiController, type: :request do
           }
         })
 
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       json = JSON.parse response.body
       expect(json['errors']['assignment[assignment_group_id]'].first['message']).
         to eq "must be a positive number"
@@ -3031,7 +3031,7 @@ describe AssignmentsApiController, type: :request do
         },
         { :assignment => { :published => false } }
       )
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       json = JSON.parse response.body
       expect(json['errors']['published'].first['message']).
         to eq "Can't unpublish if there are student submissions"
@@ -3068,7 +3068,7 @@ describe AssignmentsApiController, type: :request do
       @assignment.save!
       raw_api_update_assignment(@course, @assignment,
                                 {'peer_reviews_assign_at' => '1/1/2013' })
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
       expect(response.code).to eql '400'
       json = JSON.parse response.body
       expect(json['errors']['assignment[peer_reviews_assign_at]'].first['message']).

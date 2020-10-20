@@ -151,13 +151,15 @@ describe "Folders API", type: :request do
     end
 
     it "should 404 for no folder found" do
-      raw_api_call(:get, @folders_path + "/0", @folders_path_options.merge(:action => "show", :id => "0"), {}, {}, :expected_status => 404)
+      raw_api_call(:get, @folders_path + "/0", @folders_path_options.merge(:action => "show", :id => "0"))
+      assert_status(404)
     end
 
     it "should 404 for deleted folder" do
       f1 = @root.sub_folders.create!(:name => "folder1", :context => @course)
       f1.destroy
-      raw_api_call(:get, @folders_path + "/#{f1.id}", @folders_path_options.merge(:action => "show", :id => f1.id.to_param), {}, {}, :expected_status => 404)
+      raw_api_call(:get, @folders_path + "/#{f1.id}", @folders_path_options.merge(:action => "show", :id => f1.id.to_param))
+      assert_status(404)
     end
 
     it "should return correct locked values" do

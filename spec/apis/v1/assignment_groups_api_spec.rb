@@ -550,6 +550,7 @@ describe AssignmentGroupsController, type: :request do
              format: 'json',
              course_id: @course.id.to_s,
              include: ['assignments'])
+    assert_status(200)
   end
 
   it "should not return unpublished assignments to students" do
