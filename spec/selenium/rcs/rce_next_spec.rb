@@ -326,11 +326,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_announcements_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
                   @course,
                   @announcement
                 )
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
+                    @course,
+                    @announcement
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -346,11 +355,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_discussions_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
                   @course,
                   @discussion
                 )
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
+                    @course,
+                    @discussion
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -402,11 +420,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_assignments_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                   @course,
                   @assignment
                 )
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+                    @course,
+                    @assignment
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -423,8 +450,17 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_modules_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+                    @course,
+                    @assignment
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -441,11 +477,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_assignments_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                   @course,
                   @assignment
                 )
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+                    @course,
+                    @assignment
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -463,11 +508,20 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_assignments_accordion
       click_course_item_link(title)
 
+<<<<<<< HEAD
       in_frame rce_page_body_ifr_id do
         expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                   @course,
                   @assignment
                 )
+=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+                    @course,
+                    @assignment
+                  )
+        end
+>>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
     end
 
@@ -831,14 +885,14 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_user_images
 
       expect(user_image_links.count).to eq 1
-      expect(tray_container).to include_text('myimage.png')
+      expect(tray_container).to include_text('myimage')
 
       click_close_button
       click_images_toolbar_menu_button
       click_user_images
 
       expect(user_image_links.count).to eq 1
-      expect(tray_container).to include_text('myimage.png')
+      expect(tray_container).to include_text('myimage')
     end
 
     describe 'keyboard shortcuts' do
