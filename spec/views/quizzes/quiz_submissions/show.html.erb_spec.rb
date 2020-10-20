@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../../views_helper')
 
-describe "/quiz_submissions/show" do
+describe "quizzes/quiz_submissions/show" do
 
   it "should render" do
     course_with_student
