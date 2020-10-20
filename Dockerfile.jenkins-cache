@@ -21,7 +21,19 @@ RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --p
 FROM busybox AS cache-helper-collect-webpack
 RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems -type d -not -path "gems/plugins/*" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/jsx" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -type d \
+  -not -path "gems" \
+  -not -path "gems/plugins" \
+  -maxdepth 2 \
+  -path "gems/*/lib" \
+  -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/canvas_i18nliner \
+  -not -path "gems/canvas_i18nliner" \
+  -not -path "gems/canvas_i18nliner/spec" \
+  -not -path "gems/canvas_i18nliner/spec/*" \
+  -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/jsx" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/stylesheets" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/public" -exec cp -rf --parents {} /tmp/dst \;
