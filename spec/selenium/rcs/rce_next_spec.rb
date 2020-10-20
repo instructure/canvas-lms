@@ -286,9 +286,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
-            @assignment
-          )
+                    @course,
+                    @assignment
+                  )
         end
       end
 
@@ -324,9 +324,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-            @course,
-            @announcement
-          )
+                    @course,
+                    @announcement
+                  )
         end
       end
 
@@ -344,9 +344,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-            @course,
-            @discussion
-          )
+                    @course,
+                    @discussion
+                  )
         end
       end
 
@@ -398,9 +398,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
-            @assignment
-          )
+                    @course,
+                    @assignment
+                  )
         end
       end
 
@@ -435,9 +435,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
-            @assignment
-          )
+                    @course,
+                    @assignment
+                  )
         end
       end
 
@@ -456,9 +456,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
-            @assignment
-          )
+                    @course,
+                    @assignment
+                  )
         end
       end
 
@@ -477,9 +477,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
-            @assignment
-          )
+                    @course,
+                    @assignment
+                  )
         end
       end
 
@@ -818,14 +818,14 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_user_images
 
       expect(user_image_links.count).to eq 1
-      expect(tray_container).to include_text('myimage.png')
+      expect(tray_container).to include_text('myimage')
 
       click_close_button
       click_images_toolbar_menu_button
       click_user_images
 
       expect(user_image_links.count).to eq 1
-      expect(tray_container).to include_text('myimage.png')
+      expect(tray_container).to include_text('myimage')
     end
 
     describe 'keyboard shortcuts' do

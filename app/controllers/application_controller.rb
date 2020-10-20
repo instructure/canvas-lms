@@ -147,6 +147,15 @@ class ApplicationController < ActionController::Base
           view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
         ]
 
+        # Cisco doesn't want to load lato extended. see LS-1559
+        if (Setting.get('disable_lato_extended', 'false') == 'false')
+          editor_css << view_context.stylesheet_path(css_url_for('lato_extended'))
+          editor_hc_css << view_context.stylesheet_path(css_url_for('lato_extended'))
+        else
+          editor_css << view_context.stylesheet_path(css_url_for('lato'))
+          editor_hc_css << view_context.stylesheet_path(css_url_for('lato'))
+        end
+
         @js_env_data_we_need_to_render_later = {}
         @js_env = {
           ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
