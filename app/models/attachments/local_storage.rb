@@ -44,10 +44,7 @@ class Attachments::LocalStorage
     }
   end
 
-  def amend_policy_conditions(policy, pseudonym:, datetime: nil)
-    # flash won't send the session cookie, so for local uploads we put the user id in the signed
-    # policy so we can mock up the session for FilesController#create
-    policy['conditions'] << { 'pseudonym_id' => pseudonym.id }
+  def amend_policy_conditions(policy, datetime: nil)
     policy['attachment_id'] = attachment.id
     policy
   end

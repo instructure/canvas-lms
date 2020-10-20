@@ -312,7 +312,6 @@ module Api::V1::Attachment
         on_duplicate = nil if on_duplicate == 'overwrite'
         quota_exemption = @attachment.quota_exemption_key if !opts[:check_quota]
         json = @attachment.ajax_upload_params(
-          @current_pseudonym,
           api_v1_files_create_url(
             on_duplicate: on_duplicate,
             quota_exemption: quota_exemption,

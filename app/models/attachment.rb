@@ -614,7 +614,7 @@ class Attachment < ActiveRecord::Base
   CONTENT_LENGTH_RANGE = 10.gigabytes
   S3_EXPIRATION_TIME = 30.minutes
 
-  def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
+  def ajax_upload_params(local_upload_url, s3_success_url, options = {})
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
     sanitized_filename = full_filename.gsub(/\+/, " ")
@@ -633,10 +633,7 @@ class Attachment < ActiveRecord::Base
     # with `extras` below.
     options[:datetime] = Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
     res = self.store.initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
-    policy = self.store.amend_policy_conditions(policy,
-      pseudonym: pseudonym,
-      datetime: options[:datetime]
-    )
+    policy = self.store.amend_policy_conditions(policy, datetime: options[:datetime])
 
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']

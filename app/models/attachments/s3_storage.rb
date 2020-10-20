@@ -61,7 +61,7 @@ class Attachments::S3Storage
     }
   end
 
-  def amend_policy_conditions(policy, datetime:, pseudonym: nil)
+  def amend_policy_conditions(policy, datetime:)
     policy['conditions'].unshift({'bucket' => bucket.name})
     cred_params(datetime).each do |k, v|
       policy['conditions'] << { k => v }

@@ -91,7 +91,7 @@ describe "Files API", type: :request do
     it 'includes success_include as include when redirecting' do
       local_storage!
       a = attachment_model(workflow_state: :unattached)
-      params = a.ajax_upload_params(@pseudonym, '/url', '/s3')[:upload_params]
+      params = a.ajax_upload_params('/url', '/s3')[:upload_params]
       raw_api_call(:post, "/files_api", params.merge({
         controller: 'files',
         action: 'api_create',

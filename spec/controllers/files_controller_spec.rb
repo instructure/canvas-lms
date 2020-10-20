@@ -1123,7 +1123,7 @@ describe FilesController do
 
     it "should accept the upload data if the policy and attachment are acceptable" do
       local_storage!
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response).to be_redirect
       @attachment.reload
@@ -1133,7 +1133,7 @@ describe FilesController do
     end
 
     it "opens up cors headers" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response.header["Access-Control-Allow-Origin"]).to eq "*"
     end
@@ -1149,20 +1149,20 @@ describe FilesController do
     end
 
     it "should reject an expired policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "", :expiration => -60.seconds)
+      params = @attachment.ajax_upload_params("", "", :expiration => -60.seconds)
       post "api_create", params: params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end
 
     it "should reject a modified policy" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       params[:upload_params]['Policy'] << 'a'
       post "api_create", params: params[:upload_params].merge({ :file => @content })
       assert_status(400)
     end
 
     it "should reject a good policy if the attachment data is already uploaded" do
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       @attachment.uploaded_data = @content
       @attachment.save!
       post "api_create", params: params[:upload_params].merge(:file => @content)
@@ -1171,7 +1171,7 @@ describe FilesController do
 
     it "should forward params[:success_include] to the api_create_success redirect as params[:include] if present" do
       local_storage!
-      params = @attachment.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = @attachment.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content, :success_include => 'foo')
       expect(response).to be_redirect
       expect(response.location).to include('include%5B%5D=foo') # include[]=foo, url encoded
@@ -1190,7 +1190,7 @@ describe FilesController do
       )
 
       local_storage!
-      params = profile_pic.ajax_upload_params(@teacher.pseudonym, "", "")
+      params = profile_pic.ajax_upload_params("", "")
       post "api_create", params: params[:upload_params].merge(:file => @content)
       expect(response).to be_redirect
       expect(response.location).to include('include%5B%5D=avatar') # include[]=avatar, url encoded
