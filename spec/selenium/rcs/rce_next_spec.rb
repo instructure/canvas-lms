@@ -203,8 +203,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it "deletes the <a> when it's text is deleted" do
-        skip('Nothing I do with webdriver deletes the link, it just unseleccts the text')
+      it "deletes the <a> when its text is deleted" do
         @course.wiki_pages.create!(
           title: 'title',
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
@@ -213,24 +212,49 @@ describe 'RCE next tests', ignore_js_errors: true do
         wait_for_tiny(edit_wiki_css)
 
         f("##{rce_page_body_ifr_id}").click
-        driver.execute_script <<-JS
-          window.selectLink = function() {
-            const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
-            const rng = win.document.createRange()
-            rng.setStart(win.document.getElementById('lnk').firstChild, 0)
-            rng.setEnd(win.document.getElementById('lnk').firstChild, 9)
-            const sel = win.getSelection()
-            sel.removeAllRanges()
-            sel.addRange(rng)
-          }
-          selectLink()
-        JS
+        f("##{rce_page_body_ifr_id}").send_keys(
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left],
+          [:shift, :arrow_left]
+        )
+        f("##{rce_page_body_ifr_id}").send_keys(:enter)
 
-        # f("##{rce_page_body_ifr_id}").send_keys(:delete) --> didn't work
         in_frame rce_page_body_ifr_id do
-          # f('body').send_keys(:delete) --> didn't work
-          f('#lnk').send_keys(:delete)
           expect(f('#para').text).to eql ''
+        end
+      end
+
+      it "doesn't delete existing link when new image is added from course files directly after it" do
+        title = "newtext.txt"
+        @course.wiki_pages.create!(
+          title: 'title',
+          body: "<p id='para'><a id='lnk' href='http://example.com'>do I stay?</a></p>"
+        )
+
+        create_course_text_file(title)
+
+        visit_existing_wiki_edit(@course, 'title')
+        wait_for_tiny(edit_wiki_css)
+
+        in_frame rce_page_body_ifr_id do
+          f('#lnk').send_keys([:end, :return])
+        end
+
+        click_document_toolbar_menu_button
+        click_course_documents
+        wait_for_ajaximations
+
+        click_document_link(title)
+
+        in_frame rce_page_body_ifr_id do
+          expect(f('#lnk').attribute('href')).to eq 'http://example.com/'
         end
       end
 
@@ -641,11 +665,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
     it 'should click on a document in sidebar to display in body' do
       title = 'text_file.txt'
-      @root_folder = Folder.root_folders(@course).first
-      @text_file =
-        @root_folder.attachments.create!(filename: 'text_file.txt', context: @course) do |a|
-          a.content_type = 'text/plain'
-        end
+      create_course_text_file(title)
 
       visit_front_page_edit(@course)
 

@@ -92,7 +92,7 @@ module RCENextPage
   def images_tab
     fj('[role="presentation"]:contains("Images")')
   end
-  
+
   def image_link(title)
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
@@ -883,5 +883,13 @@ module RCENextPage
   def click_menubar_submenu_item(menu_name, item_name)
     menubar_button(menu_name).click
     menubar_menu_item(item_name).click
+  end
+
+  def create_course_text_file(title)
+    @root_folder = Folder.root_folders(@course).first
+    @text_file =
+      @root_folder.attachments.create!(filename: title, context: @course) do |a|
+        a.content_type = 'text/plain'
+      end
   end
 end
