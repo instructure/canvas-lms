@@ -75,7 +75,7 @@ module ReportSpecHelper
     }
     skip_order = true if options[:order] == 'skip'
     order = Array(options[:order]).presence || [0, 1]
-    all_parsed = CSV.parse(csv, csv_parse_opts).map.to_a
+    all_parsed = CSV.parse(csv, **csv_parse_opts).map.to_a
     raise 'Must order report results to avoid brittle specs' unless options[:order].present? || all_parsed.count < 3
     header = all_parsed.shift
     if all_parsed.present? && !skip_order
