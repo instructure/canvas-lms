@@ -506,7 +506,7 @@ pipeline {
               ]) {
                 def stages = [:]
 
-                if (configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
+                if (configuration.isChangeMerged()) {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
                     skipIfPreviouslySuccessful("build-docker-cache") {
