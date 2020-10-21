@@ -102,7 +102,10 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
 
   set_policy do
     given { |user| user && user.id == self.user_id }
-    can :read and can :record_events
+    can :read
+
+    given { |user| user && user.id == self.user_id && end_date_is_valid? }
+    can :record_events
 
     given { |user| user && user.id == self.user_id && self.untaken? }
     can :update
@@ -229,6 +232,14 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     (self.untaken? && self.end_at && self.end_at < Time.now)
   end
   alias_method :overdue_and_needs_submission, :overdue_and_needs_submission?
+
+  def end_date_needs_recalculated?
+    self.end_at == nil && !!quiz.time_limit
+  end
+
+ def end_date_is_valid?
+   quiz.grants_right?(user, :submit) && !overdue_and_needs_submission?(true) && !end_date_needs_recalculated?
+ end
 
   def has_seen_results?
     !!self.has_seen_results
@@ -872,6 +883,18 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def ensure_question_reference_integrity!
     fixer = ::Quizzes::QuizSubmission::QuestionReferenceDataFixer.new
     fixer.run!(self)
+  end
+
+  def ensure_end_at_integrity!
+    if end_date_needs_recalculated? && !!self.started_at
+      self.end_at = quiz.build_submission_end_at(self)
+
+      if self.untaken?
+        self.save!
+      else
+        self.with_versioning(true, &:save!)
+      end
+    end
   end
 
   def due_at

@@ -813,6 +813,7 @@ class Quizzes::QuizzesController < ApplicationController
 
     if submission
       submission.ensure_question_reference_integrity!
+      submission.ensure_end_at_integrity!
     end
 
     submission
