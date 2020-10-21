@@ -45,7 +45,7 @@ const GroupCategoryProgress = props => {
             />
           </Flex.Item>
           <Flex.Item>
-            <Text size="x-large">{I18n.t('Your Group is Being Created')}</Text>
+            <Text size="x-large">{I18n.t('Your groups are being created.')}</Text>
           </Flex.Item>
           <Flex.Item margin="small 0">
             <Text>{I18n.t('This may take a few minutes.')}</Text>
