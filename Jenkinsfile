@@ -333,24 +333,22 @@ pipeline {
                 sh 'ls -A1 | xargs rm -rf'
                 sh 'find .'
                 cleanAndSetup()
-                // If using custom CANVAS_LMS_REFSPEC do custom checkout to get correct code
-                if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
-                  checkout([
-                    $class: 'GitSCM',
-                    branches: [[name: 'FETCH_HEAD']],
-                    doGenerateSubmoduleConfigurations: false,
-                    extensions: [],
-                    submoduleCfg: [],
-                    userRemoteConfigs: [[
-                      credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
-                      name: 'origin',
-                      refspec: "$env.CANVAS_LMS_REFSPEC",
-                      url: "ssh://gerrit.instructure.com:29418/canvas-lms.git"
-                    ]]
-                  ])
-                } else {
-                  checkout scm
-                }
+
+                def refspecToCheckout = env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master') ? env.CANVAS_LMS_REFSPEC : env.GERRIT_REFSPEC
+
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: 'FETCH_HEAD']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'CloneOption', depth: 100, honorRefspec: true, noTags: true, shallow: true]],
+                  submoduleCfg: [],
+                  userRemoteConfigs: [[
+                    credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+                    name: 'origin',
+                    refspec: refspecToCheckout,
+                    url: "ssh://gerrit.instructure.com:29418/canvas-lms.git"
+                  ]]
+                ])
 
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
@@ -374,7 +372,7 @@ pipeline {
                         $class: 'GitSCM',
                         branches: [[name: 'FETCH_HEAD']],
                         doGenerateSubmoduleConfigurations: false,
-                        extensions: [],
+                        extensions: [[$class: 'CloneOption', depth: 1, honorRefspec: true, noTags: true, shallow: true]],
                         submoduleCfg: [],
                         userRemoteConfigs: [[
                           credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
