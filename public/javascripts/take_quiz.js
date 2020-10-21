@@ -44,7 +44,7 @@ let lastAnswerSelected = null
 let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
-var quizSubmission = (function() {
+let quizSubmission = (function() {
   let timeMod = 0,
     endAt = $('.end_at'),
     endAtParsed = endAt.text() && new Date(endAt.text()),
@@ -100,10 +100,14 @@ var quizSubmission = (function() {
        * This is required to test updating questions via the API.
        */
       if (quizSubmission.backupsDisabled) {
+        console.log('[updateSubmission] Aborting because backups are disabled')
         return
       }
 
       if (quizSubmission.submitting && !repeat) {
+        console.log(
+          '[updateSubmission] Aborting because submission is in process and repeat is disabled'
+        )
         return
       }
       const now = new Date()
@@ -111,6 +115,7 @@ var quizSubmission = (function() {
         return
       }
       if (quizSubmission.currentlyBackingUp) {
+        console.log('[updateSubmission] Aborting because submission is currently being backed up')
         return
       }
 
@@ -206,6 +211,9 @@ var quizSubmission = (function() {
               if ($.inArray(ec, $.ajaxJSON.ignoredXHRs) === -1) {
                 $.ajaxJSON.ignoredXHRs.push(ec)
               }
+            } else if (ec.status === 403 || resp.status == 'forbidden') {
+              // Something has been malaligned and we now need ruby to figure out where we should be
+              window.location.reload()
             } else {
               // Connectivity lost?
               const current_user_id = window.ENV.current_user_id || 'none'
@@ -718,7 +726,11 @@ $(function() {
       }
       if ($this.hasClass('precision_question_input')) {
         var val = numberHelper.parse($this.val())
-        $this.val(isNaN(val) ? '' : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true, precision: 16}))
+        $this.val(
+          isNaN(val)
+            ? ''
+            : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true, precision: 16})
+        )
       }
       if (update !== false) {
         quizSubmission.updateSubmission()
