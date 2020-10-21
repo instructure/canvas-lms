@@ -222,15 +222,7 @@ module SIS
         end
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
-        csv ||= begin
-          att = parallel_importer.attachment
-          file = att.open
-          parallel_importer.start
-          {:fullpath => file.path, :file => att.display_name}
-        end
-        count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
-        parallel_importer.complete(rows_processed: count)
-        update_progress unless @run_immediately # just update progress on completion - the parallel jobs should be short enough
+        try_importing_segment(csv, parallel_importer, importer_object, skip_progress: @run_immediately)
       rescue => e
         if parallel_importer.workflow_state != 'retry'
           parallel_importer.write_attribute(:workflow_state, 'retry')
@@ -240,12 +232,42 @@ module SIS
         csv ||= { file: parallel_importer.attachment.display_name }
         fail_with_error!(e, csv: csv)
       ensure
-        file&.close
         unless @run_immediately
           if is_last_parallel_importer_of_type?(parallel_importer)
             queue_next_importer_set unless should_stop_import?
           end
         end
+      end
+
+      def try_importing_segment(input_csv, parallel_importer, importer_object, skip_progress: false)
+        malformed_retries ||= 0
+        csv = input_csv || begin
+          att = parallel_importer.attachment
+          file = att.open
+          parallel_importer.start
+          {:fullpath => file.path, :file => att.display_name}
+        end
+        count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
+        parallel_importer.complete(rows_processed: count)
+        # just update progress on completion - the parallel jobs should be short enough
+        update_progress unless skip_progress
+      rescue ::CSV::MalformedCSVError => csv_err
+        # sometimes the file we get from s3 is incomplete.
+        # it would be really hard to get a true malformed csv error because
+        # we parse the file in order to count the rows for splitting it up in the first place,
+        # so the file was valid csv at the time we parsed it.
+        # If the csv we got from s3 looks malformed, we'll try to redownload it once just to make
+        # sure it's not due to corruption during download.
+        #
+        # If we were actually handed a csv input, and we aren't
+        # pulling it from the importer attachment, then re-parsing
+        # won't help because we won't redownload, so we might as well go ahead and raise
+        raise if input_csv.present? || malformed_retries >= 1
+        file&.close
+        malformed_retries += 1
+        retry
+      ensure
+        file&.close
       end
 
       def fail_with_error!(e, csv: nil)
