@@ -234,6 +234,31 @@ describe LiveEventsObserver do
       submission_model
     end
 
+    it "does not post a create event when a submission is first created in an unsubmitted state" do
+      expect(Canvas::LiveEvents).to_not receive(:submission_created)
+      Submission.create!(assignment: assignment_model, user: user_model, workflow_state: 'unsubmitted', submitted_at: Time.zone.now)
+    end
+
+    it "posts a create event when a submission is first created in an submitted state" do
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      Submission.create!(
+        assignment: assignment_model, user: user_model, workflow_state: 'submitted',
+        submitted_at: Time.zone.now, submission_type: 'online_url'
+      )
+    end
+
+    it "posts a submission_created event when a unsubmitted submission is submitted" do
+      s = unsubmitted_submission_model
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      s.assignment.submit_homework(s.user, { url: "http://www.instructure.com/" })
+    end
+
+    it "posts a create event when a submitted submission is resubmitted" do
+      s = submission_model
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      s.assignment.submit_homework(s.user, { url: "http://www.instructure.com/" })
+    end
+
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:submission_updated).once
       s = submission_model

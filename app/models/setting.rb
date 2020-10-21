@@ -91,4 +91,6 @@ class Setting < ActiveRecord::Base
     @all_settings = nil
     MultiCache.delete("all_settings")
   end
+
+  Canvas::Reloader.on_reload { reset_cache! }
 end

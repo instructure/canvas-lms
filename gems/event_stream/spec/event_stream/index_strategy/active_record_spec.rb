@@ -96,7 +96,7 @@ describe EventStream::IndexStrategy::ActiveRecord do
       base_scope = @fake_record_type
       expect(@fake_record_type).to receive(:where).with("created_at < ?", Time.zone.parse("2020-06-12T15:34:13-06:00")).and_return(@fake_record_type)
       expect(@fake_record_type).to receive(:order).with("created_at DESC").and_return(@fake_record_type)
-      @index.pager_to_records(base_scope, pager_type.new)
+      EventStream::IndexStrategy::ActiveRecord.pager_to_records(base_scope, pager_type.new)
     end
   end
 

@@ -381,6 +381,51 @@ describe Auditors::GradeChange do
       }.by(1)
     end
 
+    it "can restrict results to override grades" do
+      Auditors::GradeChange.record(submission: @submission)
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+
+      records = Auditors::GradeChange.for_course_and_other_arguments(
+        @course,
+        {
+          assignment: Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT
+        }
+      ).paginate(per_page: 10)
+
+      aggregate_failures do
+        expect(records.length).to eq 1
+        expect(records.first).to be_override_grade
+      end
+    end
+
+    it "can return results restricted to override grades in combination with other filters" do
+      Auditors::GradeChange.record(submission: @submission)
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+
+      other_teacher = @course.enroll_teacher(User.create!, workflow_state: "active").user
+      other_override = Auditors::GradeChange::OverrideGradeChange.new(
+        grader: other_teacher,
+        old_grade: nil,
+        old_score: nil,
+        score: @student.enrollments.first.find_score
+      )
+      Auditors::GradeChange.record(override_grade_change: other_override)
+
+      grade_changes = Auditors::GradeChange.for_course_and_other_arguments(
+        @course,
+        {
+          assignment: Auditors::GradeChange::COURSE_OVERRIDE_ASSIGNMENT,
+          grader: @teacher
+        }
+      ).paginate(per_page: 10)
+
+      aggregate_failures do
+        expect(grade_changes.length).to eq 1
+        expect(grade_changes.first).to be_override_grade
+        expect(grade_changes.first.grader).to eq @teacher
+      end
+    end
+
     describe "grading period ID" do
       let(:grading_period) do
         grading_period_group = @course.root_account.grading_period_groups.create!

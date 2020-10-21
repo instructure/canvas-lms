@@ -158,11 +158,13 @@ module Importers
       elsif ['external_tool'].include?(hash[:submission_format])
         item.submission_types = "external_tool"
       end
-      if item.submission_types == "online_quiz"
+      case item.submission_types
+      when "online_quiz"
         item.saved_by = :quiz
-      end
-      if item.submission_types == "discussion_topic"
+      when "discussion_topic"
         item.saved_by = :discussion_topic
+      when "wiki_page"
+        item.saved_by = :wiki_page
       end
 
       if hash[:grading_type]
@@ -230,7 +232,11 @@ module Importers
       end
 
       if hash[:assignment_overrides]
+        added_overrides = false
         hash[:assignment_overrides].each do |o|
+          next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
+            o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
+            !context.feature_enabled?(:conditional_release)
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
@@ -241,10 +247,12 @@ module Importers
             override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
+          added_overrides = true
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
-        if hash.has_key?(:only_visible_to_overrides)
+        can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
+        if hash.has_key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end

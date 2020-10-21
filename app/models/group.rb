@@ -77,6 +77,7 @@ class Group < ActiveRecord::Base
   after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   delegate :time_zone, :to => :context
+  delegate :usage_rights_required, to: :context
 
   include StickySisFields
   are_sis_sticky :name

@@ -398,9 +398,6 @@
     "embed_video_a97a64af": {
         "message": "Videó beágyazása"
     },
-    "embed_video_code_703e10f2": {
-        "message": "Videó Kód beágyazása"
-    },
     "embedded_content_aaeb4d3d": {
         "message": "beágyazott tartalom"
     },
@@ -694,9 +691,6 @@
     },
     "my_grades_98834476": {
         "message": "Az én értékeléseim"
-    },
-    "my_media_82bade11": {
-        "message": "Az én médiám"
     },
     "navigate_through_the_menu_or_toolbar_415a4e50": {
         "message": "Navigáljon a menün vagy eszköztáron át"
@@ -1162,6 +1156,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Videólejátszó ehhez: { title }"
+    },
+    "view_ba339f93": {
+        "message": "Megtekintés"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "A gyors elérés billentyűkombinációk megtekintése"

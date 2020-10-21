@@ -223,11 +223,23 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    outcome_proficiency&.active? ? outcome_proficiency : parent_account&.resolved_outcome_proficiency
+    if outcome_proficiency&.active?
+      outcome_proficiency
+    elsif parent_account
+      parent_account.resolved_outcome_proficiency
+    elsif self.feature_enabled?(:account_level_mastery_scales)
+      OutcomeProficiency.find_or_create_default!(self)
+    end
   end
 
   def resolved_outcome_calculation_method
-    outcome_calculation_method&.active? ? outcome_calculation_method : parent_account&.resolved_outcome_calculation_method
+    if outcome_calculation_method&.active?
+      outcome_calculation_method
+    elsif parent_account
+      parent_account.resolved_outcome_calculation_method
+    elsif self.feature_enabled?(:account_level_mastery_scales)
+      OutcomeCalculationMethod.find_or_create_default!(self)
+    end
   end
 
   include ::Account::Settings
@@ -331,6 +343,8 @@ class Account < ActiveRecord::Base
   # privacy settings for root accounts
   add_setting :enable_fullstory, boolean: true, root_only: true, default: true
   add_setting :enable_google_analytics, boolean: true, root_only: true, default: true
+
+  add_setting :rce_favorite_tool_ids, :inheritable => true
 
   def settings=(hash)
     if hash.is_a?(Hash) || hash.is_a?(ActionController::Parameters)
@@ -490,6 +504,7 @@ class Account < ActiveRecord::Base
   end
 
   def ensure_defaults
+    self.name&.delete!("\r")
     self.uuid ||= CanvasSlug.generate_securish_uuid
     self.lti_guid ||= "#{self.uuid}:#{INSTANCE_GUID_SUFFIX}" if self.respond_to?(:lti_guid)
     self.root_account_id ||= self.parent_account.root_account_id if self.parent_account
@@ -876,8 +891,8 @@ class Account < ActiveRecord::Base
     end
 
     if starting_account_id
-      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
-      Shackles.activate(shackles_env) do
+      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      GuardRail.activate(guard_rail_env) do
         chain.concat(Shard.shard_for(starting_account_id).activate do
           Account.find_by_sql(<<~SQL)
                 WITH RECURSIVE t AS (
@@ -903,7 +918,7 @@ class Account < ActiveRecord::Base
         end
 
         if starting_account_id
-          Shackles.activate(:slave) do
+          GuardRail.activate(:secondary) do
             ids = Account.connection.select_values(<<~SQL)
                   WITH RECURSIVE t AS (
                     SELECT * FROM #{Account.quoted_table_name} WHERE id=#{Shard.local_id_for(starting_account_id).first}
@@ -997,8 +1012,8 @@ class Account < ActiveRecord::Base
 
   def self.sub_account_ids_recursive(parent_account_id)
     if connection.adapter_name == 'PostgreSQL'
-      shackles_env = Account.connection.open_transactions == 0 ? :slave : Shackles.environment
-      Shackles.activate(shackles_env) do
+      guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
+      GuardRail.activate(guard_rail_env) do
         sql = Account.sub_account_ids_recursive_sql(parent_account_id)
         Account.find_by_sql(sql).map(&:id)
       end
@@ -1272,7 +1287,7 @@ class Account < ActiveRecord::Base
   def default_enrollment_term
     return @default_enrollment_term if @default_enrollment_term
     if self.root_account?
-      @default_enrollment_term = Shackles.activate(:master) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
+      @default_enrollment_term = GuardRail.activate(:primary) { self.enrollment_terms.active.where(name: EnrollmentTerm::DEFAULT_TERM_NAME).first_or_create }
     end
   end
 
@@ -2052,5 +2067,11 @@ class Account < ActiveRecord::Base
     roles.select do |role|
       RoleOverride.permission_for(self, permission, role, self, true)[:enabled]
     end
+  end
+
+  def get_rce_favorite_tool_ids
+    rce_favorite_tool_ids[:value] ||
+      ContextExternalTool.all_tools_for(self, placements: [:editor_button]). # TODO remove after datafixup and the is_rce_favorite column is removed
+        where(:is_rce_favorite => true).pluck(:id).map{|id| Shard.global_id_for(id)}
   end
 end

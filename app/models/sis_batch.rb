@@ -73,7 +73,7 @@ class SisBatch < ActiveRecord::Base
       batch.user = user
       batch.save
 
-      att = create_data_attachment(batch, attachment)
+      att = Attachment.create_data_attachment(batch, attachment)
       batch.attachment = att
 
       yield batch if block_given?
@@ -82,20 +82,6 @@ class SisBatch < ActiveRecord::Base
 
       batch
     end
-  end
-
-  def self.create_data_attachment(batch, data, display_name=nil)
-    batch.shard.activate do
-      Attachment.new.tap do |att|
-        Attachment.skip_3rd_party_submits(true)
-        att.context = batch
-        att.display_name = display_name if display_name
-        Attachments::Storage.store_for_attachment(att, data)
-        att.save!
-      end
-    end
-  ensure
-    Attachment.skip_3rd_party_submits(false)
   end
 
   def self.add_error(csv, message, sis_batch:, row: nil, failure: false, backtrace: nil, row_info: nil)
@@ -356,7 +342,7 @@ class SisBatch < ActiveRecord::Base
 
     self.data[:diffed_against_sis_batch_id] = previous_batch.id
 
-    self.generated_diff = SisBatch.create_data_attachment(
+    self.generated_diff = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(diffed_data_file.path, 'application/zip'),
       t(:diff_filename, "sis_upload_diffed_%{id}.zip", :id => self.id)
@@ -733,7 +719,7 @@ class SisBatch < ActiveRecord::Base
         csv << row
       end
     end
-    self.errors_attachment = SisBatch.create_data_attachment(
+    self.errors_attachment = Attachment.create_data_attachment(
       self,
       Rack::Test::UploadedFile.new(file, 'csv', true),
       "sis_errors_attachment_#{id}.csv"
@@ -766,14 +752,14 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_enrollment_data(scope, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.where(previous_workflow_state: 'deleted').find_in_batches do |batch|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           Enrollment::BatchStateUpdater.destroy_batch(batch.map(&:context_id))
           count = update_restore_progress(restore_progress, batch, count, total)
         end
       end
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         count = restore_workflow_states(scope, 'Enrollment', restore_progress, count, total)
       end
     end
@@ -781,15 +767,15 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_group_categories(scope, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.where(previous_workflow_state: 'active').find_in_batches do |gcs|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: nil, updated_at: Time.zone.now)
           count = update_restore_progress(restore_progress, gcs, count, total)
         end
       end
       scope.active.where.not(previous_workflow_state: 'active').find_in_batches do |gcs|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           GroupCategory.where(id: gcs.map(&:context_id)).update_all(deleted_at: Time.zone.now, updated_at: Time.zone.now)
           count = update_restore_progress(restore_progress, gcs, count, total)
         end
@@ -799,9 +785,9 @@ class SisBatch < ActiveRecord::Base
   end
 
   def restore_workflow_states(scope, type, restore_progress, count, total)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope.active.order(:context_id).find_in_batches(batch_size: 5_000) do |data|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           ActiveRecord::Base.unique_constraint_retry do |retry_count|
             if retry_count == 0
               # restore the items and return the ids of the items that changed

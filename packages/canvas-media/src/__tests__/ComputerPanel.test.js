@@ -45,8 +45,6 @@ const uploadMediaTranslations = {
     COMPUTER_PANEL_TITLE: 'Computer',
     DRAG_DROP_CLICK_TO_BROWSE: 'Drag and drop, or click to browse your computer',
     DRAG_FILE_TEXT: 'Drag a file here',
-    EMBED_PANEL_TITLE: 'Embed',
-    EMBED_VIDEO_CODE_TEXT: 'Embed Code',
     INVALID_FILE_TEXT: 'Invalid File',
     LOADING_MEDIA: 'Loading...',
     RECORD_PANEL_TITLE: 'Record',

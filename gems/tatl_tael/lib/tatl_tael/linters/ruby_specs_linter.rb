@@ -36,7 +36,7 @@ module TatlTael
 
       def ruby_specs?
         changes_exist?(include: config[:globs][:ruby_spec],
-                       whitelist: config[:globs][:selenium_spec])
+                       allowlist: config[:globs][:selenium_spec])
       end
 
       def selenium_specs?

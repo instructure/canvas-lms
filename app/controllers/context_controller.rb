@@ -226,7 +226,7 @@ class ContextController < ApplicationController
   end
 
   def roster_user_usage
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action(@context, @current_user, :read_reports)
         @user = @context.users.find(params[:user_id])
         contexts = [@context] + @user.group_memberships_for(@context).to_a

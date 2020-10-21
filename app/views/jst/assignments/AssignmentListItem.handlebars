@@ -117,20 +117,22 @@
         {{/if}}
       </div>
     </div>
-    {{#if canManage}}
+    {{#if canOpenManageOptions}}
       <div class="ig-admin">
-        {{#if cyoe.isTrigger}}
-        <a href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+      {{#if canManage}}
+          {{#if cyoe.isTrigger}}
+            <a href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor" title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}">{{#t}}Mastery Paths{{/t}}</a>
+          {{/if}}
+          {{#if cyoe.isReleased}}
+            <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
+              <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
+            </span>
+            <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
+          {{/if}}
+          <span class="sis-button" data-view="sis-button"></span>
+          <span class="lock-icon" data-view="lock-icon"></span>
+          <span class="publish-icon" data-view="publish-icon"></span>
         {{/if}}
-        {{#if cyoe.isReleased}}
-        <span class="pill mastery-path-icon" aria-hidden="true" data-tooltip title="{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}">
-          <i class="icon-mastery-path"></i>{{cyoe.releasedLabel}}
-        </span>
-        <span class="screenreader-only">{{#t}}Released by Mastery Path: {{cyoe.releasedLabel}}{{/t}}</span>
-        {{/if}}
-        <span class="sis-button" data-view="sis-button"></span>
-        <span class="lock-icon" data-view="lock-icon"></span>
-        <span class="publish-icon" data-view="publish-icon"></span>
         <div class="inline-block">
           <button
             class="al-trigger al-trigger-gray btn"
@@ -145,86 +147,88 @@
             id="assignment_{{id}}_settings_list"
             class="al-options"
           >
-            {{#if canEdit}}
-              <li>
-                <a
-                  class="edit_assignment icon-edit"
-                  id="assignment_{{id}}_settings_edit_item"
-                  aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
-                  data-focus-returns-to="assign_{{id}}_manage_link"
-                >{{#t}}Edit{{/t}}</a>
-              </li>
-            {{else}}
-              <li>
-                <a
-                  class="edit_assignment icon-edit disabled"
-                  id="assignment_{{id}}_settings_edit_item"
-                  aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
-                  aria-disabled="true"
-                >{{#t}}Edit{{/t}}</a>
-                <span class="screenreader-only">{{#t}}You do not have permissions to edit this moderated assignment{{/t}}</span>
-              </li>
-            {{/if}}
-            {{#if canDuplicate}}
-            <li>
-              <a
-                class="duplicate_assignment icon-copy-course"
-                id="assignment_{{id}}_settings_duplicate_item"
-                aria-label="{{#t}}Duplicate Assignment {{name}}{{/t}}"
-                data-focus-returns-to"assign_{{id}}_manage_link"
-              >{{#t}}Duplicate{{/t}}</a>
-            </li>
-            {{/if}}
-            {{#if canMove}}
-            <li>
-              <a
-                class="move_assignment icon-updown"
-                id="assignment_{{id}}_settings_move_item"
-                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
-                data-focus-returns-to="assign_{{id}}_manage_link"
-              >{{#t}}Move To…{{/t}}</a>
-            </li>
-            {{else}}
-            <li>
-              <a
-                class="move_assignment icon-updown disabled"
-                id="assignment_{{id}}_settings_move_item"
-                aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
-                aria-disabled=true
-              >{{#t}}Move To…{{/t}}</a>
-            </li>
-            {{/if}}
-            {{#if cyoe.isCyoeAble}}
-            <li>
-              <a
-                href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor"
-                class="edit_mastery_paths icon-mastery-path"
-                id="assignment_{{id}}_settings_edit_item_mastery_paths"
-                aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
-                data-focus-returns-to="assign_{{id}}_manage_link"
-                title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}"
-              >{{#t}}Mastery Paths{{/t}}</a>
-            </li>
-            {{/if}}
-            {{#unless is_locked}}
-              <li>
-                {{#if canDelete}}
-                  <a
-                    class="delete_assignment icon-trash"
-                    id="assignment_{{id}}_settings_delete_item"
-                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                    data-focus-returns-to="assign_{{id}}_manage_link"
-                  >{{#t "delete"}}Delete{{/t}}</a>
+            {{#if canManage }}
+                {{#if canEdit}}
+                  <li>
+                    <a
+                      class="edit_assignment icon-edit"
+                      id="assignment_{{id}}_settings_edit_item"
+                      aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
+                      data-focus-returns-to="assign_{{id}}_manage_link"
+                    >{{#t}}Edit{{/t}}</a>
+                  </li>
                 {{else}}
-                  <a
-                    class="delete_assignment icon-trash disabled"
-                    id="assignment_{{id}}_settings_delete_item"
-                    aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
-                    aria-disabled=true
-                  >{{#t "delete"}}Delete{{/t}}</a>
+                  <li>
+                    <a
+                      class="edit_assignment icon-edit disabled"
+                      id="assignment_{{id}}_settings_edit_item"
+                      aria-label="{{#t}}Edit Assignment {{name}}{{/t}}"
+                      aria-disabled="true"
+                    >{{#t}}Edit{{/t}}</a>
+                    <span class="screenreader-only">{{#t}}You do not have permissions to edit this moderated assignment{{/t}}</span>
+                  </li>
                 {{/if}}
-              </li>
-            {{/unless}}
+                {{#if canDuplicate}}
+                <li>
+                  <a
+                    class="duplicate_assignment icon-copy-course"
+                    id="assignment_{{id}}_settings_duplicate_item"
+                    aria-label="{{#t}}Duplicate Assignment {{name}}{{/t}}"
+                    data-focus-returns-to"assign_{{id}}_manage_link"
+                  >{{#t}}Duplicate{{/t}}</a>
+                </li>
+                {{/if}}
+                {{#if canMove}}
+                <li>
+                  <a
+                    class="move_assignment icon-updown"
+                    id="assignment_{{id}}_settings_move_item"
+                    aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
+                    data-focus-returns-to="assign_{{id}}_manage_link"
+                  >{{#t}}Move To…{{/t}}</a>
+                </li>
+                {{else}}
+                <li>
+                  <a
+                    class="move_assignment icon-updown disabled"
+                    id="assignment_{{id}}_settings_move_item"
+                    aria-label='{{#t}}Move Assignment {{name}}{{/t}}'
+                    aria-disabled=true
+                  >{{#t}}Move To…{{/t}}</a>
+                </li>
+                {{/if}}
+                {{#if cyoe.isCyoeAble}}
+                <li>
+                  <a
+                    href="{{htmlEditUrl}}?return_to={{return_to}}#mastery-paths-editor"
+                    class="edit_mastery_paths icon-mastery-path"
+                    id="assignment_{{id}}_settings_edit_item_mastery_paths"
+                    aria-label="{{#t}}Edit Assignment {{name}} Mastery Paths{{/t}}"
+                    data-focus-returns-to="assign_{{id}}_manage_link"
+                    title="{{#t}}Edit Mastery Paths for {{name}}{{/t}}"
+                  >{{#t}}Mastery Paths{{/t}}</a>
+                </li>
+                {{/if}}
+                {{#unless is_locked}}
+                  <li>
+                    {{#if canDelete}}
+                      <a
+                        class="delete_assignment icon-trash"
+                        id="assignment_{{id}}_settings_delete_item"
+                        aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                        data-focus-returns-to="assign_{{id}}_manage_link"
+                      >{{#t "delete"}}Delete{{/t}}</a>
+                    {{else}}
+                      <a
+                        class="delete_assignment icon-trash disabled"
+                        id="assignment_{{id}}_settings_delete_item"
+                        aria-label="{{#t}}Delete Assignment {{name}}{{/t}}"
+                        aria-disabled=true
+                      >{{#t "delete"}}Delete{{/t}}</a>
+                    {{/if}}
+                  </li>
+                {{/unless}}
+            {{/if}}
             {{#if DIRECT_SHARE_ENABLED}}
               <li>
                 <a
@@ -241,12 +245,12 @@
                 >{{#t}}Copy To...{{/t}}</a>
               </li>
             {{/if}}
-            {{>ExternalTools/external_tools_menu menu_tools}}
+            {{#if canManage}}{{>ExternalTools/external_tools_menu menu_tools}}{{/if}}
           </ul>
         </div>
       </div>
     </div>
 
-    <form data-view="edit-assignment" class="form-dialog"></form>
+    {{#if canManage}}<form data-view="edit-assignment" class="form-dialog"></form>{{/if}}
   {{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}{{/if}}
 </div>

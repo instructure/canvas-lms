@@ -96,7 +96,7 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def create_error_report(opts)
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         begin
           report = ErrorReport.new
           report.assign_data(opts)

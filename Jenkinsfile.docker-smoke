@@ -86,4 +86,19 @@ pipeline {
       }//steps
     }//environment
   }//stages
+
+  post {
+    unsuccessful {
+      script {
+        def causes = currentBuild.getBuildCauses()[0].shortDescription
+        if (causes.contains("Started by timer")) {
+          slackSend(
+            channel: "#flaky-spec-alerts",
+            color: 'danger',
+            message: "${env.JOB_NAME} failed! Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\n"
+          )
+        }
+      }
+    }
+  }
 }//pipeline

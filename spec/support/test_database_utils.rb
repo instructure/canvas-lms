@@ -74,7 +74,7 @@ module TestDatabaseUtils
 
     def get_table_names(connection)
       # use custom SQL to exclude tables from extensions
-      schema = connection.shard.name if connection.use_qualified_names?
+      schema = connection.shard.name
       table_names = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT relname
          FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid
@@ -106,7 +106,7 @@ module TestDatabaseUtils
     end
 
     def get_sequences(connection)
-      schema = connection.shard.name if connection.use_qualified_names?
+      schema = connection.shard.name
       sequences = connection.query(<<-SQL, 'SCHEMA').map(&:first)
          SELECT relname
          FROM pg_class INNER JOIN pg_namespace ON relnamespace=pg_namespace.oid

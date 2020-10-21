@@ -98,6 +98,19 @@ describe "users" do
       wait_for_no_such_element { f(".paginatedView-loading") }
       expect(ff("#page_view_results tr").length).to eq page_views_count
     end
+
+    it "filters by date" do
+      old_date = 2.days.ago.beginning_of_day
+      page_view(:user => @student, :course => @course, :url => 'recent', :created_at => 5.minutes.ago)
+      page_view(:user => @student, :course => @course, :url => 'older', :created_at => old_date + 1.minute)
+      get "/users/#{@student.id}"
+      wait_for_ajaximations
+      expect(ff('#page_view_results tr').first.text).to include 'recent'
+      replace_content(f('#page_view_date'), old_date.strftime("%Y-%m-%d"))
+      driver.action.send_keys(:tab).perform
+      wait_for_ajaximations
+      expect(ff('#page_view_results tr').first.text).to include 'older'
+    end
   end
 
   context "admin merge" do

@@ -77,6 +77,7 @@ module Importers
         item.usage_rights_id = find_or_create_usage_rights(context, hash[:usage_rights], created_usage_rights_map) if hash[:usage_rights]
         item.set_publish_state_for_usage_rights unless hash[:locked]
         item.save_without_broadcasting!
+        item.handle_duplicates(:rename)
         migration.add_imported_item(item)
       end
       item

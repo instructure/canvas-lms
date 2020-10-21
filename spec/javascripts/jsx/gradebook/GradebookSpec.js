@@ -2436,6 +2436,32 @@ QUnit.module('Gradebook#getViewOptionsMenuProps', () => {
     const {showUnpublishedAssignments} = createGradebook({settings}).getViewOptionsMenuProps()
     strictEqual(showUnpublishedAssignments, false)
   })
+
+  test('viewUngradedAsZero is true when settings.view_ungraded_as_zero is "true"', () => {
+    const settings = {view_ungraded_as_zero: 'true'}
+    const {viewUngradedAsZero} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(viewUngradedAsZero, true)
+  })
+
+  test('viewUngradedAsZero is false when settings.view_ungraded_as_zero is "false"', () => {
+    const settings = {view_ungraded_as_zero: 'false'}
+    const {viewUngradedAsZero} = createGradebook({settings}).getViewOptionsMenuProps()
+    strictEqual(viewUngradedAsZero, false)
+  })
+
+  test('allowViewUngradedAsZero is true when allow_view_ungraded_as_zero is true', () => {
+    const {allowViewUngradedAsZero} = createGradebook({
+      allow_view_ungraded_as_zero: true
+    }).getViewOptionsMenuProps()
+    strictEqual(allowViewUngradedAsZero, true)
+  })
+
+  test('allowViewUngradedAsZero is false when allow_view_ungraded_as_zero is false', () => {
+    const {allowViewUngradedAsZero} = createGradebook({
+      allow_view_ungraded_as_zero: false
+    }).getViewOptionsMenuProps()
+    strictEqual(allowViewUngradedAsZero, false)
+  })
 })
 
 QUnit.module('Gradebook#createTeacherNotes', {

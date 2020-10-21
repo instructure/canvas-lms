@@ -174,6 +174,7 @@ describe 'as a student' do
       end
 
       it "should be able to open the media modal" do
+        skip 'LS-1514 10/5/2020'
         StudentAssignmentPageV2.record_upload_button.click
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
       end

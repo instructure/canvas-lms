@@ -32,6 +32,7 @@ export default class Bridge {
     this.trayProps = new WeakMap()
     this._languages = []
     this._controller = {}
+    this._uploadMediaTranslations = null
   }
 
   get editorRendered() {
@@ -79,6 +80,17 @@ export default class Bridge {
 
   set languages(langs) {
     this._languages = langs
+  }
+
+  // we have to defer importing mediaTranslations until they are asked for
+  // or they get imported before the locale has been setup and all the strings
+  // are in English
+  get uploadMediaTranslations() {
+    if (!this._uploadMediaTranslations) {
+      const module = require('../rce/plugins/instructure_record/mediaTranslations')
+      this._uploadMediaTranslations = module.default
+    }
+    return this._uploadMediaTranslations
   }
 
   detachEditor(editor) {

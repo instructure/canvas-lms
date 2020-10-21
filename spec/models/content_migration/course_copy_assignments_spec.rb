@@ -685,10 +685,11 @@ describe ContentMigration do
       end
 
       it "should copy only noop overrides" do
+        Account.default.enable_feature!(:conditional_release)
         assignment_override_model(assignment: @assignment, set_type: 'ADHOC')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop',
-          set_id: 1, title: 'Tag 1')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS, title: 'Tag 1')
+        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
           set_id: nil, title: 'Tag 2')
         @assignment.only_visible_to_overrides = true
         @assignment.save!
@@ -700,7 +701,21 @@ describe ContentMigration do
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id.nil? }.title).to eq 'Tag 2'
       end
 
+      it "should ignore conditional release noop overrides if feature is not enabled in destination" do
+        assignment_override_model(assignment: @assignment,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+
+        run_course_copy
+        to_assignment = @copy_to.assignments.first
+        expect(to_assignment.only_visible_to_overrides).to be_falsey
+        expect(to_assignment.assignment_overrides.length).to eq 0
+      end
+
       it "should copy dates" do
+        Account.default.enable_feature!(:conditional_release)
         due_at = 1.hour.from_now.round
         assignment_override_model(assignment: @assignment, set_type: 'Noop',
           set_id: 1, title: 'Tag 1', due_at: due_at)
@@ -713,6 +728,7 @@ describe ContentMigration do
       end
 
       it "preserves only_visible_to_overrides for page assignments" do
+        Account.default.enable_feature!(:conditional_release)
         a1 = assignment_model(context: @copy_from, title: 'a1', submission_types: 'wiki_page', only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         a2 = assignment_model(context: @copy_from, title: 'a2', submission_types: 'wiki_page', only_visible_to_overrides: false)
@@ -722,6 +738,15 @@ describe ContentMigration do
         expect(a1_to.only_visible_to_overrides).to eq true
         a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
         expect(a2_to.only_visible_to_overrides).to eq false
+      end
+
+      it "ignores page assignments if mastery paths is not enabled in destination" do
+        a1 = assignment_model(context: @copy_from, title: 'a1', submission_types: 'wiki_page', only_visible_to_overrides: true)
+        a1.build_wiki_page(title: a1.title, context: a1.context).save!
+        run_course_copy
+        page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
+        expect(page_to.assignment).to eq nil
+        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to eq false
       end
     end
 

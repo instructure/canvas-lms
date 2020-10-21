@@ -64,4 +64,32 @@ describe('Notification Preferences', () => {
       )
     ).toBeInTheDocument()
   })
+
+  it('renders the observer toggle if sendObservedNamesInNotifications prop is present', () => {
+    const props = defaultProps({
+      contextType: 'account',
+      contextName: 'Cool Account',
+      notificationPreferences: {
+        channels: [],
+        sendObservedNamesInNotifications: true
+      }
+    })
+    const {getByTestId} = render(<NotificationPreferences {...props} />)
+
+    expect(getByTestId('send-observed-names-toggle')).toBeInTheDocument()
+  })
+
+  it('does not render the observer toggle if sendObservedNamesInNotifications prop is missing', () => {
+    const props = defaultProps({
+      contextType: 'account',
+      contextName: 'Cool Account',
+      notificationPreferences: {
+        channels: [],
+        sendObservedNamesInNotifications: null
+      }
+    })
+    const {queryByTestId} = render(<NotificationPreferences {...props} />)
+
+    expect(queryByTestId('send-observed-names-toggle')).not.toBeInTheDocument()
+  })
 })

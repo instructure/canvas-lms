@@ -96,15 +96,15 @@ test('it should be accessible', assert => {
   return assertions.isAccessible(view, done, {a11yReport: true})
 })
 
-test('renders admin if can_update', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+test('renders admin if canManage', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo'})
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin').length, 1)
 })
 
-test('doesnt render admin if can_update is false', () => {
-  const quiz = createQuiz({id: 1, title: 'Foo', can_update: false})
-  const view = createView(quiz)
+test('doesnt render admin if canManage is false', () => {
+  const quiz = createQuiz({id: 1, title: 'Foo'})
+  const view = createView(quiz, {canManage: false})
   equal(view.$('.ig-admin').length, 0)
 })
 
@@ -236,7 +236,7 @@ test('cannot delete quiz without delete permissions', () => {
 
 test('prompts confirm for delete', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   quiz.destroy = () => true
 
   sandbox.stub(window, 'confirm').returns(true)
@@ -247,7 +247,7 @@ test('prompts confirm for delete', () => {
 
 test('confirm delete destroys model', () => {
   const quiz = createQuiz({id: 1, title: 'Foo', can_update: true})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
 
   let destroyed = false
   quiz.destroy = () => (destroyed = true)
@@ -325,7 +325,7 @@ test('does not render lockAt/unlockAt when not locking in future', () => {
 test('does not render mastery paths menu option for quiz if cyoe off', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = false
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'assignment'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
@@ -338,28 +338,28 @@ test('renders mastery paths menu option for assignment quiz if cyoe on', () => {
     quiz_type: 'assignment',
     assignment_id: '2'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 1)
 })
 
 test('does not render mastery paths menu option for survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'survey'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('does not render mastery paths menu option for graded survey quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'graded_survey'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
 test('does not render mastery paths menu option for practice quiz if cyoe on', () => {
   ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
   const quiz = new Quiz({id: 1, title: 'Foo', can_update: true, quiz_type: 'practice_quiz'})
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin .al-options .icon-mastery-path').length, 0)
 })
 
@@ -372,7 +372,7 @@ test('does not render mastery paths link for quiz if cyoe off', () => {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
 })
 
@@ -385,7 +385,7 @@ test('does not render mastery paths link for quiz if quiz does not have a rule',
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 0)
 })
 
@@ -398,7 +398,7 @@ test('renders mastery paths link for quiz if quiz has a rule', () => {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.ig-admin > a[href$="#mastery-paths-editor"]').length, 1)
 })
 
@@ -411,7 +411,7 @@ test('does not render mastery paths icon for quiz if cyoe off', () => {
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
 })
 
@@ -424,7 +424,7 @@ test('does not render mastery paths icon for quiz if quiz is not released by a r
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 0)
 })
 
@@ -437,7 +437,7 @@ test('renders mastery paths link for quiz if quiz has is released by a rule', ()
     can_update: true,
     quiz_type: 'assignment'
   })
-  const view = createView(quiz)
+  const view = createView(quiz, {canManage: true})
   equal(view.$('.mastery-path-icon').length, 1)
 })
 
@@ -449,7 +449,7 @@ test('can duplicate when a quiz can be duplicated', () => {
     can_update: true
   })
   Object.assign(window.ENV, {current_user_roles: ['admin']})
-  const view = createView(quiz, {})
+  const view = createView(quiz, {canManage: true})
   const json = view.toJSON()
   ok(json.canDuplicate)
   equal(view.$('.duplicate_assignment').length, 1)

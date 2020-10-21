@@ -126,6 +126,7 @@
     "@babel/core": "^7",
     "@babel/register": "7",
     "@instructure/browserslist-config-canvas-lms": ">=2",
+    "@instructure/translations": ">=1",
     "@instructure/ui-babel-preset": "6",
     "@testing-library/dom": "^7",
     "@testing-library/jest-dom": "^5",

@@ -469,7 +469,7 @@ RSpec.configure do |config|
   config.before :each do
     if Canvas.redis_enabled? && Canvas.redis_used
       # yes, we really mean to run this dangerous redis command
-      Shackles.activate(:deploy) { Canvas.redis.flushdb }
+      GuardRail.activate(:deploy) { Canvas.redis.flushdb }
     end
     Canvas.redis_used = false
   end
@@ -789,7 +789,10 @@ RSpec.configure do |config|
       @headers = headers
     end
 
-    def read_body(io)
+    def read_body(io = nil)
+      return yield(@body) if block_given?
+      return if io.nil?
+
       io << @body
     end
 

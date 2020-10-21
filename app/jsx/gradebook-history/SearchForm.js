@@ -20,9 +20,10 @@ import React, {Component} from 'react'
 import {connect} from 'react-redux'
 import {arrayOf, func, shape, string} from 'prop-types'
 import I18n from 'i18n!gradebook_history'
+import tz from 'timezone'
 import moment from 'moment'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Select, DateInput} from '@instructure/ui-forms'
+import {Select} from '@instructure/ui-forms'
 import {Button} from '@instructure/ui-buttons'
 import {View, Grid} from '@instructure/ui-layout'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -30,6 +31,7 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '../shared/FlashAlert'
 import environment from './environment'
+import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
 
 const recordShape = shape({
   fetchStatus: string.isRequired,
@@ -41,6 +43,8 @@ const recordShape = shape({
   ),
   nextPage: string.isRequired
 })
+
+const formatDate = date => tz.format(date, 'date.formats.medium_with_weekday')
 
 class SearchFormComponent extends Component {
   static propTypes = {
@@ -59,8 +63,9 @@ class SearchFormComponent extends Component {
       assignment: '',
       grader: '',
       student: '',
-      from: {value: '', conversionFailed: false},
-      to: {value: '', conversionFailed: false}
+      from: {value: ''},
+      to: {value: ''},
+      showFinalGradeOverridesOnly: false
     },
     messages: {
       assignments: I18n.t('Type a few letters to start searching'),
@@ -113,42 +118,54 @@ class SearchFormComponent extends Component {
     }
   }
 
-  setSelectedFrom = (_, from, _rawValue, rawConversionFailed) => {
-    const startOfFrom = from
-      ? moment(from)
-          .startOf('day')
-          .toISOString()
-      : ''
+  setSelectedFrom = from => {
+    const value =
+      from == null
+        ? null
+        : moment(from)
+            .startOf('day')
+            .toISOString()
+
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        from: {value: startOfFrom, conversionFailed: rawConversionFailed}
+        from: {value}
       }
     }))
   }
 
-  setSelectedTo = (_, to, _rawValue, rawConversionFailed) => {
-    const endOfTo = to
-      ? moment(to)
-          .endOf('day')
-          .toISOString()
-      : ''
+  setSelectedTo = to => {
+    const value =
+      to == null
+        ? null
+        : moment(to)
+            .endOf('day')
+            .toISOString()
+
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        to: {value: endOfTo, conversionFailed: rawConversionFailed}
+        to: {value}
       }
     }))
   }
 
-  setSelectedAssignment = (event, selected) => {
+  setSelectedAssignment = (event, selectedOption) => {
     this.props.clearSearchOptions('assignments')
-    this.setState(prevState => ({
-      selected: {
+    this.setState(prevState => {
+      const selected = {
         ...prevState.selected,
-        assignment: selected ? selected.id : ''
+        assignment: selectedOption ? selectedOption.id : ''
       }
-    }))
+
+      // If we selected an assignment, uncheck the "show final grade overrides
+      // only" checkbox
+      if (selectedOption != null) {
+        selected.showFinalGradeOverridesOnly = false
+      }
+
+      return {selected}
+    })
   }
 
   setSelectedGrader = (event, selected) => {
@@ -181,11 +198,7 @@ class SearchFormComponent extends Component {
   }
 
   hasDateInputErrors() {
-    return (
-      this.dateInputErrors().length > 0 ||
-      this.state.selected.from.conversionFailed ||
-      this.state.selected.to.conversionFailed
-    )
+    return this.dateInputErrors().length > 0
   }
 
   dateInputErrors = () => {
@@ -222,6 +235,31 @@ class SearchFormComponent extends Component {
 
   handleStudentChange = (_event, value) => {
     this.handleSearchEntry('students', value)
+  }
+
+  handleShowFinalGradeOverridesOnlyChange = _event => {
+    const enabled = !this.state.selected.showFinalGradeOverridesOnly
+
+    if (enabled) {
+      // If we checked the checkbox, clear any assignments we were filtering by
+      this.props.clearSearchOptions('assignments')
+    }
+
+    this.setState(
+      prevState => ({
+        selected: {
+          ...prevState.selected,
+          assignment: enabled ? '' : prevState.selected.assignment,
+          showFinalGradeOverridesOnly: enabled
+        }
+      }),
+      () => {
+        if (enabled) {
+          // Also manually clear the contents of the assignment select input
+          this.assignmentInput.value = ''
+        }
+      }
+    )
   }
 
   handleSearchEntry = (target, searchTerm) => {
@@ -340,17 +378,19 @@ class SearchFormComponent extends Component {
                   vAlign="top"
                   messages={this.dateInputErrors()}
                 >
-                  <DateInput
-                    label={I18n.t('Start Date')}
-                    previousLabel={I18n.t('Previous Month')}
-                    nextLabel={I18n.t('Next Month')}
-                    onDateChange={this.setSelectedFrom}
+                  <CanvasDateInput
+                    renderLabel={I18n.t('Start Date')}
+                    formatDate={formatDate}
+                    selectedDate={this.state.selected.from.value}
+                    onSelectedDateChange={this.setSelectedFrom}
+                    withRunningValue
                   />
-                  <DateInput
-                    label={I18n.t('End Date')}
-                    previousLabel={I18n.t('Previous Month')}
-                    nextLabel={I18n.t('Next Month')}
-                    onDateChange={this.setSelectedTo}
+                  <CanvasDateInput
+                    renderLabel={I18n.t('End Date')}
+                    formatDate={formatDate}
+                    selectedDate={this.state.selected.to.value}
+                    onSelectedDateChange={this.setSelectedTo}
+                    withRunningValue
                   />
                 </FormFieldGroup>
               </FormFieldGroup>
@@ -384,8 +424,10 @@ class SearchFormComponent extends Component {
                   vAlign="top"
                 >
                   <Checkbox
+                    checked={this.state.selected.showFinalGradeOverridesOnly}
                     id="show_final_grade_overrides_only"
                     label={I18n.t('Show Final Grade Overrides Only')}
+                    onChange={this.handleShowFinalGradeOverridesOnlyChange}
                   />
                 </FormFieldGroup>
               </Grid.Col>

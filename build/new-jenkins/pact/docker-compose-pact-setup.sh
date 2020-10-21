@@ -8,7 +8,9 @@ docker-compose build --parallel canvas cassandra postgres redis
 docker-compose up -d canvas cassandra postgres redis
 
 # wait for services to respond
-for service in cassandra:9160 postgres:5432 redis:6379; do
+docker-compose exec -T postgres /bin/bash -c /wait-for-it
+
+for service in cassandra:9160 redis:6379; do
   docker-compose exec -T canvas ./build/new-jenkins/wait-for-it ${service}
 done
 

@@ -169,54 +169,42 @@ describe('contentRendering', () => {
   })
 
   describe('renderVideo', () => {
-    it('builds iframe src from tray video data', () => {
+    it('builds html from tray video data', () => {
       const video = videoFromTray()
-      const src = contentRendering.mediaIframeSrcFromFile(video)
-      expect(src).toEqual('/media_objects_iframe/17?type=video')
-    })
-
-    it('builds iframe src from uploaded video data', () => {
-      const video = videoFromUpload()
-      const src = contentRendering.mediaIframeSrcFromFile(video)
-      expect(src).toEqual('/url/to/m-media-id?type=video')
-    })
-
-    it('builds the html from tray video data', () => {
-      const video = videoFromTray()
-      const rendered = contentRendering.renderVideo(video)
-      expect(rendered).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe/17?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
+      const html = contentRendering.renderVideo(video)
+      expect(html).toEqual(
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;`
       )
     })
 
-    it('builds the html from uploaded video data', () => {
+    it('builds html from uploaded video data', () => {
       const video = videoFromUpload()
-      const rendered = contentRendering.renderVideo(video)
+      const html = contentRendering.renderVideo(video)
+      expect(html).toEqual(
+        `<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="${video.embedded_iframe_url}?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;`
+      )
+    })
 
-      expect(rendered).toEqual(
-        '<iframe allow="fullscreen" allowfullscreen data-media-id="m-media-id" data-media-type="video" src="/url/to/m-media-id?type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
+    it('builds html from canvas file data', () => {
+      const file = {
+        id: '17',
+        url: '/files/17',
+        title: 'filename.mov',
+        type: 'video'
+      }
+      const html = contentRendering.renderVideo(file)
+      expect(html).toEqual(
+        '<iframe allow="fullscreen" allowfullscreen data-media-id="17" data-media-type="video" src="/media_objects_iframe?mediahref=/files/17&type=video" style="width:400px;height:225px;display:inline-block;" title="Video player for filename.mov"></iframe>&nbsp;'
       )
     })
   })
 
   describe('renderAudio', () => {
-    it('builds iframe src from tray audio data', () => {
-      const audio = audioFromTray()
-      const src = contentRendering.mediaIframeSrcFromFile(audio)
-      expect(src).toEqual('/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&type=audio')
-    })
-
-    it('builds iframe src from uploaded audio data', () => {
-      const audio = audioFromUpload()
-      const src = contentRendering.mediaIframeSrcFromFile(audio)
-      expect(src).toEqual('/url/to/m-media-id?type=audio')
-    })
-
     it('builds the html from tray audio data', () => {
       const audio = audioFromTray()
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
-        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url%2Fto%2Fcourse%2Ffile&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+        '<iframe data-media-id="29" data-media-type="audio" src="/media_objects_iframe?mediahref=url/to/course/file&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
       )
     })
 
@@ -225,6 +213,19 @@ describe('contentRendering', () => {
       const rendered = contentRendering.renderAudio(audio)
       expect(rendered).toEqual(
         '<iframe data-media-id="m-media-id" data-media-type="audio" src="/url/to/m-media-id?type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
+      )
+    })
+
+    it('builds html from canvas file data', () => {
+      const file = {
+        id: '17',
+        url: '/files/17',
+        title: 'filename.mp3',
+        type: 'audio'
+      }
+      const html = contentRendering.renderAudio(file)
+      expect(html).toEqual(
+        '<iframe data-media-id="17" data-media-type="audio" src="/media_objects_iframe?mediahref=/files/17&type=audio" style="width:320px;height:14.25rem;display:inline-block;" title="Audio player for filename.mp3"></iframe>&nbsp;'
       )
     })
   })

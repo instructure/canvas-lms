@@ -66,7 +66,7 @@ module AccountReports
       write_report headers do |csv|
 
         total = courses.count(:all)
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
         courses.find_each do |c|
           row = []
@@ -101,7 +101,7 @@ module AccountReports
       write_report headers do |csv|
 
         total = courses.count(:all)
-        Shackles.activate(:master) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
+        GuardRail.activate(:primary) { AccountReport.where(id: @account_report.id).update_all(total_lines: total) }
 
         courses.find_each do |c|
           row = []

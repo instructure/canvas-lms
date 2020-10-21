@@ -27,7 +27,7 @@ describe('fileEmbed', () => {
   }
 
   it('defaults to file', () => {
-    assert.equal(fileEmbed({}).type, 'file')
+    assert.strictEqual(fileEmbed({}).type, 'file')
   })
 
   it('uses content-type to identify video and audio', () => {
@@ -38,62 +38,45 @@ describe('fileEmbed', () => {
     )
     const notvideo = fileEmbed(getBaseFile({'content-type': 'x-video/mp4', preview_url: undefined}))
 
-    assert.equal(video.type, 'video')
-    assert.equal(video.id, 'maybe')
-    assert.equal(audio.type, 'audio')
-    assert.equal(audio.id, 'maybe')
-    assert.equal(notaudio.type, 'file')
-    assert.equal(notvideo.type, 'file')
-  })
-
-  it('returns media entry id if provided', () => {
-    const video = fileEmbed(
-      getBaseFile({
-        'content-type': 'video/mp4',
-        media_entry_id: '42'
-      })
-    )
-    assert.equal(video.id, '42')
-  })
-
-  it('returns maybe in place of media entry id if not provided', () => {
-    const video = fileEmbed(getBaseFile({'content-type': 'video/mp4'}))
-    assert.equal(video.id, 'maybe')
+    assert.strictEqual(video.type, 'video')
+    assert.strictEqual(audio.type, 'audio')
+    assert.strictEqual(notaudio.type, 'file')
+    assert.strictEqual(notvideo.type, 'file')
   })
 
   it('picks scribd if there is a preview_url', () => {
     const scribd = fileEmbed(getBaseFile({preview_url: 'some-url'}))
-    assert.equal(scribd.type, 'scribd')
+    assert.strictEqual(scribd.type, 'scribd')
   })
 
   it('uses content-type to identify images', () => {
     const png = fileEmbed(getBaseFile({'content-type': 'image/png'}))
     const svg = fileEmbed(getBaseFile({'content-type': 'image/svg+xml'}))
 
-    assert.equal(png.type, 'image')
-    assert.equal(svg.type, 'image')
+    assert.strictEqual(png.type, 'image')
+    assert.strictEqual(svg.type, 'image')
   })
 })
 
 describe('mimeClass', () => {
   it('returns mime_class attribute if present', () => {
     const mime_class = 'wooper'
-    assert.equal(mimeClass({mime_class}), mime_class)
+    assert.strictEqual(mimeClass({mime_class}), mime_class)
   })
 
   it('returns value corresponding to provided `content-type`', () => {
-    assert.equal(mimeClass({'content-type': 'video/mp4'}), 'video')
-    assert.equal(mimeClass({'content-type': 'audio/webm'}), 'audio')
-    assert.equal(mimeClass({'content-type': 'image/svg+xml'}), 'image')
-    assert.equal(mimeClass({'content-type': 'image/webp'}), 'file')
-    assert.equal(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')
+    assert.strictEqual(mimeClass({'content-type': 'video/mp4'}), 'video')
+    assert.strictEqual(mimeClass({'content-type': 'audio/webm'}), 'audio')
+    assert.strictEqual(mimeClass({'content-type': 'image/svg+xml'}), 'image')
+    assert.strictEqual(mimeClass({'content-type': 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({'content-type': 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 
   it('returns value corresponding to provided `type`', () => {
-    assert.equal(mimeClass({type: 'video/mp4'}), 'video')
-    assert.equal(mimeClass({type: 'audio/webm'}), 'audio')
-    assert.equal(mimeClass({type: 'image/svg+xml'}), 'image')
-    assert.equal(mimeClass({type: 'image/webp'}), 'file')
-    assert.equal(mimeClass({type: 'application/vnd.ms-powerpoint'}), 'ppt')
+    assert.strictEqual(mimeClass({type: 'video/mp4'}), 'video')
+    assert.strictEqual(mimeClass({type: 'audio/webm'}), 'audio')
+    assert.strictEqual(mimeClass({type: 'image/svg+xml'}), 'image')
+    assert.strictEqual(mimeClass({type: 'image/webp'}), 'file')
+    assert.strictEqual(mimeClass({type: 'application/vnd.ms-powerpoint'}), 'ppt')
   })
 })

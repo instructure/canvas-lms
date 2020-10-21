@@ -101,6 +101,26 @@ test('getGradebookHistory requests with course, assignment, grader, and student'
   strictEqual(this.getStub.getCall(0).args[0], url)
 })
 
+test('getGradebookHistory requests with course and override grades', function() {
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/override`
+
+  HistoryApi.getGradebookHistory(this.courseId, {showFinalGradeOverridesOnly: true})
+  strictEqual(this.getStub.getCall(0).args[0], url)
+})
+
+test('getGradebookHistory filters by override grades combined with other parameters', function() {
+  const grader = '22'
+  const student = '2200'
+  const url = `/api/v1/audit/grade_change/courses/${this.courseId}/assignments/override/graders/${grader}/students/${student}`
+
+  HistoryApi.getGradebookHistory(this.courseId, {
+    grader,
+    showFinalGradeOverridesOnly: true,
+    student
+  })
+  strictEqual(this.getStub.getCall(0).args[0], url)
+})
+
 test('getNextPage makes an axios get request', function() {
   const url = encodeURI(
     'http://example.com/grades?include[]=current_grade&page=42&per_page=100000000'

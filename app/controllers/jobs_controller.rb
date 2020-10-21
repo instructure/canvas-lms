@@ -33,7 +33,7 @@ class JobsController < ApplicationController
   def index
     @flavor = params[:flavor] || 'current'
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       respond_to do |format|
         format.html do
           @running_jobs_refresh_seconds = Setting.get('running_jobs_refresh_seconds', 2.seconds.to_s).to_f

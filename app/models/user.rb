@@ -301,7 +301,7 @@ class User < ActiveRecord::Base
 
   def assignment_and_quiz_visibilities(context)
     RequestCache.cache("assignment_and_quiz_visibilities", self, context) do
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         {assignment_ids: DifferentiableAssignment.scope_filter(context.assignments, self, context).pluck(:id),
           quiz_ids: DifferentiableAssignment.scope_filter(context.quizzes, self, context).pluck(:id)}
       end
@@ -1736,7 +1736,7 @@ class User < ActiveRecord::Base
   # made a tree, it would be the chain between the root and the first branching
   # point.
   def common_account_chain(in_root_account)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       rid = in_root_account.id
       accts = self.associated_accounts.where("accounts.id = ? OR accounts.root_account_id = ?", rid, rid)
       return [] if accts.blank?
@@ -1797,7 +1797,7 @@ class User < ActiveRecord::Base
               where("enrollment_states.state IN ('active', 'invited', 'pending_invited', 'pending_active')")
           end
 
-          Shackles.activate(:slave) do
+          GuardRail.activate(:secondary) do
             scope.select("courses.*, enrollments.id AS primary_enrollment_id, enrollments.type AS primary_enrollment_type, enrollments.role_id AS primary_enrollment_role_id, #{Enrollment.type_rank_sql} AS primary_enrollment_rank, enrollments.workflow_state AS primary_enrollment_state, enrollments.created_at AS primary_enrollment_date").
                 order(Arel.sql("courses.id, #{Enrollment.type_rank_sql}, #{Enrollment.state_rank_sql}")).
                 distinct_on(:id).shard(shards).to_a
@@ -2028,7 +2028,7 @@ class User < ActiveRecord::Base
       Rails.cache.fetch_with_batched_keys(['submissions_for_course_ids', ids_hash, start_at, limit].cache_key, expires_in: 1.day, batch_object: self, batched_keys: :submissions) do
         start_at ||= 4.weeks.ago
 
-        Shackles.activate(:slave) do
+        GuardRail.activate(:secondary) do
           submissions = []
           submissions += self.submissions.posted.where("GREATEST(submissions.submitted_at, submissions.created_at) > ?", start_at).
             where(:course_id => course_ids).eager_load(:assignment).
@@ -2117,7 +2117,7 @@ class User < ActiveRecord::Base
   # NOTE: excludes submission stream items
   def recent_stream_items(opts={})
     self.shard.activate do
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         visible_instances = visible_stream_item_instances(opts).
           preload(stream_item: :context).
           limit(Setting.get('recent_stream_item_limit', 100))
@@ -3000,14 +3000,14 @@ class User < ActiveRecord::Base
 
   def user_roles(root_account, exclude_deleted_accounts = nil)
     roles = ['user']
-    enrollment_types = Shackles.activate(:slave) do
+    enrollment_types = GuardRail.activate(:secondary) do
       root_account.all_enrollments.where(user_id: self, workflow_state: 'active').distinct.pluck(:type)
     end
     roles << 'student' unless (enrollment_types & %w[StudentEnrollment StudentViewEnrollment]).empty?
     roles << 'fake_student' if fake_student?
     roles << 'teacher' unless (enrollment_types & %w[TeacherEnrollment TaEnrollment DesignerEnrollment]).empty?
     roles << 'observer' unless (enrollment_types & %w[ObserverEnrollment]).empty?
-    account_users = Shackles.activate(:slave) do
+    account_users = GuardRail.activate(:secondary) do
       root_account.cached_all_account_users_for(self)
     end
 

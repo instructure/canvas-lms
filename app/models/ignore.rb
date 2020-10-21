@@ -24,7 +24,7 @@ class Ignore < ActiveRecord::Base
   validates_inclusion_of :permanent, :in => [false, true]
 
   def self.cleanup
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       Ignore.select(:id).
         joins("LEFT JOIN #{Assignment.quoted_table_name} AS a ON a.id = ignores.asset_id AND 'Assignment' = ignores.asset_type
           LEFT JOIN #{Quizzes::Quiz.quoted_table_name} AS q ON q.id = ignores.asset_id AND 'Quizzes::Quiz' = ignores.asset_type
@@ -50,7 +50,7 @@ class Ignore < ActiveRecord::Base
             UNION
             SELECT 1 FROM enrollments WHERE enrollments.completed_at > :conclude_time))",
           {deletion_time: 1.month.ago, conclude_time: 6.months.ago}).find_in_batches do |batch|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           Ignore.where(id: batch).delete_all
         end
       end

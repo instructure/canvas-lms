@@ -356,7 +356,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope = if @type == :assignment
         assignment_scope(
           user,
@@ -722,7 +722,7 @@ class CalendarEventsApiController < ApplicationController
 
       get_options(nil)
 
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
         @events.concat calendar_event_scope(@current_user) { |relation| relation.events_without_child_events }.paginate(per_page: 1000, max: 1000)
@@ -763,7 +763,7 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url doesn't give us the requesting user,
       # we have to just display the generic course feed
       get_all_pertinent_contexts
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         @contexts.each do |context|
           @assignments = context.assignments.active.to_a if context.respond_to?("assignments")
           # no overrides to apply without a current user

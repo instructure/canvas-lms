@@ -281,7 +281,7 @@ export default class DiscussionsIndex extends Component {
         <ConnectedIndexHeader />
         {this.props.isLoadingDiscussions
           ? this.renderSpinner(I18n.t('Loading Discussions'))
-          : this.props.permissions.moderate
+          : this.props.permissions.moderate || this.props.DIRECT_SHARE_ENABLED
           ? this.renderTeacherView()
           : this.renderStudentView()}
       </div>

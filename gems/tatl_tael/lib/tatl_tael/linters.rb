@@ -21,11 +21,11 @@ module TatlTael
       ### core
       def changes_matching(statuses: %w[added modified], # excludes "deleted",
                            include: ["*"], # include everything
-                           whitelist: []) # don't whitelist anything
+                           allowlist: []) # don't allowlist anything
         changes.select do |change|
           statuses.include?(change.status) &&
             include.any? { |pattern| File.fnmatch(pattern, change.path) } &&
-            whitelist.all? { |pattern| !File.fnmatch(pattern, change.path) }
+            allowlist.all? { |pattern| !File.fnmatch(pattern, change.path) }
         end
       end
 

@@ -553,20 +553,113 @@ describe ContextExternalTool do
     end
   end
 
+  describe "active?" do
+    subject { tool.active? }
+
+    let(:tool) { external_tool_model(opts: tool_opts) }
+    let(:tool_opts) { {} }
+
+    it { is_expected.to eq true }
+
+    context 'when "workflow_state" is "deleted"' do
+      let(:tool_opts) { { workflow_state: 'deleted' } }
+
+      it { is_expected.to eq false }
+    end
+
+    context 'when "workflow_state" is "disabled"' do
+      let(:tool_opts) { { workflow_state: 'disabled' } }
+
+      it { is_expected.to eq false }
+    end
+  end
+
+  describe "uses_preferred_lti_version?" do
+    subject { tool.uses_preferred_lti_version? }
+
+    let_once(:tool) { external_tool_model }
+
+    it { is_expected.to eq false }
+
+    context 'when the tool uses LTI 1.3' do
+      before do
+        tool.use_1_3 = true
+        tool.save!
+      end
+
+      it { is_expected.to eq true }
+    end
+  end
+
   describe "from_content_tag" do
     subject { ContextExternalTool.from_content_tag(*arguments) }
 
     let(:arguments) { [content_tag, tool.context] }
+    let(:assignment) { assignment_model(course: tool.context) }
     let(:tool) { external_tool_model }
-    let(:content_tag_opts) { { url: tool.url, content_type: 'ContextExternalTool' } }
+    let(:content_tag_opts) { { url: tool.url, content_type: 'ContextExternalTool', context: assignment } }
     let(:content_tag) { ContentTag.new(content_tag_opts) }
+
+    let(:lti_1_3_tool) do
+      t = tool.dup
+      t.use_1_3 = true
+      t.save!
+      t
+    end
 
     it { is_expected.to eq tool }
 
-    context 'when the tool is linked to the tag by id (hard association)' do
+    context 'when the tool is linked to the tag by id (LTI 1.1)' do
       let(:content_tag_opts) { super().merge({ content_id: tool.id }) }
 
       it { is_expected.to eq tool }
+
+      context 'and an LTI 1.3 tool has a conflicting URL' do
+        let(:arguments) do
+          [content_tag, tool.context]
+        end
+
+        before { lti_1_3_tool }
+
+        it { is_expected.to be_use_1_3 }
+      end
+    end
+
+    context 'when the tool is linked to a tag by id (LTI 1.3)' do
+      let(:content_tag_opts) { super().merge({ content_id: lti_1_3_tool.id }) }
+      let(:duplicate_1_3_tool) do
+        t = lti_1_3_tool.dup
+        t.save!
+        t
+      end
+
+      context 'and an LTI 1.1 tool has a conflicting URL' do
+
+        before { tool } # intitialized already, but included for clarity
+
+        it { is_expected.to eq lti_1_3_tool }
+
+        context 'and there are multiple matching LTI 1.3 tools' do
+          before { duplicate_1_3_tool }
+
+          let(:arguments) { [content_tag, tool.context] }
+          let(:content_tag_opts) { super().merge({ content_id: lti_1_3_tool.id }) }
+
+          it { is_expected.to eq lti_1_3_tool }
+        end
+
+        context 'and the LTI 1.3 tool gets reinstalled' do
+          before do
+            # "install" a copy of the tool
+            duplicate_1_3_tool
+
+            # "uninstall" the original tool
+            lti_1_3_tool.destroy!
+          end
+
+          it { is_expected.to eq duplicate_1_3_tool }
+        end
+      end
     end
 
     context 'when there are blank arguments' do
@@ -1066,6 +1159,43 @@ describe ContextExternalTool do
         :name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret", :developer_key => DeveloperKey.create!
       )
       expect(ContextExternalTool.all_tools_for(@course).placements(*Lti::ResourcePlacement::LEGACY_DEFAULT_PLACEMENTS).to_a).to eql([tool1])
+      end
+    end
+
+    describe 'enabling/disabling placements' do
+      let!(:tool) {
+        tool = @course.context_external_tools.create!(:name => "First Tool", :url => "http://www.example.com", :consumer_key => "key", :shared_secret => "secret")
+        tool.homework_submission = {enabled: true, selection_height: 300}
+        tool.save
+        tool
+      }
+
+      it 'moves inactive placement data back to active when re-enabled' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission][:enabled]).to be_falsey
+
+        tool.homework_submission = {enabled: true}
+        expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
+        expect(tool.settings.key?(:inactive_placements)).to be_falsey
+      end
+
+      it 'moves placement data to inactive placements when disabled' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+        expect(tool.settings.key?(:homework_submission)).to be_falsey
+      end
+
+      it 'keeps already inactive placement data when disabled again' do
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+
+        tool.homework_submission = {enabled: false}
+        expect(tool.settings[:inactive_placements][:homework_submission]).to include({enabled: false, selection_height: 300})
+      end
+
+      it 'keeps already active placement data when enabled again' do
+        tool.homework_submission = {enabled: true}
+        expect(tool.settings[:homework_submission]).to include({enabled: true, selection_height: 300})
       end
     end
   end
@@ -1972,50 +2102,64 @@ describe ContextExternalTool do
         shared_secret: 'secret',
         name: 'test tool',
         url: 'http://www.tool.com/launch',
+        editor_button: {url: 'http://example.com', icon_url: 'http://example.com'}
       )
     end
 
-    it 'saves is_rce_favorite if can_be_rce_favorite?' do
+    it 'can be an rce favorite if it has an editor_button placement' do
       tool = tool_in_context(@root_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be true
+      expect(tool.can_be_rce_favorite?).to eq true
     end
 
-    it 'does not save is_rce_favorite if no editor_button placement' do
+    it 'cannot be an rce favorite if no editor_button placement' do
       tool = tool_in_context(@root_account)
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'does not set is_rce_favorite if context is not a root account' do
-      sub_account = @root_account.sub_accounts.create!
-      tool = tool_in_context(sub_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'does not set is_rce_favorite if context is not an account' do
-      tool = tool_in_context(@course)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be false
-    end
-
-    it 'resets is_rce_favorite if editor_button placement is removed' do
-      tool = tool_in_context(@root_account)
-      tool.editor_button = {url: 'http://example.com'}
-      tool.is_rce_favorite = true
-      tool.save!
-      expect(tool.is_rce_favorite).to be true
       tool.editor_button = nil
       tool.save!
-      expect(tool.is_rce_favorite).to be false
+      expect(tool.can_be_rce_favorite?).to eq false
+    end
+
+    it 'does not set tools as an rce favorite for any context by default' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq false
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq false
+    end
+
+    it 'inherits from the old is_rce_favorite column if the accounts have not be seen up yet' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      tool.is_rce_favorite = true
+      tool.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
+    end
+
+    it 'inherits from root account configuration if not set on sub-account' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      @root_account.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
+    end
+
+    it 'overrides with sub-account configuration if specified' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(@root_account)
+      @root_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      @root_account.save!
+      sub_account.settings[:rce_favorite_tool_ids] = {value: []}
+      sub_account.save!
+      expect(tool.is_rce_favorite_in_context?(@root_account)).to eq true
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq false
+    end
+
+    it 'can set sub-account tools as favorites' do
+      sub_account = @root_account.sub_accounts.create!
+      tool = tool_in_context(sub_account)
+      sub_account.settings[:rce_favorite_tool_ids] = {value: [tool.global_id]}
+      sub_account.save!
+      expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
     end
   end
 end

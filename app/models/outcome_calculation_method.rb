@@ -56,4 +56,24 @@ class OutcomeCalculationMethod < ApplicationRecord
   def as_json(options={})
     super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
   end
+
+  def self.find_or_create_default!(context)
+    method = OutcomeCalculationMethod.find_by(context: context)
+    if method&.workflow_state == 'active'
+      return method
+    end
+
+    method ||= OutcomeCalculationMethod.new(context: context)
+    method.workflow_state = 'active'
+    method.calculation_method = 'highest'
+    method.calculation_int = nil
+    method.save!
+    method
+  rescue ActiveRecord::RecordNotUnique
+    retry
+  rescue ActiveRecord::RecordInvalid => e
+    raise unless e.record.errors[:context_id] == ['has already been taken']
+
+    retry
+  end
 end

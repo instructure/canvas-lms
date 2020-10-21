@@ -45,13 +45,13 @@ class CommunicationChannel
     end
 
     def count
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         matching_channels.count
       end
     end
 
     def report
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         CSV.generate do |csv|
           columns = self.class.report_columns
 

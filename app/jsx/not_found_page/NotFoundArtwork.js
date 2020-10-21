@@ -32,7 +32,7 @@ const NotFoundArtwork = () => (
         <SVGWrapper url="/images/not_found_page/empty-planet.svg" />
       </Container>
       <Heading level="h2" as="h1" margin="x-small 0 0">
-        {I18n.t('Woops... Looks like nothing is here!')}
+        {I18n.t('Whoops... Looks like nothing is here!')}
       </Heading>
       <Container margin="small" display="block">
         <Text level="h4" margin="x-small">

@@ -46,7 +46,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     scale_data = scale_params
     if needs_scale?(scale_data) && self.score && self.possible
       self.percent = calculate_by_scale(scale_data).round(4)
-    elsif self.score && self.possible
+    elsif self.score
       self.percent = percentage
     end
     self.percent = nil if self.percent && !self.percent.to_f.finite?
@@ -55,6 +55,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   def percentage
     if self.possible.to_f > 0
       self.score.to_f / self.possible.to_f
+    elsif context&.root_account&.feature_enabled?(:account_level_mastery_scales) && outcome_proficiency.present? && outcome_proficiency.points_possible > 0
+      self.score.to_f / outcome_proficiency.points_possible.to_f
     elsif parent_has_mastery?
       # the parent should always have a mastery score, if it doesn't
       # it means something is broken with the outcome and it will need to
@@ -63,6 +65,11 @@ class LearningOutcomeResult < ActiveRecord::Base
       # the get_aggregates method in RollupScoreAggregatorHelper
       self.score.to_f / parent_outcome.mastery_points.to_f
     end
+  end
+
+  def outcome_proficiency
+    ## TODO: As part of OUT-3922, ensure a default is returned here
+    @outcome_proficiency ||= context.resolved_outcome_proficiency
   end
 
   def assignment
@@ -203,7 +210,12 @@ class LearningOutcomeResult < ActiveRecord::Base
   def precise_mastery_percent
     # the outcome's mastery percent is rounded to 2 places. This is normally OK
     # but for scaling it's too imprecise and can lead to inaccurate calculations
-    return unless parent_has_mastery? && parent_outcome.points_possible > 0
-    parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
+    if context&.root_account&.feature_enabled?(:account_level_mastery_scales) && outcome_proficiency.present?
+      return unless outcome_proficiency.points_possible > 0 && outcome_proficiency.mastery_points > 0
+      outcome_proficiency.mastery_points.to_f / outcome_proficiency.points_possible.to_f
+    else
+      return unless parent_has_mastery? && parent_outcome.points_possible > 0
+      parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
+    end
   end
 end

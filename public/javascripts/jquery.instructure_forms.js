@@ -1132,7 +1132,7 @@ $.fn.formErrors = function(data_errors, options) {
 
 // Pops up a small box containing the given message.  The box is connected to the given form element, and will
 // go away when the element is selected.
-$.fn.errorBox = function(message, scroll) {
+$.fn.errorBox = function(message, scroll, override_position) {
   if (this.length) {
     const $obj = this,
       $oldBox = $obj.data('associated_error_box')
@@ -1150,11 +1150,15 @@ $.fn.errorBox = function(message, scroll) {
     }
     $.screenReaderFlashError(message)
 
-    const $box = $template
+    let $box = $template
       .clone(true)
       .attr('id', '')
       .css('zIndex', $obj.zIndex() + 1)
-      .appendTo('body')
+
+    if (override_position) {
+      $box = $box.css('position', override_position)
+    }
+    $box.appendTo('body')
 
     // If our message happens to be a safe string, parse it as such. Otherwise, clean it up. //
     $box.find('.error_text').html(htmlEscape(message))

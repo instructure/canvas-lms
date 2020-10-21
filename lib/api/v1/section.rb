@@ -46,7 +46,7 @@ module Api::V1::Section
     end
 
     if includes.include?('user_count')
-      res['user_count'] = Shackles.activate(:slave) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      res['user_count'] = GuardRail.activate(:secondary) { section.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
 
     res

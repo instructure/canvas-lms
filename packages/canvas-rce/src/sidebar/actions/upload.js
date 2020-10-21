@@ -157,8 +157,10 @@ export function embedUploadResult(results, selectedTabType) {
       ?.mceInstance()
       ?.selection.collapse()
 
+    // when we record audio, notorious thinks it's a video. use the content type we got
+    // from the recoreded file, not the returned media object.
     bridge.embedMedia({
-      id: embedData.id,
+      id: results.id,
       embedded_iframe_url: results.embedded_iframe_url,
       href: results.href || results.url,
       media_id: results.media_id,

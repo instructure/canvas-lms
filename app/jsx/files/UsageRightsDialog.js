@@ -172,9 +172,11 @@ UsageRightsDialog.render = function() {
         <div ref={e => (this.form = e)} className="UsageRightsDialog__Content">
           <div>
             <div className="UsageRightsDialog__paddingFix grid-row">
-              <div className="UsageRightsDialog__previewColumn col-xs-3">
-                <DialogPreview itemsToShow={this.props.itemsToManage} />
-              </div>
+              {!this.props.hidePreview && (
+                <div className="UsageRightsDialog__previewColumn col-xs-3">
+                  <DialogPreview itemsToShow={this.props.itemsToManage} />
+                </div>
+              )}
               <div className="UsageRightsDialog__contentColumn off-xs-1 col-xs-8">
                 {this.renderDifferentRightsMessage()}
                 {this.renderFileName()}
@@ -184,6 +186,8 @@ UsageRightsDialog.render = function() {
                   use_justification={this.use_justification}
                   copyright={this.copyright || ''}
                   cc_value={this.cc_value}
+                  contextType={this.props.contextType}
+                  contextId={this.props.contextId}
                 />
                 {this.renderAccessManagement()}
               </div>
@@ -201,7 +205,7 @@ UsageRightsDialog.render = function() {
             buttonRef={e => (this.saveButton = e)}
             variant="primary"
             type="submit"
-            onClick={this.submit}
+            onClick={() => this.submit(this.props.deferSave)}
           >
             {I18n.t('Save')}
           </Button>

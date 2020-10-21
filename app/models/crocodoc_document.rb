@@ -189,9 +189,9 @@ class CrocodocDocument < ActiveRecord::Base
 
   def self.update_process_states
     bs = Setting.get('crocodoc_status_check_batch_size', '45').to_i
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       CrocodocDocument.where(:process_state => %w(QUEUED PROCESSING)).find_in_batches do |docs|
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           statuses = []
           docs.each_slice(bs) do |sub_docs|
             Canvas.timeout_protection("crocodoc_status") do

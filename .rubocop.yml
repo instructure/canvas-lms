@@ -1,5 +1,6 @@
 require:
   - rubocop-rspec
+  - rubocop-performance
   # this odd relative path is so that rubocop works when run without "bundle
   # exec", such as from most editors/IDEs.
   - ./gems/rubocop-canvas/lib/rubocop_canvas
@@ -26,7 +27,7 @@ Layout/EmptyLinesAroundMethodBody:
   Enabled: false
 Layout/EmptyLinesAroundModuleBody:
   Enabled: false
-Layout/IndentHash:
+Layout/IndentFirstHashElement:
   Enabled: false
 Layout/IndentationConsistency:
   Enabled: false
@@ -93,7 +94,9 @@ Style/DoubleNegation:
   Enabled: false
 Style/TrailingCommaInArguments:
   Enabled: false
-Style/TrailingCommaInLiteral:
+Style/TrailingCommaInArrayLiteral:
+  Enabled: false
+Style/TrailingCommaInHashLiteral:
   Enabled: false
 Style/MethodCallWithoutArgsParentheses:
   Enabled: false
@@ -194,7 +197,7 @@ Lint/UselessAssignment:
   Severity: convention
 Lint/Debugger:
   Severity: error
-Lint/EndAlignment:
+Layout/EndAlignment:
   EnforcedStyleAlignWith: variable
   Severity: convention
 
@@ -212,7 +215,7 @@ Style/RescueModifier:
   Severity: warning
 Layout/MultilineMethodCallIndentation:
   EnforcedStyle: indented
-Layout/IndentArray:
+Layout/IndentFirstArrayElement:
   EnforcedStyle: consistent
 
 # these don't make sense pre-Rails 4
@@ -278,3 +281,7 @@ Specs/EnsureSpecExtension:
   Enabled: true
   Exclude:
     - spec/shared_examples/**/*
+
+# this cops is crashing; https://github.com/rubocop-hq/rubocop/issues/6992
+Layout/IndentFirstParameter:
+  Enabled: false

@@ -65,7 +65,10 @@ class ViewOptionsMenu extends React.Component {
     }).isRequired,
     onSelectShowStatusesModal: func.isRequired,
     showUnpublishedAssignments: bool.isRequired,
-    onSelectShowUnpublishedAssignments: func.isRequired
+    onSelectShowUnpublishedAssignments: func.isRequired,
+    onSelectViewUngradedAsZero: func.isRequired,
+    viewUngradedAsZero: bool.isRequired,
+    allowViewUngradedAsZero: bool.isRequired
   }
 
   onFilterSelect = (_event, filters) => {
@@ -214,6 +217,17 @@ class ViewOptionsMenu extends React.Component {
         <Menu.Item ref={this.bindStausMenuItem} onSelect={this.props.onSelectShowStatusesModal}>
           {I18n.t('Statuses…')}
         </Menu.Item>
+
+        {this.props.allowViewUngradedAsZero && (
+          <Menu.Group label={I18n.t('View Options')}>
+            <Menu.Item
+              onSelect={this.props.onSelectViewUngradedAsZero}
+              selected={this.props.viewUngradedAsZero}
+            >
+              {I18n.t('View Ungraded as 0')}
+            </Menu.Item>
+          </Menu.Group>
+        )}
 
         <Menu.Separator />
 

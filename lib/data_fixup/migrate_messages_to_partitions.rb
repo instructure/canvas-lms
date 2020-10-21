@@ -31,7 +31,7 @@ module DataFixup::MigrateMessagesToPartitions
     partman = CanvasPartman::PartitionManager.create(Message)
 
     if partman.migrate_data_to_partitions(timeout: 5.minutes, batch_size: batch_size)
-      Shackles.activate(:deploy) { Message.connection.update("TRUNCATE ONLY #{Message.quoted_table_name}") }
+      GuardRail.activate(:deploy) { Message.connection.update("TRUNCATE ONLY #{Message.quoted_table_name}") }
     else
       self.requeue(batch_size: batch_size, last_run_date_threshold: min_date_threshold) # timed out
     end

@@ -637,7 +637,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def accept(force = false)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       return false unless force || invited?
       if update_attribute(:workflow_state, 'active')
         if self.type == 'StudentEnrollment'
@@ -721,7 +721,7 @@ class Enrollment < ActiveRecord::Base
   def create_enrollment_state
     self.enrollment_state =
       self.shard.activate do
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           EnrollmentState.unique_constraint_retry do
             EnrollmentState.where(:enrollment_id => self).first_or_create
           end

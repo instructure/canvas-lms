@@ -24,8 +24,6 @@ const translationShape = shape({
   COMPUTER_PANEL_TITLE: string,
   DRAG_DROP_CLICK_TO_BROWSE: string,
   DRAG_FILE_TEXT: string,
-  EMBED_PANEL_TITLE: string,
-  EMBED_VIDEO_CODE_TEXT: string,
   INVALID_FILE_TEXT: string,
   LOADING_MEDIA: string,
   RECORD_PANEL_TITLE: string,

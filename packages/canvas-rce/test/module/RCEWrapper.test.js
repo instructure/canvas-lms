@@ -176,7 +176,7 @@ describe('RCEWrapper', () => {
       element = createdMountedElement().getMountedInstance()
       editor.hidden = true
       document.getElementById(textareaId).value = 'Some Input HTML'
-      element.toggle()
+      element.toggleView()
       assert.equal(element.getCode(), 'Some Input HTML')
     })
 
@@ -198,8 +198,8 @@ describe('RCEWrapper', () => {
       sinon.assert.called(handleUnmount)
     })
 
-    it('doesnt reset the doc for other commands', () => {
-      element.toggle()
+    it("doesn't reset the doc for other commands", () => {
+      element.toggleView()
       assert(!editorCommandSpy.calledWith('mceNewDocument'))
     })
 

@@ -281,4 +281,15 @@ Rails.configuration.after_initialize do
     # write-heavy updates so that they don't all hit at the same time and run immediately back to back.
     with_each_shard_by_database(AssetUserAccessLog, :compact, jitter: 15.minutes)
   end
+
+  if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
+    Delayed::Periodic.cron 'HaStore.validate_consul_event', '5 * * * *' do
+      DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
+          {
+            run_current_region_asynchronously: true,
+            singleton: 'HaStore.validate_consul_event'
+          }
+        )
+    end
+  end
 end

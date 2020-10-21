@@ -62,7 +62,7 @@
     </div>
   </td>
 {{/if}}
-{{#if CAN.MANAGE}}
+{{#if CAN.OPEN_MANAGE_OPTIONS}}
   <td role="gridcell" class="master-content-lock-cell"></td>
   {{#if CAN.PUBLISH}}
     <td role="gridcell" class="publish-cell"></td>
@@ -74,69 +74,71 @@
         <span class="screenreader-only">{{#t 'menu.settings'}}Settings{{/t}}</span>
       </a>
       <ul class="al-options">
-        {{#unless cannot_edit_by_master_course}}
-          {{#if CAN.UPDATE}}
-            <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+          {{#if CAN.MANAGE}}
+              {{#unless cannot_edit_by_master_course}}
+                  {{#if CAN.UPDATE}}
+                    <li><a href="#" class="icon-edit edit-menu-item" title="{{#t}}Edit{{/t}}">{{#t}}Edit{{/t}}</a></li>
+                  {{/if}}
+              {{/unless}}
+              {{#unless cannot_delete_by_master_course}}
+                  {{#if CAN.DELETE}}
+                    <li>
+                      <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
+                         title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>
+                         {{#t}}Delete{{/t}}
+                      </a>
+                    </li>
+                  {{/if}}
+              {{/unless}}
+              {{#if front_page}}
+                  {{#if CAN.UPDATE}}
+                    <li>
+                      <a href="#" class="unset-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+                         title="{{#t}}Remove as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                          <i class="icon-remove-bookmark" aria-hidden="true">
+                           {{#t}}Remove as Front Page{{/t}}
+                          </i>
+                      </a>
+                    </li>
+                  {{/if}}
+              {{/if}}
+              {{#unless front_page}}
+                  {{#if CAN.UPDATE}}
+                    <li>
+                      <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
+                         title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
+                          <i class="icon-bookmark" aria-hidden="true">
+                            {{#t}}Use as Front Page{{/t}}
+                          </i>
+                      </a>
+                    </li>
+                  {{/if}}
+              {{/unless}}
+              {{#if CAN.DUPLICATE}}
+                  <li>
+                    <a href="#" class="icon-copy-course duplicate-wiki-page" title="{{#t}}Duplicate{{/t}}">
+                      {{#t}}Duplicate{{/t}}
+                    </a>
+                  </li>
+              {{/if}}
           {{/if}}
-        {{/unless}}
-        {{#unless cannot_delete_by_master_course}}
-          {{#if CAN.DELETE}}
-            <li>
-              <a href="#" class="icon-trash delete-menu-item{{#unless deletable}} disabled{{/unless}}"
-                 title="{{#t}}Delete {{title}}{{/t}}" {{#unless deletable}}aria-disabled="true"{{/unless}}>
-                 {{#t}}Delete{{/t}}
-              </a>
-            </li>
+          {{#if DIRECT_SHARE_ENABLED}}
+              <li>
+                <a
+                  href="#"
+                  class="send-wiki-page-to icon-user"
+                  aria-label="{{#t}}Send page to another user{{/t}}"
+                >{{#t}}Send to...{{/t}}</a>
+              </li>
+              <li>
+                <a
+                  href="#"
+                  class="copy-wiki-page-to icon-duplicate"
+                  aria-label="{{#t}}Copy page to another course{{/t}}"
+                >{{#t}}Copy to...{{/t}}</a>
+              </li>
           {{/if}}
-        {{/unless}}
-        {{#if front_page}}
-          {{#if CAN.UPDATE}}
-            <li>
-              <a href="#" class="unset-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
-                 title="{{#t}}Remove as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-                  <i class="icon-remove-bookmark" aria-hidden="true">
-                   {{#t}}Remove as Front Page{{/t}}
-                  </i>
-              </a>
-            </li>
-          {{/if}}
-        {{/if}}
-        {{#unless front_page}}
-          {{#if CAN.UPDATE}}
-            <li>
-              <a href="#" class="use-as-front-page-menu-item{{#unless published}} disabled{{/unless}}"
-                 title="{{#t}}Use as Front Page{{/t}}" {{#unless published}}aria-disabled="true"{{/unless}}>
-                  <i class="icon-bookmark" aria-hidden="true">
-                    {{#t}}Use as Front Page{{/t}}
-                  </i>
-              </a>
-            </li>
-          {{/if}}
-        {{/unless}}
-        {{#if CAN.DUPLICATE}}
-          <li>
-            <a href="#" class="icon-copy-course duplicate-wiki-page" title="{{#t}}Duplicate{{/t}}">
-              {{#t}}Duplicate{{/t}}
-            </a>
-          </li>
-        {{/if}}
-        {{#if DIRECT_SHARE_ENABLED}}
-          <li>
-            <a
-              href="#"
-              class="send-wiki-page-to icon-user"
-              aria-label="{{#t}}Send page to another user{{/t}}"
-            >{{#t}}Send to...{{/t}}</a>
-          </li>
-          <li>
-            <a
-              href="#"
-              class="copy-wiki-page-to icon-duplicate"
-              aria-label="{{#t}}Copy page to another course{{/t}}"
-            >{{#t}}Copy to...{{/t}}</a>
-          </li>
-        {{/if}}
-        {{>ExternalTools/external_tools_menu wiki_page_menu_tools}}
+          {{#if CAN.MANAGE}}{{>ExternalTools/external_tools_menu wiki_page_menu_tools}}{{/if}}
       </ul>
     </div>
   </td>

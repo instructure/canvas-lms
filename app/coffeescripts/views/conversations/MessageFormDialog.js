@@ -519,6 +519,7 @@ export default class MessageFormDialog extends DialogBaseView {
       $attachment.hide()
       return
     }
+    this.focusAddAttachment()
     $attachment.slideDown('fast')
     const $icon = $attachment.find('.attachment-icon i')
     $icon.empty()
@@ -526,6 +527,15 @@ export default class MessageFormDialog extends DialogBaseView {
     const {name} = file
     $attachment.find('.attachment-name').text(name)
     this.setAttachmentClip($attachment)
+
+    // have the alert happen later so the focus change doesn't interrupt it
+    const attachedFiles = this.$attachmentsPane.find('input:not([value=])')
+    setTimeout(() => {
+      $.screenReaderFlashMessageExclusive(
+        I18n.t('File %{count} attached: %{name}', {count: attachedFiles.length, name})
+      )
+    }, 1000)
+
     const remove = $attachment.find('.remove_link')
     remove.attr('aria-label', `${remove.attr('title')}: ${name}`)
     const extension = name

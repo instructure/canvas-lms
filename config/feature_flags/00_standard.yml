@@ -252,6 +252,8 @@ conditional_release:
     results.
   applies_to: Course
   root_opt_in: true
+  custom_transition_proc: conditional_release_transition_hook
+  after_state_change_proc: conditional_release_after_change_hook
 wrap_calendar_event_titles:
   state: allowed
   display_name: Wrap event titles in Calendar month view

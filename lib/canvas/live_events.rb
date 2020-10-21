@@ -342,6 +342,7 @@ module Canvas::LiveEvents
       lti_assignment_id: submission.assignment.lti_context_id,
       group_id: submission.group_id,
       posted_at: submission.posted_at,
+      workflow_state: submission.workflow_state,
     }
     actl = submission.assignment.assignment_configuration_tool_lookups.take
     if actl
@@ -560,7 +561,7 @@ module Canvas::LiveEvents
       grader_id = submission.global_grader_id
     end
 
-    sis_pseudonym = Shackles.activate(:slave) do
+    sis_pseudonym = GuardRail.activate(:secondary) do
       SisPseudonym.for(submission.user, submission.assignment.context, type: :trusted, require_sis: false)
     end
 

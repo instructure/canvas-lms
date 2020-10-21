@@ -207,6 +207,23 @@ describe MediaObject do
       }
       @media_type = "video"
       @assets = []
+
+      course_factory
+      @media_object = MediaObject.create!(
+        context: @course,
+        title: "uploaded_video.mp4",
+        media_id: "m-somejunkhere",
+        media_type: "video"
+      )
+    end
+
+    before :each do
+      mock_kaltura = double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
+      allow(mock_kaltura).to receive(:media_sources).and_return(
+        [{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+          :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}]
+      )
     end
 
     before :each do
@@ -223,7 +240,7 @@ describe MediaObject do
     end
 
     it "keeps the current title if already set" do
-        mo = media_object
+        mo = @media_object
         mo.title = "Canvas Title"
         mo.save!
 
@@ -232,7 +249,7 @@ describe MediaObject do
     end
 
     it "uses the kaltura title if no current title" do
-        mo = media_object
+        mo = @media_object
         mo.title = ""
         mo.save!
 
@@ -259,6 +276,22 @@ describe MediaObject do
       mo.process_retrieved_details(@mock_entry, @media_type, @assets)
       att = Attachment.where(:media_entry_id => mo[:media_id])
       expect(att).to be_empty
+    end
+
+    it "creates the corresponding attachment if the feature is enabled" do
+      @course.root_account.enable_feature!(:autocreate_attachment_from_media_object)
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att = Attachment.find(mo[:attachment_id])
+      expect(att).to be_hidden
+      expect(att.folder.name).to eq "Uploaded Media"
+      expect(att[:media_entry_id]).to eql mo[:media_id]
+    end
+
+    it "doesn't create the corresponding attachment if the feature is not enabled" do
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(mo.attachment_id).to be_nil
     end
   end
 

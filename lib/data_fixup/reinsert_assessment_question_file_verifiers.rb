@@ -42,7 +42,7 @@ module DataFixup::ReinsertAssessmentQuestionFileVerifiers
     quiz_updates = {}
     qq_updates = {}
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       Quizzes::Quiz.find_ids_in_ranges do |min_id, max_id|
         Quizzes::Quiz.where(:id => min_id..max_id).
           where("updated_at > ? AND quiz_data LIKE ?", date, "%assessment_questions%").pluck(Arel.sql("id, quiz_data as qd")).each do |id, data|

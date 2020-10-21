@@ -129,8 +129,8 @@ export default class GroupCategory extends Backbone.Model
   present: ->
     data = Backbone.Model::toJSON.call(this)
     data.progress = @progressModel.toJSON()
-    data.randomlyAssignStudentsInProgress = data.progress.workflow_state is "queued" or
-                                            data.progress.workflow_state is "running"
+    data.groupCreationInProgress = data.progress.workflow_state is "queued" or
+                                   data.progress.workflow_state is "running"
     data
 
   toJSON: ->

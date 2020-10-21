@@ -258,8 +258,8 @@ module Canvas::Redis
       if UNSUPPORTED_METHODS.include?(command.first.to_s)
         raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is not supported by Twemproxy, and so shouldn't be used in Canvas")
       end
-      if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && Shackles.environment != :deploy
-        raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running Shackles.activate!(:deploy)")
+      if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && GuardRail.environment != :deploy
+        raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running GuardRail.activate!(:deploy)")
       end
       super
     end

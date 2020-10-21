@@ -142,10 +142,15 @@ export default class DataLoader {
     await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
 
     /*
-     * Currently, custom columns data has the lowest priority for initial
-     * data loading, so it waits until all students and submissions are
-     * finished loading.
+     * Load custom column data if:
+     *   Custom columns are not done loading (we'll ask for the data now in case custom columns exist), OR
+     *   Custom columns are done loading, and at least one of them is being shown in the Gradebook.
      */
-    dataLoader.customColumnsDataLoader.loadCustomColumnsData()
+    if (
+      !gradebook.contentLoadStates.customColumnsLoaded ||
+      gradebook.listVisibleCustomColumns().length
+    ) {
+      dataLoader.customColumnsDataLoader.loadCustomColumnsData()
+    }
   }
 }

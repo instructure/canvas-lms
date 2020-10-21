@@ -259,21 +259,30 @@ class AppointmentGroup < ActiveRecord::Base
     can :read_appointment_participants
   end
 
+  def broadcast_data
+    data = {}
+    data[:root_account_id] = context.root_account_id if context.root_account_id
+    data[:course_id] = context.id if context.is_a?(Course)
+    data
+  end
+
   has_a_broadcast_policy
 
   set_broadcast_policy do
     dispatch :appointment_group_published
     to       { possible_users }
     whenever { contexts.any?(&:available?) && active? && saved_change_to_workflow_state? }
+    data     { broadcast_data}
 
     dispatch :appointment_group_updated
     to       { possible_users }
     whenever { contexts.any?(&:available?) && active? && new_appointments && !saved_change_to_workflow_state? }
+    data     { broadcast_data}
 
     dispatch :appointment_group_deleted
     to       { possible_users }
     whenever { contexts.any?(&:available?) && changed_state(:deleted, :active) }
-    data     { {:cancel_reason => @cancel_reason} }
+    data     { broadcast_data.merge({:cancel_reason => @cancel_reason}) }
   end
 
   def possible_users

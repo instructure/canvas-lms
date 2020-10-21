@@ -226,5 +226,19 @@ describe('Editor/Sidebar bridge', () => {
         })
       })
     })
+
+    describe('get uploadMediaTranslations', () => {
+      it('requires mediaTranslations if it needs to', () => {
+        Bridge._uploadMediaTranslations = null
+        const umt = Bridge.uploadMediaTranslations
+        expect(umt).toBeDefined()
+      })
+
+      it('uses the cached value if available', () => {
+        Bridge._uploadMediaTranslations = {foo: 1}
+        const umt = Bridge.uploadMediaTranslations
+        expect(umt).toEqual({foo: 1})
+      })
+    })
   })
 })

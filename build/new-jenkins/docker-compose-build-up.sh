@@ -10,6 +10,8 @@ docker-compose build
 
 seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} up -d"
 
-for service in cassandra:9160 postgres:5432 dynamodb:8000 redis:6379; do
+for service in cassandra:9160  dynamodb:8000 redis:6379; do
   seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T canvas ./build/new-jenkins/wait-for-it ${service}"
 done
+
+seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T postgres /bin/bash -c /wait-for-it"

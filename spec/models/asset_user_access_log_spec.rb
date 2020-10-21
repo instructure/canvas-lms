@@ -125,7 +125,7 @@ describe AssetUserAccessLog do
         expect(AssetUserAccessLog.log_model(24.hours.ago).count).to eq(0)
         # we should only have one setting with an offset in it, the other should have been zeroed
         # out during the truncation
-        expect(AssetUserAccessLog.plugin_setting.settings[:max_log_ids].select{|id| id > 0}.size).to eq(1)
+        expect(AssetUserAccessLog.metadatum_payload[:max_log_ids].select{|id| id > 0}.size).to eq(1)
       end
     end
 
