@@ -81,6 +81,13 @@ describe HistoryController, type: :request do
                         format: 'json', user_id: 'self')
         expect(json[0]['context_name']).to eq 'Terribad'
       end
+
+      it "deals with a missing asset_user_access" do
+        AssetUserAccess.where(asset_code: "pages:#{@group.asset_string}").delete_all
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                        format: 'json', user_id: 'self')
+        expect(json.map { |item| item['asset_name'] }).to eq(['Course People', 'Assign 1'])
+      end
     end
 
     context 'permissions' do
