@@ -43,23 +43,6 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
-  try {
-    build(job: jobName, parameters: parameters, propagate: propagate)
-  }
-  catch(FlowInterruptedException ex) {
-    // if its this type, then that means its a build failure.
-    // other reasons can be user cancelling or jenkins aborting, etc...
-    def failure = ex.causes.find { it instanceof DownstreamFailureCause }
-    if (failure != null) {
-      def downstream = failure.getDownstreamBuild()
-      def url = downstream.getAbsoluteUrl() + urlExtra
-      failureReport.addFailure(jobName, url)
-    }
-    throw ex
-  }
-}
-
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
 def ignoreBuildNeverStartedError(block) {
@@ -578,44 +561,40 @@ pipeline {
                 })
 
                 echo 'adding Vendored Gems'
-                timedStage('Vendored Gems', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
+                buildStage.makeFromJob('Vendored Gems', '/Canvas/test-suites/vendored-gems', stages, buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                  ], true, "")
-                })
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                  ]
+                )
 
                 echo 'adding Javascript (Jest)'
-                timedStage('Javascript (Jest)', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'TEST_SUITE', value: "jest"),
-                  ], true, "testReport")
-                })
+                  ], true, "testReport"
+                )
+
 
                 echo 'adding Javascript (Karma)'
-                timedStage('Javascript (Karma)', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'TEST_SUITE', value: "karma"),
-                  ], true, "testReport")
-                })
+                  ], true, "testReport"
+                )
 
                 echo 'adding Contract Tests'
-                timedStage('Contract Tests', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
+                buildStage.makeFromJob('Contract Tests', '/Canvas/test-suites/contract-tests', stages, buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                  ], true, "")
-                })
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                  ]
+                )
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
-                  timedStage('CDC Schema Check', stages, {
-                    build job: '../Canvas/cdc-event-transformer-master', parameters: [
+                  buildStage.makeFromJob('CDC Schema Check', '../Canvas/cdc-event-transformer-master', stages, buildParameters + [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
                     ]
-                  })
+                  )
                 }
                 else {
                   echo 'no migrations added, skipping CDC Schema check'
@@ -629,22 +608,17 @@ pipeline {
                   )
                 ) {
                   echo 'adding Flakey Spec Catcher'
-                  timedStage('Flakey Spec Catcher', stages, {
-                    def propagate = configuration.fscPropagate()
-                    echo "fsc propagation: $propagate"
-                    wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
+                  buildStage.makeFromJob('Flakey Spec Catcher', '/Canvas/test-suites/flakey-spec-catcher', stages, buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], propagate, "")
-                  })
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                    ], configuration.fscPropagate(), ""
+                  )
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
                   echo 'adding Local Docker Dev Build'
-                  timedStage('Local Docker Dev Build', stages, {
-                    wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
-                  })
+                  buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
                 }
 
                 if(configuration.isChangeMerged()) {
