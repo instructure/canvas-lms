@@ -34,7 +34,7 @@
   <h2><%= @attachment.display_name %></h2>
   <div>
     <span style="font-size: 1.2em;">
-      <%= link_to "Download #{@attachment.display_name}", download_url %>
+      <%= link_to "Download #{@attachment.display_name}", download_url, download: "true" %>
     </span> (<%= @attachment.readable_size %>)
   </div>
   <% if @attachment.content_type == "application/x-shockwave-flash" %>
