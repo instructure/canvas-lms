@@ -59,7 +59,7 @@ describe('sources/api', () => {
     })
 
     it('creates a collection with a bookmark derived from props', () => {
-      assert.equal(
+      assert.strictEqual(
         collection.bookmark,
         `${window.location.protocol}//example.host/api/wikiPages?contextType=group&contextId=123`
       )
@@ -68,47 +68,94 @@ describe('sources/api', () => {
     it('bookmark omits host if not in props', () => {
       const noHostProps = {...props, host: undefined}
       collection = apiSource.initializeCollection(endpoint, noHostProps)
-      assert.equal(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
+      assert.strictEqual(collection.bookmark, '/api/wikiPages?contextType=group&contextId=123')
     })
 
     it('creates a collection that is not initially loading', () => {
-      assert.equal(collection.loading, false)
+      assert.strictEqual(collection.loading, false)
     })
   })
 
   describe('initializeImages', () => {
     it('sets hasMore to true', () => {
-      assert.equal(apiSource.initializeImages(props)[props.contextType].hasMore, true)
+      assert.strictEqual(apiSource.initializeImages(props)[props.contextType].hasMore, true)
     })
   })
 
-  describe('URI construction', () => {
+  describe('URI construction (baseUri)', () => {
     it('uses a protocol relative url when no window', () => {
       const uri = apiSource.baseUri('files', 'example.instructure.com', {})
-      assert.equal(uri, '//example.instructure.com/api/files')
+      assert.strictEqual(uri, '//example.instructure.com/api/files')
     })
 
     it('uses a path for no-host url construction', () => {
       const uri = apiSource.baseUri('files')
-      assert.equal(uri, '/api/files')
+      assert.strictEqual(uri, '/api/files')
     })
 
     it('gets protocol from window if available', () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.baseUri('files', 'example.instructure.com', fakeWindow)
-      assert.equal(uri, 'https://example.instructure.com/api/files')
+      assert.strictEqual(uri, 'https://example.instructure.com/api/files')
     })
 
     it('never applies protocol to path', () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.baseUri('files', null, fakeWindow)
-      assert.equal(uri, '/api/files')
+      assert.strictEqual(uri, '/api/files')
     })
 
     it("will replace protocol if there's a mismatch from http to https", () => {
       const fakeWindow = {location: {protocol: 'https:'}}
       const uri = apiSource.normalizeUriProtocol('http://something.com', fakeWindow)
-      assert.equal(uri, 'https://something.com')
+      assert.strictEqual(uri, 'https://something.com')
+    })
+  })
+
+  describe('more URI construction (uriFor)', () => {
+    let props = {}
+    beforeEach(() => {
+      props = {
+        host: undefined,
+        contextType: 'course',
+        contextId: '17',
+        sort: 'alphabetical',
+        order: 'asc',
+        searchString: 'hello world'
+      }
+    })
+
+    it('gets documents', () => {
+      const uri = apiSource.uriFor('documents', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&exclude_content_types=image,video,audio&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    it('gets images', () => {
+      const uri = apiSource.uriFor('images', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&content_types=image&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    // this endpoint isn't actually used yet, but could be if media_objects all had associated Attachments
+    it('gets media', () => {
+      const uri = apiSource.uriFor('media', props)
+      assert.strictEqual(
+        uri,
+        '/api/documents?contextType=course&contextId=17&content_types=video,audio&sort=name&order=asc&search_term=hello%20world'
+      )
+    })
+
+    it('gets media', () => {
+      const uri = apiSource.uriFor('media_objects', props)
+      assert.strictEqual(
+        uri,
+        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc'
+      )
     })
   })
 
@@ -124,7 +171,7 @@ describe('sources/api', () => {
       apiSource
         .fetchPage(uri)
         .then(() => {
-          assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+          assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
           done()
         })
         .catch(done)
@@ -139,7 +186,7 @@ describe('sources/api', () => {
           throw new Error('No error raised')
         })
         .catch(error => {
-          assert.equal(error.message, 'Forbidden')
+          assert.strictEqual(error.message, 'Forbidden')
           done()
         })
         .catch(done)
@@ -186,8 +233,8 @@ describe('sources/api', () => {
       }, fakePageBody)
 
       return apiSource.fetchPage(uri, 'theJWT').then(page => {
-        assert.equal(page.bookmark, 'newBookmark')
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(page.bookmark, 'newBookmark')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
       })
     })
   })
@@ -213,7 +260,7 @@ describe('sources/api', () => {
       const uri = 'files-uri'
       return apiSource.fetchFiles(uri).then(body => {
         sinon.assert.calledWith(apiSource.fetchPage, uri)
-        assert.equal(body.bookmark, bookmark)
+        assert.strictEqual(body.bookmark, bookmark)
       })
     })
 
@@ -221,7 +268,7 @@ describe('sources/api', () => {
       return apiSource.fetchFiles('foo').then(body => {
         files.forEach((file, i) => {
           sinon.assert.calledWith(fileUrl.downloadToWrap, file.url)
-          assert.equal(body.files[i].href, wrapUrl)
+          assert.strictEqual(body.files[i].href, wrapUrl)
         })
       })
     })
@@ -262,7 +309,7 @@ describe('sources/api', () => {
       fetchMock.mock(uri, '{}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
@@ -276,7 +323,7 @@ describe('sources/api', () => {
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(response => {
-        assert.equal(response.upload, 'done')
+        assert.strictEqual(response.upload, 'done')
       })
     })
 
@@ -290,7 +337,7 @@ describe('sources/api', () => {
       }, '{"upload": "done"}')
 
       return apiSource.preflightUpload(fileProps, apiProps).then(() => {
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
       })
     })
 
@@ -365,7 +412,7 @@ describe('sources/api', () => {
       it('includes credentials in non-S3 upload', () => {
         preflightProps.upload_params.success_url = undefined
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.equal(fetchMock.lastOptions(uploadUrl).credentials, 'include')
+          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, 'include')
         })
       })
 
@@ -375,7 +422,7 @@ describe('sources/api', () => {
         const s3File = {url: 's3-file-url'}
         fetchMock.mock(preflightProps.upload_params.success_url, s3File)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(() => {
-          assert.equal(fetchMock.lastOptions(uploadUrl).credentials, undefined)
+          assert.strictEqual(fetchMock.lastOptions(uploadUrl).credentials, undefined)
         })
       })
 
@@ -397,8 +444,8 @@ describe('sources/api', () => {
         fetchMock.mock(preflightProps.upload_url, response)
         return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
           sinon.assert.calledWith(apiSource.getFile, fileId)
-          assert.equal(response.uuid, 'xyzzy')
-          assert.equal(response.url, 'file-url')
+          assert.strictEqual(response.uuid, 'xyzzy')
+          assert.strictEqual(response.url, 'file-url')
         })
       })
     })
@@ -456,7 +503,7 @@ describe('sources/api', () => {
 
     it('includes jwt in Authorization header', () => {
       return apiSource.getSession().then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
   })
@@ -472,7 +519,7 @@ describe('sources/api', () => {
 
     it('includes jwt in Authorization header', () => {
       return apiSource.setUsageRights(fileId, usageRights).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
@@ -497,7 +544,7 @@ describe('sources/api', () => {
       fetchMock.mock(uri, {url})
 
       return apiSource.getFile(id, props).then(() => {
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
       })
     })
 
@@ -514,7 +561,7 @@ describe('sources/api', () => {
       )
 
       return apiSource.getFile(id, props).then(response => {
-        assert.equal(response.upload, 'done')
+        assert.strictEqual(response.upload, 'done')
       })
     })
 
@@ -531,7 +578,7 @@ describe('sources/api', () => {
       )
 
       return apiSource.getFile(id, props).then(() => {
-        assert.equal(apiSource.jwt, 'freshJWT')
+        assert.strictEqual(apiSource.jwt, 'freshJWT')
       })
     })
 
@@ -542,7 +589,7 @@ describe('sources/api', () => {
       sinon.stub(fileUrl, 'downloadToWrap').returns(wrapUrl)
       return apiSource.getFile(id).then(file => {
         sinon.assert.calledWith(fileUrl.downloadToWrap, url)
-        assert.equal(file.href, wrapUrl)
+        assert.strictEqual(file.href, wrapUrl)
         fileUrl.downloadToWrap.restore()
         fetchMock.restore()
       })
@@ -554,7 +601,7 @@ describe('sources/api', () => {
       fetchMock.mock('*', {url, name})
       sinon.stub(fileUrl, 'downloadToWrap')
       return apiSource.getFile(id).then(file => {
-        assert.equal(file.display_name, name)
+        assert.strictEqual(file.display_name, name)
         fileUrl.downloadToWrap.restore()
         fetchMock.restore()
       })
@@ -582,7 +629,7 @@ describe('sources/api', () => {
           {},
           {media_object_id: 'm-id', title: 'new title'}
         )
-        assert.equal(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
+        assert.strictEqual(fetchMock.lastOptions(uri).headers.Authorization, 'Bearer theJWT')
         assert.deepEqual(response, {media_id: 'm-id', title: 'new title'})
       })
     })

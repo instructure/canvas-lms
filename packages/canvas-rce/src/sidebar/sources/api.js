@@ -247,8 +247,7 @@ class RceApiSource {
               reject(e)
             })
         })
-        .catch(e => {
-          console.error('reading a media track file failed', e)
+        .catch(_e => {
           this.alertFunc({
             text: formatMessage('Reading a media track file failed. Aborting.'),
             variant: 'error'
@@ -418,7 +417,7 @@ class RceApiSource {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, {headers})
       .then(response => {
-        if (response.status == 401) {
+        if (response.status === 401) {
           // retry once with fresh token
           return this.buildRetryHeaders(headers).then(newHeaders => {
             return fetch(uri, {headers: newHeaders})
@@ -454,7 +453,7 @@ class RceApiSource {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, fetchOptions)
       .then(response => {
-        if (response.status == 401) {
+        if (response.status === 401) {
           // retry once with fresh token
           return this.buildRetryHeaders(fetchOptions.headers).then(newHeaders => {
             const newOptions = {...fetchOptions, headers: newHeaders}
@@ -531,13 +530,21 @@ class RceApiSource {
     let extra = ''
     switch (endpoint) {
       case 'images':
-        extra = `&content_types=image${getSortParams(props.sort, props.order)}`
+        extra = `&content_types=image${getSortParams(props.sort, props.order)}${getSearchParam(
+          props.searchString
+        )}`
         break
       case 'media': // when requesting media files via the documents endpoint
-        extra = `&content_types=video,audio${getSortParams(props.sort, props.order)}`
+        extra = `&content_types=video,audio${getSortParams(
+          props.sort,
+          props.order
+        )}${getSearchParam(props.searchString)}`
         break
       case 'documents':
-        extra = `&exclude_content_types=image,video,audio${getSortParams(props.sort, props.order)}`
+        extra = `&exclude_content_types=image,video,audio${getSortParams(
+          props.sort,
+          props.order
+        )}${getSearchParam(props.searchString)}`
         break
       case 'media_objects': // when requesting media objects (this is the currently used branch)
         extra = getSortParams(props.sort === 'alphabetical' ? 'title' : 'date', props.order)
@@ -558,6 +565,10 @@ function getSortParams(sort, order) {
     sortBy = 'name'
   }
   return `&sort=${sortBy}&order=${order}`
+}
+
+function getSearchParam(searchString) {
+  return searchString?.length >= 3 ? `&search_term=${encodeURIComponent(searchString)}` : ''
 }
 
 export default RceApiSource

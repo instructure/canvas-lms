@@ -20,6 +20,7 @@ import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/documents'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}
+const searchString = 'hello'
 
 describe('Documents actions', () => {
   describe('fetchDocuments', () => {
@@ -38,7 +39,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchInitialDocs(sortBy)(dispatchSpy, getState)
+      actions.fetchInitialDocs(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('fetches subsequent page if necessary', () => {
@@ -56,7 +57,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('skips the fetch if currently loading', () => {
@@ -74,7 +75,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy, searchString)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
     it('always fetches initial page', () => {
@@ -92,7 +93,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchInitialDocs(sortBy)(dispatchSpy, getState)
+      actions.fetchInitialDocs(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('does not fetch if requested but no more to load', () => {
@@ -111,7 +112,7 @@ describe('Documents actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextDocs(sortBy)(dispatchSpy, getState)
+      actions.fetchNextDocs(sortBy, searchString)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
   })

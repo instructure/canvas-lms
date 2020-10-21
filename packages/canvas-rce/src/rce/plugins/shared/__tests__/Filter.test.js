@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 
 import Filter, {useFilterSettings} from '../Filter'
 
@@ -31,7 +31,8 @@ describe('RCE Plugins > Filter', () => {
     default_filter_settings = {
       contentType: 'course_files',
       contentSubtype: 'documents',
-      sortValue: 'date_added'
+      sortValue: 'date_added',
+      searchString: ''
     }
   })
 
@@ -294,6 +295,57 @@ describe('RCE Plugins > Filter', () => {
       selectContentSubtype('Media')
       selectSortBy('Alphabetical')
       expect(currentFilterSettings.contentSubtype).toEqual('media')
+    })
+  })
+
+  describe('"Search" field', () => {
+    it('is visible when the contentSubtype is documents', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is visible when the contentSubtype is images', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'images'
+      })
+      expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is not visible when the contentSubtype is media', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'media'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBe(null)
+    })
+
+    it('is not visible when the contentType is links', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'links'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBe(null)
+    })
+
+    it('updates filter ssettings when the search string is > 3 chars long', async () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(currentFilterSettings.searchString).toBe('')
+      fireEvent.change(searchInput, {target: {value: 'abc'}})
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('abc')
+      })
     })
   })
 })

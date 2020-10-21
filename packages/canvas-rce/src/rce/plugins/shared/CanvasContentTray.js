@@ -98,84 +98,96 @@ const FILTER_SETTINGS_BY_PLUGIN = {
     contentType: 'user_files',
     contentSubtype: 'documents',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   course_documents: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'documents',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   group_documents: {
     contextType: 'group',
     contentType: 'group_files',
     contentSubtype: 'documents',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   user_images: {
     contextType: 'user',
     contentType: 'user_files',
     contentSubtype: 'images',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   course_images: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'images',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   group_images: {
     contextType: 'group',
     contentType: 'group_files',
     contentSubtype: 'images',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   user_media: {
     contextType: 'user',
     contentType: 'user_files',
     contentSubtype: 'media',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   course_media: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'media',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   group_media: {
     contextType: 'group',
     contentType: 'group_files',
     contentSubtype: 'media',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   course_links: {
     contextType: 'course',
     contentType: 'links',
     contentSubtype: 'all',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   group_links: {
     contextType: 'group',
     contentType: 'links',
     contentSubtype: 'all',
     sortValue: 'date_added',
-    sortDir: 'desc'
+    sortDir: 'desc',
+    searchString: ''
   },
   all: {
     contextType: 'course',
     contentType: 'course_files',
     contentSubtype: 'all',
     sortValue: 'alphabetical',
-    sortDir: 'asc'
+    sortDir: 'asc',
+    searchString: ''
   }
 }
 
@@ -351,6 +363,7 @@ export default function CanvasContentTray(props) {
                     contentType={filterSettings.contentType}
                     contentSubtype={filterSettings.contentSubtype}
                     sortBy={{sort: filterSettings.sortValue, order: filterSettings.sortDir}}
+                    searchString={filterSettings.searchString}
                     {...contentProps}
                   />
                 </ErrorBoundary>

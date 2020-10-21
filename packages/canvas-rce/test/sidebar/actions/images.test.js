@@ -21,6 +21,7 @@ import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/images'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}
+const searchString = 'hello'
 
 describe('Image actions', () => {
   describe('createAddImage', () => {
@@ -76,7 +77,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchInitialImages(sortBy)(dispatchSpy, getState)
+      actions.fetchInitialImages(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
@@ -95,7 +96,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
@@ -114,7 +115,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
 
@@ -133,7 +134,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
 
@@ -153,7 +154,7 @@ describe('Image actions', () => {
           contextType: 'user'
         }
       }
-      actions.fetchNextImages(sortBy)(dispatchSpy, getState)
+      actions.fetchNextImages(sortBy, searchString)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
   })

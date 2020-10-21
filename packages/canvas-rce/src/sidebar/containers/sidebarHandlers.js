@@ -45,8 +45,9 @@ export default function propsFromDispatch(dispatch) {
     fetchNextPage: key => dispatch(fetchNextPage(key)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
-    fetchInitialImages: sortBy => dispatch(fetchInitialImages(sortBy)),
-    fetchNextImages: sortBy => dispatch(fetchNextImages(sortBy)),
+    fetchInitialImages: (sortBy, searchString) =>
+      dispatch(fetchInitialImages(sortBy, searchString)),
+    fetchNextImages: (sortBy, searchString) => dispatch(fetchNextImages(sortBy, searchString)),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
     flickrSearch: term => dispatch(searchFlickr(term)),
@@ -58,8 +59,8 @@ export default function propsFromDispatch(dispatch) {
     createMediaServerSession: () => dispatch(createMediaServerSession()),
     // saveMediaRecording: (file, editor, dismiss) => dispatch(saveMediaRecording(file, editor, dismiss)),
     mediaUploadComplete: (error, uploadData) => dispatch(mediaUploadComplete(error, uploadData)),
-    fetchInitialDocs: sortBy => dispatch(fetchInitialDocs(sortBy)),
-    fetchNextDocs: sortBy => dispatch(fetchNextDocs(sortBy)),
+    fetchInitialDocs: (sortBy, searchString) => dispatch(fetchInitialDocs(sortBy, searchString)),
+    fetchNextDocs: (sortBy, searchString) => dispatch(fetchNextDocs(sortBy, searchString)),
     fetchInitialMedia: sortBy => dispatch(fetchInitialMedia(sortBy)),
     fetchNextMedia: sortBy => dispatch(fetchNextMedia(sortBy)),
     updateMediaObject: new_values => dispatch(updateMediaObject(new_values)),

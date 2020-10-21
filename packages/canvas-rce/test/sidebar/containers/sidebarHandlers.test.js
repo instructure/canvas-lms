@@ -71,17 +71,29 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties images fetch initial images to store', () => {
-    testHandler('fetchInitialImages', images, 'fetchInitialImages', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchInitialImages',
+      images,
+      'fetchInitialImages',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties images fetch next images to store', () => {
-    testHandler('fetchNextImages', images, 'fetchNextImages', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchNextImages',
+      images,
+      'fetchNextImages',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties upload preflight to store', () => {
@@ -107,17 +119,29 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties documents fetch initial documents to store', () => {
-    testHandler('fetchInitialDocs', documents, 'fetchInitialDocs', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchInitialDocs',
+      documents,
+      'fetchInitialDocs',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties documents fetch next documents to store', () => {
-    testHandler('fetchNextDocs', documents, 'fetchNextDocs', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchNextDocs',
+      documents,
+      'fetchNextDocs',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties context change context to store', () => {
