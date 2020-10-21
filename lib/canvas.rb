@@ -15,8 +15,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'canvas/draft_state_validations'
-
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
   # assignment. The default, and Rails' normal behavior, is to just :log. Set

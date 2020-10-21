@@ -103,7 +103,6 @@ COPY --chown=docker:docker config ${APP_HOME}config
 COPY --chown=docker:docker db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb ${APP_HOME}db/migrate/
 COPY --chown=docker:docker frontend_build ${APP_HOME}frontend_build
 COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
-COPY --chown=docker:docker lib ${APP_HOME}lib
 COPY --chown=docker:docker public ${APP_HOME}public
 COPY --chown=docker:docker Rakefile ${APP_HOME}
 COPY --chown=docker:docker gulpfile.js ${APP_HOME}
@@ -117,6 +116,7 @@ RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEG
 
 COPY --chown=docker:docker app ${APP_HOME}/app
 COPY --chown=docker:docker doc ${APP_HOME}/doc
+COPY --chown=docker:docker lib ${APP_HOME}lib
 RUN bundle exec rails doc:api css:styleguide
 
 COPY --chown=docker:docker . ${APP_HOME}

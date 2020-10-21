@@ -37,3 +37,17 @@ RUN --mount=target=/tmp/src find gems/plugins -path "*/app/jsx" -exec cp -rf --p
 RUN --mount=target=/tmp/src find gems/plugins -path "*/app/stylesheets" -exec cp -rf --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find gems/plugins -path "*/app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find gems/plugins -path "*/public" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib && \
+  cp -rf lib/brandable_css.rb /tmp/dst/lib && \
+  cp -rf lib/canvas_logger.rb /tmp/dst/lib && \
+  cp -rf lib/canvas_yaml.rb /tmp/dst/lib && \
+  cp -rf lib/config_file.rb /tmp/dst/lib && \
+  cp -rf lib/logging_filter.rb /tmp/dst/lib && \
+  cp -rf lib/request_cache.rb /tmp/dst/lib && \
+  cp -rf lib/temp_cache.rb /tmp/dst/lib
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib/canvas && \
+  cp -rf lib/canvas/cdn.rb /tmp/dst/lib/canvas/ && \
+  cp -rf lib/canvas/reloader.rb /tmp/dst/lib/canvas/
+RUN --mount=target=/tmp/src cp -rf lib/canvas/cdn --parents /tmp/dst
+RUN --mount=target=/tmp/src cp -rf lib/rake --parents /tmp/dst
+RUN --mount=target=/tmp/src cp -rf lib/tasks --parents /tmp/dst
