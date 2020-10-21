@@ -22,8 +22,9 @@ import {arrayOf, func, shape, string} from 'prop-types'
 import I18n from 'i18n!gradebook_history'
 import tz from 'timezone'
 import moment from 'moment'
+import {debounce} from 'lodash'
 import {Checkbox} from '@instructure/ui-checkbox'
-import {Select} from '@instructure/ui-forms'
+import CanvasAsyncSelect from 'jsx/shared/components/CanvasAsyncSelect'
 import {Button} from '@instructure/ui-buttons'
 import {View, Grid} from '@instructure/ui-layout'
 import {FormFieldGroup} from '@instructure/ui-form-field'
@@ -32,6 +33,8 @@ import SearchFormActions from './actions/SearchFormActions'
 import {showFlashAlert} from '../shared/FlashAlert'
 import environment from './environment'
 import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
+
+const DEBOUNCE_DELAY = 500 // milliseconds
 
 const recordShape = shape({
   fetchStatus: string.isRequired,
@@ -58,20 +61,24 @@ class SearchFormComponent extends Component {
     getSearchOptionsNextPage: func.isRequired
   }
 
-  state = {
-    selected: {
-      assignment: '',
-      grader: '',
-      student: '',
-      from: {value: ''},
-      to: {value: ''},
-      showFinalGradeOverridesOnly: false
-    },
-    messages: {
-      assignments: I18n.t('Type a few letters to start searching'),
-      graders: I18n.t('Type a few letters to start searching'),
-      students: I18n.t('Type a few letters to start searching')
+  constructor(props) {
+    super(props)
+    this.state = {
+      selected: {
+        assignment: '',
+        grader: '',
+        student: '',
+        from: {value: ''},
+        to: {value: ''},
+        showFinalGradeOverridesOnly: false
+      },
+      messages: {
+        assignments: I18n.t('Type a few letters to start searching'),
+        graders: I18n.t('Type a few letters to start searching'),
+        students: I18n.t('Type a few letters to start searching')
+      }
     }
+    this.debouncedGetSearchOptions = debounce(props.getSearchOptions, DEBOUNCE_DELAY)
   }
 
   componentDidMount() {
@@ -150,17 +157,18 @@ class SearchFormComponent extends Component {
     }))
   }
 
-  setSelectedAssignment = (event, selectedOption) => {
-    this.props.clearSearchOptions('assignments')
+  setSelectedAssignment = (_event, selectedOption) => {
+    const selname = this.props.assignments.items.find(e => e.id === selectedOption)?.name
+    if (selname) this.props.getSearchOptions('assignments', selname)
     this.setState(prevState => {
       const selected = {
         ...prevState.selected,
-        assignment: selectedOption ? selectedOption.id : ''
+        assignment: selectedOption || ''
       }
 
       // If we selected an assignment, uncheck the "show final grade overrides
       // only" checkbox
-      if (selectedOption != null) {
+      if (selectedOption) {
         selected.showFinalGradeOverridesOnly = false
       }
 
@@ -168,22 +176,24 @@ class SearchFormComponent extends Component {
     })
   }
 
-  setSelectedGrader = (event, selected) => {
-    this.props.clearSearchOptions('graders')
+  setSelectedGrader = (_event, selected) => {
+    const selname = this.props.graders.items.find(e => e.id === selected)?.name
+    if (selname) this.props.getSearchOptions('graders', selname)
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        grader: selected ? selected.id : ''
+        grader: selected || ''
       }
     }))
   }
 
-  setSelectedStudent = (event, selected) => {
-    this.props.clearSearchOptions('students')
+  setSelectedStudent = (_event, selected) => {
+    const selname = this.props.students.items.find(e => e.id === selected)?.name
+    if (selname) this.props.getSearchOptions('students', selname)
     this.setState(prevState => ({
       selected: {
         ...prevState.selected,
-        student: selected ? selected.id : ''
+        student: selected || ''
       }
     }))
   }
@@ -245,21 +255,13 @@ class SearchFormComponent extends Component {
       this.props.clearSearchOptions('assignments')
     }
 
-    this.setState(
-      prevState => ({
-        selected: {
-          ...prevState.selected,
-          assignment: enabled ? '' : prevState.selected.assignment,
-          showFinalGradeOverridesOnly: enabled
-        }
-      }),
-      () => {
-        if (enabled) {
-          // Also manually clear the contents of the assignment select input
-          this.assignmentInput.value = ''
-        }
+    this.setState(prevState => ({
+      selected: {
+        ...prevState.selected,
+        assignment: enabled ? '' : prevState.selected.assignment,
+        showFinalGradeOverridesOnly: enabled
       }
-    )
+    }))
   }
 
   handleSearchEntry = (target, searchTerm) => {
@@ -272,23 +274,18 @@ class SearchFormComponent extends Component {
       return
     }
 
-    this.props.getSearchOptions(target, searchTerm)
+    this.debouncedGetSearchOptions(target, searchTerm)
   }
 
   handleSubmit = () => {
     this.props.getGradebookHistory(this.state.selected)
   }
 
-  filterNone = options =>
-    // empty function here as the default filter function for Select
-    // does a startsWith call, and won't match `nora` -> `Elenora` for example
-    options
-
   renderAsOptions = data =>
-    data.map(item => (
-      <option key={item.id} value={item.id}>
-        {item.name}
-      </option>
+    data.map(i => (
+      <CanvasAsyncSelect.Option key={i.id} id={i.id}>
+        {i.name}
+      </CanvasAsyncSelect.Option>
     ))
 
   render() {
@@ -313,63 +310,42 @@ class SearchFormComponent extends Component {
                     vAlign="top"
                     startAt="medium"
                   >
-                    <Select
-                      editable
+                    <CanvasAsyncSelect
                       id="students"
-                      allowEmpty
-                      emptyOption={this.state.messages.students}
-                      filter={this.filterNone}
-                      label={I18n.t('Student')}
-                      loadingText={
-                        this.props.students.fetchStatus === 'started'
-                          ? I18n.t('Loading Students')
-                          : undefined
-                      }
+                      renderLabel={I18n.t('Student')}
+                      isLoading={this.props.students.fetchStatus === 'started'}
+                      selectedOptionId={this.state.selected.student}
+                      noOptionsLabel={this.state.messages.students}
                       onBlur={this.promptUserEntry}
-                      onChange={this.setSelectedStudent}
+                      onOptionSelected={this.setSelectedStudent}
                       onInputChange={this.handleStudentChange}
                     >
                       {this.renderAsOptions(this.props.students.items)}
-                    </Select>
-                    <Select
-                      editable
+                    </CanvasAsyncSelect>
+                    <CanvasAsyncSelect
                       id="graders"
-                      allowEmpty
-                      emptyOption={this.state.messages.graders}
-                      filter={this.filterNone}
-                      label={I18n.t('Grader')}
-                      loadingText={
-                        this.props.graders.fetchStatus === 'started'
-                          ? I18n.t('Loading Graders')
-                          : undefined
-                      }
+                      renderLabel={I18n.t('Grader')}
+                      isLoading={this.props.graders.fetchStatus === 'started'}
+                      selectedOptionId={this.state.selected.grader}
+                      noOptionsLabel={this.state.messages.graders}
                       onBlur={this.promptUserEntry}
-                      onChange={this.setSelectedGrader}
+                      onOptionSelected={this.setSelectedGrader}
                       onInputChange={this.handleGraderChange}
                     >
                       {this.renderAsOptions(this.props.graders.items)}
-                    </Select>
-                    <Select
-                      editable
+                    </CanvasAsyncSelect>
+                    <CanvasAsyncSelect
                       id="assignments"
-                      allowEmpty
-                      emptyOption={this.state.messages.assignments}
-                      filter={this.filterNone}
-                      inputRef={ref => {
-                        this.assignmentInput = ref
-                      }}
-                      label={I18n.t('Artifact')}
-                      loadingText={
-                        this.props.assignments.fetchStatus === 'started'
-                          ? I18n.t('Loading Artifact')
-                          : undefined
-                      }
+                      renderLabel={I18n.t('Artifact')}
+                      isLoading={this.props.assignments.fetchStatus === 'started'}
+                      selectedOptionId={this.state.selected.assignment}
+                      noOptionsLabel={this.state.messages.assignments}
                       onBlur={this.promptUserEntry}
-                      onChange={this.setSelectedAssignment}
+                      onOptionSelected={this.setSelectedAssignment}
                       onInputChange={this.handleAssignmentChange}
                     >
                       {this.renderAsOptions(this.props.assignments.items)}
-                    </Select>
+                    </CanvasAsyncSelect>
                   </FormFieldGroup>
 
                   <FormFieldGroup
