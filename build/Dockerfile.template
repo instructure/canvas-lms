@@ -81,7 +81,7 @@ COPY --chown=docker:docker packages     ${APP_HOME}packages
 
 RUN set -eux; \
   mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %> \
-  && (DISABLE_POSTINSTALL=1 yarn install --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --pure-lockfile --network-concurrency 1) \
+  && (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
@@ -115,8 +115,8 @@ RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEG
 
 COPY --chown=docker:docker . ${APP_HOME}
 
-ARG COMPILE_ASSETS_API_DOCS=0
-RUN bash -c "if [[ "$COMPILE_ASSETS_API_DOCS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"
+ARG COMPILE_ADDITIONAL_ASSETS=0
+RUN bash -c "if [[ "$COMPILE_ADDITIONAL_ASSETS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"
 <% else -%>
 COPY --chown=docker:docker . ${APP_HOME}
 
