@@ -26,6 +26,7 @@
   "dependencies": {
     "@instructure/canvas-theme": "6",
     "@instructure/ui-a11y-content": "6",
+    "@instructure/ui-checkbox": "6",
     "@instructure/ui-flex": "6",
     "@instructure/ui-text": "6",
     "@instructure/ui-text-input": "6",
