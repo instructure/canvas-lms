@@ -12,6 +12,7 @@ DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cach
 docker pull $CACHE_TAG || true
 docker build \
   --build-arg COMPILE_ADDITIONAL_ASSETS="$COMPILE_ADDITIONAL_ASSETS" \
+  --build-arg CANVAS_RAILS6_0=${CANVAS_RAILS6_0:-0} \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
