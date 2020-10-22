@@ -76,194 +76,190 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       click_insert_menu_button
     end
 
-    it 'should add bullet lists' do
-      rce_wysiwyg_state_setup(@course)
+    context 'list types' do
+      it 'should add bullet lists' do
+        rce_wysiwyg_state_setup(@course)
 
-      click_list_toggle_button
-      click_bullet_list_button
+        click_list_toggle_button
+        click_bullet_list_button
 
-      in_frame rce_page_body_ifr_id do
-        expect(ff('#tinymce li').length).to eq 3
+        in_frame rce_page_body_ifr_id do
+          expect(ff('#tinymce ul li').length).to eq 3
+        end
+      end
+
+      it 'should remove bullet lists' do
+        text = '<ul><li>1</li><li>2</li><li>3</li></ul>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
+
+        click_list_toggle_button
+        click_bullet_list_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body).not_to contain_css('li')
+        end
+      end
+
+      it 'should add numbered lists', priority: '1', test_id: 307_625 do
+        rce_wysiwyg_state_setup(@course)
+
+        click_list_toggle_button
+        click_numbered_list_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(ff('#tinymce ol li').length).to eq 3
+        end
+      end
+
+      it 'should remove numbered lists', priority: '1', test_id: 537_619 do
+        text = '<ol><li>1</li><li>2</li><li>3</li></ol>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
+
+        click_list_toggle_button
+        click_numbered_list_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(f('#tinymce')).not_to contain_css('li')
+        end
       end
     end
 
-    it 'should remove bullet lists' do
-      text = '<ul><li>1</li><li>2</li><li>3</li></ul>'
-      rce_wysiwyg_state_setup(@course, text, html: true)
+    context 'indent and outdent' do
+      it 'should indent and remove indentation for embedded images' do
+        skip('LS-1593 outdent not working with indented image')
+        title = 'email.png'
+        @root_folder = Folder.root_folders(@course).first
+        @image = @root_folder.attachments.build(context: @course)
+        path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
+        @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+        @image.save!
 
-      click_list_toggle_button
-      click_bullet_list_button
+        visit_front_page_edit(@course)
+        click_images_toolbar_menu_button
+        click_course_images
+        click_image_link(title)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body).not_to contain_css('li')
+        select_all_wiki
+        click_indent_button
+
+        rce_validate_wiki_style_attrib('padding-left', '40px', 'p')
+
+        click_indent_toggle_button
+        click_outdent_button
+
+        rce_validate_wiki_style_attrib_empty('p')
+      end
+
+      it 'should indent and remove indentation for text' do
+        rce_wysiwyg_state_setup(@course, 'test')
+
+        click_indent_button
+        rce_validate_wiki_style_attrib('padding-left', '40px', 'p')
+
+        click_indent_toggle_button
+        click_outdent_button
+
+        rce_validate_wiki_style_attrib_empty('p')
       end
     end
 
-    it 'should add numbered lists', priority: '1', test_id: 307_625 do
-      skip('Unskip in CORE-2636')
-      wysiwyg_state_setup(@course)
+    context 'super and sub script' do
+      it 'should make text superscript in rce' do
+        rce_wysiwyg_state_setup(@course)
 
-      click_list_toggle_button
-      click_numbered_list_button
+        click_superscript_button
 
-      in_frame rce_page_body_ifr_id do
-        expect(ff('#tinymce li').length).to eq 3
+        in_frame rce_page_body_ifr_id do
+          expect(f('#tinymce sup')).to be_displayed
+        end
+      end
+
+      it 'should remove superscript from text in rce' do
+        text = '<p><sup>This is my text</sup></p>'
+
+        rce_wysiwyg_state_setup(@course, text, html: true)
+
+        shift_click_button(superscript_button_selector)
+
+        in_frame rce_page_body_ifr_id do
+          expect(f('#tinymce')).not_to contain_css('sup')
+        end
+      end
+
+      it 'should make text subscript in rce' do
+        rce_wysiwyg_state_setup(@course)
+
+        click_super_toggle_button
+        click_subscript_menu_button
+
+        in_frame rce_page_body_ifr_id do
+          expect(f('#tinymce sub')).to be_displayed
+        end
+      end
+
+      it 'should remove subscript from text in rce' do
+        text = '<p><sub>This is my text</sub></p>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
+
+        shift_click_button(subscript_button_selector)
+
+        in_frame rce_page_body_ifr_id do
+          expect(f('#tinymce')).not_to contain_css('sub')
+        end
       end
     end
 
-    it 'should remove numbered lists', priority: '1', test_id: 537_619 do
-      skip('Unskip in CORE-2636')
-      text = '<ol><li>1</li><li>2</li><li>3</li></ol>'
-      wysiwyg_state_setup(@course, text, html: true)
+    context 'text alignment' do
+      it 'should align text to the left' do
+        rce_wysiwyg_state_setup(@course, 'text to align')
 
-      click_list_toggle_button
-      click_numbered_list_button
-
-      in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce')).not_to contain_css('li')
+        click_align_toggle_button
+        click_align_left_button
+        rce_validate_wiki_style_attrib('text-align', 'left', 'p')
       end
-    end
 
-    it 'should indent and remove indentation for embedded images' do
-      skip('Unskip in CORE-2637')
-      title = 'email.png'
-      @root_folder = Folder.root_folders(@course).first
-      @image = @root_folder.attachments.build(context: @course)
-      path = File.expand_path(File.dirname(__FILE__) + '/../../../public/images/email.png')
-      @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
-      @image.save!
+      it 'should remove left align from text' do
+        text = '<p style="text-align: left;">1</p>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
 
-      visit_front_page_edit(@course)
-      click_images_toolbar_button
-      click_course_images
-      click_image_link(title)
-
-      select_all_wiki
-      force_click(indent_button)
-      validate_wiki_style_attrib('padding-left', '40px', 'p')
-
-      force_click(indent_toggle_button)
-      force_click(outdent_button)
-
-      validate_wiki_style_attrib_empty('p')
-    end
-
-    it 'should indent and remove indentation for text' do
-      skip('Unskip in CORE-2637')
-      wysiwyg_state_setup(@course, 'test')
-
-      click_indent_button
-      validate_wiki_style_attrib('padding-left', '40px', 'p')
-
-      click_indent_toggle_button
-      click_outdent_button
-
-      validate_wiki_style_attrib_empty('p')
-    end
-
-    it 'should make text superscript in rce' do
-      skip('Unskip in CORE-2634')
-      wysiwyg_state_setup(@course)
-
-      click_superscript_button
-
-      in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce sup')).to be_displayed
+        click_align_toggle_button
+        click_align_left_button
+        rce_validate_wiki_style_attrib_empty('p')
       end
-    end
 
-    it 'should remove superscript from text in rce' do
-      skip('Unskip in CORE-2634')
-      skip_if_chrome('fragile in chrome')
-      text = '<p><sup>This is my text</sup></p>'
+      it 'should align text to the center' do
+        rce_wysiwyg_state_setup(@course, 'text to align')
 
-      wysiwyg_state_setup(@course, text, html: true)
-      shift_click_button(superscript_button)
-
-      in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce')).not_to contain_css('sup')
+        click_align_toggle_button
+        click_align_center_button
+        rce_validate_wiki_style_attrib('text-align', 'center', 'p')
       end
-    end
 
-    it 'should make text subscript in rce' do
-      skip('Unskip in CORE-2634')
-      wysiwyg_state_setup(@course)
+      it 'should remove center align from text' do
+        text = '<p style="text-align: center;">1</p>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
 
-      click_super_toggle_button
-      click_subscript_button
-
-      in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce sub')).to be_displayed
+        click_align_toggle_button
+        click_align_center_button
+        rce_validate_wiki_style_attrib_empty('p')
       end
-    end
 
-    it 'should remove subscript from text in rce' do
-      skip('Unskip in CORE-2634')
-      skip_if_chrome('fragile in chrome')
-      text = '<p><sub>This is my text</sub></p>'
-      wysiwyg_state_setup(@course, text, html: true)
+      it 'should align text to the right' do
+        rce_wysiwyg_state_setup(@course, 'text to align')
 
-      click_super_toggle_button
-      shift_click_button(subscript_button)
-
-      in_frame rce_page_body_ifr_id do
-        expect(f('#tinymce')).not_to contain_css('sub')
+        click_align_toggle_button
+        click_align_right_button
+        rce_validate_wiki_style_attrib('text-align', 'right', 'p')
       end
-    end
 
-    it 'should align text to the left' do
-      skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = 'left')
+      it 'should remove right align from text' do
+        text = '<p style="text-align: right;">1</p>'
+        rce_wysiwyg_state_setup(@course, text, html: true)
 
-      click_align_left_button
-      validate_wiki_style_attrib('text-align', text, 'p')
-    end
-
-    it 'should remove left align from text' do
-      skip('Unskip in CORE-2635')
-      text = '<p style="text-align: left;">1</p>'
-      wysiwyg_state_setup(@course, text, html: true)
-
-      click_align_left_button
-      validate_wiki_style_attrib_empty('p')
-    end
-
-    it 'should align text to the center' do
-      skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = 'center')
-
-      click_align_toggle_button
-      click_align_center_button
-      validate_wiki_style_attrib('text-align', text, 'p')
-    end
-
-    it 'should remove center align from text' do
-      skip('Unskip in CORE-2635')
-      text = '<p style="text-align: center;">1</p>'
-      wysiwyg_state_setup(@course, text, html: true)
-
-      click_align_toggle_button
-      click_align_center_button
-      validate_wiki_style_attrib_empty('p')
-    end
-
-    it 'should align text to the right' do
-      skip('Unskip in CORE-2635')
-      wysiwyg_state_setup(@course, text = 'right')
-
-      click_align_toggle_button
-      click_align_right_button
-      validate_wiki_style_attrib('text-align', text, 'p')
-    end
-
-    it 'should remove right align from text' do
-      skip('Unskip in CORE-2635')
-      text = '<p style="text-align: right;">1</p>'
-      wysiwyg_state_setup(@course, text, html: true)
-
-      click_align_toggle_button
-      click_align_right_button
-      validate_wiki_style_attrib_empty('p')
+        click_align_toggle_button
+        click_align_right_button
+        rce_validate_wiki_style_attrib_empty('p')
+      end
     end
 
     it 'should change text to right-to-left in the rce' do

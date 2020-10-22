@@ -298,6 +298,7 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect(wiki_body_anchor.attribute('class')).to include 'inline_disabled'
         end
       end
+
       it 'should click on sidebar assignment page to create link in body' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title)
