@@ -149,8 +149,8 @@ class Quizzes::QuizzesController < ApplicationController
     end
 
     if @current_user.present?
-      Quizzes::OutstandingQuizSubmissionManager.send_later_if_production(:grade_by_course,
-                                                                         @context)
+      Quizzes::OutstandingQuizSubmissionManager.delay_if_production.
+        grade_by_course(@context)
     end
 
     log_asset_access([ "quizzes", @context ], "quizzes", 'other')
@@ -509,9 +509,7 @@ class Quizzes::QuizzesController < ApplicationController
             @quiz.reload
 
             if params[:quiz][:time_limit].present?
-              @quiz.send_later_if_production_enqueue_args(:update_quiz_submission_end_at_times, {
-                priority: Delayed::HIGH_PRIORITY
-              })
+              @quiz.delay_if_production(priority: Delayed::HIGH_PRIORITY).update_quiz_submission_end_at_times
             end
 
             @quiz.publish! if params[:publish]

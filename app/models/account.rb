@@ -502,7 +502,7 @@ class Account < ActiveRecord::Base
   def update_account_associations_if_changed
     if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
       self.shard.activate do
-        send_later_if_production(:update_account_associations)
+        delay_if_production.update_account_associations
       end
     end
   end
@@ -516,7 +516,7 @@ class Account < ActiveRecord::Base
     keys_to_clear << :default_locale if self.saved_change_to_default_locale?
     if keys_to_clear.any?
       self.shard.activate do
-        send_later_if_production(:clear_downstream_caches, *keys_to_clear)
+        delay_if_production.clear_downstream_caches(*keys_to_clear)
       end
     end
   end
@@ -726,9 +726,8 @@ class Account < ActiveRecord::Base
         @invalidations.each do |key|
           Rails.cache.delete([key, self.global_id].cache_key)
         end
-        Account.send_later_if_production_enqueue_args(:invalidate_inherited_caches,
-         { singleton: "Account.invalidate_inherited_caches_#{global_id}" },
-          self, @invalidations)
+        Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
+          invalidate_inherited_caches(self, @invalidations)
       end
     end
   end

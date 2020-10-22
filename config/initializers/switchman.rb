@@ -139,13 +139,13 @@ Rails.application.config.after_initialize do
         next if db.shards.empty?
         regions << db.config[:region]
         db.shards.first.activate do
-          klass.send_later_enqueue_args(method, enqueue_args, *args)
+          klass.delay(**enqueue_args).__send__(method, *args)
         end
       end
     end
 
     def self.send_in_region(region, klass, method, enqueue_args = {}, *args)
-      return klass.send_later_enqueue_args(method, enqueue_args, *args) if region.nil?
+      return klass.delay(**enqueue_args).__send__(method, *args) if region.nil?
 
       shard = nil
       all.find { |db| db.config[:region] == region && (shard = db.shards.first) }
@@ -153,12 +153,12 @@ Rails.application.config.after_initialize do
       # the app server knows what region it's in, but the database servers don't?
       # just send locally
       if shard.nil? && all.all? { |db| db.config[:region].nil? }
-        return klass.send_later_enqueue_args(method, enqueue_args, *args)
+        return klass.delay(**enqueue_args).__send__(method, *args)
       end
 
       raise "Could not find a shard in region #{region}" unless shard
       shard.activate do
-        klass.send_later_enqueue_args(method, enqueue_args, *args)
+        klass.delay(**enqueue_args).__send__(method, *args)
       end
     end
   end

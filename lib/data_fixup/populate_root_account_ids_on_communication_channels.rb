@@ -30,9 +30,7 @@ module DataFixup::PopulateRootAccountIdsOnCommunicationChannels
 
       # the root account ids
       scope.where('user_id >= ?', Shard::IDS_PER_SHARD).joins(:user).find_each do |cc|
-        cc.user.send_later_if_production_enqueue_args(
-          :update_root_account_ids, { max_attempts: User::MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS }
-        )
+        cc.user.delay_if_production(max_attempts: User::MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS).update_root_account_ids
       end
     end
   end

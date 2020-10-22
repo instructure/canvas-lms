@@ -17,15 +17,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-describe RuboCop::Cop::Migration::SendLater do
+describe RuboCop::Cop::Migration::Delay do
   subject(:cop) { described_class.new }
 
-  it 'catches other forms of send_later' do
+  it 'catches other forms of delay' do
     inspect_source(%{
       class TestMigration < ActiveRecord::Migration
 
         def up
-          MyClass.send_later_enqueue_args(:run, max_attempts: 1)
+          MyClass.delay(max_attempts: 5).run
         end
       end
     })
@@ -34,13 +34,13 @@ describe RuboCop::Cop::Migration::SendLater do
     expect(cop.offenses.first.severity.name).to eq(:warning)
   end
 
-  it 'disallows send_later in predeploys' do
+  it 'disallows delay in predeploys' do
     inspect_source(%{
       class TestMigration < ActiveRecord::Migration
         tag :predeploy
 
         def up
-          MyClass.send_later_if_production(:run, max_attempts: 1)
+          MyClass.delay_if_production(:run, max_attempts: 1)
         end
       end
     })

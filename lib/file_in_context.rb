@@ -28,7 +28,7 @@ class FileInContext
 
     def destroy_queued_files
       if @queued_files && !@queued_files.empty?
-        Attachment.send_later_if_production(:destroy_files, @queued_files.map(&:id))
+        Attachment.delay_if_production.destroy_files(@queued_files.map(&:id))
         @queued_files.clear
       end
     end

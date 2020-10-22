@@ -352,29 +352,16 @@ class DeveloperKey < ActiveRecord::Base
 
     if affected_account.blank? || affected_account.site_admin?
       # Cleanup tools across all shards
-      send_later_enqueue_args(
-        :manage_external_tools_multi_shard,
-        enqueue_args,
-        enqueue_args,
-        method,
-        affected_account
-      )
+      delay(**enqueue_args).
+        manage_external_tools_multi_shard(enqueue_args, method, affected_account)
     else
-      send_later_enqueue_args(
-        method,
-        enqueue_args,
-        affected_account
-      )
+      delay(**enqueue_args).__send__(method, affected_account)
     end
   end
 
   def manage_external_tools_multi_shard(enqueue_args, method, affected_account)
     Shard.with_each_shard do
-      send_later_enqueue_args(
-        method,
-        enqueue_args,
-        affected_account
-      )
+      delay(**enqueue_args).__send__(method, affected_account)
     end
   end
 
@@ -485,7 +472,7 @@ class DeveloperKey < ActiveRecord::Base
   def invalidate_access_tokens_if_scopes_removed!
     return unless saved_change_to_scopes?
     return if (scopes_before_last_save - scopes).blank?
-    send_later_if_production(:invalidate_access_tokens!)
+    delay_if_production.invalidate_access_tokens!
   end
 
   def invalidate_access_tokens!

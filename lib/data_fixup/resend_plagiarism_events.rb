@@ -77,16 +77,10 @@ module DataFixup
     end
 
     def self.schedule_resubmit_job_by_time(start_time, end_time)
-      DataFixup::ResendPlagiarismEvents.send_later_if_production_enqueue_args(
-        :trigger_plagiarism_resubmit_by_time,
-        {
-          priority: Delayed::LOWER_PRIORITY,
+      DataFixup::ResendPlagiarismEvents.delay_if_production(priority: Delayed::LOWER_PRIORITY,
           strand: "plagiarism_event_resend",
-          run_at: 1.year.from_now
-        },
-        start_time,
-        end_time
-      )
+          run_at: 1.year.from_now).
+        trigger_plagiarism_resubmit_by_time(start_time, end_time)
     end
 
     def self.run_next_job

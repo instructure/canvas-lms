@@ -22,20 +22,16 @@ class LatePolicyApplicator
     return unless course.published?
     return unless course.assignments.published.exists?
 
-    new(course).send_later_if_production_enqueue_args(
-      :process,
-      { singleton: "late_policy_applicator:calculator:Course:#{course.global_id}" }
-    )
+    new(course).delay_if_production(singleton: "late_policy_applicator:calculator:Course:#{course.global_id}").
+      process
   end
 
   def self.for_assignment(assignment)
     return unless assignment.published? && assignment.points_possible&.positive?
     return unless assignment.course
 
-    new(assignment.course, [assignment]).send_later_if_production_enqueue_args(
-      :process,
-      { singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}" }
-    )
+    new(assignment.course, [assignment]).delay_if_production(singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}").
+      process
   end
 
   def initialize(course, assignments = [])

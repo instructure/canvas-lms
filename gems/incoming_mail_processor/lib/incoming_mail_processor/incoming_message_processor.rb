@@ -52,15 +52,13 @@ module IncomingMailProcessor
           if self.dedicated_workers_per_mailbox
             # Launch one per mailbox
             self.mailbox_accounts.each do |account|
-              imp.send_later_enqueue_args(:process,
-                {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}", max_attempts: 1},
-                {worker_id: worker_id, mailbox_account_address: account.address})
+              imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}:#{account.address}").
+                process({worker_id: worker_id, mailbox_account_address: account.address})
             end
           else
             # Just launch the one
-            imp.send_later_enqueue_args(:process,
-              {singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}", max_attempts: 1},
-              {worker_id: worker_id})
+            imp.delay(singleton: "IncomingMailProcessor::IncomingMessageProcessor#process:#{worker_id}").
+              process({worker_id: worker_id})
           end
         end
       end

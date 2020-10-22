@@ -99,11 +99,11 @@ class CommunicationChannel
 
 
       def perform!
-        send_later(:reset_bounce_counts!)
+        delay.reset_bounce_counts!
         {scheduled_reset_approximate_count: count}
       end
 
-      private def reset_bounce_counts!
+      def reset_bounce_counts!
         matching_channels.to_a.each(&:reset_bounce_count!)
       end
     end

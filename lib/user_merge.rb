@@ -125,7 +125,7 @@ class UserMerge
 
       attachments = Attachment.where(user_id: from_user)
       merge_data.add_more_data(attachments)
-      Attachment.send_later(:migrate_attachments, from_user, target_user)
+      Attachment.delay.migrate_attachments(from_user, target_user)
 
       updates = {}
       %w(access_tokens asset_user_accesses calendar_events collaborations
@@ -164,7 +164,7 @@ class UserMerge
 
       merge_data.bulk_insert_merge_data(data) unless data.empty?
       @data = []
-      Enrollment.send_later(:recompute_due_dates_and_scores, target_user.id)
+      Enrollment.delay.recompute_due_dates_and_scores(target_user.id)
       target_user.update_account_associations
     end
 

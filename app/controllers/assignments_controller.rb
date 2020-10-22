@@ -162,7 +162,7 @@ class AssignmentsController < ApplicationController
             !@current_user_submission.submission_type
           if @current_user_submission
             GuardRail.activate(:primary) do
-              @current_user_submission.send_later(:context_module_action)
+              @current_user_submission.delay.context_module_action
             end
           end
         end

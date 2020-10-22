@@ -41,7 +41,12 @@ class DelayedNotification < ActiveRecord::Base
     state :errored
   end
 
-  def self.process(asset, notification, recipient_keys, data)
+  
+  def self.process(asset, notification, recipient_keys, data = {}, **kwargs)
+    # RUBY 2.7 this can go away (**{} will work at the caller)
+    raise ArgumentError, "Only send one hash" if !data&.empty? && !kwargs.empty?
+    data = kwargs if data&.empty? && !kwargs.empty?
+
     DelayedNotification.new(
       asset: asset,
       notification: notification,

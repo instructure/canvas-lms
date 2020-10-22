@@ -46,8 +46,7 @@ module SendToStream
       block = self.class.send_to_stream_block rescue nil
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
-        send_later_if_production_enqueue_args(:create_stream_items,
-                                              { :priority => Delayed::LOW_PRIORITY })
+        delay_if_production(priority: Delayed::LOW_PRIORITY).create_stream_items
       end
       true
     end
@@ -76,9 +75,7 @@ module SendToStream
       block = self.class.send_to_stream_update_block
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
-        send_later_if_production_enqueue_args(:generate_stream_items,
-                                              { :priority => 25 },
-                                              stream_recipients)
+        delay_if_production(priority: 25).generate_stream_items(stream_recipients)
         true
       end
     rescue => e
@@ -99,7 +96,7 @@ module SendToStream
     def clear_stream_items
       # We need to pass the asset_string, not the asset itself, since we're about to delete the asset
       root_object = StreamItem.root_object(self)
-      StreamItem.send_later_if_production(:delete_all_for, [root_object.class.base_class.name, root_object.id], [self.class.base_class.name, self.id])
+      StreamItem.delay_if_production.delete_all_for([root_object.class.base_class.name, root_object.id], [self.class.base_class.name, self.id])
     end
   end
 

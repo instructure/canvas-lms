@@ -54,11 +54,10 @@ class PeriodicJobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
       dj_params = {
         strand: strand,
-        max_attempts: 1,
         priority: 40
       }
       dj_params[:run_at] = compute_run_at(jitter: jitter, local_offset: local_offset)
-      klass.send_later_enqueue_args(method, dj_params, *args)
+      klass.delay(**dj_params).__send__(method, *args)
     end
   end
 end
@@ -68,7 +67,6 @@ def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset:
                                      :with_each_shard_by_database_in_region,
                                      {
                                        singleton: "periodic:region: #{klass}.#{method}",
-                                       max_attempts: 1,
                                      }, klass, method, *args, jitter: jitter, local_offset: local_offset)
 end
 

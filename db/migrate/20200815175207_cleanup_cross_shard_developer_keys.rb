@@ -24,10 +24,7 @@ class CleanupCrossShardDeveloperKeys < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    DataFixup::CleanupCrossShardDeveloperKeys.send_later_if_production_enqueue_args(
-      :run,
-      {priority: Delayed::LOWER_PRIORITY}
-    )
+    DataFixup::CleanupCrossShardDeveloperKeys.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
   end
 
   def down

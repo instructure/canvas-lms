@@ -300,7 +300,7 @@ class ContextModuleProgression < ActiveRecord::Base
     begin
       if self.update_requirement_met(*args)
         self.save!
-        self.send_later_if_production(:evaluate!)
+        delay_if_production.evaluate!
       end
     rescue ActiveRecord::StaleObjectError
       # retry up to five times, otherwise return current (stale) data
@@ -458,8 +458,8 @@ class ContextModuleProgression < ActiveRecord::Base
       User.where(:id => progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
-        progression.send_later_if_production_enqueue_args(:evaluate!,
-          {:n_strand => ["dependent_progression_reevaluation", context_module.global_context_id]}, self)
+        progression.delay_if_production(n_strand: ["dependent_progression_reevaluation", context_module.global_context_id]).
+          evaluate!(self)
       end
     end
   end

@@ -40,9 +40,7 @@ module DataFixup::MigrateMessagesToPartitions
   end
 
   def self.requeue(*args)
-    self.send_later_if_production_enqueue_args(:run,
-      {priority: Delayed::LOWER_PRIORITY,
-      strand: "partition_messages:#{Shard.current.database_server.id}"},
-      *args)
+    delay_if_production(priority: Delayed::LOWER_PRIORITY,
+      strand: "partition_messages:#{Shard.current.database_server.id}").run(*args)
   end
 end

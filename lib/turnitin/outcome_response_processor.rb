@@ -62,27 +62,18 @@ module Turnitin
       # exponential backoff. We should add
       # one to give TII more time to process
       # attachments.
-      self.send_later_enqueue_args(
-        :update_originality_data,
-        {max_attempts: self.class.max_attempts},
-        submission,
-        asset_string
-      )
+      delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
     rescue Errors::ScoreStillPendingError
       if attempt_number == self.class.max_attempts
         create_error_attachment
         raise
       else
         turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
-        turnitin_processor.send_later_enqueue_args(
-          :process,
-          {
-            max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-            priority: Delayed::LOW_PRIORITY,
-            attempts: attempt_number,
-            run_at: Time.now.utc + (attempt_number ** 4) + 5
-          }
-        )
+        turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+          priority: Delayed::LOW_PRIORITY,
+          attempts: attempt_number,
+          run_at: Time.now.utc + (attempt_number ** 4) + 5).
+          process
       end
     rescue StandardError
       if attempt_number == self.class.max_attempts
@@ -92,12 +83,7 @@ module Turnitin
     end
 
     def resubmit(submission, asset_string)
-      self.send_later_enqueue_args(
-        :update_originality_data,
-        {max_attempts: self.class.max_attempts},
-        submission,
-        asset_string
-      )
+      delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
     end
 
     def turnitin_client
@@ -127,8 +113,8 @@ module Turnitin
     end
 
     # dont try and recreate the turnitin client in a delayed job. bad things happen
-    def send_later_enqueue_args(*args)
-      stash_turnitin_client { super(*args) }
+    def delay(**)
+      stash_turnitin_client { super }
     end
 
     private
@@ -145,8 +131,9 @@ module Turnitin
     def stash_turnitin_client
       old_turnit_client = @_turnitin_client
       @_turnitin_client = nil
-      yield
+      result = yield
       @_turnitin_client = old_turnit_client
+      result
     end
 
     def attempt_number

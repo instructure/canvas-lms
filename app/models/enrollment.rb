@@ -221,7 +221,7 @@ class Enrollment < ActiveRecord::Base
     if (self.just_created || self.saved_change_to_workflow_state? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
         !self.self_enrolled && !(self.observer? && self.user.registered?)
       # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
-      self.send_later_enqueue_args(:re_send_confirmation_if_invited!, {:run_at => self.available_at, :singleton => "send_enrollment_invitations_#{global_id}"})
+      delay(run_at: self.available_at, singleton: "send_enrollment_invitations_#{global_id}").re_send_confirmation_if_invited!
     end
   end
 
@@ -659,7 +659,7 @@ class Enrollment < ActiveRecord::Base
   def add_to_favorites_later
     if self.saved_change_to_workflow_state? && self.workflow_state == 'active'
       self.class.connection.after_transaction_commit do
-        self.send_later_if_production_enqueue_args(:add_to_favorites, { :priority => Delayed::LOW_PRIORITY })
+        delay_if_production(priority: Delayed::LOW_PRIORITY).add_to_favorites
       end
     end
   end
@@ -1004,16 +1004,9 @@ class Enrollment < ActiveRecord::Base
     # Guard against getting more than one user_id
     raise ArgumentError, "Cannot call with more than one user" if Array(user_id).size > 1
 
-    send_later_if_production_enqueue_args(
-      :recompute_final_score,
-      {
-        singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
-        max_attempts: 10
-      },
-      user_id,
-      course_id,
-      **opts
-    )
+    delay_if_production(singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
+        max_attempts: 10).
+      recompute_final_score(user_id, course_id, **opts)
   end
 
   def self.recompute_due_dates_and_scores(user_id)
@@ -1482,14 +1475,9 @@ class Enrollment < ActiveRecord::Base
 
     # running in an n_strand to handle situations where a SIS import could
     # update a ton of enrollments from "deleted" to "completed".
-    send_later_if_production_enqueue_args(
-      :restore_submissions_and_scores_now,
-      {
-        n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
-        max_attempts: 1,
-        priority: Delayed::LOW_PRIORITY
-      }
-    )
+    delay_if_production(n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
+        priority: Delayed::LOW_PRIORITY).
+      restore_submissions_and_scores_now
   end
 
   def restore_submissions_and_scores_now

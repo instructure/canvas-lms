@@ -39,9 +39,8 @@ class RoleOverride < ActiveRecord::Base
   end
 
   def self.clear_caches(account, role)
-    account.send_later_if_production_enqueue_args(:clear_downstream_caches,
-      {:singleton => "clear_downstream_role_caches:#{account.global_id}"},
-      :role_overrides)
+    account.delay_if_production(singleton: "clear_downstream_role_caches:#{account.global_id}").
+      clear_downstream_caches(:role_overrides)
     role.touch
   end
 

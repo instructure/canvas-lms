@@ -661,11 +661,10 @@ class Assignment < ActiveRecord::Base
     return if run_at.blank?
 
     run_at = 1.minute.from_now if run_at < 1.minute.from_now # delay immediate run in case associated objects are still being saved
-    self.send_later_enqueue_args(:do_auto_peer_review, {
-      :run_at => run_at,
-      :on_conflict => :overwrite,
-      :singleton => Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }
-    })
+    delay(run_at: run_at,
+      on_conflict: :overwrite,
+      singleton: Shard.birth.activate { "assignment:auto_peer_review:#{self.id}" }).
+      do_auto_peer_review
   end
 
   attr_accessor :skip_schedule_peer_reviews
@@ -721,7 +720,7 @@ class Assignment < ActiveRecord::Base
   # reflect the changes
   def update_submissions_and_grades_if_details_changed
     if needs_to_update_submissions?
-      send_later_if_production(:update_student_submissions)
+      delay_if_production.update_student_submissions
     else
       update_grades_if_details_changed
     end
@@ -880,16 +879,9 @@ class Assignment < ActiveRecord::Base
 
   def self.remove_user_as_final_grader(user_id, course_id)
     strand_identifier = Course.find(course_id).root_account.global_id
-    send_later_if_production_enqueue_args(
-      :remove_user_as_final_grader_immediately,
-      {
-        strand: "Assignment.remove_user_as_final_grader:#{strand_identifier}",
-        max_attempts: 1,
-        priority: Delayed::LOW_PRIORITY,
-      },
-      user_id,
-      course_id
-    )
+    delay_if_production(strand: "Assignment.remove_user_as_final_grader:#{strand_identifier}",
+          priority: Delayed::LOW_PRIORITY).
+      remove_user_as_final_grader_immediately(user_id, course_id)
   end
 
   def self.remove_user_as_final_grader_immediately(user_id, course_id)
@@ -959,7 +951,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def update_submissions_later
-    send_later_if_production(:update_submissions) if saved_change_to_points_possible?
+    delay_if_production.update_submissions if saved_change_to_points_possible?
   end
 
   attr_accessor :updated_submissions # for testing
@@ -1049,7 +1041,7 @@ class Assignment < ActiveRecord::Base
 
     modules.each do |mod|
       if mod.context_module_progressions.where(current: true, user_id: student_ids).update_all(current: false) > 0
-        mod.send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{mod.global_context_id}"})
+        mod.delay_if_production(strand: "module_reeval_#{mod.global_context_id}").evaluate_all_progressions
       end
     end
   end
@@ -1530,7 +1522,7 @@ class Assignment < ActiveRecord::Base
         # a different unlock_at time, so include that in the singleton key so that different
         # unlock_at times are properly handled.
         singleton = "touch_on_unlock_assignment_#{self.global_id}_#{self.unlock_at}"
-        send_later_enqueue_args(:touch_assignment_and_submittable, { :run_at => self.unlock_at, :singleton => singleton })
+        delay(run_at: self.unlock_at, singleton: singleton ).touch_assignment_and_submittable
       end
     end
   end
@@ -3222,7 +3214,7 @@ class Assignment < ActiveRecord::Base
       { singleton: "assignment_overrides_changed_#{self.global_id}" }
     end
 
-    self.send_later_if_production_enqueue_args(:run_if_overrides_changed!, enqueuing_args, student_ids, updating_user)
+    delay_if_production(**enqueuing_args).run_if_overrides_changed!(student_ids, updating_user)
   end
 
   def validate_overrides_for_sis(overrides)
@@ -3469,7 +3461,7 @@ class Assignment < ActiveRecord::Base
       course.recompute_student_scores(submissions.pluck(:user_id))
       update_muted_status!
     end
-    self.send_later_if_production(:recalculate_module_progressions, submission_ids)
+    delay_if_production.recalculate_module_progressions(submission_ids)
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
     broadcast_submissions_posted(posting_params) if posting_params.present?
   end

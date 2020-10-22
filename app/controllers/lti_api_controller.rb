@@ -136,13 +136,8 @@ class LtiApiController < ApplicationController
     assignment.update_attribute(:turnitin_enabled, false) if assignment.turnitin_enabled?
     request.body.rewind
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
-    turnitin_processor.send_later_enqueue_args(
-      :process,
-      {
-        max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-        priority: Delayed::LOW_PRIORITY
-      }
-    )
+    turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+        priority: Delayed::LOW_PRIORITY).process
     render json: {}, status: 200
   end
 

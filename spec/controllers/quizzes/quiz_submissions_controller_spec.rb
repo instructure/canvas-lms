@@ -227,8 +227,8 @@ describe Quizzes::QuizSubmissionsController do
       it "queues a job to get all attachments for all submissions of a quiz" do
         user_session(@teacher)
         quiz = course_quiz !!:active
-        expect(ContentZipper).to receive(:send_later_enqueue_args).with(:process_attachment,
-          {priority: Delayed::LOW_PRIORITY, max_attempts: 1}, anything)
+        expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
+        expect(ContentZipper).to receive(:process_attachment)
         get 'index', params: {quiz_id: quiz.id, zip: '1', course_id: @course}
       end
 
@@ -239,8 +239,8 @@ describe Quizzes::QuizSubmissionsController do
         quiz = course_quiz !!:active
         expect(quiz.grants_right?(@teacher, :grade)).to eq false
         expect(quiz.grants_right?(@teacher, :review_grades)).to eq true
-        expect(ContentZipper).to receive(:send_later_enqueue_args).with(:process_attachment,
-          {priority: Delayed::LOW_PRIORITY, max_attempts: 1}, anything)
+        expect(ContentZipper).to receive(:delay).and_return(ContentZipper)
+        expect(ContentZipper).to receive(:process_attachment)
         get 'index', params: {quiz_id: quiz.id, zip: '1', course_id: @course}
       end
     end

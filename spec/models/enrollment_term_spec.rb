@@ -74,15 +74,12 @@ describe EnrollmentTerm do
     it 'runs recompute jobs in an n-strand stranded by the enrollment term global ID' do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:EnrollmentTerm:#{@term.global_id}",
-        max_attempts: 1,
         priority: Delayed::LOW_PRIORITY
       }
 
-      expect(@term).to receive(:send_later_if_production_enqueue_args).with(
-        :recompute_scores_for_batch,
-        delayed_job_args,
-        any_args
-      )
+      fake_term = double()
+      expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
+      expect(fake_term).to receive(:recompute_scores_for_batch)
 
       @term.update!(grading_period_group_id: @grading_period_set)
     end
@@ -348,15 +345,12 @@ describe EnrollmentTerm do
     it 'runs recompute jobs in an n-strand stranded by the enrollment term global ID' do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:EnrollmentTerm:#{@term.global_id}",
-        max_attempts: 1,
         priority: Delayed::LOW_PRIORITY
       }
 
-      expect(@term).to receive(:send_later_if_production_enqueue_args).with(
-        :recompute_scores_for_batch,
-        delayed_job_args,
-        any_args
-      )
+      fake_term = double()
+      expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
+      expect(fake_term).to receive(:recompute_scores_for_batch)
 
       @term.recompute_course_scores_later
     end
@@ -364,15 +358,13 @@ describe EnrollmentTerm do
     it 'runs recompute jobs in an n-strand stranded by the grading period group global ID, if passed one' do
       delayed_job_args = {
         n_strand: "EnrollmentTerm#recompute_scores_for_batch:GradingPeriodGroup:#{@grading_period_set.global_id}",
-        max_attempts: 1,
         priority: Delayed::LOW_PRIORITY
       }
 
-      expect(@term).to receive(:send_later_if_production_enqueue_args).with(
-        :recompute_scores_for_batch,
-        delayed_job_args,
-        any_args
-      )
+      fake_term = double()
+      expect(@term).to receive(:delay_if_production).with(**delayed_job_args).and_return(fake_term)
+      expect(fake_term).to receive(:recompute_scores_for_batch)
+
       strand_identifier = "GradingPeriodGroup:#{@grading_period_set.global_id}"
       @term.recompute_course_scores_later(strand_identifier: strand_identifier)
     end

@@ -19,21 +19,15 @@ class RecreateSubscriptionsForPlagiarismTools < ActiveRecord::Migration[5.2]
   tag :postdeploy
 
   def up
-    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
-      :delete_subscriptions,
-      strand: "plagiarism_subscription_create_#{Shard.current.id}"
-    )
-    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
-      :create_subscriptions,
-      strand: "plagiarism_subscription_create_#{Shard.current.id}"
-    )
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: "plagiarism_subscription_create_#{Shard.current.id}").
+      delete_subscriptions
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: "plagiarism_subscription_create_#{Shard.current.id}").
+      create_subscriptions
   end
 
   def down
     Delayed::Job.where(strand: "plagiarism_subscription_create_#{Shard.current.id}").destroy_all
-    DataFixup::CreateSubscriptionsForPlagiarismTools.send_later_if_production_enqueue_args(
-      :delete_subscriptions,
-      strand: "plagiarism_subscription_delete_#{Shard.current.id}"
-    )
+    DataFixup::CreateSubscriptionsForPlagiarismTools.delay_if_production(strand: "plagiarism_subscription_delete_#{Shard.current.id}").
+      delete_subscriptions
   end
 end

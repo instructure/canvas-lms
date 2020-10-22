@@ -207,10 +207,7 @@ class MediaObjectsController < ApplicationController
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
       @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
-      @media_object.send_later_enqueue_args(
-        :retrieve_details,
-        { singleton: "retrieve_media_details:#{@media_object.media_id}" }
-      )
+      @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
       increment_request_cost(Setting.get('missed_media_additional_request_cost', '200').to_i)
     end
 

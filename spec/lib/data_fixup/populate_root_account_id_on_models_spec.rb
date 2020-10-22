@@ -1192,7 +1192,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
   describe '#run' do
     it 'should create delayed jobs to backfill root_account_ids for the table' do
-      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:send_later_if_production_enqueue_args).at_least(:once)
+      expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:delay_if_production).at_least(:once).and_return(DataFixup::PopulateRootAccountIdOnModels)
       DataFixup::PopulateRootAccountIdOnModels.run
     end
 
@@ -1225,12 +1225,9 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it 'should remove tables from the hash that are in progress' do
       expect(DataFixup::PopulateRootAccountIdOnModels).to receive(:migration_tables).
         and_return({ContentTag => :context, ContextModule => :course})
-      DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
-        {
-          priority: Delayed::MAX_PRIORITY,
-          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
-        },
-        ContentTag, {course: :root_account_id}, 1, 2)
+      DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
+          n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
+          populate_root_account_ids(ContentTag, {course: :root_account_id}, 1, 2)
       expect(DataFixup::PopulateRootAccountIdOnModels.clean_and_filter_tables).to eq({ContextModule => {course: :root_account_id}})
     end
 
@@ -1281,19 +1278,13 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
       it 'should only return tables that are in progress for this shard' do
         @shard1.activate do
-          DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
-            {
-              priority: Delayed::MAX_PRIORITY,
-              n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
-            },
-            ContentTag, {course: :root_account_id}, 1, 2)
+          DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
+              n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
+              populate_root_account_ids(ContentTag, {course: :root_account_id}, 1, 2)
         end
-        DataFixup::PopulateRootAccountIdOnModels.send_later_enqueue_args(:populate_root_account_ids,
-          {
-            priority: Delayed::MAX_PRIORITY,
-            n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
-          },
-          ContextModule, {course: :root_account_id}, 1, 2)
+        DataFixup::PopulateRootAccountIdOnModels.delay(priority: Delayed::MAX_PRIORITY,
+            n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).
+            populate_root_account_ids(ContextModule, {course: :root_account_id}, 1, 2)
         expect(DataFixup::PopulateRootAccountIdOnModels.in_progress_tables).to eq([ContextModule])
       end
     end

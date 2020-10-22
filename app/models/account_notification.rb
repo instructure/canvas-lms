@@ -44,12 +44,11 @@ class AccountNotification < ActiveRecord::Base
   end
 
   def create_alert
-    if self.start_at > Time.zone.now
-      self.send_later_enqueue_args(:create_alert, {
-        :run_at => self.start_at,
-        :on_conflict => :overwrite,
-        :singleton => "create_notification_alert:#{self.global_id}"
-      })
+    if start_at > Time.zone.now
+      delay(run_at: start_at,
+        on_conflict: :overwrite,
+        singleton: "create_notification_alert:#{self.global_id}").
+        create_alert
       return
     end
 
@@ -291,11 +290,9 @@ class AccountNotification < ActiveRecord::Base
 
   def queue_message_broadcast
     if self.send_message? && !self.messages_sent_at && !self.message_recipients
-      self.send_later_enqueue_args(:broadcast_messages, {
-        :run_at => self.start_at || Time.now.utc,
-        :on_conflict => :overwrite,
-        :singleton => "account_notification_broadcast_messages:#{self.global_id}",
-        :max_attempts => 1})
+      delay(run_at: start_at || Time.now.utc,
+        on_conflict: :overwrite,
+        singleton: "account_notification_broadcast_messages:#{self.global_id}").broadcast_messages
     end
   end
 

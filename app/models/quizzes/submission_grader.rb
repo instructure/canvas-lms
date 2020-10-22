@@ -115,7 +115,7 @@ module Quizzes
 
       tagged_bank_ids = Set.new(alignments.map(&:content_id))
       question_ids = questions.select { |q| tagged_bank_ids.include?(q.assessment_question_bank_id) }
-      send_later_if_production(:update_outcomes, question_ids, @submission.id, attempt) unless question_ids.empty?
+      delay_if_production.update_outcomes(question_ids, @submission.id, attempt) unless question_ids.empty?
     end
 
     def update_outcomes(question_ids, submission_id, attempt)

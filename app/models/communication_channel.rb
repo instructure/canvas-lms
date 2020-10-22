@@ -344,11 +344,7 @@ class CommunicationChannel < ActiveRecord::Base
         true
       )
     else
-      send_later_if_production_enqueue_args(
-        :send_otp_via_sms_gateway!,
-        { priority: Delayed::HIGH_PRIORITY, max_attempts: 1 },
-        message
-      )
+      delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
     end
   end
 

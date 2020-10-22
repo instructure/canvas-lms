@@ -492,7 +492,7 @@ class GroupCategory < ActiveRecord::Base
 
   def assign_unassigned_members_in_background(by_section=false, updating_user: nil)
     start_progress
-    send_later_enqueue_args(:assign_unassigned_members, {:priority => Delayed::LOW_PRIORITY}, by_section, updating_user: updating_user)
+    delay(priority: Delayed::LOW_PRIORITY).assign_unassigned_members(by_section, updating_user: updating_user)
   end
 
   def clone_groups_and_memberships(new_group_category)

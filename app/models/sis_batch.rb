@@ -173,9 +173,8 @@ class SisBatch < ActiveRecord::Base
       job_args = {
         singleton: "account:update_account_associations:#{Shard.birth.activate { account.id }}",
         priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1,
       }
-      account.send_later_enqueue_args(:update_account_associations, job_args)
+      account.delay(**job_args).update_account_associations
     end
   end
 
@@ -384,7 +383,7 @@ class SisBatch < ActiveRecord::Base
     @has_errors = self.sis_batch_errors.exists?
     import_finished = !(@has_errors && self.sis_batch_errors.failed.exists?) if import_finished
     finalize_workflow_state(import_finished)
-    self.send_later_if_production_enqueue_args(:write_errors_to_file, {max_attempts: 5}) if @has_errors
+    delay_if_production(max_attempts: 5).write_errors_to_file if @has_errors
     populate_old_warnings_and_errors
     statistics
     self.progress = 100 if import_finished
@@ -832,7 +831,8 @@ class SisBatch < ActiveRecord::Base
 
   def finalize_enrollments(ids)
     ids.each_slice(1000) do |slice|
-      Enrollment::BatchStateUpdater.send_later_enqueue_args(:run_call_backs_for, { n_strand: ["restore_states_batch_updater", account.global_id] }, slice, self.account)
+      Enrollment::BatchStateUpdater.delay(n_strand: ["restore_states_batch_updater", account.global_id]).
+        run_call_backs_for(slice, self.account)
     end
     # we know enrollments are not deleted, but we don't know what the previous
     # state was, we will assume deleted and restore the scores and submissions

@@ -462,16 +462,11 @@ class User < ActiveRecord::Base
   end
 
   def update_root_account_ids_later
-    send_later_enqueue_args(
-      :update_root_account_ids,
-      {
-        max_attempts: MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS
-      }
-    )
+    delay(max_attempts: MAX_ROOT_ACCOUNT_ID_SYNC_ATTEMPTS).update_root_account_ids
   end
 
   def update_account_associations_later
-    self.send_later_if_production(:update_account_associations) unless self.class.skip_updating_account_associations?
+    delay_if_production.update_account_associations unless self.class.skip_updating_account_associations?
   end
 
   def update_account_associations_if_necessary

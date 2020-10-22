@@ -191,8 +191,9 @@ end
 
 # syntactic sugar and compatibility shims
 module CanvasDelayedMessageSending
-  def delay_if_production(**kwargs)
-    delay(**kwargs.merge(synchronous: !Rails.env.production?))
+  def delay_if_production(sender: nil, **kwargs)
+    sender ||= __calculate_sender_for_delay
+    delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
   end
 
   def send_later(method, *args, **kwargs)

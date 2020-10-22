@@ -71,7 +71,7 @@ class MissingPolicyApplicator
       end
 
       if assignment.course.root_account.feature_enabled?(:missing_policy_applicator_emits_live_events)
-        Canvas::LiveEvents.send_later_if_production(:submissions_bulk_updated, submissions)
+        Canvas::LiveEvents.delay_if_production.submissions_bulk_updated(submissions)
       end
 
       assignment.course.recompute_student_scores(submissions.map(&:user_id).uniq)

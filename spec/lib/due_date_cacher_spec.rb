@@ -52,12 +52,10 @@ describe DueDateCacher do
 
     it "queues a delayed job in an assignment-specific singleton in production" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(
-          :recompute,
-          strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
-          max_attempts: 10
-        )
+      expect(@instance).to receive(:delay_if_production).
+        with(strand: "cached_due_date:calculator:Course:Assignments:#{@assignment.context.global_id}",
+          max_attempts: 10).and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute(@assignment)
     end
 
@@ -137,20 +135,25 @@ describe DueDateCacher do
 
     it "queues a delayed job in a singleton in production if assignments.nil" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course)
     end
 
     it "queues a delayed job without a singleton if assignments is passed" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).with(:recompute, { max_attempts: 10 })
+      expect(@instance).to receive(:delay_if_production).with(max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments)
     end
 
     it "does not queue a delayed job when passed run_immediately: true" do
       expect(DueDateCacher).to receive(:new).and_return(@instance)
-      expect(@instance).not_to receive(:send_later_if_production_enqueue_args).with(:recompute, {})
+      expect(@instance).not_to receive(:delay_if_production)
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course, assignments: @assignments, run_immediately: true)
     end
 
@@ -164,8 +167,10 @@ describe DueDateCacher do
       expect(DueDateCacher).to receive(:new).
         with(@course, match_array(@assignments.map(&:id).sort), hash_including(update_grades: false)).
         and_return(@instance)
-      expect(@instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)  
       DueDateCacher.recompute_course(@course.id)
     end
 
@@ -247,20 +252,25 @@ describe DueDateCacher do
     end
 
     it "queues a delayed job in a singleton if given no assignments and no singleton option" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:send_later_if_production_enqueue_args).
+      @instance = double()
+      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(@instance).to receive(:delay_if_production).
         with(
-          :recompute,
           singleton: "cached_due_date:calculator:Users:#{@course.global_id}:#{Digest::MD5.hexdigest(student_1.id.to_s)}",
           max_attempts: 10
-        )
+        ).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)  
       DueDateCacher.recompute_users_for_course(student_1.id, @course)
     end
 
     it "queues a delayed job in a singleton if given no assignments and a singleton option" do
-      expect(DueDateCacher).to receive(:new).and_return(instance)
-      expect(instance).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute, singleton: "what:up:dog", max_attempts: 10)
+      @instance = double()
+      expect(DueDateCacher).to receive(:new).and_return(@instance)
+      expect(@instance).to receive(:delay_if_production).
+        with(singleton: "what:up:dog", max_attempts: 10).
+        and_return(@instance)
+      expect(@instance).to receive(:recompute)  
       DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
     end
 

@@ -269,7 +269,7 @@ class EnrollmentState < ActiveRecord::Base
       EnrollmentState.where(:enrollment_id => enrollment_ids).
         update_all(["lock_version = COALESCE(lock_version, 0) + 1, state_is_current = ?", false])
       args = strand ? {n_strand: strand} : {}
-      EnrollmentState.send_later_if_production_enqueue_args(:process_states_for_ids, args, enrollment_ids)
+      EnrollmentState.delay_if_production(**args).process_states_for_ids(enrollment_ids)
     end
   end
 
@@ -290,10 +290,9 @@ class EnrollmentState < ActiveRecord::Base
     scope = scope.where(:type => enrollment_type) if enrollment_type
     scope.find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       if invalidate_states(scope.where(:id => min_id..max_id)) > 0
-        EnrollmentState.send_later_if_production_enqueue_args(:process_term_states_in_ranges, {
-          :priority => Delayed::LOW_PRIORITY,
-          :n_strand => ['invalidate_states_for_term', term.global_root_account_id]
-        }, min_id, max_id, term, enrollment_type)
+        EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
+          n_strand: ['invalidate_states_for_term', term.global_root_account_id]).
+          process_term_states_in_ranges(min_id, max_id, term, enrollment_type)
       end
     end
   end
@@ -318,10 +317,9 @@ class EnrollmentState < ActiveRecord::Base
     enrollments_for_account_ids(account_ids).find_ids_in_ranges(:batch_size => ENROLLMENT_BATCH_SIZE) do |min_id, max_id|
       scope = enrollments_for_account_ids(account_ids).where(:id => min_id..max_id)
       if invalidate_access(scope, states_to_update) > 0
-        EnrollmentState.send_later_if_production_enqueue_args(:process_account_states_in_ranges, {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ['invalidate_access_for_accounts', Shard.current.id]
-        }, min_id, max_id, account_ids)
+        EnrollmentState.delay_if_production(priority: Delayed::LOW_PRIORITY,
+          n_strand: ['invalidate_access_for_accounts', Shard.current.id]).
+          process_account_states_in_ranges(min_id, max_id, account_ids)
       end
     end
   end

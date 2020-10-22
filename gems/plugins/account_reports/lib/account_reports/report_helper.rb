@@ -327,9 +327,9 @@ module AccountReports::ReportHelper
 
     @account_report.update(total_lines: total_runners)
 
-    args = {priority: Delayed::LOW_PRIORITY, max_attempts: 1, n_strand: ["account_report_runner", root_account.global_id]}
+    args = {priority: Delayed::LOW_PRIORITY, n_strand: ["account_report_runner", root_account.global_id]}
     @account_report.account_report_runners.find_each do |runner|
-      self.send_later_enqueue_args(:run_account_report_runner, args, runner, headers, files: files)
+      delay(**args).run_account_report_runner(runner, headers, files: files)
     end
   end
 

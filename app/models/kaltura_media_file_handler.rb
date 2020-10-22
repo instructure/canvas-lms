@@ -94,7 +94,8 @@ class KalturaMediaFileHandler
   end
 
   def refresh_later(bulk_upload_id, attachments, root_account_id)
-    MediaObject.send_later_enqueue_args(:refresh_media_files, {:run_at => 1.minute.from_now, :priority => Delayed::LOW_PRIORITY}, bulk_upload_id, attachments.map(&:id), root_account_id)
+    MediaObject.delay(run_at: 1.minute.from_now, priority: Delayed::LOW_PRIORITY).
+      refresh_media_files(bulk_upload_id, attachments.map(&:id), root_account_id)
   end
 
   def send_sis_data_to_kaltura?

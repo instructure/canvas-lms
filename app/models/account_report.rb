@@ -110,7 +110,7 @@ class AccountReport < ActiveRecord::Base
       mark_as_errored
     end
   end
-  handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY, max_attempts: 1,
+  handle_asynchronously :run_report, priority: Delayed::LOW_PRIORITY,
                         n_strand: proc {|ar| ['account_reports', ar.account.root_account.global_id]},
                         on_permanent_failure: :mark_as_errored
 

@@ -37,10 +37,7 @@ module Lti
     private
 
     def callback(method)
-      CanvasHttp.send_later_enqueue_args(method, {
-          priority: Delayed::LOW_PRIORITY,
-          max_attempts: 3
-      }, @callback_url) if @callback_url
+      CanvasHttp.delay(priority: Delayed::LOW_PRIORITY, max_attempts: 3).__send__(method, @callback_url) if @callback_url
     end
 
   end

@@ -90,7 +90,7 @@ class ContextModule < ActiveRecord::Base
       progression_scope = progression_scope.where(:user_id => student_ids) if student_ids
 
       if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
-        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+        delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
 
       self.context.context_modules.each do |mod|
@@ -103,11 +103,11 @@ class ContextModule < ActiveRecord::Base
     self.class.connection.after_transaction_commit do
       if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
-        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+        delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
       if @discussion_topics_to_recalculate
         @discussion_topics_to_recalculate.each do |dt|
-          dt.send_later_if_production_enqueue_args(:recalculate_context_module_actions!, {:strand => "module_reeval_#{self.global_context_id}"})
+          dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
         end
       end
     end
@@ -288,7 +288,7 @@ class ContextModule < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
     ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => self.deleted_at)
-    self.send_later_if_production_enqueue_args(:update_downstreams, { max_attempts: 1, n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY }, self.position)
+    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams(self.position)
     save!
     true
   end

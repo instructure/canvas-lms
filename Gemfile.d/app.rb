@@ -74,7 +74,7 @@ gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
   gem 'dogstatsd-ruby', '4.7.0'
-gem 'inst-jobs', '1.0.0'
+gem 'inst-jobs', '1.0.3'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.2', require: false
 gem 'inst-jobs-autoscaling', '2.0.0'
@@ -119,7 +119,7 @@ gem 'guardrail', '2.0.0'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'switchman', '2.0.1'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '3.0.0'
+gem 'switchman-inst-jobs', '3.0.2'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
 gem 'vault', '0.13.0', require: false

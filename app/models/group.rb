@@ -388,13 +388,13 @@ class Group < ActiveRecord::Base
       notification = BroadcastPolicy.notification_finder.by_name(notification_name)
 
       users.each_with_index do |user, index|
-        BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
-                                                         { :priority => Delayed::LOW_PRIORITY },
-                                                         new_group_memberships[index],
-                                                         notification_name.parameterize.underscore.to_sym,
-                                                         notification,
-                                                         [user],
-                                                         broadcast_data)
+        BroadcastPolicy.notifier.delay(priority: Delayed::LOW_PRIORITY).
+          send_notification(
+            new_group_memberships[index],
+            notification_name.parameterize.underscore.to_sym,
+            notification,
+            [user],
+            broadcast_data)
       end
     end
     new_group_memberships

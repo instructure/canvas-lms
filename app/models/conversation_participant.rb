@@ -359,7 +359,7 @@ class ConversationParticipant < ActiveRecord::Base
       save
     end
     # update the stream item data but leave the instances alone
-    StreamItem.send_later_if_production_enqueue_args(:generate_or_update, {:priority => 25}, self.conversation)
+    StreamItem.delay_if_production(priority: 25).generate_or_update(self.conversation)
   end
 
   def update(hash)
@@ -583,9 +583,8 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.batch_update(user, conversation_ids, update_params)
     progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
-    job = ConversationParticipant.send_later_enqueue_args(:do_batch_update,
-                                                          { no_delay: true },
-                                                          progress, user, conversation_ids, update_params)
+    job = ConversationParticipant.delay(ignore_transaction: true).
+      do_batch_update(progress, user, conversation_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

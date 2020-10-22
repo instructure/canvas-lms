@@ -7521,20 +7521,19 @@ describe Assignment do
 
   describe '.remove_user_as_final_grader' do
     it 'calls .remove_user_as_final_grader_immediately in a delayed job' do
-      expect(Assignment).to receive(:send_later_if_production_enqueue_args).
-        with(:remove_user_as_final_grader_immediately, any_args)
+      expect(Assignment).to receive(:delay_if_production).and_return(Assignment)
+      expect(Assignment).to receive(:remove_user_as_final_grader_immediately)
       Assignment.remove_user_as_final_grader(@teacher.id, @course.id)
     end
 
     it 'runs the job in a strand, stranded by the root account ID' do
       delayed_job_args = {
         strand: "Assignment.remove_user_as_final_grader:#{@course.root_account.global_id}",
-        max_attempts: 1,
         priority: Delayed::LOW_PRIORITY
       }
 
-      expect(Assignment).to receive(:send_later_if_production_enqueue_args).
-        with(:remove_user_as_final_grader_immediately, delayed_job_args, any_args)
+      expect(Assignment).to receive(:delay_if_production).with(**delayed_job_args).and_return(Assignment)
+      expect(Assignment).to receive(:remove_user_as_final_grader_immediately)
       Assignment.remove_user_as_final_grader(@teacher.id, @course.id)
     end
   end

@@ -375,8 +375,8 @@ class SplitUsers
             model.where(id: other_ids).update_all(user_id: source_user.id)
             model.where(id: ids).update_all(user_id: restored_user.id)
           end
-          Enrollment.send_later(:recompute_due_dates_and_scores, source_user.id)
-          Enrollment.send_later(:recompute_due_dates_and_scores, restored_user.id)
+          Enrollment.delay.recompute_due_dates_and_scores(source_user.id)
+          Enrollment.delay.recompute_due_dates_and_scores(restored_user.id)
         end
       end
     end

@@ -46,7 +46,7 @@ class SummaryMessageConsolidator
         batches.each do |dm_ids|
           dm_ids = dm_ids & updated_ids
           next unless dm_ids.any?
-          DelayedMessage.send_later_enqueue_args(:summarize, { :priority => Delayed::LOWER_PRIORITY }, dm_ids)
+          DelayedMessage.delay(priority: Delayed::LOWER_PRIORITY).summarize(dm_ids)
         end
       end
     end

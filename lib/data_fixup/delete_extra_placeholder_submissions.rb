@@ -20,14 +20,9 @@
 module DataFixup::DeleteExtraPlaceholderSubmissions
   def self.run
     Course.find_ids_in_ranges do |min_id, max_id|
-      send_later_if_production_enqueue_args(
-        :run_for_course_range,
-        {
-          n_strand: ["DataFixup:DeleteExtraPlaceholderSubmissions", Shard.current.database_server.id],
-          priority: Delayed::MAX_PRIORITY
-        },
-        min_id, max_id
-      )
+      delay_if_production(n_strand: ["DataFixup:DeleteExtraPlaceholderSubmissions", Shard.current.database_server.id],
+          priority: Delayed::MAX_PRIORITY).
+        run_for_course_range(min_id, max_id)
     end
   end
 

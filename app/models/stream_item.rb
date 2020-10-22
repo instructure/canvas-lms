@@ -458,8 +458,8 @@ class StreamItem < ActiveRecord::Base
     self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
-        StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,
-          { :priority => Delayed::LOW_PRIORITY }, user_ids, self.context_type, self.context_id)
+        StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY).
+          invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       end

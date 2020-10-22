@@ -69,7 +69,7 @@ class Progress < ActiveRecord::Base
     queued? || running?
   end
 
-  # Tie this Progress model to a delayed job. Rather than `obj.send_later(:long_method)`, use:
+  # Tie this Progress model to a delayed job. Rather than `obj.delay.long_method`, use:
   # `progress.process_job(obj, :long_method)`. This will transition from queued
   # => running when the job starts, from running => completed when the job
   # finishes, and from running => failed if the job fails.

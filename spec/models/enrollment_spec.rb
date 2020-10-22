@@ -1438,11 +1438,10 @@ describe Enrollment do
     end
 
     it "sends later for a single student" do
-      expect(Enrollment).to receive(:send_later_if_production_enqueue_args).with(
-        :recompute_final_score,
-        hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:"),
-        @user.id, @course.id, {}
-      )
+      expect(Enrollment).to receive(:delay_if_production).
+        with(hash_including(singleton: "Enrollment.recompute_final_score:#{@user.id}:#{@course.id}:")).
+        and_return(Enrollment)
+      expect(Enrollment).to receive(:recompute_final_score).with(@user.id, @course.id, {})
 
       Enrollment.recompute_final_score_in_singleton(@user.id, @course.id)
     end

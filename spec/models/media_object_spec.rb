@@ -122,7 +122,9 @@ describe MediaObject do
       Timecop.freeze do
         mo = MediaObject.create!(:context => user_factory, :media_id => "test")
         expect(mo).to receive(:retrieve_details)
-        expect(mo).to receive(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        expect(mo).to receive(:delay).with(run_at: 5.minutes.from_now).and_return(mo)
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(1).and_call_original
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(2)
         mo.retrieve_details_ensure_codecs(1)
       end
     end
@@ -131,7 +133,7 @@ describe MediaObject do
       mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo).to receive(:retrieve_details)
-      expect(mo).to receive(:send_at).never
+      expect(mo).to receive(:delay).never
       mo.retrieve_details_ensure_codecs(1)
     end
   end

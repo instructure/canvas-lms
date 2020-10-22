@@ -116,7 +116,7 @@ class DueDateCacher
     if run_immediately
       due_date_cacher.recompute
     else
-      due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+      due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
     end
   end
 
@@ -139,7 +139,7 @@ class DueDateCacher
     if run_immediately
       due_date_cacher.recompute
     else
-      due_date_cacher.send_later_if_production_enqueue_args(:recompute, inst_jobs_opts)
+      due_date_cacher.delay_if_production(**inst_jobs_opts).recompute
     end
   end
 

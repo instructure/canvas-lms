@@ -280,9 +280,7 @@ to because the assignment has no points possible.
               :n_strand => Attachment.clone_url_strand(url)
             }
 
-            send_later_enqueue_args(
-              :fetch_attachment_and_save_submission,
-              job_options,
+            delay(**job_options).fetch_attachment_and_save_submission(
               url,
               attachment,
               tool,

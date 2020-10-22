@@ -103,7 +103,7 @@ class Assignment::BulkUpdate
           end
           progress.calculate_completion!(progress_count, progress_total)
           progress_count += 1
-          assignment.send_later_if_production :do_notifications!
+          assignment.delay_if_production.do_notifications!
         end
       end
     end

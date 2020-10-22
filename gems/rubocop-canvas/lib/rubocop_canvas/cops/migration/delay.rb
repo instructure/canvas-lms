@@ -20,10 +20,10 @@
 module RuboCop
   module Cop
     module Migration
-      class SendLater < Cop
+      class Delay < Cop
         include RuboCop::Canvas::MigrationTags
 
-        PREDEPLOY_MSG = "`send_later` cannot be used in a"\
+        PREDEPLOY_MSG = "`delay` cannot be used in a"\
                         " predeploy migration, since job servers won't"\
                         " have the new code yet"
         
@@ -31,7 +31,7 @@ module RuboCop
         def on_send(node)
           super
           _receiver, method_name = *node
-          if method_name.to_s =~ /^send_later/
+          if method_name.to_s =~ /^delay/
             check_send_later(node, method_name)
           end
         end
@@ -39,7 +39,7 @@ module RuboCop
         def check_send_later(node, method_name)
           if method_name.to_s !~ /if_production/
             add_offense(node,
-              message: "All `send_later`s in migrations should be `send_later_if_production`",
+              message: "All `delay`s in migrations should be `delay_if_production`",
               severity: :warning)
           end
 

@@ -365,15 +365,14 @@ describe Course do
     end
 
     it "triggers a delayed job by default" do
-      expect(@course).to receive(:send_later_if_production_enqueue_args).
-        with(:recompute_student_scores_without_send_later, any_args)
+      expect(@course).to receive(:delay_if_production).and_return(@course)
+      expect(@course).to receive(:recompute_student_scores_without_send_later)
 
       @course.recompute_student_scores
     end
 
     it "does not trigger a delayed job when passed run_immediately: true" do
-      expect(@course).not_to receive(:send_later_if_production_enqueue_args).
-        with(:recompute_student_scores_without_send_later, any_args)
+      expect(@course).not_to receive(:delay)
 
       @course.recompute_student_scores(nil, run_immediately: true)
     end
@@ -3058,7 +3057,8 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the actual grade send' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user)
@@ -3066,7 +3066,8 @@ describe Course, 'grade_publishing' do
 
       it 'should kick off the actual grade send for a specific user' do
         make_student_enrollments
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, @student_enrollments.first.user_id).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, @student_enrollments.first.user_id)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings[:publish_endpoint] = "http://localhost/endpoint"
         @course.publish_final_grades(@user, @student_enrollments.first.user_id)
@@ -3074,11 +3075,13 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should kick off the timeout when a success timeout is defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).with(current_time + 1.seconds, :expire_pending_grade_publishing_statuses, current_time).and_return(nil)
+        expect(@course).to receive(:delay).with(run_at: current_time + 1.seconds).and_return(@course)
+        expect(@course).to receive(:expire_pending_grade_publishing_statuses).with(current_time).and_return(nil)
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3089,11 +3092,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3104,11 +3108,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is not configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay_if_production).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",
@@ -3119,11 +3124,12 @@ describe Course, 'grade_publishing' do
       end
 
       it 'should not kick off the timeout when a success timeout is not defined and waiting is configured' do
-        expect(@course).to receive(:send_later_if_production_enqueue_args).with(:send_final_grades_to_endpoint, anything, @user, nil).and_return(nil)
+        expect(@course).to receive(:delay_if_production).and_return(@course)
+        expect(@course).to receive(:send_final_grades_to_endpoint).with(@user, nil)
         current_time = Time.now.utc
         allow(Time).to receive(:now).and_return(current_time)
         allow(current_time).to receive(:utc).and_return(current_time)
-        expect(@course).to receive(:send_at).never
+        expect(@course).to receive(:delay).never
         allow(@plugin).to receive(:enabled?).and_return(true)
         @plugin_settings.merge!({
             :publish_endpoint => "http://localhost/endpoint",

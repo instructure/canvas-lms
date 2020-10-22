@@ -153,7 +153,7 @@ class AuthenticationProvider < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save!
     enable_canvas_authentication
-    send_later_if_production(:soft_delete_pseudonyms)
+    delay_if_production.soft_delete_pseudonyms
     true
   end
   alias destroy_permanently! destroy

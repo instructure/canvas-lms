@@ -49,7 +49,7 @@ class RubricAssessment < ActiveRecord::Base
     peer_review = self.assessment_type == "peer_review"
     provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
-    send_later_if_production(:update_outcomes_for_assessment, outcome_ids) if update_outcomes
+    delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
 
   def update_outcomes_for_assessment(outcome_ids=[])

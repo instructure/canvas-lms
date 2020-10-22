@@ -326,8 +326,8 @@ class Course < ActiveRecord::Base
         # a lot of things can change the date logic here :/
 
       if self.enrollments.exists?
-        EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
-          {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self)
+        EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id]).
+          invalidate_states_for_course_or_section(self)
       end
       # if the course date settings have been changed, we'll end up reprocessing all the access values anyway, so no need to queue below for other setting changes
     end
@@ -335,7 +335,7 @@ class Course < ActiveRecord::Base
       state_settings = [:restrict_student_future_view, :restrict_student_past_view]
       changed_keys = saved_change_to_account_id? ? state_settings : (@changed_settings & state_settings)
       if changed_keys.any?
-        EnrollmentState.send_later_if_production(:invalidate_access_for_course, self, changed_keys)
+        EnrollmentState.delay_if_production.invalidate_access_for_course(self, changed_keys)
       end
     end
 
@@ -1087,7 +1087,7 @@ class Course < ActiveRecord::Base
               EnrollmentState.where(:enrollment_id => locked_ids).
                 update_all(["state = ?, state_is_current = ?, access_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'completed', true, false, Time.now.utc])
             end
-            EnrollmentState.send_later_if_production(:process_states_for_ids, enrollment_info.map(&:id)) # recalculate access
+            EnrollmentState.delay_if_production.process_states_for_ids(enrollment_info.map(&:id)) # recalculate access
           end
 
           appointment_participants.active.current.update_all(:workflow_state => 'deleted')
@@ -1107,7 +1107,7 @@ class Course < ActiveRecord::Base
                   update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
               end
             end
-            User.send_later_if_production(:update_account_associations, user_ids)
+            User.delay_if_production.update_account_associations(user_ids)
           end
         end
       end
@@ -1233,9 +1233,7 @@ class Course < ActiveRecord::Base
         inst_job_opts[:singleton] = "recompute_student_scores:#{global_id}:#{grading_period_id}"
       end
 
-      send_later_if_production_enqueue_args(
-        :recompute_student_scores_without_send_later,
-        inst_job_opts,
+      delay_if_production(**inst_job_opts).recompute_student_scores_without_send_later(
         student_ids,
         grading_period_id: grading_period_id,
         update_all_grading_period_scores: update_all_grading_period_scores
@@ -1327,7 +1325,7 @@ class Course < ActiveRecord::Base
 
   def do_offer
     self.start_at ||= Time.now
-    send_later_if_production(:invite_uninvited_students)
+    delay_if_production.invite_uninvited_students
   end
 
   def do_claim
@@ -1396,7 +1394,7 @@ class Course < ActiveRecord::Base
       EnrollmentState.where(:enrollment_id => e_batch.map(&:id)).
         update_all(["state = ?, state_is_current = ?, lock_version = lock_version + 1, updated_at = ?", 'deleted', true, Time.now.utc])
       User.touch_and_clear_cache_keys(user_ids, :enrollments)
-      User.send_later_if_production(:update_account_associations, user_ids) if user_ids.any?
+      User.delay_if_production.update_account_associations(user_ids) if user_ids.any?
     end
     c_data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: courses, updated_state: 'deleted', batch_mode_delete: batch_mode)
     SisBatchRollBackData.bulk_insert_roll_back_data(c_data) if c_data
@@ -1864,10 +1862,9 @@ class Course < ActiveRecord::Base
                      :grade_publishing_message => nil,
                      :last_publish_attempt_at => last_publish_attempt_at)
 
-    send_later_if_production_enqueue_args(:send_final_grades_to_endpoint,
-                                          { n_strand: ["send_final_grades_to_endpoint", global_root_account_id] },
-                                          publishing_user, user_ids_to_publish)
-    send_at(last_publish_attempt_at + settings[:success_timeout].to_i.seconds, :expire_pending_grade_publishing_statuses, last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
+    delay_if_production(n_strand: ["send_final_grades_to_endpoint", global_root_account_id]).
+      send_final_grades_to_endpoint(publishing_user, user_ids_to_publish)
+    delay(run_at: last_publish_attempt_at + settings[:success_timeout].to_i.seconds).expire_pending_grade_publishing_statuses(last_publish_attempt_at) if should_kick_off_grade_publishing_timeout?
   end
 
   def send_final_grades_to_endpoint(publishing_user, user_ids_to_publish = nil)
@@ -3298,9 +3295,8 @@ class Course < ActiveRecord::Base
 
   def self.batch_update(account, user, course_ids, update_params, update_source = :manual)
     progress = account.progresses.create! :tag => "course_batch_update", :completion => 0.0
-    job = Course.send_later_enqueue_args(:do_batch_update,
-                                         { no_delay: true },
-                                         progress, user, course_ids, update_params, update_source)
+    job = Course.delay(ignore_transaction: true).
+      do_batch_update(progress, user, course_ids, update_params, update_source)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!
@@ -3344,7 +3340,12 @@ class Course < ActiveRecord::Base
     RUBY
   end
 
-  def touch_content_if_public_visibility_changed(changes)
+  # only send one
+  def touch_content_if_public_visibility_changed(changes = {}, **kwargs)
+    # RUBY 2.7 this can go away (**{} will work at the caller)
+    raise ArgumentError, "Only send one hash" if !changes.empty? && !kwargs.empty?
+    changes = kwargs if changes.empty? && !kwargs.empty?
+
     if changes[:is_public] || changes[:is_public_to_auth_users]
       self.assignments.touch_all
       self.attachments.touch_all
@@ -3359,7 +3360,8 @@ class Course < ActiveRecord::Base
 
   def clear_todo_list_cache_later(association_type)
     raise "invalid association" unless self.association(association_type).klass == User
-    send_later_enqueue_args(:clear_todo_list_cache, { :run_at => 15.seconds.from_now, :singleton => "course_clear_cache_#{global_id}_#{association_type}", on_conflict: :loose }, association_type)
+    delay(run_at: 15.seconds.from_now, singleton: "course_clear_cache_#{global_id}_#{association_type}", on_conflict: :loose).
+      clear_todo_list_cache(association_type)
   end
 
   def clear_todo_list_cache(association_type)

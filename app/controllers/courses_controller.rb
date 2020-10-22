@@ -1544,8 +1544,8 @@ class CoursesController < ApplicationController
       :home_page_announcement_limit
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
-    @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
-      { :priority => Delayed::LOW_PRIORITY }, changes)
+    @course.delay_if_production(priority: Delayed::LOW_PRIORITY).
+      touch_content_if_public_visibility_changed(changes)
 
     DueDateCacher.with_executing_user(@current_user) do
       if @course.save
@@ -1614,7 +1614,7 @@ class CoursesController < ApplicationController
   def re_send_invitations
     get_context
     if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
-      @context.send_later_if_production(:re_send_invitations!, @current_user)
+      @context.delay_if_production.re_send_invitations!(@current_user)
 
       respond_to do |format|
         format.html { redirect_to course_settings_url }
@@ -2802,7 +2802,8 @@ class CoursesController < ApplicationController
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
 
-      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes)
+      # RUBY 3.0 - **{} can go away, because data won't implicitly convert to kwargs
+      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes , **{})
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)

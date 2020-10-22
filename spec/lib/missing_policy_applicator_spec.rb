@@ -390,15 +390,14 @@ describe MissingPolicyApplicator do
 
         it "queues a delayed job if the applicator marks any submissions as missing" do
           assignment.submissions.update_all(score: nil, grade: nil)
-          expect(Canvas::LiveEvents).to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, assignment.submissions.to_a)
+          expect(Canvas::LiveEvents).to receive(:delay_if_production).and_return(Canvas::LiveEvents)
+          expect(Canvas::LiveEvents).to receive(:submissions_bulk_updated).with(assignment.submissions.to_a)
 
           applicator.apply_missing_deductions
         end
 
         it "does not queue a delayed job if the applicator marks no submissions as missing" do
-          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, any_args)
+          expect(Canvas::LiveEvents).not_to receive(:delay_if_production)
 
           applicator.apply_missing_deductions
         end
@@ -407,8 +406,7 @@ describe MissingPolicyApplicator do
       context "when the missing_policy_applicator_emits_live_events flag is not enabled" do
         it "does not queue a delayed job when the applicator marks submissions as missing" do
           assignment.submissions.update_all(score: nil, grade: nil)
-          expect(Canvas::LiveEvents).not_to receive(:send_later_if_production).
-            with(:submissions_bulk_updated, any_args)
+          expect(Canvas::LiveEvents).not_to receive(:delay)
 
           applicator.apply_missing_deductions
         end

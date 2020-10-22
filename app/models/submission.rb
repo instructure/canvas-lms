@@ -589,7 +589,7 @@ class Submission < ActiveRecord::Base
           )
         end
       end
-      self.assignment&.send_later_if_production(:multiple_module_actions, [self.user_id], :scored, self.score)
+      self.assignment&.delay_if_production&.multiple_module_actions([self.user_id], :scored, self.score)
     end
     true
   end
@@ -691,7 +691,7 @@ class Submission < ActiveRecord::Base
       self.turnitin_data[asset_string] = data
     end
 
-    send_at((2 ** attempt).minutes.from_now, :check_turnitin_status, attempt + 1) if needs_retry
+    delay(run_at: (2 ** attempt).minutes.from_now).check_turnitin_status(attempt + 1) if needs_retry
     self.turnitin_data_changed!
     self.save
   end
@@ -699,7 +699,7 @@ class Submission < ActiveRecord::Base
   def turnitin_report_url(asset_string, user)
     if self.turnitin_data && self.turnitin_data[asset_string] && self.turnitin_data[asset_string][:similarity_score]
       turnitin = Turnitin::Client.new(*self.context.turnitin_settings)
-      self.send_later(:check_turnitin_status)
+      delay.check_turnitin_status
       if self.grants_right?(user, :grade)
         turnitin.submissionReportUrl(self, asset_string)
       elsif self.grants_right?(user, :view_turnitin_report)
@@ -710,7 +710,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  TURNITIN_JOB_OPTS = { :n_strand => 'turnitin', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
+  TURNITIN_JOB_OPTS = { n_strand: 'turnitin', priority: Delayed::LOW_PRIORITY, max_attempts: 2 }
 
   TURNITIN_RETRY = 5
   def submit_to_turnitin(attempt=0)
@@ -725,7 +725,7 @@ class Submission < ActiveRecord::Base
       delete_turnitin_errors
     else
       if attempt < TURNITIN_RETRY
-        send_later_enqueue_args(:submit_to_turnitin, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS), attempt + 1)
+        delay(run_at: 5.minutes.from_now, **TURNITIN_JOB_OPTS).submit_to_turnitin(attempt + 1)
       else
         assignment_error = assignment.turnitin_settings[:error]
         self.turnitin_data[:status] = 'error'
@@ -747,13 +747,13 @@ class Submission < ActiveRecord::Base
       end
     end
 
-    send_later_enqueue_args(:check_turnitin_status, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS))
+    delay(run_at: 5.minutes.from_now, **TURNITIN_JOB_OPTS).check_turnitin_status
     self.save
 
     # Schedule retry if there were failures
     submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
     unless submit_status
-      send_later_enqueue_args(:submit_to_turnitin, { :run_at => 5.minutes.from_now }.merge(TURNITIN_JOB_OPTS), attempt + 1) if attempt < TURNITIN_RETRY
+      delay(run_at: 5.minutes.from_now, **TURNITIN_JOB_OPTS).submit_to_turnitin(attempt + 1) if attempt < TURNITIN_RETRY
       return false
     end
 
@@ -1002,7 +1002,7 @@ class Submission < ActiveRecord::Base
       retry_mins = 240;
     end
     # if attempt <= 0, then that means no retries should be attempted
-    send_at(retry_mins.minutes.from_now, :check_vericite_status, attempt + 1) if attempt > 0 && needs_retry
+    delay(run_at: retry_mins.minutes.from_now).check_vericite_status(attempt + 1) if attempt > 0 && needs_retry
     # if all we did was recheck scores, do not version this save (i.e. increase the attempt number)
     if data_changed
       self.vericite_data_changed!
@@ -1029,7 +1029,7 @@ class Submission < ActiveRecord::Base
     end
   end
 
-  VERICITE_JOB_OPTS = { :n_strand => 'vericite', :priority => Delayed::LOW_PRIORITY, :max_attempts => 2 }
+  VERICITE_JOB_OPTS = { n_strand: 'vericite', priority: Delayed::LOW_PRIORITY, max_attempts: 2 }
 
   VERICITE_RETRY = 5
   def submit_to_vericite(attempt=0)
@@ -1077,7 +1077,7 @@ class Submission < ActiveRecord::Base
     end
     # only save if there were newly submitted attachments
     if update
-      send_later_enqueue_args(:check_vericite_status, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS))
+      delay(run_at: 5.minutes.from_now, **VERICITE_JOB_OPTS).check_vericite_status
       if !self.vericite_data_hash.empty?
         # only set vericite provider flag if the hash isn't empty
         self.vericite_data_hash[:provider] = :vericite
@@ -1087,7 +1087,7 @@ class Submission < ActiveRecord::Base
       # Schedule retry if there were failures
       submit_status = submission_response.present? && submission_response.values.all?{ |v| v[:object_id] }
       unless submit_status
-        send_later_enqueue_args(:submit_to_vericite, { :run_at => 5.minutes.from_now }.merge(VERICITE_JOB_OPTS), attempt + 1) if attempt < VERICITE_RETRY
+        delay(run_at: 5.minutes.from_now, **VERICITE_JOB_OPTS).submit_to_vericite(attempt + 1) if attempt < VERICITE_RETRY
         return false
       end
     end
@@ -1230,7 +1230,7 @@ class Submission < ActiveRecord::Base
     Rails.logger.info("#submit_to_plagiarism_later submission ID: #{self.id}, type: #{plagiarism_service_to_use}, canSubmit? #{canSubmit}, submitPlag? #{submitPlag}")
     if canSubmit && submitPlag
       delay = Setting.get(delayName, 60.to_s).to_i
-      send_later_enqueue_args(delayFunction, { :run_at => delay.seconds.from_now }.merge(delayOpts))
+      delay(run_at: delay.seconds.from_now, **delayOpts).__send__(delayFunction)
     end
   end
   # End Plagiarism functions
@@ -1255,10 +1255,8 @@ class Submission < ActiveRecord::Base
 
   def update_assignment
     unless @assignment_changed_not_sub
-      self.send_later_enqueue_args(:context_module_action, {
-        singleton: "submission_context_module_action_#{self.global_id}",
-        on_conflict: :loose
-      })
+      delay(singleton: "submission_context_module_action_#{self.global_id}",
+        on_conflict: :loose).context_module_action
     end
     true
   end
@@ -1346,11 +1344,10 @@ class Submission < ActiveRecord::Base
             opts[:preferred_plugins].unshift Canvadocs::RENDER_O365
           end
 
-          a.send_later_enqueue_args :submit_to_canvadocs, {
-            :n_strand     => 'canvadocs',
-            :max_attempts => 1,
-            :priority => Delayed::LOW_PRIORITY
-          }, 1, opts
+          a.delay(
+            n_strand: 'canvadocs',
+            priority: Delayed::LOW_PRIORITY).
+            submit_to_canvadocs(1, opts)
         end
       end
     end
@@ -1423,7 +1420,7 @@ class Submission < ActiveRecord::Base
 
   def update_admins_if_just_submitted
     if @just_submitted
-      context.send_later_if_production(:resubmission_for, assignment)
+      context.delay_if_production.resubmission_for(assignment)
     end
     true
   end
@@ -1646,7 +1643,7 @@ class Submission < ActiveRecord::Base
 
   def queue_websnap
     if !self.attachment_id && @attempt_changed && self.url && self.submission_type == 'online_url'
-      self.send_later_enqueue_args(:get_web_snapshot, { :priority => Delayed::LOW_PRIORITY })
+      delay(priority: Delayed::LOW_PRIORITY).get_web_snapshot
     end
   end
 
@@ -1920,11 +1917,8 @@ class Submission < ActiveRecord::Base
         self.course.feature_enabled?(:conditional_release)
       end
       if ConditionalRelease::Rule.is_trigger_assignment?(self.assignment)
-        ConditionalRelease::OverrideHandler.send_later_if_production_enqueue_args(
-          :handle_grade_change,
-          {:priority => Delayed::LOW_PRIORITY, :strand => "conditional_release_grade_change:#{self.global_assignment_id}"},
-          self
-        )
+        ConditionalRelease::OverrideHandler.delay_if_production(priority: Delayed::LOW_PRIORITY, strand: "conditional_release_grade_change:#{self.global_assignment_id}").
+          handle_grade_change(self)
       end
     end
   end

@@ -223,12 +223,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   DONE_TABLES = [Account, Assignment, Course, CourseSection, Enrollment, EnrollmentDatesOverride, EnrollmentTerm, Group].freeze
 
   def self.send_later_backfill_strand(job, *args)
-    self.send_later_if_production_enqueue_args(job,
-    {
-      priority: Delayed::MAX_PRIORITY,
-      n_strand: ["root_account_id_backfill", Shard.current.database_server.id]
-    },
-    *args)
+    delay_if_production(priority: Delayed::MAX_PRIORITY,
+      n_strand: ["root_account_id_backfill", Shard.current.database_server.id]).__send__(job, *args)
   end
 
   def self.run
@@ -311,8 +307,8 @@ module DataFixup::PopulateRootAccountIdOnModels
   def self.in_progress_tables
     Delayed::Job.where(strand: "root_account_id_backfill/#{Shard.current.database_server.id}",
       shard_id: Shard.current).map do |job|
-        job.payload_object.try(:args)&.first
-    end.uniq.compact
+        job.payload_object&.args&.first
+      end.uniq.compact
   end
 
   def self.hash_association(association)
@@ -586,10 +582,8 @@ module DataFixup::PopulateRootAccountIdOnModels
     # when the current table has been fully backfilled, restart the backfill job
     # so it can check to see if any new tables can begin working based off of this table
     if empty_root_account_column_scope(table).none?
-      self.send_later_if_production_enqueue_args(:run, {
-        priority: Delayed::LOWER_PRIORITY,
-        singleton: "root_account_id_backfill_strand_#{Shard.current.id}"
-      })
+      delay_if_production(priority: Delayed::LOWER_PRIORITY,
+        singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
     end
   end
 end

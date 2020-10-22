@@ -173,7 +173,7 @@ class AssetUserAccessLog
   end
 
   def self.reschedule!
-    AssetUserAccessLog.send_later_enqueue_args(:compact, { strand: strand_name })
+    AssetUserAccessLog.delay(strand: strand_name).compact
   end
 
   def self.strand_name

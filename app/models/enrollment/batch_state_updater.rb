@@ -194,13 +194,10 @@ class Enrollment::BatchStateUpdater
     return if batch.empty?
     root_account ||= Enrollment.where(id: batch).take&.root_account
     return unless root_account
-    EnrollmentState.send_later_if_production_enqueue_args(
-      :force_recalculation,
-      {run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
+    EnrollmentState.delay_if_production(run_at: Setting.get("wait_time_to_calculate_enrollment_state", 1).to_f.minute.from_now,
        n_strand: ["restore_states_enrollment_states", root_account.global_id],
-       max_attempts: 2},
-      batch
-    )
+       max_attempts: 2).
+      force_recalculation(batch)
     students = Enrollment.of_student_type.where(id: batch).preload({user: :linked_observers}, :root_account).to_a
     user_ids = Enrollment.where(id: batch).distinct.pluck(:user_id)
     courses = Course.where(id: Enrollment.where(id: batch).select(:course_id).distinct).to_a

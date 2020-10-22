@@ -67,9 +67,8 @@ module SIS
         User.touch_and_clear_cache_keys(ids_to_touch, :enrollments) if ids_to_touch.any?
       end
       i.enrollments_to_add_to_favorites.map(&:id).compact.each_slice(1000) do |sliced_ids|
-        Enrollment.send_later_enqueue_args(:batch_add_to_favorites,
-                                           {:priority => Delayed::LOW_PRIORITY, :strand => "batch_add_to_favorites_#{@root_account.global_id}"},
-                                           sliced_ids)
+        Enrollment.delay(priority: Delayed::LOW_PRIORITY, strand: "batch_add_to_favorites_#{@root_account.global_id}").
+          batch_add_to_favorites(sliced_ids)
       end
       new_data = Enrollment::BatchStateUpdater.destroy_batch(i.enrollments_to_delete, sis_batch: @batch) if i.enrollments_to_delete.any?
 
