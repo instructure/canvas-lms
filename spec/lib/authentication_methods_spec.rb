@@ -75,7 +75,7 @@ describe AuthenticationMethods do
     context "with active session" do
       before do
         @request = double(:env => {'encrypted_cookie_store.session_refreshed_at' => 5.minutes.ago},
-                        :format =>double(:json? => false),
+                        :format => double(:json? => false),
                         :host_with_port => "")
         @controller = MockController.new(request: @request)
         allow(@controller).to receive(:load_pseudonym_from_access_token)
@@ -116,13 +116,83 @@ describe AuthenticationMethods do
       end
     end
 
+    context "with a JSON web token" do
+      include_context "JWT setup"
+
+      before do
+        enable_default_developer_key!
+        user_with_pseudonym # masquerading user
+        @real_user = @user
+        Account.site_admin.account_users.create!(user: @real_user)
+        user_with_pseudonym # masqueradee
+      end
+
+      def build_encoded_token(user_id, real_user_id: nil)
+        payload = { sub: user_id }
+        payload[:masq_sub] = real_user_id if real_user_id
+        crypted_token = Canvas::Security::ServicesJwt.generate(payload, false)
+        payload = {
+          iss: "some other service",
+          user_token: crypted_token
+        }
+        wrapper_token = Canvas::Security.create_jwt(payload, nil, fake_signing_secret)
+        Canvas::Security.base64_encode(wrapper_token)
+      end
+
+      def setup_with_jwt(token)
+        request = double(authorization: "Bearer #{token}",
+                         format: double(:json? => true),
+                         host_with_port: "",
+                         url: "",
+                         method: "GET")
+        controller = MockController.new(request: request)
+        allow(controller).to receive(:api_request?).and_return(true)
+        controller
+      end
+
+      it "finds a user by JWT" do
+        base64_encoded_token = build_encoded_token(@user.id)
+        controller = setup_with_jwt(base64_encoded_token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_user)).to eq @user
+      end
+
+      it "sets real current_user if masquerading user id present" do
+        base64_encoded_token = build_encoded_token(@user.id, real_user_id: @real_user.id)
+        controller = setup_with_jwt(base64_encoded_token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_user)).to eq @user
+        expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
+      end
+
+      it "sets current_pseudonym" do
+        base64_encoded_token = build_encoded_token(@user.id)
+        controller = setup_with_jwt(base64_encoded_token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
+        expect(controller.instance_variable_get(:@real_current_pseudonym)).to be_nil
+      end
+
+      it "sets real current_pseudonym if masquerading user id present" do
+        base64_encoded_token = build_encoded_token(@user.id, real_user_id: @real_user.id)
+        controller = setup_with_jwt(base64_encoded_token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
+        expect(controller.instance_variable_get(:@real_current_pseudonym)).to eq @real_user.pseudonym
+      end
+    end
+
     context "with an access token" do
       before do
         enable_default_developer_key!
-        user_with_pseudonym
+        user_with_pseudonym # masquerading user
         @real_user = @user
         Account.site_admin.account_users.create!(user: @real_user)
-        user_with_pseudonym
+        user_with_pseudonym # masqueradee
       end
 
       def setup_with_token(token)
@@ -153,6 +223,40 @@ describe AuthenticationMethods do
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
       end
 
+      it "sets current_pseudonym" do
+        token = AccessToken.create!(user: @user)
+        controller = setup_with_token(token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
+        expect(controller.instance_variable_get(:@real_current_pseudonym)).to be_nil
+      end
+
+      it "sets real current_pseudonym" do
+        token = AccessToken.create!(user: @user, real_user: @real_user)
+        controller = setup_with_token(token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@current_pseudonym)).to eq @user.pseudonym
+        expect(controller.instance_variable_get(:@real_current_pseudonym)).to eq @real_user.pseudonym
+      end
+
+      it "marks the access token as used" do
+        token = AccessToken.create!(user: @user)
+        controller = setup_with_token(token)
+
+        expect(controller.send(:load_user)).to eq @user
+        expect(controller.instance_variable_get(:@access_token).last_used_at).to be_truthy
+      end
+
+      it "raises AccessTokenError if current_user and current_pseudonym are not set" do
+        allow(SisPseudonym).to receive(:for).and_return(nil)
+        token = AccessToken.create!(user: @user)
+        controller = setup_with_token(token)
+
+        expect{controller.send(:load_user)}.to raise_error(AuthenticationMethods::AccessTokenError)
+      end
+
       it "accepts as_user_id on a masquerading token if masquerade matches" do
         token = AccessToken.create!(user: @user, real_user: @real_user)
         controller = setup_with_token(token)
@@ -163,7 +267,7 @@ describe AuthenticationMethods do
         expect(controller.instance_variable_get(:@real_current_user)).to eq @real_user
       end
 
-      it "rejects as_user_id on a masquerading token if masquerade dose not match" do
+      it "rejects as_user_id on a masquerading token if masquerade does not match" do
         @other_user = @user
         user_with_pseudonym
         token = AccessToken.create!(user: @user, real_user: @real_user)

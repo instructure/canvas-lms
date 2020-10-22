@@ -72,13 +72,14 @@ module AuthenticationMethods
       @authenticated_with_jwt = true
     rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
            Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
-           Canvas::Security::InvalidToken       # Looks like garbage
+           Canvas::Security::InvalidToken        # not formatted like a JWT
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
       return
-    rescue Imperium::TimeoutError => exception # Something went wrong in the Network
-      # these are indications of infrastructure of data problems
+    rescue Imperium::TimeoutError => exception
+      # Something went wrong in the Network
+      # these are indications of infrastructure or data problems
       # so we should log them for resolution, but recover gracefully
       Canvas::Errors.capture_exception(:jwt_check, exception)
     end
