@@ -444,6 +444,20 @@ var quizSubmission = (function() {
       const hr = date.getUTCHours()
       const min = date.getUTCMinutes()
       const sec = date.getUTCSeconds()
+      // Only checking min and sec since those are the only two forced to always display.
+      // Plus, it's most likely either none of these will be NaN, or they all will be.
+      if (Number.isNaN(Number(min)) || Number.isNaN(Number(sec))) {
+        // display a helpful message instead of a NaN time
+        $('.time_header').hide()
+        $('.hide_time_link').hide()
+        $('.time_running').css('color', '#EA0611')
+        $timeRunningFunc().text(
+          I18n.t(
+            'Your browser connectivity might be unstable. Please refresh the page to continue with this quiz. If the problem persists please reach out to your instructor.'
+          )
+        )
+        return
+      }
       const times = []
       if (yr) {
         times.push(I18n.t('years_count', 'Year', {count: yr}))
