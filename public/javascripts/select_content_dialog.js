@@ -84,7 +84,7 @@ SelectContentDialog.deepLinkingListener = event => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.dialog('close')
         })
-    } else {
+    } else if (event.data.content_items.length === 1) {
       processSingleContentItem(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
@@ -108,6 +108,15 @@ SelectContentDialog.deepLinkingListener = event => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.dialog('close')
         })
+    } else if (event.data.content_items.length === 0) {
+      const $selectContextContentDialog = $('#select_context_content_dialog')
+      const $resourceSelectionDialog = $('#resource_selection_dialog')
+
+      $resourceSelectionDialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+      $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+      $resourceSelectionDialog.dialog('close')
+      $selectContextContentDialog.dialog('close')
     }
   }
 }
