@@ -23,11 +23,10 @@ class CoverageTool
     SimpleCov.merge_timeout(3600)
     SimpleCov.command_name(command_name)
     SimpleCov.start do
-      SimpleCov.coverage_dir("#{ENV['WORKSPACE']}/coverage") if ENV['WORKSPACE']
       # no formatting by default, just get the json
       SimpleCov.at_exit {
         # generate an HTML report if this is running locally / not on jenkins:
-        SimpleCov.result.format! unless ENV['WORKSPACE']
+        SimpleCov.result.format! unless ENV['DOCKER_PROCESSES']
         SimpleCov.result
       }
     end
