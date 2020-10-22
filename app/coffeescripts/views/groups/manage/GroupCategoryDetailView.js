@@ -82,7 +82,6 @@ export default class GroupCategoryDetailView extends View {
     json.canMessageMembers = this.model.canMessageUnassignedMembers()
     json.canAssignMembers = this.model.canAssignUnassignedMembers()
     json.locked = this.model.isLocked()
-    json.group_csv_import_enabled = ENV.group_csv_import_enabled
     return json
   }
 
