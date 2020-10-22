@@ -281,7 +281,7 @@ describe ExternalContentController do
 
     it 'embeds oembed objects' do
       expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
-      expect(subject).to be_success
+      expect(subject).to be_successful
     end
 
     context 'With "use_oembed_token" enabed' do
@@ -316,7 +316,7 @@ describe ExternalContentController do
 
         it 'embeds oembed objects' do
           expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
-          expect(subject).to be_success
+          expect(subject).to be_successful
         end
 
         context 'when a disabled tool shares the same consumer key' do
@@ -328,7 +328,7 @@ describe ExternalContentController do
 
           it 'uses the active tool to verify the signature' do
             expect(CanvasHttp).to receive(:get).with(expected_oembed_uri)
-            expect(subject).to be_success
+            expect(subject).to be_successful
           end
         end
 

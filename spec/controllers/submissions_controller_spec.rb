@@ -628,14 +628,13 @@ describe SubmissionsController do
       expect(a.user).to eq @teacher
       expect(a.workflow_state).to eq 'to_be_zipped'
       a.update_attribute('workflow_state', 'zipped')
-      allow(a).to receive('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
-      allow(a).to receive('content_type').and_return('test/file')
-      allow(Attachment).to receive(:instantiate).and_return(a)
+      allow_any_instantiation_of(a).to receive('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
+      allow_any_instantiation_of(a).to receive('content_type').and_return('test/file')
 
       request.headers['HTTP_ACCEPT'] = '*/*'
       get 'index', params: { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }
       expect(response).to be_successful
-      expect(response.content_type).to eq 'test/file'
+      expect(response.media_type).to eq 'test/file'
     end
   end
 
