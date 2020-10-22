@@ -232,6 +232,7 @@ describe "Folders API", type: :request do
       folder = @course.folders.where(:name => "Uploaded Media").first
       expect(folder.unique_type).to eq Folder::MEDIA_TYPE
       expect(json['id']).to eq folder.id
+      expect(json['hidden']).to be_truthy
 
       # get the same one twice
       json2 = api_call(:get, "/api/v1/courses/#{@course.id}/folders/media", @folders_path_options.

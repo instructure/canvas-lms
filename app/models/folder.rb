@@ -332,8 +332,11 @@ class Folder < ActiveRecord::Base
     folder = nil
     context.shard.activate do
       Folder.unique_constraint_retry do
-        folder = context.folders.active.where(:unique_type => unique_type).take
-        folder ||= context.folders.create!(:unique_type => unique_type, :name => default_name_proc.call, :parent_folder_id => Folder.root_folders(context).first)
+        folder = context.folders.active.where(unique_type: unique_type).take
+        folder ||= context.folders.create!(unique_type: unique_type,
+                                           name: default_name_proc.call,
+                                           parent_folder_id: Folder.root_folders(context).first,
+                                           workflow_state: 'hidden')
       end
     end
     folder
