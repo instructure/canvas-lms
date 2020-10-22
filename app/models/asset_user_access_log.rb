@@ -287,7 +287,12 @@ class AssetUserAccessLog
   # of the max timestamp from a log segment and the timestamp currently on the
   # AUA record
   def self.compaction_sql(aggregation_results)
-    values_list = aggregation_results.map{|row| "(#{row["aua_id"]}, #{row["view_count"]}, '#{row["max_updated_at"]}')" }.join(", ")
+    values_list = aggregation_results.map do |row|
+      max_updated_at = row['max_updated_at']
+      max_updated_at = max_updated_at.to_s(:db) unless CANVAS_RAILS5_2
+      "(#{row["aua_id"]}, #{row["view_count"]}, '#{max_updated_at}')"
+    end.join(", ")
+
     update_query = <<~SQL
       UPDATE #{AssetUserAccess.quoted_table_name} AS aua
       SET view_score = COALESCE(aua.view_score, 0) + log_segment.view_count,

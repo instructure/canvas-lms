@@ -295,7 +295,7 @@ module Workflow
     # state. That's why it is important to save the string with the name of the
     # initial state in all the new records.
     def write_initial_state
-      write_attribute :workflow_state, current_state.to_s
+      write_attribute :workflow_state, current_state.to_s unless frozen?
     end
   end
  

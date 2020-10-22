@@ -3681,6 +3681,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def clear_moderated_grading_attributes(assignment)
+    return if assignment.frozen?
     assignment.final_grader_id = nil
     assignment.grader_count = 0
     assignment.grader_names_visible_to_final_grader = true

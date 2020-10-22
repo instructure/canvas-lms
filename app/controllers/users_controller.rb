@@ -571,7 +571,11 @@ class UsersController < ApplicationController
       end
     end
 
-    render :formats => 'html', :layout => false
+    if CANVAS_RAILS5_2
+      render :formats => 'html', :layout => false
+    else
+      render format: 'html', layout: false
+    end
   end
 
   def toggle_hide_dashcard_color_overlays
