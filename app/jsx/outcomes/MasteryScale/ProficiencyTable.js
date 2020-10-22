@@ -57,13 +57,13 @@ const configToState = data => {
   return {
     masteryIndex,
     rows,
-    locked: data.locked,
     allowSave: false
   }
 }
 class ProficiencyTable extends React.Component {
   static propTypes = {
     proficiency: PropTypes.object,
+    canManage: PropTypes.bool.isRequired,
     update: PropTypes.func.isRequired,
     focusTab: PropTypes.func,
     breakpoints: breakpointsShape
@@ -81,6 +81,7 @@ class ProficiencyTable extends React.Component {
         ]
       }
     },
+    canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     focusTab: null,
     breakpoints: {}
   }
@@ -282,7 +283,7 @@ class ProficiencyTable extends React.Component {
 
   render() {
     const {allowSave, masteryIndex} = this.state
-    const {breakpoints} = this.props
+    const {breakpoints, canManage} = this.props
     const isMobileView = breakpoints.mobileOnly
     return (
       <>
@@ -331,30 +332,36 @@ class ProficiencyTable extends React.Component {
               onPointsChange={this.handlePointsChange(index)}
               position={index + 1}
               isMobileView={isMobileView}
+              canManage={canManage}
             />
             {this.renderBorder()}
           </React.Fragment>
         ))}
-        <View
-          width="100%"
-          textAlign="start"
-          padding="small small medium small"
-          as="div"
-          borderWidth="none none small none"
-        >
-          <Button onClick={this.addRow} renderIcon={<IconPlusLine />}>
-            {I18n.t('Add Proficiency Level')}
-          </Button>
-        </View>
-        <div className="save">
-          <Button
-            variant="primary"
-            interaction={allowSave ? 'enabled' : 'disabled'}
-            onClick={this.handleSubmit}
-          >
-            {I18n.t('Save Mastery Scale')}
-          </Button>
-        </div>
+
+        {canManage && (
+          <>
+            <View
+              width="100%"
+              textAlign="start"
+              padding="small small medium small"
+              as="div"
+              borderWidth="none none small none"
+            >
+              <Button onClick={this.addRow} renderIcon={<IconPlusLine />}>
+                {I18n.t('Add Proficiency Level')}
+              </Button>
+            </View>
+            <div className="save">
+              <Button
+                variant="primary"
+                interaction={allowSave ? 'enabled' : 'disabled'}
+                onClick={this.handleSubmit}
+              >
+                {I18n.t('Save Mastery Scale')}
+              </Button>
+            </div>
+          </>
+        )}
       </>
     )
   }

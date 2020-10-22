@@ -21,7 +21,7 @@ require "bigdecimal"
 class GradeCalculator
   attr_accessor :assignments, :groups
 
-  def initialize(user_ids, course, opts = {})
+  def initialize(user_ids, course, **opts)
     Rails.logger.debug "GRADE CALCULATOR STARTS (initialize): #{Time.zone.now.to_i}"
     Rails.logger.debug "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     opts = opts.reverse_merge(
@@ -69,7 +69,7 @@ class GradeCalculator
   end
 
   # recomputes the scores and saves them to each user's Enrollment
-  def self.recompute_final_score(user_ids, course_id, compute_score_opts = {})
+  def self.recompute_final_score(user_ids, course_id, **compute_score_opts)
     Rails.logger.debug "GRADE CALCULATOR STARTS (recompute_final_score): #{Time.zone.now.to_i}"
     Rails.logger.debug "GRADE CALCULATOR - caller: #{caller(1..1).first}"
     user_ids = Array(user_ids).uniq.map(&:to_i)
@@ -89,7 +89,7 @@ class GradeCalculator
       periods: periods
     )
     user_ids.sort.in_groups_of(100, false) do |user_ids_group|
-      GradeCalculator.new(user_ids_group, course, opts).compute_and_save_scores
+      GradeCalculator.new(user_ids_group, course, **opts).compute_and_save_scores
     end
   end
 
@@ -369,7 +369,7 @@ class GradeCalculator
     @submissions_by_user ||= submissions.group_by {|s| Shard.relative_id_for(s.user_id, Shard.current, @course.shard) }
   end
 
-  def compute_branch(opts = {})
+  def compute_branch(**opts)
     opts = opts.reverse_merge(
       groups: @groups,
       grading_period: @grading_period,
@@ -385,7 +385,7 @@ class GradeCalculator
       only_update_course_gp_metadata: @only_update_course_gp_metadata,
       only_update_points: @only_update_points
     )
-    GradeCalculator.new(@user_ids, @course, opts).compute_and_save_scores
+    GradeCalculator.new(@user_ids, @course, **opts).compute_and_save_scores
   end
 
   def calculate_hidden_scores

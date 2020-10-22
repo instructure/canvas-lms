@@ -623,7 +623,7 @@ describe AssignmentsController do
           external_tool
         end
 
-        it { is_expected.to be_success }
+        it { is_expected.to be_successful }
 
         it 'creates the default line item' do
           expect {

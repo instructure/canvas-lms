@@ -99,13 +99,18 @@
     <tr>
       <th scope="row"><%= f.blabel :pronouns, :en => "Pronouns" %></th>
       <td>
-        <span id="pronouns" class="<%= editable_name ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
-        <span class="edit_data">
-          <%= f.select(:pronouns, options_for_select(([[t("None"), '']] + @domain_root_account.pronouns), @user.pronouns) ) %>
-        </span>
+        <span id="pronouns" class="<%= @domain_root_account.can_change_pronouns? ? 'display_data' : 'edit_or_show_data' %>"><%= @user.pronouns || t("None") %></span>
+        <% if @domain_root_account.can_change_pronouns? %>
+          <span class="edit_data">
+            <%= f.select(
+              :pronouns,
+              options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns))
+            %>
+          </span>
+        <% end %>
         <span class="edit_or_show_data data_description">
           <br/>
-          <%= t("These pronouns will appear after your name when shown in the UI") %>
+          <%= t("This pronoun will appear after your name when enabled") %>
         </span>
       </td>
     </tr>

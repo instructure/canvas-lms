@@ -815,6 +815,12 @@ en:
     media is uploaded or recorded through the RCE.
   enhanced_grade_change_auditing_2b155dfa: Enhanced grade change auditing
   allow_searching_grade_change_audit_logs_by_multipl_4aaa0110: Allow searching grade change audit logs by multiple criteria
+  update_file_links_to_prefer_preview_not_download_94535382: Update file links to prefer preview, not download
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+    Canvas rewrites file URLs in user generated content. In the process, it
+    often added "/download" where it was not wanted and inappropriate. This
+    setting updates how URL rewriting takes place to facilitate previewing
+    files within Canvas and not downloading.
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   reduce_outcome_duplication_on_course_import_26431b40: Reduce outcome duplication on course import
@@ -827,8 +833,8 @@ en:
   includes_outcomes_service_alignments_when_exportin_6c578a35: Includes Outcomes Service alignments when exporting and importing course content
   page_bulk_deleting_74860a80: Page Bulk Deleting
   allow_pages_to_be_deleted_in_bulk_199d3d3b: Allow pages to be deleted in bulk
-  account_level_mastery_scales_a5bdff29: Account-level Mastery Scales
-  allows_account_level_mastery_scales_and_proficienc_43899cf6: Allows Account-level mastery scales and proficiency calculations, replacing per-outcome scales
+  account_and_course_level_outcome_proficiencies_1cfa260: Account and Course Level Outcome Proficiencies
+  allows_account_course_level_mastery_scales_and_cal_da88d5a0: Allows Account & Course Level mastery scales and calculation, replacing per-outcome criterion ratings & calculation methods
   usage_rights_on_discussion_topics_7bb66ac2: Usage Rights on Discussion Topics
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: On courses with usage rights enabled, enforces usage rights selection on discussion topic file attachments
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
@@ -907,6 +913,8 @@ en:
   this_refactor_will_make_this_page_more_maintainabl_659b23e: |-
     This refactor will make this page more maintainable and easily
     allow us to make the page more accessible
+  update_inbox_page_to_use_react_instui_4d343fd: Update Inbox page to use react/instui
+  this_refactor_will_make_this_page_more_maintainabl_8ba354cf: This refactor will make this page more maintainable
   smart_alerts_44db622e: Smart alerts
   notify_students_in_time_of_assignments_that_requir_332ef10e: Notify students in time of assignments that require their attention.
   trophy_case_da3b25bb: Trophy case
@@ -1168,6 +1176,7 @@ en:
         restrict_student_future_listing: Restrict students from viewing future courses in enrollments list
         value: Disable comments on announcements
         can_add_pronouns: Enable Personal Pronouns
+        can_change_pronouns: Allow users to change their pronouns in Canvas
         domain: 'Domain:'
         admins_can_change_passwords: Password setting by admins
         admins_can_view_notifications: Admins can view notifications
@@ -4357,7 +4366,7 @@ en:
         group_structure: Group Structure
         split_into_groups: Split students into %{num_groups} groups
         split_into_sized_groups: Split students into groups with %{num_members} students per group
-        create_groups_manually: I'll create groups manually
+        create_groups_later: I'll create groups later
         create_groups: Create %{num_groups} groups now
         limit_group_size: Limit groups to %{group_limit} members
         leave_group_limit_blank: Leave blank for no limit
@@ -4438,10 +4447,10 @@ en:
   your_password_has_been_changed_df0e72aa: Your password has been changed.
   invalid_authenticity_token_b753558c: Invalid Authenticity Token
   no_password_was_given_472222e5: No password was given
+  invalid_username_or_password_b60aa240: Invalid username or password
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: Too many failed login attempts. Please try again later or contact your system administrator.
   that_user_account_has_been_deleted_please_contact__350e0e0: That user account has been deleted.  Please contact your system administrator to have your account re-activated.
   invalid_username_or_password_trouble_logging_in_ch_7699399c: Invalid username or password. Trouble logging in? *Check out our Login FAQs*.
-  invalid_username_or_password_b60aa240: Invalid username or password
   failed_to_validate_cas_ticket_error_31aa4c63: 'Failed to validate CAS ticket: %{error}'
   there_was_a_problem_logging_in_at_institution_5a298155: There was a problem logging in at %{institution}
   validated_ticket_for_username_c6c7722f: Validated ticket for %{username}
@@ -9034,6 +9043,11 @@ en:
   catalog_users_already_exist_2894b8c4: Catalog users already exist
   host_is_unreachable_or_not_pointing_to_catalog_fb3fc082: Host is unreachable or not pointing to Catalog
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: 'Uh oh! Contact your friendly Catalog Developer. Error message: %{message}'
+  failed_to_delete_auth_tokens_on_canvas_side_1d871f46: Failed to delete auth tokens on Canvas side
+  failed_to_delete_auth_tokens_on_catalog_side_54aa9a8c: Failed to delete auth tokens on Catalog side
+  failed_to_remove_special_catalog_users_8889b686: Failed to remove special Catalog users
+  failed_to_invalidate_portal_path_5bc31b91: Failed to invalidate portal path
+  failed_to_remove_catalog_settings_f5359b2b: Failed to remove Catalog settings
   acalanes_union_high_grade_report_ae9bce11: Acalanes Union High Grade Report
   student_current_grades_report_aeries_san_mateo_2cd8cc5a: Student Current Grades Report - Aeries (San Mateo)
   user_id_user_id_69a9e865: 'User ID: %{user_id}'
@@ -9310,7 +9324,8 @@ en:
   orbis_report_header_date_submitted: date submitted
   created_by_sis_b590894c: Created by SIS;
   always_include_dates_74b3721d: Always Include Dates;
-  has_syllabus_f1d6e507: has_syllabus
+  has_syllabus_body_6f250277: has_syllabus_body
+  syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
   canvas_group_membership_id_3b8c7607: canvas_group_membership_id
   student_current_grades_report_base_86b5962a: Student Current Grades Report - Base
   template_account_21ac8f4f: Template Account
@@ -9329,6 +9344,9 @@ en:
       title: Canvas Test Installation
   students_are_not_allowed_to_access_test_installati_11b9078: Students are not allowed to access test installations.
   this_environment_is_currently_being_updated_with_a_235f1875: This environment is currently being updated with a copy of the latest production data. Please check back later.
+  learn_more_in_the_canvas_community_3bba7b11: Learn more in the Canvas Community
+  recent_history_unavailable_in_test_d1753d0d: Recent History Unavailable in Test
+  recent_history_unavailable_in_beta_869b4762: Recent History Unavailable in Beta
   instructure_legacy_a2cacda7: Instructure Legacy
   instructure_default_73317bb1: Instructure Default
   internet2_254c6ca6: Internet2
@@ -12490,7 +12508,7 @@ en:
   click_to_change_profile_picture_for_display_name_6a4b41db: Click to change profile picture for %{display_name}
   user_s_settings_d65644b4: "%{user}'s Settings"
   none_3b5e34d2: None
-  these_pronouns_will_appear_after_your_name_when_sh_6b7ff5b2: These pronouns will appear after your name when shown in the UI
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: This pronoun will appear after your name when enabled
   system_default_language_28a1052d: System Default (%{language})
   remove_account_from_this_profile_c3095eb2: Remove account from this profile
   unregister_service_985238e9: Unregister Service
@@ -12721,8 +12739,6 @@ en:
   edit_criterion_description_5828919: Edit criterion description
   delete_criterion_row_80c3b3b: Delete criterion row
   this_criterion_is_linked_to_a_learning_outcome_c8aa57bf: This criterion is linked to a Learning Outcome
-  view_longer_description_6b762087: view longer description
-  long_description_7d89285c: Long Description
   range_56b2f310: Range
   instructor_comments_205e0ec8: Instructor Comments
   select_1e849959: "[ Select ]"
@@ -12736,6 +12752,7 @@ en:
   points_total_pts_5b4cbd77: "%{points} / %{total} pts"
   additional_comments_9aed10bb: Additional Comments
   description_436c48d7: Description
+  long_description_7d89285c: Long Description
   update_criterion_edcbd330: Update Criterion
   update_comments_21991be0: Update Comments
   rating_score_22cfc724: Rating Score
@@ -12835,7 +12852,7 @@ en:
         partner_key: Partner Key
         common_core_guid: Common Core GUID (optional)
       common_core_guid: "(e.g. %{guid})"
-  these_credentials_are_for_academic_benchmark_api_v_a3845be7: These credentials are for Academic Benchmark API v3.
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: The importer will be migrating from API v3 to v4.1. Credentials will not change, but you should ensure your account has access to v4.1 by February 2021.
   this_report_shows_all_the_courses_for_a_given_term_3cdc11e5: This report shows all the courses for a given term. The resulting csv file will have one row per course and will show the course id, course sis id, course short name, course name, account id, account sis id, account name, storage used in MB, and sum of all files in MB. The storage used reflects all files that go against the courses quota. The sum of all files in the course is the sum of all files that are in the course regardless of impact to the courses quota.
   example_84698b7d: Example
   configuration_location_ee0f6592: Configuration Location
@@ -12912,7 +12929,12 @@ en:
   canvas_dashboard_links_will_navigate_to_the_catalo_4143635e: Canvas dashboard links will navigate to the Catalog dashboard
   create_132b3be1: Create
   edit_your_catalog_account_cce59310: Edit your Catalog Account
+  updating_the_catalog_url_will_make_your_old_url_in_b2030b: Updating the Catalog URL will make your old URL inaccessible for users effective immediately! If there’s an existing payment processor configured, changes will require the help of a Catalog engineer.
   update_4d8ee62: Update
+  unprovisioning_your_catalog_account_7780ee2b: Unprovisioning Your Catalog Account
+  unprovisioning_will_terminate_your_catalog_account_eaa723c7: Unprovisioning will terminate your Catalog account. All data in Catalog including listings, enrollments and student data will be lost and not recoverable.
+  i_understand_the_risks_of_this_action_fb257656: I understand the risks of this action
+  unprovision_catalog_6e0d59c: Unprovision Catalog
   user_id_or_sis_id_sis_id_should_be_prepended_with__980ff02b: User ID or SIS ID (SIS ID should be prepended with sis_user_id:)
   include_deleted_enrollments_1c87684a: Include Deleted Enrollments
   course_canvas_id_9e36b24c: Course Canvas ID
@@ -12932,6 +12954,8 @@ en:
   include_unpublished_courses_7a0e7aab: Include Unpublished Courses
   include_assignment_description_36e6ed1b: Include Assignment Description
   include_needs_grading_count_b8106ff7: Include Needs Grading Count
+  updated_after_3a81825c: Updated After
+  exclude_any_data_that_hasn_t_been_updated_since_th_b9505c82: Exclude any data that hasn't been updated since the given date
   course_sis_id_sis_id_or_canvas_id_4d323f5c: 'Course SIS ID (SIS_ID:####) OR Canvas ID: (###)'
   this_report_shows_all_the_activity_from_users_enro_46394fa6: |-
     This report shows all the activity from users enrolled in a given course or
@@ -14392,72 +14416,6 @@ en:
   download_scores_generated_on_date_ff5b9cd2: Download Scores Generated on %{date}
   external_toolsHomeworkSubmissionLtiContainer:
     no_tools_found: No tools found
-  gradebook_settings_b45c6df9: Gradebook Settings
-  upload_successful_ca47465f: Upload successful
-  override_3de65b2c: Override
-  there_was_an_error_fetching_submission_comments_ce153077: There was an error fetching Submission Comments
-  successfully_saved_the_comment_c87681fd: Successfully saved the comment
-  there_was_a_problem_saving_the_comment_d94cbac9: There was a problem saving the comment
-  successfully_updated_the_comment_946360d5: Successfully updated the comment
-  there_was_a_problem_updating_the_comment_5f3595b9: There was a problem updating the comment
-  successfully_deleted_the_comment_a8bbe561: Successfully deleted the comment
-  there_was_a_problem_deleting_the_comment_93053aa9: There was a problem deleting the comment
-  there_was_a_problem_creating_the_teacher_notes_col_dd73456f: There was a problem creating the teacher notes column.
-  there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: There was a problem hiding the teacher notes column.
-  there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: There was a problem showing the teacher notes column.
-  there_was_a_problem_updating_the_submission_6e5280a1: There was a problem updating the submission.
-  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: You have entered an invalid grade for this student. Check the value and the grading type and try again.
-  unable_to_set_default_grade_because_this_assignmen_d19842a9: Unable to set default grade because this assignment is due in a closed grading period for at least one student
-  unable_to_curve_grades_because_this_assignment_is__17f78c27: Unable to curve grades because this assignment is due in a closed grading period for at least one student
-  gradebookHeaderMenu:
-    errors:
-      upload_as_zip: Please upload files as a .zip
-  note_length_cannot_exceed_maxlength_characters_82798b1: Note length cannot exceed %{maxLength} characters.
-  gradebookGradebookKeyboardNav:
-    keycodes:
-      sort: s
-      menu: m
-      close_menu: esc
-      goto_assignment: g
-    keyboard_sort_desc: Sort the grid on the current active column
-    keyboard_menu_desc: Open menu for the active column
-    keyboard_close_menu: Close the currently active menu
-    keyboard_assignment_desc: Go to the current assignment's detail page
-  open_the_grade_detail_tray_cea682a5: Open the grade detail tray
-  this_assignment_is_unpublished_64c0f46c: This assignment is unpublished
-  dropped_for_grading_purposes_46256461: Dropped for grading purposes
-  assignment_excused_eb6c08fa: Assignment Excused
-  submitted_late_97730017: Submitted Late
-  missing_submission_ec204c33: Missing Submission
-  anonymous_e1b8ad27: Anonymous
-  moderated_assignment_12873e87: Moderated Assignment
-  assignment_muted_8d74bfa0: Assignment Muted
-  resubmitted_since_last_graded_8484d285: Resubmitted since last graded
-  not_factored_into_grading_455dcf6a: Not factored into grading
-  url_submission_f76327e3: URL Submission
-  discussion_submission_781d5d33: Discussion Submission
-  file_upload_submission_740711f: File Upload Submission
-  text_entry_submission_7b0ae0c5: Text Entry Submission
-  this_quiz_needs_review_50e014e: This quiz needs review
-  media_comment_submission_14e224dc: Media Comment Submission
-  media_recording_submission_b7fd1491: Media Recording Submission
-  quiz_submission_dca0c013: Quiz Submission
-  has_similarity_score_d5f332b4: Has similarity score
-  this_submission_is_not_in_any_grading_period_cbbd2f8: This submission is not in any grading period
-  this_submission_is_in_another_grading_period_36bc720b: This submission is in another grading period
-  this_submission_is_in_a_closed_grading_period_cc9ecb8a: This submission is in a closed grading period
-  there_was_an_error_updating_this_assignment_please_59fc608d: There was an error updating this assignment. Please refresh the page and try again.
-  this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: This student was just awarded an unusually high grade.
-  this_student_was_just_awarded_negative_points_55741a37: This student was just awarded negative points.
-  pass_2a8c4f07: pass
-  fail_62dbb06a: fail
-  blank_38df4238: blank
-  excused_3aab77: excused
-  gradebookOutcomeGradebookGrid:
-    learning_outcome: Learning Outcome
-  meets_mastery_754e1c06: Meets Mastery
-  well_below_mastery_37664bdc: Well Below Mastery
-  there_was_an_error_fetching_course_statistics_96e9dbad: There was an error fetching course statistics
   duration_hours_hours_and_minutes_minutes_d5da8c3: 'Duration: %{hours} hours and %{minutes} minutes'
   duration_minutes_minutes_d7b9182b: 'Duration: %{minutes} minutes'
   duration_1_minute_29c7d5ab: 'Duration: 1 minute'
@@ -14667,6 +14625,8 @@ en:
   highest_score_e080551e: Highest Score
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: Mastery score reflects the highest score of a graded assignment or quiz.
   unstarted_932f2990: Unstarted
+  well_below_mastery_37664bdc: Well Below Mastery
+  meets_mastery_754e1c06: Meets Mastery
   content_migration_queued_46c27790: Content migration queued
   notification_preferences:
     groups:
@@ -14889,7 +14849,7 @@ en:
     teacher: Teacher
     teacher_assistant: TA
     observer: Observer
-    course_designer: Course Designer
+    designer: Designer
   listWithOthers:
     other:
       one: 1 other
@@ -15171,14 +15131,10 @@ en:
     unknown_error: Something went wrong with your search, please try again.
   open_this_keyboard_shortcuts_dialog_9658b83a: Open this keyboard shortcuts dialog
   this_will_affect_every_customer_are_you_sure_a1e0cac6: This will affect every customer. Are you sure?
-  gradebookHeaderFilterView:
-    course_average: Course average
-    course_median: Course median
   there_was_an_error_fetching_outcome_results_45c57590: There was an error fetching outcome results
-  gradebookSectionMenuView:
-    all_sections: All Sections
   clone_group_set_c2a40e15: Clone Group Set
   must_have_at_least_1_group_per_section_9809e708: Must have at least 1 group per section
+  add_group_c84f9e9d: Add Group
   count_max_students_2db76773: "%{count} / %{max} students"
   count_max_users_bdebb537: "%{count} / %{max} users"
   GroupDetailView:
@@ -15192,6 +15148,7 @@ en:
     flash:
       removed: Group successfully removed.
       removeError: Unable to remove the group. Please try again later.
+  edit_group_c8679dba: Edit Group
   removed_user_as_group_leader_bb69330f: Removed %{user} as group leader
   user_is_now_group_leader_60ec9b98: "%{user} is now group leader"
   move_student_49d6bc9d: Move Student
@@ -15381,6 +15338,7 @@ en:
   more_people_options_730e9686: More People Options
   manage_profile_pictures_40c958ce: Manage profile pictures
   view_user_groups_d2bfa855: View user groups
+  these_pronouns_will_be_available_to_canvas_users_i_e8f474e5: These pronouns will be available to Canvas users in your account to choose from.
   available_pronouns_b45330b1: Available Pronouns
   content_on_this_page_violates_the_security_policy__25685d8a: Content on this page violates the security policy, contact your admin for assistance.
   canvas_content_security_policy_c3d7bf2b: Canvas Content Security Policy
@@ -15753,6 +15711,7 @@ en:
   all_submission_comments_have_been_marked_as_read_74c0683b: All submission comments have been marked as read
   there_was_a_problem_marking_submission_comments_as_27c2f5c7: There was a problem marking submission comments as read
   send_a_comment_to_your_instructor_about_this_assig_83fd5960: Send a comment to your instructor about this assignment.
+  anonymous_e1b8ad27: Anonymous
   at_791460b3: at
   error_sending_submission_comment_dc15d24f: Error sending submission comment
   submission_comment_sent_3f2af3d0: Submission comment sent
@@ -16076,6 +16035,7 @@ en:
     one: "%{count} exception"
     other: "%{count} exceptions"
   loading_sync_history_9f342cbf: Loading Sync History
+  count_changes_pushed_by_user_654aade2: "%{count} changes pushed by %{user}"
   count_pushed_changes_6fe7fba: "%{count} pushed changes"
   there_are_no_unsynced_changes_4e8f0838: There are no unsynced changes
   count_unsynced_changes_1fc147e5: "%{count} Unsynced Changes"
@@ -16306,6 +16266,7 @@ en:
   activity_compared_to_class_8133cb0: Activity Compared to Class
   participation_af2598: Participation
   page_views_eb64cf53: Page Views
+  excused_3aab77: excused
   grade_10d1e5a1: "%{grade}"
   last_length_graded_items_6db7374e: Last %{length} Graded Items
   select_the_files_you_want_to_associate_or_add_file_9acd7878: Select the files you want to associate, or add files by selecting "New File(s)".
@@ -16807,6 +16768,7 @@ en:
   user_navigation_a097be0f: User Navigation
   page_menu_2f8bee0: Page Menu
   pages_index_menu_f391bf04: Pages Index Menu
+  assignment_and_link_selection_557faf38: Assignment and Link Selection
   placement_active_click_to_deactivate_47f8cf45: Placement active; click to deactivate
   placement_inactive_click_to_activate_f7fe8c30: Placement inactive; click to activate
   active_d7e32718: Active
@@ -16969,6 +16931,48 @@ en:
   not_anonymously_graded_87574f91: Not anonymously graded
   not_available_assignment_is_anonymous_94e77edf: Not available; assignment is anonymous
   not_available_487d3648: Not available
+  note_length_cannot_exceed_maxlength_characters_82798b1: Note length cannot exceed %{maxLength} characters.
+  gradebookGradebookKeyboardNav:
+    keycodes:
+      sort: s
+      menu: m
+      close_menu: esc
+      goto_assignment: g
+    keyboard_sort_desc: Sort the grid on the current active column
+    keyboard_menu_desc: Open menu for the active column
+    keyboard_close_menu: Close the currently active menu
+    keyboard_assignment_desc: Go to the current assignment's detail page
+  open_the_grade_detail_tray_cea682a5: Open the grade detail tray
+  this_assignment_is_unpublished_64c0f46c: This assignment is unpublished
+  dropped_for_grading_purposes_46256461: Dropped for grading purposes
+  assignment_excused_eb6c08fa: Assignment Excused
+  submitted_late_97730017: Submitted Late
+  missing_submission_ec204c33: Missing Submission
+  moderated_assignment_12873e87: Moderated Assignment
+  assignment_muted_8d74bfa0: Assignment Muted
+  resubmitted_since_last_graded_8484d285: Resubmitted since last graded
+  not_factored_into_grading_455dcf6a: Not factored into grading
+  url_submission_f76327e3: URL Submission
+  discussion_submission_781d5d33: Discussion Submission
+  file_upload_submission_740711f: File Upload Submission
+  text_entry_submission_7b0ae0c5: Text Entry Submission
+  this_quiz_needs_review_50e014e: This quiz needs review
+  media_comment_submission_14e224dc: Media Comment Submission
+  media_recording_submission_b7fd1491: Media Recording Submission
+  quiz_submission_dca0c013: Quiz Submission
+  has_similarity_score_d5f332b4: Has similarity score
+  this_submission_is_not_in_any_grading_period_cbbd2f8: This submission is not in any grading period
+  this_submission_is_in_another_grading_period_36bc720b: This submission is in another grading period
+  this_submission_is_in_a_closed_grading_period_cc9ecb8a: This submission is in a closed grading period
+  there_was_an_error_updating_this_assignment_please_59fc608d: There was an error updating this assignment. Please refresh the page and try again.
+  this_student_was_just_awarded_an_unusually_high_gr_9ad835f3: This student was just awarded an unusually high grade.
+  this_student_was_just_awarded_negative_points_55741a37: This student was just awarded negative points.
+  pass_2a8c4f07: pass
+  fail_62dbb06a: fail
+  blank_38df4238: blank
+  gradebookOutcomeGradebookGrid:
+    learning_outcome: Learning Outcome
+  there_was_an_error_fetching_course_statistics_96e9dbad: There was an error fetching course statistics
   name_error_fee4236: Name Error
   assignment_name_b2d87383: Assignment Name
   no_assignment_name_adbb215b: No Assignment Name
@@ -16987,9 +16991,25 @@ en:
   you_are_ready_to_sync_count_assignments_525eb8b1:
     one: You are ready to sync 1 assignment.
     other: You are ready to sync %{count} assignments.
+  unable_to_curve_grades_because_this_assignment_is__17f78c27: Unable to curve grades because this assignment is due in a closed grading period for at least one student
   there_was_a_problem_loading_submissions_39855ff0: There was a problem loading submissions.
   there_was_a_problem_loading_final_grade_overrides_e269e08: There was a problem loading final grade overrides.
   there_was_a_problem_overriding_the_grade_f6d83c4d: There was a problem overriding the grade.
+  you_have_entered_an_invalid_grade_for_this_student_7c41e9bc: You have entered an invalid grade for this student. Check the value and the grading type and try again.
+  gradebook_settings_b45c6df9: Gradebook Settings
+  upload_successful_ca47465f: Upload successful
+  override_3de65b2c: Override
+  there_was_an_error_fetching_submission_comments_ce153077: There was an error fetching Submission Comments
+  successfully_saved_the_comment_c87681fd: Successfully saved the comment
+  there_was_a_problem_saving_the_comment_d94cbac9: There was a problem saving the comment
+  successfully_updated_the_comment_946360d5: Successfully updated the comment
+  there_was_a_problem_updating_the_comment_5f3595b9: There was a problem updating the comment
+  successfully_deleted_the_comment_a8bbe561: Successfully deleted the comment
+  there_was_a_problem_deleting_the_comment_93053aa9: There was a problem deleting the comment
+  there_was_a_problem_creating_the_teacher_notes_col_dd73456f: There was a problem creating the teacher notes column.
+  there_was_a_problem_hiding_the_teacher_notes_colum_3f03014: There was a problem hiding the teacher notes column.
+  there_was_a_problem_showing_the_teacher_notes_colu_a6e4a2bc: There was a problem showing the teacher notes column.
+  there_was_a_problem_updating_the_submission_6e5280a1: There was a problem updating the submission.
   open_submission_tray_4eb14e96: Open submission tray
   ungraded_ed0c6f98: Ungraded
   open_complete_incomplete_menu_cfe2033b: Open Complete/Incomplete menu
@@ -17163,6 +17183,7 @@ en:
   error_exporting_gradebook_msg_6ea31e2f: 'Error exporting gradebook: %{msg}'
   no_way_to_export_gradebooks_provided_b4c2939d: No way to export gradebooks provided!
   an_export_is_already_in_progress_54270f01: An export is already in progress.
+  unable_to_set_default_grade_because_this_assignmen_d19842a9: Unable to set default grade because this assignment is due in a closed grading period for at least one student
   score_pointspossibletranslated_c1ac019e: "%{score}/%{pointsPossibleTranslated}"
   no_submission_for_assignment_a9cb6fe2: No submission for %{assignment}
   no_grade_for_assignment_97c9bc75: No grade for %{assignment}
@@ -17171,6 +17192,14 @@ en:
   you_will_be_redirected_to_gradebook_while_your_fil_23fab7de: You will be redirected to Gradebook while your file is being uploaded. If you have a large CSV file, your changes may take a few minutes to update. To prevent overwriting any data, please confirm the upload has completed and Gradebook is correct before making additional changes.
   done_8af51c9b: Done.
   invalid_csv_file_grades_could_not_be_updated_4d5c120c: Invalid CSV file. Grades could not be updated.
+  gradebookHeaderMenu:
+    errors:
+      upload_as_zip: Please upload files as a .zip
+  gradebookHeaderFilterView:
+    course_average: Course average
+    course_median: Course median
+  gradebookSectionMenuView:
+    all_sections: All Sections
   are_you_sure_you_want_to_delete_this_grading_perio_422359cd: Are you sure you want to delete this grading period?
   the_grading_period_was_deleted_7814a349: The grading period was deleted
   an_error_occured_while_deleting_the_grading_period_c8343484: An error occured while deleting the grading period
@@ -17340,19 +17369,20 @@ en:
   group_group_name_is_joined_by_invitation_only_4ac2a9e5: Group %{group_name} is joined by invitation only
   percent_complete_a7f6d403: Percent complete
   progress_percent_ae80cd55: "%{progress} percent"
-  your_group_is_being_created_88c0c024: Your Group is Being Created
+  your_groups_are_being_created_50156e34: Your groups are being created.
   this_may_take_a_few_minutes_e2df06d6: This may take a few minutes.
   there_was_an_error_uploading_your_file_please_try__ce458566: There was an error uploading your file. Please try again.
   import_groups_3a2ae14b: Import Groups
   upload_csv_file_c2d287c9: Upload CSV File
   drag_and_drop_or_click_to_browse_your_computer_2b46a2b6: Drag and drop or click to browse your computer
   download_course_roster_csv_86b3d192: Download Course Roster CSV
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: To assign students to a group, enter group names in the "group_name" column.
   group_import_api_documentation_7d0d28ee: Group Import API Documentation
   group_membership_limit_54e165b: Group Membership Limit
-  group_created_successfully_cae99f8c: Group created successfully
-  creating_group_17bd69ce: Creating group
-  error_during_group_creation_f232994b: Error during group creation
-  add_group_c84f9e9d: Add Group
+  group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: Group membership limit must be equal to or greater than current members count.
+  group_saved_successfully_fcd5ca66: Group saved successfully
+  saving_group_230707e6: Saving group
+  an_error_occurred_when_saving_the_group_536c8f66: An error occurred when saving the group.
   group_name_b69c144: Group Name
   joining_81f8b6c9: Joining
   invitation_only_9a253f1d: Invitation Only
@@ -17746,6 +17776,7 @@ en:
   granular_course_notification_settings_will_be_conf_68f122db: Granular course notification settings will be configurable here in the future.
   course_level_notifications_are_inherited_from_your_7ae3c0c2: Course-level notifications are inherited from your account-level notification settings. Adjusting notifications for this course will override notifications at the account level.
   account_level_notifications_apply_to_all_courses_n_8b99c5b0: Account-level notifications apply to all courses. Notifications for individual courses can be changed within each course and will override these notifications.
+  show_name_of_observed_students_in_notifications_d38b53ca: Show name of observed students in notifications
   notify_immediately_d1749c07: Notify immediately
   daily_summary_cf43f37c: Daily summary
   weekly_summary_56cd0c95: Weekly summary
@@ -17803,13 +17834,15 @@ en:
   item_scores_9fbfe956: 'Item Scores:'
   final_score_53278fd0: 'Final Score:'
   an_error_occurred_updating_the_calculation_method_49384084: An error occurred updating the calculation method
-  the_proficiency_calculation_was_set_by_your_admin__c31f8e95: The proficiency calculation was set by your admin and applies to all courses in this account.
   an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: 'An error occurred while loading the outcome calculation: %{error}'
   permission_to_change_this_mastery_calculation_is_e_91e19659: 'Permission to change this mastery calculation is enabled at the account level for:'
   change_description_for_proficiency_rating_position_97626231: Change description for proficiency rating %{position}
+  description_for_proficiency_rating_position_descri_da7c3cbe: 'Description for proficiency rating %{position}: %{description}'
   mastery_mastery_for_proficiency_rating_position_74aa3b56: Mastery %{mastery} for proficiency rating %{position}
   change_points_for_proficiency_rating_position_a385c658: Change points for proficiency rating %{position}
+  points_for_proficiency_rating_position_points_a5c09291: 'Points for proficiency rating %{position}: %{points}'
   change_color_for_proficiency_rating_position_48b39bfc: Change color for proficiency rating %{position}
+  color_color_for_proficiency_rating_position_273414eb: Color %{color} for proficiency rating %{position}
   delete_proficiency_rating_position_46e205f7: Delete proficiency rating %{position}
   added_new_proficiency_rating_e30cab8a: Added new proficiency rating
   account_proficiency_ratings_saved_292d9239: Account proficiency ratings saved
@@ -18351,6 +18384,7 @@ en:
   _2d4c0d31: "…"
   saved_comments_2f6ba95: Saved Comments
   select_from_saved_comments_dd398cd4: Select from saved comments
+  view_longer_description_6b762087: view longer description
   threshold_pts_45f0e5d8: 'threshold: %{pts}'
   possible_pts_b63dff4c: "%{possible} pts"
   points_possible_720fc8fd: "%{points} / %{possible}"
@@ -18397,11 +18431,14 @@ en:
   pumpkin_904428d5: Pumpkin
   orange_81386a62: Orange
   pink_68ad45cb: Pink
+  chosencolor_is_not_a_valid_color_enter_a_valid_hex_9e2c7c42: "'%{chosenColor}' is not a valid color. Enter a valid hexcode before saving."
   could_not_save_chosencolor_741b74ce: Could not save '%{chosenColor}'
   chosencolor_is_not_a_valid_color_5d542cc: "'%{chosenColor}' is not a valid color."
   select_course_color_cad8e62b: Select Course Color
+  invalid_hexcode_9124519f: Invalid hexcode
   select_a_predefined_color_c77ab2f5: Select a predefined color.
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: Enter a hexcode here to use a custom color.
+  invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: Invalid hexcode. Enter a valid hexcode here to use a custom color.
   launch_external_tool_672c0409: Launch External Tool
   please_let_them_know_which_page_you_were_viewing_a_c9816406: Please let them know which page you were viewing and the link you clicked on.
   broken_file_link_found_in_your_course_7cc24395: Broken file link found in your course

@@ -1069,32 +1069,6 @@ describe User do
       viewing_user.address_book.search_users(*args).paginate(:page => 1, :per_page => 20)
     end
 
-    it "should include yourself even when not enrolled in courses" do
-      @student = user_model
-      expect(search_messageable_users(@student).map(&:id)).to include(@student.id)
-    end
-
-    it "should only return users from the specified context and type" do
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-
-      expect(search_messageable_users(@student, :context => "course_#{@course.id}").map(&:id).sort).
-        to eql [@student, @this_section_user, @this_section_teacher, @other_section_user, @other_section_teacher].map(&:id).sort
-      expect(@student.count_messageable_users_in_course(@course)).to eql 5
-
-      expect(search_messageable_users(@student, :context => "course_#{@course.id}_students").map(&:id).sort).
-        to eql [@student, @this_section_user, @other_section_user].map(&:id).sort
-
-      expect(search_messageable_users(@student, :context => "group_#{@group.id}").map(&:id).sort).
-        to eql [@this_section_user].map(&:id).sort
-      expect(@student.count_messageable_users_in_group(@group)).to eql 1
-
-      expect(search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id).sort).
-        to eql [@other_section_user, @other_section_teacher].map(&:id).sort
-
-      expect(search_messageable_users(@student, :context => "section_#{@other_section.id}_teachers").map(&:id).sort).
-        to eql [@other_section_teacher].map(&:id).sort
-    end
-
     it "should not include users from other sections if visibility is limited to sections" do
       @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active', :limit_privileges_to_course_section => true)
       messageable_users = search_messageable_users(@student).map(&:id)
@@ -1146,13 +1120,6 @@ describe User do
 
       messageable_users = search_messageable_users(@student, :context => "section_#{@other_section.id}").map(&:id)
       expect(messageable_users).not_to include @this_section_user.id
-      expect(messageable_users).to include @other_section_user.id
-    end
-
-    it "should include users from all sections if visibility is not limited to sections" do
-      @course.enroll_user(@student, 'StudentEnrollment', :enrollment_state => 'active')
-      messageable_users = search_messageable_users(@student).map(&:id)
-      expect(messageable_users).to include @this_section_user.id
       expect(messageable_users).to include @other_section_user.id
     end
 

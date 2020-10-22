@@ -244,6 +244,7 @@ describe UserContent, type: :request do
     api_call(:get, "/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
                { :controller => 'wiki_pages_api', :action => 'show',
                  :format => 'json', :course_id => @course.id.to_s, :url => @wiki_page.url })
+    assert_status(200)
   end
 
   context "data api endpoints" do

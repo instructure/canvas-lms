@@ -39,7 +39,7 @@ module Lti
       }.freeze,
       {
         id: GROUP_INDEX_SERVICE,
-        endpoint: 'api/lti/group/{group_id}/users',
+        endpoint: 'api/lti/groups/{group_id}/users',
         format: ['application/json'].freeze,
         action: ['GET'].freeze
       }.freeze

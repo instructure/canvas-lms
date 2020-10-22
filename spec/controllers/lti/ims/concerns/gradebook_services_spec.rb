@@ -24,7 +24,7 @@ module Lti
     describe GradebookServices, type: :controller do
       controller(ApplicationController) do
         include Lti::Ims::Concerns::GradebookServices
-        before_action :verify_user_in_context, :verify_line_item_in_context
+        before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context
         skip_before_action(
           :verify_access_token,
           :verify_developer_key,
@@ -121,6 +121,45 @@ module Lti
           it 'fails to process the request' do
             get :index, params: {course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1}
             expect(response).to be_not_found
+          end
+        end
+      end
+
+      describe '#prepare_line_item_for_ags!' do
+        before do
+          allow(controller).to receive(:developer_key).and_return(developer_key)
+        end
+
+        context 'when resource link id is missing' do
+          let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
+
+          it 'is ignored' do
+            expect_any_instance_of(Assignment).not_to receive(:prepare_for_ags_if_needed!)
+            get :index, params: valid_params
+          end
+        end
+
+        context 'when resource link id points to wrong assignment' do
+          let(:valid_params) {
+            a2 = assignment.clone
+            a2.lti_context_id = nil
+            a2.save
+            {course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id}
+          }
+
+          it 'fails to match assignment tool' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+            expect(parsed_response_body['errors']['message']).to eq('Resource link id points to Tool not associated with this Context')
+          end
+        end
+
+        context 'with correct resource link id' do
+          let(:valid_params) { {course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id} }
+
+          it 'fixes up line items on assignment' do
+            expect_any_instance_of(Assignment).to receive(:prepare_for_ags_if_needed!)
+            get :index, params: valid_params
           end
         end
       end

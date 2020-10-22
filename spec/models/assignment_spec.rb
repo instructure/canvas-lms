@@ -1425,6 +1425,40 @@ describe Assignment do
     end
   end
 
+  describe "event: failed_to_duplicate" do
+    subject { described_class }
+
+    let(:duplicating_assignment) do
+      @course.assignments.create!(workflow_state: 'duplicating', **assignment_valid_attributes)
+    end
+
+    describe ".finish_duplicating" do
+      it "update to published" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.finish_duplicating
+        expect(duplicating_assignment.workflow_state).to eq 'unpublished'
+      end
+    end
+
+    describe ".fail_to_duplicate" do
+      it "update to failed_to_duplicate" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.fail_to_duplicate
+        expect(duplicating_assignment.workflow_state).to eq 'failed_to_duplicate'
+      end
+    end
+
+    describe ".fail_to_duplicate and .finish_duplicating" do
+      it "update to failed_to_duplicate" do
+        expect(duplicating_assignment.workflow_state).to eq 'duplicating'
+        duplicating_assignment.fail_to_duplicate
+        expect(duplicating_assignment.workflow_state).to eq 'failed_to_duplicate'
+        duplicating_assignment.finish_duplicating
+        expect(duplicating_assignment.workflow_state).to eq 'unpublished'
+      end
+    end
+  end
+
   describe "scope: migrating_for_too_long" do
     subject { described_class.migrating_for_too_long }
 
@@ -7448,6 +7482,41 @@ describe Assignment do
     end
   end
 
+  describe '.from_secure_lti_params' do
+    subject { Assignment.from_secure_lti_params(secure_params) }
+
+    let_once(:assignment) { assignment_model }
+
+    let(:jwt_body) { { lti_assignment_id: assignment.lti_context_id } }
+    let(:secure_params) { Canvas::Security.create_jwt(jwt_body) }
+
+    it { is_expected.to eq assignment }
+
+    context 'when no matching assignment is found' do
+      before { jwt_body.merge!({lti_assignment_id: SecureRandom.uuid}) }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params are nil' do
+      let(:secure_params) { nil }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params have invalid signature' do
+      let(:secure_params) { "#{super()}added" }
+
+      it { is_expected.to be_nil }
+    end
+
+    context 'when secure params are not a JWT' do
+      let(:secure_params) { 'notajwt' }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe '.remove_user_as_final_grader' do
     it 'calls .remove_user_as_final_grader_immediately in a delayed job' do
       expect(Assignment).to receive(:send_later_if_production_enqueue_args).
@@ -9103,7 +9172,7 @@ describe Assignment do
 
     context "when the account has SIS-related features active and the setting enabled" do
       before(:once) do
-        Account.site_admin.enable_feature!(:new_sis_integrations)
+        account.enable_feature!(:new_sis_integrations)
         account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
         account.settings[:disable_post_to_sis_when_grading_period_closed] = true
         account.save!
@@ -9211,7 +9280,7 @@ describe Assignment do
       end
     end
 
-    it "does not run when the site-admin 'new_sis_integrations' flag is not enabled" do
+    it "does not run when the root account 'new_sis_integrations' flag is not enabled" do
       account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
       account.settings[:disable_post_to_sis_when_grading_period_closed] = true
       account.save!
@@ -9222,7 +9291,7 @@ describe Assignment do
     end
 
     it "does not run when the feature flag governing the setting is not enabled for the account" do
-      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.enable_feature!(:new_sis_integrations)
       account.settings[:disable_post_to_sis_when_grading_period_closed] = true
       account.save!
 
@@ -9232,7 +9301,7 @@ describe Assignment do
     end
 
     it "does not run when the account does not have the setting enabled" do
-      Account.site_admin.enable_feature!(:new_sis_integrations)
+      account.enable_feature!(:new_sis_integrations)
       account.enable_feature!(:disable_post_to_sis_when_grading_period_closed)
 
       expect {

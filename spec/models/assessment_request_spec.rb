@@ -105,7 +105,7 @@ describe AssessmentRequest do
 
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      @assignment.update_attributes(:anonymous_peer_reviews => true)
+      @assignment.update(:anonymous_peer_reviews => true)
 
       @request.rubric_association = @association
       @request.save!

@@ -200,7 +200,7 @@ describe ConversationsController do
       it "returns starred conversations with no received messages" do
         course_with_student_logged_in(:active_all => true)
         conv = @user.initiate_conversation([])
-        conv.update_attributes(starred: true, message_count: 1)
+        conv.update(starred: true, message_count: 1)
 
         get 'index', params: {:scope => 'starred'}, :format => 'json'
         expect(response).to be_successful
@@ -343,6 +343,14 @@ describe ConversationsController do
       expect(response).to be_successful
       expect(assigns[:conversation]).not_to be_nil
       expect(assigns[:conversation].messages.first.forwarded_message_ids).to eql(@conversation.messages.first.id.to_s)
+    end
+
+    it "allows Observers to message linked students" do
+      observer = user_with_pseudonym
+      add_linked_observer(@student, observer, root_account: @course.root_account)
+      user_session(observer)
+      post 'create', params: { recipients: [@student.id.to_s], body: "Hello there", context_code: @course.asset_string }
+      expect(response).to be_successful
     end
 
     context "group conversations" do

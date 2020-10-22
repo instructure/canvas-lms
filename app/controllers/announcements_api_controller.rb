@@ -98,6 +98,12 @@ class AnnouncementsApiController < ApplicationController
     scope = scope.where('COALESCE(delayed_post_at, posted_at, created_at) BETWEEN ? AND ?', @start_date, @end_date)
     scope = scope.order(Arel.sql('COALESCE(delayed_post_at, posted_at, created_at) DESC'))
 
+    # only filter by section visibility if user has no course manage rights
+    skip_section_filtering = courses.all? do |course|
+      course.grants_any_right?(@current_user, :read_as_admin, :manage_grades, :manage_assignments, :manage_content)
+    end
+    scope = scope.visible_to_student_sections(@current_user) unless skip_section_filtering
+
     @topics = Api.paginate(scope, self, api_v1_announcements_url)
 
     include_params = Array(params[:include])

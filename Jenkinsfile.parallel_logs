@@ -39,6 +39,11 @@ def ignoreBuildNeverStartedError(block) {
   }
 }
 
+def getMigrationsTag(name) {
+
+  (env.GERRIT_REFSPEC.contains('master')) || !migrations.cacheLoadFailed() ? migrations.imageMergeTag(name) : migrations.imagePatchsetTag(name)
+}
+
 def getPatchsetTag() {
   (env.GERRIT_REFSPEC.contains('master')) ? "${configuration.buildRegistryPath()}:${env.GERRIT_BRANCH}" : imageTag.patchset()
 }
@@ -74,13 +79,20 @@ pipeline {
       steps {
         script {
           def stages = [:]
-
           def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
+
           distribution.stashBuildScripts()
 
           distribution.addRSpecSuites(stages)
           distribution.addSeleniumSuites(stages)
-          parallel(stages)
+
+          withEnv([
+            "CASSANDRA_IMAGE_TAG=${getMigrationsTag('cassandra')}",
+            "DYNAMODB_IMAGE_TAG=${getMigrationsTag('dynamodb')}",
+            "POSTGRES_IMAGE_TAG=${getMigrationsTag('postgres')}"
+          ]) {
+            parallel(stages)
+          }
         }
       }
     }
@@ -110,10 +122,9 @@ pipeline {
       script {
         ignoreBuildNeverStartedError {
           def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadJunitReports()
           rspec.uploadSeleniumFailures()
           rspec.uploadRSpecFailures()
-          load('build/new-jenkins/groovy/reports.groovy').sendFailureMessageIfPresent()
+          failureReport.submit()
         }
       }
     }

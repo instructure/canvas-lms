@@ -18,7 +18,7 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe '/shared/_grading_standard' do
+describe 'shared/_grading_standard' do
 
   let(:grading_standard) do
     @course.grading_standards.create!(:title => 'My Grading Standard', :standard_data => {

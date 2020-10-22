@@ -18,9 +18,23 @@
 
 import {gql} from 'jsx/canvas-apollo'
 
-export const OUTCOME_PROFICIENCY_QUERY = gql`
+export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
   query GetOutcomeProficiencyData($contextId: ID!) {
-    account(id: $contextId) {
+    context: account(id: $contextId) {
+      outcomeCalculationMethod {
+        _id
+        calculationInt
+        calculationMethod
+        contextId
+        contextType
+      }
+    }
+  }
+`
+
+export const COURSE_OUTCOME_PROFICIENCY_QUERY = gql`
+  query GetOutcomeProficiencyData($contextId: ID!) {
+    context: course(id: $contextId) {
       outcomeCalculationMethod {
         _id
         calculationInt

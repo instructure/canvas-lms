@@ -41,7 +41,7 @@ module AttachmentHelper
     context_name = url_helper_context_from_object(attachment.context)
     url_helper = "#{context_name}_file_inline_view_url"
     if self.respond_to?(url_helper)
-      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id)
+      attrs[:attachment_view_inline_ping_url] = self.send(url_helper, attachment.context, attachment.id, {:verifier => params[:verifier]})
     end
     if attachment.pending_upload? || attachment.processing?
       attrs[:attachment_preview_processing] = true

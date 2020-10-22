@@ -283,7 +283,7 @@ module AccountReports::ReportHelper
     if enable_i18n_features
       options = CsvWithI18n.csv_i18n_settings(@account_report.user)
     end
-    ExtendedCSV.open(file, "w", options) do |csv|
+    ExtendedCSV.open(file, "w", **options) do |csv|
       csv.instance_variable_set(:@account_report, @account_report)
       csv << headers unless headers.nil?
       activate_report_db(use_primary: compile) { yield csv } if block_given?

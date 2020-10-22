@@ -18,7 +18,7 @@
 
 import $ from 'jquery'
 import fakeENV from 'helpers/fakeENV'
-import GradebookHeaderMenu from 'compiled/gradebook/GradebookHeaderMenu'
+import GradebookHeaderMenu from 'jsx/gradebook/views/GradebookHeaderMenu'
 import SetDefaultGradeDialog from 'compiled/shared/SetDefaultGradeDialog'
 import CurveGradesDialog from 'compiled/shared/CurveGradesDialog'
 

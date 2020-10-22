@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Редактировать"
     },
+    "edit_equation_f5279959": {
+        "message": "Редактировать уравнение"
+    },
     "edit_link_7f53bebb": {
         "message": "Редактировать ссылку"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Найдено { count, plural,\n     =0 {# результата(-ов)}\n    one {# результат}\n  other {# результата(-ов)}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "На весь экран"
+    },
     "generating_preview_45b53be0": {
         "message": "Создание предварительного просмотра"
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Оценки загружены"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Документы группы"
+    },
     "group_files_4324f3df": {
         "message": "Файлы группы"
     },
     "group_files_82e5dcdb": {
         "message": "Файлы группы"
     },
+    "group_images_98e0ac17": {
+        "message": "Изображения группы"
+    },
     "group_links_9493129e": {
         "message": "Групповые ссылки"
+    },
+    "group_media_2f3d128a": {
+        "message": "Медиа группы"
     },
     "group_navigation_99f191a": {
         "message": "Навигация группы"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Тесты"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Редактор Raw HTML"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Сбой чтения файла мультимедийного трека. Прерывание."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Видеоплеер для { title }"
+    },
+    "view_ba339f93": {
+        "message": "Просмотр"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Показать клавиши быстрого доступа"

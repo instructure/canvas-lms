@@ -39,14 +39,14 @@ module Canvas
 
       private
 
-      def write_entry(key, entry, options)
+      def write_entry(key, entry, **options)
         if entry.value.nil?
           Rails.logger.warn("[LOCAL_CACHE] Writing nil value for key #{key}")
         end
-        super(key, entry, options)
+        super(key, entry, **options)
         forever_entry = entry.dup
         forever_entry.remove_instance_variable(:@expires_in)
-        super(key + KEY_SUFFIX, forever_entry, options.except(:expires_in))
+        super(key + KEY_SUFFIX, forever_entry, **options.except(:expires_in))
       end
     end
   end

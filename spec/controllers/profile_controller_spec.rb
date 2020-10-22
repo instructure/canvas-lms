@@ -131,6 +131,16 @@ describe ProfileController do
         @user.reload
         expect(@user.pronouns).to eq nil
       end
+
+      it 'should not allow setting pronouns if the setting is disabled' do
+        @user.account.settings[:can_change_pronouns] = false
+        @user.account.save!
+        user_session(@user, @pseudonym)
+        put 'update', params: {:user => {:pronouns => "Pro/Noun"}}, format: 'json'
+        expect(response).to be_successful
+        @user.reload
+        expect(@user.pronouns).to eq nil
+      end
     end
 
     it "should allow changing the default e-mail address and nothing else (name changing disabled)" do

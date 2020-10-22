@@ -245,6 +245,7 @@ class Conversation < ActiveRecord::Base
         body_or_obj :
         Conversation.build_message(current_user, body_or_obj, options)
       message.conversation = self
+      message.relativize_attachment_ids(from_shard: message.shard, to_shard: self.shard)
       message.shard = self.shard
 
       if options[:cc_author]
@@ -626,6 +627,7 @@ class Conversation < ActiveRecord::Base
         conversation_messages.find_each do |message|
           new_message = message.clone
           new_message.conversation = other
+          message.relativize_attachment_ids(from_shard: self.shard, to_shard: other.shard)
           new_message.shard = other.shard
           new_message.save!
           message.conversation_message_participants.find_each do |cmp|

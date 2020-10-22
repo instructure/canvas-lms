@@ -26,76 +26,108 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {Spinner} from '@instructure/ui-spinner'
 import {TextInput} from '@instructure/ui-text-input'
-import {showFlashSuccess} from 'jsx/shared/FlashAlert'
+import {showFlashAlert, showFlashSuccess} from 'jsx/shared/FlashAlert'
 import CanvasModal from 'jsx/shared/components/CanvasModal'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import GroupMembershipInput from './GroupMembershipInput'
 
 GroupModal.propTypes = {
-  groupCategory: shape({
+  groupCategory: shape({id: string}),
+  group: shape({
     id: string,
+    group_category_id: string,
+    name: string,
+    join_level: string,
     role: string,
-    group_limit: number
+    group_limit: number,
+    members_count: number
   }),
-  onSave: func
+  onSave: func.isRequired,
+  requestMethod: string.isRequired
 }
 
-export default function GroupModal({groupCategory, onSave, ...modalProps}) {
+export default function GroupModal({groupCategory, group, onSave, requestMethod, ...modalProps}) {
   const [name, setName] = useState('')
   const [groupLimit, setGroupLimit] = useState('')
   const [joinLevel, setJoinLevel] = useState('')
-  const [postStatus, setPostStatus] = useState(null)
+  const [status, setStatus] = useState(null)
 
   useEffect(() => {
+    if (group.name) setName(group.name)
+    if (group.group_limit) setGroupLimit(group.group_limit)
+    if (group.join_level) setJoinLevel(group.join_level)
     if (!modalProps.open) resetState()
-  }, [modalProps.open])
+  }, [group.name, group.group_limit, group.join_level, modalProps.open])
 
-  const isStudentGroup = groupCategory.role ? groupCategory.role === 'student_organized' : false
-  let payload
-  if (isStudentGroup) {
-    payload = {
-      group_category_id: groupCategory.id,
-      join_level: joinLevel || 'invitation_only',
-      name
+  const isStudentGroup = group.role ? group.role === 'student_organized' : false
+  const groupCategoryId = groupCategory ? groupCategory.id : group.group_category_id
+
+  const payload = () => {
+    if (isStudentGroup) {
+      return {
+        group_category_id: groupCategoryId,
+        join_level: joinLevel || 'invitation_only',
+        name
+      }
+    } else {
+      return {
+        group_category_id: groupCategoryId,
+        isFull: '',
+        max_membership: groupLimit ? groupLimit.toString() : '',
+        name
+      }
     }
-  } else {
-    payload = {
-      group_category_id: groupCategory.id,
-      isFull: '',
-      max_membership: (groupLimit ? groupLimit.toString() : null) || groupCategory.group_limit,
-      name
+  }
+
+  function validateBeforeSend() {
+    // prefer undefined over null as a fallback for the following
+    // comparison to evaluate properly given a group members count
+    const groupMembershipLimit = groupLimit ? parseInt(groupLimit, 10) : undefined
+    if (groupMembershipLimit < group.members_count) {
+      showFlashAlert({
+        type: 'error',
+        message: I18n.t(
+          'Group membership limit must be equal to or greater than current members count.'
+        )
+      })
+    } else {
+      handleSend()
     }
+  }
+
+  function handleSend() {
+    setStatus('info')
+    startSendOperation()
+      .then(notifyDidSave)
+      .catch(err => {
+        console.error(err) // eslint-disable-line no-console
+        if (err.response) console.error(err.response) // eslint-disable-line no-console
+        setStatus('error')
+      })
+  }
+
+  function startSendOperation() {
+    const path =
+      requestMethod === 'POST'
+        ? `/api/v1/group_categories/${groupCategoryId}/groups`
+        : `/api/v1/groups/${group.id}`
+    return doFetchApi({
+      method: requestMethod,
+      path,
+      body: payload()
+    })
+  }
+
+  function notifyDidSave() {
+    showFlashSuccess(I18n.t('Group saved successfully'))()
+    modalProps.onDismiss()
+    onSave()
   }
 
   function resetState() {
     setName('')
     setGroupLimit('')
-    setPostStatus(null)
-  }
-
-  function startSendOperation() {
-    return doFetchApi({
-      method: 'POST',
-      path: `/api/v1/group_categories/${groupCategory.id}/groups`,
-      body: payload
-    })
-  }
-
-  function handleSend() {
-    setPostStatus('info')
-    startSendOperation()
-      .then(notifyDidCreate)
-      .catch(err => {
-        console.error(err) // eslint-disable-line no-console
-        if (err.response) console.error(err.response) // eslint-disable-line no-console
-        setPostStatus('error')
-      })
-  }
-
-  function notifyDidCreate() {
-    showFlashSuccess(I18n.t('Group created successfully'))()
-    modalProps.onDismiss()
-    onSave()
+    setStatus(null)
   }
 
   function Footer() {
@@ -104,10 +136,10 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
           type="submit"
-          disabled={name.length === 0 || postStatus === 'info'}
+          disabled={name.length === 0 || status === 'info'}
           color="primary"
           margin="0 0 0 x-small"
-          onClick={handleSend}
+          onClick={validateBeforeSend}
         >
           {I18n.t('Save')}
         </Button>
@@ -116,21 +148,20 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
   }
 
   let alertMessage = ''
-  if (postStatus === 'info') alertMessage = I18n.t('Creating group')
-  else if (postStatus === 'error') alertMessage = I18n.t('Error during group creation')
+  if (status === 'info') alertMessage = I18n.t('Saving group')
+  else if (status === 'error') alertMessage = I18n.t('An error occurred when saving the group.')
 
   const alert = alertMessage ? (
-    <Alert variant={postStatus}>
+    <Alert variant={status}>
       <div role="alert" aria-live="assertive" aria-atomic>
         {alertMessage}
       </div>
-      {postStatus === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
+      {status === 'info' ? <Spinner renderTitle={alertMessage} size="x-small" /> : null}
     </Alert>
   ) : null
 
   return (
     <CanvasModal
-      label={I18n.t('Add Group')}
       size="small"
       shouldCloseOnDocumentClick={false}
       footer={<Footer />}
@@ -138,7 +169,7 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
     >
       {alert}
       <FormFieldGroup
-        description={<ScreenReaderContent>{I18n.t('Add Group')}</ScreenReaderContent>}
+        description={<ScreenReaderContent>{modalProps.label}</ScreenReaderContent>}
         layout="stacked"
         rowSpacing="large"
       >
@@ -146,6 +177,7 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
           id="group_name"
           renderLabel={I18n.t('Group Name')}
           placeholder={I18n.t('Name')}
+          value={name}
           onChange={(_event, value) => setName(value)}
           isRequired
         />
@@ -153,6 +185,7 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
           <SimpleSelect
             renderLabel={I18n.t('Joining')}
             defaultValue="invitation_only"
+            value={joinLevel}
             onChange={(_event, data) => setJoinLevel(data.value)}
           >
             <SimpleSelect.Option id="invitation_only" value="invitation_only">
@@ -163,7 +196,7 @@ export default function GroupModal({groupCategory, onSave, ...modalProps}) {
             </SimpleSelect.Option>
           </SimpleSelect>
         ) : (
-          <GroupMembershipInput onChange={setGroupLimit} value={groupLimit} />
+          <GroupMembershipInput onChange={setGroupLimit} value={groupLimit.toString()} />
         )}
       </FormFieldGroup>
     </CanvasModal>

@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/shared/_select_content_dialog" do
+describe "shared/_select_content_dialog" do
 
   describe "with module_dnd FF enabled" do
     before(:each) do

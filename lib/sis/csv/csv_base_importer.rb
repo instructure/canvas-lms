@@ -50,7 +50,7 @@ module SIS
         # counter first thing because we skip if the line number is out of the
         # range. We have to start at -1 to have a 0 index work.
         lineno = -1
-        ::CSV.foreach(csv[:fullpath], PARSE_ARGS) do |row|
+        ::CSV.foreach(csv[:fullpath], **PARSE_ARGS) do |row|
           lineno += 1
           next if index && lineno < index
           break if index && lineno >= index + count

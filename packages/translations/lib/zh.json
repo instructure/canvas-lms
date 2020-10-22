@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "编辑"
     },
+    "edit_equation_f5279959": {
+        "message": "编辑等式"
+    },
     "edit_link_7f53bebb": {
         "message": "编辑链接"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "查找 { count, plural,\n     =0 {# 结果}\n    one {# 结果}\n  other {# 结果}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "全屏"
+    },
     "generating_preview_45b53be0": {
         "message": "生成预览..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "已加载评分"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "组文档"
+    },
     "group_files_4324f3df": {
         "message": "小组文件"
     },
     "group_files_82e5dcdb": {
         "message": "组文件"
     },
+    "group_images_98e0ac17": {
+        "message": "组图像"
+    },
     "group_links_9493129e": {
         "message": "小组链接"
+    },
+    "group_media_2f3d128a": {
+        "message": "组媒体"
     },
     "group_navigation_99f191a": {
         "message": "小组导航"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "测验"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "原始 HTML 编辑器"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "读取媒体跟踪文件失败。正在中止。"
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title }的视频播放器"
+    },
+    "view_ba339f93": {
+        "message": "查看"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "查看键盘快捷键"

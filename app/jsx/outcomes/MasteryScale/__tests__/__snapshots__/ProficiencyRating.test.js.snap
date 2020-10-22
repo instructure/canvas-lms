@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`renders the ProficiencyRating component 1`] = `
+exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`] = `
 <Flex
   alignItems="start"
   as="span"
@@ -23,7 +23,7 @@ exports[`renders the ProficiencyRating component 1`] = `
     textAlign="center"
   >
     <div
-      className="mastery"
+      className="mastery null"
     >
       <RadioInput
         checked={false}
@@ -320,6 +320,135 @@ exports[`renders the ProficiencyRating component 1`] = `
         withBackground={false}
         withBorder={false}
       />
+    </div>
+  </Item>
+</Flex>
+`;
+
+exports[`ProficiencyRating can not manage renders the ProficiencyRating component 1`] = `
+<Flex
+  alignItems="start"
+  as="span"
+  direction="row"
+  display="flex"
+  elementRef={[Function]}
+  justifyItems="start"
+  padding="0 small small small"
+  width="100%"
+  withVisualDebug={false}
+  wrap="no-wrap"
+>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    padding="0 medium 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+    textAlign="center"
+  >
+    <div
+      className="mastery view-only"
+    />
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="40%"
+  >
+    <div
+      className="description"
+    >
+      <Text
+        as="span"
+        letterSpacing="normal"
+        size="medium"
+        wrap="normal"
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Description for proficiency rating 1: Stellar
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          Stellar
+        </PresentationContent>
+      </Text>
+    </div>
+  </Item>
+  <Item
+    align="start"
+    as="span"
+    elementRef={[Function]}
+    padding="0 small 0 0"
+    shouldGrow={false}
+    shouldShrink={false}
+    size="15%"
+  >
+    <div
+      className="points"
+    >
+      <View
+        borderColor="default"
+        debug={false}
+        display="auto"
+        focusColor="info"
+        focusPosition="offset"
+        focused={false}
+        margin="0 0 0 small"
+        overflowX="visible"
+        overflowY="visible"
+        position="static"
+        shouldAnimateFocus={true}
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Points for proficiency rating 1: 10.0
+        </ScreenReaderContent>
+        <PresentationContent
+          as="span"
+        >
+          10
+          <div
+            className="pointsDescription view-only"
+          >
+            points
+          </div>
+        </PresentationContent>
+      </View>
+    </div>
+  </Item>
+  <Item
+    as="span"
+    elementRef={[Function]}
+    shouldGrow={false}
+    shouldShrink={false}
+  >
+    <div
+      className="color"
+    >
+      <span
+        className="colorPickerIcon"
+        style={
+          Object {
+            "background": "#00ff00",
+            "marginLeft": "2rem",
+          }
+        }
+      >
+        <ScreenReaderContent
+          as="span"
+        >
+          Color #00ff00 for proficiency rating 1
+        </ScreenReaderContent>
+      </span>
     </div>
   </Item>
 </Flex>

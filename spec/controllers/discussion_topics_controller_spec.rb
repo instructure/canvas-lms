@@ -778,7 +778,7 @@ describe DiscussionTopicsController do
     end
 
     it "successfully redirects no authorization for a public course" do
-      @course.update_attributes(is_public: true)
+      @course.update(is_public: true)
       course_topic
       get 'show', params: {:course_id => @course.id, :id => @topic.id}
       expect(response.code).to eq "302"

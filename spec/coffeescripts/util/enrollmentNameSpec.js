@@ -25,6 +25,6 @@ test('it converts a role name to the name', () => {
   equal(enrollmentName('TeacherEnrollment'), 'Teacher')
   equal(enrollmentName('TaEnrollment'), 'TA')
   equal(enrollmentName('ObserverEnrollment'), 'Observer')
-  equal(enrollmentName('DesignerEnrollment'), 'Course Designer')
+  equal(enrollmentName('DesignerEnrollment'), 'Designer')
   equal(enrollmentName('no match'), 'no match')
 })

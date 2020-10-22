@@ -16,11 +16,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class GradebookGradingPeriodAssignments
-  def initialize(course, course_settings)
+  def initialize(course, student: nil, course_settings: nil)
     raise "Context must be a course" unless course.is_a?(Course)
     raise "Context must have an id" unless course.id
 
     @course = course
+    @student = student
     @settings_for_course = course_settings || {
       'show_concluded_enrollments' => 'false',
       'show_inactive_enrollments' => 'false'
@@ -41,15 +42,19 @@ class GradebookGradingPeriodAssignments
     excluded_workflow_states
   end
 
+  # One Query to rule them all, One Query to find them, One Query to bring them all, and in the darkness bind them to a hash
   def the_query
     GuardRail.activate(:secondary) do
-      Submission.
+      scope = Submission.
         active.
         joins(:assignment).
         joins("INNER JOIN #{Enrollment.quoted_table_name} enrollments ON enrollments.user_id = submissions.user_id").
         merge(Assignment.for_course(@course).active).
         where(enrollments: { course_id: @course, type: ['StudentEnrollment', 'StudentViewEnrollment'] }).
-        where.not(grading_period_id: nil).where.not(enrollments: { workflow_state: excluded_workflow_states }).
+        where.not(grading_period_id: nil).where.not(enrollments: { workflow_state: excluded_workflow_states })
+
+      scope = scope.where(user: @student) if @student
+      scope.
         group(:grading_period_id).
         pluck(:grading_period_id, Arel.sql("array_agg(DISTINCT assignment_id)")).
         to_h

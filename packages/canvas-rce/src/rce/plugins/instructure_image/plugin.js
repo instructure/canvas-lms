@@ -92,7 +92,11 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
           return {
             type: 'menuitem',
             text: item.text,
-            onAction: () => doMenuItem(editor, item.value)
+            onAction: () => doMenuItem(editor, item.value),
+            onSetup: api => {
+              api.setDisabled(!isOKToLink(editor.selection.getContent()))
+              return () => {}
+            }
           }
         })
     })

@@ -4,7 +4,7 @@
 
 ARG RUBY=2.6-p6.0.4
 
-FROM instructure/ruby-passenger:$RUBY AS dependencies
+FROM instructure/ruby-passenger:$RUBY AS webpack-final
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
@@ -16,17 +16,12 @@ ENV LANGUAGE en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-WORKDIR $APP_HOME
-COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
-COPY --chown=docker:docker Gemfile   ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-
-COPY --chown=docker:docker gems      ${APP_HOME}gems
-
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
+
+WORKDIR $APP_HOME
 
 USER root
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
@@ -55,6 +50,13 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 USER docker
+
+COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
+COPY --chown=docker:docker Gemfile   ${APP_HOME}
+COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
+
+COPY --chown=docker:docker gems      ${APP_HOME}gems
+
 RUN set -eux; \
   \
   # set up bundle config options \
@@ -118,8 +120,7 @@ COPY --chown=docker:docker script          ${APP_HOME}script
 
 RUN yarn postinstall
 
-FROM dependencies AS webpack-final
-ARG JS_BUILD_NO_UGLIFY=0
-
 COPY --chown=docker:docker . ${APP_HOME}
+
+ARG JS_BUILD_NO_UGLIFY=0
 RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets

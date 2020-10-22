@@ -113,8 +113,8 @@ class OutcomeProficiencyApiController < ApplicationController
   #
   def create
     if authorized_action(@context, @current_user, :manage_outcomes)
-      proficiency = @account.outcome_proficiency.presence || OutcomeProficiency.new
-      proficiency = update_ratings(proficiency, @account)
+      proficiency = @context.outcome_proficiency.presence || OutcomeProficiency.new
+      proficiency = update_ratings(proficiency, @context)
       render json: outcome_proficiency_json(proficiency, @current_user, session)
     end
   end
@@ -132,7 +132,8 @@ class OutcomeProficiencyApiController < ApplicationController
   # @returns Proficiency
   def show
     return unless authorized_action(@context, @current_user, :read)
-    proficiency = @account.resolved_outcome_proficiency or raise ActiveRecord::RecordNotFound
+
+    proficiency = @context.resolved_outcome_proficiency or raise ActiveRecord::RecordNotFound
     render json: outcome_proficiency_json(proficiency, @current_user, session)
   rescue ActiveRecord::RecordNotFound => e
     render json: { message: e.message }, status: :not_found

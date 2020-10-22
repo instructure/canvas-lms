@@ -99,5 +99,23 @@ module FeatureFlags
         )
       end
     end
+
+    def self.mastery_scales_after_change_hook(_user, context, _old_state, new_state)
+      if context.is_a?(Account) && OutcomesService::Service.enabled_in_context?(context)
+        OutcomesService::Service.send_later_if_production_enqueue_args(
+          :toggle_feature_flag,
+          {
+            priority: Delayed::LOW_PRIORITY,
+            n_strand: [
+              'outcomes_service_toggle_context_proficiencies_feature_flag',
+              context.global_root_account_id
+            ]
+          },
+          context.root_account,
+          'context_proficiencies',
+          new_state == 'on'
+        )
+      end
+    end
   end
 end

@@ -22,6 +22,14 @@ module UserContent
       def preview?
         rest.start_with?('/preview')
       end
+
+      def download?
+        rest.start_with?('/download')
+      end
+
+      def download_frd?
+        rest.include?('download_frd=1')
+      end
     end
 
     class ProcessedUrl
@@ -32,6 +40,7 @@ module UserContent
         @attachment = attachment
         @is_public = is_public
         @in_app = in_app
+        @new_file_url_rewriting = Account.site_admin.feature_enabled?(:new_file_url_rewriting)
       end
 
       def url
@@ -58,7 +67,11 @@ module UserContent
 
       def options
         { only_path: true }.tap do |h|
-          h[:download] = 1 unless match.preview?
+          if @new_file_url_rewriting
+            h[:download] = 1 if match.download_frd?
+          else
+            h[:download] = 1 unless match.preview?
+          end
           h[:verifier] = attachment.uuid unless in_app && !is_public
           if !match.preview? && match.rest.include?('wrap=1')
             h[:wrap] = 1
@@ -67,14 +80,28 @@ module UserContent
       end
 
       def path
-        if Attachment.relative_context?(attachment.context_type)
-          if match.preview?
-            "#{attachment.context_type.downcase}_file_preview_url"
+        if @new_file_url_rewriting
+          if Attachment.relative_context?(attachment.context_type)
+            if match.preview?
+              "#{attachment.context_type.downcase}_file_preview_url"
+            elsif match.download? || match.download_frd?
+              "#{attachment.context_type.downcase}_file_download_url"
+            else
+              "#{attachment.context_type.downcase}_file_url"
+            end
           else
-            "#{attachment.context_type.downcase}_file_download_url"
+            "file_download_url"
           end
         else
-          "file_download_url"
+          if Attachment.relative_context?(attachment.context_type)
+            if match.preview?
+              "#{attachment.context_type.downcase}_file_preview_url"
+            else
+              "#{attachment.context_type.downcase}_file_download_url"
+            end
+          else
+            "file_download_url"
+          end
         end
       end
     end

@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Edytuj"
     },
+    "edit_equation_f5279959": {
+        "message": "Edytuj równanie"
+    },
     "edit_link_7f53bebb": {
         "message": "Edytuj łącze"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Odnaleziono { count, plural,\n     =0 {# wyników}\n    one {# wynik}\n  other {# wyników}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Pełny ekran"
+    },
     "generating_preview_45b53be0": {
         "message": "Generowanie podglądu..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Wczytano oceny"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Grupuj dokumenty"
+    },
     "group_files_4324f3df": {
         "message": "Pliki grupy"
     },
     "group_files_82e5dcdb": {
         "message": "Pliki grupy"
     },
+    "group_images_98e0ac17": {
+        "message": "Grupuj zdjęcia"
+    },
     "group_links_9493129e": {
         "message": "Łącza grupowe"
+    },
+    "group_media_2f3d128a": {
+        "message": "Grupuj multimedia"
     },
     "group_navigation_99f191a": {
         "message": "Nawigowanie po grupach"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Testy"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Edytor HTML bez formatowania"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Nie udało się odczytać pliku multimediów. Przerywanie..."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Odtwarzacz wideo dla { title }"
+    },
+    "view_ba339f93": {
+        "message": "Wyświetl"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Wyświetl skróty klawiszowe"

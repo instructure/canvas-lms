@@ -114,7 +114,7 @@ describe ConferencesController do
 
       expect(BigBlueButtonConference).to receive(:preload_recordings).with([@bbb])
       get 'index', params: {:course_id => @course.id}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     context "sets render_alternatives variable" do

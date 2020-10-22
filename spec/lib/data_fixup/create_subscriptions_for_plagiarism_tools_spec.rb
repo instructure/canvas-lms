@@ -33,7 +33,7 @@ describe DataFixup::CreateSubscriptionsForPlagiarismTools do
   let(:tool_proxy) do
     allow_any_instance_of(Lti::PlagiarismSubscriptionsHelper).to receive(:create_subscription).and_return(nil)
     tool = create_tool_proxy(account)
-    tool.update_attributes(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
+    tool.update(raw_data: {'tool_profile' => {'service_offered' => [{'endpoint' => 'endpoint', '@id' => '#vnd.Canvas.SubmissionEvent'}]}})
     tool
   end
 

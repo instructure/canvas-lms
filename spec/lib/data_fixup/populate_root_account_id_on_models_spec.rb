@@ -23,7 +23,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     @cm = @course.context_modules.create!
     @cm.update_columns(root_account_id: nil)
     user_model
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   # add additional models here as they are calculated and added to migration_tables.
@@ -58,7 +58,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       before do
         # Ensure dummy account exists (done in migration but may be undone by specs)
         Account.find_or_create_by!(id: 0).
-          update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+          update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
       end
 
       it 'should populate the root_account_id to 0' do
@@ -264,7 +264,7 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         let(:attachment) { attachment_model(context: account_model(root_account_id: nil)) }
         let(:conversation_message) do
           conversation(@user).messages.first.tap do |msg|
-            msg.update_attributes!(root_account_ids: [@course.root_account_id])
+            msg.update!(root_account_ids: [@course.root_account_id])
           end
         end
         let(:record) do

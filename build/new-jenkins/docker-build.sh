@@ -3,32 +3,18 @@
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 WORKSPACE=${WORKSPACE:-$(pwd)}
-RUBY_PATCHSET_IMAGE=${RUBY_PATCHSET_IMAGE:-canvas-lms-ruby}
-PATCHSET_TAG=${PATCHSET_TAG:-canvas-lms}
 
-dependencyArgs=(
-  --build-arg BUILDKIT_INLINE_CACHE=1
-  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
-  --build-arg RUBY="$RUBY"
-  --file Dockerfile.jenkins
-)
-
-if [[ "${SKIP_CACHE:-false}" = "false" ]]; then
-  dependencyArgs+=("--cache-from $DEPENDENCIES_MERGE_IMAGE")
-fi
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
 # shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
-  --pull \
-  ${dependencyArgs[@]} \
-  --tag "$DEPENDENCIES_PATCHSET_IMAGE" \
-  --target dependencies \
-  "$WORKSPACE"
-
-# shellcheck disable=SC2086
-DOCKER_BUILDKIT=1 PROGRESS_NO_TRUNC=1 docker build \
-  ${dependencyArgs[@]} \
+docker pull $CACHE_TAG || true
+docker build \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
-  --tag "$PATCHSET_TAG" \
-  --target webpack-final \
+  --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
+  --build-arg RUBY="$RUBY" \
+  --cache-from $CACHE_TAG \
+  --file Dockerfile.jenkins \
+  --tag "$1" \
   "$WORKSPACE"

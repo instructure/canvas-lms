@@ -617,7 +617,7 @@ describe MasterCourses::MasterMigration do
 
       # check that syncs still work before we change downstream
       Timecop.freeze(30.seconds.from_now) do
-        ag1.update_attributes(:rules => "drop_lowest:2\n", :group_weight => 75)
+        ag1.update(:rules => "drop_lowest:2\n", :group_weight => 75)
       end
       run_master_migration
       expect(ag1_to.reload.group_weight).to eq 75
@@ -626,7 +626,7 @@ describe MasterCourses::MasterMigration do
       # change downstream
       Timecop.freeze(30.seconds.from_now) do
         ag1.touch
-        ag1_to.update_attributes(:rules => "drop_lowest:3\n", :group_weight => 25)
+        ag1_to.update(:rules => "drop_lowest:3\n", :group_weight => 25)
       end
       run_master_migration
       expect(ag1_to.reload.group_weight).to eq 25 # should not have reverted from downstream change
@@ -1463,7 +1463,7 @@ describe MasterCourses::MasterMigration do
       expect(assignment_to.reload).to be_deleted
       topic_tag = MasterCourses::ChildContentTag.where(content_type: 'DiscussionTopic', content_id: topic_to.id).take
       expect(topic_tag.downstream_changes).to include 'assignment_id'
-      assign_tag = MasterCourses::ChildContentTag.where(content_id: 'Assignment', content_id: assignment_to.id).take
+      assign_tag = MasterCourses::ChildContentTag.where(content_type: 'Assignment', content_id: assignment_to.id).take
       expect(assign_tag.downstream_changes).to include 'workflow_state'
 
       Timecop.travel(1.hour.from_now) do
@@ -2330,7 +2330,7 @@ describe MasterCourses::MasterMigration do
       mod1 = @copy_from.context_modules.create! :name => 'mod'
       page = @copy_from.wiki_pages.create!(:title => "some page")
       page_tag = mod1.add_item({:id => page.id, :type => 'wiki_page', :indent => 1})
-      mod1.update_attributes(:completion_requirements => [{:id => page_tag.id, :type => 'must_view'}])
+      mod1.update(:completion_requirements => [{:id => page_tag.id, :type => 'must_view'}])
 
       run_master_migration
 
@@ -2339,7 +2339,7 @@ describe MasterCourses::MasterMigration do
       expect(mod1_to.completion_requirements).to eq([{:id => page_tag_to.id, :type => 'must_view'}])
 
       Timecop.freeze(1.minute.from_now) do
-        mod1.update_attributes(:completion_requirements => [])
+        mod1.update(:completion_requirements => [])
       end
       run_master_migration
       expect(mod1_to.reload.completion_requirements).to eq([])

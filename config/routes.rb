@@ -1364,6 +1364,8 @@ CanvasRails::Application.routes.draw do
     scope(controller: :outcome_proficiency_api) do
       post "accounts/:account_id/outcome_proficiency", action: :create
       get "accounts/:account_id/outcome_proficiency", action: :show
+      post "courses/:course_id/outcome_proficiency", action: :create
+      get "courses/:course_id/outcome_proficiency", action: :show
     end
 
     scope(controller: :users) do

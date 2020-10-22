@@ -43,6 +43,8 @@ import ViewOptionsMenu from 'jsx/gradebook/default_gradebook/components/ViewOpti
 import ContentFilterDriver from './default_gradebook/components/content-filters/ContentFilterDriver'
 import {waitFor} from '../support/Waiters'
 
+import {compareAssignmentDueDates} from 'jsx/gradebook/default_gradebook/Gradebook.utils'
+
 import {
   createGradebook,
   setFixtureHtml
@@ -416,7 +418,7 @@ test('calculates grades without grading period data when effective due dates are
   equal(typeof args[4], 'undefined')
 })
 
-test('stores the current grade on the student', function() {
+test('stores the current grade on the student if not viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
   const student = {
@@ -428,7 +430,21 @@ test('stores the current grade on the student', function() {
   equal(student.total_grade, this.exampleGrades.current)
 })
 
-test('stores the current grade from the selected grading period', function() {
+test('stores the final grade on the student if viewing ungraded as zero', function() {
+  const gradebook = this.createGradebook()
+  gradebook.courseFeatures.allowViewUngradedAsZero = true
+  gradebook.gridDisplaySettings.viewUngradedAsZero = true
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+  gradebook.calculateStudentGrade(student)
+  equal(student.total_grade, this.exampleGrades.final)
+})
+
+test('stores the current grade from the selected grading period if not viewing ungraded as zero', function() {
   const gradebook = this.createGradebook()
   gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
   sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
@@ -439,6 +455,51 @@ test('stores the current grade from the selected grading period', function() {
   }
   gradebook.calculateStudentGrade(student)
   equal(student.total_grade, this.exampleGrades.gradingPeriods[701].current)
+})
+
+test('stores the final grade from the selected grading period if viewing ungraded as zero', function() {
+  const gradebook = this.createGradebook()
+  gradebook.courseFeatures.allowViewUngradedAsZero = true
+  gradebook.gridDisplaySettings.viewUngradedAsZero = true
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+  gradebook.calculateStudentGrade(student)
+  equal(student.total_grade, this.exampleGrades.gradingPeriods[701].final)
+})
+
+test('does not repeat the calculation if cached and preferCachedGrades is true', function() {
+  const gradebook = this.createGradebook()
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+
+  gradebook.calculateStudentGrade(student)
+  gradebook.calculateStudentGrade(student, true)
+
+  strictEqual(CourseGradeCalculator.calculate.callCount, 1)
+})
+
+test('does perform the calculation if preferCachedGrades is true and no cached value exists', function() {
+  const gradebook = this.createGradebook()
+  gradebook.setFilterColumnsBySetting('gradingPeriodId', '701')
+  sandbox.stub(CourseGradeCalculator, 'calculate').returns(this.exampleGrades)
+  const student = {
+    id: '101',
+    loaded: true,
+    initialized: true
+  }
+
+  gradebook.calculateStudentGrade(student, true)
+  strictEqual(CourseGradeCalculator.calculate.callCount, 1)
 })
 
 test('does not calculate when the student is not loaded', function() {
@@ -461,43 +522,6 @@ test('does not calculate when the student is not initialized', function() {
     initialized: false
   })
   notOk(CourseGradeCalculator.calculate.called)
-})
-
-QUnit.module('Gradebook#getStudentGradeForColumn')
-
-test('returns the grade stored on the student for the column id', () => {
-  const student = {total_grade: {score: 5, possible: 10}}
-  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade')
-  equal(grade, student.total_grade)
-})
-
-test('returns an empty grade when the student has no grade for the column id', () => {
-  const student = {total_grade: undefined}
-  const grade = createGradebook().getStudentGradeForColumn(student, 'total_grade')
-  strictEqual(grade.score, null, 'grade has a null score')
-  strictEqual(grade.possible, 0, 'grade has no points possible')
-})
-
-QUnit.module('Gradebook#getGradeAsPercent')
-
-test('returns a percent for a grade with points possible', () => {
-  const percent = createGradebook().getGradeAsPercent({score: 5, possible: 10})
-  equal(percent, 0.5)
-})
-
-test('returns null for a grade with no points possible', () => {
-  const percent = createGradebook().getGradeAsPercent({score: 5, possible: 0})
-  strictEqual(percent, null)
-})
-
-test('returns 0 for a grade with a null score', () => {
-  const percent = createGradebook().getGradeAsPercent({score: null, possible: 10})
-  strictEqual(percent, 0)
-})
-
-test('returns 0 for a grade with an undefined score', () => {
-  const percent = createGradebook().getGradeAsPercent({score: undefined, possible: 10})
-  strictEqual(percent, 0)
 })
 
 QUnit.module('Gradebook#localeSort')
@@ -739,7 +763,6 @@ QUnit.module('Gradebook#makeColumnSortFn', {
     this.gradebook = createGradebook()
     sandbox.stub(this.gradebook, 'wrapColumnSortFn')
     sandbox.stub(this.gradebook, 'compareAssignmentPositions')
-    sandbox.stub(this.gradebook, 'compareAssignmentDueDates')
     sandbox.stub(this.gradebook, 'compareAssignmentNames')
     sandbox.stub(this.gradebook, 'compareAssignmentPointsPossible')
     sandbox.stub(this.gradebook, 'compareAssignmentModulePositions')
@@ -772,7 +795,7 @@ test('wraps compareAssignmentNames when called with a sortType of name', functio
 
 test('wraps compareAssignmentDueDates when called with a sortType of due_date', function() {
   this.gradebook.makeColumnSortFn(this.sortOrder('due_date', 'descending'))
-  const expectedArgs = [this.gradebook.compareAssignmentDueDates, 'descending']
+  const expectedArgs = [compareAssignmentDueDates, 'descending']
 
   strictEqual(this.gradebook.wrapColumnSortFn.callCount, 1)
   deepEqual(this.gradebook.wrapColumnSortFn.firstCall.args, expectedArgs)
@@ -2489,6 +2512,22 @@ test('sets teacherNotesUpdating to true before sending the api request', functio
   equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
 })
 
+test('sets contextModulesLoaded to false if there are modules', function() {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: true
+  }).contentLoadStates
+  equal(contextModulesLoaded, false)
+})
+
+test('sets contextModulesLoaded to true if there are no modules', function() {
+  const {contextModulesLoaded} = createGradebook({
+    context_id: '1201',
+    has_modules: false
+  }).contentLoadStates
+  equal(contextModulesLoaded, true)
+})
+
 test('re-renders the view options menu after setting teacherNotesUpdating', function() {
   this.gradebook.renderViewOptionsMenu.callsFake(() => {
     equal(this.gradebook.contentLoadStates.teacherNotesColumnUpdating, true)
@@ -4195,45 +4234,6 @@ QUnit.module('Gradebook Grid Events', function(suiteHooks) {
       strictEqual(gradebook.updateColumnHeaders.callCount, 1)
     })
   })
-})
-
-QUnit.module('Gradebook#onGridKeyDown', {
-  setup() {
-    const columns = [
-      {id: 'student', type: 'student'},
-      {id: 'assignment_2301', type: 'assignment'}
-    ]
-    this.gradebook = createGradebook()
-    this.grid = {
-      getColumns() {
-        return columns
-      }
-    }
-  }
-})
-
-test('skips SlickGrid default behavior when pressing "enter" on a "student" cell', function() {
-  const event = {which: 13, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
-  strictEqual(event.originalEvent.skipSlickGridDefaults, true)
-})
-
-test('does not skip SlickGrid default behavior when pressing other keys on a "student" cell', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 0, row: 0}) // 0 is the index of the 'student' column
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
-})
-
-test('does not skip SlickGrid default behavior when pressing "enter" on other cells', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: 1, row: 0}) // 1 is the index of the 'assignment' column
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
-})
-
-test('does not skip SlickGrid default behavior when pressing "enter" off the grid', function() {
-  const event = {which: 27, originalEvent: {}}
-  this.gradebook.onGridKeyDown(event, {grid: this.grid, cell: undefined, row: undefined})
-  notOk('skipSlickGridDefaults' in event.originalEvent, 'skipSlickGridDefaults is not applied')
 })
 
 QUnit.module('Gradebook Grid Events', () => {
@@ -9512,6 +9512,92 @@ QUnit.module('Gradebook#getSubmission', hooks => {
 
   test('returns undefined when the student is not present', () => {
     strictEqual(gradebook.getSubmission('2202', '201'), undefined)
+  })
+})
+
+QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
+  let gradebook
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      },
+      settings: {
+        allow_view_ungraded_as_zero: 'true'
+      }
+    })
+
+    sandbox.stub(gradebook, 'saveSettings').callsFake((_data, callback) => {
+      callback()
+    })
+  })
+
+  test('toggles viewUngradedAsZero to true when false', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, true)
+  })
+
+  test('toggles viewUngradedAsZero to false when true', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, false)
+  })
+
+  test('calls updateColumnsAndRenderViewOptionsMenu after toggling', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
+    const stubFn = sandbox
+      .stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+      .callsFake(() => {
+        strictEqual(gradebook.gridDisplaySettings.viewUngradedAsZero, false)
+      })
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(stubFn.callCount, 1)
+  })
+
+  test('calls saveSettings with the new value of the setting', () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = false
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+
+    gradebook.toggleViewUngradedAsZero()
+
+    deepEqual(gradebook.saveSettings.firstCall.args[0], {
+      viewUngradedAsZero: true
+    })
+  })
+
+  test('calls calculateStudentGrade once for each student', () => {
+    const allStudents = [
+      {id: '1101', assignment_201: {}, assignment_202: {}},
+      {id: '1102', assignment_201: {}}
+    ]
+    sandbox.stub(gradebook.courseContent.students, 'listStudents').returns(allStudents)
+
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    sandbox.stub(gradebook, 'calculateStudentGrade')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.calculateStudentGrade.callCount, 2)
+  })
+
+  test('calls updateAllTotalColumns', () => {
+    gradebook.students = {
+      1101: {id: '1101', assignment_201: {}, assignment_202: {}},
+      1102: {id: '1102', assignment_201: {}}
+    }
+
+    sandbox.stub(gradebook, 'updateColumnsAndRenderViewOptionsMenu')
+    sandbox.stub(gradebook, 'updateAllTotalColumns')
+    gradebook.toggleViewUngradedAsZero()
+
+    strictEqual(gradebook.updateAllTotalColumns.callCount, 1)
   })
 })
 

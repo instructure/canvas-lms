@@ -132,9 +132,9 @@ describe LtiApiController, type: :request do
     if Canvas.redis_enabled?
       it "should not allow the same nonce to be used more than once" do
         enable_cache do
-          make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+          make_call('nonce' => 'not_so_random', 'content-type' => 'application/json')
           assert_status(415)
-          make_call('nonce' => 'not_so_random', 'content-type' => 'none')
+          make_call('nonce' => 'not_so_random', 'content-type' => 'application/json')
           assert_status(401)
           check_error_response("Duplicate nonce detected")
         end
@@ -143,7 +143,7 @@ describe LtiApiController, type: :request do
 
     it "should block timestamps more than 90 minutes old" do
       # the 90 minutes value is suggested by the LTI spec
-      make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'none')
+      make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'application/json')
       assert_status(401)
       expect(response.body).to match(/expired/i)
       check_error_response("Timestamp too old or too far in the future, request has expired")
@@ -264,7 +264,7 @@ XML
 
   def check_failure(failure_type = 'unsupported', error_message = nil)
     expect(response).to be_successful
-    expect(response.content_type).to eq 'application/xml'
+    expect(response.media_type).to eq 'application/xml'
     xml = Nokogiri::XML.parse(response.body)
     expect(xml.at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq failure_type
     expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists
@@ -275,7 +275,7 @@ XML
 
   def check_success
     expect(response).to be_successful
-    expect(response.content_type).to eq 'application/xml'
+    expect(response.media_type).to eq 'application/xml'
     expect(Nokogiri::XML.parse(response.body).at_css('imsx_POXEnvelopeResponse > imsx_POXHeader > imsx_POXResponseHeaderInfo > imsx_statusInfo > imsx_codeMajor').content).to eq 'success'
   end
 
@@ -681,7 +681,7 @@ to because the assignment has no points possible.
 
     def check_success
       expect(response).to be_successful
-      expect(response.content_type).to eq 'application/xml'
+      expect(response.media_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('message_response > statusinfo > codemajor').content).to eq 'Success'
       expect(xml.at_css('message_response > statusinfo > codeminor').content).to eq 'fullsuccess'
@@ -690,7 +690,7 @@ to because the assignment has no points possible.
 
     def check_failure(failure_type = 'Failure', error_message = nil)
       expect(response).to be_successful
-      expect(response.content_type).to eq 'application/xml'
+      expect(response.media_type).to eq 'application/xml'
       xml = Nokogiri::XML.parse(response.body)
       expect(xml.at_css('message_response > statusinfo > codemajor').content).to eq failure_type
       expect(@assignment.submissions.not_placeholder.where(user_id: @student)).not_to be_exists

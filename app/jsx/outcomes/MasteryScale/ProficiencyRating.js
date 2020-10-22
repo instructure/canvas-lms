@@ -24,7 +24,9 @@ import {IconTrashLine} from '@instructure/ui-icons'
 import {Popover} from '@instructure/ui-overlays'
 import {RadioInput} from '@instructure/ui-forms'
 import {TextInput} from '@instructure/ui-text-input'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-layout'
 import {Flex} from '@instructure/ui-flex'
 import ColorPicker, {PREDEFINED_COLORS} from '../../shared/ColorPicker'
 
@@ -51,13 +53,15 @@ class ProficiencyRating extends React.Component {
     points: PropTypes.string.isRequired,
     pointsError: PropTypes.string,
     isMobileView: PropTypes.bool,
-    position: PropTypes.number.isRequired
+    position: PropTypes.number.isRequired,
+    canManage: PropTypes.bool
   }
 
   static defaultProps = {
     descriptionError: null,
     focusField: null,
     pointsError: null,
+    canManage: window.ENV?.PERMISSIONS ? ENV.PERMISSIONS.manage_proficiency_scales : true,
     isMobileView: false
   }
 
@@ -71,21 +75,24 @@ class ProficiencyRating extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.focusField === 'mastery') {
+    const {canManage, focusField} = this.props
+    if (focusField === 'mastery' && canManage) {
       this.radioInput.focus()
     }
   }
 
   componentDidUpdate() {
-    if (this.props.focusField === 'trash') {
-      setTimeout(
-        () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
-        700
-      )
-    } else if (this.props.focusField === 'description') {
-      this.descriptionInput.focus()
-    } else if (this.props.focusField === 'points') {
-      this.pointsInput.focus()
+    if (this.props.canManage) {
+      if (this.props.focusField === 'trash') {
+        setTimeout(
+          () => (this.props.disableDelete ? this.colorButton.focus() : this.trashButton.focus()),
+          700
+        )
+      } else if (this.props.focusField === 'description') {
+        this.descriptionInput.focus()
+      } else if (this.props.focusField === 'points') {
+        this.pointsInput.focus()
+      }
     }
   }
 
@@ -136,105 +143,160 @@ class ProficiencyRating extends React.Component {
   }
 
   renderDescription = () => {
-    const {description, descriptionError, position} = this.props
+    const {description, descriptionError, position, canManage} = this.props
     return (
       <div className="description">
-        <TextInput
-          width="100%"
-          messages={this.errorMessage(descriptionError)}
-          renderLabel={
+        {canManage ? (
+          <TextInput
+            width="100%"
+            messages={this.errorMessage(descriptionError)}
+            renderLabel={
+              <ScreenReaderContent>
+                {I18n.t(`Change description for proficiency rating %{position}`, {position})}
+              </ScreenReaderContent>
+            }
+            onChange={this.handleDescriptionChange}
+            inputRef={element => this.setDescriptionRef(element)}
+            defaultValue={description}
+          />
+        ) : (
+          <Text>
             <ScreenReaderContent>
-              {I18n.t(`Change description for proficiency rating %{position}`, {position})}
+              {I18n.t(`Description for proficiency rating %{position}: %{description}`, {
+                position,
+                description
+              })}
             </ScreenReaderContent>
-          }
-          onChange={this.handleDescriptionChange}
-          inputRef={element => this.setDescriptionRef(element)}
-          defaultValue={description}
-        />
+
+            <PresentationContent>{description}</PresentationContent>
+          </Text>
+        )}
       </div>
     )
   }
 
   renderMastery = () => {
-    const {mastery, position} = this.props
+    const {mastery, position, canManage} = this.props
     return (
-      <div className="mastery">
-        <RadioInput
-          label={
-            <ScreenReaderContent>
-              {I18n.t(`Mastery %{mastery} for proficiency rating %{position}`, {
-                position,
-                mastery
-              })}
-            </ScreenReaderContent>
-          }
-          ref={input => (this.radioInput = input)}
-          checked={mastery}
-          onChange={this.handleMasteryChange}
-        />
+      <div className={`mastery ${canManage ? null : 'view-only'}`}>
+        {(mastery || canManage) && (
+          <RadioInput
+            label={
+              <ScreenReaderContent>
+                {I18n.t(`Mastery %{mastery} for proficiency rating %{position}`, {
+                  position,
+                  mastery
+                })}
+              </ScreenReaderContent>
+            }
+            ref={input => (this.radioInput = input)}
+            checked={mastery}
+            readOnly={!canManage}
+            onChange={this.handleMasteryChange}
+          />
+        )}
       </div>
     )
   }
 
   renderPointsInput = () => {
-    const {points, pointsError, position, isMobileView} = this.props
+    const {points, pointsError, position, isMobileView, canManage} = this.props
     return (
       <div className="points">
-        <TextInput
-          type="text"
-          inputRef={this.setPointsRef}
-          messages={this.errorMessage(pointsError)}
-          renderLabel={
+        {canManage ? (
+          <>
+            <TextInput
+              type="text"
+              inputRef={this.setPointsRef}
+              messages={this.errorMessage(pointsError)}
+              renderLabel={
+                <ScreenReaderContent>
+                  {I18n.t(`Change points for proficiency rating %{position}`, {position})}
+                </ScreenReaderContent>
+              }
+              onChange={this.handlePointChange}
+              defaultValue={I18n.n(points)}
+              width={isMobileView ? '7rem' : '4rem'}
+            />
+
+            <div className="pointsDescription" aria-hidden="true">
+              {I18n.t('points')}
+            </div>
+          </>
+        ) : (
+          <View margin={`0 0 0 ${isMobileView ? '0' : 'small'}`}>
             <ScreenReaderContent>
-              {I18n.t(`Change points for proficiency rating %{position}`, {position})}
+              {I18n.t(`Points for proficiency rating %{position}: %{points}`, {
+                position,
+                points
+              })}
             </ScreenReaderContent>
-          }
-          onChange={this.handlePointChange}
-          defaultValue={I18n.n(points)}
-          width={isMobileView ? '7rem' : '4rem'}
-        />
-        <div className="pointsDescription" aria-hidden="true">
-          {I18n.t('points')}
-        </div>
+
+            <PresentationContent>
+              {I18n.n(points)}
+
+              <div className="pointsDescription view-only">{I18n.t('points')}</div>
+            </PresentationContent>
+          </View>
+        )}
       </div>
     )
   }
 
   renderColorPicker = () => {
-    const {color, position} = this.props
+    const {color, position, canManage, isMobileView} = this.props
     return (
       <div className="color">
-        <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
-          <Popover.Trigger>
-            <Button ref={this.setColorRef} variant="link">
-              <div>
-                <span className="colorPickerIcon" style={{background: formatColor(color)}} />
-                <ScreenReaderContent>
-                  {I18n.t(`Change color for proficiency rating %{position}`, {position})}
-                </ScreenReaderContent>
-                <span aria-hidden="true">{I18n.t('Change')}</span>
-              </div>
-            </Button>
-          </Popover.Trigger>
-          <Popover.Content>
-            <ColorPicker
-              parentComponent="ProficiencyRating"
-              colors={PREDEFINED_COLORS}
-              currentColor={formatColor(color)}
-              isOpen
-              hidePrompt
-              nonModal
-              hideOnScroll={false}
-              withAnimation={false}
-              withBorder={false}
-              withBoxShadow={false}
-              withArrow={false}
-              focusOnMount={false}
-              afterClose={this.handleMenuClose}
-              setStatusColor={this.setColor}
-            />
-          </Popover.Content>
-        </Popover>
+        {canManage ? (
+          <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
+            <Popover.Trigger>
+              <Button ref={this.setColorRef} variant="link">
+                <div>
+                  <span className="colorPickerIcon" style={{background: formatColor(color)}} />
+                  <ScreenReaderContent>
+                    {I18n.t(`Change color for proficiency rating %{position}`, {position})}
+                  </ScreenReaderContent>
+                  <span aria-hidden="true">{I18n.t('Change')}</span>
+                </div>
+              </Button>
+            </Popover.Trigger>
+            <Popover.Content>
+              <ColorPicker
+                parentComponent="ProficiencyRating"
+                colors={PREDEFINED_COLORS}
+                currentColor={formatColor(color)}
+                isOpen
+                hidePrompt
+                nonModal
+                hideOnScroll={false}
+                withAnimation={false}
+                withBorder={false}
+                withBoxShadow={false}
+                withArrow={false}
+                focusOnMount={false}
+                afterClose={this.handleMenuClose}
+                setStatusColor={this.setColor}
+              />
+            </Popover.Content>
+          </Popover>
+        ) : (
+          <>
+            <span
+              className="colorPickerIcon"
+              style={{
+                background: formatColor(color),
+                marginLeft: isMobileView ? 0 : '2rem'
+              }}
+            >
+              <ScreenReaderContent>
+                {I18n.t(`Color %{color} for proficiency rating %{position}`, {
+                  color: ColorPicker.getColorName(color) || formatColor(color),
+                  position
+                })}
+              </ScreenReaderContent>
+            </span>
+          </>
+        )}
       </div>
     )
   }
@@ -259,7 +321,7 @@ class ProficiencyRating extends React.Component {
   errorMessage = error => (error ? [{text: error, type: 'error'}] : null)
 
   render() {
-    const {isMobileView} = this.props
+    const {isMobileView, canManage} = this.props
     return (
       <Flex
         padding={`${isMobileView ? '0 0 small 0' : '0 small small small'}`}
@@ -274,9 +336,9 @@ class ProficiencyRating extends React.Component {
           {isMobileView && (
             <>
               {this.renderPointsInput()}
-              <div className="mobileRow">
+              <div className={`mobileRow ${canManage ? null : 'view-only'}`}>
                 {this.renderColorPicker()}
-                {this.renderDeleteButton()}
+                {canManage && this.renderDeleteButton()}
               </div>
             </>
           )}
@@ -287,9 +349,11 @@ class ProficiencyRating extends React.Component {
               {this.renderPointsInput()}
             </Flex.Item>
             <Flex.Item>{this.renderColorPicker()}</Flex.Item>
-            <Flex.Item size="10%" padding="0 small 0 small">
-              {this.renderDeleteButton()}
-            </Flex.Item>
+            {canManage && (
+              <Flex.Item size="10%" padding="0 small 0 small">
+                {this.renderDeleteButton()}
+              </Flex.Item>
+            )}
           </>
         )}
       </Flex>

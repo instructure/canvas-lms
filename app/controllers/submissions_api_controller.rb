@@ -431,7 +431,7 @@ class SubmissionsApiController < ApplicationController
 
     assignments = GuardRail.activate(:secondary) do
       if params[:grading_period_id].present?
-        GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
+        GradingPeriod.active.find(params[:grading_period_id]).assignments(@context, assignment_scope)
       else
         assignment_scope.to_a
       end
@@ -491,7 +491,7 @@ class SubmissionsApiController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(
         submissions,
         :submission_comments,
-        {select: [:hidden, :submission_id]}
+        SubmissionComment.select(:hidden, :submission_id)
       )
 
       bulk_load_attachments_and_previews(submissions)

@@ -1,0 +1,73 @@
+# syntax = docker/dockerfile:1.0-experimental
+
+FROM busybox AS cache-helper-collect-gems
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
+
+FROM busybox AS cache-helper-collect-yarn
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+
+FROM busybox AS cache-helper-collect-webpack
+RUN mkdir -p /tmp/dst /tmp/dst
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src find gems -type d \
+  -not -path "gems" \
+  -not -path "gems/plugins" \
+  -maxdepth 2 \
+  -path "gems/*/lib" \
+  -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/canvas_i18nliner \
+  -not -path "gems/canvas_i18nliner" \
+  -not -path "gems/canvas_i18nliner/spec" \
+  -not -path "gems/canvas_i18nliner/spec/*" \
+  -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/jsx" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/stylesheets" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src find gems/plugins -path "*/public" -exec cp -rf --parents {} /tmp/dst \;
+
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config && \
+  cp -rf config/application.rb /tmp/dst/config && \
+  cp -rf config/boot.rb /tmp/dst/config && \
+  cp -rf config/brandable_css.yml /tmp/dst/config && \
+  cp -rf config/browsers.yml /tmp/dst/config && \
+  cp -rf config/canvas_rails_switcher.rb /tmp/dst/config && \
+  cp -rf config/environment.rb /tmp/dst/config
+
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config/initializers && \
+  cp -rf config/initializers/plugin_symlinks.rb /tmp/dst/config/initializers/ && \
+  cp -rf config/initializers/client_app_symlinks.rb /tmp/dst/config/initializers/ && \
+  cp -rf config/initializers/json.rb /tmp/dst/config/initializers/ && \
+  cp -rf config/initializers/revved_asset_urls.rb /tmp/dst/config/initializers/
+
+RUN --mount=target=/tmp/src cp -rf config/environments --parents /tmp/dst
+RUN --mount=target=/tmp/src cp -rf config/locales --parents /tmp/dst
+
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib && \
+  cp -rf lib/brandable_css.rb /tmp/dst/lib && \
+  cp -rf lib/canvas_logger.rb /tmp/dst/lib && \
+  cp -rf lib/canvas_yaml.rb /tmp/dst/lib && \
+  cp -rf lib/config_file.rb /tmp/dst/lib && \
+  cp -rf lib/logging_filter.rb /tmp/dst/lib && \
+  cp -rf lib/request_cache.rb /tmp/dst/lib && \
+  cp -rf lib/temp_cache.rb /tmp/dst/lib
+
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib/canvas && \
+  cp -rf lib/canvas/cdn.rb /tmp/dst/lib/canvas/ && \
+  cp -rf lib/canvas/reloader.rb /tmp/dst/lib/canvas/
+
+RUN --mount=target=/tmp/src cp -rf lib/canvas/cdn --parents /tmp/dst
+RUN --mount=target=/tmp/src cp -rf lib/rake --parents /tmp/dst
+RUN --mount=target=/tmp/src cp -rf lib/tasks --parents /tmp/dst

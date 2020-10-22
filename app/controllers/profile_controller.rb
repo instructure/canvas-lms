@@ -358,7 +358,7 @@ class ProfileController < ApplicationController
         user_params.delete(:short_name)
         user_params.delete(:sortable_name)
       end
-      if user_params[:pronouns].present? && @domain_root_account.pronouns.exclude?(user_params[:pronouns].strip)
+      if !@domain_root_account.can_change_pronouns? || user_params[:pronouns].present? && @domain_root_account.pronouns.exclude?(user_params[:pronouns].strip)
         user_params.delete(:pronouns)
       end
       if @user.update(user_params)
@@ -419,8 +419,11 @@ class ProfileController < ApplicationController
     @profile = @user.profile
     @context = @profile
 
+    if @domain_root_account.can_change_pronouns? && params[:pronouns].present? && @domain_root_account.pronouns.include?(params[:pronouns].strip)
+      @user.pronouns = params[:pronouns]
+    end
+
     short_name = params[:user] && params[:user][:short_name]
-    @user.pronouns = params[:pronouns] if params[:pronouns]
     @user.short_name = short_name if short_name && @user.user_can_edit_name?
     if params[:user_profile]
       user_profile_params = params[:user_profile].permit(:title, :bio)

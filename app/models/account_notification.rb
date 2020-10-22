@@ -161,10 +161,11 @@ class AccountNotification < ActiveRecord::Base
           end
         end
 
-        roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.pluck(:type)
-
-        if roles == ['StudentEnrollment'] && !root_account.include_students_in_global_survey?
-          current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
+        if !root_account.include_students_in_global_survey? && current.any? { |a| a.required_account_service == 'account_survey_notifications' }
+          roles = user.enrollments.shard(user.in_region_associated_shards).active_or_pending_by_date.distinct.pluck(:type)
+          if roles == ['StudentEnrollment']
+            current.reject! { |announcement| announcement.required_account_service == 'account_survey_notifications' }
+          end
         end
       end
 

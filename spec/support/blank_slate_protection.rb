@@ -19,7 +19,7 @@ require_relative "./call_stack_utils"
 
 module BlankSlateProtection
   module ActiveRecord
-    def create_or_update(*)
+    def create_or_update(*, **)
       return super unless BlankSlateProtection.enabled?
       return super if caller.grep(BlankSlateProtection.exempt_patterns).present?
 

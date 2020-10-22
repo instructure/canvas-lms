@@ -330,8 +330,7 @@ class AssignmentGroupsController < ApplicationController
   def include_overrides?
     override_dates? ||
       include_params.include?('all_dates') ||
-      include_params.include?('overrides') ||
-      filter_by_grading_period?
+      include_params.include?('overrides')
   end
 
   def assignment_visibilities(course, assignments)
@@ -445,9 +444,9 @@ class AssignmentGroupsController < ApplicationController
 
     if params[:scope_assignments_to_student] &&
       course.user_is_student?(@current_user, include_future: true, include_fake_student: true)
-      grading_period.assignments_for_student(assignments, @current_user)
+      grading_period.assignments_for_student(course, assignments, @current_user)
     else
-      grading_period.assignments(assignments)
+      grading_period.assignments(course, assignments)
     end
   end
 

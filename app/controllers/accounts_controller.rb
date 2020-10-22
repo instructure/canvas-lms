@@ -1200,8 +1200,7 @@ class AccountsController < ApplicationController
     pseudonym.update!(workflow_state: 'active')
     pseudonym.clear_permissions_cache(user)
     user.update_account_associations
-    user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
-    user.touch
+    user.clear_caches
     render json: user || {}
   end
 
@@ -1513,7 +1512,8 @@ class AccountsController < ApplicationController
   PERMITTED_SETTINGS_FOR_UPDATE = [:admins_can_change_passwords, :admins_can_view_notifications,
                                    :allow_invitation_previews, :allow_sending_scores_in_emails,
                                    :author_email_in_notifications, :canvadocs_prefer_office_online,
-                                   :consortium_parent_account, :consortium_can_create_own_accounts, :can_add_pronouns,
+                                   :can_add_pronouns, :can_change_pronouns,
+                                   :consortium_parent_account, :consortium_can_create_own_accounts,
                                    :shard_per_account, :consortium_autocreate_web_of_trust,
                                    :consortium_autocreate_reverse_trust,
                                    :default_storage_quota, :default_storage_quota_mb,

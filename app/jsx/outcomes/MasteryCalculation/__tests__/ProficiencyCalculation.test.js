@@ -43,20 +43,18 @@ describe('ProficiencyCalculation', () => {
 
   const makeProps = (overrides = {}) => ({
     update: Function.prototype,
+    canManage: true,
     ...overrides,
     method: {
       calculationMethod: 'decaying_average',
       calculationInt: 75,
-      locked: false,
       ...(overrides.method || {})
     }
   })
 
   describe('locked', () => {
     it('renders method and int', () => {
-      const {getByText} = render(
-        <ProficiencyCalculation {...makeProps({method: {locked: true}})} />
-      )
+      const {getByText} = render(<ProficiencyCalculation {...makeProps({canManage: false})} />)
       expect(getByText('Decaying Average')).not.toBeNull()
       expect(getByText('75')).not.toBeNull()
     })
@@ -65,7 +63,8 @@ describe('ProficiencyCalculation', () => {
       const {getByText, queryByText} = render(
         <ProficiencyCalculation
           {...makeProps({
-            method: {calculationMethod: 'latest', calculationInt: null, locked: true}
+            canManage: false,
+            method: {calculationMethod: 'latest', calculationInt: null}
           })}
         />
       )
@@ -77,7 +76,7 @@ describe('ProficiencyCalculation', () => {
       const {getByText} = render(
         <ProficiencyCalculation
           {...makeProps({
-            method: {locked: true}
+            canManage: false
           })}
         />
       )
@@ -89,7 +88,8 @@ describe('ProficiencyCalculation', () => {
       const {getByText} = render(
         <ProficiencyCalculation
           {...makeProps({
-            method: {calculationMethod: 'latest', calculationInt: null, locked: true}
+            canManage: false,
+            method: {calculationMethod: 'latest', calculationInt: null}
           })}
         />
       )

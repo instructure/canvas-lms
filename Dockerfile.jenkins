@@ -1,29 +1,10 @@
-# syntax = docker/dockerfile:1.0-experimental
 # GENERATED FILE, DO NOT MODIFY!
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
 ARG RUBY=2.6-p6.0.4
 
-FROM busybox AS cache-helper-collect-gems
-RUN mkdir -p /tmp/dst /tmp/dst
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
-
-FROM busybox AS cache-helper-collect-yarn
-RUN mkdir -p /tmp/dst /tmp/dst
-WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-
-FROM instructure/ruby-passenger:$RUBY AS dependencies
+FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
@@ -35,17 +16,12 @@ ENV LANGUAGE en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
 
-WORKDIR $APP_HOME
-COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
-COPY --chown=docker:docker Gemfile   ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-
-COPY --chown=docker:docker --from=cache-helper-collect-gems /tmp/dst ${APP_HOME}
-
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
 ENV PATH $GEM_HOME/bin:$PATH
 ENV BUNDLE_APP_CONFIG /home/docker/.bundle
+
+WORKDIR $APP_HOME
 
 USER root
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
@@ -74,6 +50,13 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
   && find $GEM_HOME ! -user docker | xargs chown docker:docker
 
 USER docker
+
+COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
+COPY --chown=docker:docker Gemfile   ${APP_HOME}
+COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
+
+COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
+
 RUN set -eux; \
   \
   # set up bundle config options \
@@ -88,7 +71,7 @@ RUN set -eux; \
 COPY --chown=docker:docker package.json ${APP_HOME}
 COPY --chown=docker:docker yarn.lock    ${APP_HOME}
 
-COPY --chown=docker:docker --from=cache-helper-collect-yarn /tmp/dst ${APP_HOME}
+COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
 
 RUN set -eux; \
   mkdir -p .yardoc \
@@ -137,8 +120,30 @@ COPY --chown=docker:docker script          ${APP_HOME}script
 
 RUN yarn postinstall
 
-FROM dependencies AS webpack-final
+COPY --chown=docker:docker app/coffeescripts ${APP_HOME}app/coffeescripts
+COPY --chown=docker:docker app/jsx ${APP_HOME}app/jsx
+COPY --chown=docker:docker app/stylesheets ${APP_HOME}app/stylesheets
+COPY --chown=docker:docker app/views/jst ${APP_HOME}app/views/jst
+COPY --chown=docker:docker bin ${APP_HOME}bin
+COPY --chown=docker:docker client_apps ${APP_HOME}client_apps
+COPY --chown=docker:docker db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb ${APP_HOME}db/migrate/
+COPY --chown=docker:docker frontend_build ${APP_HOME}frontend_build
+COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
+COPY --chown=docker:docker public ${APP_HOME}public
+COPY --chown=docker:docker Rakefile ${APP_HOME}
+COPY --chown=docker:docker gulpfile.js ${APP_HOME}
+COPY --chown=docker:docker webpack.config.js ${APP_HOME}
+COPY --chown=docker:docker .bowerrc ${APP_HOME}
+COPY --chown=docker:docker .i18nignore ${APP_HOME}
+COPY --chown=docker:docker .i18nrc ${APP_HOME}
+
 ARG JS_BUILD_NO_UGLIFY=0
+RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
+
+COPY --chown=docker:docker app ${APP_HOME}/app
+COPY --chown=docker:docker config ${APP_HOME}config
+COPY --chown=docker:docker doc ${APP_HOME}/doc
+COPY --chown=docker:docker lib ${APP_HOME}lib
+RUN bundle exec rails doc:api css:styleguide
 
 COPY --chown=docker:docker . ${APP_HOME}
-RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets

@@ -12,5 +12,5 @@ for keyspace in auditors global_lookups page_views; do
 done
 seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T cassandra cqlsh -e \"${create_cmd[@]}\""
 
-seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T -e VERBOSE=false canvas bundle exec rails db:migrate"
+seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T canvas bundle exec rails db:migrate >> ./migrate-{}.log"
 seq 0 $PROCESSES | parallel "docker-compose --project-name canvas-lms{} exec -T canvas bundle exec rails runner \"require 'switchman/test_helper'; Switchman::TestHelper.recreate_persistent_test_shards\""

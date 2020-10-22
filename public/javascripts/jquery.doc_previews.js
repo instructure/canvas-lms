@@ -177,12 +177,18 @@ $.fn.loadDocPreview = function(options) {
       if (opts.public_url) {
         loadGooglePreview()
       } else if (opts.attachment_id) {
-        let url = '/api/v1/files/' + opts.attachment_id + '/public_url.json'
+        let url = `/api/v1/files/${opts.attachment_id}/public_url.json`
         if (opts.submission_id) {
           url += '?' + $.param({submission_id: opts.submission_id})
         }
         if (opts.verifier) {
           url += `${opts.submission_id ? '&' : '?'}verifier=${opts.verifier}`
+        } else {
+          const match = window.location.search.match(/verifier=([^&]+)(?:&|$)/)
+          const ver = match && match[1]
+          if (ver) {
+            url += `${opts.submission_id ? '&' : '?'}verifier=${ver}`
+          }
         }
         $this.loadingImage()
         $.ajaxJSON(url, 'GET', {}, data => {

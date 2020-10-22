@@ -626,8 +626,8 @@ describe "assignment rubrics" do
       get "/courses/#{@course.id}/assignments/#{@assignment.id}"
 
       expect(f("#rubrics .rubric_title").text).to eq "My Rubric"
-      f(".criterion_description .long_description_link").click
-      expect(f(".ui-dialog div.long_description").text).to eq "This is awesome."
+      expect(f(".criterion_description .description_title").text).to eq "Outcome row"
+      expect(f(".criterion_description .long_description").text).to eq "This is awesome."
     end
 
     it "should show criterion comments and only render when necessary", priority: "2", test_id: 220333 do

@@ -93,6 +93,40 @@ module Lti
           ]
         end
       end
+
+      context 'when Edge >= 79 is used' do
+        let(:user_agent) do
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edg/86.0.622.31"
+        end
+
+        it 'sets allowed origin to "*"' do
+          expect(subject).to match_array [
+            'geolocation *',
+            'microphone *',
+            'camera *',
+            'midi *',
+            'encrypted-media *',
+            'autoplay *'
+          ]
+        end
+      end
+
+      context 'when Edge < 79 is used' do
+        let(:user_agent) do
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Edge/12.10136"
+        end
+
+        it 'does not set allowed origin to "*"' do
+          expect(subject).to match_array [
+            'geolocation',
+            'microphone',
+            'camera',
+            'midi',
+            'encrypted-media',
+            'autoplay'
+          ]
+        end
+      end
     end
 
     describe 'initialize' do

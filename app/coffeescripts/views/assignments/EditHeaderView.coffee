@@ -65,7 +65,7 @@ export default class EditHeaderView extends Backbone.View
   delete: ->
     disablingDfd = new $.Deferred()
     if destroyDfd = @model.destroy()
-      destroyDfd.then(@onSaveSuccess.bind(this))
+      destroyDfd.then(@onDeleteSuccess.bind(this))
       destroyDfd.fail -> disablingDfd.reject()
       $('#content').disableWhileLoading disablingDfd
     else

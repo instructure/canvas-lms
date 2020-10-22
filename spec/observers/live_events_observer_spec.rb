@@ -452,10 +452,10 @@ describe LiveEventsObserver do
         expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
         ContextModuleProgression.transaction(requires_new: true) do
           # complete it
-          context_module_progression.update_attributes(:workflow_state => 'completed',
+          context_module_progression.update(:workflow_state => 'completed',
             :requirements_met => [{:id => tag.id, :type => 'must_view'}])
           # sneakily remove the requiremets met because terribleness
-          context_module_progression.update_attributes(:requirements_met => [])
+          context_module_progression.update(:requirements_met => [])
         end
         # event fires off now but it should ignore the missing requirements_met in the db and
         # use the ones that were present when the completion happened
@@ -552,6 +552,19 @@ describe LiveEventsObserver do
       proficiency = outcome_proficiency_model(account_model)
       expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
       proficiency.destroy
+    end
+  end
+
+  describe "calculation_method" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_created).once
+      outcome_calculation_method_model(account_model)
+    end
+
+    it "posts updated events" do
+      calculation_method = outcome_calculation_method_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_updated).once
+      calculation_method.destroy
     end
   end
 end

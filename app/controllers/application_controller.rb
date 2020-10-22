@@ -147,6 +147,15 @@ class ApplicationController < ActionController::Base
           view_context.stylesheet_path(css_url_for('what_gets_loaded_inside_the_tinymce_editor', false, { force_high_contrast: true }))
         ]
 
+        # Cisco doesn't want to load lato extended. see LS-1559
+        if (Setting.get('disable_lato_extended', 'false') == 'false')
+          editor_css << view_context.stylesheet_path(css_url_for('lato_extended'))
+          editor_hc_css << view_context.stylesheet_path(css_url_for('lato_extended'))
+        else
+          editor_css << view_context.stylesheet_path(css_url_for('lato'))
+          editor_hc_css << view_context.stylesheet_path(css_url_for('lato'))
+        end
+
         @js_env_data_we_need_to_render_later = {}
         @js_env = {
           ASSET_HOST: Canvas::Cdn.add_brotli_to_host_if_supported(request),
@@ -1452,7 +1461,7 @@ class ApplicationController < ActionController::Base
   end
 
   def log_gets
-    if @page_view && !request.xhr? && request.get? && (((response.content_type || "").to_s.match(/html/)) ||
+    if @page_view && !request.xhr? && request.get? && (((response.media_type || "").to_s.match(/html/)) ||
       (Setting.get('create_get_api_page_views', 'true') == 'true') && api_request?)
       @page_view.render_time ||= (Time.now.utc - @page_before_render) rescue nil
       @page_view_update = true
@@ -2689,8 +2698,8 @@ class ApplicationController < ActionController::Base
   end
 
   # makes it so you can use the prefetch_xhr erb helper from controllers. They'll be rendered in _head.html.erb
-  def prefetch_xhr(*args)
-    (@xhrs_to_prefetch_from_controller ||= []) << args
+  def prefetch_xhr(*args, **kwargs)
+    (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
 
   def teardown_live_events_context

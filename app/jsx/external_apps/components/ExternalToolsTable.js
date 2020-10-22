@@ -105,13 +105,14 @@ export default class ExternalToolsTable extends React.Component {
     })
   }
 
-  // Don't forget to change the tooltip text whtn the rce_enhancements flag goes away
+  // Don't forget to change the tooltip text when the rce_enhancements flag goes away
   render() {
-    // only in account settings (not course), but not site_admin, and with the feature on
+    // only in account settings (not course), but not site_admin, and with the feature on, and with permissions
     const show_lti_favorite_toggles =
       /^account_/.test(ENV.context_asset_string) &&
       !ENV.ACCOUNT?.site_admin &&
-      ENV.FEATURES?.rce_lti_favorites
+      ENV.FEATURES?.rce_lti_favorites &&
+      this.props.canAddEdit
 
     return (
       <div className="ExternalToolsTable">

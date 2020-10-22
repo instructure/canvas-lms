@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Uredi"
     },
+    "edit_equation_f5279959": {
+        "message": "Uredi enačbo"
+    },
     "edit_link_7f53bebb": {
         "message": "Uredi povezavo"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Najdeno (najden) je { count, plural,\n     =0 {# rezultatov}\n    one {# rezultat }\n  other {# rezultatov}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Celoten zaslon"
+    },
     "generating_preview_45b53be0": {
         "message": "Generiranje predogleda ..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Ocene so naložene."
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Dokumenti skupine"
+    },
     "group_files_4324f3df": {
         "message": "Datoteke skupine"
     },
     "group_files_82e5dcdb": {
         "message": "Datoteke skupine"
     },
+    "group_images_98e0ac17": {
+        "message": "Slike skupine"
+    },
     "group_links_9493129e": {
         "message": "Povezave do skupin"
+    },
+    "group_media_2f3d128a": {
+        "message": "Mediji skupine"
     },
     "group_navigation_99f191a": {
         "message": "Navigacija po skupini"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Kvizi"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Urejevalnik surovega HTML"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Branje datoteke z zapisi na mediju ni uspelo. Prekinjam."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Predvajalnik videoposnetkov za { title }"
+    },
+    "view_ba339f93": {
+        "message": "Ogled"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Prikaži bližnjice na tipkovnici"

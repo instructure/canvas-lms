@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/shared/_new_nav_header" do
+describe "shared/_new_nav_header" do
   it "should render courses with logged in user" do
     assign(:domain_root_account, Account.default)
     assign(:current_user, user_factory)

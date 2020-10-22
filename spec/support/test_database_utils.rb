@@ -102,7 +102,7 @@ module TestDatabaseUtils
         connection.execute("TRUNCATE TABLE #{table_names.map { |t| connection.quote_table_name(t) }.join(',')}")
       end
       Account.find_or_create_by!(id: 0).
-        update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+        update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     end
 
     def get_sequences(connection)

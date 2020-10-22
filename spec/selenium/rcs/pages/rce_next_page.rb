@@ -90,11 +90,7 @@ module RCENextPage
   def images_tab
     fj('[role="presentation"]:contains("Images")')
   end
-
-  def upload_new_image
-    fj('button:contains("Upload a new image")')
-  end
-
+  
   def image_link(title)
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
@@ -120,15 +116,16 @@ module RCENextPage
   end
 
   def assignment_published_status
-    # add selector
+    f('[name="IconPublish"]')
   end
 
   def assignment_unpublished_status
-    # add selector
+    f('[name="IconUnpublished"]')
   end
 
-  def assignment_due_date
-    # add (selector).text
+  def assignment_due_date_exists?(due_date)
+    modified_due_date = due_date.strftime("%B %e, %Y")
+    element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
   def possibly_hidden_toolbar_button(selector)
@@ -232,8 +229,12 @@ module RCENextPage
     f('[role^="menuitem"][title="Upload Image"]')
   end
 
+  def course_images_tray
+    f('[role="dialog"][aria-label="Course Images"]')
+  end
+
   def upload_image_modal
-    f('[role="dialog"][aria-label="Upload Image"')
+    f('[role="dialog"][aria-label="Upload Image"]')
   end
 
   def image_options_button
@@ -380,6 +381,10 @@ module RCENextPage
     f('[data-testid="CanvasContentTray"]')
   end
 
+  def tray_container_exists?
+    element_exists?('[data-testid="CanvasContentTray"]')
+  end
+
   def display_text_link_option
     fj('label:contains("Display Text Link (Opens in a new tab)")')
   end
@@ -468,6 +473,22 @@ module RCENextPage
   def menubar_menu_item(item_name)
     # works for sub-menus too
     f(menubar_menu_item_css(item_name))
+  end
+
+  def external_link_menubar_button
+    menu_option_by_name('External Links')
+  end
+
+  def image_menubar_button
+    menu_option_by_name('Upload Image')
+  end
+
+  def media_menubar_button
+    menu_option_by_name('Course Media')
+  end
+
+  def document_menubar_button
+    menu_option_by_name('Upload Document')
   end
 
   # ---------------------- Actions ----------------------
@@ -807,6 +828,30 @@ module RCENextPage
     menu_item_by_name('Format').click
     menu_option_by_name('Directionality').click
     menu_option_by_name('Right-to-Left').click
+  end
+
+  def click_insert_menu_button
+    menu_item_by_name('Insert').click
+  end
+
+  def click_link_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Link').click
+  end
+
+  def click_image_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Image').click
+  end
+
+  def click_media_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Media').click
+  end
+
+  def click_document_menubar_button
+    click_insert_menu_button
+    menu_option_by_name('Document').click
   end
 
   def select_text_of_element_by_id(id)

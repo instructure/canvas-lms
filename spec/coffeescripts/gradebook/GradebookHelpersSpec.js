@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import GradebookHelpers from 'compiled/gradebook/GradebookHelpers'
+import GradebookHelpers from 'jsx/gradebook/GradebookHelpers'
 import GradebookConstants from 'jsx/gradebook/shared/constants'
 
 QUnit.module('GradebookHelpers#noErrorsOnPage', {

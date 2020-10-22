@@ -179,7 +179,7 @@ class SplitUsers
   end
 
   def move_new_enrollments(enrollment_ids, pseudonyms)
-    new_enrollments = Enrollment.where.not(id: enrollment_ids, user: restored_user).
+    new_enrollments = Enrollment.where.not(id: enrollment_ids).where.not(user: restored_user).
       where(sis_pseudonym_id: pseudonyms).shard(pseudonyms.first.shard)
     move_enrollments(new_enrollments)
   end

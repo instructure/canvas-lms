@@ -604,7 +604,7 @@ class GradebookImporter
     # using "foreach" rather than "parse" processes a chunk of the
     # file at a time rather than loading the whole file into memory
     # at once, a boon for memory consumption
-    CSV.foreach(csv_file.path, csv_parse_options) do |row|
+    CSV.foreach(csv_file.path, **csv_parse_options) do |row|
       yield row
     end
   end

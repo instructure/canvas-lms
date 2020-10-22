@@ -275,7 +275,16 @@ module AuthenticationMethods
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
       end
-      if user && user.can_masquerade?(@current_user, @domain_root_account)
+      if user && @real_current_user
+        if @current_user != user
+          # if we're already masquerading from an access token, and now try to
+          # masquerade as someone else
+          render :json => {:errors => "Cannot change masquerade"}, :status => :unauthorized
+          return false
+        # else: they do match, everything is already set
+        end
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url} via masquerade token"
+      elsif user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
         @real_current_pseudonym = @current_pseudonym

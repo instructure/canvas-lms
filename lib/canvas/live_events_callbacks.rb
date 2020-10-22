@@ -83,6 +83,8 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.sis_batch_created(obj)
     when OutcomeProficiency
       Canvas::LiveEvents.outcome_proficiency_created(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_created(obj)
     end
   end
 
@@ -181,6 +183,8 @@ module Canvas::LiveEventsCallbacks
       end
     when OutcomeProficiency
       Canvas::LiveEvents.outcome_proficiency_updated(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_updated(obj)
     end
   end
 

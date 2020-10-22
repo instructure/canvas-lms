@@ -167,8 +167,7 @@ class UserMerge
     end
 
     from_user.reload
-    target_user.touch
-    target_user.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
+    target_user.clear_caches
     from_user.destroy
     @merge_data.workflow_state = 'active'
     @merge_data.save!

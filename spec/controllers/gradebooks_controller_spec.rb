@@ -844,15 +844,32 @@ describe GradebooksController do
       end
 
       describe "view ungraded as zero" do
-        it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
-          Account.site_admin.enable_feature!(:view_ungraded_as_zero)
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
+        context "when individual gradebook is enabled" do
+          before(:each) { @teacher.preferences[:gradebook_version] = "srgb" }
+
+          it "save_view_ungraded_as_zero_to_server is true when the feature is enabled" do
+            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:save_view_ungraded_as_zero_to_server]).to be true
+          end
+
+          it "save_view_ungraded_as_zero_to_server is false when the feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:save_view_ungraded_as_zero_to_server]).to be false
+          end
         end
 
-        it "sets allow_view_ungraded_as_zero in the ENV to false if the feature is not enabled" do
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
+        context "when default gradebook is enabled" do
+          it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
+            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
+          end
+
+          it "sets allow_view_ungraded_as_zero in the ENV to false if the feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
+          end
         end
       end
 
@@ -1709,14 +1726,35 @@ describe GradebooksController do
 
         let(:override_grades_enabled) { assigns[:js_env][:OVERRIDE_GRADES_ENABLED] }
 
-        it "is set to true if the final_grade_override_in_gradebook_history feature is enabled" do
-          Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history)
+        context "when the final_grade_override_in_gradebook_history feature is enabled" do
+          before(:each) { Account.site_admin.enable_feature!(:final_grade_override_in_gradebook_history) }
 
-          get 'history', params: { course_id: @course.id }
-          expect(override_grades_enabled).to be true
+          it "is set to true if the final_grade_override flag is enabled and the course setting is on" do
+            @course.enable_feature!(:final_grades_override)
+            @course.allow_final_grade_override = true
+            @course.save!
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be true
+          end
+
+          it "is set to false if the final_grade_override flag is disabled" do
+            @course.allow_final_grade_override = true
+            @course.save!
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be false
+          end
+
+          it "is set to false if the course setting is off" do
+            @course.enable_feature!(:final_grades_override)
+
+            get 'history', params: { course_id: @course.id }
+            expect(override_grades_enabled).to be false
+          end
         end
 
-        it "is set to true if the final_grade_override_in_gradebook_history feature is not enabled" do
+        it "is set to false if the final_grade_override_in_gradebook_history feature is not enabled" do
           get 'history', params: { course_id: @course.id }
           expect(override_grades_enabled).to be false
         end

@@ -90,17 +90,17 @@ module ConditionalRelease
     describe "self.current_assignments" do
       it "should select only actions that have not been unassigned" do
         set = create :assignment_set
-        create(:assignment_set_action, action: 'assign', student_id: 'user', assignment_set: set, created_at: 1.hour.ago)
-        create(:assignment_set_action, action: 'unassign', student_id: 'user', assignment_set: set)
+        create(:assignment_set_action, action: 'assign', student_id: 1, assignment_set: set, created_at: 1.hour.ago)
+        create(:assignment_set_action, action: 'unassign', student_id: 1, assignment_set: set)
         expect(AssignmentSetAction.current_assignments('user')).to eq []
-        recent = create(:assignment_set_action, action: 'assign', student_id: 'user', assignment_set: set)
-        expect(AssignmentSetAction.current_assignments('user')).to eq [recent]
+        recent = create(:assignment_set_action, action: 'assign', student_id: 1, assignment_set: set)
+        expect(AssignmentSetAction.current_assignments(1)).to eq [recent]
       end
 
       it "should select only actions for the specified sets" do
-        actions = Array.new(3) { create(:assignment_set_action, student_id: 'user') }
+        actions = Array.new(3) { create(:assignment_set_action, student_id: 1) }
         selected_sets = actions[1..2].map(&:assignment_set)
-        expect(AssignmentSetAction.current_assignments('user', selected_sets).order(:id)).to eq actions[1..2]
+        expect(AssignmentSetAction.current_assignments(1, selected_sets).order(:id)).to eq actions[1..2]
       end
     end
 
@@ -109,7 +109,7 @@ module ConditionalRelease
         range = create :scoring_range_with_assignments, assignment_set_count: 4
         assigned = range.assignment_sets[0..1]
         unassigned = range.assignment_sets[2..3]
-        audit_opts = { student_id: 'Will', actor_id: 'Sean', source: 'grade_change' }
+        audit_opts = { student_id: 1, actor_id: 2, source: 'grade_change' }
         AssignmentSetAction.create_from_sets(assigned, unassigned, audit_opts)
         assigned.each do |s|
           set_action = AssignmentSetAction.find_by(audit_opts.merge(assignment_set_id: s.id, action: 'assign'))

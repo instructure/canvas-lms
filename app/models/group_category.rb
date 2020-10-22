@@ -147,7 +147,7 @@ class GroupCategory < ActiveRecord::Base
                  context.group_categories.build(name: name_for_role(role),
                                                 role: role,
                                                 root_account: context.root_account)
-      category.save({:validate => false}) if category.new_record?
+      category.save(validate: false) if category.new_record?
       category
     end
   end
@@ -381,7 +381,7 @@ class GroupCategory < ActiveRecord::Base
     Group.where(id: groups).touch_all
     if context_type == 'Course'
       opts = { assignments: Assignment.where(context_type: context_type, context_id: context_id, group_category_id: self).pluck(:id) }
-      DueDateCacher.recompute_course(context_id, opts)
+      DueDateCacher.recompute_course(context_id, **opts)
     end
   end
 

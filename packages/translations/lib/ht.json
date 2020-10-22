@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Modifye"
     },
+    "edit_equation_f5279959": {
+        "message": "Modifye Ekwasyon"
+    },
     "edit_link_7f53bebb": {
         "message": "Chanje Lyen"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Jwenn { count, plural,\n     =0 {# rezilta}\n    one {# rezilta}\n  other {# rezilta}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Plen Ekran"
+    },
     "generating_preview_45b53be0": {
         "message": "Jenerasyon apèsi..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Nòt yo chaje"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Gwoupe Dokiman"
+    },
     "group_files_4324f3df": {
         "message": "Gwoup Fichye"
     },
     "group_files_82e5dcdb": {
         "message": "Gwoup fichye"
     },
+    "group_images_98e0ac17": {
+        "message": "Gwoupe Imaj"
+    },
     "group_links_9493129e": {
         "message": "Lyen Gwoup"
+    },
+    "group_media_2f3d128a": {
+        "message": "Gwoupe Medya"
     },
     "group_navigation_99f191a": {
         "message": "Navigasyon Gwoup"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Quiz"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Editè HTML Brit"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Lekti yon fichye miltimedya echwe. Anilasyon."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Lektè videyo pou { title }"
+    },
+    "view_ba339f93": {
+        "message": "Afiche"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Afiche rakousi klavye"

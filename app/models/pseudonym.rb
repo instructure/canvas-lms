@@ -15,6 +15,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+class ImpossibleCredentialsError < ArgumentError; end
 
 class Pseudonym < ActiveRecord::Base
   include Workflow
@@ -491,6 +492,12 @@ class Pseudonym < ActiveRecord::Base
   def self.find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
     return [] if credentials[:unique_id].blank? ||
                  credentials[:password].blank?
+    if credentials[:unique_id].length > 255
+      # this sometimes happens by mistake, and produces noisy errors.
+      # we can handle this error explicitly when it arrives and just return
+      # a failed login instead of an error.
+      raise ImpossibleCredentialsError, "pseudonym cannot have a unique_id of length #{credentials[:unique_id].length}"
+    end
     too_many_attempts = false
     begin
       associated_shards = associated_shards(credentials[:unique_id])
@@ -516,7 +523,13 @@ class Pseudonym < ActiveRecord::Base
   end
 
   def self.authenticate(credentials, account_ids, remote_ip = nil)
-    pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    pseudonyms = []
+    begin
+      pseudonyms = find_all_by_arbitrary_credentials(credentials, account_ids, remote_ip)
+    rescue ImpossibleCredentialsError => e
+      Rails.logger.info("Impossible pseudonym credentials: #{credentials[:unique_id]}, invalidating session")
+      return :impossible_credentials
+    end
     return :too_many_attempts if pseudonyms == :too_many_attempts
     site_admin = pseudonyms.find { |p| p.account_id == Account.site_admin.id }
     # only log them in if these credentials match a single user OR if it matched site admin

@@ -30,7 +30,7 @@ gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
-gem 'after_transaction_commit', '2.1.0'
+gem 'after_transaction_commit', '2.2.0'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.90.1', require: false
@@ -86,11 +86,11 @@ gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.2', require: false
-gem 'marginalia', '1.8.0', require: false
+gem 'marginalia', '1.9.0', require: false
 gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.10.1'
 gem 'multi_json', '1.14.1'
-gem 'net-ldap', '0.16.2', require: false
+gem 'net-ldap', '0.16.3', require: false
 gem 'nokogiri', '1.10.9', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
@@ -117,7 +117,7 @@ gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'guardrail', '2.0.0'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '2.0.0'
+gem 'switchman', '2.0.1'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '2.0.0'
 gem 'twilio-ruby', '5.36.0', require: false

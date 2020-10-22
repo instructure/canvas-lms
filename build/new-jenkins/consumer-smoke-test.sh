@@ -8,6 +8,7 @@ export COMPOSE_FILE='docker-compose.new-jenkins.consumer.yml'
 ./build/new-jenkins/docker-compose-pull.sh
 
 docker-compose up -d
+docker-compose exec -T postgres /bin/bash -c /wait-for-it
 docker-compose run -T canvas bundle exec rails db:create db:migrate
 
 docker ps
@@ -26,4 +27,3 @@ do
 done
 
 curl --head --fail http://$CANVAS_HOST/health_check.json
-
