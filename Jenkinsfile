@@ -334,7 +334,7 @@ pipeline {
                 sh 'find .'
                 cleanAndSetup()
 
-                def refspecToCheckout = env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master') ? env.CANVAS_LMS_REFSPEC : env.GERRIT_REFSPEC
+                def refspecToCheckout = currentBuild.projectName.contains("main-from-plugin") ? env.CANVAS_LMS_REFSPEC : env.GERRIT_REFSPEC
 
                 checkout([
                   $class: 'GitSCM',
