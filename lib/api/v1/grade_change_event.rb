@@ -37,8 +37,8 @@ module Api::V1::GradeChangeEvent
       id: event.id,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
-      grade_before: event.grade_before,
-      grade_after: event.grade_after,
+      grade_before: display_grade(event: event, grade: event.grade_before, score: event.score_before),
+      grade_after: display_grade(event: event, grade: event.grade_after, score: event.score_after),
       excused_before: event.excused_before,
       excused_after: event.excused_after,
       graded_anonymously: event.graded_anonymously,
@@ -104,5 +104,14 @@ module Api::V1::GradeChangeEvent
       courses: courses_json(courses, user, session, [], []),
       users: users_json(users, user, session, [], @domain_root_account)
     }
+  end
+
+  def display_grade(event:, grade:, score:)
+    # Unlike for individual assignments, override grades get saved with blank
+    # grade_before/grade_after values if the course has no grading scheme.  If
+    # we have a score but no grade, fall back to showing the score.
+    return grade unless event.override_grade? && grade.blank?
+
+    score.present? ? I18n.n(score, percentage: true) : nil
   end
 end
