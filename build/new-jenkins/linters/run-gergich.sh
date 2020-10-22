@@ -37,6 +37,10 @@ fi
 # we need to remove the hooks because compile_assets calls yarn install which will
 # try to create the .git commit hooks
 > ./script/install_hooks
+export COMPILE_ASSETS_NPM_INSTALL=0
+export COMPILE_ASSETS_API_DOCS=0
+export COMPILE_ASSETS_STYLEGUIDE=0
+export JS_BUILD_NO_FALLBACK=1
 gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets "rake canvas:compile_assets"
 
 gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint "node script/xsslint.js"
@@ -60,7 +64,7 @@ if ! git diff --exit-code yarn.lock; then
   gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 
-bundle exec rake doc:api
+bundle exec rake doc:api css:styleguide
 if ! git diff --exit-code lib/api_scope_mapper.rb; then
   message="lib/api_scope_mapper.rb changes need to be checked in. Make sure you run 'bundle exec rake doc:api' without private canvas-lms plugins installed."
   gergich comment "{\"path\":\"lib/api_scope_mapper.rb\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
