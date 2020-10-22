@@ -74,10 +74,10 @@ class Progress < ActiveRecord::Base
   #
   # This progress object will get passed as the first argument to the method,
   # so that you can update the completion percentage on it as the job runs.
-  def process_job(target, method, enqueue_args = {}, *method_args)
+  def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
     method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
-    work = Progress::Work.new(self, target, method, method_args)
+    work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
         Delayed::Job.enqueue(work, enqueue_args)
@@ -87,9 +87,9 @@ class Progress < ActiveRecord::Base
 
   # (private)
   class Work < Delayed::PerformableMethod
-    def initialize(progress, *args)
+    def initialize(progress, *args, **kwargs)
       @progress = progress
-      super(*args)
+      super(*args, **kwargs)
     end
 
     def perform

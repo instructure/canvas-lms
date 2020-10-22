@@ -50,7 +50,7 @@ describe Progress do
     end
 
     it "should fail the progress if the job fails" do
-      progress.process_job(Jerbs, :fail)
+      progress.process_job(Jerbs, :fail, {})
       run_jobs
       expect(progress.reload).to be_failed
     end

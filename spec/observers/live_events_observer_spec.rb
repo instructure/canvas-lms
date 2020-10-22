@@ -344,14 +344,14 @@ describe LiveEventsObserver do
         :selected_content => quiz.id,
         :user => user_model
       )
-      ce.export_without_send_later
+      ce.export(synchronous: true)
     end
 
     it "does not post for other ContentExport types" do
       expect(Canvas::LiveEvents).to receive(:quiz_export_complete).never
       course = Account.default.courses.create!
       ce = course.content_exports.create!
-      ce.export_without_send_later
+      ce.export(synchronous: true)
     end
 
     def enable_quizzes_next(course)

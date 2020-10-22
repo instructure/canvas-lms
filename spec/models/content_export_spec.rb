@@ -84,37 +84,37 @@ describe ContentExport do
 
     it "changes the workflow_state when :quizzes_next is enabled" do
       @course.enable_feature!(:quizzes_next)
-      expect { @ce.export_without_send_later }.to change { @ce.workflow_state }
+      expect { @ce.export(synchronous: true) }.to change { @ce.workflow_state }
       expect(@ce.workflow_state).to eq "exported"
     end
 
     it "fails the content export when :quizzes_next is disabled" do
       @course.disable_feature!(:quizzes_next)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.workflow_state).to eq "created"
     end
 
     it "composes the payload with assignment details" do
       @course.enable_feature!(:quizzes_next)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.settings[:quizzes2][:assignment]).not_to be_empty
     end
 
     it "composes the payload with course UUID" do
       @course.enable_feature!(:quizzes_next)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.settings[:quizzes2][:assignment][:course_uuid]).to eq(@course.uuid)
     end
 
     it "composes the payload with qti details" do
       @course.enable_feature!(:quizzes_next)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
     end
 
     it "completes with export_type of 'quizzes2'" do
       @course.enable_feature!(:quizzes_next)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.export_type).to eq('quizzes2')
     end
 
@@ -122,14 +122,14 @@ describe ContentExport do
       it "fails if the quiz exporter fails" do
         @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(Exporters::Quizzes2Exporter).to receive(:export).and_return(false)
-        @ce.export_without_send_later
+        @ce.export(synchronous: true)
         expect(@ce.workflow_state).to eq "failed"
       end
 
       it "fails if the qti exporter fails" do
         @course.enable_feature!(:quizzes_next)
         allow_any_instance_of(CC::CCExporter).to receive(:export).and_return(false)
-        @ce.export_without_send_later
+        @ce.export(synchronous: true)
         expect(@ce.workflow_state).to eq "failed"
       end
     end
@@ -157,7 +157,7 @@ describe ContentExport do
         expect(CC::CCExporter).to receive(:new).and_return(cc_exporter)
         expect(cc_exporter).to receive(:export).and_call_original
         @ce.quizzes2_build_assignment
-        @ce.export_without_send_later
+        @ce.export(synchronous: true)
         expect(@ce.settings[:quizzes2][:qti_export][:url]).to eq(@ce.attachment.public_download_url)
         expect(@ce.export_type).to eq('quizzes2')
       end
@@ -169,7 +169,7 @@ describe ContentExport do
         expect(cc_exporter).to receive(:export).and_return(false)
         @ce.quizzes2_build_assignment
         assignment_id = @ce.settings['quizzes2']['assignment']['assignment_id']
-        @ce.export_without_send_later
+        @ce.export(synchronous: true)
         assignment = Assignment.find_by(id: assignment_id)
         expect(assignment.workflow_state).to eq('failed_to_migrate')
         expect(@ce.workflow_state).to eq('failed')

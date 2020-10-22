@@ -42,7 +42,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         cm.content_export = ce
 
         source.shard.activate do
-          ce.export_without_send_later
+          ce.export(synchronous: true)
         end
 
         if ce.workflow_state == 'exported_for_course_copy'

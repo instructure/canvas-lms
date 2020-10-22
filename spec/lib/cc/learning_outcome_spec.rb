@@ -40,7 +40,7 @@ describe "Learning Outcome exporting" do
   end
 
   def run_export(opts = {})
-    @ce.export_without_send_later(opts)
+    @ce.export(opts, synchronous: true)
     expect(@ce.error_messages).to eq []
     @file_handle = @ce.attachment.open need_local_file: true
     @zip_file = Zip::File.open(@file_handle.path)

@@ -1896,7 +1896,7 @@ describe Account do
       @account.reload
 
       expect([@user1.dashboard_view(@account), @user2.dashboard_view(@account)]).to match_array(['activity', 'cards'])
-      @account.update_user_dashboards_without_send_later
+      @account.update_user_dashboards(synchronous: true)
       @account.reload
       expect([@user1.reload.dashboard_view(@account), @user2.reload.dashboard_view(@account)]).to match_array(Array.new(2, 'planner'))
     end

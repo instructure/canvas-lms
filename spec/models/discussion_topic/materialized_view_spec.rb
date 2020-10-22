@@ -49,7 +49,7 @@ describe DiscussionTopic::MaterializedView do
     end
 
     it "should return the view if it exists but is out of date" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       expect(DiscussionTopic::MaterializedView.materialized_view_for(@topic)).to be_present
       reply = @topic.reply_from(:user => @user, :text => "new message!")
       Delayed::Job.find_available(100).each(&:destroy)
@@ -59,7 +59,7 @@ describe DiscussionTopic::MaterializedView do
       # since the view was out of date, it's returned but a job is queued
       expect(Delayed::Job.strand_size("materialized_discussion:#{@topic.id}")).to eq 1
       # after updating, the view should include the new entry
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       json, participants, entries = DiscussionTopic::MaterializedView.materialized_view_for(@topic)
       expect(json).to be_present
       expect(entries).to be_include(reply.id)
@@ -83,7 +83,7 @@ describe DiscussionTopic::MaterializedView do
 
   it "should build a materialized view of the structure, participants and entry ids" do
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
-    view.update_materialized_view_without_send_later
+    view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
     expect(view.materialized_view_json).to eq [structure, participant_ids, entry_ids, []]
     expect(participant_ids.sort).to eq [@student.id, @teacher.id].sort
@@ -129,7 +129,7 @@ describe DiscussionTopic::MaterializedView do
     bad_entry = @topic.reply_from(:user => @student, :html => %Q{<a id="media_comment_0_deadbeef" class="instructure_inline_media_comment video_comment"></a>})
 
     view = DiscussionTopic::MaterializedView.where(discussion_topic_id: @topic).first
-    view.update_materialized_view_without_send_later
+    view.update_materialized_view(synchronous: true)
     structure, participant_ids, entry_ids = @topic.materialized_view
     entry_json = JSON.parse(structure).last
     html = Nokogiri::HTML::DocumentFragment.parse(entry_json['message'])
@@ -141,7 +141,7 @@ describe DiscussionTopic::MaterializedView do
     specs_require_sharding
 
     it "users local ids when accessed from the same shard" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       structure, participant_ids, entry_ids = @topic.materialized_view
       expect(participant_ids.sort).to eq [@student.local_id, @teacher.local_id].sort
       expect(entry_ids.sort).to eq @topic.discussion_entries.map(&:local_id).sort
@@ -184,7 +184,7 @@ describe DiscussionTopic::MaterializedView do
     end
 
     it "users global ids when accessed from a different shard" do
-      @view.update_materialized_view_without_send_later
+      @view.update_materialized_view(synchronous: true)
       @shard1.activate!
       structure, participant_ids, entry_ids = @topic.materialized_view
       expect(participant_ids.sort).to eq [@student.global_id, @teacher.global_id].sort

@@ -38,7 +38,7 @@ describe "Common Cartridge exporting" do
     content_export.save!
 
     expect {
-      content_export.export_without_send_later
+      content_export.export(synchronous: true)
     }.to change(ErrorReport, :count).by 1
 
     expect(content_export.error_messages.length).to eq 1
@@ -65,7 +65,7 @@ describe "Common Cartridge exporting" do
     end
 
     def run_export(opts = {})
-      @ce.export_without_send_later(opts)
+      @ce.export(opts, synchronous: true)
       expect(@ce.error_messages).to eq []
       @file_handle = @ce.attachment.open :need_local_file => true
       @zip_file = Zip::File.open(@file_handle.path)
@@ -206,7 +206,7 @@ describe "Common Cartridge exporting" do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      @ce.export_without_send_later
+      @ce.export(synchronous: true)
       expect(@ce.attachments.first.instfs_uuid).to eq(uuid)
     end
 

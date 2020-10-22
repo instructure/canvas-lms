@@ -88,10 +88,10 @@ class GradingPeriodGroup < ActiveRecord::Base
     recompute_scores_for_each_term(false)
   end
 
-  handle_asynchronously_if_production(
-    :recompute_course_scores,
-    singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
-  )
+  if Rails.env.production?
+    handle_asynchronously :recompute_course_scores,
+      singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
+  end
 
   def weighted_actually_changed?
     !self.new_record? && saved_change_to_weighted?

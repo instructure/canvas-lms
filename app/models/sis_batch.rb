@@ -157,7 +157,7 @@ class SisBatch < ActiveRecord::Base
       end
     end
 
-    work = SisBatch::Work.new(SisBatch, :process_all_for_account, [account])
+    work = SisBatch::Work.new(SisBatch, :process_all_for_account, args: [account])
     Delayed::Job.enqueue(work, job_args)
   end
 

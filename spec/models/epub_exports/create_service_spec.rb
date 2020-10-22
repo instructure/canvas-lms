@@ -43,7 +43,7 @@ describe EpubExports::CreateService do
     context "when user has an active epub_export" do
       before(:once) do
         @epub_export = @course.epub_exports.create(user: @student)
-        @epub_export.export_without_send_later
+        @epub_export.export(synchronous: true)
         @service = EpubExports::CreateService.new(@course, @student, :epub_export)
       end
 
@@ -63,7 +63,7 @@ describe EpubExports::CreateService do
   describe "#already_running?" do
     context "when user has an active epub_export" do
       before(:once) do
-        @course.epub_exports.create(user: @student).export_without_send_later
+        @course.epub_exports.create(user: @student).export(synchronous: true)
         @service = EpubExports::CreateService.new(@course, @student, :epub_export)
       end
 
@@ -82,7 +82,7 @@ describe EpubExports::CreateService do
     context "when user has an active epub_export and starts a web_zip_export" do
       before(:once) do
         @epub_export = @course.epub_exports.create(user: @student)
-        @epub_export.export_without_send_later
+        @epub_export.export(synchronous: true)
         @service = EpubExports::CreateService.new(@course, @student, :web_zip_export)
       end
 

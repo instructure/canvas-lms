@@ -4084,7 +4084,7 @@ describe Submission do
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+          expect(job.payload_object.kwargs[:preferred_plugins]).to eq [
             Canvadocs::RENDER_PDFJS,
             Canvadocs::RENDER_BOX,
             Canvadocs::RENDER_CROCODOC
@@ -4099,7 +4099,7 @@ describe Submission do
                                       attachments: [@attachment])
 
           job = Delayed::Job.where(strand: 'canvadocs').last
-          expect(job.payload_object.args[1][:preferred_plugins]).to eq [
+          expect(job.payload_object.kwargs[:preferred_plugins]).to eq [
             Canvadocs::RENDER_O365,
             Canvadocs::RENDER_PDFJS,
             Canvadocs::RENDER_BOX,

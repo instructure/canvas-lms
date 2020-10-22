@@ -67,7 +67,7 @@ describe "root account basic settings" do
     account.account_reports.create!(
       user: @user,
       report_type: 'course_storage_csv'
-    ).run_report_without_send_later
+    ).run_report(synchronous: true)
     get reports_url
 
     expect(f('#course_storage_csv .last-run a').attribute('href')).to match(/download_frd=1/)

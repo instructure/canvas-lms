@@ -41,16 +41,16 @@ describe EpubExport do
 
     context "method is successful" do
       it "should create one content_export" do
-        expect{epub_export.export_without_send_later}.to change{ContentExport.count}.from(0).to(1)
+        expect{epub_export.export(synchronous: true)}.to change{ContentExport.count}.from(0).to(1)
       end
 
       it "should set state to 'exporting'" do
-        epub_export.export_without_send_later
+        epub_export.export(synchronous: true)
         expect(epub_export.workflow_state).to eq 'exporting'
       end
 
       it "should start job_progress" do
-        epub_export.export_without_send_later
+        epub_export.export(synchronous: true)
         expect(epub_export.job_progress.reload.running?).to be_truthy
       end
     end
@@ -84,7 +84,7 @@ describe EpubExport do
       allow(InstFS).to receive(:enabled?).and_return(true)
       uuid = "1234-abcd"
       allow(InstFS).to receive(:direct_upload).and_return(uuid)
-      epub_export.convert_to_epub_without_send_later
+      epub_export.convert_to_epub(synchronous: true)
       expect(epub_export.epub_attachment.instfs_uuid).to eq uuid
     end
   end
@@ -106,7 +106,7 @@ describe EpubExport do
     context "when content export is successful" do
       before(:once) do
         epub_export.content_export.update_attribute(:workflow_state, 'exported')
-        epub_export.mark_exported_without_send_later
+        epub_export.mark_exported(synchronous: true)
       end
 
       it "should change the workflow state of epub_export to exported" do
@@ -121,7 +121,7 @@ describe EpubExport do
     context "when content export is failed" do
       it "should change the workflow state of epub_export to failed" do
         epub_export.content_export.update_attribute(:workflow_state, 'failed')
-        epub_export.mark_exported_without_send_later
+        epub_export.mark_exported(synchronous: true)
         expect(epub_export.workflow_state).to eq 'failed'
       end
     end
@@ -137,12 +137,12 @@ describe EpubExport do
     end
 
     it "should update job_progress completion" do
-      epub_export.generate_without_send_later
+      epub_export.generate(synchronous: true)
       expect(epub_export.job_progress.completion).to eq EpubExport::PERCENTAGE_COMPLETE[:generating]
     end
 
     it "should set state to generating" do
-      epub_export.generate_without_send_later
+      epub_export.generate(synchronous: true)
       expect(epub_export.generating?).to be_truthy
     end
   end
@@ -175,7 +175,7 @@ describe EpubExport do
       expect(epub_export.epub_attachment).to be_nil, 'precondition'
       expect(epub_export.zip_attachment).to be_nil, 'precondition'
 
-      expect{epub_export.convert_to_epub_without_send_later}.to change{Attachment.count}.by(2)
+      expect{epub_export.convert_to_epub(synchronous: true)}.to change{Attachment.count}.by(2)
 
       epub_export.reload
       expect(epub_export.epub_attachment).not_to be_nil
@@ -284,7 +284,7 @@ describe EpubExport do
       expect(epub_export).to receive(:infer_locale).once
         .with(context: @course, user: @student, root_account: @course.root_account)
         .and_return(:ru)
-      epub_export.convert_to_epub_without_send_later
+      epub_export.convert_to_epub(synchronous: true)
       expect(I18n.locale).to be :en
     end
 

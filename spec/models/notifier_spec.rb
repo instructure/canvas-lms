@@ -30,9 +30,8 @@ describe Notifier do
       dispatch = :test_dispatch
       message = double('message')
 
-      expect(DelayedNotification).to receive(:send_later_if_production_enqueue_args).with(
-        :process,
-        kind_of(Hash),
+      expect(DelayedNotification).to receive(:delay_if_production).and_return(DelayedNotification)
+      expect(DelayedNotification).to receive(:process).with(
         kind_of(ActiveRecord::Base),
         kind_of(Notification),
         ["user_#{group_user.id}"],

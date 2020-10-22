@@ -2802,8 +2802,7 @@ class CoursesController < ApplicationController
 
       changes = changed_settings(@course.changes, @course.settings, old_settings)
 
-      @course.send_later_if_production_enqueue_args(:touch_content_if_public_visibility_changed,
-        { :priority => Delayed::LOW_PRIORITY }, changes)
+      @course.delay_if_production(priority: Delayed::LOW_PRIORITY).touch_content_if_public_visibility_changed(changes)
 
       if @course.errors.none? && @course.save
         Auditors::Course.record_updated(@course, @current_user, changes, source: logging_source)

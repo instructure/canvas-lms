@@ -34,7 +34,7 @@ class MessageDispatcher < Delayed::PerformableMethod
       return
     end
 
-    Delayed::Job.enqueue(self.new(self, :deliver_batch, [messages.map(&:for_queue)]),
+    Delayed::Job.enqueue(self.new(self, :deliver_batch, args: [messages.map(&:for_queue)]),
                          run_at: messages.first.dispatch_at,
                          priority: 25,
                          max_attempts: 15)

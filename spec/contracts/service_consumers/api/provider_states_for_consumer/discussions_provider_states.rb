@@ -85,7 +85,7 @@ PactConfig::Consumers::ALL.each do |consumer|
         # Special incantation to cause entries to be promoted to "view" array
         # from "new_entries" array
         view = DiscussionTopic::MaterializedView.where(discussion_topic_id: topic1).first
-        view.update_materialized_view_without_send_later
+        view.update_materialized_view(synchronous: true)
 
         # Create Topic 2: locked, delayed, assignment-specific, requires initial post
         topic2 = course.discussion_topics.create!(title: "title", message: "message", user: student,
