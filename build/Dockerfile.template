@@ -113,13 +113,10 @@ COPY --chown=docker:docker .i18nrc ${APP_HOME}
 ARG JS_BUILD_NO_UGLIFY=0
 RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
 
-COPY --chown=docker:docker app ${APP_HOME}/app
-COPY --chown=docker:docker config ${APP_HOME}config
-COPY --chown=docker:docker doc ${APP_HOME}/doc
-COPY --chown=docker:docker lib ${APP_HOME}lib
-RUN bundle exec rails doc:api css:styleguide
-
 COPY --chown=docker:docker . ${APP_HOME}
+
+ARG COMPILE_ASSETS_API_DOCS=0
+RUN bash -c "if [[ "$COMPILE_ASSETS_API_DOCS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"
 <% else -%>
 COPY --chown=docker:docker . ${APP_HOME}
 

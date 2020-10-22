@@ -455,6 +455,7 @@ pipeline {
                     slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
                       withEnv([
                         "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
+                        "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                         "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                       ]) {
                         sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
@@ -505,6 +506,7 @@ pipeline {
                     skipIfPreviouslySuccessful("build-docker-cache") {
                       withEnv([
                         "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
+                        "COMPILE_ADDITIONAL_ASSETS=0",
                         "JS_BUILD_NO_UGLIFY=1"
                       ]) {
                         slackSendCacheBuild('pre-merge') {
