@@ -1531,7 +1531,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
         fk_name_to_delete = foreign_key_for!(from_table, options_or_to_table).name
       end
     else
-      options[:to_table] = args.first if args.length == 2
+      options[:to_table] = args.first unless args.first.is_a?(Hash)
 
       if options.delete(:if_exists)
         fk_name_to_delete = foreign_key_for(from_table, **options)&.name
