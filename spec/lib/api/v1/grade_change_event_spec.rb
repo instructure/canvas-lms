@@ -205,5 +205,89 @@ describe Api::V1::GradeChangeEvent do
     it "includes true as the value of 'course_override_grade'" do
       expect(override_event_json.dig(:events, 0, :course_override_grade)).to be true
     end
+
+    describe "grade fields" do
+      let(:score) { @course.student_enrollments.first.find_score }
+
+      describe "grade_before" do
+        it "is returned as nil if grade_before and score_before are nil" do
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: nil,
+            old_score: nil,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_before]).to be nil
+        end
+
+        it "is returned as the grade value if grade_before is present" do
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: "A-",
+            old_score: 90,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_before]).to eq "A-"
+        end
+
+        it "is returned as the score value if score_before is present but not grade_before" do
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: nil,
+            old_score: 90,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_before]).to eq "90%"
+        end
+      end
+
+      describe "grade_after" do
+        it "is returned as nil if grade_before and score_before are nil" do
+          score.update!(override_score: nil)
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: nil,
+            old_score: nil,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_after]).to be nil
+        end
+
+        it "is returned as the grade value if grade_after is present" do
+          score.course.grading_standard_enabled = true
+          score.update!(override_score: 80)
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: nil,
+            old_score: nil,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_after]).to eq "B-"
+        end
+
+        it "is returned as the score value if score_after is present but not grade_after" do
+          score.update!(override_score: 80)
+          override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+            grader: @teacher,
+            old_grade: nil,
+            old_score: nil,
+            score: score
+          )
+          event = Auditors::GradeChange.record(override_grade_change: override_grade_change)
+          event_json = subject.grade_change_event_json(event, @user, @session)
+          expect(event_json[:grade_after]).to eq "80%"
+        end
+      end
+    end
   end
 end
