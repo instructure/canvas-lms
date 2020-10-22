@@ -38,12 +38,19 @@ export function gradeToScoreUpperBound(grade, gradingScheme) {
 
   const matchingSchemeValue = gradingScheme[index][1]
   const nextHigherSchemeValue = gradingScheme[index - 1][1]
-
+  const schemeValuesDiff = round(nextHigherSchemeValue - matchingSchemeValue, 4) * 100
   let percentageOffset = 1
-  if (round(nextHigherSchemeValue - matchingSchemeValue, 4) <= 0.01) {
-    // if the two scheme values are less than 1% apart, reduce the offset to 0.1%
-    // this is the minimum granularity currently supported for grading schemes
-    percentageOffset = 0.1
+
+  if (schemeValuesDiff <= 1) {
+    // The maximum granularity currently supported by grading schemes right
+    // now is 2 decimal places. If the matchingSchemeValue has too small of a
+    // range, then a percentageOffset of 1% or even .1% may be too large, so
+    // set it to 0.01% in that case (the most granular possible).
+    if (schemeValuesDiff <= 0.1) {
+      percentageOffset = 0.01
+    } else {
+      percentageOffset = 0.1
+    }
   }
 
   return round(nextHigherSchemeValue * 100 - percentageOffset, 2)
