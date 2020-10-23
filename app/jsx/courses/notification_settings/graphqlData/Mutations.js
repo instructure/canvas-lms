@@ -20,7 +20,6 @@ import gql from 'graphql-tag'
 export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
   mutation UpdateCourseNotificationPreferences(
     $courseId: ID!
-    $userId: ID!
     $enabled: Boolean
     $channelId: ID
     $category: NotificationCategoryType
