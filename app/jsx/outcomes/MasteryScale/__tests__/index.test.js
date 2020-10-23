@@ -192,6 +192,7 @@ describe('MasteryScale', () => {
       const pointsInput = (await findAllByLabelText(/Change points/))[0]
       fireEvent.change(pointsInput, {target: {value: '100'}})
       fireEvent.click(getByText('Save Mastery Scale'))
+      fireEvent.click(getByText('Save'))
 
       await wait(() => {
         const request = moxios.requests.mostRecent()
