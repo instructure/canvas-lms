@@ -304,8 +304,8 @@ module AccountReports
         scope.each do |row|
           row = row.attributes.dup
 
-          row['assignment url'] = "https://#{host}" +
-            "/courses/#{row['course id']}" +
+          row['assignment url'] = "https://#{host}" \
+            "/courses/#{row['course id']}" \
             "/assignments/#{row['assignment id']}"
           row['submission date'] = default_timezone_format(row['submission date'])
           add_outcomes_data(row)
@@ -339,6 +339,36 @@ module AccountReports
       }
     end
 
+    def set_score(row, outcome_data)
+      total_percent = row['total percent outcome score']
+      if total_percent.present?
+        points_possible = outcome_data[:points_possible]
+        points_possible = outcome_data[:mastery_points] if points_possible.zero?
+        score = points_possible * total_percent
+      else
+        score = if row['outcome score'].nil? || row['learning outcome points possible'].nil?
+                  nil
+                else
+                  (row['outcome score'] / row['learning outcome points possible']) * outcome_data[:points_possible]
+        end
+      end
+      score
+    end
+
+    def set_rating(row, score, outcome_data)
+        ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
+        rating = ratings.detect { |r| r[:points] <= score } || {}
+        row['learning outcome rating'] = rating[:description]
+        rating
+    end
+
+    def hide_points(row)
+      row['outcome score'] = nil
+      row['learning outcome rating points'] = nil
+      row['learning outcome points possible'] = nil
+      row['learning outcome mastery score'] = nil
+    end
+
     def add_outcomes_data(row)
       row['learning outcome mastered'] = unless row['learning outcome mastered'].nil?
                                            row['learning outcome mastered'] ? 1 : 0
@@ -352,34 +382,16 @@ module AccountReports
                      else
                          LearningOutcome.default_rubric_criterion
       end
-
-
       row['learning outcome mastery score'] = outcome_data[:mastery_points]
-      total_percent = row['total percent outcome score']
-      if total_percent.present?
-        points_possible = outcome_data[:points_possible]
-        points_possible = outcome_data[:mastery_points] if points_possible.zero?
-        score = points_possible * total_percent
-      else
-        score = if row['outcome score'].nil? || row['learning outcome points possible'].nil?
-            nil
-        else
-            outcome_data[:points_possible] * (row['outcome score'] / row['learning outcome points possible'])
-        end
+      score = set_score(row, outcome_data)
+      rating = set_rating(row, score, outcome_data) if score.present?
+      if row['assessment type'] != 'quiz' && @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
+        row['learning outcome points possible'] = outcome_data[:points_possible]
       end
-      if score.present?
-        ratings = outcome_data[:ratings]&.sort_by { |r| r[:points] }&.reverse || []
-        rating = ratings.detect { |r| r[:points] <= score } || {}
-        row['learning outcome rating'] = rating[:description]
-
-        if row['learning outcome points hidden'] == true
-          row['outcome score'] = nil
-          row['learning outcome rating points'] = nil
-          row['learning outcome points possible'] = nil
-          row['learning outcome mastery score'] = nil
-        else
-          row['learning outcome rating points'] = rating[:points]
-        end
+      if row['learning outcome points hidden']
+        hide_points(row)
+      elsif rating.present?
+        row['learning outcome rating points'] = rating[:points]
       end
     end
   end
