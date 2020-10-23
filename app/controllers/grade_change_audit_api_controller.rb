@@ -420,7 +420,13 @@ class GradeChangeAuditApiController < AuditorApiController
     override_events.each do |event|
       grading_period_id = event.in_grading_period? ? event.grading_period_id : nil
       key = key_from_ids(event.context_id, event.student_id, grading_period_id)
-      event.grade_current = current_scores[key]&.override_grade || current_scores[key]&.override_score.to_s
+
+      current_score = current_scores[key]
+      event.grade_current = if current_score&.override_grade
+        current_score.override_grade
+      elsif current_score&.override_score
+        I18n.n(current_score.override_score, percentage: true)
+      end
     end
   end
 

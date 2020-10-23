@@ -34,13 +34,17 @@ if settings.present?
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
     config.sanitize_credit_cards = false
+    # this array should only contain exceptions that are intentionally
+    # thrown to drive client facing behavior.  A good example
+    # are login/auth exceptions.  Exceptions that are simply noisy/inconvenient
+    # should probably be caught and solved...
     config.excluded_exceptions += %w{
       AuthenticationMethods::AccessTokenError
+      AuthenticationMethods::AccessTokenScopeError
       AuthenticationMethods::LoggedOutError
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
-      ConditionalRelease::ServiceError
     }
   end
 
