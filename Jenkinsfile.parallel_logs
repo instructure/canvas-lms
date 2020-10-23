@@ -121,9 +121,8 @@ pipeline {
     always {
       script {
         ignoreBuildNeverStartedError {
-          def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-          rspec.uploadSeleniumFailures()
-          rspec.uploadRSpecFailures()
+          failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
+          failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
           failureReport.submit()
         }
       }

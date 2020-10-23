@@ -111,13 +111,16 @@ def _runRspecTestSuite(
         sh 'build/new-jenkins/docker-compose-build-up.sh'
         sh 'build/new-jenkins/docker-compose-rspec-parallel.sh'
       }
-    }
-    finally {
+    } catch(Exception e) {
+      failureReport.addFailure(prefix, "${BUILD_URL}${prefix}-test-failures")
+
+      throw e
+    } finally {
       // copy spec failures to local
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures canvas_ --allow-error --clean-dir'
+      sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
-      def reports = load 'build/new-jenkins/groovy/reports.groovy'
-      reports.stashSpecFailures(prefix, index)
+
+      archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
 
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
       def preStatus = currentBuild.rawBuild.@result
@@ -128,14 +131,18 @@ def _runRspecTestSuite(
         currentBuild.rawBuild.@result = preStatus
       }
 
+      def reports = load 'build/new-jenkins/groovy/reports.groovy'
+
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
         reports.stashSpecCoverage(prefix, index)
       }
+
       if (env.RSPEC_LOG == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime_rspec_tests.log ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
         reports.stashParallelLogs(prefix, index)
       }
+
       sh 'rm -rf ./tmp'
       execute 'bash/docker-cleanup.sh --allow-failure'
     }
@@ -154,22 +161,6 @@ def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
   if (successes.hasSuccess(prefix, total)) {
     def reports = load 'build/new-jenkins/groovy/reports.groovy'
     reports.publishSpecCoverageToS3(prefix, total, coverage_name)
-  }
-}
-
-def uploadSeleniumFailures() {
-  _uploadSpecFailures('selenium', seleniumConfig().node_total, 'Selenium Test Failures')
-}
-
-def uploadRSpecFailures() {
-  _uploadSpecFailures('rspec', rspecConfig().node_total, 'Rspec Test Failures')
-}
-
-def _uploadSpecFailures(prefix, total, test_name) {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
-  if (!successes.hasSuccessOrBuildIsSuccessful(prefix, total)) {
-    failureReport.addFailure(prefix, report_url)
   }
 }
 

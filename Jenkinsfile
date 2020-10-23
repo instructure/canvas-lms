@@ -107,18 +107,17 @@ def isPatchsetRetriggered() {
 
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
-    try {
-      def rspec = load 'build/new-jenkins/groovy/rspec.groovy'
-      rspec.uploadSeleniumFailures()
-      rspec.uploadRSpecFailures()
-      failureReport.submit()
-    } finally {
-      execute 'bash/docker-cleanup.sh --allow-failure'
-    }
+    execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
 def postFn(status) {
+  node('master') {
+    failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
+    failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
+    failureReport.submit()
+  }
+
   if(status == 'FAILURE') {
     maybeSlackSendFailure()
     maybeRetrigger()
