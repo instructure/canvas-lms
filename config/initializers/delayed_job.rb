@@ -195,53 +195,5 @@ module CanvasDelayedMessageSending
     sender ||= __calculate_sender_for_delay
     delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
   end
-
-  def send_later(method, *args, **kwargs)
-    # in ruby 2.6, an empty **kwargs being passed to a method that
-    # does not accept kwargs will be transformed into a literal positional
-    # `{}`, which the method likely doesn't accept; just drop it here
-    if kwargs.empty?
-      delay.__send__(method, *args)
-    else
-      delay.__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_enqueue_args(method, enqueue_args, *args, **kwargs)
-    if kwargs.empty?
-      delay(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args)
-    else
-      delay(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_if_production(method, *args, **kwargs)
-    if kwargs.empty?
-      delay_if_production.__send__(method, *args)
-    else
-      delay_if_production.__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_later_if_production_enqueue_args(method, enqueue_args, *args, **kwargs)
-    if kwargs.empty?
-      delay_if_production(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args)
-    else
-      delay_if_production(**translate_legacy_enqueue_args(**enqueue_args)).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def send_at(run_at, method, *args, **kwargs)
-    if kwargs.empty?
-      delay(run_at: run_at).__send__(method, *args)
-    else
-      delay(run_at: run_at).__send__(method, *args, **kwargs)
-    end
-  end
-
-  def translate_legacy_enqueue_args(**enqueue_args)
-    enqueue_args[:ignore_transaction] = true if enqueue_args.delete(:no_delay)
-    enqueue_args
-  end
 end
 Object.send(:include, CanvasDelayedMessageSending)
