@@ -61,8 +61,8 @@ export default function propsFromDispatch(dispatch) {
     mediaUploadComplete: (error, uploadData) => dispatch(mediaUploadComplete(error, uploadData)),
     fetchInitialDocs: (sortBy, searchString) => dispatch(fetchInitialDocs(sortBy, searchString)),
     fetchNextDocs: (sortBy, searchString) => dispatch(fetchNextDocs(sortBy, searchString)),
-    fetchInitialMedia: sortBy => dispatch(fetchInitialMedia(sortBy)),
-    fetchNextMedia: sortBy => dispatch(fetchNextMedia(sortBy)),
+    fetchInitialMedia: (sortBy, searchString) => dispatch(fetchInitialMedia(sortBy, searchString)),
+    fetchNextMedia: (sortBy, searchString) => dispatch(fetchNextMedia(sortBy, searchString)),
     updateMediaObject: new_values => dispatch(updateMediaObject(new_values)),
     onChangeContext: newContext => dispatch(changeContext(newContext))
   }

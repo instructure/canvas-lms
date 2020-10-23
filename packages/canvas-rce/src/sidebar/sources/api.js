@@ -547,7 +547,10 @@ class RceApiSource {
         )}${getSearchParam(props.searchString)}`
         break
       case 'media_objects': // when requesting media objects (this is the currently used branch)
-        extra = getSortParams(props.sort === 'alphabetical' ? 'title' : 'date', props.order)
+        extra = `${getSortParams(
+          props.sort === 'alphabetical' ? 'title' : 'date',
+          props.order
+        )}${getSearchParam(props.searchString)}`
         break
     }
     return `${this.baseUri(

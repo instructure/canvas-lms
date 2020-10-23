@@ -149,6 +149,7 @@ class MediaObjectsController < ApplicationController
       order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)')
     end
     scope = scope.order(order_by => order_dir)
+    scope = MediaObject.search_by_attribute(scope, :title, params[:search_term])
 
     exclude = params[:exclude] || []
     media_objects =

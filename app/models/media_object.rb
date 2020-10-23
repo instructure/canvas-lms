@@ -22,6 +22,7 @@ require 'csv'
 
 class MediaObject < ActiveRecord::Base
   include Workflow
+  include SearchTermHelper
   belongs_to :user
   belongs_to :context, polymorphic:
     [:course, :group, :conversation_message, :account, :assignment,

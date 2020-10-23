@@ -149,17 +149,29 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties media fetch initial media to store', () => {
-    testHandler('fetchInitialMedia', media, 'fetchInitialMedia', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchInitialMedia',
+      media,
+      'fetchInitialMedia',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties media fetch next media to store', () => {
-    testHandler('fetchNextMedia', media, 'fetchNextMedia', {
-      sort: 'alphabetical',
-      order: 'asc'
-    })
+    testHandler(
+      'fetchNextMedia',
+      media,
+      'fetchNextMedia',
+      {
+        sort: 'alphabetical',
+        order: 'asc'
+      },
+      'search-string'
+    )
   })
 
   it('ties media update media object to store', () => {

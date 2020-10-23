@@ -207,7 +207,7 @@ export default function Filter(props) {
               </Flex.Item>
             )}
           </Flex>
-          {['images', 'documents'].indexOf(contentSubtype) >= 0 && (
+          {['images', 'documents', 'media'].indexOf(contentSubtype) >= 0 && (
             <View as="div" margin="small none none none">
               <TextInput
                 renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}

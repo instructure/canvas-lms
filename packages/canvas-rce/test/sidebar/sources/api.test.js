@@ -150,11 +150,11 @@ describe('sources/api', () => {
       )
     })
 
-    it('gets media', () => {
+    it('gets media_objects', () => {
       const uri = apiSource.uriFor('media_objects', props)
       assert.strictEqual(
         uri,
-        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc'
+        '/api/media_objects?contextType=course&contextId=17&sort=title&order=asc&search_term=hello%20world'
       )
     })
   })

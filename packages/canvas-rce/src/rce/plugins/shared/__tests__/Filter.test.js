@@ -317,13 +317,13 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('is not visible when the contentSubtype is media', () => {
+    it('is visible when the contentSubtype is media', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
         contentSubtype: 'media'
       })
-      expect(component.queryByPlaceholderText('Search')).toBe(null)
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
     it('is not visible when the contentType is links', () => {
