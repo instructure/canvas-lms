@@ -628,12 +628,6 @@ pipeline {
                   })
                 }
 
-                if(configuration.isChangeMerged()) {
-                  timedStage('Dependency Check', stages, {
-                    snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
-                  })
-                }
-
                 def distribution = load 'build/new-jenkins/groovy/distribution.groovy'
                 distribution.stashBuildScripts()
 
@@ -663,6 +657,12 @@ pipeline {
                   // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
                 }
+              }
+            }
+
+            if(configuration.isChangeMerged()) {
+              timedStage('Dependency Check') {
+                snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
               }
             }
 
