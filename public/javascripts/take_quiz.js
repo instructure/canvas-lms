@@ -461,7 +461,7 @@ let quizSubmission = (function() {
         $('.time_running').css('color', '#EA0611')
         $timeRunningFunc().text(
           I18n.t(
-            'Your browser connectivity might be unstable. Please refresh the page to continue with this quiz. If the problem persists please reach out to your instructor.'
+            'Your browser connectivity may be slow or unstable. In spite of your browser\'s timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt.'
           )
         )
         return
