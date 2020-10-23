@@ -23,8 +23,13 @@ import {REQUEST_PAGE, RECEIVE_PAGE, FAIL_PAGE} from '../actions/data'
 export default function(state = {}, action) {
   switch (action.type) {
     case REQUEST_PAGE:
-      // set loading flag to true
-      return {...state, loading: true}
+      // set loading flag to true and update search string
+      return {
+        ...state,
+        links: state.searchString !== action.searchString ? [] : state.links,
+        loading: true,
+        searchString: action.searchString
+      }
 
     case RECEIVE_PAGE:
       // add links to collection, store bookmark if more, resolve loading

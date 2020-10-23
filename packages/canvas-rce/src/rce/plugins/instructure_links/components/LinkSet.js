@@ -37,7 +37,7 @@ import Link from './Link'
  * This is needed only as long as `LinkSet` is a class component.
  */
 function IncrementalLoader(props) {
-  const {children, collection, fetchInitialPage, fetchNextPage, contextType} = props
+  const {children, collection, fetchInitialPage, fetchNextPage, contextType, searchString} = props
   const {hasMore, isLoading, links} = collection
   const lastItemRef = useRef(null)
 
@@ -47,6 +47,7 @@ function IncrementalLoader(props) {
     lastItemRef,
     contextType,
     sortBy: {sort: 'alphabetical', order: 'asc'}, // not actually used in the query, but a required param
+    searchString,
 
     onLoadInitial() {
       if (fetchInitialPage) {
@@ -166,7 +167,8 @@ LinkSet.propTypes = {
   contextType: string.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,
-  suppressRenderEmpty: bool
+  suppressRenderEmpty: bool,
+  searchString: string
 }
 
 export default LinkSet

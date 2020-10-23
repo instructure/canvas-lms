@@ -55,11 +55,11 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties data fetch initial page to store', () => {
-    testHandler('fetchInitialPage', data, 'fetchInitialPage', 'key')
+    testHandler('fetchInitialPage', data, 'fetchInitialPage', 'key', 'search-string')
   })
 
   it('ties data fetch next page to store', () => {
-    testHandler('fetchNextPage', data, 'fetchNextPage', 'key')
+    testHandler('fetchNextPage', data, 'fetchNextPage', 'key', 'search-string')
   })
 
   it('ties files toggle folder to store', () => {

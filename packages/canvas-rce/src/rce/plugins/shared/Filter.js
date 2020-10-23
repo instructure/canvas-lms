@@ -16,20 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useState} from 'react'
+import React, {bool, useEffect, useState} from 'react'
 import {func, oneOf, string} from 'prop-types'
 import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {Select} from '@instructure/ui-forms'
+import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {
   IconLinkLine,
   IconFolderLine,
   IconImageLine,
   IconDocumentLine,
-  IconAttachMediaLine
+  IconAttachMediaLine,
+  IconXLine
 } from '@instructure/ui-icons'
 
 const DEFAULT_FILTER_SETTINGS = {
@@ -126,7 +128,15 @@ function shouldSearch(searchString) {
 const searchMessage = formatMessage('Enter at least 3 characters to search')
 
 export default function Filter(props) {
-  const {contentType, contentSubtype, onChange, sortValue, searchString, userContextType} = props
+  const {
+    contentType,
+    contentSubtype,
+    onChange,
+    sortValue,
+    searchString,
+    userContextType,
+    isContentLoading
+  } = props
   const [pendingSearchString, setPendingSearchString] = useState(searchString)
   const [searchInputTimer, setSearchInputTimer] = useState(0)
 
@@ -154,76 +164,87 @@ export default function Filter(props) {
     setSearchInputTimer(tid)
   }
 
+  function handleClear() {
+    handleChangeSearch('')
+  }
+
   return (
     <View display="block" direction="column">
       {renderType(contentType, contentSubtype, onChange, userContextType)}
       {contentType !== 'links' && (
-        <>
-          <Flex margin="small none none none">
-            <Flex.Item grow shrink margin="none xx-small none none">
-              <Select
-                label={
-                  <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
+        <Flex margin="small none none none">
+          <Flex.Item grow shrink margin="none xx-small none none">
+            <Select
+              label={<ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>}
+              onChange={(e, selection) => {
+                const changed = {contentSubtype: selection.value}
+                if (changed.contentSubtype === 'all') {
+                  // when flipped to All, the context needs to be user
+                  // so we can get media_objects, which are all returned in the user context
+                  changed.contentType = 'user_files'
                 }
+                onChange(changed)
+              }}
+              selectedOption={contentSubtype}
+            >
+              <option value="images" icon={IconImageLine}>
+                {formatMessage('Images')}
+              </option>
+
+              <option value="documents" icon={IconDocumentLine}>
+                {formatMessage('Documents')}
+              </option>
+
+              <option value="media" icon={IconAttachMediaLine}>
+                {formatMessage('Media')}
+              </option>
+
+              <option value="all">{formatMessage('All')}</option>
+            </Select>
+          </Flex.Item>
+          {contentSubtype !== 'all' && (
+            <Flex.Item grow shrink margin="none none none xx-small">
+              <Select
+                label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
                 onChange={(e, selection) => {
-                  const changed = {contentSubtype: selection.value}
-                  if (changed.contentSubtype === 'all') {
-                    // when flipped to All, the context needs to be user
-                    // so we can get media_objects, which are all returned in the user context
-                    changed.contentType = 'user_files'
-                  }
-                  onChange(changed)
+                  onChange({sortValue: selection.value})
                 }}
-                selectedOption={contentSubtype}
+                selectedOption={sortValue}
               >
-                <option value="images" icon={IconImageLine}>
-                  {formatMessage('Images')}
-                </option>
-
-                <option value="documents" icon={IconDocumentLine}>
-                  {formatMessage('Documents')}
-                </option>
-
-                <option value="media" icon={IconAttachMediaLine}>
-                  {formatMessage('Media')}
-                </option>
-
-                <option value="all">{formatMessage('All')}</option>
+                <option value="date_added">{formatMessage('Date Added')}</option>
+                <option value="alphabetical">{formatMessage('Alphabetical')}</option>
               </Select>
             </Flex.Item>
-
-            {contentSubtype !== 'all' && (
-              <Flex.Item grow shrink margin="none none none xx-small">
-                <Select
-                  label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
-                  onChange={(e, selection) => {
-                    onChange({sortValue: selection.value})
-                  }}
-                  selectedOption={sortValue}
-                >
-                  <option value="date_added">{formatMessage('Date Added')}</option>
-                  <option value="alphabetical">{formatMessage('Alphabetical')}</option>
-                </Select>
-              </Flex.Item>
-            )}
-          </Flex>
-          {['images', 'documents', 'media'].indexOf(contentSubtype) >= 0 && (
-            <View as="div" margin="small none none none">
-              <TextInput
-                renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
-                messages={searchMessage ? [{type: 'hint', text: searchMessage}] : []}
-                placeholder={formatMessage('Search')}
-                value={pendingSearchString}
-                onChange={(e, value) => handleChangeSearch(value)}
-                onKeyDown={e => {
-                  if (e.key === 'Enter') {
-                    doSearch(pendingSearchString)
-                  }
-                }}
-              />
-            </View>
           )}
-        </>
+        </Flex>
+      )}
+      {(contentType === 'links' || contentSubtype !== 'all') && (
+        <Flex as="div" margin="small none none none" alignItems="start">
+          <Flex.Item shouldGrow margin="none xx-small none none">
+            <TextInput
+              renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
+              messages={searchMessage ? [{type: 'hint', text: searchMessage}] : []}
+              placeholder={formatMessage('Search')}
+              value={pendingSearchString}
+              onChange={(e, value) => handleChangeSearch(value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  doSearch(pendingSearchString)
+                }
+              }}
+              interaction={isContentLoading ? 'readonly' : 'enabled'}
+            />
+          </Flex.Item>
+          <Flex.Item>
+            <IconButton
+              screenReaderLabel={formatMessage('Clear')}
+              onClick={handleClear}
+              interaction={isContentLoading ? 'disabled' : 'enabled'}
+            >
+              <IconXLine />
+            </IconButton>
+          </Flex.Item>
+        </Flex>
       )}
     </View>
   )
@@ -259,5 +280,10 @@ Filter.propTypes = {
   /**
    * The user's context
    */
-  userContextType: oneOf(['user', 'course', 'group'])
+  userContextType: oneOf(['user', 'course', 'group']),
+
+  /**
+   * Is my content currently loading?
+   */
+  isContentLoading: bool
 }

@@ -191,6 +191,23 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   }
 }
 
+function isLoading(cprops) {
+  return (
+    cprops.collections.announcements?.isLoading ||
+    cprops.collections.assignments?.isLoading ||
+    cprops.collections.discussions?.isLoading ||
+    cprops.collections.modules?.isLoading ||
+    cprops.collections.quizzes?.isLoading ||
+    cprops.collections.wikiPages?.isLoading ||
+    cprops.documents.course?.isLoading ||
+    cprops.documents.user?.isLoading ||
+    cprops.documents.group?.isLoading ||
+    cprops.media.course?.isLoading ||
+    cprops.media.user?.isLoading ||
+    cprops.media.group?.isLoading
+  )
+}
+
 /**
  * This component is used within various plugins to handle loading in content
  * from Canvas.  It is essentially the main component.
@@ -354,6 +371,7 @@ export default function CanvasContentTray(props) {
                   onChange={newFilter => {
                     handleFilterChange(newFilter, contentProps.onChangeContext)
                   }}
+                  isContentLoading={isLoading(contentProps)}
                 />
               </Flex.Item>
 

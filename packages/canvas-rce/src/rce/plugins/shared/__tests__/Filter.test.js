@@ -326,15 +326,24 @@ describe('RCE Plugins > Filter', () => {
       expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('is not visible when the contentType is links', () => {
+    it('is visible when the contentType is links', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'links'
       })
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is not visible when the contentSubtype is all', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'all'
+      })
       expect(component.queryByPlaceholderText('Search')).toBe(null)
     })
 
-    it('updates filter ssettings when the search string is > 3 chars long', async () => {
+    it('updates filter settings when the search string is > 3 chars long', async () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
@@ -346,6 +355,38 @@ describe('RCE Plugins > Filter', () => {
       await waitFor(() => {
         expect(currentFilterSettings.searchString).toBe('abc')
       })
+    })
+
+    it('clears search when clear button is clicked', async () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(currentFilterSettings.searchString).toBe('')
+      fireEvent.change(searchInput, {target: {value: 'abc'}})
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('abc')
+      })
+      fireEvent.click(component.getByText('Clear'))
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('')
+      })
+    })
+
+    it('is readonly while content is loading', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents',
+        isContentLoading: true
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(searchInput.hasAttribute('readonly')).toBe(true)
+
+      const clearBtn = component.getByText('Clear').closest('button')
+      expect(clearBtn.hasAttribute('disabled')).toBe(true)
     })
   })
 })

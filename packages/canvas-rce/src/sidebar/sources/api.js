@@ -552,6 +552,8 @@ class RceApiSource {
           props.order
         )}${getSearchParam(props.searchString)}`
         break
+      default:
+        extra = getSearchParam(props.searchString)
     }
     return `${this.baseUri(
       endpoint,
@@ -570,7 +572,7 @@ function getSortParams(sort, order) {
   return `&sort=${sortBy}&order=${order}`
 }
 
-function getSearchParam(searchString) {
+export function getSearchParam(searchString) {
   return searchString?.length >= 3 ? `&search_term=${encodeURIComponent(searchString)}` : ''
 }
 

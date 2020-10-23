@@ -41,8 +41,8 @@ export default function propsFromDispatch(dispatch) {
     loadSession: () => dispatch(getSession),
     onChangeTab: index => dispatch(changeTab(index)),
     onChangeAccordion: index => dispatch(changeAccordion(index)),
-    fetchInitialPage: key => dispatch(fetchInitialPage(key)),
-    fetchNextPage: key => dispatch(fetchNextPage(key)),
+    fetchInitialPage: (key, searchString) => dispatch(fetchInitialPage(key, searchString)),
+    fetchNextPage: (key, searchString) => dispatch(fetchNextPage(key, searchString)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
     fetchInitialImages: (sortBy, searchString) =>
