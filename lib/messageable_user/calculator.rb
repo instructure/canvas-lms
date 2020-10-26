@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -640,7 +642,7 @@ class MessageableUser
     # enrollment in a course is as a student, he can't see observers that
     # aren't observing him
     def observer_restriction_clause
-      clause = ["enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
+      clause = [+"enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
       if linked_observer_ids.present?
         clause.first << " OR enrollments.user_id IN (?)"
         clause << linked_observer_ids

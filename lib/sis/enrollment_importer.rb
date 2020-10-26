@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -152,7 +154,7 @@ module SIS
           end
 
           unless pseudo
-            err = "User not found for enrollment "
+            err = +"User not found for enrollment "
             err << "(User ID: #{enrollment_info.user_id}, Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, err, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
@@ -170,8 +172,8 @@ module SIS
           @course ||= @root_account.all_courses.where(sis_source_id: enrollment_info.course_id).take unless enrollment_info.course_id.blank?
           @section ||= @root_account.course_sections.where(sis_source_id: enrollment_info.section_id).take unless enrollment_info.section_id.blank?
           if @course.nil? && @section.nil?
-            message = "Neither course nor section existed for user enrollment "
-            message << "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
+            message = "Neither course nor section existed for user enrollment " +
+              "(Course ID: #{enrollment_info.course_id}, Section ID: #{enrollment_info.section_id}, User ID: #{enrollment_info.user_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end
@@ -197,9 +199,9 @@ module SIS
             (@course.id != @section.course_id && @section.nonxlist_course_id == @course.id)
 
           if @course.id != @section.course_id
-            message = "An enrollment listed a section (#{enrollment_info.section_id}) "
-            message << "and a course (#{enrollment_info.course_id}) that are unrelated "
-            message << "for user (#{enrollment_info.user_id})"
+            message = "An enrollment listed a section (#{enrollment_info.section_id}) " +
+              "and a course (#{enrollment_info.course_id}) that are unrelated " +
+              "for user (#{enrollment_info.user_id})"
             @messages << SisBatch.build_error(enrollment_info.csv, message, sis_batch: @batch, row: enrollment_info.lineno, row_info: enrollment_info.row_info)
             next
           end

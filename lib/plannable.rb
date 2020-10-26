@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -281,7 +283,7 @@ module Plannable
         args.concat(clause_args)
         visited << [col, val]
       end
-      sql = "(" << top_clauses.join(" OR ") << ")"
+      sql = "(" + top_clauses.join(" OR ") + ")"
       return [sql, *args]
     end
   end
