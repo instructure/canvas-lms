@@ -37,7 +37,7 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
 
     if Shard.current.default?
       # will clear cached role overrides everywhere
-      Account.site_admin.send_later_if_production_enqueue_args(:clear_downstream_caches,
+      Account.site_admin&.send_later_if_production_enqueue_args(:clear_downstream_caches,
         {
           priority: Delayed::LOWER_PRIORITY,
           singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}"
