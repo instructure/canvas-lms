@@ -618,6 +618,7 @@ class GradebooksController < ApplicationController
 
     js_env({
       GRADEBOOK_OPTIONS: {
+        IMPROVED_LMGB: @context.root_account.feature_enabled?(:improved_lmgb),
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
         outcome_proficiency: outcome_proficiency,

@@ -49,3 +49,8 @@ usage_rights_discussion_topics:
   display_name: Usage Rights on Discussion Topics
   description: On courses with usage rights enabled, enforces usage rights
     selection on discussion topic file attachments
+improved_lmgb:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Improved LMGB
+  description: Improved LMGB UI

@@ -24,6 +24,7 @@ import 'jquery.ajaxJSON'
 import OutcomeGradebookView from 'compiled/views/gradebook/OutcomeGradebookView'
 import GradebookMenu from '../gradebook/default_gradebook/components/GradebookMenu'
 import Paginator from '../shared/components/Paginator'
+import GradebookLayout from './GradebookLayayout'
 
 function normalizeSections(options) {
   const sections = options.sections || []
@@ -88,11 +89,27 @@ export default class LearningMastery {
     $.ajaxJSON(this.options.settings_update_url, 'PUT', data)
   }
 
+  renderImprovedLMGB() {
+    const $container = document.querySelector('.outcome-gradebook')
+    const props = {
+      courseUrl: this.options.context_url,
+      learningMasteryEnabled: true,
+      variant: 'DefaultGradebookLearningMastery'
+    }
+    ReactDOM.render(<GradebookLayout {...props} />, $container)
+  }
+
   start() {
-    this.view.render()
-    this._renderGradebookMenu()
-    this.renderPagination()
-    this.view.onShow()
+    if (ENV.GRADEBOOK_OPTIONS.IMPROVED_LMGB) {
+      this._renderGradebookMenu()
+      this.renderImprovedLMGB()
+      this.renderPagination()
+    } else {
+      this.view.render()
+      this._renderGradebookMenu()
+      this.renderPagination()
+      this.view.onShow()
+    }
   }
 
   destroy() {
