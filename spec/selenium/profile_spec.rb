@@ -188,6 +188,22 @@ describe "profile" do
       expect(get_value('#user_locale')).to eq 'es'
     end
 
+    context "when pronouns are enabled" do
+      before :each do
+        @user.account.settings = { :can_add_pronouns => true }
+        @user.account.save!
+      end
+
+      it "should change pronouns" do
+        get "/profile/settings"
+        desired_pronoun = 'She/Her'
+        edit_form = click_edit
+        click_option('#user_pronouns', desired_pronoun)
+        expect_new_page_load { submit_form(edit_form) }
+        expect(get_value('#user_pronouns')).to eq desired_pronoun
+      end
+    end
+
     it "should add another contact method - sms" do
       @user.account.enable_feature!(:international_sms)
       test_cell_number = '8017121011'
