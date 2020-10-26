@@ -1409,24 +1409,21 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
-    shard.activate do
-      begin
-        user = @current_user || (@accessed_asset && @accessed_asset[:user])
-        if user && @log_page_views != false
-          add_interaction_seconds
-          log_participation(user)
-          log_gets
-          finalize_page_view
-        else
-          @page_view.destroy if @page_view && !@page_view.new_record?
-        end
-      rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-        Canvas::Errors.capture_exception(:page_view, e)
-        logger.error "Pageview error!"
-        raise e if Rails.env.development?
-        true
+    begin
+      user = @current_user || (@accessed_asset && @accessed_asset[:user])
+      if user && @log_page_views != false
+        add_interaction_seconds
+        log_participation(user)
+        log_gets
+        finalize_page_view
+      else
+        @page_view.destroy if @page_view && !@page_view.new_record?
       end
+    rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+      Canvas::Errors.capture_exception(:page_view, e)
+      logger.error "Pageview error!"
+      raise e if Rails.env.development?
+      true
     end
   end
 
