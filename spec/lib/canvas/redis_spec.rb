@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -227,7 +229,7 @@ describe "Canvas::Redis" do
           Rails.logger.capture_messages do
             # make sure this works with fetching nested fetches
             cache.fetch(key, force: true) do
-              val = "a1"
+              val = +"a1"
               val << cache.fetch(key2, force: true) do
                 Timecop.travel(Time.zone.now + 1.second)
                 "b1"

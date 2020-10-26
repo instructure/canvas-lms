@@ -99,7 +99,7 @@ module Csp::AccountHelper
   end
 
   def add_domain!(domain)
-    domain.downcase!
+    domain = domain.downcase
     Csp::Domain.unique_constraint_retry do |retry_count|
       if retry_count > 0 && (record = self.csp_domains.where(:domain => domain).take)
         record.undestroy if record.deleted?

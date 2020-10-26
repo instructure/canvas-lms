@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ describe SIS::CSV::ImportRefactored do
   it "should error files with invalid UTF-8" do
     importer = process_csv_data(
       "xlist_course_id,section_id,status",
-      "ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active".force_encoding("UTF-8")
+      (+"ABC2119_ccutrer_2012201_xlist,26076.20122\xA0,active").force_encoding("UTF-8")
     )
     expect(importer.errors.first.last).to eq "Invalid UTF-8"
   end
@@ -386,9 +388,8 @@ describe SIS::CSV::ImportRefactored do
           tf
         end
       end
-      csv_string = ""
-      csv_string << "term_id,name,status\n"
-      csv_string << "\"T001\",\"Winter13\",active"
+      csv_string = "term_id,name,status\n" +
+        "\"T001\",\"Winter13\",active"
       fake_attachment = flakey_attachment_cls.new(csv_string)
       input_csv = nil
       root_account = account_model

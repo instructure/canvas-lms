@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2013 - present Instructure, Inc.
@@ -21,7 +23,7 @@ require 'spec_helper'
 describe "rubyzip encoding fix patch" do
   before(:all) do
     @utf8_name = "utf-8 molé"
-    @ascii_name = "ascii mol\xE9".force_encoding('ASCII-8BIT')
+    @ascii_name = (+"ascii mol\xE9").force_encoding('ASCII-8BIT')
 
     @tmpfile = Tempfile.new('datafile')
     @tmpfile.write('some data')

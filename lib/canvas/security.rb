@@ -234,7 +234,7 @@ module Canvas::Security
   end
 
   def self.base64_decode(token_string)
-    utf8_string = token_string.force_encoding(Encoding::UTF_8)
+    utf8_string = token_string.dup.force_encoding(Encoding::UTF_8)
     Base64.decode64(utf8_string.encode('ascii-8bit'))
   end
 

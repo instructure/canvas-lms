@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2016 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -33,7 +35,7 @@ describe CC::BasicLTILinks do
 
     let(:lti_doc) { Builder::XmlMarkup.new(target: xml, indent: 2) }
     #this is the target for Builder::XmlMarkup. this is how you access the generated XML
-    let(:xml) { '' }
+    let(:xml) { +'' }
 
     it "sets the encoding to 'UTF-8'" do
       subject.create_blti_link(tool, lti_doc)

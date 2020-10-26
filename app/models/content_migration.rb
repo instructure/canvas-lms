@@ -169,7 +169,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def question_bank_name=(name)
-    if name && name.strip! != ''
+    if (name = name&.strip) != ''
       migration_settings[:question_bank_name] = name
     end
   end

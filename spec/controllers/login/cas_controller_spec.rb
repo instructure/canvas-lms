@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -37,7 +39,7 @@ describe Login::CasController do
     user_with_pseudonym(active_all: true, account: account)
 
     cas_ticket = CanvasUuid::Uuid.generate_securish_uuid
-    request_text = <<-REQUEST_TEXT
+    request_text = <<-REQUEST_TEXT.strip
         <samlp:LogoutRequest
           xmlns:samlp="urn:oasis:names:tc:SAML:2.0:protocol"
           xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
@@ -48,7 +50,6 @@ describe Login::CasController do
           <samlp:SessionIndex>#{cas_ticket}</samlp:SessionIndex>
         </samlp:LogoutRequest>
     REQUEST_TEXT
-    request_text.strip!
 
     session[:cas_session] = cas_ticket
     session[:login_aac] = Account.default.authentication_providers.first.id

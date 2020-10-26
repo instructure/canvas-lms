@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -31,15 +33,15 @@ describe 'ruby_version_compat' do
     it "should not output to stdout/stderr" do
       output = capture_io do
         # this file is marked utf-8 for one of the specs below, so we need to force these string literals to be binary
-        sio = StringIO.new("".force_encoding('binary'))
+        sio = StringIO.new((+"").force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
         expect(imio.write_message("\u3042\r\u3044\n\u3046\r\n\u3048")).to eq 23
-        expect(sio.string.force_encoding('binary')).to eq "\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n".force_encoding('binary')
+        expect(sio.string.force_encoding('binary')).to eq (+"\u3042\r\n\u3044\r\n\u3046\r\n\u3048\r\n.\r\n").force_encoding('binary')
 
-        sio = StringIO.new("".force_encoding('binary'))
+        sio = StringIO.new((+"").force_encoding('binary'))
         imio = Net::InternetMessageIO.new(sio)
         expect(imio.write_message("\u3042\r")).to eq 8
-        expect(sio.string.force_encoding('binary')).to eq "\u3042\r\n.\r\n".force_encoding('binary')
+        expect(sio.string.force_encoding('binary')).to eq (+"\u3042\r\n.\r\n").force_encoding('binary')
       end
 
       expect(output).to eq ['', '']

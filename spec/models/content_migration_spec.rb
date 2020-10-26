@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2012 - present Instructure, Inc.
@@ -129,7 +131,7 @@ describe ContentMigration do
     it "should strip invalid utf8" do
       data = {
         'assessment_questions' => [{
-          'question_name' => "hai\xfbabcd"
+          'question_name' => +"hai\xfbabcd"
         }]
       }
       expect(ContentMigration.new.prepare_data(data)[:assessment_questions][0][:question_name]).to eq "haiabcd"

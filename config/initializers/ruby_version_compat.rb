@@ -43,7 +43,7 @@ class ActionController::Base
     traverse.call(params, force_encoding)
     path_str = request.path.to_s
     if path_str.respond_to?(:force_encoding)
-      path_str.force_encoding(Encoding::UTF_8)
+      path_str = path_str.dup.force_encoding(Encoding::UTF_8)
       raise ActionController::InvalidByteSequenceErrorFromParams unless path_str.valid_encoding?
     end
   end

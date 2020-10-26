@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -82,10 +84,10 @@ module Canvas
       describe ".useful_http_env_stuff_from_request" do
         it "duplicates to get away from frozen strings out of the request.env" do
           dangerous_hash = {
-            "QUERY_STRING".force_encoding(Encoding::ASCII_8BIT).freeze =>
-              "somestuff=blah".force_encoding(Encoding::ASCII_8BIT).freeze,
-            "HTTP_HOST".force_encoding(Encoding::ASCII_8BIT).freeze =>
-              "somehost.com".force_encoding(Encoding::ASCII_8BIT).freeze,
+            (+"QUERY_STRING").force_encoding(Encoding::ASCII_8BIT).freeze =>
+              (+"somestuff=blah").force_encoding(Encoding::ASCII_8BIT).freeze,
+            (+"HTTP_HOST").force_encoding(Encoding::ASCII_8BIT).freeze =>
+              (+"somehost.com").force_encoding(Encoding::ASCII_8BIT).freeze,
           }
           req = double(env: dangerous_hash, remote_ip: "", url: "",
                      path_parameters: {}, query_parameters: {}, request_parameters: {})
