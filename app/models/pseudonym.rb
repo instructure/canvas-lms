@@ -275,7 +275,7 @@ class Pseudonym < ActiveRecord::Base
   set_policy do
     # an admin can only create and update pseudonyms when they have
     # :manage_user_logins permission on the pseudonym's account, :read
-    # permission on the pseudonym's owner, and a superset of hte pseudonym's
+    # permission on the pseudonym's owner, and a superset of the pseudonym's
     # owner's rights (if any) on the pseudonym's account. some fields of the
     # pseudonym may require additional conditions to update (see below)
     given do |user|
