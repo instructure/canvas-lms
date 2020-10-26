@@ -303,7 +303,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_confirmation!(root_account)
-    if self.confirmation_limit_reached
+    if self.confirmation_limit_reached || bouncing?
       return
     end
     self.confirmation_sent_count = self.confirmation_sent_count + 1

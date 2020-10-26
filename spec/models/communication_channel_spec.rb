@@ -92,6 +92,26 @@ describe CommunicationChannel do
     expect(@cc.confirmation_code).to eql('abc123')
   end
 
+  it "should not increment confirmation_sent_count on bouncing channel" do
+    account = Account.create!
+    cc = communication_channel_model(
+      path: 'foo@bar.edu',
+      last_bounce_at: '2015-01-01T01:01:01.000Z',
+      last_suppression_bounce_at: '2015-03-03T03:03:03.000Z',
+      last_transient_bounce_at: '2015-04-04T04:04:04.000Z'
+    )
+    CommunicationChannel.bounce_for_path(
+      path: 'foo@bar.edu',
+      timestamp: '2015-02-02T02:02:02.000Z',
+      details: nil,
+      permanent_bounce: true,
+      suppression_bounce: false
+    )
+    conf_count = cc.reload.confirmation_sent_count
+    cc.send_confirmation!(account)
+    expect(cc.reload.confirmation_sent_count).to eq conf_count
+  end
+
   it "should be able to reset a confirmation code" do
     communication_channel_model
     old_cc = @cc.confirmation_code
