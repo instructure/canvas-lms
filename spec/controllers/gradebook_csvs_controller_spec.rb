@@ -1,5 +1,3 @@
-# encoding: utf-8
-#
 # Copyright (C) 2015 - present Instructure, Inc.
 #
 # This file is part of Canvas.

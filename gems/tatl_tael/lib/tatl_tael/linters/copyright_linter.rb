@@ -49,7 +49,7 @@ module TatlTael
       end
 
       def precondition_changes
-        changes_matching(config[:precondition])
+        changes_matching(**config[:precondition])
       end
 
       def missing_copyright?(path)
