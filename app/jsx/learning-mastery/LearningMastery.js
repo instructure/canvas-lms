@@ -24,7 +24,7 @@ import 'jquery.ajaxJSON'
 import OutcomeGradebookView from 'compiled/views/gradebook/OutcomeGradebookView'
 import GradebookMenu from '../gradebook/default_gradebook/components/GradebookMenu'
 import Paginator from '../shared/components/Paginator'
-import GradebookLayout from './GradebookLayayout'
+import GradebookLayout from './GradebookLayout'
 
 function normalizeSections(options) {
   const sections = options.sections || []
