@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -302,9 +304,9 @@ module AccountReports
         scope.each do |row|
           row = row.attributes.dup
 
-          row['assignment url'] = "https://#{host}"
-          row['assignment url'] << "/courses/#{row['course id']}"
-          row['assignment url'] << "/assignments/#{row['assignment id']}"
+          row['assignment url'] = "https://#{host}" +
+            "/courses/#{row['course id']}" +
+            "/assignments/#{row['assignment id']}"
           row['submission date'] = default_timezone_format(row['submission date'])
           add_outcomes_data(row)
           csv << header_keys.map { |h| row[h] }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LtiAdvantage
   require_relative 'lti_advantage/type_validator'
   require_relative 'lti_advantage/claims'

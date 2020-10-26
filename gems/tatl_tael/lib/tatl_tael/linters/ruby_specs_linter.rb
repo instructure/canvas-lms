@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module TatlTael
   module Linters
     # TODO: inherit from SimpleLinter

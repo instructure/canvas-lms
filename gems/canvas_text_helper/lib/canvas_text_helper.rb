@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -64,7 +66,7 @@ module CanvasTextHelper
 
   # CGI escape a string, truncating it without breaking apart UTF-8 characters or other escape sequences
   def self.cgi_escape_truncate(string, max_len)
-    retval = ''
+    retval = +''
     string.chars do |char|
       escape_seq = CGI::escape(char)
       break if retval.length + escape_seq.length > max_len

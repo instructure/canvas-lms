@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -111,7 +113,7 @@ module AccountReports
       filename = generate_file_name(account_report)
       temp = Tempfile.open([filename, ".zip"])
       filepath = temp.path
-      filename << ".zip"
+      filename += ".zip"
       temp.close!
 
       Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|

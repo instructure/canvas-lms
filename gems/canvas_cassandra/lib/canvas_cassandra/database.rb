@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2012 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -248,7 +250,7 @@ module CanvasCassandra
       # so no need to differentiate here
       if updates && !updates.empty?
         args = []
-        statement = "UPDATE #{table_name}"
+        statement = +"UPDATE #{table_name}"
         if ttl_seconds
           args << ttl_seconds
           statement << " USING TTL ?"

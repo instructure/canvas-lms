@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -63,7 +65,7 @@ describe Qti::Converter do
       @copy = Tempfile.new(['spec-canvas', '.zip'])
       FileUtils.cp(fname, @copy.path)
       Zip::File.open(@copy.path) do |zf|
-        zf.file.open("settings.xml", 'w') do |f|
+        zf.file.open("settings.xml", +'w') do |f|
           f.write <<-XML
           <settings>
             <setting name='hasSettings'>true</setting>
