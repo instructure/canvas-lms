@@ -289,6 +289,14 @@ class Submission < ActiveRecord::Base
     needs_grading? != needs_grading?(:was)
   end
 
+  def submitted_changed?
+    submitted? != ['submitted', 'pending_review', 'graded'].include?(send('workflow_state_before_last_save'))
+  end
+
+  def graded_changed?
+    graded? != (send("workflow_state_before_last_save") == 'graded')
+  end
+
   scope :needs_grading, -> {
     all.primary_shard.activate do
       joins(:assignment).
@@ -359,6 +367,22 @@ class Submission < ActiveRecord::Base
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
       self.assignment.clear_cache_key(:needs_grading)
+    end
+  end
+
+  after_create :assignment_submission_count_updated, if: :submitted?
+  after_update :assignment_submission_count_updated, if: :submitted_changed?
+  def assignment_submission_count_updated
+    self.class.connection.after_transaction_commit do
+      Rails.cache.delete(['submitted_count', self.assignment].cache_key)
+    end
+  end
+
+  after_create :assignment_graded_count_updated, if: :graded?
+  after_update :assignment_graded_count_updated, if: :graded_changed?
+  def assignment_graded_count_updated
+    self.class.connection.after_transaction_commit do
+      Rails.cache.delete(['graded_count', self.assignment].cache_key)
     end
   end
 

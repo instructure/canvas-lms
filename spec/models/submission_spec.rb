@@ -7063,4 +7063,80 @@ describe Submission do
       expect(assignment.submission_for_student(student).root_account_id).to eq root_account.id
     end
   end
+
+  context "Assignment Cache" do
+    specs_require_cache(:redis_cache_store)
+
+    describe "creating a new submission" do
+      subject(:submission) { @assignment.submissions.new user: User.create, workflow_state: 'submitted' }
+
+      it "invalidates submited count cache if submitted" do
+        Rails.cache.write(['submitted_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+        subject.run_callbacks :create
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(false)
+      end
+
+      it "does not invalidate submitted count cache if unsubmtted" do
+        Rails.cache.write(['submitted_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+        subject.workflow_state = 'unsubmitted'
+        subject.run_callbacks :create
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+      end
+
+      it "invalidates graded count cache if graded" do
+        Rails.cache.write(['graded_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+        subject.score = 10
+        subject.workflow_state = 'graded'
+        subject.run_callbacks :create
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(false)
+      end
+
+      it "does not invalidate graded count cache if unsubmtted" do
+        Rails.cache.write(['graded_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+        subject.run_callbacks :create
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+      end
+    end
+
+    describe "updating a submission" do
+      subject(:submission) { @assignment.submissions.first }
+
+      it "invalidates submited count cache if submitted" do
+        Rails.cache.write(['submitted_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+        subject.workflow_state = 'submitted'
+        subject.run_callbacks :update
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(false)
+      end
+
+      it "does not invalidate submitted count cache if unsubmtted" do
+        Rails.cache.write(['submitted_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+        subject.workflow_state = 'unsubmitted'
+        subject.run_callbacks :update
+        expect(Rails.cache.exist?(['submitted_count', @assignment].cache_key)).to be(true)
+      end
+
+      it "invalidates graded count cache if graded" do
+        Rails.cache.write(['graded_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+        subject.score = 10
+        subject.workflow_state = 'graded'
+        subject.run_callbacks :update
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(false)
+      end
+
+      it "does not invalidate graded count cache if unsubmtted" do
+        Rails.cache.write(['graded_count', @assignment].cache_key, 'test')
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+        subject.workflow_state = 'submitted'
+        subject.run_callbacks :create
+        expect(Rails.cache.exist?(['graded_count', @assignment].cache_key)).to be(true)
+      end
+    end
+  end
 end
