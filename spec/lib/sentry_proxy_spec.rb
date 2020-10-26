@@ -49,8 +49,14 @@ describe SentryProxy do
     it "does not send the message if configured as ignorable" do
       SentryProxy.register_ignorable_error(MyCustomError)
       e = MyCustomError.new
-      expect(Raven).to receive(:capture_exception).never
+      expect(Raven).to_not receive(:capture_exception)
       SentryProxy.capture(e, data)
+    end
+
+    it "does not send to sentry for low-level errors" do
+      e = MyCustomError.new
+      expect(Raven).to receive(:capture_exception).never
+      SentryProxy.capture(e, data, :warn)
     end
   end
 
@@ -69,7 +75,7 @@ describe SentryProxy do
     it "registers strings to skip capture_message" do
       e = "Some Message"
       SentryProxy.register_ignorable_error(e)
-      expect(Raven).to receive(:capture_message).never
+      expect(Raven).to_not receive(:capture_message)
       SentryProxy.capture(e, data)
     end
 

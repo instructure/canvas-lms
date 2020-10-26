@@ -20,11 +20,11 @@
 require 'raven/base'
 
 class SentryProxy
-  def self.capture(exception, data)
+  def self.capture(exception, data, level=:error)
     if exception.is_a?(String) || exception.is_a?(Symbol)
-      Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s)
+      Raven.capture_message(exception.to_s, data) if reportable?(exception.to_s, level)
     else
-      Raven.capture_exception(exception, data) if reportable?(exception)
+      Raven.capture_exception(exception, data) if reportable?(exception, level)
     end
   end
 
@@ -45,7 +45,11 @@ class SentryProxy
     @ignorable_errors = []
   end
 
-  def self.reportable?(exception)
+  def self.reportable?(exception, error_level)
+    # :info and :warn levels specifically introduced
+    # to avoid sentry noise for inactionable errors.
+    return false unless error_level == :error
+
     if exception.is_a?(String)
       !ignorable_errors.include?(exception.to_s)
     else

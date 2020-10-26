@@ -216,7 +216,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
 
     result
   rescue => e
-    ::Canvas::Errors.capture(e, type: :ldap, account: self.account)
+    ::Canvas::Errors.capture(e, {type: :ldap, account: self.account}, :warn)
     if e.is_a?(Timeout::Error)
       if should_send_to_statsd?
         InstStatsd::Statsd.increment("#{statsd_prefix}.ldap_timeout",

@@ -37,14 +37,20 @@ module Canvas
     # The parameter is a unique key for this callback, which is
     # used when assembling return values from ".capture" and it's friends.
     #
-    # The block should accept two parameters, one for the exception/message
-    # and one for contextual info in the form of a hash.  The hash *will*
+    # The block should accept three parameters, one for the exception/message
+    # and one for contextual info in the form of a hash, and one which is the
+    # severity "level" of the exception (defaulting to :error)
+    #
+    # The contextual hash (2nd parameter) *will*
     # have an ":extra" key, and *may* have a ":tags" key.  tags would
     # be things it might be useful to aggreate errors around (job queue), extras
     # are things that would be useful for tracking down why or in what
     # circumstance an error might occur (request_context_id)
     #
-    #   Canvas::Errors.register!(:my_key) do |ex, data|
+    # The ":level" parameter will be one of a predefined set (see ERROR_LEVELS below),
+    # so your callback can decide what to do with it.
+    #
+    #   Canvas::Errors.register!(:my_key) do |ex, data, level|
     #     # do something with the exception
     #   end
     def self.register!(key, &block)
@@ -56,17 +62,27 @@ module Canvas
     # just a message.  If you don't build your data hash
     # with a "tags" key and an "extra" key, it will just group all contextual
     # information under "extra"
-    def self.capture(exception, data={})
+    #
+    # the ":level" parameter, which defaults
+    # to ":error" and (much like log levels), can trigger different
+    # reporting outcomes in the callbacks. expected member of ERROR_LEVELS.
+    # Registered callbacks can decide what to do about different levels.
+    ERROR_LEVELS = [:info, :warn, :error].freeze
+    def self.capture(exception, data={}, level=:error)
+      unless ERROR_LEVELS.include?(level)
+        Rails.logger.warn("[ERRORS] error level #{level} is not supported, defaulting to :error")
+        level = :error
+      end
       job_info = check_for_job_context
       request_info = check_for_request_context
       error_info = job_info.deep_merge(request_info).deep_merge(wrap_in_extra(data))
-      run_callbacks(exception, error_info)
+      run_callbacks(exception, error_info, level)
     end
 
     # convenience method, use this if you want to apply the 'type' tag without
     # having to pass in a whole hash
-    def self.capture_exception(type, exception)
-      self.capture(exception, {tags: {type: type.to_s}})
+    def self.capture_exception(type, exception, level=:error)
+      self.capture(exception, {tags: {type: type.to_s}}, level)
     end
 
     # This is really just for clearing out the registry during tests,
@@ -89,9 +105,9 @@ module Canvas
       job ? Canvas::Errors::JobInfo.new(job, nil).to_h : {}
     end
 
-    def self.run_callbacks(exception, extra)
+    def self.run_callbacks(exception, extra, level=:error)
       registry.each_with_object({}) do |(key, callback), outputs|
-        outputs[key] = callback.call(exception, extra)
+        outputs[key] = callback.call(exception, extra, level)
       end
     end
     private_class_method :run_callbacks

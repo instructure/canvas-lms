@@ -1494,13 +1494,6 @@ class ApplicationController < ActionController::Base
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
-    ActiveSupport::Deprecation.silence do
-      message = "\n#{exception.class} (#{exception.message}):\n"
-      message << exception.annoted_source_code.to_s if exception.respond_to?(:annoted_source_code)
-      message << "  " << exception.backtrace.join("\n  ")
-      logger.fatal("#{message}\n\n")
-    end
-
     if config.consider_all_requests_local
       rescue_action_locally(exception)
     else
@@ -1666,6 +1659,8 @@ class ApplicationController < ActionController::Base
       # the logs.
       rescue_action_in_public(exception)
     else
+      # this ensures the logging will still happen so you can see backtrace, etc.
+      Canvas::Errors.capture(exception)
       super
     end
   end

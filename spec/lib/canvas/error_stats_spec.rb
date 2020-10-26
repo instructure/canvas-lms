@@ -28,24 +28,20 @@ module Canvas
       end
       let(:data){ {} }
 
-      it "increments errors.all always" do
-        expect(InstStatsd::Statsd).to receive(:increment).with("errors.all")
+      it "increments the error level by default" do
+        expect(InstStatsd::Statsd).to receive(:increment) do |key, data|
+          expect(key).to eq("errors.error")
+          expect(data[:tags][:category]).to eq("something")
+        end
         described_class.capture("something", data)
       end
 
-      it "increments the message name for a string" do
-        expect(InstStatsd::Statsd).to receive(:increment).with("errors.something")
-        described_class.capture("something", data)
-      end
-
-      it "increments the message name for a symbol" do
-        expect(InstStatsd::Statsd).to receive(:increment).with("errors.something")
-        described_class.capture(:something, data)
-      end
-
-      it "bumps the exception name for anything else" do
-        expect(InstStatsd::Statsd).to receive(:increment).with("errors.StandardError")
-        described_class.capture(StandardError.new, data)
+      it "uses the exception name for the category tag" do
+        expect(InstStatsd::Statsd).to receive(:increment) do |key, data|
+          expect(key).to eq("errors.warn")
+          expect(data[:tags][:category]).to eq("StandardError")
+        end
+        described_class.capture(StandardError.new, data, :warn)
       end
     end
   end

@@ -21,13 +21,18 @@ module Canvas
   # Simple class for shipping errors to statsd based on the format
   # propogated from callbacks on Canvas::Errors
   class ErrorStats
-    def self.capture(exception, _data)
+    def self.capture(exception, data, level=:error)
       category = exception
       unless exception.is_a?(String) || exception.is_a?(Symbol)
         category = exception.class.name
       end
-      InstStatsd::Statsd.increment("errors.all")
-      InstStatsd::Statsd.increment("errors.#{category}")
+      # careful!  adding tags is useful for finding things,
+      # but every unique combination of tags gets treated
+      # as a custom metric for billing purposes.  Only
+      # add high value and low-ish cardinality tags.
+      tags = data.fetch(:tags, {}).fetch(:for_stats, {})
+      tags[:category] = category.to_s
+      InstStatsd::Statsd.increment("errors.#{level}", tags: tags)
     end
   end
 end
