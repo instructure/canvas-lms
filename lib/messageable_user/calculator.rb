@@ -541,7 +541,7 @@ class MessageableUser
       ]
       if options[:include_concluded]
         clause = Enrollment::QueryBuilder.new(:completed, options.slice(:strict_checks)).conditions
-        clause << " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
+        clause += " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
         state_clauses << clause
       end
       state_clauses.compact!

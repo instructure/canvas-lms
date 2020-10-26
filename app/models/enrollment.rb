@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -1120,7 +1122,7 @@ class Enrollment < ActiveRecord::Base
 
   def cached_score_or_grade(current_or_final, score_or_grade, posted_or_unposted, id_opts=nil)
     score = find_score(id_opts)
-    method = "#{current_or_final}_#{score_or_grade}"
+    method = +"#{current_or_final}_#{score_or_grade}"
     method.prepend("unposted_") if posted_or_unposted == :unposted
     score&.send(method)
   end

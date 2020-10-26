@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ module Importers
       mt = media_object.media_tracks.build
       mt.kind = track['kind']
       mt.locale = track['locale']
-      content = ''
+      content = +''
       file.open { |data| content << data }
       mt.content = content
       begin

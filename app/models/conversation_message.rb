@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -55,13 +57,13 @@ class ConversationMessage < ActiveRecord::Base
           "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
         }) AND NOT generated
         AND (conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)"
-      base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
+      base_conditions += sanitize_sql([" AND author_id = ?", author.id]) if author
 
       # limit it for non-postgres so we can reduce the amount of extra data we
       # crunch in ruby (generally none, unless a conversation has multiple
       # most-recent messages, i.e. same created_at)
       unless connection.adapter_name == 'PostgreSQL'
-        base_conditions << <<~SQL
+        base_conditions += <<~SQL
           AND conversation_messages.created_at = (
             SELECT MAX(created_at)
             FROM conversation_messages cm2
