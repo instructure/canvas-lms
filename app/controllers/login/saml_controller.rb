@@ -178,7 +178,7 @@ class Login::SamlController < ApplicationController
 
   rescue_from SAML2::InvalidMessage, with: :saml_error
   def saml_error(error)
-    Canvas::Errors.capture_exception(:saml, error)
+    Canvas::Errors.capture_exception(:saml, error, :log)
     render status: :bad_request, plain: error.to_s
   end
 
