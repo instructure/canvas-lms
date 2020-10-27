@@ -124,6 +124,15 @@ describe "/gradebooks/speed_grader" do
     end
   end
 
+  describe 'reassignment wrapper' do
+    it 'is rendered when @can_comment_on_submission and @can_reassign_submissions are true' do
+      assign(:can_comment_on_submission, true)
+      assign(:can_reassign_submissions, true)
+      render template: 'gradebooks/speed_grader', locals: locals
+      expect(rendered).to include "<div id=\"reassign_assignment_wrapper\""
+    end
+  end
+
   context 'when group assignment' do
     before do
       assign(:can_comment_on_submission, true)

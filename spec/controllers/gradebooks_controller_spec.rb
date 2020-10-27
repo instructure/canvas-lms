@@ -2645,6 +2645,53 @@ describe GradebooksController do
         expect(assigns[:js_env]).not_to include(:new_gradebook_plagiarism_icons_enabled)
       end
     end
+
+    describe 'reassignment' do
+      it 'does not allow reassignment' do
+        @assignment.publish
+        get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+        expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq false
+      end
+
+      context 'with reassign_assignments feature flag enabled' do
+        before do
+          @course.root_account.enable_feature!(:reassign_assignments)
+        end
+
+        it 'allows teacher reassignment' do
+          get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
+        end
+
+        it 'does not allow student reassignment' do
+          user_session(@student)
+          get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
+          expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq nil
+        end
+
+        context 'with moderated grading' do
+          before(:once) do
+            @mod_assignment = @course.assignments.create!(
+              title: "some assignment", moderated_grading: true, grader_count: 1
+            )
+            course_with_ta(course: @course)
+            @mod_assignment.update!(final_grader: @teacher)
+          end
+
+          it 'does not allow non-final grader to reassign' do
+            user_session(@ta)
+            get 'speed_grader', params: {course_id: @course, assignment_id: @mod_assignment.id}
+            expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq false
+          end
+
+          it 'allows final grader to reassign' do
+            user_session(@teacher)
+            get 'speed_grader', params: {course_id: @course, assignment_id: @mod_assignment.id}
+            expect(controller.instance_variable_get(:@can_reassign_submissions)).to eq true
+          end
+        end
+      end
+    end
   end
 
   describe "POST 'speed_grader_settings'" do

@@ -279,6 +279,7 @@ CanvasRails::Application.routes.draw do
         end
 
       put 'anonymous_submissions/:anonymous_id', to: 'anonymous_submissions#update'
+      put 'anonymous_submissions/:anonymous_id/reassign', to: 'anonymous_submissions#redo_submission'
       resources :submissions do
         get 'originality_report/:asset_string' => 'submissions#originality_report', as: :originality_report
         post 'turnitin/resubmit' => 'submissions#resubmit_to_turnitin', as: :resubmit_to_turnitin
@@ -286,6 +287,7 @@ CanvasRails::Application.routes.draw do
         post 'vericite/resubmit' => 'submissions#resubmit_to_vericite', as: :resubmit_to_vericite
         get 'vericite/:asset_string' => 'submissions#vericite_report', as: :vericite_report
         get 'audit_events' => 'submissions#audit_events', as: :audit_events
+        put 'reassign' => 'submissions#redo_submission', as: :reassign
       end
 
       get 'anonymous_submissions/:anonymous_id/originality_report/:asset_string',

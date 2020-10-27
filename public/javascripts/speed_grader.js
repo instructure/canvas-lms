@@ -115,6 +115,7 @@ let anonymizableAuthorId
 let isModerated
 
 let commentSubmissionInProgress
+let reassignAssignmentInProgress
 
 let $window
 let $full_width_container
@@ -134,6 +135,7 @@ let $add_a_comment
 let $add_a_comment_submit_button
 let $add_a_comment_textarea
 let $comment_attachment_input_blank
+let $reassign_assignment
 let fileIndex
 let $add_attachment
 let $submissions_container
@@ -172,6 +174,7 @@ let $comment_submitted
 let $comment_submitted_message
 let $comment_saved
 let $comment_saved_message
+let $reassignment_complete
 let $selectmenu
 let browserableCssClasses
 let snapshotCache
@@ -1504,6 +1507,8 @@ EG = {
     this.currentStudent =
       jsonData.studentMap[selectMenuValue] || _.values(jsonData.studentsWithSubmissions)[0]
 
+    EG.resetReassignButton()
+
     if (historyBehavior) {
       EG.updateHistoryForCurrentStudent(historyBehavior)
     }
@@ -1537,6 +1542,43 @@ EG = {
     }
 
     this.setCurrentStudentAvatar()
+  },
+
+  resetReassignButton() {
+    // Restore the tooltip text for the reassignment button
+    // and enable the reassignment button if this user has
+    // posted a comment since submission
+    if ($reassign_assignment[0]) {
+      const redoRequest = this.currentStudent?.submission?.redo_request
+      let disableReassign = true
+      let submittedAt = this.currentStudent?.submission?.submitted_at
+      if (submittedAt) {
+        submittedAt = new Date(submittedAt)
+        let submissionComments = this.currentStudent.submission.submission_comments
+        if (submissionComments) {
+          submissionComments = submissionComments.filter(
+            comment => comment.author_id === ENV.current_user_id
+          )
+          const lastCommentByUser = submissionComments[submissionComments.length - 1]
+          if (lastCommentByUser?.created_at) {
+            const commentedAt = new Date(lastCommentByUser.created_at)
+            disableReassign = redoRequest || commentedAt < submittedAt
+          }
+        }
+      }
+      $reassign_assignment.attr('disabled', disableReassign)
+      $reassign_assignment.text(I18n.t('Reassign Assignment'))
+      $reassign_assignment
+        .parent()
+        .attr(
+          'title',
+          disableReassign
+            ? redoRequest
+              ? I18n.t('Assignment is reassigned.')
+              : I18n.t('Student feedback required in comments above to reassign.')
+            : ''
+        )
+    }
   },
 
   setCurrentStudentAvatar() {
@@ -2304,9 +2346,20 @@ EG = {
 
       $(`#submission_to_view option:eq(${index})`).attr('selected', 'selected')
       $submission_details.show()
+      if (
+        !!currentSubmission.cached_due_date &&
+        currentSubmission.submission_type &&
+        currentSubmission.submission_type.startsWith('online_') &&
+        currentSubmission.submission_type !== 'online_quiz'
+      ) {
+        $reassign_assignment.show()
+      } else {
+        $reassign_assignment.hide()
+      }
     } else {
       // there's no submission
       $submission_details.hide()
+      $reassign_assignment.hide()
     }
     this.handleSubmissionSelectionChange()
   },
@@ -2910,6 +2963,56 @@ EG = {
       $comment_submitted_message.attr('tabindex', -1).focus()
     }
     $add_a_comment_submit_button.text(I18n.t('submit', 'Submit'))
+    // This hides the tooltip over the reassignment button
+    // and enables the reassign button if the submission
+    // doesn't already have a redo request
+    if ($reassign_assignment[0] && !EG.currentStudent?.submission?.redo_request) {
+      $reassign_assignment.parent().attr('title', '')
+      $reassign_assignment.removeAttr('disabled')
+    }
+  },
+
+  reassignAssignment() {
+    if (reassignAssignmentInProgress) {
+      return false
+    }
+    reassignAssignmentInProgress = true
+    const url = `${assignmentUrl}/${isAnonymous ? 'anonymous_' : ''}submissions/${
+      EG.currentStudent[anonymizableId]
+    }/reassign`
+    const method = 'PUT'
+    const formData = {}
+
+    function formSuccess(studentId) {
+      jsonData.submissionsMap[studentId].redo_request = true
+      // Check if we're still on the same student submission
+      if (studentId === EG.currentStudent?.id) {
+        $reassign_assignment.text(I18n.t('Reassign Assignment'))
+        $reassign_assignment.parent().attr('title', I18n.t('Assignment is reassigned.'))
+      }
+      reassignAssignmentInProgress = false
+      $reassignment_complete.show()
+      $reassignment_complete.attr('tabindex', -1).focus()
+    }
+
+    function formError(data, studentId) {
+      EG.handleGradingError(data)
+      // Check if we're still on the same student submission
+      if (studentId === EG.currentStudent?.id) {
+        $reassign_assignment.text(I18n.t('Reassign Assignment'))
+        $reassign_assignment.removeAttr('disabled')
+      }
+      reassignAssignmentInProgress = false
+    }
+    $reassign_assignment.attr('disabled', true)
+    $reassign_assignment.text(I18n.t('Reassigning ...'))
+    $.ajaxJSON(
+      url,
+      method,
+      formData,
+      () => formSuccess(EG.currentStudent.id),
+      data => formError(data, EG.currentStudent.id)
+    )
   },
 
   addSubmissionComment(draftComment) {
@@ -3312,6 +3415,16 @@ EG = {
       }
       return false // so that it doesn't hit the $("a.instructure_inline_media_comment").live('click' event handler
     })
+    $reassign_assignment.click(event => {
+      event.preventDefault()
+      EG.reassignAssignment()
+    })
+    if ($reassign_assignment[0]) {
+      $reassign_assignment.parent().tooltip({
+        position: {my: 'left bottom', at: 'left top'},
+        tooltipClass: 'center bottom vertical'
+      })
+    }
   },
 
   // Note: do not use compareStudentsBy if your dataset includes 0.
@@ -3640,6 +3753,7 @@ function setupSelectors() {
   $add_a_comment_submit_button = $add_a_comment.find('button:submit')
   $add_a_comment_textarea = $(`#${SPEED_GRADER_COMMENT_TEXTAREA_MOUNT_POINT}`)
   $add_attachment = $('#add_attachment')
+  $reassign_assignment = $('#reassign_assignment')
   $assignment_submission_originality_report_url = $('#assignment_submission_originality_report_url')
   $assignment_submission_resubmit_to_vericite_url = $(
     '#assignment_submission_resubmit_to_vericite_url'
@@ -3661,6 +3775,7 @@ function setupSelectors() {
   $comment_submitted = $('#comment_submitted')
   $comment_submitted_message = $('#comment_submitted_message')
   $comments = $('#comments')
+  $reassignment_complete = $('#reassignment_complete')
   $deduction_box = $('#deduction-box')
   $enrollment_concluded_notice = $('#enrollment_concluded_notice')
   $enrollment_inactive_notice = $('#enrollment_inactive_notice')

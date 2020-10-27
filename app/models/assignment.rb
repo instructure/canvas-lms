@@ -3629,6 +3629,10 @@ class Assignment < ActiveRecord::Base
     !!self.rubric_association&.active?
   end
 
+  def can_reassign?(grader)
+    (final_grader_id.nil? || final_grader_id == grader.id) && context.grants_right?(grader, :manage_grades)
+  end
+
   private
 
   def set_muted

@@ -173,6 +173,7 @@ module Api::V1::PlannerItem
         needs_grading: submission&.needs_grading?,
         has_feedback: submission&.last_teacher_comment.present?,
         new_activity: submission&.unread?(user),
+        redo_request: submission&.redo_request?
       }
       sub_data_hash[:feedback] = feedback_data(submission, user) if sub_data_hash[:has_feedback]
       subs_data_hash[assign.id] = sub_data_hash
