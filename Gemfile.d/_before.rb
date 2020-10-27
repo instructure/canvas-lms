@@ -16,7 +16,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-gem 'bundler', '>= 1.13.3', '<= 2.1.4'
+gem 'bundler', '>= 1.13.3', '<= 2.2.0'
 
 if Gem::Version.new(Bundler::VERSION) >= Gem::Version.new('1.14.0') &&
   Gem::Version.new(Gem::VERSION) < Gem::Version.new('2.6.9')
@@ -31,6 +31,9 @@ elsif RUBY_VERSION >= "2.6.0" && RUBY_VERSION < "2.7"
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
 elsif RUBY_VERSION >= "2.7.0" && RUBY_VERSION < "2.8"
   $stderr.puts "Ruby 2.7+ support is untested" unless ENV['SUPPRESS_RUBY_WARNING']
+  ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
+elsif RUBY_VERSION >= "3.0.0" && RUBY_VERSION < "3.1"
+  $stderr.puts "Ruby 3.0+ support is experimental" unless ENV['SUPPRESS_RUBY_WARNING']
   ruby RUBY_VERSION, :engine => 'ruby', :engine_version => RUBY_ENGINE_VERSION
 else
   ruby '2.6.5', :engine => 'ruby', :engine_version => '2.6.0'

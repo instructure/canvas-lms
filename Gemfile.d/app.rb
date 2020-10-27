@@ -81,7 +81,7 @@ gem 'inst-jobs-autoscaling', '2.0.0'
   gem 'aws-sdk-autoscaling', '1.49.0', require: false
 gem 'inst-jobs-statsd', '2.0.0'
 gem 'json', '2.3.1'
-gem 'json_schemer', '0.2.16'
+gem 'json_schemer', '0.2.16', github: 'robotdana/json_schemer', ref: '0d2ac359a87964f74c07a14cafeb98cfcae4e29f'
 gem 'json-jwt', '1.13.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
