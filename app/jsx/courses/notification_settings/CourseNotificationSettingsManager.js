@@ -52,7 +52,6 @@ export default function CourseNotifcationSettingsManager(props) {
       updatePreference={(data = {}) =>
         updatePreference({
           variables: {
-            userId: props.userId,
             courseId: props.courseId,
             enabled: data.enabled,
             channelId: data.channel?._id,
@@ -68,7 +67,6 @@ export default function CourseNotifcationSettingsManager(props) {
 }
 
 CourseNotifcationSettingsManager.propTypes = {
-  userId: string.isRequired,
   courseId: string.isRequired,
   courseName: string.isRequired,
   enabled: bool.isRequired,
