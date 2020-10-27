@@ -571,6 +571,15 @@ RSpec.describe ApplicationController do
       I18n.set_locale_with_localizer # this is what t() triggers
       expect(I18n.locale.to_s).to eq "ru"
     end
+
+    it "doesn't fail if localizer exists in a contextless state" do
+      # establish an instance with no request/session
+      ctrl = ApplicationController.new
+      ctrl.send(:assign_localizer)
+      locale = nil
+      expect{ locale = I18n.localizer.call }.to_not raise_error
+      expect(locale).to eq("en") # default locale
+    end
   end
 
   context 'require_context' do

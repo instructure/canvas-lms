@@ -543,11 +543,23 @@ class ApplicationController < ActionController::Base
 
   def assign_localizer
     I18n.localizer = lambda {
-      infer_locale :context => @context,
-                   :user => not_fake_student_user,
-                   :root_account => @domain_root_account,
-                   :session_locale => session[:locale],
-                   :accept_language => request.headers['Accept-Language']
+      context_hash = {
+        context: @context,
+        user: not_fake_student_user,
+        root_account: @domain_root_account
+      }
+      if request.present?
+        # if for some reason this gets stuck
+        # as global state on I18n (cleanup failure), we don't want it to
+        # explode trying to access a non-existant request.
+        context_hash.merge!({
+          session_locale: session[:locale],
+          accept_language: request.headers['Accept-Language']
+        })
+      else
+        logger.warn("[I18N] localizer executed from context-less controller")
+      end
+      infer_locale context_hash
     }
   end
 
