@@ -833,6 +833,7 @@ CanvasRails::Application.routes.draw do
     resources :pseudonyms, except: :index
     resources :question_banks, only: :index
     get :admin_merge
+    get :admin_split
     post :merge
     get :grades
     resources :user_notes
@@ -1414,7 +1415,7 @@ CanvasRails::Application.routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
-      post 'users/:id/split', controller: 'users', action: 'split'
+      post 'users/:id/split', controller: 'users', action: 'split', as: 'split'
 
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 
