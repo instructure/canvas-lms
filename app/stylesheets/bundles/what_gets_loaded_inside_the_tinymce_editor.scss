@@ -16,10 +16,6 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import url('https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&subset=latin-ext&display=swap'); //  This needs to be the same as what's in the <link> in _head.html.erb
-@import url('https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap');
-
 @import 'base/environment';
 @import 'components/ic-reset';
 @import 'components/ic-typography';
