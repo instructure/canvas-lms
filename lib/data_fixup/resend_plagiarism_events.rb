@@ -50,7 +50,7 @@ module DataFixup
         schedule_resubmit_job_by_id(start_time, end_time, id, last_id)
         id = last_id + 1
       end
-      run_next_job_at(Time.zone.now)
+      run_next_job
     end
 
     def self.resend_scope(start_time, end_time)
@@ -76,9 +76,10 @@ module DataFixup
       )
     end
 
-    def self.run_next_job_at(time)
+    def self.run_next_job
+      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
       Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil).
-        order(:id).first&.update_attributes(run_at: time)
+        order(:id).first&.update_attributes(run_at: wait_time.seconds.from_now)
     end
 
     # Retriggers the plagiarism resubmit event for the given
@@ -95,8 +96,7 @@ module DataFixup
     ensure
       # After we finish any job, we need to set the next one to run after the specified
       # wait time
-      _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
-      run_next_job_at(wait_time.seconds.from_now)
+      run_next_job
     end
 
     # Returns all submissions configured with a plagiarism
