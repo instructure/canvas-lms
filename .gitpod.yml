@@ -1,5 +1,5 @@
 image:
-  file: ubuntu.development.Dockerfile
+  file: .gitpod.Dockerfile
 
 ports:
   - port: 3000
