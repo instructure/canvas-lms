@@ -8,7 +8,7 @@ ports:
     onOpen: ignore
 
 tasks:
-  - init:
+  - init: bundle install && yarn install --pure-lockfile && yarn install --pure-lockfile && for config in amazon_s3 delayed_jobs domain file_store outgoing_mail security external_migration; do cp -v config/$config.yml.example config/$config.yml; done && cp config/dynamic_settings.yml.example config/dynamic_settings.yml && bundle exec rails canvas:compile_assets
 
 github:
   prebuilds:
