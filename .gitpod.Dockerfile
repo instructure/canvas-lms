@@ -247,7 +247,7 @@ RUN mkdir -p .yardoc \
 RUN bundle lock --local --conservative
 
 # TODO: switch to canvas:compile_assets_dev once we stop using this Dockerfile in production/e2e
-RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
+#RUN COMPILE_ASSETS_NPM_INSTALL=0 bundle exec rake canvas:compile_assets
 
 RUN sudo apt-get update \
  && sudo apt-get install -y postgresql-12 postgresql-contrib-12 \
