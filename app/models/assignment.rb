@@ -1873,6 +1873,17 @@ class Assignment < ActiveRecord::Base
   end
   private :tool_settings_message_handlers
 
+  def associated_tool_proxy
+    actl = assignment_configuration_tool_lookups.take
+    return unless actl
+
+    Lti::ToolProxy.proxies_in_order_by_codes(
+      vendor_code: actl.tool_vendor_code,
+      product_code: actl.tool_product_code,
+      resource_type_code: actl.tool_resource_type_code
+    ).first
+  end
+
   def save_grade_to_submission(submission, original_student, group, opts)
     unless submission.grader_can_grade?
       error_details = submission.grading_error_message

@@ -83,8 +83,7 @@ describe DataFixup::ResendPlagiarismEvents do
       Setting.set('trigger_plagiarism_resubmit', '1,10')
       dj = Delayed::Job.create(strand: "plagiarism_event_resend", locked_at: nil, run_at: 1.year.from_now)
       expect(Canvas::LiveEvents).to receive(:post_event_stringified).twice.with('plagiarism_resubmit', anything, anything)
-      DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_id(1.month.ago, Time.zone.now,
-        @submission.id, @submission_two.id)
+      DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time(1.month.ago, Time.zone.now)
       expect(dj.reload.run_at).to be < 11.seconds.from_now
     end
   end
