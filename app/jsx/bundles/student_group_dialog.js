@@ -16,15 +16,47 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import $ from 'jquery'
+import I18n from 'i18n!StudentGroupDialog'
 import ready from '@instructure/ready'
+import GroupModal from 'jsx/groups/components/GroupModal'
 import Group from 'compiled/models/Group'
-import GroupCategory from 'compiled/models/GroupCategory'
-import GroupEditView from 'compiled/views/groups/manage/GroupEditView'
+
+function reloadStudentGroup() {
+  return window.location.reload()
+}
+
+function editGroup(group, open = true) {
+  ReactDOM.render(
+    <GroupModal
+      group={{
+        name: group.get('name'),
+        id: group.get('id'),
+        group_category_id: group.get('group_category_id'),
+        join_level: group.get('join_level'),
+        group_limit: group.get('max_membership')
+      }}
+      label={I18n.t('Edit Group')}
+      open={open}
+      nameOnly
+      requestMethod="PUT"
+      onSave={reloadStudentGroup}
+      onDismiss={() => {
+        editGroup(group, false)
+        document.getElementById('edit_group').focus()
+      }}
+    />,
+    document.getElementById('student-group-dialog-mount-point')
+  )
+}
 
 ready(() => {
   const group = new Group(ENV.group)
-  const groupCategory = new GroupCategory(ENV.group_category)
-  const editView = new GroupEditView({model: group, groupCategory, nameOnly: true})
-  editView.setTrigger($('#edit_group'))
+
+  $('#edit_group').click(event => {
+    event.preventDefault()
+    editGroup(group)
+  })
 })

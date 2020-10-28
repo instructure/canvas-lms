@@ -59,6 +59,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     if (!modalProps.open) resetState()
   }, [group.name, group.group_limit, group.join_level, modalProps.open])
 
+  const isNameOnly = modalProps.nameOnly ? modalProps.nameOnly : false
   const isStudentGroup = group.role ? group.role === 'student_organized' : false
   const groupCategoryId = groupCategory ? groupCategory.id : group.group_category_id
 
@@ -131,12 +132,13 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
   }
 
   function Footer() {
+    const saveButtonState = name.length === 0 || status === 'info' ? 'disabled' : 'enabled'
     return (
       <>
         <Button onClick={modalProps.onDismiss}>{I18n.t('Cancel')}</Button>
         <Button
           type="submit"
-          disabled={name.length === 0 || status === 'info'}
+          interaction={saveButtonState}
           color="primary"
           margin="0 0 0 x-small"
           onClick={validateBeforeSend}
@@ -160,6 +162,24 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
     </Alert>
   ) : null
 
+  const groupOptions = isStudentGroup ? (
+    <SimpleSelect
+      renderLabel={I18n.t('Joining')}
+      defaultValue="invitation_only"
+      value={joinLevel}
+      onChange={(_event, data) => setJoinLevel(data.value)}
+    >
+      <SimpleSelect.Option id="invitation_only" value="invitation_only">
+        {I18n.t('Invitation Only')}
+      </SimpleSelect.Option>
+      <SimpleSelect.Option id="parent_context_auto_join" value="parent_context_auto_join">
+        {I18n.t('Members are free to join')}
+      </SimpleSelect.Option>
+    </SimpleSelect>
+  ) : (
+    <GroupMembershipInput onChange={setGroupLimit} value={groupLimit.toString()} />
+  )
+
   return (
     <CanvasModal
       size="small"
@@ -181,23 +201,7 @@ export default function GroupModal({groupCategory, group, onSave, requestMethod,
           onChange={(_event, value) => setName(value)}
           isRequired
         />
-        {isStudentGroup ? (
-          <SimpleSelect
-            renderLabel={I18n.t('Joining')}
-            defaultValue="invitation_only"
-            value={joinLevel}
-            onChange={(_event, data) => setJoinLevel(data.value)}
-          >
-            <SimpleSelect.Option id="invitation_only" value="invitation_only">
-              {I18n.t('Invitation Only')}
-            </SimpleSelect.Option>
-            <SimpleSelect.Option id="parent_context_auto_join" value="parent_context_auto_join">
-              {I18n.t('Members are free to join')}
-            </SimpleSelect.Option>
-          </SimpleSelect>
-        ) : (
-          <GroupMembershipInput onChange={setGroupLimit} value={groupLimit.toString()} />
-        )}
+        {isNameOnly ? null : groupOptions}
       </FormFieldGroup>
     </CanvasModal>
   )
