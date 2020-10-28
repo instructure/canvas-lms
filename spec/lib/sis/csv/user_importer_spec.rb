@@ -18,7 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../../spec_helper.rb')
+require_relative "../../../spec_helper"
+require_relative "../../../sharding_spec_helper"
 
 def gen_ssha_password(password)
   salt = SecureRandom.random_bytes(10)
@@ -1627,5 +1628,47 @@ describe SIS::CSV::UserImporter do
     pseudonym = user.pseudonyms.first
     expect(pseudonym.unique_id).to eql('user1ö')
     expect(pseudonym.sis_user_id).to eql('user_1ö')
+  end
+
+  it 'should validate ccs on create' do
+    importer = process_csv_data(
+      "user_id,login_id,first_name,last_name,email,status",
+      "user_2,user2,User,Dos,invalid_at_example.com,active"
+    )
+    expect(importer.errors.length).to eq 1
+  end
+
+  context "sharding" do
+    specs_require_sharding
+
+    it 'should update cc from users shard' do
+      @shard1.activate do
+        @shard1_cc = communication_channel_model(path: 'taken@example.com')
+      end
+
+      @cc = communication_channel_model(path: 'taken@example.com')
+
+      # make login on local shard to find cross shard user during import.
+      @account.pseudonyms.create!(user: @shard1_cc.user, unique_id: 'user2', sis_user_id: 'user_2')
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,integration_id",
+        "user_2,user2,User,Dos,taken@example.com,active,9000"
+      )
+      expect(@shard1_cc.reload.workflow_state).to eq 'active'
+      expect(@cc.reload.workflow_state).to eq 'unconfirmed'
+    end
+
+    it 'should create ccs on users shard' do
+      @shard1.activate { @shard1_user = User.create!(name: 'shard1 user') }
+      # make login on local shard to find cross shard user during import.
+      @account.pseudonyms.create!(user: @shard1_user, unique_id: 'user2', sis_user_id: 'user_2')
+
+      process_csv_data_cleanly(
+        "user_id,login_id,first_name,last_name,email,status,integration_id",
+        "user_2,user2,User,Dos,shard1@example.com,active,9000"
+      )
+      expect(@shard1_user.email).to eq 'shard1@example.com'
+    end
   end
 end

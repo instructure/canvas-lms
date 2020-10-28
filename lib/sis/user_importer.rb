@@ -308,17 +308,24 @@ module SIS
           @users_to_add_account_associations << user.id if should_add_account_associations
           @users_to_update_account_associations << user.id if should_update_account_associations
 
+          limit = nil
           if user_row.email.present? && EmailAddressValidator.valid?(user_row.email)
             # find all CCs for this user, and active conflicting CCs for all users
             # unless we're deleting this user, then only find CCs for this user
-            cc_scope = if status_is_active
-                         CommunicationChannel.where("workflow_state='active' OR user_id=?", user).shard(user.shard)
-                       else
-                         user.communication_channels
-                       end
-            cc_scope = cc_scope.email.by_path(user_row.email)
-            limit = Setting.get("merge_candidate_search_limit", "100").to_i
-            ccs = cc_scope.limit(limit + 1).to_a
+            ccs = []
+            user.shard.activate do
+              # ^ maybe after switchman supports OR conditions we can not do this?
+              # as it is, this scope gets evaluated on the current shard instead of the user shard
+              # and that can lead to failing to find the matching communication channel.
+              cc_scope = if status_is_active
+                            CommunicationChannel.where("workflow_state='active' OR user_id=?", user)
+                        else
+                          user.communication_channels
+                        end
+              cc_scope = cc_scope.email.by_path(user_row.email)
+              limit = Setting.get("merge_candidate_search_limit", "100").to_i
+              ccs = cc_scope.limit(limit + 1).to_a
+            end
             if ccs.count > limit
               ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
             end
@@ -346,8 +353,7 @@ module SIS
             cc.workflow_state = status_is_active ? 'active' : 'retired'
             newly_active = cc.path_changed? || (cc.active? && cc.workflow_state_changed?)
             if cc.changed?
-              if cc.valid?
-                cc.save_without_broadcasting
+              if cc.valid? && cc.save_without_broadcasting
                 cc_data = SisBatchRollBackData.build_data(sis_batch: @batch, context: cc)
                 @roll_back_data << cc_data if cc_data
               else

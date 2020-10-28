@@ -229,12 +229,18 @@ class CommunicationChannel < ActiveRecord::Base
     return if path.nil?
     return if retired?
     return unless user_id
-    scope = self.class.by_path(path).where(user_id: user_id, path_type: path_type, workflow_state: ['unconfirmed', 'active'])
-    unless new_record?
-      scope = scope.where("id<>?", id)
-    end
-    if scope.exists?
-      self.errors.add(:path, :taken, :value => path)
+    self.shard.activate do
+      # ^ if we create a new CC record while on another shard
+      # and try to check the validity OUTSIDE the save path
+      # (cc.valid?) this needs to switch to the shard where we'll
+      # be writing to make sure we're checking uniqueness in the right place
+      scope = self.class.by_path(path).where(user_id: user_id, path_type: path_type, workflow_state: ['unconfirmed', 'active'])
+      unless new_record?
+        scope = scope.where("id<>?", id)
+      end
+      if scope.exists?
+        self.errors.add(:path, :taken, :value => path)
+      end
     end
   end
 
