@@ -27,9 +27,6 @@ class ConversationParticipant < ActiveRecord::Base
   # deprecated
   has_many :conversation_message_participants
 
-  # Publish to the pipeline in using CanvasShim
-  after_commit { PipelineService.publish(self) }
-
   after_destroy :destroy_conversation_message_participants
 
   scope :visible, -> { where("last_message_at IS NOT NULL") }

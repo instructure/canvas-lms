@@ -284,16 +284,6 @@ class Submission < ActiveRecord::Base
   after_save :update_quiz_submission
   after_save :update_participation
 
-  # StrongMind Added
-  after_save :send_unit_grades_to_pipeline
-
-  # StrongMind Added
-  def send_unit_grades_to_pipeline
-    return unless SettingsService.get_settings(object: :school, id: 1)['enable_unit_grade_calculations'] == true
-
-    PipelineService.publish(PipelineService::Nouns::UnitGrades.new(self))
-  end
-
   def autograded?
     # AutoGrader == (quiz_id * -1)
     !!(self.grader_id && self.grader_id < 0)
