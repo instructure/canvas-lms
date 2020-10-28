@@ -1,0 +1,35 @@
+image:
+  file: .gitpod.Dockerfile
+
+ports:
+  - port: 3000
+    onOpen: ignore
+  - port: 5432
+    onOpen: ignore
+
+tasks:
+  - init: bundle install && yarn install --pure-lockfile && yarn install
+      --pure-lockfile && for config in amazon_s3 delayed_jobs domain file_store
+      outgoing_mail security external_migration; \ do cp -v
+      config/$config.yml.example config/$config.yml; done && cp
+      config/dynamic_settings.yml.example config/dynamic_settings.yml && bundle
+      exec rails canvas:compile_assets
+
+github:
+  prebuilds:
+    # enable for the master/default branch (defaults to true)
+    master: true
+    # enable for all branches in this repo (defaults to false)
+    branches: true
+    # enable for pull requests coming from this repo (defaults to true)
+    pullRequests: true
+    # enable for pull requests coming from forks (defaults to false)
+    pullRequestsFromForks: true
+    # add a "Review in Gitpod" button as a comment to pull requests (defaults to true)
+    addComment: false
+    # add a "Review in Gitpod" button to pull requests (defaults to false)
+    addBadge: false
+    # add a label once the prebuild is ready to pull requests (defaults to false)
+    addLabel: false
+    # add a check to pull requests (defaults to true)
+    addCheck: true
