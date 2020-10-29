@@ -34,6 +34,15 @@ module Types
       value "deleted"
     end
 
+    class GradesEnrollmentFilterInputType < Types::BaseInputObject
+      graphql_name "GradesEnrollmentFilter"
+
+      argument :enrollment_ids, [ID],
+        "only include users with the given enrollment ids",
+        prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func("Enrollment"),
+        required: false
+    end
+
     global_id_field :id
     field :name, String, null: true
     field :rules, AssignmentGroupRulesType, method: :rules_hash, null: true
@@ -50,10 +59,15 @@ module Types
 
     field :grades_connection, GradesType.connection_type, null: true do
       description "grades for this assignment group"
+      argument :filter, GradesEnrollmentFilterInputType, required: false
     end
-    def grades_connection
+    def grades_connection(filter: {})
       load_association(:context).then do |course|
-        visible_enrollments = course.apply_enrollment_visibility(course.all_student_enrollments, current_user)
+        enrollments = course.all_student_enrollments
+        if filter[:enrollment_ids]
+          enrollments = enrollments.where(id: filter[:enrollment_ids])
+        end
+        visible_enrollments = course.apply_enrollment_visibility(enrollments, current_user)
 
         # slim the scope down further because while students can see other student enrollments, they should not be able to see other student grades
         unless course.grants_any_right?(current_user, :manage_grades, :read_as_admin, :manage_assignments)

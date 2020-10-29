@@ -74,6 +74,13 @@ describe Types::AssignmentGroupType do
         expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @teacher).size).to eq 2
       end
 
+      it "teacher may filter scores to individual enrollments" do
+        graphql_query = "gradesConnection(filter: {enrollmentIds: [#{@student_enrollment.id}]}) { nodes { enrollment { _id } } }"
+        results = @group_type.resolve(graphql_query, current_user: @teacher)
+        expect(results.size).to eq 1 
+        expect(results).to eq [@student_enrollment.id.to_s]
+      end
+
       it "student may only see their scores" do
         expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @student).size).to eq 1
       end
