@@ -126,7 +126,7 @@ module RCENextPage
   end
 
   def assignment_due_date_exists?(due_date)
-    modified_due_date = due_date.strftime("%B %e, %Y")
+    modified_due_date = due_date.strftime("%B %-d, %Y")
     element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
