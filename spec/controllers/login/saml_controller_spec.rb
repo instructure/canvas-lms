@@ -565,10 +565,14 @@ SAML
       saml_request = URI.decode_www_form(URI.parse(url).query).first.last
 
       controller.request.env['canvas.domain_root_account'] = account
+      expect(Canvas::Errors).to receive(:capture_exception) do |category, error, level|
+        expect(category).to eq(:saml)
+        expect(error.class).to eq(SAML2::UnsignedMessage)
+        expect(level).to eq(:warn)
+      end
       get :destroy, params: {SAMLRequest: saml_request}
 
       expect(response.status).to eq 400
-      expect(ErrorReport.last.message).to eq "SAML2::UnsignedMessage"
     end
 
     it "accepts an HTTP-POST message" do

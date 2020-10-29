@@ -178,7 +178,7 @@ class Login::SamlController < ApplicationController
 
   rescue_from SAML2::InvalidMessage, with: :saml_error
   def saml_error(error)
-    Canvas::Errors.capture_exception(:saml, error, :log)
+    Canvas::Errors.capture_exception(:saml, error, :warn)
     render status: :bad_request, plain: error.to_s
   end
 
@@ -313,7 +313,7 @@ class Login::SamlController < ApplicationController
       return redirect_to(forward_url)
     else
       error = "Unexpected SAML message: #{message.class}"
-      Canvas::Errors.capture_exception(:saml, error)
+      Canvas::Errors.capture_exception(:saml, error, :warn)
       return render status: :bad_request, plain: error
     end
   end
