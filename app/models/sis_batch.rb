@@ -597,7 +597,13 @@ class SisBatch < ActiveRecord::Base
   def remove_previous_imports
     # we should not try to cleanup if the batch didn't work out, we could delete
     # stuff we still need
-    return if ['failed', 'failed_with_messages', 'aborted'].include?(self.workflow_state.to_s)
+    current_workflow_state = self.class.where(id: id).pluck(:workflow_state).first.to_s
+    # ^reloading the whole batch can be a problem because we might be tracking data
+    # we haven't persisted yet on model attributes...
+    if ['failed', 'failed_with_messages', 'aborted'].include?(current_workflow_state)
+      Rails.logger.info("[SIS_BATCH] Refusing to cleanup after batch #{self.id} because workflow state is #{current_workflow_state}")
+      return false
+    end
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term || options[:multi_term_batch_mode]
     supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }
