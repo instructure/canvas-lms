@@ -733,6 +733,23 @@ describe AssignmentOverride do
       new_override.save!
     end
 
+    it 'should delete completed overrides' do
+      @course = course_model
+      default = @course.course_sections.create!(name: "concluder")
+      section2 = @course.course_sections.create!(name: "keeper")
+      assignment1 = assignment_model(course: @course, title: 'concluder', only_visible_to_overrides: true)
+      o1 = assignment_override_model(assignment: assignment1, set: default)
+      assignment2 = assignment_model(course: @course, title: 'keeper', only_visible_to_overrides: true)
+      o2 = assignment_override_model(assignment: assignment2, set: section2)
+      conclude_me = @course.enroll_student(@student, enrollment_state: 'active', section: default)
+      @course.enroll_student(@student, enrollment_state: 'active', section: section2, allow_multiple_enrollments: true)
+      expect(o1.applies_to_students).to eq [@student]
+      expect(o2.applies_to_students).to eq [@student]
+      conclude_me.conclude
+      expect(o1.applies_to_students).to eq []
+      expect(o2.applies_to_students).to eq [@student]
+    end
+
     it "triggers when overridden due_at changes" do
       expect(DueDateCacher).to receive(:recompute).with(@assignment)
       @override.override_due_at(5.days.from_now)

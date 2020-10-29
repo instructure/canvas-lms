@@ -276,7 +276,7 @@ class EffectiveDueDates
             WHERE
               o.set_type = 'CourseSection' AND
               s.workflow_state <> 'deleted' AND
-              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive') AND
+              e.workflow_state NOT IN ('rejected', 'deleted', 'inactive', 'completed') AND
               e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
               #{filter_students_sql('e')}
           ),
