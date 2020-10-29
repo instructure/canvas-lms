@@ -26,7 +26,10 @@ module BrandConfigHelpers
     md5 = Rails.cache.fetch_with_batched_keys("effective_brand_config_md5", batch_object: self, batched_keys: [:account_chain, :brand_config]) do
       brand_config_chain(include_self: true).select(&:branding_allowed?).find(&:brand_config_md5)&.brand_config_md5
     end
-    md5 && BrandConfig.find_cached_by_md5(md5)
+    # ensure the BrandConfig query hits the correct shard
+    shard.activate do
+      md5 && BrandConfig.find_cached_by_md5(md5)
+    end
   end
 
   def first_parent_brand_config

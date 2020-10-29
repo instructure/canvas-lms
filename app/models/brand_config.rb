@@ -62,12 +62,12 @@ class BrandConfig < ActiveRecord::Base
     find(MD5_OF_K12_CONFIG)
   end
 
-  def self.cache_key_for_md5(md5)
-    ["brand_configs", md5].cache_key
+  def self.cache_key_for_md5(shard_id, md5)
+    ["brand_configs", shard_id, md5].cache_key
   end
 
   def self.find_cached_by_md5(md5)
-    MultiCache.fetch(cache_key_for_md5(md5)) do
+    MultiCache.fetch(cache_key_for_md5(Shard.current.id, md5)) do
       BrandConfig.where(md5: md5).take
     end
   end
@@ -75,7 +75,7 @@ class BrandConfig < ActiveRecord::Base
   def clear_cache
     self.shard.activate do
       self.class.connection.after_transaction_commit do
-        MultiCache.delete(self.class.cache_key_for_md5(self.md5))
+        MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
       end
     end
   end
