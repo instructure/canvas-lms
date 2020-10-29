@@ -898,7 +898,8 @@ class GradebooksController < ApplicationController
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,
-          update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url)
+          update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
+          can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user)
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
