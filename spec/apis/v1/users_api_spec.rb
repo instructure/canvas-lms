@@ -1657,6 +1657,89 @@ describe "Users API", type: :request do
         end
       end
 
+      context 'pronouns' do
+        context 'when can_change_pronouns=true' do
+          before :once do
+            Account.default.tap do |a|
+              a.settings[:can_add_pronouns] = true
+              a.settings[:can_change_pronouns] = true
+              a.save!
+            end
+          end
+
+          it "should clear attribute when empty string is passed" do
+            @student.pronouns = "He/Him"
+            @student.save!
+            json = api_call(:put, @path, @path_options, {:user => {:pronouns => ""}})
+            expect(json['pronouns']).to be_nil
+            expect(@student.reload.pronouns).to be_nil
+          end
+
+          it "should update with a default pronoun" do
+            approved_pronoun = "He/Him"
+            json = api_call(:put, @path, @path_options, {:user => {:pronouns => approved_pronoun}})
+            expect(json['pronouns']).to eq approved_pronoun
+            expect(@student.reload.pronouns).to eq approved_pronoun
+            expect(@student.read_attribute(:pronouns)).to eq "he_him"
+          end
+
+          it "should fix the case when pronoun does not match default pronoun case" do
+            wrong_case_pronoun = "he/him"
+            expected_pronoun = "He/Him"
+            json = api_call(:put, @path, @path_options, {:user => {:pronouns => wrong_case_pronoun}})
+            expect(json['pronouns']).to eq expected_pronoun
+            expect(@student.reload.pronouns).to eq expected_pronoun
+            expect(@student.read_attribute(:pronouns)).to eq "he_him"
+          end
+
+          it "should fix the case when pronoun does not match custom pronoun case" do
+            Account.default.tap do |a|
+              a.pronouns = ["Siya/Siya", "Ito/Iyan"]
+              a.save!
+            end
+            wrong_case_pronoun = "ito/iyan"
+            expected_pronoun = "Ito/Iyan"
+            json = api_call(:put, @path, @path_options, {:user => {:pronouns => wrong_case_pronoun}})
+            expect(json['pronouns']).to eq expected_pronoun
+            expect(@student.reload.pronouns).to eq expected_pronoun
+            expect(@student.read_attribute(:pronouns)).to eq expected_pronoun
+          end
+
+          it "should not update when pronoun is not approved" do
+            @student.pronouns = "She/Her"
+            @student.save!
+            original_pronoun = @student.pronouns
+            unapproved_pronoun = "Unapproved/Unapproved"
+            json = api_call(:put, @path, @path_options, {:user => {:pronouns => unapproved_pronoun}})
+            expect(json['pronouns']).to eq original_pronoun
+            expect(@student.reload.pronouns).to eq original_pronoun
+          end
+        end
+
+        context 'when can_change_pronouns=false' do
+          before :once do
+            Account.default.tap do |a|
+              a.settings[:can_add_pronouns] = true
+              a.settings[:can_change_pronouns] = false
+              a.save!
+            end
+          end
+
+          it "errors" do
+            @student.pronouns = "She/Her"
+            @student.save!
+            original_pronoun = @student.pronouns
+            test_pronoun = "He/Him"
+            raw_api_call(:put, @path, @path_options, {:user => {:pronouns => test_pronoun}})
+            json = JSON.parse(response.body)
+            expect(response.code).to eq '401'
+            expect(json['status']).to eq 'unauthorized'
+            expect(json['errors'][0]['message']).to eq 'user not authorized to perform that action'
+            expect(@student.reload.pronouns).to eq original_pronoun
+          end
+        end
+      end
+
       it "should be able to update a user's profile" do
         Account.default.tap{|a| a.settings[:enable_profiles] = true; a.save!}
         new_title = "Burninator"
@@ -1779,6 +1862,27 @@ describe "Users API", type: :request do
       before :once do
         user_with_pseudonym name: "Earnest Lambert Watkins"
         course_with_teacher user: @user, active_all: true
+      end
+
+      context 'pronouns' do
+        it "returns an error when user does not have manage rights" do
+          Account.default.tap do |a|
+            a.settings[:can_add_pronouns] = true
+            a.settings[:can_change_pronouns] = true
+            a.save!
+          end
+
+          @student.pronouns = "She/Her"
+          @student.save!
+          original_pronoun = @student.pronouns
+          test_pronoun = "He/Him"
+          raw_api_call(:put, @path, @path_options, {:user => {:pronouns => test_pronoun}})
+          json = JSON.parse(response.body)
+          expect(response.code).to eq '401'
+          expect(json['status']).to eq 'unauthorized'
+          expect(json['errors'][0]['message']).to eq 'user not authorized to perform that action'
+          expect(@student.reload.pronouns).to eq original_pronoun
+        end
       end
 
       context "with users_can_edit_name enabled" do

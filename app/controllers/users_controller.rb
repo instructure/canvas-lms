@@ -1776,6 +1776,8 @@ class UsersController < ApplicationController
     end
   end
 
+  include Pronouns
+
   # @API Edit a user
   # Modify an existing user. To modify a user's login, see the documentation for logins.
   #
@@ -1822,6 +1824,12 @@ class UsersController < ApplicationController
   #   Sets a bio on the user profile. (See {api:ProfileController#settings Get user profile}.)
   #   Profiles must be enabled on the root account.
   #
+  # @argument user[pronouns] [String]
+  #   Sets pronouns on the user profile.
+  #   Passing an empty string will empty the user's pronouns
+  #   Only Available Pronouns set on the root account are allowed
+  #   Adding and changing pronouns must be enabled on the root account.
+  #
   # @example_request
   #
   #   curl 'https://<canvas>/api/v1/users/133.json' \
@@ -1852,6 +1860,10 @@ class UsersController < ApplicationController
     if @domain_root_account.enable_profiles?
       managed_attributes << :bio if @user.grants_right?(@current_user, :manage_user_details)
       managed_attributes << :title if @user.grants_right?(@current_user, :rename)
+    end
+
+    if @domain_root_account.can_change_pronouns? && @user.grants_right?(@current_user, :manage_user_details)
+      managed_attributes << :pronouns
     end
 
     if @user.grants_right?(@current_user, :manage_user_details)
@@ -1893,6 +1905,14 @@ class UsersController < ApplicationController
       if bio = user_params.delete(:bio)
         @user.profile.bio = bio
         includes << "bio"
+      end
+
+      if (pronouns = user_params.delete(:pronouns))
+        updated_pronoun = match_pronoun(pronouns, @domain_root_account.pronouns)
+        if updated_pronoun || pronouns&.empty?
+          @user.pronouns = updated_pronoun
+        end
+        includes << "pronouns"
       end
 
       if admin_avatar_update
