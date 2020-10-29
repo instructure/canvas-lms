@@ -1494,6 +1494,10 @@ class ApplicationController < ActionController::Base
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception)
+    # On exception `after_action :set_response_headers` is not called.
+    # This causes controller#action from not being set on x-canvas-meta header.
+    set_response_headers
+
     if config.consider_all_requests_local
       rescue_action_locally(exception)
     else

@@ -73,6 +73,15 @@ describe "site-wide" do
       expect(response[x_canvas_meta]).to match(%r{o=courses;n=show;})
     end
 
+    it "should set controller#action information in API requests on 500" do
+      course_with_teacher_logged_in
+      allow_any_instance_of(CoursesController).to receive(:index).and_raise(ArgumentError)
+      get "/api/v1/courses"
+
+      assert_status(500)
+      expect(response[x_canvas_meta]).to match(%r{o=courses;n=index;})
+    end
+
     it "should set page view information in user requests" do
       course_with_teacher_logged_in
       Setting.set('enable_page_views', 'db')
