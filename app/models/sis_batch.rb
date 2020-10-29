@@ -595,6 +595,9 @@ class SisBatch < ActiveRecord::Base
   end
 
   def remove_previous_imports
+    # we should not try to cleanup if the batch didn't work out, we could delete
+    # stuff we still need
+    return if ['failed', 'failed_with_messages', 'aborted'].include?(self.workflow_state.to_s)
     # we shouldn't be able to get here without a term, but if we do, skip
     return unless self.batch_mode_term || options[:multi_term_batch_mode]
     supplied_batches = data[:supplied_batches].dup.keep_if { |i| [:course, :section, :enrollment].include? i }

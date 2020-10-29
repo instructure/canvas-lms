@@ -1210,6 +1210,15 @@ test_1,u1,student,active}
     end
   end
 
+  describe 'remove_previous_imports' do
+    it 'refuses to do anything if the batch is already failed' do
+      ['failed', 'failed_with_messages', 'aborted' ].each do |status|
+        batch = SisBatch.new(workflow_state: status, batch_mode_term: EnrollmentTerm.new)
+        expect(batch.remove_previous_imports).to be_falsey
+      end
+    end
+  end
+
   describe 'live events' do
 
     def test_batch
