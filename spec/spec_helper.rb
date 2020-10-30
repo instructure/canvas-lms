@@ -853,7 +853,7 @@ RSpec.configure do |config|
   end
 end
 
-class I18n::Backend::Simple
+class LazyPresumptuousI18nBackend
   def stub(translations)
     @stubs = translations.with_indifferent_access
     singleton_class.instance_eval do
@@ -870,7 +870,7 @@ class I18n::Backend::Simple
   end
 
   def lookup_with_stubs(locale, key, scope = [], options = {})
-    init_translations unless initialized?
+    ensure_initialized
     keys = I18n.normalize_keys(locale, key, scope, options[:separator])
     keys.inject(@stubs){ |h,k| h[k] if h.respond_to?(:key) } || lookup_without_stubs(locale, key, scope, options)
   end

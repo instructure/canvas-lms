@@ -15,36 +15,15 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-# loading all the locales has a significant (>30%) impact on the speed of initializing canvas
-# so we skip it in situations where we don't need the locales, such as in development mode and in rails console
-skip_locale_loading = (Rails.env.development? ||
-  Rails.env.test? ||
-  $0 == 'irb' ||
-  $PROGRAM_NAME == 'rails_console' ||
-  $0 =~ /rake$/)
-if ENV['RAILS_LOAD_ALL_LOCALES']
-  skip_locale_loading = ENV['RAILS_LOAD_ALL_LOCALES'] == '0'
-end
-# always load locales for rake tasks that we know need them
-if $0 =~ /rake$/ && !($ARGV & ["i18n:generate_js",
-                               "canvas:compile_assets",
-                               "canvas:compile_assets_dev",
-                               "js:test"]).empty?
-  skip_locale_loading = false
-end
-
-load_path = Rails.application.config.i18n.railties_load_path
-if skip_locale_loading
-  load_path = load_path.map(&:existent).flatten
-  load_path.replace(load_path.grep(%r{/(locales|en)\.yml\z}))
-else
-  # add the definition file at the end, to trump any weird/invalid stuff in locale-specific files
-  yml = "config/locales/locales.yml"
-  load_path << Rails::Paths::Path.new(CanvasRails::Application.instance.paths, yml, [yml])
-end
+require_dependency 'lazy_presumptuous_i18n_backend'
 
 Rails.application.config.i18n.enforce_available_locales = true
 Rails.application.config.i18n.fallbacks = true
+
+I18n.backend = LazyPresumptuousI18nBackend.new(
+  meta_keys: %w[aliases crowdsourced custom locales],
+  logger: Rails.logger.method(:debug)
+)
 
 module DontTrustI18nPluralizations
   def pluralize(locale, entry, count)
@@ -54,7 +33,7 @@ module DontTrustI18nPluralizations
     ""
   end
 end
-I18n::Backend::Simple.include(DontTrustI18nPluralizations)
+LazyPresumptuousI18nBackend.prepend(DontTrustI18nPluralizations)
 
 module FormatInterpolatedNumbers
   def interpolate_hash(string, values)
@@ -67,18 +46,6 @@ module FormatInterpolatedNumbers
   end
 end
 I18n.singleton_class.prepend(FormatInterpolatedNumbers)
-
-module CalculateDeprecatedFallbacks
-  def reload!
-    super
-    I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
-        I18n.fallbacks[locale] = I18n.fallbacks[deprecated_for.to_sym]
-      end
-    end
-  end
-end
-I18n.singleton_class.prepend CalculateDeprecatedFallbacks
 
 I18nliner.infer_interpolation_values = false
 

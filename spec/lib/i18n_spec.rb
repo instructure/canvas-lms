@@ -34,6 +34,15 @@ describe I18n do
     end
   end
 
+  context "DontTrustI18nPluralizations" do
+    it "should not raise an exception for a bad pluralization entry" do
+      missing_other_key = {en: {__pluralize_test: {one: "One thing"}}}
+      I18n.backend.stub(missing_other_key) do
+        expect(I18n.t(:__pluralize_test, count: 123)).to eq ""
+      end
+    end
+  end
+
   context "interpolation" do
     before { I18n.locale = I18n.default_locale }
     after { I18n.locale = I18n.default_locale }
