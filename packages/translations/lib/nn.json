@@ -240,7 +240,7 @@
         "message": "Emnefiler"
     },
     "course_images_f8511d04": {
-        "message": "Emnebilde"
+        "message": "Hent bilde frå emnefiler"
     },
     "course_links_b56959b9": {
         "message": "Emnelenker"
@@ -412,6 +412,9 @@
     },
     "embedded_content_aaeb4d3d": {
         "message": "innebygd innhald"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Oppgi minst 3 teikn for å søke"
     },
     "equation_1c5ac93c": {
         "message": "Likning"
@@ -1146,7 +1149,7 @@
         "message": "Last opp fil"
     },
     "upload_image_6120b609": {
-        "message": "Last opp bilde"
+        "message": "Last opp bilde frå disk"
     },
     "upload_media_ce31135a": {
         "message": "Last opp media"
@@ -1188,7 +1191,7 @@
         "message": "Brukarfiler"
     },
     "user_images_b6490852": {
-        "message": "Brukarbilder"
+        "message": "Hent bilde frå mine filer"
     },
     "user_media_14fbf656": {
         "message": "Brukarmedia"
