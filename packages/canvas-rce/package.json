@@ -17,6 +17,7 @@
     "test:jest": "jest --runInBand",
     "test:cafe": "yarn build:cafe && yarn test:cafe:only",
     "test:cafe:only": "testcafe chrome testcafe/**/*.test.js",
+    "test:cafe:one": "testcafe chrome testcafe/**/*.test.js --test ",
     "test:cafe:all": "yarn build:cafe && testcafe chrome,firefox,safari testcafe/**/*.test.js",
     "test:cafe:debug": "testcafe --inspect-brk chrome testcafe/**/*.test.js",
     "test:watch": "BABEL_ENV=test-node mocha 'test/**/*.test.js' --require @instructure/canvas-theme --require @babel/register --watch",
@@ -165,7 +166,8 @@
     "shelljs": "^0.8.3",
     "sinon": "^7",
     "skin-deep": "^1",
-    "testcafe": "^1.1.3",
+    "testcafe": "^1.9.0",
+    "testcafe-react-selectors": "^3.3.0",
     "webpack": "^4",
     "webpack-cli": "^3.0.8",
     "webpack-dev-server": "^3"

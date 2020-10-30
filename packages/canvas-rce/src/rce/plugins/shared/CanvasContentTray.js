@@ -285,7 +285,6 @@ export default function CanvasContentTray(props) {
     }
 
     setFilterSettings(newFilterSettings)
-
     if (newFilterSettings.contentType) {
       let contextType, contextId
       switch (newFilterSettings.contentType) {

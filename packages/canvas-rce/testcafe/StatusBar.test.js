@@ -60,7 +60,7 @@ test('toggles between rce and html views', async t => {
 
 test('counts words', async t => {
   // search for the exact text for the selector will wait for it to change to this text
-  await t.expect(wordCount.withText('0 words')).exists
+  await t.expect(wordCount.withText('0 words').exists).ok()
 
   await t.switchToIframe(tinyIframe).typeText('body', 'foo')
   await t

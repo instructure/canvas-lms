@@ -26,37 +26,59 @@ const tinyIframe = Selector('.tox-edit-area__iframe')
 const textarea = Selector('#textarea')
 const rceContainer = Selector('.tox-tinymce')
 const toggleButton = Selector('button').withText('</>')
-const linksButton = Selector('button.tox-tbtn[title="Links"]')
-const externalLinksMenuItem = Selector('[role="menuitem"]').withText('External Links')
-const courseLinksMenuItem = Selector('[role="menuitem"]').withText('Course Links')
-const editLinkMenuItem = Selector('[role="menuitem"]').withText('Edit Link')
-const removeLinkMenuItem = Selector('[role="menuitem"]').withText('Remove Link')
+const linksButton = Selector('[role="button"][aria-label="Links"] .tox-split-button__chevron')
+const externalLinksMenuItem = Selector('[role^="menuitem"][title="External Links"]')
+const courseLinksMenuItem = Selector('[role^="menuitem"][title="Course Links"]')
+const editLinkMenuItem = Selector('[role^="menuitem"][title="Edit Link"]')
+const removeLinkMenuItem = Selector('[role^="menuitem"][title="Remove Link"]')
 const linkDialog = Selector('[data-testid="RCELinkOptionsDialog"]')
+const linkTray = Selector('[data-testid="RCELinkOptionsTray"]')
 const selectword = Selector('#selectword')
 const linksTraySelector = '[role="dialog"][aria-label="Course Links"]'
+const rceBody = Selector('#tinymce')
+const linksPanelSelector = Selector('[data-testid="instructure_links-LinksPanel"]')
+const imagesButton = Selector('[role="button"][aria-label="Images"] .tox-split-button__chevron')
+const uploadImageMenuItem = Selector('[role^="menuitem"][title="Upload Image"]')
+const uploadImageDialog = Selector('[role="dialog"][aria-label="Upload Image"]')
 
 function named(name) {
   return Selector(`[name="${name}"]`)
 }
 
+function specificValue(value) {
+  return Selector(`[value="${value}"]`)
+}
+
 test('edits in the textarea are reflected in the editor', async t => {
+  // const myText = ClientFunction(() => document.querySelector('#tinymce').innerText)
   await t
     .click(toggleButton)
     .typeText(textarea, 'this is new content')
     .click(toggleButton)
     .switchToIframe(tinyIframe)
-    .expect(Selector('body').withText('this is new content').visible)
+
+  await t
+    .expect(rceBody.withExactText('this is new content').visible)
     .ok()
     .switchToMainWindow()
 
   await t
     .click(toggleButton)
+    .pressKey('end')
     .typeText(textarea, 'this is more content')
     .click(toggleButton)
     .switchToIframe(tinyIframe)
-    .expect(Selector('body').withText('this is new content').visible)
+    .expect(
+      Selector('body')
+        .find('p')
+        .withExactText('this is new content').visible
+    )
     .ok()
-    .expect(Selector('body').withText('this is more content').visible)
+    .expect(
+      Selector('body')
+        .find('p')
+        .withExactText('this is more content').visible
+    )
     .ok()
     .switchToMainWindow()
 })
@@ -150,16 +172,16 @@ test('can edit an external link', async t => {
     .switchToMainWindow()
 
   // the link is selected, the toolbar button should be enabled
-  await t.expect(linksButton.hasClass('tox-tbtn--enabled')).ok()
+  // await t.expect(linksButton.hasClass('tox-tbtn--enabled')).ok()
 
   await t
     .click(linksButton)
     .click(editLinkMenuItem)
-    .expect(linkDialog.visible)
+    .expect(linkTray.visible)
     .ok()
 
-  await t.expect(named('linklink').value).eql('http://example.com')
-  await t.expect(named('linktext').value).eql('selected')
+  await t.expect(specificValue('http://example.com').exists).ok()
+  await t.expect(specificValue('selected').exists).ok()
 })
 
 test('expands selection to edit external link', async t => {
@@ -178,17 +200,14 @@ test('expands selection to edit external link', async t => {
     .click(selectword, {caretPos: 1})
     .switchToMainWindow()
 
-  // the link is selected, the toolbar button should be enabled
-  await t.expect(linksButton.hasClass('tox-tbtn--enabled')).ok()
-
   await t
     .click(linksButton)
     .click(editLinkMenuItem)
-    .expect(linkDialog.visible)
+    .expect(linkTray.visible)
     .ok()
 
-  await t.expect(named('linklink').value).eql('http://example.com')
-  await t.expect(named('linktext').value).eql('selected')
+  await t.expect(specificValue('http://example.com').exists).ok()
+  await t.expect(specificValue('selected').exists).ok()
 })
 
 test('can remove a link', async t => {
@@ -216,10 +235,11 @@ test('can remove a link', async t => {
 })
 
 // fails at the React.lazy call to load the tray's panel
-test.skip('focus returns on dismissing tray', async t => {
+test('focus returns on dismissing tray', async t => {
   const tinymceSelection = ClientFunction(() => tinymce.get('textarea').selection.getContent()) // the textarea id is from testcafe.html
   const focusedId = ClientFunction(() => document.activeElement.id)
   const focusedTag = ClientFunction(() => document.activeElement.tagName)
+  const ltSelector = Selector(linksTraySelector)
 
   await t
     .click(toggleButton)
@@ -234,10 +254,14 @@ test.skip('focus returns on dismissing tray', async t => {
     .switchToMainWindow()
     .click(linksButton)
     .click(courseLinksMenuItem)
-    .expect(Selector(linksTraySelector).visible)
+
+  await linksPanelSelector()
+
+  await t
+    .expect(ltSelector.visible)
     .ok()
     .click(Selector(`${linksTraySelector} button`).withText('Close'))
-    .expect(Selector(linksTraySelector).exist)
+    .expect(ltSelector.exist)
     .notOk()
 
   await t
@@ -254,9 +278,14 @@ test.skip('focus returns on dismissing tray', async t => {
 test('show the kb shortcut modal various ways', async t => {
   const hiddenbutton = Selector('[data-testid="ShowOnFocusButton__sronly"]')
   const kbshortcutbutton = Selector('button[data-testid="ShowOnFocusButton__button"]')
+  const sbKbshortcutbutton = Selector('button[title="View keyboard shortcuts"]')
   const shortcutmodal = Selector('[data-testid="RCE_KeyboardShortcutModal"]')
+  const editorStatusbar = Selector('[title="Editor Statusbar"]')
   const focusKBSCBtn = ClientFunction(() => kbshortcutbutton().focus(), {
     dependencies: {kbshortcutbutton}
+  })
+  const focusStatusbar = ClientFunction(() => editorStatusbar().focus(), {
+    dependencies: {editorStatusbar}
   })
 
   await t
@@ -283,38 +312,49 @@ test('show the kb shortcut modal various ways', async t => {
 
   // open modal using alt+0
   // close with the close button
+  // await t
+  //   .switchToIframe(tinyIframe)
+  //   .click(Selector('body'))
+  //   .pressKey('alt+0')
+  //   .expect(shortcutmodal.visible)
+  //   .ok()
+  //   .click(Selector('button').withText('Close'))
+  //   .expect(shortcutmodal.exists)
+  //   .notOk()
+
+  // open modal from button in status bar
+  // debugger;
+  // close with the close button
+
+  await focusStatusbar()
+
   await t
-    .pressKey('alt+0')
+    .expect(sbKbshortcutbutton.exists)
+    .ok()
+    .click(sbKbshortcutbutton)
     .expect(shortcutmodal.visible)
     .ok()
     .click(Selector('button').withText('Close'))
     .expect(shortcutmodal.exists)
     .notOk()
-
-  // open modal from button in status bar
-  await t
-    .click(Selector('[data-testid="RCEStatusBar"] button').withText('View keyboard shortcuts'))
-    .expect(shortcutmodal.visible)
-    .ok()
 })
 
-test('editor auto-resizes as content is added', async t => {
-  const paramargin = 12
-  const fontSize = 16
-  const height = await rceContainer.clientHeight
-  const parasFitInRce = Math.floor(height / (fontSize + paramargin))
-  let content = ''
-  // add 1 too many
-  for (let i = 0; i <= parasFitInRce; ++i) {
-    content += '<p>para</p>'
-  }
+// test('can bring up the images dialog', async t => {
+//   await t
+//     .switchToMainWindow()
+//     .click(imagesButton())
+//     .click(uploadImageMenuItem())
+//     .expect(uploadImageDialog().visible)
+//     .ok()
 
-  await t
-    .click(toggleButton)
-    .typeText(textarea, content)
-    .click(toggleButton)
-    .switchToMainWindow()
-
-  const newHeight = await rceContainer.clientHeight
-  await t.expect(newHeight > height).ok()
-})
+// await t
+//   .typeText(named('linklink'), 'https://instructure.com')
+//   .click(Selector('button').withText('Done'))
+//   .switchToIframe(tinyIframe)
+//   .expect(
+//     Selector('a')
+//       .withAttribute('href', 'https://instructure.com')
+//       .withAttribute('target', '_blank').exists
+//   )
+//   .ok()
+// })

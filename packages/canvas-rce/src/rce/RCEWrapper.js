@@ -1148,14 +1148,16 @@ class RCEWrapper extends React.Component {
     const portals = document.querySelectorAll('.tox-tinymce-aux')
     // my portal will be the last one in the doc because tinyumce appends them
     const tinymce_floating_toolbar_portal = portals[portals.length - 1]
-    this.observer = new MutationObserver((mutationList, _observer) => {
-      mutationList.forEach(mutation => {
-        if (mutation.type === 'childList') {
-          this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
-        }
+    if (tinymce_floating_toolbar_portal) {
+      this.observer = new MutationObserver((mutationList, _observer) => {
+        mutationList.forEach(mutation => {
+          if (mutation.type === 'childList') {
+            this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
+          }
+        })
       })
-    })
-    this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
+      this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
+    }
   }
 
   componentDidUpdate(_prevProps, prevState) {
