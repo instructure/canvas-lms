@@ -254,6 +254,15 @@ class ConversationParticipant < ActiveRecord::Base
 
     participants
   end
+  
+  def clear_participants_cache
+    shard.activate do
+      key = [conversation, 'participants'].cache_key
+      Rails.cache.delete(key)
+      indirect_key = [conversation, user, 'indirect_participants'].cache_key
+      Rails.cache.delete(indirect_key)
+    end
+  end
 
   def properties(latest = last_message)
     properties = []
@@ -487,12 +496,14 @@ class ConversationParticipant < ActiveRecord::Base
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user.id)
         if existing = conversation.conversation_participants.where(user_id: new_user).first
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+          existing.clear_participants_cache
           destroy
         else
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id).
               update_all(:user_id => new_user.id)
           update_attribute :user, new_user
+          clear_participants_cache
           existing = self
         end
         # replicate ConversationParticipant record to the new user's shard
