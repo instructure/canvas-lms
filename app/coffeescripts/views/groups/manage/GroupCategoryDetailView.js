@@ -23,9 +23,9 @@ import {View} from 'Backbone'
 import MessageStudentsDialog from '../../MessageStudentsDialog'
 import RandomlyAssignMembersView from './RandomlyAssignMembersView'
 import GroupCategoryEditView from './GroupCategoryEditView'
-import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from 'jst/groups/manage/groupCategoryDetail'
 import GroupModal from 'jsx/groups/components/GroupModal'
+import GroupCategoryCloneModal from 'jsx/groups/components/GroupCategoryCloneModal'
 import GroupImportModal from 'jsx/groups/components/GroupImportModal'
 
 export default class GroupCategoryDetailView extends View {
@@ -153,20 +153,24 @@ export default class GroupCategoryDetailView extends View {
     return this.editCategoryView.open()
   }
 
-  cloneCategory(e) {
-    e.preventDefault()
-    this.cloneCategoryView = new GroupCategoryCloneView({
-      model: this.model,
-      openedFromCaution: false
-    })
-    this.cloneCategoryView.open()
-    return this.cloneCategoryView.on('close', () => {
-      if (this.cloneCategoryView.cloneSuccess) {
-        return window.location.reload()
-      } else {
-        return $(`#group-category-${this.model.id}-actions`).focus()
-      }
-    })
+  cloneCategory(e, open = true) {
+    if (e) e.preventDefault()
+    ReactDOM.render(
+      <GroupCategoryCloneModal
+        // implicitly rendered with openedFromCaution: false
+        groupCategory={{
+          id: this.model.get('id'),
+          name: this.model.get('name')
+        }}
+        label={I18n.t('Clone Group Set')}
+        open={open}
+        onDismiss={() => {
+          this.cloneCategory(null, false)
+          $(`#group-category-${this.model.id}-actions`).focus()
+        }}
+      />,
+      document.getElementById('group-category-clone-mount-point')
+    )
   }
 
   messageAllUnassigned(e) {
