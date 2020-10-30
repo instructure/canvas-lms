@@ -1220,6 +1220,12 @@ class Account < ActiveRecord::Base
 
     given { |user| !self.site_admin? && self.root_account? && self.grants_right?(user, :manage_site_settings) }
     can :manage_privacy_settings
+
+    given do |user|
+      self.root_account? && self.grants_right?(user, :read_roster) &&
+        (self.grants_right?(user, :view_notifications) || Account.site_admin.grants_right?(user, :read_messages))
+    end
+    can :view_bounced_emails
   end
 
   alias_method :destroy_permanently!, :destroy

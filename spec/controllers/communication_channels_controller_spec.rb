@@ -833,10 +833,16 @@ describe CommunicationChannelsController do
         ]
       end
 
-      context 'as a site admin' do
-        before do
-          account_admin_user(account: Account.site_admin)
-          user_session(@user)
+      context 'as an account admin' do
+        before :once do
+          @account = Account.default
+          @account.settings[:admins_can_view_notifications] = true
+          @account.save!
+          account_admin_user_with_role_changes(:account => @account, :role_changes => {view_notifications: true})
+        end
+
+        before :each do
+          user_session(@admin)
         end
 
         it 'fetches communication channels in this account and orders by date' do
@@ -866,6 +872,16 @@ describe CommunicationChannelsController do
 
           csv = CSV.parse(response.body)
           expect(csv).to eq [
+            ['User ID', 'Name', 'Communication channel ID', 'Type', 'Path', 'Date of most recent bounce', 'Bounce reason'],
+            channel_csv(c2),
+            channel_csv(c1),
+            channel_csv(c3)
+          ]
+
+          # also test JSON format
+          get 'bouncing_channel_report', params: {account_id: Account.default.id, format: :json}
+          json = JSON.parse(response.body)
+          expect(json).to eq [
             ['User ID', 'Name', 'Communication channel ID', 'Type', 'Path', 'Date of most recent bounce', 'Bounce reason'],
             channel_csv(c2),
             channel_csv(c1),
@@ -914,8 +930,11 @@ describe CommunicationChannelsController do
 
         it 'uses the requested account' do
           a = account_model
-          user_with_pseudonym(account: a)
+          account_admin_user_with_role_changes(user: @admin, account: a, role_changes: {view_notifications: true})
+          a.settings[:admins_can_view_notifications] = true
+          a.save!
 
+          user_with_pseudonym(account: a)
           c = @user.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
             cc.workflow_state = 'active'
             cc.bounce_count = 1

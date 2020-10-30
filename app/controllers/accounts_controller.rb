@@ -1131,7 +1131,10 @@ class AccountsController < ApplicationController
                       Account.site_admin.grants_right?(@current_user, :read_messages),
        logging: logging
       }
-    js_env enhanced_grade_change_query: Auditors::read_from_postgres? && Account.site_admin.feature_enabled?(:enhanced_grade_change_query)
+    js_env enhanced_grade_change_query: Auditors::read_from_postgres? &&
+      Account.site_admin.feature_enabled?(:enhanced_grade_change_query)
+    js_env bounced_emails_admin_tool: @account.feature_enabled?(:bounced_emails_admin_tool) &&
+      @account.grants_right?(@current_user, session, :view_bounced_emails)
   end
 
   def confirm_delete_user

@@ -641,6 +641,7 @@ describe Account do
 
     limited_access = [ :read, :read_as_admin, :manage, :update, :delete, :read_outcomes, :read_terms ]
     conditional_access = RoleOverride.permissions.select { |_, v| v[:account_allows] }.map(&:first)
+    conditional_access += [:view_bounced_emails] # since this depends on :view_notifications
     disabled_by_default = RoleOverride.permissions.select { |_, v| v[:true_for].empty? }.map(&:first)
     full_access = RoleOverride.permissions.keys +
                   limited_access - disabled_by_default - conditional_access +
@@ -659,7 +660,6 @@ describe Account do
       admin_privileges += [:manage_privacy_settings] if k == :root
 
       user_privileges = limited_access + common_siteadmin_privileges
-
       expect(account.check_policy(hash[:site_admin][:admin]) - conditional_access).to match_array admin_privileges
       expect(account.check_policy(hash[:site_admin][:user]) - conditional_access).to match_array user_privileges
     end
