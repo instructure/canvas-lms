@@ -343,10 +343,8 @@ class AssignmentsController < ApplicationController
       docs = {}
       begin
         docs = google_drive_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDrive::NoTokenError => e
-        Canvas::Errors.capture_exception(:oauth, e)
-      rescue Google::APIClient::AuthorizationError => e
-        Canvas::Errors.capture_exception(:oauth, e)
+      rescue GoogleDrive::NoTokenError, Google::APIClient::AuthorizationError => e
+        Canvas::Errors.capture_exception(:oauth, e, :warn)
       rescue ArgumentError => e
         Canvas::Errors.capture_exception(:oauth, e)
       rescue => e
