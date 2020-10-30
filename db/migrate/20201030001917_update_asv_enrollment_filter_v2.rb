@@ -93,7 +93,7 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
         ON e.course_id = a.context_id
         AND a.context_type = 'Course'
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive', 'completed')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
          ON e.course_section_id = ao.set_id
          AND ao.set_type = 'CourseSection'
@@ -194,7 +194,7 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
         ON e.course_id = a.context_id
         AND a.context_type = 'Course'
         AND e.type IN ('StudentEnrollment', 'StudentViewEnrollment')
-        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive')
+        AND e.workflow_state NOT IN ('deleted', 'rejected', 'inactive', 'completed')
       INNER JOIN #{AssignmentOverride.quoted_table_name} ao
          ON e.course_section_id = ao.set_id
          AND ao.set_type = 'CourseSection'
@@ -222,4 +222,5 @@ class UpdateAsvEnrollmentFilterV2 < ActiveRecord::Migration[5.2]
         AND a.only_visible_to_overrides = 'true'
     SQL
   end
+
 end
