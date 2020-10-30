@@ -54,3 +54,8 @@ inactive_concluded_lmgb_filters:
   applies_to: RootAccount
   display_name: Student filters in LMGB
   description: Allow inactive and/or concluded enrollments to be displayed in LMGB
+enable_webcam_submission:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Enable Webcam on Submissions
+  description: Allow students to submit photo using their webcam.

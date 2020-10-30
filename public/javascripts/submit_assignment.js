@@ -45,6 +45,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import FileBrowser from 'jsx/shared/rce/FileBrowser'
 import {ProgressCircle} from '@instructure/ui-progress'
+import Attachment from 'jsx/assignments/Attachment'
 
 var SubmitAssignment = {
   // This ensures that the tool links in the "More" tab (which only appears with 4
@@ -122,7 +123,7 @@ var SubmitAssignment = {
   }
 }
 
-window.submissionAttachmentIndex = -1
+let submissionAttachmentIndex = -1
 
 RichContentEditor.preloadRemoteModule()
 
@@ -205,6 +206,17 @@ $(document).ready(function() {
         .find('input[type=file]:visible')
         .filter(function() {
           return $(this).val() !== ''
+        })
+
+      Object.values(webcamBlobs)
+        .filter(blob => blob)
+        .forEach(blob => {
+          fileElements.push({
+            name: 'webcam-picture.png',
+            size: blob.size,
+            type: blob.type,
+            files: [blob]
+          })
         })
 
       const emptyFiles = $(this)
@@ -296,7 +308,7 @@ $(document).ready(function() {
 
       $.ajaxJSONPreparedFiles.call(this, {
         handle_files(attachments, data) {
-          const ids = (data['submission[attachment_ids]'] || '').split(',')
+          const ids = (data['submission[attachment_ids]'] || '').split(',').filter(id => id !== '')
           for (const idx in attachments) {
             ids.push(attachments[idx].id)
           }
@@ -358,7 +370,6 @@ $(document).ready(function() {
   $('.submit_assignment_link').click(function(event, skipConfirmation) {
     event.preventDefault()
     const late = $(this).hasClass('late')
-    const now = new Date()
     if (late && !skipConfirmation) {
       let result
       if ($('.resubmit_link').length > 0) {
@@ -470,16 +481,31 @@ $(document).ready(function() {
     fileEl.slideToggle()
   })
 
+  const webcamBlobs = {}
+
   $('.add_another_file_link')
     .click(function(event) {
       event.preventDefault()
-      $('#submission_attachment_blank')
-        .clone(true)
+      const clone = $('#submission_attachment_blank').clone(true)
+
+      clone
         .removeAttr('id')
         .show()
         .insertBefore(this)
-        .find('input')
-        .attr('name', 'attachments[' + ++submissionAttachmentIndex + '][uploaded_data]')
+
+      const wrapperDom = clone.find('.attachment_wrapper')[0]
+      if (wrapperDom) {
+        const index = ++submissionAttachmentIndex
+        ReactDOM.render(
+          <Attachment
+            index={index}
+            setBlob={blob => {
+              webcamBlobs[index] = blob
+            }}
+          />,
+          wrapperDom
+        )
+      }
       toggleRemoveAttachmentLinks()
     })
     .click()
@@ -608,7 +634,7 @@ $(document).ready(function() {
       .pop()
       .toLowerCase()
     $(this)
-      .parent()
+      .parents('.submission_attachment')
       .find('.bad_ext_msg')
       .showIf($.inArray(ext, ENV.SUBMIT_ASSIGNMENT.ALLOWED_EXTENSIONS) < 0)
     checkAllowUploadSubmit()
