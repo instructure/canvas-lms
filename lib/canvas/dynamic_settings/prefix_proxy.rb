@@ -139,10 +139,10 @@ module Canvas
         end
         Rails.logger.warn("[DYNAMIC_SETTINGS] config requested which was found no-where (#{key})")
         nil
-      rescue Imperium::TimeoutError, UnexpectedConsulResponse, Errno::ECONNREFUSED => exception
+      rescue Imperium::TimeoutError, UnexpectedConsulResponse, Errno::ECONNREFUSED => e
         LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + keys.first).tap do |val|
           if val
-            Canvas::Errors.capture_exception(:consul, exception)
+            Canvas::Errors.capture_exception(:consul, e, :warn)
             val
           else
             raise

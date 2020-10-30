@@ -123,7 +123,7 @@ module Services
       def setting(key)
         Canvas::DynamicSettings.find("address-book", default_ttl: 5.minutes)[key]
       rescue Imperium::TimeoutError => e
-        Canvas::Errors.capture_exception(:address_book, e)
+        Canvas::Errors.capture_exception(:address_book, e, :warn)
         nil
       end
 
@@ -146,10 +146,12 @@ module Services
         Canvas.timeout_protection(timeout_service_name) do
           response = CanvasHttp.get(url, 'Authorization' => "Bearer #{jwt}")
           if ![200, 202].include?(response.code.to_i)
-            Canvas::Errors.capture(CanvasHttp::InvalidResponseCodeError.new(response.code.to_i), {
+            err = CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
+            data = {
               extra: { url: url, response: response.body },
               tags: { type: 'address_book_fault' }
-            })
+            }
+            Canvas::Errors.capture(err, data, :warn)
             return fallback
           elsif params[:ignore_result] == 1
             return fallback

@@ -189,8 +189,11 @@ describe Pseudonym do
 
     it "should set last_timeout_failure on LDAP servers that timeout" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).once.and_raise(Timeout::Error, "timed out")
+      expect(Canvas::Errors).to receive(:capture_exception) do |_subsystem, e, level|
+        expect(e.class.to_s).to eq("Timeout::Error")
+        expect(level).to eq(:warn)
+      end
       expect(@pseudonym.ldap_bind_result('test')).to be_falsey
-      expect(ErrorReport.last.message).to match(/timed out/)
       expect(@aac.reload.last_timeout_failure).to be > 1.minute.ago
     end
 

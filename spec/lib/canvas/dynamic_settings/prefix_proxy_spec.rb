@@ -107,7 +107,7 @@ module Canvas
         it "must log the connection failure when consul can't be contacted" do
           LocalCache.write(DynamicSettings::CACHE_KEY_PREFIX + 'foo/bar/baz', 'qux', expires_in: -3.minutes)
           expect(Canvas::Errors).to receive(:capture_exception).
-            with(:consul, an_instance_of(Imperium::TimeoutError))
+            with(:consul, an_instance_of(Imperium::TimeoutError), :warn)
           allow(client).to receive(:get).and_raise(Imperium::TimeoutError)
           proxy.fetch('baz')
         end

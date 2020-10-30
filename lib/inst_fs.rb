@@ -50,7 +50,7 @@ module InstFS
       return unless user && enabled?
       CanvasHttp.delete(logout_url(user))
     rescue CanvasHttp::Error => e
-      Canvas::Errors.capture_exception(:page_view, e)
+      Canvas::Errors.capture_exception(:page_view, e, :warn)
     end
 
     def bearer_token(options)
@@ -262,7 +262,7 @@ module InstFS
       # capture this to make sure that we have SOME
       # signal that the problem is continuing, even if our
       # retries are all successful.
-      Canvas::Errors.capture_exception(:inst_fs, e)
+      Canvas::Errors.capture_exception(:inst_fs, e, :warn)
       Rails.logger.warn("[INST_FS] Consul timeout hit during settings #{e}, entering retry handling...")
       retry_limit = Setting.get("inst_fs_config_retry_count", "5").to_i
       retry_base = Setting.get("inst_fs_config_retry_base_interval", "1.4").to_i

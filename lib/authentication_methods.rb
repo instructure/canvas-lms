@@ -58,9 +58,9 @@ module AuthenticationMethods
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
-    rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
-           Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
-           Canvas::Security::InvalidToken        # not formatted like a JWT
+    rescue JSON::JWT::InvalidFormat,       # definitely not a JWT
+           Canvas::Security::TokenExpired, # it could be a JWT, but it's expired if so
+           Canvas::Security::InvalidToken  # not formatted like a JWT
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
@@ -69,7 +69,7 @@ module AuthenticationMethods
       # Something went wrong in the Network
       # these are indications of infrastructure or data problems
       # so we should log them for resolution, but recover gracefully
-      Canvas::Errors.capture_exception(:jwt_check, exception)
+      Canvas::Errors.capture_exception(:jwt_check, exception, :warn)
     end
   end
 

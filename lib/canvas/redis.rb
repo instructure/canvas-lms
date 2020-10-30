@@ -120,7 +120,7 @@ module Canvas::Redis
 
     Setting.skip_cache do
       if self.ignore_redis_failures?
-        Canvas::Errors.capture(e, type: :redis)
+        Canvas::Errors.capture_exception(:redis, e, :warn)
         last_redis_failure[redis_name] = Time.now
         failure_retval
       else

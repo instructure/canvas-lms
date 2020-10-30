@@ -98,7 +98,7 @@ module CC::Importer::Canvas
           data = JSON.parse(json)
           external_content[service_key] = data
         rescue JSON::ParserError => e
-          Canvas::Errors.capture_exception(:external_content_migration, e)
+          Canvas::Errors.capture_exception(:external_content_migration, e, :info)
         end
       end
       @course[:external_content] = external_content

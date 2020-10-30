@@ -30,9 +30,14 @@ module Canvas
       # but every unique combination of tags gets treated
       # as a custom metric for billing purposes.  Only
       # add high value and low-ish cardinality tags.
-      tags = data.fetch(:tags, {}).fetch(:for_stats, {})
-      tags[:category] = category.to_s
-      InstStatsd::Statsd.increment("errors.#{level}", tags: tags)
+      all_tags = data.fetch(:tags, {})
+      stat_tags = all_tags.fetch(:for_stats, {})
+      # convenience for propogating the "type" parameter
+      # passed in Canvas::Errors.capture_exception,
+      # which is usually a subsystem label
+      stat_tags[:type] = all_tags[:type]
+      stat_tags[:category] = category.to_s
+      InstStatsd::Statsd.increment("errors.#{level}", tags: stat_tags)
     end
   end
 end
