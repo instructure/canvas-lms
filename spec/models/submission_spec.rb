@@ -5003,6 +5003,58 @@ describe Submission do
     end
   end
 
+  describe "#rubric_assessment" do
+    let(:submission) { @assignment.submission_for_student(@student) }
+
+    it "excludes non-grading assessments" do
+      grading_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      grading_assessment = grading_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: grading_rubric_association.rubric,
+        user: @student
+      )
+
+      non_grading_rubric_association = rubric_association_model(association_object: @assignment, purpose: "pleasurable event")
+      non_grading_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "pleasurable event",
+        assessor: @teacher,
+        rubric: non_grading_rubric_association.rubric,
+        user: @student
+      )
+
+      expect(submission.rubric_assessment).to eq grading_assessment
+    end
+
+    it "prioritizes assessments with a non-nil rubric_association when multiple grading assessments exist" do
+      old_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      old_assessment = old_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: old_rubric_association.rubric,
+        user: @student
+      )
+      old_rubric_association.destroy
+
+      new_rubric_association = rubric_association_model(association_object: @assignment, purpose: "grading")
+      new_assessment = new_rubric_association.rubric_assessments.create!(
+        artifact: submission,
+        assessment_type: "grading",
+        assessor: @teacher,
+        rubric: new_rubric_association.rubric,
+        user: @student
+      )
+
+      aggregate_failures do
+        expect(submission.rubric_assessments).to contain_exactly(old_assessment, new_assessment)
+        expect(submission.rubric_assessment).to eq new_assessment
+      end
+    end
+  end
+
   describe '#add_comment' do
     before(:once) do
       submission_spec_model
