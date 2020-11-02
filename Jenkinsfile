@@ -370,6 +370,11 @@ pipeline {
                 if (currentBuild.projectName.contains("rails-6")) {
                   buildParameters += string(name: 'CANVAS_RAILS6_0', value: "${env.CANVAS_RAILS6_0}")
                 }
+                // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
+                // the gerrit rather than master.
+                if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: './build/new-jenkins/jenkinsfile_changes.sh', returnStatus: true) == 0)) {
+                    buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
+                }
 
                 if (env.GERRIT_PROJECT != "canvas-lms") {
                   // the plugin builds require the canvas lms refspec to be different. so only
@@ -427,8 +432,6 @@ pipeline {
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               timedStage('Rebase') {
                 timeout(time: 2) {
-                  def beforeHash = sh(script: 'md5sum Jenkinsfile', returnStdout: true).trim()
-
                   credentials.withGerritCredentials({ ->
                     sh '''#!/bin/bash
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
@@ -453,12 +456,6 @@ pipeline {
                       fi
                     '''
                   })
-
-                  def afterHash = sh(script: 'md5sum Jenkinsfile', returnStdout: true).trim()
-
-                  if(beforeHash != afterHash) {
-                    error "Jenkinsfile has been updated. Please rebase your patchset for the latest updates."
-                  }
                 }
               }
             }

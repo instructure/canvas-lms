@@ -81,7 +81,22 @@ pipeline {
               cleanAndSetup()
               timeout(time: 10) {
                 sh 'rm -vrf ./tmp/*'
-                checkout scm
+                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                checkout([
+                  $class: 'GitSCM',
+                  branches: [[name: 'FETCH_HEAD']],
+                  doGenerateSubmoduleConfigurations: false,
+                  extensions: [[$class: 'CloneOption', depth: 100, honorRefspec: true, noTags: true, shallow: true]],
+                  submoduleCfg: [],
+                  userRemoteConfigs: [[
+                    credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
+                    name: 'origin',
+                    refspec: refspecToCheckout,
+                    url: "ssh://gerrit.instructure.com:29418/canvas-lms.git"
+                  ]]
+                ])
+
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
                 sh 'docker-compose build'
               }
