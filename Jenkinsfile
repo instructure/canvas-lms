@@ -35,8 +35,6 @@ def buildParameters = [
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
-library "canvas-builds-library"
-
 def getDockerWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
@@ -256,10 +254,25 @@ def getExternalTag() {
 def getDependenciesImage() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.dependenciesImageDefault() : configuration.dependenciesImage()
 }
+
+@groovy.transform.Field def CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
+
+def getCanvasBuildsRefspec() {
+  def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+
+  if(env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
+    return 'master'
+  }
+
+  return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
+}
+
 def getCanvasLmsRefspec() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
 }
 // =========
+
+library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 
 pipeline {
   agent none
@@ -305,6 +318,7 @@ pipeline {
     POSTGRES_IMAGE_TAG=imageTag.postgres()
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
+    CANVAS_BUILDS_REFSPEC = getCanvasBuildsRefspec()
     CANVAS_LMS_REFSPEC = getCanvasLmsRefspec()
     DOCKER_WORKDIR = getDockerWorkDir()
     LOCAL_WORKDIR = getLocalWorkDir()
@@ -349,6 +363,7 @@ pipeline {
                   ]]
                 ])
 
+                buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
