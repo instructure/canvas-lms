@@ -24,6 +24,14 @@ class LtiApiController < ApplicationController
   skip_before_action :load_user
   skip_before_action :verify_authenticity_token
 
+  rescue_from BasicLTI::BasicOutcomes::Unauthorized, BasicLTI::BasicOutcomes::InvalidRequest, with: :rescue_lti_exception
+
+  def rescue_lti_exception(exception)
+    # these exceptions will happen on bad external requests,
+    # we don't need to tell sentry about every one of them
+    rescue_exception(exception, level: :info)
+  end
+
   # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
   def grade_passback
     verify_oauth

@@ -39,26 +39,28 @@ describe LtiApiController, type: :request do
     allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
   end
 
-  def check_error_response(message, check_generated_sig=true)
+  def check_error_response(message, check_generated_sig=true, with_report: true)
     expect(response.body.strip).to_not be_empty, "Should not have an empty response body"
 
     json = JSON.parse response.body
     expect(json["errors"][0]["message"]).to eq message
-    expect(json["error_report_id"]).to be > 0
 
-    data = error_data(json)
+    if with_report
+      expect(json["error_report_id"]).to be > 0
+      data = error_data(json)
 
-    expect(data.key?('oauth_signature')).to be true
-    expect(data.key?('oauth_signature_method')).to be true
-    expect(data.key?('oauth_nonce')).to be true
-    expect(data.key?('oauth_timestamp')).to be true
-    expect(data.key?('generated_signature')).to be true if check_generated_sig
+      expect(data.key?('oauth_signature')).to be true
+      expect(data.key?('oauth_signature_method')).to be true
+      expect(data.key?('oauth_nonce')).to be true
+      expect(data.key?('oauth_timestamp')).to be true
+      expect(data.key?('generated_signature')).to be true if check_generated_sig
 
-    expect(data['oauth_signature']).to_not be_empty
-    expect(data['oauth_signature_method']).to_not be_empty
-    expect(data['oauth_nonce']).to_not be_empty
-    expect(data['oauth_timestamp']).to_not be_empty
-    expect(data['generated_signature']).to_not be_empty if check_generated_sig
+      expect(data['oauth_signature']).to_not be_empty
+      expect(data['oauth_signature_method']).to_not be_empty
+      expect(data['oauth_nonce']).to_not be_empty
+      expect(data['oauth_timestamp']).to_not be_empty
+      expect(data['generated_signature']).to_not be_empty if check_generated_sig
+    end
   end
 
   def error_data(json=nil)
@@ -114,20 +116,13 @@ describe LtiApiController, type: :request do
   context "OAuth Requests" do
     it "should fail on invalid signature method" do
       make_call('override_signature_method' => 'BawkBawk256')
-      check_error_response("Invalid authorization header", false)
-      data = error_data
-
-      expect(data['error_class']).to eq "OAuth::Signature::UnknownSignatureMethod"
+      check_error_response("Invalid authorization header", false, with_report: false)
       assert_status(401)
     end
 
     it "should require the correct shared secret" do
       make_call('secret' => 'bad secret is bad')
-      check_error_response("Invalid authorization header")
-
-      data = error_data
-      expect(data['error_class']).to eq "OAuth::Unauthorized"
-
+      check_error_response("Invalid authorization header", with_report: false)
       assert_status(401)
     end
 
@@ -138,7 +133,7 @@ describe LtiApiController, type: :request do
           assert_status(415)
           make_call('nonce' => 'not_so_random', 'content-type' => 'application/json')
           assert_status(401)
-          check_error_response("Duplicate nonce detected")
+          check_error_response("Duplicate nonce detected", with_report: false)
         end
       end
     end
@@ -148,7 +143,7 @@ describe LtiApiController, type: :request do
       make_call('timestamp' => 2.hours.ago.utc.to_i, 'content-type' => 'application/json')
       assert_status(401)
       expect(response.body).to match(/expired/i)
-      check_error_response("Timestamp too old or too far in the future, request has expired")
+      check_error_response("Timestamp too old or too far in the future, request has expired", with_report: false)
     end
   end
 
