@@ -66,7 +66,7 @@ def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
     if (failure != null) {
       def downstream = failure.getDownstreamBuild()
       def url = downstream.getAbsoluteUrl() + urlExtra
-      failureReport.append(jobName, url)
+      failureReport.addFailure(jobName, url)
     }
     throw ex
   }
