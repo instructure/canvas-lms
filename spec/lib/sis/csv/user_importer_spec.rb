@@ -273,6 +273,40 @@ describe SIS::CSV::UserImporter do
       )
       expect(user.pronouns).to eq 'he/him'
     end
+
+    it "deletes users set pronouns" do
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+      expect(user.pronouns).to eq 'mr/man'
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,<delete>"
+      )
+      expect(user.reload.pronouns).to be_nil
+    end
+
+    it "does not deletes users set pronouns when sticky" do
+      @account.pronouns = ['mr/man', 'he/him']
+      @account.save!
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,mr/man"
+      )
+      user = Pseudonym.by_unique_id('user1').first.user
+
+      user.pronouns = 'he/him'
+      user.save!
+
+      process_csv_data_cleanly(
+        "user_id,login_id,full_name,status,pronouns",
+        "user_1,user1,tom riddle,active,<delete>"
+      )
+      expect(user.reload.pronouns).to eq 'he/him'
+    end
   end
 
   it "uses sortable_name if none of first_name/last_name/full_name is given" do

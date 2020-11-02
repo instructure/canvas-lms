@@ -215,7 +215,9 @@ module SIS
           should_add_account_associations = false
           should_update_account_associations = false
 
-          user.pronouns = user_row.pronouns if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns)
+          if user_row.pronouns.present? && !user.stuck_sis_fields.include?(:pronouns)
+            user.pronouns = (user_row.pronouns == '<delete>') ? nil : user_row.pronouns
+          end
 
           if !status_is_active && !user.new_record?
             if user.id == @batch&.user_id
@@ -308,7 +310,6 @@ module SIS
           @users_to_add_account_associations << user.id if should_add_account_associations
           @users_to_update_account_associations << user.id if should_update_account_associations
 
-          limit = nil
           if user_row.email.present? && EmailAddressValidator.valid?(user_row.email)
             # find all CCs for this user, and active conflicting CCs for all users
             # unless we're deleting this user, then only find CCs for this user
