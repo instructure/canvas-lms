@@ -1,0 +1,37 @@
+{
+  "name": "module_created",
+  "definition": "The event is emitted anytime a new module is created by an end user or API request.",
+  "trigger": "Triggered when a new module is created.",
+  "schema": {
+    "context_id": "The local Canvas id of the context.",
+    "context_type": "The type of module's context.",
+    "module_id": "The Canvas id of the module.",
+    "name": "The name of the module.",
+    "position": "The position of the module in the course.",
+    "workflow_state": "The workflow state of the module."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "module_created",
+          "event_time": "2019-11-01T19:11:05.880Z",
+          "job_id": "1020020528469291",
+          "job_tag": "Canvas::Migration::Worker::CCWorker#perform",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "context_id": "1234560",
+          "context_type": "Course",
+          "module_id": "1234567",
+          "name": "Module 3",
+          "position": 101,
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "name": "enrollment_state_created",
+  "definition": "The event is emitted anytime a new enrollment record is added to a course.",
+  "trigger": "Triggered when a new course enrollment is created with a new workflow_state.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "access_is_current": "Indicates if the enrollment_state is up to date",
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "restricted_access": "Indicates whether enrollment access is restricted, set to 'TRUE' if enrollment state is restricted",
+      "state_is_current": "Indicates if this enrollment_state is up to date",
+      "state": "The state of the enrollment",
+      "state_valid_until": "The time at which this enrollment is no longer valid"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:09:05.617Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:0b3800ce-e9c5-4566-8b5f-72ea469a07b7",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000001",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000001"
+                }
+              }
+            },
+            "action": "Created",
+            "object": {
+              "id": "urn:instructure:canvas:enrollment:21070000000000143",
+              "type": "Entity",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "access_is_current": true,
+                  "restricted_access": false,
+                  "state": "pending_invited",
+                  "state_is_current": true,
+                  "state_valid_until": "2019-11-05T13:38:00.218Z",
+                  "entity_id": "21070000000000143"
+                }
+              },
+              "startedAtTime": "2019-10-05T13:38:00.000Z"
+            },
+            "eventTime": "2019-11-01T19:11:09.910Z",
+            "referrer": "https://oxana.instructure.com/accounts/1?enrollment_term_id=83&search_term=hsw",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:user:21070000000000001",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000001",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              }
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/courses/565/enroll_users",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

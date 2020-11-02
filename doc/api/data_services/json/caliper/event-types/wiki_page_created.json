@@ -1,0 +1,102 @@
+{
+  "name": "wiki_page_created",
+  "definition": "The event is emitted anytime a new wiki page is created by an end user or API request.",
+  "trigger": "Triggered when a new wiki page is created.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "body": "The body of the new page. NOTE: This field will be truncated to only include the first 8192 characters.",
+      "entity_id": "Canvas global ID of the object affected by the event"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T23:47:23.376Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:c6fd66af-c89a-4554-bb03-aa35b3e75525",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000333",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana",
+                  "user_sis_id": "OXANA123",
+                  "root_account_id": "21070000000000333",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000333"
+                }
+              }
+            },
+            "action": "Created",
+            "object": {
+              "id": "urn:instructure:canvas:wikiPage:21070000000048392",
+              "type": "Page",
+              "name": "Great new wiki page",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "body": "This is the text of a simply awesome new wiki page!",
+                  "entity_id": "21070000000048392"
+                }
+              }
+            },
+            "eventTime": "2019-11-01T19:11:12.455Z",
+            "referrer": "https://oxana.instructure.com/courses/565/modules",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:Instructor:21070000000000333",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000333",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/courses/565/modules/items/982711/duplicate",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "name": "group_created",
+  "definition": "The event is emitted anytime a new group is added to a course by an end user or API request.",
+  "trigger": "Triggered when a new group is created.",
+  "schema": {
+    "account_id": "The Canvas id of the group's account.",
+    "context_id": "The Canvas id of the group's context.",
+    "context_type": "The type of the group's context ('Account' or 'Course').",
+    "group_category_id": "The Canvas id of the group category.",
+    "group_category_name": "The name of the group category.",
+    "group_id": "The Canvas id of the group.",
+    "group_name": "The name of the group.",
+    "max_membership": "The maximum membership cap for the group.",
+    "uuid": "The unique id of the group.",
+    "workflow_state": "The state of the group. (available, deleted)"
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "event_name": "group_created",
+          "event_time": "2019-11-01T00:08:52.795Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/565/groups",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/New_York",
+          "url": "https://oxana.instructure.com/api/v1/group_categories/1149/groups",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_type": "Course",
+          "group_category_id": "21070000000001149",
+          "group_category_name": "Live_events_Group1",
+          "group_id": "21070000000000051",
+          "group_name": "Group 1",
+          "max_membership": 100,
+          "uuid": "axUYte7Y2ktt62hYUlU5QcMt3T3VbGzAJLASM6tn",
+          "workflow_state": "available"
+        }
+      }
+    }
+  ]
+}

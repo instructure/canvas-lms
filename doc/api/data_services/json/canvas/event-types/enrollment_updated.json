@@ -1,0 +1,47 @@
+{
+  "name": "enrollment_updated",
+  "definition": "The event is emitted anytime an enrollment record is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when a course enrollment is modified.",
+  "schema": {
+    "associated_user_id": "The id of the user observed by an observer's enrollment. Omitted from non-observer enrollments.",
+    "course_id": "The Canvas id of the course for this enrollment.",
+    "course_section_id": "The id of the section of the course for the new enrollment.",
+    "created_at": "The time at which this enrollment was created.",
+    "enrollment_id": "The Canvas id of the new enrollment.",
+    "limit_privileges_to_course_section": "Whether students can only talk to students within their course section.",
+    "type": "The type of enrollment; e.g. StudentEnrollment, TeacherEnrollment, ObserverEnrollment, etc.",
+    "updated_at": "The time at which this enrollment was last modified in any way.",
+    "user_id": "The Canvas id of the user for this enrollment.",
+    "user_name": "The user's name.",
+    "workflow_state": "The state of the enrollment (active, completed, creation_pending, deleted, inactive, invited)"
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "enrollment_updated",
+          "event_time": "2019-11-01T19:11:12.546Z",
+          "job_id": "1020020528469291",
+          "job_tag": "SIS::CSV::ImportRefactored#run_parallel_importer",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "associated_user_id": "21070000000000562",
+          "course_id": "21070000000000565",
+          "course_section_id": "21070000000000598",
+          "created_at": "2018-10-09T21:07:33Z",
+          "enrollment_id": "21070000000046825",
+          "limit_privileges_to_course_section": false,
+          "type": "StudentEnrollment",
+          "updated_at": "2018-10-09T21:07:33Z",
+          "user_id": "21070000000020064",
+          "user_name": "Isaac Netwon",
+          "workflow_state": "invited"
+        }
+      }
+    }
+  ]
+}

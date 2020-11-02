@@ -58,5 +58,31 @@
       <a href="<%= url_for("file.jwt_access_tokens.html") %>" class="<%= 'current' if options[:object] == 'file.jwt_access_tokens.html' %>">JWT Access Tokens</a>
     </li >
   </td>
+  <h2>Data Services</h2>
+  <td>
+    <li>
+      <h4>Live Events</h4>
+      <ul>
+        <h4>Overview</h4>
+        <a href="<%= url_for("file.data_service_setup.html") %>" class="<%= 'current' if options[:object] == 'file.data_service_setup.html' %>">Setup</a>
+        <a href="<%= url_for("file.data_service_canvas_event_metadata.html") %>" class="<%= 'current' if options[:object] == 'file.data_service_canvas_event_metadata.html' %>">Metadata</a>
+      </ul>
 
+      <ul>
+        <h4>Event Format</h4>
+        <li>
+          <h4>Canvas</h4>
+          <% DataServicesCanvasLoader.data.each do |content| %>
+            <a href="<%= url_for("file.data_service_canvas_#{content[:event_category]}.html") %>" class="<%= 'current' if options[:object] == "file.data_service_canvas_#{content[:event_category]}.html" %>"><%= content[:page_title] %></a>
+          <% end %>
+        </li>
+        <li>
+          <h4>Caliper IMS 1.1</h4>
+          <% DataServicesCaliperLoader.data.each do |content| %>
+            <a href="<%= url_for("file.data_service_caliper_#{content[:event_category]}.html") %>" class="<%= 'current' if options[:object] == "file.data_service_caliper_#{content[:event_category]}.html" %>"><%= content[:page_title] %></a>
+          <% end %>
+        </li>
+      </ul>
+    </li>
+  </td>
 </nav>

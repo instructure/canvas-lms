@@ -1,0 +1,67 @@
+{
+  "name": "course_grade_change",
+  "definition": "The event gets emitted anytime any of the course scores are changed for a student.",
+  "trigger": "Triggered when anything (a user or asynchronous job) updates the final_score, course_score, unposted_current_score, or unposted_final_score columns in the scores table in the database.",
+  "schema": {
+    "user_id": "The Canvas user ID of the student.",
+    "course_id": "The Canvas ID of the course.",
+    "workflow_state": "The state of the score record in the database, could be \"active\" or \"deleted\".",
+    "created_at": "The time when the row in the scores table (representing the course grade) was created. The score row is created as a result of some grade calculation, even if there are not yet any graded submissions for a student, i.e. when a student is enrolled in the class.",
+    "updated_at": "The time when the row in the scores table was last updated -- that is, when the event is emitted.",
+    "current_score": "The user's current score in the class.",
+    "old_current_score": "The user's current score in the class before it was changed. This field will not be available until a student submits the first assignment in the  class.",
+    "final_score": "The user's final score for the class.",
+    "old_final_score": "The user's final score for the class before it was changed. This field will be set to 0.0 until a student submits the first assignment in the class.",
+    "unposted_current_score": "The user's current grade in the class including unposted assignments.",
+    "old_unposted_current_score": "The user's current grade in the class including unposted assignments, before it was changed. This field will not be available until a student submits the first assignment in the class.",
+    "unposted_final_score": "The user's final grade for the class including unposted assignments.",
+    "old_unposted_final_score": "The user's final grade for the class including unposted assignments, before it was changed. This field will not be available when a student submits the first assignment in the class."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "44fJ44GgJ29gJBsl43JLKgljsBIOTsbnKT48932g",
+          "root_account_id": "10000000000001",
+          "root_account_lti_guid": "794d72b707af6ea82cfe3d5d473f16888a8366c7.canvas.docker",
+          "user_login": "oxana@instructure.com",
+          "user_account_id": "10000000000002",
+          "user_sis_id": null,
+          "user_id": "21070000000000001",
+          "time_zone": "America/Denver",
+          "context_type": "Course",
+          "context_id": "21070000000000002",
+          "context_sis_source_id": "194387",
+          "context_account_id": "21070000000000003",
+          "context_role": "TeacherEnrollment",
+          "request_id": "98e1b771-fe22-4481-8264-d523dadb16b1",
+          "session_id": "242872453a9d69f7ccddeb4788d22506",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "http://oxana.instructure.com/courses/2/gradebook/update_submission",
+          "referrer": "http://oxana.instructure.com/courses/2/gradebook/speed_grader?assignment_id=39&student_id=2",
+          "producer": "canvas",
+          "event_name": "course_grade_change",
+          "event_time": "2019-12-11T16:26:34.552Z"
+        },
+        "body": {
+          "user_id": "2",
+          "course_id": "2",
+          "workflow_state": "active",
+          "created_at": "2019-12-04T13:32:21Z",
+          "updated_at": "2019-12-11T16:26:34Z",
+          "current_score": 17.31,
+          "old_current_score": 13.46,
+          "final_score": 12.5,
+          "old_final_score": 9.72,
+          "unposted_current_score": 17.31,
+          "old_unposted_current_score": 13.46,
+          "unposted_final_score": 12.5,
+          "old_unposted_final_score": 9.72
+        }
+      }
+    }
+  ]
+}

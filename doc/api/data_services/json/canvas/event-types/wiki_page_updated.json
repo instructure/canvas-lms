@@ -1,0 +1,35 @@
+{
+  "name": "wiki_page_updated",
+  "definition": "The event is emitted anytime a wiki page is altered by an end user or API request.",
+  "trigger": "Triggered when title or body of wiki page is altered.",
+  "schema": {
+    "body": "The new page body. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "old_body": "The old page body. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "old_title": "The old title. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "title": "The new title. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "wiki_page_id": "The Canvas id of the changed wiki page."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "wiki_page_updated",
+          "event_time": "2019-11-01T19:11:25.788Z",
+          "job_id": "1020020528469291",
+          "job_tag": "ContentMigration#import_content",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "body": "<p>page 1 - updated</p>",
+          "old_body": "<p>page 1</p>",
+          "old_title": "Page 1 Created",
+          "title": "Page 1 Updated",
+          "wiki_page_id": "21070000000000009"
+        }
+      }
+    }
+  ]
+}

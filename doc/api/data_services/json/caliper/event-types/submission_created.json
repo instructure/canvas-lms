@@ -1,0 +1,82 @@
+{
+  "name": "submission_created",
+  "definition": "The event is emitted anytime an end user or API request submits an assignment.",
+  "trigger": "Triggered when a submission gets updated and has not yet been submitted.",
+  "schema": {
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "submission_type": "The types of submission (basic_lti_launch, discussion_topic, media_recording, online_quiz, online_text_entry, online_upload, online_url)",
+      "url": "The URL of the request that triggered the event. Only present in user-generated events"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:09:14.293Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:bd9dedcf-6fd9-4605-82d6-325c4e2adaf6",
+            "type": "AssignableEvent",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000014012",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000014012"
+                }
+              }
+            },
+            "action": "Submitted",
+            "object": {
+              "id": "urn:instructure:canvas:submission:21070000012345567",
+              "type": "Attempt",
+              "dateCreated": "2019-11-01T19:11:21.419Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "submission_type": "online_text_entry",
+                  "url": "https://test.submission.net",
+                  "entity_id": "21070000012345567"
+                }
+              },
+              "assignee": {
+                "id": "urn:instructure:canvas:user:21070000000014012",
+                "type": "Person"
+              },
+              "assignable": {
+                "id": "urn:instructure:canvas:assignment:21070000001234012",
+                "type": "AssignableDigitalResource"
+              },
+              "count": 12,
+              "body": "Test Submission Data"
+            },
+            "eventTime": "2019-11-01T19:11:21.419Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/lti/v1/tools/453919/grade_passback",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

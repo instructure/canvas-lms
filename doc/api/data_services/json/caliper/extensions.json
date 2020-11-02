@@ -1,0 +1,18 @@
+{
+  "name": "Caliper event extensions",
+  "definition": "",
+  "trigger": "",
+  "schema": {
+    "data[0].extensions[\"com.instructure.canvas\"]": {
+      "client_ip": "The client IP address of the request that triggered the event. Only present in user-generated events",
+      "hostname": "The domain of the Canvas instance for the request. Only present in user-generated events",
+      "job_id": "The identifier for the asynchronous job. Only present in system-generated events (events emitted in an asynchronous job, not an HTTP request)",
+      "job_tag": "A string identifying the type of job being performed. Only present in system-generated events (events emitted in an asynchronous job, not an HTTP request)",
+      "request_id": "The identifier for this request. Correlates to Canvas Data table requests.id. Only present in user-generated events",
+      "request_url": "The URL to the requested resource. Only present in user-generated events",
+      "user_agent": "The User-Agent sent by the browser making the request. Only present in user-generated events",
+      "version": "Canvas implementation version of Caliper p1v1 events"
+    }
+  },
+  "examples": []
+}

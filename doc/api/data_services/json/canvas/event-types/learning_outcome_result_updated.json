@@ -1,0 +1,51 @@
+{
+  "name": "learning_outcome_result_updated",
+  "definition": "The event is emitted anytime a existing outcome rating for a submission is updated. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when a submission outcome rating is updated.",
+  "schema": {
+    "assessed_at": "The date when the outcome was last assessed.",
+    "attempt": "The submission attempt number.",
+    "created_at": "Time when the result was created.",
+    "learning_outcome_id": "The local Canvas ID of the learning outcome.",
+    "mastery": "True if student achieved mastery.",
+    "original_mastery": "True if student achieved mastery on the first attempt.",
+    "original_possible": "Possible points on the first attempt.",
+    "original_score": "Score on the first attempt.",
+    "percent": "Percent of maximum points possible for an outcome, scaled to reflect any custom mastery levels that differ from the learning outcome.",
+    "possible": "Total number of points possible.",
+    "score": "The student's score.",
+    "title": "Title of the learning outcome.",
+    "updated_at": "Time the learning outcome result was updated at."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "learning_outcome_result_updated",
+          "event_time": "2019-08-09T21:35:05Z",
+          "job_id": "1020020528469291",
+          "job_tag": "RubricAssessment#update_outcomes_for_assessment",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "assessed_at": "2019-08-09T21:35:05Z",
+          "attempt": 1,
+          "created_at": "2019-08-09T21:35:05Z",
+          "learning_outcome_id": "1",
+          "mastery": true,
+          "original_mastery": false,
+          "original_possible": 5,
+          "original_score": 5,
+          "percent": 1,
+          "possible": 5,
+          "score": 5,
+          "title": "oxana Student 2, Test Outcome",
+          "updated_at": "2019-11-01T00:21:24Z"
+        }
+      }
+    }
+  ]
+}

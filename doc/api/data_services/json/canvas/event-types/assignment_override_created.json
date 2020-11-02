@@ -1,0 +1,63 @@
+{
+  "name": "assignment_override_created",
+  "definition": "The event is emitted anytime an assignment override is created by an end user or API request.",
+  "trigger": "Triggered when an assignment override is created.",
+  "schema": {
+      "assignment_override_id": "The Canvas id of the assignment override.",
+      "assignment_id": "The Canvas id of the assignment linked to the override.",
+      "due_at": "The override due_at timestamp, or nil if not overridden.",
+      "all_day": "The overridden all_day flag, or nil if not overridden.",
+      "all_day_date": "The overridden all_day_date, or nil if not overridden.",
+      "unlock_at": "The overridden unlock_at timestamp, or nil if not overridden.",
+      "lock_at": "The overridden lock_at timestamp, or nil if not overridden.",
+      "type": "Override type - `ADHOC` (list of Students), `CourseSection`, or `Group`.",
+      "course_section_id": "(if `type='CourseSection'`) Canvas section id that this override applies to.",
+      "group_id": "(if `type='Group'`) Canvas group id that this override applies to.",
+      "workflow_state": "Workflow state of the override. (active, deleted)"
+  },
+  "examples": [
+      {
+          "payload": {
+              "metadata": {
+                  "client_ip": "93.184.216.34",
+                  "context_account_id": "21070000000000079",
+                  "context_id": "21070000001279362",
+                  "context_role": "TeacherEnrollment",
+                  "context_sis_source_id": "2017.100.101.101-1",
+                  "context_type": "Course",
+                  "developer_key_id": "170000000056",
+                  "event_name": "assignment_override_created",
+                  "event_time": "2019-11-01T19:11:14.005Z",
+                  "hostname": "oxana.instructure.com",
+                  "http_method": "PUT",
+                  "producer": "canvas",
+                  "referrer": null,
+                  "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+                  "time_zone": "America/New_York",
+                  "url": "https://oxana.instructure.com/api/v1/courses/1279362/assignments/2030605",
+                  "user_account_id": "21070000000000001",
+                  "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                  "user_id": "21070000000000001",
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45"
+              },
+              "body": {
+                  "assignment_override_id": 1,
+                  "assignment_id": 1,
+                  "due_at": "2019-08-10T12:35:54Z",
+                  "all_day": true,
+                  "all_day_date": "2019-08-10T00:00:00Z",
+                  "unlock_at": "2019-08-01T00:00:00Z",
+                  "lock_at": "2019-08-21T00:00:00Z",
+                  "type": "CourseSection",
+                  "course_section_id": 1,
+                  "workflow_state": "active"
+              }
+          }
+      }
+  ]
+}

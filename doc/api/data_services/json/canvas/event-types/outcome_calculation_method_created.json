@@ -1,0 +1,52 @@
+{
+  "name": "outcome_calculation_method_created",
+  "definition": "The event is emitted anytime a new outcome_calculation_method is created by an end user or API request.",
+  "trigger": "Triggered when a new outcome_calculation_method is saved.",
+  "schema": {
+    "outcome_calculation_method_id": "The Canvas id of the outcome calculation method.",
+    "context_type": "The type of context the outcome calculation method is used in.",
+    "context_id": "The id of the context the outcome calculation method is used in.",
+    "workflow_state": "Workflow state of the outcome calculation method. E.g active, deleted.",
+    "calculation_int": "Defines the variable value used by the calculation_method. Included only if calculation_method uses it.",
+    "calculation_method": "The method used to calculate student score."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "7db438071375c02373713c12c73869ff2f470b68.oxana.instructure.com",
+          "user_login": "oxana@instructure.com",
+          "user_account_id": "21070000000000001",
+          "user_sis_id": "456-T45",
+          "user_id": "21070000000000001",
+          "time_zone": "America/Denver",
+          "context_type": "Account",
+          "context_id": "21070000000000144",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_account_id": "21070000000000079",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "client_ip": "93.184.216.34",
+          "url": "https://oxana.instructure.com/api/graphql",
+          "referrer": null,
+          "producer": "canvas",
+          "event_name": "outcome_calculation_method_created",
+          "event_time": "2020-08-18T23:28:24.396Z"
+        },
+        "body": {
+          "outcome_calculation_method_id": "1",
+          "context_type": "Account",
+          "context_id": "1",
+          "calculation_method": "decaying_average",
+          "calculation_int": 65,
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}
