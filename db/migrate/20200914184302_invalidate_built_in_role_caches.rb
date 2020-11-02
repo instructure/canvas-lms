@@ -36,7 +36,7 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
       # will clear cached role overrides everywhere
       Account.site_admin&.
         delay_if_production(priority: Delayed::LOWER_PRIORITY,
-          singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}").
+          singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}")&.
         clear_downstream_caches(:role_overrides)
     end
   end
