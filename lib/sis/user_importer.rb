@@ -325,9 +325,9 @@ module SIS
               cc_scope = cc_scope.email.by_path(user_row.email)
               limit = Setting.get("merge_candidate_search_limit", "100").to_i
               ccs = cc_scope.limit(limit + 1).to_a
-            end
-            if ccs.count > limit
-              ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+              if ccs.count > limit
+                ccs = cc_scope.where(:user_id => user).to_a # don't bother with merge candidates anymore
+              end
             end
 
             # sis_cc could be set from the previous user, if we're not on a transaction boundary,
