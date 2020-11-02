@@ -383,7 +383,7 @@ class RCEWrapper extends React.Component {
 
   insertImagePlaceholder(fileMetaProps) {
     let width, height
-    if (isImage(fileMetaProps.contentType)) {
+    if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
       const image = new Image()
       image.src = fileMetaProps.domObject.preview
       width = image.width
