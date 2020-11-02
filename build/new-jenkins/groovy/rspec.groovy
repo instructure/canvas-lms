@@ -120,7 +120,7 @@ def _runRspecTestSuite(
       reports.stashSpecFailures(prefix, index)
 
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
-      def preStatus = currentBuild.getResult()
+      def preStatus = currentBuild.rawBuild.@result
 
       junit allowEmptyResults: true, testResults: "tmp/rspec_results/**/*.xml"
 
