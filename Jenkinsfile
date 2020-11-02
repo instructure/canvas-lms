@@ -538,7 +538,7 @@ pipeline {
                   }
                 }
 
-                if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
+                if (!configuration.isChangeMerged()) {
                   echo 'adding Linters'
                   timedStage('Linters', stages, {
                     skipIfPreviouslySuccessful("linters") {
