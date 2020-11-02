@@ -2481,6 +2481,11 @@ describe GradebooksController do
         expect(js_env).to have_key :outcome_extra_credit_enabled
       end
 
+      it 'sets media_comment_asset_string' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:media_comment_asset_string)).to eq @teacher.asset_string
+      end
+
       describe "student group filtering" do
         before(:each) do
           @course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
