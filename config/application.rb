@@ -115,6 +115,9 @@ module CanvasRails
     config.middleware.use Rack::Deflater, if: -> (*) {
       ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_deflation"]
     }
+    config.middleware.use Rack::Brotli, if: -> (*) {
+      ::Canvas::DynamicSettings.find(tree: :private)["enable_rack_brotli"]
+    }
 
     config.i18n.load_path << Rails.root.join('config', 'locales', 'locales.yml')
 
