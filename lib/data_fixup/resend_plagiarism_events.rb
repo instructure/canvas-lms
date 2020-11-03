@@ -38,7 +38,7 @@ module DataFixup
   class ResendPlagiarismEvents
     EVENT_NAME = 'plagiarism_resubmit'.freeze
 
-    def self.run(start_time = 3.months.ago, end_time = Time.zone.now)
+    def self.run(start_time: 3.months.ago, end_time: Time.zone.now, only_errors: false)
       limit, = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
 
       # We're going to create all of the jobs that need to run with some far future run date
@@ -46,44 +46,68 @@ module DataFixup
       # then we're going to start the first one.
       batch_end_time = end_time
       loop do
-        batch_start_time = resend_scope(start_time, batch_end_time).limit(limit).pluck(:submitted_at)&.last
+        batch_start_time = resend_scope(start_time, batch_end_time, limit: limit, only_errors: only_errors).
+          pluck(:submitted_at)&.last
         break if batch_start_time.nil?
 
-        schedule_resubmit_job_by_time(batch_start_time, batch_end_time)
+        schedule_resubmit_job_by_time(batch_start_time, batch_end_time, only_errors)
         batch_end_time = batch_start_time
       end
-      run_next_job
+      schedule_next_job
     end
 
-    def self.resend_scope(start_time, end_time)
+    def self.resend_scope(start_time, end_time, limit: nil, only_errors: false)
       raise 'start_time must be less than end_time' unless start_time < end_time
 
-      submission_scope = all_configured_submissions(start_time, end_time)
-      submission_scope.joins(:attachment_associations).
-        joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
+      # this is a limit and order on the subquery scope so the union over the whole submissions table doesn't take forever
+      submission_scope = all_configured_submissions(start_time, end_time).select(:id).order(submitted_at: :desc)
+      submission_scope = submission_scope.limit(limit) if limit
+      submission_scope = only_errors ? errors_report_scope(submission_scope) : missing_report_scope(submission_scope)
+      union_scope = Submission.where("id in (#{submission_scope})").order(submitted_at: :desc)
+      union_scope = union_scope.limit(limit) if limit
+      union_scope
+    end
+
+    def self.missing_report_scope(scope)
+      "(#{scope.joins(:attachment_associations).
+      joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
+              AS ors ON submissions.id = ors.submission_id
+                    AND submissions.submitted_at = ors.submission_time
+                    AND attachment_associations.attachment_id = ors.attachment_id").
+      where("ors.id IS NULL OR ors.workflow_state = 'pending'").to_sql})
+      UNION
+      (#{scope.where(submission_type: 'online_text_entry').
+      joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
+            AS ors ON submissions.id = ors.submission_id
+                  AND submissions.submitted_at = ors.submission_time
+                  AND ors.attachment_id IS NULL").
+      where("ors.id IS NULL OR ors.workflow_state ='pending'").to_sql})"
+    end
+
+    def self.errors_report_scope(scope)
+      "(#{scope.joins(:attachment_associations).
+      joins("INNER JOIN #{OriginalityReport.quoted_table_name}
+              AS ors ON submissions.id = ors.submission_id
+                    AND submissions.submitted_at = ors.submission_time
+                    AND attachment_associations.attachment_id = ors.attachment_id
+                    AND ors.workflow_state = 'error'").to_sql})
+      UNION
+      (#{scope.where(submission_type: 'online_text_entry').
+        joins("INNER JOIN #{OriginalityReport.quoted_table_name}
                 AS ors ON submissions.id = ors.submission_id
                       AND submissions.submitted_at = ors.submission_time
-                      AND attachment_associations.attachment_id = ors.attachment_id
-                      AND ors.workflow_state <> 'scored'").
-        union(
-          submission_scope.where(submission_type: 'online_text_entry').
-          joins("LEFT JOIN #{OriginalityReport.quoted_table_name}
-                  AS ors ON submissions.id = ors.submission_id
-                        AND submissions.submitted_at = ors.submission_time
-                        AND ors.attachment_id IS NULL
-                        AND ors.workflow_state <> 'scored'")
-        ).order(submitted_at: :desc).
-        preload(course: :root_account, assignment: :assignment_configuration_tool_lookups, user: :pseudonyms)
+                      AND ors.attachment_id IS NULL
+                      AND ors.workflow_state = 'error'").to_sql})"
     end
 
-    def self.schedule_resubmit_job_by_time(start_time, end_time)
-      DataFixup::ResendPlagiarismEvents.delay_if_production(priority: Delayed::LOWER_PRIORITY,
+    def self.schedule_resubmit_job_by_time(start_time, end_time, only_errors)
+      DataFixup::ResendPlagiarismEvents.delay(priority: Delayed::LOWER_PRIORITY,
           strand: "plagiarism_event_resend",
           run_at: 1.year.from_now).
-        trigger_plagiarism_resubmit_by_time(start_time, end_time)
+        trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors)
     end
 
-    def self.run_next_job
+    def self.schedule_next_job
       _, wait_time = Setting.get('trigger_plagiarism_resubmit', '100,180').split(',').map(&:to_i)
       Delayed::Job.where(strand: "plagiarism_event_resend", locked_at: nil).
         order(:id).first&.update_attributes(run_at: wait_time.seconds.from_now)
@@ -91,18 +115,19 @@ module DataFixup
 
     # Retriggers the plagiarism resubmit event for the given
     # submission scope.
-    def self.trigger_plagiarism_resubmit_by_time(start_time, end_time)
-      resend_scope(start_time, end_time).each do |submission|
+    def self.trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors=false)
+      # Since we set all of the jobs to be run in a year, we need to schedule the next job to run
+      # so they run every few minutes
+      schedule_next_job
+
+      resend_scope(start_time, end_time, only_errors: only_errors).
+        preload(course: :root_account, assignment: :assignment_configuration_tool_lookups, user: :pseudonyms).each do |submission|
         Canvas::LiveEvents.post_event_stringified(
           ResendPlagiarismEvents::EVENT_NAME,
           Canvas::LiveEvents.get_submission_data(submission),
           context_for_event(submission)
         )
       end
-    ensure
-      # After we finish any job, we need to set the next one to run after the specified
-      # wait time
-      run_next_job
     end
 
     # Returns all submissions for assignments associated with

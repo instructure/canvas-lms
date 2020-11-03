@@ -1870,6 +1870,7 @@ class Assignment < ActiveRecord::Base
     return unless actl
 
     Lti::ToolProxy.proxies_in_order_by_codes(
+      context: self.course,
       vendor_code: actl.tool_vendor_code,
       product_code: actl.tool_product_code,
       resource_type_code: actl.tool_resource_type_code

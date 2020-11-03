@@ -27,58 +27,56 @@ describe DataFixup::ResendPlagiarismEvents do
     assignment_two.tool_settings_tool = message_handler
     assignment.save!
     assignment_two.save!
+
+    @submission = assignment.submit_homework(student, body: 'done')
+    @submission_two = assignment_two.submit_homework(student, body: 'done')
+    @submission_two.originality_reports.create!(workflow_state: 'pending')
+    student2 = student_in_course(course: assignment_two.course).user
+    @submission_three = assignment_two.submit_homework(student2, body: 'done')
+    @submission_three.originality_reports.create!(workflow_state: 'error')
   end
 
   describe '#run' do
-    context 'when there are configured assignments' do
-      before do
-        @submission = assignment.submit_homework(student, body: 'done')
-      end
-
-      context 'when configured submissions have no originality report' do
-        it 'sends events for the submission' do
-          expect(Canvas::LiveEvents).to receive(:post_event_stringified).once.with('plagiarism_resubmit', anything, anything)
+    context 'when only_errors is not provided' do
+      it 'sends events for submissions with no originality report and pending originality reports' do
+        Setting.set('trigger_plagiarism_resubmit', '1,10')
+        Timecop.freeze do
           DataFixup::ResendPlagiarismEvents.run
+          djs = Delayed::Job.where(tag: 'DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time').order(:id)
+          expect(djs.count).to eq 2
+          expect(djs.map(&:payload_object).map(&:args)).to eq([[@submission_two.submitted_at, Time.zone.now, false],
+            [@submission.submitted_at, @submission_two.submitted_at, false]])
+          expect(djs.map(&:run_at)).to eq([10.seconds.from_now, 1.year.from_now])
         end
       end
+    end
 
-      context 'when configured submissions have a non-scored originality report' do
-        before do
-          @submission.originality_reports.create!(workflow_state: 'pending')
-        end
-
-        it 'sends events for the submission' do
-          expect(Canvas::LiveEvents).to receive(:post_event_stringified).once.with('plagiarism_resubmit', anything, anything)
-          DataFixup::ResendPlagiarismEvents.run
+    context 'when only_errors is true' do
+      it 'sends events for the errored submissions' do
+        Timecop.freeze do
+          DataFixup::ResendPlagiarismEvents.run(only_errors: true)
+          expect(Delayed::Job.where(tag: 'DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time').count).to eq 1
+          dj = Delayed::Job.where(tag: 'DataFixup::ResendPlagiarismEvents.trigger_plagiarism_resubmit_by_time').take
+          expect(dj.payload_object.args).to eq([@submission_three.submitted_at, Time.zone.now, true])
+          expect(dj.run_at).to eq(3.minutes.from_now)
         end
       end
+    end
 
-      context 'when a time range is specified' do
-        let(:start_time) { 1.hour.ago }
-        let(:end_time) { Time.zone.now }
+    context 'when a time range is specified' do
+      let(:start_time) { 1.hour.ago }
+      let(:end_time) { 30.minutes.ago }
 
-        before do
-          @submission.update!(submitted_at: start_time - 1.hour)
-        end
-
-        it 'only resends events for submissions in the given time range' do
-          expect(Canvas::LiveEvents).not_to receive(:post_event_stringified)
-          DataFixup::ResendPlagiarismEvents.run(
-            start_time,
-            end_time
-          )
-        end
+      it 'only resends events for submissions in the given time range' do
+        expect{DataFixup::ResendPlagiarismEvents.run(
+          start_time: start_time,
+          end_time: end_time
+        )}.not_to change{Delayed::Job.count}
       end
     end
   end
 
   describe '#trigger_plagiarism_resubmit_by_id' do
-    before do
-      @submission = assignment.submit_homework(student, body: 'done')
-      @submission_two = assignment_two.submit_homework(student, body: 'done')
-      @submission_two.originality_reports.create!(workflow_state: 'pending')
-    end
-
     it 'should trigger the next job in the batch after it finishes' do
       Setting.set('trigger_plagiarism_resubmit', '1,10')
       dj = Delayed::Job.create(strand: "plagiarism_event_resend", locked_at: nil, run_at: 1.year.from_now)
