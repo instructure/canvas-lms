@@ -21,6 +21,7 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
+import {capitalizeFirstLetter} from '@instructure/ui-utils'
 import I18n from 'i18n!ProficiencyTable'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
@@ -125,7 +126,7 @@ class ProficiencyTable extends React.Component {
         return {rows: rows.push(newRow)}
       },
       () => {
-        $.screenReaderFlashMessage(I18n.t('Added new proficiency rating'))
+        $.screenReaderFlashMessage(I18n.t('Added mastery level'))
       }
     )
   }
@@ -151,10 +152,17 @@ class ProficiencyTable extends React.Component {
       () => {
         this.props
           .update(this.stateToConfig())
-          .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
+          .then(() => {
+            $.flashMessage(
+              I18n.t(`%{context} mastery scale saved`, {
+                context: capitalizeFirstLetter(this.props.contextType)
+              })
+            )
+          })
           .catch(e => {
             $.flashError(
-              I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+              I18n.t('An error occurred while saving %{context} mastery scale: %{message}', {
+                context: capitalizeFirstLetter(this.props.contextType),
                 message: e.message
               })
             )
@@ -221,7 +229,7 @@ class ProficiencyTable extends React.Component {
     } else {
       this.setState({rows: rows.setIn([index - 1, 'focusField'], 'trash')})
     }
-    $.screenReaderFlashMessage(I18n.t('Proficiency Rating deleted'))
+    $.screenReaderFlashMessage(I18n.t('Mastery level deleted'))
   })
 
   isStateValid = () =>
@@ -280,7 +288,7 @@ class ProficiencyTable extends React.Component {
             r = r.set('focusField', 'points')
           }
           hasError = true
-          r = r.set('pointsError', I18n.t('Ratings must have a unique point value'))
+          r = r.set('pointsError', I18n.t('Points must be unique'))
         } else {
           r = r.delete('pointsError')
         }
@@ -324,7 +332,7 @@ class ProficiencyTable extends React.Component {
           </Flex.Item>
           <Flex.Item size={isMobileView ? '75%' : '40%'}>
             <div aria-hidden="true" className="header">
-              {isMobileView ? I18n.t('Proficiency Level') : I18n.t('Description')}
+              {isMobileView ? I18n.t('Mastery Levels') : I18n.t('Description')}
             </div>
           </Flex.Item>
           {!isMobileView && (
@@ -377,7 +385,7 @@ class ProficiencyTable extends React.Component {
               borderWidth="none none small none"
             >
               <Button onClick={this.addRow} renderIcon={<IconPlusLine />}>
-                {I18n.t('Add Proficiency Level')}
+                {I18n.t('Add Mastery Level')}
               </Button>
             </View>
             <div className="save">

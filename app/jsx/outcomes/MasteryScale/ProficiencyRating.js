@@ -145,7 +145,7 @@ class ProficiencyRating extends React.Component {
             messages={this.errorMessage(descriptionError)}
             renderLabel={
               <ScreenReaderContent>
-                {I18n.t(`Change description for proficiency rating %{position}`, {position})}
+                {I18n.t(`Change description for mastery level %{position}`, {position})}
               </ScreenReaderContent>
             }
             onChange={this.handleDescriptionChange}
@@ -155,7 +155,7 @@ class ProficiencyRating extends React.Component {
         ) : (
           <Text>
             <ScreenReaderContent>
-              {I18n.t(`Description for proficiency rating %{position}: %{description}`, {
+              {I18n.t(`Description for mastery level %{position}: %{description}`, {
                 position,
                 description
               })}
@@ -176,7 +176,7 @@ class ProficiencyRating extends React.Component {
           <RadioInput
             label={
               <ScreenReaderContent>
-                {I18n.t(`Mastery %{mastery} for proficiency rating %{position}`, {
+                {I18n.t(`Mastery %{mastery} for mastery level %{position}`, {
                   position,
                   mastery
                 })}
@@ -204,7 +204,7 @@ class ProficiencyRating extends React.Component {
               messages={this.errorMessage(pointsError)}
               renderLabel={
                 <ScreenReaderContent>
-                  {I18n.t(`Change points for proficiency rating %{position}`, {position})}
+                  {I18n.t(`Change points for mastery level %{position}`, {position})}
                 </ScreenReaderContent>
               }
               onChange={this.handlePointChange}
@@ -219,7 +219,7 @@ class ProficiencyRating extends React.Component {
         ) : (
           <View margin={`0 0 0 ${isMobileView ? '0' : 'small'}`}>
             <ScreenReaderContent>
-              {I18n.t(`Points for proficiency rating %{position}: %{points}`, {
+              {I18n.t(`Points for mastery level %{position}: %{points}`, {
                 position,
                 points
               })}
@@ -247,7 +247,7 @@ class ProficiencyRating extends React.Component {
                 <div>
                   <span className="colorPickerIcon" style={{background: formatColor(color)}} />
                   <ScreenReaderContent>
-                    {I18n.t(`Change color for proficiency rating %{position}`, {position})}
+                    {I18n.t(`Change color for mastery level %{position}`, {position})}
                   </ScreenReaderContent>
                   <span aria-hidden="true">{I18n.t('Change')}</span>
                 </div>
@@ -282,7 +282,7 @@ class ProficiencyRating extends React.Component {
               }}
             >
               <ScreenReaderContent>
-                {I18n.t(`Color %{color} for proficiency rating %{position}`, {
+                {I18n.t(`Color %{color} for mastery level %{position}`, {
                   color: ColorPicker.getColorName(color) || formatColor(color),
                   position
                 })}
@@ -305,7 +305,7 @@ class ProficiencyRating extends React.Component {
           elementRef={this.setTrashRef}
           onClick={this.handleDelete}
           renderIcon={<IconTrashLine />}
-          screenReaderLabel={I18n.t(`Delete proficiency rating %{position}`, {position})}
+          screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
         />
       </div>
     )

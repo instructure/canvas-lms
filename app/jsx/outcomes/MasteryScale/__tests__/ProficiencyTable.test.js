@@ -20,19 +20,20 @@ import React from 'react'
 import {render, fireEvent, wait, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
-const defaultProps = {
+const defaultProps = (props = {}) => ({
   update: () => Promise.resolve(),
-  contextType: 'Account'
-}
+  contextType: 'Account',
+  ...props
+})
 
 describe('default proficiency', () => {
-  let flashMock
+  let srFlashMock
   beforeEach(() => {
-    flashMock = jest.spyOn($, 'screenReaderFlashMessage')
+    srFlashMock = jest.spyOn($, 'screenReaderFlashMessage')
   })
 
   afterEach(() => {
-    flashMock.mockRestore()
+    srFlashMock.mockRestore()
   })
 
   it('renders the correct headers', () => {
@@ -51,7 +52,7 @@ describe('default proficiency', () => {
 
   it('clicking button adds rating', () => {
     const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getByText(/Add Proficiency Level/)
+    const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
     const inputs = getAllByLabelText(/Change description/)
     expect(inputs.length).toEqual(6)
@@ -59,16 +60,16 @@ describe('default proficiency', () => {
 
   it('clicking add rating button flashes SR message', () => {
     const {getByText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getByText(/Add Proficiency Level/)
+    const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
-    expect(flashMock).toHaveBeenCalledTimes(1)
+    expect(srFlashMock).toHaveBeenCalledTimes(1)
   })
 
   it('handling delete rating removes rating and flashes SR message', () => {
     const {getAllByText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getAllByText(/Delete proficiency rating/)[0]
+    const button = getAllByText(/Delete mastery level/)[0]
     fireEvent.click(button)
-    expect(flashMock).toHaveBeenCalledTimes(1)
+    expect(srFlashMock).toHaveBeenCalledTimes(1)
   })
 
   it('setting blank description sets error and focus', async () => {
@@ -118,9 +119,7 @@ describe('default proficiency', () => {
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '4'}})
     fireEvent.click(getByText('Save Mastery Scale'))
-    const error = await within(pointsInput.closest('.points')).findByText(
-      'Ratings must have a unique point value'
-    )
+    const error = await within(pointsInput.closest('.points')).findByText('Points must be unique')
     expect(error).not.toBeNull()
     expect(document.activeElement).toEqual(pointsInput.closest('input'))
   })
@@ -135,16 +134,20 @@ describe('default proficiency', () => {
     expect(document.activeElement).toEqual(masteryField.closest('input'))
   })
 
-  it('renders confirmation modal and calls update on save', async () => {
+  it('renders confirmation modal, calls update on save, and flashes a message to the user', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
+    const flashMock = jest.spyOn($, 'flashMessage')
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps({contextType: 'course'})} update={updateSpy} />
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
     fireEvent.click(getByText('Save Mastery Scale'))
     fireEvent.click(getByText('Save'))
-    expect(updateSpy).toHaveBeenCalled()
+    await wait(() => {
+      expect(updateSpy).toHaveBeenCalled()
+      expect(flashMock).toHaveBeenCalledWith('Course mastery scale saved')
+    })
   })
 
   it('does not call save when canceling on the confirmation modal', async () => {
@@ -260,7 +263,7 @@ describe('custom proficiency', () => {
       }
     }
     const {getAllByText} = render(<ProficiencyTable {...customProficiencyProps} />)
-    const deleteButtons = getAllByText(/Delete proficiency rating/).map(el => el.closest('button'))
+    const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
     expect(deleteButtons.length).toEqual(2)
     expect(deleteButtons.some(btn => btn.disabled)).toEqual(false)
   })
@@ -299,7 +302,7 @@ describe('custom proficiency', () => {
       const {getAllByLabelText, getByText, getByDisplayValue} = render(
         <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
       )
-      const button = getByText(/Add Proficiency Level/)
+      const button = getByText(/Add Mastery Level/)
       fireEvent.click(button)
 
       const pointsInput = getByDisplayValue('2')
@@ -342,9 +345,7 @@ describe('custom proficiency', () => {
       fireEvent.click(getByText('Save Mastery Scale'))
       fireEvent.click(getByText('Save'))
 
-      const masteryRatings = getAllByLabelText(/Mastery.*for proficiency rating/).map(
-        el => el.checked
-      )
+      const masteryRatings = getAllByLabelText(/Mastery.*for mastery level/).map(el => el.checked)
       const expectedMasteryRatings = [false, false, true]
       expect(masteryRatings).toEqual(expectedMasteryRatings)
 
@@ -361,7 +362,7 @@ describe('custom proficiency', () => {
       const {getAllByLabelText, getByText} = render(
         <ProficiencyTable {...customProficiencyProps} update={updateSpy} />
       )
-      const button = getByText(/Add Proficiency Level/)
+      const button = getByText(/Add Mastery Level/)
       fireEvent.click(button)
 
       const descriptionInput = getAllByLabelText(/Change description/)[3]
@@ -369,9 +370,7 @@ describe('custom proficiency', () => {
       fireEvent.click(getByText('Save Mastery Scale'))
       fireEvent.click(getByText('Save'))
 
-      const masteryRatings = getAllByLabelText(/Mastery.*for proficiency rating/).map(
-        el => el.checked
-      )
+      const masteryRatings = getAllByLabelText(/Mastery.*for mastery level/).map(el => el.checked)
       const expectedMasteryRatings = [false, true, false, false]
       expect(masteryRatings).toEqual(expectedMasteryRatings)
 
@@ -394,8 +393,8 @@ describe('custom proficiency', () => {
       )
 
       const pointsInput = getByDisplayValue('3')
-      const masteryButton = getAllByText(/Mastery.*for proficiency rating/)[2].closest('label')
-      const deleteButton = getAllByText(/Delete proficiency rating/)[0].closest('button')
+      const masteryButton = getAllByText(/Mastery.*for mastery level/)[2].closest('label')
+      const deleteButton = getAllByText(/Delete mastery level/)[0].closest('button')
 
       fireEvent.change(pointsInput, {target: {value: '20'}})
       fireEvent.click(masteryButton)
@@ -430,7 +429,7 @@ describe('custom proficiency', () => {
       }
     }
     const {getAllByText} = render(<ProficiencyTable {...props} />)
-    const deleteButtons = getAllByText(/Delete proficiency rating/).map(el => el.closest('button'))
+    const deleteButtons = getAllByText(/Delete mastery level/).map(el => el.closest('button'))
     expect(deleteButtons.length).toEqual(1)
     expect(deleteButtons[0].disabled).toEqual(true)
   })
@@ -466,7 +465,7 @@ describe('custom proficiency', () => {
 
     it('does not render Add button', () => {
       const {queryByText} = render(<ProficiencyTable {...props} />)
-      expect(queryByText('Add Proficiency Level')).not.toBeInTheDocument()
+      expect(queryByText('Add Mastery Scale')).not.toBeInTheDocument()
     })
   })
 })

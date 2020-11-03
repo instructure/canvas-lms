@@ -47,14 +47,14 @@ export default class ConfirmMasteryScaleEdit extends Component {
       )
     }
     return I18n.t(
-      'This will update all account and course level rubrics that are tied to account level mastery scales and have not yet been assessed.'
+      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.'
     )
   }
 
   render() {
     return (
       <Modal
-        label={I18n.t('Confirm Mastery Scales')}
+        label={I18n.t('Confirm Mastery Scale')}
         open={this.props.isOpen}
         onDismiss={this.onClose}
         size="small"

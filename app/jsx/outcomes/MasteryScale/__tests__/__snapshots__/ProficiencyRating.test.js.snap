@@ -34,7 +34,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           <ScreenReaderContent
             as="span"
           >
-            Mastery false for proficiency rating 1
+            Mastery false for mastery level 1
           </ScreenReaderContent>
         }
         onChange={[Function]}
@@ -71,7 +71,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           <ScreenReaderContent
             as="span"
           >
-            Change description for proficiency rating 1
+            Change description for mastery level 1
           </ScreenReaderContent>
         }
         shouldNotWrap={false}
@@ -108,7 +108,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
           <ScreenReaderContent
             as="span"
           >
-            Change points for proficiency rating 1
+            Change points for mastery level 1
           </ScreenReaderContent>
         }
         shouldNotWrap={false}
@@ -197,7 +197,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
               <ScreenReaderContent
                 as="span"
               >
-                Change color for proficiency rating 1
+                Change color for mastery level 1
               </ScreenReaderContent>
               <span
                 aria-hidden="true"
@@ -313,7 +313,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         margin="0"
         onClick={[Function]}
         renderIcon={<IconTrashLine />}
-        screenReaderLabel="Delete proficiency rating 1"
+        screenReaderLabel="Delete mastery level 1"
         shape="rectangle"
         size="medium"
         type="button"
@@ -372,7 +372,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
         <ScreenReaderContent
           as="span"
         >
-          Description for proficiency rating 1: Stellar
+          Description for mastery level 1: Stellar
         </ScreenReaderContent>
         <PresentationContent
           as="span"
@@ -410,7 +410,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
         <ScreenReaderContent
           as="span"
         >
-          Points for proficiency rating 1: 10.0
+          Points for mastery level 1: 10.0
         </ScreenReaderContent>
         <PresentationContent
           as="span"
@@ -446,7 +446,7 @@ exports[`ProficiencyRating can not manage renders the ProficiencyRating componen
         <ScreenReaderContent
           as="span"
         >
-          Color #00ff00 for proficiency rating 1
+          Color #00ff00 for mastery level 1
         </ScreenReaderContent>
       </span>
     </div>
