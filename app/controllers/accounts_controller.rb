@@ -661,10 +661,16 @@ class AccountsController < ApplicationController
       search_term = params[:search_term]
       SearchTermHelper.validate_search_term(search_term)
 
-      if params[:search_by] == "teacher"
-        @courses = @courses.where("EXISTS (?)", TeacherEnrollment.active.joins(:user).where(
-          ActiveRecord::Base.wildcard('users.name', params[:search_term])
-        ).where("enrollments.course_id=courses.id"))
+      if params[:search_by] == 'teacher'
+        @courses =
+          @courses.where(
+            'EXISTS (?)',
+            TeacherEnrollment.active.joins(:user).where(
+              ActiveRecord::Base.wildcard('users.name', params[:search_term])
+            ).where(
+              "enrollments.workflow_state NOT IN ('rejected', 'inactive', 'completed', 'deleted') AND enrollments.course_id=courses.id"
+            )
+          )
       else
         name = ActiveRecord::Base.wildcard('courses.name', search_term)
         code = ActiveRecord::Base.wildcard('courses.course_code', search_term)

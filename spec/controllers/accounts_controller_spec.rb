@@ -1262,6 +1262,46 @@ describe AccountsController do
       expect(response.body).to match(/\"name\":\"hot dog eating\".+\"name\":\"xylophone\"/)
     end
 
+    it "should filter course search by teacher enrollment state" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
+
+      user = @c3.shard.activate { user_factory(name: 'rejected') }
+      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
+      user.save!
+      enrollment.course = @c3
+      enrollment.workflow_state = 'rejected'
+      enrollment.save!
+
+      user2 = @c3.shard.activate { user_factory(name: 'inactive') }
+      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user2.save!
+      enrollment2.course = @c3
+      enrollment2.workflow_state = 'inactive'
+      enrollment2.save!
+
+      user3 = @c3.shard.activate { user_factory(name: 'completed') }
+      enrollment3 = @c3.enroll_user(user, 'TeacherEnrollment')
+      user3.save!
+      enrollment3.course = @c3
+      enrollment3.workflow_state = 'completed'
+      enrollment3.save!
+
+      user4 = @c3.shard.activate { user_factory(name: 'deleted') }
+      enrollment4 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user4.save!
+      enrollment4.course = @c3
+      enrollment4.workflow_state = 'deleted'
+      enrollment4.save!
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "hot dog eating", sis_source_id: 63))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach"}
+
+      expect(JSON.parse(response.body.sub("while(1)\;", '')).length).to eq 2
+    end
+
     it "should be able to search by course name" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
