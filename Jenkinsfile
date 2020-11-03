@@ -112,26 +112,51 @@ def cleanupFn(status) {
 }
 
 def postFn(status) {
-  def requestStartTime = System.currentTimeMillis()
-  node('master') {
-    def requestEndTime = System.currentTimeMillis()
+  try {
+    def requestStartTime = System.currentTimeMillis()
+    node('master') {
+      def requestEndTime = System.currentTimeMillis()
 
-    reportToSplunk('node_request_time', [
-      'nodeName': 'master',
-      'nodeLabel': 'master',
-      'requestTime': requestEndTime - requestStartTime,
-    ])
+      reportToSplunk('node_request_time', [
+        'nodeName': 'master',
+        'nodeLabel': 'master',
+        'requestTime': requestEndTime - requestStartTime,
+      ])
 
-    failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
-    failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
-    failureReport.submit()
-  }
+      failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
+      failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
+      failureReport.submit()
 
-  if(status == 'FAILURE') {
-    maybeSlackSendFailure()
-    maybeRetrigger()
-  } else if(status == 'SUCCESS') {
-    maybeSlackSendSuccess()
+      if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
+        withCredentials([
+          usernamePassword(
+            credentialsId: 'starlord',
+            usernameVariable: 'STARLORD_USERNAME',
+            passwordVariable: 'STARLORD_PASSWORD'
+          )
+        ]) {
+          def tagParts = env.PATCHSET_TAG.split(":")
+          def pathParts = tagParts[0].split("/", 2)
+
+          def CONTENT_TYPE = "application/vnd.docker.distribution.manifest.v2+json"
+          def SOURCE_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${tagParts[1]}"
+          def TARGET_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/master"
+
+          sh """
+            MANIFEST=\$(curl -H "Accept: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD $SOURCE_URL)
+
+            curl -X PUT -H "Content-Type: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD -d "\$MANIFEST" $TARGET_URL
+          """
+        }
+      }
+    }
+  } finally {
+    if(status == 'FAILURE') {
+      maybeSlackSendFailure()
+      maybeRetrigger()
+    } else if(status == 'SUCCESS') {
+      maybeSlackSendSuccess()
+    }
   }
 }
 
@@ -497,6 +522,11 @@ pipeline {
                     sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
                     sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
                     slackSendCacheAvailable('post-merge')
+
+                    def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                    sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
+
+                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
                   }
                 }
               }
@@ -661,28 +691,6 @@ pipeline {
                 distribution.addSeleniumSuites(stages)
 
                 parallel(stages)
-              }
-            }
-
-            if(configuration.isChangeMerged() && isPatchsetPublishable()) {
-              timedStage('Publish Image on Merge') {
-                timeout(time: 10) {
-                  // Retriggers won't have an image to tag/push, pull that
-                  // image if doesn't exist. If image is not found it will
-                  // return NULL
-                  if (!sh (script: 'docker images -q $PATCHSET_TAG')) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
-                  }
-
-                  // publish canvas-lms:$GERRIT_BRANCH (i.e. canvas-lms:master)
-                  sh 'docker tag $PUBLISHABLE_TAG $MERGE_TAG'
-
-                  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                  sh "docker tag \$PUBLISHABLE_TAG \$BUILD_IMAGE:${GIT_REV}"
-
-                  // push *all* canvas-lms images (i.e. all canvas-lms prefixed tags)
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $BUILD_IMAGE'
-                }
               }
             }
 
