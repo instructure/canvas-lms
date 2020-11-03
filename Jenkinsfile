@@ -379,23 +379,8 @@ pipeline {
                 sh 'ls -A1 | xargs rm -rf'
                 sh 'find .'
                 cleanAndSetup()
-
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
-
-                checkout([
-                  $class: 'GitSCM',
-                  branches: [[name: 'FETCH_HEAD']],
-                  doGenerateSubmoduleConfigurations: false,
-                  extensions: [[$class: 'CloneOption', depth: 100, honorRefspec: true, noTags: true, shallow: true]],
-                  submoduleCfg: [],
-                  userRemoteConfigs: [[
-                    credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
-                    name: 'origin',
-                    refspec: refspecToCheckout,
-                    url: "ssh://gerrit.instructure.com:29418/canvas-lms.git"
-                  ]]
-                ])
-
+                checkoutRepo("canvas-lms", refspecToCheckout, 100)
                 buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
@@ -424,19 +409,7 @@ pipeline {
                   if (env.GERRIT_PROJECT == gem) {
                     /* this is the commit we're testing */
                     dir(env.LOCAL_WORKDIR) {
-                      checkout([
-                        $class: 'GitSCM',
-                        branches: [[name: 'FETCH_HEAD']],
-                        doGenerateSubmoduleConfigurations: false,
-                        extensions: [[$class: 'CloneOption', depth: 1, honorRefspec: true, noTags: true, shallow: true]],
-                        submoduleCfg: [],
-                        userRemoteConfigs: [[
-                          credentialsId: '44aa91d6-ab24-498a-b2b4-911bcb17cc35',
-                          name: 'origin',
-                          refspec: "$env.GERRIT_REFSPEC",
-                          url: "ssh://$GERRIT_URL/${GERRIT_PROJECT}.git"
-                        ]]
-                      ])
+                      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
                     }
                   } else {
                     pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
