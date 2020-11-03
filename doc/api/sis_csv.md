@@ -273,7 +273,7 @@ still be provided.</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns.</td>
+<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
 </tr>
 <tr>
 <td>status</td>
