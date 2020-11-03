@@ -1498,6 +1498,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.preload_unposted_anonymous_submissions(assignments)
+    # Don't do anything if there are no assignments OR unposted anonymous submissions are already preloaded
+    if assignments.is_a?(Array) &&
+      (assignments.empty? || assignments.all? { |a| !a.unposted_anonymous_submissions.nil? })
+      return
+    end
+
     assignment_ids_with_unposted_anonymous_submissions = Assignment.
       where(id: assignments, anonymous_grading: true).
       where(
@@ -1512,6 +1518,8 @@ class Assignment < ActiveRecord::Base
     assignments.each do |assignment|
       assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
     end
+
+    nil
   end
 
   def touch_on_unlock_if_necessary

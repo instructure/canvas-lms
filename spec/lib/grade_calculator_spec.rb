@@ -485,6 +485,38 @@ describe GradeCalculator do
             end
           end
 
+          context "with unposted anonymous assignments" do
+            let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: false) }
+            let(:computed_score_data) { calculator.compute_scores.first }
+
+            before(:each) do
+              @anonymized_assignment = @course.assignments.create!(anonymous_grading: true)
+              @anonymized_assignment.grade_student(@user, grade: "10", grader: @teacher)
+            end
+
+            it "does not incorporate submissions for unposted anonymous assignments" do
+              expect(computed_score_data[:current][:grade]).to eq 75.0
+            end
+
+            it "incorporates submissions for posted anonymous assignments" do
+              @anonymized_assignment.post_submissions
+              expect(computed_score_data[:current][:grade]).to eq 125.0
+            end
+
+            context "when including unposted anonymous assignments in grade calculations" do
+              let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: false, ignore_unposted_anonymous: false) }
+
+              it "incorporates submissions for unposted anonymous assignments" do
+                expect(computed_score_data[:current][:grade]).to eq 125.0
+              end
+
+              it "incorporates submissions for posted anonymous assignments" do
+                @anonymized_assignment.post_submissions
+                expect(computed_score_data[:current][:grade]).to eq 125.0
+              end
+            end
+          end
+
           describe "persisting score data" do
             let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: true) }
             let(:enrollment) { Enrollment.find_by!(user: @user, course: @course) }

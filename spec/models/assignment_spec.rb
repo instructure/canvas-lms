@@ -44,8 +44,8 @@ describe Assignment do
   it { is_expected.not_to validate_presence_of(:final_grader) }
 
   it "should create a new instance given valid attributes" do
-    course = @course.assignments.create!(assignment_valid_attributes)
-    expect(course).to be_valid
+    assignment = @course.assignments.create!(assignment_valid_attributes)
+    expect(assignment).to be_valid
   end
 
   it "should set the lti_context_id on create" do
@@ -1385,6 +1385,38 @@ describe Assignment do
         updated_at: now
       )
       described_class.clean_up_duplicating_assignments
+    end
+  end
+
+  describe ".preload_unposted_anonymous_submissions" do
+    it "preloads unposted anonymous submissions for an assignment" do
+      assignment = @course.assignments.create!(assignment_valid_attributes.merge(anonymous_grading: true))
+      expect(Assignment).to receive(:where).once.and_call_original
+      expect { Assignment.preload_unposted_anonymous_submissions([assignment]) }.to change {
+        assignment.unposted_anonymous_submissions
+      }.from(nil).to(true)
+    end
+
+    it "preloads if some assignments have the attribute preloaded but others do not" do
+      assignment = @course.assignments.create!(assignment_valid_attributes.merge(anonymous_grading: true))
+      other_assignment = @course.assignments.create!(assignment_valid_attributes.merge(anonymous_grading: true))
+      assignment.unposted_anonymous_submissions = true
+      expect(Assignment).to receive(:where).once.and_call_original
+      Assignment.preload_unposted_anonymous_submissions([assignment, other_assignment])
+    end
+
+    it "does not attempt to preload if all assignments already have the attribute preloaded" do
+      assignment = @course.assignments.create!(assignment_valid_attributes.merge(anonymous_grading: true))
+      other_assignment = @course.assignments.create!(assignment_valid_attributes.merge(anonymous_grading: true))
+      assignment.unposted_anonymous_submissions = true
+      other_assignment.unposted_anonymous_submissions = true
+      expect(Assignment).not_to receive(:where)
+      Assignment.preload_unposted_anonymous_submissions([assignment, other_assignment])
+    end
+
+    it "does not attempt to preload if given an empty array" do
+      expect(Assignment).not_to receive(:where)
+      Assignment.preload_unposted_anonymous_submissions([])
     end
   end
 

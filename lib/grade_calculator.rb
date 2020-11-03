@@ -49,7 +49,20 @@ class GradeCalculator
     # if we're updating a grading period score, we also need to update the
     # overall course score
     @update_course_score = @grading_period.present? && opts[:update_course_score]
-    @assignments = opts[:assignments] || @course.assignments.published.gradeable.to_a
+    @ignore_unposted_anonymous = opts.fetch(
+      :ignore_unposted_anonymous,
+      @course.root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous)
+    )
+    @assignments = (opts[:assignments] || @course.assignments.published.gradeable).to_a
+
+    if @ignore_unposted_anonymous
+      Assignment.preload_unposted_anonymous_submissions(@assignments)
+
+      # Ignore anonymous assignments with unposted submissions in the grade calculation
+      # so that we don't break anonymity prior to the assignment being posted
+      # (which is when identities are revealed)
+      @assignments.reject!(&:unposted_anonymous_submissions?)
+    end
 
     @user_ids = Array(user_ids).map { |id| Shard.relative_id_for(id, Shard.current, @course.shard) }
     @current_updates = {}
@@ -335,6 +348,7 @@ class GradeCalculator
       assignments: @assignments,
       emit_live_event: @emit_live_event,
       ignore_muted: @ignore_muted,
+      ignore_unposted_anonymous: @ignore_unposted_anonymous,
       periods: grading_periods_for_course,
       effective_due_dates: effective_due_dates,
       enrollments: enrollments,
