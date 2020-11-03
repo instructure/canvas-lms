@@ -331,8 +331,8 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:$GERRIT_BRANCH"
-    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:$GERRIT_BRANCH"
+    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:${configuration.gerritBranchSanitized()}"
+    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:${configuration.gerritBranchSanitized()}"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -430,23 +430,40 @@ pipeline {
                     sh '''#!/bin/bash
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-
-                      if ! git merge-base HEAD origin/master; then
-                        echo "Error: your branch is over 100 commits behind, please rebase your branch manually."
-                        exit $exit_status
-                      fi
-
                       git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
                       git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-                      # store exit_status inline to  ensures the script doesn't exit here on failures
+                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+
+                      if ! git merge-base HEAD origin/$GERRIT_BRANCH; then
+                        echo "Error: your branch is over 100 commits behind $GERRIT_BRANCH, please rebase your branch manually."
+                        exit $exit_status
+                      fi
+
                       git rebase --preserve-merges --stat origin/$GERRIT_BRANCH; exit_status=$?
                       if [ $exit_status != 0 ]; then
                         echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
                         git rebase --abort
                         exit $exit_status
+                      fi
+
+                      if [[ $GERRIT_BRANCH == 'dev/'* ]]; then
+                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                          git fetch --depth 100 --force --no-tags origin master:origin/master
+
+                        if ! git merge-base HEAD origin/master; then
+                          echo "Error: your branch is over 100 commits behind master, please rebase your branch manually."
+                          exit $exit_status
+                        fi
+
+                        # store exit_status inline to  ensures the script doesn't exit here on failures
+                        git rebase --preserve-merges --stat origin/master; exit_status=$?
+                        if [ $exit_status != 0 ]; then
+                          echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                         git rebase --abort
+                          exit $exit_status
+                        fi
                       fi
                     '''
                   })
