@@ -149,19 +149,17 @@ def _runRspecTestSuite(
   }
 }
 
-def uploadSeleniumCoverageIfSuccessful() {
-  _uploadCoverageIfSuccessful('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
+def uploadSeleniumCoverage() {
+  _uploadCoverage('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
 }
 
-def uploadRSpecCoverageIfSuccessful() {
-  _uploadCoverageIfSuccessful('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
+def uploadRSpecCoverage() {
+  _uploadCoverage('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
 }
 
-def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
-  if (successes.hasSuccess(prefix, total)) {
-    def reports = load 'build/new-jenkins/groovy/reports.groovy'
-    reports.publishSpecCoverageToS3(prefix, total, coverage_name)
-  }
+def _uploadCoverage(prefix, total, coverage_name) {
+  def reports = load 'build/new-jenkins/groovy/reports.groovy'
+  reports.publishSpecCoverageToS3(prefix, total, coverage_name)
 }
 
 def uploadParallelLog() {

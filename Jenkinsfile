@@ -43,18 +43,6 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-def skipIfPreviouslySuccessful(name, block) {
-  if (env.CANVAS_LMS_REFSPEC && !env.CANVAS_LMS_REFSPEC.contains('master')) {
-    name+="${env.CANVAS_LMS_REFSPEC}"
-  }
-  if (env.SKIP_CACHE.toBoolean()) {
-    echo "Build cache is disabled; forcing step ${name} to run, even if it was already successful."
-    block()
-  } else {
-    successes.skipIfPreviouslySuccessful(name, block)
-  }
-}
-
 def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
   try {
     build(job: jobName, parameters: parameters, propagate: propagate)
@@ -468,39 +456,37 @@ pipeline {
 
             timedStage('Build Docker Image') {
               timeout(time: 30) {
-                skipIfPreviouslySuccessful('docker-build-and-push') {
-                  if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
-                    sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
-                  } else {
-                    slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
-                      withEnv([
-                        "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
-                        "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
-                        "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
-                      ]) {
-                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
-                      }
+                if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
+                  sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
+                } else {
+                  slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
+                    withEnv([
+                      "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
+                      "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
+                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
+                    ]) {
+                      sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                     }
                   }
+                }
 
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
-                  if (isPatchsetPublishable()) {
-                    sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-                  }
+                if (isPatchsetPublishable()) {
+                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
+                }
 
-                  if (configuration.isChangeMerged()) {
-                    sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
-                    sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
-                    slackSendCacheAvailable('post-merge')
+                if (configuration.isChangeMerged()) {
+                  sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
+                  slackSendCacheAvailable('post-merge')
 
-                    def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-                    sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
+                  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+                  sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
-                    sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
-                  }
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
                 }
               }
             }
@@ -529,19 +515,17 @@ pipeline {
                 if (configuration.isChangeMerged()) {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
-                    skipIfPreviouslySuccessful("build-docker-cache") {
-                      withEnv([
-                        "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
-                        "COMPILE_ADDITIONAL_ASSETS=0",
-                        "JS_BUILD_NO_UGLIFY=1"
-                      ]) {
-                        slackSendCacheBuild('pre-merge') {
-                          sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
-                        }
-
-                        sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
-                        slackSendCacheAvailable('pre-merge')
+                    withEnv([
+                      "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
+                      "COMPILE_ADDITIONAL_ASSETS=0",
+                      "JS_BUILD_NO_UGLIFY=1"
+                    ]) {
+                      slackSendCacheBuild('pre-merge') {
+                        sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
                       }
+
+                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
+                      slackSendCacheAvailable('pre-merge')
                     }
                   }
                 }
@@ -549,14 +533,12 @@ pipeline {
                 if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
                   echo 'adding Linters'
                   timedStage('Linters', stages, {
-                    skipIfPreviouslySuccessful("linters") {
-                      credentials.withGerritCredentials {
-                        sh 'build/new-jenkins/linters/run-gergich.sh'
-                      }
-                      if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
-                        credentials.withMasterBouncerCredentials {
-                          sh 'build/new-jenkins/linters/run-master-bouncer.sh'
-                        }
+                    credentials.withGerritCredentials {
+                      sh 'build/new-jenkins/linters/run-gergich.sh'
+                    }
+                    if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
+                      credentials.withMasterBouncerCredentials {
+                        sh 'build/new-jenkins/linters/run-master-bouncer.sh'
                       }
                     }
                   })
@@ -564,49 +546,39 @@ pipeline {
 
                 echo 'adding Consumer Smoke Test'
                 timedStage('Consumer Smoke Test', stages, {
-                  skipIfPreviouslySuccessful("consumer-smoke-test") {
-                    sh 'build/new-jenkins/consumer-smoke-test.sh'
-                  }
+                  sh 'build/new-jenkins/consumer-smoke-test.sh'
                 })
 
                 echo 'adding Vendored Gems'
                 timedStage('Vendored Gems', stages, {
-                  skipIfPreviouslySuccessful("vendored-gems") {
-                    wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], true, "")
-                  }
+                  wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                  ], true, "")
                 })
 
                 echo 'adding Javascript (Jest)'
                 timedStage('Javascript (Jest)', stages, {
-                  skipIfPreviouslySuccessful("javascript_jest") {
-                    wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
-                      string(name: 'TEST_SUITE', value: "jest"),
-                    ], true, "testReport")
-                  }
+                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'TEST_SUITE', value: "jest"),
+                  ], true, "testReport")
                 })
 
                 echo 'adding Javascript (Karma)'
                 timedStage('Javascript (Karma)', stages, {
-                  skipIfPreviouslySuccessful("javascript_karma") {
-                    wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
-                      string(name: 'TEST_SUITE', value: "karma"),
-                    ], true, "testReport")
-                  }
+                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'TEST_SUITE', value: "karma"),
+                  ], true, "testReport")
                 })
 
                 echo 'adding Contract Tests'
                 timedStage('Contract Tests', stages, {
-                  skipIfPreviouslySuccessful("contract-tests") {
-                    wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], true, "")
-                  }
+                  wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
+                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                  ], true, "")
                 })
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
@@ -630,24 +602,20 @@ pipeline {
                 ) {
                   echo 'adding Flakey Spec Catcher'
                   timedStage('Flakey Spec Catcher', stages, {
-                    skipIfPreviouslySuccessful("flakey-spec-catcher") {
-                      def propagate = configuration.fscPropagate()
-                      echo "fsc propagation: $propagate"
-                      wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
-                        string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                        string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                        string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                      ], propagate, "")
-                    }
+                    def propagate = configuration.fscPropagate()
+                    echo "fsc propagation: $propagate"
+                    wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ], propagate, "")
                   })
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
                   echo 'adding Local Docker Dev Build'
                   timedStage('Local Docker Dev Build', stages, {
-                    skipIfPreviouslySuccessful("local-docker-dev-smoke") {
-                      wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
-                    }
+                    wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
                   })
                 }
 
@@ -666,13 +634,9 @@ pipeline {
                 parallel(stages)
               }
             }
-
-            timedStage('Mark Build as Successful') {
-              successes.markBuildAsSuccessful()
-            }
           }//protectedNode
         }//script
       }//steps
     }//environment
   }//stages
-}//pipline
+}//pipeline
