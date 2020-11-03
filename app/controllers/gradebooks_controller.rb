@@ -121,6 +121,7 @@ class GradebooksController < ApplicationController
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
 
     ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
+    root_account = @context.root_account
 
     js_hash = {
       submissions: submissions_json,
@@ -128,6 +129,7 @@ class GradebooksController < ApplicationController
       assignment_sort_options: @presenter.sort_options,
       group_weighting_scheme: @context.group_weighting_scheme,
       show_total_grade_as_points: @context.show_total_grade_as_points?,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       grading_scheme: @context.grading_standard_or_default.data,
       current_grading_period_id: @current_grading_period_id,
       current_assignment_sort_order: @presenter.assignment_order,
@@ -137,7 +139,7 @@ class GradebooksController < ApplicationController
       courses_with_grades: courses_with_grades_json,
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
-      gradebook_non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
+      gradebook_non_scoring_rubrics_enabled: root_account.feature_enabled?(:non_scoring_rubrics),
       rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: 'full'),
       rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
@@ -383,6 +385,7 @@ class GradebooksController < ApplicationController
     grading_standard = @context.grading_standard_or_default
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
     visible_sections = @context.sections_visible_to(@current_user)
+    root_account = @context.root_account
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -442,13 +445,14 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
-      login_handle_name: @context.root_account.settings[:login_handle_name],
+      login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
@@ -468,11 +472,11 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
+      show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
       sis_app_url: Setting.get('sis_app_url', nil),
-      sis_name: @context.root_account.settings[:sis_name],
+      sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       # TODO: remove `students_stateless_url` with TALLY-831
@@ -507,6 +511,7 @@ class GradebooksController < ApplicationController
     grading_standard = @context.grading_standard_or_default
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
     visible_sections = @context.sections_visible_to(@current_user)
+    root_account = @context.root_account
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -557,13 +562,14 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
-      login_handle_name: @context.root_account.settings[:login_handle_name],
+      login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
@@ -584,11 +590,11 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
+      show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
       sis_app_url: Setting.get('sis_app_url', nil),
-      sis_name: @context.root_account.settings[:sis_name],
+      sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),

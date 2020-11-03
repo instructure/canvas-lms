@@ -308,6 +308,7 @@ function calculateGrades() {
       ENV.submissions,
       ENV.assignment_groups,
       ENV.group_weighting_scheme,
+      ENV.grade_calc_ignore_unposted_anonymous_enabled,
       getGradingPeriodSet(),
       scopeToUser(ENV.effective_due_dates, ENV.student_id)
     )
@@ -315,7 +316,8 @@ function calculateGrades() {
     grades = CourseGradeCalculator.calculate(
       ENV.submissions,
       ENV.assignment_groups,
-      ENV.group_weighting_scheme
+      ENV.group_weighting_scheme,
+      ENV.grade_calc_ignore_unposted_anonymous_enabled
     )
   }
 

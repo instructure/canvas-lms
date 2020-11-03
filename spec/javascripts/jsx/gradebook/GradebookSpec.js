@@ -367,7 +367,7 @@ test('calculates grades using properties from the gradebook', function() {
   equal(args[0], this.submissions)
   equal(args[1], gradebook.assignmentGroups)
   equal(args[2], gradebook.options.group_weighting_scheme)
-  equal(args[3], gradebook.gradingPeriodSet)
+  equal(args[4], gradebook.gradingPeriodSet)
 })
 
 test('scopes effective due dates to the user', function() {
@@ -378,7 +378,7 @@ test('scopes effective due dates to the user', function() {
     loaded: true,
     initialized: true
   })
-  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
   deepEqual(dueDates, {
     201: {
       grading_period_id: '701'
@@ -418,8 +418,8 @@ test('calculates grades without grading period data when effective due dates are
   equal(args[0], this.submissions)
   equal(args[1], gradebook.assignmentGroups)
   equal(args[2], gradebook.options.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
 test('stores the current grade on the student if not viewing ungraded as zero', function() {

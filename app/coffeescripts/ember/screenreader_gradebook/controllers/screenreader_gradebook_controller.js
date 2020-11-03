@@ -537,6 +537,7 @@ const ScreenreaderGradebookController = Ember.ObjectController.extend({
       submissions,
       assignmentGroups,
       weightingScheme,
+      ENV?.GRADEBOOK_OPTIONS?.grade_calc_ignore_unposted_anonymous_enabled,
       hasGradingPeriods ? gradingPeriodSet : undefined,
       hasGradingPeriods ? scopeToUser(effectiveDueDates, student.id) : undefined
     )
