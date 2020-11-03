@@ -5100,7 +5100,7 @@
     classnames "^2"
     prop-types "^15"
 
-"@instructure/ui-tooltip@^6.22.0", "@instructure/ui-tooltip@^6.24.0", "@instructure/ui-tooltip@^6.26.0":
+"@instructure/ui-tooltip@6", "@instructure/ui-tooltip@^6.22.0", "@instructure/ui-tooltip@^6.24.0", "@instructure/ui-tooltip@^6.26.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-tooltip/-/ui-tooltip-6.27.0.tgz#c9389b7a18d5832150a6bf06ceee64d17640bbde"
   integrity sha512-+5MpoOhoMGaOmtjoHa0WmRjKqu4/RR3kyFcE1/YK41GDGgxSEYVMtCgGO8XzF9PeNfARxpttRsjlDRA1lQEhWA==
