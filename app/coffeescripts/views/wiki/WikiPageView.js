@@ -153,7 +153,7 @@ export default class WikiPageView extends Backbone.View {
 
   afterRender() {
     super.afterRender(...arguments)
-    $('.header-bar-outer-container .header-bar-right').append($('#mark-as-done-checkbox'))
+    $('.page-toolbar .page-toolbar-end .buttons').append($('#mark-as-done-checkbox'))
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
