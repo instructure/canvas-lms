@@ -112,7 +112,16 @@ def cleanupFn(status) {
 }
 
 def postFn(status) {
+  def requestStartTime = System.currentTimeMillis()
   node('master') {
+    def requestEndTime = System.currentTimeMillis()
+
+    reportToSplunk('node_request_time', [
+      'nodeName': 'master',
+      'nodeLabel': 'master',
+      'requestTime': requestEndTime - requestStartTime,
+    ])
+
     failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
     failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
     failureReport.submit()
