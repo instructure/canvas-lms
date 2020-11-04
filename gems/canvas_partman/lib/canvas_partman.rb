@@ -30,8 +30,20 @@ module CanvasPartman
     #   extension by dots.
     #
     #   Example: "partitions" => "20141215000000_add_something.partitions.rb"
-    attr_accessor :migrations_scope
+    #
+    # @property [Lambda, ->{ 90 }] timeout_seconds
+    #   A callable block that returns the number of seconds to timeout
+    #   during partition table creation/deletion so that the behavior
+    #   when partition management is happening can be bounded to avoid
+    #   operational impacts from long running transactions
+    attr_accessor :migrations_scope, :timeout_seconds
+
+    def timeout_value
+      timeout_seconds.call * 1000
+    end
   end
 
   self.migrations_scope = 'partitions'
+  self.timeout_seconds = ->{ 90 }
+
 end
