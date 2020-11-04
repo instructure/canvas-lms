@@ -285,7 +285,6 @@ QUnit.module('Gradebook > OldDataLoader', suiteHooks => {
 
       QUnit.module('when student ids have been prefetched', contextHooks => {
         contextHooks.beforeEach(() => {
-          ENV.prefetch_gradebook_user_ids = true
           const jsonString = JSON.stringify({user_ids: exampleData.studentIds})
           const response = new Response(jsonString)
           setPrefetchedXHR('user_ids', Promise.resolve(response))
@@ -293,7 +292,6 @@ QUnit.module('Gradebook > OldDataLoader', suiteHooks => {
 
         contextHooks.afterEach(() => {
           clearPrefetchedXHRs()
-          delete ENV.prefetch_gradebook_user_ids
         })
 
         test('does not sends the request using the given course id', async () => {

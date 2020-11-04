@@ -252,8 +252,7 @@ class GradebooksController < ApplicationController
     set_tutorial_js_env
 
     # Optimize initial data loading
-    if Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids) ||
-      Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
+    if Account.site_admin.feature_enabled?(:gradebook_dataloader_improvements)
       prefetch_xhr(user_ids_course_gradebook_url(@context), id: 'user_ids')
     end
 
@@ -489,9 +488,6 @@ class GradebooksController < ApplicationController
 
     js_env({
       GRADEBOOK_OPTIONS: gradebook_options,
-      # TODO: remove `prefetch_gradebook_user_ids` with TALLY-831
-      prefetch_gradebook_user_ids: Account.site_admin.feature_enabled?(:prefetch_gradebook_user_ids),
-
       # TODO: remove `performance_controls` with TALLY-831
       performance_controls: {
         active_request_limit: Setting.get('gradebook.active_request_limit', '12').to_i,

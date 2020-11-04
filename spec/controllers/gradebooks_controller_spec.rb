@@ -725,17 +725,6 @@ describe GradebooksController do
         expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
       end
 
-      it "prefetches user ids when only 'prefetch_gradebook_user_ids' is enabled" do
-        # TODO: remove this with TALLY-831
-        Account.site_admin.enable_feature!(:prefetch_gradebook_user_ids)
-        allow(Account.site_admin).to receive(:feature_enabled?).and_call_original
-        allow(Account.site_admin).to receive(:feature_enabled?).with(:gradebook_dataloader_improvements).and_return(false)
-        get :show, params: { course_id: @course.id }
-
-        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
-        expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
-      end
-
       it "prefetches grading period assignments when the course uses grading periods" do
         group_helper = Factories::GradingPeriodGroupHelper.new
         period_helper = Factories::GradingPeriodHelper.new
