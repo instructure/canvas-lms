@@ -462,6 +462,17 @@ pipeline {
                       fi
                     '''
                   })
+
+                  if(!env.JOB_NAME.endsWith('Jenkinsfile')) {
+                    sh """#!/bin/bash
+                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+
+                      if git diff origin/master..HEAD Jenkinsfile*; then
+                        echo "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
+                        exit 1
+                      fi
+                    """
+                  }
                 }
               }
             }
