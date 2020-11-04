@@ -158,6 +158,17 @@ describe Course do
     end
   end
 
+  describe '#membership_for_user' do
+    it 'should return active enrollments' do
+      course = Course.create!(name: 'the best')
+      user = User.create!(name: 'the best')
+      course.enroll_teacher(user, enrollment_state: :completed)
+      course.enroll_student(user, enrollment_state: :active)
+      expect(course.membership_for_user(user).active?).to eq true
+    end
+  end
+
+
   describe '#moderators' do
     before(:once) do
       @course = Course.create!

@@ -1002,7 +1002,7 @@ class Course < ActiveRecord::Base
   end
 
   def membership_for_user(user)
-    self.enrollments.where(user_id: user).first if user
+    self.enrollments.where(user_id: user).order(:workflow_state).first if user
   end
 
   def infer_root_account
