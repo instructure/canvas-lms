@@ -211,7 +211,7 @@ describe "discussions" do
         expect(f('#discussion_attachment_uploaded_data')).not_to be_nil
       end
 
-      context 'in a group' do
+      context 'in a course group' do
         let(:url) { "/groups/#{group.id}/discussion_topics/new" }
 
         it 'should not show file attachment if allow_student_forum_attachments is not true', priority: '2', test_id: 223508 do
@@ -232,6 +232,56 @@ describe "discussions" do
           # expect
           get url
           expect(f('label[for=discussion_attachment_uploaded_data]')).to be_displayed
+        end
+
+        context "with usage rights required" do
+          before { course.update!(usage_rights_required: true) }
+
+          context "without the ability to attach files" do
+            before { course.update!(allow_student_forum_attachments: false) }
+
+            it "should load page without usage rights" do
+              get url
+
+              expect(f('body')).not_to contain_jqcss('#usage_rights_control button')
+              # verify that the page did load correctly
+              expect(ff("button[type='submit']").length).to eq 1
+            end
+          end
+        end
+      end
+    end
+
+    context "as a student" do
+      let(:account) { course.account }
+
+      before(:each) do
+        user_session(student)
+      end
+
+      context 'in an account group' do
+        let(:group) { account.groups.create! }
+
+        before do
+          tie_user_to_account(student, account: account, role: student_role)
+          group.add_user(student)
+        end
+
+        context "usage rights" do
+          before do
+            account.root_account.enable_feature!(:usage_rights_discussion_topics)
+            account.settings = {'usage_rights_required' => {
+              'value' => true
+            }}
+            account.save!
+          end
+
+          it "should load page" do
+            get "/groups/#{group.id}/discussion_topics/new"
+
+            expect(f('body')).not_to contain_jqcss('#usage_rights_control button')
+            expect(ff("button[type='submit']").length).to eq 1
+          end
         end
       end
     end

@@ -860,9 +860,18 @@ describe Group do
   end
 
   describe 'usage_rights_required' do
-    it 'returns true' do
+    it 'returns true on course group' do
       @course.update!(usage_rights_required: true)
-      expect(@group.usage_rights_required).to be true
+      expect(@group.usage_rights_required?).to be true
+    end
+
+    it 'returns true on account group' do
+      account = account_model
+      account.settings = {'usage_rights_required' => {
+        'value' => true
+      }}
+      group = group_model(context: account)
+      expect(group.usage_rights_required?).to be true
     end
   end
 end
