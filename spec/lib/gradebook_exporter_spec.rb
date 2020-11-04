@@ -39,8 +39,6 @@ describe GradebookExporter do
 
     describe "assignment group order" do
       before(:once) do
-        Account.site_admin.enable_feature!(:gradebook_export_sort_order_bugfix)
-
         student_in_course(course: @course, active_all: true)
 
         # The assignment groups are created out of order on purpose. The old code would order by assignment_group.id, so
