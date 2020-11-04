@@ -23,10 +23,6 @@ describe ObserverAlert do
   include Api
   include Api::V1::ObserverAlertThreshold
 
-  before(:each) do
-    Account.site_admin.enable_feature!(:grade_calculator_performance_improvements)
-  end
-
   describe 'validations' do
     before :once do
       @student = user_model

@@ -24,11 +24,6 @@ datadog_rum_js:
   applies_to: SiteAdmin
   display_name: Datadog RUM JS Agent
   description: Include the Datadog RUM JS Agent in the document HEAD.
-grade_calculator_performance_improvements:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Grade Calculator Performance Improvements
-  description: Performance improvements for the grade calculation process.
 gradebook_dataloader_improvements:
   state: hidden
   applies_to: SiteAdmin

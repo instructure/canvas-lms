@@ -22,7 +22,6 @@ require_relative '../sharding_spec_helper'
 
 describe GradeCalculator do
   before :once do
-    Account.site_admin.enable_feature!(:grade_calculator_performance_improvements)
     course_with_student active_all: true
   end
 

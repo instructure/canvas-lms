@@ -351,7 +351,6 @@ describe Lti::LtiOutboundAdapter do
     let(:enrollment) { StudentEnrollment.create!(user: user, course: course, workflow_state: 'active') }
 
     before do
-      allow(Account.site_admin).to receive(:feature_enabled?).with(:grade_calculator_performance_improvements).and_return(true)
       allow(BasicLTI::Sourcedid).to receive(:encryption_secret) {'encryption-secret-5T14NjaTbcYjc4'}
       allow(BasicLTI::Sourcedid).to receive(:signing_secret) {'signing-secret-vp04BNqApwdwUYPUI'}
       assignment.update!(
