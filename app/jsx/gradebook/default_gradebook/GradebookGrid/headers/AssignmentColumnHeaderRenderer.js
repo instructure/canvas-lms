@@ -122,8 +122,6 @@ function getProps(column, gradebook, options) {
       }
     },
 
-    includeSpeedGraderMenuItem: gradebook.options.include_speed_grader_in_assignment_header_menu,
-
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,
       hasGradesOrPostableComments,

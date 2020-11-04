@@ -138,8 +138,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       onSelect: func.isRequired
     }).isRequired,
 
-    includeSpeedGraderMenuItem: bool.isRequired,
-
     postGradesAction: shape({
       featureEnabled: bool.isRequired,
       hasGradesOrPostableComments: bool.isRequired,
@@ -401,11 +399,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
           </Menu.Group>
         </Menu>
 
-        {this.props.includeSpeedGraderMenuItem && (
-          <Menu.Item href={speedGraderUrl(this.props.assignment)}>
-            {I18n.t('SpeedGrader')}
-          </Menu.Item>
-        )}
+        <Menu.Item href={speedGraderUrl(this.props.assignment)}>{I18n.t('SpeedGrader')}</Menu.Item>
 
         <Menu.Item
           disabled={!this.props.submissionsLoaded || this.props.assignment.anonymizeStudents}

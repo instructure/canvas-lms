@@ -84,8 +84,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
         onSelect() {}
       },
 
-      includeSpeedGraderMenuItem: false,
-
       postGradesAction: {
         enabled: false,
         featureEnabled: false,
@@ -784,26 +782,15 @@ QUnit.module('GradebookGrid AssignmentColumnHeader', suiteHooks => {
   })
 
   QUnit.module('"Options" > "SpeedGrader" action', () => {
-    QUnit.module('when includeSpeedGraderMenuItem is true', includeSpeedGraderHooks => {
-      includeSpeedGraderHooks.beforeEach(() => {
-        props.includeSpeedGraderMenuItem = true
-      })
-
-      test('is present', () => {
-        mountAndOpenOptionsMenu()
-        ok(getMenuItem($menuContent, 'SpeedGrader'))
-      })
-
-      test('links to SpeedGrader for the current assignment', () => {
-        mountAndOpenOptionsMenu()
-        const menuItem = getMenuItem($menuContent, 'SpeedGrader')
-        ok(menuItem.href.includes('/courses/1201/gradebook/speed_grader?assignment_id=2301'))
-      })
+    test('is present', () => {
+      mountAndOpenOptionsMenu()
+      ok(getMenuItem($menuContent, 'SpeedGrader'))
     })
 
-    test('is not present when includeSpeedGraderMenuItem is false', () => {
+    test('links to SpeedGrader for the current assignment', () => {
       mountAndOpenOptionsMenu()
-      notOk(getMenuItem($menuContent, 'SpeedGrader'))
+      const menuItem = getMenuItem($menuContent, 'SpeedGrader')
+      ok(menuItem.href.includes('/courses/1201/gradebook/speed_grader?assignment_id=2301'))
     })
   })
 

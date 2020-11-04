@@ -9,11 +9,6 @@ gradebook_export_sort_order_bugfix:
   applies_to: SiteAdmin
   display_name: Gradebook Export Sort Order Bugfix (Tally-219)
   description: Changes the sort order of the gradebook export to more closely match the canvas documentation
-include_speed_grader_in_assignment_header_menu:
-  state: hidden
-  applies_to: SiteAdmin
-  display_name: Include SpeedGrader in Assignment Header Menu
-  description: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
 datadog_rum_js:
   state: hidden
   applies_to: SiteAdmin

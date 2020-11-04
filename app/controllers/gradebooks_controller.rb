@@ -447,7 +447,6 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
-      include_speed_grader_in_assignment_header_menu: Account.site_admin.feature_enabled?(:include_speed_grader_in_assignment_header_menu),
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: @context.root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
