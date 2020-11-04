@@ -39,6 +39,7 @@ const globalError = console.error
 const ignoredErrors = []
 const globalWarn = console.warn
 const ignoredWarnings = [
+  /Warning: componentWillReceiveProps has been renamed/,
   /Warning: \[SimpleSelect\] is experimental.*/,
   /Warning: \[themeable\] component styles require setting a \'dir\'*/
 ]

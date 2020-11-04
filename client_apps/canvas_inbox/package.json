@@ -40,6 +40,7 @@
     "@instructure/ui-select": "6",
     "@instructure/ui-simple-select": "6",
     "@instructure/ui-text": "6",
+    "@instructure/ui-text-area": "6",
     "@instructure/ui-text-input": "6",
     "@instructure/ui-tooltip": "6",
     "@instructure/ui-truncate-text": "6",
