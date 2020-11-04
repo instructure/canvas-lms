@@ -156,12 +156,8 @@ def executeFlakeySpecCatcher(prefix = 'main') {
       throw e
     }
   } finally {
-    sh "mkdir -vp tmp/$prefix"
-    sh(
-      script: "docker cp \$(docker ps -q --filter 'name=canvas_'):/usr/src/app/tmp/fsc.out ./tmp/$prefix/fsc.out",
-      returnStatus: true
-    )
-    archiveArtifacts(artifacts: "tmp/$prefix/fsc.out", allowEmptyArchive: true)
+    sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/tmp/fsc.out tmp canvas_ --allow-error --clean-dir"
+    archiveArtifacts artifacts: "tmp/**/fsc.out", allowEmptyArchive: true
   }
 }
 
