@@ -396,6 +396,9 @@
     background-color: var(--tableSelectorHighlightColor);
     border-color: var(--tableSelectorHighlightColor);
   }
+  .tox-selected-menu .tox-insert-table-picker {
+    background-color: var(--canvasBackgroundColor);
+  }
   .tox .tox-insert-table-picker__label {
     color: var(--canvasTextColor);
   }
