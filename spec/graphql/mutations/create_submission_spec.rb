@@ -142,8 +142,11 @@ RSpec.describe Mutations::CreateSubmission do
 
     it 'returns an error if any of the file_ids are not found' do
       @assignment.update!(submission_types: 'online_upload')
-      result = run_mutation(submission_type: 'online_upload', file_ids: [1,2,3])
-      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq 'No attachments found for the following ids: ["1", "2", "3"]'
+      id_offset = [@attachment1.id, @attachment2.id].max
+      unaffiliated_ids = [id_offset + 1, id_offset + 2, id_offset + 3]
+      result = run_mutation(submission_type: 'online_upload', file_ids: unaffiliated_ids)
+      expected_message = "No attachments found for the following ids: [#{unaffiliated_ids.map{|i| "\"#{i}\""}.join(", ")}]"
+      expect(result.dig(:data, :createSubmission, :errors, 0, :message)).to eq expected_message
     end
 
     it 'returns an error if the returned attachment does not have an allowed file extension' do
