@@ -179,7 +179,7 @@ describe OutcomeResultsController do
                       aggregate: 'course',
                       aggregate_stat: 'powerlaw'},
                       format: "json"
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     context 'with muted assignment' do
@@ -304,23 +304,23 @@ describe OutcomeResultsController do
     context 'sorting' do
       it 'should validate sort_by parameter' do
         get_rollups(sort_by: 'garbage')
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'should validate sort_order parameter' do
         get_rollups(sort_by: 'student', sort_order: 'random')
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       context 'by outcome' do
         it 'should validate a missing sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome')
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it 'should validate an invalid sort_outcome_id parameter' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: 'NaN')
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
       end
 
@@ -340,14 +340,14 @@ describe OutcomeResultsController do
       context 'by student' do
         it 'should sort rollups by ascending student name' do
           get_rollups(sort_by: 'student')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student1, @student2, @student3])
         end
 
         it 'should sort rollups by descending student name' do
           get_rollups(sort_by: 'student', sort_order: 'desc')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student3, @student2, @student1])
         end
@@ -392,7 +392,7 @@ describe OutcomeResultsController do
 
           def expect_students_in_pagination(page, students, sort_order = 'asc', include: nil)
             get_rollups(sort_by: 'student', sort_order: sort_order, per_page: 1, page: page, include: include)
-            expect(response).to be_success
+            expect(response).to be_successful
             expect_user_order(json['rollups'], students)
           end
 
@@ -469,7 +469,7 @@ describe OutcomeResultsController do
       context 'by outcome' do
         it 'should sort rollups by ascending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id)
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student2, @student1, @student3])
           expect_score_order(json['rollups'], [1, 3, nil])
@@ -477,7 +477,7 @@ describe OutcomeResultsController do
 
         it 'should sort rollups by descending rollup score' do
           get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: 'desc')
-          expect(response).to be_success
+          expect(response).to be_successful
           json = parse_response(response)
           expect_user_order(json['rollups'], [@student1, @student2, @student3])
           expect_score_order(json['rollups'], [3, 1, nil])
@@ -486,7 +486,7 @@ describe OutcomeResultsController do
         context 'with pagination' do
           def expect_students_in_pagination(page, students, scores, sort_order = 'asc')
             get_rollups(sort_by: 'outcome', sort_outcome_id: @outcome.id, sort_order: sort_order, per_page: 1, page: page)
-            expect(response).to be_success
+            expect(response).to be_successful
             json = parse_response(response)
             expect_user_order(json['rollups'], students)
             expect_score_order(json['rollups'], scores)

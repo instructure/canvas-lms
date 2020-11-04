@@ -628,53 +628,53 @@ describe GradingPeriod do
     end
   end
 
-  # TODO: move all of this to filter_with_overrides_by_due_at_for_class.rb
   describe "#assignments" do
-    let!(:first_assignment)  { course.assignments.create!(due_at: first_grading_period.start_date + 1.minute) }
-    let!(:second_assignment) { course.assignments.create!(due_at: second_grading_period.start_date + 1.minute) }
-    let!(:third_assignment)  { course.assignments.create!(due_at: nil) }
-
-    let(:first_grading_period) do
-        grading_period_group.grading_periods.create!(
-          title:      '1st period',
-          start_date: 2.months.from_now(now),
-          end_date:   3.months.from_now(now)
-        )
-    end
-    let(:second_grading_period) do
-      grading_period_group.grading_periods.create!(
+    before(:once) do
+      account = Account.create!
+      @course = account.courses.create!
+      student = User.create!
+      @course.enroll_student(student, enrollment_state: :active)
+      @grading_period_group = group_helper.legacy_create_for_course(@course)
+      @first_grading_period = @grading_period_group.grading_periods.create!(
+        title:      '1st period',
+        start_date: 2.months.from_now(now),
+        end_date:   3.months.from_now(now)
+      )
+      @second_grading_period = @grading_period_group.grading_periods.create!(
         title:      '2nd period',
         start_date: 3.months.from_now(now),
         end_date:   4.months.from_now(now)
       )
+      @first_assignment = @course.assignments.create!(due_at: @first_grading_period.start_date + 1.minute)
+      @second_assignment = @course.assignments.create!(due_at: @second_grading_period.start_date + 1.minute)
+      @third_assignment = @course.assignments.create!(due_at: nil)
     end
-    let(:grading_period_group) { group_helper.legacy_create_for_course(course) }
 
     it "filters the first grading period" do
-      assignments = first_grading_period.assignments(course.assignments)
-      expect(assignments).to eq [first_assignment]
+      assignments = @first_grading_period.assignments(@course, @course.assignments)
+      expect(assignments).to eq [@first_assignment]
     end
 
     it "filters assignments without a due_at into the last grading period" do
-      assignments = second_grading_period.assignments(course.assignments)
-      expect(assignments).to eq [second_assignment, third_assignment]
+      assignments = @second_grading_period.assignments(@course, @course.assignments)
+      expect(assignments).to eq [@second_assignment, @third_assignment]
     end
 
     describe "when due at is near the edge of a period" do
       let!(:fourth_assignment) do
-        course.assignments.create!(
+        @course.assignments.create!(
           due_at: third_grading_period.end_date - 0.995.seconds
         )
       end
 
       let!(:fifth_assignment) do
-        course.assignments.create!(
+        @course.assignments.create!(
           due_at: fourth_grading_period.start_date - 0.005.seconds
         )
       end
 
       let(:third_grading_period) do
-        grading_period_group.grading_periods.create!(
+        @grading_period_group.grading_periods.create!(
           title:      '3rd period',
           start_date: 5.months.from_now(now),
           end_date:   6.months.from_now(now)
@@ -682,7 +682,7 @@ describe GradingPeriod do
       end
 
       let(:fourth_grading_period) do
-        grading_period_group.grading_periods.create!(
+        @grading_period_group.grading_periods.create!(
           title:      '4th period',
           start_date: 7.months.from_now(now),
           end_date:   8.months.from_now(now)
@@ -690,12 +690,12 @@ describe GradingPeriod do
       end
 
       it "includes assignments if they are on the future edge of end date" do
-        assignments = third_grading_period.assignments(course.assignments)
+        assignments = third_grading_period.assignments(@course, @course.assignments)
         expect(assignments).to include fourth_assignment
       end
 
       it "does NOT include assignments if they are on the past edge of start date" do
-        assignments = fourth_grading_period.assignments(course.assignments)
+        assignments = fourth_grading_period.assignments(@course, @course.assignments)
         expect(assignments).not_to include fifth_assignment
       end
     end

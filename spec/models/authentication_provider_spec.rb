@@ -247,8 +247,8 @@ describe AuthenticationProvider do
 
     it 'handles separate names' do
       aac.apply_federated_attributes(@pseudonym,
-        'given_name' => 'Cody',
-        'surname' => 'Cutrer')
+        { 'given_name' => 'Cody',
+          'surname' => 'Cutrer' })
       @user.reload
       expect(@user.short_name).to eq 'Cody Cutrer'
       expect(@user.name).to eq 'Cody Cutrer'

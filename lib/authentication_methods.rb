@@ -70,9 +70,9 @@ module AuthenticationMethods
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
-    rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
-           Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
-           Canvas::Security::InvalidToken       # Looks like garbage
+    rescue JSON::JWT::InvalidFormat,       # definitely not a JWT
+           Canvas::Security::TokenExpired, # it could be a JWT, but it's expired if so
+           Canvas::Security::InvalidToken  # not formatted like a JWT
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
@@ -80,7 +80,7 @@ module AuthenticationMethods
     rescue Imperium::TimeoutError => exception # Something went wrong in the Network
       # these are indications of infrastructure of data problems
       # so we should log them for resolution, but recover gracefully
-      Canvas::Errors.capture_exception(:jwt_check, exception)
+      Canvas::Errors.capture_exception(:jwt_check, exception, :warn)
     end
   end
 
@@ -275,7 +275,16 @@ module AuthenticationMethods
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
       end
-      if user && user.can_masquerade?(@current_user, @domain_root_account)
+      if user && @real_current_user
+        if @current_user != user
+          # if we're already masquerading from an access token, and now try to
+          # masquerade as someone else
+          render :json => {:errors => "Cannot change masquerade"}, :status => :unauthorized
+          return false
+        # else: they do match, everything is already set
+        end
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url} via masquerade token"
+      elsif user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
         @real_current_pseudonym = @current_pseudonym

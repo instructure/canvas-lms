@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/shared/_rubric" do
+describe "shared/_rubric" do
   let(:context) { course_model }
   let(:rubric) { rubric_model(context: context) }
   let(:rubric_association) { rubric_association_model(context: context, rubric: rubric) }

@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "編集"
     },
+    "edit_equation_f5279959": {
+        "message": "方程式を編集する"
+    },
     "edit_link_7f53bebb": {
         "message": "リンクの編集"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "{ count, plural,\n     =0 {# 結果}\n    one {# 1つの結果}\n  other {# 結果}\n}が見つかりました"
     },
+    "fullscreen_873bf53f": {
+        "message": "全画面"
+    },
     "generating_preview_45b53be0": {
         "message": "プレビュー中..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "成績が読み込まれました"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "グループドキュメント"
+    },
     "group_files_4324f3df": {
         "message": "グループファイル"
     },
     "group_files_82e5dcdb": {
         "message": "グループ ファイル"
     },
+    "group_images_98e0ac17": {
+        "message": "グループ画像"
+    },
     "group_links_9493129e": {
         "message": "グループリンク"
+    },
+    "group_media_2f3d128a": {
+        "message": "グループメディア"
     },
     "group_navigation_99f191a": {
         "message": "グループ ナビゲーション"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "クイズ"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "無変換の HTML エディタ"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "メディアトラックファイルの読み取りに失敗しました。中止中。"
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title }のビデオプレーヤー"
+    },
+    "view_ba339f93": {
+        "message": "表示"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "キーボードのショートカットを見る"

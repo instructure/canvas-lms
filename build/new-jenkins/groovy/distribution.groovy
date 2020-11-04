@@ -53,7 +53,7 @@ def appendStagesAsBuildNodes(nodes,
       // mark with instance index.
       // we need to do this on the main node so we dont run into
       // concurrency issues with persisting the success
-      load('build/new-jenkins/groovy/successes.groovy').saveSuccess(test_label)
+      successes.saveSuccess(test_label)
     })
   }
 }
@@ -73,7 +73,6 @@ def stashBuildScripts() {
  */
 def addRSpecSuites(stages) {
   def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').rspecConfig().node_total
-  def successes = load('build/new-jenkins/groovy/successes.groovy')
 
   if (successes.hasSuccess('rspec', rspec_node_total)) {
     echo 'not running rspec. already successful'
@@ -92,7 +91,6 @@ def addRSpecSuites(stages) {
  */
 def addSeleniumSuites(stages) {
   def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').seleniumConfig().node_total
-  def successes = load('build/new-jenkins/groovy/successes.groovy')
 
   if (successes.hasSuccess('selenium', selenium_node_total)) {
     echo 'not running selenium. already successful'

@@ -70,7 +70,6 @@ pipeline {
                 checkout scm
                 sh 'build/new-jenkins/docker-compose-pull.sh'
                 sh 'build/new-jenkins/docker-compose-build-up.sh'
-                sh 'build/new-jenkins/docker-compose-setup-cassandra-keyspaces.sh'
               }
             }
 

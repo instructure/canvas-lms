@@ -181,7 +181,7 @@ class GradebooksController < ApplicationController
 
       if grading_periods? && @current_grading_period_id && !view_all_grading_periods?
         current_period = GradingPeriod.for(@context).find_by(id: @current_grading_period_id)
-        visible_assignments = current_period.assignments_for_student(visible_assignments, opts[:student])
+        visible_assignments = current_period.assignments_for_student(@context, visible_assignments, opts[:student])
       end
 
       visible_assignments.map! do |a|
@@ -388,6 +388,7 @@ class GradebooksController < ApplicationController
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
+      allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
       # TODO: remove `api_max_per_page` with TALLY-831
       api_max_per_page: per_page,
 
@@ -450,6 +451,7 @@ class GradebooksController < ApplicationController
       include_speed_grader_in_assignment_header_menu: Account.site_admin.feature_enabled?(:include_speed_grader_in_assignment_header_menu),
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: @context.root_account.settings[:login_handle_name],
+      has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       performance_controls: gradebook_performance_controls,
@@ -482,8 +484,7 @@ class GradebooksController < ApplicationController
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
       teacher_notes: teacher_notes && custom_gradebook_column_json(teacher_notes, @current_user, session),
       user_asset_string: @current_user&.asset_string,
-      version: params.fetch(:version, nil),
-      allow_view_ungraded_as_zero: Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
+      version: params.fetch(:version, nil)
     }
 
     js_env({
@@ -569,6 +570,7 @@ class GradebooksController < ApplicationController
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: @context.root_account.settings[:login_handle_name],
+      has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
       outcome_links_url: api_v1_course_outcome_group_links_url(@context, outcome_style: :full),
@@ -584,6 +586,7 @@ class GradebooksController < ApplicationController
       publish_to_sis_url: context_url(@context, :context_details_url, anchor: 'tab-grade-publishing'),
       re_upload_submissions_url: named_context_url(@context, :submissions_upload_context_gradebook_url, "{{ assignment_id }}"),
       reorder_custom_columns_url: api_v1_custom_gradebook_columns_reorder_url(@context),
+      save_view_ungraded_as_zero_to_server: allow_view_ungraded_as_zero?,
       sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
       sections_url: api_v1_course_sections_url(@context),
       setting_update_url: api_v1_course_settings_url(@context),
@@ -1046,7 +1049,10 @@ class GradebooksController < ApplicationController
   def grading_period_assignments
     return unless authorized_action(@context, @current_user, [:manage_grades, :view_all_grades])
 
-    grading_period_assignments = GradebookGradingPeriodAssignments.new(@context, gradebook_settings(@context.global_id))
+    grading_period_assignments = GradebookGradingPeriodAssignments.new(
+      @context,
+      course_settings: gradebook_settings(@context.global_id)
+    )
     render json: { grading_period_assignments: grading_period_assignments.to_h }
   end
 
@@ -1241,9 +1247,9 @@ class GradebooksController < ApplicationController
   def grade_summary_presenter
     options = presenter_options
     if options.key?(:grading_period_id)
-      GradingPeriodGradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+      GradingPeriodGradeSummaryPresenter.new(@context, @current_user, params[:id], **options)
     else
-      GradeSummaryPresenter.new(@context, @current_user, params[:id], options)
+      GradeSummaryPresenter.new(@context, @current_user, params[:id], **options)
     end
   end
 
@@ -1363,5 +1369,9 @@ class GradebooksController < ApplicationController
     shared_settings = @current_user.get_preference(:gradebook_column_size, "shared") || {}
     course_settings = @current_user.get_preference(:gradebook_column_size, @context.global_id) || {}
     shared_settings.merge(course_settings)
+  end
+
+  def allow_view_ungraded_as_zero?
+    Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
   end
 end

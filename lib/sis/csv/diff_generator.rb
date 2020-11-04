@@ -95,8 +95,8 @@ module SIS
       end
 
       def generate_diff(importer, previous_input, current_input, status = 'deleted')
-        previous_csv = ::CSV.open(previous_input, CSVBaseImporter::PARSE_ARGS)
-        current_csv = ::CSV.open(current_input, CSVBaseImporter::PARSE_ARGS)
+        previous_csv = ::CSV.open(previous_input, **CSVBaseImporter::PARSE_ARGS)
+        current_csv = ::CSV.open(current_input, **CSVBaseImporter::PARSE_ARGS)
         diff = CsvDiff::Diff.new(importer.identifying_fields)
         diff.generate(previous_csv, current_csv, deletes: ->(row) { row['status'] = status }, return_count: true)
       end

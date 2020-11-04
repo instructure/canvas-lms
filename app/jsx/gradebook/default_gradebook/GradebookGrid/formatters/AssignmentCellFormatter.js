@@ -20,7 +20,7 @@
 
 import I18n from 'i18n!gradebook'
 import htmlEscape from 'str/htmlEscape'
-import {extractDataTurnitin} from 'compiled/gradebook/Turnitin'
+import {extractDataTurnitin} from 'jsx/gradebook/Turnitin'
 import GradeFormatHelper from '../../../shared/helpers/GradeFormatHelper'
 import {
   extractSimilarityInfo,

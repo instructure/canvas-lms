@@ -698,4 +698,12 @@ describe Lti::Messages::JwtMessage do
       it_behaves_like 'skips role scope mentor'
     end
   end
+
+  describe 'legacy user id claims' do
+    it 'sets the "lti11_legacy_user_id" claim' do
+      expected = decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']
+
+      expect(expected).to eq tool.opaque_identifier_for(user)
+    end
+  end
 end

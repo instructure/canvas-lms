@@ -17,12 +17,12 @@
  */
 
 import axios from 'axios'
-
+import pluralize from 'str/pluralize'
 import {gql} from 'jsx/canvas-apollo'
 
-export const OUTCOME_PROFICIENCY_QUERY = gql`
+export const ACCOUNT_OUTCOME_PROFICIENCY_QUERY = gql`
   query GetOutcomeProficiencyData($contextId: ID!) {
-    account(id: $contextId) {
+    context: account(id: $contextId) {
       outcomeProficiency {
         _id
         contextId
@@ -41,8 +41,30 @@ export const OUTCOME_PROFICIENCY_QUERY = gql`
   }
 `
 
-export const fetchProficiency = (contextType, contextId) =>
-  axios.get(`/api/v1/accounts/${contextId}/outcome_proficiency`)
+export const COURSE_OUTCOME_PROFICIENCY_QUERY = gql`
+  query GetOutcomeProficiencyData($contextId: ID!) {
+    context: course(id: $contextId) {
+      outcomeProficiency {
+        _id
+        contextId
+        contextType
+        proficiencyRatingsConnection {
+          nodes {
+            _id
+            color
+            description
+            mastery
+            points
+          }
+        }
+      }
+    }
+  }
+`
 
-export const saveProficiency = (contextType, contextId, config) =>
-  axios.post(`/api/v1/accounts/${contextId}/outcome_proficiency`, config)
+export const saveProficiency = (contextType, contextId, config) => {
+  return axios.post(
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_proficiency`,
+    config
+  )
+}

@@ -69,8 +69,8 @@
   </script>
 
   <%= benchmark("include_head_js") { include_head_js } %>
-  <% @xhrs_to_prefetch_from_controller&.each do |args| %>
-    <%= prefetch_xhr(*args) %>
+  <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| %>
+    <%= prefetch_xhr(*args, **kwargs) %>
   <% end %>
   <% @content_for_head&.each do |string| %>
     <%= string %>

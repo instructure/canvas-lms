@@ -62,7 +62,10 @@ daySubCollectionView      = new CollectionView
                                 template: daySubCollectionTemplate
 
 progressingMigCollection  = new ProgressingContentMigrationCollection null,
-                                course_id: ENV.COURSE_ID
+                                course_id: ENV.COURSE_ID,
+                                params: {
+                                  per_page: 25
+                                }
 
 progressingCollectionView = new PaginatedCollectionView
                                 el: '#progress'

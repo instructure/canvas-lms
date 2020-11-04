@@ -22,7 +22,7 @@ class LatePolicyApplicator
 
     new(course).send_later_if_production_enqueue_args(
       :process,
-      singleton: "late_policy_applicator:calculator:Course:#{course.global_id}"
+      { singleton: "late_policy_applicator:calculator:Course:#{course.global_id}" }
     )
   end
 
@@ -32,7 +32,7 @@ class LatePolicyApplicator
 
     new(assignment.course, [assignment]).send_later_if_production_enqueue_args(
       :process,
-      singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}"
+      { singleton: "late_policy_applicator:calculator:Assignment:#{assignment.global_id}" }
     )
   end
 

@@ -67,15 +67,15 @@ module Factories
   end
 
   def outcome_with_rubric(opts={})
-    course = opts[:course] || @course
-    @outcome_group ||= course.root_outcome_group
-    @outcome = opts[:outcome] || outcome_model(context: course,
-                                               outcome_context: opts[:outcome_context] || course,
+    context = opts[:context] || opts[:course] || @course
+    @outcome_group ||= context.root_outcome_group
+    @outcome = opts[:outcome] || outcome_model(context: context,
+                                               outcome_context: opts[:outcome_context] || context,
                                                title: 'new outcome',
                                                description: '<p>This is <b>awesome</b>.</p>',
                                                calculation_method: 'highest')
-    [opts[:outcome_context], course].compact.uniq.each do |context|
-      root = context.root_outcome_group
+    [opts[:outcome_context], context].compact.uniq.each do |ctxt|
+      root = ctxt.root_outcome_group
       root.add_outcome(@outcome)
       root.save!
     end
@@ -123,7 +123,7 @@ module Factories
         }
     }
 
-    @rubric = course.rubrics.build
+    @rubric = context.rubrics.build
     @rubric.update_criteria(rubric_params)
   end
 end

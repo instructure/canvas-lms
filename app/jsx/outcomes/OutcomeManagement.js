@@ -20,7 +20,6 @@ import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
-
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
 
 export const OutcomePanel = () => {
@@ -51,7 +50,10 @@ const OutcomeManagement = () => {
 
   const client = useMemo(() => createClient(), [])
 
-  const contextId = ENV.context_asset_string.split('_')[1]
+  const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
+
+  const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
+
   return (
     <ApolloProvider client={client}>
       <Tabs onRequestTabChange={handleTabChange}>
@@ -59,10 +61,10 @@ const OutcomeManagement = () => {
           <OutcomePanel />
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
-          <MasteryScale contextType="Account" contextId={contextId} />
+          <MasteryScale contextType={contextType} contextId={contextId} />
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Calculation')} isSelected={selectedIndex === 2}>
-          <MasteryCalculation contextType="Account" contextId={contextId} />
+          <MasteryCalculation contextType={contextType} contextId={contextId} />
         </Tabs.Panel>
       </Tabs>
     </ApolloProvider>

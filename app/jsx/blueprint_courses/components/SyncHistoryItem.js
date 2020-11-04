@@ -37,7 +37,12 @@ const SyncHistoryItem = ({migration, heading, ChangeComponent}) => {
           <FriendlyDatetime dateTime={date} format={I18n.t('#date.formats.full_with_weekday')} />
         </Heading>
         <Text color="secondary" size="small">
-          {I18n.t('%{count} pushed changes', {count: changes.length})}
+          {migration.user?.display_name
+            ? I18n.t('%{count} changes pushed by %{user}', {
+                count: changes.length,
+                user: migration.user.display_name
+              })
+            : I18n.t('%{count} pushed changes', {count: changes.length})}
         </Text>
       </header>
       {comment && <Text as="p" color="secondary" size="small">{`"${comment}"`}</Text>}

@@ -49,7 +49,11 @@
         <%# even if @domain_root_account.settings[:can_add_pronouns] is false, we still want to let someone that has pronouns set to see this so they can unset them  %>
         <% if @user.pronouns || @domain_root_account.settings[:can_add_pronouns] %>
           <label for="pronouns"class="show-if-editing ic-Label"><%= t('Pronouns') %>:</label>
-          <%= select_tag :pronouns, options_for_select([[t("None"), '']] + @domain_root_account.pronouns, @user.pronouns), class:"show-if-editing" %>
+          <%= select_tag :pronouns,
+            options_for_select(([[t("None"), '']] + @domain_root_account.pronouns + [@user.pronouns]).compact.uniq, @user.pronouns),
+            class:"show-if-editing",
+            disabled:!@domain_root_account.can_change_pronouns?
+          %>
         <% end %>
         <p class="profileDetails">
           <span class="hide-if-editing"><%= @user_data[:title] %></span>

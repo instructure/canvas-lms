@@ -8,7 +8,7 @@ fileArr=(
   '^build/common_docker_build_steps.sh'
   '^script/canvas_update'
   '^docker-compose.yml'
-  '^Dockerfile'
+  '^Dockerfile$'
   '^lib/tasks/'
 )
 

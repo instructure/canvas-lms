@@ -840,7 +840,7 @@ module AccountReports
 
     def xlist_query_options(xl)
       xl = xl.where.not(course_sections: {sis_batch_id: nil}) if @created_by_sis
-      xl = xl.where.not(courses: {sis_source_id: nil}, course_sections: {sis_source_id: nil}) if @sis_format
+      xl = xl.where.not(courses: {sis_source_id: nil}).where.not(course_sections: {sis_source_id: nil}) if @sis_format
 
       if @include_deleted
         xl.where!("(courses.workflow_state<>'deleted'

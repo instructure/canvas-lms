@@ -354,6 +354,8 @@ describe "Feature Flags API", type: :request do
         MultiCache.fetch(cache_key) { nil }
         api_call_as_user(t_root_admin, :put, "/api/v1/accounts/#{t_root_account.id}/features/flags/course_feature?state=off",
                          { controller: 'feature_flags', action: 'update', format: 'json', account_id: t_root_account.to_param, feature: 'course_feature', state: 'off' })
+        assert_status(200)
+        expect(flag.reload.state).to eq('off')
       end
     end
 

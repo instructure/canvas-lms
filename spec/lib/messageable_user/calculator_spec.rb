@@ -1128,6 +1128,23 @@ describe "MessageableUser::Calculator" do
         it "should return an empty set for unrecognized contexts" do
           expect(messageable_user_ids(:context => 'bogus')).to be_empty
         end
+
+        context "for a group" do
+          before do
+            @group = @course.groups.create(:name => 'the group')
+            @group.add_user(@viewing_user)
+          end
+
+          context "send_messages permission is disabled" do
+            before do
+              @course.account.role_overrides.create!(role: student_role, permission: 'send_messages', enabled: false)
+            end
+
+            it "should not include group members" do
+              expect(messageable_user_ids(:context => @group.asset_string)).to match_array []
+            end
+          end
+        end
       end
 
       context "without a context" do

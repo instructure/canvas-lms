@@ -37,6 +37,8 @@ describe AssetUserAccessLog do
     end
 
     it "can do updates with a 24hr clock" do
+      # rails 6 never converts to a string
+      skip unless CANVAS_RAILS5_2
       row = {"aua_id" => @asset.id, "view_count" => 12, "max_updated_at" => "2020-09-06 14:01:15"}
       update_sql = AssetUserAccessLog.compaction_sql([row])
       expect{ AssetUserAccess.connection.execute(update_sql) }.to_not raise_error

@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Editar"
     },
+    "edit_equation_f5279959": {
+        "message": "Editar Equação"
+    },
     "edit_link_7f53bebb": {
         "message": "Editar ligação"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Foram encontrados { count, plural,\n     =0 {# resultados}\n    one {# resultado}\n  other {# resultados}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Ecrã completo"
+    },
     "generating_preview_45b53be0": {
         "message": "A gerar visualização..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Classificações carregadas"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Agrupar Documentos"
+    },
     "group_files_4324f3df": {
         "message": "Arquivos de grupo"
     },
     "group_files_82e5dcdb": {
         "message": "Ficheiros de grupo"
     },
+    "group_images_98e0ac17": {
+        "message": "Agrupar Imagens"
+    },
     "group_links_9493129e": {
         "message": "Ligações do grupo"
+    },
+    "group_media_2f3d128a": {
+        "message": "Agrupar Meios de comunicação"
     },
     "group_navigation_99f191a": {
         "message": "Navegação do grupo"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Testes"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Editor HTML em bruto"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "A leitura de um ficheiro de pista de vídeo correu mal. Abortamento."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Leitor de vídeo para { title }"
+    },
+    "view_ba339f93": {
+        "message": "Ver"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Ver atalhos de teclado"

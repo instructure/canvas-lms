@@ -16,6 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class EnrollmentState < ActiveRecord::Base
+  # a 1-1 table with enrollments
+  # that was really only a separate table because enrollments had a billion columns already
+  # and the data here was going to have a lot of churn too
+
+  # anyways, determining whether an enrollment actually grants any useful permissions
+  # depends on a complicated chain of dates and states stored on other models
+  # (and how those dates compare to _now_)
+  # e.g. an enrollment can have an "active" workflow_state but if the term was set to end last week
+  # the user won't be considered active in the course anymore (i.e. "soft"-concluded)
+
+  # TL;DR: this table acts as a fairly-reliable cache
+  # (date triggers are resolved within ~5 minutes typically)
+  # so we can quickly determine frd permissions
+  # and build simple queries (e.g. use course.enrollments.active_by_date
+  # instead of pulling all potentially active enrollments and filtering in-app)
+
   extend RootAccountResolver
 
   belongs_to :enrollment, inverse_of: :enrollment_state
@@ -31,6 +47,7 @@ class EnrollmentState < ActiveRecord::Base
     global_enrollment_id.hash
   end
 
+  # check if we've manually marked the enrollment state as potentially out of date (or if the stored date trigger has past)
   def state_needs_recalculation?
     !self.state_is_current? || self.state_valid_until && self.state_valid_until < Time.now
   end
@@ -56,6 +73,10 @@ class EnrollmentState < ActiveRecord::Base
     end
   end
 
+  # tweak the new state (in a handful of cases) into a symbol compatible with older enrollment state checks
+  # - a locked down enrollment is basically the same as a inactive one
+  # - an invitation in a course yet to start is functionally identical to an invitation in a started course
+  # - :accepted is kind of silly, but it's how the old code signified an active enrollment in a course that hadn't started
   def get_effective_state
     self.ensure_current_state
 
@@ -117,6 +138,10 @@ class EnrollmentState < ActiveRecord::Base
     end
   end
 
+  # TL;DR an enrollment can have its start and end dates determined in a variety of places
+  # (see Canvas::Builders::EnrollmentDateBuilder for more details)
+  # so this translates the current enrollment's workflow_state depending
+  # whether we're currently before the start, after the end, or between the two
   def calculate_state_based_on_dates
     wf_state = self.enrollment.workflow_state
     ranges = self.enrollment.enrollment_dates
@@ -124,23 +149,26 @@ class EnrollmentState < ActiveRecord::Base
 
     # start_at <= now <= end_at, allowing for open ranges on either end
     if range = ranges.detect{|start_at, end_at| (start_at || now) <= now && now <= (end_at || now) }
+      # we're in the middle of the start-end so the state is just the same as the workflow state
       self.state = wf_state
       start_at, end_at = range
       self.state_started_at = start_at
-      self.state_valid_until = end_at
+      self.state_valid_until = end_at # stores the next date trigger
     else
       global_start_at = ranges.map(&:compact).map(&:min).compact.min
 
       if !global_start_at
-        # Not strictly within any range
+        # Not strictly within any range so no translation needed
         self.state = wf_state
       elsif global_start_at < now
+        # we've past the end date so no matter what the state was, we're "completed" now
         self.state_started_at = ranges.map(&:last).compact.min
         self.state = 'completed'
       elsif self.enrollment.fake_student? # Allow student view students to use the course before the term starts
         self.state = wf_state
       else
-        self.state_valid_until = global_start_at
+        # the course has yet to begin for the enrollment
+        self.state_valid_until = global_start_at # store the date when that will change
         if self.enrollment.view_restrictable?
           # these enrollment states mean they still can't participate yet even if they've accepted it,
           # but should be able to view just like an invited enrollment
@@ -157,6 +185,9 @@ class EnrollmentState < ActiveRecord::Base
     end
   end
 
+  # normally if you're part of a course that hasn't started yet or has already finished
+  # you can still access the course in a "view-only" mode
+  # but courses/accounts can disable this
   def recalculate_access
     if self.enrollment.view_restrictable?
       self.restricted_access =
@@ -172,6 +203,9 @@ class EnrollmentState < ActiveRecord::Base
     end
     self.access_is_current = true
   end
+
+  # ********************
+  # The rest of these class-level methods keep the database state up to date when dates and access settings are changed elsewhere
 
   def self.enrollments_needing_calculation(scope=Enrollment.all)
     scope.joins(:enrollment_state).
@@ -298,6 +332,7 @@ class EnrollmentState < ActiveRecord::Base
     end
   end
 
+  # called every ~5 minutes by a periodic delayed job
   def self.recalculate_expired_states
     while (enrollments = Enrollment.joins(:enrollment_state).where("enrollment_states.state_valid_until IS NOT NULL AND
            enrollment_states.state_valid_until < ?", Time.now.utc).limit(250).to_a) && enrollments.any?

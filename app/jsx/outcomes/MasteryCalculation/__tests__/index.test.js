@@ -17,9 +17,13 @@
  */
 
 import React from 'react'
-import {render, wait, fireEvent} from '@testing-library/react'
+import {render, wait, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {OUTCOME_PROFICIENCY_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
+import {
+  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
+  COURSE_OUTCOME_PROFICIENCY_QUERY,
+  SET_OUTCOME_CALCULATION_METHOD
+} from '../api'
 import MasteryCalculation from '../index'
 
 describe('MasteryCalculation', () => {
@@ -27,7 +31,10 @@ describe('MasteryCalculation', () => {
     window.ENV = {
       PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: [
         {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
-      ]
+      ],
+      PERMISSIONS: {
+        manage_proficiency_calculations: true
+      }
     }
   })
 
@@ -35,27 +42,44 @@ describe('MasteryCalculation', () => {
     window.ENV = null
   })
 
+  const outcomeCalculationMethod = {
+    __typename: 'OutcomeCalculationMethod',
+    _id: '1',
+    contextType: 'Account',
+    contextId: 1,
+    calculationMethod: 'decaying_average',
+    calculationInt: 65
+  }
+
   const mocks = [
     {
       request: {
-        query: OUTCOME_PROFICIENCY_QUERY,
+        query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
         variables: {
           contextId: '11'
         }
       },
       result: {
         data: {
-          account: {
+          context: {
             __typename: 'Account',
-            outcomeCalculationMethod: {
-              __typename: 'OutcomeCalculationMethod',
-              _id: '1',
-              contextType: 'Account',
-              contextId: 1,
-              calculationMethod: 'decaying_average',
-              calculationInt: 65,
-              locked: false
-            }
+            outcomeCalculationMethod
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: COURSE_OUTCOME_PROFICIENCY_QUERY,
+        variables: {
+          contextId: '12'
+        }
+      },
+      result: {
+        data: {
+          context: {
+            __typename: 'Course',
+            outcomeCalculationMethod
           }
         }
       }
@@ -63,9 +87,20 @@ describe('MasteryCalculation', () => {
   ]
 
   it('loads proficiency data', async () => {
-    const {getByText, getByDisplayValue} = render(
+    const {getByText, queryByText, getByDisplayValue} = render(
       <MockedProvider mocks={mocks}>
         <MasteryCalculation contextType="Account" contextId="11" />
+      </MockedProvider>
+    )
+    expect(getByText('Loading')).not.toEqual(null)
+    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    expect(getByDisplayValue(/65/)).not.toEqual(null)
+  })
+
+  it('loads proficiency data for Course', async () => {
+    const {getByText, getByDisplayValue} = render(
+      <MockedProvider mocks={mocks}>
+        <MasteryCalculation contextType="Course" contextId="12" />
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
@@ -74,24 +109,24 @@ describe('MasteryCalculation', () => {
   })
 
   it('loads role list', async () => {
-    const {getByText} = render(
+    const {getByText, queryByText} = render(
       <MockedProvider mocks={mocks}>
         <MasteryCalculation contextType="Account" contextId="11" />
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
-    await wait()
+    await waitForElementToBeRemoved(() => queryByText('Loading'))
     expect(getByText(/Permission to change this mastery calculation/)).not.toEqual(null)
     expect(getByText(/Account Admin/)).not.toEqual(null)
   })
 
   it('displays an error on failed request', async () => {
-    const {getByText} = render(
+    const {getByText, queryByText} = render(
       <MockedProvider mocks={[]}>
         <MasteryCalculation contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    await wait()
+    await waitForElementToBeRemoved(() => queryByText('Loading'))
     expect(getByText(/An error occurred/)).not.toEqual(null)
   })
 
@@ -99,14 +134,14 @@ describe('MasteryCalculation', () => {
     const emptyMocks = [
       {
         request: {
-          query: OUTCOME_PROFICIENCY_QUERY,
+          query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
           variables: {
             contextId: '11'
           }
         },
         result: {
           data: {
-            account: {
+            context: {
               __typename: 'Account',
               outcomeCalculationMethod: null
             }
@@ -114,12 +149,12 @@ describe('MasteryCalculation', () => {
         }
       }
     ]
-    const {getByText} = render(
+    const {getByText, queryByText} = render(
       <MockedProvider mocks={emptyMocks}>
         <MasteryCalculation contextType="Account" contextId="11" />
       </MockedProvider>
     )
-    await wait()
+    await waitForElementToBeRemoved(() => queryByText('Loading'))
     expect(getByText('Proficiency Calculation')).not.toBeNull()
   })
 
@@ -162,6 +197,30 @@ describe('MasteryCalculation', () => {
       fireEvent.input(parameter, {target: {value: '88'}})
 
       await wait(() => expect(updateCall).toHaveBeenCalled())
+    })
+  })
+
+  describe('locked', () => {
+    beforeEach(() => {
+      window.ENV.PERMISSIONS = {
+        manage_proficiency_calculations: false
+      }
+    })
+
+    afterEach(() => {
+      window.ENV.PERMISSIONS = null
+    })
+
+    it('hides role list', async () => {
+      const {getByText, queryByText} = render(
+        <MockedProvider mocks={mocks}>
+          <MasteryCalculation contextType="Account" contextId="11" />
+        </MockedProvider>
+      )
+      expect(getByText('Loading')).not.toEqual(null)
+      await waitForElementToBeRemoved(() => queryByText('Loading'))
+      expect(queryByText(/Permission to change this mastery calculation/)).not.toBeInTheDocument()
+      expect(queryByText(/Account Admin/)).not.toBeInTheDocument()
     })
   })
 })

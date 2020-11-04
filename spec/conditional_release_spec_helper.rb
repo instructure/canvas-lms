@@ -44,6 +44,8 @@ RSpec.shared_examples 'a soft-deletable model' do
   end
 end
 
+# ensure this is loaded
+ConditionalRelease
 module ConditionalRelease
   module SpecHelper
     def setup_course_with_native_conditional_release(course: nil)

@@ -30,16 +30,28 @@ Rails.configuration.to_prepare do
     ActionController::InvalidAuthenticityToken
     Turnitin::Errors::SubmissionNotScoredError
   })
-  Canvas::Errors.register!(:error_report) do |exception, data|
+
+  # write a database record to our application DB capturing useful info for looking
+  # at this error later
+  Canvas::Errors.register!(:error_report) do |exception, data, level|
     setting = Setting.get("error_report_exception_handling", 'true')
-    if setting == 'true'
+    if setting == 'true' && level == :error
       report = ErrorReport.log_exception_from_canvas_errors(exception, data)
       report.try(:global_id)
     end
   end
 
-  Canvas::Errors.register!(:error_stats) do |exception, data|
+  # keep track of incidence rates for errors we might not send
+  # to the DB or to sentry (e.g. we expect auth errors to happen,
+  # but if they spike we want to see that in a dashboard and maybe
+  # even have a monitor fire)
+  Canvas::Errors.register!(:error_stats) do |exception, data, level|
     setting = Setting.get("collect_error_statistics", 'true')
-    Canvas::ErrorStats.capture(exception, data) if setting == 'true'
+    Canvas::ErrorStats.capture(exception, data, level) if setting == 'true'
+  end
+
+  # output full error stack trace and context to log files
+  Canvas::Errors.register!(:logging) do |exception, data, level|
+    Canvas::Errors::LogEntry.write(exception, data, level)
   end
 end

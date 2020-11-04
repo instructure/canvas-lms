@@ -271,15 +271,6 @@ describe Api::V1::SisAssignment do
         expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
       end
 
-      it "does not list student sis_ids when pseudonyms are not preloaded" do
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(active_assignment_overrides: [assignment_override_students: [:user]])
-
-        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
-
-        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
-      end
-
       it 'provides an empty list when there are no overrides' do
         assignment_2 = assignment_model(course: course)
         assignments = Assignment.where(id: assignment_2.id).

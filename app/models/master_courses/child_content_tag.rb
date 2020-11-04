@@ -18,6 +18,10 @@
 class MasterCourses::ChildContentTag < ActiveRecord::Base
   # can never have too many content tags
 
+  # stores change data on the associated course
+  # i.e. which objects were changed from their blueprint versions and what columns (and pseudo-columns)
+  # so we don't overwrite intentional changes during a sync (unless the object gets locked)
+
   belongs_to :child_subscription, :class_name => "MasterCourses::ChildSubscription"
 
   belongs_to :content, polymorphic: [:assessment_question_bank,

@@ -68,7 +68,7 @@ describe 'Submissions Comment API', type: :request do
        format: "json", course_id: @course.to_param,
        assignment_id: @assignment.to_param, user_id: @student.to_param},
       name: "whatever"
-      expect(response).not_to be_success
+      expect(response).not_to be_successful
     end
 
     it "creates an attachment with the right the user_id" do

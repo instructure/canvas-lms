@@ -18,7 +18,7 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe "/shared/_flash_notices" do
+describe "shared/_flash_notices" do
   def local_options(overrides={})
     {
       with_login_text: 'Login with Facebook',

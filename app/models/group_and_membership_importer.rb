@@ -48,7 +48,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     return unless progress.reload.running?
 
     begin
-      csv_contents = CSV.read(csv[:fullpath], SIS::CSV::CSVBaseImporter::PARSE_ARGS)
+      csv_contents = CSV.read(csv[:fullpath], **SIS::CSV::CSVBaseImporter::PARSE_ARGS)
     rescue CSV::MalformedCSVError
       fail_import(I18n.t("Malformed CSV"))
     end

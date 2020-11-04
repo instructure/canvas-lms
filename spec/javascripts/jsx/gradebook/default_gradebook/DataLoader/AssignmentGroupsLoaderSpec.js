@@ -108,6 +108,28 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       strictEqual(requests.length, 1)
     })
 
+    test('excludes rubrics when requesting assignments', async () => {
+      loadAssignmentGroups()
+      await network.allRequestsReady()
+      const [{params}] = getRequests()
+      ok(params.exclude_response_fields.includes('rubric'))
+    })
+
+    test('includes module ids when requesting assignments if the course has modules', async () => {
+      loadAssignmentGroups()
+      await network.allRequestsReady()
+      const [{params}] = getRequests()
+      ok(params.include.includes('module_ids'))
+    })
+
+    test('excludes module ids when requesting assignments if the course has no modules', async () => {
+      gradebook.options.has_modules = false
+      loadAssignmentGroups()
+      await network.allRequestsReady()
+      const [{params}] = getRequests()
+      notOk(params.include.includes('module_ids'))
+    })
+
     QUnit.module('when sending the initial request', () => {
       test('sets the `per_page` parameter to the configured per page maximum', async () => {
         performanceControls = new PerformanceControls({assignmentGroupsPerPage: 45})

@@ -109,12 +109,14 @@ export default class GroupCategoryDetailView extends View {
     if (e) e.preventDefault()
     ReactDOM.render(
       <GroupModal
-        groupCategory={{
-          id: this.model.get('id'),
+        groupCategory={{id: this.model.get('id')}}
+        group={{
           role: this.model.get('role'),
           group_limit: this.model.get('group_limit')
         }}
+        label={I18n.t('Add Group')}
         open={open}
+        requestMethod="POST"
         onSave={() => this.refreshCollection()}
         onDismiss={() => {
           this.addGroup(null, false)

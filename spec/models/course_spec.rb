@@ -1848,7 +1848,11 @@ describe Course, "enroll" do
     @course.enroll_student(@user)
     scope = account.associated_courses.active.select([:id, :name]).eager_load(:teachers).joins(:teachers).where(:enrollments => { :workflow_state => 'active' })
     sql = scope.to_sql
-    expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
+    if CANVAS_RAILS5_2
+      expect(sql).to match(/"enrollments"\."type" IN \('TeacherEnrollment'\)/)
+    else
+      expect(sql).to match(/"enrollments"\."type" = 'TeacherEnrollment'/)
+    end
   end
 end
 
@@ -6009,5 +6013,25 @@ describe Course, "#show_total_grade_as_points?" do
       sub_account2.update_attribute(:parent_account, sub_account1)
       expect(cached_account_users).to eq [au]
     end
+  end
+end
+
+describe Course, "#has_modules?" do
+  before(:once) do
+    @course = Course.create!
+  end
+
+  it "returns false when the course has no modules" do
+    expect(@course).not_to be_has_modules
+  end
+
+  it "returns false when all modules are soft-deleted" do
+    @course.context_modules.create!(workflow_state: "deleted")
+    expect(@course).not_to be_has_modules
+  end
+
+  it "returns true when at least one not-deleted module exists" do
+    @course.context_modules.create!
+    expect(@course).to be_has_modules
   end
 end

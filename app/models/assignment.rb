@@ -1218,7 +1218,9 @@ class Assignment < ActiveRecord::Base
       event :finish_duplicating, :transitions_to => :unpublished
       event :fail_to_duplicate, :transitions_to => :failed_to_duplicate
     end
-    state :failed_to_duplicate
+    state :failed_to_duplicate do
+      event :finish_duplicating, :transitions_to => :unpublished
+    end
     state :importing do
       event :finish_importing, :transitions_to => :unpublished
       event :fail_to_import, :transitions_to => :fail_to_import
@@ -3512,10 +3514,9 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.disable_post_to_sis_if_grading_period_closed
-    return unless Account.site_admin.feature_enabled?(:new_sis_integrations)
-
     eligible_root_accounts = Account.root_accounts.active.select do |account|
       account.feature_enabled?(:disable_post_to_sis_when_grading_period_closed) &&
+        account.feature_enabled?(:new_sis_integrations) &&
         account.disable_post_to_sis_when_grading_period_closed?
     end
     return unless eligible_root_accounts.any?
@@ -3548,6 +3549,13 @@ class Assignment < ActiveRecord::Base
 
       Assignment.where(id: assignment_ids_to_update).update_all(post_to_sis: false, updated_at: Time.zone.now)
     end
+  end
+
+  def self.from_secure_lti_params(secure_params)
+    lti_context_id = Lti::Security.decoded_lti_assignment_id(secure_params)
+    return nil if lti_context_id.blank?
+
+    self.find_by(lti_context_id: lti_context_id)
   end
 
   private

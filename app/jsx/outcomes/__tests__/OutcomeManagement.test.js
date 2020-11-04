@@ -21,25 +21,51 @@ import {mount, shallow} from 'enzyme'
 import OutcomeManagement, {OutcomePanel} from '../OutcomeManagement'
 
 describe('OutcomeManagement', () => {
-  beforeEach(() => {
-    window.ENV = {
-      context_asset_string: 'account_1'
-    }
+  const sharedExamples = () => {
+    it('renders the OutcomeManagement and shows the "outcomes" div', () => {
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('OutcomePanel').exists()).toBe(true)
+    })
+  }
+
+  describe('account', () => {
+    beforeEach(() => {
+      window.ENV = {
+        context_asset_string: 'account_1'
+      }
+    })
+
+    afterEach(() => {
+      window.ENV = null
+    })
+
+    sharedExamples()
+
+    it('passes accountId to the ProficiencyTable component', () => {
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Account')
+      expect(wrapper.find('MasteryScale').prop('contextId')).toBe('1')
+    })
   })
 
-  afterEach(() => {
-    window.ENV = null
-  })
+  describe('course', () => {
+    beforeEach(() => {
+      window.ENV = {
+        context_asset_string: 'course_2'
+      }
+    })
 
-  it('renders the OutcomeManagement and shows the "outcomes" div', () => {
-    const wrapper = shallow(<OutcomeManagement />)
-    expect(wrapper.find('OutcomePanel').exists()).toBe(true)
-  })
+    afterEach(() => {
+      window.ENV = null
+    })
 
-  it('passes accountId to the ProficiencyTable component', () => {
-    const wrapper = shallow(<OutcomeManagement />)
-    expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Account')
-    expect(wrapper.find('MasteryScale').prop('contextId')).toBe('1')
+    sharedExamples()
+
+    it('passes courseId to the ProficiencyTable component', () => {
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Course')
+      expect(wrapper.find('MasteryScale').prop('contextId')).toBe('2')
+    })
   })
 })
 

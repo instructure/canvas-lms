@@ -244,7 +244,7 @@ module Lti
         json = JSON.parse(response.body)
         url = json["attachments"].first["url"]
         get url, headers: request_headers
-        expect(response.content_type.to_s).to eq attachment.content_type
+        expect(response.media_type.to_s).to eq attachment.content_type
       end
 
       it "returns a 401 if the attachment isn't associated to the assignment" do
@@ -264,7 +264,7 @@ module Lti
           @shard2.activate do
             get url, headers: request_headers
             expect(response).to be_successful
-            expect(response.content_type.to_s).to eq attachment.content_type
+            expect(response.media_type.to_s).to eq attachment.content_type
           end
         end
       end

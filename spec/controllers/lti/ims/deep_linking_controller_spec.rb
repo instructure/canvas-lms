@@ -63,7 +63,7 @@ module Lti
 
           before {  Lti::Security.check_and_store_nonce(nonce_key, iat, 30.seconds) }
 
-          it { is_expected.to be_success }
+          it { is_expected.to be_successful }
         end
 
         context 'when the aud is invalid' do
@@ -127,7 +127,7 @@ module Lti
 
             it do
               expected_url_called(url, :get, stubbed_response)
-              is_expected.to be_success
+              is_expected.to be_successful
             end
           end
 
@@ -138,7 +138,7 @@ module Lti
 
             it do
               expected_url_called(url, :get, stubbed_response)
-              is_expected.to be_success
+              is_expected.to be_successful
             end
           end
 
@@ -264,7 +264,7 @@ module Lti
             user_session(@user)
             context_external_tool
             subject
-            is_expected.to be_success
+            is_expected.to be_successful
             expect(context_module.content_tags.count).to eq(3)
           end
 
@@ -273,7 +273,7 @@ module Lti
             user_session(@user)
             context_external_tool
             subject
-            is_expected.to be_success
+            is_expected.to be_successful
             expect(context_module.content_tags[0][:link_settings]).to be(nil)
           end
 
@@ -291,7 +291,7 @@ module Lti
               user_session(@user)
               context_external_tool
               subject
-              is_expected.to be_success
+              is_expected.to be_successful
               expect(context_module.content_tags[0][:link_settings]['selection_width']).to be(642)
               expect(context_module.content_tags[0][:link_settings]['selection_height']).to be(842)
             end

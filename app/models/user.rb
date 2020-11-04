@@ -1013,6 +1013,11 @@ class User < ActiveRecord::Base
     deleted?
   end
 
+  def clear_caches
+    self.clear_cache_key(*Canvas::CacheRegister::ALLOWED_TYPES['User'])
+    self.touch
+  end
+
   alias_method :destroy_permanently!, :destroy
   def destroy
     self.remove_from_root_account(:all)
@@ -2609,7 +2614,7 @@ class User < ActiveRecord::Base
   def user_can_edit_name?
     accounts = pseudonyms.shard(self).active.map(&:account)
     return true if accounts.empty?
-    accounts.any? { |a| a.settings[:users_can_edit_name] != false }
+    accounts.any? { |a| a.users_can_edit_name? }
   end
 
   def limit_parent_app_web_access?

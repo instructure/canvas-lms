@@ -47,7 +47,7 @@ class AssignmentGroupsApiController < ApplicationController
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       assignments = @assignment_group.visible_assignments(@current_user)
       if params[:grading_period_id].present?
-        assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(assignments)
+        assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(@context, assignments)
       end
       if assignments.any? && includes.include?('submission')
         submissions = submissions_hash(['submission'], assignments)

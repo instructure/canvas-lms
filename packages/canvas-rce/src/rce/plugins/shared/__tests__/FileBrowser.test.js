@@ -41,7 +41,7 @@ describe('RceFileBrowser', () => {
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
       title: 'a file',
-      href: '/file/download?wrap=1',
+      href: '/file?wrap=1',
       embedded_iframe_url: undefined,
       content_type: 'application/pdf',
       target: '_blank',

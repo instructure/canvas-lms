@@ -181,7 +181,8 @@ describe QuizzesNext::QuizzesApiController, type: :request do
           enable_cache do
             subject
             link_header = response.headers['Link']
-            cache_key = Rails.cache.instance_variable_get(:@data).keys.select{|x| x.start_with?('quizzes.next')}.first
+            cache_key = Rails.cache.instance_variable_get(:@data).keys.grep(/quizzes\.next/).first.dup
+            cache_key.sub!(/^rails60:/, '')
             cached_content = Rails.cache.read(cache_key)
             expect(cached_content[:link]).to eq(link_header)
           end

@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Api::V1::MasterCourses
+  include Api::V1::User
+
   def master_template_json(template, user, session, opts={})
     hash = api_json(template, user, session, :only => %w(id course_id), :methods => %w{last_export_completed_at associated_course_count})
     migration = template.active_migration
@@ -33,6 +35,7 @@ module Api::V1::MasterCourses
       hash['template_id'] = migration.master_template_id
     end
     hash['id'] = opts[:child_migration].id if opts[:child_migration]
+    hash['user'] = user_display_json(migration.user)
     hash
   end
 

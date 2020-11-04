@@ -67,7 +67,7 @@ RSpec.describe Lti::ToolConfigurationsApiController, type: :controller do
 
   shared_examples_for 'an action that requires manage developer keys' do |skip_404|
     context 'when the user has manage_developer_keys' do
-      it { is_expected.to be_success }
+      it { is_expected.to be_successful }
     end
 
     context 'when the user is not an admin' do

@@ -144,6 +144,10 @@ class ConversationMessage < ActiveRecord::Base
     write_attribute(:attachment_ids, ids.join(','))
   end
 
+  def relativize_attachment_ids(from_shard:, to_shard:)
+    self.attachment_ids = attachment_ids.map { |id| Shard.relative_id_for(id, from_shard, to_shard) }.sort
+  end
+
   def attachments
     self.attachment_associations.map(&:attachment)
   end

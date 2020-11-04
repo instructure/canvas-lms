@@ -26,18 +26,27 @@ export default class AssignmentGroupsLoader {
   loadAssignmentGroups() {
     const courseId = this._gradebook.course.id
     const url = `/api/v1/courses/${courseId}/assignment_groups`
+    const includes = [
+      'assignment_group_id',
+      'assignment_visibility',
+      'assignments',
+      'grades_published',
+      'post_manually'
+    ]
+
+    if (this._gradebook.options.has_modules) {
+      includes.push('module_ids')
+    }
 
     const params = {
       exclude_assignment_submission_types: ['wiki_page'],
-      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
-      include: [
-        'assignment_group_id',
-        'assignment_visibility',
-        'assignments',
-        'grades_published',
-        'module_ids',
-        'post_manually'
+      exclude_response_fields: [
+        'description',
+        'in_closed_grading_period',
+        'needs_grading_count',
+        'rubric'
       ],
+      include: includes,
       override_assignment_dates: false,
       per_page: this._performanceControls.assignmentGroupsPerPage
     }

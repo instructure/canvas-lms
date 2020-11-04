@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Bewerken"
     },
+    "edit_equation_f5279959": {
+        "message": "Vergelijking bewerken"
+    },
     "edit_link_7f53bebb": {
         "message": "Link bewerken"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "{ count, plural,\n     =0 {# resultaten}\n    one {# resultaat}\n  other {# resultaten}\n} gevonden"
     },
+    "fullscreen_873bf53f": {
+        "message": "Volledig scherm"
+    },
     "generating_preview_45b53be0": {
         "message": "Bezig met genereren van voorbeeld..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "Cijfers geladen"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Documenten groeperen"
+    },
     "group_files_4324f3df": {
         "message": "Groepsbestanden"
     },
     "group_files_82e5dcdb": {
         "message": "Groepsbestanden"
     },
+    "group_images_98e0ac17": {
+        "message": "Afbeeldingen groeperen"
+    },
     "group_links_9493129e": {
         "message": "Groeplinks"
+    },
+    "group_media_2f3d128a": {
+        "message": "Media groeperen"
     },
     "group_navigation_99f191a": {
         "message": "Groepsnavigatie"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Toetsen"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Editor voor onbewerkte HTML"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Lezen van een mediatrackbestand is mislukt. Afbreken."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Videospeler voor { title }"
+    },
+    "view_ba339f93": {
+        "message": "Bekijken"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Sneltoetsen bekijken"

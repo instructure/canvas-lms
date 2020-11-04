@@ -144,12 +144,12 @@ describe('SearchableSelect', () => {
     expect(subjectProps.onChange).not.toHaveBeenCalled()
   })
 
-  it('removes the no matches message after blurring', () => {
+  it('keeps the no matches message after blurring', () => {
     const {input, queryByText} = renderSubject()
     fireEvent.click(input)
     fireEvent.input(input, {target: {value: 'will not match'}})
     fireEvent.blur(input)
-    expect(queryByText('No matches to your search')).toBeNull()
+    expect(queryByText('No matches to your search')).toBeVisible()
   })
 
   it('sets the input value and calls onChange when blurring after typing if no ambiguity', () => {
@@ -250,21 +250,23 @@ describe('SearchableSelect::Groups', () => {
     expect(getByText('No matches to your search')).toBeInTheDocument()
   })
 
-  it('clears an error message and restores old search result after blurring', () => {
-    const {input, queryByText} = renderSubject({value: 'g1o1'})
+  it('keeps selection if matched to single result after blurring', () => {
+    const {input, queryByText} = renderSubject()
     fireEvent.click(input)
-    fireEvent.input(input, {target: {value: 'xxx'}})
+    fireEvent.input(input, {target: {value: 'grp 1 option 2'}})
     fireEvent.blur(input)
+    fireEvent.click(input)
     expect(queryByText('No matches to your search')).toBeNull()
-    expect(input.value).toBe('grp 1 option 1')
+    expect(input.value).toBe('grp 1 option 2')
   })
 
   it('does not misbehave when clicking back in after blurring', () => {
-    const {input} = renderSubject({value: 'g1o1'})
+    const {input, getByText} = renderSubject({value: 'g1o1'})
     fireEvent.click(input)
     fireEvent.input(input, {target: {value: 'xxx'}})
     fireEvent.blur(input)
     fireEvent.click(input)
-    expect(input.value).toBe('grp 1 option 1')
+    expect(input.value).toBe('xxx')
+    expect(getByText('No matches to your search')).toBeInTheDocument()
   })
 })

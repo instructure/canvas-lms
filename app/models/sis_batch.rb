@@ -499,7 +499,7 @@ class SisBatch < ActiveRecord::Base
 
   def term_course_scope
     if data[:supplied_batches].include?(:course)
-      scope = account.all_courses.active.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope = account.all_courses.active.where.not(sis_batch_id: nil).where.not(sis_source_id: nil)
       scope.where(enrollment_term_id: batch_mode_terms)
     end
   end
@@ -539,7 +539,7 @@ class SisBatch < ActiveRecord::Base
   def term_sections_scope
     if data[:supplied_batches].include?(:section)
       scope = self.account.course_sections.active.where(courses: {enrollment_term_id: batch_mode_terms})
-      scope = scope.where.not(sis_batch_id: nil, sis_source_id: nil)
+      scope = scope.where.not(sis_batch_id: nil).where.not(sis_source_id: nil)
       scope.joins("INNER JOIN #{Course.quoted_table_name} ON courses.id=COALESCE(nonxlist_course_id, course_id)").readonly(false)
     end
   end

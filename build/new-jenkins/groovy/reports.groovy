@@ -61,55 +61,11 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
   cleanupCoverage(prefix)
 }
 
-def appendFailMessageReport(message, link) {
-  if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
-    echo "build not associated with a PS... not sending message"
-  }
-  dir ("_buildmeta") {
-    def message_file = "failure-messages-${BUILD_NUMBER}.txt"
-    if (!fileExists(message_file)) {
-      sh "echo 'failure links:' >> $message_file"
-    }
-    sh "echo '$message' >> $message_file"
-    sh "echo '$link' >> $message_file"
-  }
-  archiveArtifacts(artifacts: '_buildmeta/*')
-}
-
-def sendFailureMessageIfPresent() {
-  def message_file = "_buildmeta/failure-messages-${BUILD_NUMBER}.txt"
-  if (fileExists(message_file)) {
-    echo "sending failure message"
-    sh "cat $message_file"
-    if (!env.GERRIT_CHANGE_NUMBER || !env.GERRIT_PATCHSET_NUMBER) {
-      echo "build not associated with a PS... not sending message"
-    }
-    else {
-      credentials.withGerritCredentials {
-        sh """
-          gerrit_message=`cat $message_file`
-          ssh -i "\$SSH_KEY_PATH" -l "\$SSH_USERNAME" -p \$GERRIT_PORT \
-            \$GERRIT_HOST gerrit review -m "'\$gerrit_message'" \$GERRIT_CHANGE_NUMBER,\$GERRIT_PATCHSET_NUMBER
-        """
-      }
-    }
-  }
-  else {
-    echo "no failure messages to send"
-  }
-}
-
 // this method is to ensure that the stashing is done in a way that
 // is expected in publishSpecFailuresAsHTML
 def stashSpecFailures(prefix, index) {
   dir("tmp") {
     stash name: "${prefix}_spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
-  }
-}
-
-def stashSpecResults(prefix, index) {
-  dir("tmp") {
-    stash name: "${prefix}_spec_results_${index}", includes: 'rspec_results/**/*', allowEmpty: true
   }
 }
 
@@ -189,73 +145,6 @@ def buildIndexPage(failureCategories) {
   }
   indexHtml += "</body>"
   writeFile file: "index.html", text: indexHtml
-}
-
-def snykCheckDependencies(projectImage, projectDirectory) {
-  def projectContainer = sh(script: "docker run -d -it -v snyk_volume:${projectDirectory} ${projectImage}", returnStdout: true).trim()
-  runSnyk(
-    projectContainer,
-    projectDirectory,
-    'canvas-lms:ruby',
-    'snyk/snyk-cli:rubygems',
-    'Gemfile.lock',
-    './snyk_ruby'
-  )
-  archiveArtifacts(artifacts: '**/snyk*')
-  sh 'rm -vr ./snyk_ruby'
-}
-
-def runSnyk(projectContainer, projectDirectory, projectName, snykImage, packageManagerFile, extractedReportsDirectory) {
-  credentials.withSnykCredentials {
-    def RC = sh(
-      script: """
-        set -o errexit -o nounset -o xtrace
-        docker run --rm \
-          -v snyk_volume:/project \
-          -eSNYK_TOKEN \
-          -e"MONITOR=true" \
-           ${snykImage} test \
-          --project-name=${projectName} \
-          --file=${packageManagerFile}
-      """,
-      returnStatus: true
-    )
-    // Snyk returns a 1 if vulnerabilities are found; we don't want this to fail the build
-    // If the return code is not 0 or 1, it's a build error and should throw an exception
-    if(RC != 0 && RC != 1) {
-      error "Snyk dependency check for ${projectName} failed with an unrecognized return code: $RC"
-    }
-  }
-  this.extractSnykReports(projectContainer, projectDirectory, extractedReportsDirectory)
-}
-
-def extractSnykReports(projectContainer, projectDirectory, destinationDirectory) {
-  sh """
-    set -o errexit -o nounset -o xtrace
-    mkdir -vp ${destinationDirectory}
-    docker cp ${projectContainer}:${projectDirectory}/snyk-error.log ${destinationDirectory}/snyk-error.log
-    docker cp ${projectContainer}:${projectDirectory}/snyk-result.json ${destinationDirectory}/snyk-result.json
-    docker cp ${projectContainer}:${projectDirectory}/snyk_report.css ${destinationDirectory}/snyk_report.css
-    docker cp ${projectContainer}:${projectDirectory}/snyk_report.html ${destinationDirectory}/snyk_report.html
-  """
-}
-
-def publishJunitReport(prefix, total) {
-  def working_dir = "${prefix}_compiled_results"
-  dir("spec_results") {
-    sh "mkdir -p $working_dir"
-    dir("${working_dir}") {
-      for(int index = 0; index < total; index++) {
-        dir ("node_${index}") {
-          try {
-            unstash "${prefix}_spec_results_${index}"
-          } catch(err) {
-            println (err)
-          }
-        }
-      }
-    }
-  }
 }
 
 def copyParallelLogs(rspecTotal, seleniumTotal) {

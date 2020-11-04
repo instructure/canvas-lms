@@ -19,7 +19,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/conference/index" do
+describe "/conferences/index" do
   before do
     # these specs need an enabled web conference plugin
     @plugin = PluginSetting.create!(name: 'wimba')

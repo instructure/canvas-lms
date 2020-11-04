@@ -66,6 +66,7 @@ module Lti
     class LineItemsController < ApplicationController
       include Concerns::GradebookServices
 
+      before_action :prepare_line_item_for_ags!, only: :create
       before_action :verify_line_item_in_context, only: %i(show update destroy)
       before_action :verify_valid_resource_link, only: :create
 

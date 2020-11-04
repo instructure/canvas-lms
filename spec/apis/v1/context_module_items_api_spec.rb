@@ -293,10 +293,12 @@ describe "Module Items API", type: :request do
       end
 
       it "should find module items" do
-        api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/modules/#{@module1.id}/items/#{@assignment_tag.id}",
           :controller => "context_module_items_api", :action => "show", :format => "json",
           :course_id => "#{@course.id}", :module_id => "#{@module1.id}",
           :id => "#{@assignment_tag.id}")
+        expect(json['id']).to eq(@assignment_tag.id)
+        expect(json['title']).to eq(@assignment_tag.title)
       end
 
       it "should not find module items when hidden" do
@@ -1560,6 +1562,7 @@ describe "Module Items API", type: :request do
 
         it "should work even when there is none must-mark-done requirement to delete" do
           mark_not_done_api_call
+          assert_status(200)
         end
       end
     end

@@ -16,13 +16,22 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class MasterCourses::MasterTemplate < ActiveRecord::Base
+  # the root of all the magic for a blueprint course
+  # is created when a course is marked as a blueprint
+  # stores the locking (aka restrictions) settings
+  # and links it to all the other models for handling associations and sync
+
   # NOTE: at some point we can use this model if we decide to allow collections of objects within a course to be pushed out
   # instead of the entire course, but for now that's what we'll roll with
 
   belongs_to :course
   belongs_to :root_account, :class_name => 'Account'
+
+  # these store which pieces of blueprint content are locked (and how)
   has_many :master_content_tags, :class_name => "MasterCourses::MasterContentTag", :inverse_of => :master_template
+  # links the blueprint to its associated courses
   has_many :child_subscriptions, :class_name => "MasterCourses::ChildSubscription", :inverse_of => :master_template
+  # sync events
   has_many :master_migrations, :class_name => "MasterCourses::MasterMigration", :inverse_of => :master_template
 
   belongs_to :active_migration, :class_name => "MasterCourses::MasterMigration"

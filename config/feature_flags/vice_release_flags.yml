@@ -76,6 +76,13 @@ react_announcement_discussion_edit:
     allow us to make the page more accessible
   applies_to: RootAccount
 
+react_inbox:
+  state: hidden
+  display_name: Update Inbox page to use react/instui
+  description: |-
+    This refactor will make this page more maintainable
+  applies_to: RootAccount
+
 smart_alerts:
   state: hidden
   display_name: Smart alerts

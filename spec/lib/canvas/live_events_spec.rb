@@ -647,7 +647,7 @@ describe Canvas::LiveEvents do
       it_behaves_like 'a submission event', 'submission_updated'
 
       it 'should include late and missing flags' do
-        submission.update_attributes(late_policy_status: 'missing')
+        submission.update(late_policy_status: 'missing')
 
         expect_event(
           'submission_updated',
@@ -662,7 +662,7 @@ describe Canvas::LiveEvents do
 
       it 'should include posted_at' do
         post_time = Time.zone.now
-        submission.update_attributes(posted_at: post_time)
+        submission.update(posted_at: post_time)
 
         expect_event(
           'submission_updated',
@@ -1803,6 +1803,43 @@ describe Canvas::LiveEvents do
           outcome_proficiency_ratings: @proficiency.outcome_proficiency_ratings.map {|rating| rating_event(rating)}
         }.compact).once
         Canvas::LiveEvents.outcome_proficiency_updated(@proficiency)
+      end
+    end
+  end
+
+  describe 'outcome_calculation_method' do
+    before do
+      @account = account_model
+      @calculation_method = outcome_calculation_method_model(@account)
+    end
+
+    context 'created' do
+      it 'should trigger an outcome_calculation_method_created live event' do
+        expect_event('outcome_calculation_method_created', {
+          outcome_calculation_method_id: @calculation_method.id.to_s,
+          calculation_int: @calculation_method.calculation_int,
+          calculation_method: @calculation_method.calculation_method,
+          workflow_state: @calculation_method.workflow_state,
+          context_id: @calculation_method.context_id.to_s,
+          context_type: @calculation_method.context_type
+        }.compact).once
+
+        Canvas::LiveEvents.outcome_calculation_method_created(@calculation_method)
+      end
+    end
+
+    context 'updated' do
+      it 'should trigger an outcome_calculation_method_updated live event' do
+        expect_event('outcome_calculation_method_updated', {
+          outcome_calculation_method_id: @calculation_method.id.to_s,
+          calculation_int: @calculation_method.calculation_int,
+          calculation_method: @calculation_method.calculation_method,
+          workflow_state: @calculation_method.workflow_state,
+          context_id: @calculation_method.context_id.to_s,
+          context_type: @calculation_method.context_type,
+          updated_at: @calculation_method.updated_at,
+        }.compact).once
+        Canvas::LiveEvents.outcome_calculation_method_updated(@calculation_method)
       end
     end
   end

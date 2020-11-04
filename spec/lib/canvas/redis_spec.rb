@@ -307,7 +307,8 @@ describe "Canvas::Redis" do
       Canvas::Redis.handle_redis_failure({'failure'=>'val'}, 'local_fake_redis') do
         raise ::Redis::InheritedError, "intentional failure"
       end
-      expect(messages.length).to eq(2)
+      # we don't log the second message under spring, cause reasons; we only
+      # care about the primary message anyway
       msgs = messages.select{|m| m =~ /Query failure/ }
       expect(msgs.length).to eq(1)
       m = msgs.first

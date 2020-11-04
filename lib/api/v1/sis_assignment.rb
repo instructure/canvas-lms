@@ -102,9 +102,9 @@ module Api::V1::SisAssignment
 
     assignment_override_students_json = override.assignment_override_students.map do |student_override|
       json = api_json(student_override, nil, nil, API_SIS_ASSIGNMENT_STUDENT_OVERRIDES_JSON_OPTS)
-      if student_override.association(:user).loaded? && student_override.user.association(:pseudonym).loaded?
-        pseudonym = student_override.user.pseudonym
-        json[:sis_user_id] = (pseudonym ? pseudonym.sis_user_id : nil)
+      if student_override.association(:user).loaded?
+        pseudonym = SisPseudonym.for(student_override.user, override.assignment.context)
+        json[:sis_user_id] = pseudonym&.sis_user_id
       end
 
       json

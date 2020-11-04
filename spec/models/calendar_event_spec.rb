@@ -20,7 +20,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CalendarEvent do
   before(:once) do
-    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
   end
 
   it "should sanitize description" do
@@ -888,6 +888,17 @@ describe CalendarEvent do
       expect(child.reload).to be_deleted
     end
 
+    it "deletes the parent event after the last child event is deleted" do
+      calendar_event_model
+      sec2 = @course.course_sections.create! name: 'sec2'
+      child1 = @event.child_events.create! context: @course.default_section, start_at: 1.day.from_now
+      child2 = @event.child_events.create! context: sec2, start_at: 2.days.from_now
+      child1.destroy
+      expect(@event.reload).to be_active
+      child2.destroy
+      expect(@event.reload).to be_deleted
+    end
+
     context "bulk updating" do
       before :once do
         course_with_teacher
@@ -1005,6 +1016,27 @@ describe CalendarEvent do
         e1.reload
         e1.update :remove_child_events => true
         expect(e1.child_events.reload).to be_empty
+      end
+
+      it "unsets all_day when deleting child events" do
+        s2 = @course.course_sections.create!
+        e1 = @course.calendar_events.create!({
+          title: 'foo',
+          start_at: "2020-10-29T00:00:00.000Z",
+          end_at: "2020-10-29T00:00:00.000Z",
+          updating_user: @user,
+          child_event_data: [
+            { start_at: "2020-10-27T10:00:00.000Z", end_at: "2020-10-27T11:00:00.000Z", context_code: @course.default_section.asset_string},
+            { start_at: "2020-10-27T14:00:00.000Z", end_at: "2020-10-27T15:00:00.000Z", context_code: s2.asset_string}
+          ]
+        })
+        e1 = CalendarEvent.find(e1.id)
+        e1.update({
+          start_at: "2020-10-27T10:00:00.000Z",
+          end_at: "2020-10-27T15:00:00.000Z",
+          remove_child_events: true
+        })
+        expect(e1.reload).not_to be_all_day
       end
     end
 

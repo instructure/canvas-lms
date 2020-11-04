@@ -80,7 +80,7 @@ describe SupportHelpers::PlagiarismPlatformController do
     end
 
     it 'is a succesful response' do
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'adds the service to all tool proxies' do

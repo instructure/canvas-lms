@@ -148,6 +148,13 @@ def check_document(html, course, attachment, include_verifiers)
   img2 = doc.at_css('img#2')
   expect(img2).to be_present
   expect(img2['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
+  img3 = doc.at_css('img#3')
+  expect(img3).to be_present
+  if Account.site_admin.feature_enabled?(:new_file_url_rewriting)
+    expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}#{params}"
+  else
+    expect(img3['src']).to eq "http://www.example.com/courses/#{course.id}/files/#{attachment.id}/download#{params}"
+  end
   video = doc.at_css('video')
   expect(video).to be_present
   expect(video['poster']).to match(%r{http://www.example.com/media_objects/qwerty/thumbnail})
@@ -166,6 +173,7 @@ def should_translate_user_content(course, include_verifiers=true)
       Hello, students.<br>
       This will explain everything: <img id="1" src="/courses/#{course.id}/files/#{attachment.id}/preview" alt="important">
       This won't explain anything:  <img id="2" src="/courses/#{course.id}/files/#{attachment.id}/download" alt="important">
+      This might explain something:  <img id="3" src="/courses/#{course.id}/files/#{attachment.id}" alt="important">
       Also, watch this awesome video: <a href="/media_objects/qwerty" class="instructure_inline_media_comment video_comment" id="media_comment_qwerty"><img></a>
       And refer to this <a href="/courses/#{course.id}/pages/awesome-page">awesome wiki page</a>.
     </p>

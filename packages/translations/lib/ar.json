@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "تحرير"
     },
+    "edit_equation_f5279959": {
+        "message": "تحرير المعادلة"
+    },
     "edit_link_7f53bebb": {
         "message": "تحرير الارتباط"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "تم العثور على { count, plural,\n     =0 {# من النتائج}\n    one {# نتيجة}\n  other {# من النتائج}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "ملء الشاشة"
+    },
     "generating_preview_45b53be0": {
         "message": "جارٍ إنشاء المعاينة..."
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "تم تحميل الدرجات"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "مستندات المجموعة"
+    },
     "group_files_4324f3df": {
         "message": "ملفات المجموعة"
     },
     "group_files_82e5dcdb": {
         "message": "ملفات المجموعة"
     },
+    "group_images_98e0ac17": {
+        "message": "صور المجموعة"
+    },
     "group_links_9493129e": {
         "message": "تجميع الارتباطات"
+    },
+    "group_media_2f3d128a": {
+        "message": "وسائط المجموعة"
     },
     "group_navigation_99f191a": {
         "message": "التنقل عبر المجموعة"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "الاختبارات الموجزة"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "محرر HTML الأولي"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "فشلت قراءة ملف مسار الوسائط. جارٍ الإيقاف قبل الاكتمال."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "مشغل الفيديو لـ { title }"
+    },
+    "view_ba339f93": {
+        "message": "عرض"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "عرض اختصارات لوحة المفاتيح"

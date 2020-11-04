@@ -21,7 +21,7 @@ require 'aws-sdk-sns'
 class DeveloperKey < ActiveRecord::Base
   class CacheOnAssociation < ActiveRecord::Associations::BelongsToAssociation
     def find_target
-      DeveloperKey.find_cached(target_id)
+      DeveloperKey.find_cached(owner._read_attribute(reflection.foreign_key))
     end  
   end
 
@@ -76,7 +76,7 @@ class DeveloperKey < ActiveRecord::Base
       lti_key_ids = Lti::ToolConfiguration.joins(:developer_key).
         where(developer_keys: { id: site_admin_key_ids }).
         pluck(:developer_key_id)
-      DeveloperKey.where(id: lti_key_ids)
+      self.where(id: lti_key_ids)
     end
   end
 

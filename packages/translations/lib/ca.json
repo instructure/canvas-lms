@@ -377,6 +377,9 @@
     "edit_c5fbea07": {
         "message": "Edita"
     },
+    "edit_equation_f5279959": {
+        "message": "Edita l''equació"
+    },
     "edit_link_7f53bebb": {
         "message": "Edita l''enllaç"
     },
@@ -500,6 +503,9 @@
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "S''han trobat { count, plural,\n     =0 {# resultats}\n    one {# resultat}\n  other {# resultats}\n}"
     },
+    "fullscreen_873bf53f": {
+        "message": "Pantalla completa"
+    },
     "generating_preview_45b53be0": {
         "message": "S''està generant la visualització prèvia…"
     },
@@ -524,14 +530,23 @@
     "grades_loaded_5056277c": {
         "message": "S''han carregat les qualificacions"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Agrupa els documents"
+    },
     "group_files_4324f3df": {
         "message": "Fitxers del grup"
     },
     "group_files_82e5dcdb": {
         "message": "Fitxers del grup"
     },
+    "group_images_98e0ac17": {
+        "message": "Agrupa les imatges"
+    },
     "group_links_9493129e": {
         "message": "Enllaços de grup"
+    },
+    "group_media_2f3d128a": {
+        "message": "Agrupa els elements multimèdia"
     },
     "group_navigation_99f191a": {
         "message": "Navegació del grup"
@@ -875,6 +890,9 @@
     "quizzes_7e598f57": {
         "message": "Qüestionaris"
     },
+    "raw_html_editor_e3993e41": {
+        "message": "Editor de dades HTML sense processar"
+    },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "S''ha produït un error en llegir un fitxer de seguiment multimèdia. S''està abandonant."
     },
@@ -1195,6 +1213,9 @@
     },
     "video_player_for_title_ffd9fbc4": {
         "message": "Reproductor de vídeo per a { title }"
+    },
+    "view_ba339f93": {
+        "message": "Mostra"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Mostra les dreceres del teclat"

@@ -109,7 +109,9 @@ const Display = ({calculationInt, currentMethod}) => {
       </Text>
       {currentMethod.validRange && (
         <>
-          <Heading level="h4">{I18n.t('Parameter')}</Heading>
+          <Heading margin="medium none none" level="h4">
+            {I18n.t('Parameter')}
+          </Heading>
           <Text color="primary" weight="normal">
             {calculationInt}
           </Text>
@@ -176,8 +178,8 @@ const Example = ({currentMethod}) => {
   )
 }
 
-const ProficiencyCalculation = ({method, update: rawUpdate, updateError}) => {
-  const {calculationMethod: initialMethodKey, calculationInt: initialInt, locked} = method
+const ProficiencyCalculation = ({method, update: rawUpdate, updateError, canManage}) => {
+  const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 
   const [calculationMethodKey, setCalculationMethodKey] = useState(initialMethodKey)
   const [calculationInt, setCalculationInt] = useState(initialInt)
@@ -216,18 +218,9 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError}) => {
 
   return (
     <View as="div">
-      {locked && (
-        <Heading level="h5" margin="medium 0">
-          {I18n.t(
-            'The proficiency calculation was set by your admin and applies to all courses in this account.'
-          )}
-        </Heading>
-      )}
       <Flex alignItems="start" wrap="wrap">
         <Flex.Item size="240px" padding="small">
-          {locked ? (
-            <Display currentMethod={currentMethod} calculationInt={calculationInt} />
-          ) : (
+          {canManage ? (
             <Form
               calculationMethodKey={calculationMethodKey}
               calculationInt={calculationInt}
@@ -236,6 +229,8 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError}) => {
               updateCalculationMethod={updateCalculationMethod}
               setCalculationInt={setCalculationInt}
             />
+          ) : (
+            <Display currentMethod={currentMethod} calculationInt={calculationInt} />
           )}
         </Flex.Item>
         <Flex.Item size="240px" shouldGrow padding="small">
@@ -249,9 +244,9 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError}) => {
 ProficiencyCalculation.propTypes = {
   method: PropTypes.shape({
     calculationMethod: PropTypes.string.isRequired,
-    calculationInt: PropTypes.number,
-    locked: PropTypes.bool
+    calculationInt: PropTypes.number
   }),
+  canManage: PropTypes.bool,
   update: PropTypes.func.isRequired,
   updateError: PropTypes.string
 }
@@ -259,8 +254,7 @@ ProficiencyCalculation.propTypes = {
 ProficiencyCalculation.defaultProps = {
   method: {
     calculationMethod: 'decaying_average',
-    calculationInt: 65,
-    locked: false
+    calculationInt: 65
   },
   updateError: null
 }

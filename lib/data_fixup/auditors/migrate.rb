@@ -254,7 +254,7 @@ module DataFixup::Auditors
         lambda do
           timeout_value = Setting.get("auditors_backfill_cassandra_timeout", 360).to_i
           opts = { override_options: { 'timeout' => timeout_value } }
-          Canvas::Cassandra::DatabaseBuilder.from_config(:auditors, opts)
+          Canvas::Cassandra::DatabaseBuilder.from_config(:auditors, **opts)
         end
       end
 

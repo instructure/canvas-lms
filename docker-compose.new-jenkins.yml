@@ -38,6 +38,7 @@ services:
   postgres:
     image: $POSTGRES_IMAGE_TAG
     environment:
+      PGDATA: /data
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     init: true
 

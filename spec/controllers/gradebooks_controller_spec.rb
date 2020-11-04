@@ -844,15 +844,32 @@ describe GradebooksController do
       end
 
       describe "view ungraded as zero" do
-        it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
-          Account.site_admin.enable_feature!(:view_ungraded_as_zero)
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
+        context "when individual gradebook is enabled" do
+          before(:each) { @teacher.preferences[:gradebook_version] = "srgb" }
+
+          it "save_view_ungraded_as_zero_to_server is true when the feature is enabled" do
+            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:save_view_ungraded_as_zero_to_server]).to be true
+          end
+
+          it "save_view_ungraded_as_zero_to_server is false when the feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options[:save_view_ungraded_as_zero_to_server]).to be false
+          end
         end
 
-        it "sets allow_view_ungraded_as_zero in the ENV to false if the feature is not enabled" do
-          get :show, params: { course_id: @course.id }
-          expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
+        context "when default gradebook is enabled" do
+          it "sets allow_view_ungraded_as_zero in the ENV to true if the feature is enabled" do
+            Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be true
+          end
+
+          it "sets allow_view_ungraded_as_zero in the ENV to false if the feature is not enabled" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:allow_view_ungraded_as_zero)).to be false
+          end
         end
       end
 

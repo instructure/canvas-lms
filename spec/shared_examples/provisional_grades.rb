@@ -58,7 +58,7 @@ RSpec.shared_examples 'a provisional grades status action' do |controller|
     it 'is authorized when the user is an admin with permission to select final grade' do
       admin = account_admin_user(account: @course.account)
       api_call_as_user(admin, :get, @path, @params.merge(last_updated_at: 1.day.ago(@submission.updated_at)), {}, {})
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it 'is unauthorized when the user is an admin without permission to select final grade' do

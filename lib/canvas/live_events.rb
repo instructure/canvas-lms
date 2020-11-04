@@ -908,4 +908,23 @@ module Canvas::LiveEvents
       workflow_state: rating.workflow_state
     }
   end
+
+  def self.outcome_calculation_method_created(method)
+    post_event_stringified('outcome_calculation_method_created', get_outcome_calculation_method_data(method))
+  end
+
+  def self.outcome_calculation_method_updated(method)
+    post_event_stringified('outcome_calculation_method_updated', get_outcome_calculation_method_data(method).merge(updated_at: method.updated_at))
+  end
+
+  def self.get_outcome_calculation_method_data(method)
+    {
+      outcome_calculation_method_id: method.id,
+      context_type: method.context_type,
+      context_id: method.context_id,
+      workflow_state: method.workflow_state,
+      calculation_method: method.calculation_method,
+      calculation_int: method.calculation_int
+    }
+  end
 end

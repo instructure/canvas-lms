@@ -369,7 +369,7 @@ describe SplitUsers do
         restored_user_ccs = restored_user.communication_channels.where.not(workflow_state: 'retired').
           map { |cc| [cc.path, cc.workflow_state] }.sort
         # cc will not be restored because it conflicted on merge and it was unconfirmed and it is frd deleted
-        source_user_ccs = source_user.communication_channels.where.not(id: cc1, workflow_state: 'retired').
+        source_user_ccs = source_user.communication_channels.where.not(id: cc1).where.not(workflow_state: 'retired').
           map { |cc| [cc.path, cc.workflow_state] }.sort
 
         UserMerge.from(restored_user).into(source_user)

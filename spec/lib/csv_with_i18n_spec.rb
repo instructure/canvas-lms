@@ -67,7 +67,7 @@ describe CsvWithI18n do
       @admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
       @admin.enable_feature!(:include_byte_order_mark_in_gradebook_exports)
       options = CsvWithI18n.csv_i18n_settings(@admin)
-      output = CsvWithI18n.generate(options) do |csv|
+      output = CsvWithI18n.generate(**options) do |csv|
         csv << [1, 2]
         csv << [3, 4]
       end

@@ -1183,7 +1183,7 @@ RSpec.describe ApplicationController do
         end
 
         it 'uses selection_width and selection_height from the ContentTag if provided' do
-          content_tag.update_attributes(link_settings: {selection_width: 543, selection_height: 321})
+          content_tag.update(link_settings: {selection_width: 543, selection_height: 321})
           controller.send(:content_tag_redirect, course, content_tag, nil)
 
           expect(assigns[:lti_launch].tool_dimensions[:selection_width]).to eq '543px'
@@ -2068,7 +2068,7 @@ RSpec.describe ApplicationController, '#teardown_live_events_context' do
   end
 
   it 'sets the context to nil after request' do
-    Thread.current[:live_events_ctx] = "something"
+    Thread.current[:live_events_ctx] = {}
 
     get :index, format: :html
 

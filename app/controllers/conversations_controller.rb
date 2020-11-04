@@ -381,7 +381,7 @@ class ConversationsController < ApplicationController
 
       recipients_are_instructors = all_recipients_are_instructors?(context, @recipients)
 
-      if context.is_a?(Course) && !recipients_are_instructors && !context.grants_right?(@current_user, session, :send_messages)
+      if context.is_a?(Course) && !recipients_are_instructors && !observer_to_linked_students && !context.grants_right?(@current_user, session, :send_messages)
         return render_error("Unable to send messages to users in #{context.name}", '')
       elsif !valid_context?(context)
         return render_error('context_code', 'invalid')
@@ -415,6 +415,7 @@ class ConversationsController < ApplicationController
     shard.activate do
       if batch_private_messages || batch_group_messages
         mode = params[:mode] == 'async' ? :async : :sync
+        message.relativize_attachment_ids(from_shard: message.shard, to_shard: shard)
         message.shard = shard
         batch = ConversationBatch.generate(message, @recipients, mode,
           subject: params[:subject], context_type: context_type,
@@ -1254,5 +1255,16 @@ class ConversationsController < ApplicationController
     end
 
     false
+  end
+
+  def observer_to_linked_students
+    observee_ids = @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
+    return false if observee_ids.empty?
+
+    @recipients.each do |recipient|
+      return false if observee_ids.exclude?(recipient.id)
+    end
+
+    true
   end
 end

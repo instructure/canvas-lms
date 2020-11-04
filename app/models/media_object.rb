@@ -149,16 +149,16 @@ class MediaObject < ActiveRecord::Base
     return !!info&.dig(:id)
   end
 
-  def self.ensure_media_object(media_id, create_opts = {})
+  def self.ensure_media_object(media_id, **create_opts)
     if !by_media_id(media_id).any?
-      self.send_later_enqueue_args(:create_if_id_exists, { :priority => Delayed::LOW_PRIORITY }, media_id, create_opts)
+      self.send_later_enqueue_args(:create_if_id_exists, { :priority => Delayed::LOW_PRIORITY }, media_id, **create_opts)
     end
   end
 
   # typically call this in a delayed job, since it has to contact kaltura
-  def self.create_if_id_exists(media_id, create_opts = {})
+  def self.create_if_id_exists(media_id, **create_opts)
     if media_id_exists?(media_id) && !by_media_id(media_id).any?
-      create!(create_opts.merge(:media_id => media_id))
+      create!(**create_opts.merge(:media_id => media_id))
     end
   end
 

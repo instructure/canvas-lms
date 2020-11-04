@@ -21,7 +21,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 describe Lti::ContentItemSelectionRequest do
   include ExternalToolsSpecHelper
 
-  subject(:lti_request) { described_class.new(default_params) }
+  subject(:lti_request) { described_class.new(**default_params) }
 
   let(:default_params) do
     {
@@ -101,7 +101,7 @@ describe Lti::ContentItemSelectionRequest do
         lti_assignment_id = SecureRandom.uuid
         body = {lti_assignment_id: lti_assignment_id}
         secure_params = Canvas::Security.create_jwt(body)
-        lti_request = described_class.new(default_params.merge({secure_params: secure_params}))
+        lti_request = described_class.new(**default_params.merge({secure_params: secure_params}))
         lti_launch = lti_request.generate_lti_launch(placement: placement)
         expect(lti_launch.params['ext_lti_assignment_id']).to eq lti_assignment_id
       end
@@ -139,7 +139,7 @@ describe Lti::ContentItemSelectionRequest do
 
         it 'generates a url a http protocol when the base_uri uses http' do
           base_uri.scheme = 'http'
-          lti_request_with_scheme = described_class.new(default_params.merge(base_url: base_uri.to_s))
+          lti_request_with_scheme = described_class.new(**default_params.merge(base_url: base_uri.to_s))
           create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
             host: base_uri.host,
             protocol: base_uri.scheme,
@@ -154,7 +154,7 @@ describe Lti::ContentItemSelectionRequest do
 
         it 'generates a url with a port when there is a port in the base_uri' do
           base_uri.port = 8080
-          lti_request_with_port = described_class.new(default_params.merge(base_url: base_uri.to_s))
+          lti_request_with_port = described_class.new(**default_params.merge(base_url: base_uri.to_s))
           create_url = Rails.application.routes.url_helpers.course_external_content_success_url(
             host: base_uri.host,
             protocol: base_uri.scheme,

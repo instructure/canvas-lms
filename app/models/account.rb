@@ -282,13 +282,14 @@ class Account < ActiveRecord::Base
   add_setting :no_enrollments_can_create_courses, :boolean => true, :root_only => true, :default => false
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
+  add_setting :can_change_pronouns, :boolean => true, :root_only => true, :default => true
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
   add_setting :equella_teaser
   add_setting :enable_alerts, :boolean => true, :root_only => true
   add_setting :enable_eportfolios, :boolean => true, :root_only => true
-  add_setting :users_can_edit_name, :boolean => true, :root_only => true
+  add_setting :users_can_edit_name, :boolean => true, :root_only => true, :default => true
   add_setting :open_registration, :boolean => true, :root_only => true
   add_setting :show_scheduler, :boolean => true, :root_only => true, :default => false
   add_setting :enable_profiles, :boolean => true, :root_only => true, :default => false
@@ -758,7 +759,9 @@ class Account < ActiveRecord::Base
         @invalidations.each do |key|
           Rails.cache.delete([key, self.global_id].cache_key)
         end
-        Account.send_later_if_production(:invalidate_inherited_caches, self, @invalidations)
+        Account.send_later_if_production_enqueue_args(:invalidate_inherited_caches,
+         { singleton: "Account.invalidate_inherited_caches_#{global_id}" },
+          self, @invalidations)
       end
     end
   end
@@ -2026,9 +2029,8 @@ class Account < ActiveRecord::Base
 
   def allow_disable_post_to_sis_when_grading_period_closed?
     return false unless root_account?
-    return false unless feature_enabled?(:disable_post_to_sis_when_grading_period_closed)
 
-    Account.site_admin.feature_enabled?(:new_sis_integrations)
+    feature_enabled?(:disable_post_to_sis_when_grading_period_closed) && feature_enabled?(:new_sis_integrations)
   end
 
   class << self

@@ -90,6 +90,10 @@ module Api::V1::Attachment
         h.merge!(:verifier => attachment.uuid) unless options[:omit_verifier_in_app] && (respond_to?(:in_app?, true) && in_app? || @authenticated_with_jwt)
         url = file_download_url(attachment, h.merge(url_options))
       end
+       # and svg can stand in as its own thumbnail, but let's be reasonable about their size
+       if !thumbnail_url && attachment.content_type == 'image/svg+xml' && attachment.size < 16_384 #16k
+        thumbnail_url = url
+      end
     else
       thumbnail_url = ''
       url = ''

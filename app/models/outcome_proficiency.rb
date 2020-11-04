@@ -36,6 +36,9 @@ class OutcomeProficiency < ApplicationRecord
   validates :context_id, uniqueness: { scope: :context_type }
   resolves_root_account through: :context
 
+  before_save :detect_changes_for_rubrics
+  after_save :propagate_changes_to_rubrics
+
   alias original_destroy_permanently! destroy_permanently!
   private :original_destroy_permanently!
   def destroy_permanently!
@@ -137,9 +140,52 @@ class OutcomeProficiency < ApplicationRecord
   def strictly_decreasing_points
     next_ratings.each_cons(2) do |l, r|
       if l.points <= r.points
-        self.errors.add(:outcome_proficiency_ratings,
-          t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points))
+        self.errors.add(
+          :outcome_proficiency_ratings,
+          t("Points should be strictly decreasing: %{l} <= %{r}", l: l.points, r: r.points)
+        )
       end
+    end
+  end
+
+  def detect_changes_for_rubrics
+    @update_rubrics = self.changed_for_autosave?
+  end
+
+  def propagate_changes_to_rubrics
+    return unless root_account.feature_enabled?(:account_level_mastery_scales)
+    return unless @update_rubrics
+
+    @update_rubrics = false
+    send_later_if_production_enqueue_args(
+      :update_associated_rubrics,
+      {strand: "update_rubrics_from_mastery_scales_#{global_id}"}
+    )
+  end
+
+  def update_associated_rubrics
+    updateable_rubric_scopes.each do |rubric_scope|
+      updateable = rubric_scope.
+        active.
+        aligned_to_outcomes.
+        unassessed.
+        with_at_most_one_association
+      updateable.find_each(&:update_mastery_scales)
+    end
+  end
+
+  def updateable_rubric_scopes
+    case context_type
+    when 'Account'
+      [
+        Rubric.where(
+          context_type: 'Account',
+          context_id: [context_id] + Account.sub_account_ids_recursive(context_id)
+        ),
+        Rubric.where(context: context.associated_courses)
+      ]
+    else
+      [Rubric.where(context: context)]
     end
   end
 end

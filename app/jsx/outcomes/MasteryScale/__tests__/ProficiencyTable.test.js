@@ -252,4 +252,39 @@ describe('custom proficiency', () => {
     expect(deleteButtons.length).toEqual(1)
     expect(deleteButtons[0].disabled).toEqual(true)
   })
+
+  describe('can not manage', () => {
+    const props = {
+      ...defaultProps,
+      canManage: false,
+      proficiency: {
+        proficiencyRatingsConnection: {
+          nodes: [
+            {
+              description: 'Great',
+              points: 10,
+              color: '0000ff',
+              mastery: true
+            },
+            {
+              description: 'Poor',
+              points: 0,
+              color: 'ff0000',
+              mastery: false
+            }
+          ]
+        }
+      }
+    }
+
+    it('does not render Save button', () => {
+      const {queryByText} = render(<ProficiencyTable {...props} />)
+      expect(queryByText('Save Mastery Scale')).not.toBeInTheDocument()
+    })
+
+    it('does not render Add button', () => {
+      const {queryByText} = render(<ProficiencyTable {...props} />)
+      expect(queryByText('Add Proficiency Level')).not.toBeInTheDocument()
+    })
+  })
 })

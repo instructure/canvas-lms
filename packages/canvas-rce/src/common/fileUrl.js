@@ -35,6 +35,8 @@ export function downloadToWrap(url) {
   delete parsed.search
   delete parsed.query.download_frd
   parsed.query.wrap = '1'
+  parsed.pathname = parsed.pathname.replace(/\/download\/?$/, '')
+
   return format(parsed)
 }
 
@@ -56,6 +58,7 @@ export function fixupFileUrl(contextType, contextId, fileInfo) {
       delete parsed.search
       delete parsed.query.download_frd
       parsed.query.wrap = '1'
+      parsed.pathname = parsed.pathname.replace(/\/download\/?$/, '')
 
       // if this is a http://canvas/files... url. change it to be contextual
       if (/^\/files/.test(parsed.pathname)) {
@@ -87,7 +90,7 @@ export function prepEmbedSrc(url) {
   if (parsed.host && window.location.host !== parsed.host) {
     return url
   }
-  parsed.pathname = parsed.pathname.replace(/\/download(\?|$)/, '/preview$1')
+  parsed.pathname = parsed.pathname.replace(/(?:\/download)?\/?(\?|$)/, '/preview$1')
   delete parsed.search
   delete parsed.query.wrap
   return format(parsed)
@@ -106,7 +109,7 @@ export function prepLinkedSrc(url) {
     return url
   }
   delete parsed.search
-  parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '/download$1')
+  parsed.pathname = parsed.pathname.replace(/\/preview(\?|$)/, '$1')
   parsed.query.wrap = '1'
   return format(parsed)
 }

@@ -657,7 +657,7 @@ class Enrollment < ActiveRecord::Base
   def add_to_favorites_later
     if self.saved_change_to_workflow_state? && self.workflow_state == 'active'
       self.class.connection.after_transaction_commit do
-        self.send_later_if_production_enqueue_args(:add_to_favorites, :priority => Delayed::LOW_PRIORITY)
+        self.send_later_if_production_enqueue_args(:add_to_favorites, { :priority => Delayed::LOW_PRIORITY })
       end
     end
   end
@@ -993,12 +993,12 @@ class Enrollment < ActiveRecord::Base
   # stale! And once you've added the call, add the condition to the comment
   # here for future enlightenment.
 
-  def self.recompute_final_score(*args)
-    GradeCalculator.recompute_final_score(*args)
+  def self.recompute_final_score(*args, **kwargs)
+    GradeCalculator.recompute_final_score(*args, **kwargs)
   end
 
   # This method is intended to not duplicate work for a single user.
-  def self.recompute_final_score_in_singleton(user_id, course_id, opts = {})
+  def self.recompute_final_score_in_singleton(user_id, course_id, **opts)
     # Guard against getting more than one user_id
     raise ArgumentError, "Cannot call with more than one user" if Array(user_id).size > 1
 
@@ -1010,7 +1010,7 @@ class Enrollment < ActiveRecord::Base
       },
       user_id,
       course_id,
-      opts
+      **opts
     )
   end
 

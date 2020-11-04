@@ -45,7 +45,7 @@ module SendToStream
       stream_recipients = Array(self.instance_eval(&block)) if block
       if stream_recipients && !stream_recipients.empty?
         send_later_if_production_enqueue_args(:create_stream_items,
-                                              :priority => Delayed::LOW_PRIORITY)
+                                              { :priority => Delayed::LOW_PRIORITY })
       end
       true
     end

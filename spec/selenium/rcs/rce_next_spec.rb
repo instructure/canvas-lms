@@ -104,7 +104,6 @@ describe 'RCE next tests', ignore_js_errors: true do
     context 'links' do
       it 'should respect selected text when creating a course link in body',
          ignore_js_errors: true do
-        skip 'flakey, LS-1394 (8/26/2020)'
         title = 'test_page'
         unpublished = false
         edit_roles = 'public'
@@ -273,288 +272,258 @@ describe 'RCE next tests', ignore_js_errors: true do
           expect(wiki_body_anchor.attribute('class')).to include 'inline_disabled'
         end
       end
-    end
+      it 'should click on sidebar assignment page to create link in body' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
 
-    it 'should click on sidebar assignment page to create link in body' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
+        visit_front_page_edit(@course)
 
-      visit_front_page_edit(@course)
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_assignments_accordion
+        click_course_item_link(title)
 
-      click_assignments_accordion
-      click_course_item_link(title)
-
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
+                    @course,
+                    @assignment
+                  )
+        end
       end
-    end
 
-    it 'should click on sidebar quizzes page to create link in body' do
-      title = 'Quiz-Title'
-      @quiz = @course.quizzes.create!(workflow_state: 'available', title: title)
+      it 'should click on sidebar quizzes page to create link in body' do
+        title = 'Quiz-Title'
+        @quiz = @course.quizzes.create!(workflow_state: 'available', title: title)
 
-      visit_front_page_edit(@course)
+        visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_quizzes_accordion
-      click_course_item_link(title)
+        click_quizzes_accordion
+        click_course_item_link(title)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include quiz_id_path(@course, @quiz)
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include quiz_id_path(@course, @quiz)
+        end
       end
-    end
 
-    it 'should click on sidebar announcements page to create link in body' do
-      title = 'Announcement-Title'
-      message = 'Announcement 1 detail'
-      @announcement = @course.announcements.create!(title: title, message: message)
+      it 'should click on sidebar announcements page to create link in body' do
+        title = 'Announcement-Title'
+        message = 'Announcement 1 detail'
+        @announcement = @course.announcements.create!(title: title, message: message)
 
-      visit_front_page_edit(@course)
+        visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_announcements_accordion
-      click_course_item_link(title)
+        click_announcements_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-                  @course,
-                  @announcement
-                )
-=======
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
                     @course,
                     @announcement
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on sidebar discussions page to create link in body' do
-      title = 'Discussion-Title'
-      @discussion = @course.discussion_topics.create!(title: title)
+      it 'should click on sidebar discussions page to create link in body' do
+        title = 'Discussion-Title'
+        @discussion = @course.discussion_topics.create!(title: title)
 
-      visit_front_page_edit(@course)
+        visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_discussions_accordion
-      click_course_item_link(title)
+        click_discussions_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-                  @course,
-                  @discussion
-                )
-=======
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
                     @course,
                     @discussion
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Module-Title'
-      @module = @course.context_modules.create!(name: title)
+      it 'should click on sidebar modules page to create link in body', ignore_js_errors: true do
+        title = 'Module-Title'
+        @module = @course.context_modules.create!(name: title)
 
-      visit_front_page_edit(@course)
+        visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_modules_accordion
-      click_course_item_link(title)
+        click_modules_accordion
+        click_course_item_link(title)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+        end
       end
-    end
 
-    it 'should click on sidebar course navigation page to create link in body',
-       ignore_js_errors: true do
-      title = 'Files'
-      visit_front_page_edit(@course)
+      it 'should click on sidebar course navigation page to create link in body',
+         ignore_js_errors: true do
+        title = 'Files'
+        visit_front_page_edit(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_navigation_accordion
-      click_course_item_link(title)
+        click_navigation_accordion
+        click_course_item_link(title)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include course_file_path(@course)
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include course_file_path(@course)
+        end
       end
-    end
 
-    it 'should click on assignment in sidebar to create link to it in announcement page',
-       ignore_js_errors: true do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
+      it 'should click on assignment in sidebar to create link to it in announcement page',
+         ignore_js_errors: true do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
 
-      visit_new_announcement_page(@course)
+        visit_new_announcement_page(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_assignments_accordion
-      click_course_item_link(title)
+        click_assignments_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-=======
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                     @course,
                     @assignment
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on module in sidebar to create link to it in assignment page',
-       ignore_js_errors: true do
-      title = 'Module-Title'
-      @module = @course.context_modules.create!(name: title)
+      it 'should click on module in sidebar to create link to it in assignment page',
+         ignore_js_errors: true do
+        title = 'Module-Title'
+        @module = @course.context_modules.create!(name: title)
 
-      visit_new_assignment_page(@course)
+        visit_new_assignment_page(@course)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_modules_accordion
-      click_course_item_link(title)
+        click_modules_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
-=======
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include module_id_path(@course, @module)
+        end
+      end
+
+      it 'should click on assignment in sidebar to create link to it in discussion page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+
+        visit_new_discussion_page(@course)
+
+        click_links_toolbar_menu_button
+        click_course_links
+        click_assignments_accordion
+        click_course_item_link(title)
+
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                     @course,
                     @assignment
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on assignment in sidebar to create link to it in discussion page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
+      it 'should click on assignment in sidebar to create link to it in quiz page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+        @quiz = @course.quizzes.create!
 
-      visit_new_discussion_page(@course)
+        visit_new_quiz_page(@course, @quiz)
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_assignments_accordion
-      click_course_item_link(title)
+        click_assignments_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-=======
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                     @course,
                     @assignment
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on assignment in sidebar to create link to it in quiz page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
-      @quiz = @course.quizzes.create!
+      it 'should click on assignment in sidebar to create link to it in syllabus page' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
 
-      visit_new_quiz_page(@course, @quiz)
+        visit_syllabus(@course)
+        click_edit_syllabus
 
-      click_links_toolbar_menu_button
-      click_course_links
+        click_links_toolbar_menu_button
+        click_course_links
 
-      click_assignments_accordion
-      click_course_item_link(title)
+        click_assignments_accordion
+        click_course_item_link(title)
 
-<<<<<<< HEAD
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
-=======
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
                     @course,
                     @assignment
                   )
         end
->>>>>>> 2b859ccf85... Add setting to choose Lato or Lato Extended font for canvas
       end
-    end
 
-    it 'should click on assignment in sidebar to create link to it in syllabus page' do
-      skip 'flakey, LS-1394 (8/26/2020)'
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title)
+      it 'should display assignment publish status in links accordion' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title, workflow_state: 'published')
 
-      visit_syllabus(@course)
-      click_edit_syllabus
+        visit_new_announcement_page(@course)
+        click_links_toolbar_menu_button
+        click_course_links
+        click_assignments_accordion
 
-      click_links_toolbar_menu_button
-      click_course_links
+        expect(assignment_published_status).to be_displayed
 
-      click_assignments_accordion
-      click_course_item_link(title)
+        @assignment.workflow_state = 'unpublished'
+        @assignment.save!
+        visit_new_announcement_page(@course)
 
-      in_frame rce_page_body_ifr_id do
-        expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                  @course,
-                  @assignment
-                )
+        click_links_toolbar_menu_button
+        click_course_links
+
+        expect(assignment_unpublished_status).to be_displayed
+      end
+
+      it 'should display assignment due date in links accordion' do
+        title = 'Assignment-Title'
+        due_at = 3.days.from_now
+        @assignment = @course.assignments.create!(name: title, workflow_state: 'published', due_at: due_at)
+
+        visit_new_announcement_page(@course)
+        click_links_toolbar_menu_button
+        click_course_links
+        click_assignments_accordion
+        wait_for_ajaximations
+        expect(assignment_due_date_exists?(due_at)).to eq true
       end
     end
 
     it 'should click on sidebar images tab' do
-      skip('Unskip in CORE-2629')
       visit_front_page_edit(@course)
-
       click_images_toolbar_menu_button
       click_course_images
 
-      expect(upload_new_image).to be_displayed
+      expect(course_images_tray).to be_displayed
     end
 
     it 'should click on an image in sidebar to display in body', ignore_js_errors: true do
@@ -668,29 +637,6 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should display assignment publish status in links accordion' do
-      skip('Unskip in CORE-2619')
-      title = 'Assignment-Title'
-      @assignment = @course.assignments.create!(name: title, status: published)
-
-      visit_new_announcement_page(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-      click_assignments_accordion
-
-      expect(assignment_published_status).to be_displayed
-
-      @assignment.save!(status: unpublished)
-      visit_new_announcement_page(@course)
-
-      click_links_toolbar_menu_button
-      click_course_links
-      click_assignments_accordion
-
-      expect(assignment_unpublished_status).to be_displayed
-    end
-
     it 'should click on a document in sidebar to display in body' do
       title = 'text_file.txt'
       @root_folder = Folder.root_folders(@course).first
@@ -711,21 +657,6 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should display assignment due date in links accordion' do
-      skip('Unskip in CORE-2619')
-      title = 'Assignment-Title'
-      due_at = 3.days.from_now
-      @assignment = @course.assignments.create!(name: title, status: published, due_at: @due_at)
-
-      visit_new_announcement_page
-
-      click_links_toolbar_menu_button
-      click_course_links
-      click_assignments_accordion
-
-      expect(assignment_due_date).to eq date_string(due_at, :no_words)
-    end
-
     it 'should open a11y checker when clicking button in status bar' do
       visit_front_page_edit(@course)
 
@@ -743,29 +674,28 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should close the course links tray when pressing esc', ignore_js_errors: true do
-      skip('Unskip in CORE-2878')
       visit_front_page_edit(@course)
 
       click_links_toolbar_menu_button
       click_course_links
-      wait_for_tiny(edit_wiki_css)
 
-      driver.action.send_keys(:escape).perform
+      expect(tray_container_exists?).to eq true
 
-      expect(tray_container).not_to be_displayed # Press esc key
+      driver.action.send_keys(:escape).perform # Press esc key
+
+      expect(tray_container_exists?).to eq false
     end
 
     it 'should close the course images tray when pressing esc', ignore_js_errors: true do
-      skip('Unskip in CORE-2878')
       visit_front_page_edit(@course)
 
       click_images_toolbar_menu_button
       click_course_images
-      wait_for_tiny(edit_wiki_css)
+      expect(tray_container_exists?).to eq true
 
-      driver.action.send_keys(:escape).perform
+      driver.action.send_keys(:escape).perform # Press esc key
 
-      expect(tray_container).not_to be_displayed # Press esc key
+      expect(tray_container_exists?).to eq false
     end
 
     it 'should open upload image modal when clicking upload option' do
@@ -775,24 +705,6 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_upload_image
 
       expect(upload_image_modal).to be_displayed
-    end
-
-    it 'should open upload media modal when clicking upload option' do
-      skip('Unskip after adding upload option back COREFE-268')
-      visit_front_page_edit(@course)
-
-      click_media_toolbar_menu_button
-      click_upload_media
-
-      expect(upload_media_modal).to be_displayed
-    end
-
-    it 'should open upload document modal when clicking upload option' do
-      visit_front_page_edit(@course)
-      click_document_toolbar_menu_button
-      click_upload_document
-
-      expect(upload_document_modal).to be_displayed
     end
 
     describe 'kaltura interaction' do
@@ -834,6 +746,27 @@ describe 'RCE next tests', ignore_js_errors: true do
         expect(menu_item_by_menu_id(menu_id, 'Course Media')).to be_displayed
         expect(menu_item_by_menu_id(menu_id, 'User Media')).to be_displayed
         expect(menu_items_by_menu_id(menu_id).length).to be(2)
+      end
+
+      it 'should open upload document modal when clicking upload option' do
+        double('CanvasKaltura::ClientV3')
+        allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+        visit_front_page_edit(@course)
+        click_document_toolbar_menu_button
+        click_upload_document
+
+        expect(upload_document_modal).to be_displayed
+      end
+
+      it 'should open upload media modal when clicking upload option' do
+        double('CanvasKaltura::ClientV3')
+        allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
+        visit_front_page_edit(@course)
+
+        click_media_toolbar_menu_button
+        click_upload_media
+
+        expect(upload_media_modal).to be_displayed
       end
     end
 
