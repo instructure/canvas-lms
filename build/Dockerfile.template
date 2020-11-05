@@ -23,6 +23,15 @@ ENV BUNDLE_APP_CONFIG /home/docker/.bundle
 WORKDIR $APP_HOME
 
 USER root
+<% if development? -%>
+
+ARG USER_ID
+# This step allows docker to write files to a host-mounted volume with the correct user permissions.
+# Without it, some linux distributions are unable to write at all to the host mounted volume.
+RUN if [ -n "$USER_ID" ]; then usermod -u "${USER_ID}" docker \
+        && chown --from=9999 docker /usr/src/nginx /usr/src/app -R; fi
+
+<% end -%>
 RUN curl -sL https://deb.nodesource.com/setup_10.x | bash - \
   && curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | apt-key add - \
   && echo "deb https://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
@@ -52,12 +61,6 @@ USER docker
 
 <% if jenkins? -%>
 COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
-<% else -%>
-COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
-COPY --chown=docker:docker Gemfile   ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-COPY --chown=docker:docker gems      ${APP_HOME}gems
-<% end -%>
 
 RUN set -eux; \
   \
@@ -69,73 +72,61 @@ RUN set -eux; \
   # TODO: --without development \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
-
+<% end -%>
 <% if jenkins? -%>
 <% set_file_suffix 'webpack-builder' %>
 <%= generation_message %>
 FROM local/ruby-runner
 
 COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
-<% else -%>
-COPY --chown=docker:docker package.json ${APP_HOME}
-COPY --chown=docker:docker yarn.lock    ${APP_HOME}
-COPY --chown=docker:docker client_apps  ${APP_HOME}client_apps
-COPY --chown=docker:docker packages     ${APP_HOME}packages
-<% end -%>
 
+<% end -%>
 RUN set -eux; \
 <% if development? -%>
   mkdir -p .yardoc \
-               app/stylesheets/brandable_css_brands \
-               app/views/info \
-               client_apps/canvas_quizzes/dist \
-               client_apps/canvas_quizzes/node_modules \
-               client_apps/canvas_quizzes/tmp \
-               config/locales/generated \
-               gems/canvas_i18nliner/node_modules \
-               log \
-               node_modules \
-               packages/canvas-media/es \
-               packages/canvas-media/lib \
-               packages/canvas-media/node_modules \
-               packages/canvas-planner/lib \
-               packages/canvas-planner/node_modules \
-               packages/canvas-rce/canvas \
-               packages/canvas-rce/lib \
-               packages/canvas-rce/node_modules \
-               packages/jest-moxios-utils/node_modules \
-               packages/js-utils/es \
-               packages/js-utils/lib \
-               packages/js-utils/node_modules \
-               packages/k5uploader/es \
-               packages/k5uploader/lib \
-               packages/k5uploader/node_modules \
-               packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
-               pacts \
-               public/dist \
-               public/doc/api \
-               public/javascripts/client_apps \
-               public/javascripts/compiled \
-               public/javascripts/translations \
-               reports \
-               tmp \
-               /home/docker/.bundler/ \
-               /home/docker/.cache/yarn \
-               /home/docker/.gem/ \
-    && \
+           app/stylesheets/brandable_css_brands \
+           app/views/info \
+           client_apps/canvas_quizzes/dist \
+           client_apps/canvas_quizzes/node_modules \
+           client_apps/canvas_quizzes/tmp \
+           config/locales/generated \
+           gems/canvas_i18nliner/node_modules \
+           log \
+           node_modules \
+           packages/canvas-media/es \
+           packages/canvas-media/lib \
+           packages/canvas-media/node_modules \
+           packages/canvas-planner/lib \
+           packages/canvas-planner/node_modules \
+           packages/canvas-rce/canvas \
+           packages/canvas-rce/lib \
+           packages/canvas-rce/node_modules \
+           packages/jest-moxios-utils/node_modules \
+           packages/js-utils/es \
+           packages/js-utils/lib \
+           packages/js-utils/node_modules \
+           packages/k5uploader/es \
+           packages/k5uploader/lib \
+           packages/k5uploader/node_modules \
+           packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
+           pacts \
+           public/dist \
+           public/doc/api \
+           public/javascripts/client_apps \
+           public/javascripts/compiled \
+           public/javascripts/translations \
+           reports \
+           tmp \
+           /home/docker/.bundler/ \
+           /home/docker/.cache/yarn \
+           /home/docker/.gem/
 <% end -%>
+<% if jenkins? -%>
   (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
-<% if jenkins? -%>
 COPY --chown=docker:docker --from=local/cache-helper-collect-packages /tmp/dst ${APP_HOME}
 RUN yarn build:packages
-<% else -%>
-COPY --chown=docker:docker babel.config.js ${APP_HOME}
-COPY --chown=docker:docker packages        ${APP_HOME}packages
-COPY --chown=docker:docker script          ${APP_HOME}script
-
-RUN yarn postinstall
 <% end -%>
 
 <% if jenkins? -%>
@@ -164,9 +155,4 @@ COPY --chown=docker:docker . ${APP_HOME}
 
 ARG COMPILE_ADDITIONAL_ASSETS=0
 RUN bash -c "if [[ "$COMPILE_ADDITIONAL_ASSETS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"
-<% else -%>
-COPY --chown=docker:docker . ${APP_HOME}
-
-ARG JS_BUILD_NO_UGLIFY=0
-RUN COMPILE_ASSETS_NPM_INSTALL=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
 <% end -%>

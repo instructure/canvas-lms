@@ -183,6 +183,8 @@ function setup_docker_environment {
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
     cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
+
+  echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
 }
 
 function copy_docker_config {
@@ -195,11 +197,9 @@ function setup_canvas {
   message 'Now we can set up Canvas!'
   copy_docker_config
   build_images
-
   check_gemfile
-  docker-compose run --rm web ./script/canvas_update -n code -n data
+  build_assets
   create_db
-  docker-compose run --rm web ./script/canvas_update -n code -n deps
 }
 
 function display_next_steps {
