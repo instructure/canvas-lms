@@ -170,16 +170,18 @@ module AuthenticationMethods
         return redirect_to(login_url(:needs_cookies => '1'))
       end
       @current_user = @current_pseudonym && @current_pseudonym.user
-      current_integration_id = @current_pseudonym.try(:integration_id)
+      if @current_user && @current_user.roles(Account.default).last == "student"
+        current_integration_id = @current_pseudonym.try(:integration_id)
 
-      if current_integration_id && !Rails.cache.read("unlocked_#{current_integration_id}")
-        begin
-          if AttendanceService.check_lockout(pseudonym: @current_pseudonym)
-            redirect_to(ENV["ATTENDANCE_V2_REDIRECT_URL"])
-          else
-            Rails.cache.write("unlocked_#{current_integration_id}", true, :expires_in => 5.minutes)
+        if current_integration_id && !Rails.cache.read("unlocked_#{current_integration_id}")
+          begin
+            if AttendanceService.check_lockout(pseudonym: @current_pseudonym)
+              redirect_to(ENV["ATTENDANCE_V2_REDIRECT_URL"])
+            else
+              Rails.cache.write("unlocked_#{current_integration_id}", true, :expires_in => 5.minutes)
+            end
+          rescue
           end
-        rescue
         end
       end
 
