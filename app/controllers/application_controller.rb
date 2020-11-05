@@ -1487,7 +1487,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Exception, :with => :rescue_exception
+
+  def rescue_expected_error_type(error)
+    rescue_exception(error, level: :info)
+  end
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception, level: :error)
