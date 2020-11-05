@@ -1155,6 +1155,8 @@ module Lti
           end
 
           it 'return an array of all student that has a SIS IDs' do
+            skip 'SOS-1808 (11/05/2020)'
+
             expect(subject).to eq 'SIS_A,SIS_B'
           end
         end
