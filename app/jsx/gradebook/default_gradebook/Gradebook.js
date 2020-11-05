@@ -476,11 +476,7 @@ class Gradebook {
     } else {
       this.finalGradeOverrides = null
     }
-    if (this.options.post_policies_enabled) {
-      this.postPolicies = new PostPolicies(this)
-    } else {
-      this.postPolicies = null
-    }
+    this.postPolicies = new PostPolicies(this)
     $.subscribe('assignment_muting_toggled', this.handleSubmissionPostedChange)
     $.subscribe('submissions_updated', this.updateSubmissionsFromExternal)
     // emitted by SectionMenuView; also subscribed in OutcomeGradebookView
@@ -506,7 +502,6 @@ class Gradebook {
     this.headerComponentRefs = {}
     this.filteredContentInfo = {
       invalidAssignmentGroups: [],
-      mutedAssignments: [],
       totalPointsPossible: 0
     }
     this.setAssignments({})
@@ -2853,9 +2848,6 @@ class Gradebook {
       return results
     }.call(this)
     const filteredAssignments = this.filterAssignments(unorderedAssignments)
-    this.filteredContentInfo.mutedAssignments = filteredAssignments.filter(assignment => {
-      return assignment.muted
-    })
     this.filteredContentInfo.totalPointsPossible = _.reduce(
       this.assignmentGroups,
       function(sum, assignmentGroup) {
@@ -2878,27 +2870,23 @@ class Gradebook {
   }
 
   listHiddenAssignments(studentId) {
-    if (this.options.post_policies_enabled) {
-      if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
-        return []
-      }
-      return Object.values(this.assignments).filter(assignment => {
-        const submission = this.getSubmission(studentId, assignment.id)
-        // Ignore anonymous assignments when deciding whether to show the
-        // "hidden" icon, as including them could reveal which students have
-        // and have not been graded.
-        // Ignore 'not_graded' assignments as they are not counted into the
-        // student's grade, nor are they visible in the Gradebook.
-        return (
-          submission != null &&
-          isPostable(submission) &&
-          !assignment.anonymize_students &&
-          assignment.grading_type !== 'not_graded'
-        )
-      })
-    } else {
-      return this.filteredContentInfo.mutedAssignments
+    if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
+      return []
     }
+    return Object.values(this.assignments).filter(assignment => {
+      const submission = this.getSubmission(studentId, assignment.id)
+      // Ignore anonymous assignments when deciding whether to show the
+      // "hidden" icon, as including them could reveal which students have
+      // and have not been graded.
+      // Ignore 'not_graded' assignments as they are not counted into the
+      // student's grade, nor are they visible in the Gradebook.
+      return (
+        submission != null &&
+        isPostable(submission) &&
+        !assignment.anonymize_students &&
+        assignment.grading_type !== 'not_graded'
+      )
+    })
   }
 
   getTotalPointsPossible() {
@@ -3285,7 +3273,6 @@ class Gradebook {
         assignmentId,
         userId: studentId
       }),
-      postPoliciesEnabled: this.options.post_policies_enabled,
       requireStudentGroupForSpeedGrader: this.requireStudentGroupForSpeedGrader(assignment),
       selectNextAssignment: () => {
         return this.loadTrayAssignment('next')

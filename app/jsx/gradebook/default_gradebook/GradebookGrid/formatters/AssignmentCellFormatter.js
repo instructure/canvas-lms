@@ -146,8 +146,6 @@ export default class AssignmentCellFormatter {
         return gradebook.options.show_similarity_score
       }
     }
-
-    this.postPoliciesEnabled = gradebook.options.post_policies_enabled
   }
 
   render = (_row, _cell, submission /* value */, columnDef, student /* dataContext */) => {
@@ -170,12 +168,6 @@ export default class AssignmentCellFormatter {
       id: assignment.id,
       pointsPossible: assignment.points_possible,
       submissionTypes: assignment.submission_types
-    }
-
-    // Avoid setting muted styles in the cell when Post Policies are enabled,
-    // as the unposted indicator already serves the same function.
-    if (!this.postPoliciesEnabled) {
-      assignmentData.muted = assignment.muted
     }
 
     const submissionData = {

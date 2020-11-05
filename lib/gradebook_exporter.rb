@@ -413,15 +413,11 @@ class GradebookExporter
   end
 
   def show_as_hidden?(assignment)
-    if @course.post_policies_enabled?
-      assignment.post_manually?
-    else
-      assignment.muted?
-    end
+    assignment.post_manually?
   end
 
   def hidden_assignment_text
-    @course.post_policies_enabled? ? "Manual Posting" : "Muted"
+    "Manual Posting"
   end
 
   def include_grading_period_in_headers?

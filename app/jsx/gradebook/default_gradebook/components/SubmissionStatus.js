@@ -34,7 +34,6 @@ export default class SubmissionStatus extends React.Component {
   static propTypes = {
     assignment: shape({
       anonymizeStudents: bool.isRequired,
-      muted: bool.isRequired,
       postManually: bool.isRequired,
       published: bool.isRequired
     }).isRequired,
@@ -43,7 +42,6 @@ export default class SubmissionStatus extends React.Component {
     isInNoGradingPeriod: bool.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
     isNotCountedForScore: bool.isRequired,
-    postPoliciesEnabled: bool.isRequired,
     submission: shape({
       drop: bool,
       excused: bool,
@@ -55,7 +53,7 @@ export default class SubmissionStatus extends React.Component {
   }
 
   getStatusPills() {
-    const {assignment, postPoliciesEnabled, submission} = this.props
+    const {assignment, submission} = this.props
     const statusPillComponents = []
 
     if (!assignment.published) {
@@ -74,23 +72,12 @@ export default class SubmissionStatus extends React.Component {
       return statusPillComponents
     }
 
-    if (postPoliciesEnabled) {
-      if (isPostable(submission)) {
-        statusPillComponents.push(
-          <Pill
-            key="hidden-submission"
-            variant="warning"
-            text={I18n.t('Hidden')}
-            margin="0 0 x-small"
-          />
-        )
-      }
-    } else if (assignment.muted) {
+    if (isPostable(submission)) {
       statusPillComponents.push(
         <Pill
-          key="muted-assignment"
-          variant="default"
-          text={I18n.t('Muted')}
+          key="hidden-submission"
+          variant="warning"
+          text={I18n.t('Hidden')}
           margin="0 0 x-small"
         />
       )

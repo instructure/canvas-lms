@@ -144,8 +144,7 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency,
-      post_policies_enabled: @context.post_policies_enabled?
+      outcome_proficiency: outcome_proficiency
     }
 
     # This really means "if the final grade override feature flag is enabled AND
@@ -456,7 +455,6 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       post_grades_ltis: post_grades_ltis,
       post_manually: @context.post_manually?,
-      post_policies_enabled: @context.post_policies_enabled?,
 
       publish_to_sis_enabled: (
         !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
@@ -572,8 +570,6 @@ class GradebooksController < ApplicationController
       outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
       post_grades_feature: post_grades_feature?,
       post_manually: @context.post_manually?,
-      post_policies_enabled: @context.post_policies_enabled?,
-
       publish_to_sis_enabled: (
         !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
       ),

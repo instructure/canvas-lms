@@ -54,20 +54,11 @@ function SecondaryDetailLine(props) {
         </Text>
       </span>
 
-      {props.postPoliciesEnabled && props.assignment.postManually && (
+      {props.assignment.postManually && (
         <span>
           &nbsp;
           <Text size="x-small" transform="uppercase" weight="bold">
             {I18n.t('Manual')}
-          </Text>
-        </span>
-      )}
-
-      {!props.postPoliciesEnabled && props.assignment.muted && (
-        <span>
-          &nbsp;
-          <Text size="x-small" transform="uppercase" weight="bold">
-            {I18n.t('Muted')}
           </Text>
         </span>
       )}
@@ -78,11 +69,9 @@ function SecondaryDetailLine(props) {
 SecondaryDetailLine.propTypes = {
   assignment: shape({
     anonymizeStudents: bool.isRequired,
-    muted: bool.isRequired,
     pointsPossible: number,
     published: bool.isRequired
-  }).isRequired,
-  postPoliciesEnabled: bool.isRequired
+  }).isRequired
 }
 
 function labelForPostGradesAction(postGradesAction) {
@@ -120,7 +109,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
       courseId: string.isRequired,
       htmlUrl: string.isRequired,
       id: string.isRequired,
-      muted: bool.isRequired,
       name: string.isRequired,
       pointsPossible: number,
       postManually: bool.isRequired,
@@ -500,7 +488,6 @@ export default class AssignmentColumnHeader extends ColumnHeader {
 
   render() {
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
-    const postPoliciesEnabled = this.props.postGradesAction.featureEnabled
 
     return (
       <div
@@ -513,7 +500,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
             <Grid.Row>
               <Grid.Col textAlign="center" width="auto" vAlign="top">
                 <div className="Gradebook__ColumnHeaderIndicators">
-                  {postPoliciesEnabled && this.renderUnpostedSubmissionsIcon()}
+                  {this.renderUnpostedSubmissionsIcon()}
                 </div>
               </Grid.Col>
 
@@ -523,10 +510,7 @@ export default class AssignmentColumnHeader extends ColumnHeader {
                     {this.renderAssignmentLink()}
                   </span>
 
-                  <SecondaryDetailLine
-                    assignment={this.props.assignment}
-                    postPoliciesEnabled={postPoliciesEnabled}
-                  />
+                  <SecondaryDetailLine assignment={this.props.assignment} />
                 </span>
               </Grid.Col>
 

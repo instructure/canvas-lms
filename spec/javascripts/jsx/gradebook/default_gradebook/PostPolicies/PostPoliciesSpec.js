@@ -37,9 +37,7 @@ QUnit.module('Gradebook PostPolicies', suiteHooks => {
     $container = document.body.appendChild(document.createElement('div'))
     setFixtureHtml($container)
 
-    gradebookOptions = {
-      post_policies_enabled: true
-    }
+    gradebookOptions = {}
   })
 
   suiteHooks.afterEach(() => {

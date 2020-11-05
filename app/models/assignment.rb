@@ -536,7 +536,7 @@ class Assignment < ActiveRecord::Base
     until self.observer_alerts.limit(1_000).delete_all < 1_000; end
   end
 
-  before_create :set_root_account_id, :set_muted_if_post_policies_enabled
+  before_create :set_root_account_id, :set_muted
 
   after_save  :update_submissions_and_grades_if_details_changed,
               :update_grading_period_grades,
@@ -730,7 +730,6 @@ class Assignment < ActiveRecord::Base
   def needs_to_recompute_grade?
     !id_before_last_save.nil? && (
       saved_change_to_points_possible? ||
-      (saved_change_to_muted? && !course.post_policies_enabled?) ||
       saved_change_to_workflow_state? ||
       saved_change_to_assignment_group_id? ||
       saved_change_to_only_visible_to_overrides? ||
@@ -3346,9 +3345,6 @@ class Assignment < ActiveRecord::Base
     # Only anonymize students for moderated assignments if grades have not been published.
     return !grades_published? if moderated_grading?
 
-    # If Post Policies isn't enabled, we can just check whether the assignment is muted.
-    return muted? unless course.post_policies_enabled?
-
     # Otherwise, only anonymize students if there's at least one active student with
     # an unposted submission.
     unposted_anonymous_submissions?
@@ -3421,11 +3417,7 @@ class Assignment < ActiveRecord::Base
   end
 
   def post_manually?
-    if course.post_policies_enabled?
-      !!effective_post_policy&.post_manually?
-    else
-      muted?
-    end
+    !!effective_post_policy&.post_manually?
   end
 
   def post_submissions(progress: nil, submission_ids: nil, skip_updating_timestamp: false, posting_params: nil)
@@ -3458,10 +3450,8 @@ class Assignment < ActiveRecord::Base
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
 
     show_stream_items(submissions: submissions)
-    if course.post_policies_enabled?
-      course.recompute_student_scores(submissions.pluck(:user_id))
-      update_muted_status!
-    end
+    course.recompute_student_scores(submissions.pluck(:user_id))
+    update_muted_status!
     delay_if_production.recalculate_module_progressions(submission_ids)
     progress.set_results(assignment_id: id, posted_at: update_time, user_ids: user_ids) if progress.present?
     broadcast_submissions_posted(posting_params) if posting_params.present?
@@ -3480,10 +3470,8 @@ class Assignment < ActiveRecord::Base
     submissions.update_all(posted_at: nil, updated_at: Time.zone.now) unless skip_updating_timestamp
     submissions.in_workflow_state('graded').each(&:assignment_muted_changed)
     hide_stream_items(submissions: submissions)
-    if course.post_policies_enabled?
-      course.recompute_student_scores(submissions.pluck(:user_id))
-      update_muted_status!
-    end
+    course.recompute_student_scores(submissions.pluck(:user_id))
+    update_muted_status!
     progress.set_results(assignment_id: id, posted_at: nil, user_ids: user_ids) if progress.present?
   end
 
@@ -3556,6 +3544,10 @@ class Assignment < ActiveRecord::Base
 
   private
 
+  def set_muted
+    self.muted = true
+  end
+
   def anonymous_grader_identities(index_by:)
     return {} unless moderated_grading?
 
@@ -3584,12 +3576,6 @@ class Assignment < ActiveRecord::Base
 
     self.muted = true if moderated_grading?
   end
-
-  def set_muted_if_post_policies_enabled
-    return unless course.post_policies_enabled?
-    self.muted = true
-  end
-  private :set_muted_if_post_policies_enabled
 
   def ensure_manual_posting_if_anonymous
     ensure_post_policy(post_manually: true) if saved_change_to_anonymous_grading?(from: false, to: true)

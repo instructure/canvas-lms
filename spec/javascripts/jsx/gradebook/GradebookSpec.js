@@ -2028,7 +2028,7 @@ QUnit.module('#listHiddenAssignments', hooks => {
         user_id: '1101'
       }
     ]
-    gradebook = createGradebook({post_policies_enabled: true})
+    gradebook = createGradebook()
     gradebook.assignments = {
       2301: gradedAssignment,
       2302: notGradedAssignment
@@ -6930,13 +6930,6 @@ QUnit.module('Gradebook#getSubmissionTrayProps', suiteHooks => {
 
     const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
     notOk(props.pendingGradeInfo)
-  })
-
-  test('sets postPoliciesEnabled to true when post_policies_enabled is true', () => {
-    gradebook.options.post_policies_enabled = true
-    gradebook.setSubmissionTrayState(true, '1101', '2301')
-    const props = gradebook.getSubmissionTrayProps(gradebook.student('1101'))
-    strictEqual(props.postPoliciesEnabled, true)
   })
 
   QUnit.module('requireStudentGroupForSpeedGrader', requireStudentGroupHooks => {

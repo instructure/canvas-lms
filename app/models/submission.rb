@@ -2521,8 +2521,8 @@ class Submission < ActiveRecord::Base
   end
 
   def hide_grade_from_student?(for_plagiarism: false)
-    return muted_assignment? unless assignment.course.post_policies_enabled?
     return false if for_plagiarism
+
     if assignment.post_manually?
       posted_at.blank?
     else
@@ -2541,14 +2541,7 @@ class Submission < ActiveRecord::Base
   end
 
   def posted?
-    # NOTE: This really should be a call to assignment.course.post_policies_enabled?
-    # but we're going to leave it the way it is for the next few months (until
-    # New Gradebook becomes universal) for fear of breaking even more things.
-    if PostPolicy.feature_enabled?
-      posted_at.present?
-    else
-      !assignment.muted?
-    end
+    posted_at.present?
   end
 
   def assignment_muted_changed
@@ -2785,14 +2778,6 @@ class Submission < ActiveRecord::Base
   end
 
   def handle_posted_at_changed
-    # This method will be called if a posted_at date was changed specifically
-    # on this submission (e.g., if it received a grade or a comment and the
-    # assignment is not manually posted), as opposed to the usual situation
-    # where all submissions in a section are updated. In this case, we call
-    # [un]post_submissions to follow the normal workflow, but skip updating the
-    # posted_at date since that already happened.
-    return unless assignment.course.post_policies_enabled?
-
     previously_posted = posted_at_before_last_save.present?
 
     # If this submission is part of an assignment associated with a quiz, the

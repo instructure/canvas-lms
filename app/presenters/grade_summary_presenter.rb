@@ -237,13 +237,10 @@ class GradeSummaryPresenter
   end
 
   def hidden_submissions?
-    if @context.post_policies_enabled?
-      submissions.any? do |sub|
-        return !sub.posted? if sub.assignment.post_manually?
-        sub.graded? && !sub.posted?
-      end
-    else
-      assignments.any?(&:muted?)
+    submissions.any? do |sub|
+      return !sub.posted? if sub.assignment.post_manually?
+
+      sub.graded? && !sub.posted?
     end
   end
 
