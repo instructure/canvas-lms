@@ -104,6 +104,26 @@ describe SisPseudonym do
     expect(SisPseudonym.for(u, e2)).to eq @p2
   end
 
+  it "follows ths sis_user_id if it moves between pseudonyms" do
+    pseudonym1 = u.pseudonyms.create!(pseud_params("testuser41@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = "user2"
+    end
+    pseudonym2 = u.pseudonyms.create!(pseud_params("testuser42@example.com")) do |x|
+      x.workflow_state = 'active'
+      x.sis_user_id = nil
+    end
+    enrollment = course1.enroll_user(u, 'StudentEnrollment', enrollment_state: 'active')
+    enrollment.sis_pseudonym_id = pseudonym1.id
+    enrollment.save!
+    expect(SisPseudonym.for(u, course1)).to eq(pseudonym1)
+    pseudonym1.sis_user_id = nil
+    pseudonym1.save!
+    pseudonym2.sis_user_id = "user2"
+    pseudonym2.save!
+    expect(SisPseudonym.for(u, course1)).to eq(pseudonym2)
+  end
+
   it "should find the right root account for a course" do
     pseudonym = account2.pseudonyms.create!(user: u, unique_id: 'user') do |p|
       p.sis_user_id = 'abc'

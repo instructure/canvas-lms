@@ -58,7 +58,14 @@ class SisPseudonym
 
   def find_on_enrollment_for_context
     if @context.is_a?(Course) || @context.is_a?(CourseSection)
-      @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      pseudonym = @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      # if the sis user id isn't here, this pointer might
+      # no longer be good.  Let the fallback logic work
+      # through "find_in_home_account".  It may still return this one,
+      # but if the sis_user_id got moved to another pseudonym
+      # it will grab that one instead.
+      return nil if pseudonym&.sis_user_id.nil?
+      pseudonym
     end
   end
 
