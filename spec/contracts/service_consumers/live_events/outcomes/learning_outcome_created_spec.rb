@@ -31,6 +31,8 @@ RSpec.describe 'Canvas LMS Live Events', :pact_live_events do
     end
 
     it 'keeps the contract' do
+      skip "INTEROP-6100 (11/5/2020)"
+
       live_event.emit_with do
         # Our contract tests only capture the latest live event that's emitted,
         #  so creating a duplicate using the factory model is easiest
