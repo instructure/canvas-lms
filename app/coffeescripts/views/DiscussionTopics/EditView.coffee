@@ -231,7 +231,7 @@ export default class EditView extends ValidatedFormView
     this
 
   shouldRenderUsageRights: =>
-    ENV.FEATURES.usage_rights_discussion_topics and ENV.USAGE_RIGHTS_REQUIRED and ENV.PERMISSIONS.manage_files
+    ENV.FEATURES.usage_rights_discussion_topics and ENV.USAGE_RIGHTS_REQUIRED and ENV.PERMISSIONS.manage_files and @permissions.CAN_ATTACH
 
   afterRender: =>
     @renderStudentTodoAtDate() if @$todoDateInput.length
