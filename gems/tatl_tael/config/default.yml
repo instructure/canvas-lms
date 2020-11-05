@@ -26,6 +26,7 @@ CopyrightLinter:
     FirstLineExceptions:
       - !ruby/regexp '/^#!/' # e.g. "#!/usr/bin/env ruby"
       - !ruby/regexp '/coding:/' # encodings
+      - !ruby/regexp '/frozen_string_literal:/'
       - !ruby/regexp '/@jsx React\.DOM/' # jsx header (see client_apps/quizzes)
     CommentPrefixRegex: !ruby/regexp '/^( *)?(#|\/\/|\/?\*+|<%|\{\{\!)( *)?/'
   CopyrightYearPlaceholder: "CURRENT_YEAR"

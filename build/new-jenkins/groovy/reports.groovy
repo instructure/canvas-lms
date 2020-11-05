@@ -61,90 +61,10 @@ def publishSpecCoverageToS3(prefix, ci_node_total, coverage_type) {
   cleanupCoverage(prefix)
 }
 
-// this method is to ensure that the stashing is done in a way that
-// is expected in publishSpecFailuresAsHTML
-def stashSpecFailures(prefix, index) {
-  dir("tmp") {
-    stash name: "${prefix}_spec_failures_${index}", includes: 'spec_failures/**/*', allowEmpty: true
-  }
-}
-
 def stashParallelLogs(prefix, index) {
   dir("tmp") {
     stash name: "${prefix}_spec_parallel_${index}", includes: 'parallel_runtime_rspec_tests/**/*.log'
   }
-}
-
-def publishSpecFailuresAsHTML(prefix, ci_node_total, report_title) {
-  def htmlFiles
-  def failureCategories
-  def working_dir = "${prefix}_compiled_failures"
-  sh "rm -vrf ./$working_dir"
-  sh "mkdir -p $working_dir"
-
-  dir(working_dir) {
-    for(int index = 0; index < ci_node_total; index++) {
-      dir ("node_${index}") {
-        try {
-          unstash "${prefix}_spec_failures_${index}"
-        } catch(err) {
-          println (err)
-        }
-      }
-    }
-    htmlFiles = findFiles glob: '**/index.html'
-    failureCategories = buildFailureCategories(htmlFiles)
-    buildIndexPage(failureCategories)
-    htmlFiles = findFiles glob: '**/index.html'
-  }
-
-  def report_name = "spec-failure-$prefix"
-  def report_url = "${BUILD_URL}${report_name}"
-  archiveArtifacts(artifacts: "$working_dir/**")
-  publishHTML target: [
-    allowMissing: false,
-    alwaysLinkToLastBuild: false,
-    keepAll: true,
-    reportDir: working_dir,
-    reportFiles: htmlFiles.join(','),
-    reportName: report_name,
-    reportTitles: report_title
-  ]
-  sh "rm -vrf ./$working_dir"
-  return report_url
-}
-
-def buildFailureCategories(htmlFiles) {
-  Map<String, List<String>> failureCategories = [:]
-  if (htmlFiles.size() > 0) {
-    htmlFiles.each { file ->
-      // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
-      // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
-      def category = file.getPath().split("/")[4]
-      if (!failureCategories.containsKey(category)) {
-        failureCategories[category] = []
-      }
-      failureCategories[category] += file
-    }
-  }
-  return failureCategories
-}
-
-def buildIndexPage(failureCategories) {
-  def indexHtml = "<body style=\"font-family:sans-serif;line-height:1.25;font-size:14px\">"
-  if (failureCategories.size() < 1) {
-    indexHtml += "\\o/ yay good job, no failures"
-  } else {
-    failureCategories.each {category, failures ->
-      indexHtml += "<h1>${category} Failures</h1>"
-      failures.each { failure ->
-        def spec = (failure =~ /.*spec_failures\/(.*)\/index/)[0][1]
-        indexHtml += "<a href=\"${failure}\">${spec}</a><br>"
-      }
-    }
-  }
-  indexHtml += "</body>"
-  writeFile file: "index.html", text: indexHtml
 }
 
 def copyParallelLogs(rspecTotal, seleniumTotal) {

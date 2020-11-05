@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -42,8 +44,7 @@ module BroadcastPolicies
     def should_dispatch_assignment_created?
       return false unless context_sendable?
 
-      published_on_create? || just_published? ||
-        (assignment.saved_change_to_workflow_state? && assignment.published?)
+      published_on_create? || just_published?
     end
 
     def should_dispatch_submissions_posted?

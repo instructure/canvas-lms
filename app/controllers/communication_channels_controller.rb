@@ -475,10 +475,26 @@ class CommunicationChannelsController < ApplicationController
   def redirect_with_success_flash
     flash[:notice] = t 'notices.registration_confirmed', "Registration confirmed!"
     @current_user ||= @user # since dashboard_url may need it
+    default_url = confirmation_redirect_url(@communication_channel) || dashboard_url
     respond_to do |format|
-      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(dashboard_url)) }
-      format.json { render :json => {:url => @enrollment ? course_url(@course) : dashboard_url} }
+      format.html { redirect_to(@enrollment ? course_url(@course) : redirect_back_or_default(default_url)) }
+      format.json { render :json => {:url => @enrollment ? course_url(@course) : default_url} }
     end
+  end
+
+  def confirmation_redirect_url(communication_channel)
+    uri = begin
+            URI.parse(communication_channel.confirmation_redirect)
+          rescue URI::InvalidURIError
+            nil
+          end
+    return nil unless uri
+
+    if @current_user
+      query_params = URI.decode_www_form(uri.query || '') << ['current_user_id', @current_user.id.to_s]
+      uri.query = URI.encode_www_form(query_params)
+    end
+    uri.to_s
   end
 
   # @API Delete a communication channel

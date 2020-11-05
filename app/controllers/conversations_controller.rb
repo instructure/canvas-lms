@@ -927,9 +927,8 @@ class ConversationsController < ApplicationController
         message = @conversation.process_new_message(message_args, @recipients, message_ids, @tags)
         render :json => conversation_json(@conversation.reload, @current_user, session, :messages => [message])
       else
-        @conversation.send_later_enqueue_args(:process_new_message,
-          {:strand => "add_message_#{@conversation.global_conversation_id}", :max_attempts => 1},
-          message_args, @recipients, message_ids, @tags)
+        @conversation.delay(strand: "add_message_#{@conversation.global_conversation_id}").
+          process_new_message(message_args, @recipients, message_ids, @tags)
         return render :json => [], :status => :accepted
       end
     else

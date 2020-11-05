@@ -20,6 +20,7 @@ import AssignmentGroupModuleNav from './AssignmentGroupModuleNav'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptSelect from './AttemptSelect'
 import AssignmentDetails from './AssignmentDetails'
+import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-layout'
 import GradeDisplay from './GradeDisplay'
 import {Heading} from '@instructure/ui-heading'
@@ -106,6 +107,36 @@ class Header extends React.Component {
     </StudentViewContext.Consumer>
   )
 
+  shouldRenderNewAttempt(context) {
+    const {assignment, submission} = this.props
+    return (
+      !assignment.lockInfo.isLocked &&
+      (submission.state === 'graded' || submission.state === 'submitted') &&
+      context.isLatestAttempt &&
+      (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
+    )
+  }
+
+  renderNewAttemptButton = () => (
+    <StudentViewContext.Consumer>
+      {context => {
+        if (this.shouldRenderNewAttempt(context)) {
+          return (
+            <Button
+              data-testid="new-attempt-button"
+              color="primary"
+              margin="small xxx-small"
+              onClick={context.startNewAttemptAction}
+            >
+              {I18n.t('New Attempt')}
+            </Button>
+          )
+        }
+        return null
+      }}
+    </StudentViewContext.Consumer>
+  )
+
   render() {
     return (
       <>
@@ -159,6 +190,9 @@ class Header extends React.Component {
                       <SubmissionStatusPill
                         submissionStatus={this.props.submission.submissionStatus}
                       />
+                    </Flex.Item>
+                    <Flex.Item grow>
+                      {!this.state.isSticky && this.renderNewAttemptButton()}
                     </Flex.Item>
                   </Flex>
                 </Flex.Item>

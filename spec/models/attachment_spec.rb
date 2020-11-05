@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -2165,7 +2167,7 @@ describe Attachment do
 
       let(:url) { "http://example.com/test.png" }
       let(:body) { "body content" }
-      let(:http_response) { FakeHttpResponse.new(401, body) } 
+      let(:http_response) { FakeHttpResponse.new(401, body) }
 
       before { allow(CanvasHttp).to receive(:get).with(url).and_yield(http_response) }
 
@@ -2331,7 +2333,7 @@ describe Attachment do
     it 'returns the attachment filename in the upload params' do
       attachment_model filename: 'test.txt'
       pseudonym @user
-      json = @attachment.ajax_upload_params(@user.pseudonym, '', '')
+      json = @attachment.ajax_upload_params('', '')
       expect(json[:upload_params]['Filename']).to eq 'test.txt'
     end
   end

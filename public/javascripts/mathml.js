@@ -17,61 +17,127 @@
  */
 
 import $ from 'jquery'
+// this copy of lodash is already in the webpack chunk
+// (something to do with backbone compatability)
+// if I simply import {debounce} from 'lodash', then there are 2 copies
+// and the chunk exceeds our size limit.
+import {debounce} from './vendor/lodash.underscore'
 
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
   TeX: {
     extensions: ['color.js']
-  }
+  },
+  tex2jax: {
+    ignoreClass: 'mathjax_ignore'
+  },
+  extensions: ['Safe.js'],
+  Safe: {
+    safeProtocols: {http: true, https: true, file: false, javascript: false, data: false}
+  },
+  MathMenu: {
+    styles: {
+      '.MathJax_Menu': {'z-index': 2001}
+    }
+  },
+  showMathMenu: true
 }
 
-export function loadMathJax(configFile = 'TeX-MML-AM_HTMLorMML', cb = null) {
-  if (!isMathJaxLoaded()) {
-    const locale = ENV.LOCALE || 'en'
-    // signal local config to mathjax as it loads
-    window.MathJax = localConfig
-    $.getScript(
-      `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=${configFile}&locale=${locale}`,
-      () => {
-        window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
-          message[1]
-            .querySelectorAll('.math_equation_latex')
-            .forEach(m => m.classList.add('fade-in-equation'))
-        })
+const mathml = {
+  loadMathJax(configFile = 'TeX-MML-AM_HTMLorMML', cb = null) {
+    if (!this.isMathJaxLoaded()) {
+      const locale = ENV.LOCALE || 'en'
+      // signal local config to mathjax as it loads
+      window.MathJax = localConfig
+      if (window.MathJaxIsLoading) return
+      window.MathJaxIsLoading = true
+      $.ajax({
+        url: `//cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/MathJax.js?config=${configFile}&locale=${locale}`,
+        cache: true,
+        success: () => {
+          window.MathJax.Hub.Register.StartupHook('MathMenu Ready', function() {
+            // get the mathjax context menu above the rce's equation editor
+            window.MathJax.Menu.BGSTYLE['z-index'] = 2000
+          })
+          window.MathJax.Hub.Register.StartupHook('End Config', function() {
+            // wait until MathJAx is configured before calling the callback
+            cb?.()
+          })
+          window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+            message[1]
+              .querySelectorAll('.math_equation_latex')
+              .forEach(m => m.classList.add('fade-in-equation'))
+          })
+          delete window.MathJaxIsLoading
+        },
+        dataType: 'script'
+      })
+    } else {
+      // Make sure we always call the callback if it is loaded already and make sure we
+      // also reprocess the page since chances are if we are requesting MathJax again,
+      // something has changed on the page and needs to gReprocess(document.body)et pulled into the MathJax ecosystem
+      // window.MathJax.Hub.Reprocess([document.body])
+      window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub])
+      cb?.()
+    }
+  },
 
-        cb?.()
+  isMathOnPage() {
+    if (ENV?.FEATURES?.new_math_equation_handling) {
+      // handle the change from image + hidden mathml to mathjax formatted latex
+      if (document.querySelector('.math_equation_latex')) {
+        return true
       }
-    )
-  } else {
-    // Make sure we always call the callback if it is loaded already and make sure we
-    // also reprocess the page since chances are if we are requesting MathJax again,
-    // something has changed on the page and needs to get pulled into the MathJax ecosystem
-    window.MathJax.Hub.Reprocess()
-    cb?.()
-  }
+
+      if (ENV.FEATURES?.inline_math_everywhere) {
+        // look for latex the user may have entered w/o the equation editor by
+        // looking for mathjax's opening delimiters
+        if (/(?:\$\$|\\\()/.test(document.body.textContent)) {
+          return true
+        }
+      }
+    }
+    const mathElements = document.getElementsByTagName('math')
+    for (let i = 0; i < mathElements.length; i++) {
+      const $el = $(mathElements[i])
+      if ($el.is(':visible') && $el.parent('.hidden-readable').length <= 0) {
+        return true
+      }
+    }
+    return false
+  },
+
+  isMathMLOnPage() {
+    return this.isMathOnPage() // just in case I missed a place it's being used
+  },
+
+  isMathJaxLoaded() {
+    return !!window.MathJax?.Hub
+  },
+
+  processNewMathOnPage() {
+    if (this.isMathOnPage()) {
+      this.loadMathJax(undefined)
+    }
+  },
+
+  /*
+   * elem: string with elementId or en elem object
+   */
+  reloadElement(elem) {
+    if (this.isMathJaxLoaded()) {
+      window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, elem])
+    }
+  },
+
+  processNewMathEventName: 'process-new-math'
 }
 
-export function isMathMLOnPage() {
-  // handle the change from image + hidden mathml to mathjax formatted latex
-  if (document.querySelector('.math_equation_latex')) {
-    return true
-  }
-  const mathElements = document.getElementsByTagName('math')
-  for (let i = 0; i < mathElements.length; i++) {
-    const $el = $(mathElements[i])
-    if ($el.is(':visible') && $el.parent('.hidden-readable').length <= 0) return true
-  }
+// TODO: if anyone firing the event ever needs a callback,
+// push them onto an array, then pop and call in the handler
+function handleNewMath() {
+  mathml.processNewMathOnPage()
 }
+window.addEventListener('process-new-math', debounce(handleNewMath, 500))
 
-export function isMathJaxLoaded() {
-  return !!window.MathJax?.Hub
-}
-
-/*
- * elem: string with elementId or en elem object
- */
-export function reloadElement(elem) {
-  if (isMathJaxLoaded()) {
-    window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub, elem])
-  }
-}
+export default mathml

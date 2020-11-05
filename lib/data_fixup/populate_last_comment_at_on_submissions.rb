@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataFixup::PopulateLastCommentAtOnSubmissions
   def self.run(start_at, end_at)
     Submission.find_ids_in_ranges(:start_at => start_at, :end_at => end_at) do |min_id, max_id|

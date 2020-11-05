@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -146,7 +148,7 @@ class Enrollment
       end
 
       if conditions && @options[:course_workflow_state] && @options[:enforce_course_workflow_state]
-        conditions << sanitize_sql(
+        conditions += sanitize_sql(
           " AND courses.workflow_state = ?",
           @options[:course_workflow_state]
         )

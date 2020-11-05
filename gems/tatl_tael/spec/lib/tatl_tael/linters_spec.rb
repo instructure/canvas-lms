@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TatlTael::Linters do
@@ -48,7 +50,7 @@ describe TatlTael::Linters do
           let(:query) { {statuses: ["deleted"]} }
 
           it "returns deleted changes" do
-            expect(base_linter.changes_matching(query)).to match([deleted_change])
+            expect(base_linter.changes_matching(**query)).to match([deleted_change])
           end
         end
       end
@@ -69,7 +71,7 @@ describe TatlTael::Linters do
           let(:query) { {include: ["**/zoo", "**/foo", "**/bar"]} }
 
           it "returns the changes that match any of the includes" do
-            expect(base_linter.changes_matching(query)).to match([added_change])
+            expect(base_linter.changes_matching(**query)).to match([added_change])
           end
         end
       end
@@ -90,7 +92,7 @@ describe TatlTael::Linters do
           let(:query) { {allowlist: ["**/zoo", "**/foo", "**/bar"]} }
 
           it "returns the changes that don't match any of the allowlists" do
-            expect(base_linter.changes_matching(query)).to match([modified_change])
+            expect(base_linter.changes_matching(**query)).to match([modified_change])
           end
         end
       end

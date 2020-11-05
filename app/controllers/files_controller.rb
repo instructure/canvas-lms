@@ -144,7 +144,6 @@ class FilesController < ApplicationController
 
   before_action :open_limited_cors, only: [:show]
 
-  prepend_around_action :load_pseudonym_from_policy, only: :create
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: [
     :api_show, :api_create_success, :api_file_status, :api_update, :destroy, :reset_verifier

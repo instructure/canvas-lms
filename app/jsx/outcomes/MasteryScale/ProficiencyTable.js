@@ -29,6 +29,7 @@ import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
 import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
+import ConfirmMasteryScaleEdit from 'jsx/outcomes/ConfirmMasteryScaleEdit'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -57,7 +58,8 @@ const configToState = data => {
   return {
     masteryIndex,
     rows,
-    allowSave: false
+    allowSave: false,
+    showConfirmation: false
   }
 }
 class ProficiencyTable extends React.Component {
@@ -66,7 +68,8 @@ class ProficiencyTable extends React.Component {
     canManage: PropTypes.bool.isRequired,
     update: PropTypes.func.isRequired,
     focusTab: PropTypes.func,
-    breakpoints: breakpointsShape
+    breakpoints: breakpointsShape,
+    contextType: PropTypes.string.isRequired
   }
 
   static defaultProps = {
@@ -109,6 +112,8 @@ class ProficiencyTable extends React.Component {
 
   enableSaveButton = () => this.setState({allowSave: true})
 
+  hideConfirmationModal = () => this.setState({showConfirmation: false})
+
   fieldWithFocus = () => this.state.rows.some(row => row.get('focusField'))
 
   addRow = () => {
@@ -131,21 +136,25 @@ class ProficiencyTable extends React.Component {
     )
   }
 
-  handleSubmit = () => {
+  confirmSubmit = () => {
     if (!this.checkForErrors()) {
-      this.setState({allowSave: false}, () => {
-        this.props
-          .update(this.stateToConfig())
-          .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
-          .catch(e => {
-            $.flashError(
-              I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
-                message: e.message
-              })
-            )
-          })
-      })
+      this.setState({showConfirmation: true})
     }
+  }
+
+  handleSubmit = () => {
+    this.setState({allowSave: false, showConfirmation: false}, () => {
+      this.props
+        .update(this.stateToConfig())
+        .then(() => $.flashMessage(I18n.t('Account proficiency ratings saved')))
+        .catch(e => {
+          $.flashError(
+            I18n.t('An error occurred while saving account proficiency ratings: %{message}', {
+              message: e.message
+            })
+          )
+        })
+    })
   }
 
   handleMasteryChange = _.memoize(index => () => {
@@ -282,8 +291,8 @@ class ProficiencyTable extends React.Component {
   invalidDescription = description => !description || description.trim().length === 0
 
   render() {
-    const {allowSave, masteryIndex} = this.state
-    const {breakpoints, canManage} = this.props
+    const {allowSave, masteryIndex, showConfirmation} = this.state
+    const {breakpoints, canManage, contextType} = this.props
     const isMobileView = breakpoints.mobileOnly
     return (
       <>
@@ -355,11 +364,17 @@ class ProficiencyTable extends React.Component {
               <Button
                 variant="primary"
                 interaction={allowSave ? 'enabled' : 'disabled'}
-                onClick={this.handleSubmit}
+                onClick={this.confirmSubmit}
               >
                 {I18n.t('Save Mastery Scale')}
               </Button>
             </div>
+            <ConfirmMasteryScaleEdit
+              isOpen={showConfirmation}
+              contextType={contextType}
+              onConfirm={this.handleSubmit}
+              onClose={this.hideConfirmationModal}
+            />
           </>
         )}
       </>

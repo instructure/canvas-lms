@@ -61,6 +61,7 @@ group :test do
   gem 'luminosity_contrast', '0.2.1'
   gem 'pact', '1.49.0', require: false
     gem 'pact-mock_service', '3.5.0', require: false
+    gem 'pact-support', '1.15.1', require: false # pinned until https://github.com/pact-foundation/pact-support/issues/81 fixed
   gem 'pact-messages', '0.2.0'
   gem 'pact_broker-client', '1.25.0'
   gem 'database_cleaner', '~> 1.5', '>= 1.5.3'

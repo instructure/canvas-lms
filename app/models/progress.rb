@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -67,17 +69,17 @@ class Progress < ActiveRecord::Base
     queued? || running?
   end
 
-  # Tie this Progress model to a delayed job. Rather than `obj.send_later(:long_method)`, use:
+  # Tie this Progress model to a delayed job. Rather than `obj.delay.long_method`, use:
   # `progress.process_job(obj, :long_method)`. This will transition from queued
   # => running when the job starts, from running => completed when the job
   # finishes, and from running => failed if the job fails.
   #
   # This progress object will get passed as the first argument to the method,
   # so that you can update the completion percentage on it as the job runs.
-  def process_job(target, method, enqueue_args = {}, *method_args)
+  def process_job(target, method, enqueue_args, *method_args, **kwargs)
     enqueue_args = enqueue_args.reverse_merge(max_attempts: 1, priority: Delayed::LOW_PRIORITY)
     method_args = method_args.unshift(self) unless enqueue_args.delete(:preserve_method_args)
-    work = Progress::Work.new(self, target, method, method_args)
+    work = Progress::Work.new(self, target, method, args: method_args, kwargs: kwargs)
     GuardRail.activate(:primary) do
       ActiveRecord::Base.connection.after_transaction_commit do
         Delayed::Job.enqueue(work, enqueue_args)
@@ -87,9 +89,9 @@ class Progress < ActiveRecord::Base
 
   # (private)
   class Work < Delayed::PerformableMethod
-    def initialize(progress, *args)
+    def initialize(progress, *args, **kwargs)
       @progress = progress
-      super(*args)
+      super(*args, **kwargs)
     end
 
     def perform

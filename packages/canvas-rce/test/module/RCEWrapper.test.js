@@ -474,6 +474,35 @@ describe('RCEWrapper', () => {
           sinon.match(imageMarkup)
         )
       })
+
+      it('inserts a little placeholder for images displayed as links', () => {
+        mockImage()
+        const square =
+          'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAoAAAAKCAYAAACNMs+9AAAAFElEQVR42mNk+A+ERADGUYX0VQgAXAYT9xTSUocAAAAASUVORK5CYII='
+        const props = {
+          name: 'square.png',
+          domObject: {
+            preview: square
+          },
+          contentType: 'image/png',
+          displayAs: 'link'
+        }
+
+        const imageMarkup = `
+    <div
+      aria-label="Loading"
+      data-placeholder-for="square.png"
+      style="width: 10rem; height: 1rem;"
+    >`
+        instance.insertImagePlaceholder(props)
+        sinon.assert.calledWith(
+          editorCommandSpy,
+          'mceInsertContent',
+          false,
+          sinon.match(imageMarkup)
+        )
+        restoreImage()
+      })
     })
 
     describe('removePlaceholders', () => {

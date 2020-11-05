@@ -21,15 +21,8 @@ class RunUpdateCourseScoreStatistic < ActiveRecord::Migration[5.2]
 
   def up
     Course.find_ids_in_ranges(batch_size: 100_000) do |start_at, end_at|
-      DataFixup::RunUpdateCourseScoreStatistic.send_later_if_production_enqueue_args(
-        :run,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::RunUpdateCourseScoreStatistic", Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::RunUpdateCourseScoreStatistic.delay_if_production(priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::RunUpdateCourseScoreStatistic", Shard.current.database_server.id]).run(start_at, end_at)
     end
   end
 end

@@ -26,7 +26,6 @@ import 'jquery.instructure_misc_plugins' // ifExists, showIf
 import 'jquery.loadingImg'
 import 'vendor/jquery.scrollTo'
 import 'jqueryui/datepicker'
-import {isMathJaxLoaded, reloadElement, loadMathJax, isMathMLOnPage} from 'mathml'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -313,13 +312,6 @@ const bindToEditSyllabus = function(course_summary_enabled) {
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
-      if (isMathMLOnPage()) {
-        if (isMathJaxLoaded()) {
-          reloadElement('content')
-        } else {
-          loadMathJax('MML_HTMLorMML.js')
-        }
-      }
     },
 
     error(data) {

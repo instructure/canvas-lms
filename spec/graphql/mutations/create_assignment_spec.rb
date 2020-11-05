@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -113,7 +115,7 @@ describe Mutations::CreateAssignment do
   ]
 
   it "creates an assignment with attributes" do
-    query = "courseId: #{@course.to_param}\n"
+    query = +"courseId: #{@course.to_param}\n"
     TEST_ATTRS.each do |graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result = graphql_result|
       query << "#{graphql_name}: #{update_value}\n"
     end

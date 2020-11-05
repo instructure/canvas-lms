@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Canvas is Copyright (C) 2020 - present Instructure, Inc.
 #

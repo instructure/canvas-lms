@@ -930,7 +930,7 @@ class CalendarEventsApiController < ApplicationController
         event_hashes = builder.generate_event_hashes(timetables)
         builder.process_and_validate_event_hashes(event_hashes)
         raise "error creating timetable events #{builder.errors.join(", ")}" if builder.errors.present?
-        builder.send_later(:create_or_update_events, event_hashes) # someday we may want to make this a trackable progress job /shrug
+        builder.delay.create_or_update_events(event_hashes) # someday we may want to make this a trackable progress job /shrug
       end
 
       # delete timetable events for sections missing here
@@ -984,6 +984,9 @@ class CalendarEventsApiController < ApplicationController
   #   A unique identifier that can be used to update the event at a later time
   #   If one is not specified, an identifier will be generated based on the start and end times
   #
+  # @argument events[][title] [Optional, String]
+  #   Title for the meeting. If not present, will default to the associated course's name
+  #
   def set_course_timetable_events
     get_context
     if authorized_action(@context, @current_user, :manage_calendar)
@@ -1001,7 +1004,7 @@ class CalendarEventsApiController < ApplicationController
         return render :json => {:errors => builder.errors}, :status => :bad_request
       end
 
-      builder.send_later(:create_or_update_events, event_hashes)
+      builder.delay.create_or_update_events(event_hashes)
       render json: {status: 'ok'}
     end
   end

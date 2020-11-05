@@ -145,7 +145,7 @@
           <%= t 'Select the page you want to associate with this *module*, or add a new page by selecting "New Page".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t 'Select the page you want to associate, or add a new page by selecting "New Page".' %>" multiple>
+        <select class="module_item_select mathjax_ignore" aria-label="<%= t 'Select the page you want to associate, or add a new page by selecting "New Page".' %>" multiple>
           <%# cache on the context.wiki instead of just the context because even though it will require a db query, we will get a much better cache hit rate %>
           <option value="new"><%= t :new_page_option, "[ New Page ]" %></option>
           <% cache([@context.wiki, 'non_deleted_wiki_pages_1']) do  %>
@@ -215,7 +215,7 @@
           <%= t :quiz_notice, 'Select the quiz you want to associate with this *module*, or add a new one by selecting "New Quiz".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t :quiz_select_label, 'Select the quiz you want to associate, or add a new one by selecting "New Quiz".' %>" multiple>
+        <select class="module_item_select mathjax_ignore" aria-label="<%= t :quiz_select_label, 'Select the quiz you want to associate, or add a new one by selecting "New Quiz".' %>" multiple>
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
           <% end %>
@@ -257,7 +257,7 @@
           <%= t :assignment_notice, 'Select the assignment you want to associate with this *module*, or add an assignment by selecting "New Assignment".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t 'assignment_item_select_label', 'Select the assignment you want to associate, or add an assignment by selecting "New Assignment".' %>" multiple>
+        <select class="module_item_select mathjax_ignore" aria-label="<%= t 'assignment_item_select_label', 'Select the assignment you want to associate, or add an assignment by selecting "New Assignment".' %>" multiple>
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_assignment_option, "[ New Assignment ]" %></option>
           <% end %>
@@ -284,7 +284,7 @@
           <%= t :topic_notice, 'Select the topic you want to associate with this *module*, or add a topic by selecting "New Topic".', :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <div style="margin-top: 5px;">
-        <select class="module_item_select" aria-label="<%= t 'discussion_topic_select_label', 'Select the topic you want to associate, or add a topic by selecting "New Topic".' %>" multiple>
+        <select class="module_item_select mathjax_ignore" aria-label="<%= t 'discussion_topic_select_label', 'Select the topic you want to associate, or add a topic by selecting "New Topic".' %>" multiple>
           <option value="new"><%= t :new_topic_option, "[ New Topic ]" %></option>
           <% @context.discussion_topics.active.only_discussion_topics.reorder(DiscussionTopic.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
             <option value="<%= id %>"><%= title %></option>

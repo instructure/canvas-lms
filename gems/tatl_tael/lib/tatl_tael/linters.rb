@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 module TatlTael
@@ -31,7 +33,7 @@ module TatlTael
 
       # convenience
       def changes_exist?(query)
-        !changes_matching(query).empty?
+        !changes_matching(**query).empty?
       end
     end
 

@@ -20,13 +20,8 @@ class UpdateMasteryConnectToolConfig < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    DataFixup::UpdateMasteryConnectToolConfig.send_later_if_production_enqueue_args(
-      :run,
-      {
-        :priority => Delayed::LOWER_PRIORITY,
-        :strand => "mc_tool_config_update_#{Shard.current.database_server.id}"
-      }
-    )
+    DataFixup::UpdateMasteryConnectToolConfig.delay_if_production(priority: Delayed::LOWER_PRIORITY,
+      strand: "mc_tool_config_update_#{Shard.current.database_server.id}").run
   end
 
   def down; end

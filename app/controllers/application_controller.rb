@@ -227,7 +227,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages,
-    :usage_rights_discussion_topics
+    :usage_rights_discussion_topics, :inline_math_everywhere
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
@@ -543,11 +543,23 @@ class ApplicationController < ActionController::Base
 
   def assign_localizer
     I18n.localizer = lambda {
-      infer_locale :context => @context,
-                   :user => not_fake_student_user,
-                   :root_account => @domain_root_account,
-                   :session_locale => session[:locale],
-                   :accept_language => request.headers['Accept-Language']
+      context_hash = {
+        context: @context,
+        user: not_fake_student_user,
+        root_account: @domain_root_account
+      }
+      if request.present?
+        # if for some reason this gets stuck
+        # as global state on I18n (cleanup failure), we don't want it to
+        # explode trying to access a non-existant request.
+        context_hash.merge!({
+          session_locale: session[:locale],
+          accept_language: request.headers['Accept-Language']
+        })
+      else
+        logger.warn("[I18N] localizer executed from context-less controller")
+      end
+      infer_locale context_hash
     }
   end
 
@@ -1397,24 +1409,21 @@ class ApplicationController < ActionController::Base
   end
 
   def log_page_view
-    shard = (@accessed_asset && @accessed_asset[:shard]) || Shard.current
-    shard.activate do
-      begin
-        user = @current_user || (@accessed_asset && @accessed_asset[:user])
-        if user && @log_page_views != false
-          add_interaction_seconds
-          log_participation(user)
-          log_gets
-          finalize_page_view
-        else
-          @page_view.destroy if @page_view && !@page_view.new_record?
-        end
-      rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
-        Canvas::Errors.capture_exception(:page_view, e)
-        logger.error "Pageview error!"
-        raise e if Rails.env.development?
-        true
+    begin
+      user = @current_user || (@accessed_asset && @accessed_asset[:user])
+      if user && @log_page_views != false
+        add_interaction_seconds
+        log_participation(user)
+        log_gets
+        finalize_page_view
+      else
+        @page_view.destroy if @page_view && !@page_view.new_record?
       end
+    rescue StandardError, CassandraCQL::Error::InvalidRequestException => e
+      Canvas::Errors.capture_exception(:page_view, e)
+      logger.error "Pageview error!"
+      raise e if Rails.env.development?
+      true
     end
   end
 
@@ -1481,11 +1490,15 @@ class ApplicationController < ActionController::Base
   rescue_from Exception, :with => :rescue_exception
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
-  def rescue_exception(exception)
+  def rescue_exception(exception, level: :error)
+    # On exception `after_action :set_response_headers` is not called.
+    # This causes controller#action from not being set on x-canvas-meta header.
+    set_response_headers
+
     if config.consider_all_requests_local
       rescue_action_locally(exception)
     else
-      rescue_action_in_public(exception)
+      rescue_action_in_public(exception, level: level)
     end
   end
 
@@ -1509,7 +1522,7 @@ class ApplicationController < ActionController::Base
   end
 
   # Custom error catching and message rendering.
-  def rescue_action_in_public(exception)
+  def rescue_action_in_public(exception, level: :error)
     response_code = exception.response_status if exception.respond_to?(:response_status)
     @show_left_side = exception.show_left_side if exception.respond_to?(:show_left_side)
     response_code ||= response_code_for_rescue(exception) || 500
@@ -1529,7 +1542,7 @@ class ApplicationController < ActionController::Base
         info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
         error_info = info.to_h
         error_info[:tags][:response_code] = response_code
-        capture_outputs = Canvas::Errors.capture(exception, error_info)
+        capture_outputs = Canvas::Errors.capture(exception, error_info, level)
         error = nil
         if capture_outputs[:error_report]
           error = ErrorReport.find(capture_outputs[:error_report])

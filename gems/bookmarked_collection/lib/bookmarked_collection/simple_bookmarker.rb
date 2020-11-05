@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -219,7 +221,7 @@ module BookmarkedCollection
         args.concat(clause_args)
         visited << [col, val]
       end
-      sql = "(" << top_clauses.join(" OR ") << ")"
+      sql = "(" + top_clauses.join(" OR ") + ")"
       # one additional clause for index happiness
       index_sql, *index_args = column_comparison(columns.first, ">=", bookmark.first)
       sql = [sql, index_sql].join(" AND ")

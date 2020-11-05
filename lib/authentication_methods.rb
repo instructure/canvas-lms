@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,20 +19,6 @@
 #
 
 module AuthenticationMethods
-  def load_pseudonym_from_policy
-    if (policy_encoded = params['Policy']) &&
-        (signature = params['Signature']) &&
-        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
-        (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
-        policy['conditions'] &&
-        (credential = policy['conditions'].detect{ |cond| cond.is_a?(Hash) && cond.has_key?("pseudonym_id") })
-      @policy_pseudonym_id = credential['pseudonym_id']
-      # so that we don't have to explicitly skip verify_authenticity_token
-      params[self.class.request_forgery_protection_token] ||= form_authenticity_token
-    end
-    yield if block_given?
-  end
-
   class AccessTokenError < Exception
   end
 
@@ -77,8 +65,9 @@ module AuthenticationMethods
       # and for some normal use cases (old token, access token),
       # so we can return and move on
       return
-    rescue Imperium::TimeoutError => exception # Something went wrong in the Network
-      # these are indications of infrastructure of data problems
+    rescue Imperium::TimeoutError => exception
+      # Something went wrong in the Network
+      # these are indications of infrastructure or data problems
       # so we should log them for resolution, but recover gracefully
       Canvas::Errors.capture_exception(:jwt_check, exception, :warn)
     end

@@ -2632,7 +2632,9 @@ $(document).ready(function() {
         (!shouldExpand && $module.find('.content:visible').length > 0)
       ) {
         const callback = function() {
-          $module.find('.collapse_module_link').css('display', shouldExpand ? 'inline-block' : 'none')
+          $module
+            .find('.collapse_module_link')
+            .css('display', shouldExpand ? 'inline-block' : 'none')
           $module.find('.expand_module_link').css('display', shouldExpand ? 'none' : 'inline-block')
           $module.find('.footer .manage_module').css('display', '')
           $module.toggleClass('collapsed_module', shouldExpand)

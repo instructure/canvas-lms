@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ class CourseLinkValidator
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!
-    progress.process_job(self, :process)
+    progress.process_job(self, :process, {})
     progress
   end
 

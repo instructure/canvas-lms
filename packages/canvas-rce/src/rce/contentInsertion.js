@@ -60,7 +60,11 @@ export function insertContent(editor, content) {
     // created nodes if there were multiple, unfortunately), because the cursor
     // itself stays just before the new content.
     scroll.scrollIntoViewWDelay(editor.iframeElement, {})
-    editor.insertContent(content)
+    // there's a bug in tinymce where insertContent calls execCommand('mceInsertContent'),
+    // but doesn't correctly forward the second "args" argument. Let's go right for
+    // execCommand
+    // editor.insertContent(content, {skip_focus: true})
+    editor.execCommand('mceInsertContent', false, content + ' ', {skip_focus: true})
     return editor.selection.getEnd()
   }
 }
@@ -188,7 +192,6 @@ function insertUndecoratedLink(editor, linkProps) {
     linkAttrs.rel = 'noopener noreferrer'
   }
 
-  editor.focus()
   if (anchorElm && !editor.selection.isCollapsed()) {
     updateLink(editor, anchorElm, linkText, linkAttrs)
   } else if (selectedContent) {
@@ -221,7 +224,7 @@ function createLink(editor, selectedElm, text, linkAttrs) {
     linkImageFigure(editor, selectedElm, linkAttrs)
   } else if (text) {
     // create the whole wazoo
-    editor.insertContent(editor.dom.createHTML('a', linkAttrs, editor.dom.encode(text)))
+    insertContent(editor, editor.dom.createHTML('a', linkAttrs, editor.dom.encode(text)))
   } else {
     // create a link on the selected content
     editor.execCommand('mceInsertLink', false, linkAttrs)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -358,7 +360,7 @@ class DiscussionEntry < ActiveRecord::Base
   end
 
   def context_module_action_later
-    self.send_later_if_production(:context_module_action)
+    delay_if_production.context_module_action
   end
   protected :context_module_action_later
 

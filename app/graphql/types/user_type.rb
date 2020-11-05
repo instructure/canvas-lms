@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -73,7 +75,8 @@ module Types
     field :sis_id, String, null: true
     def sis_id
       domain_root_account = context[:domain_root_account]
-      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
+      if domain_root_account.grants_any_right?(context[:current_user], :read_sis, :manage_sis) ||
+        object.grants_any_right?(context[:current_user], :read_sis, :manage_sis)
         Loaders::AssociationLoader.for(User, :pseudonyms).
           load(object).
           then do

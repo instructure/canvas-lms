@@ -158,7 +158,7 @@ class ErrorsController < ApplicationController
       report.request_context_id = RequestContextGenerator.request_id
       report.assign_data(error)
       report.save
-      report.send_later(:send_to_external)
+      report.delay.send_to_external
     rescue => e
       @exception = e
       Canvas::Errors.capture(

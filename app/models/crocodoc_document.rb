@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -222,9 +224,7 @@ class CrocodocDocument < ActiveRecord::Base
             error_docs = CrocodocDocument.where(:uuid => error_uuids)
             attachment_ids = error_docs.pluck(:attachment_id)
             if Canvadocs.enabled?
-              Attachment.send_later_enqueue_args :submit_to_canvadocs,
-                {:n_strand => "canvadocs", :max_attempts => 1},
-                attachment_ids
+              Attachment.delay(n_strand: "canvadocs").submit_to_canvadocs(attachment_ids)
             end
           end
         end

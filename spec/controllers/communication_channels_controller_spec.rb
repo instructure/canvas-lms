@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -473,6 +475,15 @@ describe CommunicationChannelsController do
 
         post 'confirm', params: {:nonce => @cc.confirmation_code, :enrollment => @enrollment.uuid, :register => 1, :pseudonym => {:password => 'asdfasdf', :password_confirmation => 'asdfasdf'}}
         assert_status(400)
+      end
+
+      it "should redirect to the confirmation_redirect url when present" do
+        @user.accept_terms
+        @user.update_attribute(:workflow_state, 'creation_pending')
+        @cc = @user.communication_channels.create!(path: 'jt@instructure.com', confirmation_redirect: 'http://some.place/in-the-world')
+
+        post 'confirm', params: {nonce: @cc.confirmation_code, register: 1, pseudonym: {password: 'asdfasdf'}}
+        expect(response).to redirect_to("http://some.place/in-the-world?current_user_id=#{@user.id}")
       end
     end
 

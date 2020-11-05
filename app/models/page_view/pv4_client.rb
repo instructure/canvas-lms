@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -32,7 +34,7 @@ class PageView
       end_time ||= Time.now.utc
       start_time ||= Time.at(0).utc
 
-      params = "start_time=#{start_time.utc.iso8601(PRECISION)}"
+      params = +"start_time=#{start_time.utc.iso8601(PRECISION)}"
       params << "&end_time=#{end_time.utc.iso8601(PRECISION)}"
       params << "&last_page_view_id=#{last_page_view_id}" if last_page_view_id
       params << "&limit=#{limit}" if limit

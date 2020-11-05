@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render, fireEvent, waitFor} from '@testing-library/react'
 import UploadFileModal from '../UploadFileModal'
 
 describe('UploadFileModal', () => {
@@ -76,6 +76,27 @@ describe('UploadFileModal', () => {
 
       expect(queryByText('Usage Rights (required)')).not.toBeInTheDocument()
     })
+
+    it('disables the Submit button on the Computer panel unless set', () => {
+      modalProps.panels = ['COMPUTER']
+      const {getByText} = render(<UploadFileModal {...modalProps} />)
+      expect(getByText('Submit').parentElement.disabled).toBe(true)
+      // would like to see the button get enabled when a value is set,
+      // but the components aren't setup in a way to make that practical.
+    })
+
+    it('enables the Submit button on the URL panel even if not set', async () => {
+      modalProps.panels = ['URL']
+      const {getByText, getByLabelText} = render(<UploadFileModal {...modalProps} />)
+      await waitFor(() => getByLabelText('File URL'))
+      const urlinput = getByLabelText('File URL')
+      fireEvent.change(urlinput, {target: {value: 'http://example.com/'}})
+      await waitFor(() => expect(getByText('Submit').parentElement.disabled).toBe(false))
+    })
+
+    // IMO, testing the Unsplash panel is more effort than the value of the test,
+    // since it requires mocking the unsplash api + multiple interactions with
+    // the UI. If the Computer and URL panels behave OK, the Unsplash one will too.
   })
 
   describe('Image Attributes', () => {

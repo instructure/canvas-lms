@@ -236,7 +236,7 @@ describe('GroupModal', () => {
       expect(getByPlaceholderText('Number')).toHaveValue('3')
     })
 
-    it('edits a non student organized group and reports status', async () => {
+    it('allows updating a non student organized group', async () => {
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
       const {getByText, getAllByText, getByPlaceholderText} = render(
         <GroupModal
@@ -268,11 +268,11 @@ describe('GroupModal', () => {
       expect(onSave).toHaveBeenCalled()
     })
 
-    it('edits a student organized group and reports status', async () => {
+    it('allows updating a student organized group', async () => {
       fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
       const {getByText, getAllByText, getByPlaceholderText} = render(
         <GroupModal
-          group={{...group, name: 'Teacher Organized', role: 'student_organized'}}
+          group={{...group, name: 'Student Organized', role: 'student_organized'}}
           label="Edit Group"
           open={open}
           requestMethod="PUT"
@@ -289,6 +289,35 @@ describe('GroupModal', () => {
         group_category_id: '1',
         join_level: 'invitation_only',
         name: 'Sleepy Hollow'
+      })
+      expect(getAllByText(/saving/i)).toBeTruthy()
+      await act(() => fetchMock.flush(true))
+      expect(getAllByText(/success/i)).toBeTruthy()
+      expect(onDismiss).toHaveBeenCalled()
+      expect(onSave).toHaveBeenCalled()
+    })
+
+    it("allows updating a 'name only' group", async () => {
+      fetchMock.putOnce(`path:/api/v1/groups/${group.id}`, 200)
+      const {getByText, getAllByText, getByPlaceholderText} = render(
+        <GroupModal
+          group={{...group, name: 'nameOnly'}}
+          label="Edit Group"
+          open={open}
+          nameOnly
+          requestMethod="PUT"
+          onSave={onSave}
+          onDismiss={onDismiss}
+        />
+      )
+      userEvent.type(getByPlaceholderText('Name'), '{selectall}{backspace}')
+      userEvent.type(getByPlaceholderText('Name'), 'Name Only')
+      userEvent.click(getByText('Save'))
+      const [, fetchOptions] = fetchMock.lastCall()
+      expect(fetchOptions.method).toBe('PUT')
+      expect(JSON.parse(fetchOptions.body)).toMatchObject({
+        group_category_id: '1',
+        name: 'Name Only'
       })
       expect(getAllByText(/saving/i)).toBeTruthy()
       await act(() => fetchMock.flush(true))

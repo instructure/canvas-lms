@@ -1,4 +1,4 @@
-# encoding: UTF-8
+# frozen_string_literal: true
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #

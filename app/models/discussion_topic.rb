@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2011 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -220,8 +222,8 @@ class DiscussionTopic < ActiveRecord::Base
   def schedule_delayed_transitions
     return if self.saved_by == :migration
 
-    self.send_at(self.delayed_post_at, :update_based_on_date) if @should_schedule_delayed_post
-    self.send_at(self.lock_at, :update_based_on_date) if @should_schedule_lock_at
+    delay(run_at: delayed_post_at).update_based_on_date if @should_schedule_delayed_post
+    delay(run_at: lock_at).update_based_on_date if @should_schedule_lock_at
     # need to clear these in case we do a save whilst saving (e.g.
     # Announcement#respect_context_lock_rules), so as to avoid the dreaded
     # double delayed job ಠ_ಠ
@@ -240,7 +242,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def update_subtopics
     if !self.deleted? && (self.has_group_category? || !!self.group_category_id_before_last_save)
-      send_later_if_production_enqueue_args(:refresh_subtopics, :singleton => "refresh_subtopics_#{self.global_id}")
+      delay_if_production(singleton: "refresh_subtopics_#{self.global_id}").refresh_subtopics
     end
   end
 
@@ -952,7 +954,7 @@ class DiscussionTopic < ActiveRecord::Base
     # either changed sections or made section specificness
     return unless self.is_section_specific? ? @sections_changed : self.is_section_specific_before_last_save
 
-    send_later_if_production(:clear_stream_items_for_sections)
+    delay_if_production.clear_stream_items_for_sections
   end
 
   def clear_stream_items_for_sections
@@ -970,7 +972,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def clear_non_applicable_stream_items_for_delayed_posts
     if self.is_announcement && self.delayed_post_at? && @delayed_post_at_changed && self.delayed_post_at > Time.now
-      send_later_if_production(:clear_stream_items_for_delayed_posts)
+      delay_if_production.clear_stream_items_for_delayed_posts
     end
   end
 
@@ -985,7 +987,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   def clear_non_applicable_stream_items_for_locked_modules
     return unless self.locked_by_module?
-    send_later_if_production(:clear_stream_items_for_locked_modules)
+    delay_if_production.clear_stream_items_for_locked_modules
   end
 
   def clear_stream_items_for_locked_modules
@@ -1001,13 +1003,11 @@ class DiscussionTopic < ActiveRecord::Base
 
   def clear_stream_item_cache_for(user_ids)
     if stream_item && user_ids.any?
-      StreamItemCache.send_later_if_production_enqueue_args(
-        :invalidate_all_recent_stream_items,
-        { :priority => Delayed::LOW_PRIORITY },
-        user_ids,
-        stream_item.context_type,
-        stream_item.context_id
-      )
+      StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY).
+        invalidate_all_recent_stream_items(
+          user_ids,
+          stream_item.context_type,
+          stream_item.context_id)
     end
   end
 
@@ -1625,7 +1625,7 @@ class DiscussionTopic < ActiveRecord::Base
 
   # synchronously create/update the materialized view
   def create_materialized_view
-    DiscussionTopic::MaterializedView.for(self).update_materialized_view_without_send_later(use_master: true)
+    DiscussionTopic::MaterializedView.for(self).update_materialized_view(synchronous: true, use_master: true)
   end
 
   def grading_standard_or_default

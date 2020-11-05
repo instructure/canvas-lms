@@ -24,25 +24,20 @@ class InvalidateBuiltInRoleCaches < ActiveRecord::Migration[5.2]
       # otherwise we didn't bother changing role ids so there's nothing that needs to be cleared
       [[AccountUser, :account_users], [Enrollment, :enrollments]].each do |klass, cache_type|
         klass.find_ids_in_ranges(batch_size: 500_000) do |start_at, end_at|
-          DataFixup::InvalidateBuiltInRoleCaches.send_later_if_production_enqueue_args(:run,
-            {
-              priority: Delayed::LOWER_PRIORITY,
-              n_strand: ["built_in_roles_cache_clearing", Shard.current.database_server.id]
-            },
-            klass, cache_type, start_at, end_at
-          )
+          DataFixup::InvalidateBuiltInRoleCaches.
+            delay_if_production(priority: Delayed::LOWER_PRIORITY,
+              n_strand: ["built_in_roles_cache_clearing", Shard.current.database_server.id]).
+            run(klass, cache_type, start_at, end_at)
         end
       end
     end
 
     if Shard.current.default?
       # will clear cached role overrides everywhere
-      Account.site_admin&.send_later_if_production_enqueue_args(:clear_downstream_caches,
-        {
-          priority: Delayed::LOWER_PRIORITY,
-          singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}"
-        },
-        :role_overrides)
+      Account.site_admin&.
+        delay_if_production(priority: Delayed::LOWER_PRIORITY,
+          singleton: "clear_downstream_role_caches:#{Account.site_admin&.global_id}").
+        clear_downstream_caches(:role_overrides)
     end
   end
 

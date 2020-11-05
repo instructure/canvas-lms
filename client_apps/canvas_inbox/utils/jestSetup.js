@@ -18,6 +18,9 @@
 
 import '@instructure/canvas-theme'
 
+// because InstUI themeable components need an explicit "dir" attribute on the <html> element
+document.documentElement.setAttribute('dir', 'ltr')
+
 // set up mocks for native APIs
 if (!('MutationObserver' in window)) {
   Object.defineProperty(window, 'MutationObserver', {
@@ -35,7 +38,10 @@ if (!('MutationObserver' in window)) {
 const globalError = console.error
 const ignoredErrors = []
 const globalWarn = console.warn
-const ignoredWarnings = [/Warning: \[SimpleSelect\] is experimental.*/]
+const ignoredWarnings = [
+  /Warning: \[SimpleSelect\] is experimental.*/,
+  /Warning: \[themeable\] component styles require setting a \'dir\'*/
+]
 global.console = {
   log: console.log,
   error: error => {

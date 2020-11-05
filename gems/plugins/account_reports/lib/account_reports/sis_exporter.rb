@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - 2015 Instructure, Inc.
 #
@@ -36,7 +38,7 @@ module AccountReports
     end
 
     def csv
-      files = ""
+      files = +""
       @reports.each do |report_name|
         files << "#{report_name} "
       end

@@ -93,3 +93,28 @@ test('sets the tool title', async () => {
   const {title} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_title').val(), title)
 })
+
+test('close all dialogs when content items attribute is empty', async () => {
+  const $selectContextContentDialog = $('#select_context_content_dialog')
+  const $resourceSelectionDialog = $('#resource_selection_dialog')
+  const options = {
+    autoOpen: false,
+    modal: true
+  }
+
+  $selectContextContentDialog.dialog(options).dialog('open')
+  $resourceSelectionDialog.dialog(options).dialog('open')
+
+  const deepLinkingEvent = {
+    data: {
+      messageType: 'LtiDeepLinkingResponse',
+      content_items: [],
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
+    }
+  }
+
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+
+  strictEqual($selectContextContentDialog.is(':visible'), false)
+  strictEqual($resourceSelectionDialog.is(':visible'), false)
+})

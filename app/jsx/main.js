@@ -25,7 +25,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import Backbone from 'Backbone'
 import splitAssetString from 'compiled/str/splitAssetString'
-import {isMathMLOnPage, loadMathJax} from 'mathml'
+import mathml from 'mathml'
 import preventDefault from 'compiled/fn/preventDefault'
 import loadBundle from 'bundles-generated'
 
@@ -94,12 +94,26 @@ if (
 })
 
 ready(() => {
-  (window.deferredBundles || []).forEach(loadBundle)
+  ;(window.deferredBundles || []).forEach(loadBundle)
 
   // This is in a setTimeout to have it run on the next time through the event loop
   // so that the code that actually renders the user_content runs first,
-  // because it has to be rendered before we can check if isMathMLOnPage
+  // because it has to be rendered before we can check if isMathOnPage
   setTimeout(() => {
-    if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
-  }, 5)
+    window.dispatchEvent(processNewMathEvent)
+  }, 0)
+
+  const processNewMathEvent = new Event(mathml.processNewMathEventName)
+  const observer = new MutationObserver((mutationList, _observer) => {
+    for (const m in mutationList) {
+      if (mutationList[m]?.addedNodes?.length) {
+        window.dispatchEvent(processNewMathEvent)
+      }
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
 })

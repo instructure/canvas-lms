@@ -58,7 +58,7 @@ function renderLoadingError(_error) {
 }
 
 export default function MediaPanel(props) {
-  const {fetchInitialMedia, fetchNextMedia, contextType, sortBy} = props
+  const {fetchInitialMedia, fetchNextMedia, contextType, sortBy, searchString} = props
   const media = props.media[contextType]
   const {hasMore, isLoading, error, files} = media
   const lastItemRef = useRef(null)
@@ -71,7 +71,8 @@ export default function MediaPanel(props) {
     onLoadMore: fetchNextMedia,
     records: files,
     contextType,
-    sortBy
+    sortBy,
+    searchString
   })
 
   const handleFileClick = file => {
@@ -116,5 +117,6 @@ MediaPanel.propTypes = {
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
     order: oneOf(['asc', 'desc']).isRequired
-  })
+  }),
+  searchString: string
 }

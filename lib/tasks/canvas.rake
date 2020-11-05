@@ -37,7 +37,7 @@ namespace :canvas do
     # build dev bundles even in prod mode so you can debug with ?optimized_js=0
     # query string (except for on jenkins where we set JS_BUILD_NO_UGLIFY anyway
     # so there's no need for an unminified fallback)
-    build_dev_js = !build_prod_js || ENV['JS_BUILD_NO_UGLIFY'] != "1"
+    build_dev_js = ENV['JS_BUILD_NO_FALLBACK'] != "1" && (!build_prod_js || ENV['JS_BUILD_NO_UGLIFY'] != "1")
 
     batches = Rake::TaskGraph.draw do
       task 'css:compile' => [ 'js:gulp_rev' ] if build_css

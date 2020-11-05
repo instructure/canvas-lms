@@ -50,10 +50,6 @@ def appendStagesAsBuildNodes(nodes,
         stage_block(index)
       }
 
-      // mark with instance index.
-      // we need to do this on the main node so we dont run into
-      // concurrency issues with persisting the success
-      successes.saveSuccess(test_label)
     })
   }
 }
@@ -73,16 +69,9 @@ def stashBuildScripts() {
  */
 def addRSpecSuites(stages) {
   def rspec_node_total = load('build/new-jenkins/groovy/rspec.groovy').rspecConfig().node_total
-
-  if (successes.hasSuccess('rspec', rspec_node_total)) {
-    echo 'not running rspec. already successful'
-  }
-  else {
-    echo 'adding RSpec Test Sets'
-    successes.clearSuccesses('rspec')
-    appendStagesAsBuildNodes(stages, rspec_node_total, 'RSpec Test Set', 'rspec') { index ->
-      load('build/new-jenkins/groovy/rspec.groovy').runRSpecSuite(rspec_node_total, index)
-    }
+  echo 'adding RSpec Test Sets'
+  appendStagesAsBuildNodes(stages, rspec_node_total, 'RSpec Test Set', 'rspec') { index ->
+    load('build/new-jenkins/groovy/rspec.groovy').runRSpecSuite(rspec_node_total, index)
   }
 }
 
@@ -91,16 +80,9 @@ def addRSpecSuites(stages) {
  */
 def addSeleniumSuites(stages) {
   def selenium_node_total = load('build/new-jenkins/groovy/rspec.groovy').seleniumConfig().node_total
-
-  if (successes.hasSuccess('selenium', selenium_node_total)) {
-    echo 'not running selenium. already successful'
-  }
-  else {
-    echo 'adding Selenium Test Sets'
-    successes.clearSuccesses('selenium')
-    appendStagesAsBuildNodes(stages, selenium_node_total, 'Selenium Test Set', 'selenium') { index ->
-      load('build/new-jenkins/groovy/rspec.groovy').runSeleniumSuite(selenium_node_total, index)
-    }
+  echo 'adding Selenium Test Sets'
+  appendStagesAsBuildNodes(stages, selenium_node_total, 'Selenium Test Set', 'selenium') { index ->
+    load('build/new-jenkins/groovy/rspec.groovy').runSeleniumSuite(selenium_node_total, index)
   }
 }
 

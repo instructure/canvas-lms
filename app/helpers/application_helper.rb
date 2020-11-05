@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -981,10 +983,10 @@ module ApplicationHelper
   end
 
   def csp_header
-    header = "Content-Security-Policy"
+    header = +"Content-Security-Policy"
     header << "-Report-Only" unless csp_enforced?
 
-    header
+    header.freeze
   end
 
   def include_files_domain_in_csp

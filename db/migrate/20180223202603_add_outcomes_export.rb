@@ -19,6 +19,6 @@ class AddOutcomesExport < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::AddNewDefaultReport.send_later_if_production(:run, 'outcome_export_csv')
+    DataFixup::AddNewDefaultReport.delay_if_production.run('outcome_export_csv')
   end
 end

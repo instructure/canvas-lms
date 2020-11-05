@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -2409,7 +2411,7 @@ describe DiscussionTopicsController, type: :request do
 
     def call_mark_all_as_read_state(new_state, opts = {})
       method = new_state == 'read' ? :put : :delete
-      url = "/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
+      url = +"/api/v1/courses/#{@course.id}/discussion_topics/#{@topic.id}/read_all.json"
       expected_params = {:controller => 'discussion_topics_api', :action => "mark_all_#{new_state}", :format => 'json',
                          :course_id => @course.id.to_s, :topic_id => @topic.id.to_s}
       if opts.has_key?(:forced)

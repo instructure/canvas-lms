@@ -35,7 +35,8 @@ function getPanelProps(contextType, mediaprops) {
         ...mediaprops
       }
     },
-    sortBy: {sort: 'alphabetical', order: 'asc'}
+    sortBy: {sort: 'alphabetical', order: 'asc'},
+    searchString: 'whereami'
   }
 }
 

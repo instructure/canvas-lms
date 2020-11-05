@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -85,8 +87,7 @@ class AuthenticationProvider::LDAP < AuthenticationProvider
       "\00" => '\00',
   }.freeze
   def sanitized_ldap_login(login)
-    login.gsub!(/[#{Regexp.escape(LDAP_SANITIZE_MAP.keys.join)}]/, LDAP_SANITIZE_MAP)
-    login
+    login.gsub(/[#{Regexp.escape(LDAP_SANITIZE_MAP.keys.join)}]/, LDAP_SANITIZE_MAP)
   end
 
   def ldap_filter(login = nil)

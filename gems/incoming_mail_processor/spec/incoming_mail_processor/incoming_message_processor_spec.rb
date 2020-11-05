@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -147,7 +149,7 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should not choke on invalid UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=UTF-8'
-          body "he\xffllo".force_encoding(Encoding::BINARY) }, '')
+          body (+"he\xffllo").force_encoding(Encoding::BINARY) }, '')
 
       expect(message_handler.body).to eq("hello")
       expect(message_handler.html_body).to eq("hello")
@@ -156,10 +158,10 @@ describe IncomingMailProcessor::IncomingMessageProcessor do
     it "should convert another charset to UTF-8" do
       IncomingMessageProcessor.new(message_handler, error_reporter).process_single(Mail.new {
           content_type 'text/plain; charset=Shift_JIS'
-          body "\x83\x40".force_encoding(Encoding::BINARY)
+          body (+"\x83\x40").force_encoding(Encoding::BINARY)
         }, '')
 
-      comparison_string = "\xe3\x82\xa1"
+      comparison_string = +"\xe3\x82\xa1"
       comparison_string.force_encoding("UTF-8")
       expect(message_handler.body).to eq(comparison_string)
       expect(message_handler.html_body).to eq(comparison_string)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -167,41 +169,6 @@ class Account < ActiveRecord::Base
   include FeatureFlags
   def feature_flag_cache
     MultiCache.cache
-  end
-
-  def redis_for_root_account_cache_register
-    return unless MultiCache.cache.respond_to?(:redis)
-    redis = MultiCache.cache.redis
-    return if redis.respond_to?(:node_for)
-    redis
-  end
-
-  def root_account_cache_key
-    base_key = self.class.base_cache_register_key_for(self)
-    "#{base_key}/feature_flags"
-  end
-
-  def cache_key(key_type = nil)
-    return super if new_record?
-    return super unless root_account? && key_type == :feature_flags
-    return super unless (redis = redis_for_root_account_cache_register)
-
-    # partially taken from CacheRegister.cache_key_for_id, but modified to
-    # target HACache
-    full_key = root_account_cache_key
-    RequestCache.cache(full_key) do
-      now = Time.now.utc.to_s(self.cache_timestamp_format)
-      # try to get the timestamp for the type, set it to now if it doesn't exist
-      ts = Canvas::CacheRegister.lua.run(:get_key, [full_key], [now], redis)
-      "#{self.model_name.cache_key}/#{global_id}-#{ts}"
-    end
-  end
-
-  def clear_cache_key(*key_types)
-    return super unless root_account? && key_types == [:feature_flags]
-    return super unless redis_for_root_account_cache_register
-
-    MultiCache.delete(root_account_cache_key)
   end
 
   def self.recursive_default_locale_for_id(account_id)
@@ -535,7 +502,7 @@ class Account < ActiveRecord::Base
   def update_account_associations_if_changed
     if self.saved_change_to_parent_account_id? || self.saved_change_to_root_account_id?
       self.shard.activate do
-        send_later_if_production(:update_account_associations)
+        delay_if_production.update_account_associations
       end
     end
   end
@@ -549,7 +516,7 @@ class Account < ActiveRecord::Base
     keys_to_clear << :default_locale if self.saved_change_to_default_locale?
     if keys_to_clear.any?
       self.shard.activate do
-        send_later_if_production(:clear_downstream_caches, *keys_to_clear)
+        delay_if_production.clear_downstream_caches(*keys_to_clear)
       end
     end
   end
@@ -759,9 +726,8 @@ class Account < ActiveRecord::Base
         @invalidations.each do |key|
           Rails.cache.delete([key, self.global_id].cache_key)
         end
-        Account.send_later_if_production_enqueue_args(:invalidate_inherited_caches,
-         { singleton: "Account.invalidate_inherited_caches_#{global_id}" },
-          self, @invalidations)
+        Account.delay_if_production(singleton: "Account.invalidate_inherited_caches_#{global_id}").
+          invalidate_inherited_caches(self, @invalidations)
       end
     end
   end

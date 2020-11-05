@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -90,13 +92,8 @@ module AccountReports
       start_and_end_times
       report_extra_text
 
-      condition = [""]
-      condition.first << " AND s.submitted_at > ?"
-      condition << start_at
-      condition.first << " AND s.submitted_at < ?"
-      condition << end_at
-
-      time_span_join = Pseudonym.send(:sanitize_sql, condition)
+      time_span_join = Pseudonym.send(:sanitize_sql,
+       [" AND s.submitted_at > ? AND s.submitted_at < ?", start_at, end_at])
 
       no_subs = root_account.all_courses.active.
         select("p.user_id, p.sis_user_id, courses.id AS course_id,

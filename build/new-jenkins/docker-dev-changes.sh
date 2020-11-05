@@ -10,6 +10,7 @@ fileArr=(
   '^docker-compose.yml'
   '^Dockerfile$'
   '^lib/tasks/'
+  'Jenkinsfile.docker-smoke'
 )
 
 files=$(join_by '|' "${fileArr[@]}")

@@ -23,7 +23,7 @@ class MakeRoleRootAccountIdNotNull < ActiveRecord::Migration[5.2]
   tag :predeploy
 
   def up
-    Role.where(:root_account_id => nil).delete_all
+    Role.where(:root_account_id => nil).update_all(:root_account_id => 0)
     change_column_null :roles, :root_account_id, false
   end
 

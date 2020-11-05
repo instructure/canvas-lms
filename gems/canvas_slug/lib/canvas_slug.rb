@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ class CanvasSlug
     end
 
     def generate(purpose = nil, length = 4)
-      slug = ''
+      slug = +''
       slug << purpose << '-' if purpose
       slug << generate_securish_uuid(length)
       slug

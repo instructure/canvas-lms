@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,6 +29,59 @@ describe CommunicationChannel do
 
   it "should create a new instance given valid attributes" do
     factory_with_protected_attributes(CommunicationChannel, communication_channel_valid_attributes)
+  end
+
+  describe '::trusted_confirmation_redirect?' do
+    before do
+      @cc_redirect_trust_policies = CommunicationChannel.instance_variable_get(:@redirect_trust_policies)
+      CommunicationChannel.instance_variable_set(:@redirect_trust_policies, nil)
+    end
+
+    after do
+      CommunicationChannel.instance_variable_set(:@redirect_trust_policies, @cc_redirect_trust_policies)
+    end
+
+    let(:account) { double('Account') }
+    let(:url) { 'http://some.place' }
+
+    it 'should be falsey by default' do
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_falsey
+    end
+
+    it 'should be falsey if no policies return true' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { false }
+
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_falsey
+    end
+
+    it 'should be truthy if any given policy returns true' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { false }
+      CommunicationChannel.add_confirmation_redirect_trust_policy { true }
+
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, url)).to be_truthy
+    end
+
+    it 'should be falsey for non-http(s) URLs' do
+      CommunicationChannel.add_confirmation_redirect_trust_policy { true }
+
+      mailto = 'mailto:bill@microsoft.net'
+      expect(CommunicationChannel.trusted_confirmation_redirect?(account, mailto)).to be_falsey
+    end
+
+    it 'should pass the given params to the policies' do
+      root_account_param = nil
+      uri_param = nil
+
+      CommunicationChannel.add_confirmation_redirect_trust_policy do |root_account, uri|
+        root_account_param = root_account
+        uri_param = uri
+      end
+
+      CommunicationChannel.trusted_confirmation_redirect?(account, url)
+
+      expect(root_account_param).to eq(account)
+      expect(uri_param).to eq(URI(url))
+    end
   end
 
   describe 'imported?' do
@@ -88,6 +143,26 @@ describe CommunicationChannel do
     expect(CanvasSlug).to receive(:generate).at_least(1).and_return('abc123')
     communication_channel_model
     expect(@cc.confirmation_code).to eql('abc123')
+  end
+
+  it "should not increment confirmation_sent_count on bouncing channel" do
+    account = Account.create!
+    cc = communication_channel_model(
+      path: 'foo@bar.edu',
+      last_bounce_at: '2015-01-01T01:01:01.000Z',
+      last_suppression_bounce_at: '2015-03-03T03:03:03.000Z',
+      last_transient_bounce_at: '2015-04-04T04:04:04.000Z'
+    )
+    CommunicationChannel.bounce_for_path(
+      path: 'foo@bar.edu',
+      timestamp: '2015-02-02T02:02:02.000Z',
+      details: nil,
+      permanent_bounce: true,
+      suppression_bounce: false
+    )
+    conf_count = cc.reload.confirmation_sent_count
+    cc.send_confirmation!(account)
+    expect(cc.reload.confirmation_sent_count).to eq conf_count
   end
 
   it "should be able to reset a confirmation code" do

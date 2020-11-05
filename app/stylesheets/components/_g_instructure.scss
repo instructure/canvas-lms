@@ -138,7 +138,6 @@
   }
 
   table:not([cellpadding]) {
-    margin-#{direction(left)}: 5px;
     td {
       padding: 2px;
     }

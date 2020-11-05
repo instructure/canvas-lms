@@ -18,6 +18,7 @@ services:
       MAX_FAIL:
       COVERAGE:
       FORCE_FAILURE:
+      CANVAS_RAILS6_0:
 
       # parallel_tests
       CI_NODE_TOTAL:

@@ -50,7 +50,7 @@ test('student names are hidden', () => {
   })
 })
 
-test('secondary id says hidden', function() {
+QUnit.skip('secondary id says hidden', function() {
   Ember.run(() => {
     const student = this.controller.get('students.firstObject')
     Ember.setProperties(student, {
@@ -67,7 +67,7 @@ test('secondary id says hidden', function() {
   })
 })
 
-test('view concluded enrollments', function() {
+QUnit.skip('view concluded enrollments', function() {
   let enrollments = this.controller.get('enrollments')
   ok(enrollments.content.length > 1)
   enrollments.content.forEach(enrollment => ok(enrollment.workflow_state === undefined))

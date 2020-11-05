@@ -22,7 +22,7 @@ import {isAudioOrVideo, isImage, isVideo} from '../rce/plugins/shared/fileTypeUt
 /* eslint no-console: 0 */
 export default class Bridge {
   constructor() {
-    this.focusedEditor = null
+    this.focusedEditor = null // the RCEWrapper, not tinymce
     this.resolveEditorRendered = null
 
     this._editorRendered = new Promise(resolve => {
@@ -48,13 +48,21 @@ export default class Bridge {
   }
 
   focusEditor(editor) {
+    if (this.focusedEditor !== editor) {
+      this.hideTrays()
+    }
     this.focusedEditor = editor
   }
 
+  blurEditor(editor) {
+    if (this.focusedEditor === editor) {
+      this.hideTrays()
+      this.focusedEditor = null
+    }
+  }
+
   focusActiveEditor(skipFocus = false) {
-    this.getEditor()
-      .mceInstance()
-      .focus(skipFocus)
+    this.focusedEditor?.mceInstance?.()?.focus(skipFocus)
   }
 
   get mediaServerSession() {
@@ -120,6 +128,12 @@ export default class Bridge {
 
   showTrayForPlugin(plugin, editorId) {
     this._controller[editorId]?.showTrayForPlugin(plugin)
+  }
+
+  hideTrays() {
+    Object.keys(this._controller).forEach(eid => {
+      this._controller[eid].hideTray(true)
+    })
   }
 
   existingContentToLink() {

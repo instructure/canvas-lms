@@ -58,33 +58,33 @@ export function failImagesLoad({error, contextType}) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchImages(sortBy) {
+export function fetchImages(sortBy, searchString) {
   return (dispatch, getState) => {
     const state = getState()
     return state.source
-      .fetchImages({...state, ...sortBy})
+      .fetchImages({...state, ...sortBy, searchString})
       .then(response => dispatch(receiveImages({response, contextType: state.contextType})))
       .catch(error => dispatch(failImagesLoad({error, contextType: state.contextType})))
   }
 }
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
-export function fetchNextImages(sortBy) {
+export function fetchNextImages(sortBy, searchString) {
   return (dispatch, getState) => {
     const state = getState()
     const images = state.images[state.contextType]
     if (!images?.isLoading && images?.hasMore) {
       dispatch(requestImages(state.contextType))
-      return dispatch(fetchImages(sortBy))
+      return dispatch(fetchImages(sortBy, searchString))
     }
   }
 }
 // fetches the next page (subject to conditions on fetchNextImages) only if the
 // collection is currently empty
-export function fetchInitialImages(sortBy) {
+export function fetchInitialImages(sortBy, searchString) {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(requestInitialImages(state.contextType))
-    return dispatch(fetchImages(sortBy))
+    return dispatch(fetchImages(sortBy, searchString))
   }
 }

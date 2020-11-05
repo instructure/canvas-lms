@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -77,7 +79,7 @@ class Group < ActiveRecord::Base
   after_update :clear_cached_short_name, :if => :saved_change_to_name?
 
   delegate :time_zone, :to => :context
-  delegate :usage_rights_required, to: :context
+  delegate :usage_rights_required?, to: :context
 
   include StickySisFields
   are_sis_sticky :name
@@ -386,13 +388,13 @@ class Group < ActiveRecord::Base
       notification = BroadcastPolicy.notification_finder.by_name(notification_name)
 
       users.each_with_index do |user, index|
-        BroadcastPolicy.notifier.send_later_enqueue_args(:send_notification,
-                                                         { :priority => Delayed::LOW_PRIORITY },
-                                                         new_group_memberships[index],
-                                                         notification_name.parameterize.underscore.to_sym,
-                                                         notification,
-                                                         [user],
-                                                         broadcast_data)
+        BroadcastPolicy.notifier.delay(priority: Delayed::LOW_PRIORITY).
+          send_notification(
+            new_group_memberships[index],
+            notification_name.parameterize.underscore.to_sym,
+            notification,
+            [user],
+            broadcast_data)
       end
     end
     new_group_memberships

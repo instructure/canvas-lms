@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ module Api::V1::Role
       :last_updated_at => role.updated_at,
       :base_role_type => (role.built_in? && role.account_role?) ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
       :workflow_state => role.workflow_state,
-      :created_at => role.created_at.iso8601,
+      :created_at => role.created_at&.iso8601,
       :permissions => {}
     }
 
