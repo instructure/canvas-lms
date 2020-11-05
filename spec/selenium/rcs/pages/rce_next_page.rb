@@ -479,6 +479,38 @@ module RCENextPage
     f('[role="dialog"][aria-label="Upload File"]')
   end
 
+  def math_builder_button
+    possibly_hidden_toolbar_button('button[aria-label="Insert Math Equation"]')
+  end
+
+  def math_square_root_button
+    f('.sqrt-stem')
+  end
+
+  def math_builder_insert_equation_button
+    find_button('Insert Equation')
+  end
+
+  def math_image
+    f('.equation_image')
+  end
+
+  def edit_equation_button
+    fxpath('//button[*[.="Edit Equation"]]')
+  end
+
+  def math_dialog_exists?
+    element_exists?('.math-dialog')
+  end
+
+  def math_rendering_exists?
+    element_exists?('.equation_image')
+  end
+
+  def save_button
+    find_button('Save')
+  end
+
   # ---- menubar items ---
   def menubar_button(menu_name)
     fj("[role='menubar'] button[role^='menuitem']:contains('#{menu_name}')")
@@ -872,6 +904,30 @@ module RCENextPage
     menu_option_by_name('Document').click
   end
 
+  # Math toolbar and modal
+  def select_squareroot_symbol
+    math_square_root_button.click
+  end
+
+  def select_math_equation_from_toolbar
+    math_builder_button.click
+  end
+
+  def click_insert_equation
+    math_builder_insert_equation_button.click
+  end
+
+  def click_page_save_button
+    save_button.click
+  end
+
+  def select_math_image
+    math_image.click
+  end
+
+  def click_edit_equation
+    edit_equation_button.click
+  end
   def select_text_of_element_by_id(id)
     script = <<-JS
         const id = arguments[0]
