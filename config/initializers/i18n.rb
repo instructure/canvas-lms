@@ -195,6 +195,14 @@ module NumberLocalizer
 
     ActiveSupport::NumberHelper.number_to_rounded(number, precision: precision)
   end
+
+  def form_proper_noun_singular_genitive(noun)
+    if I18n.locale.to_s.start_with?('de') && %{s ß x z}.include?(noun.last)
+      "#{noun}'"
+    else
+      I18n.t("#proper_noun_singular_genitive", "%{noun}'s", noun: noun)
+    end
+  end
 end
 I18n.singleton_class.include(NumberLocalizer)
 

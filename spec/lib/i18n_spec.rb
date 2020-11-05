@@ -63,4 +63,34 @@ describe I18n do
       end
     end
   end
+
+  context "genitives" do
+    before { I18n.locale = I18n.default_locale }
+    after { I18n.locale = I18n.default_locale }
+
+    it "forms with `'s` in english" do
+      I18n.locale = :en
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Cody's")
+    end
+
+    it "forms with `s` in german generally" do
+      I18n.locale = :de
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Codys")
+    end
+
+    it "forms with `'` in german when ending appropriately" do
+      I18n.locale = :de
+      expect(I18n.form_proper_noun_singular_genitive("Max")).to eq ("Max'")
+    end
+
+    it "forms with `de ` in spanish" do
+      I18n.locale = :es
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("de Cody")
+    end
+
+    it "returns it untouched in chinese" do
+      I18n.locale = :"zh-Hant"
+      expect(I18n.form_proper_noun_singular_genitive("Cody")).to eq ("Cody")
+    end
+  end
 end
