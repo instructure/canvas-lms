@@ -793,6 +793,23 @@ describe Account do
     subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
     subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
     expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
+    expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
+  end
+
+  context "sharding" do
+    specs_require_sharding
+    it "returns sub account ids recursively when another shard is active" do
+      a = Account.default
+      subs = []
+      sub = Account.create!(name: 'sub', parent_account: a)
+      subs << grand_sub = Account.create!(name: 'grand_sub', parent_account: sub)
+      subs << great_grand_sub = Account.create!(name: 'great_grand_sub', parent_account: grand_sub)
+      subs << Account.create!(name: 'great_great_grand_sub', parent_account: great_grand_sub)
+      @shard1.activate do
+        expect(Account.sub_account_ids_recursive(sub.id).sort).to eq(subs.map(&:id).sort)
+        expect(sub.sub_accounts_recursive(10, 0).sort_by(&:id)).to eq(subs.sort_by(&:id))
+      end
+    end
   end
 
   it "should return the correct user count" do

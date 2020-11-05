@@ -956,7 +956,7 @@ class Account < ActiveRecord::Base
   # named scope, so we pass the limit and offset into the method instead and
   # build our own query string
   def sub_accounts_recursive(limit, offset)
-    if ActiveRecord::Base.configurations[Rails.env]['adapter'] == 'postgresql'
+    shard.activate do
       Account.find_by_sql([<<~SQL, self.id, limit.to_i, offset.to_i])
           WITH RECURSIVE t AS (
             SELECT * FROM #{Account.quoted_table_name}
@@ -968,30 +968,18 @@ class Account < ActiveRecord::Base
           )
           SELECT * FROM t ORDER BY parent_account_id, id LIMIT ? OFFSET ?
       SQL
-    else
-      account_descendents = lambda do |id|
-        as = Account.where(:parent_account_id => id).active.order(:id)
-        as.empty? ?
-          [] :
-          as << as.map { |a| account_descendents.call(a.id) }
-      end
-      account_descendents.call(id).flatten[offset, limit]
     end
   end
 
   def self.sub_account_ids_recursive(parent_account_id)
-    if connection.adapter_name == 'PostgreSQL'
+    original_shard = Shard.current
+    Shard.shard_for(parent_account_id).activate do
+      parent_account_id = Shard.relative_id_for(parent_account_id, original_shard, Shard.current)
       guard_rail_env = Account.connection.open_transactions == 0 ? :secondary : GuardRail.environment
       GuardRail.activate(guard_rail_env) do
         sql = Account.sub_account_ids_recursive_sql(parent_account_id)
-        Account.find_by_sql(sql).map(&:id)
+        Account.find_by_sql(sql).map { |a| Shard.relative_id_for(a.id, Shard.current, original_shard) }
       end
-    else
-      account_descendants = lambda do |ids|
-        as = Account.where(:parent_account_id => ids).active.pluck(:id)
-        as + account_descendants.call(as)
-      end
-      account_descendants.call([parent_account_id])
     end
   end
 
