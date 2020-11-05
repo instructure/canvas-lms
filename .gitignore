@@ -73,6 +73,9 @@ docker-compose.local.*
 /reports/
 /pacts/
 
+# generated scopes
+/lib/api_scope_mapper.rb
+
 # generated scopes markdown
 /doc/api/api_token_scopes.md
 
