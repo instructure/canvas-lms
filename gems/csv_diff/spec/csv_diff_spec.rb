@@ -92,6 +92,14 @@ a,b,c,d,
 CSV
   end
 
+  def with_nil_column
+    CSV.new(<<CSV, headers: true)
+pk1,,col1,pk2,col2,
+a,,b,c,d,
+1,,2,3,4,
+CSV
+  end
+
   context 'validation' do
     it 'rejects csvs without headers' do
       expect { subject.generate(csv1(headers: false), csv1) }.to raise_error(CsvDiff::Failure, /headers/)
@@ -122,6 +130,11 @@ CSV
 
     it 'generates an empty diff, even with extra commas' do
       output = subject.generate(csv1, with_trailing_commas)
+      expect(output.read).to eq "pk1,col1,pk2,col2\n"
+    end
+
+    it 'generates an empty diff, even with a nil column in the middle' do
+      output = subject.generate(csv1, with_nil_column)
       expect(output.read).to eq "pk1,col1,pk2,col2\n"
     end
 

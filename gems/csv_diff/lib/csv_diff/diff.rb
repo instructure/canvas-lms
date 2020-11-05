@@ -65,11 +65,7 @@ module CsvDiff
         # We need to turn this row into an array of known order, so that fields
         # are guaranteed to be in the same order from both csvs.
         key = Marshal.dump(row.fields(*@key_fields))
-        fields = if header_order
-          row.fields(*header_order)
-        else
-          row.fields
-        end
+        fields = row.fields(*header_order)
         data = Marshal.dump(fields)
         @db.execute("insert or replace into #{table} (key, data) values (?, ?)", [key, data])
       }
