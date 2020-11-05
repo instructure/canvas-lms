@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {act} from 'react-dom/test-utils'
-import {mount} from 'enzyme'
+import {mount,render} from 'enzyme'
 import LinkValidator from '../LinkValidator'
 import sinon from 'sinon'
 import $ from 'jquery'
@@ -116,6 +116,11 @@ describe('LinkValidator', () => {
                       url: 'http://example.foo',
                       reason: 'unreachable',
                       link_text: 'foo'
+                    },
+                    {
+                      url: 'javascript:alert("lulz")',
+                      reason: 'unreachable',
+                      link_text: 'hehehh'
                     }
                   ]
                 }
@@ -142,6 +147,28 @@ describe('LinkValidator', () => {
         return promise.then(() => {
           wrapper.update()
           expect(wrapper.exists('canvas')).toEqual(false)
+        })
+      })
+
+      it('sanitizes URLs', () => {
+        const wrapper = mount(<LinkValidator />)
+        const promise = new Promise(resolve => {
+          setTimeout(resolve, 1)
+        })
+        act(() => {
+          wrapper.find('button').simulate('click')
+          jest.advanceTimersByTime(2000)
+        })
+        return promise.then(() => {
+          wrapper.update()
+
+          expect(
+            wrapper.findWhere(x => x.text() === 'hehehh')
+              .hostNodes()
+              .first()
+              .getDOMNode()
+              .href
+          ).toEqual("about:blank")
         })
       })
     })
