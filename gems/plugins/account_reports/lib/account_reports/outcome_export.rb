@@ -29,25 +29,24 @@ module AccountReports
       include_deleted_objects
     end
 
-    OUTCOME_EXPORT_SCALAR_HEADERS = [
-      'vendor_guid',
-      'object_type',
-      'title',
-      'description',
-      'display_name',
-      'calculation_method',
-      'calculation_int',
-      'parent_guids',
-      'workflow_state',
-      'mastery_points'
-    ].freeze
+
+    NO_SCORE_HEADERS = %w(vendor_guid object_type title description display_name parent_guids workflow_state).freeze
+    OUTCOME_EXPORT_SCALAR_HEADERS = %w(vendor_guid object_type title description display_name calculation_method \
+                                       calculation_int parent_guids workflow_state mastery_points).freeze
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ['ratings']).freeze
 
     def outcome_export
       enable_i18n_features = true
-      write_report OUTCOME_EXPORT_HEADERS, enable_i18n_features do |csv|
-        export_outcome_groups(csv)
-        export_outcomes(csv)
+      if @account_report.account.root_account.feature_enabled?(:account_level_mastery_scales)
+        write_report NO_SCORE_HEADERS, enable_i18n_features do |csv|
+          export_outcome_groups(csv, NO_SCORE_HEADERS)
+          export_outcomes(csv, NO_SCORE_HEADERS, false)
+        end
+      else
+        write_report OUTCOME_EXPORT_HEADERS, enable_i18n_features do |csv|
+          export_outcome_groups(csv, OUTCOME_EXPORT_SCALAR_HEADERS)
+          export_outcomes(csv, OUTCOME_EXPORT_SCALAR_HEADERS, true)
+        end
       end
     end
 
@@ -101,10 +100,10 @@ module AccountReports
       SQL
     end
 
-    def export_outcome_groups(csv)
+    def export_outcome_groups(csv, headers)
       outcome_group_scope.each do |row|
         row['object_type'] = 'group'
-        csv << OUTCOME_EXPORT_SCALAR_HEADERS.map { |h| row[h] }
+        csv << headers.map { |h| row[h] }
       end
     end
 
@@ -138,7 +137,7 @@ module AccountReports
         SQL
     end
 
-    def export_outcomes(csv)
+    def export_outcomes(csv, headers, include_ratings)
       I18n.locale = account.default_locale if account.default_locale.present?
       outcome_scope.find_each do |row|
         outcome_model = row.learning_outcome_content
@@ -146,10 +145,9 @@ module AccountReports
         outcome['object_type'] = 'outcome'
         criterion = outcome_model.rubric_criterion
         outcome['mastery_points'] = I18n.n(criterion[:mastery_points])
-
-        csv_row = OUTCOME_EXPORT_SCALAR_HEADERS.map { |h| outcome[h] }
+        csv_row = headers.map { |h| outcome[h] }
         ratings = criterion[:ratings]
-        if ratings.present?
+        if ratings.present? && include_ratings
           csv_row += ratings.flat_map do |r|
             r.values_at(:points, :description).tap do |p|
               p[0] = I18n.n(p[0]) if p[0]
