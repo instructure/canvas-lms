@@ -16,7 +16,7 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
+require 'bigdecimal/util'
 module Quizzes
   class SubmissionGrader
     class AlreadyGradedError < RuntimeError; end
@@ -28,6 +28,7 @@ module Quizzes
       if @submission.submission_data.is_a?(Array)
         raise(AlreadyGradedError,"Can't grade an already-submitted submission: #{@submission.workflow_state} #{@submission.submission_data.class}")
       end
+
       @submission.manually_scored = false
       tally = 0
       user_answers = []
@@ -35,10 +36,10 @@ module Quizzes
       @submission.questions.each do |q|
         user_answer = self.class.score_question(q, data)
         user_answers << user_answer
-        tally += (user_answer[:points] || 0) if user_answer[:correct]
+        tally += (user_answer[:points] || 0).to_d if user_answer[:correct]
       end
-      @submission.score = tally
-      @submission.score = @submission.quiz.points_possible if @submission.quiz && @submission.quiz.graded_survey?
+      @submission.score = tally.to_d
+      @submission.score = @submission.quiz.points_possible if @submission&.quiz && @submission&.quiz&.graded_survey?
       @submission.submission_data = user_answers
       @submission.workflow_state = "complete"
       user_answers.each do |answer|
