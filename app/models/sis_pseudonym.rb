@@ -65,6 +65,7 @@ class SisPseudonym
       # but if the sis_user_id got moved to another pseudonym
       # it will grab that one instead.
       return nil if pseudonym&.sis_user_id.nil?
+      return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
       pseudonym
     end
   end

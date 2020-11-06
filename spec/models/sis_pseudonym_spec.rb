@@ -37,7 +37,7 @@ describe SisPseudonym do
 
   context "when there is a deleted pseudonym" do
     before do
-      u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
+      @deleted_pseudonym = u.pseudonyms.create!(pseud_params("user2@example.com")) do |x|
         x.workflow_state = 'deleted'
         x.sis_user_id = "user2"
       end
@@ -50,6 +50,19 @@ describe SisPseudonym do
         x.sis_user_id = "user1"
       end
       expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
+    end
+
+    it "should not return deleted pseudonyms from enrollments unless @include_deleted" do
+      e = course1.enroll_user(u)
+      e.sis_pseudonym_id = @deleted_pseudonym
+      e.save!
+      expect(SisPseudonym.for(u, course1)).to be_nil
+      active_pseudonym = u.pseudonyms.create!(pseud_params("user1@example.com")) do |x|
+        x.workflow_state = 'active'
+        x.sis_user_id = "user1"
+      end
+      expect(SisPseudonym.for(u, course1)).to eq(active_pseudonym)
+      expect(SisPseudonym.for(u, course1, include_deleted: true)).to eq @deleted_pseudonym
     end
 
     it "returns only active pseudonyms when loading from user collection too" do
