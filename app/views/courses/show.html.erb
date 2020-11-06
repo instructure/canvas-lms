@@ -132,7 +132,7 @@
           </a>
         <% end %>
 
-        <% if can_do(@context, @current_user, :use_student_view) %>
+        <% if can_do(@context, @current_user, :use_student_view) && !@context.feature_enabled?(:easy_student_view) %>
           <%= link_to course_student_view_path(@context), :method => :post, :class => 'btn button-sidebar-wide' do %>
             <i class="icon-student-view"></i> <%= t('links.student_view', 'Student View') %>
           <% end %>

@@ -1793,6 +1793,92 @@ describe ApplicationController do
       end
     end
   end
+
+  describe "show_student_view_button? helper" do
+    before :once do
+      Account.default.enable_feature!(:easy_student_view)
+    end
+
+    context "for teachers" do
+      before :once do
+        course_with_teacher :active_all => true
+      end
+
+      before :each do
+        user_session @teacher
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+      end
+
+      it "should return true on course home page" do
+        controller.params[:controller] = 'courses'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_truthy
+      end
+
+      it "should return true on modules page" do
+        controller.params[:controller] = 'context_modules'
+        controller.params[:action] = 'index'
+        expect(controller.send(:show_student_view_button?)).to be_truthy
+      end
+
+      it "should return false if flag is disabled" do
+        Account.default.disable_feature!(:easy_student_view)
+        controller.params[:controller] = 'courses'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+
+      it "should return false if context is not set" do
+        controller.instance_variable_set(:@context, nil)
+        controller.params[:controller] = 'courses'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+
+      it "should return false for pages index if pages tab is disabled" do
+        @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_PAGES, 'hidden'=>true}])
+        controller.instance_variable_set(:@context, @course)
+        controller.params[:controller] = 'wiki_pages'
+        controller.params[:action] = 'index'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+
+      it "should return true for pages page even if pages tab is disabled" do
+        @course.update_attribute(:tab_configuration, [{'id'=>Course::TAB_PAGES, 'hidden'=>true}])
+        controller.instance_variable_set(:@context, @course)
+        controller.params[:controller] = 'wiki_pages'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_truthy
+      end
+    end
+
+    context "for students" do
+      before :once do
+        course_with_student :active_all => true
+      end
+
+      before :each do
+        user_session @student
+        controller.instance_variable_set(:@context, @course)
+        controller.instance_variable_set(:@current_user, @user)
+      end
+
+      it "should return false regardless of page" do
+        controller.params[:controller] = 'courses'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+
+        controller.params[:controller] = 'wiki_pages'
+        controller.params[:action] = 'show'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+
+        controller.params[:controller] = 'assignments'
+        controller.params[:action] = 'syllabus'
+        expect(controller.send(:show_student_view_button?)).to be_falsey
+      end
+    end
+  end
 end
 
 describe WikiPagesController do

@@ -474,7 +474,7 @@ CanvasRails::Application.routes.draw do
 
     post 'reset' => 'courses#reset_content'
     resources :alerts
-    post :student_view
+    post 'student_view(/:redirect_to_referer)' => 'courses#student_view', as: :student_view
     delete 'student_view' => 'courses#leave_student_view'
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'

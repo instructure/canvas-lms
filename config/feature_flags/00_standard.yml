@@ -435,3 +435,9 @@ recent_history:
   applies_to: RootAccount
   display_name: Recent History
   description: Show a list of recently visited pages in the Canvas global navigation
+easy_student_view:
+  state: hidden
+  applies_to: Course
+  display_name: Easy Toggle Student View
+  description: Places a button in the top-right corner of course pages allowing teachers to quickly switch to Student
+    View.
