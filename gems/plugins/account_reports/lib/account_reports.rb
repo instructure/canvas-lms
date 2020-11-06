@@ -22,9 +22,14 @@ require 'account_reports/engine'
 require 'zip'
 
 module AccountReports
+  class << self
+    attr_writer :handle_error
+  end
 
   # This hash is modified below and should not be frozen.
+  # rubocop:disable Lint/FreezeConstants, Style/MutableConstant
   REPORTS = {}
+  # rubocop:enable Lint/FreezeConstants, Style/MutableConstant
 
   Report = Struct.new(:type, :title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
     def module_name
@@ -85,17 +90,32 @@ module AccountReports
     begin
       REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
-      account_report.logger.error e
-      @er = ErrorReport.log_exception(nil, e, :user => account_report.user)
+      error_report_id = report_on_exception(e, {:user => account_report.user})
       title = account_report.report_type.to_s.titleize
-      error_message = "Generating the report, #{title}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}"
+      error_message = "Generating the report, #{title}, failed."
+      error_message += if error_report_id
+        " Please report the following error code to your system administrator: ErrorReport:#{error_report_id}"
+      else
+        " Unable to create error_report_id for #{e}"
+      end
       self.finalize_report(account_report, error_message)
       @er = nil
     end
   end
 
+  def self.report_on_exception(exception, context, level: :error)
+    if @handle_error.respond_to?(:call)
+      capture_outputs = @handle_error.call(exception, context, level)
+      # return the error_report id
+      capture_outputs[:error_report]
+    else
+      Rails.logger.error(exception)
+      nil
+    end
+  end
+
   def self.generate_file_name(account_report)
-    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}"
+    "#{account_report.report_type}_#{Time.zone.now.strftime('%d_%b_%Y')}_#{account_report.id}"
   end
 
   def self.generate_file(account_report, ext = 'csv')
