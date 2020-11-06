@@ -273,7 +273,8 @@ export default class EquationEditorView extends Backbone.View {
     fetch(url, {
       method: 'GET',
       mode: 'cors',
-      redirect: 'follow'
+      redirect: 'follow',
+      credentials: 'omit'
     })
       .then(response => {
         this.restoreCaret()
