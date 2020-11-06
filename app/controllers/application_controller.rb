@@ -1537,23 +1537,16 @@ class ApplicationController < ActionController::Base
       status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
       type = nil
       type = '404' if status == '404 Not Found'
-
-      # TODO: get rid of exceptions that implement this "skip_error_report?" thing, instead
-      # use the initializer in config/initializers/errors.rb to configure
-      # exceptions we want skipped
-      unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        opts = {type: type}
-        opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
-        info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
-        error_info = info.to_h
-        error_info[:tags][:response_code] = response_code
-        capture_outputs = Canvas::Errors.capture(exception, error_info, level)
-        error = nil
-        if capture_outputs[:error_report]
-          error = ErrorReport.find(capture_outputs[:error_report])
-        end
+      opts = {type: type}
+      opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
+      info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
+      error_info = info.to_h
+      error_info[:tags][:response_code] = response_code
+      capture_outputs = Canvas::Errors.capture(exception, error_info, level)
+      error = nil
+      if capture_outputs[:error_report]
+        error = ErrorReport.find(capture_outputs[:error_report])
       end
-
       if api_request?
         rescue_action_in_api(exception, error, response_code)
       else

@@ -29,6 +29,8 @@ Rails.configuration.to_prepare do
     AuthenticationMethods::AccessTokenError
     ActionController::InvalidAuthenticityToken
     Turnitin::Errors::SubmissionNotScoredError
+    ActionController::ParameterMissing
+    SearchTermHelper::SearchTermTooShortError
   })
 
   # write a database record to our application DB capturing useful info for looking
