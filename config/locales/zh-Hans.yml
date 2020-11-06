@@ -1319,6 +1319,7 @@ zh-Hans:
         allow_sis_import: "SIS 导入"
         author_email_in_notifications: 显示发件人用于用户交互通知的电子邮件地址
         can_add_pronouns: 启用人称代词
+        can_change_pronouns: "允许用户更改在 Canvas 中的代号"
         canvadocs_prefer_office_online: "偏爱Office 365文件浏览器"
         canvas_authentication: "Canvas 身份验证"
         default_language: 默认语言
@@ -1714,6 +1715,7 @@ zh-Hans:
           zero_activity: 
             text: "此报告显示某个指定学期中注册了任意课程的所有学生。在生成的 csv 文件中，自该日期起尚未访问课程的每项用户注册占一行。"
   accounts_752dc365: 账户
+  accounts_lti_546d15c7: "帐户 (LTI)"
   achieve_mastery_count_times_8c9bbcec: 
     one: "达到程度%{count} 次"
     other: "达到程度%{count} 次"
@@ -2478,6 +2480,7 @@ zh-Hans:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "更新熟练程度评级时发生错误:%{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: 更新熟练程度评级时发生错误
   an_error_occurred_updating_this_assignment_21287c7e: 更新此作业时出错。
+  an_error_occurred_when_saving_the_group_536c8f66: 保存组时出错。
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "为 %{filename} 设置使用权限时出错"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: 在尝试联系Turnitin时发生错误
   an_error_occurred_while_checking_the_migration_sta_d17035b1: 检查迁移状态时出错
@@ -2924,6 +2927,7 @@ zh-Hans:
       assignment_rubric_details: 作业评分标准详细说明
   assignment_976578a8: 作业
   assignment_allowed_attempts_7e3d43ee: 作业允许的尝试次数
+  assignment_and_link_selection_557faf38: 作业和链接选择
   assignment_assignment_submission_paper_view_8a4c9776: "作业%{assignment}提交项纸张视图"
   assignment_assignment_submission_plain_text_view_b217d372: "作业%{assignment}提交项纯文本视图"
   assignment_bulk_editing_37248ca4: 作业批量编辑
@@ -4876,6 +4880,11 @@ zh-Hans:
   canvas_parent_description: 此设置控制着家长使用Canvas他们的手机应用程序与您机构中的学生连接。
   canvas_parent_improved_description: "该设置控制创建 Canvas Parent 账户的家长能否使用 Canvas Parent 移动应用程序连接您所在机构的学生。注意：即使该功能标记关闭，注册为 Canvas Observer 的家长仍可使用 Canvas Parent 移动应用程序。"
   canvas_revision_unknown: 未知
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+      Canvas 在用户生成的内容中重写了文件 URL。在该过程中，它
+      经常不必要且不恰当地添加“下载”。该
+      设置更新了如何进行 URL 重写以支持在 Canvas 中预览
+      文件，而不是下载文件。
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas 将响应视作有效"
   canvas_ticketing_email_connector_27e253ae: "Canvas 的票务电子邮件连接器"
@@ -5263,7 +5272,7 @@ zh-Hans:
   comment_submitted_d9934b: 评论已提交！
   comments_e07bcbe3: 评论
   comments_for_this_attempt_a5fae61f: 对本次尝试的评论
-  commmessages_9fa33faa: CommMessages
+  commmessages_9fa33faa: 通信消息
   common_cartridge_description: "这可以将 Common Cartridge 包转换为要导入的中间 json 格式"
   common_cartridge_display: "Common Cartridge"
   common_cartridge_file_description: "Common Cartridge 1.x 包"
@@ -5748,6 +5757,7 @@ zh-Hans:
   content_share_preview_166f6562: 内容共享预览
   content_share_started_successfully_2c37fb79: 内容共享已成功启动
   content_shared_by_others_to_you_5a40bb2c: 其他人分享给您的内容
+  content_shares_e1e1: 内容共享
   content_shares_received_view_error_page_c7021a4a: 收到的共享内容，查看错误页面
   content_successfully_added_395c906f: "已成功添加 %{content}"
   content_tag: 
@@ -6406,6 +6416,7 @@ zh-Hans:
     one: "1 次尝试次数"
     other: "%{count} 次尝试次数"
     zero: 无限尝试次数
+  count_changes_pushed_by_user_654aade2: "%{count} 处更改来自 %{user}"
   count_comments_cb137ab8: 
     one: "%{count} 评论"
     other: "%{count} 评论"
@@ -10078,6 +10089,7 @@ zh-Hans:
   first_reviewer_9ea05caa: 第一个审阅者
   first_reviewer_sortorder_e2184140: "第一个审阅者%{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students}，和另外的%{others_count}"
+  fix_missing_policy_grade_change_records_c404507c: 修复缺少策略评分更改记录
   flagged_as_possible_spam_ebbc4683: 标记为潜在垃圾邮件
   flags_new_eportfolio_content_matching_specific_key_a66af560: 将匹配特定关键词的新ePortfolio内容标记为潜在垃圾邮件，以便管理员确认已标记的ePortfolio或标注为安全内容。
   flash_6afbf65a: Flash
@@ -11098,7 +11110,7 @@ zh-Hans:
   grading_period_title_fa470c50: 评分周期的标题
   grading_period_weight_99b66906: 评分周期权重
   grading_period_weights_aaea757f: 评分周期权重
-  grading_periods_81941e66: 评分时段
+  grading_periods_81941e66: 评分周期
   grading_periods_are_weighted_4f3663ab: 评分周期已加权
   grading_periods_must_not_overlap_f45336fb: 评分周期不可重叠
   grading_scheme_deleted_7ae5a072: 删除评分计划
@@ -11223,6 +11235,7 @@ zh-Hans:
       group_full: 该小组已满。
       not_in_group_section: "%{student} 没有与 %{group} 的其他成员共享班级。"
   group_membership_limit_54e165b: 组成员限制
+  group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: 组成员限制人数不得小于当前成员数量。
   group_name_b69c144: 小组名称
   group_name_group_announcements_5ce81c6d: "%{group_name} - 小组公告"
   group_name_group_calendar_7f10e0ed: "%{group_name} - 小组日历"
@@ -11238,6 +11251,7 @@ zh-Hans:
   group_pages_656556f3: 小组页面
   group_people_50e9785b: 小组成员
   group_roster_1846bf84: 小组清单
+  group_saved_successfully_fcd5ca66: 已成功保存组
   group_select_330df8bd: 小组选择
   group_set_name_2aed2347: 小组集名称
   group_settings: 
@@ -11581,7 +11595,7 @@ zh-Hans:
       self_signup_help: 自行注册小组
     unassigned_students: "未分配的学生 (%{count})"
     unassigned_users: "未分配的用户 (%{count})"
-  groups_6c90e26a: 组
+  groups_6c90e26a: 小组
   groups_add_edit_delete_1536bbb4: "群组 - 添加/编辑/删除"
   groups_are_a_good_place_to_collaborate_on_projects_7386830f: |-
       组是项目协作或安排学习时间之类活动的良好场所。
@@ -11743,6 +11757,7 @@ zh-Hans:
       create: "创建 %{model}"
       submit: "保存 %{model}"
       update: "更新 %{model}"
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: 帮助管理员和教师在导入、整理和编辑帐户和课程中的结果时做出更加合理的决定。
   here_are_the_first_100_errors_that_occurred_d6e46739: 下方列出了前100条错误：
   here_are_your_assignments_listed_by_due_date_7d8e98e6: 这是您的作业，按到期日期列出。
   here_f44564ee: 这里、此处
@@ -12095,6 +12110,7 @@ zh-Hans:
   image_8ad06: 图像
   image_c1c98202: 图像
   image_id_is_not_a_valid_id_7dd6bad6: "image_id 不是有效的 ID"
+  image_search_b0944fc2: 图像搜索
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url 和 image_id 无法同时设置"
   image_url_is_not_a_valid_url_4e31c8b0: "image_url 不是有效的 URL"
   images: 
@@ -12157,6 +12173,7 @@ zh-Hans:
   importing_outcomes_e62a0375: 正在导入结果
   improve_accessibility_of_left_hand_menu_through_be_908fb002: 通过优化使用颜色及不活跃菜单项的视觉和屏幕朗读器指示器，改善左侧菜单的辅助功能。
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: 改进文件拖放的可发现性
+  improved_outcomes_management_4692f886: 改进的结果管理
   improved_visual_reminders_to_encourage_instructors_f203c7f: 改进视觉提醒以鼓励教师发布课程
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "在 %{asset_link} 中，学生正在点击课程中不存在的页面的 %{bad_link}。"
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "在 %{asset_link} 中，学生正在点击其他课程中的内容的 %{bad_link} 。"
@@ -12246,6 +12263,7 @@ zh-Hans:
       输入和分配学生评分。显示评分为得分、百分数、
       完成或未完成、合格或不合格、GPA 评分以及字母评分。
       用于评分加权的小组作业。
+  insert_a_grade_change_record_when_the_periodic_mis_424139e5: "在提交项上运行周期性 MissingPolicyApplicator 作业时，插入评分更改记录。"
   insert_above_row_de82d138: "在上面插入%{row}"
   insert_below_row_55ed6f34: "插入行%{row}"
   insert_equella_links_49a8dacd: "插入 Equella 链接"
@@ -12824,6 +12842,7 @@ zh-Hans:
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "将此段限制给 %{input_type_number_name_max_parti} 组。"
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "将此段限制给 %{input_type_number_name_max_parti} 用户。"
   limited_322546c5: 受到限制
+  line_items_828f62cc: 行项目
   link_7262adec: 联系、链接
   link_color_55f8b835: 链接颜色
   link_description_4355ca82: 链接说明
@@ -12884,7 +12903,7 @@ zh-Hans:
   live_event_subscription_webhooks_1dae83bb: 实时事件订阅网络钩子
   live_event_tool_documentation_f6dcc3d7: 实时事件工具文档
   live_events_subscriptions_service_is_not_configure_8c6024e2: 未配置现场活动订阅服务
-  liveassessments_92d9edc0: LiveAssessments
+  liveassessments_92d9edc0: 实时评估
   load_bank: 
     error_loading_banks: 加载库时出错
     loading_banks: 正在加载库...
@@ -13339,6 +13358,7 @@ zh-Hans:
     messages: 
       submitting: 正在提交媒体文件...
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: 媒体一直在排队等待转换，请稍后重试。
+  media_objects_c2fa37cd: 媒体对象
   media_over_time_d9332e25: 一段时间的媒体
   media_record_not_available_f78c16dd: 媒体记录不可用
   media_recording_77cddc52: 媒体录制
@@ -15684,6 +15704,7 @@ zh-Hans:
   name_unposted_final_grade_798491b7: "%{name}已取消发布最终评分"
   name_unposted_final_score_124708d2: "%{name}已取消发布最终分数"
   name_user_e44eebed: "%{name} 用户"
+  names_and_role_ebff0149: 名称和角色
   nav_avatar_border_3246beb1: 导航头像边框
   nav_background_fd299145: 导航背景
   nav_badge_3c67de17: 导航徽章
@@ -15968,7 +15989,7 @@ zh-Hans:
   note_for_differentiated_group_topics_some_threads__90adbb21: 注意：对于区分小组的题目，某些线程可能没有分配任何的学生。
   note_grades_and_notes_will_be_saved_automatically__e3270872: 注意：移出字段后将自动保存评分和备注。
   note_it_may_take_up_to_a_week_for_the_beta_url_to__d695bddc: 注意：取决于测试版的更新周期，测试版网址的计提可能需要一个星期。
-  note_length_cannot_exceed_maxlength_characters_82798b1: "注意长度不能超过%{maxLength} 的字符。"
+  note_length_cannot_exceed_maxlength_characters_82798b1: "请注意，长度不能超过 %{maxLength} 个字符。"
   note_question_details_not_available_when_more_than_93199f6d: "注意：当超过%{question_count} 时，问题细节不可用。"
   note_some_items_fall_outside_the_start_and_or_end__feab0642: 注：某些项不在课程的开始和/或结束日期范围内
   note_students_have_submitted_work_for_these_assign_7bc34e28: 注：对于这些作业，学生具有尚未评分的提交内容。如果您现在发布这些评分，将需要在对最新的提交项进行评分后重新发布其分数。
@@ -16863,8 +16884,9 @@ zh-Hans:
     errors: 
       delete_reminder_failed: 删除失败
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: 同侪评审无法启用于缓和的作业。
-  peer_reviews_e3a55964: 同侪审阅
+  peer_reviews_e3a55964: 同伴互评
   peer_service_6b4828b9: 对等服务
+  peer_services_102357e3: 对等服务
   penalty_adjusted_707df573: "*%{penalty}* **%{adjusted}**"
   pending_3e506a5b: 审核中
   pending_message_2d9a8796: "审核中：%{message}"
@@ -17492,7 +17514,7 @@ zh-Hans:
   poland_b43b9d20: 波兰
   polish_4cf2ecaf: 波兰语
   poll_sessions_516c4c26: 轮询会话
-  pollchoices_f1cd038c: PollChoices
+  pollchoices_f1cd038c: 轮询选择
   polling: 
     poll_sessions: 
       errors: 
@@ -17510,7 +17532,7 @@ zh-Hans:
         validations: 
           user_and_poll_session_uniqueness: 每个投票会话只能提交一个选项。
   polls_d8096fb7: 轮询
-  pollsubmissions_ce0ef4d: PollSubmissions
+  pollsubmissions_ce0ef4d: 轮询提交
   poor_1150a0f8: 较差的
   poor_score_715306e2: 低分
   port_75f69d1: 接口
@@ -19965,6 +19987,7 @@ zh-Hans:
   resubmit_to_tool_name_1cf02a31: "重新提交至%{tool_name}"
   resubmitted_2080646f: 已重新提交
   resubmitted_since_last_graded_8484d285: 重新提交上次的评分
+  result_8f971a09: 结果
   resume_quiz_afeceb87: 继续测验
   resume_survey_58dce775: 继续调查
   resync_grades_to_sis_d4dcfe12: "将评分重新同步到 SIS"
@@ -20122,7 +20145,7 @@ zh-Hans:
       account_roles: 帐户角色
       course_roles: 课程角色
       page_header_title: 帐户权限
-  roles_730b879e: 评估表格
+  roles_730b879e: 角色
   romanian_13670c1e: 罗马尼亚语
   rootFoldersFinder: 
     course_files: 课程文件
@@ -20263,6 +20286,7 @@ zh-Hans:
   saving_associations_started_8ac85360: 保存关联已开始
   saving_d55dd90e: 正在保存...
   saving_dates_2472a539: 保存日期
+  saving_group_230707e6: 正在保存组
   saving_new_role_458f4ba8: 正在保存新角色
   saving_recording_e111cb05: 保存录制...
   saving_the_csp_status_failed_please_try_again_8275aaa4: "保存 CSP 状态失败，请重试。"
@@ -20282,7 +20306,7 @@ zh-Hans:
   score_does_not_include_groups_becuase_they_have_no_ee031bff: 
     one: "分数不包含%{groups}，因为他们可能没有分值。"
     other: "分数不包含%{groups}，因为他们可能没有分值。"
-  score_f7ac9e08: 分数
+  score_f7ac9e08: 评分
   score_letter_grade_b3bb9e52: "%{score} 字母评分"
   score_muted_82eef66: 分数：（静音）
   score_n_a_34dfdcda: 评分：不适用
@@ -20573,7 +20597,7 @@ zh-Hans:
         current_enrollments: 当前注册
         decrosslist_section: 取消交叉列出此班级
   sections_6d057c07: 分组
-  sections_94731e51: 班级
+  sections_94731e51: 班次
   security_7a7e8808: 安全
   security_tab_failed_to_load_2d2242a: 无法加载安全标签
   see_more_in_canvas_guides_fc90a457: "在 Canvas 指南中查看更多信息"
@@ -21630,6 +21654,7 @@ zh-Hans:
   show_me_76823679: 给我看看
   show_more_af9cbc16: 显示更多
   show_name_of_observed_students_in_notifications_a56dd9e4: 在通知中显示观察到的学生的姓名。
+  show_name_of_observed_students_in_notifications_d38b53ca: 在通知中显示观察到的学生的姓名
   show_navigation_menu_34e7f441: 显示导航菜单
   show_new_analytics_for_course_and_user_data_18e92636: 显示课程和用户数据的新分析
   show_new_analytics_for_course_and_user_data_data_m_89526eb: 显示课程和用户数据的新分析。将此功能标志设置为“开启”后，可能需要24小时才能在“新分析”中显示数据。
@@ -22736,6 +22761,7 @@ zh-Hans:
   the_group_groupname_was_selected_because_the_previ_e080c168: "小组“%{groupName}”已选中，因为此前选择的小组中没有学生。您可以在评分册中更改选择的小组。"
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "小组“%{groupName}”已选中，因为您请求的学生不在此前选择的小组中。您可以在评分册中更改选择的小组。"
   the_imported_question_text_for_this_question_was_t_83b4e6fb: 此问题的导入文本太长。
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "导入工具将从 API v3 迁移到 v4.1。在 2021 年 2 月之前不会更改凭证，但您应该确保您的帐户具有对 v4.1 的访问权限。"
   the_institution_you_logged_in_from_is_not_configur_5ceac41: 您登录的机构未在此帐户上配置。
   the_launched_tool_returned_an_invalid_resource_for_24512878: 已启动的工具对此次作业返回了无效资源
   the_link_you_used_has_expired_click_forgot_passwor_80569899: 您使用的链接已过期。单击“忘记密码？”以获取新的重置密码链接。
@@ -22897,7 +22923,7 @@ zh-Hans:
   there_was_an_error_setting_usage_rights_53739e1d: 设置使用权限时出错。
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: 开始保存作业日期工作时发生错误
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: 提交相似度检测服务时出现错误。联系支持人员前，请尝试重新提交文件。
-  there_was_an_error_updating_this_assignment_please_59fc608d: 更新此作业时出现错误。请刷新页面，然后再试一次。
+  there_was_an_error_updating_this_assignment_please_59fc608d: 删除此作业时发生错误。请刷新此页面并重试。
   there_was_an_error_uploading_the_image_932fc4ce: 上传图像出现错误
   there_was_an_error_uploading_your_file_please_try__ce458566: 上传您的文件时出错。请重试。
   there_was_an_error_with_your_import_please_examine_7b42f29d: 您的导入出现错误，请检查您的文件并再次尝试上传。查看您的电子邮件以获取更多详情。
@@ -23069,6 +23095,7 @@ zh-Hans:
       必须启用“用户 - 在课程中添加/删除学生”或“用户 - 在课程中添加/删除教师、课程设计者或助教”。
   this_placement_requires_deep_link_support_by_the_v_702d554f: 此位置需要供应商支持深层链接。请与您的工具供应商核实，确保他们支持此功能。
   this_pronoun_appears_after_last_name_bf5c0bf5: 此代词显示在姓氏后面
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: 启用后，该代号将显示在您的姓名后面。
   this_question_group_is_set_to_pick_more_questions__2e3552c4: 此问题小组为选择更多可用的问题而设置。
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: 这个问题将在每个答案旁显示一个复选框。
   this_quiz_has_been_excused_d89d2b74: 此测验已被豁免
@@ -23446,6 +23473,7 @@ zh-Hans:
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "要允许查看/编辑/删除由其他用户创建的协作功能，还必须启用“课程内容 - 添加/编辑/删除”。如果启用了“课程内容 - 添加/编辑/删除”并禁用了“学生协作 - 创建”，用户将无法创建新的协作，但能够查看/编辑/删除所有协作。要将学生添加到协作，还必须启用“用户 - 查看列表”。要将课程组添加到协作，还必须启用“组 - 查看所有学生组”。"
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "要允许查看、编辑、删除由其他用户创建的协作功能，还必须启用“课程内容 (Course Content) - 添加/编辑/删除”。如果启用了“课程内容 (Course Content) - 添加/编辑/删除”但禁用了“学生协作 (Student Collaborations) - 创建”，用户将无法创建新的协作，但能够查看、编辑、删除所有协作。要将学生添加到协作，还必须启用“用户 - 查看列表”。要将课程组添加到协作，还必须启用“小组 (Group) - 查看所有学生组”。"
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "要允许查看、编辑、删除由其他用户创建的协作功能，还必须启用“课程内容 (Course Content) - 添加/编辑/删除”。若启用“课程内容 - 添加/编辑/删除”但禁用“学生协作 - 创建”，则用户无法创建新的协作，但可以查看、编辑、删除所有协作。要将学生添加到协作，还必须启用“用户 - 查看列表”。要将课程组添加到协作，还必须启用“小组 (Group) - 查看所有学生组”。"
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: 要将学生分配到组，请在“group_name”列输入组名。
   to_be_added_2959cc72: 待添加
   to_be_removed_d4b48586: 待删除
   to_c4c44f4b: 到
@@ -24032,6 +24060,7 @@ zh-Hans:
   update_comments_21991be0: 更新评论
   update_criterion_edcbd330: 更新标准
   update_details_6abfed16: 更新详细信息
+  update_file_links_to_prefer_preview_not_download_94535382: 更新文件链接以首选预览，而不是下载
   update_how_we_process_sis_imports_8195bf77: 更新我们处理SIS导入的方式
   update_inbox_page_to_use_react_instui_4d343fd: 更新收件箱页面以使用反应/instui
   update_link_b7cab181: 更新链接
@@ -25316,6 +25345,7 @@ zh-Hans:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "您的作业列表现在可以在 *日历* 页面上找到。"
   your_assignments_list_has_improved_3eded80e: "您的 *作业* 列表已改进！"
   your_assignments_will_show_here_listed_by_due_date_18dc880f: 您的作业将显示在此处，按到期日期列出。
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "您的浏览器连接可能较慢或不稳定。尽管浏览器计时器暂时断开连接，但您的回答在记录中保留的时间将在此次尝试的原始时限后额外延长 5 分钟。"
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: 您的浏览器不符合Canvas的最低要求。请访问*Canvas社区*查看支持浏览器的完整列表。
   your_comment_was_auto_saved_as_a_draft_c49d3510: 您的评论自动保存为草稿。
   your_content_has_been_exported_bbb57764: 您的内容已被导出。
@@ -25326,6 +25356,7 @@ zh-Hans:
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: 您的文件正被上传到评分册，您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载已完成，以及在作出任何其它更改之前，确认评分册是正确的。
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: 您的文件正被上传到评分册。您可以在任何时候离开这个页面。如果您有一个大的CSV文件，您的更改可能需要几分钟来更新。为了避免覆盖任何数据，请确认上载完成与您的评分册是正确才进行任何另外的更改。
   your_group_is_being_created_88c0c024: 正在创建您的组
+  your_groups_are_being_created_50156e34: 正在创建您的组。
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       您的讲师发布了有关%{title}的评分更改和新评论%{course}。
       

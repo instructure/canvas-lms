@@ -1222,6 +1222,7 @@ en-CA:
         allow_sending_scores_in_emails: "Students can opt-in to receiving scores in email notifications"
         author_email_in_notifications: "Show the email address of sender for user interaction Notifications"
         can_add_pronouns: "Enable Personal Pronouns"
+        can_change_pronouns: "Allow users to change their pronouns in Canvas"
         canvadocs_prefer_office_online: "Prefer Office 365 file viewer"
         default_language: "Default Language"
         default_time_zone: "Default Time Zone"
@@ -1584,6 +1585,7 @@ en-CA:
           zero_activity: 
             text: "This report shows all the students enrolled in any courses in a given term. Resulting csv file will have one row per user enrollment that have not visited the course since the date."
   accounts_752dc365: Accounts
+  accounts_lti_546d15c7: "Accounts (LTI)"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Achieve mastery one time"
     other: "Achieve mastery %{count} times"
@@ -2328,6 +2330,7 @@ en-CA:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "An error occurred updating the proficiency ratings: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "An error occurred updating the proficiency ratings"
   an_error_occurred_updating_this_assignment_21287c7e: "An error occurred updating this assignment."
+  an_error_occurred_when_saving_the_group_536c8f66: "An error occurred when saving the group."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "An error occurred when setting the usage right for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "An error occurred while attempting to contact Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "An error occurred while checking the migration status"
@@ -2757,6 +2760,7 @@ en-CA:
       assignment_rubric_details: "Assignment Rubric Details"
   assignment_976578a8: Assignment
   assignment_allowed_attempts_7e3d43ee: "Assignment Allowed Attempts"
+  assignment_and_link_selection_557faf38: "Assignment and Link Selection"
   assignment_assignment_submission_paper_view_8a4c9776: "Assignment %{assignment} submission Paper View"
   assignment_assignment_submission_plain_text_view_b217d372: "Assignment %{assignment} submission Plain Text View"
   assignment_bulk_editing_37248ca4: "Assignment Bulk Editing"
@@ -4507,6 +4511,11 @@ en-CA:
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_improved_description: "This setting controls whether parents who create their own Canvas Parent accounts can connect to students at your institution using the Canvas Parent mobile app. Note: Parents registered as Canvas Observers can use the Canvas Parent mobile app even when this feature flag is disabled."
   canvas_revision_unknown: Unknown
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+      Canvas rewrites file URLs in user generated content. In the process, it
+      often added "/download" where it was not wanted and inappropriate. This
+      setting updates how URL rewriting takes place to facilitate previewing
+      files within Canvas and not downloading.
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas thinks response is valid"
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
@@ -5321,6 +5330,7 @@ en-CA:
   content_share_preview_166f6562: "Content Share Preview"
   content_share_started_successfully_2c37fb79: "Content share started successfully"
   content_shared_by_others_to_you_5a40bb2c: "Content shared by others to you"
+  content_shares_e1e1: "Content Shares"
   content_shares_received_view_error_page_c7021a4a: "Content Shares Received View Error Page"
   content_successfully_added_395c906f: "%{content} successfully added"
   content_tag: 
@@ -5895,6 +5905,7 @@ en-CA:
     one: "1 Attempt"
     other: "%{count} Attempts"
     zero: "Unlimited Attempts"
+  count_changes_pushed_by_user_654aade2: "%{count} changes pushed by %{user}"
   count_comments_cb137ab8: 
     one: "1 comment"
     other: "%{count} comments"
@@ -8026,6 +8037,7 @@ en-CA:
   edit_discussion_settings_1bbb03d: "Edit Discussion Settings"
   edit_grading_scheme_53091236: "Edit Grading Scheme"
   edit_grading_scheme_title_ff41d916: "Edit Grading Scheme %{title}"
+  edit_group_c8679dba: "Edit Group"
   edit_item_details_c9a7b9c5: "Edit item details"
   edit_key_developername_2980f240: "Edit key %{developerName}"
   edit_key_name_5c7d2f46: "Edit key %{name}"
@@ -9072,6 +9084,7 @@ en-CA:
   first_last_name_9820d256: "First, Last Name"
   first_name_d5c12500: "First Name"
   first_reviewer_sortorder_e2184140: "First reviewer %{sortOrder}"
+  fix_missing_policy_grade_change_records_c404507c: "Fix Missing Policy Grade Change Records"
   flagged_as_possible_spam_ebbc4683: "Flagged as possible spam"
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Flags new ePortfolio content matching specific keywords as possible spam, and allows administrators to either confirm flagged ePortfolios or mark them as safe."
   flash_6afbf65a: Flash
@@ -9875,6 +9888,7 @@ en-CA:
       group_full: "The group is full."
       not_in_group_section: "%{student} does not share a section with the other members of %{group}."
   group_membership_limit_54e165b: "Group Membership Limit"
+  group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Group membership limit must be equal to or greater than current members count."
   group_name_b69c144: "Group Name"
   group_name_group_announcements_5ce81c6d: "%{group_name} - Group Announcements"
   group_name_group_calendar_7f10e0ed: "%{group_name} - Group Calendar"
@@ -9890,6 +9904,7 @@ en-CA:
   group_pages_656556f3: "Group Pages"
   group_people_50e9785b: "Group People"
   group_roster_1846bf84: "Group Roster"
+  group_saved_successfully_fcd5ca66: "Group saved successfully"
   group_select_330df8bd: "Group Select"
   group_set_name_2aed2347: "Group Set Name"
   group_weight_for_d46c5db4: "Group weight for:"
@@ -10253,6 +10268,7 @@ en-CA:
       create: "Create %{model}"
       submit: "Save %{model}"
       update: "Update %{model}"
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Helps administrators and teachers make more meaningful decisions as they import, organize, and edit outcomes in their account and courses."
   here_are_the_first_100_errors_that_occurred_d6e46739: "Here are the first 100 errors that occurred:"
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Here's some quick tips to get you started in Canvas!"
@@ -10588,6 +10604,7 @@ en-CA:
   image_8ad06: Image
   image_c1c98202: image
   image_id_is_not_a_valid_id_7dd6bad6: "image_id is not a valid ID"
+  image_search_b0944fc2: "Image Search"
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url and image_id cannot both be set."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url is not a valid URL"
   images_documents_and_more_dccb362f: "Images, Documents, and more"
@@ -10640,6 +10657,7 @@ en-CA:
   importing_outcomes_e62a0375: "importing outcomes"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Improve accessibility of left-hand menu through better use of color plus visual and screenreader indicators of inactive menu items."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Improve discoverability of drag and drop in Files"
+  improved_outcomes_management_4692f886: "Improved Outcomes Management"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Improved visual reminders to encourage instructors to publish courses"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link}, students are clicking %{bad_link} to content in a different course."
@@ -10715,6 +10733,7 @@ en-CA:
       Input and distribute grades for students. Display grades as
                 points, percentages, complete or incomplete, pass or fail, GPA scale,
                 and letter grades. Group assignments for grade weighting.
+  insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Insert a grade change record when the periodic MissingPolicyApplicator job runs on a submission."
   insert_above_row_de82d138: "insert above %{row}"
   insert_below_row_55ed6f34: "insert below %{row}"
   insert_equella_links_49a8dacd: "Insert Equella Links"
@@ -11278,6 +11297,7 @@ en-CA:
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Limit this slot to %{input_type_number_name_max_parti} groups."
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "Limit this slot to %{input_type_number_name_max_parti} users."
   limited_322546c5: Limited
+  line_items_828f62cc: "Line Items"
   link_7262adec: Link
   link_color_55f8b835: "Link Color"
   link_description_4355ca82: "Link description"
@@ -11748,6 +11768,7 @@ en-CA:
     messages: 
       submitting: "Submitting Media File..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Media has been queued for conversion, please try again in a little bit."
+  media_objects_c2fa37cd: "Media Objects"
   media_over_time_d9332e25: "media over time"
   media_record_not_available_f78c16dd: "Media record not available"
   media_recording_77cddc52: "Media Recording"
@@ -13783,6 +13804,7 @@ en-CA:
   name_unposted_final_grade_798491b7: "%{name} unposted final grade"
   name_unposted_final_score_124708d2: "%{name} unposted final score"
   name_user_e44eebed: "%{name} User"
+  names_and_role_ebff0149: "Names and Role"
   nav_avatar_border_3246beb1: "Nav Avatar Border"
   nav_background_fd299145: "Nav Background"
   nav_badge_3c67de17: "Nav Badge"
@@ -14901,6 +14923,7 @@ en-CA:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer reviews cannot be enabled for moderated assignments"
   peer_reviews_e3a55964: "Peer Reviews"
   peer_service_6b4828b9: "Peer Service"
+  peer_services_102357e3: "Peer Services"
   pending_3e506a5b: Pending
   pending_message_2d9a8796: "Pending: %{message}"
   people_account_30bbffec: "People (Account)"
@@ -17633,6 +17656,7 @@ en-CA:
   resubmit_to_tool_name_1cf02a31: "Resubmit to %{tool_name}"
   resubmitted_2080646f: Resubmitted
   resubmitted_since_last_graded_8484d285: "Resubmitted since last graded"
+  result_8f971a09: Result
   resume_quiz_afeceb87: "Resume Quiz"
   resume_survey_58dce775: "Resume Survey"
   resync_grades_to_sis_d4dcfe12: "Resync grades to SIS"
@@ -17920,6 +17944,7 @@ en-CA:
   saving_associations_started_8ac85360: "Saving associations started"
   saving_d55dd90e: Saving...
   saving_dates_2472a539: "Saving Dates"
+  saving_group_230707e6: "Saving group"
   saving_new_role_458f4ba8: "Saving New Role"
   saving_recording_e111cb05: "Saving Recording..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Saving the CSP status failed, please try again."
@@ -19125,6 +19150,7 @@ en-CA:
   show_links_to_unpublished_content_30c0450d: "Show links to unpublished content"
   show_more_af9cbc16: "Show More"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Show name of observed students in notifications."
+  show_name_of_observed_students_in_notifications_d38b53ca: "Show name of observed students in notifications"
   show_navigation_menu_34e7f441: "Show Navigation Menu"
   show_new_analytics_for_course_and_user_data_18e92636: "Show new analytics for course and user data"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Show new analytics for course and user data. Data may take 24 hours to appear in New Analytics after setting this feature flag to ON."
@@ -20136,6 +20162,7 @@ en-CA:
   the_group_groupname_was_selected_because_the_previ_e080c168: "The group \"%{groupName}\" was selected because the previously-selected group contains no students. You can change the selected group in the Gradebook."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "The group \"%{groupName}\" was selected because the student you requested is not in the previously-selected group. You can change the selected group in the Gradebook."
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "The imported question text for this question was too long."
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "The importer will be migrating from API v3 to v4.1. Credentials will not change, but you should ensure your account has access to v4.1 by February 2021."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "The institution you logged in from is not configured on this account."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "The launched tool returned an invalid resource for this assignment"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "The link you used has expired. Click \"Forgot Password?\" to get a new reset-password link."
@@ -20451,6 +20478,7 @@ en-CA:
       to a course, Users - add / remove students from courses or Users - add / remove teachers, course designers, or TAs from courses to the course​ must be enabled.
   this_placement_requires_deep_link_support_by_the_v_702d554f: "This placement requires Deep Link support by the vendor. Check with your tool vendor to ensure they support this functionality"
   this_pronoun_appears_after_last_name_bf5c0bf5: "This pronoun appears after last name"
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "This pronoun will appear after your name when enabled"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "This question group is set to pick more questions than are available."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "This question will show a checkbox next to each answer."
   this_quiz_has_been_excused_d89d2b74: "This quiz has been excused"
@@ -20824,6 +20852,7 @@ en-CA:
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "To allow view/edit/delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled. If Course Content - add / edit / delete​ is enabled and Student Collaborations - create is disabled, user will not be able to create new collaborations but will be able to view/edit/delete all collaborations. To add students to a collaboration, Users - view list​​ must also be enabled. To add a course group to a collaboration, Group view all student groups​ must also be enabled."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "To allow view edit delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled. If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, user will not be able to create new collaborations but will be able to view edit delete all collaborations. To add students to a collaboration, Users - view list must also be enabled. To add a course group to a collaboration, Group view all student groups must also be enabled."
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "To allow view edit delete functionality of collaborations created by other users, Course Content - add / edit / delete must also be enabled. If Course Content - add / edit / delete is enabled and Student Collaborations - create is disabled, the user will not be able to create new collaborations but will be able to view edit delete all collaborations. To add students to a collaboration, Users - view list must also be enabled. To add a course group to a collaboration, Group view all student groups must also be enabled."
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: "To assign students to a group, enter group names in the \"group_name\" column."
   to_be_added_2959cc72: "To be Added"
   to_be_removed_d4b48586: "To be Removed"
   to_c4c44f4b: to
@@ -21388,6 +21417,7 @@ en-CA:
   update_comments_21991be0: "Update Comments"
   update_criterion_edcbd330: "Update Criterion"
   update_details_6abfed16: "Update Details"
+  update_file_links_to_prefer_preview_not_download_94535382: "Update file links to prefer preview, not download"
   update_how_we_process_sis_imports_8195bf77: "Update how we process SIS imports"
   update_inbox_page_to_use_react_instui_4d343fd: "Update Inbox page to use react/instui"
   update_link_b7cab181: "Update link"
@@ -22577,6 +22607,7 @@ en-CA:
   your_answer_8dad6ea4: "Your Answer:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Your assignment %{assignment_name} is due on %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Your assignment %{assignment_name} is due on %{due_at}. Click the following link to visit your assignment and get it in on time:"
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Your browser does not meet the minimum requirements for Canvas. Please visit the *Canvas Community* for a complete list of supported browsers."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Your comment was auto-saved as a draft."
   your_content_has_been_exported_bbb57764: "Your content has been exported."
@@ -22585,6 +22616,7 @@ en-CA:
   your_email_address_f881e583: "Your email address"
   your_email_b5364bee: "Your Email"
   your_group_is_being_created_88c0c024: "Your Group is Being Created"
+  your_groups_are_being_created_50156e34: "Your groups are being created."
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       Your instructor has released grade changes and new comments for %{title}, %{course}.
       
