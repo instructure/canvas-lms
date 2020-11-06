@@ -1292,6 +1292,7 @@ de:
         allow_sis_import: SIS-importe
         author_email_in_notifications: "Die E-Mail-Adresse des Senders für die Benutzerinteraktion Benachrichtigungen"
         can_add_pronouns: "Persönliche Pronomen aktivieren"
+        can_change_pronouns: "Ermöglicht Benutzern, ihre Pronomen in Canvas zu ändern"
         canvadocs_prefer_office_online: "Office 365 File-Viewer bevorzugen"
         canvas_authentication: Canvas-authentifizierung
         default_language: Standardsprache
@@ -1687,6 +1688,7 @@ de:
           zero_activity: 
             text: "Dieser Bericht zeigt alle für beliebige Kurse in einem bestimmten Semester eingeschriebenen Benutzer. Die erstellte CSV-Datei enthält eine Zeile für jeden Teilnehmer, der den Kurs seit dem Datum nicht besucht hat."
   accounts_752dc365: Konten
+  accounts_lti_546d15c7: "Konten (LTI)"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Leistungsziel einmal erreichen"
     other: "Leistungsziel %{count}-mal erreichen"
@@ -2447,6 +2449,7 @@ de:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Beim Aktualisieren der Kompetenzeinstufungen ist ein Fehler aufgetreten: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Beim Aktualisieren der Kompetenzeinstufungen ist ein Fehler aufgetreten."
   an_error_occurred_updating_this_assignment_21287c7e: "Fehler beim Aktualisieren dieser Aufgabe"
+  an_error_occurred_when_saving_the_group_536c8f66: "Beim Speichern der Gruppe ist ein Fehler aufgetreten."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Beim Festlegen des Nutzungsrechts für %{filename} ist ein Fehler aufgetreten"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Beim Versuch, Turnitin zu kontaktieren, ist ein Fehler aufgetreten."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Fehler beim Überprüfen des Migrationsstatus"
@@ -2586,7 +2589,7 @@ de:
     podcast_feed_name: "Podcast-Feed mit %{course}-Ankündigungen"
     podcast_title_course: "Podcast-Feed mit Kursankündigungen"
     podcast_title_group: "Podcast-Feed mit Gruppenankündigungen"
-  announcements_a4b8ed4a: Ankündigungen
+  announcements_a4b8ed4a: Announcements
   announcements_account_4e9df626: "Ankündigungen (Konto)"
   announcements_cannot_be_duplicated_2de8824c: "Anmeldungen können nicht dupliziert werden."
   announcements_deleted_successfully_7d77e9e1: "Ankündigungen erfolgreich gelöscht"
@@ -2895,6 +2898,7 @@ de:
       assignment_rubric_details: "Details des Aufgaben-Bewertungsschemas"
   assignment_976578a8: Aufgabe
   assignment_allowed_attempts_7e3d43ee: "Zugelassene Versuche für die Aufgabe"
+  assignment_and_link_selection_557faf38: "Aufgabe und Link-Auswahl"
   assignment_assignment_submission_paper_view_8a4c9776: "Papieransicht der Abgabe zur Aufgabe %{assignment}"
   assignment_assignment_submission_plain_text_view_b217d372: "Klartextansicht der Abgabe zur Aufgabe %{assignment}"
   assignment_bulk_editing_37248ca4: "Massenbearbeitung von Aufgaben"
@@ -4847,6 +4851,11 @@ de:
   canvas_parent_description: "Diese Einstellung kontrolliert, ob sich Eltern mit Studenten in Ihrem Institut mittels der mobilen Canvas Parent App verbinden können."
   canvas_parent_improved_description: "Diese Einstellung bestimmt, ob Eltern, die ihr eigenes Canvas-Elternkonto eingerichtet haben, mittels der mobilen Canvas Parent App mit Studenten in Ihrem Institut Kontakt aufnehmen können. Anmerkung: Eltern, die als Canvas-Beobachter registriert sind, können die mobile Canvas Parent App auch verwenden, wenn diese Funktion deaktiviert ist."
   canvas_revision_unknown: Unbekannt
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+      Canvas schreibt die Datei-URLs in benutzergeneriertem Content um. In diesem Rahmen fügte es
+      häufig „/download“ hinzu, wo dies nicht gewollt und angemessen war. Diese
+      Einstellung aktualisiert, wie das Umschreiben von URLs zur erleichtern Vorschau von
+      Dateien innerhalb von Canvas erfolgt, statt sie herunterzuladen.
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas hält die Antwort für gültig"
   canvas_ticketing_email_connector_27e253ae: Canvas-Ticketing-E-Mail-Konnektor
@@ -5716,6 +5725,7 @@ de:
   content_share_preview_166f6562: "Vorschau der Content-Freigabe"
   content_share_started_successfully_2c37fb79: "Inhaltsfreigabe erfolgreich gestartet"
   content_shared_by_others_to_you_5a40bb2c: "Contents, die von anderen für Sie freigegeben werden"
+  content_shares_e1e1: Inhaltsfreigaben
   content_shares_received_view_error_page_c7021a4a: "Content-Freigaben erhielten Ansichts-Fehlerseite"
   content_successfully_added_395c906f: "%{content} erfolgreich hinzugefügt"
   content_tag: 
@@ -6374,6 +6384,7 @@ de:
     one: "1 Versuch"
     other: "%{count} Versuche"
     zero: "Anzahl der Versuche unbegrenzt"
+  count_changes_pushed_by_user_654aade2: "%{count} Änderungen veranlasst durch %{user}"
   count_comments_cb137ab8: 
     one: "1 Kommentar"
     other: "%{count} Kommentare"
@@ -10039,6 +10050,7 @@ de:
   first_reviewer_9ea05caa: "Erster Prüfer"
   first_reviewer_sortorder_e2184140: "Erster Prüfer %{sortOrder}"
   first_two_students_and_others_count_others_bb0a212a: "%{first_two_students} und %{others_count} andere"
+  fix_missing_policy_grade_change_records_c404507c: "Fehlen der Richtlinie zu Notenänderungsaufnahmen korrigieren"
   flagged_as_possible_spam_ebbc4683: "Als möglicher „Spam“ gekennzeichnet"
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Kennzeichnet neuen E-Portfolio-Content, der mit spezifischen Schlüsselwörtern übereinstimmt, als möglichen Spam und ermöglicht es Administratoren, die gekennzeichneten E-Portfolios entweder zu bestätigen oder als sicher zu kennzeichnen."
   flash_6afbf65a: Flash
@@ -11180,6 +11192,7 @@ de:
       group_full: "Die Gruppe ist voll."
       not_in_group_section: "%{student} nutzt keinen Kursabschnitt gemeinsam mit den anderen Mitgliedern von %{group}."
   group_membership_limit_54e165b: Gruppenmitgliedschaftsbegrenzung
+  group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Die Gruppenmitgliedschaftsbegrenzung muss darf nicht kleiner als die aktuelle Mitgliederzahl sein."
   group_name_b69c144: Gruppenname
   group_name_group_announcements_5ce81c6d: "%{group_name} – Gruppenankündigungen"
   group_name_group_calendar_7f10e0ed: "%{group_name} – Gruppenkalender"
@@ -11195,6 +11208,7 @@ de:
   group_pages_656556f3: Gruppenseiten
   group_people_50e9785b: Gruppenleute
   group_roster_1846bf84: Gruppenteilnehmerliste
+  group_saved_successfully_fcd5ca66: "Die Gruppe wurde erfolgreich gespeichert."
   group_select_330df8bd: Gruppenauswahl
   group_set_name_2aed2347: "Name des Gruppensets"
   group_settings: 
@@ -11698,6 +11712,7 @@ de:
       create: "%{model} erstellen"
       submit: "%{model} speichern"
       update: "%{model} aktualisieren"
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Administratoren und Lehrer treffen sinnvollere Entscheidungen beim Importieren, organisieren und Ändern von Lernzielen in ihren Konten und Kursen."
   here_are_the_first_100_errors_that_occurred_d6e46739: "Hier sind die ersten 100 Fehler, die aufgetreten sind:"
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Hier sind Ihre Aufgaben, nach Fälligkeitsdatum aufgelistet."
   here_f44564ee: hier.
@@ -12050,6 +12065,7 @@ de:
   image_8ad06: Bild
   image_c1c98202: Bild
   image_id_is_not_a_valid_id_7dd6bad6: "Die image_id ist ungültig."
+  image_search_b0944fc2: Bildsuche
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url und image_id können nicht beide verwendet werden."
   image_url_is_not_a_valid_url_4e31c8b0: "Der image_url ist ungültig."
   images: 
@@ -12112,6 +12128,7 @@ de:
   importing_outcomes_e62a0375: "Ergebnisse werden importiert"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Verbessern Sie die Bedienbarkeit des linken Menüs durch bessere Nutzung von Farbe sowie visuelle und Screenreader-Indikatoren für inaktive Menüelemente."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Verbesserung der Erkennbarkeit von Drag-and-Drop in Dateien"
+  improved_outcomes_management_4692f886: "Verbesserte Lernzieleverwaltung"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbesserte visuelle Erinnerungen, um Kursleiter zur Veröffentlichung von Kurse zu ermutigen"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link} klicken Studenten auf %{bad_link} zu einer nicht existenten Seite in Ihrem Kurs."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link} klicken Studenten auf %{bad_link} zu Content eines anderen Kurses."
@@ -12204,6 +12221,7 @@ de:
       Eingeben und Verteilen von Noten für Studenten Anzeige der Noten als
                 Punkte, Prozentsätze, vollständig oder unvollständig, bestanden oder nicht bestanden, GPA-Skala
                 und Buchstabennoten. Gruppenaufgaben für Notengewichtung
+  insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Fügen Sie eine Notenänderungsaufnahme ein, wenn der regelmäßige MissingPolicyApplicator-Job für eine Abgabe ausgeführt wird."
   insert_above_row_de82d138: "Über %{row} einfügen"
   insert_below_row_55ed6f34: "Unter %{row} einfügen"
   insert_equella_links_49a8dacd: "Equella-Links einfügen"
@@ -12780,6 +12798,7 @@ de:
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Diesen Zeitblock auf %{input_type_number_name_max_parti} Benutzer limitieren."
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "Diesen Zeitblock für %{input_type_number_name_max_parti} Benutzer limitieren"
   limited_322546c5: Begrenzt
+  line_items_828f62cc: Positionen
   link_7262adec: Link
   link_color_55f8b835: Link-Farbe
   link_description_4355ca82: Linkbeschreibung
@@ -12840,7 +12859,7 @@ de:
   live_event_subscription_webhooks_1dae83bb: "Webhooks für Abonnements von Live-Ereignissen"
   live_event_tool_documentation_f6dcc3d7: "Dokumentation des Live-Ereignis-Tools"
   live_events_subscriptions_service_is_not_configure_8c6024e2: "Live Events Abonnements-Service ist nicht konfiguriert."
-  liveassessments_92d9edc0: LiveAssessments
+  liveassessments_92d9edc0: Live-Bewertungen
   load_bank: 
     error_loading_banks: "Fehler beim Laden von Fragenpools"
     loading_banks: "Fragenpools werden geladen ..."
@@ -13292,6 +13311,7 @@ de:
     messages: 
       submitting: "Mediendatei wird eingesandt..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Das Medium befindet sich zur Umwandlung in der Warteschlange. Bitte später noch einmal versuchen."
+  media_objects_c2fa37cd: Medienobjekte
   media_over_time_d9332e25: "Medien im Laufe der Zeit"
   media_record_not_available_f78c16dd: "Medienaufzeichnung nicht verfügbar"
   media_recording_77cddc52: Medienaufzeichnung
@@ -15637,6 +15657,7 @@ de:
   name_unposted_final_grade_798491b7: "%{name} nicht gepostete endgültige Note"
   name_unposted_final_score_124708d2: "%{name} Nicht gepostete Gesamtpunktzahl"
   name_user_e44eebed: "%{name} Benutzer"
+  names_and_role_ebff0149: "Namen und Rolle"
   nav_avatar_border_3246beb1: "Nav Avatar-Abgrenzung"
   nav_background_fd299145: "Nav Hintergrund"
   nav_badge_3c67de17: "Nav Badge"
@@ -16815,6 +16836,7 @@ de:
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Peer-Korrekturen können für moderierte Aufgaben nicht aktiviert werden."
   peer_reviews_e3a55964: Peer-Korrekturen
   peer_service_6b4828b9: Peer-Service
+  peer_services_102357e3: Kollegendienste
   pending_3e506a5b: Ausstehend
   pending_message_2d9a8796: "Ausstehend: %{message}"
   people_account_30bbffec: "Personen (Konto)"
@@ -17435,7 +17457,7 @@ de:
   poland_b43b9d20: Polen
   polish_4cf2ecaf: Polnisch
   poll_sessions_516c4c26: Umfragesitzungen
-  pollchoices_f1cd038c: PollChoices
+  pollchoices_f1cd038c: Umfrage-Wahlen
   polling: 
     poll_sessions: 
       errors: 
@@ -17453,7 +17475,7 @@ de:
         validations: 
           user_and_poll_session_uniqueness: "kann nur eine Wahl pro Umfragesitzung übermitteln."
   polls_d8096fb7: Umfragen
-  pollsubmissions_ce0ef4d: PollSubmissions
+  pollsubmissions_ce0ef4d: Umfrage-Abgaben
   poor_1150a0f8: Schlecht
   poor_score_715306e2: "Ungenügender Punktestand"
   port_75f69d1: Port
@@ -17888,7 +17910,7 @@ de:
   progress_9de4af8f: Fortschritt
   progress_for_account_name_ef203250: "Fortschritt für %{account_name}"
   progress_loading_bar_a26b8861: Fortschritt/Ladebalken
-  progress_percent_ae80cd55: "%{progress} Prozent"
+  progress_percent_ae80cd55: "%{progress} Prozent"
   project_groups_1fa0320b: Projektgruppen
   pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomen stimmt nicht mit dem Pronomen des Kontos überein oder Pronomen sind für dieses Konto nicht aktiviert, %{user_id}, wird übersprungen"
   pronouns_d1cd8dd0: Pronomen
@@ -19902,6 +19924,7 @@ de:
   resubmit_to_tool_name_1cf02a31: "Erneut einreichen %{tool_name}"
   resubmitted_2080646f: "Erneut abgegeben"
   resubmitted_since_last_graded_8484d285: "seit letzter Benotung erneut abgegeben"
+  result_8f971a09: Ergebnis
   resume_quiz_afeceb87: "Quiz fortsetzen"
   resume_survey_58dce775: "Befragung fortsetzen"
   resync_grades_to_sis_d4dcfe12: "Noten erneut mit SIS synchronisieren"
@@ -20200,6 +20223,7 @@ de:
   saving_associations_started_8ac85360: "Speichern der Verknüpfungen gestartet"
   saving_d55dd90e: "Wird gespeichert ..."
   saving_dates_2472a539: "Datumsangaben speichern"
+  saving_group_230707e6: "Gruppe speichern"
   saving_new_role_458f4ba8: "Neue Rolle wird gespeichert"
   saving_recording_e111cb05: "Aufzeichnung wird gespeichert ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Speichern des CSP-Status fehlgeschlagen. Versuchen Sie es erneut."
@@ -21571,6 +21595,7 @@ de:
   show_me_76823679: Zeigen
   show_more_af9cbc16: "Mehr anzeigen"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Den Namen der beobachteten Studenten in Benachrichtigungen anzeigen."
+  show_name_of_observed_students_in_notifications_d38b53ca: "Namen der beobachteten Studenten in Benachrichtigungen anzeigen"
   show_navigation_menu_34e7f441: "Navigationsmenü einblenden"
   show_new_analytics_for_course_and_user_data_18e92636: "Neue Analysen für Kurs- und Benutzerdaten anzeigen"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Neue Analysen für Kurs- und Benutzerdaten zeigen. Es kann bis zu 24 Stunden dauern, dass die Daten in New Analytics sichtbar werden, nachdem dieses Funktions-Flag auf AN eingestellt wurde."
@@ -22671,6 +22696,7 @@ de:
   the_group_groupname_was_selected_because_the_previ_e080c168: "Die Gruppe „%{groupName}“ wurde ausgewählt, weil die zuvor ausgewählte Gruppe keine Studenten enthält. Sie können die ausgewählte Gruppe im Notenbuch ändern."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "Die Gruppe „%{groupName}“ wurde ausgewählt, weil der von Ihnen gewünschte Student nicht in der zuvor ausgewählten Gruppe ist. Sie können die ausgewählte Gruppe im Notenbuch ändern."
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Der importierte Fragetext für diese Frage war zu lang."
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Der Importeur migriert von API 3 nach API 4.1. Die Anmeldedaten werden sich nicht ändern, aber Sie sollten sicherstellen, dass Ihr Konto bis Februar 2021 Zugriff auf Version 4.1 hat."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Die Institution, über die Sie sich angemeldet haben, ist für dieses Konto nicht konfiguriert."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Das gestartete Tool hat eine ungültige Ressource für diese Aufgabe zurückgegeben."
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Der verwendete Link ist abgelaufen. Wenn Sie auf „Kennwort vergessen?“ klicken, erhalten Sie einen neuen Link, um das Kennwort zurückzusetzen."
@@ -22832,7 +22858,7 @@ de:
   there_was_an_error_setting_usage_rights_53739e1d: "Beim Festlegen der Nutzungsrechte ist ein Fehler aufgetreten."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Es gab einen Fehler beim Speichern der Aufgabendaten"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Fehler bei der Übermittlung des Ähnlichkeitserkennungsservice. Versuchen Sie erneut die Datei zu senden, bevor Sie sich an den Support wenden."
-  there_was_an_error_updating_this_assignment_please_59fc608d: "Beim Aktualisieren der Aufgabe ist ein Fehler aufgetreten. Aktualisieren Sie die Seite, und versuchen Sie es erneut."
+  there_was_an_error_updating_this_assignment_please_59fc608d: "Beim Aktualisieren dieser Aufgabe trat ein Fehler auf. Bitte laden Sie die Seite erneut, und versuchen Sie es nochmal."
   there_was_an_error_uploading_the_image_932fc4ce: "Beim Hochladen des Bilds ist ein Fehler aufgetreten."
   there_was_an_error_uploading_your_file_please_try__ce458566: "Beim Hochladen der Datei ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Es gab einen Fehler bei Ihrem Import. Bitte überprüfen Sie Ihre Datei, und wiederholen Sie den Upload. Weitere Informationen finden Sie in Ihrer E-Mail."
@@ -23004,6 +23030,7 @@ de:
       zu können, muss mindestens eine der Optionen „Benutzer – Studenten zu Kursen hinzufügen oder daraus entfernen“ und „Benutzer – Lehrer, Kursdesigner oder TAs zu Kursen hinzufügen oder daraus entfernen“ aktiviert sein.
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Diese Platzierung erfordert Deep-Link-Support durch den Anbieter. Erkundigen Sie sich bei Ihrem Tool-Anbieter, ob diese Funktionalität unterstützt wird."
   this_pronoun_appears_after_last_name_bf5c0bf5: "Dieses Pronomen erscheint nach dem Nachnamen"
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dieses Pronomen erscheint hinter Ihrem Namen, falls aktiviert"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Diese Fragegruppe ist so eingestellt, dass sie mehr Fragen auswählt, als vorhanden sind."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Bei dieser Frage erscheint neben jeder Antwort ein Kästchen zum Ankreuzen."
   this_quiz_has_been_excused_d89d2b74: "Dieses Quiz wurde entschuldigt."
@@ -23381,6 +23408,7 @@ de:
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "Um die Funktionen „Anzeigen, Bearbeiten, Löschen von Arbeitsgruppen“ zuzulassen, die von anderen Benutzern erstellt wurden, muss „Kurs-Content – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studentenkooperationen – erstellen“ deaktiviert ist, können die Benutzer keine neuen Arbeitsgruppen erstellen, aber sie können alle Arbeitsgruppen anzeigen, ändern oder löschen. Um Studenten zu einer Arbeitsgruppe hinzuzufügen, muss „Benutzer – Liste anzeigen“ ebenfalls aktiviert sein. Um eine Kursgruppe zu einer Arbeitsgruppe hinzuzufügen, ändern oder löschen zu können, muss „Gruppe – alle Studentengruppen anzeigen“ ebenfalls aktiviert sein."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Um die Funktionen „Anzeigen, Bearbeiten, Löschen von Arbeitsgruppen“ zuzulassen, die von anderen Benutzern erstellt wurden, muss „Kurs-Content – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studentenkooperationen – erstellen“ deaktiviert ist, können die Benutzer keine neuen Arbeitsgruppen erstellen, aber sie können alle Arbeitsgruppen anzeigen, ändern oder löschen. Um Studenten zu einer Arbeitsgruppe hinzuzufügen, muss „Benutzer – Liste anzeigen“ ebenfalls aktiviert sein. Um eine Kursgruppe zu einer Arbeitsgruppe hinzuzufügen, ändern oder löschen zu können, muss „Gruppe – alle Studentengruppen anzeigen“ ebenfalls aktiviert sein."
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "Um die Funktionen „Anzeigen, Bearbeiten, Löschen von Arbeitsgruppen“ zuzulassen, die von anderen Benutzern erstellt wurden, muss „Kurs-Content – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Wenn „Kurs-Content – hinzufügen / ändern / löschen“ aktiviert und „Studentenkooperationen – erstellen“ deaktiviert ist, kann der Benutzer keine neuen Arbeitsgruppen erstellen, aber er kann alle Arbeitsgruppen anzeigen, ändern oder löschen. Um Studenten zu einer Arbeitsgruppe hinzuzufügen, muss „Benutzer – Liste anzeigen“ ebenfalls aktiviert sein. Um eine Kursgruppe zu einer Arbeitsgruppe hinzuzufügen, ändern oder löschen zu können, muss „Gruppe – alle Studentengruppen anzeigen“ ebenfalls aktiviert sein."
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: "Um Studenten einer Gruppe zuzuweisen, geben Sie den Gruppennamen in der Spalte „group_name“ ein."
   to_be_added_2959cc72: Hinzuzufügen
   to_be_removed_d4b48586: "Soll entfernt werden"
   to_c4c44f4b: bis/an/um
@@ -23840,7 +23868,7 @@ de:
   unfavorite_coursename_32f77231: "%{courseName} aus Favoriten entfernen"
   ungraded_147a0dce: unbenotet
   ungraded_answers_31ef2df7: "Unbenotete Antworten"
-  ungraded_as_0_bb864f07: "Unbenotete als 0 gewertet"
+  ungraded_as_0_bb864f07: "Unbenotete als 0 gewertet"
   ungraded_ed0c6f98: "Nicht benotet"
   ungraded_or_excused_60694bd7: "Unbenotet oder entschuldigt"
   ungraded_out_of_pointspossible_2d6d81da: "unbenotet aus %{pointsPossible}"
@@ -23964,6 +23992,7 @@ de:
   update_comments_21991be0: "Kommentare aktualisieren"
   update_criterion_edcbd330: "Kriterium aktualisieren"
   update_details_6abfed16: "Details aktualisieren"
+  update_file_links_to_prefer_preview_not_download_94535382: "Datei-Links zur bevorzugten Vorschau aktualisieren, nicht herunterladen"
   update_how_we_process_sis_imports_8195bf77: "Aktualisieren der Art, wie wir SIS-Importe verarbeiten"
   update_inbox_page_to_use_react_instui_4d343fd: "Posteingangsseite aktualisieren für die Verwendung von react/instui"
   update_link_b7cab181: "Links aktualisieren"
@@ -24666,7 +24695,7 @@ de:
   view_the_assignment_e61ca4fc: "Aufgabe anzeigen"
   view_this_message_in_conversations_5a16bc9f: "Diese Nachricht in den Konversationen anzeigen"
   view_toolname_placements_4a5724d1: "%{toolName}-Platzierungen anzeigen"
-  view_ungraded_as_0_1a9631a1: "Unbenotete als 0 anzeigen"
+  view_ungraded_as_0_1a9631a1: "Unbenotete als 0 anzeigen"
   view_ungraded_as_zero_view_in_gradebook_1bfc0783: "Als unzensierte Nullansicht im Notenbuch anzeigen"
   view_uploads_status_4c836211: "Status der Uploads anzeigen"
   view_user_groups_538f22b4: "Nutzergruppen anzeigen"
@@ -24766,13 +24795,13 @@ de:
   weight_final_grade_based_on_assignment_groups_3124161: "Die Gewichtung der Gesamtnote basiert auf den Aufgabengruppen"
   weight_of_final_abbbe82f: "%{weight} der Endnote"
   weight_of_grade_dff535d9: "%{weight} der Note"
-  weight_of_grade_ungraded_as_0_44e63478: "%{weight} der Note/ unbenotete als 0"
+  weight_of_grade_ungraded_as_0_44e63478: "%{weight} der Note/ unbenotete als 0"
   weighted_grading_periods_ae4edd70: "Gewichtete Benotungszeiträume"
   welcome_to_the_canvas_theme_editor_73091d1: "Willkommen beim Canvas-Design-Editor"
   welcome_to_your_courses_to_customize_the_list_of_c_22de652e: "Willkommen bei Ihren Kursen! Zur Anpassung des Kursverzeichnisses, klicken Sie auf den Link „Alle Kurse“ und kreuzen die anzuzeigenden Kurse an."
   welcome_to_your_courses_to_customize_the_list_of_c_f95e4b2: "Willkommen bei ihren Kursen! Um die Liste der Kurse anzupassen, klicken Sie auf den Link „Alle Kurse“, setzen Sie bei allen anzuzeigenden Kursen ein Sternchen."
   welcome_your_students_e1d96088: "Begrüßen Sie Ihre Studenten"
-  well_below_mastery_37664bdc: "Deutlich unter Leistungsziel"
+  well_below_mastery_37664bdc: "Deutlich unter dem Leistungsziel"
   welsh_42ab94b1: Walisisch
   were_errors_27343020: 
     one: "war ein Fehler"
@@ -24820,7 +24849,7 @@ de:
   whitelisted_domains_faed9e0c: "Zugelassene Domänen"
   whitelisted_tool_domains_7df5e481: "Zugelassene Tool-Domänen"
   who_can_create_new_courses_7a6c1338: "Wer kann neue Kurse erstellen?"
-  whoops_looks_like_nothing_is_here_f5c7dd44: "Hoppla ... Sieht so aus, als wäre nichts hier!"
+  whoops_looks_like_nothing_is_here_f5c7dd44: "Hoppla ... Sieht so aus, als wäre nichts hier!"
   widget: 
     upload_media_track_form: 
       choose_a_language: "– Eine Sprache auswählen –"
@@ -25253,6 +25282,7 @@ de:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Sie finden die Liste mit Ihren Aufgaben jetzt auf der Seite *Kalender*."
   your_assignments_list_has_improved_3eded80e: "Die Liste *Aufgaben* wurde verbessert."
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Ihre Aufgaben werden hier nach Fälligkeitsdatum angezeigt."
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Die Konnektivität Ihres Browsers kann langsam oder instabil sein. Trotz der Trenndauer Ihres Browsers werden Ihre Antworten bei diesem Versuch für zusätzliche 5 Minuten über die ursprüngliche Frist hinaus aufgezeichnet."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ihr Browser erfüllt die Mindestanforderungen für Canvas nicht. Bei der *Canvas Community* erhalten Sie eine komplette Liste aller unterstützten Browser."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Ihr Kommentar wurde automatisch als Entwurf gespeichert."
   your_content_has_been_exported_bbb57764: "Ihr Inhalt wurde exportiert."
@@ -25263,6 +25293,7 @@ de:
   your_file_is_being_uploaded_to_gradebook_and_you_c_70e80fc7: "Ihre Datei wird ins Notenbuch hochgeladen, und Sie können diese Seite jederzeit verlassen. Wenn Sie eine große .csv-Datei haben, dann dauert es einige Minuten, bis Ihre Änderungen aktualisiert werden. Um zu vermeiden, dass Daten überschrieben werden, bestätigen Sie bitte den erfolgreichen Abschluss Ihres Uploads und dass Ihr Notenbuch korrekt ist, und machen dann erst zusätzliche Veränderungen."
   your_file_is_being_uploaded_to_the_gradebook_and_y_aa5edfc6: "Ihre Datei wird ins Notenbuch hochgeladen, und Sie können diese Seite jederzeit verlassen. Wenn Sie eine große .csv-Datei haben, dann dauert es einige Minuten, bis Ihre Änderungen aktualisiert werden. Um zu vermeiden, dass Daten überschrieben werden, bestätigen Sie bitte den erfolgreichen Abschluss Ihres Uploads und dass Ihr Notenbuch korrekt ist, und machen dann erst zusätzliche Veränderungen."
   your_group_is_being_created_88c0c024: "Ihre Gruppe wird erstellt"
+  your_groups_are_being_created_50156e34: "Ihre Gruppen werden erstellt."
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       Ihr Lehrer hat Notenänderungen und neue Kommentare für %{title} veröffentlicht., %{course}.
       
