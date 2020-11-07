@@ -103,11 +103,19 @@ ready(() => {
     window.dispatchEvent(processNewMathEvent)
   }, 0)
 
+  const ignore_list = '#quiz-elapsed-time' // comma-separated list of selectors to ignore
   const processNewMathEvent = new Event(mathml.processNewMathEventName)
   const observer = new MutationObserver((mutationList, _observer) => {
-    for (const m in mutationList) {
+    for (let m = 0; m < mutationList.length; ++m) {
       if (mutationList[m]?.addedNodes?.length) {
+        const addedNodes = mutationList[m].addedNodes
+        for (let n = 0; n < addedNodes.length; ++n) {
+          const node = addedNodes[n]
+          if (node.nodeType !== Node.ELEMENT_NODE) return
+          if (node.parentElement?.querySelector(ignore_list)) return
+        }
         window.dispatchEvent(processNewMathEvent)
+        return
       }
     }
   })

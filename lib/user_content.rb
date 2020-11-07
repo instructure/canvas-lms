@@ -58,14 +58,7 @@ module UserContent
     find_equation_images(html) do |node|
       equation = node['data-equation-content'] || node['alt']
       next if equation.blank?
-      if use_updated_math_rendering
-        # replace the equation image with a span containing the
-        # LaTex, which MathJAX will typeset once we're in the browser
-        latex_span = Nokogiri::HTML::DocumentFragment.parse(
-          "<span class=\"math_equation_latex\">\\(#{equation}\\)</span>"
-        )
-        node.replace(latex_span)
-      else
+      if !use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
         

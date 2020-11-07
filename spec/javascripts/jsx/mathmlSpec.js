@@ -180,9 +180,7 @@ test('returns true if there is inline-delmited math', () => {
   equal(mathml.isMathOnPage(), true)
 })
 
-QUnit.module('handles "process-new-math" events', {})
-
-test('debounces event handler', assert => {
+test('debounces "process-new-math" event handler', assert => {
   const done = assert.async()
   const spy = sinon.spy(mathml, 'processNewMathOnPage')
   window.dispatchEvent(new Event('process-new-math'))
