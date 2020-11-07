@@ -44,7 +44,7 @@ let lastAnswerSelected = null
 let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
-let quizSubmission = (function() {
+const quizSubmission = (function() {
   let timeMod = 0,
     endAt = $('.end_at'),
     endAtParsed = endAt.text() && new Date(endAt.text()),
@@ -461,7 +461,7 @@ let quizSubmission = (function() {
         $('.time_running').css('color', '#EA0611')
         $timeRunningFunc().text(
           I18n.t(
-            'Your browser connectivity may be slow or unstable. In spite of your browser\'s timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt.'
+            "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt."
           )
         )
         return
