@@ -1147,6 +1147,7 @@ da-x-k12:
         allow_sending_scores_in_emails: "Elever kan melde sig til at modtage resultater i e-mailmeddelelser"
         author_email_in_notifications: "Vis e-mailadressen på afsenderen for meddelelser om brugerinteraktioner"
         can_add_pronouns: "Aktivér personlige pronomener"
+        can_change_pronouns: "Tillad, at brugere ændrer deres pronomen i Canvas"
         canvadocs_prefer_office_online: "Foretræk Office 365 filvisning"
         default_language: Standardsprog
         default_time_zone: "Standard tidszone"
@@ -1509,6 +1510,7 @@ da-x-k12:
           zero_activity: 
             text: "Dette er en rapport, der viser alle elever, som er tilmeldt fag i et givet skoleår. Den resulterende csv-fil har en række pr. brugertilmelding, som ikke er gået ind på faget siden den pågældende dato."
   accounts_752dc365: Konti
+  accounts_lti_546d15c7: "Konti (LTI)"
   achieve_mastery_count_times_8c9bbcec: 
     one: "Opnå opfyldelse af læringsmål en gang"
     other: "Opnå opfyldelse af læringsmål %{count} gange"
@@ -2228,6 +2230,7 @@ da-x-k12:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Der opstod en fejl under opdatering af​ færdighedsbedømmelserne: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Der opstod en fejl under opdatering af​ færdighedsbedømmelserne"
   an_error_occurred_updating_this_assignment_21287c7e: "Der opstod en fejl under opdatering af denne opgave."
+  an_error_occurred_when_saving_the_group_536c8f66: "Der opstod en fejl under lagring af gruppen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Der opstod en fejl under indstilling af brugsrettigheder til %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Der opstod en fejl under forsøget på at kontakte Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Der opstod en fejl under kontrol af overførselsstatus"
@@ -2642,6 +2645,7 @@ da-x-k12:
       assignment_rubric_details: "Detaljer om vurderingskriterie til opgave"
   assignment_976578a8: Opgave
   assignment_allowed_attempts_7e3d43ee: "Tilladte forsøg for opgaven"
+  assignment_and_link_selection_557faf38: "Opgave- og linkvalg"
   assignment_assignment_submission_paper_view_8a4c9776: "Opgave %{assignment} indsendelse papirvisning"
   assignment_assignment_submission_plain_text_view_b217d372: "Opgave %{assignment} indsendelse almindelig tekstvisning"
   assignment_bulk_editing_37248ca4: "Redigering af flere opgaver"
@@ -2669,6 +2673,7 @@ da-x-k12:
   assignment_edit_6dced39f: "Rediger opgave"
   assignment_enhancements_student_557372ab: "Opgaveforbedringer - elev"
   assignment_excused_eb6c08fa: "Opgave fritaget"
+  assignment_extensions_cac06daa: Opgaveforlængelser
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Opgave bedømt: %{grade} for %{assignment_name} i %{course_code}"
   assignment_graded_score_on_assignmentname_in_cours_1acbf85f: "Opgave bedømt: %{score} på %{assignmentName} i %{courseName}"
   assignment_grades_have_already_been_published_ff2d84c6: "Opgavevurderinger er allerede blevet offentliggjort."
@@ -4351,6 +4356,11 @@ da-x-k12:
   canvas_observer_id_59db0918: canvas_observer_id
   canvas_parent_improved_description: "Denne indstilling styrer, om forældre, der skaber deres egen Canvas Parent-konto, kan oprette forbindelse til eleverne på din institution ved hjælp af den mobile app, Canvas Parent. Bemærk: Forældre registreret som Canvas-observatører kan bruge den mobile app, Canvas Parent, selv når denne funktion er deaktiveret."
   canvas_revision_unknown: Ukendt
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+      Canvas omskriver fil-URL'er i brugergenereret indhold. I processen tilføjede det ofte
+      "/ download", hvor det ikke var ønsket og upassende. Denne
+      indstilling opdaterer, hvordan URL-omskrivning finder sted for at lette forhåndsvisning af
+      filer i Canvas i stedet for at downloade.
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas mener, at svaret er gyldigt"
   canvas_ticketing_email_connector_27e253ae: "Canvas Ticketing Email Connector"
@@ -5145,9 +5155,11 @@ da-x-k12:
   content_not_available_7b2e004: "Indhold ikke tilgængeligt"
   content_on_this_page_violates_the_security_policy__25685d8a: "Indhold på denne side overtræder sikkerhedspolitikken, kontakt din administrator for at få hjælp."
   content_security_policy_3bb8d922: Indholdssikkerhedspolitik
+  content_security_policy_settings_3e87fcb2: "Indstillinger for politikker for indholdssikkerhed"
   content_share_preview_166f6562: "Forhåndsvisning af indholdsdeling"
   content_share_started_successfully_2c37fb79: "Indholdsdelingen blev påbegyndt"
   content_shared_by_others_to_you_5a40bb2c: "Indhold, som andre har delt med dig"
+  content_shares_e1e1: Indholdsdelinger
   content_shares_received_view_error_page_c7021a4a: "Modtaget indholdsdeling - vis fejlside"
   content_successfully_added_395c906f: "%{content} blev tilføjet"
   content_tag: 
@@ -5692,6 +5704,7 @@ da-x-k12:
     one: "1 forsøg"
     other: "%{count} forsøg"
     zero: "Ubegrænsede forsøg"
+  count_changes_pushed_by_user_654aade2: "%{count} ændringer foretaget af %{user}"
   count_comments_cb137ab8: 
     one: "1 kommentar"
     other: "%{count} kommentarer"
@@ -7782,6 +7795,7 @@ da-x-k12:
   edit_discussion_settings_1bbb03d: "Rediger diskussionsindstillinger"
   edit_grading_scheme_53091236: "Rediger vurderingsordning"
   edit_grading_scheme_title_ff41d916: "Rediger karaktersystem %{title}"
+  edit_group_c8679dba: "Rediger gruppe"
   edit_item_details_c9a7b9c5: "Rediger elementoplysninger"
   edit_key_developername_2980f240: "Rediger nøgle %{developerName}"
   edit_key_name_5c7d2f46: "Rediger nøgle %{name}"
@@ -8806,6 +8820,7 @@ da-x-k12:
   first_last_name_9820d256: "Fornavn, efternavn"
   first_name_d5c12500: Fornavn
   first_reviewer_sortorder_e2184140: "Første bedømmer %{sortOrder}"
+  fix_missing_policy_grade_change_records_c404507c: "Ret manglende poster for politikker for vurderingsændring"
   flagged_as_possible_spam_ebbc4683: "Markeret som mulig spam"
   flags_new_eportfolio_content_matching_specific_key_a66af560: "Markerer nyt ePortfolio-indhold, der matcher specifikke søgeord, som mulig spam og giver administratorer mulighed for enten at bekræfte markerede ePortfolios som spam eller markere dem som sikre."
   flash_6afbf65a: Flash
@@ -9588,6 +9603,7 @@ da-x-k12:
       group_full: "Gruppen er fuld."
       not_in_group_section: "%{student} deler ikke nogen sektion med de andre medlemmer i %{group}."
   group_membership_limit_54e165b: "Grænse for gruppemedlemskab"
+  group_membership_limit_must_be_equal_to_or_greater_c52e0d7b: "Gruppemedlemskabsgrænsen skal være lig med eller større end antallet af nuværende medlemmer."
   group_name_b69c144: Gruppenavn
   group_name_group_announcements_5ce81c6d: "%{group_name} - Gruppebeskeder"
   group_name_group_calendar_7f10e0ed: "%{group_name} - Gruppekalender"
@@ -9603,6 +9619,7 @@ da-x-k12:
   group_pages_656556f3: Gruppesider
   group_people_50e9785b: Gruppedeltagere
   group_roster_1846bf84: Gruppeliste
+  group_saved_successfully_fcd5ca66: "Gruppe gemt"
   group_select_330df8bd: "Vælg gruppe"
   group_set_name_2aed2347: "Navn på gruppesæt"
   group_weight_for_d46c5db4: "Vægtning af grupper for:"
@@ -9947,6 +9964,7 @@ da-x-k12:
       create: "Opret %{model}"
       submit: "Gem %{model}"
       update: "Opdater %{model}"
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: "Hjælper administratorer og lærere med at tage mere meningsfulde beslutninger, når de importerer, organiserer og redigerer læringsudbytter i deres konto og fag."
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Her er alle tiders mulighed for at lære kalenderen at kende og tilføje begivenheder uden opgaver, som du eventuelt hat til faget. Ingen panik, vi hjælper dig igennem processen."
   here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Her er nogle hurtige tip, så du kan komme i gang i Canvas!"
   hi_contrast_373b614f: "Høj kontrast"
@@ -10270,6 +10288,7 @@ da-x-k12:
   image_8ad06: Billede
   image_c1c98202: billede
   image_id_is_not_a_valid_id_7dd6bad6: "image_id er ikke et gyldigt id"
+  image_search_b0944fc2: Billedsøgning
   image_url_and_image_id_cannot_both_be_set_9d6cbba4: "image_url og image_id kan ikke begge blive indstillet."
   image_url_is_not_a_valid_url_4e31c8b0: "image_url er ikke et gyldigt URL"
   images_documents_and_more_dccb362f: "Billeder, dokumenter og meget mere"
@@ -10321,6 +10340,7 @@ da-x-k12:
   importing_name_8f2b131d: "Importerer \"%{name}\""
   importing_outcomes_e62a0375: "importerer læringsudbytter"
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Forbedret synlighed af træk og slip i Filer"
+  improved_outcomes_management_4692f886: "Forbedret styring af læringsudbytter"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbedrede visuelle påmindelser til at tilskynde instruktører til at offentliggøre fag"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "I %{asset_link} klikker elev på %{bad_link} til en ikke-eksisterende side i dit fag."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link} klikker elev på %{bad_link} til indhold i et andet fag."
@@ -10394,6 +10414,7 @@ da-x-k12:
       Indtast og distribuer vurderinger for eleverne. Vis vurderinger som
                 point, procent, fuldstændig eller ufuldstændig, bestået eller ikke bestået,
                 GPA-skala og bogstavvurdering. Gruppeopgaver for vægtning af vurdering.
+  insert_a_grade_change_record_when_the_periodic_mis_424139e5: "Indsæt en post for vurderingsændring, når det periodiske MissingPolicyApplicator-job kører for en aflevering."
   insert_above_row_de82d138: "indsæt ovenfor %{row}"
   insert_below_row_55ed6f34: "indsæt nedenfor %{row}"
   insert_equella_links_49a8dacd: "Indsæt Equella-links"
@@ -10932,6 +10953,7 @@ da-x-k12:
   limit_this_slot_to_input_type_number_name_max_part_1580add0: "Begræns dette tidsrum til %{input_type_number_name_max_parti} grupper."
   limit_this_slot_to_input_type_number_name_max_part_8344547a: "Begræns dette tidsrum til %{input_type_number_name_max_parti} brugere."
   limited_322546c5: Begrænset
+  line_items_828f62cc: Linjeposter
   link_7262adec: Link
   link_color_55f8b835: "Link farve"
   link_description_4355ca82: Link-beskrivelse
@@ -11391,6 +11413,7 @@ da-x-k12:
     messages: 
       submitting: "Indsender mediefil ..."
   media_has_been_queued_for_conversion_please_try_ag_74343bbd: "Medierne er blevet sat i kø til konvertering, prøv igen lidt senere."
+  media_objects_c2fa37cd: Medieobjekter
   media_over_time_d9332e25: "medier over tid"
   media_record_not_available_f78c16dd: "Medieoptegnelse ikke tilgængelig"
   media_recording_77cddc52: Medieoptagelse
@@ -13407,6 +13430,7 @@ da-x-k12:
   name_unposted_final_grade_798491b7: "%{name} ikke-postet endelig vurdering"
   name_unposted_final_score_124708d2: "%{name} ikke postet slutresultat"
   name_user_e44eebed: "%{name} Bruger"
+  names_and_role_ebff0149: "Navne og rolle"
   nav_avatar_border_3246beb1: "Nav avatar-ramme"
   nav_background_fd299145: "Nav baggrund"
   nav_badge_3c67de17: "Nav Badge"
@@ -14497,8 +14521,9 @@ da-x-k12:
     errors: 
       delete_reminder_failed: "Sletning mislykkedes"
   peer_reviews_cannot_be_enabled_for_moderated_assig_149d33c4: "Elev-elev vurderinger kan ikke aktiveres til bedømte opgaver"
-  peer_reviews_e3a55964: "Elev-elev vurderinger"
+  peer_reviews_e3a55964: Elev-elev-vurderinger
   peer_service_6b4828b9: Peer-service
+  peer_services_102357e3: Elev-elev-tjenester
   pending_3e506a5b: Afventer
   pending_message_2d9a8796: "Verserende: %{message}"
   people_account_30bbffec: "Deltagere (konto)"
@@ -17184,6 +17209,7 @@ da-x-k12:
   resubmit_to_tool_name_1cf02a31: "Aflever igen til %{tool_name}"
   resubmitted_2080646f: "Afleveret igen"
   resubmitted_since_last_graded_8484d285: "Afleveret igen siden sidste bedømmelse"
+  result_8f971a09: Resultat
   resume_quiz_afeceb87: "Genoptag quiz"
   resume_survey_58dce775: "Genoptag spørgeundersøgelse"
   resync_grades_to_sis_d4dcfe12: "Gensynkroniser vurderinger til SIS"
@@ -17462,6 +17488,7 @@ da-x-k12:
   saving_associations_started_8ac85360: "Gemmer associationer"
   saving_d55dd90e: "Gemmer ..."
   saving_dates_2472a539: "Gemmer datoer"
+  saving_group_230707e6: "Gemmer gruppe"
   saving_new_role_458f4ba8: "Gemmer ny rolle"
   saving_recording_e111cb05: "Gemmer optagelse ..."
   saving_the_csp_status_failed_please_try_again_8275aaa4: "Det lykkedes ikke at gemme CSP-status, prøv igen."
@@ -18618,6 +18645,7 @@ da-x-k12:
   show_links_to_unpublished_content_30c0450d: "Vis links til ikke-offentliggjort indhold"
   show_more_af9cbc16: "Vis mere"
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis navn på observerede elever i meddelelser."
+  show_name_of_observed_students_in_notifications_d38b53ca: "Vis navn på observerede elever i meddelelser"
   show_navigation_menu_34e7f441: "Vis navigationsmenu"
   show_new_analytics_for_course_and_user_data_18e92636: "Vis ny analyse for fag- og brugerdata"
   show_new_analytics_for_course_and_user_data_data_m_89526eb: "Vis ny analyse for fag- og brugerdata. Det kan tage 24 timer, før datene vises i New Analytics, efter at dette funktionsflag er blevet indstillet til ON."
@@ -19607,6 +19635,7 @@ da-x-k12:
   the_group_groupname_was_selected_because_the_previ_e080c168: "Gruppen \"%{groupName}” blev valgt, fordi den tidligere valgte gruppe ikke indeholder nogen elever. Du kan ændre den valgte gruppe i vurderingsoversigten."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "Gruppen \"%{groupName}” blev valgt, fordi den elev, du anmodede om, ikke er i den tidligere valgte gruppe. Du kan ændre den valgte gruppe i vurderingsoversigten."
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Den importerede tekst for dette spørgsmål var for lang."
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Importøren migrerer fra API v3 til v4.1. Brugeroplysningerne ændres ikke, men du skal sikre dig, at din konto har adgang til v4.1 inden februar 2021."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Institutionen, fra hvilken du loggede på, er ikke konfigureret på denne konto."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Det igangsatte værktøj returnerede en ugyldig ressource til denne opgave"
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Det link, du brugte, er udløbet. Klik på \"Glemt adgangskode?\" for at få et nyt nulstil-adgangskode-link."
@@ -19754,7 +19783,7 @@ da-x-k12:
   there_was_an_error_setting_usage_rights_53739e1d: "Der opstod en fejl ved indstilling af brugsrettigheder."
   there_was_an_error_starting_the_save_assignment_da_22ffb6a8: "Der opstod en fejl ved påbegyndelse af jobbet Gem opgavedatoerne"
   there_was_an_error_submitting_to_the_similarity_de_eb6a261: "Der opstod en fejl ved aflevering til lighedsafsløringstjenesten. Prøv at genindsende filen, inden du kontakter support."
-  there_was_an_error_updating_this_assignment_please_59fc608d: "Der opstod en fejl under opdatering af denne opgave. Opdater venligst siden og prøv igen."
+  there_was_an_error_updating_this_assignment_please_59fc608d: "Der opstod en fejl under opdatering af denne opgave. Opdater din side, og prøv igen."
   there_was_an_error_uploading_the_image_932fc4ce: "Der var en fejl under upload of billedet"
   there_was_an_error_uploading_your_file_please_try__ce458566: "Der opstod en fejl under uploading af din fil. Prøv igen."
   there_was_an_error_with_your_import_please_examine_7b42f29d: "Der opstod en fejl med din import. Undersøg venligst din fil, og forsøg at uploade igen. Tjek din e-mail for flere detaljer."
@@ -19895,6 +19924,7 @@ da-x-k12:
       Denne tilladelse styrer kun tilføjelse af brugere på kontoniveauet. For at føje
       brugere til et fag skal Brugere - føj/fjern elever til/fra fag eller Brugere - føj/fjern lærere, fagdesignere eller undervisningsassistenter til/fra faget også være aktiveret.
   this_placement_requires_deep_link_support_by_the_v_702d554f: "Denne placering kræver Deep Link-support fra leverandøren. Kontakt din værktøjsleverandør for at sikre, at de understøtter denne funktionalitet"
+  this_pronoun_will_appear_after_your_name_when_enab_473d8e1d: "Dette pronomen vises efter dit navn, når aktiveret"
   this_question_group_is_set_to_pick_more_questions__2e3552c4: "Denne spørgsmålsgruppe er konfigureret til at vælge flere spørgsmål end tilgængelige."
   this_question_will_show_a_checkbox_next_to_each_an_169cd6d9: "Dette spørgsmål viser et afkrydsningsfelt ved siden af hvert svar."
   this_quiz_has_been_excused_d89d2b74: "Denne quiz er blevet undtaget"
@@ -20266,6 +20296,7 @@ da-x-k12:
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "For at gøre det muligt at få vist/redigere/slette funktionalitet i samarbejder, der er oprettet af andre brugere, skal Fagindhold - tilføj/redigér/slet også være aktiveret. Hvis fagindhold - tilføj/redigér/slet er aktiveret, og Elevers samarbejder - opret er deaktiveret, kan brugeren ikke oprette nye samarbejder, men kan få vist/redigere/slette alle samarbejder. For at føje elever til et samarbejde skal Brugere - vis liste også være aktiveret. For at føje en faggruppe til et samarbejde skal Grupper - vis alle studiegrupper også være aktiveret."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "For at gøre det muligt at få vist/redigere/slette funktionalitet i samarbejder, der er oprettet af andre brugere, skal Fagindhold - tilføj/rediger/slet også være aktiveret. Hvis Fagindhold - tilføj/rediger/slet er aktiveret og Elevers samarbejder - opret er deaktiveret, kan brugeren ikke oprette nye samarbejder, men kan få vist/redigere/slette alle samarbejder. For at føje elever til et samarbejde skal Brugere - vis liste også være aktiveret. For at føje en faggruppe til et samarbejde skal Grupper - vis alle studiegrupper også være aktiveret."
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "For at gøre det muligt at få vist/redigere/slette funktionalitet i samarbejder, der er oprettet af andre brugere, skal Fagindhold - tilføj/rediger/slet også være aktiveret. Hvis Fagindhold - tilføj / rediger / slet er aktiveret, og Elevernes samarbejder - opret er deaktiveret, kan brugeren ikke oprette nye samarbejder, men vil være i stand til at se, redigere og slette alle samarbejder. For at føje elever til et samarbejde skal Brugere - vis liste også være aktiveret. For at føje en faggruppe til et samarbejde skal Grupper - vis alle studiegrupper også være aktiveret."
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: "For at tildele elever til en gruppe skal du indtaste gruppenavne i kolonnen \"group_name\"."
   to_be_added_2959cc72: "Skal tilføjes"
   to_be_removed_d4b48586: "Skal fjernes"
   to_c4c44f4b: til
@@ -20810,6 +20841,7 @@ da-x-k12:
   update_comment_8cedb4f0: "Opdater kommentar"
   update_comments_21991be0: "Opdater kommentarer"
   update_criterion_edcbd330: Opdateringskriterie
+  update_file_links_to_prefer_preview_not_download_94535382: "Opdater fillinks til at foretrække forhåndsvisning, ikke download"
   update_inbox_page_to_use_react_instui_4d343fd: "Opdater siden Indbakke for at bruge react/instui"
   update_link_b7cab181: "Opdater link"
   update_pages_c91d7ba: "Opdater sider"
@@ -21963,6 +21995,7 @@ da-x-k12:
   your_answer_8dad6ea4: "Dit svar:"
   your_assignment_assignment_name_is_due_on_due_at_9f82e587: "Din opgave %{assignment_name} skal afleveres den %{due_at}."
   your_assignment_assignment_name_is_due_on_due_at_c_8d11082: "Din opgave %{assignment_name} skal afleveres den %{due_at}. Klik på følgende link for at besøge din opgave og få den afleveret i tide:"
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Din browserforbindelse kan være langsom eller ustabil. Selvom din browsers timer er afbrudt, registreres dine svar i yderligere 5 minutter ud over den oprindelige tidsgrænse for dette forsøg."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Din browser opfylder ikke minimumskravene for Canvas. Gå ind på *Canvas Community* for en fuldstændig liste over understøttede browsere."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Din kommentar blev gemt automatisk som kladde."
   your_content_has_been_exported_bbb57764: "Dit indhold er blevet eksporteret"
@@ -21971,6 +22004,7 @@ da-x-k12:
   your_email_address_f881e583: "Din e-mailadresse"
   your_email_b5364bee: "Din e-mail"
   your_group_is_being_created_88c0c024: "Din gruppe oprettes"
+  your_groups_are_being_created_50156e34: "Dine grupper oprettes."
   your_instructor_has_released_grade_changes_and_new_218d61bb: |-
       Din instruktør har offentliggjort vurderingsændringer og kommentarer for %{title}, %{course}.
       
