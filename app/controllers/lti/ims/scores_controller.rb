@@ -69,7 +69,8 @@ module Lti::Ims
       :verify_user_in_context,
       :verify_required_params,
       :verify_valid_timestamp,
-      :verify_exclusive_key_pairs
+      :verify_exclusive_key_pairs,
+      :verify_valid_submitted_at,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
@@ -124,6 +125,7 @@ module Lti::Ims
     #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
     #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, or online_url. Defaults to external_tool.
     #   submission_data [String] submission data (URL or body text)
+    #   submitted_at [String] Date and time that the submission was originally created. Should use subsecond precision. This should match the data and time that the original submission happened in Canvas.
     #
     # @returns resultUrl [String]
     #   The url to the result that was created.
@@ -140,7 +142,8 @@ module Lti::Ims
     #     "https://canvas.instructure.com/lti/submission": {
     #       "new_submission": true,
     #       "submission_type": "online_url",
-    #       "submission_data": "https://instructure.com"
+    #       "submission_data": "https://instructure.com",
+    #       "submitted_at": "2017-04-14T18:54:36.736+00:00"
     #     }
     #   }
     def create
@@ -162,7 +165,7 @@ module Lti::Ims
     def scores_params
       @_scores_params ||= begin
         update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS,
-          Lti::Result::AGS_EXT_SUBMISSION => [:new_submission, :submission_type, :submission_data]).transform_keys do |k|
+          Lti::Result::AGS_EXT_SUBMISSION => [:new_submission, :submission_type, :submission_data, :submitted_at]).transform_keys do |k|
             k.to_s.underscore
         end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
@@ -189,6 +192,18 @@ module Lti::Ims
           "of #{result.updated_at.iso8601(3)}",
           :bad_request
         )
+      end
+    end
+
+    def verify_valid_submitted_at
+      submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at_date = submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
+      future_buffer = Setting.get('ags_submitted_at_future_buffer', 1.minute.to_s).to_i.seconds
+
+      if submitted_at.present? && submitted_at_date.nil?
+        render_error "Provided submitted_at timestamp of #{submitted_at} not a valid timestamp", :bad_request
+      elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + future_buffer
+        render_error "Provided submitted_at timestamp of #{submitted_at} in the future", :bad_request
       end
     end
 
@@ -230,6 +245,12 @@ module Lti::Ims
         end
       end
 
+      # change submission time without making it a "new" submission
+      if submitted_at.present?
+        submission.submitted_at = submitted_at
+        submission.attempt -= 1 if submission.attempt.try(:'>', 0)
+      end
+
       submission.save!
       submission.add_comment(comment: scores_params[:comment], skip_author: true) if scores_params[:comment].present?
       submission
@@ -263,7 +284,7 @@ module Lti::Ims
     end
 
     def timestamp
-      @_timestamp = Time.zone.parse(params[:timestamp])
+      @_timestamp = Time.zone.parse(params[:timestamp]) rescue nil
     end
 
     def result_url
@@ -283,6 +304,11 @@ module Lti::Ims
     def new_submission?
       new_flag = ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :new_submission))
       (new_flag || new_flag.nil?) && submission_type != 'none'
+    end
+
+    def submitted_at
+      submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil): nil
     end
   end
 end
