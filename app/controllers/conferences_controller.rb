@@ -278,6 +278,18 @@ class ConferencesController < ApplicationController
       @render_alternatives = WebConference.conference_types(@context).all? { |ct| ct[:replace_with_alternatives] }
       case @context
       when Course
+        @sections = @context.course_sections
+        @groups = @context.active_groups
+
+        @group_user_ids_map = @groups.to_a.each_with_object({}) do |group, acc|
+          acc[group.id] = group.participating_users_in_context.map{|u| u.id.to_s}
+          acc
+        end
+
+        @section_user_ids_map = @sections.to_a.each_with_object({}) do |section, acc|
+          acc[section.id] = section.participants.map{|u| u.id.to_s}
+          acc
+        end
         @users = User.where(:id => @context.current_enrollments.not_fake.active_by_date.where.not(:user_id => @current_user).select(:user_id)).
           order(User.sortable_name_order_by_clause).to_a
         @render_alternatives ||= @context.settings[:show_conference_alternatives].present?
@@ -296,6 +308,10 @@ class ConferencesController < ApplicationController
       default_conference: default_conference_json(@context, @current_user, session),
       conference_type_details: conference_types_json(WebConference.conference_types(@context)),
       users: @users.map { |u| {:id => u.id, :name => u.last_name_first} },
+      groups: @groups&.map { |g| {:id => g.id, :name => g.full_name} },
+      sections: @sections&.map { |s| {:id => s.id, :name => s.display_name} },
+      group_user_ids_map: @group_user_ids_map,
+      section_user_ids_map: @section_user_ids_map,
       can_create_conferences: @context.grants_right?(@current_user, session, :create_conferences),
       render_alternatives: @render_alternatives
     )
