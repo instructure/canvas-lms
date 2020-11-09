@@ -91,11 +91,24 @@ module Api
       end
 
       def media_context
+        # not all objects are clean to find media urls for.
+        # If the current context is one of those classes,
+        # then we should look up what the actual context is that
+        # would have a reasonable media url on it (usually a course).
+        # If you are trying to do "media_redirect_url" on a context
+        # where you're finding a media url helper doesn't exist, you probably
+        # need to add a case here.
         case context
-        when Group
+        when Announcement
           context.context
         when CourseSection
           context.course
+        when DiscussionTopic
+          context.course
+        when DiscussionEntry
+          context.discussion_topic.course
+        when Group
+          context.context
         else
           context
         end
