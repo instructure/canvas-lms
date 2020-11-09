@@ -30,7 +30,21 @@ QUnit.module('EditConferenceView', {
     this.datepickerSetting = {field: 'datepickerSetting', type: 'date_picker'}
     fakeENV.setup({
       conference_type_details: [{settings: [this.datepickerSetting]}],
-      users: [{id: 1, name: 'Owlswick Clamp'}]
+      users: [
+        {id: 1, name: 'Owlswick Clamp'},
+        {id: 2, name: 'Abby Zollinger'},
+        {id: 3, name: 'Bruce Young'}
+      ],
+      sections: [
+        {id: 1, name: 'Section 1'},
+        {id: 2, name: 'Section 2'}
+      ],
+      groups: [
+        {id: 1, name: 'Study Group 1'},
+        {id: 2, name: 'Study Group 2'}
+      ],
+      section_user_ids_map: {1: [1, 2], 2: [3]},
+      group_user_ids_map: {1: [1], 2: [1, 2]}
     })
   },
   teardown() {
@@ -128,4 +142,260 @@ test('"remove observers" modifies "invite all course members"', function() {
   this.view.$('#user_all').click()
   ok(this.view.$('#members_list').is(':visible'))
   ok(this.view.$('#observers_remove').is(':disabled'))
+})
+
+test('sections should appear in member list if course has more than one section', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(this.view.$('#section_1').is(':visible'))
+  ok(this.view.$('#section_2').is(':visible'))
+})
+
+test('sections should not appear in member list if course has only section', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  window.ENV.sections = [{name: 'Section 1', id: 1}]
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(!this.view.$('#section_1').is(':visible'))
+})
+
+test('groups should appear in member list if course has one or more groups', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(this.view.$('#group_1').is(':visible'))
+})
+
+test('checking/unchecking a section also checks/unchecks the members that are in that section', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  this.view.$('#section_2').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+  this.view.$('#section_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  this.view.$('#section_1').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+})
+
+test('checking/unchecking a groups also checks/unchecks the members that are in that group', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+  this.view.$('#group_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  this.view.$('#group_1').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+})
+
+test('unchecking a group only unchecks members that have not been selected by section also', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+  this.view.$('#group_1').click()
+  this.view.$('#section_1').click()
+
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(this.view.$('#user_2').is(':checked'))
+  this.view.$('#group_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+})
+
+test('unchecking a section only unchecks members that have not been selected by group also', function() {
+  const attributes = {
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  this.view.$('#user_all').click()
+  ok(!this.view.$('#user_1').is(':checked'))
+  this.view.$('#group_1').click()
+  this.view.$('#section_1').click()
+
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(this.view.$('#user_2').is(':checked'))
+  this.view.$('#section_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(!this.view.$('#user_2').is(':checked'))
+})
+
+test('While editing a conference the box for a group should be checked and disabled if everyone in the group is a participant', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    },
+    user_ids: [1]
+  }
+  const conference = new Conference(attributes)
+  this.view.show(conference, {isEditing: true})
+
+  ok(this.view.$('#group_1').is(':checked'))
+  ok(this.view.$('#group_1').is(':disabled'))
+})
+
+test('While editing a conference the box for a section should be checked and disabled if everyone in the section is a participant', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    },
+    user_ids: [3]
+  }
+  const conference = new Conference(attributes)
+  this.view.show(conference, {isEditing: true})
+
+  ok(this.view.$('#section_2').is(':checked'))
+  ok(this.view.$('#section_2').is(':disabled'))
+})
+
+test('While editing a conference unchecking a group should only uncheck members who are not a part of the existing conference', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    },
+    user_ids: [1]
+  }
+  const conference = new Conference(attributes)
+  this.view.show(conference, {isEditing: true})
+  ok(!this.view.$('#group_2').is(':checked'))
+  ok(!this.view.$('#user_2').is(':checked'))
+
+  this.view.$('#group_2').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(this.view.$('#user_2').is(':checked'))
+
+  this.view.$('#group_2').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(!this.view.$('#user_2').is(':checked'))
+})
+
+test('While editing a conference unchecking a section should only uncheck member who are not a part of the existing conference', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    },
+    user_ids: [1]
+  }
+  const conference = new Conference(attributes)
+  this.view.show(conference, {isEditing: true})
+  ok(!this.view.$('#section_1').is(':checked'))
+  ok(!this.view.$('#user_2').is(':checked'))
+
+  this.view.$('#section_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(this.view.$('#user_2').is(':checked'))
+
+  this.view.$('#section_1').click()
+  ok(this.view.$('#user_1').is(':checked'))
+  ok(!this.view.$('#user_2').is(':checked'))
+})
+
+test('while context_is_group = true no sections or groups should appear in the member list', function() {
+  const attributes = {
+    title: 'Making Money',
+    recordings: [],
+    user_settings: {
+      scheduled_date: new Date()
+    },
+    permissions: {
+      update: true
+    }
+  }
+  window.ENV.context_is_group = true
+  const conference = new Conference(attributes)
+  this.view.show(conference)
+  ok(!this.view.$('#section_1').is(':visible'))
+  ok(!this.view.$('#section_2').is(':visible'))
+  ok(!this.view.$('#group_1').is(':visible'))
+  ok(!this.view.$('#group_2').is(':visible'))
 })
