@@ -144,6 +144,13 @@ module Types
       end
     end
 
+    field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true
+    def conversations_connection
+      load_association(:all_conversations).then do
+        object.conversations
+      end
+    end
+
     # TODO: deprecate this
     #
     # we should probably have some kind of top-level field called `self` or

@@ -302,4 +302,13 @@ describe Types::UserType do
       ).to eq 0
     end
   end
+
+  context 'conversations' do
+    it 'returns conversations for the user' do
+      c = conversation(@student, @teacher)
+      expect(
+        user_type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }')[0][0]
+      ).to eq c.conversation.conversation_messages.first.body
+    end
+  end
 end

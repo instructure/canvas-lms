@@ -175,6 +175,14 @@ module GraphQLNodeLoader
         next if !record || record.deleted? || !record.context.grants_right?(ctx[:current_user], :read)
         record
       end
+    when "Conversation"
+      Loaders::IDLoader.for(Conversation).load(id).then do |conversation|
+        Loaders::AssociationLoader.for(User, :all_conversations).load(ctx[:current_user]).then do |all_conversations|
+          next nil unless all_conversations.where(conversation_id: conversation.id).first
+
+          conversation
+        end
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end

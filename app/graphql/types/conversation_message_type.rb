@@ -1,0 +1,53 @@
+# frozen_string_literal: true
+
+#
+# Copyright (C) 2020 - present Instructure, Inc.
+#
+# This file is part of Canvas.
+#
+# Canvas is free software: you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation, version 3 of the License.
+#
+# Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+# WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+# A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program. If not, see <http://www.gnu.org/licenses/>.
+#
+
+module Types
+  class ConversationMessageType < ApplicationObjectType
+    graphql_name 'ConversationMessage'
+
+    implements Interfaces::TimestampInterface
+
+    global_id_field :id
+    field :_id, ID, "legacy canvas id", method: :id, null: false
+    field :conversation_id, ID, null: false
+    field :body, String, null: false
+
+    field :author, UserType, null: false
+    def author
+      load_association(:author)
+    end
+
+    field :media_comment, MediaObjectType, null: true
+    def media_comment
+      Loaders::MediaObjectLoader.load(object.media_comment_id)
+    end
+
+    field :attachments_connection, Types::FileType.connection_type, null: true
+    def attachments_connection
+      Promise.all([
+        load_association(:attachment_associations).then do |attachment_associations|
+          attachment_associations.each do |attachment_association|
+            Loaders::AssociationLoader.for(AttachmentAssociation, :attachment).load(attachment_association)
+          end
+        end
+      ]).then { object.attachments }
+    end
+  end
+end
