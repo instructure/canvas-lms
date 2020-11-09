@@ -1491,9 +1491,26 @@ describe GradebooksController do
             @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
           end
 
-          it "is set to the outcome proficiency on the course" do
+          it "is set to the outcome proficiency on the account" do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
           end
+
+          # rubocop:disable RSpec/NestedGroups
+          describe "with account_level_mastery_scales enabled" do
+            before do
+              @course_proficiency = outcome_proficiency_model(@course)
+              @course.root_account.enable_feature! :account_level_mastery_scales
+
+              get 'show', params: {course_id: @course.id}
+
+              @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            end
+
+            it "is set to the resolved_outcome_proficiency on the course" do
+              expect(@gradebook_env[:outcome_proficiency]).to eq(@course_proficiency.as_json)
+            end
+          end
+          # rubocop:enable RSpec/NestedGroups
         end
 
         describe ".sections" do

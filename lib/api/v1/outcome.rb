@@ -49,21 +49,12 @@ module Api::V1::Outcome
       hash['has_updateable_rubrics'] = outcome.updateable_rubrics?
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
-
-        if outcome.context_id && outcome.context.root_account.feature_enabled?(:account_level_mastery_scales) && outcome.context.resolved_outcome_calculation_method
-          method = outcome.context.resolved_outcome_calculation_method
-          hash['calculation_method'] = method.calculation_method
-          hash['calculation_int'] = method.calculation_int
-        else
-          # existing outcomes that have a nil calculation method should be handled as highest
-          hash['calculation_method'] = outcome.calculation_method || 'highest'
-          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
-            hash['calculation_int'] = outcome.calculation_int
-          end
-        end
-
-        if outcome.context_id && outcome.context.root_account.feature_enabled?(:account_level_mastery_scales) && outcome.context.resolved_outcome_proficiency
-          proficiency = outcome.context.resolved_outcome_proficiency
+        context = opts[:context]
+        if (context.is_a?(Course) || context.is_a?(Account)) && context.root_account.feature_enabled?(:account_level_mastery_scales)
+          calculation_method = context.resolved_outcome_calculation_method
+          hash['calculation_method'] = calculation_method.calculation_method
+          hash['calculation_int'] = calculation_method.calculation_int
+          proficiency = context.resolved_outcome_proficiency
           hash['ratings'] = proficiency.ratings_hash
           hash['points_possible'] = proficiency.points_possible
           hash['mastery_points'] = proficiency.mastery_points
@@ -71,6 +62,11 @@ module Api::V1::Outcome
           hash['points_possible'] = outcome.rubric_criterion[:points_possible]
           hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
           hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
+          # existing outcomes that have a nil calculation method should be handled as highest
+          hash['calculation_method'] = outcome.calculation_method || 'highest'
+          if ["decaying_average", "n_mastery"].include? outcome.calculation_method
+            hash['calculation_int'] = outcome.calculation_int
+          end
         end
         hash['ratings']&.each_with_index do |rating, i|
           rating[:percent] = opts[:rating_percents][i] if i < opts[:rating_percents].length

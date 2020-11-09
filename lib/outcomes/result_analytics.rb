@@ -137,15 +137,21 @@ module Outcomes
     # Public: Gets rating percents for outcomes based on rollup
     #
     # Returns a hash of outcome id to array of rating percents
-    def rating_percents(rollups)
+    def rating_percents(rollups, context: nil)
       counts = {}
+      outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
+        context.resolved_outcome_proficiency.ratings_hash
+      end
       rollups.each do |rollup|
         rollup.scores.each do |score|
           next unless score.score
+
           outcome = score.outcome
           next unless outcome
-          ratings = outcome.rubric_criterion[:ratings]
+
+          ratings = outcome_proficiency_ratings || outcome.rubric_criterion[:ratings]
           next unless ratings
+
           counts[outcome.id] = Array.new(ratings.length, 0) unless counts[outcome.id]
           idx = ratings.find_index { |rating| rating[:points] <= score.score }
           counts[outcome.id][idx] = counts[outcome.id][idx] + 1 if idx

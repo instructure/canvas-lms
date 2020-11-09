@@ -611,6 +611,7 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
+        ACCOUNT_LEVEL_MASTERY_SCALES:  @context.root_account.feature_enabled?(:account_level_mastery_scales),
         outcome_proficiency: outcome_proficiency,
         sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
@@ -1087,7 +1088,11 @@ class GradebooksController < ApplicationController
 
   def outcome_proficiency
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)
-      @context.account.resolved_outcome_proficiency&.as_json
+      if @context.root_account.feature_enabled?(:account_level_mastery_scales)
+        @context.resolved_outcome_proficiency&.as_json
+      else
+        @context.account.resolved_outcome_proficiency&.as_json
+      end
     end
   end
 
