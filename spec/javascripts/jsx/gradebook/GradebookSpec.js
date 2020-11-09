@@ -3889,6 +3889,10 @@ QUnit.module('Gradebook#filterAssignments', {
       1401: ['2301', '2303'],
       1402: ['2302', '2304']
     }
+    this.gradebook.courseContent.contextModules = [
+      {id: '1', name: 'Algebra', position: 1},
+      {id: '2', name: 'English', position: 2}
+    ]
     this.gradebook.gradingPeriodSet = {id: '1501', gradingPeriods: [{id: '1401'}, {id: '1402'}]}
     this.gradebook.gridDisplaySettings.showUnpublishedAssignments = true
     this.gradebook.show_attendance = true
@@ -3969,6 +3973,13 @@ test('excludes assignments from other modules when filtering by a module', funct
   this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
   const assignments = this.gradebook.filterAssignments(this.assignments)
   deepEqual(_.map(assignments, 'id'), ['2301'])
+})
+
+test('does not filter assignments when filtering by a module that was deleted', function() {
+  this.gradebook.courseContent.contextModules = []
+  this.gradebook.setFilterColumnsBySetting('contextModuleId', '2')
+  const assignments = this.gradebook.filterAssignments(this.assignments)
+  deepEqual(_.map(assignments, 'id'), ['2301', '2302', '2304'])
 })
 
 test('includes assignments from all assignment groups when not filtering by assignment group', function() {

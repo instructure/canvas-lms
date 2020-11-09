@@ -366,6 +366,7 @@ class Gradebook {
     this.setFilterRowsBySetting = this.setFilterRowsBySetting.bind(this)
     this.isFilteringColumnsByAssignmentGroup = this.isFilteringColumnsByAssignmentGroup.bind(this)
     this.getAssignmentGroupToShow = this.getAssignmentGroupToShow.bind(this)
+    this.getModuleToShow = this.getModuleToShow.bind(this)
     this.isFilteringColumnsByGradingPeriod = this.isFilteringColumnsByGradingPeriod.bind(this)
     this.isFilteringRowsBySearchTerm = this.isFilteringRowsBySearchTerm.bind(this)
     this.getGradingPeriodAssignments = this.getGradingPeriodAssignments.bind(this)
@@ -1254,13 +1255,8 @@ class Gradebook {
 
   filterAssignmentByModule(assignment) {
     let ref1
-    const contextModuleFilterSetting = this.getFilterColumnsBySetting('contextModuleId')
-    if (!contextModuleFilterSetting) {
-      return true
-    }
-    if (contextModuleFilterSetting === '0' || contextModuleFilterSetting === 'null') {
-      // Firefox returns a value of "null" (String) for this when nothing is set.  The comparison
-      // to 'null' below is a result of that
+    const contextModuleFilterSetting = this.getModuleToShow()
+    if (contextModuleFilterSetting === '0') {
       return true
     }
     return (
@@ -1744,7 +1740,7 @@ class Gradebook {
         disabled: false,
         modules: this.moduleList(),
         onSelect: this.updateCurrentModule,
-        selectedModuleId: this.getFilterColumnsBySetting('contextModuleId') || '0'
+        selectedModuleId: this.getModuleToShow()
       }
       return renderComponent(ModuleFilter, mountPoint, props)
     } else if (mountPoint != null) {
@@ -3684,6 +3680,14 @@ class Gradebook {
 
   isFilteringColumnsByAssignmentGroup() {
     return this.getAssignmentGroupToShow() !== '0'
+  }
+
+  getModuleToShow() {
+    const moduleId = this.getFilterColumnsBySetting('contextModuleId')
+    if (moduleId == null || !this.listContextModules().some(module => module.id === moduleId)) {
+      return '0'
+    }
+    return moduleId
   }
 
   getAssignmentGroupToShow() {
