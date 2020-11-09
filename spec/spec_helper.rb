@@ -905,3 +905,7 @@ end
 def enable_default_developer_key!
   enable_developer_key_account_binding!(DeveloperKey.default)
 end
+
+def run_live_events_specs?
+  ENV.fetch('RUN_LIVE_EVENTS_SPECS', '0') == '1'
+end
