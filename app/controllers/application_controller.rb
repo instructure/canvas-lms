@@ -20,18 +20,6 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  class << self
-    [:before, :after, :around,
-     :skip_before, :skip_after, :skip_around,
-     :prepend_before, :prepend_after, :prepend_around].each do |type|
-      class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{type}_filter(*)
-          raise "Please use #{type}_action instead of #{type}_filter"
-        end
-      RUBY
-    end
-  end
-
   define_callbacks :html_render
 
   attr_accessor :active_tab
@@ -42,11 +30,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
-  around_action :set_locale
-  around_action :enable_request_cache
-  around_action :batch_statsd
-  around_action :report_to_datadog
-  around_action :compute_http_cost
 
   helper :all
 
@@ -55,10 +38,21 @@ class ApplicationController < ActionController::Base
   include Canvas::RequestForgeryProtection
   protect_from_forgery with: :exception
 
+  # Before/around actions run in order defined (even if interleaved)
+  # After actions run in REVERSE order defined. Skipped on exception raise
+  #   (which is common for 401, 404, 500 responses)
+  # Around action yields return (in REVERSE order) after all after actions
+
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
+
+  around_action :set_locale
+  around_action :enable_request_cache
+  around_action :batch_statsd
+  around_action :report_to_datadog
+  around_action :compute_http_cost
 
   before_action :clear_idle_connections
   before_action :annotate_apm
@@ -68,23 +62,23 @@ class ApplicationController < ActionController::Base
   before_action :set_page_view
   before_action :require_reacceptance_of_terms
   before_action :clear_policy_cache
-  before_action :setup_live_events_context
+  around_action :manage_live_events_context
+  before_action :initiate_session_from_token
+  before_action :fix_xhr_requests
+  before_action :init_body_classes
+  # multiple actions might be called on a single controller instance in specs
+  before_action :clear_js_env if Rails.env.test?
+
   after_action :log_page_view
   after_action :discard_flash_if_xhr
   after_action :cache_buster
-  before_action :initiate_session_from_token
   # Yes, we're calling this before and after so that we get the user id logged
   # on events that log someone in and log someone out.
   after_action :set_user_id_header
-  before_action :fix_xhr_requests
-  before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :before, :add_csp_for_root
-  after_action :teardown_live_events_context
 
-  # multiple actions might be called on a single controller instance in specs
-  before_action :clear_js_env if Rails.env.test?
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -2708,7 +2702,10 @@ class ApplicationController < ActionController::Base
     (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
 
-  def teardown_live_events_context
+  def manage_live_events_context
+    setup_live_events_context
+    yield
+  ensure
     LiveEvents.clear_context!
   end
 

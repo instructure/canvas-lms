@@ -2071,7 +2071,7 @@ RSpec.describe ApplicationController, '#redirect_to_login' do
   end
 end
 
-RSpec.describe ApplicationController, '#teardown_live_events_context' do
+RSpec.describe ApplicationController, '#manage_live_events_context' do
   controller do
     def index
       render json: [{}]
