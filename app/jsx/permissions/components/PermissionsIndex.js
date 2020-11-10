@@ -55,7 +55,7 @@ export default class PermissionsIndex extends Component {
 
   state = {
     permissionSearchString: '',
-    contextType: COURSE,
+    contextType: COURSE
   }
 
   onRoleFilterChange = (_, value) => {
@@ -120,10 +120,7 @@ export default class PermissionsIndex extends Component {
     return (
       <div className="permissions-v2__header_container">
         <View display="block">
-          <Grid
-            startAt="large"
-            rowSpacing='small'
-          >
+          <Grid startAt="large" rowSpacing="small">
             <Grid.Row vAlign="middle">
               <Grid.Col width="auto">
                 <TextInput
