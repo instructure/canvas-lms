@@ -15,6 +15,8 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+ARG CANVAS_RAILS6_0=0
+ENV CANVAS_RAILS6_0=${CANVAS_RAILS6_0}
 
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
@@ -54,7 +56,6 @@ USER docker
 COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
 COPY --chown=docker:docker Gemfile   ${APP_HOME}
 COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-
 COPY --chown=docker:docker gems      ${APP_HOME}gems
 
 RUN set -eux; \
@@ -70,7 +71,6 @@ RUN set -eux; \
 
 COPY --chown=docker:docker package.json ${APP_HOME}
 COPY --chown=docker:docker yarn.lock    ${APP_HOME}
-
 COPY --chown=docker:docker client_apps  ${APP_HOME}client_apps
 COPY --chown=docker:docker packages     ${APP_HOME}packages
 

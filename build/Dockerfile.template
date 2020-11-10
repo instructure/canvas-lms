@@ -12,6 +12,8 @@ ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 ENV LC_ALL en_US.UTF-8
+ARG CANVAS_RAILS6_0=0
+ENV CANVAS_RAILS6_0=${CANVAS_RAILS6_0}
 
 ENV YARN_VERSION 1.19.1-1
 ENV GEM_HOME /home/docker/.gem/$RUBY
@@ -48,13 +50,12 @@ RUN if [ -e /var/lib/gems/$RUBY_MAJOR.0/gems/bundler-* ]; then BUNDLER_INSTALL="
 
 USER docker
 
-COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
-COPY --chown=docker:docker Gemfile   ${APP_HOME}
-COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
-
 <% if jenkins? -%>
 COPY --chown=docker:docker --from=local/cache-helper-collect-gems /tmp/dst ${APP_HOME}
 <% else -%>
+COPY --chown=docker:docker config/canvas_rails_switcher.rb ${APP_HOME}/config/canvas_rails_switcher.rb
+COPY --chown=docker:docker Gemfile   ${APP_HOME}
+COPY --chown=docker:docker Gemfile.d ${APP_HOME}Gemfile.d
 COPY --chown=docker:docker gems      ${APP_HOME}gems
 <% end -%>
 
@@ -69,12 +70,11 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 
-COPY --chown=docker:docker package.json ${APP_HOME}
-COPY --chown=docker:docker yarn.lock    ${APP_HOME}
-
 <% if jenkins? -%>
 COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
 <% else -%>
+COPY --chown=docker:docker package.json ${APP_HOME}
+COPY --chown=docker:docker yarn.lock    ${APP_HOME}
 COPY --chown=docker:docker client_apps  ${APP_HOME}client_apps
 COPY --chown=docker:docker packages     ${APP_HOME}packages
 <% end -%>
@@ -84,6 +84,10 @@ RUN set -eux; \
   && (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
+<% if jenkins? -%>
+<% set_file_suffix 'webpack-runner' %>
+FROM local/webpack-builder
+<% end -%>
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
 <% if jenkins? -%>
 COPY --chown=docker:docker packages        ${APP_HOME}packages

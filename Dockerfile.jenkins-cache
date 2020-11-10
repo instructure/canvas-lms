@@ -3,6 +3,10 @@
 FROM busybox AS cache-helper-collect-gems
 RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config && \
+  cp -rf config/canvas_rails_switcher.rb /tmp/dst/config && \
+  cp -rf Gemfile /tmp/dst && \
+  cp -rf Gemfile.d /tmp/dst
 RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
@@ -13,6 +17,9 @@ RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /
 FROM busybox AS cache-helper-collect-yarn
 RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
+RUN --mount=target=/tmp/src mkdir -p /tmp/dst && \
+  cp -rf package.json /tmp/dst && \
+  cp -rf yarn.lock /tmp/dst
 RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
 RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
