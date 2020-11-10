@@ -680,20 +680,34 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
     end
 
-    it 'should open a11y checker when clicking button in status bar' do
-      visit_front_page_edit(@course)
+    context 'status bar functions' do
+      it 'should open a11y checker when clicking button in status bar' do
+        visit_front_page_edit(@course)
 
-      click_a11y_checker_button
+        click_a11y_checker_button
 
-      expect(a11y_checker_tray).to be_displayed
-    end
+        expect(a11y_checker_tray).to be_displayed
+      end
 
-    it 'should open keyboard shortcut modal when clicking button in status bar' do
-      visit_front_page_edit(@course)
+      it 'should open keyboard shortcut modal when clicking button in status bar' do
+        visit_front_page_edit(@course)
 
-      click_visible_keyboard_shortcut_button
+        click_visible_keyboard_shortcut_button
 
-      expect(keyboard_shortcut_modal).to be_displayed
+        expect(keyboard_shortcut_modal).to be_displayed
+      end
+
+      it 'should open rce in full screen with button in status bar' do
+        visit_front_page_edit(@course)
+
+        click_full_screen_button
+
+        expect(rce_page_body_ifr_style).to eq('height: 100%; width: 100%;')
+
+        driver.action.send_keys(:escape).perform
+
+        expect(rce_page_body_ifr_style).to_not eq('height: 100%; width: 100%;')
+      end
     end
 
     it 'should close the course links tray when pressing esc', ignore_js_errors: true do

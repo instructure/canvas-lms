@@ -283,6 +283,10 @@ module RCENextPage
     f('iframe.tox-edit-area__iframe')['id']
   end
 
+  def rce_page_body_ifr_style
+    element_value_for_attr(f('iframe.tox-edit-area__iframe'), "style")
+  end
+
   def course_item_link(title)
     fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
   end
@@ -413,6 +417,10 @@ module RCENextPage
 
   def visible_keyboard_shortcut_button
     ffj('button:has([name="IconKeyboardShortcuts"])')[1]
+  end
+
+  def full_screen_button
+    f('button[title="Fullscreen"]')
   end
 
   def keyboard_shortcut_modal
@@ -812,6 +820,10 @@ module RCENextPage
 
   def click_visible_keyboard_shortcut_button
     visible_keyboard_shortcut_button.click
+  end
+
+  def click_full_screen_button
+    full_screen_button.click
   end
 
   def click_decorative_options_checkbox
