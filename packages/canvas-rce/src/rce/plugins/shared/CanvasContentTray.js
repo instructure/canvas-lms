@@ -204,7 +204,8 @@ function isLoading(cprops) {
     cprops.documents.group?.isLoading ||
     cprops.media.course?.isLoading ||
     cprops.media.user?.isLoading ||
-    cprops.media.group?.isLoading
+    cprops.media.group?.isLoading ||
+    cprops.all_files?.isLoading
   )
 }
 
@@ -269,11 +270,20 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
-  function handleFilterChange(newFilter, onChangeContext) {
+  function handleFilterChange(newFilter, onChangeContext, onChangeSearchString, onChangeSortBy) {
     const newFilterSettings = {...newFilter}
     if (newFilterSettings.sortValue) {
       newFilterSettings.sortDir = newFilterSettings.sortValue === 'alphabetical' ? 'asc' : 'desc'
+      onChangeSortBy({sort: newFilterSettings.sortValue, dir: newFilterSettings.sortDir})
     }
+
+    if (
+      'searchString' in newFilterSettings &&
+      filterSettings.searchString !== newFilterSettings.searchString
+    ) {
+      onChangeSearchString(newFilterSettings.searchString)
+    }
+
     setFilterSettings(newFilterSettings)
 
     if (newFilterSettings.contentType) {
@@ -372,7 +382,12 @@ export default function CanvasContentTray(props) {
                   {...filterSettings}
                   userContextType={props.contextType}
                   onChange={newFilter => {
-                    handleFilterChange(newFilter, contentProps.onChangeContext)
+                    handleFilterChange(
+                      newFilter,
+                      contentProps.onChangeContext,
+                      contentProps.onChangeSearchString,
+                      contentProps.onChangeSortBy
+                    )
                   }}
                   isContentLoading={isLoading(contentProps)}
                 />

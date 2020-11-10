@@ -96,5 +96,17 @@ describe('Sidebar initialState', () => {
       })
       assert.equal(state.collections.announcements.bookmark, 'announcements')
     })
+
+    it('searchString is empty string', () => {
+      assert.strictEqual(initialState().searchString, '')
+    })
+
+    it('sortBy sorts by date desc', () => {
+      assert.deepStrictEqual(initialState().sortBy, {sort: 'date_added', dir: 'desc'})
+    })
+
+    it('all_files is not loadingt', () => {
+      assert.deepStrictEqual(initialState().all_files, {isLoading: false})
+    })
   })
 })

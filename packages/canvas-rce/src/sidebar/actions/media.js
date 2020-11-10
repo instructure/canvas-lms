@@ -44,12 +44,12 @@ export function failMedia({error, contextType}) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchMedia(sortBy, searchString) {
+export function fetchMedia() {
   return (dispatch, getState) => {
     const state = getState()
     dispatch(requestMedia(state.contextType))
     return state.source
-      .fetchMedia({...state, ...sortBy, searchString})
+      .fetchMedia(state)
       .then(response => dispatch(receiveMedia({response, contextType: state.contextType})))
       .catch(error => dispatch(failMedia({error, contextType: state.contextType})))
   }
@@ -57,26 +57,26 @@ export function fetchMedia(sortBy, searchString) {
 
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
-export function fetchNextMedia(sortBy, searchString) {
+export function fetchNextMedia() {
   return (dispatch, getState) => {
     const state = getState()
     const media = state.media[state.contextType]
 
     if (!media?.isLoading && media?.hasMore) {
       dispatch(requestMedia(state.contextType))
-      return dispatch(fetchMedia(sortBy, searchString))
+      return dispatch(fetchMedia())
     }
   }
 }
 
 // fetches the next page (subject to conditions on fetchNextMedia) only if the
 // collection is currently empty
-export function fetchInitialMedia(sortBy, searchString) {
+export function fetchInitialMedia() {
   return (dispatch, getState) => {
     const state = getState()
 
     dispatch(requestInitialMedia(state.contextType))
-    return dispatch(fetchMedia(sortBy, searchString))
+    return dispatch(fetchMedia())
   }
 }
 

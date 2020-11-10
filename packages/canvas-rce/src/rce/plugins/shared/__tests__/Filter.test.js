@@ -334,13 +334,13 @@ describe('RCE Plugins > Filter', () => {
       expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
-    it('is not visible when the contentSubtype is all', () => {
+    it('is visible when the contentSubtype is all', () => {
       renderComponent({
         userContextType: 'course',
         contentType: 'course_files',
         contentSubtype: 'all'
       })
-      expect(component.queryByPlaceholderText('Search')).toBe(null)
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
     })
 
     it('updates filter settings when the search string is > 3 chars long', async () => {
@@ -380,13 +380,25 @@ describe('RCE Plugins > Filter', () => {
         userContextType: 'course',
         contentType: 'course_files',
         contentSubtype: 'documents',
-        isContentLoading: true
+        isContentLoading: true,
+        searchString: 'abc'
       })
       const searchInput = component.getByPlaceholderText('Search')
       expect(searchInput.hasAttribute('readonly')).toBe(true)
 
       const clearBtn = component.getByText('Clear').closest('button')
       expect(clearBtn.hasAttribute('disabled')).toBe(true)
+    })
+
+    it('shows the search message when not loading', () => {
+      renderComponent()
+      expect(component.getByText('Enter at least 3 characters to search')).toBeInTheDocument()
+    })
+
+    it('shows the loading message when loading', () => {
+      renderComponent({isContentLoading: true})
+      // screenreader message + hint under the search input box
+      expect(component.getAllByText('Loading, please wait').length).toBe(2)
     })
   })
 })

@@ -16,12 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+export const REQUEST_INITIAL_PAGE = 'REQUEST_INITIAL_PAGE'
 export const REQUEST_PAGE = 'REQUEST_PAGE'
 export const RECEIVE_PAGE = 'RECEIVE_PAGE'
 export const FAIL_PAGE = 'FAIL_PAGE'
 
-export function requestPage(key, searchString) {
-  return {type: REQUEST_PAGE, key, searchString}
+export function requestInitialPage(key, searchString) {
+  return {type: REQUEST_INITIAL_PAGE, key, searchString}
+}
+
+export function requestPage(key) {
+  return {type: REQUEST_PAGE, key}
 }
 
 export function receivePage(key, page) {
@@ -36,47 +41,39 @@ export function failPage(key, error) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchPage(key, searchString) {
+export function fetchPage(key) {
   return (dispatch, getState) => {
     const state = getState()
-    const {source, collections} = state
-    let bookmark = collections[key].bookmark
-    if (searchString !== collections[key].searchString) {
-      bookmark = source.uriFor(key, {...state, searchString})
-    }
-    dispatch(requestPage(key, searchString))
+    const {source} = state
     return source
-      .fetchPage(bookmark)
+      .fetchLinks(key, state)
       .then(page => dispatch(receivePage(key, page)))
       .catch(error => dispatch(failPage(key, error)))
   }
 }
 
-// fetches a page only if a page is not already being loaded and the
-// collection is not yet completely loaded
-export function fetchNextPage(key, searchString) {
+export function fetchNextPage(key) {
   return (dispatch, getState) => {
     const state = getState()
     const collection = state.collections[key]
-    if (collection && !collection.loading) {
-      if (searchString !== collection.searchString) {
-        // start over
-        dispatch(fetchInitialPage(key, searchString))
-      } else if (collection.bookmark) {
-        return dispatch(fetchPage(key, searchString))
-      }
+    if (collection && !collection.isLoading) {
+      dispatch(requestPage(key))
+      return dispatch(fetchPage(key))
     }
   }
 }
 
-// fetches the next page (subject to conditions on fetchNextPage) only if the
-// collection is currently empty
-export function fetchInitialPage(key, searchString) {
+export function fetchInitialPage(key) {
   return (dispatch, getState) => {
     const state = getState()
     const collection = state.collections[key]
-    if (collection && (collection.links.length === 0 || collection.searchString !== searchString)) {
-      return dispatch(fetchPage(key, searchString))
+    if (
+      collection &&
+      !collection.isLoading &&
+      (collection.links.length === 0 || collection.searchString !== state.searchString)
+    ) {
+      dispatch(requestInitialPage(key, state.searchString))
+      return dispatch(fetchPage(key))
     }
   }
 }

@@ -19,6 +19,8 @@
 export const CHANGE_CONTEXT = 'CHANGE_CONTEXT'
 export const CHANGE_CONTEXT_TYPE = 'CHANGE_CONTEXT_TYPE'
 export const CHANGE_CONTEXT_ID = 'CHANGE_CONTEXT_ID'
+export const CHANGE_SEARCH_STRING = 'CHANGE_SEARCH_STRING'
+export const CHANGE_SORT_BY = 'CHANGE_SORT_BY'
 
 export function changeContext({contextType, contextId}) {
   return dispatch => {
@@ -34,4 +36,12 @@ export function changeContextType(contextType) {
 
 export function changeContextId(contextId) {
   return {type: CHANGE_CONTEXT_ID, payload: contextId}
+}
+
+export function changeSearchString(searchString) {
+  return {type: CHANGE_SEARCH_STRING, payload: searchString}
+}
+
+export function changeSortBy(sortBy) {
+  return {type: CHANGE_SORT_BY, payload: sortBy}
 }

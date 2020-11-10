@@ -17,18 +17,18 @@
  */
 import assert from 'assert'
 import sinon from 'sinon'
-import * as actions from '../../../src/sidebar/actions/context'
+import * as actions from '../../../src/sidebar/actions/filter'
 
-describe('Context actions', () => {
+describe('Filter actions', () => {
   it('change context type returns CHANGE_CONTEXT_TYPE with the new type', () => {
-    assert.deepEqual(actions.changeContextType('new context'), {
+    assert.deepStrictEqual(actions.changeContextType('new context'), {
       type: actions.CHANGE_CONTEXT_TYPE,
       payload: 'new context'
     })
   })
 
   it('change context id returns CHANGE_CONTEXT_ID with the new id', () => {
-    assert.deepEqual(actions.changeContextId('19'), {
+    assert.deepStrictEqual(actions.changeContextId('19'), {
       type: actions.CHANGE_CONTEXT_ID,
       payload: '19'
     })
@@ -82,5 +82,12 @@ describe('Context actions', () => {
         payload: {contextType: 'course', contextId: '27'}
       })
     )
+  })
+
+  it('changeSearchString return CHANGE_SEARCH_STRING with the new string', () => {
+    assert.deepStrictEqual(actions.changeSearchString('new-search'), {
+      type: actions.CHANGE_SEARCH_STRING,
+      payload: 'new-search'
+    })
   })
 })

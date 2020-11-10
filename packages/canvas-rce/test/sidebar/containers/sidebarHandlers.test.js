@@ -26,8 +26,9 @@ import * as upload from '../../../src/sidebar/actions/upload'
 import * as flickr from '../../../src/sidebar/actions/flickr'
 import * as files from '../../../src/sidebar/actions/files'
 import * as documents from '../../../src/sidebar/actions/documents'
-import * as context from '../../../src/sidebar/actions/context'
+import * as context from '../../../src/sidebar/actions/filter'
 import * as media from '../../../src/sidebar/actions/media'
+import * as all_files from '../../../src/sidebar/actions/all_files'
 
 describe('sidebarHandlers', () => {
   let handlers, dispatch
@@ -55,11 +56,11 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties data fetch initial page to store', () => {
-    testHandler('fetchInitialPage', data, 'fetchInitialPage', 'key', 'search-string')
+    testHandler('fetchInitialPage', data, 'fetchInitialPage', 'key')
   })
 
   it('ties data fetch next page to store', () => {
-    testHandler('fetchNextPage', data, 'fetchNextPage', 'key', 'search-string')
+    testHandler('fetchNextPage', data, 'fetchNextPage', 'key')
   })
 
   it('ties files toggle folder to store', () => {
@@ -71,29 +72,11 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties images fetch initial images to store', () => {
-    testHandler(
-      'fetchInitialImages',
-      images,
-      'fetchInitialImages',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchInitialImages', images, 'fetchInitialImages')
   })
 
   it('ties images fetch next images to store', () => {
-    testHandler(
-      'fetchNextImages',
-      images,
-      'fetchNextImages',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchNextImages', images, 'fetchNextImages')
   })
 
   it('ties upload preflight to store', () => {
@@ -119,59 +102,31 @@ describe('sidebarHandlers', () => {
   })
 
   it('ties documents fetch initial documents to store', () => {
-    testHandler(
-      'fetchInitialDocs',
-      documents,
-      'fetchInitialDocs',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchInitialDocs', documents, 'fetchInitialDocs')
   })
 
   it('ties documents fetch next documents to store', () => {
-    testHandler(
-      'fetchNextDocs',
-      documents,
-      'fetchNextDocs',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchNextDocs', documents, 'fetchNextDocs')
   })
 
   it('ties context change context to store', () => {
     testHandler('onChangeContext', context, 'changeContext', 'newContext')
   })
 
+  it('ties searchString change to store', () => {
+    testHandler('onChangeSearchString', context, 'changeSearchString', 'new-string')
+  })
+
+  it('ties all file loading change to store', () => {
+    testHandler('onAllFilesLoading', all_files, 'allFilesLoading', true)
+  })
+
   it('ties media fetch initial media to store', () => {
-    testHandler(
-      'fetchInitialMedia',
-      media,
-      'fetchInitialMedia',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchInitialMedia', media, 'fetchInitialMedia')
   })
 
   it('ties media fetch next media to store', () => {
-    testHandler(
-      'fetchNextMedia',
-      media,
-      'fetchNextMedia',
-      {
-        sort: 'alphabetical',
-        order: 'asc'
-      },
-      'search-string'
-    )
+    testHandler('fetchNextMedia', media, 'fetchNextMedia')
   })
 
   it('ties media update media object to store', () => {

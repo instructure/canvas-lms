@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {func} from 'prop-types'
+import {func, string} from 'prop-types'
 import classnames from 'classnames'
 import {View} from '@instructure/ui-layout'
 import {downloadToWrap} from '../../../common/fileUrl'
@@ -28,11 +28,13 @@ import FileBrowser from '../../../canvasFileBrowser/FileBrowser'
 import {isPreviewable} from './Previewable'
 
 RceFileBrowser.propTypes = {
-  onFileSelect: func.isRequired
+  onFileSelect: func.isRequired,
+  onAllFilesLoading: func.isRequired,
+  searchString: string.isRequired
 }
 
 export default function RceFileBrowser(props) {
-  const {onFileSelect} = props
+  const {onFileSelect, searchString, onAllFilesLoading} = props
 
   function handleFileSelect(fileInfo) {
     const content_type = fileInfo.api['content-type']
@@ -56,7 +58,13 @@ export default function RceFileBrowser(props) {
 
   return (
     <View as="div" margin="medium" data-testid="instructure_links-FilesPanel">
-      <FileBrowser allowUpload={false} selectFile={handleFileSelect} contentTypes={['**']} />
+      <FileBrowser
+        allowUpload={false}
+        selectFile={handleFileSelect}
+        contentTypes={['**']}
+        searchString={searchString}
+        onLoading={onAllFilesLoading}
+      />
     </View>
   )
 }

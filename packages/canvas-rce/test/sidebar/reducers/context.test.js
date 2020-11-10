@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import assert from 'assert'
-import {changeContextType, changeContextId} from '../../../src/sidebar/reducers/context'
-import * as actions from '../../../src/sidebar/actions/context'
+import {changeContextType, changeContextId} from '../../../src/sidebar/reducers/filter'
+import * as actions from '../../../src/sidebar/actions/filter'
 
 describe('Context reducer', () => {
   let state

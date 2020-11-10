@@ -103,7 +103,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     })
 
     expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
-    expect(fetchInitialDocs).toHaveBeenCalledWith({sort: 'alphabetical', order: 'asc'}, 'Waldo')
+    expect(fetchInitialDocs).toHaveBeenCalledWith()
   })
 
   it('fetches more when the load more button is clicked', () => {
@@ -115,7 +115,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
 
     const loadMoreBtn = getByText('Load More')
     loadMoreBtn.click()
-    expect(fetchNextDocs).toHaveBeenCalledWith({sort: 'alphabetical', order: 'asc'}, 'Waldo')
+    expect(fetchNextDocs).toHaveBeenCalledWith()
   })
 
   it('shows an error message if the fetch failed', () => {

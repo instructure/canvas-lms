@@ -31,6 +31,7 @@ import {
   IconImageLine,
   IconDocumentLine,
   IconAttachMediaLine,
+  IconSearchLine,
   IconXLine
 } from '@instructure/ui-icons'
 
@@ -126,6 +127,7 @@ function shouldSearch(searchString) {
 }
 
 const searchMessage = formatMessage('Enter at least 3 characters to search')
+const loadingMessage = formatMessage('Loading, please wait')
 
 export default function Filter(props) {
   const {
@@ -168,6 +170,25 @@ export default function Filter(props) {
     handleChangeSearch('')
   }
 
+  function renderClearButton() {
+    if (pendingSearchString) {
+      return (
+        <IconButton
+          screenReaderLabel={formatMessage('Clear')}
+          onClick={handleClear}
+          interaction={isContentLoading ? 'disabled' : 'enabled'}
+          withBorder={false}
+          withBackground={false}
+          size="small"
+        >
+          <IconXLine />
+        </IconButton>
+      )
+    }
+    return undefined
+  }
+
+  const msg = isContentLoading ? loadingMessage : searchMessage
   return (
     <View display="block" direction="column">
       {renderType(contentType, contentSubtype, onChange, userContextType)}
@@ -218,34 +239,29 @@ export default function Filter(props) {
           )}
         </Flex>
       )}
-      {(contentType === 'links' || contentSubtype !== 'all') && (
-        <Flex as="div" margin="small none none none" alignItems="start">
-          <Flex.Item shouldGrow margin="none xx-small none none">
-            <TextInput
-              renderLabel={<ScreenReaderContent>Search</ScreenReaderContent>}
-              messages={searchMessage ? [{type: 'hint', text: searchMessage}] : []}
-              placeholder={formatMessage('Search')}
-              value={pendingSearchString}
-              onChange={(e, value) => handleChangeSearch(value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter') {
-                  doSearch(pendingSearchString)
-                }
-              }}
-              interaction={isContentLoading ? 'readonly' : 'enabled'}
-            />
-          </Flex.Item>
-          <Flex.Item>
-            <IconButton
-              screenReaderLabel={formatMessage('Clear')}
-              onClick={handleClear}
-              interaction={isContentLoading ? 'disabled' : 'enabled'}
-            >
-              <IconXLine />
-            </IconButton>
-          </Flex.Item>
-        </Flex>
-      )}
+      <View as="div" margin="small none none none">
+        <TextInput
+          renderLabel={
+            isContentLoading ? (
+              <ScreenReaderContent>{formatMessage('Loading, please wait')}</ScreenReaderContent>
+            ) : (
+              <ScreenReaderContent>{formatMessage('Search')}</ScreenReaderContent>
+            )
+          }
+          renderBeforeInput={<IconSearchLine inline={false} />}
+          renderAfterInput={renderClearButton()}
+          messages={[{type: 'hint', text: msg}]}
+          placeholder={formatMessage('Search')}
+          value={pendingSearchString}
+          onChange={(e, value) => handleChangeSearch(value)}
+          onKeyDown={e => {
+            if (e.key === 'Enter') {
+              doSearch(pendingSearchString)
+            }
+          }}
+          interaction={isContentLoading ? 'readonly' : 'enabled'}
+        />
+      </View>
     </View>
   )
 }
