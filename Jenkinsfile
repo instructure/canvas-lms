@@ -190,17 +190,25 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def slackSendCacheAvailable(blockName = '') {
+def slackSendCacheAvailable(registryPath) {
   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
   slackSend(
     channel: '#jenkins_cache_noisy',
     color: 'good',
-    message: "Uploaded New Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nRevision: ${GIT_REV}\nInstance: ${env.NODE_NAME}"
+    message: """
+      Uploaded New Image
+
+      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
+      Registry Path: ${registryPath}
+      Revision: ${GIT_REV}
+      Instance: ${env.NODE_NAME}
+    """
   )
 }
 
-def slackSendCacheBuild(blockName = '', block) {
+def slackSendCacheBuild(registryPath, block) {
   def buildStartTime = System.currentTimeMillis()
 
   block()
@@ -211,7 +219,16 @@ def slackSendCacheBuild(blockName = '', block) {
 
   slackSend(
     channel: '#jenkins_cache_noisy',
-    message: "Built Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nParent: ${PARENT_GIT_REV}\nDuration: ${buildEndTime - buildStartTime}ms\nInstance: ${env.NODE_NAME}"
+    message: """
+      Built Image
+
+      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
+      Registry Path: ${registryPath}
+      Parent: ${PARENT_GIT_REV}
+      Duration: ${buildEndTime - buildStartTime}ms
+      Instance: ${env.NODE_NAME}
+    """
   )
 }
 
@@ -485,9 +502,11 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
+                  def cacheTag = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE
+
+                  slackSendCacheBuild(cacheTag) {
                     withEnv([
-                      "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
+                      "CACHE_TAG=${cacheTag}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
@@ -500,6 +519,7 @@ pipeline {
                 if(configuration.isChangeMerged()) {
                   sh "docker tag local/webpack-builder $WEBPACK_BUILDER_IMAGE"
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
+                  slackSendCacheAvailable(env.WEBPACK_BUILDER_IMAGE)
                 }
 
                 sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
@@ -512,7 +532,7 @@ pipeline {
                 if (configuration.isChangeMerged()) {
                   sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
-                  slackSendCacheAvailable('post-merge')
+                  slackSendCacheAvailable(env.POSTMERGE_CACHE_IMAGE)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
@@ -552,12 +572,12 @@ pipeline {
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {
-                      slackSendCacheBuild('pre-merge') {
+                      slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
                         sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
                       }
 
                       sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
-                      slackSendCacheAvailable('pre-merge')
+                      slackSendCacheAvailable(env.PREMERGE_CACHE_IMAGE)
                     }
                   }
                 }
