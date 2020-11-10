@@ -511,6 +511,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    user_json_preloads(users, false, {profile: true})
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @group_category.context_type == "Course"
