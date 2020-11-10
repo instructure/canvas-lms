@@ -56,8 +56,16 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 // setup the inst-ui default theme
+// override the fontFamily to include "Lato Extended", which we prefer
+// to load over plain Lato (see LS-1559)
 if (ENV.use_high_contrast) {
-  canvasHighContrastTheme.use()
+  canvasHighContrastTheme.use({
+    overrides: {
+      typography: {
+        fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
+      }
+    }
+  })
 } else {
   const brandvars = window.CANVAS_ACTIVE_BRAND_VARIABLES || {}
 
@@ -72,7 +80,13 @@ if (ENV.use_high_contrast) {
   }
 
   canvasBaseTheme.use({
-    overrides: {...transitionOverride, ...brandvars}
+    overrides: {
+      ...transitionOverride,
+      ...brandvars,
+      typography: {
+        fontFamily: 'LatoWeb, "Lato Extended", Lato, "Helvetica Neue", Helvetica, Arial, sans-serif'
+      }
+    }
   })
 }
 
