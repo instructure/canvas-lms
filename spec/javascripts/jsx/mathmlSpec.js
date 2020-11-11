@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import mathml from 'mathml'
+import mathml, {mathImageHelper} from 'mathml'
 
 let stub = null
 QUnit.module('MathML and MathJax test', {
@@ -79,7 +79,7 @@ test('reloadElement reloads the element', () => {
 })
 
 QUnit.module('isMathOnPage', {
-  setup() {
+  beforeEach: () => {
     window.ENV = {
       FEATURES: {}
     }
@@ -102,7 +102,7 @@ test('returns false if there is a .math_equation_latex element', () => {
 })
 
 QUnit.module('isMathOnPage, with new_math_equation_handling on', {
-  setup() {
+  beforeEach: () => {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true
@@ -141,7 +141,7 @@ test('returns true if there is inline-delmited math', () => {
 })
 
 QUnit.module('isMathOnPage, including inline LaTex', {
-  setup() {
+  beforeEach: () => {
     window.ENV = {
       FEATURES: {
         new_math_equation_handling: true,
@@ -190,4 +190,78 @@ test('debounces "process-new-math" event handler', assert => {
     equal(spy.callCount, 1)
     done()
   }, 501)
+})
+
+QUnit.module('mathEquationHelper', {
+  beforeEach: () => {
+    window.ENV = {
+      FEATURES: {
+        new_math_equation_handling: true,
+        inline_math_everywhere: true
+      }
+    }
+    document.getElementById('fixtures').innerHTML = ''
+  },
+  afterEach: () => {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+})
+
+test('catchEquationImages only processes loaded images', assert => {
+  const done = assert.async()
+  const root = document.getElementById('fixtures')
+  root.innerHTML = `
+    <img id="i1"
+      class="equation_image"
+      src="https://www.instructure.com/themes/instructure_blog/images/logo.svg?_time=${Date.now()}"
+    >
+    <img id="i2"
+      class="equation_image"
+      src="data:image/gif;base64,R0lGODdhDAAMAIABAMzMzP///ywAAAAADAAMAAACFoQfqYeabNyDMkBQb81Uat85nxguUAEAOw=="
+    >
+  `
+
+  window.setTimeout(() => {
+    mathImageHelper.catchEquationImages(root)
+    equal(document.querySelectorAll('img[mathjaxified]').length, 1)
+    done()
+  }, 0)
+})
+
+test('catchEquationImages defers processing images until loaded', assert => {
+  const done = assert.async()
+  const root = document.getElementById('fixtures')
+  const spy = sinon.spy(mathImageHelper, 'dispatchProcessNewMathOnLoad')
+  root.innerHTML = `
+    <img id="i1"
+      class="equation_image"
+      src="https://www.instructure.com/themes/instructure_blog/images/logo.svg?_time=${Date.now()}"
+    >
+  `
+  mathImageHelper.catchEquationImages(root)
+  equal(document.querySelectorAll('img[mathjaxified]').length, 0)
+  equal(spy.callCount, 0)
+  document
+    .getElementById('i1')
+    .setAttribute(
+      'src',
+      'data:image/gif;base64,R0lGODdhDAAMAIABAMzMzP///ywAAAAADAAMAAACFoQfqYeabNyDMkBQb81Uat85nxguUAEAOw=='
+    )
+
+  window.setTimeout(() => {
+    equal(spy.callCount, 1)
+    done()
+  }, 0)
+})
+
+test('removeStrayEquationImages only removes tagged images', () => {
+  const root = document.getElementById('fixtures')
+  root.innerHTML = `
+    <img id="i1" class="equation_image">
+    <img id="i2" class="equation_image" mathjaxified>
+  `
+  mathImageHelper.removeStrayEquationImages(root)
+
+  ok(document.getElementById('i1'))
+  equal(document.getElementById('i2'), null)
 })

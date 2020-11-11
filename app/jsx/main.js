@@ -103,7 +103,7 @@ ready(() => {
     window.dispatchEvent(processNewMathEvent)
   }, 0)
 
-  const ignore_list = '#quiz-elapsed-time' // comma-separated list of selectors to ignore
+  const ignore_list = '#quiz-elapsed-time,.ui-menu-carat' // comma-separated list of selectors to ignore
   const processNewMathEvent = new Event(mathml.processNewMathEventName)
   const observer = new MutationObserver((mutationList, _observer) => {
     for (let m = 0; m < mutationList.length; ++m) {

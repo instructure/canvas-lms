@@ -64,10 +64,10 @@ const mathml = {
             cb?.()
           })
           window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
-            catchEquationImages(message[1])
+            mathImageHelper.catchEquationImages(message[1])
           })
           window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
-            removeStrayEquationImages(message[1])
+            mathImageHelper.removeStrayEquationImages(message[1])
             message[1]
               .querySelectorAll('.math_equation_latex')
               .forEach(m => m.classList.add('fade-in-equation'))
@@ -148,27 +148,45 @@ const mathml = {
   processNewMathEventName: 'process-new-math'
 }
 
-function catchEquationImages(refnode) {
-  // find equation images and replace with inline LaTeX
-  const eqimgs = refnode.querySelectorAll('img.equation_image')
-  if (eqimgs.length > 0) {
+const mathImageHelper = {
+  catchEquationImages(refnode) {
+    // find equation images and replace with inline LaTeX
+    const eqimgs = refnode.querySelectorAll('img.equation_image')
+    if (eqimgs.length > 0) {
+      eqimgs.forEach(img => {
+        if (img.complete) {
+          // only process loaded images
+          img.setAttribute('mathjaxified', '')
+          const equation_text = img.getAttribute('data-equation-content')
+          const mathtex = document.createElement('span')
+          mathtex.setAttribute('class', 'math_equation_latex')
+          mathtex.textContent = `\\(${equation_text}\\)`
+          if (img.nextSibling) {
+            img.parentElement.insertBefore(mathtex, img.nextSibling)
+          } else {
+            img.parentElement.appendChild(mathtex)
+          }
+        } else {
+          img.addEventListener('load', this.dispatchProcessNewMathOnLoad)
+        }
+      })
+      return true
+    }
+  },
+
+  removeStrayEquationImages(refnode) {
+    const eqimgs = refnode.querySelectorAll('img.equation_image')
     eqimgs.forEach(img => {
-      const equation_text = img.getAttribute('data-equation-content')
-      const mathtex = document.createElement('span')
-      mathtex.setAttribute('class', 'math_equation_latex')
-      mathtex.textContent = `\\(${equation_text}\\)`
-      if (img.nextSibling) {
-        img.parentElement.insertBefore(mathtex, img.nextSibling)
-      } else {
-        img.parentElement.appendChild(mathtex)
+      if (img.hasAttribute('mathjaxified')) {
+        img.parentElement.removeChild(img)
       }
     })
-    return true
+  },
+
+  dispatchProcessNewMathOnLoad(event) {
+    event.target.removeEventListener('load', this.dispatchProcessNewMathOnLoad)
+    window.dispatchEvent(new Event('process-new-math'))
   }
-}
-function removeStrayEquationImages(refnode) {
-  const eqimgs = refnode.querySelectorAll('img.equation_image')
-  eqimgs.forEach(img => img.parentElement.removeChild(img))
 }
 
 // TODO: if anyone firing the event ever needs a callback,
@@ -181,4 +199,4 @@ function handleNewMath() {
 
 window.addEventListener('process-new-math', debounce(handleNewMath, 500))
 
-export default mathml
+export {mathml as default, mathImageHelper}
