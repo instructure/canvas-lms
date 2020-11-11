@@ -113,6 +113,9 @@ class EportfolioEntriesController < ApplicationController
       @entry = @portfolio.eportfolio_entries.find(params[:entry_id])
       @category = @entry.eportfolio_category
       @attachment = @portfolio.user.all_attachments.shard(@portfolio.user).where(uuid: params[:attachment_id]).first
+      unless @attachment.present?
+        return render json: { message: t('errors.not_found', "Not Found") }, status: :not_found
+      end
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
