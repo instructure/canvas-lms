@@ -369,11 +369,12 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
+    RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
-    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:${configuration.gerritBranchSanitized()}"
-    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:${configuration.gerritBranchSanitized()}"
+    PREMERGE_CACHE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
+    POSTMERGE_CACHE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -485,11 +486,12 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  def cacheTag = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE
+                  def cachePrefix = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_PREFIX : env.PREMERGE_CACHE_PREFIX
 
-                  slackSendCacheBuild(cacheTag) {
+                  slackSendCacheBuild(cachePrefix) {
                     withEnv([
-                      "CACHE_TAG=${cacheTag}",
+                      "CACHE_PREFIX=${cachePrefix}",
+                      "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
@@ -500,25 +502,55 @@ pipeline {
                   }
                 }
 
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
-
-                if (isPatchsetPublishable()) {
-                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-                }
-
                 if(configuration.isChangeMerged()) {
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE"
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE || true"
                   slackSendCacheAvailable(env.WEBPACK_BUILDER_CACHE_IMAGE)
 
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
-                  slackSendCacheAvailable(env.POSTMERGE_CACHE_IMAGE)
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
+                  slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
+
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_PREFIX'
+                  slackSendCacheAvailable(env.POSTMERGE_CACHE_PREFIX)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
+                }
+
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+
+                def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
+
+                // If we are unable to push up the webpack builder image, then this
+                // build should use the currently cached image.
+                if (hasWebpackBuilderImage != 0) {
+                  def cacheTagParts = env.WEBPACK_BUILDER_CACHE_IMAGE.split(":")
+                  def tagParts = env.WEBPACK_BUILDER_IMAGE.split(":")
+                  def pathParts = cacheTagParts[0].split("/", 2)
+
+                  def CONTENT_TYPE = "application/vnd.docker.distribution.manifest.v2+json"
+                  def SOURCE_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${cacheTagParts[1]}"
+                  def TARGET_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${tagParts[1]}"
+
+                  withCredentials([
+                    usernamePassword(
+                      credentialsId: 'starlord',
+                      usernameVariable: 'STARLORD_USERNAME',
+                      passwordVariable: 'STARLORD_PASSWORD'
+                    )
+                  ]) {
+                    sh """
+                      MANIFEST=\$(curl -H "Accept: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD $SOURCE_URL)
+
+                      curl -X PUT -H "Content-Type: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD -d "\$MANIFEST" $TARGET_URL
+                    """
+                  }
+                }
+
+                if (isPatchsetPublishable()) {
+                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                 }
               }
             }
@@ -548,7 +580,8 @@ pipeline {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
                     withEnv([
-                      "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
+                      "CACHE_PREFIX=${env.PREMERGE_CACHE_PREFIX}",
+                      "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
@@ -557,8 +590,8 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
-                      slackSendCacheAvailable(env.PREMERGE_CACHE_IMAGE)
+                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_PREFIX"
+                      slackSendCacheAvailable(env.PREMERGE_CACHE_PREFIX)
                     }
                   }
                 }
@@ -594,6 +627,7 @@ pipeline {
                 buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "jest"),
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                   ], true, "testReport"
                 )
 
@@ -608,6 +642,7 @@ pipeline {
                 buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "karma"),
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                   ], true, "testReport"
                 )
 
