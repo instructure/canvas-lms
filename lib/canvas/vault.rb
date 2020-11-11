@@ -33,7 +33,9 @@ module Canvas::Vault
       cached_data = LocalCache.fetch(cache_key, expires_in: default_expiry, race_condition_ttl: default_race_condition_ttl) do
         vault_resp = api_client.logical.read(path)
         raise(MissingVaultProfile, "nil credentials found for #{path}") if vault_resp.nil?
-        fetched_lease_value = vault_resp.lease_duration || vault_resp.data[:ttl] || 10.minutes
+        fetched_lease_value = vault_resp.lease_duration
+        fetched_lease_value = vault_resp.data[:ttl] unless fetched_lease_value&.positive?
+        fetched_lease_value = 10.minutes unless fetched_lease_value&.positive?
         vault_resp.data
       end
       unless fetched_lease_value.nil?
