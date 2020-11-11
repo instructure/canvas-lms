@@ -144,6 +144,20 @@ describe GradebookExporter do
           actual_headers = CSV.parse(exporter.to_csv, headers: true).headers
           expect(actual_headers).not_to include("Override Grade")
         end
+
+        describe "read-only indicator for Override Score" do
+          let(:parsed_csv) { CSV.parse(exporter.to_csv, headers: true) }
+          let(:read_only_row) { parsed_csv[0] }
+
+          it "is omitted if importing override scores is enabled" do
+            Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
+            expect(read_only_row["Override Score"]).to eq nil
+          end
+
+          it "is included if importing override scores is not enabled" do
+            expect(read_only_row["Override Score"]).to eq "(read only)"
+          end
+        end
       end
 
       context "when Final Grade Override is not enabled" do
