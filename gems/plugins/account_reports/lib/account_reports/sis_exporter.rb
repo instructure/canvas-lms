@@ -87,6 +87,7 @@ module AccountReports
         headers = ['user_id', 'integration_id', 'authentication_provider_id',
                    'login_id', 'password', 'first_name', 'last_name', 'full_name',
                    'sortable_name', 'short_name', 'email', 'status']
+        headers << 'pronouns' if should_add_pronouns?
       else # provisioning_report
         headers << I18n.t('#account_reports.report_header_canvas_user_id', 'canvas_user_id')
         headers << I18n.t('#account_reports.report_header_user__id', 'user_id')
@@ -101,17 +102,30 @@ module AccountReports
         headers << I18n.t('#account_reports.report_header_email', 'email')
         headers << I18n.t('#account_reports.report_header_status', 'status')
         headers << I18n.t('created_by_sis')
+        headers << I18n.t('pronouns') if should_add_pronouns?
       end
       headers
     end
 
+    def should_add_pronouns?
+      return @should_add_pronouns if defined?(@should_add_pronouns)
+
+      # if root_account.can_add_pronouns? is true, that means the account is using pronouns
+      # if we decided to turn off this column for everyone via Setting, we should not include them
+      # if one root_account has pronouns enabled, but does not want to have them in the report, we can disable for the one account
+      # if any return false, don't export
+      @should_add_pronouns = ![root_account.can_add_pronouns?.to_s,
+                               Setting.get('enable_sis_export_pronouns', 'true'),
+                               root_account.enable_sis_export_pronouns?.to_s].include?('false')
+    end
+
     def user_query
-      users = root_account.pseudonyms.except(:preload).joins(:user).select(
+      root_account.pseudonyms.except(:preload).joins(:user).select(
         "pseudonyms.id, pseudonyms.sis_user_id, pseudonyms.user_id, pseudonyms.sis_batch_id,
          pseudonyms.integration_id,pseudonyms.authentication_provider_id,pseudonyms.unique_id,
          pseudonyms.workflow_state, users.sortable_name,users.updated_at AS user_updated_at,
-         users.name, users.short_name").
-        where("NOT EXISTS (SELECT user_id
+         users.name, users.short_name, users.pronouns"
+      ).where("NOT EXISTS (SELECT user_id
                            FROM #{Enrollment.quoted_table_name} e
                            WHERE e.type = 'StudentViewEnrollment'
                            AND e.user_id = pseudonyms.user_id)")
@@ -127,26 +141,27 @@ module AccountReports
         users.where!("pseudonyms.workflow_state<>'deleted'")
       end
 
-      users = add_user_sub_account_scope(users)
+      add_user_sub_account_scope(users)
     end
 
-    def user_row(u, emails)
+    def user_row(user, emails)
       row = []
-      row << u.user_id unless @sis_format
-      row << u.sis_user_id
-      row << u.integration_id
-      row << u.authentication_provider_id
-      row << u.unique_id
+      row << user.user_id unless @sis_format
+      row << user.sis_user_id
+      row << user.integration_id
+      row << user.authentication_provider_id
+      row << user.unique_id
       row << nil if @sis_format
-      name_parts = User.name_parts(u.sortable_name, likely_already_surname_first: true)
+      name_parts = User.name_parts(user.sortable_name, likely_already_surname_first: true)
       row << name_parts[0] || '' # first name
       row << name_parts[1] || '' # last name
-      row << u.name
-      row << u.sortable_name
-      row << u.short_name
-      row << emails[u.user_id].try(:path)
-      row << u.workflow_state
-      row << u.sis_batch_id? unless @sis_format
+      row << user.name
+      row << user.sortable_name
+      row << user.short_name
+      row << emails[user.user_id].try(:path)
+      row << user.workflow_state
+      row << user.sis_batch_id? unless @sis_format
+      row << user.pronouns if should_add_pronouns?
       row
     end
 

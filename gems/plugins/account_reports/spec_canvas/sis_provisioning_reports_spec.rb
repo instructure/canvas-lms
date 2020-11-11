@@ -25,11 +25,10 @@ describe "Default Account Reports" do
 
   def create_some_users_with_pseudonyms
     sis = @account.sis_batches.create
-    @user1 = user_with_pseudonym(:active_all => true, :account => @account, :name => "John St. Clair",
-                                 :sortable_name => "St. Clair,John", :username => 'john@stclair.com')
-    @user.pseudonym.sis_user_id = "user_sis_id_01"
-    @user.pseudonym.sis_batch_id = sis.id
-    @user.pseudonym.save!
+    @user1 = user_with_pseudonym(active_all: true, account: @account, name: "John St. Clair",
+                                 sortable_name: "St. Clair,John", username: 'john@stclair.com')
+    @user.update(pronouns: 'human/being')
+    @user.pseudonym.update(sis_batch_id: sis.id, sis_user_id: "user_sis_id_01")
     @user2 = user_with_pseudonym(:active_all => true, :username => 'micheal@michaelbolton.com',
                                  :name => 'Michael Bolton', :account => @account)
     @user.pseudonym.sis_user_id = "user_sis_id_02"
@@ -313,12 +312,18 @@ describe "Default Account Reports" do
   end
 
   def user_headers(format: 'sis')
-    case format
-    when 'sis'
-      %w[user_id integration_id authentication_provider_id login_id password first_name last_name full_name sortable_name short_name email status]
-    when 'provisioning'
-      %w[canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name full_name sortable_name short_name email status created_by_sis]
+    @report ||= AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
+
+    header = case format
+             when 'sis'
+               %w(user_id integration_id authentication_provider_id login_id password first_name last_name
+                  full_name sortable_name short_name email status)
+             when 'provisioning'
+               %w(canvas_user_id user_id integration_id authentication_provider_id login_id first_name last_name
+                  full_name sortable_name short_name email status created_by_sis)
     end
+    header << 'pronouns' if @report.should_add_pronouns?
+    header
   end
 
   def expected_user(user, pseudonym: nil, format: 'sis')
@@ -326,15 +331,18 @@ describe "Default Account Reports" do
     name_parts = User.name_parts(user.sortable_name, likely_already_surname_first: true)
     first_name = name_parts[0]
     last_name = name_parts[1]
-    state = (user.workflow_state == 'registered') ? 'active' : user.workflow_state
-    case format
-    when 'sis'
-      [pseudonym&.sis_user_id, pseudonym&.integration_id, pseudonym&.authentication_provider_id, pseudonym&.unique_id, nil,
-       first_name, last_name, user.name, user.sortable_name, nil, user.email, state]
-    when 'provisioning'
-      [user.id.to_s, pseudonym&.sis_user_id, pseudonym&.integration_id, pseudonym&.authentication_provider_id, pseudonym&.unique_id,
-       first_name, last_name, user.name, user.sortable_name, nil, user.email, state, pseudonym&.sis_batch_id?&.to_s]
+    state = user.workflow_state == 'registered' ? 'active' : user.workflow_state
+    @report ||= AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
+    row = case format
+          when 'sis'
+            [pseudonym&.sis_user_id, pseudonym&.integration_id, pseudonym&.authentication_provider_id, pseudonym&.unique_id, nil,
+             first_name, last_name, user.name, user.sortable_name, nil, user.email, state]
+          when 'provisioning'
+            [user.id.to_s, pseudonym&.sis_user_id, pseudonym&.integration_id, pseudonym&.authentication_provider_id, pseudonym&.unique_id,
+             first_name, last_name, user.name, user.sortable_name, nil, user.email, state, pseudonym&.sis_batch_id?&.to_s]
     end
+    row << user.pronouns if @report.should_add_pronouns?
+    row
   end
 
   describe "SIS export and Provisioning reports" do
@@ -344,6 +352,35 @@ describe "Default Account Reports" do
       @account = Account.create(name: 'New Account', default_time_zone: 'UTC')
       @admin = account_admin_user(account: @account, name: 'default admin')
       @default_term = @account.default_enrollment_term
+    end
+
+    describe '#should_add_pronouns' do
+      before(:once) do
+        @account.settings[:can_add_pronouns] = true
+        @account.save!
+        @report = AccountReports::SisExporter.new(@account.account_reports.new(user: @admin), {})
+      end
+
+      it 'should evaluate to true when enabled' do
+        expect(@report.should_add_pronouns?).to eq(true)
+      end
+
+      it 'should evaluate to false when not enabled' do
+        @account.settings[:can_add_pronouns] = false
+        @account.save!
+        expect(@report.should_add_pronouns?).to eq(false)
+      end
+
+      it 'should evaluate to false when disabled for just report' do
+        @account.settings[:enable_sis_export_pronouns] = false
+        @account.save!
+        expect(@report.should_add_pronouns?).to eq(false)
+      end
+
+      it 'should evaluate to false when disabled via Setting' do
+        Setting.set('enable_sis_export_pronouns', 'false')
+        expect(@report.should_add_pronouns?).to eq(false)
+      end
     end
 
     describe "Users" do
@@ -362,7 +399,7 @@ describe "Default Account Reports" do
         headers = parsed.shift
         expect(headers).to eq user_headers
         expect(parsed.length).to eq 4
-        expect(parsed).to eq [@user1, @user2, @user3, @user5].map { |u| expected_user(u) }
+        expect(parsed).to eq([@user1, @user2, @user3, @user5].map { |u| expected_user(u) })
       end
 
       it "should run sis report" do
@@ -371,7 +408,26 @@ describe "Default Account Reports" do
         parsed = read_report("sis_export_csv", {params: parameters, order: 0})
         expect(parsed.length).to eq 4
 
-        expect(parsed).to eq [@user1, @user2, @user3, @user4].map { |u| expected_user(u) }
+        expect(parsed).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
+      end
+
+      it "should not add pronouns if not enabled for the account" do
+        @account.settings[:can_add_pronouns] = false
+        @account.save!
+        parameters = {}
+        parameters["users"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        expect(parsed.first.last).to eq('active')
+      end
+
+      it "should add pronouns if enabled for the account" do
+        @account.settings[:can_add_pronouns] = true
+        @account.save!
+        parameters = {}
+        parameters["users"] = true
+        parsed = read_report("sis_export_csv", {params: parameters, order: 0})
+        expect(parsed.first.last).to eq 'human/being'
+        expect(parsed).to eq([@user1, @user2, @user3, @user4].map { |u| expected_user(u) })
       end
 
       it "should run sis report on a sub_account" do
@@ -386,7 +442,7 @@ describe "Default Account Reports" do
         parameters["users"] = true
         parsed = read_report("sis_export_csv", {params: parameters, account: @sub_account})
         expect(parsed.length).to eq 1
-        expect(parsed).to match_array [expected_user(@user1)]
+        expect(parsed).to match_array([expected_user(@user1)])
       end
 
       it "should run provisioning report" do
@@ -397,7 +453,7 @@ describe "Default Account Reports" do
         headers = parsed.shift
         expect(headers).to eq user_headers(format: 'provisioning')
         expect(parsed.length).to eq 6
-        expect(parsed).to eq [@user6, @user7, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') }
+        expect(parsed).to eq([@user6, @user7, @user1, @user2, @user3, @user4].map { |u| expected_user(u, format: 'provisioning') })
       end
 
       it "should run provisioning report including deleted users for course" do
@@ -410,7 +466,7 @@ describe "Default Account Reports" do
         parsed = read_report("provisioning_csv", {params: parameters, order: [1, 2]})
         expect(parsed.length).to eq 4
 
-        expect(parsed).to eq [@user1, @user2, @user3, @user5].map { |u| expected_user(u, format: 'provisioning') }
+        expect(parsed).to eq([@user1, @user2, @user3, @user5].map { |u| expected_user(u, format: 'provisioning') })
       end
     end
 
