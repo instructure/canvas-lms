@@ -64,3 +64,8 @@ fix_missing_policy_grade_change_records:
   applies_to: SiteAdmin
   display_name: Fix Missing Policy Grade Change Records
   description: Insert a grade change record when the periodic MissingPolicyApplicator job runs on a submission.
+import_override_scores_in_gradebook:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Import Override Scores in Gradebook
+  description: Allows the Gradebook importer to recognize and apply changes to override scores.
