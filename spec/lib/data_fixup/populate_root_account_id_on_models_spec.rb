@@ -384,20 +384,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with ContextExternalTool' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { external_tool_model(context: @course) }
-        let(:reference_record) { @course }
-      end
-
-      context 'when the tool context is a root account' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { external_tool_model(context: @course.root_account) }
-          let(:reference_record) { @course }
-        end
-      end
-    end
-
     context 'with ContentMigration' do
       it 'should populate the root_account_id' do
         cm = @course.content_migrations.create!(user: @user)
