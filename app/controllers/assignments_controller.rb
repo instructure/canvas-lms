@@ -294,6 +294,8 @@ class AssignmentsController < ApplicationController
           js_bundle :assignment_show
         end
 
+        mastery_scales_js_env
+
         render locals: {
           eula_url: tool_eula_url,
           show_moderation_link: @assignment.moderated_grading? && @assignment.permits_moderation?(@current_user),
