@@ -107,8 +107,8 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#react_files', format: false
-        get "search" => 'files#react_files', format: false
+        get "folder#{full_path_glob}" => 'files#react_files', format: false, defaults: {format: 'html'}
+        get "search" => 'files#react_files', format: false, defaults: {format: 'html'}
         get :quota
         post :reorder
       end
@@ -907,8 +907,8 @@ CanvasRails::Application.routes.draw do
   get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
-  get "files/search", controller: 'files', action: 'react_files', format: false
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
+  get "files/search", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
