@@ -250,6 +250,7 @@ class Account < ActiveRecord::Base
   add_setting :allow_sending_scores_in_emails, :boolean => true, :root_only => true
   add_setting :can_add_pronouns, :boolean => true, :root_only => true, :default => false
   add_setting :can_change_pronouns, :boolean => true, :root_only => true, :default => true
+  add_setting :enable_sis_export_pronouns, boolean: true, root_only: true, default: true
 
   add_setting :self_enrollment
   add_setting :equella_endpoint
