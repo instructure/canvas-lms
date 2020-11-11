@@ -109,7 +109,7 @@ class AssignmentGroupsController < ApplicationController
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
   #
   # @argument assignment_ids[] [String]
-  # If "assignments" are included, optionally return only assignments having their ID in this array.
+  #  If "assignments" are included, optionally return only assignments having their ID in this array.
   #
   # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
   #  If "assignments" are included, those with the specified submission types

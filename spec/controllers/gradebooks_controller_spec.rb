@@ -1625,6 +1625,7 @@ describe GradebooksController do
       @period1, @period2 = Factories::GradingPeriodHelper.new.create_presets_for_group(@group, :past, :current)
       @assignment1_in_gp1 = @course.assignments.create!(due_at: 3.months.ago)
       @assignment2_in_gp2 = @course.assignments.create!(due_at: 1.day.from_now)
+      @assignment_not_in_gp = @course.assignments.create!(due_at: 9.months.from_now)
     end
 
     it "returns unauthorized if there is no current user" do
@@ -1657,7 +1658,8 @@ describe GradebooksController do
       json = json_parse(response.body)["grading_period_assignments"]
       expect(json).to eq({
         @period1.id.to_s => [@assignment1_in_gp1.id.to_s],
-        @period2.id.to_s => [@assignment2_in_gp2.id.to_s]
+        @period2.id.to_s => [@assignment2_in_gp2.id.to_s],
+        "none" => [@assignment_not_in_gp.id.to_s]
       })
     end
   end
