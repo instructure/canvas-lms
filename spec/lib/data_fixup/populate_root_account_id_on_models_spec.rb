@@ -102,18 +102,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
             let(:reference_record) { account }
           end
         end
-
-        context 'with DeveloperKey without root_account_id (eg SiteAdmin)' do
-          it 'sets root_account_id to null' do
-            dk = @shard1.activate { DeveloperKey.create!(account: account_model) }
-            at = AccessToken.create!(developer_key: dk, user: user_model)
-            at.update_columns(root_account_id: nil)
-            dk.update_columns(root_account_id: nil)
-            expect(at.reload.root_account_id).to eq nil
-            DataFixup::PopulateRootAccountIdOnModels.run
-            expect(at.reload.root_account_id).to eq nil
-          end
-        end
       end
     end
 
@@ -555,21 +543,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:reference_record) { @course }
         end
       end
-    end
-
-    it 'should populate the root_account_id on DeveloperKey' do
-      dk = DeveloperKey.create!(account: @course.account)
-      dk.update_columns(root_account_id: nil)
-      expect(dk.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dk.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      dk = DeveloperKey.create!(account: account)
-      dk.update_columns(root_account_id: nil)
-      expect(dk.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dk.reload.root_account_id).to eq account.root_account_id
     end
 
     it 'should populate the root_account_id on DeveloperKeyAccountBinding' do
@@ -1601,21 +1574,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       association_hash = described_class.hash_association(assoc)
       direct_relation_associations = described_class.replace_polymorphic_associations(table, association_hash)
       described_class.check_if_table_has_root_account(table, direct_relation_associations.keys)
-    end
-
-    context 'DeveloperKey' do
-      it 'ignores site admin keys (null account_id) and cross-shard account_id' do
-        dk2 = DeveloperKey.create!(account_id: nil)
-        dk2.update_columns(root_account_id: nil)
-
-        expect(dk2.root_account_id).to eq(nil)
-        dk3 = DeveloperKey.create!(account: @course.account)
-        expect(dk3.root_account_id).to_not eq(nil)
-
-        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
-        dk3.update_columns(root_account_id: nil)
-        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
-      end
     end
   end
 

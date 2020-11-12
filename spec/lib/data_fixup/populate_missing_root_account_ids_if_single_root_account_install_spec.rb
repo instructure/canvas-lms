@@ -129,26 +129,4 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
       end
     end
   end
-
-  context '#populate_site_admin_records' do
-    it "fills in developer keys and their access tokens if the dev key's account_id = nil" do
-      dk_acct = DeveloperKey.create!(account: Account.default)
-      at_acct = dk_acct.access_tokens.create!(user: user_model)
-      dk_sa = DeveloperKey.create!(account: nil)
-      at_sa = dk_sa.access_tokens.create!(user: user_model)
-
-      [dk_acct, at_acct, dk_sa, at_sa].each do |model|
-        model.update_column(:root_account_id, nil)
-        expect(model.reload.root_account_id).to be_nil
-      end
-
-      described_class.populate_site_admin_records
-
-      expect(dk_acct.reload.root_account_id).to be_nil
-      expect(at_acct.reload.root_account_id).to be_nil
-      expect(dk_sa.reload.root_account_id).to eq(Account.site_admin.id)
-      expect(at_sa.reload.root_account_id).to eq(Account.site_admin.id)
-    end
-  end
-
 end
