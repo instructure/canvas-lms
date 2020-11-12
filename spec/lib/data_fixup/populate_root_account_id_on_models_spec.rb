@@ -702,13 +702,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with Lti::LineItem' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { line_item_model(course: @course) }
-        let(:reference_record) { @course }
-      end
-    end
-
     context 'with learning outcomes' do
       let(:outcome) { outcome_model }
       let(:alignment) { outcome.align(assignment, @course) }
@@ -766,13 +759,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { outcome_result }
           let(:reference_record) { course2 }
         end
-      end
-    end
-
-    context 'with Lti::LineItem' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { line_item_model(course: @course) }
-        let(:reference_record) { @course }
       end
     end
 
