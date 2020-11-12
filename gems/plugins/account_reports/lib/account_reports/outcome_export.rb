@@ -31,8 +31,7 @@ module AccountReports
 
 
     NO_SCORE_HEADERS = %w(vendor_guid object_type title description display_name parent_guids workflow_state).freeze
-    OUTCOME_EXPORT_SCALAR_HEADERS = %w(vendor_guid object_type title description display_name calculation_method \
-                                       calculation_int parent_guids workflow_state mastery_points).freeze
+    OUTCOME_EXPORT_SCALAR_HEADERS = %w(vendor_guid object_type title description display_name calculation_method calculation_int parent_guids workflow_state mastery_points).freeze
     OUTCOME_EXPORT_HEADERS = (OUTCOME_EXPORT_SCALAR_HEADERS + ['ratings']).freeze
 
     def outcome_export
