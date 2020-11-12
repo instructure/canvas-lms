@@ -496,55 +496,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with ContentTag' do
-      let(:content_tag) { ContentTag.create!(context: context, content: content) }
-
-      context 'when context is a Course' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { @course }
-          let(:content) { assignment_model(course: @course) }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is a LearningOutcomeGroup' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { outcome_group_model(context: @course) }
-          let(:content) { assignment_model(course: @course) }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is an Assignment' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { assignment_model(course: @course) }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is an Account' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { @course.account }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course.account }
-        end
-      end
-
-      context 'when context is a Quizzes::Quiz' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { quiz_model(course: @course) }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-    end
-
     it 'should populate the root_account_id on DeveloperKeyAccountBinding' do
       account_model
       dk = DeveloperKey.create!(account: @course.account)
