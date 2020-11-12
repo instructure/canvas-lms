@@ -20,8 +20,8 @@ class SetAllMediaUploadFoldersToHidden < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    folders = Folder.where(unique_type: 'media').where.not(workflow_state: 'hidden')
-    until folders.limit(10_000).update_all(workflow_state: 'hidden') < 10_000 do; end
+    folders = Folder.where(unique_type: 'media').where(workflow_state: 'visible')
+    until folders.limit(1_000).update_all(workflow_state: 'hidden') < 1_000 do; end
   end
 
   def down
