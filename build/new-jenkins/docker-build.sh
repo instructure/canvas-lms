@@ -9,9 +9,9 @@ DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cach
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
 # shellcheck disable=SC2086
-docker pull $WEBPACK_BUILDER_TAG || true
-docker pull $CACHE_TAG || true
-docker pull instructure/ruby-passenger:$RUBY
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_TAG || true
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $CACHE_TAG || true
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull instructure/ruby-passenger:$RUBY
 
 # Buildkit pulls the manifest directly from the server to avoid downloading
 # the whole image. This path seems to have an issue on CI systems where the
