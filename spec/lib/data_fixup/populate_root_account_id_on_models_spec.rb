@@ -496,16 +496,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on DeveloperKeyAccountBinding' do
-      account_model
-      dk = DeveloperKey.create!(account: @course.account)
-      dkab = DeveloperKeyAccountBinding.create!(account: @account, developer_key: dk)
-      dkab.update_columns(root_account_id: nil)
-      expect(dkab.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dkab.reload.root_account_id).to eq @account.id
-    end
-
     it 'should populate the root_account_id on DiscussionEntry' do
       discussion_topic_model(context: @course)
       de = @topic.discussion_entries.create!(user: user_model)
