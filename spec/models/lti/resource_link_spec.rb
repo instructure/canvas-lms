@@ -18,7 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require_relative '../../spec_helper'
+require 'spec_helper'
 
 RSpec.describe Lti::ResourceLink, type: :model do
   let(:tool) { external_tool_model }
@@ -37,12 +37,6 @@ RSpec.describe Lti::ResourceLink, type: :model do
   context 'after saving' do
     it 'sets the root_account using context_external_tool' do
       expect(resource_link.root_account).to eq tool.root_account
-    end
-
-    it 'leaves root_account_id blank if tool has none' do
-      tool.root_account = nil
-      link = Lti::ResourceLink.create!(context_external_tool: tool)
-      expect(link.root_account).to be_nil
     end
   end
 

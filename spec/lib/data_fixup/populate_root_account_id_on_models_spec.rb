@@ -786,13 +786,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with Lti::ResourceLink' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { resource_link_model(overrides: {context: @course}) }
-        let(:reference_record) { @course }
-      end
-    end
-
     context 'with MasterCourses::*' do
       let(:content_migration) { @course.content_migrations.create!(user: @user) }
       let(:child_course) { course_model(account: @course.account) }
