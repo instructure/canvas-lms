@@ -63,11 +63,22 @@ const mathml = {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
+          window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
+            catchEquationImages(message[1])
+          })
           window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+            removeStrayEquationImages(message[1])
             message[1]
               .querySelectorAll('.math_equation_latex')
               .forEach(m => m.classList.add('fade-in-equation'))
           })
+          // leaving this here so I don't have to keep looking up how to see all messages
+          // window.MathJax.Hub.Startup.signal.Interest(function (message) {
+          //   console.log('>>> Startup:', message[0])
+          // })
+          // window.MathJax.Hub.signal.Interest(function(message) {
+          //   console.log('>>> ', message[0])
+          // })
           delete window.MathJaxIsLoading
         },
         dataType: 'script'
@@ -86,6 +97,10 @@ const mathml = {
     if (ENV?.FEATURES?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
       if (document.querySelector('.math_equation_latex')) {
+        return true
+      }
+
+      if (document.querySelector('img.equation_image')) {
         return true
       }
 
@@ -133,11 +148,37 @@ const mathml = {
   processNewMathEventName: 'process-new-math'
 }
 
+function catchEquationImages(refnode) {
+  // find equation images and replace with inline LaTeX
+  const eqimgs = refnode.querySelectorAll('img.equation_image')
+  if (eqimgs.length > 0) {
+    eqimgs.forEach(img => {
+      const equation_text = img.getAttribute('data-equation-content')
+      const mathtex = document.createElement('span')
+      mathtex.setAttribute('class', 'math_equation_latex')
+      mathtex.textContent = `\\(${equation_text}\\)`
+      if (img.nextSibling) {
+        img.parentElement.insertBefore(mathtex, img.nextSibling)
+      } else {
+        img.parentElement.appendChild(mathtex)
+      }
+    })
+    return true
+  }
+}
+function removeStrayEquationImages(refnode) {
+  const eqimgs = refnode.querySelectorAll('img.equation_image')
+  eqimgs.forEach(img => img.parentElement.removeChild(img))
+}
+
 // TODO: if anyone firing the event ever needs a callback,
 // push them onto an array, then pop and call in the handler
 function handleNewMath() {
-  mathml.processNewMathOnPage()
+  if (ENV?.FEATURES?.new_math_equation_handling) {
+    mathml.processNewMathOnPage()
+  }
 }
+
 window.addEventListener('process-new-math', debounce(handleNewMath, 500))
 
 export default mathml
