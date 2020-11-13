@@ -1,80 +1,104 @@
 # syntax = docker/dockerfile:1.0-experimental
 
 FROM busybox AS cache-helper-collect-gems
-RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config && \
-  cp -rf config/canvas_rails_switcher.rb /tmp/dst/config && \
-  cp -rf Gemfile /tmp/dst && \
-  cp -rf Gemfile.d /tmp/dst
-RUN --mount=target=/tmp/src find gems -name "Gemfile" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.d" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "Gemfile.lock" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "*.gemspec" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "gem_version.rb" -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems -name "version.rb" -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  cp --parents -rf \
+    config/canvas_rails_switcher.rb \
+    Gemfile \
+    Gemfile.d \
+    \
+    /tmp/dst && \
+  find gems \( \
+    -name "Gemfile" -o \
+    -name "Gemfile.d" -o \
+    -name "Gemfile.lock" -o \
+    -name "*.gemspec" -o \
+    -name "gem_version.rb" -o \
+    -name "version.rb" \
+  \) -exec cp --parents -rf {} /tmp/dst \;
 
 FROM busybox AS cache-helper-collect-yarn
-RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst && \
-  cp -rf package.json /tmp/dst && \
-  cp -rf yarn.lock /tmp/dst
-RUN --mount=target=/tmp/src find gems/canvas_i18nliner -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find packages/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find client_apps/* -name 'package.json' -exec cp --parents {} /tmp/dst \;
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  cp --parents -rf \
+    package.json \
+    yarn.lock \
+    \
+    /tmp/dst && \
+  find \
+    client_apps/* \
+    gems/canvas_i18nliner \
+    gems/plugins/* \
+    packages/* \
+    \
+    -name 'package.json' \
+    -exec cp --parents {} /tmp/dst \;
 
 FROM busybox AS cache-helper-collect-webpack
-RUN mkdir -p /tmp/dst /tmp/dst
 WORKDIR /tmp/src
-RUN --mount=target=/tmp/src find gems -type d \
-  -not -path "gems" \
-  -not -path "gems/plugins" \
-  -maxdepth 2 \
-  -path "gems/*/lib" \
-  -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/canvas_i18nliner \
-  -not -path "gems/canvas_i18nliner" \
-  -not -path "gems/canvas_i18nliner/spec" \
-  -not -path "gems/canvas_i18nliner/spec/*" \
-  -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "*/app/coffeescripts" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "*/app/jsx" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "*/app/stylesheets" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "*/app/views/jst" -exec cp -rf --parents {} /tmp/dst \;
-RUN --mount=target=/tmp/src find gems/plugins -path "*/public" -exec cp -rf --parents {} /tmp/dst \;
-
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config && \
-  cp -rf config/application.rb /tmp/dst/config && \
-  cp -rf config/boot.rb /tmp/dst/config && \
-  cp -rf config/brandable_css.yml /tmp/dst/config && \
-  cp -rf config/browsers.yml /tmp/dst/config && \
-  cp -rf config/canvas_rails_switcher.rb /tmp/dst/config && \
-  cp -rf config/environment.rb /tmp/dst/config
-
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst/config/initializers && \
-  cp -rf config/initializers/plugin_symlinks.rb /tmp/dst/config/initializers/ && \
-  cp -rf config/initializers/client_app_symlinks.rb /tmp/dst/config/initializers/ && \
-  cp -rf config/initializers/json.rb /tmp/dst/config/initializers/ && \
-  cp -rf config/initializers/revved_asset_urls.rb /tmp/dst/config/initializers/
-
-RUN --mount=target=/tmp/src cp -rf config/environments --parents /tmp/dst
-RUN --mount=target=/tmp/src cp -rf config/locales --parents /tmp/dst
-
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib && \
-  cp -rf lib/brandable_css.rb /tmp/dst/lib && \
-  cp -rf lib/canvas_logger.rb /tmp/dst/lib && \
-  cp -rf lib/canvas_yaml.rb /tmp/dst/lib && \
-  cp -rf lib/config_file.rb /tmp/dst/lib && \
-  cp -rf lib/logging_filter.rb /tmp/dst/lib && \
-  cp -rf lib/request_cache.rb /tmp/dst/lib && \
-  cp -rf lib/temp_cache.rb /tmp/dst/lib
-
-RUN --mount=target=/tmp/src mkdir -p /tmp/dst/lib/canvas && \
-  cp -rf lib/canvas/cdn.rb /tmp/dst/lib/canvas/ && \
-  cp -rf lib/canvas/reloader.rb /tmp/dst/lib/canvas/
-
-RUN --mount=target=/tmp/src cp -rf lib/canvas/cdn --parents /tmp/dst
-RUN --mount=target=/tmp/src cp -rf lib/rake --parents /tmp/dst
-RUN --mount=target=/tmp/src cp -rf lib/tasks --parents /tmp/dst
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  find gems -type d \
+    -not -path "gems" \
+    -not -path "gems/plugins" \
+    -maxdepth 2 \
+    -path "gems/*/lib" \
+    -exec cp -rf --parents {} /tmp/dst \; && \
+  find gems/canvas_i18nliner \
+    -not -path "gems/canvas_i18nliner" \
+    -not -path "gems/canvas_i18nliner/spec" \
+    -not -path "gems/canvas_i18nliner/spec/*" \
+    -exec cp -rf --parents {} /tmp/dst \; && \
+  find gems/plugins \( \
+    -path "*/app/coffeescripts" -o \
+    -path "*/app/jsx" -o \
+    -path "*/app/stylesheets" -o \
+    -path "*/app/views/jst" -o \
+    -path "*/public" -o \
+  \) -exec cp -rf --parents {} /tmp/dst \; && \
+  cp --parents -rf \
+    app/coffeescripts \
+    app/jsx \
+    app/stylesheets \
+    app/views/jst \
+    bin \
+    client_apps \
+    config/environments \
+    config/locales \
+    frontend_build \
+    lib/canvas/cdn \
+    lib/rake \
+    lib/tasks \
+    public \
+    \
+    config/application.rb \
+    config/boot.rb \
+    config/brandable_css.yml \
+    config/browsers.yml \
+    config/canvas_rails_switcher.rb \
+    config/environment.rb \
+    config/initializers/plugin_symlinks.rb \
+    config/initializers/client_app_symlinks.rb \
+    config/initializers/json.rb \
+    config/initializers/revved_asset_urls.rb \
+    db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb \
+    lib/brandable_css.rb \
+    lib/canvas_logger.rb \
+    lib/canvas_yaml.rb \
+    lib/config_file.rb \
+    lib/logging_filter.rb \
+    lib/request_cache.rb \
+    lib/temp_cache.rb \
+    lib/canvas/cdn.rb \
+    lib/canvas/reloader.rb \
+    .bowerrc \
+    .i18nignore \
+    .i18nrc \
+    Rakefile \
+    gulpfile.js \
+    webpack.config.js \
+    \
+    /tmp/dst

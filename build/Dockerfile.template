@@ -97,22 +97,7 @@ COPY --chown=docker:docker script          ${APP_HOME}script
 RUN yarn postinstall
 
 <% if jenkins? -%>
-COPY --chown=docker:docker app/coffeescripts ${APP_HOME}app/coffeescripts
-COPY --chown=docker:docker app/jsx ${APP_HOME}app/jsx
-COPY --chown=docker:docker app/stylesheets ${APP_HOME}app/stylesheets
-COPY --chown=docker:docker app/views/jst ${APP_HOME}app/views/jst
-COPY --chown=docker:docker bin ${APP_HOME}bin
-COPY --chown=docker:docker client_apps ${APP_HOME}client_apps
-COPY --chown=docker:docker db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb ${APP_HOME}db/migrate/
-COPY --chown=docker:docker frontend_build ${APP_HOME}frontend_build
 COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
-COPY --chown=docker:docker public ${APP_HOME}public
-COPY --chown=docker:docker Rakefile ${APP_HOME}
-COPY --chown=docker:docker gulpfile.js ${APP_HOME}
-COPY --chown=docker:docker webpack.config.js ${APP_HOME}
-COPY --chown=docker:docker .bowerrc ${APP_HOME}
-COPY --chown=docker:docker .i18nignore ${APP_HOME}
-COPY --chown=docker:docker .i18nrc ${APP_HOME}
 
 ARG JS_BUILD_NO_UGLIFY=0
 RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
