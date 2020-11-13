@@ -30,7 +30,9 @@ class GradebookExporter
   BUFFER_COLUMN_DEFINITIONS = {
     grading_standard: ['Current Grade', 'Unposted Current Grade', 'Final Grade', 'Unposted Final Grade'].freeze,
     override_score: ['Override Score'].freeze,
-    override_grade: ['Override Grade'].freeze
+    override_grade: ['Override Grade'].freeze,
+    points: ['Current Points', 'Final Points'].freeze,
+    total_scores: ['Current Score', 'Unposted Current Score', 'Final Score', 'Unposted Final Score'].freeze
   }.freeze
 
   def initialize(course, user, options = {})
@@ -52,8 +54,21 @@ class GradebookExporter
 
   private
 
-  def buffer_column_headers(column_name)
-    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).dup
+  def buffer_column_headers(column_name, assignment_group: nil)
+    append_grading_period = grading_period.present? && include_grading_period_in_headers?
+
+    # Possible output formats:
+    #  Current Score [no assignment group and no grading period]
+    #  Assignment Group 1 Current Score [assignment group, no grading period]
+    #  Current Score (Fall 2020) [grading period, no assignment group]
+    #  Assignment Group 1 Current Score (Fall 2020) [both assignment group and grading period]
+    BUFFER_COLUMN_DEFINITIONS.fetch(column_name).map do |column|
+      name_tokens = [column]
+      name_tokens.prepend(assignment_group.name) if assignment_group.present?
+      name_tokens.append("(#{grading_period.title})") if append_grading_period
+
+      name_tokens.join(" ")
+    end
   end
 
   def buffer_columns(column_name, buffer_value=nil)
@@ -124,17 +139,14 @@ class GradebookExporter
 
       if should_show_totals
         groups.each do |group|
-          if include_points?
-            header << "#{group.name} Current Points" << "#{group.name} Final Points"
-          end
-          header << "#{group.name} Current Score"
-          header << "#{group.name} Unposted Current Score"
-          header << "#{group.name} Final Score"
-          header << "#{group.name} Unposted Final Score"
+          header.concat(buffer_column_headers(:points, assignment_group: group)) if include_points?
+          header.concat(buffer_column_headers(:total_scores, assignment_group: group))
         end
-        header << "Current Points" << "Final Points" if include_points?
-        header << "Current Score" << "Unposted Current Score" << "Final Score" << "Unposted Final Score"
+
+        header.concat(buffer_column_headers(:points)) if include_points?
+        header.concat(buffer_column_headers(:total_scores))
         header.concat(buffer_column_headers(:grading_standard)) if @course.grading_standard_enabled?
+
         if include_final_grade_override?
           header.concat(buffer_column_headers(:override_score))
           header.concat(buffer_column_headers(:override_grade)) if @course.grading_standard_enabled?
@@ -163,8 +175,8 @@ class GradebookExporter
 
         if should_show_totals
           row.concat([nil] * group_filler_length)
-          row << nil << nil if include_points?
-          row << nil << nil << nil << nil
+          row.concat(buffer_columns(:points)) if include_points?
+          row.concat(buffer_columns(:total_scores))
         end
 
         row.concat(buffer_columns(:grading_standard)) if @course.grading_standard_enabled?
@@ -410,5 +422,9 @@ class GradebookExporter
 
   def hidden_assignment_text
     @course.post_policies_enabled? ? "Manual Posting" : "Muted"
+  end
+
+  def include_grading_period_in_headers?
+    Account.site_admin.feature_enabled?(:gradebook_csv_headers_include_grading_period)
   end
 end

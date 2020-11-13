@@ -32,6 +32,10 @@ describe GradebookExporter do
     @course.update!(allow_final_grade_override: true)
   end
 
+  def enable_grading_period_in_column_headers!
+    Account.site_admin.enable_feature!(:gradebook_csv_headers_include_grading_period)
+  end
+
   describe "#to_csv" do
     def exporter(opts = {})
       GradebookExporter.new(@course, @teacher, opts)
@@ -459,6 +463,16 @@ describe GradebookExporter do
             expect(final_grade).to eq 20
           end
 
+          it "includes the grading period in column headers when the relevant feature flag is enabled" do
+            enable_grading_period_in_column_headers!
+
+            csv = exporter(grading_period_id: @last_period.id).to_csv
+            rows = CSV.parse(csv, headers: true)
+
+            final_grade = rows[1]["Final Score (present day, present time)"].try(:to_f)
+            expect(final_grade).to eq 20
+          end
+
           it "does not export assignments without due date" do
             @grading_period_id = @first_period.id
             @csv = exporter(grading_period_id: @grading_period_id).to_csv
@@ -545,6 +559,73 @@ describe GradebookExporter do
       assignment.update_attribute(:position, nil)
 
       expect { exporter.to_csv }.not_to raise_error
+    end
+
+    describe "column headers" do
+      before(:once) do
+        enable_final_grade_override!
+
+        group = Factories::GradingPeriodGroupHelper.new.create_for_account(@course.root_account)
+        group.grading_periods.create!(
+          start_date: 6.weeks.ago,
+          end_date: 3.weeks.ago,
+          title: "past grading period"
+        )
+        @last_grading_period = group.grading_periods.create!(
+          start_date: 3.weeks.ago,
+          end_date: 3.weeks.from_now,
+          title: "present day, present time"
+        )
+
+        enrollment_term = @course.root_account.enrollment_terms.create!(grading_period_group: group)
+        @course.update!(enrollment_term: enrollment_term)
+
+        assignment_group = @course.assignment_groups.create!(name: "my group")
+        @course.assignments.create!(
+          assignment_group: assignment_group,
+          due_at: 1.day.after(@last_grading_period.start_date),
+          title: "my assignment"
+        )
+      end
+
+      let(:exporter) do
+        GradebookExporter.new(@course, @teacher, { grading_period_id: @last_grading_period.id })
+      end
+      let(:exported_headers) { CSV.parse(exporter.to_csv, headers: true).headers }
+
+      let(:total_columns) do
+        [
+          "Current Points", "Final Points",
+          "Current Grade", "Unposted Current Grade", "Final Grade", "Unposted Final Grade",
+          "Current Score", "Unposted Current Score", "Final Score", "Unposted Final Score"
+        ]
+      end
+      let(:total_and_override_columns) { total_columns + ["Override Score", "Override Grade"] }
+
+      context "when adding grading periods to headers" do
+        before(:each) { enable_grading_period_in_column_headers! }
+
+        it "appends the grading period to overall total and override columns" do
+          columns_with_grading_period = total_and_override_columns.map do |column|
+            "#{column} (present day, present time)"
+          end
+
+          expect(exported_headers).to include(*columns_with_grading_period)
+        end
+
+        it "appends the grading period to assignment group total columns" do
+          aggregate_failures do
+            expect(exported_headers).to include("my group Current Score (present day, present time)")
+            expect(exported_headers).not_to include("my group Current Score")
+          end
+        end
+      end
+
+      context "when not adding grading periods to headers" do
+        it "does not append the grading period to column headers" do
+          expect(exported_headers).not_to include(a_string_including("(present day, present time)"))
+        end
+      end
     end
   end
 

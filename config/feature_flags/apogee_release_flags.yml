@@ -59,3 +59,9 @@ import_override_scores_in_gradebook:
   applies_to: SiteAdmin
   display_name: Import Override Scores in Gradebook
   description: Allows the Gradebook importer to recognize and apply changes to override scores.
+gradebook_csv_headers_include_grading_period:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Gradebook CSV Headers Include Grading Period
+  description: If set, the Gradebook CSV exporter will append the title of the selected grading
+    period to column headers whose values vary based on grading period.
