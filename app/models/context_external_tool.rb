@@ -969,6 +969,62 @@ end
     !feature || (context || self.context).feature_enabled?(feature)
   end
 
+  # for helping tool providers upgrade from 1.1 to 1.3.
+  # this method will upgrade all related assignments to 1.3,
+  # only if this is a 1.3 tool and has a matching 1.1 tool.
+  # since finding all assignments related to this tool is an
+  # expensive operation (unavoidable N+1 for indirectly
+  # related assignments, which are more rare), this is done
+  # in a delayed job.
+  def prepare_for_ags_if_needed!
+    return unless use_1_3?
+
+    # is there a 1.1 tool that matches this one?
+    matching_1_1_tool = self.class.find_external_tool(url || domain, context, nil, id)
+    return if matching_1_1_tool.nil? || matching_1_1_tool.use_1_3?
+
+    delay_if_production(priority: Delayed::LOW_PRIORITY).prepare_for_ags(matching_1_1_tool.id)
+  end
+
+  def prepare_for_ags(matching_1_1_tool_id)
+    related_assignments(matching_1_1_tool_id).each do |a|
+      a.prepare_for_ags_if_needed!(self)
+    end
+  end
+
+  # finds all assignments related to a tool, whether directly through a
+  # ContentTag with a ContextExternalTool as its `content`, or indirectly
+  # through a ContentTag with a `url` that matches a ContextExternalTool.
+  # accepts a `tool_id` parameter that specifies the tool to search for.
+  # if this isn't provided, searches for self.
+  def related_assignments(tool_id = nil)
+    tool_id ||= id
+    scope = Assignment.active.joins(:external_tool_tag)
+
+    # limit to assignments in the tool's context
+    if context.is_a? Course
+      scope = scope.where(context_id: context.id)
+    elsif context.is_a? Account
+      scope = scope.where(root_account_id: root_account_id, content_tags: { root_account_id: root_account_id })
+    end
+
+    directly_associated = scope.where(content_tags: { content_id: tool_id })
+    indirectly_associated = []
+    scope.
+      where(content_tags: { content_id: nil}).
+      select("assignments.*", "content_tags.url as tool_url").
+      each do |a| 
+        # again, look for the 1.1 tool by excluding self from this query.
+        # an unavoidable N+1, sadly
+        a_tool = self.class.find_external_tool(a.tool_url, a, nil, id)
+        next if a_tool.nil? || a_tool.id != tool_id
+
+        indirectly_associated << a
+      end
+
+    directly_associated + indirectly_associated
+  end
+
   private
 
   def self.context_id_for(asset, shard)
