@@ -674,13 +674,18 @@ class AccountsController < ApplicationController
       else
         name = ActiveRecord::Base.wildcard('courses.name', search_term)
         code = ActiveRecord::Base.wildcard('courses.course_code', search_term)
+        or_clause = Course.where(code).or(Course.where(name))
+
+        if search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
+          or_clause = Course.where(:id => search_term).or(or_clause)
+        end
 
         if @account.grants_any_right?(@current_user, :read_sis, :manage_sis)
           sis_source = ActiveRecord::Base.wildcard('courses.sis_source_id', search_term)
-          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)).or(Course.where(sis_source)))
-        else
-          @courses = @courses.merge(Course.where(:id => search_term).or(Course.where(code)).or(Course.where(name)))
+          or_clause = or_clause.or(Course.where(sis_source))
         end
+
+        @courses = @courses.merge(or_clause)
       end
     end
 
