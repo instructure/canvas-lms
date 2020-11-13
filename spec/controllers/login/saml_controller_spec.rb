@@ -888,4 +888,18 @@ SAML
       expect(session[:saml_unique_id]).to eq unique_id
     end
   end
+
+  describe '#metadata' do
+    it "does not persist the entity id if no saml provider exists" do
+      get :metadata
+      expect(Account.default.settings).not_to have_key(:saml_entity_id)
+    end
+
+    it "does persist the entity id if a saml provider exists" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'saml')
+      expect(Account.default.reload.settings).not_to have_key(:saml_entity_id)
+      get :metadata
+      expect(Account.default.reload.settings[:saml_entity_id]).not_to be_blank
+    end
+  end
 end
