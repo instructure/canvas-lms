@@ -40,7 +40,7 @@ export default function RceFileBrowser(props) {
     const clazz = classnames('instructure_file_link', {
       instructure_scribd_file: canPreview
     })
-    const url = downloadToWrap(fileInfo.api.url)
+    const url = downloadToWrap(fileInfo.src)
     const embedded_iframe_url = mediaPlayerURLFromFile(fileInfo.api)
 
     onFileSelect({
