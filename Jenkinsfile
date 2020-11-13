@@ -415,8 +415,7 @@ pipeline {
                   buildParameters += string(name: 'CANVAS_LMS_REFSPEC', value: env.CANVAS_LMS_REFSPEC)
                 }
 
-                pullGerritRepo('gerrit_builder', 'master', '.')
-                gems = readFile('gerrit_builder/canvas-lms/config/plugins_list').split()
+                gems = configuration.plugins()
                 echo "Plugin list: ${gems}"
                 // fetch plugins
                 gems.each { gem ->
@@ -433,13 +432,7 @@ pipeline {
 
                 // Plugin builds using the checkout above will create this @tmp file, we need to remove it
                 sh(script: 'rm -vr gems/plugins/*@tmp', returnStatus: true)
-                sh 'mv -v gerrit_builder/canvas-lms/config/* config/'
-                sh 'rm -v config/cache_store.yml'
-                sh 'rm -vr gerrit_builder'
-                sh 'rm -v config/database.yml'
-                sh 'rm -v config/security.yml'
-                sh 'rm -v config/selenium.yml'
-                sh 'rm -v config/file_store.yml'
+                sh 'cp -v docker-compose/config/redis.yml config/'
                 sh 'cp -v docker-compose/config/selenium.yml config/'
                 sh 'cp -vR docker-compose/config/new-jenkins/* config/'
                 sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
@@ -573,7 +566,11 @@ pipeline {
                   echo 'adding Linters'
                   timedStage('Linters', stages, {
                     credentials.withGerritCredentials {
-                      sh 'build/new-jenkins/linters/run-gergich.sh'
+                      withEnv([
+                        "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+                      ]) {
+                        sh 'build/new-jenkins/linters/run-gergich.sh'
+                      }
                     }
                     if (env.MASTER_BOUNCER_RUN == '1' && !configuration.isChangeMerged()) {
                       credentials.withMasterBouncerCredentials {
