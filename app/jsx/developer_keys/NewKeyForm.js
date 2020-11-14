@@ -144,7 +144,13 @@ export default class NewKeyForm extends React.Component {
                   onChange={e => updateDeveloperKey('notes', e.target.value)}
                   resize="both"
                 />
-                {ENV.enableTestClusterChecks && !isLtiKey ? (
+                <Checkbox
+                  label={I18n.t('Trusted')}
+                  name="developer_key[trusted]"
+                  checked={(console.log(developerKey), developerKey.trusted)}
+                  onChange={e => updateDeveloperKey('trusted', e.target.checked)}
+                />
+                {ENV.enableTestClusterChecks ? (
                   <Checkbox
                     label={I18n.t('Test Cluster Only')}
                     name="developer_key[test_cluster_only]"

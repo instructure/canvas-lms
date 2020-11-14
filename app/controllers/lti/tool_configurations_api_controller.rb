@@ -199,7 +199,7 @@ class Lti::ToolConfigurationsApiController < ApplicationController
 
   def developer_key_params
     return {} unless params.key? :developer_key
-    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :client_credentials_audience, scopes: [])
+    params.require(:developer_key).permit(:name, :email, :notes, :redirect_uris, :test_cluster_only, :client_credentials_audience, :trusted, scopes: [])
   end
 
   def developer_key_redirect_uris

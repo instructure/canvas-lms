@@ -148,6 +148,7 @@ class DeveloperKeysController < ApplicationController
       :client_credentials_audience,
       :require_scopes,
       :allow_includes,
+      :trusted,
       scopes: []
     )
   end
