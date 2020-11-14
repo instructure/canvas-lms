@@ -203,7 +203,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it "deletes the <a> when its text is deleted" do
+      it 'deletes the <a> when its text is deleted' do
         @course.wiki_pages.create!(
           title: 'title',
           body: "<p id='para'><a id='lnk' href='http://example.com'>delete me</a></p>"
@@ -213,16 +213,16 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         f("##{rce_page_body_ifr_id}").click
         f("##{rce_page_body_ifr_id}").send_keys(
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left],
-          [:shift, :arrow_left]
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left],
+          %i[shift arrow_left]
         )
         f("##{rce_page_body_ifr_id}").send_keys(:enter)
 
@@ -232,7 +232,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
 
       it "doesn't delete existing link when new image is added from course files directly after it" do
-        title = "newtext.txt"
+        title = 'newtext.txt'
         @course.wiki_pages.create!(
           title: 'title',
           body: "<p id='para'><a id='lnk' href='http://example.com'>do I stay?</a></p>"
@@ -244,7 +244,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         wait_for_tiny(edit_wiki_css)
 
         in_frame rce_page_body_ifr_id do
-          f('#lnk').send_keys([:end, :return])
+          f('#lnk').send_keys(%i[end return])
         end
 
         click_document_toolbar_menu_button
@@ -534,7 +534,8 @@ describe 'RCE next tests', ignore_js_errors: true do
       it 'should display assignment due date in links accordion' do
         title = 'Assignment-Title'
         due_at = 3.days.from_now
-        @assignment = @course.assignments.create!(name: title, workflow_state: 'published', due_at: due_at)
+        @assignment =
+          @course.assignments.create!(name: title, workflow_state: 'published', due_at: due_at)
 
         visit_new_announcement_page(@course)
         click_links_toolbar_menu_button
@@ -718,9 +719,9 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       expect(tray_container_exists?).to eq true
 
-      driver.action.send_keys(:escape).perform # Press esc key
+      driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false
+      expect(tray_container_exists?).to eq false # Press esc key
     end
 
     it 'should close the course images tray when pressing esc', ignore_js_errors: true do
@@ -730,9 +731,9 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_course_images
       expect(tray_container_exists?).to eq true
 
-      driver.action.send_keys(:escape).perform # Press esc key
+      driver.action.send_keys(:escape).perform
 
-      expect(tray_container_exists?).to eq false
+      expect(tray_container_exists?).to eq false # Press esc key
     end
 
     it 'should open upload image modal when clicking upload option' do
@@ -1121,6 +1122,33 @@ describe 'RCE next tests', ignore_js_errors: true do
         click_document_toolbar_button
         expect(upload_file_modal).to be_displayed
         f('body').send_keys :escape
+      end
+    end
+
+    describe 'the content tray' do
+      after(:each) { driver.local_storage.clear }
+
+      it 'should show course links after user files' do
+        title = 'Assignment-Title'
+        @assignment = @course.assignments.create!(name: title)
+
+        rce_wysiwyg_state_setup(@course)
+
+        driver.session_storage['canvas_rce_links_accordion_index'] = 'assignments'
+        click_links_toolbar_menu_button
+        click_course_links
+        wait_for_ajaximations
+        expect(fj("li:contains('#{title}')")).to be_displayed
+
+        click_content_tray_close_button
+        wait_for_animations
+        click_document_toolbar_menu_button
+        click_user_documents
+        wait_for_ajaximations
+
+        change_content_tray_content_type('Links')
+        wait_for_ajaximations
+        expect(fj("li:contains('#{title}')")).to be_displayed
       end
     end
   end

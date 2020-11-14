@@ -288,8 +288,11 @@ export default function CanvasContentTray(props) {
           contextId = props.containingContext.contextId
           break
         case 'course_files':
-        case 'links':
           contextType = props.contextType
+          contextId = props.containingContext.contextId
+          break
+        case 'links':
+          contextType = props.containingContext.contextType
           contextId = props.containingContext.contextId
       }
       onChangeContext({contextType, contextId})

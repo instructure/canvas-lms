@@ -126,7 +126,7 @@ module RCENextPage
   end
 
   def assignment_due_date_exists?(due_date)
-    modified_due_date = due_date.strftime("%B %-d, %Y")
+    modified_due_date = due_date.strftime('%B %-d, %Y')
     element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
@@ -284,7 +284,7 @@ module RCENextPage
   end
 
   def rce_page_body_ifr_style
-    element_value_for_attr(f('iframe.tox-edit-area__iframe'), "style")
+    element_value_for_attr(f('iframe.tox-edit-area__iframe'), 'style')
   end
 
   def course_item_link(title)
@@ -312,7 +312,9 @@ module RCENextPage
   end
 
   def indent_toggle_button
-    possibly_hidden_toolbar_button('[role="button"][aria-label="Increase indent"] .tox-split-button__chevron')
+    possibly_hidden_toolbar_button(
+      '[role="button"][aria-label="Increase indent"] .tox-split-button__chevron'
+    )
   end
 
   def indent_button
@@ -547,6 +549,23 @@ module RCENextPage
 
   def document_menubar_button
     menu_option_by_name('Upload Document')
+  end
+
+  def content_tray_close_button
+    fj('[data-testid="CanvasContentTray"] button:contains("Close")')
+  end
+
+  def content_tray_content_type
+    f('input[role="combobox"]', fj(':contains("Content Type")'))
+  end
+
+  def change_content_tray_content_type(which)
+    content_type = content_tray_content_type
+    content_type.click
+    options_id = content_type.attribute('aria-owns')
+    options = f("##{options_id}")
+    option = fj(":contains(#{which})", options)
+    option.click
   end
 
   # ---------------------- Actions ----------------------
@@ -836,6 +855,11 @@ module RCENextPage
 
   def click_embed_submit_button
     embed_submit_button.click
+  end
+
+  def click_content_tray_close_button
+    content_tray_close_button.click
+    wait_for_animations
   end
 
   def switch_to_html_view
