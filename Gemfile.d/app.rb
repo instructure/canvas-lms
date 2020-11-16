@@ -22,7 +22,7 @@ if CANVAS_RAILS5_2
     gem 'loofah', '2.3.0'
     gem 'sprockets', '4.0.2'
 else
-  gem 'rails', '6.0.3.3'
+  gem 'rails', '6.0.3.4'
 end
 
 gem 'academic_benchmarks', '0.0.11', require: false
@@ -30,7 +30,7 @@ gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
-gem 'after_transaction_commit', '2.2.0'
+gem 'after_transaction_commit', '2.2.1'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.90.1', require: false
@@ -44,8 +44,8 @@ gem 'aws-sdk-kms', '1.29.0', require: false
 gem 'aws-sigv4', '1.1.1', require: false
 gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.1.2', require: false
-  gem 'chunky_png', '1.3.11', require: false
-gem 'bcrypt', '3.1.13'
+  gem 'chunky_png', '1.3.14', require: false
+gem 'bcrypt', '3.1.16'
 gem 'brotli', '0.2.3', require: false
 gem 'browser', '4.0.0', require: false
 gem 'builder', '3.2.4'
@@ -59,11 +59,11 @@ gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.12.2', require: false
 gem 'gepub', '1.0.11', github: 'skoji/gepub', ref: '04c8c2542f9fa3f8d99652f9058d77c8a23c1fd9'
 gem 'graphql', '1.9.17'
-gem 'graphql-batch', '0.4.2'
+gem 'graphql-batch', '0.4.3'
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '2.0.3', require: false
-gem 'httparty', '0.18.0'
-gem 'i18n', '1.8.2'
+gem 'httparty', '0.18.1'
+gem 'i18n', '1.8.5'
 gem 'i18nliner', '0.1.2'
   gem 'ruby2ruby', '2.4.4', require: false
   gem 'ruby_parser', '3.14.2', require: false
@@ -76,12 +76,12 @@ gem 'inst_statsd', '2.1.6'
   gem 'dogstatsd-ruby', '4.7.0'
 gem 'inst-jobs', '1.0.3'
   gem 'fugit', '1.3.3', require: false
-    gem 'et-orbi', '1.2.2', require: false
+    gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.0.0'
   gem 'aws-sdk-autoscaling', '1.32.0', require: false
 gem 'inst-jobs-statsd', '2.0.0'
 gem 'json', '2.3.1'
-gem 'json_schemer', '0.2.10'
+gem 'json_schemer', '0.2.16'
 gem 'json-jwt', '1.11.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
@@ -91,10 +91,10 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.10.1'
 gem 'multi_json', '1.14.1'
 gem 'net-ldap', '0.16.3', require: false
-gem 'nokogiri', '1.10.9', require: false
+gem 'nokogiri', '1.10.10', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
-gem 'oj', '3.10.5'
+gem 'oj', '3.10.16'
 gem 'parallel', '1.19.1', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
@@ -116,9 +116,9 @@ gem 'saml2', '3.0.9'
   gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
-gem 'guardrail', '2.0.0'
+gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '2.0.1'
+gem 'switchman', '2.0.2'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '3.0.3'
 gem 'twilio-ruby', '5.36.0', require: false
