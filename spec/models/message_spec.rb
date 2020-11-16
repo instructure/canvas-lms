@@ -349,6 +349,42 @@ describe Message do
         message_model(:dispatch_at => Time.now, :workflow_state => 'staged', :to => 'somebody', :updated_at => Time.now.utc - 11.minutes, :path_type => 'push', :user => @user)
         @message.deliver
       end
+
+      context 'with the reduce_push_notifications feature enabled' do
+        before :each do
+          Account.site_admin.enable_feature!(:reduce_push_notifications)
+        end
+
+        after :each do
+          Account.site_admin.disable_feature!(:reduce_push_notifications)
+        end
+
+        it "allows whitelisted notification types" do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'Assignment Created',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push)
+          @message.deliver
+        end
+
+        it "does not deliver notification types not on the whitelist" do
+          message_model(
+            dispatch_at: Time.now,
+            workflow_state: 'staged',
+            updated_at: Time.now.utc - 11.minutes,
+            path_type: 'push',
+            notification_name: 'New Wiki Page',
+            user: @user
+          )
+          expect(@message).to receive(:deliver_via_push).never
+          @message.deliver
+        end
+      end
     end
 
     context 'SMS' do

@@ -76,6 +76,13 @@ react_inbox:
     This refactor will make this page more maintainable
   applies_to: RootAccount
 
+reduce_push_notifications:
+  state: hidden
+  display_name: Restrict Push Notifications to Select Types
+  description: |-
+    Disables Push notifications for certain types.
+  applies_to: SiteAdmin
+
 smart_alerts:
   state: hidden
   display_name: Smart alerts
