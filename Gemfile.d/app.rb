@@ -31,7 +31,7 @@ gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
 gem 'after_transaction_commit', '2.2.1'
-gem 'authlogic', '5.0.4'
+gem 'authlogic', '6.2.0'
   gem 'scrypt', '3.0.7'
 gem 'aws-sdk-core', '3.109.2', require: false
   gem 'aws-partitions', '1.393.0', require: false
