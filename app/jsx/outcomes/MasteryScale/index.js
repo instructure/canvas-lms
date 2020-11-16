@@ -78,6 +78,7 @@ const MasteryScale = ({contextType, contextId}) => {
   const {outcomeProficiency} = data.context
 
   const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
+  const accountRoles = roles.filter(role => role.is_account_role)
   const canManage = ENV.PERMISSIONS.manage_proficiency_scales
   return (
     <div>
@@ -91,21 +92,30 @@ const MasteryScale = ({contextType, contextId}) => {
         </p>
       )}
 
-      {canManage && (
-        <RoleList
-          description={I18n.t(
-            'Permission to change this mastery scale is enabled at the account level for:'
-          )}
-          roles={roles}
-        />
-      )}
-
       <ProficiencyTable
         contextType={contextType}
         proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
       />
+
+      {accountRoles.length > 0 && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery scale at the account level is enabled for:'
+          )}
+          roles={accountRoles}
+        />
+      )}
+
+      {roles.length > 0 && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery scale at the course level is enabled for:'
+          )}
+          roles={roles}
+        />
+      )}
     </div>
   )
 }

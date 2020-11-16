@@ -27,7 +27,20 @@ describe('MasteryScale', () => {
   beforeEach(() => {
     window.ENV = {
       PROFICIENCY_SCALES_ENABLED_ROLES: [
-        {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
+        {
+          id: '1',
+          role: 'AccountAdmin',
+          label: 'Account Admin',
+          base_role_type: 'AccountMembership',
+          is_account_role: true
+        },
+        {
+          id: '2',
+          role: 'TeacherEnrollment',
+          label: 'Teacher',
+          base_role_type: 'TeacherEnrollment',
+          is_account_role: false
+        }
       ],
       PERMISSIONS: {
         manage_proficiency_scales: true
@@ -126,15 +139,21 @@ describe('MasteryScale', () => {
   })
 
   it('loads role list', async () => {
-    const {getByText} = render(
+    const {getByText, getAllByText} = render(
       <MockedProvider mocks={mocks}>
         <MasteryScale contextType="Account" contextId="11" />
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
     await wait()
-    expect(getByText(/Permission to change this mastery scale/)).not.toEqual(null)
-    expect(getByText(/Account Admin/)).not.toEqual(null)
+    expect(
+      getByText(/Permission to change this mastery scale at the account level is enabled for/)
+    ).not.toEqual(null)
+    expect(
+      getByText(/Permission to change this mastery scale at the course level is enabled for/)
+    ).not.toEqual(null)
+    expect(getAllByText(/Account Admin/).length).not.toBe(0)
+    expect(getByText(/Teacher/)).not.toEqual(null)
   })
 
   it('displays an error on failed request', async () => {
@@ -213,7 +232,7 @@ describe('MasteryScale', () => {
       window.ENV.PERMISSIONS = null
     })
 
-    it('hides role list', async () => {
+    it('hides mastery info', async () => {
       const {getByText, queryByText} = render(
         <MockedProvider mocks={mocks}>
           <MasteryScale contextType="Account" contextId="11" />
@@ -221,8 +240,11 @@ describe('MasteryScale', () => {
       )
       expect(getByText('Loading')).not.toEqual(null)
       await wait()
-      expect(queryByText(/Permission to change this mastery calculation/)).not.toBeInTheDocument()
-      expect(queryByText(/Account Admin/)).not.toBeInTheDocument()
+      expect(
+        queryByText(
+          /This mastery scale will be used as the default for all courses within your account/
+        )
+      ).not.toBeInTheDocument()
     })
   })
 })

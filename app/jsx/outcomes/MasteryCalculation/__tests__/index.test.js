@@ -30,7 +30,20 @@ describe('MasteryCalculation', () => {
   beforeEach(() => {
     window.ENV = {
       PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: [
-        {id: '1', role: 'AccountAdmin', label: 'Account Admin', base_role_type: 'AccountMembership'}
+        {
+          id: '1',
+          role: 'AccountAdmin',
+          label: 'Account Admin',
+          base_role_type: 'AccountMembership',
+          is_account_role: true
+        },
+        {
+          id: '2',
+          role: 'TeacherEnrollment',
+          label: 'Teacher',
+          base_role_type: 'TeacherEnrollment',
+          is_account_role: false
+        }
       ],
       PERMISSIONS: {
         manage_proficiency_calculations: true
@@ -97,7 +110,7 @@ describe('MasteryCalculation', () => {
     expect(getByDisplayValue(/65/)).not.toEqual(null)
   })
 
-  it('loads proficiency data for Course', async () => {
+  it('loads calculation data for Course', async () => {
     const {getByText, getByDisplayValue} = render(
       <MockedProvider mocks={mocks}>
         <MasteryCalculation contextType="Course" contextId="12" />
@@ -109,15 +122,21 @@ describe('MasteryCalculation', () => {
   })
 
   it('loads role list', async () => {
-    const {getByText, queryByText} = render(
+    const {getByText, queryByText, getAllByText} = render(
       <MockedProvider mocks={mocks}>
         <MasteryCalculation contextType="Account" contextId="11" />
       </MockedProvider>
     )
     expect(getByText('Loading')).not.toEqual(null)
     await waitForElementToBeRemoved(() => queryByText('Loading'))
-    expect(getByText(/Permission to change this mastery calculation/)).not.toEqual(null)
-    expect(getByText(/Account Admin/)).not.toEqual(null)
+    expect(
+      getByText(/Permission to change this mastery calculation at the account level is enabled for/)
+    ).not.toEqual(null)
+    expect(
+      getByText(/Permission to change this mastery calculation at the course level is enabled for/)
+    ).not.toEqual(null)
+    expect(getAllByText(/Account Admin/).length).not.toBe(0)
+    expect(getByText(/Teacher/)).not.toEqual(null)
   })
 
   it('displays an error on failed request', async () => {
@@ -200,30 +219,6 @@ describe('MasteryCalculation', () => {
       await wait(() => {
         expect(updateCall).toHaveBeenCalled()
       })
-    })
-  })
-
-  describe('locked', () => {
-    beforeEach(() => {
-      window.ENV.PERMISSIONS = {
-        manage_proficiency_calculations: false
-      }
-    })
-
-    afterEach(() => {
-      window.ENV.PERMISSIONS = null
-    })
-
-    it('hides role list', async () => {
-      const {getByText, queryByText} = render(
-        <MockedProvider mocks={mocks}>
-          <MasteryCalculation contextType="Account" contextId="11" />
-        </MockedProvider>
-      )
-      expect(getByText('Loading')).not.toEqual(null)
-      await waitForElementToBeRemoved(() => queryByText('Loading'))
-      expect(queryByText(/Permission to change this mastery calculation/)).not.toBeInTheDocument()
-      expect(queryByText(/Account Admin/)).not.toBeInTheDocument()
     })
   })
 })
