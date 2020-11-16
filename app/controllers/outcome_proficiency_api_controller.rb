@@ -112,7 +112,7 @@ class OutcomeProficiencyApiController < ApplicationController
   #        -H "Authorization: Bearer <token>"
   #
   def create
-    if authorized_action(@context, @current_user, :manage_outcomes)
+    if authorized_action(@context, @current_user, :manage_proficiency_scales)
       proficiency = @context.outcome_proficiency.presence || OutcomeProficiency.new
       proficiency = update_ratings(proficiency, @context)
       render json: outcome_proficiency_json(proficiency, @current_user, session)
