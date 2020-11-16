@@ -74,13 +74,6 @@ class ProficiencyRating extends React.Component {
     this.colorButton = null
   }
 
-  componentDidMount() {
-    const {canManage, focusField} = this.props
-    if (focusField === 'mastery' && canManage) {
-      this.radioInput.focus()
-    }
-  }
-
   componentDidUpdate() {
     if (this.props.canManage) {
       if (this.props.focusField === 'trash') {

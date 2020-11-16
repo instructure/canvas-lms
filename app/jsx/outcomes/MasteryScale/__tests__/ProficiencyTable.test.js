@@ -49,13 +49,6 @@ describe('default proficiency', () => {
     expect(inputs.length).toEqual(5)
   })
 
-  it('sets focus on mastery on first row only', async () => {
-    const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
-    const inputs = getAllByLabelText(/Mastery /)
-    const firstMastery = inputs[0]
-    await wait(() => expect(document.activeElement).toEqual(firstMastery))
-  })
-
   it('clicking button adds rating', () => {
     const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
     const button = getByText(/Add Proficiency Level/)
