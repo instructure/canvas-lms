@@ -33,15 +33,15 @@ gem 'addressable', '2.7.0', require: false
 gem 'after_transaction_commit', '2.2.1'
 gem 'authlogic', '5.0.4'
   gem 'scrypt', '3.0.7'
-gem 'aws-sdk-core', '3.90.1', require: false
-  gem 'aws-partitions', '1.279.0', require: false
-gem 'aws-sdk-dynamodb', '1.44.0'
-gem 'aws-sdk-kinesis', '1.20.0', require: false
-gem 'aws-sdk-s3', '1.60.2', require: false
-gem 'aws-sdk-sns', '1.21.0', require: false
-gem 'aws-sdk-sqs', '1.23.1', require: false
-gem 'aws-sdk-kms', '1.29.0', require: false
-gem 'aws-sigv4', '1.1.1', require: false
+gem 'aws-sdk-core', '3.109.2', require: false
+  gem 'aws-partitions', '1.393.0', require: false
+gem 'aws-sdk-dynamodb', '1.57.0'
+gem 'aws-sdk-kinesis', '1.30.0', require: false
+gem 'aws-sdk-s3', '1.84.1', require: false
+gem 'aws-sdk-sns', '1.36.0', require: false
+gem 'aws-sdk-sqs', '1.34.0', require: false
+gem 'aws-sdk-kms', '1.39.0', require: false
+gem 'aws-sigv4', '1.2.2', require: false
 gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.1.2', require: false
   gem 'chunky_png', '1.3.14', require: false
@@ -78,7 +78,7 @@ gem 'inst-jobs', '1.0.3'
   gem 'fugit', '1.3.3', require: false
     gem 'et-orbi', '1.2.4', require: false
 gem 'inst-jobs-autoscaling', '2.0.0'
-  gem 'aws-sdk-autoscaling', '1.32.0', require: false
+  gem 'aws-sdk-autoscaling', '1.49.0', require: false
 gem 'inst-jobs-statsd', '2.0.0'
 gem 'json', '2.3.1'
 gem 'json_schemer', '0.2.16'
