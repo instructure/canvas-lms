@@ -32,6 +32,7 @@
     "@instructure/ui-a11y": "6",
     "@instructure/ui-alerts": "6",
     "@instructure/ui-avatar": "6",
+    "@instructure/ui-badge": "6",
     "@instructure/ui-billboard": "6",
     "@instructure/ui-breadcrumb": "6",
     "@instructure/ui-buttons": "6",
