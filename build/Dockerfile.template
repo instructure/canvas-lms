@@ -86,6 +86,7 @@ RUN set -eux; \
 
 <% if jenkins? -%>
 <% set_file_suffix 'webpack-runner' %>
+<%= generation_message %>
 FROM local/webpack-builder
 <% end -%>
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
@@ -101,6 +102,9 @@ COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${
 
 ARG JS_BUILD_NO_UGLIFY=0
 RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
+<% set_file_suffix 'final' %>
+<%= generation_message %>
+FROM local/webpack-runner
 
 COPY --chown=docker:docker . ${APP_HOME}
 

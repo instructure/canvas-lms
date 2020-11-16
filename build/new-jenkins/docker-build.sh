@@ -23,14 +23,22 @@ docker build \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
   --cache-from $WEBPACK_BUILDER_TAG \
-  --file Dockerfile.jenkins \
   --tag "local/webpack-builder" \
-  "$WORKSPACE"
+  --tag "$WEBPACK_BUILDER_IMAGE" \
+  - < Dockerfile.jenkins
 
 docker build \
-  --build-arg COMPILE_ADDITIONAL_ASSETS="$COMPILE_ADDITIONAL_ASSETS" \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
   --cache-from $CACHE_TAG \
   --file Dockerfile.jenkins.webpack-runner \
-  --tag "$1" \
+  --tag "local/webpack-runner" \
+  --tag "$CACHE_TAG" \
   "$WORKSPACE"
+
+if [ -n "${1:-}" ]; then
+  docker build \
+    --build-arg COMPILE_ADDITIONAL_ASSETS="$COMPILE_ADDITIONAL_ASSETS" \
+    --file Dockerfile.jenkins.final \
+    --tag "$1" \
+    "$WORKSPACE"
+fi

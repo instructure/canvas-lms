@@ -516,12 +516,6 @@ pipeline {
                   }
                 }
 
-                if(configuration.isChangeMerged()) {
-                  sh "docker tag local/webpack-builder $WEBPACK_BUILDER_IMAGE"
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
-                  slackSendCacheAvailable(env.WEBPACK_BUILDER_IMAGE)
-                }
-
                 sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
                 if (isPatchsetPublishable()) {
@@ -529,8 +523,10 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                 }
 
-                if (configuration.isChangeMerged()) {
-                  sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
+                if(configuration.isChangeMerged()) {
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
+                  slackSendCacheAvailable(env.WEBPACK_BUILDER_IMAGE)
+
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
                   slackSendCacheAvailable(env.POSTMERGE_CACHE_IMAGE)
 
@@ -573,7 +569,7 @@ pipeline {
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {
                       slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
-                        sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
+                        sh "build/new-jenkins/docker-build.sh"
                       }
 
                       sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
