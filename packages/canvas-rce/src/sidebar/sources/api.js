@@ -361,7 +361,7 @@ class RceApiSource {
       // it requires Canvas authentication. we also don't have an RCE API
       // endpoint to forward it through.
       const {pathname} = parse(uploadResults.location)
-      const matchData = pathname.match(/^\/api\/v1\/files\/(\d+)$/)
+      const matchData = pathname.match(/^\/api\/v1\/files\/((?:\d+~)?\d+)$/)
       if (!matchData) {
         const error = new Error('cannot determine file ID from location')
         error.location = uploadResults.location
