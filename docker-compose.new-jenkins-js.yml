@@ -1,11 +1,12 @@
 version: "2.3"
 services:
-  karma:
+  canvas:
     environment:
       - JSPEC_GROUP
     build:
       context: .
-      dockerfile: ./build/new-jenkins/js/Dockerfile-karma
+      dockerfile: ./build/new-jenkins/js/Dockerfile
       args:
         PATCHSET_TAG: $PATCHSET_TAG
+        WEBPACK_BUILDER_TAG: $WEBPACK_BUILDER_TAG
     init: true

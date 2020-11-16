@@ -65,7 +65,9 @@ pipeline {
   options { ansiColor('xterm') }
 
   environment {
-    COMPOSE_FILE = 'docker-compose.new-jenkins.canvas.yml:docker-compose.new-jenkins-karma.yml'
+    COMPOSE_DOCKER_CLI_BUILD=1
+    COMPOSE_FILE = 'docker-compose.new-jenkins-js.yml'
+    DOCKER_BUILDKIT=1
     FORCE_FAILURE = configuration.forceFailureJS()
     SENTRY_URL="https://sentry.insops.net"
     SENTRY_ORG="instructure"
@@ -85,7 +87,6 @@ pipeline {
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
 
-                sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
                 sh 'docker-compose build'
               }
             }
