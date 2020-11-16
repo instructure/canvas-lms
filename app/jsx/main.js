@@ -111,11 +111,10 @@ ready(() => {
         const addedNodes = mutationList[m].addedNodes
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
-          if (node.nodeType !== Node.ELEMENT_NODE) return
-          if (node.parentElement?.querySelector(ignore_list)) return
+          if (node.nodeType !== Node.ELEMENT_NODE) continue
+          if (node.parentElement?.querySelector(ignore_list)) continue
+          window.dispatchEvent(processNewMathEvent)
         }
-        window.dispatchEvent(processNewMathEvent)
-        return
       }
     }
   })
