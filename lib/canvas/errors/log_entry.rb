@@ -39,7 +39,7 @@ module Canvas
       end
 
       def message
-        msg = ""
+        msg = +""
         ActiveSupport::Deprecation.silence do
           msg << "\n\n[CANVAS_ERRORS] EXCEPTION LOG"
           if @ex.is_a?(String)
