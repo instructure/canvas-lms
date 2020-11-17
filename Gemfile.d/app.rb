@@ -66,7 +66,7 @@ gem 'httparty', '0.18.1'
 gem 'i18n', '1.8.5'
 gem 'i18nliner', '0.1.2'
   gem 'ruby2ruby', '2.4.4', require: false
-  gem 'ruby_parser', '3.14.2', require: false
+  gem 'ruby_parser', '3.15.0', require: false
 gem 'icalendar', '2.7.0', require: false
 gem 'imperium', '0.5.2', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
