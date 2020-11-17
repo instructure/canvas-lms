@@ -23,10 +23,12 @@ class PageView
 
     attr_reader :user, :limit
 
-    def initialize(user, viewer = nil)
+    def initialize(user, viewer = nil, options = {})
       @user = user
-      @viewer = viewer
       @limit = Setting.get('page_views_csv_export_rows', '300').to_i
+      @options = {}
+      @options[:viewer] = viewer if viewer
+      @options.merge!(options)
     end
 
     def generate
@@ -52,7 +54,7 @@ class PageView
     end
 
     def page_views(page)
-      user.page_views(viewer: @viewer).paginate(page: page, per_page: limit)
+      user.page_views(@options).paginate(page: page, per_page: limit)
     end
 
     def header

@@ -30,11 +30,16 @@ function renderTable(date) {
 
   const pageViews = new PageViewCollection()
   pageViews.url = `/api/v1/users/${userId}/page_views`
+  const $csvLink = $('#page_views_csv_link')
+  let csvUrl = $csvLink.attr('href').split('?')[0]
   if (date) {
     const start_time = $.unfudgeDateForProfileTimezone(date)
     const end_time = moment(start_time).add(1, 'days')
-    pageViews.url += `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
+    const date_params = `?start_time=${start_time.toISOString()}&end_time=${end_time.toISOString()}`
+    pageViews.url += date_params
+    csvUrl += date_params
   }
+  $csvLink.attr('href', csvUrl)
 
   const fetchOptions = {reset: true}
 
