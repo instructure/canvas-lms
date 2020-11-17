@@ -4,7 +4,7 @@
   "scripts": {
     "storybook": "start-storybook -p 6006",
     "build-storybook": "build-storybook",
-    "test": "jest"
+    "test": "echo"
   },
   "description": "An application for Canvas Conversations",
   "repository": "https://github.com/instructure/canvas-lms.git",
