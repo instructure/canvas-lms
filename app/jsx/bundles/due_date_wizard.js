@@ -1,2 +1,2 @@
-import DueDateWizardView from 'compiled/views/courses/DueDateWizardView'
+import DueDateWizardView from 'compiled/views/courses/DueDateWizardView';
 new DueDateWizardView();

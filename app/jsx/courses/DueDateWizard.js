@@ -1,3 +1,5 @@
+import React from 'react';
+
 class DueDateWizard extends React.Component {
   constructor(props) {
     super(props);
@@ -13,3 +15,5 @@ class DueDateWizard extends React.Component {
     )
   }
 }
+
+export default DueDateWizard;
