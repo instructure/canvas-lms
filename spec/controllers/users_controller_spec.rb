@@ -2368,6 +2368,22 @@ describe UsersController do
         expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "some nickname or whatever"
         expect(course_data.detect{|h| h[:id] == @course2.id}[:shortName]).to eq @course2.name
       end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should load nicknames for a cross-shard user" do
+          @shard1.activate do
+            xs_user = user_factory(active_all: true)
+            @course1.enroll_student(xs_user, enrollment_state: 'active')
+            xs_user.set_preference(:course_nicknames, @course1.id, "worst class")
+            user_session(xs_user)
+          end
+          get 'user_dashboard'
+          course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+          expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "worst class"
+        end
+      end
     end
   end
 
