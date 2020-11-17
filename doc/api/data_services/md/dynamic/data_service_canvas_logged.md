@@ -85,8 +85,7 @@ Logged
     "user_login": "oxana@example.com",
     "user_sis_id": "456-T45"
   },
-  "body": {
-  }
+  "body": {}
 }
 ```
 

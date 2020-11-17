@@ -2,8 +2,7 @@
   "name": "logged_out",
   "definition": "The event is emitted anytime an end user logs out of Canvas",
   "trigger": "Triggered when a user has logged out.",
-  "schema": {
-  },
+  "schema": {},
   "examples": [
     {
       "payload": {
@@ -28,8 +27,7 @@
           "user_login": "oxana@example.com",
           "user_sis_id": "456-T45"
         },
-        "body": {
-        }
+        "body": {}
       }
     }
   ]
