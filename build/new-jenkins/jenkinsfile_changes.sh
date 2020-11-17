@@ -10,6 +10,8 @@ fileArr=(
   '^Jenkinsfile.js$'
   '^Jenkinsfile.selenium.flakey_spec_catcher$'
   '^Jenkinsfile.vendored-gems$'
+  '^docker-compose.new-jenkins*.yml'
+  'build/new-jenkins/*'
 )
 
 files=$(join_by '|' "${fileArr[@]}")

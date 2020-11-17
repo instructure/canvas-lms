@@ -487,7 +487,7 @@ pipeline {
                     sh """#!/bin/bash
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-                      if git diff origin/master..HEAD Jenkinsfile* | grep Jenkinsfile; then
+                      if git diff --name-only origin/master..HEAD Jenkinsfile* docker-compose.new-jenkins* build/new-jenkins/* |grep -E "Jenkinsfile|docker-compose.new-jenkins|build/new-jenkins/"; then
                         echo "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
                         exit 1
                       fi
