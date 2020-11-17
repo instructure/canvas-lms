@@ -82,7 +82,7 @@ gem 'inst-jobs-autoscaling', '2.0.0'
 gem 'inst-jobs-statsd', '2.0.0'
 gem 'json', '2.3.1'
 gem 'json_schemer', '0.2.16'
-gem 'json-jwt', '1.11.0', require: false
+gem 'json-jwt', '1.13.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.2', require: false
