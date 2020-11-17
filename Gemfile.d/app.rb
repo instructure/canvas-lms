@@ -123,7 +123,7 @@ gem 'switchman', '2.0.2'
 gem 'switchman-inst-jobs', '3.0.3'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
-gem 'vault', '0.13.0', require: false
+gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
