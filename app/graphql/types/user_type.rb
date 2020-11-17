@@ -36,6 +36,8 @@ module Types
     #
     graphql_name "User"
 
+    include SearchHelper
+
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
@@ -151,6 +153,61 @@ module Types
           object.conversations
         end
       end
+    end
+
+    field :recipients, RecipientsType, null: true do
+      argument :search, String, required: false
+      argument :context, String, required: false
+    end
+    def recipients(search: nil, context: nil)
+      return nil unless object == self.context[:current_user]
+
+      @current_user = object
+      search_context = AddressBook.load_context(context)
+
+      load_all_contexts(
+        context: search_context,
+        permissions: [:send_messages, :send_messages_all],
+        base_url: self.context[:request].base_url
+      )
+
+      collections = search_contexts_and_users(
+        search: search,
+        context: context,
+        synthetic_contexts: true,
+        messageable_only: true,
+        base_url: self.context[:request].base_url
+      )
+
+      per_page = 100
+      contexts_collection = collections.select { |c| c[0] == 'contexts' }
+      contexts = []
+      if contexts_collection.count > 0
+        batch = contexts_collection[0][1].paginate(per_page: per_page)
+        contexts += batch
+        while batch.next_page
+          batch = contexts_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
+          contexts += batch
+        end
+      end
+
+      users_collection = collections.select { |c| c[0] == 'participants' }
+      users = []
+      if users_collection.count > 0
+        batch = users_collection[0][1].paginate(per_page: per_page)
+        users += batch
+        while batch.next_page
+          batch = users_collection[0][1].paginate(page: batch.next_page, per_page: per_page)
+          users += batch
+        end
+      end
+
+      {
+        contexts_connection: contexts,
+        users_connection: users
+      }
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
 
     # TODO: deprecate this
