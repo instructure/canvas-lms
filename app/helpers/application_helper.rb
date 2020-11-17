@@ -520,7 +520,7 @@ module ApplicationHelper
 
   def dataify(obj, *attributes)
     hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = ""
+    res = +""
     if !attributes.empty?
       attributes.each do |attribute|
         res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
