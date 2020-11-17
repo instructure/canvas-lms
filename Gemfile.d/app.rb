@@ -53,7 +53,7 @@ gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
-gem 'ddtrace', '0.33.1', require: false
+gem 'ddtrace', '0.42.0', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.13.1', require: false
@@ -73,7 +73,7 @@ gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
-  gem 'dogstatsd-ruby', '4.7.0'
+  gem 'dogstatsd-ruby', '4.8.2'
 gem 'inst-jobs', '1.0.3'
   gem 'fugit', '1.4.0', require: false
     gem 'et-orbi', '1.2.4', require: false
