@@ -862,13 +862,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with Lti::Result' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { lti_result_model(course: @course) }
-        let(:reference_record) { record.submission }
-      end
-    end
-
     context 'with Lti::ResourceLink' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { resource_link_model(overrides: {context: @course}) }
@@ -939,14 +932,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { master_template }
           let(:reference_record) { @course }
         end
-      end
-    end
-
-    context 'with OriginalityReport' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:submission) { submission_model }
-        let(:record) { OriginalityReport.create!(submission: submission, workflow_state: :pending) }
-        let(:reference_record) { submission }
       end
     end
 
