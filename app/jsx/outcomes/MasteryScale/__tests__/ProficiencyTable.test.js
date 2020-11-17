@@ -146,7 +146,7 @@ describe('default proficiency', () => {
     fireEvent.click(getByText('Save'))
     await wait(() => {
       expect(updateSpy).toHaveBeenCalled()
-      expect(flashMock).toHaveBeenCalledWith('Course mastery scale saved')
+      expect(flashMock).toHaveBeenCalledWith('Mastery scale saved')
     })
   })
 
@@ -467,5 +467,27 @@ describe('custom proficiency', () => {
       const {queryByText} = render(<ProficiencyTable {...props} />)
       expect(queryByText('Add Mastery Scale')).not.toBeInTheDocument()
     })
+  })
+})
+
+describe('confirmation modal', () => {
+  it('renders correct text for the Account context', () => {
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const pointsInput = getByDisplayValue('3')
+    fireEvent.change(pointsInput, {target: {value: '1000'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    expect(getByText(/Confirm Mastery Scale/)).not.toBeNull()
+    expect(getByText(/all account and course level rubrics/)).not.toBeNull()
+  })
+
+  it('renders correct text for the Course context', () => {
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} contextType="Course" />
+    )
+    const pointsInput = getByDisplayValue('3')
+    fireEvent.change(pointsInput, {target: {value: '1000'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    expect(getByText(/Confirm Mastery Scale/)).not.toBeNull()
+    expect(getByText(/all rubrics aligned to outcomes within this course/)).not.toBeNull()
   })
 })

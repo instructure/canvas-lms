@@ -155,7 +155,7 @@ describe('MasteryCalculation', () => {
       </MockedProvider>
     )
     await waitForElementToBeRemoved(() => queryByText('Loading'))
-    expect(getByText('Proficiency Calculation')).not.toBeNull()
+    expect(getByText('Mastery Calculation')).not.toBeNull()
   })
 
   describe('update outcomeCalculationMethod', () => {
@@ -187,16 +187,19 @@ describe('MasteryCalculation', () => {
         result: updateCall
       }
     ]
-    it('submits a request when calculation method is updated', async () => {
-      const {findByLabelText} = render(
+    it('submits a request when calculation method is saved', async () => {
+      const {getByText, findByLabelText} = render(
         <MockedProvider mocks={updateMocks} addTypename={false}>
           <MasteryCalculation contextType="Account" contextId="11" />
         </MockedProvider>
       )
       const parameter = await findByLabelText(/Parameter/)
       fireEvent.input(parameter, {target: {value: '88'}})
-
-      await wait(() => expect(updateCall).toHaveBeenCalled())
+      fireEvent.click(getByText('Save Mastery Calculation'))
+      fireEvent.click(getByText('Save'))
+      await wait(() => {
+        expect(updateCall).toHaveBeenCalled()
+      })
     })
   })
 

@@ -21,7 +21,6 @@ import PropTypes from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
 import {IconPlusLine} from '@instructure/ui-icons'
-import {capitalizeFirstLetter} from '@instructure/ui-utils'
 import I18n from 'i18n!ProficiencyTable'
 import {View} from '@instructure/ui-view'
 import ProficiencyRating from './ProficiencyRating'
@@ -30,7 +29,7 @@ import _ from 'lodash'
 import {fromJS, List} from 'immutable'
 import NumberHelper from '../../shared/helpers/numberHelper'
 import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
-import ConfirmMasteryScaleEdit from 'jsx/outcomes/ConfirmMasteryScaleEdit'
+import ConfirmMasteryModal from 'jsx/outcomes/ConfirmMasteryModal'
 
 const ADD_DEFAULT_COLOR = 'EF4437'
 
@@ -152,17 +151,10 @@ class ProficiencyTable extends React.Component {
       () => {
         this.props
           .update(this.stateToConfig())
-          .then(() => {
-            $.flashMessage(
-              I18n.t(`%{context} mastery scale saved`, {
-                context: capitalizeFirstLetter(this.props.contextType)
-              })
-            )
-          })
+          .then(() => $.flashMessage(I18n.t(`Mastery scale saved`)))
           .catch(e => {
             $.flashError(
-              I18n.t('An error occurred while saving %{context} mastery scale: %{message}', {
-                context: capitalizeFirstLetter(this.props.contextType),
+              I18n.t('An error occurred while saving the mastery scale: %{message}', {
                 message: e.message
               })
             )
@@ -318,9 +310,21 @@ class ProficiencyTable extends React.Component {
 
   invalidDescription = description => !description || description.trim().length === 0
 
+  getModalText = () => {
+    const {contextType} = this.props
+    if (contextType === 'Course') {
+      return I18n.t(
+        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.'
+      )
+    }
+    return I18n.t(
+      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.'
+    )
+  }
+
   render() {
     const {showConfirmation} = this.state
-    const {breakpoints, canManage, contextType} = this.props
+    const {breakpoints, canManage} = this.props
     const isMobileView = breakpoints.mobileOnly
     return (
       <>
@@ -397,10 +401,11 @@ class ProficiencyTable extends React.Component {
                 {I18n.t('Save Mastery Scale')}
               </Button>
             </div>
-            <ConfirmMasteryScaleEdit
+            <ConfirmMasteryModal
               isOpen={showConfirmation}
-              contextType={contextType}
               onConfirm={this.handleSubmit}
+              modalText={this.getModalText()}
+              title={I18n.t('Confirm Mastery Scale')}
               onClose={this.hideConfirmationModal}
             />
           </>

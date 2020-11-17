@@ -16,13 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useState, useEffect, useRef, useCallback} from 'react'
+import React, {useState, useEffect} from 'react'
 import PropTypes from 'prop-types'
-import _ from 'lodash'
 import $ from 'jquery'
 import 'compiled/jquery.rails_flash_notifications'
 import I18n from 'i18n!MasteryScale'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
+import {Button} from '@instructure/ui-buttons'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Flex} from '@instructure/ui-flex'
 import {Text} from '@instructure/ui-text'
@@ -32,6 +32,7 @@ import {View} from '@instructure/ui-view'
 import {NumberInput} from '@instructure/ui-number-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import CalculationMethodContent from 'compiled/models/grade_summary/CalculationMethodContent'
+import ConfirmMasteryModal from 'jsx/outcomes/ConfirmMasteryModal'
 
 const validInt = (method, value) => {
   if (method.validRange) {
@@ -43,42 +44,29 @@ const validInt = (method, value) => {
 }
 
 const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculationInt}) => {
-  const [currentValue, setCurrentValue] = useState(calculationInt)
-
-  useEffect(() => {
-    setCurrentValue(calculationInt)
-  }, [calculationInt])
-
   const handleChange = (_event, data) => {
     if (data === '') {
-      setCurrentValue(null)
+      updateCalculationInt('')
     } else {
       const parsed = numberHelper.parse(data)
       if (!Number.isNaN(parsed)) {
-        setCurrentValue(parsed)
-        if (validInt(calculationMethod, parsed)) {
-          updateCalculationInt(parsed)
-        }
+        updateCalculationInt(parsed)
       }
     }
   }
 
   const handleIncrement = () => {
-    if (validInt(calculationMethod, calculationInt + 1)) {
-      updateCalculationInt(calculationInt + 1)
-    }
+    updateCalculationInt(calculationInt !== '' ? calculationInt + 1 : 1)
   }
 
   const handleDecrement = () => {
-    if (validInt(calculationMethod, calculationInt - 1)) {
-      updateCalculationInt(calculationInt - 1)
-    }
+    updateCalculationInt(calculationInt - 1)
   }
 
   const errorMessages = []
-  if (currentValue === null) {
+  if (calculationInt === '') {
     errorMessages.push({text: I18n.t('Must be a number'), type: 'error'})
-  } else if (!validInt(calculationMethod, currentValue)) {
+  } else if (!validInt(calculationMethod, calculationInt)) {
     errorMessages.push({
       text: I18n.t('Must be between %{lower} and %{upper}', {
         lower: calculationMethod.validRange[0],
@@ -90,8 +78,8 @@ const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculati
 
   return (
     <NumberInput
-      renderLabel={I18n.t('Parameter')}
-      value={currentValue || ''}
+      renderLabel={() => I18n.t('Parameter')}
+      value={typeof calculationInt === 'number' ? calculationInt : ''}
       messages={errorMessages}
       onIncrement={handleIncrement}
       onDecrement={handleDecrement}
@@ -103,7 +91,7 @@ const CalculationIntInput = ({updateCalculationInt, calculationMethod, calculati
 const Display = ({calculationInt, currentMethod}) => {
   return (
     <>
-      <Heading level="h4">{I18n.t('Proficiency Calculation')}</Heading>
+      <Heading level="h4">{I18n.t('Mastery Calculation')}</Heading>
       <Text color="primary" weight="normal">
         {currentMethod.friendlyCalculationMethod}
       </Text>
@@ -132,11 +120,11 @@ const Form = ({
   return (
     <FormFieldGroup
       description={
-        <ScreenReaderContent>{I18n.t('Proficiency calculation parameters')}</ScreenReaderContent>
+        <ScreenReaderContent>{I18n.t('Mastery calculation parameters')}</ScreenReaderContent>
       }
     >
       <SimpleSelect
-        renderLabel={I18n.t('Proficiency Calculation')}
+        renderLabel={I18n.t('Mastery Calculation')}
         value={calculationMethodKey}
         onChange={updateCalculationMethod}
       >
@@ -178,23 +166,23 @@ const Example = ({currentMethod}) => {
   )
 }
 
-const ProficiencyCalculation = ({method, update: rawUpdate, updateError, canManage}) => {
+const getModalText = contextType => {
+  if (contextType === 'Course') {
+    return I18n.t('This will update all student mastery results within this course.')
+  }
+  return I18n.t(
+    'This will update all student mastery results tied to the account level mastery calculation.'
+  )
+}
+
+const ProficiencyCalculation = ({method, update, updateError, canManage, contextType}) => {
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 
   const [calculationMethodKey, setCalculationMethodKey] = useState(initialMethodKey)
   const [calculationInt, setCalculationInt] = useState(initialInt)
-  const firstRender = useRef(true)
 
-  const update = useCallback(_.debounce(rawUpdate, 500), [rawUpdate])
-
-  useEffect(() => () => update.cancel(), [update]) // cancel on unmount
-
-  useEffect(() => {
-    if (!firstRender.current) {
-      update(calculationMethodKey, calculationInt)
-    }
-    firstRender.current = false
-  }, [calculationMethodKey, calculationInt, update])
+  const [allowSave, setAllowSave] = useState(false)
+  const [showConfirmation, setShowConfirmationModal] = useState(false)
 
   useEffect(() => {
     if (updateError) {
@@ -210,10 +198,31 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError, canMana
 
   const updateCalculationMethod = (_event, data) => {
     const newMethod = data.id
+    const newCalculationInt = calculationMethods[newMethod].defaultInt || null
     if (newMethod !== calculationMethodKey) {
       setCalculationMethodKey(newMethod)
-      setCalculationInt(calculationMethods[newMethod].defaultInt || null)
+      setCalculationInt(newCalculationInt)
+      if (initialMethodKey === newMethod && initialInt === newCalculationInt) {
+        setAllowSave(false)
+      } else {
+        setAllowSave(true)
+      }
     }
+  }
+
+  const updateCalculationInt = newCalculationInt => {
+    setCalculationInt(newCalculationInt)
+    if (initialMethodKey === calculationMethodKey && initialInt === newCalculationInt) {
+      setAllowSave(false)
+    } else {
+      setAllowSave(true)
+    }
+  }
+
+  const saveCalculationMethod = () => {
+    update(calculationMethodKey, calculationInt)
+    setShowConfirmationModal(false)
+    setAllowSave(false)
   }
 
   return (
@@ -227,7 +236,7 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError, canMana
               calculationMethods={calculationMethods}
               currentMethod={currentMethod}
               updateCalculationMethod={updateCalculationMethod}
-              setCalculationInt={setCalculationInt}
+              setCalculationInt={updateCalculationInt}
             />
           ) : (
             <Display currentMethod={currentMethod} calculationInt={calculationInt} />
@@ -237,6 +246,28 @@ const ProficiencyCalculation = ({method, update: rawUpdate, updateError, canMana
           <Example currentMethod={currentMethod} />
         </Flex.Item>
       </Flex>
+      {canManage && (
+        <div className="save">
+          <Button
+            variant="primary"
+            interaction={allowSave ? 'enabled' : 'disabled'}
+            onClick={() => {
+              if (validInt(currentMethod, calculationInt)) {
+                setShowConfirmationModal(true)
+              }
+            }}
+          >
+            {I18n.t('Save Mastery Calculation')}
+          </Button>
+          <ConfirmMasteryModal
+            isOpen={showConfirmation}
+            onConfirm={saveCalculationMethod}
+            modalText={getModalText(contextType)}
+            title={I18n.t('Confirm Mastery Calculation')}
+            onClose={() => setShowConfirmationModal(false)}
+          />
+        </div>
+      )}
     </View>
   )
 }
@@ -248,7 +279,8 @@ ProficiencyCalculation.propTypes = {
   }),
   canManage: PropTypes.bool,
   update: PropTypes.func.isRequired,
-  updateError: PropTypes.string
+  updateError: PropTypes.string,
+  contextType: PropTypes.string.isRequired
 }
 
 ProficiencyCalculation.defaultProps = {

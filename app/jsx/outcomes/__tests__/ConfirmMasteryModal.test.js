@@ -16,21 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React from 'react'
-import ConfirmMasteryScaleEdit from '../ConfirmMasteryScaleEdit'
+import ConfirmMasteryModal from '../ConfirmMasteryModal'
 import {render, fireEvent} from '@testing-library/react'
 
 const defaultProps = () => ({
   onConfirm: () => {},
-  contextType: 'account',
   isOpen: true,
-  onClose: () => {}
+  onClose: () => {},
+  title: 'title',
+  modalText: 'body!!'
 })
 
 it('calls onClose and does not call onConfirm when canceled', () => {
   const onConfirm = jest.fn()
   const onClose = jest.fn()
   const {getByText} = render(
-    <ConfirmMasteryScaleEdit {...defaultProps()} onConfirm={onConfirm} onClose={onClose} />
+    <ConfirmMasteryModal {...defaultProps()} onConfirm={onConfirm} onClose={onClose} />
   )
   fireEvent.click(getByText('Cancel'))
   expect(onConfirm).not.toHaveBeenCalled()
@@ -39,19 +40,13 @@ it('calls onClose and does not call onConfirm when canceled', () => {
 
 it('does call onConfirm when saved', () => {
   const onConfirm = jest.fn()
-  const {getByText} = render(<ConfirmMasteryScaleEdit {...defaultProps()} onConfirm={onConfirm} />)
+  const {getByText} = render(<ConfirmMasteryModal {...defaultProps()} onConfirm={onConfirm} />)
   fireEvent.click(getByText('Save'))
   expect(onConfirm).toHaveBeenCalled()
 })
 
-describe('modal text', () => {
-  it('renders correct text for an Account context', () => {
-    const {getByText} = render(<ConfirmMasteryScaleEdit {...defaultProps()} />)
-    expect(getByText(/all account and course level rubrics/)).not.toBeNull()
-  })
-
-  it('renders correct text for a Course context', () => {
-    const {getByText} = render(<ConfirmMasteryScaleEdit {...defaultProps()} contextType="Course" />)
-    expect(getByText(/all rubrics aligned to outcomes within this course/)).not.toBeNull()
-  })
+it('renders the modalText and title provided as props', () => {
+  const {getByText} = render(<ConfirmMasteryModal {...defaultProps()} />)
+  expect(getByText(/title/)).not.toBeNull()
+  expect(getByText(/body!!/)).not.toBeNull()
 })

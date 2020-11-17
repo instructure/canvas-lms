@@ -16,19 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import I18n from 'i18n!confirmMasteryScaleEditModal'
+import I18n from 'i18n!confirmMasteryModal'
 import React, {Component} from 'react'
 import {func, string, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 
 import Modal from '../shared/components/InstuiModal'
 
-export default class ConfirmMasteryScaleEdit extends Component {
+export default class ConfirmMasteryModal extends Component {
   static propTypes = {
     onConfirm: func.isRequired,
-    contextType: string.isRequired,
+    modalText: string.isRequired,
     isOpen: bool.isRequired,
-    onClose: func.isRequired
+    onClose: func.isRequired,
+    title: string.isRequired
   }
 
   onConfirm = () => {
@@ -39,28 +40,16 @@ export default class ConfirmMasteryScaleEdit extends Component {
     this.props.onClose()
   }
 
-  getModalText = () => {
-    const {contextType} = this.props
-    if (contextType === 'Course') {
-      return I18n.t(
-        'This will update all rubrics aligned to outcomes within this course that have not yet been assessed.'
-      )
-    }
-    return I18n.t(
-      'This will update all account and course level rubrics that are tied to the account level mastery scale and have not yet been assessed.'
-    )
-  }
-
   render() {
     return (
       <Modal
-        label={I18n.t('Confirm Mastery Scale')}
+        label={this.props.title}
         open={this.props.isOpen}
         onDismiss={this.onClose}
         size="small"
       >
         <Modal.Body>
-          <div>{this.getModalText()}</div>
+          <div>{this.props.modalText}</div>
         </Modal.Body>
         <Modal.Footer>
           <Button onClick={this.onClose}>{I18n.t('Cancel')}</Button>
