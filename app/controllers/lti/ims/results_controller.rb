@@ -76,7 +76,7 @@ module Lti::Ims
     def index
       render(json: [], content_type: MIME_TYPE) and return if user.present? && !context.user_is_student?(user)
 
-      results = Lti::Result.active.where(line_item: line_item)
+      results = Lti::Result.active.where(line_item: line_item).preload(:assignment, :submission)
       results = results.where(user: user).preload(:user) if params.key?(:user_id)
       results = Api.paginate(results, self, "#{line_item_url}/results", pagination_args)
       render json: results_collection(results), content_type: MIME_TYPE
