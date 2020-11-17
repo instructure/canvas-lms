@@ -107,7 +107,7 @@ gem 'ratom-nokogiri', '0.10.8', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
-gem 'rotp', '5.1.0', require: false
+gem 'rotp', '6.2.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
