@@ -56,7 +56,7 @@ gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.33.1', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
-gem 'ffi', '1.12.2', require: false
+gem 'ffi', '1.13.1', require: false
 gem 'gepub', '1.0.11', github: 'skoji/gepub', ref: '04c8c2542f9fa3f8d99652f9058d77c8a23c1fd9'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.3'
