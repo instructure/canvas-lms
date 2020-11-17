@@ -1,6 +1,6 @@
 {
   "name": "outcome_proficiency_updated",
-  "definition": "The event is emitted anytime an outcome_proficiency is updated or its associated ratings are updated by an end user or API request.",
+  "definition": "The event is emitted anytime an outcome_proficiency (mastery scale) is updated or its associated ratings are updated by an end user or API request.",
   "trigger": "Triggered when an outcome_proficiency is saved.",
   "schema": {
     "outcome_proficiency_id": "The Canvas id of the outcome proficiency.",

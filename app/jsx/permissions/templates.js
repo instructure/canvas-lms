@@ -2530,17 +2530,17 @@ const outcomeProficiencyScalesAddEditDeletePermissions = generateActionTemplates
   'manage_proficiency_scales',
   [
     {
-      title: I18n.t('Outcome Proficiency Scales'),
+      title: I18n.t('Outcome Mastery Scales'),
       description: I18n.t(
-        `Allows user to set outcome proficiency scales at the account and course levels.`
+        `Allows user to set outcome mastery scales at the account and course levels.`
       )
     }
   ],
   [],
   [
     {
-      title: I18n.t('Outcome Proficiency Scales'),
-      description: I18n.t(`Allows user to set outcome proficiency scales at the course level.`)
+      title: I18n.t('Outcome Mastery Scales'),
+      description: I18n.t(`Allows user to set outcome mastery scales at the course level.`)
     }
   ],
   []
