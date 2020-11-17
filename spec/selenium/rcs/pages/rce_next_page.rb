@@ -556,7 +556,7 @@ module RCENextPage
   end
 
   def content_tray_content_type
-    f('input[role="combobox"]', fj(':contains("Content Type")'))
+    f('input[aria-haspopup="listbox"]', fj(':contains("Content Type")'))
   end
 
   def change_content_tray_content_type(which)

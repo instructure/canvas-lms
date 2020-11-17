@@ -398,7 +398,7 @@ describe('RCE Plugins > Filter', () => {
     it('shows the loading message when loading', () => {
       renderComponent({isContentLoading: true})
       // screenreader message + hint under the search input box
-      expect(component.getAllByText('Loading, please wait').length).toBe(2)
+      expect(component.getByText('Loading, please wait')).toBeInTheDocument()
     })
   })
 })
