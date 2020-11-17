@@ -9,7 +9,7 @@ DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cach
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
 # shellcheck disable=SC2086
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_TAG || true
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $CACHE_TAG || true
 ./build/new-jenkins/docker-with-flakey-network-protection.sh pull instructure/ruby-passenger:$RUBY
 
@@ -22,9 +22,10 @@ docker build \
   --build-arg CANVAS_RAILS6_0=${CANVAS_RAILS6_0:-0} \
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT" \
   --build-arg RUBY="$RUBY" \
-  --cache-from $WEBPACK_BUILDER_TAG \
+  --cache-from $WEBPACK_BUILDER_CACHE_TAG \
   --tag "local/webpack-builder" \
-  --tag "$WEBPACK_BUILDER_IMAGE" \
+  --tag "$WEBPACK_BUILDER_CACHE_TAG" \
+  ${WEBPACK_BUILDER_TAG:+ --tag "$WEBPACK_BUILDER_TAG"} \
   - < Dockerfile.jenkins
 
 docker build \
