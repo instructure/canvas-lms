@@ -64,11 +64,15 @@ class DueDateWizard extends React.Component {
     return moment(date).format("MM-DD-YY");
   }
 
-  innerCard() {
+  courseHasDates() {
     let course = this.props.course;
+    return course.start_at && course.conclude_at;
+  }
+
+  innerCard() {
     let component;
 
-    if (course.start_at && course.conclude_at) {
+    if (this.courseHasDates()) {
       component = this.datePusher();
     } else {
       component = this.noDateWarning();
@@ -157,7 +161,7 @@ class DueDateWizard extends React.Component {
       <Card>
         <h3 className="title">Distribute Dates for Course '{this.props.course.name}'</h3>
         {this.innerCard()}
-        {this.renderButtons()}
+        {this.courseHasDates() ? this.renderButtons() : ""}
       </Card>
     )
   }
