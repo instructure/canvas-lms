@@ -44,11 +44,19 @@ const Card = styled.div`
   .warning {
     color: red;
   }
+
+  .disabled {
+		opacity: 0.5;
+    pointer-events: none;
+	}
 `
 
 class DueDateWizard extends React.Component {
   constructor(props) {
     super(props);
+    this.state = {
+      distributingDates: false
+    }
   }
   
   static defaultProps = {
@@ -158,8 +166,8 @@ class DueDateWizard extends React.Component {
   renderButtons() {
     return (
       <div>
-        <button className="sm-btn-primary due-date-btn" onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
-        <button className="sm-btn-secondary due-date-btn" onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
+        <button className={`sm-btn-primary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
+        <button className={`sm-btn-secondary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
       </div>
     )
   }
