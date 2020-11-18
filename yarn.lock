@@ -2916,6 +2916,11 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
 
+"@instructure/i18nliner-handlebars@^1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.0.tgz#a823bb28b76967540d5e4a3b5d2ca8d60690e821"
+  integrity sha512-ZAAKm/I3Q9qH6l4Hb7dCoKUyEWCi7Z2kkzhdG79pjNPYRYyKxNZN9K+GpkOMceEtOgwTnfdWlkzuOlG6liF7Ug==
+
 "@instructure/instructure-theme@^6.24.0":
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/@instructure/instructure-theme/-/instructure-theme-6.24.0.tgz#fd7554aa4852d97d84fe70bcf8058396346e89c7"
@@ -11661,7 +11666,7 @@ cssom@^0.4.1:
   resolved "https://registry.yarnpkg.com/cssom/-/cssom-0.4.4.tgz#5a66cf93d2d0b661d80bf6a44fb65f5c2e4e0a10"
   integrity sha512-p3pvU7r1MyyqbTk+WbNJIgJjG2VmTIaB10rI93LzVPrmDJKkzKYMtxxyAvQXR/NS6otuzveI7+7BBq3SjBS2mw==
 
-"cssstyle@>= 0.2.34 < 0.3.0", "cssstyle@>= 0.2.36 < 0.3.0":
+"cssstyle@>= 0.2.36 < 0.3.0":
   version "0.2.37"
   resolved "https://registry.yarnpkg.com/cssstyle/-/cssstyle-0.2.37.tgz#541097234cb2513c83ceed3acddc27ff27987d54"
   integrity sha1-VBCXI0yyUTyDzu06zdwn/yeYfVQ=
@@ -16152,13 +16157,6 @@ i18n-js@^3:
   resolved "https://registry.yarnpkg.com/i18n-js/-/i18n-js-3.5.0.tgz#e2c41e1f90405d691d33ddce260f3dff9743215e"
   integrity sha512-XosH7plfEisWo5XEYxkdlwONsDVQ3sYI3ZoKXcjXdyq+9eVNIJg2h2oPsgadfqcXxpPHMVMNBgmiyW3aEJXg1g==
 
-i18nliner-handlebars@^0.2.2:
-  version "0.2.2"
-  resolved "https://registry.yarnpkg.com/i18nliner-handlebars/-/i18nliner-handlebars-0.2.2.tgz#e17c6315fc4deec61be3996e3cf58d027e43bfcb"
-  integrity sha1-4XxjFfxN7sYb45luPPWNAn5Dv8s=
-  dependencies:
-    jsdom "~8.5.0"
-
 i18nliner@instructure/i18nliner-js#babel7, i18nliner@~0.2.0:
   version "0.2.6"
   resolved "https://codeload.github.com/instructure/i18nliner-js/tar.gz/089da4716c98dc536a8c4f79f187b37697591a03"
@@ -18289,29 +18287,6 @@ jsdom@^15.2.1:
     whatwg-url "^7.0.0"
     ws "^7.0.0"
     xml-name-validator "^3.0.0"
-
-jsdom@~8.5.0:
-  version "8.5.0"
-  resolved "https://registry.yarnpkg.com/jsdom/-/jsdom-8.5.0.tgz#d4d8f5dbf2768635b62a62823b947cf7071ebc98"
-  integrity sha1-1Nj12/J2hjW2KmKCO5R89wcevJg=
-  dependencies:
-    abab "^1.0.0"
-    acorn "^2.4.0"
-    acorn-globals "^1.0.4"
-    array-equal "^1.0.0"
-    cssom ">= 0.3.0 < 0.4.0"
-    cssstyle ">= 0.2.34 < 0.3.0"
-    escodegen "^1.6.1"
-    iconv-lite "^0.4.13"
-    nwmatcher ">= 1.3.7 < 2.0.0"
-    parse5 "^1.5.1"
-    request "^2.55.0"
-    sax "^1.1.4"
-    symbol-tree ">= 3.1.0 < 4.0.0"
-    tough-cookie "^2.2.0"
-    webidl-conversions "^3.0.1"
-    whatwg-url "^2.0.1"
-    xml-name-validator ">= 2.0.1 < 3.0.0"
 
 jsdomify@^3:
   version "3.1.1"
@@ -26783,7 +26758,7 @@ tough-cookie@>=0.12.0, tough-cookie@^3.0.1:
     psl "^1.1.28"
     punycode "^2.1.1"
 
-tough-cookie@^2.2.0, tough-cookie@^2.3.1, tough-cookie@^2.3.3, tough-cookie@^2.3.4, tough-cookie@^2.5.0:
+tough-cookie@^2.3.1, tough-cookie@^2.3.3, tough-cookie@^2.3.4, tough-cookie@^2.5.0:
   version "2.5.0"
   resolved "https://registry.yarnpkg.com/tough-cookie/-/tough-cookie-2.5.0.tgz#cd9fb2a0aa1d5a12b473bd9fb96fa3dcff65ade2"
   integrity sha512-nlLsUzgm1kfLXSXfRZMc1KLAugd4hqJHDTvc2hDIwS3mZAfMEuMbc03SujMF+GEcpaX/qboeycw6iO8JwVv2+g==
@@ -28099,14 +28074,6 @@ whatwg-mimetype@^2.1.0, whatwg-mimetype@^2.2.0, whatwg-mimetype@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/whatwg-mimetype/-/whatwg-mimetype-2.3.0.tgz#3d4b1e0312d2079879f826aff18dbeeca5960fbf"
   integrity sha512-M4yMwr6mAnQz76TbJm914+gPpB/nCwvZbJU28cUD6dR004SAxDLOOSUaB1JDRqLtaOV/vi0IC5lEAGFgrjGv/g==
-
-whatwg-url@^2.0.1:
-  version "2.0.1"
-  resolved "https://registry.yarnpkg.com/whatwg-url/-/whatwg-url-2.0.1.tgz#5396b2043f020ee6f704d9c45ea8519e724de659"
-  integrity sha1-U5ayBD8CDub3BNnEXqhRnnJN5lk=
-  dependencies:
-    tr46 "~0.0.3"
-    webidl-conversions "^3.0.0"
 
 whatwg-url@^3.0.0:
   version "3.1.0"

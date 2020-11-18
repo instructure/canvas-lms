@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var HbsExtractor = require("i18nliner-handlebars/dist/lib/extractor").default;
+var HbsExtractor = require("@instructure/i18nliner-handlebars/dist/lib/extractor").default;
 
-var HbsTranslateCall = require("i18nliner-handlebars/dist/lib/t_call").default;
+var HbsTranslateCall = require("@instructure/i18nliner-handlebars/dist/lib/t_call").default;
 var ScopedHbsTranslateCall = require("./scoped_translate_call")(HbsTranslateCall);
 
 function ScopedHbsExtractor(ast, options) {
