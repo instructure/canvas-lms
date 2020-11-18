@@ -1,0 +1,50 @@
+.sm-btn-primary {
+  display: inline-block;
+  border: none;
+  text-align: center;
+  background-color: #2E85B6;
+  color: #fff;
+  font-weight: bold;
+  vertical-align: middle;
+  padding: .6rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+  font-family: "Montserrat", sans-serif;
+}
+
+.sm-btn-primary:hover {
+  background: #006BA6;
+}
+
+.sm-btn-primary:active {
+  background: #005888;
+  outline: none;
+}
+
+.sm-btn-secondary {
+  display: inline-block;
+  border: none;
+  text-align: center;
+  background-color: #454950;
+  color: #fff;
+  font-weight: bold;
+  vertical-align: middle;
+  padding: 0.6rem 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: 0.2s ease;
+  position: relative;
+  font-family: "Montserrat", sans-serif;
+}
+
+  .sm-btn-secondary:hover {
+    background: #33373F;
+  }
+
+  .sm-btn-secondary:active {
+    background: #2A2E34;
+    outline: none;
+  }
+
