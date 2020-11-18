@@ -566,7 +566,7 @@ Learning
 
 <h2 id="outcome_proficiency_created">outcome_proficiency_created</h2>
 
-**Definition:** The event is emitted anytime a new outcome_proficiency is created by an end user or API request.
+**Definition:** The event is emitted anytime a new outcome_proficiency (mastery scale) is created by an end user or API request.
 
 **Trigger:** Triggered when a new outcome_proficiency is saved.
 
@@ -670,7 +670,7 @@ Learning
 
 <h2 id="outcome_proficiency_updated">outcome_proficiency_updated</h2>
 
-**Definition:** The event is emitted anytime an outcome_proficiency is updated or its associated ratings are updated by an end user or API request.
+**Definition:** The event is emitted anytime an outcome_proficiency (mastery scale) is updated or its associated ratings are updated by an end user or API request.
 
 **Trigger:** Triggered when an outcome_proficiency is saved.
 
