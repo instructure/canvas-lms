@@ -9,3 +9,8 @@ granular_permissions_manage_admin_users:
   applies_to: RootAccount
   display_name: Granular permissions for Add/Remove admin roles from Course
   description: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
+granular_permissions_course_sections:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Granular permissions for managing course sections
+  description: Add granularity to permissions around managing course sections

@@ -773,11 +773,77 @@ class RoleOverride < ActiveRecord::Base
          'AccountAdmin'
        ]
     },
-    :manage_sections => {
-        :label => lambda { t('permissions.manage_sections', "Manage (create / edit / delete) course sections") },
-        :label_v2 => lambda { t("Course Sections - add / edit / delete") },
-        :true_for => %w(AccountAdmin TeacherEnrollment DesignerEnrollment),
-        :available_to => %w(AccountAdmin AccountMembership TeacherEnrollment TaEnrollment DesignerEnrollment),
+    manage_sections: {
+      label: lambda do
+        t(
+          # Legacy bundled role override for managing course sections
+          'permissions.manage_sections',
+          'Manage (create / edit / delete) course sections'
+        )
+      end,
+      label_v2: -> { t('Course Sections - add / edit / delete') },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        TaEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+      account_allows: lambda do |a|
+        !a.root_account.feature_enabled?(:granular_permissions_course_sections)
+      end
+    },
+    manage_sections_add: {
+      label: -> { t('permissions.manage_sections_add', 'Add course sections') },
+      label_v2: -> { t('Course Sections - add') },
+      group: "manage_sections",
+      group_label: lambda { t("Manage Course Sections") },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        TaEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_sections)
+      end
+    },
+    manage_sections_edit: {
+      label: -> { t('permissions.manage_sections_edit', 'Edit course sections') },
+      label_v2: -> { t('Course Sections - edit') },
+      group: "manage_sections",
+      group_label: lambda { t("Manage Course Sections") },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        TaEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_sections)
+      end
+    },
+    manage_sections_delete: {
+      label: -> { t('permissions.manage_sections_delete', 'Delete course sections') },
+      label_v2: -> { t('Course Sections - delete') },
+      group: "manage_sections",
+      group_label: lambda { t("Manage Course Sections") },
+      available_to: %w[
+        AccountAdmin
+        AccountMembership
+        TeacherEnrollment
+        TaEnrollment
+        DesignerEnrollment
+      ],
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_sections)
+      end
     },
     :manage_students => {
          :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
