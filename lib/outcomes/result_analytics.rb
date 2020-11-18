@@ -102,8 +102,9 @@ module Outcomes
       aggregate_results = outcome_results.map do |scores|
         scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
+      opts = {aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context)}
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(outcome_results: result, opts: {aggregate_score: true, aggregate_stat: stat}, context: context)
+        RollupScore.new(outcome_results: result, opts: opts)
       end
       Rollup.new(context, aggregate_rollups)
     end
@@ -117,8 +118,24 @@ module Outcomes
     # Returns an Array of RollupScore objects
     def rollup_user_results(user_results, context = nil)
       filtered_results = user_results.select{|r| !r.score.nil?}
+      opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results:outcome_results, opts:{}, context: context)
+        RollupScore.new(outcome_results:outcome_results, opts: opts)
+      end
+    end
+
+    def mastery_scale_opts(context)
+      return {} unless context.is_a?(Course) && context.root_account.feature_enabled?(:account_level_mastery_scales)
+      @mastery_scale_opts ||= {}
+      @mastery_scale_opts[context.asset_string] ||= begin
+        method = context.resolved_outcome_calculation_method
+        mastery_scale = context.resolved_outcome_proficiency
+        {
+          calculation_method: method&.calculation_method,
+          calculation_int: method&.calculation_int,
+          points_possible: mastery_scale&.points_possible,
+          mastery_points: mastery_scale&.mastery_points
+        }
       end
     end
 
