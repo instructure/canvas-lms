@@ -1,8 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 import moment from 'moment';
-//import axios from 'axios';
-import IcInput from 'jsx/account_course_user_search/IcInput';
+import axios from 'axios';
+import { flashError } from 'jquery';
+import { flashMessage } from 'jquery';
 
 const Card = styled.div`
   border: 1px solid #D7D7D7;
@@ -59,7 +60,8 @@ class DueDateWizard extends React.Component {
   }
 
   formatDateString(dateStr) {
-    return moment(dateStr).format("MM-DD-YY");
+    let date = dateStr === "start" ? this.props.course.start_at : this.props.course.conclude_at;
+    return moment(date).format("MM-DD-YY");
   }
 
   innerCard() {
@@ -96,7 +98,7 @@ class DueDateWizard extends React.Component {
               Course Start Date:
             </span>
             <span>
-              {this.formatDateString(this.props.course.start_at)}
+              {this.formatDateString('start')}
             </span>
           </div>
 
@@ -105,7 +107,7 @@ class DueDateWizard extends React.Component {
               Course End Date:
             </span>
             <span>
-              {this.formatDateString(this.props.course.conclude_at)}
+              {this.formatDateString('end')}
             </span>
           </div>
         </div>
@@ -113,11 +115,39 @@ class DueDateWizard extends React.Component {
     );
   }
 
+  confirmDistribute() {
+    return confirm(`You are about to distribute due dates between ${this.formatDateString('start')} \
+      and ${this.formatDateString('end')}. Please confirm you want to complete this action.
+    `.replace(/  +/g, ' '));
+  }
+  
+  distributeDueDates() {
+    if (this.confirmDistribute()) {
+      axios.post(`/courses/${this.props.course.id}/distribute_due_dates`).then(() => {
+        flashMessage('Dates are distributing');
+      });
+    }
+  }
+
+  confirmClear() {
+    return confirm(`You are about to clear all due dates from this course. \
+      Course assignments will no longer have due dates or calendar events. \
+      Please confirm that you want to complete this action.`.replace(/  +/g, ' '));
+  }
+
+  clearDueDates() {
+    if (this.confirmClear()) {
+      axios.post(`/courses/${this.props.course.id}/clear_due_dates`).then(() => {
+        flashMessage("Due dates are clearing");
+      });
+    }
+  }
+  
   renderButtons() {
     return (
       <div>
-        <button className="sm-btn-primary due-date-btn">Distribute Due Dates</button>
-        <button className="sm-btn-secondary due-date-btn">Clear Due Dates</button>
+        <button className="sm-btn-primary due-date-btn" onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
+        <button className="sm-btn-secondary due-date-btn" onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
       </div>
     )
   }
