@@ -25,6 +25,7 @@ export default function useIncrementalLoading(options) {
     isLoading,
     lastItemRef,
     sortBy,
+    searchString,
     onLoadInitial,
     onLoadMore,
     records
@@ -32,8 +33,8 @@ export default function useIncrementalLoading(options) {
   const recordCountRef = useRef(records.length)
 
   useEffect(() => {
-    onLoadInitial(sortBy)
-  }, [sortBy.sort, sortBy.order, contextType]) // eslint-disable-line react-hooks/exhaustive-deps
+    onLoadInitial(sortBy, searchString)
+  }, [sortBy.sort, sortBy.order, searchString, contextType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return useMemo(() => {
     const loader = {
@@ -42,13 +43,14 @@ export default function useIncrementalLoading(options) {
       lastRecordsLoaded: records.length - recordCountRef.current,
       onLoadInitial,
       sortBy,
+      searchString,
       contextType,
 
       onLoadMore() {
         if (lastItemRef.current) {
           lastItemRef.current.focus()
         }
-        onLoadMore(sortBy)
+        onLoadMore(sortBy, searchString)
       }
     }
 
@@ -57,6 +59,7 @@ export default function useIncrementalLoading(options) {
     return loader
   }, [
     sortBy,
+    searchString,
     contextType,
     hasMore,
     isLoading,

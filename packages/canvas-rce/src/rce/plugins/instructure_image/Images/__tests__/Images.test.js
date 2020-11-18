@@ -41,6 +41,7 @@ describe('RCE "Images" Plugin > Images', () => {
       },
       contextType: 'course',
       sortBy: {sort: 'alphabetical', order: 'desc'},
+      searchString: 'whereami?',
       onImageEmbed() {}
     }
   })
@@ -74,6 +75,7 @@ describe('RCE "Images" Plugin > Images', () => {
     it('calls the .fetchInitialImages prop', () => {
       renderComponent()
       expect(props.fetchInitialImages).toHaveBeenCalledTimes(1)
+      expect(props.fetchInitialImages).toHaveBeenCalledWith(props.sortBy, props.searchString)
     })
 
     it('does not display the "Load More" button', () => {

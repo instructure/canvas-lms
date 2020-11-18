@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -407,7 +409,7 @@ describe Outcomes::CsvImporter do
       expect_import_error(
         [
           headers,
-          outcome_row(title: "evil \xFF utf-8".force_encoding("ASCII-8BIT")),
+          outcome_row(title: (+"evil \xFF utf-8").force_encoding("ASCII-8BIT")),
         ],
         [
           [2, "Not a valid utf-8 string: \"evil \\xFF utf-8\""]

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -88,10 +90,10 @@ class GradingPeriodGroup < ActiveRecord::Base
     recompute_scores_for_each_term(false)
   end
 
-  handle_asynchronously_if_production(
-    :recompute_course_scores,
-    singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
-  )
+  if Rails.env.production?
+    handle_asynchronously :recompute_course_scores,
+      singleton: proc { |g| "grading_period_group:recompute:GradingPeriodGroup:#{g.global_id}" }
+  end
 
   def weighted_actually_changed?
     !self.new_record? && saved_change_to_weighted?
@@ -120,15 +122,9 @@ class GradingPeriodGroup < ActiveRecord::Base
 
   def cleanup_associations_and_recompute_scores_later(updating_user: nil)
     root_account_id = course_id ? course.root_account.global_id : root_account.global_id
-    send_later_if_production_enqueue_args(
-      :cleanup_associations_and_recompute_scores,
-      {
-        strand: "GradingPeriodGroup#cleanup_associations_and_recompute_scores:Account#{root_account_id}",
-        max_attempts: 1,
-        priority: Delayed::LOW_PRIORITY
-      },
-      updating_user: updating_user
-    )
+    delay_if_production(strand: "GradingPeriodGroup#cleanup_associations_and_recompute_scores:Account#{root_account_id}",
+        priority: Delayed::LOW_PRIORITY).
+      cleanup_associations_and_recompute_scores(updating_user: updating_user)
   end
 
   def cleanup_associations_and_recompute_scores(updating_user: nil)

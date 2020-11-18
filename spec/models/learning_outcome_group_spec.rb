@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,7 +28,7 @@ describe LearningOutcomeGroup do
   end
 
   def long_text(max = 65535)
-    text = ''
+    text = +''
     (0...max+1).each do |num|
       text.concat(num.to_s)
     end

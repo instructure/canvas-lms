@@ -20,7 +20,6 @@
 class ContentImportsController < ApplicationController
   before_action :require_context
   before_action { |c| c.active_tab = "home" }
-  prepend_around_action :load_pseudonym_from_policy, :only => :migrate_content_upload
 
   include Api::V1::Course
   include ContentImportsHelper

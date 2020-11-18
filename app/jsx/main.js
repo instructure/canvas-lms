@@ -25,7 +25,7 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import Backbone from 'Backbone'
 import splitAssetString from 'compiled/str/splitAssetString'
-import {isMathMLOnPage, loadMathJax} from 'mathml'
+import mathml from 'mathml'
 import preventDefault from 'compiled/fn/preventDefault'
 import loadBundle from 'bundles-generated'
 
@@ -94,12 +94,34 @@ if (
 })
 
 ready(() => {
-  (window.deferredBundles || []).forEach(loadBundle)
+  ;(window.deferredBundles || []).forEach(loadBundle)
 
   // This is in a setTimeout to have it run on the next time through the event loop
   // so that the code that actually renders the user_content runs first,
-  // because it has to be rendered before we can check if isMathMLOnPage
+  // because it has to be rendered before we can check if isMathOnPage
   setTimeout(() => {
-    if (isMathMLOnPage()) loadMathJax('TeX-MML-AM_HTMLorMML')
-  }, 5)
+    window.dispatchEvent(processNewMathEvent)
+  }, 0)
+
+  const ignore_list = '#quiz-elapsed-time' // comma-separated list of selectors to ignore
+  const processNewMathEvent = new Event(mathml.processNewMathEventName)
+  const observer = new MutationObserver((mutationList, _observer) => {
+    for (let m = 0; m < mutationList.length; ++m) {
+      if (mutationList[m]?.addedNodes?.length) {
+        const addedNodes = mutationList[m].addedNodes
+        for (let n = 0; n < addedNodes.length; ++n) {
+          const node = addedNodes[n]
+          if (node.nodeType !== Node.ELEMENT_NODE) return
+          if (node.parentElement?.querySelector(ignore_list)) return
+        }
+        window.dispatchEvent(processNewMathEvent)
+        return
+      }
+    }
+  })
+
+  observer.observe(document.body, {
+    childList: true,
+    subtree: true
+  })
 })

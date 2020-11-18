@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -230,13 +232,11 @@ class Attachment < ActiveRecord::Base
     end
 
     # try an infer encoding if it would be useful to do so
-    send_later(:infer_encoding) if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
+    delay.infer_encoding if self.encoding.nil? && self.content_type =~ /text/ && self.context_type != 'SisBatch'
     if respond_to?(:process_attachment, true)
       automatic_thumbnail_sizes.each do |suffix|
-        send_later_if_production_enqueue_args(
-          :create_thumbnail_size,
-          {singleton: "attachment_thumbnail_#{global_id}_#{suffix}"},
-          suffix)
+        delay_if_production(singleton: "attachment_thumbnail_#{global_id}_#{suffix}").
+        create_thumbnail_size(suffix)
       end
     end
   end
@@ -614,7 +614,7 @@ class Attachment < ActiveRecord::Base
   CONTENT_LENGTH_RANGE = 10.gigabytes
   S3_EXPIRATION_TIME = 30.minutes
 
-  def ajax_upload_params(pseudonym, local_upload_url, s3_success_url, options = {})
+  def ajax_upload_params(local_upload_url, s3_success_url, options = {})
     # Build the data that will be needed for the user to upload to s3
     # without us being the middle-man
     sanitized_filename = full_filename.gsub(/\+/, " ")
@@ -633,10 +633,7 @@ class Attachment < ActiveRecord::Base
     # with `extras` below.
     options[:datetime] = Time.now.utc.strftime("%Y%m%dT%H%M%SZ")
     res = self.store.initialize_ajax_upload_params(local_upload_url, s3_success_url, options)
-    policy = self.store.amend_policy_conditions(policy,
-      pseudonym: pseudonym,
-      datetime: options[:datetime]
-    )
+    policy = self.store.amend_policy_conditions(policy, datetime: options[:datetime])
 
     if res[:upload_params]['folder'].present?
       policy['conditions'] << ['starts-with', '$folder', '']
@@ -1076,10 +1073,7 @@ class Attachment < ActiveRecord::Base
 
         notification = BroadcastPolicy.notification_finder.by_name(count.to_i > 1 ? 'New Files Added' : 'New File Added')
         data = { :count => count }
-        DelayedNotification.send_later_if_production_enqueue_args(
-            :process,
-            { :priority => 30},
-            record, notification, recipient_keys, data)
+        DelayedNotification.delay_if_production(priority: 30).process(record, notification, recipient_keys, data)
       end
     end
   end
@@ -1284,8 +1278,8 @@ class Attachment < ActiveRecord::Base
   # prevent an access attempt shortly before unlock_at from caching permissions beyond that time
   def touch_on_unlock
     GuardRail.activate(:primary) do
-      send_later_enqueue_args(:touch, { :run_at => unlock_at,
-                                        :singleton => "touch_on_unlock_attachment_#{global_id}" })
+      delay(run_at: unlock_at,
+            singleton: "touch_on_unlock_attachment_#{global_id}").touch
     end
   end
 
@@ -1695,11 +1689,9 @@ class Attachment < ActiveRecord::Base
     if submit_to_crocodoc_instead
       # get crocodoc off the canvadocs strand
       # (maybe :wants_annotation was a dumb idea)
-      send_later_enqueue_args :submit_to_crocodoc, {
-        n_strand: 'crocodoc',
-        max_attempts: 1,
-        priority: Delayed::LOW_PRIORITY,
-      }, attempt
+      delay(n_strand: 'crocodoc',
+        priority: Delayed::LOW_PRIORITY).
+        submit_to_crocodoc(attempt)
     elsif canvadocable?
       doc = canvadoc || create_canvadoc
       doc.upload({
@@ -1713,12 +1705,10 @@ class Attachment < ActiveRecord::Base
     Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation])
 
     if attempt <= Setting.get('max_canvadocs_attempts', '5').to_i
-      send_later_enqueue_args :submit_to_canvadocs, {
-        :n_strand => 'canvadocs_retries',
-        :run_at => (5 * attempt).minutes.from_now,
-        :max_attempts => 1,
-        :priority => Delayed::LOW_PRIORITY,
-      }, attempt + 1, opts
+      delay(n_strand: 'canvadocs_retries',
+        run_at: (5 * attempt).minutes.from_now,
+        priority: Delayed::LOW_PRIORITY
+      ).submit_to_canvadocs(attempt + 1, opts)
     end
   end
 
@@ -1733,12 +1723,10 @@ class Attachment < ActiveRecord::Base
     Canvas::Errors.capture(e, type: :canvadocs, attachment_id: id)
 
     if attempt <= Setting.get('max_crocodoc_attempts', '5').to_i
-      send_later_enqueue_args :submit_to_crocodoc, {
-        :n_strand => 'crocodoc_retries',
-        :run_at => (5 * attempt).minutes.from_now,
-        :max_attempts => 1,
-        :priority => Delayed::LOW_PRIORITY,
-      }, attempt + 1
+      delay(n_strand: 'crocodoc_retries',
+        run_at: (5 * attempt).minutes.from_now,
+        priority: Delayed::LOW_PRIORITY).
+        submit_to_crocodoc(attempt + 1)
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -228,7 +230,7 @@ describe 'CommunicationChannels API', type: :request do
       end
 
       context 'push' do
-        before { @post_params.merge!(communication_channel: {token: 'registration_token', type: 'push'}) }
+        before { @post_params.merge!(communication_channel: {token: +'registration_token', type: 'push'}) }
 
         let(:client) { double() }
         let(:dk) do

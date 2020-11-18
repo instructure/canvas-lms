@@ -18,8 +18,19 @@
 import $ from 'jquery'
 import Backbone from 'Backbone'
 import template from 'jst/tinymce/EquationToolbarView'
-import {loadMathJax} from 'mathml'
+import mathml from 'mathml'
 import 'mathquill'
+
+export function disableMathJaxMenu(isDisabled) {
+  // even with the z-index issue solved, opening the sub-menus
+  // doesn't work with the mouse. Maybe the equation editor modal
+  // is consuming the mouse events?
+  // for now, turn it off while the editor is open.
+  if (window.MathJax?.Hub) {
+    window.MathJax.Hub.config.showMathMenu = !isDisabled
+    window.MathJax.Hub.config.inTabOrder = !isDisabled
+  }
+}
 
 export default class EquationToolbarView extends Backbone.View {
   static initClass() {
@@ -80,15 +91,15 @@ export default class EquationToolbarView extends Backbone.View {
 
     $('#mathjax-view .mathquill-tab-bar li:first-child').addClass('mathquill-tab-selected')
 
-    return loadMathJax('TeX-AMS_HTML.js', this.addMathJaxEvents.bind(this))
+    return mathml.loadMathJax(undefined, this.addMathJaxEvents.bind(this))
   }
 
   addMathJaxEvents() {
     function renderPreview() {
-      const jax = MathJax.Hub.getAllJax('mathjax-preview')[0]
+      const jax = window.MathJax.Hub.getAllJax('mathjax-preview')[0]
       if (jax) {
         const tex = $('#mathjax-editor').val()
-        return MathJax.Hub.Queue(['Text', jax, tex])
+        return window.MathJax.Hub.Queue(['Text', jax, tex])
       }
     }
 
@@ -116,7 +127,8 @@ export default class EquationToolbarView extends Backbone.View {
 
     this.renderPreview = renderPreview
     this.$matheditor.keyup(renderPreview)
-    return this.$matheditor.bind('paste', renderPreview)
+    this.$matheditor.bind('paste', renderPreview)
+    disableMathJaxMenu(true)
   }
 }
 EquationToolbarView.initClass()

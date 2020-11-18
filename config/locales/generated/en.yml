@@ -739,12 +739,8 @@ en:
   changes_the_sort_order_of_the_gradebook_export_to__41b286fd: Changes the sort order of the gradebook export to more closely match the canvas documentation
   include_speedgrader_in_assignment_header_menu_69cd8656: Include SpeedGrader in Assignment Header Menu
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: Includes a link to SpeedGrader in the assignment header menu in Gradebook.
-  prefetch_user_ids_in_gradebook_b96521b0: Prefetch User IDs in Gradebook
-  load_user_ids_upon_page_load_so_that_gradebook_loa_c51693aa: Load user ids upon page load so that Gradebook loads more quickly.
   datadog_rum_js_agent_4c3bea75: Datadog RUM JS Agent
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: Include the Datadog RUM JS Agent in the document HEAD.
-  grade_calculator_performance_improvements_564af0de: Grade Calculator Performance Improvements
-  performance_improvements_for_the_grade_calculation_7d9b0b16: Performance improvements for the grade calculation process.
   gradebook_data_loading_performance_improvements_421e1c93: Gradebook Data Loading Performance Improvements
   performance_improvements_for_loading_data_into_gra_1c3a0c60: Performance improvements for loading data into Gradebook.
   missing_policy_applicator_emits_live_events_88b47396: Missing Policy Applicator Emits Live Events
@@ -757,6 +753,8 @@ en:
   makes_the_student_grades_page_responsive_c13e00eb: Makes the student grades page responsive.
   view_ungraded_as_zero_view_in_gradebook_1bfc0783: View Ungraded as Zero View in Gradebook
   the_gradebook_will_factor_in_ungraded_submissions__3fcf0bd8: The Gradebook will factor in ungraded submissions as if they were given a score of zero for calculations. This is just a view for the teacher, and does not affect actual scoring.
+  fix_missing_policy_grade_change_records_c404507c: Fix Missing Policy Grade Change Records
+  insert_a_grade_change_record_when_the_periodic_mis_424139e5: Insert a grade change record when the periodic MissingPolicyApplicator job runs on a submission.
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
@@ -804,10 +802,10 @@ en:
     automatically after associating and syncing with a blueprint course
   enable_fullstory_5c673a06: Enable fullstory
   include_fullstory_recording_of_the_user_s_session_656d131e: Include FullStory recording of the user's session
-  updated_math_equation_display_583671a8: Updated math equation display
-  replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
-    Replaces the existing image of the math equation plus the hidden mathml
-    with a MathJax formatted version. This provides better accessibility
+  updated_math_equation_handling_b84509d1: Updated math equation handling
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+    Replaces the existing image of the math equation plus its hidden mathml
+    with a MathJax processed version. This change provides better accessibility
     and many options for the reader to interact with the equation on the page.
   create_files_after_rce_media_upload_recording_77d75a96: Create Files After RCE Media Upload/Recording
   creates_file_objects_initially_hidden_to_students__7f333bf0: |-
@@ -821,6 +819,16 @@ en:
     often added "/download" where it was not wanted and inappropriate. This
     setting updates how URL rewriting takes place to facilitate previewing
     files within Canvas and not downloading.
+  support_latex_math_equations_almost_everywhere_6ce8ca24: Support LaTex math equations almost everywhere
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+    With this feature, LaTex math equations entered into most
+    text entry fields in Canvas will be processed by MathJax.
+    LaTex delimited by \(...\) become inline equations, while
+    $$...$$ will be rendered as as a block.  For example,
+    you could choose to title an Assignment \(\sqrt{x}\), or
+    enter $$ax^2 + by + c = 0$$ in a submission comment.
+    This feature reequires that the "Updated math equation handling"
+    flag is also on.
   outcome_alignment_to_non_scoring_content_3efa45fb: Outcome alignment to non-scoring content
   allows_aligning_outcomes_to_non_scoring_content_537ce399: Allows aligning outcomes to non-scoring content
   reduce_outcome_duplication_on_course_import_26431b40: Reduce outcome duplication on course import
@@ -837,6 +845,8 @@ en:
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: Allows Account & Course Level mastery scales and calculation, replacing per-outcome criterion ratings & calculation methods
   usage_rights_on_discussion_topics_7bb66ac2: Usage Rights on Discussion Topics
   on_courses_with_usage_rights_enabled_enforces_usag_8b8072a3: On courses with usage rights enabled, enforces usage rights selection on discussion topic file attachments
+  improved_outcomes_management_4692f886: Improved Outcomes Management
+  helps_administrators_and_teachers_make_more_meanin_c458bcf7: Helps administrators and teachers make more meaningful decisions as they import, organize, and edit outcomes in their account and courses.
   system_and_user_generated_events_84bc4c8a: System- and User-Generated Events
   differentiate_between_system_and_user_generated_li_b5a1c49f: |-
     Differentiate between system- and user-generated live events
@@ -893,8 +903,6 @@ en:
     grade changes.
   hide_course_sections_from_students_b7850d64: Hide Course Sections from Students
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
-  import_course_student_groups_by_csv_d2cde97d: Import course student groups by csv
-  allows_course_student_groups_to_be_created_by_csv__bb0c8456: Allows course student groups to be created by csv upload
   mute_notifications_by_course_440e18be: Mute notifications by course
   allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
   course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
@@ -4311,10 +4319,6 @@ en:
     unassigned_students: Unassigned Students (%{count})
     unassigned_users: Unassigned Users (%{count})
     groups_count: Groups (%{count})
-    add_group: Add Group
-    edit_group: Edit Group
-    name_too_long: Name is too long
-    max_membership_number: Max membership must be a number
     randomly_assigning_members: Randomly Assigning Students
     manage:
       auto_leadership_controls:
@@ -4406,17 +4410,6 @@ en:
         visit_group_homepage: Visit Group Homepage
         group_edit: Edit
         group_delete: Delete
-      group_edit:
-        group_name: Group Name
-        group_join_level: Joining
-        open: Members are free to join
-        invitation_only: Invitation only
-        group_max_membership: Limit groups to
-        group_max_membership_members: members
-        group_max_membership_help: "(Leave blank to use group set max)"
-        cancel: Cancel
-        saving: Saving...
-        save: Save
       group_user:
         group_leader: Group Leader
         assign_user_to_group: Assign %{name} to a group
@@ -9162,6 +9155,8 @@ en:
   course_outcome_mastery_bb12e292: Course Outcome Mastery
   course_quiz_export_1f59f15: Course Quiz Export
   synergetic_grade_passback_e7f54b63: Synergetic Grade Passback
+  mesa_public_user_inactivity_report_a6792ccf: Mesa Public User Inactivity Report
+  mesa_public_course_syllabus_52282dd3: Mesa Public Course Syllabus
   miami_utilization_report_9c927880: Miami Utilization Report
   sis_data_eee75d5b: SIS data
   get_the_sis_file_for_users_36ba0cd: Get the SIS file for users
@@ -9323,6 +9318,7 @@ en:
   orbis_report_header_points_possible: points possible
   orbis_report_header_date_submitted: date submitted
   created_by_sis_b590894c: Created by SIS;
+  enrollment_types_enrollment_types_742626ce: 'Enrollment types: %{enrollment_types}'
   always_include_dates_74b3721d: Always Include Dates;
   has_syllabus_body_6f250277: has_syllabus_body
   syllabus_tab_enabled_62aebc2e: syllabus_tab_enabled
@@ -13004,6 +13000,8 @@ en:
   additional_options_7cefee79: Additional Options
   always_include_dates_1ae2935e: Always Include Dates
   the_default_report_only_includes_course_section_da_729092f0: The default report only includes Course/Section dates if Enrollment restrictions are enabled
+  enrollment_types_56c15a50: Enrollment Types
+  only_needed_if_enrollments_selected_ee620ce3: Only needed if enrollments selected
   this_report_gets_the_submissions_for_courses_d83bb449: This report gets the submissions for courses.
   course_submission_report_data_example_95971ae4: Course Submission Report Data Example
   include_course_scores_e38e71da: Include course scores
@@ -14000,6 +13998,7 @@ en:
       agree_to_pledge: You must agree to the submission pledge before you can submit this assignment.
   you_have_been_given_extra_time_on_this_attempt_9d8bff6c: You have been given extra time on this attempt
   your_time_for_this_quiz_has_been_reduced_394652e9: Your time for this quiz has been reduced.
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt.
   saving_d55dd90e: Saving...
   apps_54d24a47: Apps
   ExternalToolsPlugin:
@@ -15020,6 +15019,7 @@ en:
     zero: 0 Students
     one: 1 Student
     other: "%{count} Students"
+  assignment_details_updated_493f410b: Assignment details updated
   assignment_d8387b78: assignment
   grader_is_required_62c88f67: Grader is required
   grader_count_is_required_45b6c85b: Grader count is required
@@ -15627,7 +15627,6 @@ en:
   attached_d7423f41: Attached
   preview_filename_f1b58572: Preview %{filename}
   remove_filename_dab5c02e: Remove %{filename}
-  new_attempt_57eae3d9: New Attempt
   not_graded_yet_82f63c67: Not Graded Yet
   submitted_318fad53: Submitted
   unavailable_46d2c344: Unavailable
@@ -15638,7 +15637,6 @@ en:
   incomplete_95612d72: incomplete
   in_progress_13b9e26f: in-progress
   unavailable_c04e4c93: unavailable
-  create_new_attempt_19c96c03: Create New Attempt
   missing_1a256b3b: Missing
   late_2be42b88: Late
   due_5d7267be: 'Due:'
@@ -15731,6 +15729,7 @@ en:
   formattedgrade_points_90505a61: "%{formattedGrade} Points"
   calculated_by_4ac40468: 'Calculated by: '
   most_recent_b2797d2: Most Recent
+  new_attempt_57eae3d9: New Attempt
   attempt_attempt_grade_c01f45df: 'Attempt %{attempt}: %{grade}'
   late_penalty_minus_count_points_810572fe:
     one: 'Late Penalty: minus 1 Point'
@@ -17383,10 +17382,10 @@ en:
   group_saved_successfully_fcd5ca66: Group saved successfully
   saving_group_230707e6: Saving group
   an_error_occurred_when_saving_the_group_536c8f66: An error occurred when saving the group.
-  group_name_b69c144: Group Name
   joining_81f8b6c9: Joining
   invitation_only_9a253f1d: Invitation Only
   members_are_free_to_join_defa5929: Members are free to join
+  group_name_b69c144: Group Name
   group_name_is_required_5547bc0b: Group name is required
   too_many_members_b8b15069: Too many members
   member_count_members_out_of_maximum_of_max_members_d3e9f575: "%{member_count} members out of maximum of %{max_membership}"
@@ -17786,6 +17785,9 @@ en:
   scheduling_5a3327e7: Scheduling
   alerts_6b871b71: Alerts
   categoryname_notification_preferences_cd64e4a0: "%{categoryName} notification preferences"
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: This will update all rubrics aligned to outcomes within this course that have not yet been assessed.
+  this_will_update_all_account_and_course_level_rubr_305e821a: This will update all account and course level rubrics that are tied to account level mastery scales and have not yet been assessed.
+  confirm_mastery_scales_c6ef2169: Confirm Mastery Scales
   confirm_edit_outcome_a9746c99: Confirm Edit Outcome
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: This will update all rubrics using this outcome that have not yet been assessed
   you_ve_updated_the_scoring_criteria_this_will_affe_ec852671: You’ve updated the scoring criteria; this will affect all students previously assessed using this outcome
@@ -18350,7 +18352,7 @@ en:
   qr_code_image_2b3a89b5: QR Code Image
   waiting_for_your_qr_code_to_load_809299e5: Waiting for your QR Code to load
   to_log_in_to_your_canvas_account_when_you_re_on_th_63ac63b1: To log in to your Canvas account when you’re on the go, scan this QR code from any Canvas mobile app.
-  this_code_expires_in_timefromnow_ec7ccef4: This code expires in %{timeFromNow}.
+  this_code_expires_timefromnow_877a5225: This code expires %{timeFromNow}.
   this_code_has_expired_41f76642: This code has expired.
   an_error_occurred_while_retrieving_your_qr_code_5392e2da: An error occurred while retrieving your QR Code
   qr_for_mobile_login_1b1560ce: QR for Mobile Login
@@ -18617,6 +18619,10 @@ en:
   error_in_mastery_paths_range_index_7d17ddac: "%{error} in mastery paths range %{index}"
   multiple_ba5220cd: Multiple
   upper_lower_56cad16c: "%{upper} - %{lower}"
+  a_few_seconds_ago_e43118d: a few seconds ago
+  in_a_few_seconds_538ddff3: in a few seconds
+  less_than_a_minute_ago_9f45e2a5: less than a minute ago
+  in_less_than_a_minute_c8595a28: in less than a minute
   select_a_course_4710371f: Select a Course
   select_a_module_optional_7edb5cb0: Select a Module (optional)
   starting_copy_operation_cc46d911: Starting copy operation
@@ -19556,7 +19562,7 @@ en:
       learning_mastery: Learning Mastery
     settings:
       assignment_toggles_and_actions:
-        include_ungraded_assignments: Treat Ungraded as 0
+        include_ungraded_assignments: View Ungraded as 0
         hide_student_names_label: Hide Student Names
         show_concluded_enrollments_label: Show Concluded Enrollments
         show_notes: Show Notes in Student Info

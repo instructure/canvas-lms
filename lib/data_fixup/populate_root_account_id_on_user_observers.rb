@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module DataFixup::PopulateRootAccountIdOnUserObservers
   def self.run
     UserObservationLink.find_ids_in_ranges do |min_id, max_id|

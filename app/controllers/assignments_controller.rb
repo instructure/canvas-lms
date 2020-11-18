@@ -162,7 +162,7 @@ class AssignmentsController < ApplicationController
             !@current_user_submission.submission_type
           if @current_user_submission
             GuardRail.activate(:primary) do
-              @current_user_submission.send_later(:context_module_action)
+              @current_user_submission.delay.context_module_action
             end
           end
         end
@@ -510,7 +510,7 @@ class AssignmentsController < ApplicationController
 
     @assignment.quiz_lti! if params.key?(:quiz_lti)
 
-    @assignment.workflow_state ||= "unpublished"
+    @assignment.workflow_state = "unpublished"
     @assignment.updating_user = @current_user
     @assignment.content_being_saved_by(@current_user)
     @assignment.assignment_group = group if group

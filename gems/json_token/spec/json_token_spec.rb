@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,7 +30,7 @@ describe JSONToken do
   end
 
   it 'should handle binary strings' do
-    messy = "\xD1\x9B\x86".force_encoding("ASCII-8BIT")
+    messy = (+"\xD1\x9B\x86").force_encoding("ASCII-8BIT")
     expect(JSONToken.decode(JSONToken.encode(messy))).to eq messy
   end
 end

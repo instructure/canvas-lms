@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -389,7 +391,7 @@ class LearningOutcome < ActiveRecord::Base
       !self.saved_change_to_short_description? &&
       !self.saved_change_to_description?
 
-    self.send_later_if_production(:update_associated_rubrics)
+    delay_if_production.update_associated_rubrics
   end
 
   def update_associated_rubrics

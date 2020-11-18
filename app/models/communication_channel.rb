@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -301,7 +303,7 @@ class CommunicationChannel < ActiveRecord::Base
   end
 
   def send_confirmation!(root_account)
-    if self.confirmation_limit_reached
+    if self.confirmation_limit_reached || bouncing?
       return
     end
     self.confirmation_sent_count = self.confirmation_sent_count + 1
@@ -342,11 +344,7 @@ class CommunicationChannel < ActiveRecord::Base
         true
       )
     else
-      send_later_if_production_enqueue_args(
-        :send_otp_via_sms_gateway!,
-        { priority: Delayed::HIGH_PRIORITY, max_attempts: 1 },
-        message
-      )
+      delay_if_production(priority: Delayed::HIGH_PRIORITY).send_otp_via_sms_gateway!(message)
     end
   end
 
@@ -396,21 +394,6 @@ class CommunicationChannel < ActiveRecord::Base
 
   scope :in_state, lambda { |state| where(:workflow_state => state.to_s) }
   scope :of_type, lambda { |type| where(:path_type => type) }
-
-  def move_to_user(user, migrate=true)
-    return unless user
-    if self.pseudonym && self.pseudonym.unique_id == self.path
-      self.pseudonym.move_to_user(user, migrate)
-    else
-      old_user_id = self.user_id
-      self.user_id = user.id
-      self.save!
-      if old_user_id
-        Pseudonym.where(:user_id => old_user_id, :unique_id => self.path).update_all(:user_id => user)
-        User.where(:id => [old_user_id, user]).touch_all
-      end
-    end
-  end
 
   # the only way this is used is if a user adds a communication channel in their
   # profile from the default account. In this space, there is currently a
@@ -586,6 +569,27 @@ class CommunicationChannel < ActiveRecord::Base
     return path if path =~ /^\+\d+$/
     return nil unless (match = path.match(/^(?<number>\d+)@(?<domain>.+)$/))
     return nil unless (carrier = CommunicationChannel.sms_carriers[match[:domain]])
+
     "+#{carrier['country_code']}#{match[:number]}"
+  end
+
+  class << self
+    def trusted_confirmation_redirect?(root_account, redirect_url)
+      uri = begin
+              URI.parse(redirect_url)
+            rescue URI::InvalidURIError
+              nil
+            end
+      return false unless uri && ['http','https'].include?(uri.scheme)
+
+      @redirect_trust_policies&.any? do |policy|
+        policy.call(root_account, uri)
+      end
+    end
+
+    def add_confirmation_redirect_trust_policy(&block)
+      @redirect_trust_policies ||= []
+      @redirect_trust_policies << block
+    end
   end
 end

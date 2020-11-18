@@ -9,7 +9,6 @@
 # * pretty much any dotfile not already covered (e.g. .rvmrc)
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
-
 .bundle/
 .byebug_history
 .env
@@ -73,9 +72,6 @@ docker-compose.local.*
 # pact artifacts
 /reports/
 /pacts/
-
-# generated scope names
-/lib/api_scope_mapper.rb
 
 # generated scopes markdown
 /doc/api/api_token_scopes.md

@@ -21,7 +21,8 @@ import {render, fireEvent, wait, within} from '@testing-library/react'
 import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
-  update: () => Promise.resolve()
+  update: () => Promise.resolve(),
+  contextType: 'Account'
 }
 
 describe('default proficiency', () => {
@@ -129,7 +130,7 @@ describe('default proficiency', () => {
     expect(document.activeElement).toEqual(masteryField.closest('input'))
   })
 
-  it('calls update on save', async () => {
+  it('renders confirmation modal and calls update on save', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
       <ProficiencyTable {...defaultProps} update={updateSpy} />
@@ -137,7 +138,20 @@ describe('default proficiency', () => {
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
     fireEvent.click(getByText('Save Mastery Scale'))
+    fireEvent.click(getByText('Save'))
     expect(updateSpy).toHaveBeenCalled()
+  })
+
+  it('does not call save when canceling on the confirmation modal', async () => {
+    const updateSpy = jest.fn(() => Promise.resolve())
+    const {getByDisplayValue, getByText} = render(
+      <ProficiencyTable {...defaultProps} update={updateSpy} />
+    )
+    const masteryField = getByDisplayValue('Mastery')
+    fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    fireEvent.click(getByText('Cancel'))
+    expect(updateSpy).not.toHaveBeenCalled()
   })
 
   it('empty rating description does not call update', () => {

@@ -20,11 +20,7 @@ class SetPostingNotificationFrequency < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    DataFixup::SetPostingNotificationFrequency.send_later_if_production_enqueue_args(
-      :run,
-      max_attempts: 1,
-      priority: Delayed::LOW_PRIORITY,
-      n_strand: ["DataFixup::SetPostingNotificationFrequency", Shard.current.database_server.id]
-    )
+    DataFixup::SetPostingNotificationFrequency.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      n_strand: ["DataFixup::SetPostingNotificationFrequency", Shard.current.database_server.id]).run
   end
 end

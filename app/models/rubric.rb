@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -342,7 +344,7 @@ class Rubric < ActiveRecord::Base
         criterion[:long_description] = format_message((criterion_data[:long_description] || "").strip).first
       end
       criterion[:points] = criterion_data[:points].to_f || 0
-      criterion_data[:id].strip! if criterion_data[:id]
+      criterion_data[:id] = criterion_data[:id].strip if criterion_data[:id]
       criterion_data[:id] = nil if criterion_data[:id] && criterion_data[:id].empty?
       criterion[:id] = unique_item_id(criterion_data[:id])
       criterion[:criterion_use_range] = [true, 'true'].include?(criterion_data[:criterion_use_range])
@@ -357,7 +359,7 @@ class Rubric < ActiveRecord::Base
       end
 
       ratings = (criterion_data[:ratings] || {}).values.map do |rating_data|
-        rating_data[:id]&.strip!
+        rating_data[:id] = rating_data[:id].strip if rating_data[:id]
         criterion_rating(rating_data, criterion[:id])
       end
       criterion[:ratings] = ratings.sort_by { |r| [-1 * (r[:points] || 0), r[:description] || CanvasSort::First] }

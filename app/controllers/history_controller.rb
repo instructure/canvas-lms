@@ -107,7 +107,9 @@ class HistoryController < ApplicationController
 
     auas = AssetUserAccess.where(id: page_views.map(&:asset_user_access_id)).preload(:context).to_a.index_by(&:id)
 
-    render json: page_views.map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
+    render json: page_views.
+      select { |pv| auas.key?(pv.asset_user_access_id) }.
+      map { |pv| history_entry_json(pv, auas[pv.asset_user_access_id], @current_user, session) }
   end
 
   def include_page_view?(pv)

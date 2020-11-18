@@ -40,6 +40,7 @@ function renderComponent(props, renderer = render) {
     <DocumentsPanel
       {...getDocumentProps('course', {bookmark: 'http://next.docs'})}
       sortBy={{sort: 'alphabetical', order: 'asc'}}
+      searchString="Waldo"
       fetchInitialDocs={() => {}}
       fetchNextDocs={() => {}}
       onLinkClick={() => {}}
@@ -102,6 +103,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
     })
 
     expect(fetchInitialDocs).toHaveBeenCalledTimes(1)
+    expect(fetchInitialDocs).toHaveBeenCalledWith({sort: 'alphabetical', order: 'asc'}, 'Waldo')
   })
 
   it('fetches more when the load more button is clicked', () => {
@@ -113,7 +115,7 @@ describe('RCE "Documents" Plugin > DocumentsPanel', () => {
 
     const loadMoreBtn = getByText('Load More')
     loadMoreBtn.click()
-    expect(fetchNextDocs).toHaveBeenCalled()
+    expect(fetchNextDocs).toHaveBeenCalledWith({sort: 'alphabetical', order: 'asc'}, 'Waldo')
   })
 
   it('shows an error message if the fetch failed', () => {

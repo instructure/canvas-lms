@@ -4,7 +4,7 @@
 
 ARG RUBY=2.6-p6.0.4
 
-FROM instructure/ruby-passenger:$RUBY AS webpack-final
+FROM instructure/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12
@@ -112,7 +112,7 @@ RUN set -eux; \
              /home/docker/.bundler/ \
              /home/docker/.cache/yarn \
              /home/docker/.gem/ \
-  && (DISABLE_POSTINSTALL=1 yarn install --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --pure-lockfile --network-concurrency 1) \
+  && (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
 COPY --chown=docker:docker babel.config.js ${APP_HOME}

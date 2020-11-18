@@ -90,3 +90,25 @@ test('it removes the confirm alert if a selection is passed back', () => {
   $dialog.trigger(selectionEvent)
   strictEqual(window.confirm.callCount, 0)
 })
+
+test('close resource selection dialog when content items attribute is empty', async () => {
+  const $testTool = document.getElementById('test-tool')
+  SelectContentDialog.Events.onContextExternalToolSelect.bind($testTool)(clickEvent)
+
+  const $resourceSelectionDialog = $('#resource_selection_dialog')
+
+  strictEqual($resourceSelectionDialog.is(':visible'), true)
+
+  const deepLinkingEvent = {
+    data: {
+      messageType: 'LtiDeepLinkingResponse',
+      content_items: [],
+      ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
+    }
+  }
+
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+
+  strictEqual($resourceSelectionDialog.is(':visible'), false)
+  strictEqual(window.confirm.callCount, 0)
+})

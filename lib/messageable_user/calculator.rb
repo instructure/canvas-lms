@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -539,7 +541,7 @@ class MessageableUser
       ]
       if options[:include_concluded]
         clause = Enrollment::QueryBuilder.new(:completed, options.slice(:strict_checks)).conditions
-        clause << " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
+        clause += " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
         state_clauses << clause
       end
       state_clauses.compact!
@@ -640,7 +642,7 @@ class MessageableUser
     # enrollment in a course is as a student, he can't see observers that
     # aren't observing him
     def observer_restriction_clause
-      clause = ["enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
+      clause = [+"enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
       if linked_observer_ids.present?
         clause.first << " OR enrollments.user_id IN (?)"
         clause << linked_observer_ids

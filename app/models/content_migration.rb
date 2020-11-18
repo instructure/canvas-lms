@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -169,7 +171,7 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def question_bank_name=(name)
-    if name && name.strip! != ''
+    if (name = name&.strip) != ''
       migration_settings[:question_bank_name] = name
     end
   end
@@ -369,7 +371,7 @@ class ContentMigration < ActiveRecord::Base
         # it's ready to be imported
         self.workflow_state = :importing
         self.save
-        self.send_later_enqueue_args(:import_content, queue_opts.merge(:on_permanent_failure => :fail_with_error!))
+        delay(**queue_opts.merge(on_permanent_failure: :fail_with_error!)).import_content
       else
         # find worker and queue for conversion
         begin
@@ -415,7 +417,7 @@ class ContentMigration < ActiveRecord::Base
         run_at = Setting.get('content_migration_requeue_delay_minutes', '60').to_i.minutes.from_now
         # if everything goes right, we'll queue it right away after the currently running one finishes
         # but if something goes catastropically wrong, then make sure we recheck it eventually
-        job = self.send_later_enqueue_args(:queue_migration, {:no_delay => true, :run_at => run_at},
+        job = delay(ignore_transaction: true, run_at: run_at).queue_migration(
           plugin, retry_count: retry_count + 1, expires_at: expires_at)
 
         if self.job_progress

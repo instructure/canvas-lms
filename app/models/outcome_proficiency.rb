@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -157,10 +159,7 @@ class OutcomeProficiency < ApplicationRecord
     return unless @update_rubrics
 
     @update_rubrics = false
-    send_later_if_production_enqueue_args(
-      :update_associated_rubrics,
-      {strand: "update_rubrics_from_mastery_scales_#{global_id}"}
-    )
+    delay_if_production(strand: "update_rubrics_from_mastery_scales_#{global_id}").update_associated_rubrics
   end
 
   def update_associated_rubrics

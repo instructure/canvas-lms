@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -90,7 +92,7 @@ module RCENextPage
   def images_tab
     fj('[role="presentation"]:contains("Images")')
   end
-  
+
   def image_link(title)
     fj("[aria-label='Course Images'] button:contains('#{title}')")
   end
@@ -124,7 +126,7 @@ module RCENextPage
   end
 
   def assignment_due_date_exists?(due_date)
-    modified_due_date = due_date.strftime("%B %e, %Y")
+    modified_due_date = due_date.strftime("%B %-d, %Y")
     element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
@@ -298,7 +300,7 @@ module RCENextPage
   end
 
   def numbered_list_button
-    # put numbered list button locator here
+    f('[role="menuitemcheckbox"][title="default numerical ordered list"]')
   end
 
   def editor_window
@@ -306,43 +308,59 @@ module RCENextPage
   end
 
   def indent_toggle_button
-    # put side arrow to switch indent locator here
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Increase indent"] .tox-split-button__chevron')
   end
 
   def indent_button
-    # put indent button locator here
+    possibly_hidden_toolbar_button('button[aria-label="Increase indent"')
   end
 
   def outdent_button
-    # put outdent button locator here
+    f('[role="menuitemcheckbox"][title="Decrease indent"]')
   end
 
-  def super_toggle_button
-    # put side arrow to switch super locator here
+  def superscript_toggle_button
+    f('[role="button"][aria-label="Superscript"] .tox-split-button__chevron')
+  end
+
+  def superscript_button_selector
+    '[role="button"][aria-label="Superscript"]'
+  end
+
+  def subscript_button_selector
+    '[role="button"][aria-label="Subscript"]'
   end
 
   def superscript_button
-    # put superscript button locator here
+    f(superscript_button_selector)
+  end
+
+  def subscript_menu_button_selector
+    '[role="menuitemcheckbox"][title="Subscript"]'
+  end
+
+  def subscript_menu_button
+    f(subscript_menu_button_selector)
   end
 
   def subscript_button
-    # put subscript button locator here
+    f(subscript_button_selector)
   end
 
   def align_toggle_button
-    # put side arrow to switch align locator here
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Align"] .tox-split-button__chevron')
   end
 
   def align_left_button
-    # put align left button locator here
+    f('[role="menuitemcheckbox"][title="Align left"]')
   end
 
   def align_center_button
-    # put align center button locator here
+    f('[role="menuitemcheckbox"][title="Align center"]')
   end
 
   def align_right_button
-    # put align right button locator here
+    f('[role="menuitemcheckbox"][title="Align right"]')
   end
 
   def formatting_dropdown
@@ -685,15 +703,15 @@ module RCENextPage
   end
 
   def click_super_toggle_button
-    super_toggle_button.click
+    superscript_toggle_button.click
   end
 
   def click_superscript_button
     superscript_button.click
   end
 
-  def click_subscript_button
-    subscript_button.click
+  def click_subscript_menu_button
+    subscript_menu_button.click
   end
 
   def click_align_toggle_button
@@ -869,6 +887,18 @@ module RCENextPage
     driver.execute_script script, id
   end
 
+  def rce_validate_wiki_style_attrib(type, value, selectors)
+    in_frame rce_page_body_ifr_id do
+      expect(f("#tinymce #{selectors}").attribute('style')).to match("#{type}: #{value}\;")
+    end
+  end
+
+  def rce_validate_wiki_style_attrib_empty(selectors)
+    in_frame rce_page_body_ifr_id do
+      expect(f("#tinymce #{selectors}").attribute('style')).to be_empty
+    end
+  end
+
   # menubar stuff
   def menubar_open_menu(menu_name)
     menubar_button(menu_name).click
@@ -881,5 +911,13 @@ module RCENextPage
   def click_menubar_submenu_item(menu_name, item_name)
     menubar_button(menu_name).click
     menubar_menu_item(item_name).click
+  end
+
+  def create_course_text_file(title)
+    @root_folder = Folder.root_folders(@course).first
+    @text_file =
+      @root_folder.attachments.create!(filename: title, context: @course) do |a|
+        a.content_type = 'text/plain'
+      end
   end
 end

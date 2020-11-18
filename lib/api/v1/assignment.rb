@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -981,7 +983,7 @@ module Api::V1::Assignment
       assignment.tool_settings_tool = tool
     elsif assignment.persisted? && clear_tool_settings_tools?(assignment, assignment_params)
       # Destroy subscriptions and tool associations
-      assignment.send_later_if_production(:clear_tool_settings_tools)
+      assignment.delay_if_production.clear_tool_settings_tools
     end
   end
 

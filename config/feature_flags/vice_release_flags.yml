@@ -30,13 +30,6 @@ hide_course_sections_from_students:
     Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
   applies_to: RootAccount
 
-import_groups_by_csv:
-  state: hidden
-  display_name: Import course student groups by csv
-  description: |-
-    Allows course student groups to be created by csv upload
-  applies_to: RootAccount
-
 mute_notifications_by_course:
   state: hidden
   display_name: Mute notifications by course

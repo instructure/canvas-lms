@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module ActiveRecord
 
       it 'escapes special characters in the query' do
         %w(% _).each do |char|
-          expect(Base.wildcard_pattern('some' << char << 'string')).to include('some\\' << char << 'string')
+          expect(Base.wildcard_pattern('some' + char + 'string')).to include('some\\' + char + 'string')
         end
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -422,7 +424,7 @@ module QuizzesHelper
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
     answer_list = hash_get(options, :answer_list, [])
-    res      = user_content hash_get(question, :question_text)
+    res      = user_content hash_get(question, :question_text).dup
     readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
     label_attr = "aria-label='#{I18n.t("Fill in the blank, read surrounding text")}'"
 

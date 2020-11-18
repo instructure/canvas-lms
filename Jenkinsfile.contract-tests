@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn(status) {
   try {
@@ -73,7 +73,10 @@ pipeline {
 
             stage('Start Docker Images') {
               timeout(time: 10) {
-                checkout scm
+                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
                 sh 'build/new-jenkins/docker-compose-pull.sh'
                 sh 'build/new-jenkins/pact/docker-compose-pact-setup.sh'
               }

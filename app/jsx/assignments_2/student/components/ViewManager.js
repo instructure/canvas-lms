@@ -231,7 +231,7 @@ class ViewManager extends React.Component {
       <StudentViewContext.Provider
         value={{
           latestSubmission: getInitialSubmission(this.props.initialQueryData),
-          nextButtonEnabled: this.hasNextSubmission(),
+          isLatestAttempt: !this.hasNextSubmission(),
           startNewAttemptAction: this.onStartNewAttempt
         }}
       >

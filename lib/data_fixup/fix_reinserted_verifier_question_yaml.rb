@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -51,7 +53,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
     end
 
     quiz_updates.each do |id, updates|
-      sql = "quiz_data = replace(quiz_data, ?, ?), updated_at = ?"
+      sql = +"quiz_data = replace(quiz_data, ?, ?), updated_at = ?"
       (updates.count - 1).times do
         sql.sub!("replace(quiz_data", "replace(replace(quiz_data, ?, ?)")
       end
@@ -60,7 +62,7 @@ module DataFixup::FixReinsertedVerifierQuestionYaml
     end
 
     qq_updates.each do |id, updates|
-      sql = "question_data = replace(question_data, ?, ?), updated_at = ?"
+      sql = +"question_data = replace(question_data, ?, ?), updated_at = ?"
       (updates.count - 1).times do
         sql.sub!("replace(question_data", "replace(replace(question_data, ?, ?)")
       end

@@ -188,3 +188,12 @@ Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
     Canvas::Errors.capture(exception, info.to_h)
   end
 end
+
+# syntactic sugar and compatibility shims
+module CanvasDelayedMessageSending
+  def delay_if_production(sender: nil, **kwargs)
+    sender ||= __calculate_sender_for_delay
+    delay(sender: sender, **kwargs.merge(synchronous: !Rails.env.production?))
+  end
+end
+Object.send(:include, CanvasDelayedMessageSending)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -43,7 +45,7 @@ module DataFixup
 
       GuardRail.activate(:primary) do
         DiscussionTopic.where(id: topic_ids).find_each do |dt|
-          DiscussionTopic::MaterializedView.for(dt).update_materialized_view_without_send_later
+          DiscussionTopic::MaterializedView.for(dt).update_materialized_view(synchronous: true)
         end
       end
     end

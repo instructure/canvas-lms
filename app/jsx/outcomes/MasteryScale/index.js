@@ -103,6 +103,7 @@ const MasteryScale = ({contextType, contextId}) => {
       )}
 
       <ProficiencyTable
+        contextType={contextType}
         proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}

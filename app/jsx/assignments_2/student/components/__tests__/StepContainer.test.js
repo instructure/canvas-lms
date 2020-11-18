@@ -84,38 +84,6 @@ describe('the assignment is unavailable', () => {
     expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
   })
 
-  it('renders the pizza tracker with the New Attempt step icon as locked for sumbitted assignments', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        state: 'submitted'
-      },
-      LockInfo: {isLocked: true}
-    })
-    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
-    verifySteps(
-      getByTestId('submitted-step-container'),
-      ['Uploaded', 'Submitted', 'Not Graded Yet', 'New Attempt'],
-      getByText
-    )
-    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
-  })
-
-  it('renders the pizza tracker with the New Attempt step icon as locked for graded assignments', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        state: 'graded'
-      },
-      LockInfo: {isLocked: true}
-    })
-    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
-    verifySteps(
-      getByTestId('graded-step-container'),
-      ['Uploaded', 'Submitted', 'Graded', 'New Attempt'],
-      getByText
-    )
-    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
-  })
-
   it('will render the unavailable state tracker with all the appropriate steps', async () => {
     const {getByText, getByTestId} = render(<StepContainer />)
     verifySteps(getByTestId('unavailable-step-container'), unavailableSteps, getByText)
@@ -178,21 +146,6 @@ describe('the assignment is submitted', () => {
     const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('submitted-step-container')).toBeInTheDocument()
   })
-
-  it('will render the New Attempt step if more attempts are allowed', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, getByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt step if more attempts are not allowed', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Assignment: {allowedAttempts: 1},
-      Submission: SubmissionMocks.submitted
-    })
-    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
 })
 
 describe('the assignment is graded', () => {
@@ -200,20 +153,5 @@ describe('the assignment is graded', () => {
     const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('graded-step-container'), gradedSteps, getByText)
-  })
-
-  it('will render the New Attempt button if more attempts are allowed', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, getByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('graded-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt step if more attempts are not allowed', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Assignment: {allowedAttempts: 1},
-      Submission: SubmissionMocks.graded
-    })
-    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
 })

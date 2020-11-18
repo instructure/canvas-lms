@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -142,7 +144,7 @@ describe Lti::Security do
 
       header = SimpleOAuth::Header.new(
         :post,
-        url_with_whitespace,
+        url_with_whitespace.strip,
         params,
         consumer_key: consumer_key,
         consumer_secret: consumer_secret,

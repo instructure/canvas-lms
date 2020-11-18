@@ -29,6 +29,7 @@ export function Embed({onSubmit, onDismiss}) {
 
   return (
     <Modal
+      data-mce-component
       label={formatMessage('Embed')}
       size="medium"
       onDismiss={onDismiss}

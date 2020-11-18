@@ -19,9 +19,9 @@ class FixDiscussionTopicMaterializedViews < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def up
-    DataFixup::FixDiscussionTopicMaterializedViews.send_later_if_production_enqueue_args(:run,
-      priority: Delayed::LOW_PRIORITY,
-      n_strand: 'long_datafixups')
+    DataFixup::FixDiscussionTopicMaterializedViews.
+      delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').
+      run
   end
 
   def down

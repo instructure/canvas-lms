@@ -18,7 +18,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-library "canvas-builds-library"
+library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def COFFEE_NODE_COUNT = 1
 def DEFAULT_NODE_COUNT = 1
@@ -81,7 +81,10 @@ pipeline {
               cleanAndSetup()
               timeout(time: 10) {
                 sh 'rm -vrf ./tmp/*'
-                checkout scm
+                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+
+                checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
                 sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $PATCHSET_TAG'
                 sh 'docker-compose build'
               }

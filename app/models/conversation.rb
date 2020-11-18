@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -287,7 +289,7 @@ class Conversation < ActiveRecord::Base
 
     # now that the message participants are all saved, we can properly broadcast to recipients
     message.after_participants_created_broadcast
-    send_later_if_production(:reset_unread_counts) if options[:reset_unread_counts]
+    delay_if_production.reset_unread_counts if options[:reset_unread_counts]
     message
   end
 

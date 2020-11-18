@@ -25,16 +25,18 @@ const apiUserContent = {
   xsslint safeString.identifier mathml
   */
   translateMathmlForScreenreaders($equationImage) {
-    // note, it is safe to treat the x-canvaslms-safe-mathml as html because it
-    // only ever gets put there by us (in Api::Html::Content::apply_mathml).
-    // Any user content that gets sent to the server will have the
-    // x-canvaslms-safe-mathml attribute stripped out.
-    const mathml = $('<div/>')
-      .html($equationImage.attr('x-canvaslms-safe-mathml'))
-      .html()
-    const mathmlSpan = $('<span class="hidden-readable"></span>')
-    mathmlSpan.html(mathml)
-    return mathmlSpan
+    if (!ENV?.FEATURES?.new_math_equation_handling) {
+      // note, it is safe to treat the x-canvaslms-safe-mathml as html because it
+      // only ever gets put there by us (in Api::Html::Content::apply_mathml).
+      // Any user content that gets sent to the server will have the
+      // x-canvaslms-safe-mathml attribute stripped out.
+      const mathml = $('<div/>')
+        .html($equationImage.attr('x-canvaslms-safe-mathml'))
+        .html()
+      const mathmlSpan = $('<span class="hidden-readable"></span>')
+      mathmlSpan.html(mathml)
+      return mathmlSpan
+    }
   },
 
   toMediaCommentLink(node) {

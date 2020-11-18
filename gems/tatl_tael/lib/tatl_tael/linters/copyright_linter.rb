@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2017 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -49,7 +51,7 @@ module TatlTael
       end
 
       def precondition_changes
-        changes_matching(config[:precondition])
+        changes_matching(**config[:precondition])
       end
 
       def missing_copyright?(path)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -518,7 +520,7 @@ module ApplicationHelper
 
   def dataify(obj, *attributes)
     hash = obj.respond_to?(:to_hash) && obj.to_hash
-    res = ""
+    res = +""
     if !attributes.empty?
       attributes.each do |attribute|
         res << %Q{ data-#{h attribute}="#{h(hash ? hash[attribute] : obj.send(attribute))}"}
@@ -981,10 +983,10 @@ module ApplicationHelper
   end
 
   def csp_header
-    header = "Content-Security-Policy"
+    header = +"Content-Security-Policy"
     header << "-Report-Only" unless csp_enforced?
 
-    header
+    header.freeze
   end
 
   def include_files_domain_in_csp

@@ -19,10 +19,7 @@ class PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView < ActiveRecord:
   tag :postdeploy
 
   def change
-    DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      strand: "DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView::Migration"
-    )
+    DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      strand: "DataFixup::PopulateScoresAndMetadataForAssignmentGroupsAndTeacherView::Migration").run
   end
 end

@@ -20,11 +20,9 @@ class CleanUpAssignmentOverrides < ActiveRecord::Migration[5.1]
   disable_ddl_transaction!
 
   def self.up
-    DataFixup::RemoveOrphanedAssignmentOverrideStudents.send_later_if_production_enqueue_args(:run,
-      priority: Delayed::LOW_PRIORITY,
-      max_attempts: 1,
-      n_strand: 'long_datafixups'
-    )
+    DataFixup::RemoveOrphanedAssignmentOverrideStudents.
+      delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').
+      run
 
     # this fix is fast enough to run synchronously, without requiring a multi-deploy rollout of the check constraint
     DataFixup::RemoveInvalidAssignmentOverrides.run

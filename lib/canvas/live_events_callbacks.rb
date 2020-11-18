@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -159,7 +161,7 @@ module Canvas::LiveEventsCallbacks
         overridden_requirements_met = changes["requirements_met"] && {obj.id => changes["requirements_met"].last&.map(&:symbolize_keys)}
         if CourseProgress.new(obj.context_module.course, obj.user, read_only: true,
             overridden_requirements_met: overridden_requirements_met).completed?
-          Canvas::LiveEvents.course_completed(obj)
+          Canvas::LiveEvents.course_completed(obj, overridden_requirements_met: overridden_requirements_met)
         else
           Canvas::LiveEvents.course_progress(obj)
         end

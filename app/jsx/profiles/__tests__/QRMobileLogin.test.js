@@ -18,9 +18,11 @@
 import React from 'react'
 import MockDate from 'mockdate'
 import fetchMock from 'fetch-mock'
-import moment from 'moment'
 import {render, act, fireEvent} from '@testing-library/react'
 import {QRMobileLogin} from '../QRMobileLogin'
+import {installIntlPolyfills} from 'jsx/shared/helpers/IntlPolyFills'
+
+const MINUTES = 1000 * 60
 
 // a fake QR code image, and then a another one after generating a new code
 const loginImageJsons = [
@@ -34,6 +36,8 @@ const route = '/canvas/login.png'
 const doNotRespond = Function.prototype
 
 describe('QRMobileLogin', () => {
+  beforeAll(installIntlPolyfills)
+
   describe('before the API call responds', () => {
     beforeEach(() => {
       fetchMock.post(route, doNotRespond, {overwriteRoutes: true})
@@ -68,8 +72,7 @@ describe('QRMobileLogin', () => {
     })
 
     // advances both global time and the jest timers by the given time duration
-    function advance(...args) {
-      const delay = moment.duration(...args).asMilliseconds()
+    function advance(delay) {
       act(() => {
         const now = Date.now()
         MockDate.set(now + delay)
@@ -87,32 +90,32 @@ describe('QRMobileLogin', () => {
     it('updates the expiration as time elapses', async () => {
       const {findByText} = render(<QRMobileLogin />)
       await findByText(/expires in 10 minutes/i)
-      advance(1, 'minute')
+      advance(1 * MINUTES)
       const expiresIn = await findByText(/expires in 9 minutes/i)
       expect(expiresIn).toBeInTheDocument()
     })
 
     it('shows the right thing when the token has expired', async () => {
-      const refreshInterval = moment.duration(15, 'minutes')
-      const pollInterval = moment.duration(3, 'minutes')
+      const refreshInterval = 15 * MINUTES
+      const pollInterval = 3 * MINUTES
       const {findByText} = render(
         <QRMobileLogin refreshInterval={refreshInterval} pollInterval={pollInterval} />
       )
       await findByText(/expires in 10 minutes/)
-      advance(11, 'minutes') // code is only good for 10
+      advance(11 * MINUTES) // code is only good for 10
       const expiresIn = await findByText(/code has expired/i)
       expect(expiresIn).toBeInTheDocument()
     })
 
     it('refreshes the code at the right time', async () => {
-      const refreshInterval = moment.duration(2, 'minutes')
+      const refreshInterval = 2 * MINUTES
       const {findByText, findByTestId} = render(<QRMobileLogin refreshInterval={refreshInterval} />)
       const image = await findByTestId('qr-code-image')
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[0].png}`)
       expect(fetchMock.calls(route)).toHaveLength(1)
-      advance(1, 'minute')
+      advance(1 * MINUTES)
       await findByText(/expires in 9 minutes/)
-      advance(1, 'minute')
+      advance(1 * MINUTES)
       await findByText(/expires in 10 minutes/)
       expect(fetchMock.calls(route)).toHaveLength(2)
       expect(image.src).toBe(`data:image/png;base64, ${loginImageJsons[1].png}`)

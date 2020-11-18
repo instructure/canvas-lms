@@ -36,6 +36,12 @@ test('moves mathml into a screenreader element', () => {
   ok(output.includes('<span class="hidden-readable"><math '))
 })
 
+test('does not inject mathml if new_math_equation_handling flag is on', () => {
+  ENV.FEATURES = {new_math_equation_handling: true}
+  const output = apiUserContent.convert(mathml_html)
+  ok(!output.includes('<span class="math_equation_latex">\\('))
+})
+
 test('mathml need not be screenreadered if editing content (this would start an update loop)', () => {
   const output = apiUserContent.convert(mathml_html, {forEditing: true})
   ok(!output.includes('<span class="hidden-readable"><math '))

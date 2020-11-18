@@ -23,10 +23,8 @@ class PopulateRootAccountIdOnModels < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    DataFixup::PopulateRootAccountIdOnModels.send_later_if_production_enqueue_args(
-      :run,
-      {priority: Delayed::LOWER_PRIORITY, singleton: "root_account_id_backfill_strand_#{Shard.current.id}"}
-    )
+    DataFixup::PopulateRootAccountIdOnModels.delay_if_production(priority: Delayed::LOWER_PRIORITY,
+      singleton: "root_account_id_backfill_strand_#{Shard.current.id}").run
   end
 
   def down

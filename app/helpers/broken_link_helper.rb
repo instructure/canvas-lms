@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -34,8 +36,8 @@ module BrokenLinkHelper
     notification = BroadcastPolicy.notification_finder.by_name('Content Link Error')
     error_type = error_type(record.context, request.url)
     data = {location: request.referer, url: request.url, anchor: anchor, error_type: error_type}
-    DelayedNotification.send_later_if_production_enqueue_args(:process, { priority: Delayed::LOW_PRIORITY },
-      record, notification, recipient_keys, data)
+    DelayedNotification.delay_if_production(priority: Delayed::LOW_PRIORITY).
+      process(record, notification, recipient_keys, data)
     true
   rescue
     false

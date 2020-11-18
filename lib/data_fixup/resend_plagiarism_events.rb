@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -99,17 +101,10 @@ module DataFixup
     end
 
     def self.schedule_resubmit_job_by_time(start_time, end_time, only_errors)
-      DataFixup::ResendPlagiarismEvents.send_later_enqueue_args(
-        :trigger_plagiarism_resubmit_by_time,
-        {
-          priority: Delayed::LOWER_PRIORITY,
+      DataFixup::ResendPlagiarismEvents.delay(priority: Delayed::LOWER_PRIORITY,
           strand: "plagiarism_event_resend",
-          run_at: 1.year.from_now
-        },
-        start_time,
-        end_time,
-        only_errors
-      )
+          run_at: 1.year.from_now).
+        trigger_plagiarism_resubmit_by_time(start_time, end_time, only_errors)
     end
 
     def self.schedule_next_job

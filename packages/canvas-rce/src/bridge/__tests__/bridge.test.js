@@ -24,10 +24,72 @@ describe('Editor/Sidebar bridge', () => {
     jest.restoreAllMocks()
   })
 
-  it('focusEditor sets the active editor', () => {
-    const editor = {}
-    Bridge.focusEditor(editor)
-    expect(Bridge.activeEditor()).toBe(editor)
+  describe('focusEditor', () => {
+    it('sets the active editor', () => {
+      const editor = {}
+      Bridge.focusEditor(editor)
+      expect(Bridge.activeEditor()).toBe(editor)
+    })
+
+    it('calls hideTrays if focus is changing', () => {
+      jest.spyOn(Bridge, 'hideTrays')
+      Bridge.focusEditor({id: 'editor_id'})
+      expect(Bridge.hideTrays).toHaveBeenCalledTimes(1)
+      Bridge.focusEditor({id: 'another_editor'})
+      expect(Bridge.hideTrays).toHaveBeenCalledTimes(2)
+    })
+
+    it('does not call hideTrays if focus is not changing', () => {
+      const editor = {id: 'editor_id'}
+      jest.spyOn(Bridge, 'hideTrays')
+      Bridge.focusEditor(editor)
+      Bridge.focusEditor(editor)
+      expect(Bridge.hideTrays).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  describe('blurEditor', () => {
+    it('sets active editor to null if bluring the active editor', () => {
+      const editor = {id: 'editor_id'}
+      Bridge.focusedEditor = editor
+      Bridge.blurEditor(editor)
+      expect(Bridge.activeEditor()).toBe(null)
+    })
+
+    it('does not set the active editor to null if not bluring the active editor', () => {
+      const editor = {id: 'editor_id'}
+      Bridge.focusedEditor = editor
+      Bridge.blurEditor({id: 'another_editor'})
+      expect(Bridge.activeEditor()).toBe(editor)
+    })
+
+    it('calls hideTrays if bluring the active editor', () => {
+      jest.spyOn(Bridge, 'hideTrays')
+      const editor = {id: 'editor_id'}
+      Bridge.focusedEditor = editor
+      Bridge.blurEditor(editor)
+      expect(Bridge.hideTrays).toHaveBeenCalledTimes(1)
+    })
+
+    it('does not set call hideTrays if not bluring the active editor', () => {
+      jest.spyOn(Bridge, 'hideTrays')
+      const editor = {id: 'editor_id'}
+      Bridge.focusedEditor = editor
+      Bridge.blurEditor({id: 'another_editor'})
+      expect(Bridge.hideTrays).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('hideTrays', () => {
+    it('calls hideTray on each of the registered controllers', () => {
+      const controller1 = {hideTray: jest.fn()}
+      const controller2 = {hideTray: jest.fn()}
+      Bridge.attachController(controller1, 'an_editor')
+      Bridge.attachController(controller2, 'another_editor')
+      Bridge.hideTrays()
+      expect(controller1.hideTray).toHaveBeenCalled()
+      expect(controller2.hideTray).toHaveBeenCalled()
+    })
   })
 
   describe('detachEditor', () => {
@@ -125,9 +187,8 @@ describe('Editor/Sidebar bridge', () => {
 
       it('calls hideTray after inserting a link', () => {
         const hideTray = jest.fn()
-        Bridge.focusEditor({id: 'editor_id'})
-        Bridge.attachController({hideTray}, 'editor_id')
         Bridge.focusEditor(editor)
+        Bridge.attachController({hideTray}, 'editor_id')
         Bridge.insertLink({})
         expect(hideTray).toHaveBeenCalledTimes(1)
       })

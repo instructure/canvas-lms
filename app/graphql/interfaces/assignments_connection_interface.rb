@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Interfaces::AssignmentsConnectionInterface
   include GraphQL::Schema::Interface
 

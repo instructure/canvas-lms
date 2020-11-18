@@ -21,7 +21,6 @@ import {bool} from 'prop-types'
 import React from 'react'
 import StepItem, {stepLabels} from '../../shared/Steps/StepItem'
 import Steps from '../../shared/Steps'
-import StudentViewContext from './Context'
 import {Submission} from '../graphqlData/Submission'
 import {Text} from '@instructure/ui-elements'
 
@@ -31,10 +30,6 @@ function renderCollapsedContainer(step) {
       <Text weight="bold">{step}</Text>
     </div>
   )
-}
-
-function allowNextAttempt(assignment, submission) {
-  return assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts
 }
 
 function availableStepContainer(props) {
@@ -105,7 +100,7 @@ uploadedStepContainer.propTypes = {
   isCollapsed: bool
 }
 
-function submittedStepContainer(props, context) {
+function submittedStepContainer(props) {
   return (
     <div className="steps-container" data-testid="submitted-step-container">
       {props.isCollapsed && renderCollapsedContainer(stepLabels.submitted)}
@@ -116,14 +111,6 @@ function submittedStepContainer(props, context) {
         <StepItem label={stepLabels.uploaded} status="complete" />
         <StepItem label={stepLabels.submitted} status="complete" />
         <StepItem label={stepLabels.notGradedYet} status="incomplete" />
-        {allowNextAttempt(props.assignment, props.submission) &&
-        !context.nextButtonEnabled &&
-        !props.isCollapsed ? (
-          <StepItem
-            label={stepLabels.newAttempt}
-            status={props.assignment.lockInfo.isLocked ? 'unavailable' : 'button'}
-          />
-        ) : null}
       </Steps>
     </div>
   )
@@ -135,7 +122,7 @@ submittedStepContainer.propTypes = {
   submission: Submission.shape
 }
 
-function gradedStepContainer(props, context) {
+function gradedStepContainer(props) {
   return (
     <div className="steps-container" data-testid="graded-step-container">
       {props.isCollapsed && renderCollapsedContainer(stepLabels.graded)}
@@ -146,41 +133,27 @@ function gradedStepContainer(props, context) {
         <StepItem label={stepLabels.uploaded} status="complete" />
         <StepItem label={stepLabels.submitted} status="complete" />
         <StepItem label={stepLabels.graded} status="complete" />
-        {allowNextAttempt(props.assignment, props.submission) &&
-        !context.nextButtonEnabled &&
-        !props.isCollapsed ? (
-          <StepItem
-            label={stepLabels.newAttempt}
-            status={props.assignment.lockInfo.isLocked ? 'unavailable' : 'button'}
-          />
-        ) : null}
       </Steps>
     </div>
   )
 }
 
-function selectStepContainer(props, context) {
+function selectStepContainer(props) {
   const {assignment, submission, isCollapsed, forceLockStatus} = props
   if (!submission || forceLockStatus) {
-    return unavailableStepContainer({isCollapsed}, context)
+    return unavailableStepContainer({isCollapsed})
   } else if (submission.state === 'graded') {
-    return gradedStepContainer({isCollapsed, assignment, submission}, context)
+    return gradedStepContainer({isCollapsed, assignment, submission})
   } else if (submission.state === 'submitted') {
-    return submittedStepContainer({isCollapsed, assignment, submission}, context)
+    return submittedStepContainer({isCollapsed, assignment, submission})
   } else if (submission.submissionDraft && submission.submissionDraft.meetsAssignmentCriteria) {
-    return uploadedStepContainer({assignment, isCollapsed}, context)
+    return uploadedStepContainer({assignment, isCollapsed})
   }
-  return availableStepContainer({assignment, isCollapsed}, context)
+  return availableStepContainer({assignment, isCollapsed})
 }
 
 export default function StepContainer({assignment, submission, isCollapsed, forceLockStatus}) {
-  return (
-    <StudentViewContext.Consumer>
-      {context =>
-        selectStepContainer({assignment, submission, isCollapsed, forceLockStatus}, context)
-      }
-    </StudentViewContext.Consumer>
-  )
+  return selectStepContainer({assignment, submission, isCollapsed, forceLockStatus})
 }
 
 // TODO: We are calling this as a function, not through jsx. Lets make sure

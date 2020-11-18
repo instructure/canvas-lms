@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -28,8 +30,8 @@ describe 'Delayed::Job' do
       shard = @shard1 || Shard.default
       shard.activate do
         Delayed::Batch.serial_batch {
-          expect("string".send_later_enqueue_args(:size, no_delay: true)).to be true
-          expect("string".send_later_enqueue_args(:gsub, { no_delay: true }, /./, "!")).to be true
+          expect("string".delay(ignore_transaction: true).size).to be true
+          expect("string".delay(ignore_transaction: true).gsub(/./, "!")).to be true
         }
       end
       job = Delayed::Job.find_available(1).first

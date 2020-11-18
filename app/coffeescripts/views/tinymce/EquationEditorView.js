@@ -19,7 +19,7 @@ import I18n from 'i18n!EquationEditorView'
 import $ from 'jquery'
 import _ from 'underscore'
 import Backbone from 'Backbone'
-import EquationToolbarView from './EquationToolbarView'
+import EquationToolbarView, {disableMathJaxMenu} from './EquationToolbarView'
 import template from 'jst/tinymce/EquationEditorView'
 import htmlEscape from 'str/htmlEscape'
 import preventDefault from '../../fn/preventDefault'
@@ -62,7 +62,9 @@ export default class EquationEditorView extends Backbone.View {
           // then we really want the alt element
           return self.getEquationText($(elem.nodeValue))
         } else {
-          return elem.nodeValue
+          // if we're editing inline LaTex, strip the delimiters
+          // if the selection included them
+          return elem.nodeValue.trim().replace(/^(?:\\\(|\$\$)(.*)*(?:\\\)|\$\$)$/g, '$1')
         }
 
         // Get alt attributes from IMG nodes
@@ -77,7 +79,9 @@ export default class EquationEditorView extends Backbone.View {
       } else if (elem.nodeType !== 8) {
         return self.getEquationText(elem.childNodes)
       }
-    }).join('')
+    })
+      .join('')
+      .trim()
   }
 
   getEquationText(elems) {
@@ -85,13 +89,17 @@ export default class EquationEditorView extends Backbone.View {
   }
 
   initialize(editor) {
+    disableMathJaxMenu(true)
     this.editor = editor
     this.$editor = $(`#${this.editor.id}`)
+    if (this.isRawLaTex()) {
+      this.editor.selection.select(this.editor.selection.getNode())
+    }
     this.prevSelection = this.editor.selection.getBookmark()
 
     if (!(this.toolbar = this.$el.data('toolbar'))) {
       const nodes = $('<span>').text(this.editor.selection.getNode())
-      const equation = this.getEquationText(nodes).replace(/^\s+|\s+$/g, '')
+      const equation = this.getEquationText(nodes)
       this.addToolbar(equation)
     }
 
@@ -118,13 +126,23 @@ export default class EquationEditorView extends Backbone.View {
     })
   }
 
+  isRawLaTex() {
+    return this.editor.selection.getNode()?.classList?.contains('math_equation_latex')
+  }
+
   onClose() {
+    disableMathJaxMenu(false)
     return this.restoreCaret()
   }
 
   initialRender() {
-    const nodes = $('<span>').text(this.editor.selection.getContent())
-    const equation = this.getEquationText(nodes).replace(/^\s+|\s+$/g, '')
+    let nodes
+    if (this.isRawLaTex()) {
+      nodes = $('<span>').text(this.editor.selection.getNode().textContent)
+    } else {
+      nodes = $('<span>').text(this.editor.selection.getContent())
+    }
+    const equation = this.getEquationText(nodes)
 
     this.$mathjaxMessage.empty()
     this.setView(this.$el.data('view'), equation)
@@ -223,6 +241,10 @@ export default class EquationEditorView extends Backbone.View {
     return this.editor.selection.moveToBookmark(this.prevSelection)
   }
 
+  close() {
+    this.$el.dialog('close')
+  }
+
   // the following is here to make it easier to unit test
   static doubleEncodeEquationForUrl(text) {
     return encodeURIComponent(encodeURIComponent(text))
@@ -237,20 +259,60 @@ export default class EquationEditorView extends Backbone.View {
     event.preventDefault()
 
     const text = this.getEquation()
-    const altText = `LaTeX: ${text}`
-    const url = `/equation_images/${this.doubleEncodeEquationForUrl(text)}`
-    const $img = $(document.createElement('img')).attr({
-      src: url,
-      alt: altText,
-      title: text,
-      class: 'equation_image',
-      'data-equation-content': text
-    })
-    const $div = $(document.createElement('div')).append($img)
+    if (text.length === 0) {
+      this.editor.selection.setContent('')
+      this.close()
+      return
+    }
 
-    this.restoreCaret()
-    RceCommandShim.send(this.$editor, 'insert_code', $div.html())
-    return this.$el.dialog('close')
+    // get the equation image to check that it succeeds
+    // if it does, we'll send its html to the RCE, where
+    // the image will get pulled from the cache, so the 2nd
+    // request won't cost much
+    const url = `/equation_images/${this.doubleEncodeEquationForUrl(text)}`
+    fetch(url, {
+      method: 'GET',
+      mode: 'cors',
+      redirect: 'follow'
+    })
+      .then(response => {
+        this.restoreCaret()
+        if (response.ok) {
+          const code = this.loadImage(text, url)
+          RceCommandShim.send(this.$editor, 'insert_code', code)
+        } else {
+          const code = this.loadAltMath(text)
+          this.editor.selection.setContent(code)
+        }
+        this.close()
+      })
+      .catch(() => {
+        const code = this.loadAltMath(text)
+        this.editor.selection.setContent(code)
+        this.close()
+      })
+  }
+
+  // the image generator was successful
+  loadImage(text, url) {
+    // if I simple create the html string, xsslint fails jenkins
+    const img = document.createElement('img')
+    img.setAttribute('alt', `LaTeX: ${text}`)
+    img.setAttribute('title', text)
+    img.setAttribute('class', 'equation_image')
+    img.setAttribute('data-equation-content', text)
+    img.setAttribute('src', url)
+    return img.outerHTML
+  }
+
+  // there are LaTex equations the the image generator can't deal with
+  // that MathJax can. If the image failed, let's inject the LaTex
+  // as inline math for MathJax to process later.
+  loadAltMath(text) {
+    const span = document.createElement('span')
+    span.setAttribute('class', 'math_equation_latex')
+    span.textContent = `\\(${text}\\)`
+    return span.outerHTML
   }
 }
 EquationEditorView.initClass()

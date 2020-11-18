@@ -140,6 +140,7 @@
   </fieldset>
   {{/if}}
 
+  {{#if newRecord}}
   <label class="label_with_checkbox" for="duplicate_event">
     <input type="checkbox" id="duplicate_event" name="duplicate" value="true"/>
     {{#t "repeat"}}Duplicate{{/t}}
@@ -171,6 +172,7 @@
       {{#t}}Number each event{{/t}}
     </label>
   </div>
+  {{/if}}
 
   <div class="form-actions">
     {{#if url}}

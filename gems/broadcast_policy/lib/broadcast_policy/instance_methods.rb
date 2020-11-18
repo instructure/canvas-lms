@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -62,6 +64,7 @@ module BroadcastPolicy
               next
             end
             if value.value != other_attributes[key].value
+              other_attributes[key].instance_variable_set(:@original_attribute, nil)
               other_attributes.write_from_user(key, value.value)
             else
               other_attributes.write_from_database(key, value.value)
