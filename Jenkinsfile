@@ -305,6 +305,17 @@ def getCanvasLmsRefspec() {
 }
 // =========
 
+def rebaseHelper(branch, commitHistory = 100) {
+  git.setGitUser(env.GERRIT_EVENT_ACCOUNT_NAME, env.GERRIT_EVENT_ACCOUNT_EMAIL)
+  git.fetch(branch, commitHistory)
+  if (!git.hasCommonAncestor(branch)) {
+    error "Error: your branch is over ${commitHistory} commits behind $GERRIT_BRANCH, please rebase your branch manually."
+  }
+  if (!git.rebase(branch)) {
+    error "Error: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+  }
+}
+
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 
 pipeline {
@@ -441,47 +452,10 @@ pipeline {
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               timedStage('Rebase') {
                 timeout(time: 2) {
-                  credentials.withGerritCredentials({ ->
-                    sh '''#!/bin/bash
-                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-
-                      git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
-                      git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
-
-                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-
-                      if ! git merge-base HEAD origin/$GERRIT_BRANCH; then
-                        echo "Error: your branch is over 100 commits behind $GERRIT_BRANCH, please rebase your branch manually."
-                        exit $exit_status
-                      fi
-
-                      git rebase --preserve-merges --stat origin/$GERRIT_BRANCH; exit_status=$?
-                      if [ $exit_status != 0 ]; then
-                        echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                        git rebase --abort
-                        exit $exit_status
-                      fi
-
-                      if [[ $GERRIT_BRANCH == 'dev/'* ]]; then
-                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                          git fetch --depth 100 --force --no-tags origin master:origin/master
-
-                        if ! git merge-base HEAD origin/master; then
-                          echo "Error: your branch is over 100 commits behind master, please rebase your branch manually."
-                          exit $exit_status
-                        fi
-
-                        # store exit_status inline to  ensures the script doesn't exit here on failures
-                        git rebase --preserve-merges --stat origin/master; exit_status=$?
-                        if [ $exit_status != 0 ]; then
-                          echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                         git rebase --abort
-                          exit $exit_status
-                        fi
-                      fi
-                    '''
-                  })
+                  rebaseHelper(GERRIT_BRANCH)
+                  if ( GERRIT_BRANCH ==~ /dev\/.*/ ) {
+                    rebaseHelper("master")
+                  }
 
                   if(!env.JOB_NAME.endsWith('Jenkinsfile')) {
                     sh """#!/bin/bash
