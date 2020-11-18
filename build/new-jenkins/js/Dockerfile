@@ -18,6 +18,6 @@ RUN apt-get update --quiet=2 \
 
 USER docker
 RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
-  cp -rf /tmp/src/* /usr/src/app
+  cp -rf /tmp/src/. /usr/src/app
 
 EXPOSE 9876
