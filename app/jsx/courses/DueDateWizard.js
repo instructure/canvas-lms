@@ -88,7 +88,15 @@ class DueDateWizard extends React.Component {
   noDateWarning() {
     return (
       <div>
-        <h2 className="warning">PLEASE ADD START AND END DATES TO YOUR COURSE</h2>
+        <h2 className="warning">
+          Due dates cannot be distributed.
+        </h2>
+        <h4>
+          <span>
+            <a href={`/courses/${this.props.course.id}/settings`}>Go to Course Settings</a>
+            &nbsp;to add start and end dates in order to use this tool.
+          </span>
+        </h4>
       </div>
     );
   }
