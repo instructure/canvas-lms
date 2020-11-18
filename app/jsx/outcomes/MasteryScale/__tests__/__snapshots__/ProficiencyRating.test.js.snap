@@ -162,7 +162,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         shadow="resting"
         shouldCloseOnDocumentClick={true}
         shouldCloseOnEscape={true}
-        shouldContainFocus={false}
+        shouldContainFocus={true}
         shouldFocusContentOnTriggerBlur={false}
         shouldRenderOffscreen={false}
         shouldReturnFocus={true}

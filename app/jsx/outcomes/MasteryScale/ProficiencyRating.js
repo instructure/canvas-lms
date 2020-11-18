@@ -241,7 +241,12 @@ class ProficiencyRating extends React.Component {
     return (
       <div className="color">
         {canManage ? (
-          <Popover on="click" show={this.state.showColorPopover} onToggle={this.handleMenuToggle}>
+          <Popover
+            on="click"
+            show={this.state.showColorPopover}
+            onToggle={this.handleMenuToggle}
+            shouldContainFocus
+          >
             <Popover.Trigger>
               <Button ref={this.setColorRef} variant="link">
                 <div>
