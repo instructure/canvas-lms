@@ -88,9 +88,21 @@ class RubricAssociationsController < ApplicationController
     # raise "User doesn't have access to this rubric" unless @rubric.grants_right?(@current_user, session, :read)
     return unless can_manage_rubrics_or_association_object?(@assocation, @association_object)
     return unless can_update_association?(@association)
-    if params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
+
+    # create a new rubric if associating in a different course
+    rubric_context = @rubric.context
+    if rubric_context != @context && rubric_context.is_a?(Course)
+      @rubric = @rubric.dup
+      @rubric.rubric_id = rubric_id
+      @rubric.update_criteria(params[:rubric]) if params[:rubric]
+      @rubric.user = @current_user
+      @rubric.context = @context
+      @rubric.update_mastery_scales(false)
+      @rubric.save!
+    elsif params[:rubric] && @rubric.grants_right?(@current_user, session, :update)
       @rubric.update_criteria(params[:rubric])
     end
+
     association_params[:association_object] = @association.association_object if @association
     association_params[:association_object] ||= @association_object
     association_params[:id] = @association.id if @association
