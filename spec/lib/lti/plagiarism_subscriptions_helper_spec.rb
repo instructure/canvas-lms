@@ -140,7 +140,7 @@ describe Lti::PlagiarismSubscriptionsHelper do
         'Format' => 'live-event',
         'TransportType' => 'https',
         'TransportMetadata' => {'Url' => "test.com/submission"},
-        'AssociatedIntegrationId' => 'com.instructure.test_abc_test.com/submission'
+        'AssociatedIntegrationId' => tool_proxy.guid
       })
     end
   end
