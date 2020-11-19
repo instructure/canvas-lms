@@ -17,7 +17,7 @@
  */
 
 import $ from 'jquery'
-import mathml from 'mathml'
+import mathml, {getImageEquationText} from 'mathml'
 
 let stub = null
 QUnit.module('MathML and MathJax test', {
@@ -190,4 +190,41 @@ test('debounces "process-new-math" event handler', assert => {
     equal(spy.callCount, 1)
     done()
   }, 501)
+})
+
+QUnit.module('getImageEquationText does the right thing', {
+  setup() {
+    window.ENV = {
+      FEATURES: {
+        new_math_equation_handling: true,
+        inline_math_everywhere: true
+      }
+    }
+  }
+})
+
+test('uses data-equation-content if available', () => {
+  const img = document.createElement('img')
+  img.setAttribute('data-equation-content', 'y = sqrt{x}')
+  equal(getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test('uses title if available', () => {
+  const img = document.createElement('img')
+  img.setAttribute('title', 'y = sqrt{x}')
+  equal(getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test("uses src if that's all that's left", () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('src', `http://host/equation_images/${txt}`)
+  equal(getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test('returns undefined if it not an equation image', () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('src', `http://host/not_equation_images/${txt}`)
+  equal(getImageEquationText(img), undefined)
 })
