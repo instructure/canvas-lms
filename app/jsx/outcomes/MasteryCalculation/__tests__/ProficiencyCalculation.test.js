@@ -96,6 +96,11 @@ describe('ProficiencyCalculation', () => {
       expect(getByText('Example')).not.toBeNull()
       expect(getByText(/most recent graded/)).not.toBeNull()
     })
+
+    it('does not render the save button', () => {
+      const {queryByText} = render(<ProficiencyCalculation {...makeProps({canManage: false})} />)
+      expect(queryByText(/Save Mastery Calculation/)).not.toBeInTheDocument()
+    })
   })
 
   describe('unlocked', () => {
@@ -138,20 +143,38 @@ describe('ProficiencyCalculation', () => {
       expect(getByDisplayValue('5')).not.toBeNull()
     })
 
-    it('debounces save', async () => {
+    it('calls save when the button is clicked', () => {
       const update = jest.fn()
-      const {getByLabelText} = render(<ProficiencyCalculation {...makeProps({update})} />)
+      const {getByText, getByLabelText} = render(
+        <ProficiencyCalculation {...makeProps({update})} />
+      )
       const parameter = getByLabelText('Parameter')
       fireEvent.input(parameter, {target: {value: '22'}})
       fireEvent.input(parameter, {target: {value: '40'}})
       fireEvent.input(parameter, {target: {value: '44'}})
       fireEvent.input(parameter, {target: {value: '41'}})
-      await wait(() => expect(update).toHaveBeenCalledTimes(1))
+      fireEvent.click(getByText('Save Mastery Calculation'))
+      fireEvent.click(getByText('Save'))
+      expect(update).toHaveBeenCalledTimes(1)
       expect(update).toHaveBeenCalledWith('decaying_average', 41)
     })
 
+    it('save button is initially disabled', () => {
+      const {getByText} = render(<ProficiencyCalculation {...makeProps()} />)
+      expect(getByText('Save Mastery Calculation').closest('button').disabled).toEqual(true)
+    })
+
+    it('save button geos back to disabled if changes are reverted', () => {
+      const {getByText, getByLabelText} = render(<ProficiencyCalculation {...makeProps()} />)
+      const parameter = getByLabelText('Parameter')
+      fireEvent.input(parameter, {target: {value: '22'}})
+      expect(getByText('Save Mastery Calculation').closest('button').disabled).toEqual(false)
+      fireEvent.input(parameter, {target: {value: '75'}})
+      expect(getByText('Save Mastery Calculation').closest('button').disabled).toEqual(true)
+    })
+
     describe('highest', () => {
-      it('saves when method changed', async () => {
+      it('calls update with the correct arguments', () => {
         const update = jest.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />
@@ -160,12 +183,14 @@ describe('ProficiencyCalculation', () => {
         fireEvent.click(method)
         const newMethod = getByText('Highest Score')
         fireEvent.click(newMethod)
-        await wait(() => expect(update).toHaveBeenCalledWith('highest', null))
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        expect(update).toHaveBeenCalledWith('highest', null)
       })
     })
 
     describe('latest', () => {
-      it('saves when method changed', async () => {
+      it('calls update with the correct arguments', () => {
         const update = jest.fn()
         const {getByDisplayValue, getByText} = render(
           <ProficiencyCalculation {...makeProps({update})} />
@@ -174,7 +199,9 @@ describe('ProficiencyCalculation', () => {
         fireEvent.click(method)
         const newMethod = getByText('Most Recent Score')
         fireEvent.click(newMethod)
-        await wait(() => expect(update).toHaveBeenCalledWith('latest', null))
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        expect(update).toHaveBeenCalledWith('latest', null)
       })
     })
 
@@ -200,19 +227,22 @@ describe('ProficiencyCalculation', () => {
         expect(getByText('Must be between 1 and 99')).not.toBeNull()
       })
 
-      it('saves only when int is valid', async () => {
+      it('renders the confirmation modal only when int is valid', async () => {
         const update = jest.fn()
-        const {getByLabelText} = render(<ProficiencyCalculation {...makeProps({update})} />)
+        const {getByText, queryByText, getByLabelText} = render(
+          <ProficiencyCalculation {...makeProps({update})} />
+        )
         const parameter = getByLabelText('Parameter')
         fireEvent.input(parameter, {target: {value: '0'}})
-        fireEvent.input(parameter, {target: {value: '22'}})
-        fireEvent.input(parameter, {target: {value: '0'}})
-        await wait(() => expect(update).toHaveBeenCalledTimes(1))
-        fireEvent.input(parameter, {target: {value: '199'}})
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        expect(queryByText('Save')).not.toBeInTheDocument()
         fireEvent.input(parameter, {target: {value: '40'}})
-        await wait(() => expect(update).toHaveBeenCalledTimes(2))
-        expect(update).toHaveBeenCalledWith('decaying_average', 22)
-        expect(update).toHaveBeenCalledWith('decaying_average', 40)
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        await wait(() => {
+          expect(update).toHaveBeenCalledTimes(1)
+          expect(update).toHaveBeenCalledWith('decaying_average', 40)
+        })
       })
     })
 
@@ -250,25 +280,54 @@ describe('ProficiencyCalculation', () => {
         expect(getByText('Must be between 1 and 5')).not.toBeNull()
       })
 
-      it('saves only when int is valid', async () => {
+      it('renders the confirmation modal only when int is valid', async () => {
         const update = jest.fn()
-        const {getByLabelText} = render(
+        const {getByText, queryByText, getByLabelText} = render(
           <ProficiencyCalculation
             {...makeProps({update, method: {calculationMethod: 'n_mastery', calculationInt: 5}})}
           />
         )
         const parameter = getByLabelText('Parameter')
-        fireEvent.input(parameter, {target: {value: '0'}})
-        fireEvent.input(parameter, {target: {value: '2'}})
-        fireEvent.input(parameter, {target: {value: '0'}})
-        await wait(() => expect(update).toHaveBeenCalledTimes(1))
         fireEvent.input(parameter, {target: {value: '6'}})
-        fireEvent.input(parameter, {target: {value: '3'}})
         fireEvent.input(parameter, {target: {value: '9'}})
-        await wait(() => expect(update).toHaveBeenCalledTimes(2))
-        expect(update).toHaveBeenCalledWith('n_mastery', 2)
-        expect(update).toHaveBeenCalledWith('n_mastery', 3)
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        expect(queryByText('Save')).not.toBeInTheDocument()
+        fireEvent.input(parameter, {target: {value: '3'}})
+        fireEvent.click(getByText('Save Mastery Calculation'))
+        fireEvent.click(getByText('Save'))
+        await wait(() => {
+          expect(update).toHaveBeenCalledTimes(1)
+          expect(update).toHaveBeenCalledWith('n_mastery', 3)
+        })
       })
+    })
+  })
+
+  describe('confirmation modal', () => {
+    it('renders correct text for the Account context', () => {
+      const {getByDisplayValue, getByText} = render(<ProficiencyCalculation {...makeProps()} />)
+      const method = getByDisplayValue('Decaying Average')
+      fireEvent.click(method)
+      const newMethod = getByText('Most Recent Score')
+      fireEvent.click(newMethod)
+      fireEvent.click(getByText('Save Mastery Calculation'))
+      expect(getByText(/Confirm Mastery Calculation/)).not.toBeNull()
+      expect(
+        getByText(/all student mastery results tied to the account level mastery calculation/)
+      ).not.toBeNull()
+    })
+
+    it('renders correct text for the Course context', () => {
+      const {getByDisplayValue, getByText} = render(
+        <ProficiencyCalculation {...makeProps()} contextType="Course" />
+      )
+      const method = getByDisplayValue('Decaying Average')
+      fireEvent.click(method)
+      const newMethod = getByText('Most Recent Score')
+      fireEvent.click(newMethod)
+      fireEvent.click(getByText('Save Mastery Calculation'))
+      expect(getByText(/Confirm Mastery Calculation/)).not.toBeNull()
+      expect(getByText(/all student mastery results within this course/)).not.toBeNull()
     })
   })
 })

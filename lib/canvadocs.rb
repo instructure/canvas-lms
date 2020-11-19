@@ -147,7 +147,11 @@ module Canvadocs
       response = @http.request(request)
 
       unless response.code =~ /\A20./
-        raise Canvadocs::Error, "HTTP Error #{response.code}: #{response.body}"
+        err_message = "HTTP Error #{response.code}: #{response.body}"
+        klass = Canvadocs::HttpError
+        klass = Canvadocs::BadGateway if response.code.to_s == "502"
+        klass = Canvadocs::BadRequest if response.code.to_s == "400"
+        raise klass, err_message
       end
       response.body
     end
@@ -194,6 +198,9 @@ module Canvadocs
   end
 
   class Error < StandardError; end
+  class HttpError < Error; end
+  class BadGateway < HttpError; end
+  class BadRequest < HttpError; end
 
   def self.config
     PluginSetting.settings_for_plugin(:canvadocs)

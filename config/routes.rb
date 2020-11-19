@@ -107,8 +107,8 @@ CanvasRails::Application.routes.draw do
       get 'contents' => 'files#attachment_content', as: :attachment_content
       get 'file_preview' => 'file_previews#show'
       collection do
-        get "folder#{full_path_glob}" => 'files#react_files', format: false
-        get "search" => 'files#react_files', format: false
+        get "folder#{full_path_glob}" => 'files#react_files', format: false, defaults: {format: 'html'}
+        get "search" => 'files#react_files', format: false, defaults: {format: 'html'}
         get :quota
         post :reorder
       end
@@ -474,7 +474,7 @@ CanvasRails::Application.routes.draw do
 
     post 'reset' => 'courses#reset_content'
     resources :alerts
-    post :student_view
+    post 'student_view(/:redirect_to_referer)' => 'courses#student_view', as: :student_view
     delete 'student_view' => 'courses#leave_student_view'
     delete 'test_student' => 'courses#reset_test_student'
     get 'content_migrations' => 'content_migrations#index'
@@ -833,6 +833,7 @@ CanvasRails::Application.routes.draw do
     resources :pseudonyms, except: :index
     resources :question_banks, only: :index
     get :admin_merge
+    get :admin_split
     post :merge
     get :grades
     resources :user_notes
@@ -907,8 +908,8 @@ CanvasRails::Application.routes.draw do
   get 'calendar2' => 'calendars#show'
   get 'course_sections/:course_section_id/calendar_events/:id' => 'calendar_events#show', as: :course_section_calendar_event
   get 'files' => 'files#index'
-  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false
-  get "files/search", controller: 'files', action: 'react_files', format: false
+  get "files/folder#{full_path_glob}", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
+  get "files/search", controller: 'files', action: 'react_files', format: false, defaults: {format: 'html'}
   get 'files/:id/public_url' => 'files#public_url', as: :public_url
   post 'files/pending' => 'files#create_pending', as: :file_create_pending
   resources :assignments, only: :index do
@@ -1414,7 +1415,7 @@ CanvasRails::Application.routes.draw do
 
       put 'users/:id/merge_into/:destination_user_id', controller: 'users', action: 'merge_into'
       put 'users/:id/merge_into/accounts/:destination_account_id/users/:destination_user_id', controller: 'users', action: 'merge_into'
-      post 'users/:id/split', controller: 'users', action: 'split'
+      post 'users/:id/split', controller: 'users', action: 'split', as: 'split'
 
       post 'users/self/pandata_events_token', controller: 'users', action: 'pandata_events_token'
 

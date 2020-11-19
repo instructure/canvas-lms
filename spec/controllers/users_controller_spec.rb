@@ -1913,6 +1913,23 @@ describe UsersController do
     end
   end
 
+  describe "GET 'admin_split'" do
+    before :once do
+      account_admin_user
+    end
+
+    it 'sets the env' do
+      user1 = user_with_pseudonym
+      user2 = user_with_pseudonym
+      UserMerge.from(user2).into user1
+      user_session(@admin)
+      get 'admin_split', params: {:user_id => user1.id}
+      expect(assigns[:js_env][:ADMIN_SPLIT_URL]).to include "/api/v1/users/#{user1.id}/split"
+      expect(assigns[:js_env][:ADMIN_SPLIT_USER][:id]).to eq user1.id
+      expect(assigns[:js_env][:ADMIN_SPLIT_USERS].map { |user| user[:id] }).to eq([user2.id])
+    end
+  end
+
   describe "GET 'show'" do
     context "sharding" do
       specs_require_sharding

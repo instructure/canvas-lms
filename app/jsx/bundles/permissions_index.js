@@ -24,17 +24,10 @@ import ready from '@instructure/ready'
 ready(() => {
   const root = document.querySelector('#content')
 
-  // Edge does not support `.flat()` :(
-  function flatten(arr) {
-    return arr.reduce((acc, val) => acc.concat(val), [])
-  }
-
   // The ENV variables containing the permissions are an array of:
   // { group_name: "foo" group_permissions: [array of permissions] }
   // so we want to flatten this out to just the permissions.
-  function flattenPermissions(permissionsFromEnv) {
-    return flatten(permissionsFromEnv.map(item => item.group_permissions))
-  }
+  const flattenPermissions = perms => perms.flatMap(item => item.group_permissions)
 
   function groupGranularPermissions(permissions) {
     const [permissionsList, groups] = permissions.reduce(
@@ -63,17 +56,17 @@ ready(() => {
       })
     })
 
-    return permissionsList.sort((a, b) => a.label > b.label)
+    return permissionsList.sort(function(a, b) {
+      if (a.label > b.label) return 1
+      if (a.label < b.label) return -1
+      return 0
+    })
   }
 
   function markAndCombineArrays(courseArray, accountArray) {
-    const markedCourseArray = courseArray.map(a => ({...a, contextType: COURSE, displayed: true}))
-    const markedAccountArray = accountArray.map(a => ({
-      ...a,
-      contextType: ACCOUNT,
-      displayed: false
-    }))
-    return markedCourseArray.concat(markedAccountArray)
+    const markedCourses = courseArray.map(a => ({...a, contextType: COURSE, displayed: true}))
+    const markedAccounts = accountArray.map(a => ({...a, contextType: ACCOUNT, displayed: false}))
+    return markedCourses.concat(markedAccounts)
   }
 
   function isAlert(element) {

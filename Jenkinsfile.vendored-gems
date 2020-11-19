@@ -67,7 +67,7 @@ pipeline {
             stage ('Setup') {
               cleanAndSetup()
               timeout(time: 5) {
-               def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
+               def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                checkoutRepo("canvas-lms", refspecToCheckout, 1)
 

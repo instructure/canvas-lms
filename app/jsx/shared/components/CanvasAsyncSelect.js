@@ -33,16 +33,26 @@ CanvasAsyncSelect.propTypes = {
   isLoading: bool,
   selectedOptionId: string,
   noOptionsLabel: string,
+  noOptionsValue: string, // value for selected option when no or invalid selection
   onOptionSelected: func, // (event, optionId | null) => {}
-  onInputChange: func // (event, value) => {}
+  onInputChange: func, // (event, value) => {}
+  onBlur: func,
+  onFocus: func
 }
 
+// NOTE:
+// If the inputValue prop is not specified, this component will control the inputValue
+// of <Select> itself. If it is specified, it is the caller's responsibility to manage
+// its value in response to input changes!
+
 CanvasAsyncSelect.defaultProps = {
-  inputValue: '',
   isLoading: false,
   noOptionsLabel: '---',
-  onOptionSelected: () => {},
-  onInputChange: () => {}
+  noOptionsValue: '',
+  onOptionSelected: Function.prototype,
+  onInputChange: Function.prototype,
+  onBlur: Function.prototype,
+  onFocus: Function.prototype
 }
 
 export default function CanvasAsyncSelect({
@@ -51,17 +61,23 @@ export default function CanvasAsyncSelect({
   isLoading,
   selectedOptionId,
   noOptionsLabel,
+  noOptionsValue,
   onOptionSelected,
   onInputChange,
+  onFocus,
+  onBlur,
   children,
   ...selectProps
 }) {
   const previousLoadingRef = useRef(isLoading)
   const previousLoading = previousLoadingRef.current
+  const previousSelectedOptionIdRef = useRef(selectedOptionId)
+
   const [isShowingOptions, setIsShowingOptions] = useState(false)
   const [highlightedOptionId, setHighlightedOptionId] = useState(null)
   const [announcement, setAnnouncement] = useState('')
   const [hasFocus, setHasFocus] = useState(false)
+  const [managedInputValue, setManagedInputValue] = useState('')
 
   function findOptionById(id) {
     let option
@@ -88,7 +104,7 @@ export default function CanvasAsyncSelect({
     if (isLoading) {
       return (
         <Select.Option id={noOptionsId}>
-          <Spinner renderTitle={I18n.t('Loading options...')} size="small" />
+          <Spinner renderTitle={I18n.t('Loading options...')} size="x-small" />
         </Select.Option>
       )
     } else if (React.Children.count(children) === 0) {
@@ -101,6 +117,7 @@ export default function CanvasAsyncSelect({
   function handleInputChange(ev) {
     // user typing in the input negates the selection
     const newValue = ev.target.value
+    if (typeof inputValue === 'undefined') setManagedInputValue(newValue)
     setIsShowingOptions(true)
     onInputChange(ev, newValue)
   }
@@ -124,23 +141,36 @@ export default function CanvasAsyncSelect({
 
   function handleSelectOption(ev, {id}) {
     const selectedOption = findOptionById(id)
+    const selectedText = selectedOption?.props.children
     if (!selectedOption) return
     setIsShowingOptions(false)
     setAnnouncement(
       <>
-        {I18n.t('Option selected:')} {selectedOption.props.children} {I18n.t('List collapsed.')}
+        {I18n.t('Option selected:')} {selectedText} {I18n.t('List collapsed.')}
       </>
     )
-    if (id !== noOptionsId) onOptionSelected(ev, id)
+    if (id !== noOptionsId) {
+      if (typeof inputValue === 'undefined') setManagedInputValue(selectedText)
+      onOptionSelected(ev, id)
+    }
   }
 
-  function handleFocus() {
+  function handleFocus(ev) {
     setHasFocus(true)
+    onFocus(ev)
   }
 
-  function handleBlur() {
+  function handleBlur(ev) {
     setHasFocus(false)
     setHighlightedOptionId(null)
+    // if we're managing our own input value and all our possible options just
+    // went away, be sure to notify the parent the the selection has gone away
+    // as well.
+    if (React.Children.count(children) === 0 && typeof inputValue === 'undefined') {
+      setManagedInputValue('')
+      onOptionSelected(ev, noOptionsValue)
+    }
+    onBlur(ev)
   }
 
   if (hasFocus && previousLoading !== isLoading) {
@@ -151,8 +181,18 @@ export default function CanvasAsyncSelect({
     }
   }
 
+  // If we're controlling our own inputValue, take care to clear it if the selection resets
+  // out from under us.
+  if (
+    typeof inputValue === 'undefined' &&
+    selectedOptionId !== previousSelectedOptionIdRef.current &&
+    !selectedOptionId
+  ) {
+    setManagedInputValue('')
+  }
+
   const controlledProps = {
-    inputValue,
+    inputValue: typeof inputValue === 'undefined' ? managedInputValue : inputValue,
     isShowingOptions,
     assistiveText: I18n.t('Type to search'),
     onFocus: handleFocus,
@@ -167,6 +207,7 @@ export default function CanvasAsyncSelect({
   // remember previous isLoading value so we know whether we need to send announcements
   // (we can't use an effect for this because effects only run after the DOM changes)
   previousLoadingRef.current = isLoading
+  previousSelectedOptionIdRef.current = selectedOptionId
   return (
     <>
       <Select {...controlledProps} {...selectProps}>

@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import $ from 'jquery'
 import React, {useCallback} from 'react'
 import I18n from 'i18n!MasteryScale'
 import {Spinner} from '@instructure/ui-spinner'
@@ -39,11 +40,12 @@ const MasteryCalculation = ({contextType, contextId}) => {
   const [setCalculationMethodQuery, {error: setCalculationMethodError}] = useMutation(
     SET_OUTCOME_CALCULATION_METHOD
   )
+
   const setCalculationMethod = useCallback(
     (calculationMethod, calculationInt) => {
       setCalculationMethodQuery({
         variables: {contextType, contextId, calculationMethod, calculationInt}
-      })
+      }).then(() => $.flashMessage(I18n.t('Mastery calculation saved')))
     },
     [contextType, contextId, setCalculationMethodQuery]
   )
@@ -58,7 +60,7 @@ const MasteryCalculation = ({contextType, contextId}) => {
   if (error) {
     return (
       <Text color="danger">
-        {I18n.t('An error occurred while loading the outcome calculation: %{error}', {error})}
+        {I18n.t('An error occurred while loading the mastery calculation: %{error}', {error})}
       </Text>
     )
   }

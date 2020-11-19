@@ -733,6 +733,15 @@ body .ui-selectmenu-dropdown:hover .ui-selectmenu-icon, body .ui-state-active .u
         #{direction(right)}: 1px;
         overflow: hidden;
       }
+      .submission-file-delete {
+        width: 16px;
+        height: 16px;
+        position: absolute;
+        top: 3px;
+        #{direction(right)}: 24px;
+        overflow: hidden;
+        font-size: 0.7rem;
+      }
       .display_name {
         white-space: nowrap;
         overflow: hidden;

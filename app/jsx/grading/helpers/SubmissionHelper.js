@@ -29,6 +29,10 @@ export function isPostable(submission) {
   return !sub.postedAt && (isGraded(sub) || !!sub.hasPostableComments)
 }
 
+export function isHideable(submission) {
+  const sub = camelize(submission)
+  return !!sub.postedAt
+}
 // This function returns an object containing plagiarism/originality-related
 // data for the given submission, or null if the submission has no relevant
 // info. The returned object contains the following keys:

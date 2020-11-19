@@ -874,6 +874,14 @@ module Lti
           expect(exp_hash[:test]).to eq '123'
         end
 
+        it 'has substitution for $Context.id.history' do
+          allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
+          allow(substitution_helper).to receive(:recursively_fetch_previous_lti_context_ids).and_return('xyz,abc')
+          exp_hash = {test: '$Context.id.history'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'xyz,abc'
+        end
+
         it 'has substitution for $vnd.instructure.Course.uuid' do
           allow(course).to receive(:uuid).and_return('Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo')
           exp_hash = {test: '$vnd.instructure.Course.uuid'}
@@ -1155,7 +1163,8 @@ module Lti
           end
 
           it 'return an array of all student that has a SIS IDs' do
-            expect(subject).to eq 'SIS_A,SIS_B'
+            id_set = subject.split(",").to_set
+            expect(Set['SIS_A', 'SIS_B']).to eq(id_set)
           end
         end
 

@@ -93,7 +93,6 @@ export default class SubmissionTray extends React.Component {
       grade: string,
       valid: bool.isRequired
     }),
-    postPoliciesEnabled: bool.isRequired,
     requireStudentGroupForSpeedGrader: bool.isRequired,
     student: shape({
       id: string.isRequired,
@@ -384,7 +383,6 @@ export default class SubmissionTray extends React.Component {
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
                 isNotCountedForScore={this.props.isNotCountedForScore}
-                postPoliciesEnabled={this.props.postPoliciesEnabled}
                 submission={this.props.submission}
               />
 

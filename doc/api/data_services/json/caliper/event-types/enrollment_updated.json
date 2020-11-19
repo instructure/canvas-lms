@@ -1,0 +1,119 @@
+{
+  "name": "enrollment_updated",
+  "definition": "The event is emitted anytime an enrollment record is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when a course enrollment is modified.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "course_id": "The Canvas id of the course for this enrollment",
+      "course_section_id": "The id of the section of the course for the new enrollment",
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "limit_privileges_to_course_section": "Whether students can only talk to students within their course section",
+      "type": "The type of enrollment; e.g. StudentEnrollment, TeacherEnrollment, ObserverEnrollment, etc.",
+      "user_id": "The Canvas id of the currently logged in user",
+      "user_name": "The user first and last name",
+      "workflow_state": "1. Workflow state of the assignment when used in the assignment context (deleted, duplicating, failed_to_import, failed_to_duplicate, failed_to_migrate, importing, published, unpublished)\n2. Workflow state of the enrollment when used in the enrollment context (active, completed, creation_pending, deleted, inactive, invited)"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T23:47:22.832Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:7205050c-95ed-4c5f-9ecf-2998c7d3a02c",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000987",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana",
+                  "user_sis_id": "ABC123",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000987"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:enrollment:21070000000549222",
+              "type": "Entity",
+              "dateCreated": "2019-10-11T13:16:23.000Z",
+              "dateModified": "2019-11-01T19:11:18.000Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "course_id": "urn:instructure:canvas:course:21070000000000565",
+                  "course_section_id": "urn:instructure:canvas:course:21070000000000565:section:21070000000509348",
+                  "limit_privileges_to_course_section": false,
+                  "type": "StudentEnrollment",
+                  "user_id": "urn:instructure:canvas:user:21070000000093482",
+                  "user_name": "Isaac Newton",
+                  "workflow_state": "invited",
+                  "entity_id": "21070000000549222"
+                }
+              }
+            },
+            "eventTime": "2019-11-01T19:11:19.407Z",
+            "referrer": "https://oxana.instructure.com/courses/565/users",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565:section:21070000000509348",
+              "type": "CourseSection",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:section:21070000000509348:Instructor:21070000000000987",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000987",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565:section:21070000000509348",
+                "type": "CourseSection",
+                "subOrganizationOf": {
+                  "id": "urn:instructure:canvas:course:21070000000000565",
+                  "type": "CourseOffering"
+                }
+              },
+              "roles": [
+                "Instructor"
+              ]
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/courses/565/enroll_users",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

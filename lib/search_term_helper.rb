@@ -39,9 +39,6 @@ module SearchTermHelper
   end
 
   class SearchTermTooShortError < ArgumentError
-    def skip_error_report?
-      true
-    end
 
     def response_status
       :bad_request

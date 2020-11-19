@@ -21,6 +21,8 @@ $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), 'api_scopes'))
 require 'controller_list_view'
 require 'api_scope_mapping_writer'
 
+Dir.glob("#{Rails.root}/doc/api/data_services/*.rb").each { |file| require file }
+
 include Helpers::ModuleHelper
 include Helpers::FilterHelper
 
@@ -160,15 +162,18 @@ def init
     group_by { |o| o.tags('API').first.text }.
     sort_by  { |o| o.first }
   generate_swagger_json
+  generate_data_services_markdown_pages
   scope_writer = ApiScopeMappingWriter.new(options[:resources])
   scope_writer.generate_scope_mapper
 
   options[:page_title] = "Canvas LMS REST API Documentation"
 
   build_json_objects_map
+
   generate_assets
+
   serialize_index
-  serialize_static_pages
+  serialize_markdown_pages
 
   options.delete(:objects)
 
@@ -274,8 +279,12 @@ def extract_page_title_from_markdown(file)
   File.open(file).readline
 end
 
-def serialize_static_pages
-  Dir.glob("doc/api/*.md").each do |file|
+def generate_data_services_markdown_pages
+  DataServicesMarkdownCreator.run
+end
+
+def serialize_markdown_pages
+  (Dir.glob("doc/api/*.md") + Dir.glob("doc/api/data_services/md/**/*.md")).each do |file|
     options[:file] = file
     filename = File.split(file).last.sub(/\.md$/, '.html')
     serialize("file." + filename, page_title: extract_page_title_from_markdown(file))

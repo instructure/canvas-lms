@@ -33,7 +33,6 @@
 
 require 'nokogiri'
 require 'cgi'
-require 'iconv'
 require 'active_support/core_ext/module/remove_method' # https://github.com/rails/rails/issues/28918
 require 'active_support'
 require 'active_support/core_ext'

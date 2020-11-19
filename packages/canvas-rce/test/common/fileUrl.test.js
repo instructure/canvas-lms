@@ -130,6 +130,11 @@ describe('Common file url utils', () => {
       strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
     })
 
+    it('does not mess with a /preview URL', () => {
+      const url = '/users/2/files/17/preview'
+      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
+    })
+
     it('does not indescriminetly replace /preview in a url', () => {
       const url = '/please/preview/me'
       strictEqual(prepEmbedSrc(url), '/please/preview/me/preview')

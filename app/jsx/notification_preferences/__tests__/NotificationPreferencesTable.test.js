@@ -23,6 +23,7 @@ import React from 'react'
 const category = 0
 const commsChannel1 = 1
 const commsChannel2 = 2
+const commsChannel3 = 3
 
 describe('Notification Preferences Table', () => {
   beforeEach(() => {
@@ -32,7 +33,9 @@ describe('Notification Preferences Table', () => {
           label: 'Some Label Text'
         },
         deprecate_sms_enabled: true,
-        allowed_sms_categories: ['announcement', 'grading']
+        allowed_sms_categories: ['announcement', 'grading'],
+        reduce_push_enabled: true,
+        allowed_push_categories: ['announcement']
       }
     }
   })
@@ -84,6 +87,22 @@ describe('Notification Preferences Table', () => {
     expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
     expect(
       dueDateCategory.children[commsChannel2].querySelector('svg[name="IconNo"]')
+    ).toBeInTheDocument()
+  })
+
+  it('correctly disables restricted categories for push', () => {
+    const {getByTestId} = render(
+      <NotificationPreferencesTable
+        preferences={mockedNotificationPreferences()}
+        updatePreference={jest.fn()}
+      />
+    )
+
+    const dueDateCategory = getByTestId('due_date')
+    expect(dueDateCategory).not.toBeNull()
+    expect(dueDateCategory.children[category].textContent).toEqual('Due Date')
+    expect(
+      dueDateCategory.children[commsChannel3].querySelector('svg[name="IconNo"]')
     ).toBeInTheDocument()
   })
 

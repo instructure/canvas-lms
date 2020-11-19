@@ -17,3 +17,8 @@
  */
 
 import '@testing-library/jest-dom/extend-expect'
+
+// explicitly clean the JSDOM before each test
+beforeEach(() => {
+  document.body.innerHTML = ''
+})

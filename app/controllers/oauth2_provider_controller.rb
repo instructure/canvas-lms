@@ -19,9 +19,9 @@
 class Oauth2ProviderController < ApplicationController
 
   rescue_from Canvas::Oauth::RequestError, with: :oauth_error
-  protect_from_forgery :except => [:token, :destroy], with: :exception
-  before_action :run_login_hooks, :only => [:token]
-  skip_before_action :require_reacceptance_of_terms
+  protect_from_forgery except: %i[token destroy], with: :exception
+  before_action :run_login_hooks, only: %i[token]
+  skip_before_action :require_reacceptance_of_terms, only: %i[token destroy]
 
   def auth
     if params[:code] || params[:error]

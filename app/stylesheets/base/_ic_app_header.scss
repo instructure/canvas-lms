@@ -364,8 +364,6 @@ body.primary-nav-expanded {
     color: var(--ic-brand-global-nav-menu-item__text-color);
     white-space: normal;
     word-wrap: break-word;
-    padding-#{direction(left)}: 0.25rem;
-    padding-#{direction(right)}: 0.25rem;
 
     &::after {
       display: none;

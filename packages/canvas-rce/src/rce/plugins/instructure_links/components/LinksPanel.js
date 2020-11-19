@@ -99,6 +99,7 @@ LinksPanel.propTypes = {
   onChangeAccordion: func,
   contextType: string.isRequired,
   contextId: string.isRequired,
+  searchString: string,
   collections: collectionsShape.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,

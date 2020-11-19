@@ -17,7 +17,7 @@
  */
 
 import {REQUEST_INITIAL_MEDIA, REQUEST_MEDIA, RECEIVE_MEDIA, FAIL_MEDIA} from '../actions/media'
-import {CHANGE_CONTEXT} from '../actions/context'
+import {CHANGE_CONTEXT, CHANGE_SEARCH_STRING} from '../actions/filter'
 
 // manages the state for a specific collection. assumes the action is intended
 // for this collection (see collections.js)
@@ -67,6 +67,9 @@ export default function mediaReducer(prevState = {}, action) {
     }
 
     case CHANGE_CONTEXT:
+      return state
+
+    case CHANGE_SEARCH_STRING:
       return state
 
     default:

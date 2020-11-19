@@ -29,7 +29,8 @@ import upload from './upload'
 import flickrReducer from './flickr'
 import session from './session'
 import newPageLinkReducer from './newPageLinkExpanded'
-import {changeContextType, changeContextId} from './context'
+import {changeContextType, changeContextId, changeSearchString, changeSortBy} from './filter'
+import {allFilesLoading} from './all_files'
 import {combineReducers} from 'redux'
 
 // combine for root level state.
@@ -41,6 +42,9 @@ export default combineReducers({
   containingContext: noop,
   contextType: changeContextType,
   contextId: changeContextId,
+  searchString: changeSearchString,
+  sortBy: changeSortBy,
+  all_files: allFilesLoading,
   collections: collectionsReducer,
   files,
   folders,

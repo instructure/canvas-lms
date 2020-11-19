@@ -33,7 +33,7 @@ export default function useIncrementalLoading(options) {
   const recordCountRef = useRef(records.length)
 
   useEffect(() => {
-    onLoadInitial(sortBy, searchString)
+    onLoadInitial()
   }, [sortBy.sort, sortBy.order, searchString, contextType]) // eslint-disable-line react-hooks/exhaustive-deps
 
   return useMemo(() => {
@@ -50,7 +50,7 @@ export default function useIncrementalLoading(options) {
         if (lastItemRef.current) {
           lastItemRef.current.focus()
         }
-        onLoadMore(sortBy, searchString)
+        onLoadMore()
       }
     }
 

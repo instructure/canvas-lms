@@ -173,7 +173,13 @@ module InstFS
         raise InstFS::DirectUploadError, "upload succeeded, but response did not contain an \"instfs_uuid\" key"
       end
 
-      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+      err_message = "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+      if response.code.to_i >= 500
+        raise InstFS::ServiceError, err_message
+      elsif response.code.to_i == 400
+        raise InstFS::BadRequestError, err_message
+      end
+      raise InstFS::DirectUploadError, err_message
     end
 
     def export_reference(attachment)
@@ -495,6 +501,8 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
+  class ServiceError < DirectUploadError; end
+  class BadRequestError < DirectUploadError; end
   class ExportReferenceError < StandardError; end
   class DuplicationError < StandardError; end
   class DeletionError < StandardError; end

@@ -267,23 +267,22 @@ module SIS
           source: :sis,
           sis_batch: @batch
         }
-
         state_changes.each do |state_change|
           case state_change
-            when :created
-              Auditors::Course.record_created(course, @batch_user, changes, options)
-            when :updated
-              Auditors::Course.record_updated(course, @batch_user, changes, options)
-            when :concluded
-              Auditors::Course.record_concluded(course, @batch_user, options)
-            when :unconcluded
-              Auditors::Course.record_unconcluded(course, @batch_user, options)
-            when :published
-              Auditors::Course.record_published(course, @batch_user, options)
-            when :deleted
-              Auditors::Course.record_deleted(course, @batch_user, options)
-            when :restored
-              Auditors::Course.record_restored(course, @batch_user, options)
+          when :created
+            Auditors::Course.record_created(course, @batch_user, changes, options)
+          when :updated
+            Auditors::Course.record_updated(course, @batch_user, changes, options)
+          when :concluded
+            Auditors::Course.record_concluded(course, @batch_user, options)
+          when :unconcluded
+            Auditors::Course.record_unconcluded(course, @batch_user, options)
+          when :published
+            Auditors::Course.record_published(course, @batch_user, options)
+          when :deleted
+            Auditors::Course.record_deleted(course, @batch_user, options)
+          when :restored
+            Auditors::Course.record_restored(course, @batch_user, options)
           end
         end
       end

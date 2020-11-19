@@ -96,6 +96,19 @@ const smsNotificationCategoryDeprecated = category => {
   )
 }
 
+const pushNotificationCategoryRestricted = category => {
+  return (
+    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.reduce_push_enabled &&
+    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
+  )
+}
+
+const menuShouldBeDisabled = (category, pathType) => {
+  if (pathType === 'sms') return smsNotificationCategoryDeprecated(category)
+  else if (pathType === 'push') return pushNotificationCategoryRestricted(category)
+  else return false
+}
+
 const renderNotificationCategory = (
   notificationPreferences,
   notificationCategory,
@@ -193,8 +206,7 @@ const renderNotificationCategory = (
               <Table.Cell textAlign="center" key={category + channel.path}>
                 <NotificationPreferencesSetting
                   selectedPreference={
-                    channel.pathType === 'sms' &&
-                    smsNotificationCategoryDeprecated(formatCategoryKey(category))
+                    menuShouldBeDisabled(formatCategoryKey(category), channel.pathType)
                       ? 'disabled'
                       : channel.categories[notificationCategory][category].frequency
                   }

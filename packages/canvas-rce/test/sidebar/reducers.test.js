@@ -29,13 +29,13 @@ describe('Sidebar reducer', () => {
         // has bookmark, not loading
         links: [{href: 'announcement', title: 'Announcement'}],
         bookmark: 'announcementsBookmark',
-        loading: false
+        isLoading: false
       },
       modules: {
         // has bookmark, is loading
         links: [{href: 'module', title: 'Module'}],
         bookmark: 'modulesBookmark',
-        loading: true
+        isLoading: true
       }
     }
   }
@@ -43,7 +43,7 @@ describe('Sidebar reducer', () => {
   describe('REQUEST_PAGE', () => {
     it('sets the loading flag on the appropriate collection', () => {
       const newState = reducer(state, actions.requestPage('announcements'))
-      assert.equal(newState.collections.announcements.loading, true)
+      assert.equal(newState.collections.announcements.isLoading, true)
     })
 
     it('leaves the other collections alone', () => {
@@ -76,7 +76,7 @@ describe('Sidebar reducer', () => {
 
     it('clears the loading flag on the appropriate collection', () => {
       const newState = reducer(state, actions.receivePage('modules', page))
-      assert.equal(newState.collections.modules.loading, false)
+      assert.equal(newState.collections.modules.isLoading, false)
     })
 
     it('leaves the other collections alone', () => {
@@ -88,7 +88,7 @@ describe('Sidebar reducer', () => {
   describe('FAIL_PAGE', () => {
     it('clears the loading flag on the appropriate collection', () => {
       const newState = reducer(state, actions.failPage('modules'))
-      assert.equal(newState.collections.modules.loading, false)
+      assert.equal(newState.collections.modules.isLoading, false)
     })
 
     it('clears the bookmark if the links are empty', () => {

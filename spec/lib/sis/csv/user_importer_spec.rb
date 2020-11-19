@@ -569,11 +569,13 @@ describe SIS::CSV::UserImporter do
   end
 
   it "should catch active-record-level errors, like invalid unique_id" do
+    sis_user = user_model
     before_user_count = User.count
     before_pseudo_count = Pseudonym.count
     importer = process_csv_data(
       "user_id,login_id,first_name,last_name,email,status",
-      "U1,u\x01ser,User,Uno,user@example.com,active"
+      "U1,u\x01ser,User,Uno,user@example.com,active",
+      user: sis_user
     )
     expect(CommunicationChannel.by_path('user@example.com').first).to be_nil
 
@@ -1410,26 +1412,30 @@ describe SIS::CSV::UserImporter do
   end
 
   it 'removes account memberships when a user is deleted' do
+    sis_user = user_model
     @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @account, :sis_user_id => 'badmin')
     tie_user_to_account(@badmin, :account => @account)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
-      "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
+      "badmin,badmin,Bad,Admin,badmin@example.com,deleted",
+      user: sis_user
     )
     @badmin.reload
-    expect(@badmin.account_users.active).to be_empty
+    expect(@badmin.account_users.active.pluck(:id)).to_not include(@badmin.id)
   end
 
   it 'removes subaccount memberships when a user is deleted' do
+    sis_user = user_model
     @subaccount = @account.sub_accounts.create! name: 'subbie'
     @badmin = user_with_managed_pseudonym(:name => 'bad admin', :account => @subaccount, :sis_user_id => 'badmin')
     tie_user_to_account(@badmin, :account => @subaccount)
     process_csv_data_cleanly(
       "user_id,login_id,first_name,last_name,email,status",
-      "badmin,badmin,Bad,Admin,badmin@example.com,deleted"
+      "badmin,badmin,Bad,Admin,badmin@example.com,deleted",
+      user: sis_user
     )
     @badmin.reload
-    expect(@badmin.account_users.active).to be_empty
+    expect(@badmin.account_users.active.pluck(:id)).to_not include(@badmin.id)
   end
 
   context 'account associations' do
@@ -1489,23 +1495,28 @@ describe SIS::CSV::UserImporter do
       @account1 = @account
       @account2 = account_model
       @account = @account1
+      sis_user = user_model
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active")
+        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+      )
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A001,,TestAccount1,active",
-        "A002,A001,TestAccount1A,active")
+        "A002,A001,TestAccount1A,active", user: sis_user
+      )
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
-        "C001,TC 101,Test Course 1,A002,,active,,")
+        "C001,TC 101,Test Course 1,A002,,active,,", user: sis_user
+      )
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
-        "S001,C001,Test Course 1,active,,")
+        "S001,C001,Test Course 1,active,,", user: sis_user
+      )
       expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-        "C001,user_1,teacher,,active,,,"
+        "C001,user_1,teacher,,active,,,", user: sis_user
       )
       @pseudo1 = @account.pseudonyms.where(sis_user_id: 'user_1').first
       expect(@pseudo1.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id].sort
@@ -1513,55 +1524,61 @@ describe SIS::CSV::UserImporter do
       @account = @account2
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active")
+        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+      )
       process_csv_data_cleanly(
         "account_id,parent_account_id,name,status",
         "A101,,TestAccount1,active",
-        "A102,A101,TestAccount1A,active")
+        "A102,A101,TestAccount1A,active", user: sis_user
+      )
       process_csv_data_cleanly(
         "course_id,short_name,long_name,account_id,term_id,status,start_date,end_date",
-        "C001,TC 101,Test Course 1,A102,,active,,")
+        "C001,TC 101,Test Course 1,A102,,active,,", user: sis_user
+      )
       process_csv_data_cleanly(
         "section_id,course_id,name,status,start_date,end_date",
-        "S001,C001,Test Course 1,active,,")
+        "S001,C001,Test Course 1,active,,", user: sis_user
+      )
       expect(@account.pseudonyms.where(sis_user_id: 'user_1').first.user.user_account_associations.map { |uaa| uaa.account_id }).to eq [@account.id]
       process_csv_data_cleanly(
         "course_id,user_id,role,section_id,status,associated_user_id,start_date,end_date",
-        "C001,user_1,teacher,,active,,,"
+        "C001,user_1,teacher,,active,,,", user: sis_user
       )
       @pseudo2 = @account.pseudonyms.where(sis_user_id: 'user_1').first
-      expect(@pseudo2.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+      expect(@pseudo2.user.user_account_associations.map(&:account_id).sort).to eq [@account.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       UserMerge.from(@pseudo1.user).into(@pseudo2.user)
       @user = @account1.pseudonyms.where(sis_user_id: 'user_1').first.user
       expect(@account2.pseudonyms.where(sis_user_id: 'user_1').first.user).to eq @user
 
-      expect(@user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account1.id, @account2.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+      expect(@user.user_account_associations.map(&:account_id).sort).to eq [@account1.id, @account2.id, Account.where(sis_source_id: 'A002').first.id, Account.where(sis_source_id: 'A001').first.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
 
       @account = @account1
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,deleted")
+        "user_1,user1,User,Uno,user1@example.com,deleted", user: sis_user
+      )
       @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+        expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
         expect(pseudo.workflow_state).to eq 'deleted'
         expect(pseudo.user.workflow_state).to eq 'registered'
       end
       @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
+        expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id].sort
         expect(pseudo.workflow_state).to eq 'active'
         expect(pseudo.user.workflow_state).to eq 'registered'
       end
       process_csv_data_cleanly(
         "user_id,login_id,first_name,last_name,email,status",
-        "user_1,user1,User,Uno,user1@example.com,active")
+        "user_1,user1,User,Uno,user1@example.com,active", user: sis_user
+      )
       @account1.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
+        expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
         expect(pseudo.workflow_state).to eq 'active'
         expect(pseudo.user.workflow_state).to eq 'registered'
       end
       @account2.pseudonyms.where(sis_user_id: 'user_1').first.tap do |pseudo|
-        expect(pseudo.user.user_account_associations.map { |uaa| uaa.account_id }.sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
+        expect(pseudo.user.user_account_associations.map(&:account_id).sort).to eq [@account2.id, Account.where(sis_source_id: 'A102').first.id, Account.where(sis_source_id: 'A101').first.id, @account1.id].sort
         expect(pseudo.workflow_state).to eq 'active'
         expect(pseudo.user.workflow_state).to eq 'registered'
       end

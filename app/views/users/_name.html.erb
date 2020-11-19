@@ -85,6 +85,9 @@
           <% if @user.grants_right?(@current_user, :merge) %>
             <%= "|" unless first %><% first = false %>
             <a class="merge_user_link" href="<%= user_admin_merge_url(@user.id) %>"><%= t('merge_with_another_user', 'Merge with Another User')%></a>
+            <% if UserMergeData.active.splitable.where(user_id: @user).shard(@user).exists? %>
+              | <a class="split_user_link" href="<%= user_admin_split_url(@user) %>"><%= t('Split Merged Users')%></a>
+            <% end %>
           <% end %>
 
           <% if ((@context.is_a?(User) || @context.is_a?(Account)) && root_account) && @user.allows_user_to_remove_from_account?(root_account, @current_user) %>

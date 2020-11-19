@@ -66,7 +66,7 @@
     <%= avatar(@user, url: nil, edit: false, class: "profile_pic") %>
   <% end %>
 <% end %>
-<h1 style="padding-top: 0.3em;"><%= t("%{user}'s Settings", :user => @user.short_name) %></h1>
+<h1 style="padding-top: 0.3em;"><%= t("%{user_with_genitive} Settings", :user => @user.short_name, :user_with_genitive => I18n.form_proper_noun_singular_genitive(@user.short_name)) %></h1>
 <div class="clear"></div>
 <%= form_for @user, :url => profile_path, :html => {:id => "update_profile_form", :style => "margin-bottom: 20px;", :class => 'form-inline'} do |f| %>
 <table class="profile_table">

@@ -1120,6 +1120,49 @@ function renderSubmissionCommentsDownloadLink(submission) {
   return mountPoint
 }
 
+function renderDeleteAttachmentLink($submission_file, attachment) {
+  if (ENV.can_delete_attachments) {
+    const $delete_link = $submission_file.find('a.submission-file-delete')
+    $delete_link.click(function(event) {
+      event.preventDefault()
+      const url = $(this).attr('href')
+      if (
+        confirm(
+          I18n.t(
+            'Deleting a submission file is typically done only when a student posts inappropriate or private material.\n\nThis action is irreversible. Are you sure you wish to delete %{file}?',
+            {file: attachment.display_name}
+          )
+        )
+      ) {
+        $full_width_container.disableWhileLoading(
+          $.ajaxJSON(
+            url,
+            'DELETE',
+            {},
+            _data => {
+              // a more targeted refresh would be preferable but this works (and `EG.showSubmission()` doesn't)
+              window.location.reload()
+            },
+            data => {
+              if (data.status === 'unauthorized') {
+                $.flashError(
+                  I18n.t(
+                    'You do not have permission to delete %{file}. Please contact your account administrator.',
+                    {file: attachment.display_name}
+                  )
+                )
+              } else {
+                $.flashError(I18n.t('Error deleting %{file}', {file: attachment.display_name}))
+              }
+            }
+          )
+        )
+      }
+    })
+    $delete_link.show()
+  }
+}
+
 // Public Variables and Methods
 EG = {
   currentStudent: null,
@@ -2071,7 +2114,8 @@ EG = {
             )
         })
         .end()
-        .show()
+      renderDeleteAttachmentLink($submission_file, attachment)
+      $submission_file.show()
       $turnitinScoreContainer = $submission_file.find('.turnitin_score_container')
       assetString = `attachment_${attachment.id}`
       turnitinAsset =

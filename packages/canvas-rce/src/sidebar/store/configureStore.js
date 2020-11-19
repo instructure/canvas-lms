@@ -35,8 +35,8 @@ export default function(props, state) {
   store.subscribe(() => {
     try {
       const accordionIndex = store.getState().ui.selectedAccordionIndex
-      if (accordionIndex !== window.sessionStorage.canvas_rce_links_accordion_index) {
-        window.sessionStorage.canvas_rce_links_accordion_index = accordionIndex
+      if (accordionIndex !== window.sessionStorage.getItem('canvas_rce_links_accordion_index')) {
+        window.sessionStorage.setItem('canvas_rce_links_accordion_index', accordionIndex)
       }
     } catch (err) {
       // If there is an error accessing session storage, just ignore it.

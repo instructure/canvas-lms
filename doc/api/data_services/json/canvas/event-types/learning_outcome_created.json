@@ -1,0 +1,76 @@
+{
+  "name": "learning_outcome_created",
+  "definition": "The event is emitted anytime a outcome is created in the account by an end user or API request.",
+  "trigger": "Triggered when a new learning outcome is created.",
+  "schema": {
+    "calculation_int": "Defines the variable value used by the calculation_method. Included only if calculation_method uses it.",
+    "calculation_method": "The method used to calculate student score.",
+    "context_id": "The ID of the context the learning_outcome is used in.",
+    "context_type": "The type of context the learning_outcome is used in.",
+    "description": "Description of the outcome.",
+    "display_name": "Optional friendly name for reporting.",
+    "learning_outcome_id": "The local Canvas ID of the learning outcome.",
+    "short_description": "Also the title of the outcome.",
+    "title": "The title of the learning outcome or learning outcome group.",
+    "vendor_guid": "A custom GUID for the learning standard.",
+    "workflow_state": "Workflow status of the learning outcome (e.g. active, deleted).",
+    "rubric_criterion": {
+      "description": "Also the title of the outcome.",
+      "mastery_points": "The number of points necessary for a rating to be considered mastery.",
+      "points_possible": "The maximum level of points of any rating.",
+      "ratings": "Array of objects with (points, description) describing each of the outcoming ratings."
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "learning_outcome_created",
+          "event_time": "2019-11-05T10:03:37.526Z",
+          "job_id": "1020020528469291",
+          "job_tag": "Canvas::Migration::Worker::CourseCopyWorker#perform",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "calculation_int": 65,
+          "calculation_method": "highest",
+          "context_id": "1234",
+          "context_type": "Course",
+          "description": "Develop understanding of molecular and cell biology.",
+          "display_name": "Learn molecular biology",
+          "learning_outcome_id": "12345",
+          "short_description": "Molecular biology knowledge",
+          "title": "Molecular biology knowledge",
+          "vendor_guid": "1",
+          "workflow_state": "active",
+          "rubric_criterion": {
+            "description": "Molecular biology knowledge",
+            "mastery_points": 2,
+            "points_possible": 3,
+            "ratings": [
+              {
+                "description": "The student shows fluency.",
+                "points": 3
+              },
+              {
+                "description": "The student shows proficiency.",
+                "points": 2
+              },
+              {
+                "description": "The student understands the fundamentals.",
+                "points": 1
+              },
+              {
+                "description": "The student does not meet the requirements.",
+                "points": 0
+              }
+            ]
+          }
+        }
+      }
+    }
+  ]
+}

@@ -77,11 +77,11 @@ describe "Group Categories API", type: :request do
         status = raw_api_call(:get, api_url, api_route)
         expect(status).to eq 200
         csv = CSV.parse(response.body)
-        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
         expect(csv.count).to eq(5)
         5.times do
           p = Pseudonym.by_unique_id(csv.first[3]).take
-          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil, nil, nil])
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
         end
       end
 
@@ -112,11 +112,11 @@ describe "Group Categories API", type: :request do
         status = raw_api_call(:get, api_url, api_route)
         expect(status).to eq 200
         csv = CSV.parse(response.body)
-        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name", "canvas_group_id", "group_id"])
+        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
         expect(csv.count).to eq(5)
         5.times do
           p = Pseudonym.by_unique_id(csv.first[3]).take
-          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil, nil, nil])
+          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
         end
       end
     end

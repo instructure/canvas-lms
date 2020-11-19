@@ -2164,4 +2164,88 @@ describe ContextExternalTool do
       expect(tool.is_rce_favorite_in_context?(sub_account)).to eq true
     end
   end
+
+  describe 'upgrading from 1.1 to 1.3' do
+    let(:old_tool) { external_tool_model(opts: { url: "https://special.url"}) }
+    let(:tool) do
+      t = old_tool.dup
+      t.use_1_3 = true
+      t.save!
+      t
+    end
+
+    context 'prechecks' do
+      it 'ignores 1.1 tools' do
+        expect(old_tool).not_to receive(:prepare_for_ags)
+        old_tool.prepare_for_ags_if_needed!
+      end
+
+      it 'ignores 1.3 tools without matching 1.1 tool' do
+        other_tool = external_tool_model(opts: { url: "http://other.url" })
+        expect(other_tool).not_to receive(:prepare_for_ags)
+        other_tool.prepare_for_ags_if_needed!
+      end
+
+      it 'starts process when needed' do
+        expect(tool).to receive(:prepare_for_ags)
+        tool.prepare_for_ags_if_needed!
+      end
+    end
+
+    context '#related_assignments' do
+      let(:course) { course_model(account: account) }
+      let(:account) { account_model }
+
+      shared_examples_for 'finds related assignments' do
+        before :each do
+          # assignments that should never get returned
+          diff_context = assignment_model(context: course_model)
+          ContentTag.create!(context: diff_context, content: old_tool)
+          diff_account = assignment_model(context: course_model(account: account_model))
+          ContentTag.create!(context: diff_account, content: old_tool)
+          invalid_url = assignment_model(context: course)
+          ContentTag.create!(context: invalid_url, url: "https://invalid.url")
+          other_tool = external_tool_model(opts: { url: "https://different.url"})
+          diff_url = assignment_model(context: course)
+          ContentTag.create!(context: diff_url, url: other_tool.url)
+        end
+
+        it 'finds assignments using tool id' do
+          direct = assignment_model(context: course, title: "direct")
+          ContentTag.create!(context: direct, content: old_tool)
+          expect(tool.related_assignments(old_tool.id)).to eq([direct])
+        end
+
+        it 'finds assignments using tool url' do
+          indirect = assignment_model(context: course, title: "indirect")
+          ContentTag.create!(context: indirect, url: old_tool.url)
+          expect(tool.related_assignments(old_tool.id)).to eq([indirect])
+        end
+      end
+
+      context 'when installed in a course' do
+        let(:old_tool) { external_tool_model(context: course, opts: { url: "https://special.url"}) }
+        let(:tool) do
+          t = old_tool.dup
+          t.use_1_3 = true
+          t.save!
+          t
+        end
+
+        it_behaves_like 'finds related assignments'
+      end
+
+      context 'when installed in an account' do
+        let(:old_tool) { external_tool_model(context: account, opts: { url: "https://special.url"}) }
+        let(:tool) do
+          t = old_tool.dup
+          t.use_1_3 = true
+          t.save!
+          t
+        end
+
+        it_behaves_like 'finds related assignments'
+      end
+    end
+  end
 end

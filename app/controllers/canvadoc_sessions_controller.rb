@@ -84,10 +84,15 @@ class CanvadocSessionsController < ApplicationController
       render :plain => "Not found", :status => :not_found
     end
 
-  rescue HmacHelper::Error
+  rescue HmacHelper::Error => e
+    Canvas::Errors.capture_exception(:canvadocs, e, :info)
     render :plain => 'unauthorized', :status => :unauthorized
-  rescue Timeout::Error
+  rescue Timeout::Error, Canvadocs::BadGateway => e
+    Canvas::Errors.capture_exception(:canvadocs, e, :warn)
     render :plain => "Service is currently unavailable. Try again later.",
            :status => :service_unavailable
+  rescue Canvadocs::BadRequest => e
+    Canvas::Errors.capture_exception(:canvadocs, e, :info)
+    render :plain => 'Canvadocs Bad Request', :status => :bad_request
   end
 end

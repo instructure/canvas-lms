@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -119,16 +118,87 @@ module Factories
     qsub
   end
 
+  def multiple_choice_multiple_question_data(count=1, opts={})
+    Array.new(count, multiple_choice_question_data.merge(opts))
+  end
+
   def multiple_choice_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"multiple_choice_question", "assessment_question_id"=>4, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>50.0, "answers"=>[{"comments"=>"", "weight"=>0, "text"=>"a", "id"=>2405}, {"comments"=>"", "weight"=>0, "text"=>"b", "id"=>8544}, {"comments"=>"", "weight"=>100, "text"=>"c", "id"=>1658}, {"comments"=>"", "weight"=>0, "text"=>"d", "id"=>2903}], "question_text"=>"<p>test</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"multiple_choice_question",
+      "assessment_question_id"=>4,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>50.0,
+      "answers"=>[
+        {"comments"=>"", "weight"=>0, "text"=>"a", "id"=>2405},
+        {"comments"=>"", "weight"=>0, "text"=>"b", "id"=>8544},
+        {"comments"=>"", "weight"=>100, "text"=>"c", "id"=>1658},
+        {"comments"=>"", "weight"=>0, "text"=>"d", "id"=>2903}
+      ],
+      "question_text"=>"<p>test</p>",
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def true_false_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"true_false_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>45, "answers"=>[{"comments"=>"", "weight"=>0, "text"=>"True", "id"=>8403}, {"comments"=>"", "weight"=>100, "text"=>"False", "id"=>8950}], "question_text"=>"<p>test</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"true_false_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>45,
+      "answers"=>[
+        {
+          "comments"=>"",
+          "weight"=>0,
+          "text"=>"True",
+          "id"=>8403
+        },
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"False",
+          "id"=>8950
+        }
+      ],
+      "question_text"=>"<p>test</p>",
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def short_answer_question_data
-    {"name"=>"Question", "correct_comments"=>"", "question_type"=>"short_answer_question", "assessment_question_id"=>8197062, "neutral_comments"=>"", "incorrect_comments"=>"", "question_name"=>"Question", "points_possible"=>16.5, "answers"=>[{"comments"=>"", "weight"=>100, "text"=>"stupid", "id"=>7100}, {"comments"=>"", "weight"=>100, "text"=>"dumb", "id"=>2159}], "question_text"=>"<p>there's no such thing as a _____ question</p>", "id" => 1}.with_indifferent_access
+    {
+      "name"=>"Question",
+      "correct_comments"=>"",
+      "question_type"=>"short_answer_question",
+      "assessment_question_id"=>8197062,
+      "neutral_comments"=>"",
+      "incorrect_comments"=>"",
+      "question_name"=>"Question",
+      "points_possible"=>16.5,
+      "answers"=>[
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"stupid",
+          "id"=>7100
+        },
+        {
+          "comments"=>"",
+          "weight"=>100,
+          "text"=>"dumb",
+          "id"=>2159
+        }
+      ],
+      "question_text"=>"<p>there's no such thing as a _____ question</p>", 
+      "id" => 1
+    }.with_indifferent_access
   end
 
   def short_answer_question_data_one_blank
@@ -144,7 +214,7 @@ module Factories
   end
 
   def multiple_dropdowns_question_data
-    {"position"=>3, "correct_comments"=>"", "name"=>"Question 3", "question_type"=>"multiple_dropdowns_question", "assessment_question_id"=>1695442, "neutral_comments"=>"", "incorrect_comments"=>"", "id"=>1630873, "question_name"=>"Question 3", "points_possible"=>0.5, "original_question_text"=>"[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]",  "answers"=>[
+    {"position"=>3, "correct_comments"=>"", "name"=>"Question 3", "question_type"=>"multiple_dropdowns_question", "assessment_question_id"=>1695442, "neutral_comments"=>"", "incorrect_comments"=>"", "id"=>1630873, "question_name"=>"Question 3", "points_possible"=>0.5, "original_question_text"=>"[structure1] [event1] [structure2] [structure3] [structure4] [structure5] [structure6] [event2] [structure7]", "answers"=>[
       {"comments"=>"", "weight"=>100, "text"=>"y", "id"=>4390, "blank_id"=>"structure1"},
       {"comments"=>"", "weight"=>0, "text"=>"n", "id"=>1522, "blank_id"=>"structure1"},
       {"comments"=>"", "weight"=>0, "text"=>"n", "id"=>7446, "blank_id"=>"structure1"},
@@ -199,7 +269,7 @@ module Factories
         record['answer_match_right'] = record['right']
         record['answer_comments'] = record['comments']
 
-        %w[ left text right comments ].each { |k| record.delete k }
+        %w[left text right comments].each { |k| record.delete k }
       end
 
       # match#1397 has a duplicate text with #7396 that needs to be adjusted
@@ -242,7 +312,7 @@ module Factories
         "weight"=>100,
         "id"=>6396,
         "answer"=>-11.7},
-      ],
+     ],
      "question_text"=>"<p>What is 5 plus [x] - [y]</p>",
      "id" => 1}.with_indifferent_access
   end
@@ -335,7 +405,7 @@ module Factories
     quiz_submission
   end
 
-  def survey_with_submission(questions, &block)
+  def survey_with_submission(questions)
     course_with_student(:active_all => true)
     @assignment = @course.assignments.create(:title => "Test Assignment")
     @assignment.workflow_state = "published"

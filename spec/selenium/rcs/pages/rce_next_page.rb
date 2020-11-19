@@ -126,7 +126,7 @@ module RCENextPage
   end
 
   def assignment_due_date_exists?(due_date)
-    modified_due_date = due_date.strftime("%B %-d, %Y")
+    modified_due_date = due_date.strftime('%B %-d, %Y')
     element_exists?("//*[contains(text(),'#{modified_due_date}')]", true)
   end
 
@@ -283,6 +283,10 @@ module RCENextPage
     f('iframe.tox-edit-area__iframe')['id']
   end
 
+  def rce_page_body_ifr_style
+    element_value_for_attr(f('iframe.tox-edit-area__iframe'), 'style')
+  end
+
   def course_item_link(title)
     fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
   end
@@ -308,7 +312,9 @@ module RCENextPage
   end
 
   def indent_toggle_button
-    possibly_hidden_toolbar_button('[role="button"][aria-label="Increase indent"] .tox-split-button__chevron')
+    possibly_hidden_toolbar_button(
+      '[role="button"][aria-label="Increase indent"] .tox-split-button__chevron'
+    )
   end
 
   def indent_button
@@ -415,6 +421,10 @@ module RCENextPage
     ffj('button:has([name="IconKeyboardShortcuts"])')[1]
   end
 
+  def full_screen_button
+    f('button[title="Fullscreen"]')
+  end
+
   def keyboard_shortcut_modal
     f('[role="dialog"][aria-label="Keyboard Shortcuts"]')
   end
@@ -479,6 +489,38 @@ module RCENextPage
     f('[role="dialog"][aria-label="Upload File"]')
   end
 
+  def math_builder_button
+    possibly_hidden_toolbar_button('button[aria-label="Insert Math Equation"]')
+  end
+
+  def math_square_root_button
+    f('.sqrt-stem')
+  end
+
+  def math_builder_insert_equation_button
+    find_button('Insert Equation')
+  end
+
+  def math_image
+    f('.equation_image')
+  end
+
+  def edit_equation_button
+    fxpath('//button[*[.="Edit Equation"]]')
+  end
+
+  def math_dialog_exists?
+    element_exists?('.math-dialog')
+  end
+
+  def math_rendering_exists?
+    element_exists?('.equation_image')
+  end
+
+  def save_button
+    find_button('Save')
+  end
+
   # ---- menubar items ---
   def menubar_button(menu_name)
     fj("[role='menubar'] button[role^='menuitem']:contains('#{menu_name}')")
@@ -507,6 +549,23 @@ module RCENextPage
 
   def document_menubar_button
     menu_option_by_name('Upload Document')
+  end
+
+  def content_tray_close_button
+    fj('[data-testid="CanvasContentTray"] button:contains("Close")')
+  end
+
+  def content_tray_content_type
+    f('input[role="combobox"]', fj(':contains("Content Type")'))
+  end
+
+  def change_content_tray_content_type(which)
+    content_type = content_tray_content_type
+    content_type.click
+    options_id = content_type.attribute('aria-owns')
+    options = f("##{options_id}")
+    option = fj(":contains(#{which})", options)
+    option.click
   end
 
   # ---------------------- Actions ----------------------
@@ -782,6 +841,10 @@ module RCENextPage
     visible_keyboard_shortcut_button.click
   end
 
+  def click_full_screen_button
+    full_screen_button.click
+  end
+
   def click_decorative_options_checkbox
     decorative_options_checkbox.click
   end
@@ -792,6 +855,11 @@ module RCENextPage
 
   def click_embed_submit_button
     embed_submit_button.click
+  end
+
+  def click_content_tray_close_button
+    content_tray_close_button.click
+    wait_for_animations
   end
 
   def switch_to_html_view
@@ -872,6 +940,30 @@ module RCENextPage
     menu_option_by_name('Document').click
   end
 
+  # Math toolbar and modal
+  def select_squareroot_symbol
+    math_square_root_button.click
+  end
+
+  def select_math_equation_from_toolbar
+    math_builder_button.click
+  end
+
+  def click_insert_equation
+    math_builder_insert_equation_button.click
+  end
+
+  def click_page_save_button
+    save_button.click
+  end
+
+  def select_math_image
+    math_image.click
+  end
+
+  def click_edit_equation
+    edit_equation_button.click
+  end
   def select_text_of_element_by_id(id)
     script = <<-JS
         const id = arguments[0]

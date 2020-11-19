@@ -48,16 +48,11 @@ const createProps = overrides => {
   }
 }
 
-beforeAll(() => {
+beforeEach(() => {
   const liveRegion = document.createElement('DIV')
   liveRegion.setAttribute('id', 'canvas_inbox_screenreader_holder')
   liveRegion.setAttribute('role', 'alert')
   document.body.appendChild(liveRegion)
-})
-
-afterAll(() => {
-  const liveRegion = document.getElementById('canvas_inbox_screenreader_holder')
-  liveRegion.remove()
 })
 
 describe('CourseSelect', () => {

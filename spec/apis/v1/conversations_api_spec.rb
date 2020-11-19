@@ -50,8 +50,10 @@ describe ConversationsController, type: :request do
 
   def observer_in_course(options = {})
     section = options.delete(:section)
+    associated_user = options.delete(:associated_user)
     u = User.create(options)
     enrollment = @course.enroll_user(u, 'ObserverEnrollment', :section => section)
+    enrollment.associated_user = associated_user
     enrollment.workflow_state = 'active'
     enrollment.save
     u
@@ -1338,6 +1340,43 @@ describe ConversationsController, type: :request do
         { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
 
       expect(json["cannot_reply"]).to eq true
+    end
+
+    context "as an observer" do
+      before :once do
+        @bobs_mom = observer_in_course(:name => "bob's mom", :associated_user => @bob)
+        @user = @bobs_mom
+      end
+
+      it "should not set cannot_reply for observer observee relationship" do
+        conversation = conversation(@bobs_mom, :sender => @bob, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to be_nil
+      end
+
+      it "should set cannot_reply to true if non-observed student" do
+        conversation = conversation(@bobs_mom, :sender => @billy, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to eq true
+      end
     end
 
     it "should not explode on account group conversations" do

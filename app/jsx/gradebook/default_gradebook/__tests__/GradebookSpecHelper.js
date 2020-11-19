@@ -79,7 +79,6 @@ export function createGradebook(options = {}) {
       active_request_limit: 10
     },
     post_grades_ltis: [],
-    post_policies_enabled: true,
     publish_to_sis_enabled: false,
     sections: [],
 

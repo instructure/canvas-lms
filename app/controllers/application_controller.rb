@@ -20,18 +20,6 @@
 # Likewise, all the methods added will be available for all controllers.
 
 class ApplicationController < ActionController::Base
-  class << self
-    [:before, :after, :around,
-     :skip_before, :skip_after, :skip_around,
-     :prepend_before, :prepend_after, :prepend_around].each do |type|
-      class_eval <<-RUBY, __FILE__, __LINE__ + 1
-        def #{type}_filter(*)
-          raise "Please use #{type}_action instead of #{type}_filter"
-        end
-      RUBY
-    end
-  end
-
   define_callbacks :html_render
 
   attr_accessor :active_tab
@@ -42,11 +30,6 @@ class ApplicationController < ActionController::Base
   include Api::V1::User
   include Api::V1::WikiPage
   include LegalInformationHelper
-  around_action :set_locale
-  around_action :enable_request_cache
-  around_action :batch_statsd
-  around_action :report_to_datadog
-  around_action :compute_http_cost
 
   helper :all
 
@@ -55,10 +38,21 @@ class ApplicationController < ActionController::Base
   include Canvas::RequestForgeryProtection
   protect_from_forgery with: :exception
 
+  # Before/around actions run in order defined (even if interleaved)
+  # After actions run in REVERSE order defined. Skipped on exception raise
+  #   (which is common for 401, 404, 500 responses)
+  # Around action yields return (in REVERSE order) after all after actions
+
   prepend_before_action :load_user, :load_account
   # make sure authlogic is before load_user
   skip_before_action :activate_authlogic
   prepend_before_action :activate_authlogic
+
+  around_action :set_locale
+  around_action :enable_request_cache
+  around_action :batch_statsd
+  around_action :report_to_datadog
+  around_action :compute_http_cost
 
   before_action :clear_idle_connections
   before_action :annotate_apm
@@ -68,23 +62,23 @@ class ApplicationController < ActionController::Base
   before_action :set_page_view
   before_action :require_reacceptance_of_terms
   before_action :clear_policy_cache
-  before_action :setup_live_events_context
+  around_action :manage_live_events_context
+  before_action :initiate_session_from_token
+  before_action :fix_xhr_requests
+  before_action :init_body_classes
+  # multiple actions might be called on a single controller instance in specs
+  before_action :clear_js_env if Rails.env.test?
+
   after_action :log_page_view
   after_action :discard_flash_if_xhr
   after_action :cache_buster
-  before_action :initiate_session_from_token
   # Yes, we're calling this before and after so that we get the user id logged
   # on events that log someone in and log someone out.
   after_action :set_user_id_header
-  before_action :fix_xhr_requests
-  before_action :init_body_classes
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
   set_callback :html_render, :before, :add_csp_for_root
-  after_action :teardown_live_events_context
 
-  # multiple actions might be called on a single controller instance in specs
-  before_action :clear_js_env if Rails.env.test?
 
   add_crumb(proc {
     title = I18n.t('links.dashboard', 'My Dashboard')
@@ -1487,7 +1481,12 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Exception, :with => :rescue_exception
+
+  def rescue_expected_error_type(error)
+    rescue_exception(error, level: :info)
+  end
 
   # analogous to rescue_action_without_handler from ActionPack 2.3
   def rescue_exception(exception, level: :error)
@@ -1532,23 +1531,16 @@ class ApplicationController < ActionController::Base
       status = 'AUT' if exception.is_a?(ActionController::InvalidAuthenticityToken)
       type = nil
       type = '404' if status == '404 Not Found'
-
-      # TODO: get rid of exceptions that implement this "skip_error_report?" thing, instead
-      # use the initializer in config/initializers/errors.rb to configure
-      # exceptions we want skipped
-      unless exception.respond_to?(:skip_error_report?) && exception.skip_error_report?
-        opts = {type: type}
-        opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
-        info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
-        error_info = info.to_h
-        error_info[:tags][:response_code] = response_code
-        capture_outputs = Canvas::Errors.capture(exception, error_info, level)
-        error = nil
-        if capture_outputs[:error_report]
-          error = ErrorReport.find(capture_outputs[:error_report])
-        end
+      opts = {type: type}
+      opts[:canvas_error_info] = exception.canvas_error_info if exception.respond_to?(:canvas_error_info)
+      info = Canvas::Errors::Info.new(request, @domain_root_account, @current_user, opts)
+      error_info = info.to_h
+      error_info[:tags][:response_code] = response_code
+      capture_outputs = Canvas::Errors.capture(exception, error_info, level)
+      error = nil
+      if capture_outputs[:error_report]
+        error = ErrorReport.find(capture_outputs[:error_report])
       end
-
       if api_request?
         rescue_action_in_api(exception, error, response_code)
       else
@@ -2710,7 +2702,10 @@ class ApplicationController < ActionController::Base
     (@xhrs_to_prefetch_from_controller ||= []) << [args, kwargs]
   end
 
-  def teardown_live_events_context
+  def manage_live_events_context
+    setup_live_events_context
+    yield
+  ensure
     LiveEvents.clear_context!
   end
 
@@ -2730,4 +2725,35 @@ class ApplicationController < ActionController::Base
   def recaptcha_enabled?
     Canvas::DynamicSettings.find(tree: :private)['recaptcha_server_key'].present? && @domain_root_account.self_registration_captcha?
   end
+
+  # Show Student View button on the following controller/action pages, as long as defined tabs are not hidden
+  STUDENT_VIEW_PAGES = {
+      "courses#show" => nil,
+      "announcements#index" => Course::TAB_ANNOUNCEMENTS,
+      "announcements#show" => nil,
+      "assignments#index" => Course::TAB_ASSIGNMENTS,
+      "assignments#show" => nil,
+      "discussion_topics#index" => Course::TAB_DISCUSSIONS,
+      "discussion_topics#show" => nil,
+      "context_modules#index" => Course::TAB_MODULES,
+      "context#roster" => Course::TAB_PEOPLE,
+      "context#roster_user" => nil,
+      "wiki_pages#front_page" => Course::TAB_PAGES,
+      "wiki_pages#index" => Course::TAB_PAGES,
+      "wiki_pages#show" => nil,
+      "files#index" => Course::TAB_FILES,
+      "files#show" => nil,
+      "assignments#syllabus" => Course::TAB_SYLLABUS,
+      "outcomes#index" => Course::TAB_OUTCOMES,
+      "quizzes/quizzes#index" => Course::TAB_QUIZZES,
+      "quizzes/quizzes#show" => nil
+  }.freeze
+
+  def show_student_view_button?
+    return false unless @context&.is_a?(Course) && @context&.feature_enabled?(:easy_student_view) && can_do(@context, @current_user, :use_student_view)
+
+    controller_action = "#{params[:controller]}##{params[:action]}"
+    STUDENT_VIEW_PAGES.key?(controller_action) && (STUDENT_VIEW_PAGES[controller_action].nil? || !@context.tab_hidden?(STUDENT_VIEW_PAGES[controller_action]))
+  end
+  helper_method :show_student_view_button?
 end

@@ -36,6 +36,7 @@ function normalizeContextType(contextType) {
   }
 }
 
+/* eslint-disable prefer-const */
 export default function(props = {}) {
   let {
     source,
@@ -52,12 +53,27 @@ export default function(props = {}) {
     documents,
     media,
     flickr,
-    newPageLinkExpanded
+    newPageLinkExpanded,
+    searchString,
+    sortBy,
+    all_files
   } = props
+  /* eslint-enable prefer-const */
 
   // normalize contextType (including in props)
   contextType = normalizeContextType(contextType)
   props = {...props, contextType}
+
+  if (searchString === undefined) {
+    searchString = ''
+  }
+
+  if (all_files === undefined) {
+    all_files = {isLoading: false}
+  }
+
+  if (!sortBy) sortBy = {}
+  sortBy = {sort: 'date_added', dir: 'desc', ...sortBy}
 
   // default to API source
   if (source == null) {
@@ -131,6 +147,9 @@ export default function(props = {}) {
     documents,
     media,
     flickr,
-    newPageLinkExpanded
+    newPageLinkExpanded,
+    searchString,
+    sortBy,
+    all_files
   }
 }

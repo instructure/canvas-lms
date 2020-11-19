@@ -151,7 +151,9 @@ module Api
           :scope => 'root_account_id' }.freeze,
   }.freeze
 
-  MAX_ID_LENGTH = (2**63 - 1).to_s.length
+  MAX_ID = (2**63 - 1)
+  MAX_ID_LENGTH = MAX_ID.to_s.length
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
   USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 

@@ -1,0 +1,107 @@
+{
+  "name": "attachment_updated",
+  "definition": "The event is emitted anytime a file is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered anytime a file is updated in a course or user file directory.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "context_id": "The Canvas id of the current context",
+      "context_type": "The type of context where the event happened",
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "filename": "The file name of the attachment. NOTE: This field will be truncated to only include the first 8192 characters.",
+      "folder_id": "The id of the folder where the attachment was saved"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-16T02:09:01.502Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:0d4f85b5-f541-4c14-a405-d6a01e578d32",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000123456",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana@example.com",
+                  "user_sis_id": "456-T45",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000123456"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:attachment:21070000000000606",
+              "type": "Document",
+              "name": "enrollments.csv",
+              "dateModified": "2018-10-11T20:32:48.000Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_id": "21070000000000565",
+                  "context_type": "Course",
+                  "filename": "enrollments.csv",
+                  "folder_id": "21070000000001344",
+                  "entity_id": "21070000000000606"
+                }
+              },
+              "mediaType": "text/csv"
+            },
+            "eventTime": "2019-11-01T19:11:18.234Z",
+            "referrer": "https://oxana.instructure.com/courses/565/files",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:user:21070000000123456",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000123456",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              }
+            },
+            "session": {
+              "id": "urn:instructure:canvas:session:ef686f8ed684abf78cbfa1f6a58112b5",
+              "type": "Session"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/files/606",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

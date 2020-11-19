@@ -24,7 +24,7 @@ module UserSearch
     return User.none if search_term.strip.empty?
     SearchTermHelper.validate_search_term(search_term)
 
-    @is_id = search_term =~ Api::ID_REGEX
+    @is_id = search_term =~ Api::ID_REGEX && Api::MAX_ID_RANGE.cover?(search_term.to_i)
     @include_login = context.grants_right?(searcher, session, :view_user_logins)
     @include_email = context.grants_right?(searcher, session, :read_email_addresses)
     @include_sis   = context.grants_any_right?(searcher, session, :read_sis, :manage_sis)

@@ -83,8 +83,8 @@ export function getInitialGridDisplaySettings(settings, colors) {
 export function getInitialContentLoadStates(options) {
   return {
     assignmentGroupsLoaded: false,
-    assignmentsLoaded: false,
     contextModulesLoaded: !options.has_modules,
+    assignmentsLoaded: {all: false, gradingPeriod: {}},
     customColumnsLoaded: false,
     gradingPeriodAssignmentsLoaded: false,
     overridesColumnUpdating: false,

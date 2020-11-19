@@ -18,6 +18,7 @@
 
 import axios from 'axios'
 import parseLinkHeader from 'parse-link-header'
+import numberHelper from '../shared/helpers/numberHelper'
 
 import categories, {OTHER_ID} from './categories'
 
@@ -48,6 +49,7 @@ const CyoeApi = {
     let url = `/api/v1/courses/${courseId}/mastery_paths/rules`
 
     const data = state.get('rule').toJS()
+    CyoeApi._parseBounds(data) // convert localized bounds (with possible decimal commas etc.) to numbers
     const ruleId = state.getIn(['rule', 'id'])
     const triggerId = state.getIn(['trigger_assignment', 'id'])
 
@@ -117,6 +119,17 @@ const CyoeApi = {
       }
       res.data = allResults
       return res
+    })
+  },
+
+  _parseBounds: data => {
+    data.scoring_ranges.forEach(range => {
+      if (typeof range.lower_bound === 'string') {
+        range.lower_bound = numberHelper.parse(range.lower_bound)
+      }
+      if (typeof range.upper_bound === 'string') {
+        range.upper_bound = numberHelper.parse(range.upper_bound)
+      }
     })
   }
 }

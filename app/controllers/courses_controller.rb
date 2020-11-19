@@ -2133,7 +2133,9 @@ class CoursesController < ApplicationController
       NOTIFICATION_PREFERENCES_OPTIONS: {
         granular_course_preferences_enabled: Account.site_admin.feature_enabled?(:notification_granular_course_preferences),
         deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
+        reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+        allowed_push_categories: Notification.categories_to_send_in_push,
         send_scores_in_emails_text: Notification.where(category: 'Grading').first&.related_user_setting(@current_user, @domain_root_account)
       }
     )
@@ -3090,7 +3092,7 @@ class CoursesController < ApplicationController
     session.delete(:become_user_id)
     return_url = session[:masquerade_return_to]
     session.delete(:masquerade_return_to)
-    return return_to(return_url, request.referer || dashboard_url)
+    return_to(return_url, request.referer || dashboard_url)
   end
 
   def reset_test_student
@@ -3128,7 +3130,9 @@ class CoursesController < ApplicationController
     session[:become_user_id] = @fake_student.id
     return_url = course_path(@context)
     session.delete(:masquerade_return_to)
-    return return_to(return_url, request.referer || dashboard_url)
+    return return_to(request.referer, return_url || dashboard_url) if value_to_boolean(params[:redirect_to_referer])
+
+    return_to(return_url, request.referer || dashboard_url)
   end
   protected :enter_student_view
 

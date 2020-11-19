@@ -631,8 +631,8 @@ class RoleOverride < ActiveRecord::Base
        ]
     },
     :manage_proficiency_scales => {
-       :label => lambda { t('permissions.manage_proficiency_scales', "Manage outcome proficiency scales") },
-       :label_v2 => lambda { t("Outcome Proficiency Scales - add / edit") },
+       :label => lambda { t('permissions.manage_proficiency_scales', "Manage outcome mastery scales") },
+       :label_v2 => lambda { t("Outcome Mastery Scales - add / edit") },
        :available_to => [
          'DesignerEnrollment',
          'TeacherEnrollment',

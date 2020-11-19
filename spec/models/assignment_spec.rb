@@ -2272,7 +2272,7 @@ describe Assignment do
         end
 
         it "inserts a record" do
-          expect(Auditors::GradeChange::Stream).to receive(:insert).once
+          expect(Auditors::GradeChange).to receive(:record).once
           assignment.grade_student(student, grade: 10, grader: teacher)
         end
       end
@@ -2283,7 +2283,9 @@ describe Assignment do
         end
 
         it "inserts a record" do
-          expect(Auditors::GradeChange::Stream).to receive(:insert).once
+          # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+          # second time is for the grade change on the record.
+          expect(Auditors::GradeChange).to receive(:record).twice
           assignment.grade_student(student, grade: 10, grader: teacher)
         end
       end
@@ -3168,7 +3170,9 @@ describe Assignment do
 
     describe "grade change audit records" do
       it "continues to insert grade change records when assignment is muted" do
-        expect(Auditors::GradeChange::Stream).to receive(:insert).once
+        # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+        # second time is for the grade change on the record.
+        expect(Auditors::GradeChange).to receive(:record).twice
         @assignment.grade_student(@student, grade: 10, grader: @teacher)
       end
 
@@ -8091,7 +8095,9 @@ describe Assignment do
           end
 
           it "inserts a single grade change record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
+            # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+            # second time is for the grade change on the record.
+            expect(Auditors::GradeChange).to receive(:record).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
           end
 
@@ -8113,7 +8119,9 @@ describe Assignment do
           end
 
           it "inserts a single grade change record" do
-            expect(Auditors::GradeChange::Stream).to receive(:insert).once
+            # once just for ther #assignment_muted_changed call as part of "handle_posted_at_changed"
+            # second time is for the grade change on the record.
+            expect(Auditors::GradeChange).to receive(:record).twice
             assignment.grade_student(student1, grade: 10, grader: teacher)
           end
         end

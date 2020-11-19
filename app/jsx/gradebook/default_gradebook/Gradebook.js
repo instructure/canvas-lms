@@ -145,6 +145,7 @@ class Gradebook {
     this.gotAllAssignmentGroups = this.gotAllAssignmentGroups.bind(this)
 
     // Grading Period Assignment Data & Lifecycle Methods
+    this.assignmentsLoadedForCurrentView = this.assignmentsLoadedForCurrentView.bind(this)
     this.updateGradingPeriodAssignments = this.updateGradingPeriodAssignments.bind(this)
     this.gotGradingPeriodAssignments = this.gotGradingPeriodAssignments.bind(this)
     this.gotSections = this.gotSections.bind(this)
@@ -255,6 +256,7 @@ class Gradebook {
     this.gradeSort = this.gradeSort.bind(this)
     this.missingSort = this.missingSort.bind(this)
     this.lateSort = this.lateSort.bind(this)
+    this.setCurrentGradingPeriod = this.setCurrentGradingPeriod.bind(this)
     this.sortByStudentColumn = this.sortByStudentColumn.bind(this)
     this.sortByCustomColumn = this.sortByCustomColumn.bind(this)
     this.sortByAssignmentColumn = this.sortByAssignmentColumn.bind(this)
@@ -274,6 +276,7 @@ class Gradebook {
     this.showNotesColumn = this.showNotesColumn.bind(this)
     this.hideNotesColumn = this.hideNotesColumn.bind(this)
     // # Grid DOM Access/Reference Methods
+    this.addAssignmentColumnDefinition = this.addAssignmentColumnDefinition.bind(this)
     this.getCustomColumnId = this.getCustomColumnId.bind(this)
     this.getAssignmentColumnId = this.getAssignmentColumnId.bind(this)
     this.getAssignmentGroupColumnId = this.getAssignmentGroupColumnId.bind(this)
@@ -363,9 +366,10 @@ class Gradebook {
     this.setFilterRowsBySetting = this.setFilterRowsBySetting.bind(this)
     this.isFilteringColumnsByAssignmentGroup = this.isFilteringColumnsByAssignmentGroup.bind(this)
     this.getAssignmentGroupToShow = this.getAssignmentGroupToShow.bind(this)
+    this.getModuleToShow = this.getModuleToShow.bind(this)
     this.isFilteringColumnsByGradingPeriod = this.isFilteringColumnsByGradingPeriod.bind(this)
     this.isFilteringRowsBySearchTerm = this.isFilteringRowsBySearchTerm.bind(this)
-    this.getGradingPeriodToShow = this.getGradingPeriodToShow.bind(this)
+    this.getGradingPeriodAssignments = this.getGradingPeriodAssignments.bind(this)
     this.getGradingPeriod = this.getGradingPeriod.bind(this)
     this.setSelectedPrimaryInfo = this.setSelectedPrimaryInfo.bind(this)
     this.toggleDefaultSort = this.toggleDefaultSort.bind(this)
@@ -472,11 +476,7 @@ class Gradebook {
     } else {
       this.finalGradeOverrides = null
     }
-    if (this.options.post_policies_enabled) {
-      this.postPolicies = new PostPolicies(this)
-    } else {
-      this.postPolicies = null
-    }
+    this.postPolicies = new PostPolicies(this)
     $.subscribe('assignment_muting_toggled', this.handleSubmissionPostedChange)
     $.subscribe('submissions_updated', this.updateSubmissionsFromExternal)
     // emitted by SectionMenuView; also subscribed in OutcomeGradebookView
@@ -502,7 +502,6 @@ class Gradebook {
     this.headerComponentRefs = {}
     this.filteredContentInfo = {
       invalidAssignmentGroups: [],
-      mutedAssignments: [],
       totalPointsPossible: 0
     }
     this.setAssignments({})
@@ -524,6 +523,7 @@ class Gradebook {
     } else {
       this.gradingPeriodSet = null
     }
+    this.setCurrentGradingPeriod()
     this.show_attendance = !!UserSettings.contextGet('show_attendance')
     // preferences serialization causes these to always come
     // from the database as strings
@@ -758,51 +758,55 @@ class Gradebook {
     return this.invalidateRowsForStudentIds(_.uniq(studentIds))
   }
 
-  updateAssignmentGroups(assigmentGroups) {
-    this.gotAllAssignmentGroups(assigmentGroups)
-    this.contentLoadStates.assignmentsLoaded = true
+  updateAssignmentGroups(assignmentGroups, gradingPeriodIds) {
+    this.gotAllAssignmentGroups(assignmentGroups)
+    this.setAssignmentsLoaded(gradingPeriodIds)
     this.renderViewOptionsMenu()
+    this.renderFilters()
     this.updateColumnHeaders()
     return this._updateEssentialDataLoaded()
   }
 
   gotAllAssignmentGroups(assignmentGroups) {
-    let assignment, group, j, len
     this.setAssignmentGroupsLoaded(true)
-    // purposely passing the @options and assignmentGroups by reference so it can update
-    // an assigmentGroup's .group_weight and @options.group_weighting_scheme
-    const results = []
-    for (j = 0, len = assignmentGroups.length; j < len; j++) {
-      group = assignmentGroups[j]
-      this.assignmentGroups[group.id] = group
-      results.push(
-        function() {
-          let k, len1
-          const ref1 = group.assignments
-          const results1 = []
-          for (k = 0, len1 = ref1.length; k < len1; k++) {
-            assignment = ref1[k]
-            assignment.assignment_group = group
-            assignment.due_at = tz.parse(assignment.due_at)
-            this.updateAssignmentEffectiveDueDates(assignment)
-            results1.push((this.assignments[assignment.id] = assignment))
-          }
-          return results1
-        }.call(this)
-      )
-    }
-    return results
+    assignmentGroups.forEach(assignmentGroup => {
+      let group = this.assignmentGroups[assignmentGroup.id]
+
+      if (!group) {
+        group = assignmentGroup
+        this.assignmentGroups[group.id] = group
+      }
+
+      assignmentGroup.assignments.forEach(assignment => {
+        assignment.assignment_group = group
+        assignment.due_at = tz.parse(assignment.due_at)
+        this.updateAssignmentEffectiveDueDates(assignment)
+        this.addAssignmentColumnDefinition(assignment)
+        this.assignments[assignment.id] = assignment
+      })
+    })
   }
 
   updateGradingPeriodAssignments(gradingPeriodAssignments) {
     this.gotGradingPeriodAssignments({
       grading_period_assignments: gradingPeriodAssignments
     })
+
+    Object.keys(gradingPeriodAssignments).forEach(periodId => {
+      this.contentLoadStates.assignmentsLoaded.gradingPeriod[
+        periodId
+      ] = this.contentLoadStates.assignmentsLoaded.all
+    })
+
     this.setGradingPeriodAssignmentsLoaded(true)
     if (this._gridHasRendered()) {
       this.updateColumns()
     }
     return this._updateEssentialDataLoaded()
+  }
+
+  getGradingPeriodAssignments(gradingPeriodId) {
+    return this.courseContent.gradingPeriodAssignments[gradingPeriodId] || []
   }
 
   gotGradingPeriodAssignments({grading_period_assignments: gradingPeriodAssignments}) {
@@ -1238,28 +1242,16 @@ class Gradebook {
   }
 
   filterAssignmentByGradingPeriod(assignment) {
-    let ref1
-    if (!this.isFilteringColumnsByGradingPeriod()) {
-      return true
-    }
-    return (
-      (ref1 = assignment.id),
-      indexOf.call(
-        this.courseContent.gradingPeriodAssignments[this.getGradingPeriodToShow()] || [],
-        ref1
-      ) >= 0
-    )
+    if (!this.isFilteringColumnsByGradingPeriod()) return true
+
+    const assignmentsForPeriod = this.getGradingPeriodAssignments(this.gradingPeriodId)
+    return assignmentsForPeriod.includes(assignment.id)
   }
 
   filterAssignmentByModule(assignment) {
     let ref1
-    const contextModuleFilterSetting = this.getFilterColumnsBySetting('contextModuleId')
-    if (!contextModuleFilterSetting) {
-      return true
-    }
-    if (contextModuleFilterSetting === '0' || contextModuleFilterSetting === 'null') {
-      // Firefox returns a value of "null" (String) for this when nothing is set.  The comparison
-      // to 'null' below is a result of that
+    const contextModuleFilterSetting = this.getModuleToShow()
+    if (contextModuleFilterSetting === '0') {
       return true
     }
     return (
@@ -1443,9 +1435,7 @@ class Gradebook {
       const studentPeriodInfo = this.effectiveDueDates[submission.assignment_id]?.[
         submission.user_id
       ]
-      return (
-        studentPeriodInfo && studentPeriodInfo.grading_period_id === this.getGradingPeriodToShow()
-      )
+      return studentPeriodInfo && studentPeriodInfo.grading_period_id === this.gradingPeriodId
     })
   }
 
@@ -1476,7 +1466,7 @@ class Gradebook {
 
     let grades = this.getStudentGrades(student, preferCachedGrades)
     if (this.isFilteringColumnsByGradingPeriod()) {
-      grades = grades.gradingPeriods[this.getGradingPeriodToShow()]
+      grades = grades.gradingPeriods[this.gradingPeriodId]
     }
 
     const scoreType = this.viewUngradedAsZero() ? 'final' : 'current'
@@ -1692,10 +1682,10 @@ class Gradebook {
       indexOf.call(this.gridDisplaySettings.selectedViewOptionsFilters, 'gradingPeriods') >= 0
     ) {
       props = {
-        disabled: false,
+        disabled: !this.contentLoadStates.assignmentsLoaded.all,
         gradingPeriods: this.gradingPeriodList(),
         onSelect: this.updateCurrentGradingPeriod,
-        selectedGradingPeriodId: this.getGradingPeriodToShow()
+        selectedGradingPeriodId: this.gradingPeriodId
       }
       return renderComponent(GradingPeriodFilter, mountPoint, props)
     } else if (mountPoint != null) {
@@ -1707,6 +1697,7 @@ class Gradebook {
   updateCurrentGradingPeriod(period) {
     if (this.getFilterColumnsBySetting('gradingPeriodId') !== period) {
       this.setFilterColumnsBySetting('gradingPeriodId', period)
+      this.setCurrentGradingPeriod()
       this.saveSettings()
       this.resetGrading()
       this.sortGridRows()
@@ -1744,7 +1735,7 @@ class Gradebook {
         disabled: false,
         modules: this.moduleList(),
         onSelect: this.updateCurrentModule,
-        selectedModuleId: this.getFilterColumnsBySetting('contextModuleId') || '0'
+        selectedModuleId: this.getModuleToShow()
       }
       return renderComponent(ModuleFilter, mountPoint, props)
     } else if (mountPoint != null) {
@@ -1756,7 +1747,7 @@ class Gradebook {
   initSubmissionStateMap() {
     return (this.submissionStateMap = new SubmissionStateMap({
       hasGradingPeriods: this.gradingPeriodSet != null,
-      selectedGradingPeriodID: this.getGradingPeriodToShow(),
+      selectedGradingPeriodID: this.gradingPeriodId,
       isAdmin: isAdmin()
     }))
   }
@@ -1878,7 +1869,7 @@ class Gradebook {
     return {
       criterion,
       direction: storedSortOrder.direction || 'ascending',
-      disabled: !this.contentLoadStates.assignmentsLoaded,
+      disabled: !this.assignmentsLoadedForCurrentView(),
       modulesEnabled: this.listContextModules().length > 0,
       onSortByDefault: () => {
         return this.arrangeColumnsBy(
@@ -2024,7 +2015,7 @@ class Gradebook {
         isEnabled: this.options.publish_to_sis_enabled,
         publishToSisUrl: this.options.publish_to_sis_url
       },
-      gradingPeriodId: this.getGradingPeriodToShow()
+      gradingPeriodId: this.gradingPeriodId
     }
     const progressData = this.options.gradebook_csv_progress
     if (this.options.gradebook_csv_progress) {
@@ -2409,17 +2400,11 @@ class Gradebook {
   }
 
   initGrid() {
-    let assignment, assignmentColumn, assignmentGroup, assignmentGroupColumn, id
+    let assignmentGroup, assignmentGroupColumn, id
     this.updateFilteredContentInfo()
     const studentColumn = this.buildStudentColumn()
     this.gridData.columns.definitions[studentColumn.id] = studentColumn
     this.gridData.columns.frozen.push(studentColumn.id)
-    const ref1 = this.assignments
-    for (id in ref1) {
-      assignment = ref1[id]
-      assignmentColumn = this.buildAssignmentColumn(assignment)
-      this.gridData.columns.definitions[assignmentColumn.id] = assignmentColumn
-    }
     const ref2 = this.assignmentGroups
     for (id in ref2) {
       assignmentGroup = ref2[id]
@@ -2432,6 +2417,13 @@ class Gradebook {
     this.gridData.columns.definitions[totalGradeOverrideColumn.id] = totalGradeOverrideColumn
     this.renderGridColor()
     return this.createGrid()
+  }
+
+  addAssignmentColumnDefinition(assignment) {
+    const assignmentColumn = this.buildAssignmentColumn(assignment)
+    if (!this.gridData.columns.definitions[assignmentColumn.id]) {
+      this.gridData.columns.definitions[assignmentColumn.id] = assignmentColumn
+    }
   }
 
   createGrid() {
@@ -2856,9 +2848,6 @@ class Gradebook {
       return results
     }.call(this)
     const filteredAssignments = this.filterAssignments(unorderedAssignments)
-    this.filteredContentInfo.mutedAssignments = filteredAssignments.filter(assignment => {
-      return assignment.muted
-    })
     this.filteredContentInfo.totalPointsPossible = _.reduce(
       this.assignmentGroups,
       function(sum, assignmentGroup) {
@@ -2881,27 +2870,23 @@ class Gradebook {
   }
 
   listHiddenAssignments(studentId) {
-    if (this.options.post_policies_enabled) {
-      if (!(this.contentLoadStates.submissionsLoaded && this.contentLoadStates.assignmentsLoaded)) {
-        return []
-      }
-      return Object.values(this.assignments).filter(assignment => {
-        const submission = this.getSubmission(studentId, assignment.id)
-        // Ignore anonymous assignments when deciding whether to show the
-        // "hidden" icon, as including them could reveal which students have
-        // and have not been graded.
-        // Ignore 'not_graded' assignments as they are not counted into the
-        // student's grade, nor are they visible in the Gradebook.
-        return (
-          submission != null &&
-          isPostable(submission) &&
-          !assignment.anonymize_students &&
-          assignment.grading_type !== 'not_graded'
-        )
-      })
-    } else {
-      return this.filteredContentInfo.mutedAssignments
+    if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
+      return []
     }
+    return Object.values(this.assignments).filter(assignment => {
+      const submission = this.getSubmission(studentId, assignment.id)
+      // Ignore anonymous assignments when deciding whether to show the
+      // "hidden" icon, as including them could reveal which students have
+      // and have not been graded.
+      // Ignore 'not_graded' assignments as they are not counted into the
+      // student's grade, nor are they visible in the Gradebook.
+      return (
+        submission != null &&
+        isPostable(submission) &&
+        !assignment.anonymize_students &&
+        assignment.grading_type !== 'not_graded'
+      )
+    })
   }
 
   getTotalPointsPossible() {
@@ -3288,7 +3273,6 @@ class Gradebook {
         assignmentId,
         userId: studentId
       }),
-      postPoliciesEnabled: this.options.post_policies_enabled,
       requireStudentGroupForSpeedGrader: this.requireStudentGroupForSpeedGrader(assignment),
       selectNextAssignment: () => {
         return this.loadTrayAssignment('next')
@@ -3530,8 +3514,30 @@ class Gradebook {
     ) // on success, do nothing since the render happened earlier
   }
 
-  setAssignmentsLoaded(loaded) {
-    return (this.contentLoadStates.assignmentsLoaded = loaded)
+  assignmentsLoadedForCurrentView() {
+    const gradingPeriodId = this.gradingPeriodId
+    const loadStates = this.contentLoadStates.assignmentsLoaded
+    if (loadStates.all || gradingPeriodId === '0') {
+      return loadStates.all
+    }
+
+    return loadStates.gradingPeriod[gradingPeriodId]
+  }
+
+  setAssignmentsLoaded(gradingPeriodIds) {
+    const {assignmentsLoaded} = this.contentLoadStates
+    if (!gradingPeriodIds) {
+      assignmentsLoaded.all = true
+      Object.keys(assignmentsLoaded.gradingPeriod).forEach(periodId => {
+        assignmentsLoaded.gradingPeriod[periodId] = true
+      })
+      return
+    }
+
+    gradingPeriodIds.forEach(id => (assignmentsLoaded.gradingPeriod[id] = true))
+    if (Object.values(assignmentsLoaded.gradingPeriod).every(loaded => loaded)) {
+      assignmentsLoaded.all = true
+    }
   }
 
   setAssignmentGroupsLoaded(loaded) {
@@ -3663,6 +3669,14 @@ class Gradebook {
     return this.getAssignmentGroupToShow() !== '0'
   }
 
+  getModuleToShow() {
+    const moduleId = this.getFilterColumnsBySetting('contextModuleId')
+    if (moduleId == null || !this.listContextModules().some(module => module.id === moduleId)) {
+      return '0'
+    }
+    return moduleId
+  }
+
   getAssignmentGroupToShow() {
     const groupId = this.getFilterColumnsBySetting('assignmentGroupId') || '0'
     if (indexOf.call(_.pluck(this.assignmentGroups, 'id'), groupId) >= 0) {
@@ -3673,23 +3687,26 @@ class Gradebook {
   }
 
   isFilteringColumnsByGradingPeriod() {
-    return this.getGradingPeriodToShow() !== '0'
+    return this.gradingPeriodId !== '0'
   }
 
   isFilteringRowsBySearchTerm() {
     return this.userFilterTerm != null && this.userFilterTerm !== ''
   }
 
-  getGradingPeriodToShow() {
+  setCurrentGradingPeriod() {
     if (this.gradingPeriodSet == null) {
-      return '0'
+      this.gradingPeriodId = '0'
+      return
     }
+
     const periodId =
       this.getFilterColumnsBySetting('gradingPeriodId') || this.options.current_grading_period_id
-    if (indexOf.call(_.pluck(this.gradingPeriodSet.gradingPeriods, 'id'), periodId) >= 0) {
-      return periodId
+
+    if (this.gradingPeriodSet.gradingPeriods.some(period => period.id === periodId)) {
+      this.gradingPeriodId = periodId
     } else {
-      return '0'
+      this.gradingPeriodId = '0'
     }
   }
 
@@ -4294,6 +4311,7 @@ class Gradebook {
       this.contentLoadStates.contextModulesLoaded &&
       this.contentLoadStates.customColumnsLoaded &&
       this.contentLoadStates.assignmentGroupsLoaded &&
+      this.assignmentsLoadedForCurrentView() &&
       (!this.gradingPeriodSet || this.contentLoadStates.gradingPeriodAssignmentsLoaded)
     ) {
       return this._essentialDataLoaded.resolve()

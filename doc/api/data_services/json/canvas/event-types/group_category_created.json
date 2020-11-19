@@ -1,0 +1,51 @@
+{
+  "name": "group_category_created",
+  "definition": "The event is emitted anytime a new group category is added to a course group by an end user or API request.",
+  "trigger": "Triggered when a new group category is created.",
+  "schema": {
+    "context_id": "The Canvas id of the group's context.",
+    "context_type": "The type of the group's context.",
+    "group_category_id": "The Canvas id of the newly created group category.",
+    "group_category_name": "The name of the newly created group category.",
+    "group_limit": "The cap of the number of users in each group."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "TeacherEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "event_name": "group_category_created",
+          "event_time": "2019-11-01T15:06:48.462Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/565/assignments/7655/edit",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/Monterrey",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/group_categories",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "context_id": "565",
+          "context_type": "Course",
+          "group_category_id": "21070000000000049",
+          "group_category_name": "Live_events_Group1",
+          "group_limit": 99
+        }
+      }
+    }
+  ]
+}

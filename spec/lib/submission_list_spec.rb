@@ -41,6 +41,9 @@ describe SubmissionList do
   end
 
   it "should take the time zone into account when dividing grading history into days" do
+    Timecop.travel(Time.utc(2011, 12, 31, 23, 0)) do
+      Auditors::ActiveRecord::Partitioner.process
+    end
     course_with_teacher(:active_all => true)
     course_with_student(:course => @course, :active_all => true)
 

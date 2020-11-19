@@ -371,6 +371,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
         createGradebookAndLoadData()
         // Select "All Grading Periods"
         gradebook.setFilterColumnsBySetting('gradingPeriodId', '0')
+        gradebook.setCurrentGradingPeriod()
         deepEqual(getSubmissionIds().sort(), ['2501', '2502'])
       })
 
@@ -380,6 +381,7 @@ QUnit.module('Gradebook > Submissions', suiteHooks => {
           createGradebookAndLoadData()
           // Select "Q2"
           gradebook.setFilterColumnsBySetting('gradingPeriodId', '1502')
+          gradebook.setCurrentGradingPeriod()
           deepEqual(getSubmissionIds(), ['2502'])
         })
       })

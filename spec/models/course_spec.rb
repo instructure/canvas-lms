@@ -1470,14 +1470,6 @@ describe Course do
       expect(course.reload.default_post_policy).to be_post_manually
     end
   end
-
-  describe "#post_policies_enabled?" do
-    let_once(:course) { Course.create! }
-
-    it "returns true" do
-      expect(course).to be_post_policies_enabled
-    end
-  end
 end
 
 describe Course do

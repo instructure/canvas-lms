@@ -101,7 +101,3 @@ ActionController::Base.class_eval do
     ArbitraryStrongishParams::ANYTHING
   end
 end
-
-ActionController::ParameterMissing.class_eval do
-  def skip_error_report?; true; end
-end

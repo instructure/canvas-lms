@@ -75,7 +75,7 @@ describe('RCE "Images" Plugin > Images', () => {
     it('calls the .fetchInitialImages prop', () => {
       renderComponent()
       expect(props.fetchInitialImages).toHaveBeenCalledTimes(1)
-      expect(props.fetchInitialImages).toHaveBeenCalledWith(props.sortBy, props.searchString)
+      expect(props.fetchInitialImages).toHaveBeenCalledWith()
     })
 
     it('does not display the "Load More" button', () => {

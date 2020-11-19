@@ -43,7 +43,8 @@ class SubmissionsBaseController < ApplicationController
           outcome_extra_credit_enabled: @context.feature_enabled?(:outcome_extra_credit),
           rubric: rubric ? rubric_json(rubric, @current_user, session, style: 'full') : nil,
           rubricAssociation: rubric_association_json ? rubric_association_json['rubric_association'] : nil,
-          outcome_proficiency: outcome_proficiency
+          outcome_proficiency: outcome_proficiency,
+          media_comment_asset_string: @current_user.asset_string
         })
 
         js_bundle :submissions

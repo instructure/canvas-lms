@@ -659,6 +659,7 @@ describe SubmissionsController do
     it "renders show template" do
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       expect(response).to render_template(:show)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @teacher.asset_string
     end
 
     it "renders json with scores for teachers" do
@@ -752,6 +753,7 @@ describe SubmissionsController do
       @assignment.ensure_post_policy(post_manually: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_status(200)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @student.asset_string
     end
 
     describe "peer reviewers" do

@@ -2027,6 +2027,16 @@ class UsersController < ApplicationController
     end
   end
 
+  def admin_split
+    @user = User.find(params[:user_id])
+    return unless authorized_action(@user, @current_user, :merge)
+
+    merge_data = UserMergeData.active.splitable.where(user_id: @user).shard(@user).preload(:from_user).to_a
+    js_env ADMIN_SPLIT_USER: user_display_json(@user),
+           ADMIN_SPLIT_URL: api_v1_split_url(@user),
+           ADMIN_SPLIT_USERS: merge_data.map { |md| user_display_json(md.from_user) }
+  end
+
   def mark_avatar_image
     if params[:remove]
       if authorized_action(@user, @current_user, :remove_avatar)
@@ -2333,7 +2343,7 @@ class UsersController < ApplicationController
 
     if authorized_action(user, @current_user, :merge)
       users = SplitUsers.split_db_users(user)
-      render :json => users.map { |u| user_json(u, @current_user, session) }
+      render :json => users.sort_by(&:short_name).map { |u| user_json(u, @current_user, session) }
     end
   end
 

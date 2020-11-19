@@ -46,14 +46,12 @@ const MasteryScale = ({contextType, contextId}) => {
       try {
         const response = await saveProficiency(contextType, contextId, config)
         if (response.status !== 200) {
-          setUpdateProficiencyRatingsError(
-            I18n.t('An error occurred updating the proficiency ratings')
-          )
+          setUpdateProficiencyRatingsError(I18n.t('An error occurred updating the mastery scale'))
           throw new Error(I18n.t('HTTP Response: %{code}', {code: response.status}))
         }
       } catch (e) {
         setUpdateProficiencyRatingsError(
-          I18n.t('An error occurred updating the proficiency ratings: %{message}', {
+          I18n.t('An error occurred updating the mastery scale: %{message}', {
             message: e.message
           })
         )
@@ -73,7 +71,7 @@ const MasteryScale = ({contextType, contextId}) => {
   if (error) {
     return (
       <Text color="danger">
-        {I18n.t('An error occurred while loading the proficiency ratings: %{error}', {error})}
+        {I18n.t('An error occurred while loading the mastery scale: %{error}', {error})}
       </Text>
     )
   }

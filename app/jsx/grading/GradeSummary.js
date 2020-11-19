@@ -227,9 +227,8 @@ const GradeSummary = {
 
     if ($assignment.data('muted')) {
       title = I18n.t('Instructor is working on grades')
-      const className = ENV.post_policies_enabled ? 'icon-off' : 'icon-muted muted_icon'
-      // xsslint safeString.identifier className title
-      $grade.html(`<i class="${className}" aria-hidden="true" title="${title}"=></i>`)
+      // xsslint safeString.identifier title
+      $grade.html(`<i class="icon-off" aria-hidden="true" title="${title}"=></i>`)
     } else {
       title = I18n.t('Click to test a different score')
       $grade.text(score.formattedValue)

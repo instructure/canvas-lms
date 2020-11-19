@@ -111,4 +111,10 @@ class TokenScopes
   end
   private_class_method :api_routes
 
+  def self.reset!
+    @_api_routes = nil
+    @_all_scopes = nil
+    @_detailed_scopes = nil
+    @_named_scopes = nil
+  end
 end

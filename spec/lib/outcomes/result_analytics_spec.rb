@@ -456,6 +456,48 @@ describe Outcomes::ResultAnalytics do
       percents = ra.rating_percents(rollups)
       expect(percents).to eq({80 => [50, 50, 0]})
     end
+
+    describe 'with the account_level_mastery_scales FF' do
+      before do
+        @course = course_factory
+      end
+
+      describe 'enabled' do
+        before do
+          @course.account.enable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'uses the context resolved_outcome_proficiency if a context is provided' do
+          results = [
+            outcome_from_score(4.0, {}),
+            outcome_from_score(5.0, {user: User.new(id: 20,name: 'b')}),
+            outcome_from_score(2.0, {user: User.new(id: 21,name: 'c')})
+          ]
+          users = [User.new(id: 10, name:'a'), User.new(id: 30, name: 'c')]
+          rollups = ra.outcome_results_rollups(results: results, users: users)
+          percents = ra.rating_percents(rollups, context: @course)
+          expect(percents).to eq({80 => [67, 0, 33, 0, 0]})
+        end
+      end
+
+      describe 'disabled' do
+        before do
+          @course.account.disable_feature!(:account_level_mastery_scales)
+        end
+
+        it 'does not use the context resolved_outcome_proficiency if a context is provided' do
+          results = [
+            outcome_from_score(4.0, {}),
+            outcome_from_score(5.0, {user: User.new(id: 20,name: 'b')}),
+            outcome_from_score(2.0, {user: User.new(id: 21,name: 'c')})
+          ]
+          users = [User.new(id: 10, name:'a'), User.new(id: 30, name: 'c')]
+          rollups = ra.outcome_results_rollups(results: results, users: users)
+          percents = ra.rating_percents(rollups, context: @course)
+          expect(percents).to eq({80 => [33, 33, 33]})
+        end
+      end
+    end
   end
 
   describe "handling quiz outcome results objects" do

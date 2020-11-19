@@ -751,9 +751,18 @@ class Conversation < ActiveRecord::Base
     # can still reply if a teacher is involved
     if course.is_a?(Course) && self.conversation_participants.where(:user_id => course.admin_enrollments.active.select(:user_id)).exists?
       false
+    # can still reply if observing all the other participants
+    elsif course.is_a?(Course) && observing_all_other_participants(user, self.conversation_participants, course)
+      false
     else
       !self.context.grants_any_right?(user, :send_messages, :send_messages_all)
     end
+  end
+
+  def observing_all_other_participants(user, participants, course)
+    observee_ids = user.observer_enrollments.active.where(course: course).pluck(:associated_user_id)
+    return false if observee_ids.empty?
+    (conversation_participants.pluck(:user_id) - observee_ids - [user.id]).empty?
   end
 
   protected

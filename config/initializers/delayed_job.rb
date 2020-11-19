@@ -179,13 +179,19 @@ Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|
 end
 
 Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
+  # this kind of thing happens when a job is queued and then the thing that
+  # it's queued on gets deleted.  It happens all the time for stuff
+  # like test students (we delete their stuff immediately), and
+  # we don't need detailed exception reports for those.
+  missing_record = exception.is_a?(Delayed::Backend::RecordNotFound)
+  error_level = missing_record ? :warn : :error
   info = Canvas::Errors::JobInfo.new(job, worker)
   begin
     (job.current_shard || Shard.default).activate do
-      Canvas::Errors.capture(exception, info.to_h)
+      Canvas::Errors.capture(exception, info.to_h, error_level)
     end
   rescue
-    Canvas::Errors.capture(exception, info.to_h)
+    Canvas::Errors.capture(exception, info.to_h, error_level)
   end
 end
 

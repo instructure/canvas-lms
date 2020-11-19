@@ -213,6 +213,43 @@ describe AssignmentGroupsController do
       end
     end
 
+    describe 'filtering assignments by ID' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @first_assignment = @course.assignments.create!(name: "Assignment 1")
+        @second_assignment = @course.assignments.create!(name: "Assignment 2")
+      end
+
+      it 'optionally filters assignments by ID' do
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
+      end
+
+      it 'does not return assignments outside the scope of the original result set' do
+        new_course = Course.create!
+        new_assignment = new_course.assignments.create!(name: "New Assignment")
+
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id, new_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
+      end
+    end
+
     context 'given a course with a teacher and a student' do
       before :once do
         course_with_teacher(active_all: true)

@@ -662,6 +662,16 @@ class Message < ActiveRecord::Base
       end
     end
 
+    if path_type == 'push' && Account.site_admin.feature_enabled?(:reduce_push_notifications)
+      if Notification.types_to_send_in_push.exclude?(notification_name)
+        InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
+                                     short_stat: 'message.skip',
+                                     tags: {path_type: path_type, notification_name: notification_name})
+        self.destroy
+        return nil
+      end
+    end
+
     InstStatsd::Statsd.increment("message.deliver.#{path_type}.#{notification_name}",
                                  short_stat: 'message.deliver',
                                  tags: {path_type: path_type, notification_name: notification_name})
