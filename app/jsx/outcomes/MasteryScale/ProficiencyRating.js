@@ -29,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-layout'
 import {Flex} from '@instructure/ui-flex'
 import ColorPicker, {PREDEFINED_COLORS} from '../../shared/ColorPicker'
+import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
 function formatColor(color) {
   if (color[0] !== '#') {
@@ -67,7 +68,10 @@ class ProficiencyRating extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {showColorPopover: false}
+    this.state = {
+      showColorPopover: false,
+      showDeleteModal: false
+    }
     this.descriptionInput = null
     this.pointsInput = null
     this.trashButton = null
@@ -132,6 +136,15 @@ class ProficiencyRating extends React.Component {
   }
 
   handleDelete = () => {
+    this.setState({showDeleteModal: true})
+  }
+
+  handleCloseDeleteModal = () => {
+    this.setState({showDeleteModal: false})
+  }
+
+  handleRealDelete = () => {
+    this.handleCloseDeleteModal()
     this.props.onDelete()
   }
 
@@ -301,6 +314,8 @@ class ProficiencyRating extends React.Component {
 
   renderDeleteButton = () => {
     const {disableDelete, position} = this.props
+    const {showDeleteModal} = this.state
+
     return (
       <div className="deleteButton">
         <IconButton
@@ -311,6 +326,15 @@ class ProficiencyRating extends React.Component {
           onClick={this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
+        />
+
+        <ConfirmMasteryModal
+          onConfirm={this.handleRealDelete}
+          modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
+          isOpen={showDeleteModal}
+          onClose={this.handleCloseDeleteModal}
+          title={I18n.t('Remove Mastery Level')}
+          confirmButtonText={I18n.t('Confirm')}
         />
       </div>
     )

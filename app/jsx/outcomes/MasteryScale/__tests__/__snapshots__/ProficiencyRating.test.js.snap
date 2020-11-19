@@ -320,6 +320,14 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         withBackground={false}
         withBorder={false}
       />
+      <ConfirmMasteryModal
+        confirmButtonText="Confirm"
+        isOpen={false}
+        modalText="This will remove the mastery level from your mastery scale."
+        onClose={[Function]}
+        onConfirm={[Function]}
+        title="Remove Mastery Level"
+      />
     </div>
   </Item>
 </Flex>
