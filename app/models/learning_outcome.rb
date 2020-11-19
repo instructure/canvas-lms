@@ -178,6 +178,7 @@ class LearningOutcome < ActiveRecord::Base
     tag = find_or_create_tag(asset, context)
     tag.tag = determine_tag_type(opts[:mastery_type])
     tag.mastery_score = opts[:mastery_score] if opts[:mastery_score]
+    InstStatsd::Statsd.increment('learning_outcome.align') if tag.new_record?
     tag.save
 
     if context.is_a? Course
