@@ -270,27 +270,27 @@ export default class EquationEditorView extends Backbone.View {
     // the image will get pulled from the cache, so the 2nd
     // request won't cost much
     const url = `/equation_images/${this.doubleEncodeEquationForUrl(text)}`
-    fetch(url, {
-      method: 'GET',
-      mode: 'cors',
-      redirect: 'follow'
-    })
-      .then(response => {
-        this.restoreCaret()
-        if (response.ok) {
-          const code = this.loadImage(text, url)
-          RceCommandShim.send(this.$editor, 'insert_code', code)
-        } else {
-          const code = this.loadAltMath(text)
-          this.editor.selection.setContent(code)
-        }
-        this.close()
-      })
-      .catch(() => {
-        const code = this.loadAltMath(text)
-        this.editor.selection.setContent(code)
-        this.close()
-      })
+    // fetch(url, {
+    //   method: 'GET',
+    //   mode: 'cors',
+    //   redirect: 'follow'
+    // })
+    //   .then(response => {
+    this.restoreCaret()
+    // if (response.ok) {
+    const code = this.loadImage(text, url)
+    RceCommandShim.send(this.$editor, 'insert_code', code)
+    //   } else {
+    //     const code = this.loadAltMath(text)
+    //     this.editor.selection.setContent(code)
+    //   }
+    this.close()
+    // })
+    // .catch(() => {
+    //   const code = this.loadAltMath(text)
+    //   this.editor.selection.setContent(code)
+    //   this.close()
+    // })
   }
 
   // the image generator was successful
