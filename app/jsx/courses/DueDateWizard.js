@@ -48,32 +48,40 @@ const Card = styled.div`
   .disabled {
 		opacity: 0.5;
     pointer-events: none;
-	}
+  }
+  
+  .distributing-warning {
+    font-weight: 600;
+  }
 `
 
 class DueDateWizard extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      course: {},
       distributingDates: false
     }
   }
-  
-  static defaultProps = {
-    course: {},
-  };
 
   componentDidMount() {
-    console.log(this.props.course);
+    this.setState({
+      course: ENV.course,
+      distributingDates: ENV.dates_distributing
+    }, () => {console.log(this.state.course)});
+  }
+
+  setStateToDistributinng() {
+    this.setState({distributingDates: true})
   }
 
   formatDateString(dateStr) {
-    let date = dateStr === "start" ? this.props.course.start_at : this.props.course.conclude_at;
+    let date = dateStr === "start" ? this.state.course.start_at : this.state.course.conclude_at;
     return moment(date).format("MM-DD-YY");
   }
 
   courseHasDates() {
-    let course = this.props.course;
+    let course = this.state.course;
     return course.start_at && course.conclude_at;
   }
 
@@ -101,7 +109,7 @@ class DueDateWizard extends React.Component {
         </h2>
         <h4>
           <span>
-            <a href={`/courses/${this.props.course.id}/settings`}>Go to Course Settings</a>
+            <a href={`/courses/${this.state.course.id}/settings`}>Go to Course Settings</a>
             &nbsp;to add start and end dates in order to use this tool.
           </span>
         </h4>
@@ -143,8 +151,9 @@ class DueDateWizard extends React.Component {
   
   distributeDueDates() {
     if (this.confirmDistribute()) {
-      axios.post(`/courses/${this.props.course.id}/distribute_due_dates`).then(() => {
+      axios.post(`/courses/${this.state.course.id}/distribute_due_dates`).then(() => {
         flashMessage('Dates are distributing');
+        this.setStateToDistributinng();
       });
     }
   }
@@ -157,8 +166,9 @@ class DueDateWizard extends React.Component {
 
   clearDueDates() {
     if (this.confirmClear()) {
-      axios.post(`/courses/${this.props.course.id}/clear_due_dates`).then(() => {
+      axios.post(`/courses/${this.state.course.id}/clear_due_dates`).then(() => {
         flashMessage("Due dates are clearing");
+        this.setStateToDistributinng();
       });
     }
   }
@@ -168,6 +178,15 @@ class DueDateWizard extends React.Component {
       <div>
         <button className={`sm-btn-primary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
         <button className={`sm-btn-secondary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
+        {this.state.distributingDates ? this.renderWarningIfDistributing() : ""}
+      </div>
+    )
+  }
+
+  renderWarningIfDistributing() {
+    return (
+      <div>
+        <small className="distributing-warning">Due Dates are currently being distributed.</small>
       </div>
     )
   }
@@ -175,7 +194,7 @@ class DueDateWizard extends React.Component {
   render() {
     return (
       <Card>
-        <h3 className="title">Distribute Dates for Course '{this.props.course.name}'</h3>
+        <h3 className="title">Distribute Dates for Course '{this.state.course.name}'</h3>
         {this.innerCard()}
         {this.courseHasDates() ? this.renderButtons() : ""}
       </Card>

@@ -13,8 +13,5 @@ define [
         @render()
 
       render: ->
-        DueDateWizardElement = React.createElement(
-          DueDateWizard,
-          course: ENV.course
-        )
+        DueDateWizardElement = React.createElement(DueDateWizard)
         ReactDOM.render(DueDateWizardElement, @el)
