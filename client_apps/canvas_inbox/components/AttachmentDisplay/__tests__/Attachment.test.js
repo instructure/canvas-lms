@@ -37,6 +37,7 @@ describe('Attachment', () => {
     const {getByTestId} = setup({onReplace: onReplaceMock})
     expect(onReplaceMock.mock.calls.length).toBe(0)
     fireEvent.dblClick(getByTestId('attachment'))
+    fireEvent.change(getByTestId('replacement-input'))
     expect(onReplaceMock.mock.calls.length).toBe(1)
   })
 

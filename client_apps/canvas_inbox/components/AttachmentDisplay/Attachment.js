@@ -28,6 +28,8 @@ import {RemovableItem} from '../RemovableItem/RemovableItem'
 const t = str => str
 
 export const Attachment = ({...props}) => {
+  let attachmentInput = null
+  const handleAttachment = () => attachmentInput?.click()
   return (
     <RemovableItem
       onRemove={props.onDelete}
@@ -39,7 +41,7 @@ export const Attachment = ({...props}) => {
         direction="column"
         padding="xx-small small"
         width="80px"
-        onDoubleClick={props.onReplace}
+        onDoubleClick={handleAttachment}
         data-testid="attachment"
       >
         <Flex.Item margin="none xx-small xxx-small xx-small" align="center">
@@ -59,6 +61,14 @@ export const Attachment = ({...props}) => {
           </TruncateText>
         </Flex.Item>
       </Flex>
+      <input
+        data-testid="replacement-input"
+        ref={input => (attachmentInput = input)}
+        type="file"
+        style={{display: 'none'}}
+        aria-hidden
+        onChange={props.onReplace}
+      />
     </RemovableItem>
   )
 }

@@ -49,15 +49,18 @@ describe('AttachmentDisplay', () => {
       const onReplaceItemMock = jest.fn()
       const {getAllByTestId} = setup({onReplaceItem: onReplaceItemMock})
       const attachments = getAllByTestId('attachment')
+      const replacementInputs = getAllByTestId('replacement-input')
       expect(onReplaceItemMock.mock.calls.length).toBe(0)
 
       // replace first attachment
       fireEvent.dblClick(attachments[0])
+      fireEvent.change(replacementInputs[0])
       expect(onReplaceItemMock.mock.calls.length).toBe(1)
       expect(onReplaceItemMock.mock.calls[0][0]).toBe('1')
 
       // replace second attachment
       fireEvent.dblClick(attachments[1])
+      fireEvent.change(replacementInputs[1])
       expect(onReplaceItemMock.mock.calls.length).toBe(2)
       expect(onReplaceItemMock.mock.calls[1][0]).toBe('2')
     })

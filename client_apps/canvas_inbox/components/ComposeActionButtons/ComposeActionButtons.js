@@ -36,18 +36,28 @@ export const ComposeActionButtons = ({...props}) => {
 }
 
 const renderUploadButtons = props => {
+  let attachmentInput = null
+  const handleAttachmentClick = () => attachmentInput?.click()
   return (
     <>
       <Tooltip renderTip={t('Add an attachment')} placement="top">
         <IconButton
           screenReaderLabel={t('Add an attachment')}
-          onClick={props.onAttachmentUpload}
+          onClick={handleAttachmentClick}
           margin="xx-small"
           data-testid="attachment-upload"
         >
           <IconPaperclipLine />
         </IconButton>
       </Tooltip>
+      <input
+        data-testid="attachment-input"
+        ref={input => (attachmentInput = input)}
+        type="file"
+        style={{display: 'none'}}
+        aria-hidden
+        onChange={props.onAttachmentUpload}
+      />
       {props.onMediaUpload && (
         <Tooltip renderTip={t('Record an audio or video comment')} placement="top">
           <IconButton

@@ -33,10 +33,11 @@ const createProps = overrides => {
 
 describe('ComposeActionButtons', () => {
   describe('attachment upload', () => {
-    it('calls onAttachmentUpload when clicked', () => {
+    it('triggers onAttachmentUpload when file is uploaded', () => {
       const props = createProps()
       const {getByTestId} = render(<ComposeActionButtons {...props} />)
       fireEvent.click(getByTestId('attachment-upload'))
+      fireEvent.change(getByTestId('attachment-input'))
       expect(props.onAttachmentUpload).toHaveBeenCalled()
     })
   })
