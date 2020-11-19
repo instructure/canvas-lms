@@ -123,6 +123,11 @@ const Form = ({
         <ScreenReaderContent>{I18n.t('Mastery calculation parameters')}</ScreenReaderContent>
       }
     >
+      <ScreenReaderContent>
+        {I18n.t(
+          'See example below to see how different calculation parameters affect student mastery calculation.'
+        )}
+      </ScreenReaderContent>
       <SimpleSelect
         renderLabel={I18n.t('Mastery Calculation')}
         value={calculationMethodKey}
@@ -227,8 +232,8 @@ const ProficiencyCalculation = ({method, update, updateError, canManage, context
 
   return (
     <View as="div">
-      <Flex alignItems="start" wrap="wrap">
-        <Flex.Item size="240px" padding="small">
+      <Flex alignItems="start" direction="column">
+        <Flex.Item padding="small">
           {canManage ? (
             <Form
               calculationMethodKey={calculationMethodKey}
@@ -242,7 +247,7 @@ const ProficiencyCalculation = ({method, update, updateError, canManage, context
             <Display currentMethod={currentMethod} calculationInt={calculationInt} />
           )}
         </Flex.Item>
-        <Flex.Item size="240px" shouldGrow padding="small">
+        <Flex.Item padding="small">
           <Example currentMethod={currentMethod} />
         </Flex.Item>
       </Flex>
