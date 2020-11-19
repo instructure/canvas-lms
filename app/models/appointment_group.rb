@@ -263,8 +263,12 @@ class AppointmentGroup < ActiveRecord::Base
 
   def broadcast_data
     data = {}
-    data[:root_account_id] = context.root_account_id if context.root_account_id
-    data[:course_id] = context.id if context.is_a?(Course)
+    ids = appointment_group_contexts.where(context_type: 'Course').
+      joins("INNER JOIN #{Course.quoted_table_name} ON courses.id = context_id").pluck(:context_id, :root_account_id)
+    ids += appointment_group_contexts.where(context_type: 'CourseSection').
+      joins("INNER JOIN #{CourseSection.quoted_table_name} ON course_sections.id = context_id").pluck(:course_id, :root_account_id)
+    data[:root_account_id] = ids.map(&:last).first
+    data[:course_ids] = ids.map(&:first).sort
     data
   end
 

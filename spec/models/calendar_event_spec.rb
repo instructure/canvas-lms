@@ -552,8 +552,22 @@ describe CalendarEvent do
         Message.where(notification_id: BroadcastPolicy.notification_finder.by_name(notification_name), user_id: @expected_users).pluck(:user_id).sort
       end
 
-      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
+      it 'should include course_ids from appointment_groups' do
         reservation = @appointment2.reserve_for(@group, @student1)
+        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+      end
+
+      it 'should include multiple course_ids' do
+        course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+        course2.enroll_teacher(@teacher).accept!
+        ag = AppointmentGroup.create!(title: "test", contexts: [@course, course2])
+        appointment = ag.appointments.create!(start_at: '2012-01-01 12:00:00', end_at: '2012-01-01 13:00:00')
+        reservation = appointment.reserve_for(@student1, @student1)
+        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+      end
+
+      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
+        @appointment2.reserve_for(@group, @student1)
         expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 

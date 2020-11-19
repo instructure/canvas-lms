@@ -69,16 +69,26 @@ class NotificationPolicyOverride < ActiveRecord::Base
   end
 
   def self.enabled_for(user, context, channel: nil)
-    !(find_all_for(user, context, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == 'disabled' })
+    enabled_for_all_contexts(user, [context], channel: channel)
   end
 
-  def self.find_all_for(user, context, channel: nil)
+  def self.enabled_for_all_contexts(user, contexts, channel: nil)
+    !(find_all_for(user, contexts, channel: channel).find { |npo| npo.notification_id.nil? && npo.workflow_state == 'disabled' })
+  end
+
+  def self.find_all_for(user, contexts, channel: nil)
+    raise ArgumentError, "can only pass one type of context" if contexts.map(&:class).map(&:name).uniq.length > 1
+
     if channel&.notification_policy_overrides&.loaded?
-      channel.notification_policy_overrides.select { |npo| npo.context_id == context.id && npo.context_type == context.class.name }
+      npos = []
+      contexts.each do |context|
+        npos += channel.notification_policy_overrides.select { |npo| npo.context_id == context.id && npo.context_type == context.class.name }
+      end
+      npos
     elsif channel
-      channel.notification_policy_overrides.where(context_id: context.id, context_type: context.class.name)
+      channel.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
     else
-      user.notification_policy_overrides.where(context_id: context.id, context_type: context.class.name)
+      user.notification_policy_overrides.where(context_id: contexts.map(&:id), context_type: contexts.first.class.name)
     end
   end
 
