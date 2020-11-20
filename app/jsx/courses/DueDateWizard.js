@@ -1,112 +1,8 @@
 import React from 'react';
-import styled from 'styled-components';
 import moment from 'moment';
 import axios from 'axios';
 import { flashError } from 'jquery';
 import { flashMessage } from 'jquery';
-
-const Card = styled.div`
-  border: 1px solid #D7D7D7;
-  border-radius: 4px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.3);
-  text-align: center;
-  height: 100%;
-  width: 100%;
-  max-width: 1000px;
-  margin: 0 auto;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
-
-  .title, .section {
-    text-align: center;
-  }
-
-  .course-date-fields {
-    display: flex;
-  }
-
-  .course-date-row {
-    display: flex;
-    flex-direction: column;
-    padding: 1rem;
-  }
-
-  .due-date-btn {
-    margin: .5rem .25rem;
-  }
-
-  .course-date-title {
-    font-weight: 600;
-  }
-
-  .warning {
-    color: red;
-  }
-
-  .disabled {
-		opacity: 0.5;
-    pointer-events: none;
-  }
-  
-  .distributing-warning-section {
-    padding-bottom: 1rem;
-  }
-  
-  .distributing-warning {
-    font-weight: 600;
-  }
-
-  .progress {
-    height: 1.5em;
-    margin: 0;
-    width: 100%;
-    background-color: #efefef;
-    background-image: none;
-    border-radius: .25rem;
-    box-shadow: none;
-    position: relative;
-
-    // Spec
-    @keyframes .value span {
-      from  { background-position: 40px 0; }
-      to    { background-position: 0 0; }
-    }
-
-    @-webkit-keyframes .value span {
-      from  { background-position: 40px 0; }
-      to    { background-position: 0 0; }
-    }
-
-    .value span {
-      background-color: #8abbd6;
-      background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
-      background-image: linear-gradient(90deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
-      display: inline-block;
-      height: 100%;
-      position: absolute;
-      animation: due-date-progress 1s;
-      -webkit-animation: due-date-progress 1s;
-       animation-iteration-count: infinite;
-       -webkit-animation-iteration-count: infinite;
-       transition-timing-function: ease-in;
-       -webkit-transition-timing-function: ease-in;
-      left: 0;
-      top: 0;
-
-      @keyframes due-date-progress {
-        from  { background-position: 2rem 0; }
-        to    { background-position: 0 0; }
-      }
-      
-      @-webkit-keyframes due-date-progress {
-        from  { background-position: 2rem 0; }
-        to    { background-position: 0 0; }
-      }
-    }
-  }
-`
 
 class DueDateWizard extends React.Component {
   constructor(props) {
@@ -271,11 +167,11 @@ class DueDateWizard extends React.Component {
 
   render() {
     return (
-      <Card>
+      <div className="due-date-wizard-card">
         <h3 className="title">Distribute Dates for Course '{this.state.course.name}'</h3>
         {this.innerCard()}
         {this.courseHasDates() ? this.renderButtons() : ""}
-      </Card>
+      </div>
     )
   }
 }
