@@ -589,6 +589,13 @@ pipeline {
                   ], true, "testReport"
                 )
 
+                echo 'adding Javascript (Coffeescript)'
+                buildStage.makeFromJob('Javascript (Coffeescript)', '/Canvas/test-suites/JS', stages, buildParameters + [
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    string(name: 'TEST_SUITE', value: "coffee"),
+                  ], true, "testReport"
+                )
+
                 echo 'adding Javascript (Karma)'
                 buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
