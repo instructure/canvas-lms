@@ -328,8 +328,8 @@ class Login::SamlController < ApplicationController
 
   def observee_validation
     redirect_to
-      @domain_root_account.parent_registration_aac.generate_authn_request_redirect(host: request.host_with_port,
-                                                                                   parent_registration: session[:parent_registration])
+      @domain_root_account.parent_registration_ap.generate_authn_request_redirect(host: request.host_with_port,
+                                                                                  parent_registration: session[:parent_registration])
   end
 
   protected

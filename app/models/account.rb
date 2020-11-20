@@ -1866,12 +1866,7 @@ class Account < ActiveRecord::Base
     authentication_providers.where(parent_registration: true).exists?
   end
 
-  def parent_auth_type
-    return nil unless parent_registration?
-    parent_registration_aac.auth_type
-  end
-
-  def parent_registration_aac
+  def parent_registration_ap
     authentication_providers.where(parent_registration: true).first
   end
 
