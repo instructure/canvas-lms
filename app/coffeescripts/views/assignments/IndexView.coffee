@@ -130,8 +130,9 @@ export default class IndexView extends Backbone.View
 
     @ensureContentStyle()
 
-    @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
-    window.onkeydown = @focusOnAssignments
+    unless (ENV.disable_keyboard_shortcuts)
+      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
+      window.onkeydown = @focusOnAssignments
 
     @selectGradingPeriod()
 

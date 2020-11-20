@@ -47,6 +47,33 @@ describe "assignments" do
       create_session(@pseudonym)
     end
 
+    describe 'keyboard shortcuts' do
+      context 'when the user has keyboard shortcuts enabled' do
+        before do
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut "SHIFT-?"' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).to be_displayed
+        end
+      end
+
+      context 'when the user has keyboard shortcuts disabled' do
+        before do
+          @teacher.enable_feature!(:disable_keyboard_shortcuts)
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut dialog is not accesible when user disables keyboard shortcuts' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).not_to be_displayed
+        end
+      end
+    end
+
     context "save and publish button" do
 
       def create_assignment(publish = true, params = {name: "Test Assignment"})
