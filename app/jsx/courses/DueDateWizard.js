@@ -68,7 +68,10 @@ class DueDateWizard extends React.Component {
     this.setState({
       course: ENV.course,
       distributingDates: ENV.dates_distributing
-    }, () => {console.log(this.state.course)});
+    }, () => {
+      console.log(this.state.course)
+      if (this.state.distributingDates) { this.getProgress() }
+    });
   }
 
   setStateToDistributinng() {
@@ -154,6 +157,7 @@ class DueDateWizard extends React.Component {
       axios.post(`/courses/${this.state.course.id}/distribute_due_dates`).then(() => {
         flashMessage('Dates are distributing');
         this.setStateToDistributinng();
+        this.getProgress();
       });
     }
   }
@@ -169,6 +173,7 @@ class DueDateWizard extends React.Component {
       axios.post(`/courses/${this.state.course.id}/clear_due_dates`).then(() => {
         flashMessage("Due dates are clearing");
         this.setStateToDistributinng();
+        this.getProgress();
       });
     }
   }
@@ -189,6 +194,19 @@ class DueDateWizard extends React.Component {
         <small className="distributing-warning">Due Dates are currently being distributed.</small>
       </div>
     )
+  }
+
+  getProgress() {
+    let progressCheck = setInterval(() => {
+      axios.get(`/courses/${this.state.course.id}/progress/show_distribution_progress`).then((response) => {
+        console.log(response.data.completion);
+        this.setState({
+          distributingDates: response.data.distributing
+        }, () => {
+          if (!this.state.distributingDates) { clearInterval(progressCheck) }
+        });
+      })
+    }, 5000);
   }
 
   render() {
