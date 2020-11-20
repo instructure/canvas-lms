@@ -306,7 +306,6 @@ def getCanvasLmsRefspec() {
 // =========
 
 def rebaseHelper(branch, commitHistory = 100) {
-  git.setGitUser(env.GERRIT_EVENT_ACCOUNT_NAME, env.GERRIT_EVENT_ACCOUNT_EMAIL)
   git.fetch(branch, commitHistory)
   if (!git.hasCommonAncestor(branch)) {
     error "Error: your branch is over ${commitHistory} commits behind $GERRIT_BRANCH, please rebase your branch manually."
