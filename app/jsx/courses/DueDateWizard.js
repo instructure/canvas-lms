@@ -53,6 +53,26 @@ const Card = styled.div`
   .distributing-warning {
     font-weight: 600;
   }
+
+  .progress {
+    height: 1.5em;
+    margin: 0;
+    width: 100%;
+    background-color: #efefef;
+    background-image: none;
+    border-radius: 1em;
+    box-shadow: none;
+    position: relative;
+
+    .value span {
+      background-color: #8abbd6;
+      display: inline-block;
+      height: 100%;
+      position: absolute;
+      left: 0;
+      top: 0;
+    }
+  }
 `
 
 class DueDateWizard extends React.Component {
@@ -191,7 +211,14 @@ class DueDateWizard extends React.Component {
   renderWarningIfDistributing() {
     return (
       <div>
-        <small className="distributing-warning">Due Dates are currently being distributed.</small>
+        <div>
+          <small className="distributing-warning">Due Dates are currently being distributed</small>
+        </div>
+        <div className="progress">
+          <span className="value">
+            <span style={{width: `${this.state.distributionProgress}%`}}></span>
+          </span>
+        </div>
       </div>
     )
   }
@@ -199,14 +226,14 @@ class DueDateWizard extends React.Component {
   getProgress() {
     let progressCheck = setInterval(() => {
       axios.get(`/courses/${this.state.course.id}/progress/show_distribution_progress`).then((response) => {
-        console.log(response.data.completion);
         this.setState({
-          distributingDates: response.data.distributing
+          distributingDates: response.data.distributing,
+          distributionProgress: response.data.completion
         }, () => {
           if (!this.state.distributingDates) { clearInterval(progressCheck) }
         });
       })
-    }, 5000);
+    }, 1000);
   }
 
   render() {
