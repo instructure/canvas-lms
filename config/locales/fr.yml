@@ -176,6 +176,7 @@ fr:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} et {b} ne peuvent être utilisés ensemble"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Une valeur de calcul n’est pas utilisée avec cette méthode de calcul"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Un jeton de sécurité Canvas vient d’être généré pour votre compte. Si vous avez demandé un jeton utilisateur, vous n’avez rien à faire. Si vous n’avez pas demandé de jeton ou que vous souhaitez gérer les jetons d'accès Canvas, vous pouvez le faire ici :"
+  a_few_seconds_ago_e43118d: "il y a quelques secondes"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un fichier nommé %{itemName} existe déjà dans ce dossier."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Il existe déjà un fichier nommé « %{name} ». Voulez-vous remplacer le fichier existant ?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Il existe déjà un fichier nommé « %{name} » dans ce dossier. Voulez-vous remplacer le fichier existant ?"
@@ -2478,6 +2479,7 @@ fr:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Une erreur est survenue lors de la mise à jour des notations de compétence : %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Une erreur est survenue lors de la mise à jour des notations de compétence"
   an_error_occurred_updating_this_assignment_21287c7e: "Une erreur s'est produite lors de la mise à jour de ce travail."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "Une erreur est survenue durant le clonage de l’ensemble de groupes."
   an_error_occurred_when_saving_the_group_536c8f66: "Une erreur est survenue durant l’enregistrement du groupe."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Une erreur s’est produite lors de la définition des droits d’utilisation pour %{filename}."
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Une erreur est survenue lors de la tentative de contacter Turnitin."
@@ -2954,6 +2956,7 @@ fr:
     scores_lower_than_the_average: "Notes inférieures à la moyenne de %{average}"
     total_graded_submissions: "Total des envois notés :"
   assignment_details_expanded_20c6f0c7: "détails de la tâche étendus"
+  assignment_details_updated_493f410b: "Détails du travail mis à jour"
   assignment_does_not_exist_74178c34: "le travail n'existe pas"
   assignment_edit_6dced39f: "Modifier un travail"
   assignment_enhancements_student_557372ab: "Améliorations aux travaux - Élève"
@@ -4886,7 +4889,7 @@ fr:
   canvas_revision_unknown: Inconnu
   canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
       Canvas réécrit les URL vers les fichiers pour le contenu généré par des utilisateurs. Ce faisant, il
-      a souvent ajouté « /download » même lorsque cela n’était ni souhaité, ni souhaitable. Ce
+      a souvent ajouté « /download » même lorsque cela n’était ni souhaité, ni souhaitable. Ce
       paramètre modifie la manière de réécrire les URL de manière à faciliter la prévisualisation
       des fichiers sous Canvas, au lieu de provoquer leur téléchargement.
   canvas_student_id_c74f57bf: canvas_student_id
@@ -5090,6 +5093,8 @@ fr:
   client_id_cb2502af: "ID de client"
   client_id_is_required_1afd54d1: "ID de client requise"
   clone_group_set_c2a40e15: "Cloner un ensemble de groupes"
+  clone_groupcategoryname_ef85ddb8: "(Clone) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "Clonage d’un ensemble de groupes"
   close_17f50799: fermer
   close_and_return_to_canvas_80544344: "Fermer et revenir dans Canvas"
   close_d634289d: Fermer
@@ -5501,6 +5506,7 @@ fr:
   confirm_dialog_component: 
     ok: OK
   confirm_edit_outcome_a9746c99: "Confirmer la modification du résultat"
+  confirm_mastery_scales_c6ef2169: "Confirmer les échelles de maîtrise"
   confirm_qr_code_display_49664fa3: "Affichage Confirmation du code QR"
   confirm_removal_a9bb889: "Confirmer le retrait"
   confirm_reservation_removal_e6350e7c: "Confirmer le retrait de la réservation"
@@ -6502,6 +6508,7 @@ fr:
   count_points_4735a2e8: 
     one: "1 point"
     other: "%{count} points"
+  count_posted_b92a9562: "%{count} postés"
   count_posts_added_fa55ce4: 
     one: "%{count} post ajouté"
     other: "%{count} posts ajoutés"
@@ -7987,6 +7994,7 @@ fr:
   delete_this_answer_f1802eaa: "Supprimer cette réponse"
   delete_this_collaboration_4f20b698: "Supprimer cette collaboration"
   delete_this_feed_67d5d924: "Supprimer ce flux"
+  delete_this_file_683804a1: "Supprimer ce fichier"
   delete_this_key_70f74aa1: "Supprimer cette clé"
   delete_this_module_20d54791: "Supprimer ce module"
   delete_this_page_509f2baf: "Supprimer cette page"
@@ -8006,6 +8014,10 @@ fr:
   deleted_content_exceptions_237e809d: "Exceptions de contenu supprimé :"
   deleted_content_referenced_in_this_resource_e42d1998: "Contenus référencés dans cette ressource supprimés :"
   deleting_6421031e: "suppression en cours..."
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      En général, on ne supprime pas de fichier de soumission sauf si l'élève a posté du contenu inapproprié ou personnel.
+      
+      Cette action est irréversible. Êtes-vous sûr de vouloir supprimer « %{file} » ?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "La suppression d'un utilisateur détruira tous ses ePortfolios. Les ePortfolios peuvent également être indiqués comme « spam » ou comme « sûr » pour en modifier la visibilité."
   deleting_assignment_22d5851d: "suppression du travail"
   delicious_7f9ac66f: Delicious
@@ -9442,6 +9454,7 @@ fr:
   error_adding_canvas_file_to_submission_draft_de258021: "Erreur lors de l'ajout d'un fichier canvas à la version préliminaire de la soumission"
   error_adding_files_to_submission_draft_6acac337: "Erreur lors de l'ajout de fichiers à la version préliminaire de la soumission"
   error_associating_assignment_assignment_name_with__d92e9acf: "Erreur lors de l’association du travail « %{assignment_name} » à un outil LTI."
+  error_deleting_file_551dc16e: "Erreur lors de la suppression de %{file}"
   error_deleting_name_reason_11f9d399: "Erreur lors de la suppression de %{name} : %{reason}"
   error_duplicating_module_4b023042: "Erreur lors de la duplication du module"
   error_during_group_creation_f232994b: "Erreur lors de la création d'un groupe"
@@ -11271,7 +11284,8 @@ fr:
   group_roster_1846bf84: "Liste des groupes"
   group_saved_successfully_fcd5ca66: "Groupe enregistré avec succès"
   group_select_330df8bd: "Sélection de groupe"
-  group_set_name_2aed2347: "Nom de l'ensemble de groupes"
+  group_set_cloned_successfully_3e1a1497: "Ensemble de groupes cloné avec succès"
+  group_set_name_2aed2347: "Nom de l’ensemble de groupes"
   group_settings: 
     invitation_sent: "Invitation envoyée"
   group_weight_for_d46c5db4: "Poids du groupe pour :"
@@ -12189,6 +12203,7 @@ fr:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Améliore la détectabilité du glisser-déposer dans la partie Fichiers"
   improved_outcomes_management_4692f886: "Gestion améliorée des acquis"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Rappels visuels améliorés pour encourager les instructeurs à publier leurs cours"
+  in_a_few_seconds_538ddff3: "dans quelques secondes"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "Dans %{asset_link}, des élèves cliquent sur %{bad_link} pointant vers une page inexistante de votre cours."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "Dans %{asset_link}, des élèves cliquent sur %{bad_link} pointant vers du contenu situé dans un cours différent."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "Dans %{asset_link}, les élèves cliquent sur %{bad_link} qui correspond à du contenu auquel ils n’ont pas accès."
@@ -12196,6 +12211,7 @@ fr:
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "Lorsqu'il est disponible, charger le RCE depuis un service Canvas à contenu riche"
   in_class_23eeca38: "En classe"
   in_closed_grading_period_dc717846: "En période fermée à la notation"
+  in_less_than_a_minute_c8595a28: "dans moins d'une minute"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Afin de compléter la procédure, vous allez être redirigé vers une page de connexion, sur laquelle vous devrez vous connecter avec les identifiants de votre enfant."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Afin d'importer une grande quantité de résultats à la fois, ou de mettre à jour vos résultats existants, veuillez *suivre le format CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Démonstration et visites guidées au sein du produit pour les enseignants"
@@ -12746,6 +12762,7 @@ fr:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} notifications trouvées"
   length_results_found_3afd01e5: "%{length} résultats trouvés"
+  less_than_a_minute_ago_9f45e2a5: "il y a moins d’une minute"
   let_students_see_the_correct_answers_dacc2faf: "Laisser les étudiants voir les réponses correctes"
   let_students_see_their_quiz_responses_fbc07d14: "Laisser les étudiants voir leurs réponses au questionnaire"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Autoriser les élèves à voir leurs réponses aux quiz (les questions incorrectes seront notées dans le retour fourni à l'élève)"
@@ -17585,6 +17602,7 @@ fr:
   post_to_961f8937: "Publier à"
   post_to_students_b02df196: "Transmettre aux élèves"
   post_types_93ff86d9: "Types de publications"
+  posted_455862b9: Posté
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Publié sur :"
   posted_to_student_861beec9: "Publié pour l’étudiant"
@@ -19917,6 +19935,10 @@ fr:
       Remplace l'image existante de l'équation mathématique plus la MathML masquée
       par MathJax une version formatée. Cela offre une meilleure accessibilité
       et de nombreuses options pour le lecteur afin qu'il puisse interagir avec l'équation sur la page.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Remplace l’image actuelle de l’équation mathématique ainsi que son code source mathml caché
+      par une version traitée MathJax. Cette modification offre une meilleure accessibilité
+      ainsi que de nombreuses options permettant au lecteur d'interagir avec l’équation directement sur la page.
   reply_389d6fb9: Répondre
   reply_from_name: "%{name} via les notifications Canvas"
   reply_to_comment_72d96728: "Répondre au commentaire"
@@ -20423,7 +20445,7 @@ fr:
         download_current_scores: "Téléverser les notes actuelles (.csv)"
         grading_history: "Afficher l’historique de relevé de notes"
         hide_student_names_label: "Masquer les noms des étudiants"
-        include_ungraded_assignments: "Considérer les tâches non notés comme ayant la note 0"
+        include_ungraded_assignments: "Afficher Non noté comme étant 0"
         set_group_weights: "Définir les coefficients de groupe"
         show_concluded_enrollments_label: "Afficher les inscriptions terminées"
         show_notes: "Afficher les notes dans les informations relatives à l’étudiant"
@@ -22493,6 +22515,7 @@ fr:
       student_support_description: "Votre instructeur est votre premier point de contact. Il peut répondre à vos questions sur la Networking Academy ou contacter le service d'assistance pour vous. Vous pouvez contacter votre instructeur en utilisant la fonction Boîte de réception."
       support_desk_livechat: "Dialogue en direct avec le service d’assistance"
   support_favorite_lti_tools_in_the_rce_1680436d: "Prise en charge des outils LTI favoris dans l’ECE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Prendre en charge les équations mathématiques LaTex presque partout"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Suède
@@ -23011,6 +23034,7 @@ fr:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Ce travail ne comptera plus dans votre note."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Cette pièce jointe a été retirée par l'auteur."
   this_code_expires_in_timefromnow_ec7ccef4: "Ce code expirera dans %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "Ce code expire dans %{timeFromNow}."
   this_code_has_expired_41f76642: "Ce code a expiré."
   this_conference_may_be_recorded_f76deeeb: "Cette conférence pourrait être enregistrée."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Il n’est pas possible d’ajouter ce cours au menu des cours pour le moment."
@@ -23168,6 +23192,8 @@ fr:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Cela vous permettra d’authentifier Canvas pour publier les notes sur SIS."
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Ceci va appliquer ces changements sur l'entièreté de votre compte. Désirez-vous procéder ?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Ceci appliquera ce thème sur l'intégralité de votre compte. Désirez-vous procéder ?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "Tous les barèmes de niveau compte ou de niveau cours qui sont liés à une échelle de réussite de niveau compte et n’ont pas été évalués seront mis à jour."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Tous les barèmes alignés aux acquis de ce cours et n’ayant pas encore été évalués seront mis à jour."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Cela permettra de mettre à jour l'ensemble des barèmes utilisant ce résultat qui n'ont pas encore été évalués."
   threshold_in_hours_to_notify_students_within_f33820aa: "Seuil (en heures) dans lequel prévenir les élèves"
   threshold_pts_45f0e5d8: "seuil : %{pts}"
@@ -23500,7 +23526,7 @@ fr:
   to_allow_view_edit_delete_functionality_of_collabo_442490c4: "Pour permettre la visualisation, la modification et la suppression des fonctionnalités des collaborations créées par d'autres utilisateurs, Contenu du cours - ajouter / modifier / supprimer doit également être activé. Si Contenu du cours - ajouter / modifier / supprimer est activé et Collaborations de l'élève - créer est désactivé, l'utilisateur ne sera pas en mesure de créer de nouvelles collaborations mais pourra visualiser, modifier et supprimer toutes les collaborations. Pour ajouter des élèves à une collaboration, Utilisateurs - afficher la liste doit également être activé. Pour ajouter un groupe de cours à une collaboration, Groupes - afficher tous les groupes élèves doivent également être activés."
   to_allow_view_edit_delete_functionality_of_collabo_986519a6: "Pour permettre la visualisation, la modification et la suppression des fonctionnalités des collaborations créées par d'autres utilisateurs, Contenu du cours - ajouter / modifier / supprimer doit également être activé. Si Contenu du cours - ajouter / modifier / supprimer est activé et Collaborations de l'élève - créer est désactivé, l'utilisateur ne sera pas en mesure de créer de nouvelles collaborations mais pourra visualiser, modifier et supprimer toutes les collaborations. Pour ajouter des élèves à une collaboration, Utilisateurs - afficher la liste doit également être activé. Pour ajouter un groupe de cours à une collaboration, Groupes - afficher tous les groupes élèves doivent également être activés."
   to_allow_view_edit_delete_functionality_of_collabo_ad4bd343: "Pour permettre la visualisation, la modification et la suppression des fonctionnalités des collaborations créées par d'autres utilisateurs, Contenu du cours - ajouter / modifier / supprimer doit également être activé. Si « Contenu du cours – ajouter / modifier / supprimer » est activé et que « Collaborations entre élèves – créer » est désactivé, l’utilisateur ne pourra pas créer de nouvelles collaborations, mais il pourra afficher, modifier et supprimer toutes les collaborations. Pour ajouter des élèves à une collaboration, Utilisateurs - afficher la liste doit également être activé. Pour ajouter un groupe de cours à une collaboration, Groupes - afficher tous les groupes élèves doivent également être activés."
-  to_assign_students_to_a_group_enter_group_names_in_913d06fb: "Pour affecter des élèves à un groupe, saisissez les noms de groupe dans la colonne « group_name »."
+  to_assign_students_to_a_group_enter_group_names_in_913d06fb: "Pour affecter des élèves à un groupe, saisissez les noms de groupe dans la colonne « group_name »."
   to_be_added_2959cc72: "À ajouter"
   to_be_removed_d4b48586: "À supprimer"
   to_c4c44f4b: à
@@ -24102,6 +24128,7 @@ fr:
   updated_current_grade_to_currentgrade_bfe2ea14: "Note actuelle mise à jour à la valeur de  %{currentGrade}"
   updated_group_group_name_727b1d98: "A mis à jour le groupe %{group_name}"
   updated_math_equation_display_583671a8: "Mise à jour de l'affichage des équations mathématiques"
+  updated_math_equation_handling_b84509d1: "Nouvelle gestion des équations mathématiques"
   updated_permissions_page_f2e91060: "Mise à jour de la page Permissions"
   updated_terms_of_service_82f34148: "Conditions d’utilisation mises à jour"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Une IU mise à jour pour chercher et afficher les utilisateurs et les cours au sein-même d'un compte."
@@ -25239,6 +25266,7 @@ fr:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Vous n'êtes pas autorisé à accéder le questionnaire demandé."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Vous n'avez pas accès à la ressource demandée."
   you_do_not_have_permission_to_change_this_488c536: "Vous n’avez pas l'autorisation de changer cela"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Vous n'avez pas la permission de supprimer %{file}. Veuillez contacter votre administrateur de compte."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "Vous n’êtes pas autorisé à modifier ce travail"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Vous n'avez pas les autorisations pour inviter un utilisateur qui n'existe pas déjà."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Vous n'êtes pas autorisé(e) à publier ce cours."
