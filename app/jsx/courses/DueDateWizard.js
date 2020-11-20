@@ -50,6 +50,10 @@ const Card = styled.div`
     pointer-events: none;
   }
   
+  .distributing-warning-section {
+    padding-bottom: 1rem;
+  }
+  
   .distributing-warning {
     font-weight: 600;
   }
@@ -60,17 +64,46 @@ const Card = styled.div`
     width: 100%;
     background-color: #efefef;
     background-image: none;
-    border-radius: 1em;
+    border-radius: .25rem;
     box-shadow: none;
     position: relative;
 
+    // Spec
+    @keyframes .value span {
+      from  { background-position: 40px 0; }
+      to    { background-position: 0 0; }
+    }
+
+    @-webkit-keyframes .value span {
+      from  { background-position: 40px 0; }
+      to    { background-position: 0 0; }
+    }
+
     .value span {
       background-color: #8abbd6;
+      background-image: -webkit-gradient(linear, 0 100%, 100% 0, color-stop(.25, rgba(255,255,255,.15)), color-stop(.25, transparent), color-stop(.5, transparent), color-stop(.5, rgba(255,255,255,.15)), color-stop(.75, rgba(255,255,255,.15)), color-stop(.75, transparent), to(transparent));
+      background-image: linear-gradient(90deg, rgba(255,255,255,.15) 25%, transparent 25%, transparent 50%, rgba(255,255,255,.15) 50%, rgba(255,255,255,.15) 75%, transparent 75%, transparent);
       display: inline-block;
       height: 100%;
       position: absolute;
+      animation: due-date-progress 1s;
+      -webkit-animation: due-date-progress 1s;
+       animation-iteration-count: infinite;
+       -webkit-animation-iteration-count: infinite;
+       transition-timing-function: ease-in;
+       -webkit-transition-timing-function: ease-in;
       left: 0;
       top: 0;
+
+      @keyframes due-date-progress {
+        from  { background-position: 2rem 0; }
+        to    { background-position: 0 0; }
+      }
+      
+      @-webkit-keyframes due-date-progress {
+        from  { background-position: 2rem 0; }
+        to    { background-position: 0 0; }
+      }
     }
   }
 `
@@ -210,7 +243,7 @@ class DueDateWizard extends React.Component {
 
   renderWarningIfDistributing() {
     return (
-      <div>
+      <div className="distributing-warning-section">
         <div>
           <small className="distributing-warning">Due Dates are currently being distributed</small>
         </div>
