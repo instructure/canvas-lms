@@ -2148,7 +2148,7 @@ class ApplicationController < ActionController::Base
         is_public: is_public
       ).processed_url
     end
-    UserContent.escape(rewriter.translate_content(str), request.host_with_port, Account.site_admin.feature_enabled?(:new_math_equation_handling))
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port)
   end
   helper_method :public_user_content
 
