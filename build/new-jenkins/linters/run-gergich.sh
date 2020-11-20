@@ -85,7 +85,7 @@ readarray -t PLUGINS_LIST < config/plugins_list
 rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST[@]}")
 
 export DISABLE_POSTINSTALL=1
-./build/new-jenkins/linters/run-and-collect-output.sh "yarn install"
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1"
 
 if ! git diff --exit-code yarn.lock; then
   message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
