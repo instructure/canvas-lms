@@ -53,6 +53,12 @@ describe WebZipExport do
       web_zip_export.reload
       expect(web_zip_export.zip_attachment).not_to be_nil
     end
+
+    it 'prevents student from reading underlying content_export' do
+      web_zip_export.export(synchronous: true)
+      web_zip_export.content_export.export(synchronous: true)
+      expect(web_zip_export.content_export.grants_right?(@student, :read)).to be_falsey
+    end
   end
 
   describe '#export' do
