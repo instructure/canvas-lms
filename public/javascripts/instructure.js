@@ -113,11 +113,15 @@ export function enhanceUserContent() {
     .each(function() {
       const $this = $(this)
       $this.find('img').each((i, img) => {
-        const handleWidth = () =>
-          $(img).css(
-            'maxWidth',
-            Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
-          )
+        const handleWidth = () => {
+          const maxw = Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
+          if (maxw > 0) {
+            $(img).css(
+              'maxWidth',
+              Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
+            )
+          }
+        }
         if (img.naturalWidth === 0) {
           img.addEventListener('load', handleWidth)
         } else {

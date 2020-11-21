@@ -206,6 +206,7 @@ class ApplicationController < ActionController::Base
 
         @js_env[:lolcalize] = true if ENV['LOLCALIZE']
         @js_env[:rce_auto_save_max_age_ms] = Setting.get('rce_auto_save_max_age_ms', 1.day.to_i * 1000).to_i if @js_env[:rce_auto_save]
+        @js_env[:FEATURES][:new_math_equation_handling] = use_new_math_equation_handling?
       end
     end
 
@@ -217,7 +218,7 @@ class ApplicationController < ActionController::Base
 
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
-  JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :new_math_equation_handling].freeze
+  JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages,
@@ -2133,7 +2134,7 @@ class ApplicationController < ActionController::Base
     return nil unless str
     return str.html_safe unless str.match(/object|embed|equation_image/)
 
-    UserContent.escape(str, request.host_with_port)
+    UserContent.escape(str, request.host_with_port, use_new_math_equation_handling?)
   end
   helper_method :user_content
 
@@ -2151,7 +2152,7 @@ class ApplicationController < ActionController::Base
         is_public: is_public
       ).processed_url
     end
-    UserContent.escape(rewriter.translate_content(str), request.host_with_port)
+    UserContent.escape(rewriter.translate_content(str), request.host_with_port, use_new_math_equation_handling?)
   end
   helper_method :public_user_content
 
@@ -2192,6 +2193,15 @@ class ApplicationController < ActionController::Base
       return false
     end
     true
+  end
+
+  # the way classic quizzes copies question data from the page into the
+  # edit form causes the elements added for a11y to get duplicated
+  # and other misadventures that caused 4 hotfixes in 3 days.
+  # Let's just not use the new math handling there.
+  def use_new_math_equation_handling?
+    Account.site_admin.feature_enabled?(:new_math_equation_handling) &&
+    !(params[:controller] == "quizzes/quizzes" && params[:action] == "edit")
   end
 
   def destroy_session

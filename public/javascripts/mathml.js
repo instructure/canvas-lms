@@ -124,8 +124,9 @@ const mathml = {
     return false
   },
 
+  // legacy api
   isMathMLOnPage() {
-    return this.isMathOnPage() // just in case I missed a place it's being used
+    return this.isMathOnPage()
   },
 
   isMathJaxLoaded() {
