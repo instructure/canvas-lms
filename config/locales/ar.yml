@@ -200,6 +200,7 @@ ar:
   a_and_b_cannot_be_used_together_77ee6a2a: "لا يمكن استخدام {a} و{b} سوياً"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "لا تُستخدم قيمة الحساب مع طريقة الحساب هذه"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "تم إنشاء رمز مميز لأمان Canvas للتو لحسابك. إذا طلبت رمزاً مميزاً للمستخدم، فلن تحتاج إلى أي إجراء إضافي. إذا لم تطلب رمزاً مميزاً أو كنت ترغب في إدارة رموزك المميزة للوصول إلى Canvas، يمكنك القيام بهذا هنا:"
+  a_few_seconds_ago_e43118d: "منذ بضع ثوان"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "يوجد بالفعل ملف اسمه %{itemName} في هذا المجلد."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "يوجد بالفعل ملف اسمه \"%{name}\". هل تريد استبدال الملف الحالي؟"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "يوجد بالفعل ملف اسمه \"%{name}\" في هذا المجلد. هل تريد استبدال الملف الحالي؟"
@@ -2530,6 +2531,7 @@ ar:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "حدث خطأ أثناء تحديث تقييمات الإجادة: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "حدث خطأ أثناء تحديث تقييمات الإجادة"
   an_error_occurred_updating_this_assignment_21287c7e: "حدث خطأ أثناء تحديث هذه المهمة."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "حدث خطأ أثناء استنساخ المجموعة."
   an_error_occurred_when_saving_the_group_536c8f66: "حدث خطأ أثناء حفظ مجموعة المجموعة."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "حدث خطأ أثناء إعداد حق الاستخدام الخاص بـ %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "حدث خطأ أثناء محاولة الاتصال بـ Turnitin."
@@ -3030,6 +3032,7 @@ ar:
     scores_lower_than_the_average: "النقاط الأقل من متوسط %{average}"
     total_graded_submissions: "إجمالي عمليات الإرسال التي تم تصحيحها:"
   assignment_details_expanded_20c6f0c7: "تم توسيع تفاصيل المهمة"
+  assignment_details_updated_493f410b: "تم تحديث تفاصيل المهمة"
   assignment_does_not_exist_74178c34: "المهمة غير موجودة"
   assignment_edit_6dced39f: "تحرير المهمة"
   assignment_enhancements_student_557372ab: "تحسينات على المهام - الطالب"
@@ -5212,6 +5215,8 @@ ar:
   client_id_cb2502af: "معرف العميل"
   client_id_is_required_1afd54d1: "معرّف العميل مطلوب"
   clone_group_set_c2a40e15: "استنساخ فئة مجموعات"
+  clone_groupcategoryname_ef85ddb8: "(استنساخ) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "جارٍ استنساخ المجموعة"
   close_17f50799: إغلاق
   close_and_return_to_canvas_80544344: "إغلاق والعودة إلى Canvas"
   close_d634289d: إغلاق
@@ -5620,6 +5625,7 @@ ar:
   confirm_dialog_component: 
     ok: موافق
   confirm_edit_outcome_a9746c99: "تأكيد ناتج التحرير"
+  confirm_mastery_scales_c6ef2169: "تأكيد مقاييس الإجادة"
   confirm_qr_code_display_49664fa3: "تأكيد عرض رمز QR."
   confirm_removal_a9bb889: "تأكيد الإزالة"
   confirm_reservation_removal_e6350e7c: "تأكيد إزالة الحجز"
@@ -6725,6 +6731,7 @@ ar:
     other: "%{count} نقطة"
     two: "نقطتين %{count}"
     zero: "%{count} نقاط"
+  count_posted_b92a9562: "تم نشر %{count}"
   count_posts_added_fa55ce4: 
     one: "%{count} المنشور المضاف"
     other: "%{count} المنشورات المضافة"
@@ -8348,6 +8355,7 @@ ar:
   delete_this_answer_f1802eaa: "حذف هذه الإجابة"
   delete_this_collaboration_4f20b698: "حذف هذا التعاون"
   delete_this_feed_67d5d924: "حذف هذا الموجز"
+  delete_this_file_683804a1: "حذف هذا الملف"
   delete_this_key_70f74aa1: "حذف هذا المفتاح"
   delete_this_module_20d54791: "حذف هذه الوحدة"
   delete_this_page_509f2baf: "حذف هذه الصفحة"
@@ -8367,6 +8375,10 @@ ar:
   deleted_content_exceptions_237e809d: "استثناءات المحتوى المحذوفة:"
   deleted_content_referenced_in_this_resource_e42d1998: "تمت الإشارة إلى محتوى محذوف في هذا المورد:"
   deleting_6421031e: "يتم الآن الحذف..."
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      لن يتم حذف ملف الإرسال في العادة إلا حين ينشر الطالب مادة غير ملائمة أو خاصة.
+      
+      لا يمكن التراجع عن هذا الإجراء. هل ترغب بالتأكيد في حذف %{file}؟
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "سيؤدي حذف المستخدم إلى القضاء على جميع المحافظ الإلكترونية الخاصة به. بدلاً من ذلك، يمكن تمييز المحافظ الإلكترونية كل على حدا كـ \"بريد عشوائي\" أو \"آمنة\" لتعديل عرضها."
   deleting_assignment_22d5851d: "جارٍ حذف المهمة"
   delicious_7f9ac66f: Delicious
@@ -9849,6 +9861,7 @@ ar:
   error_adding_canvas_file_to_submission_draft_de258021: "خطأ أثناء إضافة ملف canvas إلى مسودة الإرسال"
   error_adding_files_to_submission_draft_6acac337: "حدث خطأ أثناء إضافة الملفات إلى مسودة الإرسال"
   error_associating_assignment_assignment_name_with__d92e9acf: "خطأ أثناء إقران المهمة \"%{assignment_name}\" مع أداة LTI."
+  error_deleting_file_551dc16e: "حدث خطأ أثناء حذف %{file}"
   error_deleting_name_reason_11f9d399: "حدث خطأ أثناء حذف %{name}: %{reason}"
   error_duplicating_module_4b023042: "حدث خطأ أثناء تكرار الوحدة النمطية"
   error_during_group_creation_f232994b: "خطأ أثناء إنشاء المجموعة"
@@ -11753,7 +11766,8 @@ ar:
   group_roster_1846bf84: "كشف المجموعات"
   group_saved_successfully_fcd5ca66: "تم حفظ المجموعة بنجاح"
   group_select_330df8bd: "تحديد المجموعة"
-  group_set_name_2aed2347: "اسم فئة المجموعة"
+  group_set_cloned_successfully_3e1a1497: "تم استنساخ المجموعة بنجاح"
+  group_set_name_2aed2347: "اسم مجموعة المجموعات"
   group_settings: 
     invitation_sent: "تم إرسال الدعوة"
   group_weight_for_d46c5db4: "الوزن الجماعي لـ:"
@@ -12705,6 +12719,7 @@ ar:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "تحسين القدرة على الاكتشاف من خلال السحب والإفلات في الملفات"
   improved_outcomes_management_4692f886: "تحسين إدارة المخرجات"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "تذكيرات مرئية محسنة لتشجيع المدرسين على نشر المساقات"
+  in_a_few_seconds_538ddff3: "بعد بضع ثوان"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "ينقر الطلاب في %{asset_link} فوق %{bad_link} لصفحة غير موجودة في مساقك."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "ينقر الطلاب في %{asset_link} فوق %{bad_link} إلى محتوى في مساق مختلف."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "في %{asset_link}، ينقر الطلاب فوق %{bad_link} إلى محتوى لا يمكنهم الوصول إليه."
@@ -12712,6 +12727,7 @@ ar:
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "في حال توفره، تحميل RCE من خدمة محتويات Canvas الثرية"
   in_class_23eeca38: "في الصف"
   in_closed_grading_period_dc717846: "خلال فترة تقييم الدرجات المغلقة"
+  in_less_than_a_minute_c8595a28: "بعد أقل من دقيقة"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "من أجل إتمام العملية، ستتم إعادة توجيهك إلى صفحة تسجيل الدخول أين ستحتاج لإعادة تسجيل الدخول باستخدام بيانات اعتماد طفلك."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "لكي تقوم باستيراد كمية هائلة من النواتج مرة واحدة، أو لتحديث النواتج الحالية، برجاء *اتباع تنسيق CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "نقاط جولات تدريبية داخل المنتج للمعلمين"
@@ -13270,6 +13286,7 @@ ar:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} تم العثور على إعلامات"
   length_results_found_3afd01e5: "%{length} النتائج التي تم العثور عليها"
+  less_than_a_minute_ago_9f45e2a5: "منذ أقل من دقيقة"
   let_students_see_the_correct_answers_dacc2faf: "السماح للطلاب بمشاهدة الإجابات الصحيحة"
   let_students_see_their_quiz_responses_fbc07d14: "السماح للطلاب بمشاهدة نتائج الاختبارات الخاصة بهم"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "اجعل الطلاب يطلعون على استجابات اختباراتهم (سيتم تعليم الأسئلة غير الصحيحة في ملاحظات الطالب)"
@@ -18200,6 +18217,7 @@ ar:
   post_to_961f8937: "نشر على"
   post_to_students_b02df196: "انشر للطلاب"
   post_types_93ff86d9: "أنواع النشر"
+  posted_455862b9: "تم النشر"
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "تم النشر على:"
   posted_to_student_861beec9: "تم النشر للطالب"
@@ -20721,6 +20739,10 @@ ar:
       لاستبدال الصورة الحالية للمعادلة الرياضية بالإضافة إلى mathml المخفي
       مع إصدار MathJax منسّق. ويوفر هذا إمكانية وصول أفضل
       وخيارات كثيرة ليتمكن القارئ من التفاعل مع المعادلة الموجودة على الصفحة.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      لاستبدال الصورة الحالية للمعادلة الرياضية بالإضافة إلى mathml المخفي
+      مع إصدار MathJax مُعالَج. ويوفر هذا التغيير إمكانية وصول أفضل 
+      وخيارات كثيرة ليتمكن القارئ من التفاعل مع المعادلة الموجودة على الصفحة.
   reply_389d6fb9: رد
   reply_from_name: "%{name} عبر إعلامات Canvas"
   reply_to_comment_72d96728: "رد على التعليق"
@@ -21243,7 +21265,7 @@ ar:
         download_current_scores: "تنزيل الدرجات الحالية (csv.)"
         grading_history: "عرض سجل دفتر الدرجات"
         hide_student_names_label: "إخفاء أسماء الطلاب"
-        include_ungraded_assignments: "اعتبار درجة المهام التي لم يتم تقييمها كـ 0"
+        include_ungraded_assignments: "عرض غير مقدّر باعتباره 0"
         set_group_weights: "ضبط تقييمات المجموعة"
         show_concluded_enrollments_label: "عرض التسجيلات المنتهية"
         show_notes: "إظهار الملاحظات في معلومات الطالب"
@@ -23385,6 +23407,7 @@ ar:
       student_support_description: "ينبغي أن يكون معلمك النقطة الأولى للاتصال. يمكنه الإجابة على أسئلتك على Networking Academy أو الاتصال بمكتب الدعم بالنيابة عنك. يمكنك الاتصال بمعلمك من خلال استخدام ميزة مربع الوارد."
       support_desk_livechat: "محادثة مباشرة مع مكتب الدعم"
   support_favorite_lti_tools_in_the_rce_1680436d: "دعم أدوات LTI المفضلة في RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "ادعم معادلات LaTex الرياضية في كل مكان تقريبًا"
   svg_d5969386: SVG
   swahili_5caeb4ba: السواحلية
   sweden_1add8e79: السويد
@@ -23923,6 +23946,7 @@ ar:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "لن يتم حساب هذه المهمة في درجتك بعد الآن."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "قام المؤلف بإلغاء نشر هذا الملف المرفق."
   this_code_expires_in_timefromnow_ec7ccef4: "تنتهي صلاحية هذا الرمز بعد %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "تنتهي صلاحية هذا الرمز في %{timeFromNow}."
   this_code_has_expired_41f76642: "انتهت صلاحية هذا الرمز."
   this_conference_may_be_recorded_f76deeeb: "قد يتم تسجيل هذا المؤتمر."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "يتعذر في هذه المرة إضافة هذا المساق إلى قائمة المساقات."
@@ -24080,6 +24104,8 @@ ar:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "يتيح لك ذلك مصادقة Canvas لنشر الدرجات في SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "سيُدخل ذلك على حسابك بأكمله تلك الغييرات. هل تريد المتابعة؟"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "سيطبق ذلك هذا النسق على حسابك بأكمله. هل تريد المتابعة؟"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "سيؤدي هذا إلى تحديث كافة معايير التقييم على مستوى الحساب والمساق المرتبطة بمقاييس إجادة مستوى الحساب ولم يتم الوصول إليها بعد."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "سيؤدي هذا إلى تحديث كل معايير التقييم المتوافقة مع المخرجات في هذا المساق التي لم يتم الوصول إليها بعد."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "سيؤدي هذا إلى تحديث كل المعايير التي تستخدم هذا الناتج التي لم يتم تقييمها بعد"
   threshold_in_hours_to_notify_students_within_f33820aa: "الحد (في الساعات) لإعلام الطلاب خلال"
   threshold_pts_45f0e5d8: "الحد %{pts}"
@@ -25023,6 +25049,7 @@ ar:
   updated_current_grade_to_currentgrade_bfe2ea14: "درجة حالية محدّثة لـ %{currentGrade}"
   updated_group_group_name_727b1d98: "تم تحديث المجموعة %{group_name}"
   updated_math_equation_display_583671a8: "شاشة محدّثة للمعادلة الرياضية"
+  updated_math_equation_handling_b84509d1: "معالجة محدّثة للمعادلة الرياضية"
   updated_permissions_page_f2e91060: "صفحة أذونات محدثة"
   updated_terms_of_service_82f34148: "تحديث شروط الخدمة"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "واجهة مستخدم محدّثة للبحث عن المستخدمين والمساقات في الحساب وعرضها."
@@ -26223,6 +26250,7 @@ ar:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "ليس لديك إذن بالوصول إلى الإختبار المطلوب."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "لا يمكنك الوصول إلى المورد المطلوب."
   you_do_not_have_permission_to_change_this_488c536: "ليس لديك إذن لتغيير هذا"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "ليس لديك الإذن اللازم لحذف %{file}. يرجى الاتصال بمسؤول حسابك."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "ليس لديك الإذن اللازم لتحرير هذه المهمة"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "ليس لديك إذن لدعوة مستخدمين غير موجودين بالفعل."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "ليس لديك إذن لنشر هذا المساق."
