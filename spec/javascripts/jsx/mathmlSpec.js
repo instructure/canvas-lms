@@ -78,7 +78,7 @@ test('reloadElement reloads the element', () => {
   ok(window.MathJax.Hub.Queue.called)
 })
 
-QUnit.module('isMathOnPage', {
+QUnit.module('isMathInElement', {
   beforeEach: () => {
     window.ENV = {
       FEATURES: {}
@@ -87,21 +87,21 @@ QUnit.module('isMathOnPage', {
 })
 
 test('returns true if there is mathml', () => {
-  const mathElem = document.createElement('math')
-  mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
+  const mathElem = document.createElement('div')
+  mathElem.innerHTML = '<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns false if there is a .math_equation_latex element', () => {
   const mathElem = document.createElement('span')
-  mathElem.setAttribute('class', 'math_equation_latex')
-  mathElem.innerHTML = '2 + 2'
+  mathElem.innerHTML = '<span class="math_equation_latex">2 + 2</span>'
+
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), false)
+  equal(mathml.isMathInElement(mathElem), false)
 })
 
-QUnit.module('isMathOnPage, with new_math_equation_handling on', {
+QUnit.module('isMathInElement, with new_math_equation_handling on', {
   beforeEach: () => {
     window.ENV = {
       FEATURES: {
@@ -112,35 +112,35 @@ QUnit.module('isMathOnPage, with new_math_equation_handling on', {
 })
 
 test('returns true if there is mathml', () => {
-  const mathElem = document.createElement('math')
-  mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
+  const mathElem = document.createElement('span')
+  mathElem.innerHTML = '<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>></math>'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns true if there is a .math_equation_latex element', () => {
   const mathElem = document.createElement('span')
-  mathElem.setAttribute('class', 'math_equation_latex')
-  mathElem.innerHTML = '2 + 2'
+  mathElem.innerHTML = '<span class="math_equation_latex">2 + 2</span>'
+
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns false if there is block-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '$$y = mx + b$$'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), false)
+  equal(mathml.isMathInElement(mathElem), false)
 })
 
 test('returns true if there is inline-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '\\(ax^2 + by + c = 0\\)'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), false)
+  equal(mathml.isMathInElement(mathElem), false)
 })
 
-QUnit.module('isMathOnPage, including inline LaTex', {
+QUnit.module('isMathInElement, including inline LaTex', {
   beforeEach: () => {
     window.ENV = {
       FEATURES: {
@@ -152,44 +152,38 @@ QUnit.module('isMathOnPage, including inline LaTex', {
 })
 
 test('returns true if there is mathml', () => {
-  const mathElem = document.createElement('math')
-  mathElem.innerHTML = '<mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup>'
+  const mathElem = document.createElement('span')
+  mathElem.innerHTML = '<math><mi>&#x3C0;</mi> <msup> <mi>r</mi> <mn>2</mn> </msup></math>'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns true if there is a .math_equation_latex element', () => {
   const mathElem = document.createElement('span')
-  mathElem.setAttribute('class', 'math_equation_latex')
-  mathElem.innerHTML = '2 + 2'
+  mathElem.innerHTML = '<span class="math_equation_latex">2 + 2</span>'
+
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns true if there is block-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '$$y = mx + b$$'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
 
 test('returns true if there is inline-delmited math', () => {
   const mathElem = document.createElement('span')
   mathElem.innerHTML = '\\(ax^2 + by + c = 0\\)'
   document.getElementById('fixtures').innerHTML = mathElem.outerHTML
-  equal(mathml.isMathOnPage(), true)
+  equal(mathml.isMathInElement(mathElem), true)
 })
-
-test('debounces "process-new-math" event handler', assert => {
-  const done = assert.async()
-  const spy = sinon.spy(mathml, 'processNewMathOnPage')
-  window.dispatchEvent(new Event('process-new-math'))
-  window.dispatchEvent(new Event('process-new-math'))
-  equal(spy.callCount, 0)
-  window.setTimeout(() => {
-    equal(spy.callCount, 1)
-    done()
-  }, 501)
+test('handles "process-new-math" event', () => {
+  const spy = sinon.spy(mathml, 'processNewMathInElem')
+  const elem = document.createElement('span')
+  window.dispatchEvent(new CustomEvent('process-new-math', {detail: {target: elem}}))
+  ok(spy.calledWith(elem))
 })
 
 QUnit.module('mathEquationHelper', {
@@ -285,4 +279,38 @@ test('removeStrayEquationImages only removes tagged images', () => {
 
   ok(document.getElementById('i1'))
   equal(document.getElementById('i2'), null)
+})
+
+QUnit.module('isMathJaxIgnored', {
+  beforeEach: () => {
+    window.ENV = {
+      FEATURES: {
+        new_math_equation_handling: true,
+        inline_math_everywhere: true
+      }
+    }
+    document.getElementById('fixtures').innerHTML = ''
+  },
+  afterEach: () => {
+    document.getElementById('fixtures').innerHTML = ''
+  }
+})
+
+test('ignores elements in the ignore list', () => {
+  const root = document.getElementById('fixtures')
+  const elem = document.createElement('span')
+  elem.setAttribute('id', 'quiz-elapsed-time')
+  root.appendChild(elem)
+  ok(mathml.isMathJaxIgnored(elem))
+})
+
+test('ignores descendents of .mathjax_ignore', () => {
+  const root = document.getElementById('fixtures')
+  const ignored = document.createElement('span')
+  ignored.setAttribute('class', 'mathjax_ignore')
+  root.appendChild(ignored)
+  const elem = document.createElement('span')
+  elem.textContent = 'ignore me'
+  ignored.appendChild(elem)
+  ok(mathml.isMathJaxIgnored(elem))
 })
