@@ -127,6 +127,13 @@ class DueDateWizard extends React.Component {
         flashMessage('Dates are distributing');
         this.setStateToDistributinng();
         this.getProgress();
+      }).catch((error) => {
+        let message = error.response.data.errors;
+        if (message) {
+          flashError(message);
+        } else {
+          flashError("Something went wrong, please try again later.");
+        }
       });
     }
   }
@@ -143,6 +150,13 @@ class DueDateWizard extends React.Component {
         flashMessage("Due dates are clearing");
         this.setStateToDistributinng();
         this.getProgress();
+      }).catch((error) => {
+        let message = error.response.data.errors;
+        if (message) {
+          flashError(message);
+        } else {
+          flashError("Something went wrong, please try again later.");
+        }
       });
     }
   }
