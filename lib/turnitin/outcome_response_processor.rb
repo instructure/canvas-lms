@@ -62,18 +62,22 @@ module Turnitin
       # exponential backoff. We should add
       # one to give TII more time to process
       # attachments.
-      delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      stash_turnitin_client do
+        delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      end
     rescue Errors::ScoreStillPendingError
       if attempt_number == self.class.max_attempts
         create_error_attachment
         raise
       else
         turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, @assignment, @user, @outcomes_response_json)
-        turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-          priority: Delayed::LOW_PRIORITY,
-          attempts: attempt_number,
-          run_at: Time.now.utc + (attempt_number ** 4) + 5).
-          process
+        stash_turnitin_client do
+          turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+            priority: Delayed::LOW_PRIORITY,
+            attempts: attempt_number,
+            run_at: Time.now.utc + (attempt_number ** 4) + 5).
+            process
+        end
       end
     rescue StandardError
       if attempt_number == self.class.max_attempts
@@ -83,7 +87,9 @@ module Turnitin
     end
 
     def resubmit(submission, asset_string)
-      delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      stash_turnitin_client do
+        delay(max_attempts: self.class.max_attempts).update_originality_data(submission, asset_string)
+      end
     end
 
     def turnitin_client
@@ -112,11 +118,6 @@ module Turnitin
       end
     end
 
-    # dont try and recreate the turnitin client in a delayed job. bad things happen
-    def delay(**)
-      stash_turnitin_client { super }
-    end
-
     private
 
     def create_error_attachment
@@ -128,6 +129,13 @@ module Turnitin
       )
     end
 
+    # the turnitin client has a proc embedded
+    # in it's faraday connection.  If you try to serialize it,
+    # it will fail to deserialize (for good reason, closures can't
+    # take the whole state of the system with them when written
+    # as yaml).  This method un-sets the ivar long enough to
+    # serialize the object for job processing (a turnitin client
+    # will be created in the job when necessary).
     def stash_turnitin_client
       old_turnit_client = @_turnitin_client
       @_turnitin_client = nil
