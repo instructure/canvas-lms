@@ -3,6 +3,7 @@ services:
   canvas:
     environment:
       - JSPEC_GROUP
+    image: local/js-runner
     build:
       context: .
       dockerfile: ./build/new-jenkins/js/Dockerfile
