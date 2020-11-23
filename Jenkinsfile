@@ -35,6 +35,22 @@ def buildParameters = [
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
+def dockerDevFiles = [
+  '^docker-compose/',
+  '^build/common_docker_build_steps.sh',
+  '^script/canvas_update',
+  '^docker-compose.yml',
+  '^Dockerfile$',
+  '^lib/tasks/',
+  'Jenkinsfile.docker-smoke'
+]
+
+def jenkinsFiles = [
+  'Jenkinsfile*',
+  '^docker-compose.new-jenkins*.yml',
+  'build/new-jenkins/*'
+]
+
 def getDockerWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
@@ -403,7 +419,7 @@ pipeline {
                 }
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master.
-                if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: './build/new-jenkins/jenkinsfile_changes.sh', returnStatus: true) == 0)) {
+                if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(jenkinsFiles, 'HEAD^') ) {
                     buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
                 }
 
@@ -456,15 +472,8 @@ pipeline {
                     rebaseHelper("master")
                   }
 
-                  if(!env.JOB_NAME.endsWith('Jenkinsfile')) {
-                    sh """#!/bin/bash
-                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-
-                      if git diff --name-only origin/master..HEAD Jenkinsfile* docker-compose.new-jenkins* build/new-jenkins/* |grep -E "Jenkinsfile|docker-compose.new-jenkins|build/new-jenkins/"; then
-                        echo "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
-                        exit 1
-                      fi
-                    """
+                  if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
+                      error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
                   }
                 }
               }
@@ -637,7 +646,7 @@ pipeline {
                   )
                 }
 
-                if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
+                if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
                   buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
                 }
