@@ -171,5 +171,15 @@ module Turnitin
         expect(submission.turnitin_data[attachment.asset_string][:public_error_message]).to start_with "Turnitin has not"
       end
     end
+
+    describe "#resubmit" do
+      it "doesn't serialize the whole TII client" do
+        expect(subject.turnitin_client).to_not be_nil
+        submission = Submission.new(id: 1)
+        output_job = subject.resubmit(submission, "asset_string")
+        output_job = Delayed::Job.where(tag: "Turnitin::OutcomeResponseProcessor#update_originality_data").last
+        expect(output_job.handler).to_not include("ruby/object:Turnitin::TiiClient")
+      end
+    end
   end
 end
