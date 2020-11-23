@@ -6,6 +6,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
+DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
 # shellcheck disable=SC2086
@@ -31,10 +32,9 @@ docker build \
 docker build \
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
   --cache-from $CACHE_TAG \
-  --file Dockerfile.jenkins.webpack-runner \
   --tag "local/webpack-runner" \
   --tag "$CACHE_TAG" \
-  "$WORKSPACE"
+  - < Dockerfile.jenkins.webpack-runner
 
 if [ -n "${1:-}" ]; then
   docker build \

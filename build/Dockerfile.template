@@ -85,19 +85,20 @@ RUN set -eux; \
   && yarn cache clean
 
 <% if jenkins? -%>
-<% set_file_suffix 'webpack-runner' %>
-<%= generation_message %>
-FROM local/webpack-builder
-<% end -%>
+COPY --chown=docker:docker --from=local/cache-helper-collect-packages /tmp/dst ${APP_HOME}
+RUN yarn build:packages
+<% else -%>
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
-<% if jenkins? -%>
 COPY --chown=docker:docker packages        ${APP_HOME}packages
-<% end -%>
 COPY --chown=docker:docker script          ${APP_HOME}script
 
 RUN yarn postinstall
+<% end -%>
 
 <% if jenkins? -%>
+<% set_file_suffix 'webpack-runner' %>
+<%= generation_message %>
+FROM local/webpack-builder
 COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
 
 ARG JS_BUILD_NO_UGLIFY=0

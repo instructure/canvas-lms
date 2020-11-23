@@ -3,12 +3,6 @@
 # task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
 FROM local/webpack-builder
-COPY --chown=docker:docker babel.config.js ${APP_HOME}
-COPY --chown=docker:docker packages        ${APP_HOME}packages
-COPY --chown=docker:docker script          ${APP_HOME}script
-
-RUN yarn postinstall
-
 COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
 
 ARG JS_BUILD_NO_UGLIFY=0

@@ -108,3 +108,6 @@ RUN set -eux; \
              /home/docker/.gem/ \
   && (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
+
+COPY --chown=docker:docker --from=local/cache-helper-collect-packages /tmp/dst ${APP_HOME}
+RUN yarn build:packages
