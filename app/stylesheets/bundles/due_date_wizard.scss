@@ -13,6 +13,13 @@
   align-items: center;
   flex-direction: column;
 
+  .title-wrapper {
+    background: rgba(217, 218, 220, .6);
+    width: 100%;
+    border-bottom: 1px solid #C7CDD1;
+    padding-bottom: .25rem;
+  }
+  
   .title, .section {
     text-align: center;
   }
@@ -24,7 +31,7 @@
   .course-date-row {
     display: flex;
     flex-direction: column;
-    padding: 1rem;
+    padding: 1rem 1rem .25rem 1rem;
   }
 
   .due-date-btn {
