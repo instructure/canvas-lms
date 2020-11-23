@@ -124,16 +124,9 @@ class DueDateWizard extends React.Component {
   distributeDueDates() {
     if (this.confirmDistribute()) {
       axios.post(`/courses/${this.state.course.id}/distribute_due_dates`).then(() => {
-        flashMessage('Dates are distributing');
-        this.setStateToDistributinng();
-        this.getProgress();
+        this.processSuccess("distributing");
       }).catch((error) => {
-        let message = error.response.data.errors;
-        if (message) {
-          flashError(message);
-        } else {
-          flashError("Something went wrong, please try again later.");
-        }
+        this.processErrors(error);
       });
     }
   }
@@ -147,17 +140,28 @@ class DueDateWizard extends React.Component {
   clearDueDates() {
     if (this.confirmClear()) {
       axios.post(`/courses/${this.state.course.id}/clear_due_dates`).then(() => {
-        flashMessage("Due dates are clearing");
-        this.setStateToDistributinng();
-        this.getProgress();
+        this.processSuccess("clearing");
       }).catch((error) => {
-        let message = error.response.data.errors;
-        if (message) {
-          flashError(message);
-        } else {
-          flashError("Something went wrong, please try again later.");
-        }
+        this.processErrors(error);
       });
+    }
+  }
+
+  processSuccess(msg) {
+    flashMessage(`Due dates are ${msg}!`);
+    this.setStateToDistributinng();
+    this.getProgress();
+  }
+
+  processErrors(error) {
+    let message = error.response.data.errors;
+    if (message) {
+      flashError(message);
+      if (message === "Currently Importing Content.") {
+        this.setState({currentlyImporting: true});
+      }
+    } else {
+      flashError("Something went wrong, please try again later.");
     }
   }
   
@@ -179,7 +183,7 @@ class DueDateWizard extends React.Component {
         <div>
           <small className="distributing-warning">Due Dates are currently being distributed</small>
         </div>
-        <div className="progress">
+        <div className="progress" style={{display: `${this.state.distributionProgress ? '' : 'none'}`}}>
           <span className="value">
             <span style={{width: `${this.state.distributionProgress}%`}}></span>
           </span>
