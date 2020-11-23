@@ -9,14 +9,16 @@ class DueDateWizard extends React.Component {
     super(props);
     this.state = {
       course: {},
-      distributingDates: false
+      distributingDates: false,
+      currentlyImporting: false
     }
   }
 
-  componentDidMount() {
+  componentWillMount() {
     this.setState({
       course: ENV.course,
-      distributingDates: ENV.dates_distributing
+      distributingDates: ENV.dates_distributing,
+      currentlyImporting: ENV.currently_importing
     }, () => {
       console.log(this.state.course)
       if (this.state.distributingDates) { this.getProgress() }
@@ -40,10 +42,12 @@ class DueDateWizard extends React.Component {
   innerCard() {
     let component;
 
-    if (this.courseHasDates()) {
-      component = this.datePusher();
-    } else {
+    if (!this.courseHasDates()) {
       component = this.noDateWarning();
+    } else if (this.state.currentlyImporting) {
+      component = this.currentImportWarning();
+    } else {
+      component = this.datePusher();
     }
 
     return (
@@ -57,12 +61,28 @@ class DueDateWizard extends React.Component {
     return (
       <div>
         <h2 className="warning">
-          Due dates cannot be distributed.
+          Missing start or end date. Due dates cannot be distributed.
         </h2>
         <h4>
           <span>
             <a href={`/courses/${this.state.course.id}/settings`}>Go to Course Settings</a>
             &nbsp;to add start and end dates in order to use this tool.
+          </span>
+        </h4>
+      </div>
+    );
+  }
+
+  currentImportWarning() {
+    return (
+      <div>
+        <h2 className="warning">
+          An import is currently running. Due dates cannot be distributed.
+        </h2>
+        <h4>
+          <span>
+            <a href={`/courses/${this.state.course.id}/content_migrations`}>Go to Imports</a>
+            &nbsp;to view the status of current course imports.
           </span>
         </h4>
       </div>
@@ -128,13 +148,15 @@ class DueDateWizard extends React.Component {
   }
   
   renderButtons() {
-    return (
-      <div>
-        <button className={`sm-btn-primary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
-        <button className={`sm-btn-secondary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
-        {this.state.distributingDates ? this.renderWarningIfDistributing() : ""}
-      </div>
-    )
+    if (this.courseHasDates() && !this.state.currentlyImporting) {
+      return (
+        <div>
+          <button className={`sm-btn-primary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.distributeDueDates.bind(this)}>Distribute Due Dates</button>
+          <button className={`sm-btn-secondary due-date-btn ${this.state.distributingDates ? "disabled" : ""}`} onClick={this.clearDueDates.bind(this)}>Clear Due Dates</button>
+          {this.state.distributingDates ? this.renderWarningIfDistributing() : ""}
+        </div>
+      )
+    }
   }
 
   renderWarningIfDistributing() {
