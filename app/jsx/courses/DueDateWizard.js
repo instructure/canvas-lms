@@ -192,7 +192,7 @@ class DueDateWizard extends React.Component {
       <div className="due-date-wizard-card">
         <h3 className="title">Distribute Dates for Course '{this.state.course.name}'</h3>
         {this.innerCard()}
-        {this.courseHasDates() ? this.renderButtons() : ""}
+        {this.renderButtons()}
       </div>
     )
   }
