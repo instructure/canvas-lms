@@ -130,16 +130,15 @@ def _runRspecTestSuite(
         currentBuild.rawBuild.@result = preStatus
       }
 
-      def reports = load 'build/new-jenkins/groovy/reports.groovy'
 
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
-        reports.stashSpecCoverage(prefix, index)
+        archiveArtifacts(artifacts: 'tmp/spec_coverage/**/*')
       }
 
       if (env.RSPEC_LOG == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime_rspec_tests.log ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
-        reports.stashParallelLogs(prefix, index)
+        archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
       }
 
       sh 'rm -rf ./tmp'
@@ -149,21 +148,19 @@ def _runRspecTestSuite(
 }
 
 def uploadSeleniumCoverage() {
-  _uploadCoverage('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
+  _uploadCoverage('selenium', 'canvas-lms-selenium')
 }
 
 def uploadRSpecCoverage() {
-  _uploadCoverage('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
+  _uploadCoverage('rspec', 'canvas-lms-rspec')
 }
 
-def _uploadCoverage(prefix, total, coverage_name) {
-  def reports = load 'build/new-jenkins/groovy/reports.groovy'
-  reports.publishSpecCoverageToS3(prefix, total, coverage_name)
+def _uploadCoverage(prefix, coverage_name) {
+  reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverage_name/coverage")
 }
 
 def uploadParallelLog() {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  reports.copyParallelLogs(rspecConfig().node_total, seleniumConfig().node_total)
+  reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
   archiveArtifacts(artifacts: "parallel_logs/**")
 }
 
