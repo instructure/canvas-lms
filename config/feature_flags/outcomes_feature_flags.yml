@@ -38,11 +38,12 @@ bulk_delete_pages:
   description: Allow pages to be deleted in bulk
 account_level_mastery_scales:
   state: hidden
-  applies_to: RootAccount
   display_name: Account and Course Level Outcome Mastery Scales
   description: Allows setting Account & Course Level mastery scales and calculation methods,
     replacing per-outcome criterion ratings & calculation methods
   after_state_change_proc: mastery_scales_after_change_hook
+  applies_to: Account
+  root_opt_in: true
 usage_rights_discussion_topics:
   state: hidden
   applies_to: RootAccount
