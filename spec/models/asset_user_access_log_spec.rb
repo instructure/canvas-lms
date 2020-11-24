@@ -199,6 +199,15 @@ describe AssetUserAccessLog do
       AssetUserAccessLog.compact
       expect(@asset_1.reload.view_score).to be_nil
     end
+
+    it "aborts for bad write path config" do
+      ps = PluginSetting.where(name: "asset_user_access_logs").first
+      ps.settings[:write_path] = "update"
+      ps.save!
+      expect(AssetUserAccess).to_not receive(:compact_partition)
+      AssetUserAccessLog.compact
+      expect(@asset_1.reload.view_score).to be_nil
+    end
   end
 
   describe ".reschedule!" do
