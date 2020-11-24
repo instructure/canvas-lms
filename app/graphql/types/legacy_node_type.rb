@@ -32,6 +32,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "GradingPeriod"
   value "Group"
   value "GroupSet"
+  value "LearningOutcomeGroup"
   value "MediaObject"
   value "Module"
   value "ModuleItem"
