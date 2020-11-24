@@ -270,7 +270,7 @@ body:not(.course-menu-expanded) {
   transform: translate3d(0,0,0);
   box-sizing: border-box;
   position: absolute;
-  top: 0; #{direction(right)}: 100%;
+  top: 0; #{direction(right)}: 99.9999%;
   width: $ic-left-side-width;
   padding: direction-sides($ic-sp*2 $ic-sp $ic-sp $ic-sp*2);
   opacity: 0;
