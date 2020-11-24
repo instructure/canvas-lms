@@ -408,6 +408,35 @@ class WikiPage < ActiveRecord::Base
     wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
   end
 
+  def self.reinterpret_version_yaml(yaml_string)
+    # TODO: This should be temporary.  For a long time
+    # course exports/imports would corrupt the yaml in the first version
+    # of an imported wiki page by trying to replace placeholders right
+    # in the yaml.  This doctors the yaml back, and can be removed
+    # when the "content_imports" exception type for psych syntax errors
+    # isn't happening anymore.
+    pattern_1 = /(\<a.*?id=.*?"media_comment.*?\/\>)/im
+    pattern_2 = /(\<a.*?id=.*?"media_comment.*?\<\/a\>)/
+    replacements = []
+    [pattern_1, pattern_2].each do |regex_pattern|
+      yaml_string.scan(regex_pattern).each do |matched_groups|
+        matched_groups.each do |group|
+          # this should be an UNESCAPED version of a media comment.
+          # let's try to escape it.
+          replacements << [group, group.inspect[1..-2]]
+        end
+      end
+    end
+    new_string = yaml_string.dup
+    replacements.each do |operation|
+      new_string = new_string.sub(operation[0], operation[1])
+    end
+    # if this works without throwing another error, we've
+    # cleaned up the yaml successfully
+    YAML::load( new_string )
+    new_string
+  end
+
   # opts contains a set of related entities that should be duplicated.
   # By default, all associated entities are duplicated.
   def duplicate(opts = {})

@@ -484,7 +484,24 @@ class WikiPagesApiController < ApplicationController
                           else
                             true
                           end
-        render :json => wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+        output_json = nil
+        begin
+          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+        rescue Psych::SyntaxError => e
+          # TODO: This should be temporary.  For a long time
+          # course exports/imports would corrupt the yaml in the first version
+          # of an imported wiki page by trying to replace placeholders right
+          # in the yaml.  When that happens, we can't parse it anymore because
+          # the html is insufficiently escaped.  This is a fix until it seems
+          # like none of these are happening anymore
+          Canvas::Errors.capture_exception(:content_imports, e, :info)
+          # this is a badly escaped media comment
+          clean_version_yaml = WikiPage.reinterpret_version_yaml(revision.yaml)
+          revision.yaml = clean_version_yaml
+          revision.save
+          output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
+        end
+        render :json => output_json
       end
     end
   end
