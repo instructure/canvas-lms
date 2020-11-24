@@ -1,8 +1,7 @@
 import React from 'react';
 import moment from 'moment';
 import axios from 'axios';
-import { flashError } from 'jquery';
-import { flashMessage } from 'jquery';
+import { flashMessage, flashError } from 'jquery';
 
 class DueDateWizard extends React.Component {
   constructor(props) {
@@ -20,7 +19,6 @@ class DueDateWizard extends React.Component {
       distributingDates: ENV.dates_distributing,
       currentlyImporting: ENV.currently_importing
     }, () => {
-      console.log(this.state.course)
       if (this.state.distributingDates) { this.getProgress() }
     });
   }
