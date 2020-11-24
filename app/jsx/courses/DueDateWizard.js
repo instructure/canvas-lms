@@ -179,7 +179,7 @@ class DueDateWizard extends React.Component {
     return (
       <div className="distributing-warning-section">
         <div>
-          <small className="distributing-warning">Due Dates are currently being distributed</small>
+          <small className="distributing-warning">Due dates are currently being altered</small>
         </div>
         <div className="progress" style={{display: `${this.state.distributionProgress ? '' : 'none'}`}}>
           <span className="value">
