@@ -127,8 +127,8 @@ class AssetUserAccessLog
   # fewer writes at peak and use spare I/O capacity later in the day if necessary to catch up.
   def self.compact
     ps = plugin_setting
-    if ps.nil?
-      return Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - PluginSetting nil, aborting")
+    if ps.nil? || ps.settings[:write_path] != "log"
+      return Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - PluginSetting configured OFF, aborting")
     end
     ts = Time.now.utc
     yesterday_ts = ts - 1.day
