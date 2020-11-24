@@ -166,4 +166,27 @@ describe AssessmentRequest do
       expect(@ignore.reload).to eq @ignore
     end
   end
+
+  describe "#active_rubric_association?" do
+    before(:once) do
+      rubric_model
+      @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+      @request.rubric_association = @association
+      @request.save!
+    end
+
+    it "returns false if there is no rubric association" do
+      @request.update!(rubric_association: nil)
+      expect(@request).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@request).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@request).to be_active_rubric_association
+    end
+  end
 end

@@ -85,7 +85,7 @@ module Context
   end
 
   def self.sorted_rubrics(user, context)
-    associations = RubricAssociation.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
+    associations = RubricAssociation.active.bookmarked.for_context_codes(context.asset_string).preload(:rubric => :context)
     Canvas::ICU.collate_by(associations.to_a.uniq(&:rubric_id).select{|r| r.rubric }) { |r| r.rubric.title || CanvasSort::Last }
   end
 
@@ -102,7 +102,7 @@ module Context
           context_codes << context.asset_string if context
         end
       end
-      associations += RubricAssociation.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
+      associations += RubricAssociation.active.bookmarked.for_context_codes(context_codes).include_rubric.preload(:context).to_a
     end
 
     associations = associations.select(&:rubric).uniq{|a| [a.rubric_id, a.context.asset_string] }

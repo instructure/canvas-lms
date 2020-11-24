@@ -286,6 +286,16 @@ describe Context do
       }])
     end
 
+    it 'excludes rubrics associated via soft-deleted rubric associations' do
+      c1 = Course.create!(:name => 'c1')
+      r = Rubric.create!(context: c1, title: 'testing')
+      user = user_factory(:active_all => true)
+      association = RubricAssociation.create!(context: c1, rubric: r, purpose: :bookmark, association_object: c1)
+      association.destroy
+      c1.enroll_user(user, "TeacherEnrollment", :enrollment_state => "active")
+      expect(c1.rubric_contexts(user)).to be_empty
+    end
+
     it 'returns contexts in alphabetically sorted order' do
       great_grandparent = Account.default
       grandparent = Account.create!(name: 'AAA', parent_account: great_grandparent)

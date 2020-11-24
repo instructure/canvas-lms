@@ -82,7 +82,7 @@ class Assignment < ActiveRecord::Base
   has_one :wiki_page
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
   has_one :rubric_association, -> { where(purpose: 'grading').order(:created_at).preload(:rubric) }, as: :association, inverse_of: :association_object
-  has_one :rubric, :through => :rubric_association
+  has_one :rubric, -> { merge(RubricAssociation.active) }, :through => :rubric_association
   has_one :teacher_enrollment, -> { preload(:user).where(enrollments: { workflow_state: 'active', type: 'TeacherEnrollment' }) }, class_name: 'TeacherEnrollment', foreign_key: 'course_id', primary_key: 'context_id'
   has_many :ignores, :as => :asset
   has_many :moderated_grading_selections, class_name: 'ModeratedGrading::Selection'
@@ -297,7 +297,7 @@ class Assignment < ActiveRecord::Base
 
     # Learning outcome alignments seem to get copied magically, possibly
     # through the rubric
-    if self.rubric_association
+    if active_rubric_association?
       result.rubric_association = self.rubric_association.clone
       result.rubric_association.skip_updating_points_possible = true
     end
@@ -1261,7 +1261,7 @@ class Assignment < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     ContentTag.delete_for(self)
-    self.rubric_association.destroy if self.rubric_association.present?
+    self.rubric_association.destroy if active_rubric_association?
     self.save!
 
     each_submission_type { |submission| submission.destroy if submission && !submission.deleted? }
@@ -2073,7 +2073,7 @@ class Assignment < ActiveRecord::Base
 
     if opts[:comment] && opts[:assessment_request]
       # if there is no rubric the peer review is complete with just a comment
-      opts[:assessment_request].complete unless opts[:assessment_request].rubric_association
+      opts[:assessment_request].complete unless opts[:assessment_request].active_rubric_association?
     end
 
     # commenting on a student submission results in a teacher occupying a
@@ -2209,7 +2209,9 @@ class Assignment < ActiveRecord::Base
 
   def as_json(options={})
     json = super(options)
-    if json && json['assignment']
+    return json unless json
+
+    if json['assignment']
       # remove anything coming automatically from deprecated db column
       json['assignment'].delete('group_category')
       if self.group_category
@@ -2219,7 +2221,16 @@ class Assignment < ActiveRecord::Base
         # or failing that, version from query
         json['assignment']['group_category'] = self.read_attribute('group_category')
       end
+
+      if json.dig('assignment', 'rubric_association') && !active_rubric_association?
+        json['assignment'].delete('rubric_association')
+      end
     end
+
+    if json['rubric_association'] && !active_rubric_association?
+      json.delete('rubric_association')
+    end
+
     json
   end
 
@@ -2375,7 +2386,7 @@ class Assignment < ActiveRecord::Base
   private :visible_students_for_speed_grader
 
   def visible_rubric_assessments_for(user, opts={})
-    return [] unless user && self.rubric_association
+    return [] unless user && active_rubric_association?
 
     scope = self.rubric_association.rubric_assessments.preload(:assessor)
 
@@ -3583,6 +3594,10 @@ class Assignment < ActiveRecord::Base
     return nil if lti_context_id.blank?
 
     self.find_by(lti_context_id: lti_context_id)
+  end
+
+  def active_rubric_association?
+    !!self.rubric_association&.active?
   end
 
   private

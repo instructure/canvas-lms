@@ -439,6 +439,39 @@ describe ContextController do
       expect(response).to be_successful
       expect(assigns[:deleted_items]).to include(g1)
     end
+
+    describe 'Rubric Associations' do
+      before(:once) do
+        assignment = assignment_model(course: @course)
+        rubric = rubric_model({
+          context: @course,
+          title: 'Test Rubric',
+          data: [{
+            description: 'Some criterion',
+            points: 10,
+            id: 'crit1',
+            ignore_for_scoring: true,
+            ratings: [
+              { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+            ]
+          }]
+        })
+        @association = rubric.associate_with(assignment, @course, purpose: 'grading')
+      end
+
+      it 'shows deleted rubric associations' do
+        @association.destroy
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).to include @association
+      end
+
+      it 'does not show active rubric associations' do
+        user_session(@teacher)
+        get :undelete_index, params: { course_id: @course.id }
+        expect(assigns[:deleted_items]).not_to include @association
+      end
+    end
   end
 
   describe "POST 'undelete_item'" do
@@ -499,6 +532,30 @@ describe ContextController do
 
       post :undelete_item, params: { course_id: @course.id, asset_string: @attachment.asset_string }
       expect(@attachment.reload).not_to be_deleted
+    end
+
+    it 'allows undeleting rubric associations' do
+      assignment = assignment_model(course: @course)
+      rubric = rubric_model({
+        context: @course,
+        title: 'Test Rubric',
+        data: [{
+          description: 'Some criterion',
+          points: 10,
+          id: 'crit1',
+          ignore_for_scoring: true,
+          ratings: [
+            { description: 'Good', points: 10, id: 'rat1', criterion_id: 'crit1' }
+          ]
+        }]
+      })
+      association = rubric.associate_with(assignment, @course, purpose: 'grading')
+      puts "association id is: #{association.id}"
+      association.destroy
+
+      user_session(@teacher)
+      post :undelete_item, params: { course_id: @course.id, asset_string: association.asset_string }
+      expect(association.reload).not_to be_deleted
     end
   end
 

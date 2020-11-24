@@ -279,16 +279,18 @@ describe RubricAssociationsController do
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric_association.id}
       assert_unauthorized
     end
+
     it "should delete the rubric if deletable" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric_association.id}
       expect(response).to be_successful
       expect(assigns[:association]).not_to be_nil
-      expect(assigns[:association]).to be_frozen
+      expect(assigns[:association]).to be_deleted
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).to be_deleted
     end
+
     it "should_not delete the rubric if still created at the context level instead of the assignment level" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -299,8 +301,9 @@ describe RubricAssociationsController do
       expect(assigns[:rubric]).not_to be_deleted
       expect(assigns[:rubric]).not_to be_frozen
       expect(assigns[:association]).not_to be_nil
-      expect(assigns[:association]).to be_frozen
+      expect(assigns[:association]).to be_deleted
     end
+
     it "should delete only the association if the rubric is not deletable" do
       rubric_association_model
       course_with_teacher_logged_in(:active_all => true)
@@ -313,7 +316,7 @@ describe RubricAssociationsController do
       expect(assigns[:rubric]).not_to be_deleted
       expect(assigns[:rubric]).not_to be_frozen
       expect(assigns[:association]).not_to be_nil
-      expect(assigns[:association]).to be_frozen
+      expect(assigns[:association]).to be_deleted
     end
 
     it "should remove aligments links" do

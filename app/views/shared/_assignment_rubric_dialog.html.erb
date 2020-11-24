@@ -17,7 +17,7 @@
 %>
 
 <div id="rubrics" class="rubric_dialog" style="display: none; margin-bottom: 10px;">
-  <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
+  <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric %>
     <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric,
         :locals => {:association => @assignment,
             :rubric_association => @assignment.rubric_association,
@@ -31,17 +31,17 @@
   </div>
   <div class="assignment_points_possible" style="display: none;"><%= round_if_whole(@assignment.points_possible) %></div>
   <% if can_do(@assignment, @current_user, :update) %>
-    <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
+    <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.active_rubric_association? ? @assignment.rubric_association.rubric : nil} %>
   <% end %>
   <%= render :partial => "shared/rubric_criterion_dialog" %>
   <%= render :partial => "shared/find_outcome" %>
   <%= render :partial => "shared/rubric", :object => nil, :locals => {:association => @assignment, :editable => can_do(@assignment, @current_user, :update), :has_assessments => false, :edit_view => true} %>
   <% if can_do(@assignment, @current_user, :update) %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', "Assign Rubric" %></a>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.active_rubric_association? %>"><%= t 'links.assign_rubric', "Assign Rubric" %></a>
     </div>
   <% end %>
-  <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.rubric_association %>"><%= image_tag "rubric.png", :alt => '' %> <%= t 'links.add_rubric', "Add Rubric" %></a>
+  <a href="#" class="btn add_rubric_link" style="margin-top: 20px; <%= hidden if @assignment && @assignment.active_rubric_association? %>"><%= image_tag "rubric.png", :alt => '' %> <%= t 'links.add_rubric', "Add Rubric" %></a>
 </div>
 
 <script>

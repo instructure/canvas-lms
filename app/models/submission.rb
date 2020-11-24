@@ -104,7 +104,11 @@ class Submission < ActiveRecord::Base
   has_many :attachment_associations, :as => :context, :inverse_of => :context
   has_many :provisional_grades, class_name: 'ModeratedGrading::ProvisionalGrade'
   has_many :originality_reports
-  has_one :rubric_assessment, -> { where(assessment_type: 'grading').where.not(rubric_association: nil) }, as: :artifact, inverse_of: :artifact
+  has_one :rubric_assessment, -> do
+    joins(:rubric_association).
+      where(assessment_type: 'grading').
+      where(rubric_associations: { workflow_state: 'active' })
+  end, as: :artifact, inverse_of: :artifact
   has_one :lti_result, inverse_of: :submission, class_name: 'Lti::Result', dependent: :destroy
   has_many :submission_drafts, inverse_of: :submission, dependent: :destroy
 
@@ -2225,7 +2229,7 @@ class Submission < ActiveRecord::Base
     @assessment_request_count ||= 0
     @assessment_request_count += 1
     user = obj.user rescue nil
-    association = self.assignment.rubric_association
+    association = self.assignment.active_rubric_association? ? self.assignment.rubric_association : nil
     res = self.assessment_requests.where(assessor_asset_id: obj.id, assessor_asset_type: obj.class.to_s, assessor_id: user.id, rubric_association_id: association.try(:id)).
       first_or_initialize
     res.user_id = self.user_id
@@ -2553,7 +2557,7 @@ class Submission < ActiveRecord::Base
   end
 
   def visible_rubric_assessments_for(viewing_user, attempt: nil)
-    return [] if assignment.rubric_association.blank?
+    return [] unless assignment.active_rubric_association?
 
     unless posted? || grants_right?(viewing_user, :read_grade)
       # If this submission is unposted and the viewer can't view the grade,
@@ -2636,7 +2640,7 @@ class Submission < ActiveRecord::Base
           submission.user = user
 
           assessment = user_data[:rubric_assessment]
-          if assessment.is_a?(Hash) && assignment.rubric_association
+          if assessment.is_a?(Hash) && assignment.active_rubric_association?
             # prepend each key with "criterion_", which is required by
             # the current RubricAssociation#assess code.
             assessment.keys.each do |crit_name|

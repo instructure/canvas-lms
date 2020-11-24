@@ -28,7 +28,8 @@ class Rubric < ActiveRecord::Base
   belongs_to :user
   belongs_to :rubric # based on another rubric
   belongs_to :context, polymorphic: [:course, :account]
-  has_many :rubric_associations, :class_name => 'RubricAssociation', :dependent => :destroy
+  has_many :rubric_associations, -> { where(workflow_state: "active") }, class_name: 'RubricAssociation', inverse_of: :rubric, dependent: :destroy
+  has_many :rubric_associations_with_deleted, class_name: 'RubricAssociation', inverse_of: :rubric
   has_many :rubric_assessments, :through => :rubric_associations, :dependent => :destroy
   has_many :learning_outcome_alignments, -> { where("content_tags.tag_type='learning_outcome' AND content_tags.workflow_state<>'deleted'").preload(:learning_outcome) }, as: :content, inverse_of: :content, class_name: 'ContentTag'
 
@@ -99,6 +100,7 @@ class Rubric < ActiveRecord::Base
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_count
       ON rubrics.id = associations_for_count.rubric_id
       AND associations_for_count.purpose = 'grading'
+      AND associations_for_count.workflow_state = 'active'
     JOINS
       group('rubrics.id').
       having('COUNT(rubrics.id) < 2')
@@ -109,6 +111,7 @@ class Rubric < ActiveRecord::Base
       LEFT JOIN #{RubricAssociation.quoted_table_name} associations_for_unassessed
       ON rubrics.id = associations_for_unassessed.rubric_id
       AND associations_for_unassessed.purpose = 'grading'
+      AND associations_for_unassessed.workflow_state = 'active'
     JOINS
       joins(<<~JOINS).
         LEFT JOIN #{RubricAssessment.quoted_table_name} assessments_for_unassessed
@@ -137,14 +140,19 @@ class Rubric < ActiveRecord::Base
 
   alias_method :destroy_permanently!, :destroy
   def destroy
-    rubric_associations.update_all(:bookmarked => false, :updated_at => Time.now.utc)
     self.workflow_state = 'deleted'
-    self.save
+    if self.save
+      rubric_associations.in_batches.destroy_all
+      true
+    end
   end
 
   def restore
     self.workflow_state = 'active'
-    self.save
+    if self.save
+      rubric_associations_with_deleted.where(workflow_state: "deleted").find_each(&:restore)
+      true
+    end
   end
 
   # If any rubric_associations for a given context are marked as
@@ -162,9 +170,10 @@ class Rubric < ActiveRecord::Base
         association.destroy
       end
     else
-      ras.update_all(:bookmarked => false, :updated_at => Time.now.utc)
+      ras.destroy_all
     end
-    unless rubric_associations.bookmarked.exists?
+
+    if rubric_associations.bookmarked.none?
       self.destroy
     end
   end

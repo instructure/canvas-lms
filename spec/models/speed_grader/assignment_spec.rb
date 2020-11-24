@@ -210,6 +210,31 @@ describe SpeedGrader::Assignment do
     ).to eq comment.provisional_grade_id.to_s
   end
 
+  context "rubric association" do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+    end
+
+    let(:json) { SpeedGrader::Assignment.new(@assignment, @user).json }
+
+    it "does not include rubric_association when one does not exist" do
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "does not include rubric_association when one exists but it is not active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      association.destroy
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "includes a rubric_association when one exists and is active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      expect(json.dig("rubric_association", "id")).to eq association.id.to_s
+    end
+  end
+
   context "students and active course sections" do
     before(:once) do
       @course = course_factory(active_course: true)

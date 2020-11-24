@@ -267,7 +267,7 @@ module Api::V1::Assignment
     end
 
     unless opts[:exclude_response_fields].include?('rubric')
-      if assignment.rubric_association
+      if assignment.active_rubric_association?
         hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
         if assignment.rubric_association.rubric
           hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments

@@ -340,11 +340,15 @@ class ContextController < ApplicationController
 
   WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
                     :collaborations, :context_modules, :enrollments, :groups,
-                    :quizzes, :rubrics, :wiki_pages].freeze
+                    :quizzes, :rubrics, :wiki_pages, :rubric_associations_with_deleted].freeze
   ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.map { |type| @context.association(type).reader }
+      @item_types = WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
+        if @context.class.reflections.key?(workflow_type.to_s)
+          item_types << @context.association(workflow_type).reader
+        end
+      end
 
       @deleted_items = []
       @item_types.each do |scope|
@@ -369,6 +373,7 @@ class ContextController < ApplicationController
         return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_groups)
       end
       type = type.pluralize
+      type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
       raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
 
       @item = scope.association(type).reader.find(id)

@@ -442,7 +442,30 @@ describe RubricAssociation do
   end
 
   describe "workflow_state" do
-    it "is set to active by default" do
+    before(:once) do
+      @course = Course.create!
+      @rubric = @course.rubrics.create!
+      @association = RubricAssociation.create!(
+        rubric: @rubric,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+    end
+
+    it "is set to 'active' by default" do
+      expect(@association).to be_active
+    end
+
+    it "gets set to 'deleted' when soft-deleted" do
+      expect { @association.destroy }.to change {
+        @association.workflow_state
+      }.from("active").to("deleted")
+    end
+  end
+
+  describe "#restore" do
+    it "sets the workflow_state to 'active'" do
       course = Course.create!
       rubric = course.rubrics.create!
       association = RubricAssociation.create!(
@@ -451,8 +474,8 @@ describe RubricAssociation do
         context: course,
         purpose: "bookmark"
       )
-
-      expect(association).to be_active
+      association.destroy
+      expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
     end
   end
 end

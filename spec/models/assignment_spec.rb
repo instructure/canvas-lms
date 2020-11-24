@@ -4519,6 +4519,50 @@ describe Assignment do
       hash = @assignment.as_json
       expect(hash["assignment"]["group_category"]).to eq "Something"
     end
+
+    context "when including rubric_association" do
+      before(:once) do
+        @rubric = Rubric.create!(user: @teacher, context: @course)
+      end
+
+      context "when including root" do
+        let(:json) { @assignment.as_json(include: [:rubric_association])[:assignment] }
+
+        it "does not include a rubric_association when there is no rubric_association" do
+          expect(json).not_to have_key "rubric_association"
+        end
+
+        it "does not include a rubric_association when there is a rubric_association but it is soft-deleted" do
+          rubric_association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
+          rubric_association.destroy
+          expect(json).not_to have_key "rubric_association"
+        end
+
+        it "includes a rubric_association when there is a rubric_association and it is not deleted" do
+          rubric_association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
+          expect(json.dig("rubric_association", "rubric_association", "id")).to eq rubric_association.id
+        end
+      end
+
+      context "when excluding root" do
+        let(:json) { @assignment.as_json(include: [:rubric_association], include_root: false) }
+
+        it "does not include a rubric_association when there is no rubric_association" do
+          expect(json).not_to have_key "rubric_association"
+        end
+
+        it "does not include a rubric_association when there is a rubric_association but it is soft-deleted" do
+          rubric_association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
+          rubric_association.destroy
+          expect(json).not_to have_key "rubric_association"
+        end
+
+        it "includes a rubric_association when there is a rubric_association and it is not deleted" do
+          rubric_association = @rubric.associate_with(@assignment, @course, purpose: 'grading')
+          expect(json.dig("rubric_association", "id")).to eq rubric_association.id
+        end
+      end
+    end
   end
 
   context "ical" do
@@ -9393,6 +9437,37 @@ describe Assignment do
       expect {
         Assignment.disable_post_to_sis_if_grading_period_closed
       }.not_to change { assignment.reload.post_to_sis }
+    end
+  end
+
+  describe "active_rubric_association?" do
+    before(:once) do
+      @assignment = @course.assignments.create!(assignment_valid_attributes)
+      rubric = @course.rubrics.create! { |r| r.user = @teacher }
+      rubric_association_params = HashWithIndifferentAccess.new({
+        hide_score_total: "0",
+        purpose: "grading",
+        skip_updating_points_possible: false,
+        update_if_existing: true,
+        use_for_grading: "1",
+        association_object: @assignment
+      })
+      @association = RubricAssociation.generate(@teacher, rubric, @course, rubric_association_params)
+      @assignment.update!(rubric_association: @association)
+    end
+
+    it "returns false if there is no rubric association" do
+      @association.destroy_permanently!
+      expect(@assignment.reload).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@assignment.reload).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@assignment).to be_active_rubric_association
     end
   end
 

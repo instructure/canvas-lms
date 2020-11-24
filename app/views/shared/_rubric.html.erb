@@ -23,7 +23,7 @@
    context = @context
    context = context.context if context.is_a?(Group)
    show_grading = !@assignment || !%w{online_quiz not_graded}.include?(@assignment.submission_types)
-   rubric_association = assessment.rubric_association if assessment
+   rubric_association = assessment.rubric_association if assessment&.active_rubric_association?
    anonymize_student ||= false
 %>
 <% cache(['rubric_render4',

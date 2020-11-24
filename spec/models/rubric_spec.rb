@@ -237,7 +237,7 @@ describe Rubric do
       a2 = rubric.associate_with(assignment2, @course, :purpose => 'grading')
 
       assignment2.destroy
-      expect(RubricAssociation.where(:id => a2).first).to be_nil # association should be destroyed
+      expect(RubricAssociation.where(:id => a2).first).to be_deleted
 
       rubric.reload
       expect(rubric).to be_active

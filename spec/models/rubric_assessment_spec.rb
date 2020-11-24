@@ -34,6 +34,37 @@ describe RubricAssessment do
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
   end
 
+  describe "active_rubric_association?" do
+    before(:once) do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5,
+            :comments => "comments",
+          }
+        }
+      })
+    end
+
+    it "returns false if there is no rubric association" do
+      @assessment.update!(rubric_association: nil)
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@assessment).to be_active_rubric_association
+    end
+  end
+
   it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
 
   it "should htmlify the rating comments" do

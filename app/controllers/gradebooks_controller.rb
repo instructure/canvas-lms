@@ -957,7 +957,7 @@ class GradebooksController < ApplicationController
           env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
         end
 
-        if @assignment.rubric_association
+        if @assignment.active_rubric_association?
           env[:update_rubric_assessment_url] = context_url(
             @context,
             :context_rubric_association_rubric_assessments_url,

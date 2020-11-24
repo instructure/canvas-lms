@@ -495,7 +495,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def has_rubric_association?
-    content.respond_to?(:rubric_association) && content.rubric_association
+    content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
   scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
