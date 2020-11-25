@@ -18,9 +18,9 @@
 
 import React, {Suspense, useState} from 'react'
 import {arrayOf, func, number, object, oneOf, oneOfType, string} from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
 import {Tabs} from '@instructure/ui-tabs'
 import {ToggleDetails} from '@instructure/ui-toggle-details'

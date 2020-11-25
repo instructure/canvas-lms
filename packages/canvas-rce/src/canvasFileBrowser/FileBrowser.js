@@ -21,11 +21,11 @@ import $ from 'jquery'
 import axios from 'axios'
 import minimatch from 'minimatch'
 import {TreeBrowser} from '@instructure/ui-tree-browser'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 import {Button} from '@instructure/ui-buttons'
 import {Mask} from '@instructure/ui-overlays'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import splitAssetString from './splitAssetString'
 import {
   IconOpenFolderSolid,

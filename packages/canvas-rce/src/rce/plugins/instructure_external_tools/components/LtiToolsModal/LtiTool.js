@@ -18,8 +18,8 @@
 
 import React, {useState} from 'react'
 import {func, string} from 'prop-types'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import ExpandoText from './ExpandoText'
 
 export default function LtiTool(props) {

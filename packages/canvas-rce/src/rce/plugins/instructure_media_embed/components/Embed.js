@@ -17,12 +17,12 @@
  */
 
 import React, {useState} from 'react'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import formatMessage from '../../../../format-message'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {func} from 'prop-types'
-import {TextArea} from '@instructure/ui-forms'
+import {TextArea} from '@instructure/ui-text-area'
 
 export function Embed({onSubmit, onDismiss}) {
   const [embedCode, setEmbedCode] = useState('')

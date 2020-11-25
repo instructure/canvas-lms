@@ -26,7 +26,7 @@ import React, {Component} from 'react'
 import {node, object} from 'prop-types'
 
 import {Button} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 export default class ShowOnFocusButton extends Component {
   static propTypes = {

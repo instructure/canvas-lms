@@ -23,7 +23,7 @@ import {Alert} from '@instructure/ui-alerts'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {TextInput} from '@instructure/ui-text-input'
-import {Modal} from '@instructure/ui-overlays'
+import {Modal} from '@instructure/ui-modal'
 import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../../../../format-message'

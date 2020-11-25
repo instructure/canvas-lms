@@ -18,11 +18,11 @@
 
 import React, {Suspense, useCallback, useEffect, useRef, useState} from 'react'
 import {bool, func, instanceOf, shape, string} from 'prop-types'
-import {Tray} from '@instructure/ui-overlays'
+import {Tray} from '@instructure/ui-tray'
 import {CloseButton} from '@instructure/ui-buttons'
-import {Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-heading'
 import {Spinner} from '@instructure/ui-spinner'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 import ErrorBoundary from './ErrorBoundary'
 import Bridge from '../../../bridge/Bridge'
@@ -354,7 +354,7 @@ export default function CanvasContentTray(props) {
           {isOpen && hasOpened ? (
             <Flex
               direction="column"
-              display="block"
+              as="div"
               height="100vh"
               overflowY="hidden"
               tabIndex="-1"
