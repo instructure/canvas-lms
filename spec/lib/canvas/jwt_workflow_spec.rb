@@ -51,8 +51,8 @@ module Canvas
       end
 
       it 'merges state of muliple workflows in order of array' do
-        JWTWorkflow.register(:foo) { |c, u| { a: 1, b: 2 } }
-        JWTWorkflow.register(:bar) { |c, u| { b: 3, c: 4 } }
+        JWTWorkflow.register(:foo) {{ a: 1, b: 2 }}
+        JWTWorkflow.register(:bar) {{ b: 3, c: 4 }}
         expect(JWTWorkflow.state_for(%i[foo bar], nil, nil)).to include({ a: 1, b: 3, c: 4 })
         expect(JWTWorkflow.state_for(%i[bar foo], nil, nil)).to include({ a: 1, b: 2, c: 4 })
       end
@@ -62,25 +62,54 @@ module Canvas
       describe ':rich_content' do
         before(:each) do
           allow(@c).to receive(:respond_to?).with(:usage_rights_required?).and_return(true)
-          allow(@c).to receive(:grants_right?)
+          allow(@c).to receive(:grants_any_right?)
           allow(@c).to receive(:feature_enabled?)
           @wiki = Wiki.new
           allow(@c).to receive(:wiki).and_return(@wiki)
           allow(@c).to receive(:respond_to?).with(:wiki).and_return(true)
           allow(@wiki).to receive(:grants_right?)
           allow(@g).to receive(:can_participate).and_return(true)
+
+          # ensure disabled by default
+          Account.default.root_account.disable_feature!(:granular_permissions_course_sections)
         end
 
         it 'sets can_upload_files to false' do
-          expect(@c).to receive(:grants_right?).with(@u, :manage_files).and_return(false)
+          expect(@c).to receive(:grants_any_right?).with(
+            @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+          ).and_return(false)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be false
         end
 
         it 'sets can_upload_files to true' do
-          expect(@c).to receive(:grants_right?).with(@u, :manage_files).and_return(true)
+          expect(@c).to receive(:grants_any_right?).with(
+            @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+          ).and_return(true)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be true
+        end
+
+        context 'with granular permissions enabled' do
+          before :each do
+            Account.default.root_account.enable_feature!(:granular_permissions_course_sections)
+          end
+
+          it 'sets can_upload_files to false' do
+            expect(@c).to receive(:grants_any_right?).with(
+              @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            ).and_return(false)
+            state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
+            expect(state[:can_upload_files]).to be false
+          end
+
+          it 'sets can_upload_files to true' do
+            expect(@c).to receive(:grants_any_right?).with(
+              @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            ).and_return(true)
+            state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
+            expect(state[:can_upload_files]).to be true
+          end
         end
 
         it 'sets usage_rights_required to false' do

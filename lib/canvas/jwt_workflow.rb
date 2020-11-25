@@ -29,7 +29,7 @@ module Canvas
 
     def self.state_for(workflows, context, user)
       workflows.inject({}) do |memo, label|
-        workflow = get(label) 
+        workflow = get(label)
         workflow ? memo.merge(workflow.state_for(context, user)) : memo
       end
     end
@@ -52,14 +52,17 @@ module Canvas
       tool_context = context&.is_a?(Group) ? context.context : context
       {
         usage_rights_required: (
-          tool_context &&
-          tool_context.respond_to?(:usage_rights_required?) &&
-          tool_context.usage_rights_required?
+          tool_context&.respond_to?(:usage_rights_required?) &&
+          tool_context&.usage_rights_required?
         ) || false,
         can_upload_files: (
           user &&
           context &&
-          context.grants_right?(user, :manage_files)
+          context.grants_any_right?(
+            user,
+            :manage_files,
+            *RoleOverride::GRANULAR_FILE_PERMISSIONS
+          )
         ) || false,
         can_create_pages: (
           user &&

@@ -108,7 +108,7 @@ class UsageRightsController < ApplicationController
   #
   # @returns UsageRights
   def set_usage_rights
-    if authorized_action(@context, @current_user, :manage_files)
+    if authorized_action(@context, @current_user, [:manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS])
       return render json: { message: I18n.t("Must supply 'file_ids' and/or 'folder_ids' parameter") }, status: :bad_request unless params[:file_ids].present? || params[:folder_ids].present?
       return render json: { message: I18n.t("No 'usage_rights' object supplied") }, status: :bad_request unless params[:usage_rights].is_a?(ActionController::Parameters)
 
@@ -131,7 +131,7 @@ class UsageRightsController < ApplicationController
   #   List of ids of folders. Usage rights will be removed from all files in these folders.
   #
   def remove_usage_rights
-    if authorized_action(@context, @current_user, :manage_files)
+    if authorized_action(@context, @current_user, [:manage_files, :manage_files_delete])
       return render json: { message: I18n.t("Must supply 'file_ids' and/or 'folder_ids' parameter") }, status: :bad_request unless params[:file_ids].present? || params[:folder_ids].present?
 
       assign_usage_rights(nil)

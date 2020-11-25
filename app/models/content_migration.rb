@@ -48,7 +48,7 @@ class ContentMigration < ActiveRecord::Base
   workflow do
     state :created
     state :queued
-    #The pre_process states can be used by individual plugins as needed
+    # The pre_process states can be used by individual plugins as needed
     state :pre_processing
     state :pre_processed
     state :pre_process_error
@@ -64,9 +64,47 @@ class ContentMigration < ActiveRecord::Base
     exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
   end
 
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
+  end
+
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
     can :manage_files and can :read
+
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_add)
+    end
+    can :read and can :manage_files_add
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_edit)
+    end
+    can :read and can :manage_files_edit
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_delete)
+    end
+    can :read and can :manage_files_delete
   end
 
   def trigger_live_events!

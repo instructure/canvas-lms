@@ -514,7 +514,12 @@ module Api
 
   def user_can_download_attachment?(attachment, context, user)
     # checking on the context first can improve performance when checking many attachments for admins
-    (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) || attachment.grants_right?(user, nil, :download)
+    context&.grants_any_right?(
+      user,
+      :manage_files,
+      :read_as_admin,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    ) || attachment&.grants_right?(user, nil, :download)
   end
 
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)

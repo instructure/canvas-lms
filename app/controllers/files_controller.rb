@@ -161,7 +161,7 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.temp_record, @current_user, :create)
+    if authorized_action(@context.attachments.temp_record, @current_user, [:create, :update, :delete])
       h = ActiveSupport::NumberHelper
       result = {
         :quota => h.number_to_human_size(@quota),
@@ -185,7 +185,7 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, :create)
+    if authorized_action(@context.attachments.build, @current_user, [:create, :update, :delete])
       get_quota
       render json: {quota: @quota, quota_used: @quota_used}
     end
@@ -347,8 +347,13 @@ class FilesController < ApplicationController
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @images = @context.active_images.paginate :page => params[:page]
+        if @context.grants_any_right?(
+          @current_user,
+          session,
+          :manage_files,
+          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+        )
+          @images = @context.active_images.paginate page: params[:page]
         else
           @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
         end
@@ -364,7 +369,11 @@ class FilesController < ApplicationController
     if !request.format.html?
       return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
     end
-    if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
+    if authorized_action(
+      @context,
+      @current_user,
+      [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    ) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -388,7 +397,12 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files: context.grants_right?(@current_user, session, :manage_files),
+            manage_files: @context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            ),
           },
           file_menu_tools: file_menu_tools,
           file_index_menu_tools: file_index_menu_tools
@@ -451,7 +465,7 @@ class FilesController < ApplicationController
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
     if ((@submission && authorized_action(@submission, @current_user, :read)) ||
         ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
-      render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
+      render :json => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end
 
@@ -1028,6 +1042,7 @@ class FilesController < ApplicationController
     @attachment = @context.attachments.find(params[:id])
     @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
     return unless authorized_action(@folder, @current_user, :manage_contents) if @folder
+
     @folder ||= @attachment.folder
     @folder ||= Folder.unfiled_folder(@context)
     if authorized_action(@attachment, @current_user, :update)
@@ -1109,7 +1124,7 @@ class FilesController < ApplicationController
   # @returns File
   def api_update
     @attachment = Attachment.find(params[:id])
-    if authorized_action(@attachment,@current_user,:update)
+    if authorized_action(@attachment, @current_user, :update)
       @context = @attachment.context
       if @context && params[:parent_folder_id]
         folder = @context.folders.active.find(params[:parent_folder_id])
@@ -1145,7 +1160,7 @@ class FilesController < ApplicationController
 
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
-    if authorized_action(@context, @current_user, :manage_files)
+    if authorized_action(@context, @current_user, [:manage_files, :manage_files_edit])
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
@@ -1153,7 +1168,6 @@ class FilesController < ApplicationController
       render :json => @folder.subcontent.map{ |f| f.as_json(methods: :readable_size, permissions: {user: @current_user, session: session}) }
     end
   end
-
 
   # @API Delete file
   # Remove the specified file. Unlike most other DELETE endpoints, using this
@@ -1188,6 +1202,7 @@ class FilesController < ApplicationController
     end
     if can_do(@attachment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@attachment)
+
       @attachment.destroy
       respond_to do |format|
         format.html {
@@ -1243,8 +1258,13 @@ class FilesController < ApplicationController
         else
           @context.respond_to?(:context) ? @context.context : @context
         end
-      permission_context.grants_right?(@current_user, nil, :manage_files) &&
-        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+      permission_context.grants_any_right?(
+        @current_user,
+        nil,
+        :manage_files,
+        :manage_files_edit,
+        :manage_files_delete
+      ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
   end
 
