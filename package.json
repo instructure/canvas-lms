@@ -258,6 +258,7 @@
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
+    "node-sass": "~4.14.1",
     "nyc": "^13",
     "prettier": "^1",
     "qunitjs": "^1.14.0",
@@ -340,8 +341,6 @@
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
-    "graphael": "https://github.com/instructure/graphael.git",
-    "node-sass": "if we let node-sass upgrade to recent versions, it causes: SIS-3125",
-    "node-sass": "4.7.2"
+    "graphael": "https://github.com/instructure/graphael.git"
   }
 }
