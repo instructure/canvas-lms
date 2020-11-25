@@ -810,6 +810,15 @@ describe MasterCourses::MasterMigration do
         expect(@outcome_to.reload).to be_deleted
         expect(@og_to.child_outcome_links.not_deleted.where(content_type: 'LearningOutcome', content_id: @outcome_to)).not_to be_any
       end
+
+      it "doesn't spuriously add the outcome to the root outcome group" do
+        Timecop.freeze(3.minutes.from_now) do
+          @outcome.touch
+        end
+        run_master_migration
+
+        expect(@copy_to.learning_outcome_links.where(content: @outcome_to).count).to eq 1
+      end
     end
 
     it "copies links to account outcomes on rubrics" do
