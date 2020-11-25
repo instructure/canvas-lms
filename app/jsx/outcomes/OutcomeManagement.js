@@ -22,6 +22,7 @@ import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
 import ManagementHeader from './ManagementHeader'
+import OutcomeManagementPanel from './OutcomeManagementPanel'
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -61,7 +62,11 @@ const OutcomeManagement = () => {
       {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
-          <OutcomePanel />
+          {improvedManagement ? (
+            <OutcomeManagementPanel contextType={contextType} contextId={contextId} />
+          ) : (
+            <OutcomePanel />
+          )}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
           <MasteryScale contextType={contextType} contextId={contextId} />

@@ -38,6 +38,18 @@ describe('OutcomeManagement', () => {
       expect(wrapper.find('ManagementHeader').exists()).toBe(true)
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
+
+    it('renders OutcomeManagementPanel when improved outcomes enabled', () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('OutcomeManagementPanel').exists()).toBe(true)
+      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
+    })
+
+    it('does not render OutcomeManagementPanel when improved outcomes disabled', () => {
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('OutcomeManagementPanel').exists()).toBe(false)
+    })
   }
 
   describe('account', () => {
@@ -58,6 +70,13 @@ describe('OutcomeManagement', () => {
       expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Account')
       expect(wrapper.find('MasteryScale').prop('contextId')).toBe('1')
     })
+
+    it('passes accountId to the OutcomeManagementPanel component', () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('OutcomeManagementPanel').prop('contextType')).toBe('Account')
+      expect(wrapper.find('OutcomeManagementPanel').prop('contextId')).toBe('1')
+    })
   })
 
   describe('course', () => {
@@ -77,6 +96,13 @@ describe('OutcomeManagement', () => {
       const wrapper = shallow(<OutcomeManagement />)
       expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Course')
       expect(wrapper.find('MasteryScale').prop('contextId')).toBe('2')
+    })
+
+    it('passes courseId to the OutcomeManagementPanel component', () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('OutcomeManagementPanel').prop('contextType')).toBe('Course')
+      expect(wrapper.find('OutcomeManagementPanel').prop('contextId')).toBe('2')
     })
   })
 })
