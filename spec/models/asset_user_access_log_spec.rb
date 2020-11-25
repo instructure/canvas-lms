@@ -81,120 +81,8 @@ describe AssetUserAccessLog do
       model.connection.execute("ALTER SEQUENCE #{sequence_name} RESTART WITH #{(model.maximum(:id) || 0) + by_count}")
     end
 
-    it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
-      expect(@asset_1.view_score).to be_nil
-      expect(@asset_5.view_score).to be_nil
-      Timecop.freeze do
-        generate_log([@asset_1, @asset_2, @asset_3], 100)
-        generate_log([@asset_1, @asset_3, @asset_4], 100)
-        generate_log([@asset_1, @asset_4, @asset_5], 100)
-        generate_log([@asset_1, @asset_4], 100)
-        AssetUserAccessLog.compact
-        expect(@asset_1.reload.view_score).to eq(400.0)
-        expect(@asset_2.reload.view_score).to eq(100.0)
-        expect(@asset_3.reload.view_score).to eq(200.0)
-        expect(@asset_4.reload.view_score).to eq(300.0)
-        expect(@asset_5.reload.view_score).to eq(100.0)
-        # DOES NOT TRUNCATE TODAY!
-        expect(AssetUserAccessLog.log_model(Time.now.utc).count).to eq(1100)
-      end
-    end
-
-    it "writes iterator state properly" do
-      expect(@asset_1.view_score).to be_nil
-      Timecop.freeze do
-        generate_log([@asset_1, @asset_2, @asset_3], 100)
-        AssetUserAccessLog.compact
-        partition_model = AssetUserAccessLog.log_model(Time.zone.now)
-        compaction_state = AssetUserAccessLog.metadatum_payload
-        expect(compaction_state[:max_log_ids].max).to eq(partition_model.maximum(:id))
-      end
-    end
-
-    it "truncates yesterday after compacting changes" do
-      Timecop.freeze do
-        Timecop.travel(24.hours.ago) do
-          generate_log([@asset_1, @asset_2, @asset_3], 50)
-          generate_log([@asset_1, @asset_3, @asset_4], 50)
-        end
-        generate_log([@asset_1, @asset_4, @asset_5], 100)
-        generate_log([@asset_1, @asset_4], 100)
-        AssetUserAccessLog.compact
-        expect(@asset_1.reload.view_score).to eq(300.0)
-        expect(@asset_2.reload.view_score).to eq(50.0)
-        expect(@asset_3.reload.view_score).to eq(100.0)
-        expect(@asset_4.reload.view_score).to eq(250.0)
-        expect(@asset_5.reload.view_score).to eq(100.0)
-        expect(AssetUserAccessLog.log_model(Time.now.utc).count).to eq(500)
-        expect(AssetUserAccessLog.log_model(24.hours.ago).count).to eq(0)
-        # we should only have one setting with an offset in it, the other should have been zeroed
-        # out during the truncation
-        expect(AssetUserAccessLog.metadatum_payload[:max_log_ids].select{|id| id > 0}.size).to eq(1)
-      end
-    end
-
-    it "chomps small batches correctly" do
-      Timecop.freeze do
-        generate_log([@asset_1, @asset_2, @asset_3], 2)
-        AssetUserAccessLog.compact
-        generate_log([@asset_1, @asset_3, @asset_4], 4)
-        AssetUserAccessLog.compact
-        generate_log([@asset_1, @asset_4, @asset_5], 8)
-        AssetUserAccessLog.compact
-        generate_log([@asset_1, @asset_4], 16)
-        AssetUserAccessLog.compact
-        expect(@asset_1.reload.view_score).to eq(30.0)
-        expect(@asset_2.reload.view_score).to eq(2.0)
-        expect(@asset_3.reload.view_score).to eq(6.0)
-        expect(@asset_4.reload.view_score).to eq(28.0)
-        expect(@asset_5.reload.view_score).to eq(8.0)
-      end
-    end
-
-    it "can skip over gaps in the sequence" do
-      Timecop.freeze do
-        Setting.set('aua_log_seq_jumps_allowed', 'true')
-        model = AssetUserAccessLog.log_model(Time.now.utc)
-        generate_log([@asset_1, @asset_2, @asset_3], 2)
-        AssetUserAccessLog.compact
-        advance_sequence(model, 200)
-        generate_log([@asset_1, @asset_3, @asset_4], 4)
-        AssetUserAccessLog.compact
-        advance_sequence(model, 200)
-        generate_log([@asset_1, @asset_4, @asset_5], 8)
-        AssetUserAccessLog.compact
-        advance_sequence(model, 200)
-        generate_log([@asset_1, @asset_4], 16)
-        AssetUserAccessLog.compact
-        expect(@asset_1.reload.view_score).to eq(30.0)
-        expect(@asset_2.reload.view_score).to eq(2.0)
-        expect(@asset_3.reload.view_score).to eq(6.0)
-        expect(@asset_4.reload.view_score).to eq(28.0)
-        expect(@asset_5.reload.view_score).to eq(8.0)
-      end
-    end
-
-    it "does not override updates from requests unless it's bigger" do
-      Timecop.freeze do
-        generate_log([@asset_1, @asset_2, @asset_3], 2)
-        update_ts = Time.now.utc + 2.minutes
-        @asset_1.last_access = update_ts
-        @asset_1.updated_at = update_ts
-        @asset_1.save!
-        AssetUserAccessLog.compact
-        expect(@asset_1.reload.view_score).to eq(2.0)
-        expect(@asset_1.reload.last_access).to eq(update_ts)
-        Timecop.travel(10.minutes.from_now) do
-          generate_log([@asset_1, @asset_2, @asset_3], 9)
-          AssetUserAccessLog.compact
-          expect(@asset_1.reload.view_score).to eq(11.0)
-          expect(@asset_1.reload.last_access > update_ts).to be_truthy
-        end
-      end
-    end
-
     it "aborts job immediately if plugin setting is nil" do
-      ps = PluginSetting.where(name: "asset_user_access_logs").delete_all
+      PluginSetting.where(name: "asset_user_access_logs").delete_all
       expect(AssetUserAccess).to_not receive(:compact_partition)
       AssetUserAccessLog.compact
       expect(@asset_1.reload.view_score).to be_nil
@@ -207,6 +95,125 @@ describe AssetUserAccessLog do
       expect(AssetUserAccess).to_not receive(:compact_partition)
       AssetUserAccessLog.compact
       expect(@asset_1.reload.view_score).to be_nil
+    end
+
+    it "doesn't fail when there is no data" do
+      expect{ AssetUserAccessLog.compact }.to_not raise_error
+    end
+
+    describe "with data" do
+
+      it "computes correct results for multiple assets with multiple log entries spanning more than one batch" do
+        expect(@asset_1.view_score).to be_nil
+        expect(@asset_5.view_score).to be_nil
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 100)
+          generate_log([@asset_1, @asset_3, @asset_4], 100)
+          generate_log([@asset_1, @asset_4, @asset_5], 100)
+          generate_log([@asset_1, @asset_4], 100)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(400.0)
+          expect(@asset_2.reload.view_score).to eq(100.0)
+          expect(@asset_3.reload.view_score).to eq(200.0)
+          expect(@asset_4.reload.view_score).to eq(300.0)
+          expect(@asset_5.reload.view_score).to eq(100.0)
+          # DOES NOT TRUNCATE TODAY!
+          expect(AssetUserAccessLog.log_model(Time.now.utc).count).to eq(1100)
+        end
+      end
+
+      it "writes iterator state properly" do
+        expect(@asset_1.view_score).to be_nil
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 100)
+          AssetUserAccessLog.compact
+          partition_model = AssetUserAccessLog.log_model(Time.zone.now)
+          compaction_state = AssetUserAccessLog.metadatum_payload
+          expect(compaction_state[:max_log_ids].max).to eq(partition_model.maximum(:id))
+        end
+      end
+
+      it "truncates yesterday after compacting changes" do
+        Timecop.freeze do
+          Timecop.travel(24.hours.ago) do
+            generate_log([@asset_1, @asset_2, @asset_3], 50)
+            generate_log([@asset_1, @asset_3, @asset_4], 50)
+          end
+          generate_log([@asset_1, @asset_4, @asset_5], 100)
+          generate_log([@asset_1, @asset_4], 100)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(300.0)
+          expect(@asset_2.reload.view_score).to eq(50.0)
+          expect(@asset_3.reload.view_score).to eq(100.0)
+          expect(@asset_4.reload.view_score).to eq(250.0)
+          expect(@asset_5.reload.view_score).to eq(100.0)
+          expect(AssetUserAccessLog.log_model(Time.now.utc).count).to eq(500)
+          expect(AssetUserAccessLog.log_model(24.hours.ago).count).to eq(0)
+          # we should only have one setting with an offset in it, the other should have been zeroed
+          # out during the truncation
+          expect(AssetUserAccessLog.metadatum_payload[:max_log_ids].select{|id| id > 0}.size).to eq(1)
+        end
+      end
+
+      it "chomps small batches correctly" do
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 2)
+          AssetUserAccessLog.compact
+          generate_log([@asset_1, @asset_3, @asset_4], 4)
+          AssetUserAccessLog.compact
+          generate_log([@asset_1, @asset_4, @asset_5], 8)
+          AssetUserAccessLog.compact
+          generate_log([@asset_1, @asset_4], 16)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(30.0)
+          expect(@asset_2.reload.view_score).to eq(2.0)
+          expect(@asset_3.reload.view_score).to eq(6.0)
+          expect(@asset_4.reload.view_score).to eq(28.0)
+          expect(@asset_5.reload.view_score).to eq(8.0)
+        end
+      end
+
+      it "can skip over gaps in the sequence" do
+        Timecop.freeze do
+          Setting.set('aua_log_seq_jumps_allowed', 'true')
+          model = AssetUserAccessLog.log_model(Time.now.utc)
+          generate_log([@asset_1, @asset_2, @asset_3], 2)
+          AssetUserAccessLog.compact
+          advance_sequence(model, 200)
+          generate_log([@asset_1, @asset_3, @asset_4], 4)
+          AssetUserAccessLog.compact
+          advance_sequence(model, 200)
+          generate_log([@asset_1, @asset_4, @asset_5], 8)
+          AssetUserAccessLog.compact
+          advance_sequence(model, 200)
+          generate_log([@asset_1, @asset_4], 16)
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(30.0)
+          expect(@asset_2.reload.view_score).to eq(2.0)
+          expect(@asset_3.reload.view_score).to eq(6.0)
+          expect(@asset_4.reload.view_score).to eq(28.0)
+          expect(@asset_5.reload.view_score).to eq(8.0)
+        end
+      end
+
+      it "does not override updates from requests unless it's bigger" do
+        Timecop.freeze do
+          generate_log([@asset_1, @asset_2, @asset_3], 2)
+          update_ts = Time.now.utc + 2.minutes
+          @asset_1.last_access = update_ts
+          @asset_1.updated_at = update_ts
+          @asset_1.save!
+          AssetUserAccessLog.compact
+          expect(@asset_1.reload.view_score).to eq(2.0)
+          expect(@asset_1.reload.last_access).to eq(update_ts)
+          Timecop.travel(10.minutes.from_now) do
+            generate_log([@asset_1, @asset_2, @asset_3], 9)
+            AssetUserAccessLog.compact
+            expect(@asset_1.reload.view_score).to eq(11.0)
+            expect(@asset_1.reload.last_access > update_ts).to be_truthy
+          end
+        end
+      end
     end
   end
 
