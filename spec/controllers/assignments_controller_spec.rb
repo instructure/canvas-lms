@@ -700,6 +700,13 @@ describe AssignmentsController do
       expect(assigns[:assigned_assessments]).to eq []
     end
 
+    it "doesn't explode when fielding a JSON request" do
+      user_session(@student)
+      get 'show', params: {:course_id => @course.id, :id => @assignment.id}, format: :json
+      expect(response.body).to include("endpoint does not support json")
+      expect(response.code.to_i).to eq(400)
+    end
+
     it "should assign (active) peer review requests" do
       @assignment.peer_reviews = true
       @assignment.save!
