@@ -193,6 +193,11 @@ class AssetUserAccessLog
       # "just a few more"
       partition_upper_bound = partition_model.maximum(:id)
       partition_lower_bound = partition_model.minimum(:id)
+      if partition_lower_bound.nil? || partition_upper_bound.nil?
+        # no data means there's nothing in this partition to compact.
+        return true
+      end
+
       # fetch from the canvas metadatum compaction state the last compacted log id.  This lets us
       # resume log compaction past the records we've already processed, but without
       # having to delete records as we go (which would churn write IO), leaving the log cleanup
