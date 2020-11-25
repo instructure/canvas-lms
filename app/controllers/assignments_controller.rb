@@ -126,6 +126,9 @@ class AssignmentsController < ApplicationController
   end
 
   def show
+    if request.format.symbol == :json
+      return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
+    end
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
