@@ -522,6 +522,13 @@ describe Quizzes::QuizzesController do
       expect(response.location).to match /login/
     end
 
+    it "renders the show page for public courses" do
+      @course.update_attribute :is_public, true
+      course_quiz !!:active
+      get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1'}
+      expect(response).to be_success
+    end
+
     it "should set session[headless_quiz] if persist_headless param is sent" do
       user_session(@student)
       course_quiz !!:active
@@ -1097,6 +1104,15 @@ describe Quizzes::QuizzesController do
 
       get 'show', params: {:course_id => @course, :quiz_id => @quiz.id, :take => '1'}
       expect(response).to render_template('invalid_ip')
+    end
+
+    it "checks for the right access code" do
+      user_session(@student)
+      @quiz.access_code = "trust me. *winks*"
+      @quiz.save!
+      @quiz.generate_submission(@student)
+      get 'show', params: {course_id: @course, quiz_id: @quiz.id, take: '1', access_code: "NOT THE CODE"}
+      expect(response).to render_template('access_code')
     end
 
     it "should allow taking the quiz" do
@@ -2639,10 +2655,16 @@ describe Quizzes::QuizzesController do
     # When possible I recommend extracting this into a PORO or Quizzes::Quiz.
 
     before do
-      allow(subject).to receive(:authorized_action).and_return(true)
       course_with_teacher
       course_quiz(active=true)
       @quiz.save!
+      allow(@quiz).to receive(:grants_right?) do |user, sess, rights|
+        if rights.nil?
+          rights = sess
+        end
+        next true if rights == :submit
+        false
+      end
       subject.instance_variable_set(:@quiz, @quiz)
       allow(@quiz).to receive(:require_lockdown_browser?).and_return(false)
       allow(@quiz).to receive(:ip_filter).and_return(false)
@@ -2653,61 +2675,29 @@ describe Quizzes::QuizzesController do
     let(:return_value) { subject.send :can_take_quiz? }
 
     it "returns false when locked" do
-      subject.instance_variable_set(:@locked, true)
+      allow(@quiz).to receive(:locked_for?).and_return(true)
       expect(return_value).to eq false
     end
 
     it "returns false when unauthorized" do
-      allow(subject).to receive(:authorized_action).and_return(false)
+      allow(@quiz).to receive(:grants_right?).and_return(false)
       expect(return_value).to eq false
     end
 
-    it "returns false when a lockdown browser is required and the lockdown browser is false" do
-      allow(@quiz).to receive(:require_lockdown_browser?).and_return(true)
-
-      allow(subject).to receive(:named_context_url).and_return("some string")
-      allow(subject).to receive(:check_lockdown_browser).and_return(false)
-
+    it "is false with wrong access code" do
+      allow(@quiz).to receive(:access_code).and_return("trust me. *winks*")
+      allow(subject).to receive(:params).and_return({
+        :access_code => "Don't trust me. *tips hat*",
+        :take => 1
+      })
       expect(return_value).to eq false
     end
 
-    context "when access code is required but does not match" do
-      before do
-        allow(@quiz).to receive(:access_code).and_return("trust me. *winks*")
-        allow(subject).to receive(:params).and_return({
-          :access_code => "Don't trust me. *tips hat*",
-          :take => 1
-        })
-      end
-
-      it "renders access_code template" do
-        expect(subject).to receive(:render).with(:access_code)
-        subject.send(:can_take_quiz?)
-      end
-
-      it "returns false" do
-        allow(subject).to receive(:render)
-
-        expect(return_value).to eq false
-      end
-    end
-
-    context "when the ip address is invalid" do
-      before do
-        allow(@quiz).to receive(:ip_filter).and_return(true)
-        allow(@quiz).to receive(:valid_ip?).and_return(false)
-        allow(subject).to receive(:params).and_return({:take => 1})
-      end
-
-      it "renders invalid_ip" do
-        expect(subject).to receive(:render).with(:invalid_ip)
-        subject.send(:can_take_quiz?)
-      end
-
-      it "returns false" do
-        allow(subject).to receive(:render)
-        expect(return_value).to eq false
-      end
+    it "false with wrong IP address" do
+      allow(@quiz).to receive(:ip_filter).and_return(true)
+      allow(@quiz).to receive(:valid_ip?).and_return(false)
+      allow(subject).to receive(:params).and_return({:take => 1})
+      expect(return_value).to eq false
     end
   end
 end
