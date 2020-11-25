@@ -205,7 +205,6 @@ class Quizzes::QuizzesController < ApplicationController
       GuardRail.activate(:primary) do
         @quiz.context_module_action(@current_user, :read) unless @locked && !@locked_reason[:can_view]
       end
-
       @assignment = @quiz.assignment
       @assignment = @assignment.overridden_for(@current_user) if @assignment
 
@@ -245,12 +244,12 @@ class Quizzes::QuizzesController < ApplicationController
         QUIZZES_URL: course_quizzes_url(@context),
         MAX_GROUP_CONVERSATION_SIZE: Conversation.max_group_conversation_size
       }
+
       append_sis_data(hash)
       js_env(hash)
       conditional_release_js_env(@quiz.assignment, includes: [:rule])
 
       set_master_course_js_env_data(@quiz, @context)
-
       @quiz_menu_tools = external_tools_display_hashes(:quiz_menu)
       @can_take = can_take_quiz?
       GuardRail.activate(:primary) do
@@ -268,7 +267,10 @@ class Quizzes::QuizzesController < ApplicationController
           log_asset_access(@quiz, "quizzes", "quizzes")
           js_bundle :quiz_show
           css_bundle :quizzes, :learning_outcomes
-          render stream: can_stream_template? unless @declined_reason
+          if params[:take] && @quiz_eligibility && @quiz_eligibility.declined_reason_renders
+            return render @quiz_eligibility.declined_reason_renders
+          end
+          render stream: can_stream_template?
         end
       end
       @padless = true
@@ -946,9 +948,9 @@ class Quizzes::QuizzesController < ApplicationController
 
   def can_take_quiz?
     return true if params[:preview] && can_preview?
-    return false if params[:take] && !authorized_action(@quiz, @current_user, :submit)
+    return false if params[:take] && !@quiz.grants_right?(@current_user, :submit)
     return false if @submission && @submission.completed? && @submission.attempts_left == 0
-    can_take = Quizzes::QuizEligibility.new(course: @context,
+    @quiz_eligibility = Quizzes::QuizEligibility.new(course: @context,
                                             quiz: @quiz,
                                             user: @current_user,
                                             session: session,
@@ -956,11 +958,9 @@ class Quizzes::QuizzesController < ApplicationController
                                             access_code: params[:access_code])
 
     if params[:take]
-      @declined_reason = can_take.declined_reason_renders
-      render @declined_reason if @declined_reason
-      can_take.eligible?
+      @quiz_eligibility.eligible?
     else
-      can_take.potentially_eligible?
+      @quiz_eligibility.potentially_eligible?
     end
   end
 
