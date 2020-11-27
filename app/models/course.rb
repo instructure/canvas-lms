@@ -207,14 +207,19 @@ class Course < ActiveRecord::Base
 
   has_one :course_score_statistic, dependent: :destroy
   has_many :auditor_course_records,
-    class_name: "Auditors::ActiveRecord::CourseRecord",
-    dependent: :destroy,
-    inverse_of: :course
+           class_name: 'Auditors::ActiveRecord::CourseRecord',
+           dependent: :destroy,
+           inverse_of: :course
   has_many :auditor_grade_change_records,
-    as: :context,
-    inverse_of: :course,
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    dependent: :destroy
+           as: :context,
+           inverse_of: :course,
+           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           dependent: :destroy
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: 'Lti::ResourceLink',
+           dependent: :destroy
 
   has_many :conditional_release_rules, inverse_of: :course, class_name: "ConditionalRelease::Rule", dependent: :destroy
   has_one :outcome_proficiency, as: :context, inverse_of: :context, dependent: :destroy

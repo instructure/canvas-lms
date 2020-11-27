@@ -27,9 +27,11 @@ describe Assignment do
 
   describe 'relationships' do
     it { is_expected.to have_one(:score_statistic).dependent(:destroy) }
+    it { is_expected.to have_one(:post_policy).dependent(:destroy).inverse_of(:assignment) }
+
     it { is_expected.to have_many(:moderation_graders) }
     it { is_expected.to have_many(:moderation_grader_users) }
-    it { is_expected.to have_one(:post_policy).dependent(:destroy).inverse_of(:assignment) }
+    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
   before :once do
@@ -8883,6 +8885,8 @@ describe Assignment do
           expect(assignment.line_items.first.coupled).to eq true
           expect(assignment.line_items.first.resource_link).not_to be_nil
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
+          expect(assignment.line_items.first.resource_link.context_id).to eq assignment.id
+          expect(assignment.line_items.first.resource_link.context_type).to eq 'Assignment'
           expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           expect(assignment.external_tool_tag.content).to eq tool
           expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first

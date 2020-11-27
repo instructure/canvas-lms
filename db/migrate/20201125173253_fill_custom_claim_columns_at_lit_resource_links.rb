@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-#
-# Copyright (C) 2018 - present Instructure, Inc.
+# Copyright (C) 2020 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,22 +15,14 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-#
+class FillCustomClaimColumnsAtLitResourceLinks < ActiveRecord::Migration[5.2]
+  tag :postdeploy
 
-module Factories
-  def resource_link_model(overrides: {})
-    return Lti::ResourceLink.find_by!(resource_link_id: overrides[:resource_link_id]) if overrides.key?(:resource_link_id)
+  disable_ddl_transaction!
 
-    context ||= Course.create!(name: 'Course')
-    assignment = Assignment.create!(course: context, name: 'Assignment')
-
-    params = {
-      context: assignment,
-      context_external_tool: overrides.fetch(:with_context_external_tool) do |_|
-        external_tool_model(context: overrides[:context], opts: overrides.fetch(:context_external_tool, {}))
-      end
-    }
-
-    Lti::ResourceLink.create!(params)
+  def up
+    DataFixup::Lti::FillCustomClaimColumnsForResourceLink.run
   end
+
+  def down; end
 end

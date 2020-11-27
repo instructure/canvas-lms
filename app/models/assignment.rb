@@ -107,9 +107,14 @@ class Assignment < ActiveRecord::Base
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
   has_many :auditor_grade_change_records,
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    dependent: :destroy,
-    inverse_of: :assignment
+           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           dependent: :destroy,
+           inverse_of: :assignment
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: 'Lti::ResourceLink',
+           dependent: :destroy
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: 'trigger_assignment_id', inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
@@ -1085,6 +1090,7 @@ class Assignment < ActiveRecord::Base
     # which Tool it's bound to.
     if lti_1_3_external_tool_tag? && line_items.empty?
       rl = Lti::ResourceLink.create!(
+        context: self,
         resource_link_id: lti_context_id,
         context_external_tool: ContextExternalTool.from_content_tag(
           external_tool_tag,

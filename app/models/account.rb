@@ -85,22 +85,27 @@ class Account < ActiveRecord::Base
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :auditor_authentication_records,
-    class_name: "Auditors::ActiveRecord::AuthenticationRecord",
-    dependent: :destroy,
-    inverse_of: :account
+           class_name: 'Auditors::ActiveRecord::AuthenticationRecord',
+           dependent: :destroy,
+           inverse_of: :account
   has_many :auditor_course_records,
-    class_name: "Auditors::ActiveRecord::CourseRecord",
-    dependent: :destroy,
-    inverse_of: :account
+           class_name: 'Auditors::ActiveRecord::CourseRecord',
+           dependent: :destroy,
+           inverse_of: :account
   has_many :auditor_grade_change_records,
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    dependent: :destroy,
-    inverse_of: :account
+           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           dependent: :destroy,
+           inverse_of: :account
   has_many :auditor_root_grade_change_records,
-    foreign_key: 'root_account_id',
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    dependent: :destroy,
-    inverse_of: :root_account
+           foreign_key: 'root_account_id',
+           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           dependent: :destroy,
+           inverse_of: :root_account
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: 'Lti::ResourceLink',
+           dependent: :destroy
 
   def inherited_assessment_question_banks(include_self = false, *additional_contexts)
     sql, conds = [], []

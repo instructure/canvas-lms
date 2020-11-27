@@ -26,6 +26,7 @@ describe Account do
   describe 'relationships' do
     it { is_expected.to have_many(:feature_flags) }
     it { is_expected.to have_one(:outcome_proficiency).dependent(:destroy) }
+    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
   context "domain_method" do
