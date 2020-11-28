@@ -1,5 +1,5 @@
 production: &production
-  address: mailcatcher
+  address: mailhog
   port: 1025
   domain: canvas.docker
   outgoing_address: canvas@canvas.docker
