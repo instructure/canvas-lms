@@ -1,3 +1,19 @@
-default:
+default: &default
   workers:
-  - queue: canvas_queue
+    - queue: <%= ENV.fetch('CANVAS_WORKER_NAME', 'canvas_queue') %>
+      workers: <%= ENV.fetch('CANVAS_NUMBER_OF_WORKERS', '2') %>
+
+development:
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default
+  workers:
+    - queue: canvas_queue
+      workers: 2
+      max_priority: 10
+    - queue: canvas_queue
+      workers: 4

@@ -1,9 +1,18 @@
-production: &production
-  address: mailhog
-  port: 1025
-  domain: canvas.docker
-  outgoing_address: canvas@canvas.docker
-  default_name: Instructure Canvas
+default: &default
+  address: <%= ENV.fetch('CANVAS_MAIL_SERVER', 'mailhog') %>
+  port: <%= ENV.fetch('CANVAS_MAIL_PORT', '1025') %>
+  user_name: <%= ENV.fetch('CANVAS_MAIL_USERNAME', 'canvas') %>
+  password: <%= ENV.fetch('CANVAS_MAIL_PASSWORD', 'password') %>
+  authentication: "plain" # plain, login, or cram_md5
+  domain: <%= ENV.fetch('CANVAS_CANVAS_DOMAIN', 'localhost') %>
+  outgoing_address: <%= ENV.fetch('CANVAS_MAIL_DEFAULT_SENDER_ADDRESS', 'admin@instructure.com') %>
+  default_name: <%= ENV.fetch('CANVAS_MAIL_DEFAULT_SENDER_NAME', 'Canvas Admin') %>
 
 development:
-  <<: *production
+  <<: *default
+
+test:
+  <<: *default
+
+production:
+  <<: *default

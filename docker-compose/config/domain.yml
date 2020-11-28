@@ -1,8 +1,12 @@
-production:
-  domain: "canvas.docker"
-
-test:
-  domain: localhost
+default: &default
+  domain: <%= ENV.fetch('CANVAS_DOMAIN', 'canvas.docker') %>
+  ssl: <%= ENV.fetch('CANVAS_DOMAIN_SSL', false) %>
 
 development:
-  domain: "canvas.docker"
+  <<: *default
+
+production:
+  <<: *default
+
+test:
+  <<: *default
