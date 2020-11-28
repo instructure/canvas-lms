@@ -127,8 +127,8 @@ class AssetUserAccessLog
   # fewer writes at peak and use spare I/O capacity later in the day if necessary to catch up.
   def self.compact
     ps = plugin_setting
-    if ps.nil?
-      return Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - PluginSetting nil, aborting")
+    if ps.nil? || ps.settings[:write_path] != "log"
+      return Rails.logger.warn("[AUA_LOG_COMPACTION:#{Shard.current.id}] - PluginSetting configured OFF, aborting")
     end
     ts = Time.now.utc
     yesterday_ts = ts - 1.day
@@ -193,6 +193,11 @@ class AssetUserAccessLog
       # "just a few more"
       partition_upper_bound = partition_model.maximum(:id)
       partition_lower_bound = partition_model.minimum(:id)
+      if partition_lower_bound.nil? || partition_upper_bound.nil?
+        # no data means there's nothing in this partition to compact.
+        return true
+      end
+
       # fetch from the canvas metadatum compaction state the last compacted log id.  This lets us
       # resume log compaction past the records we've already processed, but without
       # having to delete records as we go (which would churn write IO), leaving the log cleanup
