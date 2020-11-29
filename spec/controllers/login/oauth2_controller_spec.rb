@@ -133,5 +133,17 @@ describe Login::Oauth2Controller do
       p = Account.default.pseudonyms.active.by_unique_id('user').first!
       expect(p.authentication_provider).to eq aac
     end
+
+    it "redirects to login any time an expired token is noticed" do
+      session[:oauth2_nonce] = 'bob'
+      expect_any_instantiation_of(aac).to receive(:get_token).and_raise(Canvas::Security::TokenExpired)
+      user_with_pseudonym(username: 'user', active_all: 1)
+      @pseudonym.authentication_provider = aac
+      @pseudonym.save!
+      session[:sentinel] = true
+      jwt = Canvas::Security.create_jwt(aac_id: aac.global_id, nonce: 'bob')
+      get :create, params: {state: jwt}
+      expect(response).to redirect_to(login_url)
+    end
   end
 end
