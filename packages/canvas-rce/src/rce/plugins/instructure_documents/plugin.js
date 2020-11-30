@@ -111,14 +111,17 @@ tinymce.create('tinymce.plugins.InstructureDocumentsPlugin', {
         })
         callback(items)
       },
-      onAction() {
-        doMenuItem(ed, 'instructure_upload_document')
+      onAction(api) {
+        if (!api.isDisabled()) {
+          doMenuItem(ed, 'instructure_upload_document')
+        }
       },
       onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
       onSetup(api) {
         function handleNodeChange(_e) {
           api.setDisabled(!isOKToLink(ed.selection.getContent()))
         }
+        setTimeout(handleNodeChange)
         ed.on('NodeChange', handleNodeChange)
         return () => {
           ed.off('NodeChange', handleNodeChange)

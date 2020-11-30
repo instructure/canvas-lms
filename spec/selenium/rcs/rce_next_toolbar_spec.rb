@@ -398,17 +398,17 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
     end
 
-    it 'disables content insertion buttons when linking is invalid' do
-      body = <<-HTML
-      <p><span id="ok">i am OK!</span></p>
-      <p><span id="ifr">cannot link <iframe/> me</span></p>
-      <p><span id="vid">nor <video/> me</span></p>
-      HTML
-      @course.wiki_pages.create!(title: 'title', body: body)
-      visit_existing_wiki_edit(@course, 'title')
-      driver.manage.window.resize_to(1_350, 800) # wide enough to display the insert buttons
+    context 'content insertion buttons' do
+      before :each do
+        body = <<-HTML
+        <p><span id="ok">i am OK!</span></p>
+        <p><span id="ifr">cannot link <iframe/> me</span></p>
+        <p><span id="vid">nor <video/> me</span></p>
+        HTML
+        @course.wiki_pages.create!(title: 'title', body: body)
+        visit_existing_wiki_edit(@course, 'title')
 
-      driver.execute_script(<<-JS)
+        driver.execute_script(<<-JS)
         window.selectNodeById = function(nid) {
           const win = document.querySelector('iframe.tox-edit-area__iframe').contentWindow
           const rng = win.document.createRange()
@@ -421,18 +421,32 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
           sel.addRange(rng2)
         }
         JS
+      end
 
-      # nothing selected, insert buttons are enabled
-      assert_insert_buttons_enabled(true)
+      it 'should be disabled in toolbar when linking is invalid' do
+        driver.manage.window.resize_to(1_350, 800) # wide enough to display the insert buttons
 
-      driver.execute_script('window.selectNodeById("ok")')
-      assert_insert_buttons_enabled(true)
+        # nothing selected, insert buttons are enabled
+        assert_insert_buttons_enabled(true)
 
-      driver.execute_script('window.selectNodeById("ifr")')
-      assert_insert_buttons_enabled(false)
+        driver.execute_script('window.selectNodeById("ok")')
+        assert_insert_buttons_enabled(true)
 
-      driver.execute_script('window.selectNodeById("vid")')
-      assert_insert_buttons_enabled(false)
+        driver.execute_script('window.selectNodeById("ifr")')
+        assert_insert_buttons_enabled(false)
+
+        driver.execute_script('window.selectNodeById("vid")')
+        assert_insert_buttons_enabled(false)
+      end
+
+      it 'should be disabled in floating toolbar if linking is invalid' do
+        driver.execute_script('window.selectNodeById("ifr")')
+        driver.manage.window.resize_to(800, 800) # small enough that the insert buttons are hidden in the overflow
+        assert_insert_buttons_enabled(false) # buttons should still be disabled without selecting anything else
+
+        driver.execute_script('window.selectNodeById("ok")')
+        assert_insert_buttons_enabled(true)
+      end
     end
   end
 end
