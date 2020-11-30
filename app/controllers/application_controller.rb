@@ -1481,6 +1481,7 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from Exception, :with => :rescue_exception
