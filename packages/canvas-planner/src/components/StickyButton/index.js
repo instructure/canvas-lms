@@ -21,9 +21,9 @@ import {themeable} from '@instructure/ui-themeable'
 import {bool, func, node, number, string, oneOf} from 'prop-types'
 import {IconArrowUpSolid, IconArrowDownLine} from '@instructure/ui-icons'
 
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 class StickyButton extends Component {
   static propTypes = {
@@ -33,16 +33,13 @@ class StickyButton extends Component {
     disabled: bool,
     hidden: bool,
     direction: oneOf(['none', 'up', 'down']),
-    className: string,
     zIndex: number,
     buttonRef: func,
     description: string
   }
 
   static defaultProps = {
-    direction: 'none',
-    offset: '0',
-    className: ''
+    direction: 'none'
   }
 
   handleClick = e => {

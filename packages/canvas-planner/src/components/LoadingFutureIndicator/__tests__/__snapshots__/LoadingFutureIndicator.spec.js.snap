@@ -4,18 +4,17 @@ exports[`renders all future items loaded regardless of other props 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Text
       as="span"
@@ -34,18 +33,17 @@ exports[`renders load more by default 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Button
       as="button"
@@ -70,30 +68,28 @@ exports[`renders loading when indicated 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <View
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <Spinner
         as="div"
@@ -120,18 +116,17 @@ exports[`shows an Alert when there's a query error 1`] = `
 <div>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="x-large"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <div
       style={

@@ -18,7 +18,8 @@
 
 import React from 'react'
 import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Text, List} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {List} from '@instructure/ui-list'
 
 import {
   IconAssignmentLine,

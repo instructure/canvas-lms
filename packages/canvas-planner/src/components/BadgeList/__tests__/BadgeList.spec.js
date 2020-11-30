@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow} from 'enzyme'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import BadgeList from '../index'
 
 it('renders Pill components as list items', () => {

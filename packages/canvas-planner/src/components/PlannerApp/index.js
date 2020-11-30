@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 import {connect} from 'react-redux'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-spinner'
 import {arrayOf, oneOfType, shape, bool, object, string, func} from 'prop-types'
 import {userShape, sizeShape} from '../plannerPropTypes'
@@ -89,12 +89,12 @@ export class PlannerApp extends Component {
     this.fixedResponsiveMemo = null
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.props.appRef(this)
     window.addEventListener('resize', this.onResize, false)
   }
 
-  componentWillUpdate(nextProps) {
+  UNSAFE_componentWillUpdate(nextProps) {
     if (this.props.allPastItemsLoaded === false && nextProps.allPastItemsLoaded === true) {
       if (this.loadPriorButton === document.activeElement) {
         this.props.focusFallback()
@@ -400,7 +400,7 @@ export class PlannerApp extends Component {
     const loading = this.props.loadingPast || this.props.loadingFuture || this.props.isLoading
     if (children.length === 0 && !loading) {
       return (
-        <div className={classes}>
+        <div className={classes} data-testid="PlannerApp">
           {this.renderLoadPastButton()}
           {this.renderNoAssignments()}
         </div>
@@ -408,7 +408,7 @@ export class PlannerApp extends Component {
     }
 
     return (
-      <div className={classes} ref={el => (this._plannerElem = el)}>
+      <div className={classes} ref={el => (this._plannerElem = el)} data-testid="PlannerApp">
         {this.renderLoadPastButton()}
         {this.renderLoadingPast()}
         {children}

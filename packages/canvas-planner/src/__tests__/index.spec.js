@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moxios from 'moxios'
+import {findByTestId} from '@testing-library/react'
 import {initializePlanner, loadPlannerDashboard, resetPlanner, renderToDoSidebar} from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
@@ -103,8 +104,10 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided divs', () => {
+    it('renders into provided divs', async () => {
       loadPlannerDashboard()
+      await findByTestId(document.body, 'PlannerApp')
+      await findByTestId(document.body, 'PlannerHeader')
       expect(document.querySelector('.PlannerApp')).toBeTruthy()
       expect(document.querySelector('.PlannerHeader')).toBeTruthy()
     })
@@ -115,8 +118,9 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided element', () => {
+    it('renders into provided element', async () => {
       renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
+      await findByTestId(document.body, 'ToDoSidebar')
       expect(document.querySelector('.todo-list-header')).toBeTruthy()
     })
   })

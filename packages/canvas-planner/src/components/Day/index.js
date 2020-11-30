@@ -20,12 +20,13 @@ import React, {Component} from 'react'
 import classnames from 'classnames'
 import moment from 'moment-timezone'
 import {themeable} from '@instructure/ui-themeable'
-import {Heading, Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {shape, string, number, arrayOf, func} from 'prop-types'
 import {userShape, itemShape} from '../plannerPropTypes'
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 import {getFriendlyDate, getFullDate, isToday} from '../../utilities/dateUtils'
 import Grouping from '../Grouping'
 import formatMessage from '../../format-message'
@@ -60,7 +61,7 @@ export class Day extends Component {
     this.props.registerAnimatable('day', this, this.props.animatableIndex, this.itemUniqueIds())
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.props.deregisterAnimatable('day', this, this.itemUniqueIds())
     this.props.registerAnimatable(
       'day',

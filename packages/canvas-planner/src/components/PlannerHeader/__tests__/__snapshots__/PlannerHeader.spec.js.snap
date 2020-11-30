@@ -3,6 +3,7 @@
 exports[`new activity button does not show when there is no new activity 1`] = `
 <div
   className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
@@ -61,41 +62,39 @@ exports[`new activity button does not show when there is no new activity 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
     shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -259,17 +258,16 @@ exports[`new activity button does not show when there is no new activity 1`] = `
   >
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
         as="button"
@@ -312,7 +310,6 @@ exports[`new activity button does not show when there is no new activity 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >
@@ -325,6 +322,7 @@ exports[`new activity button does not show when there is no new activity 1`] = `
 exports[`new activity button shows when there is new activity 1`] = `
 <div
   className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
@@ -383,41 +381,39 @@ exports[`new activity button shows when there is new activity 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
     shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -581,17 +577,16 @@ exports[`new activity button shows when there is new activity 1`] = `
   >
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
         as="button"
@@ -634,7 +629,6 @@ exports[`new activity button shows when there is new activity 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >
@@ -647,6 +641,7 @@ exports[`new activity button shows when there is new activity 1`] = `
 exports[`renders the base component correctly with buttons and trays 1`] = `
 <div
   className="PlannerHeader-styles__root PlannerHeader"
+  data-testid="PlannerHeader"
 >
   <Button
     as="button"
@@ -705,41 +700,39 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
     </ScreenReaderContent>
   </Button>
   <Popover
-    alignArrow={false}
+    color="primary"
     constrain="window"
     contentRef={[Function]}
-    defaultFocusElement={null}
-    defaultShow={false}
+    defaultIsShowingContent={false}
     insertAt="bottom"
-    label={null}
-    liveRegion={null}
-    mountNode={null}
+    isShowingContent={false}
     offsetX={0}
     offsetY={0}
     on="click"
     onBlur={[Function]}
     onClick={[Function]}
-    onDismiss={[Function]}
     onFocus={[Function]}
+    onHideContent={[Function]}
+    onKeyDown={[Function]}
+    onKeyUp={[Function]}
     onMouseOut={[Function]}
     onMouseOver={[Function]}
     onPositionChanged={[Function]}
     onPositioned={[Function]}
-    onShow={[Function]}
-    onToggle={[Function]}
+    onShowContent={[Function]}
     placement="bottom end"
     positionTarget={null}
+    renderTrigger={null}
     shadow="resting"
+    shouldAlignArrow={false}
     shouldCloseOnDocumentClick={true}
     shouldCloseOnEscape={true}
     shouldContainFocus={false}
     shouldFocusContentOnTriggerBlur={false}
     shouldRenderOffscreen={false}
     shouldReturnFocus={true}
-    show={false}
+    shouldTrackPosition={true}
     stacking="topmost"
-    trackPosition={true}
-    variant="default"
     withArrow={true}
   >
     <PopoverTrigger>
@@ -903,17 +896,16 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
   >
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       overflowX="visible"
       overflowY="visible"
       padding="large large medium"
       position="static"
       shouldAnimateFocus={true}
+      withVisualDebug={false}
     >
       <CloseButton
         as="button"
@@ -956,7 +948,6 @@ exports[`renders the base component correctly with buttons and trays 1`] = `
       description="Scrolls up to the previous item with new activity."
       direction="up"
       id="new_activity_button"
-      offset="0"
       onClick={[Function]}
       zIndex={3}
     >

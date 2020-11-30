@@ -17,7 +17,7 @@
  */
 import React from 'react'
 import {shallow, mount} from 'enzyme'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 import {Opportunity} from '../index'
 
 function defaultProps(options = {}) {

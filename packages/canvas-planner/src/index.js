@@ -16,13 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {Suspense} from 'react'
 import ReactDOM from 'react-dom'
 import {Provider} from 'react-redux'
 import moment from 'moment-timezone'
-import PlannerApp from './components/PlannerApp'
-import PlannerHeader from './components/PlannerHeader'
-import ToDoSidebar from './components/ToDoSidebar'
+import {Spinner} from '@instructure/ui-spinner'
 import i18n from './i18n'
 import configureStore from './store/configureStore'
 import {initialOptions, getPlannerItems, scrollIntoPast, loadFutureItems} from './actions'
@@ -32,6 +30,10 @@ import {initializeContent} from './utilities/contentUtils'
 import {initializeDateTimeFormatters} from './utilities/dateUtils'
 import {DynamicUiManager, DynamicUiProvider, specialFallbackFocusId} from './dynamic-ui'
 import responsiviser from './components/responsiviser'
+
+const ToDoSidebar = React.lazy(() => import('./components/ToDoSidebar'))
+const PlannerApp = React.lazy(() => import('./components/PlannerApp'))
+const PlannerHeader = React.lazy(() => import('./components/PlannerHeader'))
 
 export {responsiviser}
 
@@ -190,6 +192,10 @@ export function resetPlanner() {
   initializedOptions = null
 }
 
+function loading() {
+  return <Spinner size="small" />
+}
+
 function render(element) {
   registerScrollEvents({
     scrollIntoPast: handleScrollIntoPastAttempt,
@@ -200,13 +206,15 @@ function render(element) {
   ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
-        <PlannerApp
-          appRef={app => dynamicUiManager.setApp(app)}
-          changeDashboardView={initializedOptions.changeDashboardView}
-          plannerActive={plannerActive}
-          currentUser={store.getState().currentUser}
-          focusFallback={() => dynamicUiManager.focusFallback('item')}
-        />
+        <Suspense fallback={loading()}>
+          <PlannerApp
+            appRef={app => dynamicUiManager.setApp(app)}
+            changeDashboardView={initializedOptions.changeDashboardView}
+            plannerActive={plannerActive}
+            currentUser={store.getState().currentUser}
+            focusFallback={() => dynamicUiManager.focusFallback('item')}
+          />
+        </Suspense>
       </Provider>
     </DynamicUiProvider>,
     element
@@ -223,14 +231,16 @@ function renderHeader(element, auxElement) {
   ReactDOM.render(
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
-        <PlannerHeader
-          stickyZIndex={initializedOptions.stickyZIndex}
-          stickyButtonId={initializedOptions.plannerNewActivityButtonId}
-          timeZone={initializedOptions.env.TIMEZONE}
-          locale={initializedOptions.env.MOMENT_LOCALE}
-          ariaHideElement={ariaHideElement}
-          auxElement={auxElement}
-        />
+        <Suspense fallback={loading()}>
+          <PlannerHeader
+            stickyZIndex={initializedOptions.stickyZIndex}
+            stickyButtonId={initializedOptions.plannerNewActivityButtonId}
+            timeZone={initializedOptions.env.TIMEZONE}
+            locale={initializedOptions.env.MOMENT_LOCALE}
+            ariaHideElement={ariaHideElement}
+            auxElement={auxElement}
+          />
+        </Suspense>
       </Provider>
     </DynamicUiProvider>,
     element
@@ -246,13 +256,15 @@ export function renderToDoSidebar(element) {
 
   ReactDOM.render(
     <Provider store={store}>
-      <ToDoSidebar
-        courses={env.STUDENT_PLANNER_COURSES}
-        timeZone={env.TIMEZONE}
-        locale={env.MOMENT_LOCALE}
-        changeDashboardView={initializedOptions.changeDashboardView}
-        forCourse={initializedOptions.forCourse}
-      />
+      <Suspense fallback={loading()}>
+        <ToDoSidebar
+          courses={env.STUDENT_PLANNER_COURSES}
+          timeZone={env.TIMEZONE}
+          locale={env.MOMENT_LOCALE}
+          changeDashboardView={initializedOptions.changeDashboardView}
+          forCourse={initializedOptions.forCourse}
+        />
+      </Suspense>
     </Provider>,
     element
   )

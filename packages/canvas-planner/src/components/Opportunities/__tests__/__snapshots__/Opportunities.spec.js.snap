@@ -29,6 +29,7 @@ exports[`renders nothing if no opportunities 1`] = `
     elementRef={[Function]}
     onRequestTabChange={[Function]}
     shouldFocusOnRender={false}
+    tabOverflow="stack"
     variant="default"
   >
     <Panel
@@ -110,6 +111,7 @@ exports[`renders the base component correctly with one of each kind of opportuni
     elementRef={[Function]}
     onRequestTabChange={[Function]}
     shouldFocusOnRender={false}
+    tabOverflow="stack"
     variant="default"
   >
     <Panel
@@ -223,6 +225,7 @@ exports[`renders the right course with the right opportunity 1`] = `
     elementRef={[Function]}
     onRequestTabChange={[Function]}
     shouldFocusOnRender={false}
+    tabOverflow="stack"
     variant="default"
   >
     <Panel
