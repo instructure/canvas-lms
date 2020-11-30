@@ -30,7 +30,7 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics]
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics, :update_final_grade_overrides]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
@@ -1032,6 +1032,59 @@ class GradebooksController < ApplicationController
 
     final_grade_overrides = ::Gradebook::FinalGradeOverrides.new(@context, @current_user)
     render json: { final_grade_overrides: final_grade_overrides.to_h }
+  end
+
+  # @API Bulk update final grade overrides
+  #
+  # Set multiple final grade override scores for a course. The course must have
+  # final grade override enabled, and the caller must have permission to
+  # manage grades.
+  #
+  # @argument grading_period_id [Integer]
+  #   The grading period to apply the override scores to. If omitted, override
+  #   scores will be applied to the total grades for the course.
+  #
+  # @argument override_scores[] [Required, Array]
+  #   An array of hashes representing the new scores to assign.
+  #
+  # @argument override_scores[student_id] [Integer]
+  #   The ID of the student to update.
+  #
+  # @argument override_scores[override_score] [Float]
+  #   The new score to assign as a percentage.
+  #
+  # @example_request
+  #
+  # {
+  #   "grading_period_id": "10",
+  #   "override_scores": [
+  #     {
+  #       "student_id": "124",
+  #       "override_score": "80.0"
+  #     },
+  #     {
+  #       "student_id": "126",
+  #       "override_score": "70.0"
+  #     }
+  #   ]
+  # }
+  #
+  # @returns Progress
+  def update_final_grade_overrides
+    return unless authorized_action(@context, @current_user, :manage_grades)
+
+    render_unauthorized_action and return unless @context.allow_final_grade_override?
+
+    if params[:grading_period_id]
+      grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
+      render json: {error: :invalid_grading_period}, status: :bad_request and return if grading_period.blank?
+    end
+
+    params.require(:override_scores)
+    override_score_updates = params.permit(override_scores: [:student_id, :override_score]).to_h[:override_scores]
+
+    progress = ::Gradebook::FinalGradeOverrides.queue_bulk_update(@context, @current_user, override_score_updates, grading_period)
+    render json: progress_json(progress, @current_user, session)
   end
 
   def user_ids

@@ -2299,6 +2299,10 @@ CanvasRails::Application.routes.draw do
     scope(controller: :history) do
       get 'users/:user_id/history', action: 'index', as: :user_history
     end
+
+    scope(controller: :gradebooks) do
+      put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
+    end
   end
 
     # this is not a "normal" api endpoint in the sense that it is not documented or
