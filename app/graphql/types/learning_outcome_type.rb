@@ -17,49 +17,40 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-module Types
-  class LearningOutcomeGroupType < ApplicationObjectType
-    description 'Learning Outcome Group'
 
+module Types
+  class LearningOutcomeType < ApplicationObjectType
+    alias outcome object
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::TimestampInterface
 
     global_id_field :id
 
-    field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
-    field :child_groups, Types::LearningOutcomeGroupType.connection_type,
-          null: true,
-          method: :child_outcome_groups
     field :context_id, Integer, null: true
     field :context_type, String, null: true
     field :title, String, null: false
     field :description, String, null: true
+    field :assessed, Boolean, null: false, method: :assessed?
+    field :display_name, String, null: true
     field :vendor_guid, String, null: true
+
 
     field :can_edit, Boolean, null: false
     def can_edit
-      if object.context_id
-        return object.context.grants_right?(current_user, session, :manage_outcomes)
+      if outcome.context_id
+        return outcome_context_promise.then {|context|
+          context.grants_right?(current_user, session, :manage_outcomes)
+        }
       end
 
       Account.site_admin.grants_right?(current_user, session, :manage_global_outcomes)
     end
 
-    field :child_groups_count, Integer, null: false
-    def child_groups_count
-      # Not Implemented yet
-      0
-    end
+    private
 
-    field :outcomes_count, Integer, null: false
-    def outcomes_count
-      # Not Implemented yet
-      0
-    end
-
-    field :outcomes, Types::ContentTagConnection, null: false
-    def outcomes
-      object.child_outcome_links.active.order_by_outcome_title
+    def outcome_context_promise
+      Loaders::AssociationLoader.for(LearningOutcome, :context).load(outcome)
     end
   end
 end

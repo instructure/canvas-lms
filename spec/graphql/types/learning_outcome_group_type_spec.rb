@@ -34,6 +34,8 @@ describe Types::LearningOutcomeGroupType do
     @child_group.learning_outcome_group = @outcome_group
     @child_group.save!
     @user = @admin
+    @outcome1 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "BBBB")
+    @outcome2 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "AAAA")
   end
 
   let(:outcome_group_type) { GraphQLTypeTester.new(@outcome_group, current_user: @user) }
@@ -50,6 +52,12 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
     expect(outcome_group_type.resolve("childGroups { nodes { _id } }")).to match_array([@child_group.id.to_s])
+  end
+
+  it "gets outcomes ordered by title" do
+    expect(outcome_group_type.resolve("outcomes { nodes { ... on LearningOutcome { _id } } }")).to match_array([
+      @outcome2.id.to_s, @outcome1.id.to_s
+    ])
   end
 
   context "when doesn't have edit permission" do

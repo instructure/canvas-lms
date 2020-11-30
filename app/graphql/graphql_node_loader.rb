@@ -194,6 +194,16 @@ module GraphQLNodeLoader
           conversation
         end
       end
+    when "LearningOutcome"
+      Loaders::IDLoader.for(LearningOutcome).load(id).then do |record|
+        if record.context
+          next unless record.context.grants_right?(ctx[:current_user], :read_outcomes)
+        else
+          next unless Account.site_admin.grants_right?(ctx[:current_user], :read_global_outcomes)
+        end
+
+        record
+      end
     else
       raise UnsupportedTypeError, "don't know how to load #{type}"
     end
