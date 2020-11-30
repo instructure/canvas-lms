@@ -80,11 +80,12 @@ class AnnouncementsController < ApplicationController
 
   def public_feed
     return unless get_feed_context
-    announcements = @context.announcements.published.order('posted_at DESC').limit(15).
+
+    announcements = @context.announcements.published.by_posted_at.limit(15).
       select{|a| a.visible_for?(@current_user) }
 
     respond_to do |format|
-      format.atom {
+      format.atom do
         feed = Atom::Feed.new do |f|
           f.title = t(:feed_name, "%{course} Announcements Feed", :course => @context.name)
           f.links << Atom::Link.new(:href => polymorphic_url([@context, :announcements]), :rel => 'self')
@@ -95,7 +96,8 @@ class AnnouncementsController < ApplicationController
           feed.entries << e.to_atom
         end
         render :plain => feed.to_xml
-      }
+      end
+
       format.rss {
         @announcements = announcements
         require 'rss/2.0'
