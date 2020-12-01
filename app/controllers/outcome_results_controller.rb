@@ -397,7 +397,7 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
-    @results = find_results
+    @results = find_results.preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
@@ -537,8 +537,12 @@ class OutcomeResultsController < ApplicationController
         outcome_group_ids.each_slice(100) do |outcome_group_ids_slice|
           @outcome_links += ContentTag.learning_outcome_links.active.where(associated_asset_id: outcome_group_ids_slice)
         end
+        associations = [:learning_outcome_content]
+        if Api.value_to_array(params[:include]).include? 'outcome_paths'
+          associations << { associated_asset: :learning_outcome_group }
+        end
         @outcome_links.each_slice(100) do |outcome_links_slice|
-          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, :learning_outcome_content)
+          ActiveRecord::Associations::Preloader.new.preload(outcome_links_slice, associations)
         end
         @outcomes = @outcome_links.map(&:learning_outcome_content)
       end

@@ -334,7 +334,7 @@ class OutcomeGroupsApiController < ApplicationController
     @outcome_group = context_outcome_groups.find(params[:id])
 
     # get and paginate links from group
-    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
+    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title.preload(:context, :associated_asset, :content)
     url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
     @links = Api.paginate(link_scope, self, url)
 
