@@ -163,7 +163,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         shouldCloseOnDocumentClick={true}
         shouldCloseOnEscape={true}
         shouldContainFocus={true}
-        shouldFocusContentOnTriggerBlur={false}
+        shouldFocusContentOnTriggerBlur={true}
         shouldRenderOffscreen={false}
         shouldReturnFocus={true}
         show={false}
@@ -279,7 +279,6 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
             focusOnMount={false}
             hideOnScroll={false}
             hidePrompt={true}
-            isOpen={true}
             nonModal={true}
             parentComponent="ProficiencyRating"
             setStatusColor={[Function]}

@@ -249,6 +249,14 @@ class ProficiencyRating extends React.Component {
     )
   }
 
+  focusColorPicker = () => {
+    this.colorPickerRef.setFocus()
+  }
+
+  setColorPickerRef = element => {
+    this.colorPickerRef = element
+  }
+
   renderColorPicker = () => {
     const {color, position, canManage, isMobileView} = this.props
     return (
@@ -258,7 +266,14 @@ class ProficiencyRating extends React.Component {
             on="click"
             show={this.state.showColorPopover}
             onToggle={this.handleMenuToggle}
+            onShow={this.focusColorPicker}
             shouldContainFocus
+            // Note: without this prop, there's a focus issue where the window will scroll up
+            // on Chrome which seems to be caused by an issue within Popover (possibly INSTUI-1799)
+            // Including this prop no longer focuses on the ColorPicker
+            // when it mounts (and resolves the scroll behavior), so we manually focus on
+            // mount with focusColorPicker
+            shouldFocusContentOnTriggerBlur
           >
             <Popover.Trigger>
               <Button ref={this.setColorRef} variant="link">
@@ -273,10 +288,10 @@ class ProficiencyRating extends React.Component {
             </Popover.Trigger>
             <Popover.Content>
               <ColorPicker
+                ref={this.setColorPickerRef}
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
                 currentColor={formatColor(color)}
-                isOpen
                 hidePrompt
                 nonModal
                 hideOnScroll={false}
