@@ -18,6 +18,7 @@
 group :development do
   gem 'letter_opener', '1.7.0'
   gem 'spring', '2.1.1'
+  gem 'spring-commands-parallel-rspec', '1.1.0'
   gem 'spring-commands-rspec', '1.0.4'
   gem 'spring-commands-rubocop', '0.2.0'
 
