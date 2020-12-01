@@ -27,7 +27,7 @@ DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cach
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-webpack" --target cache-helper-collect-webpack "$WORKSPACE"
 
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_TAG
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_TAG || true
 # Explicitly pull instructure/ruby-passenger to update the local tag in case $RUBY_RUNNER_TAG is
 # using a new version. If this doesn't happen, the cache isn't used because Docker thinks the base
 # image is different.
@@ -65,7 +65,7 @@ exit_code=0
 if [[ "$exit_code" == "0" ]]; then
   docker tag $CACHE_TAG local/webpack-cache
 else
-  ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG
+  ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 
   docker build \
     --cache-from $WEBPACK_BUILDER_CACHE_TAG \
