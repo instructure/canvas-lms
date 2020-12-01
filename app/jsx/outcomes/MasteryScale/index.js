@@ -34,12 +34,10 @@ const MasteryScale = ({contextType, contextId}) => {
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 
   const {loading, error, data} = useQuery(query, {
-    variables: {contextId}
+    variables: {contextId},
+    fetchPolicy: 'no-cache'
   })
 
-  // const [updateProficiencyRatingsQuery, {error: updateProficiencyRatingsError}] = useMutation(
-  //   SET_OUTCOME_PROFICIENCY_RATINGS
-  // )
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
   const updateProficiencyRatings = useCallback(
     async config => {
