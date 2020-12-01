@@ -386,7 +386,7 @@ class ConversationsController < ApplicationController
 
       recipients_are_instructors = all_recipients_are_instructors?(context, @recipients)
 
-      if context.is_a?(Course) && !recipients_are_instructors && !observer_to_linked_students && !context.grants_right?(@current_user, session, :send_messages)
+      if context.is_a?(Course) && !recipients_are_instructors && !observer_to_linked_students(@recipients) && !context.grants_right?(@current_user, session, :send_messages)
         return render_error("Unable to send messages to users in #{context.name}", '')
       elsif !valid_context?(context)
         return render_error('context_code', 'invalid')
@@ -445,6 +445,8 @@ class ConversationsController < ApplicationController
     end
   rescue ActiveRecord::RecordInvalid => err
     render :json => err.record.errors, :status => :bad_request
+  rescue ConversationsHelper::InvalidContextError => err
+    render json: { message: err.message }, status: :bad_request
   end
 
   # @API Get running batches
@@ -1130,82 +1132,11 @@ class ConversationsController < ApplicationController
     end
   end
 
-  def normalize_recipients
-    return unless params[:recipients]
-
-    unless params[:recipients].is_a? Array
-      params[:recipients] = params[:recipients].split ","
-    end
-
-    # unrecognized context codes are ignored
-    if AddressBook.valid_context?(params[:context_code])
-      context = AddressBook.load_context(params[:context_code])
-      if context.nil?
-        # recognized context code must refer to a valid course or group
-        return render json: { message: 'invalid context_code' }, status: :bad_request
-      end
-    end
-
-    users, contexts = AddressBook.partition_recipients(params[:recipients])
-    known = @current_user.address_book.known_users(
-      users,
-      context: context,
-      conversation_id: params[:from_conversation_id],
-      strict_checks: !Account.site_admin.grants_right?(@current_user, session, :send_messages)
-    )
-    contexts.each{ |context| known.concat(@current_user.address_book.known_in_context(context)) }
-    @recipients = known.uniq(&:id)
-    @recipients.reject!{|u| u.id == @current_user.id} unless @recipients == [@current_user] && params[:recipients].count == 1
-  end
-
-  def infer_tags
-    tags = param_array(:tags).concat(param_array(:recipients)).concat([params[:context_code]])
-    tags = SimpleTags.normalize_tags(tags)
-    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
-    @tags = tags.uniq
-  end
-
   def get_conversation(allow_deleted = false)
     scope = @current_user.all_conversations
     scope = scope.where('message_count>0') unless allow_deleted
     @conversation = scope.where(conversation_id: params[:id] || params[:conversation_id] || 0).first
     raise ActiveRecord::RecordNotFound unless @conversation
-  end
-
-  def build_message
-    Conversation.build_message(*build_message_args)
-  end
-
-  def build_message_args
-    [
-      @current_user,
-      params[:body],
-      {
-        :attachment_ids => params[:attachment_ids],
-        :forwarded_message_ids => params[:forwarded_message_ids],
-        :root_account_id => @domain_root_account.id,
-        :media_comment => infer_media_comment,
-        :generate_user_note => value_to_boolean(params[:user_note])
-      }
-    ]
-  end
-
-  def infer_media_comment
-    media_id = params[:media_comment_id]
-    media_type = params[:media_comment_type]
-    if media_id.present? && media_type.present?
-      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
-      unless media_comment
-        media_comment ||= MediaObject.new
-        media_comment.media_type = media_type
-        media_comment.media_id = media_id
-        media_comment.root_account_id = @domain_root_account.id
-        media_comment.user = @current_user
-      end
-      media_comment.context = @current_user
-      media_comment.save
-      media_comment
-    end
   end
 
   def include_private_conversation_enrollments
@@ -1220,55 +1151,5 @@ class ConversationsController < ApplicationController
   def auto_mark_as_read?
     params[:auto_mark_as_read] ||= api_request?
     value_to_boolean(params[:auto_mark_as_read])
-  end
-
-  # look up the param and cast it to an array. treat empty string same as empty
-  def param_array(key)
-    Array(params[key].presence || []).compact
-  end
-
-  def valid_context?(context)
-    case context
-    when nil then false
-    when Account then valid_account_context?(context)
-    when Course, Group then context.membership_for_user(@current_user) || context.grants_right?(@current_user, session, :send_messages)
-    else false
-    end
-  end
-
-  def valid_account_context?(account)
-    return false unless account.root_account?
-    return true if account.grants_right?(@current_user, session, :read_roster)
-    account.shard.activate do
-      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
-      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
-        return true
-      end
-    end
-
-    false
-  end
-
-  def all_recipients_are_instructors?(context, recipients)
-    if context.is_a?(Course)
-      all_recipients_are_instructors = true
-      recipients.each do |recipient|
-        all_recipients_are_instructors = false unless context.user_is_instructor?(recipient)
-      end
-      return all_recipients_are_instructors
-    end
-
-    false
-  end
-
-  def observer_to_linked_students
-    observee_ids = @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
-    return false if observee_ids.empty?
-
-    @recipients.each do |recipient|
-      return false if observee_ids.exclude?(recipient.id)
-    end
-
-    true
   end
 end
