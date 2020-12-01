@@ -41,17 +41,13 @@ export default function register(editor) {
     },
     onItemAction: () => editor.execCommand('outdent'),
     onSetup: () => {
-      const $basicButton = editor.$(
-        editor.editorContainer.querySelector(`.tox-tbtn[aria-label="${baseIndentButton.tooltip}"]`)
-      )
-      const $splitButton = editor.$(
-        editor.editorContainer.querySelector(
-          `.tox-split-button[aria-label="${baseIndentButton.tooltip}"]`
-        )
-      )
       function showHideButtons(canOutdent) {
-        $basicButton[canOutdent ? 'hide' : 'show']()
-        $splitButton[canOutdent ? 'show' : 'hide']()
+        editor
+          .$(`.tox-tbtn[aria-label="${baseIndentButton.tooltip}"]`, document)
+          [canOutdent ? 'hide' : 'show']()
+        editor
+          .$(`.tox-split-button[aria-label="${baseIndentButton.tooltip}"]`, document)
+          [canOutdent ? 'show' : 'hide']()
       }
       function onNodeChange() {
         const canOutdent = editor.queryCommandState('outdent')
