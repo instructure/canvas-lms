@@ -37,7 +37,7 @@ describe('default proficiency', () => {
   })
 
   it('renders the correct headers', () => {
-    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByText} = render(<ProficiencyTable {...defaultProps()} />)
     expect(getByText('Mastery')).not.toBeNull()
     expect(getByText('Description')).not.toBeNull()
     expect(getByText('Points')).not.toBeNull()
@@ -45,13 +45,13 @@ describe('default proficiency', () => {
   })
 
   it('renders five ratings', () => {
-    const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getAllByLabelText} = render(<ProficiencyTable {...defaultProps()} />)
     const inputs = getAllByLabelText(/Change description/)
     expect(inputs.length).toEqual(5)
   })
 
   it('clicking button adds rating', () => {
-    const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByText, getAllByLabelText} = render(<ProficiencyTable {...defaultProps()} />)
     const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
     const inputs = getAllByLabelText(/Change description/)
@@ -59,21 +59,21 @@ describe('default proficiency', () => {
   })
 
   it('clicking add rating button flashes SR message', () => {
-    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const button = getByText(/Add Mastery Level/)
     fireEvent.click(button)
     expect(srFlashMock).toHaveBeenCalledTimes(1)
   })
 
   it('handling delete rating removes rating and flashes SR message', () => {
-    const {getAllByText, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getAllByText, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     fireEvent.click(getAllByText(/Delete mastery level/)[0])
     fireEvent.click(getByText(/Confirm/))
     expect(srFlashMock).toHaveBeenCalledTimes(1)
   })
 
   it('setting blank description sets error and focus', async () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -85,7 +85,7 @@ describe('default proficiency', () => {
   })
 
   it('setting blank points sets error and focus', async () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: ''}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -95,7 +95,7 @@ describe('default proficiency', () => {
   })
 
   it('setting invalid points sets error and focus', async () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -105,7 +105,7 @@ describe('default proficiency', () => {
   })
 
   it('setting negative points sets error and focus', async () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-1'}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -115,7 +115,7 @@ describe('default proficiency', () => {
   })
 
   it('setting duplicate point values sets error and focus', async () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '4'}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -125,7 +125,7 @@ describe('default proficiency', () => {
   })
 
   it('only sets focus on the first error', () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
     const pointsInput = getByDisplayValue('3')
@@ -153,7 +153,7 @@ describe('default proficiency', () => {
   it('does not call save when canceling on the confirmation modal', async () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: 'Mastery2'}})
@@ -165,7 +165,7 @@ describe('default proficiency', () => {
   it('empty rating description does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const masteryField = getByDisplayValue('Mastery')
     fireEvent.change(masteryField, {target: {value: ''}})
@@ -176,7 +176,7 @@ describe('default proficiency', () => {
   it('empty rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: ''}})
@@ -187,7 +187,7 @@ describe('default proficiency', () => {
   it('invalid rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1.1.1'}})
@@ -198,7 +198,7 @@ describe('default proficiency', () => {
   it('increasing rating points does call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})
@@ -210,7 +210,7 @@ describe('default proficiency', () => {
   it('negative rating points does not call update', () => {
     const updateSpy = jest.fn(() => Promise.resolve())
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
+      <ProficiencyTable {...defaultProps()} update={updateSpy} />
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '-10'}})
@@ -219,16 +219,13 @@ describe('default proficiency', () => {
   })
 
   it('save button is initially disabled', () => {
-    const {getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const saveButton = getByText('Save Mastery Scale').closest('button')
     expect(saveButton.disabled).toEqual(true)
   })
 
   it('save errors do not disable the save button', () => {
-    const updateSpy = jest.fn(() => Promise.reject())
-    const {getByText, getByDisplayValue} = render(
-      <ProficiencyTable {...defaultProps} update={updateSpy} />
-    )
+    const {getByText, getByDisplayValue} = render(<ProficiencyTable {...defaultProps()} />)
 
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '100'}})
@@ -237,12 +234,37 @@ describe('default proficiency', () => {
     const saveButton = getByText('Save Mastery Scale').closest('button')
     expect(saveButton.disabled).toEqual(false)
   })
+
+  it('calls onNotifyPendingChanges when changes data', async () => {
+    const onNotifyPendingChangesSpy = jest.fn()
+    const update = () => Promise.resolve()
+    const {getByText, getByDisplayValue} = render(
+      <ProficiencyTable
+        {...defaultProps()}
+        onNotifyPendingChanges={onNotifyPendingChangesSpy}
+        update={update}
+      />
+    )
+
+    const pointsInput = getByDisplayValue('3')
+    fireEvent.change(pointsInput, {target: {value: '100'}})
+    fireEvent.click(getByText('Save Mastery Scale'))
+    fireEvent.click(getByText('Save'))
+
+    await wait(() => {
+      expect(onNotifyPendingChangesSpy.mock.calls.length).toBe(2)
+      // first call first argument
+      expect(onNotifyPendingChangesSpy.mock.calls[0][0]).toBe(true)
+      // second call first argument
+      expect(onNotifyPendingChangesSpy.mock.calls[1][0]).toBe(false)
+    })
+  })
 })
 
 describe('custom proficiency', () => {
   it('renders two ratings that are deletable', () => {
     const customProficiencyProps = {
-      ...defaultProps,
+      ...defaultProps(),
       proficiency: {
         proficiencyRatingsConnection: {
           nodes: [
@@ -290,7 +312,7 @@ describe('custom proficiency', () => {
       mastery: false
     }
     const customProficiencyProps = {
-      ...defaultProps,
+      ...defaultProps(),
       proficiency: {
         proficiencyRatingsConnection: {
           nodes: [defaultRating1, defaultRating2, defaultRating3]
@@ -394,7 +416,6 @@ describe('custom proficiency', () => {
 
       const pointsInput = getByDisplayValue('3')
       const masteryButton = getAllByText(/Mastery.*for mastery level/)[2].closest('label')
-      const deleteButton = getAllByText(/Delete mastery level/)[0].closest('button')
 
       fireEvent.change(pointsInput, {target: {value: '20'}})
       fireEvent.click(masteryButton)
@@ -415,7 +436,7 @@ describe('custom proficiency', () => {
 
   it('renders one rating that is not deletable', () => {
     const props = {
-      ...defaultProps,
+      ...defaultProps(),
       proficiency: {
         proficiencyRatingsConnection: {
           nodes: [
@@ -437,7 +458,7 @@ describe('custom proficiency', () => {
 
   describe('can not manage', () => {
     const props = {
-      ...defaultProps,
+      ...defaultProps(),
       canManage: false,
       proficiency: {
         proficiencyRatingsConnection: {
@@ -473,7 +494,7 @@ describe('custom proficiency', () => {
 
 describe('confirmation modal', () => {
   it('renders correct text for the Account context', () => {
-    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    const {getByDisplayValue, getByText} = render(<ProficiencyTable {...defaultProps()} />)
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})
     fireEvent.click(getByText('Save Mastery Scale'))
@@ -483,7 +504,7 @@ describe('confirmation modal', () => {
 
   it('renders correct text for the Course context', () => {
     const {getByDisplayValue, getByText} = render(
-      <ProficiencyTable {...defaultProps} contextType="Course" />
+      <ProficiencyTable {...defaultProps()} contextType="Course" />
     )
     const pointsInput = getByDisplayValue('3')
     fireEvent.change(pointsInput, {target: {value: '1000'}})

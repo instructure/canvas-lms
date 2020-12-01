@@ -24,7 +24,7 @@ import React from 'react'
 const OutcomeManagementPanel = ({contextType, contextId}) => {
   const isCourse = contextType === 'Course'
   return (
-    <div className="management-panel">
+    <div className="management-panel" data-testid="outcomeManagementPanel">
       <Billboard
         size="large"
         headingLevel="h3"

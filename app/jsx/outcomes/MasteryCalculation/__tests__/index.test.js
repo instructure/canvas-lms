@@ -19,12 +19,9 @@
 import React from 'react'
 import {render, wait, fireEvent, waitForElementToBeRemoved} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
-import {
-  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-  COURSE_OUTCOME_PROFICIENCY_QUERY,
-  SET_OUTCOME_CALCULATION_METHOD
-} from '../api'
+import {ACCOUNT_OUTCOME_CALCULATION_QUERY, SET_OUTCOME_CALCULATION_METHOD} from '../api'
 import MasteryCalculation from '../index'
+import {masteryCalculationGraphqlMocks as mocks} from '../../__tests__/mocks'
 
 describe('MasteryCalculation', () => {
   beforeEach(() => {
@@ -54,50 +51,6 @@ describe('MasteryCalculation', () => {
   afterEach(() => {
     window.ENV = null
   })
-
-  const outcomeCalculationMethod = {
-    __typename: 'OutcomeCalculationMethod',
-    _id: '1',
-    contextType: 'Account',
-    contextId: 1,
-    calculationMethod: 'decaying_average',
-    calculationInt: 65
-  }
-
-  const mocks = [
-    {
-      request: {
-        query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-        variables: {
-          contextId: '11'
-        }
-      },
-      result: {
-        data: {
-          context: {
-            __typename: 'Account',
-            outcomeCalculationMethod
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: COURSE_OUTCOME_PROFICIENCY_QUERY,
-        variables: {
-          contextId: '12'
-        }
-      },
-      result: {
-        data: {
-          context: {
-            __typename: 'Course',
-            outcomeCalculationMethod
-          }
-        }
-      }
-    }
-  ]
 
   it('loads proficiency data', async () => {
     const {getByText, queryByText, getByDisplayValue} = render(
@@ -153,7 +106,7 @@ describe('MasteryCalculation', () => {
     const emptyMocks = [
       {
         request: {
-          query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
+          query: ACCOUNT_OUTCOME_CALCULATION_QUERY,
           variables: {
             contextId: '11'
           }

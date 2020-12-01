@@ -17,45 +17,162 @@
  */
 
 import React from 'react'
-import {mount, shallow} from 'enzyme'
-import OutcomeManagement, {OutcomePanel} from '../OutcomeManagement'
+import {render, fireEvent, act} from '@testing-library/react'
+import {MockedProvider} from '@apollo/react-testing'
+import {
+  OutcomePanel,
+  OutcomeManagementWithoutGraphql as OutcomeManagement
+} from '../OutcomeManagement'
+import {masteryCalculationGraphqlMocks, masteryScalesGraphqlMocks} from './mocks'
+
+jest.useFakeTimers()
 
 describe('OutcomeManagement', () => {
   const sharedExamples = () => {
     it('renders the OutcomeManagement and shows the "outcomes" div', () => {
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('OutcomePanel').exists()).toBe(true)
+      document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
+      render(<OutcomeManagement />)
+      expect(document.getElementById('outcomes').style.display).toBe('block')
     })
 
     it('does not render ManagementHeader', () => {
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('ManagementHeader').exists()).toBe(false)
+      const {queryByTestId} = render(<OutcomeManagement />)
+      expect(queryByTestId('managementHeader')).not.toBeInTheDocument()
     })
 
     it('renders ManagementHeader when improved outcomes enabled', () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('ManagementHeader').exists()).toBe(true)
-      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
-    })
-
-    it('renders OutcomeManagementPanel when improved outcomes enabled', () => {
-      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('OutcomeManagementPanel').exists()).toBe(true)
+      const {queryByTestId} = render(<OutcomeManagement />)
+      expect(queryByTestId('managementHeader')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
     it('does not render OutcomeManagementPanel when improved outcomes disabled', () => {
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('OutcomeManagementPanel').exists()).toBe(false)
+      const {queryByTestId} = render(<OutcomeManagement />)
+      expect(queryByTestId('outcomeManagementPanel')).not.toBeInTheDocument()
+    })
+
+    it('renders OutcomeManagementPanel when improved outcomes enabled', () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const {queryByTestId} = render(<OutcomeManagement />)
+      expect(queryByTestId('outcomeManagementPanel')).toBeInTheDocument()
+      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
+    })
+
+    describe('Changes confirmation', () => {
+      let originalConfirm, originalAddEventListener, unloadEventListener
+
+      beforeAll(() => {
+        originalConfirm = window.confirm
+        originalAddEventListener = window.addEventListener
+        window.confirm = jest.fn(() => true)
+        window.addEventListener = (eventName, callback) => {
+          if (eventName === 'beforeunload') {
+            unloadEventListener = callback
+          }
+        }
+      })
+
+      afterAll(() => {
+        window.confirm = originalConfirm
+        window.addEventListener = originalAddEventListener
+        unloadEventListener = null
+      })
+
+      it("Doesn't ask to confirm tab change when there is not change", () => {
+        const {getByText} = render(
+          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+
+        fireEvent.click(getByText('Mastery'))
+        fireEvent.click(getByText('Calculation'))
+
+        expect(window.confirm).not.toHaveBeenCalled()
+      })
+
+      it('Asks to confirm tab change when there is changes', () => {
+        const {getByText, getByLabelText, getByTestId} = render(
+          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+
+        fireEvent.click(getByText('Calculation'))
+        act(() => jest.runAllTimers())
+        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
+        fireEvent.click(getByText('Mastery'))
+        act(() => jest.runAllTimers())
+        expect(window.confirm).toHaveBeenCalled()
+        expect(getByTestId('masteryScales')).toBeInTheDocument()
+      })
+
+      it("Doesn't change tabs when doesn't confirm", () => {
+        // mock decline from user
+        window.confirm = () => false
+
+        const {getByText, getByLabelText, queryByTestId} = render(
+          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+
+        fireEvent.click(getByText('Calculation'))
+        act(() => jest.runAllTimers())
+        fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
+        fireEvent.click(getByText('Mastery'))
+        expect(queryByTestId('masteryScales')).not.toBeInTheDocument()
+      })
+
+      it("Allows to leave page when doesn't have changes", () => {
+        const {getByText} = render(
+          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+
+        const calculationButton = getByText('Calculation')
+        fireEvent.click(calculationButton)
+
+        act(() => jest.runAllTimers())
+
+        const e = jest.mock()
+        e.preventDefault = jest.fn()
+        unloadEventListener(e)
+        expect(e.preventDefault).not.toHaveBeenCalled()
+      })
+
+      it("Doesn't Allow to leave page when has changes", async () => {
+        const {getByText, getByLabelText} = render(
+          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+            <OutcomeManagement />
+          </MockedProvider>
+        )
+
+        const calculationButton = getByText('Calculation')
+        fireEvent.click(calculationButton)
+
+        act(() => jest.runAllTimers())
+
+        const parameter = getByLabelText(/Parameter/)
+        fireEvent.input(parameter, {target: {value: '88'}})
+
+        const e = jest.mock()
+        e.preventDefault = jest.fn()
+        unloadEventListener(e)
+        expect(e.preventDefault).toHaveBeenCalled()
+      })
     })
   }
 
   describe('account', () => {
     beforeEach(() => {
       window.ENV = {
-        context_asset_string: 'account_1'
+        context_asset_string: 'account_11',
+        PERMISSIONS: {
+          manage_proficiency_calculations: true
+        }
       }
     })
 
@@ -64,25 +181,15 @@ describe('OutcomeManagement', () => {
     })
 
     sharedExamples()
-
-    it('passes accountId to the ProficiencyTable component', () => {
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Account')
-      expect(wrapper.find('MasteryScale').prop('contextId')).toBe('1')
-    })
-
-    it('passes accountId to the OutcomeManagementPanel component', () => {
-      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('OutcomeManagementPanel').prop('contextType')).toBe('Account')
-      expect(wrapper.find('OutcomeManagementPanel').prop('contextId')).toBe('1')
-    })
   })
 
   describe('course', () => {
     beforeEach(() => {
       window.ENV = {
-        context_asset_string: 'course_2'
+        context_asset_string: 'course_12',
+        PERMISSIONS: {
+          manage_proficiency_calculations: true
+        }
       }
     })
 
@@ -91,19 +198,6 @@ describe('OutcomeManagement', () => {
     })
 
     sharedExamples()
-
-    it('passes courseId to the ProficiencyTable component', () => {
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('MasteryScale').prop('contextType')).toBe('Course')
-      expect(wrapper.find('MasteryScale').prop('contextId')).toBe('2')
-    })
-
-    it('passes courseId to the OutcomeManagementPanel component', () => {
-      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const wrapper = shallow(<OutcomeManagement />)
-      expect(wrapper.find('OutcomeManagementPanel').prop('contextType')).toBe('Course')
-      expect(wrapper.find('OutcomeManagementPanel').prop('contextId')).toBe('2')
-    })
   })
 })
 
@@ -117,13 +211,13 @@ describe('OutcomePanel', () => {
   })
 
   it('sets style on mount', () => {
-    mount(<OutcomePanel />)
+    render(<OutcomePanel />)
     expect(document.getElementById('outcomes').style.display).toBe('block')
   })
 
   it('sets style on unmount', () => {
-    const wrapper = mount(<OutcomePanel />)
-    wrapper.unmount()
+    const {unmount} = render(<OutcomePanel />)
+    unmount()
     expect(document.getElementById('outcomes').style.display).toBe('none')
   })
 })

@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useState, useEffect, useMemo} from 'react'
+import React, {useState, useEffect, useMemo, useRef} from 'react'
 import I18n from 'i18n!OutcomeManagement'
 import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
@@ -40,25 +40,59 @@ export const OutcomePanel = () => {
   return null
 }
 
-const OutcomeManagement = () => {
+export const OutcomeManagementWithoutGraphql = () => {
   const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
   })
 
+  // Need to use a ref because a when normal setState is changed, this component will render
+  // By rendering again, the handleTabChange will be a new function.
+  // If we pass a new function to Tabs onRequestTabChange prop, it will recreate
+  // the childs components, and we don't want that
+  const hasUnsavedChangesRef = useRef(false)
+  const setHasUnsavedChanges = hasUnsavedChanges =>
+    (hasUnsavedChangesRef.current = hasUnsavedChanges)
+
   const handleTabChange = (_, {index}) => {
-    setSelectedIndex(index)
+    if (hasUnsavedChangesRef.current) {
+      /* eslint-disable no-restricted-globals */
+      /* eslint-disable no-alert */
+      if (
+        confirm(I18n.t('Are you sure you want to proceed? Changes you made will not be saved.'))
+      ) {
+        /* eslint-enable no-restricted-globals */
+        /* eslint-enable no-alert */
+        setHasUnsavedChanges(false)
+        setSelectedIndex(index)
+      }
+    } else {
+      setSelectedIndex(index)
+    }
   }
 
-  const client = useMemo(() => createClient(), [])
+  // close tab / load link
+  useEffect(() => {
+    const onBeforeUnload = e => {
+      if (hasUnsavedChangesRef.current) {
+        e.preventDefault()
+        e.returnValue = true
+      }
+    }
+
+    window.addEventListener('beforeunload', onBeforeUnload)
+    return () => {
+      window.removeEventListener('beforeunload', onBeforeUnload)
+    }
+  }, [hasUnsavedChangesRef])
 
   const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
 
   const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
 
   return (
-    <ApolloProvider client={client}>
+    <>
       {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
@@ -69,12 +103,30 @@ const OutcomeManagement = () => {
           )}
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Mastery')} isSelected={selectedIndex === 1}>
-          <MasteryScale contextType={contextType} contextId={contextId} />
+          <MasteryScale
+            onNotifyPendingChanges={setHasUnsavedChanges}
+            contextType={contextType}
+            contextId={contextId}
+          />
         </Tabs.Panel>
         <Tabs.Panel renderTitle={I18n.t('Calculation')} isSelected={selectedIndex === 2}>
-          <MasteryCalculation contextType={contextType} contextId={contextId} />
+          <MasteryCalculation
+            onNotifyPendingChanges={setHasUnsavedChanges}
+            contextType={contextType}
+            contextId={contextId}
+          />
         </Tabs.Panel>
       </Tabs>
+    </>
+  )
+}
+
+const OutcomeManagement = () => {
+  const client = useMemo(() => createClient(), [])
+
+  return (
+    <ApolloProvider client={client}>
+      <OutcomeManagementWithoutGraphql />
     </ApolloProvider>
   )
 }

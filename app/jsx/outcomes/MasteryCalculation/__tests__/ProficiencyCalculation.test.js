@@ -44,6 +44,7 @@ describe('ProficiencyCalculation', () => {
   const makeProps = (overrides = {}) => ({
     update: Function.prototype,
     canManage: true,
+    contextType: 'Account',
     ...overrides,
     method: {
       calculationMethod: 'decaying_average',
@@ -157,6 +158,22 @@ describe('ProficiencyCalculation', () => {
       fireEvent.click(getByText('Save'))
       expect(update).toHaveBeenCalledTimes(1)
       expect(update).toHaveBeenCalledWith('decaying_average', 41)
+    })
+
+    it('calls onNotifyPendingChanges when changes data', async () => {
+      const onNotifyPendingChangesSpy = jest.fn()
+      const {getByText, getByLabelText} = render(
+        <ProficiencyCalculation
+          {...makeProps({onNotifyPendingChanges: onNotifyPendingChangesSpy})}
+        />
+      )
+      const parameter = getByLabelText('Parameter')
+      fireEvent.input(parameter, {target: {value: '22'}})
+      expect(onNotifyPendingChangesSpy).toHaveBeenCalledWith(true)
+      onNotifyPendingChangesSpy.mockClear()
+      fireEvent.click(getByText('Save Mastery Calculation'))
+      fireEvent.click(getByText('Save'))
+      expect(onNotifyPendingChangesSpy).toHaveBeenCalledWith(false)
     })
 
     it('save button is initially disabled', () => {

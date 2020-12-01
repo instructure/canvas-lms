@@ -29,13 +29,13 @@ import {
 } from './api'
 import {useQuery} from 'react-apollo'
 
-const MasteryScale = ({contextType, contextId}) => {
+const MasteryScale = ({contextType, contextId, onNotifyPendingChanges}) => {
   const query =
     contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
 
   const {loading, error, data} = useQuery(query, {
     variables: {contextId},
-    fetchPolicy: 'no-cache'
+    fetchPolicy: process.env.NODE_ENV === 'test' ? undefined : 'no-cache'
   })
 
   const [updateProficiencyRatingsError, setUpdateProficiencyRatingsError] = useState(null)
@@ -78,8 +78,9 @@ const MasteryScale = ({contextType, contextId}) => {
   const roles = ENV.PROFICIENCY_SCALES_ENABLED_ROLES || []
   const accountRoles = roles.filter(role => role.is_account_role)
   const canManage = ENV.PERMISSIONS.manage_proficiency_scales
+
   return (
-    <div>
+    <div data-testid="masteryScales">
       {canManage && contextType === 'Account' && (
         <p>
           <Text>
@@ -95,6 +96,7 @@ const MasteryScale = ({contextType, contextId}) => {
         proficiency={outcomeProficiency || undefined} // send undefined when value is null
         update={updateProficiencyRatings}
         updateError={updateProficiencyRatingsError}
+        onNotifyPendingChanges={onNotifyPendingChanges}
       />
 
       {accountRoles.length > 0 && (
