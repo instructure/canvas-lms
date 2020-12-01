@@ -837,7 +837,7 @@ class AssignObservers extends React.Component {
   }
   
   getCurrentObservees() {
-    return axios.get(`${ENV.BASE_URL}/api/v1/users/${this.state.observer.id}/observees`).then(response => {
+    return axios.get(`${ENV.BASE_URL}/api/v1/users/${this.state.observer.id}/observees?per_page=99`).then(response => {
       this.setState({currentObserversObservees: response.data})
     })
   }
