@@ -52,8 +52,9 @@ class StudentEnrollment < Enrollment
     old_grade = score.override_grade
     score.update!(override_score: override_score)
 
-    Canvas::LiveEvents.grade_override(score, old_score, self, course)
+    return score unless score.saved_change_to_override_score?
 
+    Canvas::LiveEvents.grade_override(score, old_score, self, course)
     if record_grade_change && updating_user.present?
       override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
         grader: updating_user,
