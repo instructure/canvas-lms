@@ -44,7 +44,6 @@ class NotificationMessageCreator
     if course_id && root_account_id
       @account = Account.new(id: root_account_id)
       @course = Course.new(id: course_id)
-      @mute_notifications_by_course_enabled = @account.feature_enabled?(:mute_notifications_by_course)
       @override_preferences_enabled = Account.site_admin.feature_enabled?(:notification_granular_course_preferences)
     end
   end
@@ -109,9 +108,9 @@ class NotificationMessageCreator
     # if the message is not summarizable?, it is in a context that notifications
     # cannot be disabled, so return true before checking.
     return true unless @notification.summarizable?
-    if @mute_notifications_by_course_enabled
-      return NotificationPolicyOverride.enabled_for(user, context)
-    end
+
+    return NotificationPolicyOverride.enabled_for(user, context) if context
+
     true
   end
 
