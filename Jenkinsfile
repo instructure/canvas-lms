@@ -373,8 +373,8 @@ pipeline {
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
-    PREMERGE_CACHE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
-    POSTMERGE_CACHE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
+    WEBPACK_CACHE_PREMERGE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
+    WEBPACK_CACHE_POSTMERGE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -486,14 +486,14 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  def cachePrefix = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_PREFIX : env.PREMERGE_CACHE_PREFIX
+                  def webpackCachePrefix = configuration.isChangeMerged() ? env.WEBPACK_CACHE_POSTMERGE_PREFIX : env.WEBPACK_CACHE_PREMERGE_PREFIX
 
-                  slackSendCacheBuild(cachePrefix) {
+                  slackSendCacheBuild(webpackCachePrefix) {
                     withEnv([
-                      "CACHE_PREFIX=${cachePrefix}",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
+                      "WEBPACK_CACHE_PREFIX=${webpackCachePrefix}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
@@ -509,8 +509,8 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
                   slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
 
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_PREFIX'
-                  slackSendCacheAvailable(env.POSTMERGE_CACHE_PREFIX)
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_POSTMERGE_PREFIX'
+                  slackSendCacheAvailable(env.WEBPACK_CACHE_POSTMERGE_PREFIX)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
@@ -580,9 +580,9 @@ pipeline {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
                     withEnv([
-                      "CACHE_PREFIX=${env.PREMERGE_CACHE_PREFIX}",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREMERGE_PREFIX}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {
@@ -590,8 +590,8 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_PREFIX"
-                      slackSendCacheAvailable(env.PREMERGE_CACHE_PREFIX)
+                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREMERGE_PREFIX"
+                      slackSendCacheAvailable(env.WEBPACK_CACHE_PREMERGE_PREFIX)
                     }
                   }
                 }

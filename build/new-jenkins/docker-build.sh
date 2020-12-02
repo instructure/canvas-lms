@@ -19,7 +19,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # Images:
 # $RUBY_RUNNER_TAG: instructure/ruby-passenger + gems
 # $WEBPACK_BUILDER_TAG: $RUBY_RUNNER_TAG + yarn + compiled packages/
-# $CACHE_TAG: $RUBY_RUNNER_TAG + final compiled assets
+# $WEBPACK_CACHE_TAG: $RUBY_RUNNER_TAG + final compiled assets
 # $1: final image for this build, including all rails code
 
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
@@ -44,26 +44,26 @@ docker build \
 
 # Calculate the MD5SUM of all images / files that compiled webpack assets depend on.
 BASE_IMAGE_ID=$(docker images --filter=reference=local/ruby-runner --format '{{.ID}}')
-DOCKERFILE_CACHE_ID=$( \
+DOCKERFILE_CACHE_MD5=$( \
   cat \
     Dockerfile.jenkins.webpack-builder \
     Dockerfile.jenkins.webpack-runner \
     Dockerfile.jenkins.webpack-cache \
   | md5sum | cut -d ' ' -f 1 \
 )
-YARN_CACHE_ID=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
-PACKAGES_CACHE_ID=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
-WEBPACK_CACHE_ID=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
+YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
+PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
+WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
 
-CACHE_ID=$(echo "$BASE_IMAGE_ID $DOCKERFILE_CACHE_ID $YARN_CACHE_ID $PACKAGES_CACHE_ID $WEBPACK_CACHE_ID" | md5sum | cut -d' ' -f1)
-CACHE_TAG="$CACHE_PREFIX:$CACHE_ID"
+WEBPACK_CACHE_ID=$(echo "$BASE_IMAGE_ID $DOCKERFILE_CACHE_MD5 $YARN_CACHE_MD5 $PACKAGES_CACHE_MD5 $WEBPACK_CACHE_MD5" | md5sum | cut -d' ' -f1)
+WEBPACK_CACHE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_ID"
 
 # If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_TAG and rebuild.
 exit_code=0
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $CACHE_TAG || exit_code=$?
+./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_TAG || exit_code=$?
 
 if [[ "$exit_code" == "0" ]]; then
-  docker tag $CACHE_TAG local/webpack-cache
+  docker tag $WEBPACK_CACHE_TAG local/webpack-cache
 else
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 
@@ -81,7 +81,7 @@ else
 
   docker build \
     --tag "local/webpack-cache" \
-    --tag "$CACHE_TAG" \
+    --tag "$WEBPACK_CACHE_TAG" \
     - < Dockerfile.jenkins.webpack-cache
 fi
 
