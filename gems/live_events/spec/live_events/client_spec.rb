@@ -84,6 +84,20 @@ describe LiveEvents::Client do
       expect(res[:endpoint]).to eq("http://example.com:6543/")
       LiveEvents.worker.stop!
     end
+
+    it "should load custom creds" do
+      LiveEvents.aws_credentials = -> (settings) {
+        settings['value_to_return']
+      }
+
+      res = LiveEvents::Client.aws_config({
+        'custom_aws_credentials' => 'true',
+        'value_to_return' => 'a_value'
+      })
+
+      expect(res[:credentials]).to eq('a_value')
+      LiveEvents.worker.stop!
+    end
   end
 
   describe "post_event" do
