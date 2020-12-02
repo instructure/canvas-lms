@@ -1217,28 +1217,28 @@ class Attachment < ActiveRecord::Base
   end
 
   def user_can_read_through_context?(user, session)
-    self.context.grants_right?(user, session, :read) ||
+    self.context&.grants_right?(user, session, :read) ||
       (self.context.is_a?(AssessmentQuestion) && self.context.user_can_see_through_quiz_question?(user, session))
   end
 
   set_policy do
     given { |user, session|
-      self.context.grants_right?(user, session, :manage_files) &&
+      self.context&.grants_right?(user, session, :manage_files) &&
         !self.associated_with_submission? &&
         (!self.folder || self.folder.grants_right?(user, session, :manage_contents))
     }
     can :delete and can :update
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    given { |user, session| self.context&.grants_right?(user, session, :manage_files) }
     can :read and can :create and can :download and can :read_as_admin
 
     given { self.public? }
     can :read and can :download
 
-    given { |user, session| self.context.grants_right?(user, session, :read) } #students.include? user }
+    given { |user, session| self.context&.grants_right?(user, session, :read) } #students.include? user }
     can :read
 
-    given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
+    given { |user, session| self.context&.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin
 
     given { |user, session|
@@ -1246,7 +1246,7 @@ class Attachment < ActiveRecord::Base
     }
     can :read and can :download
 
-    given { |user, session| self.context_type == 'Submission' && self.context.grant_right?(user, session, :comment) }
+    given { |user, session| self.context_type == 'Submission' && self.context&.grant_right?(user, session, :comment) }
     can :create
 
     given { |user, session|
