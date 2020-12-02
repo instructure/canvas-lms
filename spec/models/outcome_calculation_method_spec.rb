@@ -136,4 +136,11 @@ describe OutcomeCalculationMethod, type: :model do
       expect(calculation_method).to eq default
     end
   end
+
+  describe 'interaction with cache' do
+    it 'clears the account cache on save' do
+      expect(account).to receive(:clear_downstream_caches).with(:resolved_outcome_proficiency)
+      OutcomeProficiency.find_or_create_default!(account)
+    end
+  end
 end

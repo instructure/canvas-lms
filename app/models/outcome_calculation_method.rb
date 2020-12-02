@@ -55,6 +55,8 @@ class OutcomeCalculationMethod < ApplicationRecord
     message: "invalid calculation_int for this calculation_method"
   }
 
+  after_save :clear_cached_methods
+
   def as_json(options={})
     super(options.reverse_merge(include_root: false, only: [:id, :calculation_method, :calculation_int, :context_type, :context_id]))
   end
@@ -77,5 +79,11 @@ class OutcomeCalculationMethod < ApplicationRecord
     raise unless e.record.errors[:context_id] == ['has already been taken']
 
     retry
+  end
+
+  def clear_cached_methods
+    if context_type == 'Account'
+      context.clear_downstream_caches(:resolved_outcome_calculation_method)
+    end
   end
 end

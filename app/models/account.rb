@@ -81,7 +81,7 @@ class Account < ActiveRecord::Base
   has_many :progresses, :as => :context, :inverse_of => :context
   has_many :content_migrations, :as => :context, :inverse_of => :context
   has_many :sis_batch_errors, foreign_key: :root_account_id, inverse_of: :root_account
-  has_one :outcome_proficiency, as: :context, inverse_of: :context, dependent: :destroy
+  has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   has_many :auditor_authentication_records,
@@ -195,22 +195,28 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    if outcome_proficiency&.active?
-      outcome_proficiency
-    elsif parent_account
-      parent_account.resolved_outcome_proficiency
-    elsif self.feature_enabled?(:account_level_mastery_scales)
-      OutcomeProficiency.find_or_create_default!(self)
+    cache_key = [cache_key(:resolved_outcome_proficiency), cache_key(:account_chain)].cache_key
+    Rails.cache.fetch(cache_key) do
+      if outcome_proficiency&.active?
+        outcome_proficiency
+      elsif parent_account
+        parent_account.resolved_outcome_proficiency
+      elsif self.feature_enabled?(:account_level_mastery_scales)
+        OutcomeProficiency.find_or_create_default!(self)
+      end
     end
   end
 
   def resolved_outcome_calculation_method
-    if outcome_calculation_method&.active?
-      outcome_calculation_method
-    elsif parent_account
-      parent_account.resolved_outcome_calculation_method
-    elsif self.feature_enabled?(:account_level_mastery_scales)
-      OutcomeCalculationMethod.find_or_create_default!(self)
+    cache_key = [cache_key(:resolved_outcome_calculation_method), cache_key(:account_chain)].cache_key
+    Rails.cache.fetch(cache_key) do
+      if outcome_calculation_method&.active?
+        outcome_calculation_method
+      elsif parent_account
+        parent_account.resolved_outcome_calculation_method
+      elsif self.feature_enabled?(:account_level_mastery_scales)
+        OutcomeCalculationMethod.find_or_create_default!(self)
+      end
     end
   end
 

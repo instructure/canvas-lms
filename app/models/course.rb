@@ -222,7 +222,7 @@ class Course < ActiveRecord::Base
            dependent: :destroy
 
   has_many :conditional_release_rules, inverse_of: :course, class_name: "ConditionalRelease::Rule", dependent: :destroy
-  has_one :outcome_proficiency, as: :context, inverse_of: :context, dependent: :destroy
+  has_one :outcome_proficiency, -> { preload(:outcome_proficiency_ratings) }, as: :context, inverse_of: :context, dependent: :destroy
   has_one :outcome_calculation_method, as: :context, inverse_of: :context, dependent: :destroy
 
   prepend Profile::Association

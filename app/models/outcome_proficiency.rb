@@ -39,6 +39,7 @@ class OutcomeProficiency < ApplicationRecord
   resolves_root_account through: :context
 
   before_save :detect_changes_for_rubrics
+  after_save :clear_cached_proficiencies
   after_save :propagate_changes_to_rubrics
 
   alias original_destroy_permanently! destroy_permanently!
@@ -67,7 +68,7 @@ class OutcomeProficiency < ApplicationRecord
   def replace_ratings(ratings)
     # update existing ratings & create any new ratings
     ratings.each_with_index do |val, idx|
-      if idx <= outcome_proficiency_ratings.count - 1
+      if idx <= outcome_proficiency_ratings.size - 1
         outcome_proficiency_ratings[idx].assign_attributes(val.to_hash.symbolize_keys)
       else
         outcome_proficiency_ratings.build(val)
@@ -93,7 +94,7 @@ class OutcomeProficiency < ApplicationRecord
   end
 
   def mastery_points
-    outcome_proficiency_ratings.where(mastery: true).first.points
+    outcome_proficiency_ratings.find(&:mastery).points
   end
 
   def self.default_ratings
@@ -152,6 +153,12 @@ class OutcomeProficiency < ApplicationRecord
     end
   end
 
+  def clear_cached_proficiencies
+    if context_type == 'Account'
+      context.clear_downstream_caches(:resolved_outcome_proficiency)
+    end
+  end
+
   def detect_changes_for_rubrics
     @update_rubrics = self.changed_for_autosave?
   end
@@ -161,17 +168,22 @@ class OutcomeProficiency < ApplicationRecord
     return unless @update_rubrics
 
     @update_rubrics = false
-    delay_if_production(strand: "update_rubrics_from_mastery_scales_#{global_id}").update_associated_rubrics
+
+    self.class.connection.after_transaction_commit do
+      delay_if_production(strand: "update_rubrics_from_mastery_scales_#{global_id}").update_associated_rubrics
+    end
   end
 
   def update_associated_rubrics
     updateable_rubric_scopes.each do |rubric_scope|
-      updateable = rubric_scope.
-        active.
-        aligned_to_outcomes.
-        unassessed.
-        with_at_most_one_association
-      updateable.find_each(&:update_mastery_scales)
+      rubric_scope.in_batches do |batch|
+        updateable = batch.
+          active.
+          aligned_to_outcomes.
+          unassessed.
+          with_at_most_one_association
+        updateable.each(&:update_mastery_scales)
+      end
     end
   end
 

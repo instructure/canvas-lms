@@ -264,12 +264,8 @@ class Rubric < ActiveRecord::Base
     mastery_scale = context.resolved_outcome_proficiency
     return if mastery_scale.nil?
 
-    points_possible = mastery_scale.points_possible
-    mastery_points = mastery_scale.mastery_points
-    proficiency_ratings = mastery_scale.outcome_proficiency_ratings
-
     self.data.each do |criterion|
-      update_criterion_from_mastery_scales(criterion, points_possible, mastery_points, proficiency_ratings)
+      update_criterion_from_mastery_scale(criterion, mastery_scale)
     end
     if self.data_changed?
       self.points_possible = total_points_from_criteria(self.data)
@@ -277,12 +273,26 @@ class Rubric < ActiveRecord::Base
     end
   end
 
-  def update_criterion_from_mastery_scales(criterion, points_possible, mastery_points, proficiency_ratings)
-    return unless criterion[:learning_outcome_id].present?
+  def criterion_needs_update?(criterion, mastery_scale)
+    return false if criterion[:learning_outcome_id].blank?
 
-    criterion[:points] = points_possible
-    criterion[:mastery_points] = mastery_points
-    criterion[:ratings] = proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
+    return true if criterion[:points] != mastery_scale.points_possible
+    return true if criterion[:mastery_points] != mastery_scale.mastery_points
+    return true if criterion[:ratings]&.length != mastery_scale.outcome_proficiency_ratings.length
+
+    criterion[:ratings].zip(mastery_scale.outcome_proficiency_ratings).any? do |criterion_rating, proficiency_rating|
+      criterion_rating[:description] != proficiency_rating.description ||
+        criterion_rating[:long_description] != '' ||
+        criterion_rating[:points] != proficiency_rating.points
+    end
+  end
+
+  def update_criterion_from_mastery_scale(criterion, mastery_scale)
+    return unless criterion_needs_update?(criterion, mastery_scale)
+
+    criterion[:points] = mastery_scale.points_possible
+    criterion[:mastery_points] = mastery_scale.mastery_points
+    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
   end
 
   def update_learning_outcome_criteria(outcome)
