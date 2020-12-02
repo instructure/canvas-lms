@@ -43,6 +43,7 @@ USER docker
 RUN mkdir -p /home/docker/gergich
 RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
   cp -rf /tmp/src/. /usr/src/app
+RUN cp -rf config/docker-compose.override.yml.example /usr/src/app/docker-compose.override.yml
 EOF
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
@@ -62,6 +63,18 @@ set -ex
 if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
   message="This commit is built upon commits not currently merged in \$GERRIT_BRANCH. Ensure that your dependent patchsets are merged first!\\n"
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"warn\",\"message\":\"\$message\"}"
+fi
+
+# when modifying Dockerfile or Dockerfile.jenkins*, Dockerfile.template must also be modified.
+ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
+ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
+if ! git diff --exit-code Dockerfile; then
+  message="This commit makes changes to Dockerfile but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
+  gergich comment "{\"path\":\"\Dockerfile\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+if ! git diff --exit-code Dockerfile.jenkins; then
+  message="This commit makes changes to Dockerfile.jenkins but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
+  gergich comment "{\"path\":\"\Dockerfile.jenkins\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'"
