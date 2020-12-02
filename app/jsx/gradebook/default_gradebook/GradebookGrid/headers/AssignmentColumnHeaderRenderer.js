@@ -54,7 +54,7 @@ function getProps(column, gradebook, options) {
   const assignment = gradebook.getAssignment(column.assignmentId)
 
   const gradeSortDataLoaded =
-    gradebook.contentLoadStates.assignmentsLoaded &&
+    gradebook.assignmentsLoadedForCurrentView() &&
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
@@ -121,8 +121,6 @@ function getProps(column, gradebook, options) {
         }
       }
     },
-
-    includeSpeedGraderMenuItem: gradebook.options.include_speed_grader_in_assignment_header_menu,
 
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,

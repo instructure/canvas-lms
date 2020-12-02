@@ -22,13 +22,14 @@ require "optparse"
 require_relative "./docker_utils"
 
 class DockerfileWriter
-  attr_reader :env, :compose_files, :in_file, :out_file
+  attr_reader :env, :compose_files, :in_file, :out_file, :out_file_suffix
 
   def initialize(env:, compose_files:, in_file:, out_file:)
     @env = env
     @compose_files = compose_files
     @in_file = in_file
     @out_file = out_file
+    @out_file_suffix = ''
   end
 
   def production?
@@ -51,9 +52,34 @@ class DockerfileWriter
     STR
   end
 
-  def run()
-    File.open(out_file, "w") do |f|
-      f.write eval(Erubi::Engine.new(File.read(in_file)).src, nil, in_file)
+  def set_file_suffix(suffix)
+    @out_file_suffix = suffix
+  end
+
+  class SuffixedStringWriter
+    attr_reader :parent, :contents
+
+    def initialize(parent)
+      @contents = {}
+      @parent = parent
+    end
+
+    def <<(obj)
+      if @contents[parent.out_file_suffix].nil?
+        @contents[parent.out_file_suffix] = String.new
+      end
+
+      @contents[parent.out_file_suffix] << obj
+    end
+  end
+
+  def run
+    contents = eval(Erubi::Engine.new(File.read(in_file), {:bufval => 'SuffixedStringWriter.new(self)'}).src + ";_buf.contents")
+
+    contents.each do |k, v|
+      File.open(k.empty? ? out_file : "#{out_file}.#{k}", "w") do |f|
+        f.write "#{v.strip!}\n"
+      end
     end
   end
 

@@ -16,6 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!select_content_dialog'
+
 export default class {
   static contentPlacements = ['resource_selection']
 
@@ -28,5 +30,19 @@ export default class {
       this.contentPlacements.some(p => Object.keys(placements).includes(p)) ||
       this.contentMessageTypes.includes(message_type)
     )
+  }
+
+  static errorForUrlItem(item, expectedType = 'LtiLinkItem') {
+    if (item['@type'] !== expectedType) {
+      return I18n.t('Error: The tool returned an invalid content type "%{contentType}"', {
+        contentType: item['@type']
+      })
+    }
+
+    if (!item.url) {
+      return I18n.t('Error: The tool did not return a URL to Canvas')
+    }
+
+    return I18n.t('Error embedding content from tool')
   }
 }

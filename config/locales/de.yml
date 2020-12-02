@@ -175,6 +175,7 @@ de:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} und {b} dürfen nicht gemeinsam verwendet werden."
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Bei dieser Berechnungsmethode wird kein Berechnungswert verwendet."
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Ein Canvas-Sicherheitstoken wurde soeben für Ihr Konto generiert. Falls Sie ein Benutzertoken beantragt haben, müssen Sie nichts weiter tun. Falls Sie kein Token beantragt haben oder Ihre Canvas-Zugriffstokens verwalten möchten, können Sie dies hier tun:"
+  a_few_seconds_ago_e43118d: "vor wenigen Sekunden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Es gibt bereits eine Datei namens %{itemName} in diesem Ordner."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Es gibt bereits eine Datei namens „%{name}“. Möchten Sie die vorhandene Datei ersetzen?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Es gibt bereits eine Datei namens „%{name}“ in diesem Ordner. Möchten Sie die vorhandene Datei ersetzen?"
@@ -2449,6 +2450,7 @@ de:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Beim Aktualisieren der Kompetenzeinstufungen ist ein Fehler aufgetreten: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Beim Aktualisieren der Kompetenzeinstufungen ist ein Fehler aufgetreten."
   an_error_occurred_updating_this_assignment_21287c7e: "Fehler beim Aktualisieren dieser Aufgabe"
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "Beim Klonen des Gruppensets ist ein Fehler aufgetreten."
   an_error_occurred_when_saving_the_group_536c8f66: "Beim Speichern der Gruppe ist ein Fehler aufgetreten."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Beim Festlegen des Nutzungsrechts für %{filename} ist ein Fehler aufgetreten"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Beim Versuch, Turnitin zu kontaktieren, ist ein Fehler aufgetreten."
@@ -2927,6 +2929,7 @@ de:
     scores_lower_than_the_average: "Punktzahlen unterhalb des Durchschnitts von %{average}"
     total_graded_submissions: "Benotete Abgaben gesamt:"
   assignment_details_expanded_20c6f0c7: "Aufgabendetails eingeblendet"
+  assignment_details_updated_493f410b: "Aufgabendetails aktualisiert"
   assignment_does_not_exist_74178c34: "Aufgabe ist nicht vorhanden."
   assignment_edit_6dced39f: Aufgabenbearbeitung
   assignment_enhancements_student_557372ab: "Aufgabenerweiterungen - Student"
@@ -5050,6 +5053,8 @@ de:
   client_id_cb2502af: Client-ID
   client_id_is_required_1afd54d1: "Client-ID ist erforderlich"
   clone_group_set_c2a40e15: "Gruppenset klonen"
+  clone_groupcategoryname_ef85ddb8: "%{groupCategoryName} (klonen)"
+  cloning_group_set_813b06f5: "Gruppenset klonen"
   close_17f50799: schließen
   close_and_return_to_canvas_80544344: "Schließen und zu Canvas zurückkehren"
   close_d634289d: Schließen
@@ -5460,6 +5465,7 @@ de:
   confirm_dialog_component: 
     ok: OK
   confirm_edit_outcome_a9746c99: "Ergebnisänderung bestätigen"
+  confirm_mastery_scales_c6ef2169: "Leistungszielmaßstäbe bestätigen"
   confirm_qr_code_display_49664fa3: "Anzeige des QR-Codes bestätigen"
   confirm_removal_a9bb889: "Entfernen bestätigen"
   confirm_reservation_removal_e6350e7c: "Reservierungsstornierung bestätigen"
@@ -6458,6 +6464,7 @@ de:
   count_points_4735a2e8: 
     one: "1 Punkt"
     other: "%{count} Punkte"
+  count_posted_b92a9562: "%{count} gepostet"
   count_posts_added_fa55ce4: 
     one: "%{count} Post hinzugefügt"
     other: "%{count} Posts hinzugefügt"
@@ -7940,6 +7947,7 @@ de:
   delete_this_answer_f1802eaa: "Diese Antwort löschen"
   delete_this_collaboration_4f20b698: "Diese Arbeitsgruppe löschen"
   delete_this_feed_67d5d924: "Diesen Feed löschen"
+  delete_this_file_683804a1: "Diese Datei löschen"
   delete_this_key_70f74aa1: "Diesen Schlüssel löschen"
   delete_this_module_20d54791: "Dieses Modul löschen"
   delete_this_page_509f2baf: "Diese Seite löschen"
@@ -7959,6 +7967,10 @@ de:
   deleted_content_exceptions_237e809d: "Gelöschte Content-Ausnahmen:"
   deleted_content_referenced_in_this_resource_e42d1998: "Content löschen, auf den diese Ressource Bezug nimmt:"
   deleting_6421031e: "Wird gelöscht ..."
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      Einer Abgabedatei wird in der Regel nur gelöscht, falls ein Student unangemessenes oder privates Material postet.
+      
+      Diese Aktion kann nicht rückgängig gemacht werden. Möchten Sie %{file} wirklich löschen?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Mit dem Löschen eines Benutzers werden alle seine E-Portfolios vernichtet. E-Portfolios können alternativ individuell als „Spam“ oder als „Sicher“ markiert werden, um ihre Sichtbarkeit zu modifizieren."
   deleting_assignment_22d5851d: "Löschen der Aufgabe"
   delicious_7f9ac66f: Delicious
@@ -9389,6 +9401,7 @@ de:
   error_adding_canvas_file_to_submission_draft_de258021: "Fehler beim Hinzufügen einer Canvas-Datei zum Abgabeentwurf"
   error_adding_files_to_submission_draft_6acac337: "Fehler beim Hinzufügen von Dateien zum Abgabeentwurf"
   error_associating_assignment_assignment_name_with__d92e9acf: "Fehler beim Verknüpfen von „%{assignment_name}“ mit einem LTI-Tool"
+  error_deleting_file_551dc16e: "Fehler beim Löschen von %{file}"
   error_deleting_name_reason_11f9d399: "Fehler beim Löschen von %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fehler beim Duplizieren des Moduls"
   error_during_group_creation_f232994b: "Fehler beim Erstellen der Gruppe"
@@ -11210,6 +11223,7 @@ de:
   group_roster_1846bf84: Gruppenteilnehmerliste
   group_saved_successfully_fcd5ca66: "Die Gruppe wurde erfolgreich gespeichert."
   group_select_330df8bd: Gruppenauswahl
+  group_set_cloned_successfully_3e1a1497: "Gruppenset geklont"
   group_set_name_2aed2347: "Name des Gruppensets"
   group_settings: 
     invitation_sent: "Einladung versandt"
@@ -12130,6 +12144,7 @@ de:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Verbesserung der Erkennbarkeit von Drag-and-Drop in Dateien"
   improved_outcomes_management_4692f886: "Verbesserte Lernzieleverwaltung"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbesserte visuelle Erinnerungen, um Kursleiter zur Veröffentlichung von Kurse zu ermutigen"
+  in_a_few_seconds_538ddff3: "in wenigen Sekunden"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link} klicken Studenten auf %{bad_link} zu einer nicht existenten Seite in Ihrem Kurs."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link} klicken Studenten auf %{bad_link} zu Content eines anderen Kurses."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "In %{asset_link} klicken Studenten auf %{bad_link}, um zu Content zu gelangen, auf den sie keinen Zugriff haben."
@@ -12137,6 +12152,7 @@ de:
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "In Fällen, wenn dies verfügbar ist, den RCE aus einem Canvas Rich-Content Dienst laden"
   in_class_23eeca38: In-Class
   in_closed_grading_period_dc717846: "Im abgeschlossenen Benotungszeitraum"
+  in_less_than_a_minute_c8595a28: "in weniger als einer Minute"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Um den Vorgang abzuschließen, werden Sie zu einer Anmeldeseite weitergeleitet, wo Sie sich mit den Anmeldedaten Ihres Kindes anmelden müssen."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Um eine größere Zahl Ergebnisse auf einmal zu importieren oder Ihre vorhandenen Ergebnisse zu aktualisieren, folgen Sie bitte *dem CSV-Format*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Produktbegleitende Schulungen und Rundgänge für Lehrer"
@@ -12685,6 +12701,7 @@ de:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} Benachrichtigungen gefunden"
   length_results_found_3afd01e5: "%{length} Ergebnisse gefunden"
+  less_than_a_minute_ago_9f45e2a5: "vor weniger als einer Minute"
   let_students_see_the_correct_answers_dacc2faf: "Studenten die richtigen Antworten zeigen"
   let_students_see_their_quiz_responses_fbc07d14: "Studenten die eigenen Quiztest-Antworten anzeigen"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Die Studierenden ihre Antworten sehen lassen (Falsche Fragen werden im Studenten-Feedback gekennzeichnet)."
@@ -17507,6 +17524,7 @@ de:
   post_to_961f8937: "Posten an"
   post_to_students_b02df196: "Den Studenten mitteilen"
   post_types_93ff86d9: Veröffentlichungsarten
+  posted_455862b9: Geposted
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Gepostet am:"
   posted_to_student_861beec9: "Dem Studenten gepostet"
@@ -19834,6 +19852,10 @@ de:
       Ersetzt die bestehende Abbildung der mathematischen Gleichung plus die versteckten MathML
       durch eine MathJax-formatierte Version Dies verbessert die Zugänglichkeit
       und viele Optionen für den Leser, um mit der Gleichung auf der Seite zu interagieren.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Ersetzt die bestehende Abbildung der mathematischen Gleichung sowie ihrer versteckten MathML
+      durch eine MathJax-verarbeitete Version Diese Änderung verbessert die Zugänglichkeit
+      und viele Optionen für den Leser, mit der Gleichung auf der Seite zu interagieren.
   reply_389d6fb9: Antworten
   reply_from_name: "%{name} über Canvas-Benachrichtigungen"
   reply_to_comment_72d96728: "Auf Kommentar antworten"
@@ -20340,7 +20362,7 @@ de:
         download_current_scores: "Aktuelle Punktzahlen herunterladen (.csv)"
         grading_history: "Notenbuchverlauf anzeigen"
         hide_student_names_label: "Namen der Studenten ausblenden"
-        include_ungraded_assignments: "Nicht benotete als 0 behandeln"
+        include_ungraded_assignments: "Unbenotete als 0 anzeigen"
         set_group_weights: "Gruppengewichtungen festlegen"
         show_concluded_enrollments_label: "Abgeschlossene Einschreibungen anzeigen"
         show_notes: "Anmerkungen in Informationen zum Studenten anzeigen"
@@ -22402,6 +22424,7 @@ de:
       student_support_description: "Ihr Kursleiter sollte Ihr erster Ansprechpartner sein. Er/Sie kann Ihre Networking Academy-Fragen beantworten oder sich für Sie an das Support-Desk wenden. Sie können Ihren Kursleiter über die Posteingangsfunktion erreichen."
       support_desk_livechat: Supportdesk-Livechat
   support_favorite_lti_tools_in_the_rce_1680436d: "Unterstützung bevorzugter LTI-Tools im RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Support für LaTex mathematische Gleichungen fast überall"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Schweden
@@ -22696,7 +22719,7 @@ de:
   the_group_groupname_was_selected_because_the_previ_e080c168: "Die Gruppe „%{groupName}“ wurde ausgewählt, weil die zuvor ausgewählte Gruppe keine Studenten enthält. Sie können die ausgewählte Gruppe im Notenbuch ändern."
   the_group_groupname_was_selected_because_the_stude_bcf7ba7c: "Die Gruppe „%{groupName}“ wurde ausgewählt, weil der von Ihnen gewünschte Student nicht in der zuvor ausgewählten Gruppe ist. Sie können die ausgewählte Gruppe im Notenbuch ändern."
   the_imported_question_text_for_this_question_was_t_83b4e6fb: "Der importierte Fragetext für diese Frage war zu lang."
-  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Der Importeur migriert von API 3 nach API 4.1. Die Anmeldedaten werden sich nicht ändern, aber Sie sollten sicherstellen, dass Ihr Konto bis Februar 2021 Zugriff auf Version 4.1 hat."
+  the_importer_will_be_migrating_from_api_v3_to_v4_1_e7550082: "Der Importeur migriert von API 3 nach API 4.1. Die Anmeldedaten werden sich nicht ändern, aber Sie sollten sicherstellen, dass Ihr Konto bis Februar 2021 Zugriff auf Version 4.1 hat."
   the_institution_you_logged_in_from_is_not_configur_5ceac41: "Die Institution, über die Sie sich angemeldet haben, ist für dieses Konto nicht konfiguriert."
   the_launched_tool_returned_an_invalid_resource_for_24512878: "Das gestartete Tool hat eine ungültige Ressource für diese Aufgabe zurückgegeben."
   the_link_you_used_has_expired_click_forgot_passwor_80569899: "Der verwendete Link ist abgelaufen. Wenn Sie auf „Kennwort vergessen?“ klicken, erhalten Sie einen neuen Link, um das Kennwort zurückzusetzen."
@@ -22919,6 +22942,7 @@ de:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Diese Aufgabe wird für Ihre Note nicht mehr berücksichtigt."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Diese Anlage wurde vom Autor zurückgenommen."
   this_code_expires_in_timefromnow_ec7ccef4: "Dieser Code läuft in %{timeFromNow} ab."
+  this_code_expires_timefromnow_877a5225: "Dieser Code läuft in %{timeFromNow} ab."
   this_code_has_expired_41f76642: "Dieser Code ist abgelaufen."
   this_conference_may_be_recorded_f76deeeb: "Diese Konferenz wird u. U. aufgezeichnet."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dieser Kurs kann derzeit nicht zum Kursmenü hinzugefügt werden."
@@ -23076,6 +23100,8 @@ de:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Hiermit können Sie Canvas authentifizieren, um Noten im SIS zu veröffentlichen."
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Hiermit werden diese Änderungen auf Ihr gesamtes Konto angewendet. Möchten Sie wirklich fortfahren?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Hiermit wird dieses Design auf Ihr gesamtes Konto angewendet. Möchten Sie wirklich fortfahren?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "Dies aktualisiert alle Konto- und Kursstufen-Bewertungsschemata, die an Leistungszielmaßstäbe auf Kontoebene gebunden sind und noch nicht bewertet wurden."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Dies aktualisiert alle Bewertungsschemata, die auf Lernziele innerhalb dieses Kurses ausgerichtet sind, die noch nicht bewertet wurden."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dies aktualisiert alle Rubriken mit diesem Ergebnis, die noch nicht bewertet wurden."
   threshold_in_hours_to_notify_students_within_f33820aa: "Schwellenwert (in Stunden) für die Benachrichtigung der Studenten innerhalb"
   threshold_pts_45f0e5d8: "Schwellenwert: %{pts}"
@@ -24005,6 +24031,7 @@ de:
   updated_current_grade_to_currentgrade_bfe2ea14: "Aktualisierte Note für %{currentGrade}"
   updated_group_group_name_727b1d98: "Aktualisierte Gruppe %{group_name}"
   updated_math_equation_display_583671a8: "Anzeigen der aktualisierten mathematischen Gleichung"
+  updated_math_equation_handling_b84509d1: "Aktualisierte Behandlung mathematischer Gleichung"
   updated_permissions_page_f2e91060: "Aktualisierte Berechtigungsseite"
   updated_terms_of_service_82f34148: "Aktualisierte Servicebedingungen"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Aktualisierte UI zur Suche und Anzeige von Benutzern und Kursen innerhalb eines Kontos."
@@ -25145,6 +25172,7 @@ de:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Sie haben keinen Zugriff auf das angeforderte Quiz."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Sie haben keinen Zugriff auf die angeforderte Ressource."
   you_do_not_have_permission_to_change_this_488c536: "Sie sind nicht berechtigt, zu dieser Änderung"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Sie sind nicht berechtigt, %{file} zu löschen. Wenden Sie sich an Ihren Kontoadministrator."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "Sie sind nicht berechtigt, diese Aufgabe zu ändern."
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Sie sind nicht berechtigt, Benutzer einzuladen, die noch nicht existieren."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Sie sind nicht berechtigt, diesen Kurs zu veröffentlichen."
@@ -25282,7 +25310,7 @@ de:
   your_assignment_list_can_now_be_found_on_the_calen_9785b5ac: "Sie finden die Liste mit Ihren Aufgaben jetzt auf der Seite *Kalender*."
   your_assignments_list_has_improved_3eded80e: "Die Liste *Aufgaben* wurde verbessert."
   your_assignments_will_show_here_listed_by_due_date_18dc880f: "Ihre Aufgaben werden hier nach Fälligkeitsdatum angezeigt."
-  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Die Konnektivität Ihres Browsers kann langsam oder instabil sein. Trotz der Trenndauer Ihres Browsers werden Ihre Antworten bei diesem Versuch für zusätzliche 5 Minuten über die ursprüngliche Frist hinaus aufgezeichnet."
+  your_browser_connectivity_may_be_slow_or_unstable__97c1f4c5: "Die Konnektivität Ihres Browsers kann langsam oder instabil sein. Trotz der Trenndauer Ihres Browsers werden Ihre Antworten bei diesem Versuch für zusätzliche 5 Minuten über die ursprüngliche Frist hinaus aufgezeichnet."
   your_browser_does_not_meet_the_minimum_requirement_2fa7c11f: "Ihr Browser erfüllt die Mindestanforderungen für Canvas nicht. Bei der *Canvas Community* erhalten Sie eine komplette Liste aller unterstützten Browser."
   your_comment_was_auto_saved_as_a_draft_c49d3510: "Ihr Kommentar wurde automatisch als Entwurf gespeichert."
   your_content_has_been_exported_bbb57764: "Ihr Inhalt wurde exportiert."

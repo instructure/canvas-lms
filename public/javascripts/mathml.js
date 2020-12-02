@@ -63,17 +63,15 @@ const mathml = {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
-          if (ENV?.FEATURES?.new_math_equation_handling) {
-            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
-              catchEquationImages(message[1])
-            })
-            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
-              removeStrayEquationImages(message[1])
-              message[1]
-                .querySelectorAll('.math_equation_latex')
-                .forEach(m => m.classList.add('fade-in-equation'))
-            })
-          }
+          window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
+            mathImageHelper.catchEquationImages(message[1])
+          })
+          window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+            mathImageHelper.removeStrayEquationImages(message[1])
+            message[1]
+              .querySelectorAll('.math_equation_latex')
+              .forEach(m => m.classList.add('fade-in-equation'))
+          })
           // leaving this here so I don't have to keep looking up how to see all messages
           // window.MathJax.Hub.Startup.signal.Interest(function (message) {
           //   console.log('>>> Startup:', message[0])
@@ -150,40 +148,45 @@ const mathml = {
   processNewMathEventName: 'process-new-math'
 }
 
-export function getImageEquationText(img) {
-  let equation_text = img.getAttribute('data-equation-content') || img.getAttribute('title')
-  if (!equation_text) {
-    const srceq = img.getAttribute('src').split('/equation_images/')[1]
-    if (srceq) {
-      equation_text = decodeURIComponent(decodeURIComponent(srceq))
-    }
-  }
-  return equation_text
-}
-
-function catchEquationImages(refnode) {
-  // find equation images and replace with inline LaTeX
-  const eqimgs = refnode.querySelectorAll('img.equation_image')
-  if (eqimgs.length > 0) {
-    eqimgs.forEach(img => {
-      const equation_text = getImageEquationText(img)
-      if (equation_text) {
-        const mathtex = document.createElement('span')
-        mathtex.setAttribute('class', 'math_equation_latex')
-        mathtex.textContent = `\\(${equation_text}\\)`
-        if (img.nextSibling) {
-          img.parentElement.insertBefore(mathtex, img.nextSibling)
+const mathImageHelper = {
+  catchEquationImages(refnode) {
+    // find equation images and replace with inline LaTeX
+    const eqimgs = refnode.querySelectorAll('img.equation_image')
+    if (eqimgs.length > 0) {
+      eqimgs.forEach(img => {
+        if (img.complete) {
+          // only process loaded images
+          img.setAttribute('mathjaxified', '')
+          const equation_text = img.getAttribute('data-equation-content')
+          const mathtex = document.createElement('span')
+          mathtex.setAttribute('class', 'math_equation_latex')
+          mathtex.textContent = `\\(${equation_text}\\)`
+          if (img.nextSibling) {
+            img.parentElement.insertBefore(mathtex, img.nextSibling)
+          } else {
+            img.parentElement.appendChild(mathtex)
+          }
         } else {
-          img.parentElement.appendChild(mathtex)
+          img.addEventListener('load', this.dispatchProcessNewMathOnLoad)
         }
+      })
+      return true
+    }
+  },
+
+  removeStrayEquationImages(refnode) {
+    const eqimgs = refnode.querySelectorAll('img.equation_image')
+    eqimgs.forEach(img => {
+      if (img.hasAttribute('mathjaxified')) {
+        img.parentElement.removeChild(img)
       }
     })
-    return true
+  },
+
+  dispatchProcessNewMathOnLoad(event) {
+    event.target.removeEventListener('load', this.dispatchProcessNewMathOnLoad)
+    window.dispatchEvent(new Event('process-new-math'))
   }
-}
-function removeStrayEquationImages(refnode) {
-  const eqimgs = refnode.querySelectorAll('img.equation_image')
-  eqimgs.forEach(img => img.parentElement.removeChild(img))
 }
 
 // TODO: if anyone firing the event ever needs a callback,
@@ -196,4 +199,4 @@ function handleNewMath() {
 
 window.addEventListener('process-new-math', debounce(handleNewMath, 500))
 
-export default mathml
+export {mathml as default, mathImageHelper}

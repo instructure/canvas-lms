@@ -44,6 +44,22 @@ describe NotificationEndpoint do
       ne = @at.notification_endpoints.create!(token: 'token')
       expect(ne.arn).to eq 'existing_arn'
     end
+
+    it "tries to create again if endpoint goes missing (race condition with a delete)" do
+      create_tries = 0
+      allow(@sns_client).to receive(:create_platform_endpoint) do
+        if create_tries <= 0
+          create_tries += 1
+          raise Aws::SNS::Errors::InvalidParameter.new(nil, "Invalid parameter: Token Reason: Endpoint existing_arn already exists with the same Token, but different attributes.")
+        end
+        { endpoint_arn: 'new-arn' }
+      end
+      expect(@sns_client).to receive(:set_endpoint_attributes)
+        .with(endpoint_arn: 'existing_arn', attributes: {'CustomUserData' => @at.global_id.to_s})
+        .and_raise(Aws::SNS::Errors::NotFound.new(nil, "deleted"))
+      ne = @at.notification_endpoints.create!(token: 'token')
+      expect(ne.arn).to eq 'new-arn'
+    end
   end
 
   describe "#push_json" do

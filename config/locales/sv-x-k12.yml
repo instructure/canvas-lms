@@ -169,6 +169,7 @@ sv-x-k12:
   a_and_b_cannot_be_used_together_77ee6a2a: "det går inte att använda {a} och {b} tillsammans"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Ett beräkningsvärde används inte i den här beräkningsmetoden"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "En Canvas-säkerhetstoken genererades precis för ditt konto. Om du begärde en användartoken behövs ingen åtgärd. Om du inte begärde en token eller om du vill hantera din Canvas-tillgångstoken kan du göra det här:"
+  a_few_seconds_ago_e43118d: "för några sekunder sedan"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med namnet %{itemName} finns redan i den här mappen."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Det finns redan en fil med namnet \"%{name}\". Vill du ersätta den befintliga filen?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Det finns redan en fil med namnet \"%{name}\" i den här mappen. Vill du ersätta den befintliga filen?"
@@ -2227,6 +2228,7 @@ sv-x-k12:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Ett fel inträffade under uppdatering av kompetensbedömningarna: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Ett fel inträffade under uppdatering av kompetensbedömningarna"
   an_error_occurred_updating_this_assignment_21287c7e: "Ett fel uppstod vid uppdatering av den här uppgiften."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "Ett fel inträffade när gruppuppsättningen skulle klonas."
   an_error_occurred_when_saving_the_group_536c8f66: "Ett fel inträffade när gruppen sparades."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Ett fel uppstod när användarens rätt för %{filename} ställdes in"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ett fel inträffade när Turnitin kontaktades."
@@ -2666,6 +2668,7 @@ sv-x-k12:
     scores_lower_than_the_average: "Resultat som är lägre än genomsnittet av %{average}"
     total_graded_submissions: "Totalt bedömda inlämningar:"
   assignment_details_expanded_20c6f0c7: "uppgiftsdetaljer expanderade"
+  assignment_details_updated_493f410b: "Uppgiftsinformationen har uppdaterats"
   assignment_does_not_exist_74178c34: "uppgiften finns inte"
   assignment_edit_6dced39f: Uppgiftsredigering
   assignment_enhancements_student_557372ab: "Uppgiftsförbättringar – elev"
@@ -4536,6 +4539,8 @@ sv-x-k12:
   client_id_cb2502af: "Klient ID"
   client_id_is_required_1afd54d1: "Klient-ID krävs"
   clone_group_set_c2a40e15: "Klona gruppuppsättning"
+  clone_groupcategoryname_ef85ddb8: "(Klon) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "Klonar gruppuppsättningen"
   close_17f50799: stäng
   close_and_return_to_canvas_80544344: "Stäng och gå tillbaka till Canvas"
   close_d634289d: Stäng
@@ -4900,6 +4905,7 @@ sv-x-k12:
   confirm_delete_announcements_3d83b69a: "Bekräfta radering av aviseringar"
   confirm_deletion_b2efe7d4: "Bekräfta borttagning"
   confirm_edit_outcome_a9746c99: "Bekräfta redigering av lärandemål"
+  confirm_mastery_scales_c6ef2169: "Bekräfta måluppfyllelseskalor"
   confirm_qr_code_display_49664fa3: "Bekräfta visning av QR-kod"
   confirm_removal_a9bb889: "Bekräfta borttagning"
   confirm_reservation_removal_e6350e7c: "Bekräfta borttagning av bokning"
@@ -5771,6 +5777,7 @@ sv-x-k12:
   count_points_4735a2e8: 
     one: "1 poäng"
     other: "%{count} poäng"
+  count_posted_b92a9562: "%{count} publicerade"
   count_posts_added_fa55ce4: 
     one: "%{count} inlägg tillagt"
     other: "%{count} inlägg tillagda"
@@ -7022,6 +7029,7 @@ sv-x-k12:
   delete_themename_8c4223a3: "Ta bort %{themeName}?"
   delete_this_answer_f1802eaa: "Radera det här svaret"
   delete_this_collaboration_4f20b698: "Ta bort det här samarbetet"
+  delete_this_file_683804a1: "Ta bort den här filen"
   delete_this_key_70f74aa1: "Ta bort den här nyckeln"
   delete_this_module_20d54791: "Radera modulen"
   delete_this_page_509f2baf: "Radera den här sidan"
@@ -7039,6 +7047,10 @@ sv-x-k12:
   deleted_content_exceptions_237e809d: "Undantag för borttaget innehåll:"
   deleted_content_referenced_in_this_resource_e42d1998: "Den här resursen har referenser till borttaget innehåll:"
   deleting_6421031e: "raderar ..."
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      En inlämningsfil tas typiskt endast bort när en elev publicerar olämpligt eller privat material.
+      
+      Åtgärden kan inte ångras. Vill du ta bort %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Om du raderar användare förstörs alla deras e-portföljer. E-portföljer kan antingen märkas som skräppost eller som säkra för att modifiera deras synlighet."
   deleting_assignment_22d5851d: "tar bort uppgiften"
   delicious_7f9ac66f: Delicious
@@ -8322,6 +8334,7 @@ sv-x-k12:
   error_adding_canvas_file_to_submission_draft_de258021: "Det gick inte att lägga till Canvas-filen till inlämningsutkastet"
   error_adding_files_to_submission_draft_6acac337: "Det gick inte att lägga till filer till inlämningsutkastet"
   error_associating_assignment_assignment_name_with__d92e9acf: "Ett fel inträffade när uppgiften ”%{assignment_name}” associerades med ett LTI-verktyg."
+  error_deleting_file_551dc16e: "Ett fel inträffade vid borttagning av %{file}"
   error_deleting_name_reason_11f9d399: "Fel vid radering av %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fel vid duplicering av modulen"
   error_during_group_creation_f232994b: "Ett fel inträffade när gruppen skapades"
@@ -9618,7 +9631,8 @@ sv-x-k12:
   group_roster_1846bf84: Grupplista
   group_saved_successfully_fcd5ca66: "Gruppen sparades"
   group_select_330df8bd: Gruppval
-  group_set_name_2aed2347: "Namn på gruppuppsättning"
+  group_set_cloned_successfully_3e1a1497: "Gruppuppsättningen klonades"
+  group_set_name_2aed2347: Gruppuppsättningsnamn
   group_weight_for_d46c5db4: "Gruppvikt för:"
   group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Det finns redan en grupp med ID:t %{guid} i en annan orelaterad kurs eller konto (%{name})"
   groups: 
@@ -10339,11 +10353,13 @@ sv-x-k12:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Bättre identifiering av dra- och släppfunktionen i Filer"
   improved_outcomes_management_4692f886: "Förbättrad hantering av lärandemål"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Förbättrade visuella påminnelser som uppmuntrar instruktörer att publicera kurser"
+  in_a_few_seconds_538ddff3: "om några sekunder"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "I %{asset_link}, klickar elever på %{bad_link} som pekar på en sida som inte finns i din kurs."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link}, klickar elever på %{bad_link} som pekar på innehåll i en annan kurs."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "I %{asset_link}, klickar elever på %{bad_link} som pekar på innehåll de inte kan komma åt."
   in_class_23eeca38: "I klass"
   in_closed_grading_period_dc717846: "I stängd bedömningsperiod"
+  in_less_than_a_minute_c8595a28: "om mindre än en minut"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "För att slutföra processen kommer du att omdirigeras till en inloggningssida där du måste logga in med ditt barns inloggningsuppgifter."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "För att importera en stor mängd lärandemål på en gång, eller för att uppdatera dina befintliga lärandemål, *använd dig av CSV-formatet*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Genomgång av produkten med hållpunkter för lärare"
@@ -10844,6 +10860,7 @@ sv-x-k12:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} aviseringar hittades"
   length_results_found_3afd01e5: "%{length} resultat hittades"
+  less_than_a_minute_ago_9f45e2a5: "för mindre än en minut sedan"
   let_students_see_the_correct_answers_dacc2faf: "Låt eleverna se de korrekta svaren"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Låt elever se deras quiz-svar (Felaktiga frågor kommer att markeras i elevens återkoppling)"
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Låt sajtens administratör välja upp till 2 LTI-appar som favoriter, som sedan kommer att visas i RCE:s verktygsfält"
@@ -15105,6 +15122,7 @@ sv-x-k12:
   post_to_961f8937: "Publicera för"
   post_to_students_b02df196: "Publicera till elever"
   post_types_93ff86d9: "Publicera typer"
+  posted_455862b9: Publicerade
   posted_on_e1010e1e: "Publicerad den:"
   posted_to_student_861beec9: "Publicerad för eleven"
   posting_grades_cd7cd758: "Publicerar omdömen"
@@ -17091,6 +17109,10 @@ sv-x-k12:
       Ersätter den befintliga bilden av ekvationen samt den dolda MathML
       med en MathJax formaterad version. Detta ökar tillgängligheten
       och ger läsaren många möjligheter att interagera med ekvationen på sidan.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Ersätter den befintliga bilden av ekvationen samt dess dolda MathML
+      med en MathJax behandlad version. Denna ändring ökar tillgängligheten
+      och ger läsaren många möjligheter att interagera med ekvationen på sidan.
   reply_389d6fb9: Svara
   reply_from_name: "%{name} via Canvas-aviseringar"
   reply_to_comment_72d96728: "Svara på kommentar"
@@ -17550,7 +17572,7 @@ sv-x-k12:
         download_current_scores: "Ladda ner nuvarande poäng (.csv)"
         grading_history: "Visa historik för bedömningsöversikt"
         hide_student_names_label: "Dölj elevnamn"
-        include_ungraded_assignments: "Betrakta ej bedömd som 0"
+        include_ungraded_assignments: "Visa ej bedömda som 0"
         show_concluded_enrollments_label: "Visa slutförda registreringar"
         show_notes: "Visa anteckningar i elevinfo"
         show_total_as_points: "Visa totalsummor som poäng på elevens bedömningssida"
@@ -19323,6 +19345,7 @@ sv-x-k12:
       student_support_description: "Din instruktör är din huvudkontaktperson De kan svara på dina frågor om Networking Academy eller kontakta supporten för din räkning. Du kan kontakta din instruktör via inkorgsfunktionen."
       support_desk_livechat: "Livechatt med supportdesk"
   support_favorite_lti_tools_in_the_rce_1680436d: "Stöd favorit-LTI-verktyg i RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Få stöd för LaTex matematiska ekvationer nästan överallt"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Sverige (+46)"
@@ -19782,6 +19805,7 @@ sv-x-k12:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Den här uppgiften kommer inte längre att räknas i din omdöme."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Denna bilaga har avpublicerats av skaparen."
   this_code_expires_in_timefromnow_ec7ccef4: "Den här koden går ut %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "Den här koden upphör att gälla %{timeFromNow}."
   this_code_has_expired_41f76642: "Koden har gått ut."
   this_conference_may_be_recorded_f76deeeb: "Konferensen kan spelas in."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Kursen kan inte läggas till i kursmenyn just nu."
@@ -19924,6 +19948,8 @@ sv-x-k12:
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "Detta kommer att påverka alla kunder. Är du säker?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Med det här kan du autentisera Canvas för att lägga upp omdömen på SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Det här kommer att tillämpa temat på hela ditt konto. Vill du fortsätta?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "Detta uppdaterar alla matriser på konto- och kursnivå som är knutna till måluppfyllelseskalor och som ännu inte har bedömts."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Detta uppdaterar alla matriser justerade till lärandemål inom den här kursen och som ännu inte har bedömts."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla matriser som använder detta lärandemål som ännu inte har utvärderats"
   threshold_in_hours_to_notify_students_within_f33820aa: "Tröskelvärde (i timmar) som elever ska aviseras inom"
   threshold_pts_45f0e5d8: "tröskel: %{pts}"
@@ -20807,6 +20833,7 @@ sv-x-k12:
   updated_2c1e8615: Uppdaterad
   updated_group_group_name_727b1d98: "Uppdaterade gruppen %{group_name}"
   updated_math_equation_display_583671a8: "Uppdatera visningen för ekvation"
+  updated_math_equation_handling_b84509d1: "Uppdaterad hantering av matematisk ekvation"
   updated_permissions_page_f2e91060: "Uppdaterad tillståndssida"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Uppdaterat användargränssnitt för sökning och visning av användare och kurser inom ett konto."
   updates_account_notification_preferences_ui_to_be__1765f66a: |-
@@ -21827,6 +21854,7 @@ sv-x-k12:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har inte tillgång till det begärda quizzet"
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Du har inte tillgång till den begärda resursen."
   you_do_not_have_permission_to_change_this_488c536: "Du har inte tillstånd att ändra detta"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Du har inte behörighet att ta bort %{file}. Kontakta din kontoadministratör."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "Du har inte behörighet att redigerade den här uppgiften"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Du har inte behörighet att bjuda in användare som inte redan finns."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har inte behörighet att publicera denna kursen."

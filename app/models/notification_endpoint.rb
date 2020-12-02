@@ -21,6 +21,8 @@
 require 'aws-sdk-sns'
 
 class NotificationEndpoint < ActiveRecord::Base
+  class FailedSnsInteraction < StandardError; end
+
   include Canvas::SoftDeletable
 
   belongs_to :access_token
@@ -72,6 +74,7 @@ class NotificationEndpoint < ActiveRecord::Base
 
   def create_platform_endpoint
     # try to create new or find existing with our access_token
+    retried = false
     begin
       response = sns_client.create_platform_endpoint(
         platform_application_arn: access_token.developer_key.sns_arn,
@@ -81,13 +84,32 @@ class NotificationEndpoint < ActiveRecord::Base
       self.arn = response[:endpoint_arn]
     rescue Aws::SNS::Errors::InvalidParameter => e
       # parse already existing with different access_token from the response message
+      Canvas::Errors.capture_exception(:push_notifications, e, :info)
       raise unless DIFFERENT_ATTRIBUTES_ERROR_REGEX.match(e.message)
       self.arn = $1
       # steal the endpoint by setting the access token
-      sns_client.set_endpoint_attributes(
-        endpoint_arn: self.arn,
-        attributes: {'CustomUserData' => access_token.global_id.to_s}
-      )
+      endpoint_updated = false
+      begin
+        sns_client.set_endpoint_attributes(
+          endpoint_arn: self.arn,
+          attributes: {'CustomUserData' => access_token.global_id.to_s}
+        )
+        endpoint_updated = true
+      rescue Aws::SNS::Errors::NotFound => ex
+        # there's a race condition if the endpoint we JUST found
+        # and are trying to update gets deleted by a different
+        # request in the same moment.  In this case we should
+        # try to create again, since the blocking endpoint is gone,
+        # but only once since if it's cyclical something strange
+        # is happening.
+        endpoint_updated = false
+        if retried
+          raise FailedSnsInteraction, "Unable to create or reassign SNS endpoint for access_token #{access_token.global_id.to_s}"
+        end
+        retried = true
+        Canvas::Errors.capture_exception(:push_notifications, ex, :info)
+      end
+      retry unless endpoint_updated
     end
   end
 

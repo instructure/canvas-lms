@@ -44,7 +44,9 @@ class FileBrowser extends React.Component {
     allowUpload: PropTypes.bool,
     selectFile: PropTypes.func.isRequired,
     contentTypes: PropTypes.arrayOf(PropTypes.string),
-    useContextAssets: PropTypes.bool
+    useContextAssets: PropTypes.bool,
+    searchString: PropTypes.string,
+    onLoading: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -67,6 +69,14 @@ class FileBrowser extends React.Component {
 
   componentDidMount() {
     this.getRootFolders()
+  }
+
+  componentDidUpdate() {
+    this.state.openFolders.forEach(fid => {
+      if (this.props.searchString !== this.state.collections[fid].searchString) {
+        this.getFolderData(fid)
+      }
+    })
   }
 
   getContextName(contextType) {
@@ -135,32 +145,60 @@ class FileBrowser extends React.Component {
   }
 
   getFolderData(id) {
-    const {collections} = this.state
-    if (!collections[id].locked) {
-      this.getPaginatedData(this.folderFileApiUrl(id, 'folders'), this.populateCollectionsList)
-      this.getPaginatedData(this.folderFileApiUrl(id), this.populateItemsList)
+    if (!this.state.collections[id].locked) {
+      this.setState(
+        (state, _props) => {
+          const collections = {...state.collections}
+          const collection = {...collections[id]}
+          collection.items = []
+          collection.searchString = this.props.searchString
+          collections[id] = collection
+          return {collections}
+        },
+        () => {
+          this.getPaginatedData(this.folderFileApiUrl(id, 'folders'), this.populateCollectionsList)
+          this.getPaginatedData(this.folderFileApiUrl(id), this.populateItemsList)
+        }
+      )
     }
   }
 
   getPaginatedData(url, callback) {
-    axios.get(url).then(response => {
-      callback(response.data)
-      const nextUrl = parseLinkHeader(response.headers.link).next
-      if (nextUrl) {
-        this.getPaginatedData(nextUrl, callback)
-      }
-    })
+    this.props.onLoading(true)
+    axios
+      .get(url)
+      .then(response => {
+        callback(response.data)
+        const nextUrl = parseLinkHeader(response.headers.link).next
+        if (nextUrl) {
+          this.getPaginatedData(nextUrl, callback)
+        } else {
+          this.props.onLoading(false)
+        }
+      })
+      .catch(error => {
+        this.props.onLoading(false)
+        /* eslint-disable no-console */
+        console.error('Error fetching data from API')
+        console.error(error)
+        /* eslint-enable no-console */
+      })
   }
 
   folderFileApiUrl(folderId, type = 'files') {
-    return `/api/v1/folders/${folderId}/${type}`
+    const search_term =
+      type === 'files' && this.props.searchString ? `&search_term=${this.props.searchString}` : ''
+    return `/api/v1/folders/${folderId}/${type}?per_page=50${search_term}`
   }
 
   populateCollectionsList = (folderList, opts = {}) => {
-    this.setState((state, _props) => {
+    this.setState((state, props) => {
       const newCollections = _.cloneDeep(state.collections)
       folderList.forEach(folder => {
-        const collection = this.formatFolderInfo(folder, opts)
+        const collection = this.formatFolderInfo(folder, {
+          ...opts,
+          searchString: props.searchString
+        })
         newCollections[collection.id] = collection
         const parent_id = folder.parent_folder_id || 0
         const collectionCollections = newCollections[parent_id].collections
@@ -279,23 +317,32 @@ class FileBrowser extends React.Component {
   }
 
   onFolderToggle = folder => {
-    return this.onFolderClick(folder.id, folder)
-  }
-
-  onFolderClick = (folderId, _folder) => {
-    this.setState((state, _props) => {
-      const collection = state.collections[folderId]
-      let newFolders = []
-      const {openFolders} = state
-      if (!collection.locked && openFolders.includes(folderId)) {
-        newFolders = newFolders.concat(openFolders.filter(id => id !== folderId))
-      } else if (!collection.locked) {
-        newFolders = newFolders.concat(openFolders)
-        newFolders.push(folderId)
-        collection.collections.forEach(id => this.getFolderData(id))
+    const folderId = folder.id
+    this.setState(
+      (state, _props) => {
+        const collection = state.collections[folderId]
+        let newFolders = []
+        let newCollections = state.collections
+        const {openFolders} = state
+        if (!collection.locked && openFolders.includes(folderId)) {
+          newFolders = newFolders.concat(openFolders.filter(id => id !== folderId))
+        } else if (!collection.locked) {
+          newFolders = newFolders.concat(openFolders)
+          newFolders.push(folderId)
+          newCollections = _.cloneDeep(state.collections)
+          newCollections[folderId] = collection
+        }
+        return {openFolders: newFolders, uploadFolder: folderId, collections: newCollections}
+      },
+      () => {
+        if (this.state.openFolders.includes(folderId)) {
+          const collection = this.state.collections[folderId]
+          if (!collection.locked) {
+            this.getFolderData(folderId)
+          }
+        }
       }
-      return {openFolders: newFolders, uploadFolder: folderId}
-    })
+    )
   }
 
   onFileClick = file => {
@@ -427,12 +474,11 @@ class FileBrowser extends React.Component {
             items={this.state.items}
             size="medium"
             onCollectionToggle={this.onFolderToggle}
-            onCollectionClick={this.onFolderClick}
             onItemClick={this.onFileClick}
             treeLabel={formatMessage('Folder tree')}
             rootId={0}
             showRootCollection={false}
-            defaultExpanded={this.state.openFolders}
+            expanded={this.state.openFolders}
             collectionIconExpanded={IconOpenFolderSolid}
             collectionIcon={IconFolderSolid}
             itemIcon={IconImageSolid}

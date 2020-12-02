@@ -326,6 +326,16 @@ module Lti
     register_expansion 'Context.sourcedId', [],
                        -> { @context.sis_source_id }
 
+    # return a string with a comma-separeted list of the context ids of the
+    # courses in reverse chronological order from which content has been copied
+    # @example
+    #   ```
+    #   "789,456,123"
+    #   ```
+    register_expansion 'Context.id.history', [],
+                       -> { lti_helper.recursively_fetch_previous_lti_context_ids },
+                       COURSE_GUARD
+
     # communicates the kind of browser window/frame where the Canvas has launched a tool
     # @launch_parameter launch_presentation_document_target
     # @example

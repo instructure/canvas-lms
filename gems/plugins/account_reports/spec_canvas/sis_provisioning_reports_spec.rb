@@ -1476,6 +1476,7 @@ describe "Default Account Reports" do
       parameters["group_categories"] = true
       parameters["group_membership"] = true
       parameters["xlist"] = true
+      expect(AccountReports).to receive(:message_recipient).once
       parsed = read_report("sis_export_csv", {params: parameters, header: true})
 
       expect(parsed["accounts.csv"]).to eq [["account_id", "parent_account_id", "name", "status"]]

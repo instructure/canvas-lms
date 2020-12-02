@@ -144,8 +144,7 @@ class GradebooksController < ApplicationController
       student_outcome_gradebook_enabled: @context.feature_enabled?(:student_outcome_gradebook),
       student_id: @presenter.student_id,
       students: @presenter.students.as_json(include_root: false),
-      outcome_proficiency: outcome_proficiency,
-      post_policies_enabled: @context.post_policies_enabled?
+      outcome_proficiency: outcome_proficiency
     }
 
     # This really means "if the final grade override feature flag is enabled AND
@@ -447,7 +446,6 @@ class GradebooksController < ApplicationController
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
-      include_speed_grader_in_assignment_header_menu: Account.site_admin.feature_enabled?(:include_speed_grader_in_assignment_header_menu),
       late_policy: @context.late_policy.as_json(include_root: false),
       login_handle_name: @context.root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
@@ -457,7 +455,6 @@ class GradebooksController < ApplicationController
       post_grades_feature: post_grades_feature?,
       post_grades_ltis: post_grades_ltis,
       post_manually: @context.post_manually?,
-      post_policies_enabled: @context.post_policies_enabled?,
 
       publish_to_sis_enabled: (
         !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
@@ -573,8 +570,6 @@ class GradebooksController < ApplicationController
       outcome_rollups_url: api_v1_course_outcome_rollups_url(@context, per_page: 100),
       post_grades_feature: post_grades_feature?,
       post_manually: @context.post_manually?,
-      post_policies_enabled: @context.post_policies_enabled?,
-
       publish_to_sis_enabled: (
         !!@context.sis_source_id && @context.allows_grade_publishing_by(@current_user) && gradebook_is_editable
       ),
@@ -616,6 +611,7 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
+        ACCOUNT_LEVEL_MASTERY_SCALES:  @context.root_account.feature_enabled?(:account_level_mastery_scales),
         outcome_proficiency: outcome_proficiency,
         sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
@@ -898,7 +894,9 @@ class GradebooksController < ApplicationController
           can_comment_on_submission: @can_comment_on_submission,
           show_help_menu_item: show_help_link?,
           help_url: help_link_url,
-          update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url)
+          update_submission_grade_url: context_url(@context, :update_submission_context_gradebook_url),
+          can_delete_attachments: @domain_root_account.grants_right?(@current_user, session, :become_user),
+          media_comment_asset_string: @current_user.asset_string
         }
         if grading_role_for_user == :moderator
           env[:provisional_select_url] = api_v1_select_provisional_grade_path(@context.id, @assignment.id, "{{provisional_grade_id}}")
@@ -1090,7 +1088,11 @@ class GradebooksController < ApplicationController
 
   def outcome_proficiency
     if @context.root_account.feature_enabled?(:non_scoring_rubrics)
-      @context.account.resolved_outcome_proficiency&.as_json
+      if @context.root_account.feature_enabled?(:account_level_mastery_scales)
+        @context.resolved_outcome_proficiency&.as_json
+      else
+        @context.account.resolved_outcome_proficiency&.as_json
+      end
     end
   end
 

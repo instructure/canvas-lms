@@ -177,6 +177,7 @@ en-AU:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} and {b} cannot be used together"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "A calculation value is not used with this calculation method"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "A Canvas security token was just generated for your account. If you requested a user token, no further action is necessary. If you did not request a token or would like to manage your canvas access tokens, you can do so here:"
+  a_few_seconds_ago_e43118d: "a few seconds ago"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "A file named %{itemName} already exists in this folder."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "A file named \"%{name}\" already exists. Do you want to replace the existing file?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "A file named \"%{name}\" already exists in this folder. Do you want to replace the existing file?"
@@ -2482,6 +2483,7 @@ en-AU:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "An error occurred updating the proficiency ratings: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "An error occurred updating the proficiency ratings"
   an_error_occurred_updating_this_assignment_21287c7e: "An error occurred updating this assignment."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "An error occurred when cloning the group set."
   an_error_occurred_when_saving_the_group_536c8f66: "An error occurred when saving the group."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "An error occurred when setting the usage right for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "An error occurred while attempting to contact Turnitin."
@@ -2962,6 +2964,7 @@ en-AU:
     scores_lower_than_the_average: "Scores lower than the average of %{average}"
     total_graded_submissions: "Total Marked Submissions:"
   assignment_details_expanded_20c6f0c7: "assignment details expanded"
+  assignment_details_updated_493f410b: "Assignment details updated"
   assignment_does_not_exist_74178c34: "assignment does not exist"
   assignment_edit_6dced39f: "Assignment Edit"
   assignment_enhancements_student_557372ab: "Assignment Enhancements - Student"
@@ -5101,6 +5104,8 @@ en-AU:
   client_id_cb2502af: "Client ID"
   client_id_is_required_1afd54d1: "Client ID is required"
   clone_group_set_c2a40e15: "Clone Group Set"
+  clone_groupcategoryname_ef85ddb8: "(Clone) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "Cloning group set"
   close_17f50799: close
   close_and_return_to_canvas_80544344: "Close and return to Canvas"
   close_d634289d: Close
@@ -5512,6 +5517,7 @@ en-AU:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Confirm Edit Outcome"
+  confirm_mastery_scales_c6ef2169: "Confirm Mastery Scales"
   confirm_qr_code_display_49664fa3: "Confirm QR code display"
   confirm_removal_a9bb889: "Confirm Removal"
   confirm_reservation_removal_e6350e7c: "Confirm Reservation Removal"
@@ -6514,6 +6520,7 @@ en-AU:
   count_points_4735a2e8: 
     one: "1 point"
     other: "%{count} points"
+  count_posted_b92a9562: "%{count} posted"
   count_posts_added_fa55ce4: 
     one: "%{count} post added"
     other: "%{count} posts added"
@@ -8000,6 +8007,7 @@ en-AU:
   delete_this_answer_f1802eaa: "Delete this Answer"
   delete_this_collaboration_4f20b698: "Delete this Collaboration."
   delete_this_feed_67d5d924: "Delete this Feed."
+  delete_this_file_683804a1: "Delete this file"
   delete_this_key_70f74aa1: "Delete this key"
   delete_this_module_20d54791: "Delete this module"
   delete_this_page_509f2baf: "Delete this Page"
@@ -8019,6 +8027,10 @@ en-AU:
   deleted_content_exceptions_237e809d: "Deleted content exceptions:"
   deleted_content_referenced_in_this_resource_e42d1998: "Deleted content referenced in this resource:"
   deleting_6421031e: Deleting...
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      Deleting a submission file is typically done only when a student posts inappropriate or private material.
+      
+      This action is irreversible. Are you sure you wish to delete %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Deleting a user will destroy all of their ePortfolios. Alternatively, ePortfolios can be individually marked as 'spam' or 'safe' to modify their visibility."
   deleting_assignment_22d5851d: "deleting assignment"
   delicious_7f9ac66f: Delicious
@@ -9455,6 +9467,7 @@ en-AU:
   error_adding_canvas_file_to_submission_draft_de258021: "Error adding canvas file to submission draft"
   error_adding_files_to_submission_draft_6acac337: "Error adding files to submission draft"
   error_associating_assignment_assignment_name_with__d92e9acf: "Error associating assignment \"%{assignment_name}\" with an LTI tool."
+  error_deleting_file_551dc16e: "Error deleting %{file}"
   error_deleting_name_reason_11f9d399: "Error deleting %{name}: %{reason}"
   error_duplicating_module_4b023042: "Error duplicating module"
   error_during_group_creation_f232994b: "Error during group creation"
@@ -11287,6 +11300,7 @@ en-AU:
   group_roster_1846bf84: "Group Roster"
   group_saved_successfully_fcd5ca66: "Group saved successfully"
   group_select_330df8bd: "Group Select"
+  group_set_cloned_successfully_3e1a1497: "Group set cloned successfully"
   group_set_name_2aed2347: "Group Set Name"
   group_settings: 
     invitation_sent: "Invitation sent"
@@ -12218,6 +12232,7 @@ en-AU:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Improve discoverability of drag and drop in Files"
   improved_outcomes_management_4692f886: "Improved Outcomes Management"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Improved visual reminders to encourage instructors to publish courses"
+  in_a_few_seconds_538ddff3: "in a few seconds"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link}, students are clicking %{bad_link} to a non-existent page in your course."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link}, students are clicking %{bad_link} to content in a different course."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "In %{asset_link}, students are clicking %{bad_link} to content they cannot access."
@@ -12225,6 +12240,7 @@ en-AU:
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "In cases where it is available, load the RCE from a canvas rich content service."
   in_class_23eeca38: "In Class"
   in_closed_grading_period_dc717846: "In closed grading period"
+  in_less_than_a_minute_c8595a28: "in less than a minute"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "In order to complete the process you will be redirected to a login page where you will need to log in with your child's credentials."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "In order to import a large quantity of Outcomes at once, or to update your existing outcomes, please *follow the CSV format*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "In-product training walkthrough and tourpoints for teachers"
@@ -12792,6 +12808,7 @@ en-AU:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} notifications found"
   length_results_found_3afd01e5: "%{length} results found"
+  less_than_a_minute_ago_9f45e2a5: "less than a minute ago"
   let_students_see_the_correct_answers_dacc2faf: "Let Students See The Correct Answers"
   let_students_see_their_quiz_responses_fbc07d14: "Let Students See Their Quiz Responses"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Let Students See Their Quiz Responses (Incorrect Questions Will Be Marked in Student Feedback)"
@@ -17636,6 +17653,7 @@ en-AU:
   post_to_961f8937: "Post to"
   post_to_students_b02df196: "Post to Students"
   post_types_93ff86d9: "Post types"
+  posted_455862b9: Posted
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Posted on:"
   posted_to_student_861beec9: "Posted to student"
@@ -19975,6 +19993,10 @@ en-AU:
       Replaces the existing image of the maths equation plus the hidden mathml
       with a MathJax formatted version. This provides better accessibility
       and many options for the reader to interact with the equation on the page.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Replaces the existing image of the maths equation plus its hidden mathml
+      with a MathJax processed version. This change provides better accessibility
+      and many options for the reader to interact with the equation on the page.
   reply_389d6fb9: Reply
   reply_from_name: "%{name} via Canvas Notifications"
   reply_to_bodyhtml_7a27da28: "Reply to %{bodyHTML}"
@@ -20482,7 +20504,7 @@ en-AU:
         download_current_scores: "Download Current Scores (.csv)"
         grading_history: "View Gradebook History"
         hide_student_names_label: "Hide Student Names"
-        include_ungraded_assignments: "Treat Unmarked as 0"
+        include_ungraded_assignments: "View Ungraded as 0"
         set_group_weights: "Set Group Weights"
         show_concluded_enrollments_label: "Show Concluded Enrolments"
         show_notes: "Show Notes in Student Info"
@@ -22566,6 +22588,7 @@ en-AU:
       student_support_description: "Your Instructor should be your first point of contact. They can answer your Networking Academy questions or contact the support desk for you. You can contact your instructor by using the Inbox feature."
       support_desk_livechat: "Support Desk Live Chat"
   support_favorite_lti_tools_in_the_rce_1680436d: "Support favourite LTI tools in the RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Support LaTex maths equations almost everywhere"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sweden
@@ -23086,6 +23109,7 @@ en-AU:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "This assignment will no longer count towards your final mark."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "This attachment has been unpublished by the author."
   this_code_expires_in_timefromnow_ec7ccef4: "This code expires in %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "This code expires %{timeFromNow}."
   this_code_has_expired_41f76642: "This code has expired."
   this_conference_may_be_recorded_f76deeeb: "This conference may be recorded."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "This course cannot be added to the courses menu at this time."
@@ -23243,6 +23267,8 @@ en-AU:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "This will allow you to authenticate Canvas for posting grades to SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "This will apply these changes to your entire account. Would you like to proceed?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "This will apply this theme to your entire account. Would you like to proceed?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "This will update all account and course level rubrics that are tied to account level mastery scales and have not yet been assessed."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "This will update all rubrics aligned to outcomes within this course that have not yet been assessed."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "This will update all rubrics using this outcome that have not yet been assessed"
   threshold_in_hours_to_notify_students_within_f33820aa: "Threshold (in hours) to notify students within"
   threshold_pts_45f0e5d8: "threshold: %{pts}"
@@ -24178,6 +24204,7 @@ en-AU:
   updated_current_grade_to_currentgrade_bfe2ea14: "Updated current grade to %{currentGrade}"
   updated_group_group_name_727b1d98: "Updated Group %{group_name}"
   updated_math_equation_display_583671a8: "Updated maths equation display"
+  updated_math_equation_handling_b84509d1: "Updated maths equation handling"
   updated_permissions_page_f2e91060: "Updated Permissions Page"
   updated_terms_of_service_82f34148: "Updated Terms of Service"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Updated UI for searching and displaying users and courses within an account."
@@ -25333,6 +25360,7 @@ en-AU:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "You do not have access to the requested quiz."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "You do not have access to the requested resource."
   you_do_not_have_permission_to_change_this_488c536: "You do not have permission to change this"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "You do not have permission to delete %{file}. Please contact your account administrator."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "You do not have permission to edit this assignment"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "You do not have permission to invite users that do not already exist."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "You do not have permission to publish this course."

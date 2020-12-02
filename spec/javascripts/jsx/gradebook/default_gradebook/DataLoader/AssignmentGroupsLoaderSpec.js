@@ -130,6 +130,76 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       notOk(params.include.includes('module_ids'))
     })
 
+    QUnit.module('when grading periods are in use', contextHooks => {
+      contextHooks.beforeEach(() => {
+        gradebook.gradingPeriodId = '3'
+        gradebook.gotGradingPeriodAssignments({
+          grading_period_assignments: {
+            3: ['1', '8', '12'],
+            19: ['4', '77', '99'],
+            66: ['3']
+          }
+        })
+      })
+
+      test('makes a single request if "All Grading Periods" is selected', async () => {
+        gradebook.gradingPeriodId = '0'
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const requests = getRequests()
+        strictEqual(requests.length, 1)
+      })
+
+      test('makes two requests if a specific grading period is selected', async () => {
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const requests = getRequests()
+        strictEqual(requests.length, 2)
+      })
+
+      test('makes one request to get assignments for the current grading period', async () => {
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const {params} = getRequests()[0]
+        deepEqual(params.assignment_ids, ['1', '8', '12'])
+      })
+
+      test('makes another request to get assignments for all other grading periods', async () => {
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const {params} = getRequests()[1]
+        deepEqual(params.assignment_ids, ['4', '77', '99', '3'])
+      })
+
+      test('excludes assignments in the second request that were present in the first', async () => {
+        gradebook.gotGradingPeriodAssignments({
+          grading_period_assignments: {
+            3: ['1', '2'],
+            19: ['2', '3']
+          }
+        })
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const {params} = getRequests()[1]
+        deepEqual(params.assignment_ids, ['3'])
+      })
+
+      test('does not include duplicates in requested assignment ids', async () => {
+        gradebook.gotGradingPeriodAssignments({
+          grading_period_assignments: {
+            3: ['1', '2'],
+            19: ['3', '4'],
+            22: ['4', '5'],
+            89: ['5', '6', '7']
+          }
+        })
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const {params} = getRequests()[1]
+        deepEqual(params.assignment_ids, ['3', '4', '5', '6', '7'])
+      })
+    })
+
     QUnit.module('when sending the initial request', () => {
       test('sets the `per_page` parameter to the configured per page maximum', async () => {
         performanceControls = new PerformanceControls({assignmentGroupsPerPage: 45})

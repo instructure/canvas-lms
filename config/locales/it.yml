@@ -173,6 +173,7 @@ it:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} e {b} non possono essere usati insieme"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Con questo metodo di calcolo non viene utilizzato alcun valore di calcolo"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Un token di sicurezza Canvas è stato appena creato per il tuo account. Se hai richiesto un token utente, non è necessaria alcun’altra azione. Se non hai richiesto un token o desideri gestire i tuoi token di accesso Canvas, è possibile farlo qui:"
+  a_few_seconds_ago_e43118d: "qualche secondo fa"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "Un file chiamato %{itemName} esiste già in questa cartella."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "Un file chiamato “%{name}” esiste già. Desideri sostituire il file esistente?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "Un file chiamato “%{name}” esiste già in questa cartella. Desideri sostituire il file esistente?"
@@ -2324,6 +2325,7 @@ it:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Si è verificato un errore durante l'aggiornamento delle valutazioni del livello di preparazione: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Si è verificato un errore durante l'aggiornamento delle valutazioni del livello di preparazione"
   an_error_occurred_updating_this_assignment_21287c7e: "Si è verificato un errore durante l'aggiornamento di questo compito."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "Si è verificato un errore durante la clonazione del set di gruppi."
   an_error_occurred_when_saving_the_group_536c8f66: "Si è verificato un errore durante il salvataggio del gruppo."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "Si è verificato un errore durante l'impostazione del diritto di utilizzo per %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Si è verificato un errore durante il tentativo di contattare Turnitin."
@@ -2777,6 +2779,7 @@ it:
     scores_lower_than_the_average: "Punteggi inferiori alla media di %{average}"
     total_graded_submissions: "Totale consegne valutate:"
   assignment_details_expanded_20c6f0c7: "dettagli compiti espansi"
+  assignment_details_updated_493f410b: "Dettagli compito aggiornati"
   assignment_does_not_exist_74178c34: "compito non esiste"
   assignment_edit_6dced39f: "Modifica compito"
   assignment_enhancements_student_557372ab: "Miglioramenti compito - Studente"
@@ -4694,6 +4697,8 @@ it:
   client_id_cb2502af: "ID client"
   client_id_is_required_1afd54d1: "ID client obbligatorio"
   clone_group_set_c2a40e15: "Clona set di gruppi"
+  clone_groupcategoryname_ef85ddb8: "(Clona) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "Clonazione set di gruppi"
   close_17f50799: chiudi
   close_and_return_to_canvas_80544344: "Chiudi e torna a Canvas"
   close_d634289d: Chiudi
@@ -5062,6 +5067,7 @@ it:
   confirm_delete_discussions_1fb0d053: "Conferma eliminazione discussioni"
   confirm_deletion_b2efe7d4: "Conferma eliminazione"
   confirm_edit_outcome_a9746c99: "Conferma modifica esito"
+  confirm_mastery_scales_c6ef2169: "Conferma scale di padronanza"
   confirm_qr_code_display_49664fa3: "Conferma visualizzazione codice QR"
   confirm_removal_a9bb889: "Conferma rimozione"
   confirm_reservation_removal_e6350e7c: "Conferma rimozione prenotazione"
@@ -5967,6 +5973,7 @@ it:
   count_points_4735a2e8: 
     one: "1 punto"
     other: "%{count} punti"
+  count_posted_b92a9562: "%{count} pubblicato"
   count_posts_added_fa55ce4: 
     one: "%{count} post aggiunto"
     other: "%{count} post aggiunti"
@@ -7237,6 +7244,7 @@ it:
   delete_themename_8c4223a3: "Eliminare %{themeName}?"
   delete_this_answer_f1802eaa: "Elimina questa risposta"
   delete_this_collaboration_4f20b698: "Elimina questa collaborazione"
+  delete_this_file_683804a1: "Elimina questo file"
   delete_this_key_70f74aa1: "Elimina questa chiave"
   delete_this_module_20d54791: "Elimina questo modulo"
   delete_this_page_509f2baf: "Elimina questa pagina"
@@ -7255,6 +7263,10 @@ it:
   deleted_content_exceptions_237e809d: "Eccezioni contenuti eliminati:"
   deleted_content_referenced_in_this_resource_e42d1998: "Eliminato contenuto che fa riferimento a questa risorsa:"
   deleting_6421031e: "eliminazione in corso..."
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      L’eliminazione di un file di invio di solito avviene quando uno studente posta del materiale inappropriato o privato.
+      
+      Questa azione è irreversibile. Vuoi eliminare %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "L’eliminazione di un utente distruggerà tutti i suoi ePortfolio. In alternativa, è possibile contrassegnare singolarmente gli ePortfolio come “spam” o “sicuri” per modificarne la visibilità."
   deleting_assignment_22d5851d: "eliminazione assegnazione"
   delicious_7f9ac66f: Delicious
@@ -8564,6 +8576,7 @@ it:
   error_adding_canvas_file_to_submission_draft_de258021: "Errore di aggiunta di un file canvas alla bozza di presentazione"
   error_adding_files_to_submission_draft_6acac337: "Errore nell'aggiunta di file alla bozza di invio"
   error_associating_assignment_assignment_name_with__d92e9acf: "Errore durante l’associazione del compito \"%{assignment_name}\" ad uno strumento LTI."
+  error_deleting_file_551dc16e: "Errore durante l'eliminazione di %{file}"
   error_deleting_name_reason_11f9d399: "Errore durante l'eliminazione di %{name}: %{reason}"
   error_duplicating_module_4b023042: "Errore durante la duplicazione del modulo"
   error_during_group_creation_f232994b: "Errore durante la creazione di gruppi"
@@ -9888,6 +9901,7 @@ it:
   group_roster_1846bf84: "Elenco dei partecipanti del gruppo"
   group_saved_successfully_fcd5ca66: "Gruppo salvato correttamente"
   group_select_330df8bd: "Selezione gruppo"
+  group_set_cloned_successfully_3e1a1497: "Set di gruppi clonato correttamente"
   group_set_name_2aed2347: "Nome set di gruppi"
   group_weight_for_d46c5db4: "Ponderazione gruppo per:"
   group_with_id_guid_already_exists_in_another_unrel_be1baf71: "Gruppo con ID %{guid} già esistente in altro corso o account non correlato (%{name})"
@@ -10640,11 +10654,13 @@ it:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Migliora la rintracciabilità della selezione e trascinamento nei file"
   improved_outcomes_management_4692f886: "Gestione migliorata dei risultati"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Promemoria visivi migliorati per incoraggiare gli istruttori a pubblicare i corsi"
+  in_a_few_seconds_538ddff3: "tra qualche secondo"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "In %{asset_link}, gli studenti stanno facendo clic su %{bad_link} per visualizzare una pagina non esistente del corso."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "In %{asset_link}, gli studenti stanno facendo clic su %{bad_link} per visualizzare dei contenuti in un altro corso."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "In %{asset_link}, gli studenti stanno facendo clic su %{bad_link} per contenuti a cui non possono accedere."
   in_class_23eeca38: "In classe"
   in_closed_grading_period_dc717846: "Nel periodo di valutazione chiuso"
+  in_less_than_a_minute_c8595a28: "tra meno di un minuto"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "Per completare il processo, verrai reindirizzato a una pagina di accesso in cui devi effettuare l'accesso con le credenziali dell'elemento secondario."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "Per importare più esiti contemporaneamente o aggiornare gli esiti esistenti, *segui il formato CSV*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Percorso di formazione dedicato ai prodotti e tour per gli insegnanti"
@@ -11153,6 +11169,7 @@ it:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} notifiche trovate"
   length_results_found_3afd01e5: "%{length} risultati trovati"
+  less_than_a_minute_ago_9f45e2a5: "meno di un minuto fa"
   let_students_see_the_correct_answers_dacc2faf: "Consenti agli studenti di visualizzare le risposte corrette"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "Consenti agli studenti di visualizzare le loro risposte ai quiz (le domande errate verranno contrassegnate nel feedback studenti)"
   let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Fai che l'amministratore del sito selezioni fino a 2 applicazioni LTI preferite, che saranno poi visualizzate nella barra degli strumenti di RCE"
@@ -15515,6 +15532,7 @@ it:
   post_to_961f8937: "Pubblica in"
   post_to_students_b02df196: "Posta agli studenti"
   post_types_93ff86d9: "Pubblica tipi"
+  posted_455862b9: Pubblicato
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Pubblicato il:"
   posted_to_student_861beec9: "Postato allo studente"
@@ -17528,6 +17546,10 @@ it:
       Sostituisce l’immagine esistente dell’equazione matematica più il mathml nascosto
       con una versione MathJax formattata. Ciò fornisce una migliore accessibilità
       e molte opzioni per il lettore di interagire con l’equazione sulla pagina.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Sostituisce l’immagine esistente dell’equazione matematica più il suo mathml nascosto
+      con una versione elaborata da MathJax. Questa modifica fornisce una migliore accessibilità
+      e molte opzioni per il lettore al fine di interagire con l’equazione nella pagina.
   reply_389d6fb9: Rispondi
   reply_from_name: "%{name} tramite Notifiche Canvas"
   reply_to_comment_72d96728: "Rispondi al commento"
@@ -17997,7 +18019,7 @@ it:
         download_current_scores: "Scarica punteggi attuali (.csv)"
         grading_history: "Visualizza cronologia registro dei voti"
         hide_student_names_label: "Nascondi nomi studenti"
-        include_ungraded_assignments: "Considera non valutato come 0"
+        include_ungraded_assignments: "Visualizza non valutato come 0"
         show_concluded_enrollments_label: "Mostra iscrizioni concluse"
         show_notes: "Mostra note in informazioni studente"
         show_total_as_points: "Mostra totali come punti nella pagina dei voti dello studente"
@@ -19821,6 +19843,7 @@ it:
       student_support_description: "Il tuo istruttore è il tuo primo punto di contatto. Può rispondere alle tue domande relative a Networking Academy o contattare per te il servizio di assistenza. Puoi contattare il tuo istruttore utilizzando la funzione Posta in arrivo."
       support_desk_livechat: "Chat dal vivo servizio di assistenza"
   support_favorite_lti_tools_in_the_rce_1680436d: "Supporta gli strumenti LTI preferiti nel RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Supporta le equazioni di matematica LaTex quasi ovunque"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_46_55cc3620: "Svezia (+46)"
@@ -20304,6 +20327,7 @@ it:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Questo compito non verrà più conteggiato ai fini della tua valutazione."
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "La pubblicazione di questo allegato è stata annullata dall'autore."
   this_code_expires_in_timefromnow_ec7ccef4: "Questo codice scade tra %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "Questo codice scade %{timeFromNow}."
   this_code_has_expired_41f76642: "Questo codice è scaduto."
   this_conference_may_be_recorded_f76deeeb: "Questa conferenza può essere registrata."
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Questo corso non può essere aggiunto al menu dei corsi al momento."
@@ -20453,6 +20477,8 @@ it:
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "Questo interesserà tutti i clienti. Continuare?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Questo ti consentirà di autenticare Canvas per la pubblicazione dei voti su SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Questa operazione applicherà questo tema all'intero account. Vuoi procedere?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "Tale operazione aggiornerà tutte le rubriche di livello account e corso che sono collegate alle scale di padronanza di livello account e che non sono ancora state valutate."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "L'operazione aggiornerà tutte le rubriche allineate ai risultati di questo corso che non sono state ancora valutate."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "L'operazione aggiornerà tutte le rubriche che utilizzano questo esito e che non sono state ancora valutate."
   threshold_in_hours_to_notify_students_within_f33820aa: "Soglia (in ore) entro cui inviare notifica agli studenti"
   threshold_pts_45f0e5d8: "soglia: %{pts}"
@@ -21359,6 +21385,7 @@ it:
   updated_2c1e8615: Aggiornato
   updated_group_group_name_727b1d98: "Gruppo aggiornato %{group_name}"
   updated_math_equation_display_583671a8: "Visualizzazione equazione matematica aggiornata"
+  updated_math_equation_handling_b84509d1: "Gestione equazione matematica aggiornata"
   updated_permissions_page_f2e91060: "Pagina autorizzazioni aggiornata"
   updated_terms_of_service_82f34148: "Termini del servizio aggiornati"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "UI aggiornata per consentire la ricerca e la visualizzazione di utenti e corsi all'interno di un account."
@@ -22398,6 +22425,7 @@ it:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Non hai accesso al quiz richiesto."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Non hai accesso alla risorsa richiesta."
   you_do_not_have_permission_to_change_this_488c536: "Non disponi dell'autorizzazione di modifica"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Non disponi dell’autorizzazione per eliminare %{file}. Contatta il tuo amministratore account."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "Non hai le autorizzazioni per modificare questo compito"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Non disponi dell'autorizzazione per invitare gli utenti che non esistono già."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Non disponi dell'autorizzazione per pubblicare questo corso."

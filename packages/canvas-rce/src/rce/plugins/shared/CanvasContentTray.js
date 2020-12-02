@@ -191,6 +191,24 @@ const FILTER_SETTINGS_BY_PLUGIN = {
   }
 }
 
+function isLoading(cprops) {
+  return (
+    cprops.collections.announcements?.isLoading ||
+    cprops.collections.assignments?.isLoading ||
+    cprops.collections.discussions?.isLoading ||
+    cprops.collections.modules?.isLoading ||
+    cprops.collections.quizzes?.isLoading ||
+    cprops.collections.wikiPages?.isLoading ||
+    cprops.documents.course?.isLoading ||
+    cprops.documents.user?.isLoading ||
+    cprops.documents.group?.isLoading ||
+    cprops.media.course?.isLoading ||
+    cprops.media.user?.isLoading ||
+    cprops.media.group?.isLoading ||
+    cprops.all_files?.isLoading
+  )
+}
+
 /**
  * This component is used within various plugins to handle loading in content
  * from Canvas.  It is essentially the main component.
@@ -252,11 +270,20 @@ export default function CanvasContentTray(props) {
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
 
-  function handleFilterChange(newFilter, onChangeContext) {
+  function handleFilterChange(newFilter, onChangeContext, onChangeSearchString, onChangeSortBy) {
     const newFilterSettings = {...newFilter}
     if (newFilterSettings.sortValue) {
       newFilterSettings.sortDir = newFilterSettings.sortValue === 'alphabetical' ? 'asc' : 'desc'
+      onChangeSortBy({sort: newFilterSettings.sortValue, dir: newFilterSettings.sortDir})
     }
+
+    if (
+      'searchString' in newFilterSettings &&
+      filterSettings.searchString !== newFilterSettings.searchString
+    ) {
+      onChangeSearchString(newFilterSettings.searchString)
+    }
+
     setFilterSettings(newFilterSettings)
 
     if (newFilterSettings.contentType) {
@@ -271,8 +298,11 @@ export default function CanvasContentTray(props) {
           contextId = props.containingContext.contextId
           break
         case 'course_files':
-        case 'links':
           contextType = props.contextType
+          contextId = props.containingContext.contextId
+          break
+        case 'links':
+          contextType = props.containingContext.contextType
           contextId = props.containingContext.contextId
       }
       onChangeContext({contextType, contextId})
@@ -352,8 +382,14 @@ export default function CanvasContentTray(props) {
                   {...filterSettings}
                   userContextType={props.contextType}
                   onChange={newFilter => {
-                    handleFilterChange(newFilter, contentProps.onChangeContext)
+                    handleFilterChange(
+                      newFilter,
+                      contentProps.onChangeContext,
+                      contentProps.onChangeSearchString,
+                      contentProps.onChangeSortBy
+                    )
                   }}
+                  isContentLoading={isLoading(contentProps)}
                 />
               </Flex.Item>
 

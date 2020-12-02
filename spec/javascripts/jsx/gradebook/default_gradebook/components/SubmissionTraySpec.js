@@ -49,7 +49,12 @@ QUnit.module('SubmissionTray', hooks => {
       editSubmissionComment() {},
       enterGradesAs: 'points',
       gradingDisabled: false,
-      gradingScheme: [['A', 0.9], ['B+', 0.85], ['B', 0.8], ['B-', 0.75]],
+      gradingScheme: [
+        ['A', 0.9],
+        ['B+', 0.85],
+        ['B', 0.8],
+        ['B-', 0.75]
+      ],
       locale: 'en',
       onAnonymousSpeedGraderClick() {},
       onGradeSubmission() {},
@@ -60,7 +65,6 @@ QUnit.module('SubmissionTray', hooks => {
       isOpen: true,
       courseId: '1',
       currentUserId: '2',
-      postPoliciesEnabled: false,
       speedGraderEnabled: true,
       student: {
         id: '27',
@@ -297,22 +301,16 @@ QUnit.module('SubmissionTray', hooks => {
     })
   })
 
-  QUnit.module('when passing true for postPoliciesEnabled', contextHooks => {
-    contextHooks.beforeEach(() => {
-      defaultProps.postPoliciesEnabled = true
-    })
+  test('"Hidden" is displayed when a submission is graded and unposted', () => {
+    defaultProps.submission.workflowState = 'graded'
+    mountComponent()
+    ok(content.textContent.includes('Hidden'))
+  })
 
-    test('"Hidden" is displayed when a submission is graded and unposted', () => {
-      defaultProps.submission.workflowState = 'graded'
-      mountComponent()
-      ok(content.textContent.includes('Hidden'))
-    })
-
-    test('"Hidden" is displayed when a submission has comments and is unposted', () => {
-      defaultProps.submission.hasPostableComments = true
-      mountComponent()
-      ok(content.textContent.includes('Hidden'))
-    })
+  test('"Hidden" is displayed when a submission has comments and is unposted', () => {
+    defaultProps.submission.hasPostableComments = true
+    mountComponent()
+    ok(content.textContent.includes('Hidden'))
   })
 
   test('shows avatar if avatar is not null', () => {
@@ -411,7 +409,13 @@ QUnit.module('SubmissionTray', hooks => {
     })
 
     test('receives the "gradingScheme" given to the Tray', () => {
-      const gradingScheme = [['A', 0.9], ['B+', 0.85], ['B', 0.8], ['B-', 0.75], ['C+', 0.7]]
+      const gradingScheme = [
+        ['A', 0.9],
+        ['B+', 0.85],
+        ['B', 0.8],
+        ['B-', 0.75],
+        ['C+', 0.7]
+      ]
       mountComponent({enterGradesAs: 'gradingScheme', gradingScheme})
       const $el = content.querySelector('#final-grade-value')
       strictEqual($el.textContent, 'C+')
@@ -669,7 +673,13 @@ QUnit.module('SubmissionTray', hooks => {
     })
 
     test('receives the "gradingScheme" given to the Tray', () => {
-      const gradingScheme = [['A', 0.9], ['B+', 0.85], ['B', 0.8], ['B-', 0.75], ['C+', 0.7]]
+      const gradingScheme = [
+        ['A', 0.9],
+        ['B+', 0.85],
+        ['B', 0.8],
+        ['B-', 0.75],
+        ['C+', 0.7]
+      ]
       mountComponent({enterGradesAs: 'gradingScheme', gradingScheme})
       equal(findGradeInput().labelText, 'Letter Grade')
     })

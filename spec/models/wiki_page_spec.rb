@@ -723,4 +723,45 @@ describe WikiPage do
         .to include @page_assigned, @page_unassigned
     end
   end
+
+  describe ".reinterpret_version_yaml" do
+    it "replaces the unescaped media comments" do
+      bad_yaml = <<-YAML
+---
+id: 787500
+wiki_id: 15160
+title: \"\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico\"
+body: \"<p style=\\\"text-align: center;\\\"><a id=\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\" class=\"instructure_inline_media_comment audio_comment\" data-media_comment_type=\"audio\" data-alt=\"\" href=\"/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\"/></p>\\r\
+<p style=\\\"text-align: center;\\\"> </p>\\r\
+<p
+  style=\\\"text-align: center;\\\"><span style=\\\"font-size: 18pt;\\\">Geography is the
+  study of Earth and its land, water, air and people. We are concentrating on learning
+  about the physical features, climate and natural resources that affect an area and
+  its people.</span></p>\\r\
+  center;\\\"> </p>\"
+user_id: 
+created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &1 2020-11-05 20:24:57.390301492 Z
+  zone: &2 !ruby/object:ActiveSupport::TimeZone
+    name: Etc/UTC
+  time: *1
+updated_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: *1
+  zone: *2
+  time: *1
+url: ss10-dot-20-|-social-studies-warm-up-las-cruces-new-mexico
+protected_editing: false
+revised_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &3 2020-11-05 20:24:57.386639804 Z
+  zone: *2
+  time: *3
+context_id: 23167
+context_type: Course
+root_account_id: 1
+YAML
+      good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
+      expect(good_yaml).to include("style=\\\"text-align: center;\\\">")
+      expect(good_yaml).to include("<a id=\\\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\\\"")
+    end
+  end
 end

@@ -265,7 +265,7 @@ module Lti
       return [] unless @context.is_a?(Course)
 
       # now find all parents for locked folders
-      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(:id => :desc).limit(1).pluck(:id).first
+      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
       return [] unless last_migration_id
 
       # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
@@ -274,8 +274,8 @@ module Lti
         Course.connection.select_rows(<<-SQL)
           WITH RECURSIVE all_contexts AS (
             SELECT context_id, source_course_id
-            FROM #{ContentMigration.quoted_table_name}              
-            WHERE context_id=#{@context.id}              
+            FROM #{ContentMigration.quoted_table_name}
+            WHERE context_id=#{@context.id}
             UNION
             SELECT content_migrations.context_id, content_migrations.source_course_id
             FROM #{ContentMigration.quoted_table_name}
@@ -285,17 +285,15 @@ module Lti
             SELECT DISTINCT context_id
             FROM all_contexts
           )
-          SELECT "courses"."id", "courses"."lti_context_id"
+          SELECT courses.id, ct.finished_at, courses.lti_context_id
           FROM #{Course.quoted_table_name}
-          WHERE (EXISTS (
-            SELECT "content_migrations".*
-            FROM #{ContentMigration.quoted_table_name}
-            WHERE
-              "content_migrations"."workflow_state" = 'imported'
-              AND (context_id IN (
-                  SELECT x.context_id
-                  FROM interesting_contexts x))
-              AND (content_migrations.source_course_id = courses.id)))
+          INNER JOIN #{ContentMigration.quoted_table_name} ct
+          ON ct.source_course_id = courses.id
+          AND ct.workflow_state = 'imported'
+          AND (ct.context_id IN (
+            SELECT x.context_id
+            FROM interesting_contexts x))
+          ORDER BY ct.finished_at DESC
         SQL
       end
     end

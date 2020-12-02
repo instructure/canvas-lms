@@ -100,3 +100,60 @@ all associated attributes with each outcome.}) %></p>
   </tr>
   </tbody>
 </table>
+
+<p><%= t(%{If mastery scales are enabled, the report will be truncated to not include calculation method,
+calculation int, mastery points, or ratings }) %></p>
+
+<h3><%= t(%{Example}) %></h3>
+
+<table class="report_example">
+  <thead>
+  <tr>
+    <th>vendor_guid</th>
+    <th>object_type</th>
+    <th>title</th>
+    <th>description</th>
+    <th>display_name</th>
+    <th>parent_guids</th>
+    <th>workflow_state</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td>a00201</td>
+    <td>outcome_group</td>
+    <td>Mathematics</td>
+    <td>Standards related to mathematics</td>
+    <td>MATH</td>
+    <td></td>
+    <td>active</td>
+  </tr>
+  <tr>
+    <td>a00202</td>
+    <td>outcome_group</td>
+    <td>Mathematics Grade 2</td>
+    <td>Standards related to mathematics, grade 2</td>
+    <td>MATH-2</td>
+    <td>a00201</td>
+    <td>active</td>
+  </tr>
+  <tr>
+    <td>canvas_outcome:81</td>
+    <td>outcome</td>
+    <td>Order of Operations, +/-</td>
+    <td>Students will be able add and subtract using parentheses to define order of operations</td>
+    <td>MATH-2-OO</td>
+    <td>a00201 a00202</td>
+    <td>deleted</td>
+  </tr>
+  <tr>
+    <td>g0335</td>
+    <td>outcome</td>
+    <td>Order of Operations, ×/÷</td>
+    <td>Students will be able multiply and divide using parentheses to define order of operations</td>
+    <td>MATH-2-O1</td>
+    <td>a00201</td>
+    <td>active</td>
+  </tr>
+  </tbody>
+</table>

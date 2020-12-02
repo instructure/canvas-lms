@@ -297,12 +297,7 @@ SelectContentDialog.Events = {
             if (item['@type'] === 'LtiLinkItem' && item.url) {
               SelectContentDialog.handleContentItemResult(item, tool)
             } else {
-              alert(
-                I18n.t(
-                  'invalid_lti_resource_selection',
-                  'There was a problem retrieving a valid link from the external tool'
-                )
-              )
+              alert(SelectContent.errorForUrlItem(item))
               $('#external_tool_create_url').val('')
               $('#external_tool_create_title').val('')
             }

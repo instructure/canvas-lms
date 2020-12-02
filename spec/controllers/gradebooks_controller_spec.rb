@@ -197,12 +197,6 @@ describe GradebooksController do
       expect(order).to eq :due_at
     end
 
-    it "includes the post_policies_enabled in the ENV" do
-      user_session(@teacher)
-      get :grade_summary, params: { course_id: @course.id, id: @student.id }
-      expect(assigns[:js_env][:post_policies_enabled]).to be true
-    end
-
     it "includes the current grading period id in the ENV" do
       group = @course.root_account.grading_period_groups.create!
       period = group.grading_periods.create!(title: "GP", start_date: 3.months.ago, end_date: 3.months.from_now)
@@ -914,11 +908,6 @@ describe GradebooksController do
         expect(gradebook_options).to have_key :grading_schemes
       end
 
-      it "sets post_policies_enabled to true" do
-        get :show, params: { course_id: @course.id }
-        expect(gradebook_options[:post_policies_enabled]).to be(true)
-      end
-
       it "sets show_similarity_score to true when the New Gradebook Plagiarism Indicator feature flag is enabled" do
         @course.root_account.enable_feature!(:new_gradebook_plagiarism_indicator)
         get :show, params: { course_id: @course.id }
@@ -1170,19 +1159,6 @@ describe GradebooksController do
         it "only includes course sections visible to the user" do
           get :show, params: {course_id: @course.id}
           expect(returned_section_ids).to contain_exactly(@course.default_section.id)
-        end
-      end
-
-      describe "include_speed_grader_in_assignment_header_menu" do
-        it "is set to true when the feature flag of the same name is true" do
-          Account.site_admin.enable_feature!(:include_speed_grader_in_assignment_header_menu)
-          get :show, params: {course_id: @course.id}
-          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be true
-        end
-
-        it "is set to false when the feature flag of the same name is false" do
-          get :show, params: {course_id: @course.id}
-          expect(gradebook_options.fetch(:include_speed_grader_in_assignment_header_menu)).to be false
         end
       end
     end
@@ -1515,9 +1491,26 @@ describe GradebooksController do
             @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
           end
 
-          it "is set to the outcome proficiency on the course" do
+          it "is set to the outcome proficiency on the account" do
             expect(@gradebook_env[:outcome_proficiency]).to eq(@proficiency.as_json)
           end
+
+          # rubocop:disable RSpec/NestedGroups
+          describe "with account_level_mastery_scales enabled" do
+            before do
+              @course_proficiency = outcome_proficiency_model(@course)
+              @course.root_account.enable_feature! :account_level_mastery_scales
+
+              get 'show', params: {course_id: @course.id}
+
+              @gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            end
+
+            it "is set to the resolved_outcome_proficiency on the course" do
+              expect(@gradebook_env[:outcome_proficiency]).to eq(@course_proficiency.as_json)
+            end
+          end
+          # rubocop:enable RSpec/NestedGroups
         end
 
         describe ".sections" do
@@ -1638,6 +1631,7 @@ describe GradebooksController do
       @period1, @period2 = Factories::GradingPeriodHelper.new.create_presets_for_group(@group, :past, :current)
       @assignment1_in_gp1 = @course.assignments.create!(due_at: 3.months.ago)
       @assignment2_in_gp2 = @course.assignments.create!(due_at: 1.day.from_now)
+      @assignment_not_in_gp = @course.assignments.create!(due_at: 9.months.from_now)
     end
 
     it "returns unauthorized if there is no current user" do
@@ -1670,7 +1664,8 @@ describe GradebooksController do
       json = json_parse(response.body)["grading_period_assignments"]
       expect(json).to eq({
         @period1.id.to_s => [@assignment1_in_gp1.id.to_s],
-        @period2.id.to_s => [@assignment2_in_gp2.id.to_s]
+        @period2.id.to_s => [@assignment2_in_gp2.id.to_s],
+        "none" => [@assignment_not_in_gp.id.to_s]
       })
     end
   end
@@ -2479,6 +2474,11 @@ describe GradebooksController do
         get 'speed_grader', params: {course_id: @course, assignment_id: @assignment.id}
         expect(js_env).to have_key :outcome_proficiency
         expect(js_env).to have_key :outcome_extra_credit_enabled
+      end
+
+      it 'sets media_comment_asset_string' do
+        get :speed_grader, params: { course_id: @course, assignment_id: @assignment }
+        expect(js_env.fetch(:media_comment_asset_string)).to eq @teacher.asset_string
       end
 
       describe "student group filtering" do

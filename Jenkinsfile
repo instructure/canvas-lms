@@ -43,23 +43,6 @@ def getLocalWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "." : "gems/plugins/${env.GERRIT_PROJECT}"
 }
 
-def wrapBuildExecution(jobName, parameters, propagate, urlExtra) {
-  try {
-    build(job: jobName, parameters: parameters, propagate: propagate)
-  }
-  catch(FlowInterruptedException ex) {
-    // if its this type, then that means its a build failure.
-    // other reasons can be user cancelling or jenkins aborting, etc...
-    def failure = ex.causes.find { it instanceof DownstreamFailureCause }
-    if (failure != null) {
-      def downstream = failure.getDownstreamBuild()
-      def url = downstream.getAbsoluteUrl() + urlExtra
-      failureReport.addFailure(jobName, url)
-    }
-    throw ex
-  }
-}
-
 // if the build never starts or gets into a node block, then we
 // can never load a file. and a very noisy/confusing error is thrown.
 def ignoreBuildNeverStartedError(block) {
@@ -207,17 +190,25 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def slackSendCacheAvailable(blockName = '') {
+def slackSendCacheAvailable(registryPath) {
   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
 
   slackSend(
     channel: '#jenkins_cache_noisy',
     color: 'good',
-    message: "Uploaded New Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nRevision: ${GIT_REV}\nInstance: ${env.NODE_NAME}"
+    message: """
+      Uploaded New Image
+
+      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
+      Registry Path: ${registryPath}
+      Revision: ${GIT_REV}
+      Instance: ${env.NODE_NAME}
+    """
   )
 }
 
-def slackSendCacheBuild(blockName = '', block) {
+def slackSendCacheBuild(registryPath, block) {
   def buildStartTime = System.currentTimeMillis()
 
   block()
@@ -228,7 +219,16 @@ def slackSendCacheBuild(blockName = '', block) {
 
   slackSend(
     channel: '#jenkins_cache_noisy',
-    message: "Built Image\n\nBuild: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>\nImage: ${blockName}\nParent: ${PARENT_GIT_REV}\nDuration: ${buildEndTime - buildStartTime}ms\nInstance: ${env.NODE_NAME}"
+    message: """
+      Built Image
+
+      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
+      Registry Path: ${registryPath}
+      Parent: ${PARENT_GIT_REV}
+      Duration: ${buildEndTime - buildStartTime}ms
+      Instance: ${env.NODE_NAME}
+    """
   )
 }
 
@@ -249,6 +249,9 @@ def getPublishableTag() {
 }
 
 def getPluginVersion(plugin) {
+  if(env.GERRIT_BRANCH.contains('stable/')) {
+    return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
+  }
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? 'master' : configuration.getString("pin-commit-$plugin", "master")
 }
 
@@ -288,7 +291,16 @@ def getCanvasBuildsRefspec() {
   return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
 }
 
+@groovy.transform.Field def CANVAS_LMS_REFSPEC_REGEX = /\[canvas\-lms\-refspec=(.+?)\]/
 def getCanvasLmsRefspec() {
+  // If stable branch, first search commit message for canvas-lms-refspec. If not present use stable branch head on origin.
+  if(env.GERRIT_BRANCH.contains('stable/')) {
+    def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
+    if((commitMessage =~ CANVAS_LMS_REFSPEC_REGEX).find()) {
+      return configuration.canvasLmsRefspec()
+    }
+    return "+refs/heads/$GERRIT_BRANCH:refs/remotes/origin/$GERRIT_BRANCH"
+  }
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.canvasLmsRefspecDefault() : configuration.canvasLmsRefspec()
 }
 // =========
@@ -331,8 +343,11 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:$GERRIT_BRANCH"
-    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:$GERRIT_BRANCH"
+    WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
+    WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
+
+    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:${configuration.gerritBranchSanitized()}"
+    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:${configuration.gerritBranchSanitized()}"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -430,26 +445,54 @@ pipeline {
                     sh '''#!/bin/bash
                       set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-
-                      if ! git merge-base HEAD origin/master; then
-                        echo "Error: your branch is over 100 commits behind, please rebase your branch manually."
-                        exit $exit_status
-                      fi
-
                       git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
                       git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
 
-                      # store exit_status inline to  ensures the script doesn't exit here on failures
+                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
+
+                      if ! git merge-base HEAD origin/$GERRIT_BRANCH; then
+                        echo "Error: your branch is over 100 commits behind $GERRIT_BRANCH, please rebase your branch manually."
+                        exit $exit_status
+                      fi
+
                       git rebase --preserve-merges --stat origin/$GERRIT_BRANCH; exit_status=$?
                       if [ $exit_status != 0 ]; then
                         echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
                         git rebase --abort
                         exit $exit_status
                       fi
+
+                      if [[ $GERRIT_BRANCH == 'dev/'* ]]; then
+                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
+                          git fetch --depth 100 --force --no-tags origin master:origin/master
+
+                        if ! git merge-base HEAD origin/master; then
+                          echo "Error: your branch is over 100 commits behind master, please rebase your branch manually."
+                          exit $exit_status
+                        fi
+
+                        # store exit_status inline to  ensures the script doesn't exit here on failures
+                        git rebase --preserve-merges --stat origin/master; exit_status=$?
+                        if [ $exit_status != 0 ]; then
+                          echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+                         git rebase --abort
+                          exit $exit_status
+                        fi
+                      fi
                     '''
                   })
+
+                  if(!env.JOB_NAME.endsWith('Jenkinsfile')) {
+                    sh """#!/bin/bash
+                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+
+                      if git diff --name-only origin/master..HEAD Jenkinsfile* docker-compose.new-jenkins* build/new-jenkins/* |grep -E "Jenkinsfile|docker-compose.new-jenkins|build/new-jenkins/"; then
+                        echo "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
+                        exit 1
+                      fi
+                    """
+                  }
                 }
               }
             }
@@ -460,9 +503,13 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  slackSendCacheBuild(configuration.isChangeMerged() ? 'post-merge' : 'pre-merge') {
+                  def cacheTag = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE
+
+                  slackSendCacheBuild(cacheTag) {
                     withEnv([
-                      "CACHE_TAG=${configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE}",
+                      "CACHE_TAG=${cacheTag}",
+                      "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
+                      "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
@@ -472,16 +519,19 @@ pipeline {
                 }
 
                 sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
 
                 if (isPatchsetPublishable()) {
                   sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                 }
 
-                if (configuration.isChangeMerged()) {
-                  sh 'docker tag $PATCHSET_TAG $POSTMERGE_CACHE_IMAGE'
+                if(configuration.isChangeMerged()) {
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE"
+                  slackSendCacheAvailable(env.WEBPACK_BUILDER_CACHE_IMAGE)
+
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
-                  slackSendCacheAvailable('post-merge')
+                  slackSendCacheAvailable(env.POSTMERGE_CACHE_IMAGE)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
@@ -517,15 +567,16 @@ pipeline {
                   stages['Build Docker Image Cache'] = {
                     withEnv([
                       "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
+                      "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {
-                      slackSendCacheBuild('pre-merge') {
-                        sh "build/new-jenkins/docker-build.sh $PREMERGE_CACHE_IMAGE"
+                      slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
+                        sh "build/new-jenkins/docker-build.sh"
                       }
 
                       sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
-                      slackSendCacheAvailable('pre-merge')
+                      slackSendCacheAvailable(env.PREMERGE_CACHE_IMAGE)
                     }
                   }
                 }
@@ -550,44 +601,41 @@ pipeline {
                 })
 
                 echo 'adding Vendored Gems'
-                timedStage('Vendored Gems', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/vendored-gems', buildParameters + [
+                buildStage.makeFromJob('Vendored Gems', '/Canvas/test-suites/vendored-gems', stages, buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                  ], true, "")
-                })
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                  ]
+                )
 
                 echo 'adding Javascript (Jest)'
-                timedStage('Javascript (Jest)', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "jest"),
-                  ], true, "testReport")
-                })
+                  ], true, "testReport"
+                )
 
                 echo 'adding Javascript (Karma)'
-                timedStage('Javascript (Karma)', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/JS', buildParameters + [
+                buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "karma"),
-                  ], true, "testReport")
-                })
+                  ], true, "testReport"
+                )
 
                 echo 'adding Contract Tests'
-                timedStage('Contract Tests', stages, {
-                  wrapBuildExecution('/Canvas/test-suites/contract-tests', buildParameters + [
+                buildStage.makeFromJob('Contract Tests', '/Canvas/test-suites/contract-tests', stages, buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                  ], true, "")
-                })
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                  ]
+                )
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
-                  timedStage('CDC Schema Check', stages, {
-                    build job: '../Canvas/cdc-event-transformer-master', parameters: [
+                  buildStage.makeFromJob('CDC Schema Check', '../Canvas/cdc-event-transformer-master', stages, buildParameters + [
                       string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
                     ]
-                  })
+                  )
                 }
                 else {
                   echo 'no migrations added, skipping CDC Schema check'
@@ -601,22 +649,17 @@ pipeline {
                   )
                 ) {
                   echo 'adding Flakey Spec Catcher'
-                  timedStage('Flakey Spec Catcher', stages, {
-                    def propagate = configuration.fscPropagate()
-                    echo "fsc propagation: $propagate"
-                    wrapBuildExecution('/Canvas/test-suites/flakey-spec-catcher', buildParameters  + [
+                  buildStage.makeFromJob('Flakey Spec Catcher', '/Canvas/test-suites/flakey-spec-catcher', stages, buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
-                    ], propagate, "")
-                  })
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
+                    ], configuration.fscPropagate(), ""
+                  )
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
                   echo 'adding Local Docker Dev Build'
-                  timedStage('Local Docker Dev Build', stages, {
-                    wrapBuildExecution('/Canvas/test-suites/local-docker-dev-smoke', buildParameters, true, "")
-                  })
+                  buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
                 }
 
                 if(configuration.isChangeMerged()) {

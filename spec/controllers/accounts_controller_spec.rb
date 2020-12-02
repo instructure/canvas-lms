@@ -1305,22 +1305,6 @@ describe AccountsController do
     it "should be able to search by course name" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
-      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
-
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
-      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 52))
 
       @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
@@ -1337,22 +1321,6 @@ describe AccountsController do
     it "should be able to search by course sis id" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30012)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
-      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
-
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
-      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
 
       @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
@@ -1364,6 +1332,19 @@ describe AccountsController do
       expect(response).to be_successful
       expect(response.body).to match(/\"name\":\"apple\".+\"name\":\"Apps\"/)
       expect(response.body).not_to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"bar\".+\"name\":\"cappuccino\".+\"name\":\"foo\"/)
+    end
+
+    it "should be able to search by a course sis id that is > than bigint max" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: "9223372036854775808")
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc", search_by: "course", search_term: "9223372036854775808"}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"name\":\"apple\"/)
+      expect(response.body).not_to match(/\"name\":\"Apps\"/)
     end
 
   end

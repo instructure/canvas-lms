@@ -96,16 +96,6 @@ if (
 ready(() => {
   ;(window.deferredBundles || []).forEach(loadBundle)
 
-  if (!ENV.FEATURES.new_math_equation_handling) {
-    // This is in a setTimeout to have it run on the next time through the event loop
-    // so that the code that actually renders the user_content runs first,
-    // because it has to be rendered before we can check if isMathMLOnPage
-    setTimeout(() => {
-      if (mathml.isMathMLOnPage()) mathml.loadMathJax(undefined)
-    }, 5)
-    return
-  }
-
   // This is in a setTimeout to have it run on the next time through the event loop
   // so that the code that actually renders the user_content runs first,
   // because it has to be rendered before we can check if isMathOnPage
@@ -113,7 +103,7 @@ ready(() => {
     window.dispatchEvent(processNewMathEvent)
   }, 0)
 
-  const ignore_list = '#quiz-elapsed-time' // comma-separated list of selectors to ignore
+  const ignore_list = '#quiz-elapsed-time,.ui-menu-carat' // comma-separated list of selectors to ignore
   const processNewMathEvent = new Event(mathml.processNewMathEventName)
   const observer = new MutationObserver((mutationList, _observer) => {
     for (let m = 0; m < mutationList.length; ++m) {
@@ -121,11 +111,10 @@ ready(() => {
         const addedNodes = mutationList[m].addedNodes
         for (let n = 0; n < addedNodes.length; ++n) {
           const node = addedNodes[n]
-          if (node.nodeType !== Node.ELEMENT_NODE) return
-          if (node.parentElement?.querySelector(ignore_list)) return
+          if (node.nodeType !== Node.ELEMENT_NODE) continue
+          if (node.parentElement?.querySelector(ignore_list)) continue
+          window.dispatchEvent(processNewMathEvent)
         }
-        window.dispatchEvent(processNewMathEvent)
-        return
       }
     }
   })

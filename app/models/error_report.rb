@@ -18,8 +18,6 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require 'iconv'
-
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
   belongs_to :account

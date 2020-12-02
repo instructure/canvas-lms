@@ -36,7 +36,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
     props = {
       bridge: new Bridge(),
       editor,
-      containingContext: {type: 'course', contextId: '1201', userId: '17'},
+      containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
       contextId: '1201',
       contextType: 'course',
       source: fakeSource,

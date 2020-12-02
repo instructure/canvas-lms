@@ -45,7 +45,7 @@ pipeline {
           protectedNode('canvas-docker', { cleanupFn() }) {
             stage('Setup') {
               cleanAndSetup()
-
+              // always pull from gerrit refspec to test the changed docker dev code
               checkoutRepo("canvas-lms", env.GERRIT_REFSPEC, 1)
             }
 

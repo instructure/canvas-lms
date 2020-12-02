@@ -413,6 +413,9 @@
     "embedded_content_aaeb4d3d": {
         "message": "埋め込まれたコンテンツ"
     },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "検索する語を3文字以上入力してください"
+    },
     "equation_1c5ac93c": {
         "message": "方程式"
     },

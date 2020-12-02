@@ -335,7 +335,9 @@ describe Auditors::GradeChange do
       )
     end
 
-    let(:course_grade_changes) { Auditors::GradeChange.for_course(@course).paginate(per_page: 10) }
+    def course_grade_changes(course)
+      Auditors::GradeChange.for_course(course).paginate(per_page: 10)
+    end
 
     before do
       allow(Auditors).to receive(:config).and_return({'write_paths' => ['active_record'], 'read_path' => 'active_record'})
@@ -358,18 +360,19 @@ describe Auditors::GradeChange do
     end
 
     it "returns submission grade changes in results" do
+      expect(course_grade_changes(@course).length).to eq 1
       Auditors::GradeChange.record(submission: @submission)
-
       aggregate_failures do
-        expect(course_grade_changes.length).to eq 1
-        expect(course_grade_changes.first.submission_id).to eq @submission.id
+        cgc = course_grade_changes(@course)
+        expect(cgc.length).to eq 2
+        expect(cgc.last.submission_id).to eq @submission.id
       end
     end
 
     it "returns override grade changes in results" do
+      expect(course_grade_changes(@course).count).to eq 1
       Auditors::GradeChange.record(override_grade_change: override_grade_change)
-
-      expect(course_grade_changes.count).to eq 1
+      expect(course_grade_changes(@course).count).to eq 2
     end
 
     it "stores override grade changes in the database" do

@@ -332,12 +332,40 @@ describe RubricAssessmentsController do
       delete 'destroy', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id}
       assert_unauthorized
     end
+
     it "should delete the assessment" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_assessment_model(:user => @user, :context => @course)
       delete 'destroy', params: {:course_id => @course.id, :rubric_association_id => @rubric_association.id, :id => @rubric_assessment.id}
       expect(response).to be_successful
       expect(assigns[:assessment]).to be_frozen
+    end
+
+    it "should delete related learning_outcome_result" do
+      outcome_model
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_assessment_model(:user => @user, :context => @course)
+      assignment = @course.assignments.create!
+      result = LearningOutcomeResult.create!(
+        artifact: @rubric_assessment,
+        user: @user,
+        learning_outcome: @outcome,
+        context: @course,
+        association_object: assignment,
+        associated_asset: assignment,
+        alignment: ContentTag.create!({
+          title: 'content',
+          context: @course,
+          learning_outcome: @outcome
+        })
+      )
+      delete 'destroy', params: {
+        :course_id => @course.id,
+        :rubric_association_id => @rubric_association.id,
+        :id => @rubric_assessment.id
+      }
+      expect(response).to be_successful
+      expect(LearningOutcomeResult.find_by(id: result.id)).to be_nil
     end
   end
 

@@ -27,7 +27,9 @@ describe('sources/api', () => {
   const props = {
     host: 'example.host',
     contextType: 'group',
-    contextId: 123
+    contextId: 123,
+    sortBy: {sort: 'date_added', dir: 'desc'},
+    searchString: ''
   }
   let apiSource
   let alertFuncSpy
@@ -72,7 +74,11 @@ describe('sources/api', () => {
     })
 
     it('creates a collection that is not initially loading', () => {
-      assert.strictEqual(collection.loading, false)
+      assert.strictEqual(collection.isLoading, false)
+    })
+
+    it('creates a collection that initially has more', () => {
+      assert.strictEqual(collection.hasMore, true)
     })
   })
 
@@ -119,8 +125,7 @@ describe('sources/api', () => {
         host: undefined,
         contextType: 'course',
         contextId: '17',
-        sort: 'alphabetical',
-        order: 'asc',
+        sortBy: {sort: 'alphabetical', dir: 'asc'},
         searchString: 'hello world'
       }
     })
@@ -476,7 +481,7 @@ describe('sources/api', () => {
     it('requests images from API', () => {
       fetchMock.mock(/\/documents\?.*content_types=image/, {body})
       return apiSource.fetchImages(props).then(page => {
-        assert.deepEqual(page, {
+        assert.deepStrictEqual(page, {
           bookmark: 'mo.images',
           files: [{href: '/some/where?wrap=1', uuid: 'xyzzy'}]
         })

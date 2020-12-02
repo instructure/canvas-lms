@@ -208,6 +208,35 @@ describe "course rubrics" do
         end
         expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text)).to eq points
       end
+
+      it "rubrics are updated after mastery scales are modified" do
+        current_proficiency = OutcomeProficiency.find_or_create_default!(@course.account)
+        rubric_association_model(:user => @user, :context => @course, :purpose => "grading")
+        outcome_model(:context => @course)
+
+        get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+        wait_for_ajaximations
+        import_outcome
+        current_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        # checks if they are equal after adding outcome
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq current_points
+        submit_form("#edit_rubric_form")
+        wait_for_ajaximations
+        # check if they are equal after submission
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq current_points
+
+        # Update proficiency's first rating with new point value of 30
+        ratings_hash_map = current_proficiency.ratings_hash
+        ratings_hash_map[0][:points] = 30.0
+        current_proficiency.replace_ratings(ratings_hash_map)
+        current_proficiency.save!
+
+        refresh_page
+        wait_for_ajaximations
+        updated_points = current_proficiency.outcome_proficiency_ratings.map { |rating| rating.points.to_f}
+        # checks if they are equal after update
+        expect(ff('tr.learning_outcome_criterion td.rating .points').map(&:text).map(&:to_f)).to eq updated_points
+      end
     end
   end
 

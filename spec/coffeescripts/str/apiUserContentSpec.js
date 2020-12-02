@@ -19,15 +19,20 @@
 import apiUserContent from 'compiled/str/apiUserContent'
 
 let mathml_html
+let FEATURES
 
 QUnit.module('apiUserContent.convert', {
   setup() {
+    FEATURES = ENV.FEATURES
     mathml_html =
       '<div><ul>\n' +
       "<li><img class=\"equation_image\" x-canvaslms-safe-mathml=\"&lt;math xmlns=&quot;http://www.w3.org/1998/Math/MathML&quot; display=&quot;inline&quot;&gt;&lt;mi&gt;i&lt;/mi&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;mi&gt;t&lt;/mi&gt;&lt;mi&gt;f&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;mo&gt;/&lt;/mo&gt;&lt;mi&gt;g&lt;/mi&gt;&lt;mo stretchy='false'&gt;(&lt;/mo&gt;&lt;mi&gt;x&lt;/mi&gt;&lt;mo stretchy='false'&gt;)&lt;/mo&gt;&lt;/math&gt;\"></li>\n" +
       '<li><img class="equation_image" x-canvaslms-safe-mathml=\'&lt;math xmlns="http://www.w3.org/1998/Math/MathML" display="inline"&gt;&lt;mo lspace="thinmathspace" rspace="thinmathspace"&gt;&amp;Sum;&lt;/mo&gt;&lt;mn&gt;1&lt;/mn&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mo&gt;.&lt;/mo&gt;&lt;mi&gt;n&lt;/mi&gt;&lt;/math&gt;\'></li>\n' +
       '<li><img class="nothing_special"></li>\n' +
       '</ul></div>'
+  },
+  teardown() {
+    ENV.FEATURES = FEATURES
   }
 })
 

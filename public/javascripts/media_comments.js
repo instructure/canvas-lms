@@ -57,7 +57,7 @@ $.mediaComment.partnerData = function(params) {
 
 $.mediaComment.contextCode = function() {
   // if we can't figure out which context we are in assume that it is the current logged in user
-  return ENV.context_asset_string || 'user_' + ENV.current_user_id
+  return ENV.media_comment_asset_string || ENV.context_asset_string || 'user_' + ENV.current_user_id
 }
 
 function addEntry(entry, isAudioFile) {

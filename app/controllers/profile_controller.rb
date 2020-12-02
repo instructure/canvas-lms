@@ -232,7 +232,9 @@ class ProfileController < ApplicationController
       add_crumb(t("Account Notification Settings"))
       js_env NOTIFICATION_PREFERENCES_OPTIONS: {
         deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
+        reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
+        allowed_push_categories: Notification.categories_to_send_in_push,
         send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account)
       }
       js_bundle :account_notification_settings_show

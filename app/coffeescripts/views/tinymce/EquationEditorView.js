@@ -269,6 +269,8 @@ export default class EquationEditorView extends Backbone.View {
     // if it does, we'll send its html to the RCE, where
     // the image will get pulled from the cache, so the 2nd
     // request won't cost much
+    // NOTE: commented out because the service used in prod
+    //       will not accept a CORS request
     const url = `/equation_images/${this.doubleEncodeEquationForUrl(text)}`
     // fetch(url, {
     //   method: 'GET',

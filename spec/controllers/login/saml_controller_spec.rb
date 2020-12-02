@@ -829,7 +829,8 @@ SAML
     @pseudonym.save!
 
     controller.request.env['canvas.domain_root_account'] = @account
-    Timecop.freeze(Time.parse("2012-08-03T20:07:15Z")) do
+    Timecop.freeze(Time.zone.parse("2012-08-03T20:07:15Z")) do
+      Auditors::ActiveRecord::Partitioner.process
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:saml_unique_id]).to eq unique_id
@@ -856,7 +857,8 @@ SAML
     @pseudonym.save!
 
     controller.request.env['canvas.domain_root_account'] = @account
-    Timecop.freeze(Time.parse("2012-08-03T20:07:15Z")) do
+    Timecop.freeze(Time.zone.parse("2012-08-03T20:07:15Z")) do
+      Auditors::ActiveRecord::Partitioner.process
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:saml_unique_id]).to eq unique_id

@@ -108,15 +108,19 @@
                   </span>
                 </th>
               {{/if}}
-              <th scope="col" style="width: 5%" role="columnheader">
-                <span class="screenreader-only">{{#t}}Master Lock{{/t}}</span>
-              </th>
-              <th scope="col" style="width: 5%" role="columnheader">
-                <span class="screenreader-only">{{#t}}Publish{{/t}}</span>
-              </th>
-              <th scope="col" style="width: 5%" role="columnheader">
-                <span class="screenreader-only">{{#t}}Manage{{/t}}</span>
-              </th>
+              {{#if CAN.OPEN_MANAGE_OPTIONS}}
+                <th scope="col" style="width: 5%" role="columnheader">
+                  <span class="screenreader-only">{{#t}}Master Lock{{/t}}</span>
+                </th>
+                {{#if CAN.PUBLISH}}
+                  <th scope="col" style="width: 5%" role="columnheader">
+                    <span class="screenreader-only">{{#t}}Publish{{/t}}</span>
+                  </th>
+                {{/if}}
+                <th scope="col" style="width: 5%" role="columnheader">
+                  <span class="screenreader-only">{{#t}}Manage{{/t}}</span>
+                </th>
+              {{/if}}
             </tr>
           </thead>
           <tbody class="collectionViewItems"></tbody>

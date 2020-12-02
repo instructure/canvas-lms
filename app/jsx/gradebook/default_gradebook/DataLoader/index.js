@@ -58,7 +58,6 @@ export default class DataLoader {
     this.__loadGradebookData({
       dataLoader: this,
       gradebook,
-
       getAssignmentGroups: true,
       getModules: gradebook.options.has_modules,
       getCustomColumns: true,
@@ -118,12 +117,20 @@ export default class DataLoader {
     // Begin loading Student IDs before any other data.
     const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
 
-    if (options.getAssignmentGroups) {
-      dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+    let gotGradingPeriodAssignments
+    if (options.getGradingPeriodAssignments) {
+      gotGradingPeriodAssignments = dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
     }
 
-    if (options.getGradingPeriodAssignments) {
-      dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+    if (options.getAssignmentGroups) {
+      if (gotGradingPeriodAssignments && gradebook.gradingPeriodId !== '0') {
+        // eslint-disable-next-line promise/catch-or-return
+        gotGradingPeriodAssignments.then(() => {
+          dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+        })
+      } else {
+        dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+      }
     }
 
     if (options.getCustomColumns) {

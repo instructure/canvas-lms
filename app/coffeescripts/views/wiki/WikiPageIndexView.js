@@ -336,6 +336,10 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
       PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+    // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexItemView.js to match
+    json.CAN.OPEN_MANAGE_OPTIONS =
+      json.CAN.MANAGE || json.CAN.CREATE || json.CAN.PUBLISH || ENV.DIRECT_SHARE_ENABLED
+
     json.BULK_DELETE_ENABLED = ENV.FEATURES?.bulk_delete_pages
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast

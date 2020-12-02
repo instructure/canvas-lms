@@ -134,20 +134,6 @@ describe('ProficiencyRating', () => {
       expect(radio.props().checked).toBe(true)
     })
 
-    it('mastery checkbox receives focus', () => {
-      const wrapper = mount(
-        <div>
-          <ProficiencyRating {...defaultProps({focusField: 'mastery', canManage: true})} />
-        </div>
-      )
-      expect(
-        wrapper
-          .find('RadioInput')
-          .find('input')
-          .instance()
-      ).toBe(document.activeElement)
-    })
-
     it('clicking mastery checkbox triggers change', () => {
       const onMasteryChange = jest.fn()
       const wrapper = mount(

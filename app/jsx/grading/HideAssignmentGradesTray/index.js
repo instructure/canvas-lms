@@ -30,6 +30,7 @@ import {
   hideAssignmentGradesForSections,
   resolveHideAssignmentGradesStatus
 } from './Api'
+import {isHideable} from '../helpers/SubmissionHelper'
 import {showFlashAlert} from '../../shared/FlashAlert'
 
 function initialShowState() {
@@ -56,7 +57,8 @@ export default class HideAssignmentGradesTray extends PureComponent {
       hidingGrades: false,
       onExited() {},
       open: false,
-      selectedSectionIds: []
+      selectedSectionIds: [],
+      submissions: []
     }
   }
 
@@ -144,7 +146,9 @@ export default class HideAssignmentGradesTray extends PureComponent {
       return null
     }
 
-    const {assignment, containerName, onExited, sections} = this.state
+    const {assignment, containerName, onExited, sections, submissions} = this.state
+
+    const unhiddenCount = submissions.filter(submission => isHideable(submission)).length
 
     return (
       <Tray
@@ -179,6 +183,7 @@ export default class HideAssignmentGradesTray extends PureComponent {
           sections={sections}
           sectionSelectionChanged={this.sectionSelectionChanged}
           selectedSectionIds={this.state.selectedSectionIds}
+          unhiddenCount={unhiddenCount}
         />
       </Tray>
     )

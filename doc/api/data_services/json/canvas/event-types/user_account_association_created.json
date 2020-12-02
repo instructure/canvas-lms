@@ -1,0 +1,37 @@
+{
+  "name": "user_account_association_created",
+  "definition": "The event is emitted anytime a user is created in an account.",
+  "trigger": "Triggered when a user is added to an account.",
+  "schema": {
+    "account_id": "The Canvas id of the account for this association.",
+    "account_uuid": "The unique id of the account for this association.",
+    "created_at": "The time at which this association was created.",
+    "is_admin": "Is user an administrator?",
+    "updated_at": "The time at which this association was last modified.",
+    "user_id": "The Canvas id of the user for this association."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "user_account_association_created",
+          "event_time": "2019-11-01T19:11:11.717Z",
+          "job_id": "1020020528469291",
+          "job_tag": "SIS::CSV::ImportRefactored#run_parallel_importer",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "account_id": "21070000000000079",
+          "account_uuid": "5CaqE03jAic6wjkvgbjaerkucZtFyIvYnsW1t62H",
+          "created_at": "2019-11-01T19:11:11.717Z",
+          "is_admin": false,
+          "updated_at": "2019-11-01T19:11:11.717Z",
+          "user_id": "21070000000000712"
+        }
+      }
+    }
+  ]
+}

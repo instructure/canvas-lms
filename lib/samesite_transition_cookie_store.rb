@@ -47,7 +47,19 @@ class SamesiteTransitionCookieStore < ActionDispatch::Session::EncryptedCookieSt
   # store something else and keep it, dropping the
   # cookie accessor wrappers.
   def unmarshal(data, options={})
-    unmarshalled_data = super(data, options)
+    unmarshalled_data = nil
+    begin
+      unmarshalled_data = super(data, options)
+    rescue ArgumentError => e
+      # if the data being provided is not formatted in such a way that
+      # we can extract appropriately sized segments from it,
+      # then this is an auth problem (bad cookie), not a real
+      # exception.  We'll return nil as though the cookie
+      # was unauthorized (and it is), and log the failure, but not explode because
+      # handling this as some 4xx is more accurate than a 500.
+      Canvas::Errors.capture_exception(:cookie_store, e, :info)
+      return nil
+    end
     if unmarshalled_data.nil? && data.present?
       Rails.logger.warn("[AUTH] Cookie data (present) failed to unmarshal. Inactivity timeout or invalid digest.")
     end

@@ -176,6 +176,7 @@ nb:
   a_and_b_cannot_be_used_together_77ee6a2a: "{a} og {b} kan ikke brukes sammen"
   a_calculation_value_is_not_used_with_this_calculat_b1e854b4: "Det brukes ikke kalkuleringsverdi med denne beregningsmetoden"
   a_canvas_security_token_was_just_generated_for_you_efeeac68: "Et Canvas sikkerhet-symbol ble nettopp generert for kontoen din. Hvis du forespurte et brukersymbol er ingen ytterligere handlinger nødvendig. Hvis du ikke forespurte et symbol, eller ønsker å administrere sine Canvas-tilgangssymboler, kan du gjøre det her"
+  a_few_seconds_ago_e43118d: "for noen sekunder siden"
   a_file_named_itemname_already_exists_in_this_folde_b0dc7185: "En fil med navnet %{itemName} finnes allerede i denne mappen."
   a_file_named_name_already_exists_do_you_want_to_re_6536980: "En fil med navnet “%{name}” finnes allerede. Vil du erstatte den eksisterende filen?"
   a_file_named_name_already_exists_in_this_folder_do_e39de0b2: "En fil med navnet “%{name}” finnes allerede i denne mappen. Vil du erstatte den eksisterende filen?"
@@ -2478,6 +2479,7 @@ nb:
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Det oppsto en feil ved oppdatering av ferdighetsvurderingene: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Det oppsto en feil ved oppdatering av ferdighetsvurderingene"
   an_error_occurred_updating_this_assignment_21287c7e: "Det oppsto et avvik under oppdatering av denne oppgaven."
+  an_error_occurred_when_cloning_the_group_set_8e80da6b: "Det oppsto en feil ved duplisering av gruppesett."
   an_error_occurred_when_saving_the_group_536c8f66: "Det oppsto en feil ved lagring av gruppen."
   an_error_occurred_when_setting_the_usage_right_for_d4ea78f5: "En avvik oppstod ved innstilling av brukerrettigheter for %{filename}"
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "En avvik oppstod under forsøket på å kontakte Turnitin."
@@ -2956,6 +2958,7 @@ nb:
     scores_lower_than_the_average: "Resultater som er lavere enn gjennomsnittet %{average}"
     total_graded_submissions: "Antall rettede innleveringer:"
   assignment_details_expanded_20c6f0c7: "oppgavedetaljer utvidet"
+  assignment_details_updated_493f410b: "Oppgavedetaljer oppdatert"
   assignment_does_not_exist_74178c34: "oppgaven eksisterer ikke"
   assignment_edit_6dced39f: "Rediger oppgave"
   assignment_enhancements_student_557372ab: "Oppgaveforbedringer - Student"
@@ -5086,6 +5089,8 @@ nb:
   client_id_cb2502af: Klient-ID
   client_id_is_required_1afd54d1: "Påkrevd med Klient-ID"
   clone_group_set_c2a40e15: "Kopier gruppesett"
+  clone_groupcategoryname_ef85ddb8: "(Dupliser) %{groupCategoryName}"
+  cloning_group_set_813b06f5: "Dupliserer gruppesett"
   close_17f50799: lukk
   close_and_return_to_canvas_80544344: "Lukk og returner til Canvas"
   close_d634289d: Lukk
@@ -5497,6 +5502,7 @@ nb:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Bekreft rediger resultat"
+  confirm_mastery_scales_c6ef2169: "Bekreft mestringsskalaer"
   confirm_qr_code_display_49664fa3: "Bekreft QR-kodevisning"
   confirm_removal_a9bb889: "Bekreft fjerning"
   confirm_reservation_removal_e6350e7c: "Bekreft fjerning av reservasjon"
@@ -6502,6 +6508,7 @@ nb:
   count_points_4735a2e8: 
     one: "1 poeng"
     other: "%{count} poeng"
+  count_posted_b92a9562: "%{count} lagt ut"
   count_posts_added_fa55ce4: 
     one: "%{count} post lagt til"
     other: "%{count} poster lagt til"
@@ -7984,6 +7991,7 @@ nb:
   delete_this_answer_f1802eaa: "Slett dette svaret"
   delete_this_collaboration_4f20b698: "Slett dette samarbeidet"
   delete_this_feed_67d5d924: "Slett denne strømmen"
+  delete_this_file_683804a1: "Slett denne filen"
   delete_this_key_70f74aa1: "Slett denne nøkkelen"
   delete_this_module_20d54791: "Slett denne modulen"
   delete_this_page_509f2baf: "Slett denne siden"
@@ -8003,6 +8011,10 @@ nb:
   deleted_content_exceptions_237e809d: "Forventninger av slettet innhold:"
   deleted_content_referenced_in_this_resource_e42d1998: "Slettet innhold er referert til i denne ressursen:"
   deleting_6421031e: sletter…
+  deleting_a_submission_file_is_typically_done_only__fb8b07e6: |-
+      Sletting av en innleveringsfil skjer som regel bare når en student publiserer upassende eller privat innhold.
+      
+      Denne handlingen er irreversibel. Er du sikker på at du ønsker å slette %{file}?
   deleting_a_user_will_destroy_all_of_their_eportfol_7f9ff34a: "Å slette en bruker vil ødelegg alle deres ePortfolioer. Alternativt kan ePortfolioer indivuelt markeres som “spam” eller “sikker” for å endre synligheten deres."
   deleting_assignment_22d5851d: "sletter oppgave"
   delicious_7f9ac66f: Delicious
@@ -9439,6 +9451,7 @@ nb:
   error_adding_canvas_file_to_submission_draft_de258021: "Avvik når canvas-fil skulle legges til som innleveringsutkast"
   error_adding_files_to_submission_draft_6acac337: "Avvik når filer skulle legges til som innleveringsutkast"
   error_associating_assignment_assignment_name_with__d92e9acf: "Avvik i forbindelse med oppgave «%{assignment_name}» med et LTI-verktøy."
+  error_deleting_file_551dc16e: "Feil ved sletting av %{file}"
   error_deleting_name_reason_11f9d399: "Avvik ved sletting av  %{name}: %{reason}"
   error_duplicating_module_4b023042: "Feil under duplisering av modul"
   error_during_group_creation_f232994b: "Det oppsto en feil under oppretting av gruppe"
@@ -11273,7 +11286,8 @@ nb:
   group_roster_1846bf84: "Liste over gruppedeltakere"
   group_saved_successfully_fcd5ca66: "Gruppen ble lagret"
   group_select_330df8bd: Gruppevalg
-  group_set_name_2aed2347: Gruppebestemtnavn
+  group_set_cloned_successfully_3e1a1497: "Duplisering av gruppesett vellykket"
+  group_set_name_2aed2347: "Gruppebestemt navn"
   group_settings: 
     invitation_sent: "Invitasjoner sendt"
   group_weight_for_d46c5db4: "Gruppens vekting til:"
@@ -12201,6 +12215,7 @@ nb:
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Forbedre synligheten av dra og slipp i filer"
   improved_outcomes_management_4692f886: "Forbedret administrasjon av læringsmål"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbedrede visuelle påminnelser for å oppmuntre instruktører til å publisere emner"
+  in_a_few_seconds_538ddff3: "om noen sekunder"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "I %{asset_link}klikker studenter på %{bad_link} til en ikke-eksisterende side i emnet ditt."
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link}klikker studenter på %{bad_link} på innhold i et annet emne."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "I %{asset_link}, trykker studenter %{bad_link} på innhold de ikke har tilgang til."
@@ -12208,6 +12223,7 @@ nb:
   in_cases_where_it_is_available_load_the_rce_from_a_1fb32537: "I tilfeller der det er tilgjengelig, last RCE fra en rikholdig innholdstjeneste fra canvas"
   in_class_23eeca38: "I kurset"
   in_closed_grading_period_dc717846: "I lukket vurderingsperiode"
+  in_less_than_a_minute_c8595a28: "om under et minutt"
   in_order_to_complete_the_process_you_will_be_redir_83376e10: "For å fullføre prosessen blir du omdirigert til en påloggingsside der du vil trenge og logge inn med ditt barns opplysninger."
   in_order_to_import_a_large_quantity_of_outcomes_at_c0d587e3: "For å kunne importere en stor mengde resultater samtidig, eller oppdatere eksisterende resultater, *følg CSV-formatet*."
   in_product_training_walkthrough_and_tourpoints_for_2e185119: "Gjennomgang av produktopplæring innad og turpoeng for lærere."
@@ -12755,6 +12771,7 @@ nb:
   len_maxlen_97f1c88d: "%{len}/%{maxLen}"
   length_notifications_found_25276610: "%{length} varslinger funnet"
   length_results_found_3afd01e5: "%{length} Funnet resultat"
+  less_than_a_minute_ago_9f45e2a5: "under et minutt siden"
   let_students_see_the_correct_answers_dacc2faf: "Vis riktige svar"
   let_students_see_their_quiz_responses_fbc07d14: "La studentene se sine testsvar"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "La studenter se quiz-svarene sine (feil svar vil bli markert i Tilbakemeldinger fra studenter)"
@@ -17586,6 +17603,7 @@ nb:
   post_to_961f8937: "Post til"
   post_to_students_b02df196: "Send til student"
   post_types_93ff86d9: "Sett inn varianter"
+  posted_455862b9: "Lagt ut"
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Postet på:"
   posted_to_student_861beec9: "Sent til student"
@@ -19921,6 +19939,10 @@ nb:
       Erstatter eksisterende bilde av matematisk likning pluss skjult MathML
       med en MathJax formatert versjon. Dette gir bedre tilgjengelighet
       og mange alternativer for leseren til å samhandle med likningen på siden.
+  replaces_the_existing_image_of_the_math_equation_p_d320e0f7: |-
+      Erstatter det eksisterende bildet til matteligningen pluss den skjulte mathml
+      med en MathJax-behandlet versjon. Denne endringer gir bedre tilgjengelighet
+      og mange alternativer for leseren til å samhandle med ligningen på siden.
   reply_389d6fb9: Svar
   reply_from_name: "%{name} via Canvas varslinger"
   reply_to_comment_72d96728: "Svar til Kommentar"
@@ -20427,7 +20449,7 @@ nb:
         download_current_scores: "Last ned Nåværende resultater (.csv)"
         grading_history: "Vis karakterhistorikk"
         hide_student_names_label: "Skjul studentnavn"
-        include_ungraded_assignments: "Behandle ikke karaktersatt som 0"
+        include_ungraded_assignments: "Vis ikke vurdert som 0"
         set_group_weights: "Sett vekting for grupper"
         show_concluded_enrollments_label: "Vis konkluderte påmeldinger"
         show_notes: "Vis notater i studentinformasjonen"
@@ -22505,6 +22527,7 @@ nb:
       student_support_description: "Instruktøren din skal være ditt første kontaktpunkt De kan svare deg på spørsmål om Networking Academy eller kontakte kundestøtte for deg. Du kan kontakte instruktøren din ved å bruke innboks-funksjonen."
       support_desk_livechat: "Support Desk Live Chat"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtter foretrukne LTI-verktøy i RCE"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Støtt LaTex-matteligninger nesten overalt."
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sverige
@@ -23023,6 +23046,7 @@ nb:
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Denne oppgaven vil ikke lenger telle mot din karakter,"
   this_attachment_has_been_unpublished_by_the_author_37bff9c3: "Dette vedlegget har blitt opphevet av forfatteren."
   this_code_expires_in_timefromnow_ec7ccef4: "Denne koden utløper %{timeFromNow}."
+  this_code_expires_timefromnow_877a5225: "Denne koden utløper %{timeFromNow}."
   this_code_has_expired_41f76642: "Denne koden har utløpt."
   this_conference_may_be_recorded_f76deeeb: "Denne konferansen kan bli tatt opp"
   this_course_cannot_be_added_to_the_courses_menu_at_a3fbb11e: "Dette emnet kan ikke legges til emnermeny på dette tidspunktet."
@@ -23180,6 +23204,8 @@ nb:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette tillater deg til å autentisere Canvas for posting av karakterer til SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Disse endringer blir nå brukt på hele kontoen. Vil du fortsette?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil legge til dette temaet på hele kontoen din. Ønsker du å fortsette?"
+  this_will_update_all_account_and_course_level_rubr_305e821a: "Dette vil oppdatere alle rubrikker på konto- og emnenivå som er knyttet til mestringsskalaer for kontonivå og ennå ikke er vurdert."
+  this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Dette vil oppdatere alle rubrikkene til læringsmål i dette emnet som ennå ikke er vurdert."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette oppdaterer alle rubrikkene med dette resultatet som ikke har blitt vurdert enda"
   threshold_in_hours_to_notify_students_within_f33820aa: "Terskel (i timer) å varsle studenter innen"
   threshold_pts_45f0e5d8: "terskel: %{pts}"
@@ -24111,6 +24137,7 @@ nb:
   updated_current_grade_to_currentgrade_bfe2ea14: "Oppdaterte nåværende karakter til %{currentGrade}"
   updated_group_group_name_727b1d98: "Oppdatert Gruppe %{group_name}"
   updated_math_equation_display_583671a8: "Oppdatert visning av matematisk likning"
+  updated_math_equation_handling_b84509d1: "Oppdaterte håndtering av matematiske ligninger"
   updated_permissions_page_f2e91060: "Oppdatert side for tillatelser"
   updated_terms_of_service_82f34148: "Oppdatert bruksavtale"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert UI for å kunne søke og vise brukere og emner innenfor en konto."
@@ -25254,6 +25281,7 @@ nb:
   you_do_not_have_access_to_the_requested_quiz_d3659e4b: "Du har ikke tilgang til den forespurte testen."
   you_do_not_have_access_to_the_requested_resource_316ce49a: "Du har ikke tilgang til den forespurte ressursen."
   you_do_not_have_permission_to_change_this_488c536: "Du har ikke tillatelse til å endre dette"
+  you_do_not_have_permission_to_delete_file_please_c_3b0abf50: "Du har ikke tillatelse til å slette %{file}. Kontakt kontoadministratoren din."
   you_do_not_have_permission_to_edit_this_assignment_59b53274: "Du har ikke tillatelse til å redigere denne oppgaven"
   you_do_not_have_permission_to_invite_users_that_do_b7142404: "Du har ikke tillatelse til å invitere brukere som ikke finnes fra før."
   you_do_not_have_permission_to_publish_this_course_ff361c82: "Du har ikke tillatelse til å publisere dette emnet."

@@ -287,6 +287,14 @@ describe OutcomeResultsController do
           score = (2.to_f / 5.to_f) * proficiency.points_possible
           expect(json['rollups'][0]['scores'][0]['score']).to eq score
         end
+
+        it 'returns outcomes with outcome_proficiency.ratings and their percents' do
+          outcome_proficiency_model(@course)
+          json = parse_response(get_rollups(rating_percents: true, include: ['outcomes']))
+          ratings = json['linked']['outcomes'][0]['ratings']
+          expect(ratings.map { |r| r['percent'] }).to eq [50, 50]
+          expect(ratings.map { |r| r['points'] }).to eq [10, 0]
+        end
       end
 
       context 'disabled' do

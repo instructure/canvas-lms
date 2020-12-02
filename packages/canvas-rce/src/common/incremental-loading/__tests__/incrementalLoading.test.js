@@ -44,7 +44,8 @@ describe('RCE > Common > Incremental Loading', () => {
       sortBy: {
         sort: 'alphabetical',
         order: 'asc'
-      }
+      },
+      searchString: ''
     }
   })
 
@@ -129,6 +130,14 @@ describe('RCE > Common > Incremental Loading', () => {
       renderComponent()
       expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
       loaderOptions.contextType = 'user'
+      rerenderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(2)
+    })
+
+    it('is executed when searchString changes', () => {
+      renderComponent()
+      expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(1)
+      loaderOptions.searchString = 'Waldo'
       rerenderComponent()
       expect(loaderOptions.onLoadInitial).toHaveBeenCalledTimes(2)
     })

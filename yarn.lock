@@ -5183,7 +5183,7 @@
     keycode "^2"
     prop-types "^15"
 
-"@instructure/ui-truncate-text@^6.17.0", "@instructure/ui-truncate-text@^6.22.0", "@instructure/ui-truncate-text@^6.26.0":
+"@instructure/ui-truncate-text@6", "@instructure/ui-truncate-text@^6.17.0", "@instructure/ui-truncate-text@^6.22.0", "@instructure/ui-truncate-text@^6.26.0":
   version "6.27.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-truncate-text/-/ui-truncate-text-6.27.0.tgz#3875f7cf88486fe114db7e5dbcc41448c6c0b53c"
   integrity sha512-MoH52JcR83XFkxQ9FQBehQFHZK38QpvQRVUA7xFfDTY8V0sH+ui7BloV9NoNTxSj9lKEvJj8SRam0mPjVF4Lcg==
@@ -17502,6 +17502,14 @@ jest-canvas-mock@^2:
     cssfontparser "^1.2.1"
     parse-color "^1.0.0"
 
+jest-canvas-mock@^2.3.0:
+  version "2.3.0"
+  resolved "https://registry.yarnpkg.com/jest-canvas-mock/-/jest-canvas-mock-2.3.0.tgz#50f4cc178ae52c4c0e2ce4fd3a3ad2a41ad4eb36"
+  integrity sha512-3TMyR66VG2MzAW8Negzec03bbcIjVJMfGNvKzrEnbws1CYKqMNkvIJ8LbkoGYfp42tKqDmhIpQq3v+MNLW2A2w==
+  dependencies:
+    cssfontparser "^1.2.1"
+    moo-color "^1.0.2"
+
 jest-changed-files@^24.9.0:
   version "24.9.0"
   resolved "https://registry.yarnpkg.com/jest-changed-files/-/jest-changed-files-24.9.0.tgz#08d8c15eb79a7fa3fc98269bc14b451ee82f8039"
@@ -20142,6 +20150,13 @@ moment-timezone@^0.5, moment-timezone@^0.5.13:
   version "2.24.0"
   resolved "https://registry.yarnpkg.com/moment/-/moment-2.24.0.tgz#0d055d53f5052aa653c9f6eb68bb5d12bf5c2b5b"
   integrity sha512-bV7f+6l2QigeBBZSM/6yTNq4P2fNpSWj/0e7jQcy87A8e7o2nAfP/34/2ky5Vw4B9S446EtIhodAzkFCcR4dQg==
+
+moo-color@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/moo-color/-/moo-color-1.0.2.tgz#837c40758d2d58763825d1359a84e330531eca64"
+  integrity sha512-5iXz5n9LWQzx/C2WesGFfpE6RLamzdHwsn3KpfzShwbfIqs7stnoEpaNErf/7+3mbxwZ4s8Foq7I0tPxw7BWHg==
+  dependencies:
+    color-name "^1.1.4"
 
 moo@^0.4.3:
   version "0.4.3"
