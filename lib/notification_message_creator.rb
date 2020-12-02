@@ -44,7 +44,6 @@ class NotificationMessageCreator
     if course_id && root_account_id
       @account = Account.new(id: root_account_id)
       @course = Course.new(id: course_id)
-      @override_preferences_enabled = Account.site_admin.feature_enabled?(:notification_granular_course_preferences)
     end
   end
 
@@ -218,10 +217,9 @@ class NotificationMessageCreator
     # a user can override the notification preference for a context, the context
     # needs to be provided in the notification from broadcast_policy, the lowest
     # level override is the one that should be respected.
-    if @override_preferences_enabled
-      policy = override_policy_for(channel, @message_data&.dig(:course_id), 'Course')
-      policy ||= override_policy_for(channel, @message_data&.dig(:root_account_id), 'Account')
-    end
+    policy = override_policy_for(channel, @message_data&.dig(:course_id), 'Course')
+    policy ||= override_policy_for(channel, @message_data&.dig(:root_account_id), 'Account')
+
     if !policy && should_use_default_policy?(user, channel)
       policy ||= channel.notification_policies.new(notification_id: @notification.id, frequency: @notification.default_frequency(user))
     end
