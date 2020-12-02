@@ -50,19 +50,23 @@ module Types
 
     field :child_groups_count, Integer, null: false
     def child_groups_count
-      # Not Implemented yet
-      0
+      learning_outcome_group_children_service.total_subgroups(object.id)
     end
 
     field :outcomes_count, Integer, null: false
     def outcomes_count
-      # Not Implemented yet
-      0
+      learning_outcome_group_children_service.total_outcomes(object.id)
     end
 
     field :outcomes, Types::ContentTagConnection, null: false
     def outcomes
       object.child_outcome_links.active.order_by_outcome_title
+    end
+
+    private
+
+    def learning_outcome_group_children_service
+      @learning_outcome_group_children_service ||= Outcomes::LearningOutcomeGroupChildren.new(object.context)
     end
   end
 end
