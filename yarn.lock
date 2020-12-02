@@ -2363,9 +2363,9 @@
     data-uri-to-blob "^0.0.4"
     prop-types "^15"
 
-"@instructure/reactour@https://github.com/instructure/reactour#master":
-  version "2.0.0"
-  resolved "https://github.com/instructure/reactour#71a498ae033056b6649bad95d4080323df2b9a4a"
+"@instructure/reactour@https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92":
+  version "2.0.1"
+  resolved "https://github.com/instructure/reactour#b908434fe544703e26bc67c67c4111252c401f92"
   dependencies:
     "@babel/runtime" "^7.8.7"
     "@emotion/core" "^10.0.28"

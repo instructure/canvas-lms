@@ -24,6 +24,7 @@ WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   cp --parents -rf \
+    script/fix_inst_esm.sh \
     package.json \
     yarn.lock \
     \
