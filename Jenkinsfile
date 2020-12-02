@@ -115,26 +115,7 @@ def postFn(status) {
       failureReport.submit()
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
-        withCredentials([
-          usernamePassword(
-            credentialsId: 'starlord',
-            usernameVariable: 'STARLORD_USERNAME',
-            passwordVariable: 'STARLORD_PASSWORD'
-          )
-        ]) {
-          def tagParts = env.PATCHSET_TAG.split(":")
-          def pathParts = tagParts[0].split("/", 2)
-
-          def CONTENT_TYPE = "application/vnd.docker.distribution.manifest.v2+json"
-          def SOURCE_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${tagParts[1]}"
-          def TARGET_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/master"
-
-          sh """
-            MANIFEST=\$(curl -H "Accept: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD $SOURCE_URL)
-
-            curl -X PUT -H "Content-Type: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD -d "\$MANIFEST" $TARGET_URL
-          """
-        }
+        dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
       }
     }
   } finally {
@@ -525,27 +506,7 @@ pipeline {
                 // If we are unable to push up the webpack builder image, then this
                 // build should use the currently cached image.
                 if (hasWebpackBuilderImage != 0) {
-                  def cacheTagParts = env.WEBPACK_BUILDER_CACHE_IMAGE.split(":")
-                  def tagParts = env.WEBPACK_BUILDER_IMAGE.split(":")
-                  def pathParts = cacheTagParts[0].split("/", 2)
-
-                  def CONTENT_TYPE = "application/vnd.docker.distribution.manifest.v2+json"
-                  def SOURCE_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${cacheTagParts[1]}"
-                  def TARGET_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${tagParts[1]}"
-
-                  withCredentials([
-                    usernamePassword(
-                      credentialsId: 'starlord',
-                      usernameVariable: 'STARLORD_USERNAME',
-                      passwordVariable: 'STARLORD_PASSWORD'
-                    )
-                  ]) {
-                    sh """
-                      MANIFEST=\$(curl -H "Accept: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD $SOURCE_URL)
-
-                      curl -X PUT -H "Content-Type: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD -d "\$MANIFEST" $TARGET_URL
-                    """
-                  }
+                  dockerUtils.tagRemote(env.WEBPACK_BUILDER_CACHE_IMAGE, env.WEBPACK_BUILDER_IMAGE)
                 }
 
                 if (isPatchsetPublishable()) {
