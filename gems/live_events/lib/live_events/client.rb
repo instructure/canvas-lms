@@ -57,6 +57,10 @@ module LiveEvents
         aws[:secret_access_key] = plugin_config['aws_secret_access_key_dec']
       end
 
+      if plugin_config['custom_aws_credentials']
+        aws[:credentials] = LiveEvents.aws_credentials(plugin_config)
+      end
+
       aws[:region] = plugin_config['aws_region'].presence || 'us-east-1'
 
       if plugin_config['aws_endpoint'].present?
