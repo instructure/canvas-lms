@@ -357,6 +357,9 @@ pipeline {
     WEBPACK_CACHE_PREMERGE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
     WEBPACK_CACHE_POSTMERGE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
 
+    WEBPACK_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
+    WEBPACK_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
     POSTGRES_IMAGE_TAG=imageTag.postgres()
@@ -468,6 +471,7 @@ pipeline {
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
                   def webpackCachePrefix = configuration.isChangeMerged() ? env.WEBPACK_CACHE_POSTMERGE_PREFIX : env.WEBPACK_CACHE_PREMERGE_PREFIX
+                  def webpackCacheScope = configuration.isChangeMerged() ? env.WEBPACK_CACHE_MERGE_SCOPE : env.WEBPACK_CACHE_BUILD_SCOPE
 
                   slackSendCacheBuild(webpackCachePrefix) {
                     withEnv([
@@ -475,6 +479,8 @@ pipeline {
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${webpackCachePrefix}",
+                      "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
+                      "WEBPACK_CACHE_SAVE_SCOPE=${webpackCacheScope}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
@@ -482,6 +488,8 @@ pipeline {
                     }
                   }
                 }
+
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
                 if(configuration.isChangeMerged()) {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE || true"
@@ -497,9 +505,11 @@ pipeline {
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
+                } else {
+                  sh(script: """
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREMERGE_PREFIX
+                  """, label: 'upload pre-merge specific images')
                 }
-
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
                 def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
 
@@ -544,6 +554,8 @@ pipeline {
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREMERGE_PREFIX}",
+                      "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
+                      "WEBPACK_CACHE_SAVE_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {

@@ -22,6 +22,10 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_CACHE_TAG: $RUBY_RUNNER_TAG + final compiled assets
 # $1: final image for this build, including all rails code
 
+# Controls:
+# $WEBPACK_CACHE_LOAD_SCOPE: image prefix for the primary cache image to load
+# $WEBPACK_CACHE_SAVE_SCOPE: image prefix for the target tag and also the secondary cache image to load
+
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
@@ -56,15 +60,18 @@ PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find 
 WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
 
 WEBPACK_CACHE_ID=$(echo "$BASE_IMAGE_ID $DOCKERFILE_CACHE_MD5 $YARN_CACHE_MD5 $PACKAGES_CACHE_MD5 $WEBPACK_CACHE_MD5" | md5sum | cut -d' ' -f1)
-WEBPACK_CACHE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_ID"
+WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
+WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:${WEBPACK_CACHE_LOAD_SCOPE:-$WEBPACK_CACHE_SAVE_SCOPE}-$WEBPACK_CACHE_ID"
 
-# If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_TAG and rebuild.
+# Check first if the primary cache ($WEBPACK_CACHE_LOAD_TAG) exists for these files
+# Fallback to the secondary cache ($WEBPACK_CACHE_SAVE_TAG).
 exit_code=0
-./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_TAG || exit_code=$?
+(./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_TAG && docker tag $WEBPACK_CACHE_LOAD_TAG local/webpack-cache) \
+  || (./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SAVE_TAG && docker tag $WEBPACK_CACHE_SAVE_TAG local/webpack-cache) \
+  || exit_code=$?
 
-if [[ "$exit_code" == "0" ]]; then
-  docker tag $WEBPACK_CACHE_TAG local/webpack-cache
-else
+# If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
+if [[ "$exit_code" != "0" ]]; then
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 
   docker build \
@@ -81,7 +88,7 @@ else
 
   docker build \
     --tag "local/webpack-cache" \
-    --tag "$WEBPACK_CACHE_TAG" \
+    --tag "$WEBPACK_CACHE_SAVE_TAG" \
     - < Dockerfile.jenkins.webpack-cache
 fi
 
