@@ -14938,9 +14938,9 @@ en-AU:
         body: "You've been invited to peer review %{reviewee}. Follow the link below to review them!"
     pseudonym_registration: 
       email: 
-        body: "You have been registered for a Canvas account at %{account}!  Before you can log in and start using Canvas, you'll need to finish the configuration process."
+        body: "You have been registered for a N1LMS account at %{account}!  Before you can log in and start using N1LMS, you'll need to finish the configuration process."
         html: 
-          body: "You have been registered for a Canvas account at %{account}! Before you can log in and start using Canvas, you'll need to finish the configuration process."
+          body: "You have been registered for a N1LMS account at %{account}! Before you can log in and start using N1LMS, you'll need to finish the configuration process."
           link: "Click here to finish the registration process"
           subject: "Finish Registration: Canvas"
         link_message: "To finish the registration process, please visit the following url:"
