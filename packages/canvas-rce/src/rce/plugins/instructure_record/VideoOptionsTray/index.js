@@ -16,12 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useState} from 'react'
-import {arrayOf, bool, func, node, number, shape, string} from 'prop-types'
+import {arrayOf, bool, func, number, shape, string} from 'prop-types'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Heading} from '@instructure/ui-heading'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {TextArea} from '@instructure/ui-text-area'
 import {IconQuestionLine} from '@instructure/ui-icons'
 import {Flex} from '@instructure/ui-flex'
@@ -44,7 +44,7 @@ import DimensionsInput, {useDimensionsState} from '../../shared/DimensionsInput'
 
 const getLiveRegion = () => document.getElementById('flash_screenreader_holder')
 export default function VideoOptionsTray(props) {
-  const {videoOptions, onRequestClose, open} = props
+  const {videoOptions, onEntered, onExited, onRequestClose, onSave, open, trayProps, id} = props
   const {naturalHeight, naturalWidth} = videoOptions
   const currentHeight = videoOptions.appliedHeight || naturalHeight
   const currentWidth = videoOptions.appliedWidth || naturalWidth
@@ -53,13 +53,11 @@ export default function VideoOptionsTray(props) {
   const [videoSize, setVideoSize] = useState(videoOptions.videoSize)
   const [videoHeight, setVideoHeight] = useState(currentHeight)
   const [videoWidth, setVideoWidth] = useState(currentWidth)
-  const [subtitles, setSubtitles] = useState(props.videoOptions.tracks || [])
-  const {trayProps} = props
+  const [subtitles, setSubtitles] = useState(videoOptions.tracks || [])
   const [minWidth] = useState(MIN_WIDTH_VIDEO)
   const [minHeight] = useState(Math.round((videoHeight / videoWidth) * MIN_WIDTH_VIDEO))
 
   const dimensionsState = useDimensionsState(videoOptions, {minHeight, minWidth})
-  const videoSizeOption = {label: labelForImageSize(videoSize), value: videoSize}
   function handleTitleTextChange(event) {
     setTitleText(event.target.value)
   }
@@ -89,8 +87,8 @@ export default function VideoOptionsTray(props) {
       appliedHeight = dimensionsState.height
       appliedWidth = dimensionsState.width
     }
-    props.onSave({
-      media_object_id: props.videoOptions.id,
+    onSave({
+      media_object_id: videoOptions.id,
       titleText,
       appliedHeight,
       appliedWidth,
@@ -140,8 +138,8 @@ export default function VideoOptionsTray(props) {
           data-mce-component
           label={formatMessage('Video Options Tray')}
           onDismiss={onRequestClose}
-          onEntered={props.onEntered}
-          onExited={props.onExited}
+          onEntered={onEntered}
+          onExited={onExited}
           open={open}
           placement="end"
           shouldCloseOnDocumentClick
@@ -194,19 +192,21 @@ export default function VideoOptionsTray(props) {
                     </Flex.Item>
                     <Flex.Item margin="small none xx-small none">
                       <View as="div" padding="small small xx-small small">
-                        <Select
+                        <SimpleSelect
+                          id={`${id}-size`}
                           disabled={displayAs !== 'embed'}
-                          label={formatMessage('Size')}
+                          renderLabel={formatMessage('Size')}
                           messages={messagesForSize}
+                          assistiveText={formatMessage('Use arrow keys to navigate options.')}
                           onChange={handleVideoSizeChange}
-                          selectedOption={videoSizeOption}
+                          value={videoSize}
                         >
                           {videoSizes.map(size => (
-                            <option key={size} value={size}>
+                            <SimpleSelect.Option id={`${id}-size-${size}`} key={size} value={size}>
                               {labelForImageSize(size)}
-                            </option>
+                            </SimpleSelect.Option>
                           ))}
-                        </Select>
+                        </SimpleSelect>
                       </View>
                       {videoSize === CUSTOM && (
                         <View as="div" padding="xx-small small">
@@ -238,7 +238,7 @@ export default function VideoOptionsTray(props) {
                   </Flex>
                 </Flex.Item>
                 <Flex.Item
-                  background="light"
+                  background="secondary"
                   borderWidth="small none none none"
                   padding="small medium"
                   textAlign="end"
@@ -266,7 +266,6 @@ VideoOptionsTray.propTypes = {
     appliedWidth: number,
     naturalHeight: number.isRequired,
     naturalWidth: number.isRequired,
-    source: node,
     tracks: arrayOf(shape({locale: string.isRequired}))
   }).isRequired,
   onEntered: func,
@@ -277,9 +276,11 @@ VideoOptionsTray.propTypes = {
   trayProps: shape({
     host: string.isRequired,
     jwt: string.isRequired
-  })
+  }),
+  id: string
 }
 VideoOptionsTray.defaultProps = {
   onEntered: null,
-  onExited: null
+  onExited: null,
+  id: 'video-options-tray'
 }

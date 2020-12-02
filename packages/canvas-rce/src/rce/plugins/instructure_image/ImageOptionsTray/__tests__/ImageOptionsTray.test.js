@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 
 import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
+import {CUSTOM} from '../../ImageEmbedOptions'
 
 describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   let props
@@ -32,6 +33,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         altText: '',
         appliedHeight: 300,
         appliedWidth: 150,
+        imageSize: CUSTOM,
         isLinked: false,
         isDecorativeImage: false,
         naturalHeight: 200,

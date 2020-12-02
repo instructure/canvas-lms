@@ -272,6 +272,7 @@ const UploadFileModal = React.forwardRef(
                     summary={<Text size="x-large">{formatMessage('Attributes')}</Text>}
                   >
                     <ImageOptionsForm
+                      id="upload-file-form"
                       altText={altText}
                       isDecorativeImage={isDecorativeImage}
                       displayAs={displayAs}

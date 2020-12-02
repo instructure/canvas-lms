@@ -20,7 +20,7 @@ import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Button} from '@instructure/ui-buttons'
 
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextArea} from '@instructure/ui-text-area'
 import {Checkbox} from '@instructure/ui-checkbox'
@@ -53,10 +53,9 @@ const ImageOptionsForm = ({
   messagesForSize,
   handleSave,
   hideDimensions,
-  flexHeight
+  flexHeight,
+  id = 'image-options-form'
 }) => {
-  const imageSizeOption = {label: labelForImageSize(imageSize), value: imageSize}
-
   const tooltipText = formatMessage('Used by screen readers to describe the content of an image')
   const textAreaLabel = (
     <Flex alignItems="center">
@@ -130,19 +129,21 @@ const ImageOptionsForm = ({
         {!hideDimensions && (
           <Flex.Item margin="small none xx-small none">
             <View as="div" padding="small small xx-small small">
-              <Select
+              <SimpleSelect
+                id={`${id}-size`}
                 disabled={displayAs !== 'embed'}
-                label={formatMessage('Size')}
+                renderLabel={formatMessage('Size')}
                 messages={messagesForSize}
+                assistiveText={formatMessage('Use arrow keys to navigate options.')}
                 onChange={handleImageSizeChange}
-                selectedOption={imageSizeOption}
+                value={imageSize}
               >
                 {imageSizes.map(size => (
-                  <option key={size} value={size}>
+                  <SimpleSelect.Option id={`${id}-size-${size}`} key={size} value={size}>
                     {labelForImageSize(size)}
-                  </option>
+                  </SimpleSelect.Option>
                 ))}
-              </Select>
+              </SimpleSelect>
             </View>
 
             {imageSize === CUSTOM && (
@@ -161,7 +162,7 @@ const ImageOptionsForm = ({
 
       {handleSave && (
         <Flex.Item
-          background="light"
+          background="secondary"
           borderWidth="small none none none"
           padding="small medium"
           textAlign="end"

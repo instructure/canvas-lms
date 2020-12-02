@@ -30,7 +30,7 @@ import {useDimensionsState} from '../../shared/DimensionsInput'
 import ImageOptionsForm from '../../shared/ImageOptionsForm'
 
 export default function ImageOptionsTray(props) {
-  const {imageOptions, onRequestClose, open} = props
+  const {imageOptions, onEntered, onExited, onRequestClose, onSave, open} = props
 
   const {naturalHeight, naturalWidth, isLinked} = imageOptions
   const currentHeight = imageOptions.appliedHeight || naturalHeight
@@ -83,7 +83,7 @@ export default function ImageOptionsTray(props) {
       appliedWidth = dimensionsState.width
     }
 
-    props.onSave({
+    onSave({
       altText: savedAltText,
       appliedHeight,
       appliedWidth,
@@ -105,8 +105,8 @@ export default function ImageOptionsTray(props) {
       data-mce-component
       label={formatMessage('Image Options Tray')}
       onDismiss={onRequestClose}
-      onEntered={props.onEntered}
-      onExited={props.onExited}
+      onEntered={onEntered}
+      onExited={onExited}
       open={open}
       placement="end"
       shouldCloseOnDocumentClick
@@ -130,6 +130,7 @@ export default function ImageOptionsTray(props) {
 
         <Flex.Item as="form" grow margin="none" shrink>
           <ImageOptionsForm
+            id="image-options-form"
             imageSize={imageSize}
             displayAs={displayAs}
             isDecorativeImage={isDecorativeImage}
