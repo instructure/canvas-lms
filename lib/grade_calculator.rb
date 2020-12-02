@@ -21,6 +21,7 @@
 require "bigdecimal"
 
 class GradeCalculator
+  attr_reader :gradable_assignments
   attr_accessor :assignments, :groups
 
   def initialize(user_ids, course, **opts)
@@ -53,15 +54,17 @@ class GradeCalculator
       :ignore_unposted_anonymous,
       @course.root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous)
     )
-    @assignments = (opts[:assignments] || @course.assignments.published.gradeable).to_a
+    @gradable_assignments = (opts[:assignments] || @course.assignments.published.gradeable).to_a
 
-    if @ignore_unposted_anonymous
-      Assignment.preload_unposted_anonymous_submissions(@assignments)
+    @assignments = if @ignore_unposted_anonymous
+      Assignment.preload_unposted_anonymous_submissions(@gradable_assignments)
 
       # Ignore anonymous assignments with unposted submissions in the grade calculation
       # so that we don't break anonymity prior to the assignment being posted
       # (which is when identities are revealed)
-      @assignments.reject!(&:unposted_anonymous_submissions?)
+      @gradable_assignments.reject(&:unposted_anonymous_submissions?)
+    else
+      @gradable_assignments
     end
 
     @user_ids = Array(user_ids).map { |id| Shard.relative_id_for(id, Shard.current, @course.shard) }
