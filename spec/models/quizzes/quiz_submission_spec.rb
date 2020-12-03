@@ -905,6 +905,23 @@ describe Quizzes::QuizSubmission do
         expect(qs.grants_right?(@teacher, :update_scores)).to eq true
         expect(qs.grants_right?(@teacher, :add_attempts)).to eq true
       end
+
+      it "does not take events from an anonymous user" do
+        course_with_student(:active_all => true)
+        @quiz = @course.quizzes.create!
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, :record_events)).to be_falsey
+      end
+
+      it "can take events for any users for a ungraded quiz in a public course" do
+        course_with_student(:active_all => true)
+        @course.is_public = true
+        @course.is_public_to_auth_users = true
+        @course.save!
+        @quiz = @course.quizzes.create!(quiz_type: 'practice_quiz')
+        qs = @quiz.generate_submission(@user)
+        expect(qs.grants_right?(nil, { user_id: nil }, :record_events)).to be_truthy
+      end
     end
 
     describe "#question" do
