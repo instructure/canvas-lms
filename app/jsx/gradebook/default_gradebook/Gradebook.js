@@ -777,12 +777,16 @@ class Gradebook {
         this.assignmentGroups[group.id] = group
       }
 
+      group.assignments = group.assignments || []
       assignmentGroup.assignments.forEach(assignment => {
         assignment.assignment_group = group
         assignment.due_at = tz.parse(assignment.due_at)
         this.updateAssignmentEffectiveDueDates(assignment)
         this.addAssignmentColumnDefinition(assignment)
         this.assignments[assignment.id] = assignment
+        if (!group.assignments.some(a => a.id === assignment.id)) {
+          group.assignments.push(assignment)
+        }
       })
     })
   }
