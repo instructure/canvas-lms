@@ -9409,6 +9409,46 @@ QUnit.module('Gradebook#gotAllAssignmentGroups', hooks => {
     gradebook.gotAllAssignmentGroups([])
     strictEqual(gradebook.setAssignmentGroupsLoaded.getCall(0).args[0], true)
   })
+
+  test('adds the assignment group to the group definitions if it is new', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    deepEqual(gradebook.assignmentGroups['12'], assignmentGroup)
+  })
+
+  test('adds new assignments to existing assignment groups', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.assignmentGroups['12'] = {
+      id: '12',
+      assignments: [{id: '22', name: 'Some Other Assignment', due_at: null}]
+    }
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
+    deepEqual(assignmentIds, ['22', '35'])
+  })
+
+  test('does not add duplicate assignments to assignment groups', () => {
+    sinon.stub(gradebook, 'setAssignmentGroupsLoaded')
+    gradebook.assignmentGroups['12'] = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    const assignmentGroup = {
+      id: '12',
+      assignments: [{id: '35', name: 'An Assignment', due_at: null}]
+    }
+    gradebook.gotAllAssignmentGroups([assignmentGroup])
+    const assignmentIds = gradebook.assignmentGroups['12'].assignments.map(a => a.id)
+    deepEqual(assignmentIds, ['35'])
+  })
 })
 
 QUnit.module('Gradebook#handleSubmissionPostedChange', hooks => {
