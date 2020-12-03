@@ -123,7 +123,12 @@ export default class DataLoader {
     }
 
     if (options.getAssignmentGroups) {
-      if (gotGradingPeriodAssignments && gradebook.gradingPeriodId !== '0') {
+      const useNewLoadingStrategy = false
+      if (
+        useNewLoadingStrategy &&
+        gotGradingPeriodAssignments &&
+        gradebook.gradingPeriodId !== '0'
+      ) {
         // eslint-disable-next-line promise/catch-or-return
         gotGradingPeriodAssignments.then(() => {
           dataLoader.assignmentGroupsLoader.loadAssignmentGroups()

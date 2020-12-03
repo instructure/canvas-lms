@@ -50,7 +50,8 @@ export default class AssignmentGroupsLoader {
     }
 
     const periodId = this._gradingPeriodId()
-    if (periodId) {
+    const useNewLoadingStrategy = false
+    if (useNewLoadingStrategy && periodId) {
       return this._loadAssignmentGroupsForGradingPeriods(params, periodId)
     }
 
