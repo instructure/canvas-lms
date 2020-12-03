@@ -1070,13 +1070,13 @@ ActiveRecord::Relation.class_eval do
   end
 
   def update_all_locked_in_order(updates)
-    locked_scope = lock(:no_key_update).order(:id)
+    locked_scope = lock(:no_key_update).order(primary_key.to_sym)
     if Setting.get("update_all_locked_in_order_subquery", "true") == "true"
-      unscoped.where(id: locked_scope).update_all(updates)
+      unscoped.where(primary_key => locked_scope).update_all(updates)
     else
       transaction do
-        ids = locked_scope.pluck(:id)
-        unscoped.where(id: ids).update_all(updates) unless ids.empty?
+        ids = locked_scope.pluck(primary_key)
+        unscoped.where(primary_key => ids).update_all(updates) unless ids.empty?
       end
     end
   end

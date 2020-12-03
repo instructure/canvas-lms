@@ -674,6 +674,7 @@ class GradeCalculator
             assignment_group_id,
             #{assignment_group_columns_to_insert_or_update[:value_names].join(', ')}
           )
+        ORDER BY enrollment_id, assignment_group_id
       ON CONFLICT (enrollment_id, assignment_group_id) WHERE assignment_group_id IS NOT NULL
       DO UPDATE SET
         #{assignment_group_columns_to_insert_or_update[:update_columns].join(', ')},
@@ -700,6 +701,7 @@ class GradeCalculator
           LEFT OUTER JOIN #{Score.quoted_table_name} scores ON
             scores.enrollment_id = val.enrollment_id AND
             scores.assignment_group_id = val.assignment_group_id
+          ORDER BY score_id
         ON CONFLICT (score_id)
         DO UPDATE SET
           calculation_details = excluded.calculation_details,
