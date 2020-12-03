@@ -39,7 +39,11 @@ export default function AttemptSelect({submission, allSubmissions, onChangeSubmi
     setOnSuccess(I18n.t('Now viewing Attempt %{current_attempt}', {current_attempt}))
   }, [current_attempt, setOnSuccess])
 
-  const attemptList = orderBy(uniqBy(allSubmissions, 'attempt'), 'attempt').map(sub => {
+  // when there is more than one, filter out attempt 0 to avoid showing duplicates
+  const filteredSubmissions =
+    allSubmissions.length > 1 ? allSubmissions.filter(s => s.attempt !== 0) : allSubmissions
+
+  const attemptList = orderBy(uniqBy(filteredSubmissions, 'attempt'), 'attempt').map(sub => {
     return [I18n.t('Attempt %{attempt}', {attempt: sub.attempt || 1}), sub.attempt]
   })
 

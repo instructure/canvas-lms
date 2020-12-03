@@ -60,9 +60,28 @@ describe('Attempt', () => {
   })
 
   it('renders attempt 0 as attempt 1', async () => {
-    const props = await createProps({attempt: 0})
+    const submission = await mockSubmission({Submission: {attempt: 0}})
+    const props = {
+      submission,
+      allSubmissions: [submission],
+      onChangeSubmission: mockedOnChangeSubmission
+    }
     const {getByDisplayValue} = render(mockContext(<AttemptSelect {...props} />))
     expect(getByDisplayValue('Attempt 1')).toBeInTheDocument()
+  })
+
+  it('only renders a single "Attempt 1" option when there is attempt 0 and attempt 1', async () => {
+    const submission = await mockSubmission({Submission: {attempt: 0}})
+    const submission2 = await mockSubmission({Submission: {attempt: 1}})
+    const props = {
+      submission: submission2,
+      allSubmissions: [submission, submission2],
+      onChangeSubmission: mockedOnChangeSubmission
+    }
+    const {getAllByText, getByTestId} = render(mockContext(<AttemptSelect {...props} />))
+    const select = getByTestId('attemptSelect')
+    fireEvent.click(select) // open select dropdown
+    expect(getAllByText('Attempt 1').length).toBe(1)
   })
 
   it('renders the current submission attempt', async () => {
