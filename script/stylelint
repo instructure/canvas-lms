@@ -6,6 +6,7 @@ linter_options = {
   file_regex: /\.s?css$/,
   format: 'stylelint',
   command: 'node_modules/.bin/stylelint',
+  campsite_mode: false,
   append_files_to_command: true,
   default_boyscout_mode: false
 }
