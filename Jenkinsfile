@@ -35,6 +35,22 @@ def buildParameters = [
   string(name: 'MASTER_BOUNCER_RUN', value: "${env.MASTER_BOUNCER_RUN}")
 ]
 
+def dockerDevFiles = [
+  '^docker-compose/',
+  '^build/common_docker_build_steps.sh',
+  '^script/canvas_update',
+  '^docker-compose.yml',
+  '^Dockerfile$',
+  '^lib/tasks/',
+  'Jenkinsfile.docker-smoke'
+]
+
+def jenkinsFiles = [
+  'Jenkinsfile*',
+  '^docker-compose.new-jenkins*.yml',
+  'build/new-jenkins/*'
+]
+
 def getDockerWorkDir() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "/usr/src/app" : "/usr/src/app/gems/plugins/${env.GERRIT_PROJECT}"
 }
@@ -305,6 +321,16 @@ def getCanvasLmsRefspec() {
 }
 // =========
 
+def rebaseHelper(branch, commitHistory = 100) {
+  git.fetch(branch, commitHistory)
+  if (!git.hasCommonAncestor(branch)) {
+    error "Error: your branch is over ${commitHistory} commits behind $GERRIT_BRANCH, please rebase your branch manually."
+  }
+  if (!git.rebase(branch)) {
+    error "Error: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
+  }
+}
+
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 
 pipeline {
@@ -343,11 +369,12 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
+    RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
-    PREMERGE_CACHE_IMAGE = "$BUILD_IMAGE-pre-merge-cache:${configuration.gerritBranchSanitized()}"
-    POSTMERGE_CACHE_IMAGE = "$BUILD_IMAGE-post-merge-cache:${configuration.gerritBranchSanitized()}"
+    WEBPACK_CACHE_PREMERGE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
+    WEBPACK_CACHE_POSTMERGE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -393,7 +420,7 @@ pipeline {
                 }
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master.
-                if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: './build/new-jenkins/jenkinsfile_changes.sh', returnStatus: true) == 0)) {
+                if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(jenkinsFiles, 'HEAD^') ) {
                     buildParameters += string(name: 'JENKINSFILE_REFSPEC', value: "${env.GERRIT_REFSPEC}")
                 }
 
@@ -441,57 +468,13 @@ pipeline {
             if(!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms' && !configuration.skipRebase()) {
               timedStage('Rebase') {
                 timeout(time: 2) {
-                  credentials.withGerritCredentials({ ->
-                    sh '''#!/bin/bash
-                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
+                  rebaseHelper(GERRIT_BRANCH)
+                  if ( GERRIT_BRANCH ==~ /dev\/.*/ ) {
+                    rebaseHelper("master")
+                  }
 
-                      git config user.name "$GERRIT_EVENT_ACCOUNT_NAME"
-                      git config user.email "$GERRIT_EVENT_ACCOUNT_EMAIL"
-
-                      GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                        git fetch --depth 100 --force --no-tags origin $GERRIT_BRANCH:origin/$GERRIT_BRANCH
-
-                      if ! git merge-base HEAD origin/$GERRIT_BRANCH; then
-                        echo "Error: your branch is over 100 commits behind $GERRIT_BRANCH, please rebase your branch manually."
-                        exit $exit_status
-                      fi
-
-                      git rebase --preserve-merges --stat origin/$GERRIT_BRANCH; exit_status=$?
-                      if [ $exit_status != 0 ]; then
-                        echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                        git rebase --abort
-                        exit $exit_status
-                      fi
-
-                      if [[ $GERRIT_BRANCH == 'dev/'* ]]; then
-                        GIT_SSH_COMMAND='ssh -i \"$SSH_KEY_PATH\" -l \"$SSH_USERNAME\"' \
-                          git fetch --depth 100 --force --no-tags origin master:origin/master
-
-                        if ! git merge-base HEAD origin/master; then
-                          echo "Error: your branch is over 100 commits behind master, please rebase your branch manually."
-                          exit $exit_status
-                        fi
-
-                        # store exit_status inline to  ensures the script doesn't exit here on failures
-                        git rebase --preserve-merges --stat origin/master; exit_status=$?
-                        if [ $exit_status != 0 ]; then
-                          echo "Warning: Rebase couldn't resolve changes automatically, please resolve these conflicts locally."
-                         git rebase --abort
-                          exit $exit_status
-                        fi
-                      fi
-                    '''
-                  })
-
-                  if(!env.JOB_NAME.endsWith('Jenkinsfile')) {
-                    sh """#!/bin/bash
-                      set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
-
-                      if git diff --name-only origin/master..HEAD Jenkinsfile* docker-compose.new-jenkins* build/new-jenkins/* |grep -E "Jenkinsfile|docker-compose.new-jenkins|build/new-jenkins/"; then
-                        echo "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
-                        exit 1
-                      fi
-                    """
+                  if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
+                      error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
                   }
                 }
               }
@@ -503,13 +486,14 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  def cacheTag = configuration.isChangeMerged() ? env.POSTMERGE_CACHE_IMAGE : env.PREMERGE_CACHE_IMAGE
+                  def webpackCachePrefix = configuration.isChangeMerged() ? env.WEBPACK_CACHE_POSTMERGE_PREFIX : env.WEBPACK_CACHE_PREMERGE_PREFIX
 
-                  slackSendCacheBuild(cacheTag) {
+                  slackSendCacheBuild(webpackCachePrefix) {
                     withEnv([
-                      "CACHE_TAG=${cacheTag}",
+                      "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
+                      "WEBPACK_CACHE_PREFIX=${webpackCachePrefix}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
@@ -518,25 +502,55 @@ pipeline {
                   }
                 }
 
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
-                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE"
-
-                if (isPatchsetPublishable()) {
-                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
-                }
-
                 if(configuration.isChangeMerged()) {
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE"
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE || true"
                   slackSendCacheAvailable(env.WEBPACK_BUILDER_CACHE_IMAGE)
 
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTMERGE_CACHE_IMAGE'
-                  slackSendCacheAvailable(env.POSTMERGE_CACHE_IMAGE)
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
+                  slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
+
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_POSTMERGE_PREFIX'
+                  slackSendCacheAvailable(env.WEBPACK_CACHE_POSTMERGE_PREFIX)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
+                }
+
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
+
+                def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
+
+                // If we are unable to push up the webpack builder image, then this
+                // build should use the currently cached image.
+                if (hasWebpackBuilderImage != 0) {
+                  def cacheTagParts = env.WEBPACK_BUILDER_CACHE_IMAGE.split(":")
+                  def tagParts = env.WEBPACK_BUILDER_IMAGE.split(":")
+                  def pathParts = cacheTagParts[0].split("/", 2)
+
+                  def CONTENT_TYPE = "application/vnd.docker.distribution.manifest.v2+json"
+                  def SOURCE_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${cacheTagParts[1]}"
+                  def TARGET_URL = "https://${pathParts[0]}/v2/${pathParts[1]}/manifests/${tagParts[1]}"
+
+                  withCredentials([
+                    usernamePassword(
+                      credentialsId: 'starlord',
+                      usernameVariable: 'STARLORD_USERNAME',
+                      passwordVariable: 'STARLORD_PASSWORD'
+                    )
+                  ]) {
+                    sh """
+                      MANIFEST=\$(curl -H "Accept: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD $SOURCE_URL)
+
+                      curl -X PUT -H "Content-Type: $CONTENT_TYPE" -u $STARLORD_USERNAME:$STARLORD_PASSWORD -d "\$MANIFEST" $TARGET_URL
+                    """
+                  }
+                }
+
+                if (isPatchsetPublishable()) {
+                  sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
                 }
               }
             }
@@ -566,8 +580,9 @@ pipeline {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
                     withEnv([
-                      "CACHE_TAG=${env.PREMERGE_CACHE_IMAGE}",
+                      "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREMERGE_PREFIX}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1"
                     ]) {
@@ -575,8 +590,8 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $PREMERGE_CACHE_IMAGE"
-                      slackSendCacheAvailable(env.PREMERGE_CACHE_IMAGE)
+                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREMERGE_PREFIX"
+                      slackSendCacheAvailable(env.WEBPACK_CACHE_PREMERGE_PREFIX)
                     }
                   }
                 }
@@ -612,6 +627,14 @@ pipeline {
                 buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "jest"),
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                  ], true, "testReport"
+                )
+
+                echo 'adding Javascript (Coffeescript)'
+                buildStage.makeFromJob('Javascript (Coffeescript)', '/Canvas/test-suites/JS', stages, buildParameters + [
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    string(name: 'TEST_SUITE', value: "coffee"),
                   ], true, "testReport"
                 )
 
@@ -619,6 +642,7 @@ pipeline {
                 buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
                     string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                     string(name: 'TEST_SUITE', value: "karma"),
+                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
                   ], true, "testReport"
                 )
 
@@ -657,7 +681,7 @@ pipeline {
                   )
                 }
 
-                if(env.GERRIT_PROJECT == 'canvas-lms' && (sh(script: 'build/new-jenkins/docker-dev-changes.sh', returnStatus: true) == 0)) {
+                if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
                   buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
                 }

@@ -126,6 +126,9 @@ class AssignmentsController < ApplicationController
   end
 
   def show
+    if request.format.symbol == :json
+      return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
+    end
     GuardRail.activate(:secondary) do
       @assignment ||= @context.assignments.find(params[:id])
 
@@ -293,6 +296,8 @@ class AssignmentsController < ApplicationController
           css_bundle :assignments
           js_bundle :assignment_show
         end
+
+        mastery_scales_js_env
 
         render locals: {
           eula_url: tool_eula_url,

@@ -827,7 +827,9 @@ class Gradebook {
     let isStudentView, j, len, student
     this.courseContent.assignmentStudentVisibility = {}
     const escapeStudentContent = student2 => {
+      const unescapedName = student2.name
       const escapedStudent = htmlEscape(student2)
+      escapedStudent.name = unescapedName
       escapedStudent?.enrollments.forEach(enrollment => {
         const gradesUrl = enrollment?.grades?.html_url
         if (gradesUrl) {

@@ -128,7 +128,6 @@ describe NotificationMessageCreator do
 
     it 'does not send a notification when policy override is disabled for a course' do
       notification_set(notification_opts: { :category => "Announcement" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -137,7 +136,6 @@ describe NotificationMessageCreator do
 
     it 'does send a notification when course_id is not passed in' do
       notification_set(notification_opts: { :category => "Announcement" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -154,7 +152,6 @@ describe NotificationMessageCreator do
 
     it 'does send other notifications when policy override is in effect' do
       notification_set(notification_opts: { :category => "Registration" })
-      @course.root_account.enable_feature!(:mute_notifications_by_course)
       NotificationPolicyOverride.enable_for_context(@user, @course, enable: false)
       data = { course_id: @course.id, root_account_id: @course.root_account_id }
       messages = NotificationMessageCreator.new(@notification, @assignment, to_list: @user, data: data).create_message
@@ -490,7 +487,6 @@ describe NotificationMessageCreator do
     context "notification policy overrides" do
       before(:each) do
         notification_set({notification_opts: {category: 'PandaExpressTime'}})
-        @course.root_account.enable_feature!(:mute_notifications_by_course)
         Account.site_admin.enable_feature!(:notification_granular_course_preferences)
       end
 

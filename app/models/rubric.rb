@@ -258,27 +258,31 @@ class Rubric < ActiveRecord::Base
     self
   end
 
-  def update_mastery_scales
+  def update_mastery_scales(save = true)
     return unless context.root_account.feature_enabled?(:account_level_mastery_scales)
 
     mastery_scale = context.resolved_outcome_proficiency
     return if mastery_scale.nil?
 
+    points_possible = mastery_scale.points_possible
+    mastery_points = mastery_scale.mastery_points
+    proficiency_ratings = mastery_scale.outcome_proficiency_ratings
+
     self.data.each do |criterion|
-      update_criterion_from_mastery_scales(criterion, mastery_scale)
+      update_criterion_from_mastery_scales(criterion, points_possible, mastery_points, proficiency_ratings)
     end
     if self.data_changed?
       self.points_possible = total_points_from_criteria(self.data)
-      self.save!
+      self.save! if save
     end
   end
 
-  def update_criterion_from_mastery_scales(criterion, mastery_scale)
+  def update_criterion_from_mastery_scales(criterion, points_possible, mastery_points, proficiency_ratings)
     return unless criterion[:learning_outcome_id].present?
 
-    criterion[:points] = mastery_scale.points_possible
-    criterion[:mastery_points] = mastery_scale.mastery_points
-    criterion[:ratings] = mastery_scale.outcome_proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
+    criterion[:points] = points_possible
+    criterion[:mastery_points] = mastery_points
+    criterion[:ratings] = proficiency_ratings.map {|pr| criterion_rating(pr, criterion[:id])}
   end
 
   def update_learning_outcome_criteria(outcome)

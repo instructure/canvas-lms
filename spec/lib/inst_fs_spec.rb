@@ -136,22 +136,6 @@ describe InstFS do
         end
       end
 
-      it "generates the same url within a cache window of time so it's not unique every time" do
-        url1 = InstFS.authenticated_url(@attachment)
-        url2 = InstFS.authenticated_url(@attachment)
-        expect(url1).to eq(url2)
-
-        Timecop.freeze(1.day.from_now) do
-          url3 = InstFS.authenticated_url(@attachment)
-          expect(url1).to_not eq(url3)
-
-          first_token = url1.split(/token=/).last
-          expect(->{
-            Canvas::Security.decode_jwt(first_token, [ secret ])
-          }).to raise_error(Canvas::Security::TokenExpired)
-        end
-      end
-
       it "retries if imperium is timing out" do
         times_called = 0
         allow(Canvas::DynamicSettings).to receive(:find).with(service: "inst-fs", default_ttl: 5.minutes) do
@@ -210,6 +194,12 @@ describe InstFS do
         it "omits user_id claim in the token if no user provided" do
           claims = claims_for(user: nil)
           expect(claims[:user_id]).to be_nil
+        end
+
+        it "includes a jti in the token" do
+          url = InstFS.authenticated_url(@attachment, expires_in: 1.hour)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
         end
 
         describe "legacy api claims" do
@@ -283,6 +273,23 @@ describe InstFS do
           }).to raise_error(Canvas::Security::TokenExpired)
         end
       end
+
+      it "generates the same url within a cache window of time so it's not unique every time" do
+        url1 = InstFS.authenticated_thumbnail_url(@attachment)
+        url2 = InstFS.authenticated_thumbnail_url(@attachment)
+        expect(url1).to eq(url2)
+
+        Timecop.freeze(1.day.from_now) do
+          url3 = InstFS.authenticated_thumbnail_url(@attachment)
+          expect(url1).to_not eq(url3)
+
+          first_token = url1.split(/token=/).last
+          expect(->{
+            Canvas::Security.decode_jwt(first_token, [ secret ])
+          }).to raise_error(Canvas::Security::TokenExpired)
+        end
+      end
+
     end
 
     context "upload_preflight_json" do

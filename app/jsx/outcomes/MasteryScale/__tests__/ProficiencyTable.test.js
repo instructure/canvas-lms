@@ -66,9 +66,9 @@ describe('default proficiency', () => {
   })
 
   it('handling delete rating removes rating and flashes SR message', () => {
-    const {getAllByText} = render(<ProficiencyTable {...defaultProps} />)
-    const button = getAllByText(/Delete mastery level/)[0]
-    fireEvent.click(button)
+    const {getAllByText, getByText} = render(<ProficiencyTable {...defaultProps} />)
+    fireEvent.click(getAllByText(/Delete mastery level/)[0])
+    fireEvent.click(getByText(/Confirm/))
     expect(srFlashMock).toHaveBeenCalledTimes(1)
   })
 
@@ -398,7 +398,8 @@ describe('custom proficiency', () => {
 
       fireEvent.change(pointsInput, {target: {value: '20'}})
       fireEvent.click(masteryButton)
-      fireEvent.click(deleteButton)
+      fireEvent.click(getAllByText(/Delete mastery level/)[0].closest('button'))
+      fireEvent.click(getByText(/Confirm/).closest('button'))
       fireEvent.click(getByText('Save Mastery Scale'))
       fireEvent.click(getByText('Save'))
 

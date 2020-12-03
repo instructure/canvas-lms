@@ -17,11 +17,6 @@
  */
 
 import $ from 'jquery'
-// this copy of lodash is already in the webpack chunk
-// (something to do with backbone compatability)
-// if I simply import {debounce} from 'lodash', then there are 2 copies
-// and the chunk exceeds our size limit.
-import {debounce} from './vendor/lodash.underscore'
 
 // configure MathJax to use 'color' extension fo LaTeX coding
 const localConfig = {
@@ -63,15 +58,17 @@ const mathml = {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
-          window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
-            mathImageHelper.catchEquationImages(message[1])
-          })
-          window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
-            mathImageHelper.removeStrayEquationImages(message[1])
-            message[1]
-              .querySelectorAll('.math_equation_latex')
-              .forEach(m => m.classList.add('fade-in-equation'))
-          })
+          if (ENV?.FEATURES?.new_math_equation_handling) {
+            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
+              mathImageHelper.catchEquationImages(message[1])
+            })
+            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+              mathImageHelper.removeStrayEquationImages(message[1])
+              message[1]
+                .querySelectorAll('.math_equation_latex')
+                .forEach(m => m.classList.add('fade-in-equation'))
+            })
+          }
           // leaving this here so I don't have to keep looking up how to see all messages
           // window.MathJax.Hub.Startup.signal.Interest(function (message) {
           //   console.log('>>> Startup:', message[0])
@@ -94,45 +91,78 @@ const mathml = {
   },
 
   isMathOnPage() {
+    return this.isMathInElement(document.body)
+  },
+
+  isMathInElement(elem) {
     if (ENV?.FEATURES?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
-      if (document.querySelector('.math_equation_latex')) {
+      if (elem.querySelector('.math_equation_latex')) {
         return true
       }
 
-      if (document.querySelector('img.equation_image')) {
+      if (elem.querySelector('img.equation_image')) {
         return true
       }
 
       if (ENV.FEATURES?.inline_math_everywhere) {
         // look for latex the user may have entered w/o the equation editor by
         // looking for mathjax's opening delimiters
-        if (/(?:\$\$|\\\()/.test(document.body.textContent)) {
+        if (/(?:\$\$|\\\()/.test(elem.textContent)) {
           return true
         }
       }
     }
-    const mathElements = document.getElementsByTagName('math')
+    const mathElements = elem.getElementsByTagName('math')
     for (let i = 0; i < mathElements.length; i++) {
       const $el = $(mathElements[i])
-      if ($el.is(':visible') && $el.parent('.hidden-readable').length <= 0) {
+      if (
+        $el.is(':visible') &&
+        $el.parent('.hidden-readable').length <= 0 &&
+        $el.parent('.MJX_Assistive_MathML').length <= 0 // already mathjax'd
+      ) {
         return true
       }
     }
     return false
   },
 
+  isMathJaxIgnored(elem) {
+    // elements to ignore selector
+    const ignore_list =
+      '.MJX_Assistive_MathML,#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat'
+
+    // check if elem is in the ignore list
+    if (elem.parentElement.querySelector(ignore_list) === elem) {
+      return true
+    }
+
+    // check if elem is a child of .mathjax_ignore
+    while (elem !== document.body) {
+      if (elem.classList.contains('mathjax_ignore')) {
+        return true
+      }
+      elem = elem.parentElement
+    }
+    return false
+  },
+
+  // legacy api
   isMathMLOnPage() {
-    return this.isMathOnPage() // just in case I missed a place it's being used
+    return this.isMathOnPage()
   },
 
   isMathJaxLoaded() {
     return !!window.MathJax?.Hub
   },
 
-  processNewMathOnPage() {
-    if (this.isMathOnPage()) {
-      this.loadMathJax(undefined)
+  processNewMathInElem(elem) {
+    if (this.isMathInElement(elem) && !this.isMathJaxIgnored(elem)) {
+      if (this.isMathJaxLoaded()) {
+        this.reloadElement(elem)
+      } else {
+        this.loadMathJax(undefined)
+      }
     }
   },
 
@@ -149,22 +179,35 @@ const mathml = {
 }
 
 const mathImageHelper = {
+  getImageEquationText(img) {
+    let equation_text = img.getAttribute('data-equation-content')
+    if (!equation_text) {
+      const srceq = img.getAttribute('src').split('/equation_images/')[1]
+      if (srceq) {
+        equation_text = decodeURIComponent(decodeURIComponent(srceq))
+      }
+    }
+    return equation_text
+  },
+
   catchEquationImages(refnode) {
     // find equation images and replace with inline LaTeX
     const eqimgs = refnode.querySelectorAll('img.equation_image')
     if (eqimgs.length > 0) {
       eqimgs.forEach(img => {
-        if (img.complete) {
+        if (img.complete && img.naturalWidth) {
           // only process loaded images
           img.setAttribute('mathjaxified', '')
-          const equation_text = img.getAttribute('data-equation-content')
-          const mathtex = document.createElement('span')
-          mathtex.setAttribute('class', 'math_equation_latex')
-          mathtex.textContent = `\\(${equation_text}\\)`
-          if (img.nextSibling) {
-            img.parentElement.insertBefore(mathtex, img.nextSibling)
-          } else {
-            img.parentElement.appendChild(mathtex)
+          const equation_text = this.getImageEquationText(img)
+          if (equation_text) {
+            const mathtex = document.createElement('span')
+            mathtex.setAttribute('class', 'math_equation_latex')
+            mathtex.textContent = `\\(${equation_text}\\)`
+            if (img.nextSibling) {
+              img.parentElement.insertBefore(mathtex, img.nextSibling)
+            } else {
+              img.parentElement.appendChild(mathtex)
+            }
           }
         } else {
           img.addEventListener('load', this.dispatchProcessNewMathOnLoad)
@@ -185,18 +228,18 @@ const mathImageHelper = {
 
   dispatchProcessNewMathOnLoad(event) {
     event.target.removeEventListener('load', this.dispatchProcessNewMathOnLoad)
-    window.dispatchEvent(new Event('process-new-math'))
+    window.dispatchEvent(
+      new CustomEvent('process-new-math', {detail: {target: event.target.parentElement}})
+    )
   }
 }
 
-// TODO: if anyone firing the event ever needs a callback,
-// push them onto an array, then pop and call in the handler
-function handleNewMath() {
-  if (ENV?.FEATURES?.new_math_equation_handling) {
-    mathml.processNewMathOnPage()
+function handleNewMath(event) {
+  if (event?.detail?.target) {
+    mathml.processNewMathInElem(event.detail.target)
   }
 }
 
-window.addEventListener('process-new-math', debounce(handleNewMath, 500))
+window.addEventListener('process-new-math', handleNewMath)
 
 export {mathml as default, mathImageHelper}

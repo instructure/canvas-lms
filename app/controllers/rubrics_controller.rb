@@ -159,10 +159,16 @@ class RubricsController < ApplicationController
       # Update the rubric if you can
       # Better specify params[:rubric_association_id] if you want it to update an existing association
 
-      # If this is a brand new rubric OR if the rubric isn't editable,
+      # If this is a brand new rubric OR if the rubric isn't editable OR if the rubric context is different than the context,
       # then create a new rubric
-      if !@rubric || (@rubric.will_change_with_update?(params[:rubric]) && !@rubric.grants_right?(@current_user, session, :update))
-        original_rubric_id = @rubric && @rubric.id
+      if !@rubric || (
+        @rubric.will_change_with_update?(params[:rubric]) && (
+          !@rubric.grants_right?(@current_user, session, :update) || (
+            @rubric.context.is_a?(Account) && @rubric.context != @context
+          )
+        )
+      )
+        original_rubric_id = @rubric&.id
         @rubric = @context.rubrics.build
         @rubric.rubric_id = original_rubric_id
         @rubric.user = @current_user

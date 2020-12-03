@@ -96,8 +96,6 @@ gulp.task('rev', () => {
 
 gulp.task('watch', () => gulp.watch(STUFF_TO_REV, ['rev']))
 
-gulp.task('default', ['rev', 'watch'])
-
 function gulpTimezonePlugin() {
   const through = require('through2')
 

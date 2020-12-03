@@ -1209,6 +1209,11 @@ describe ApplicationHelper do
       expect(js_env).not_to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
     end
 
+    it 'does not include improved outcomes management FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+    end
+
     context 'when account_level_mastery_scales enabled' do
       before(:once) do
         @course.root_account.enable_feature! :account_level_mastery_scales
@@ -1224,6 +1229,19 @@ describe ApplicationHelper do
         mastery_scale = js_env[:MASTERY_SCALE]
         expect(mastery_scale[:outcome_proficiency]).to eq @proficiency.as_json
         expect(mastery_scale[:outcome_calculation_method]).to eq @calculation_method.as_json
+      end
+
+      it 'includes improved outcomes management FF' do
+        helper.mastery_scales_js_env
+        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
+      end
+
+      context "when improved_outcomes_management enabled" do
+        it 'includes improved outcomes management FF' do
+          @course.root_account.enable_feature! :improved_outcomes_management
+          helper.mastery_scales_js_env
+          expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(true)
+        end
       end
     end
   end

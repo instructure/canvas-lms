@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
+import {render, fireEvent} from '@testing-library/react'
 import ProficiencyRating from '../ProficiencyRating'
 
 const defaultProps = (props = {}) => ({
@@ -184,19 +185,19 @@ describe('ProficiencyRating', () => {
       expect(onPointsChange).toHaveBeenCalledTimes(1)
     })
 
-    it('clicking delete button triggers delete', () => {
+    it('calls onDelete prop when click on delete and confirm in the confirmation modal', () => {
       const onDelete = jest.fn()
-      const wrapper = mount(<ProficiencyRating {...defaultProps({onDelete, canManage: true})} />)
-      wrapper
-        .find('IconButton')
-        .at(0)
-        .simulate('click')
+      const {getByText} = render(
+        <ProficiencyRating {...defaultProps({onDelete, canManage: true})} />
+      )
+      fireEvent.click(getByText('Delete mastery level 1'))
+      fireEvent.click(getByText('Confirm'))
       expect(onDelete).toHaveBeenCalledTimes(1)
     })
 
-    it('clicking disabled delete button does not triggers delete', () => {
+    it('clicking disabled delete button does not show delete modal', () => {
       const onDelete = jest.fn()
-      const wrapper = mount(
+      const {queryByText} = render(
         <ProficiencyRating
           {...defaultProps({
             onDelete,
@@ -205,11 +206,8 @@ describe('ProficiencyRating', () => {
           })}
         />
       )
-      wrapper
-        .find('IconButton')
-        .at(0)
-        .simulate('click')
-      expect(onDelete).toHaveBeenCalledTimes(0)
+      fireEvent.click(queryByText('Delete mastery level 1'))
+      expect(queryByText('Remove Mastery Level')).not.toBeInTheDocument()
     })
   })
 })

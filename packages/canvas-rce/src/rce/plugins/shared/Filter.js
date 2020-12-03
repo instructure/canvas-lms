@@ -22,7 +22,7 @@ import formatMessage from '../../../format-message'
 import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
-import {Select} from '@instructure/ui-forms'
+import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {
@@ -68,28 +68,43 @@ function fileLabelFromContext(contextType) {
 
 function renderTypeOptions(contentType, contentSubtype, userContextType) {
   const options = [
-    <option key="links" value="links" icon={IconLinkLine}>
+    <SimpleSelect.Option key="links" id="links" value="links" renderBeforeLabel={IconLinkLine}>
       {formatMessage('Links')}
-    </option>
+    </SimpleSelect.Option>
   ]
   if (userContextType === 'course' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
-      <option key="course_files" value="course_files" icon={IconFolderLine}>
+      <SimpleSelect.Option
+        key="course_files"
+        id="course_files"
+        value="course_files"
+        renderBeforeLabel={IconFolderLine}
+      >
         {fileLabelFromContext('course')}
-      </option>
+      </SimpleSelect.Option>
     )
   }
   if (userContextType === 'group' && contentType !== 'links' && contentSubtype !== 'all') {
     options.push(
-      <option key="group_files" value="group_files" icon={IconFolderLine}>
+      <SimpleSelect.Option
+        key="group_files"
+        id="group_files"
+        value="group_files"
+        renderBeforeLabel={IconFolderLine}
+      >
         {fileLabelFromContext('group')}
-      </option>
+      </SimpleSelect.Option>
     )
   }
   options.push(
-    <option key="user_files" value="user_files" icon={IconFolderLine}>
+    <SimpleSelect.Option
+      key="user_files"
+      id="user_files"
+      value="user_files"
+      renderBeforeLabel={IconFolderLine}
+    >
       {fileLabelFromContext(contentType === 'links' || contentSubtype === 'all' ? 'files' : 'user')}
-    </option>
+    </SimpleSelect.Option>
   )
   return options
 }
@@ -97,8 +112,9 @@ function renderTypeOptions(contentType, contentSubtype, userContextType) {
 function renderType(contentType, contentSubtype, onChange, userContextType) {
   if (userContextType === 'course' || userContextType === 'group') {
     return (
-      <Select
-        label={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
+      <SimpleSelect
+        renderLabel={<ScreenReaderContent>{formatMessage('Content Type')}</ScreenReaderContent>}
+        assistiveText={formatMessage('Use arrow keys to navigate options.')}
         onChange={(e, selection) => {
           const changed = {contentType: selection.value}
           if (contentType === 'links') {
@@ -107,10 +123,10 @@ function renderType(contentType, contentSubtype, onChange, userContextType) {
           }
           onChange(changed)
         }}
-        selectedOption={contentType}
+        value={contentType}
       >
         {renderTypeOptions(contentType, contentSubtype, userContextType)}
-      </Select>
+      </SimpleSelect>
     )
   } else {
     return (
@@ -195,8 +211,11 @@ export default function Filter(props) {
       {contentType !== 'links' && (
         <Flex margin="small none none none">
           <Flex.Item grow shrink margin="none xx-small none none">
-            <Select
-              label={<ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>}
+            <SimpleSelect
+              renderLabel={
+                <ScreenReaderContent>{formatMessage('Content Subtype')}</ScreenReaderContent>
+              }
+              assistiveText={formatMessage('Use arrow keys to navigate options.')}
               onChange={(e, selection) => {
                 const changed = {contentSubtype: selection.value}
                 if (changed.contentSubtype === 'all') {
@@ -206,48 +225,53 @@ export default function Filter(props) {
                 }
                 onChange(changed)
               }}
-              selectedOption={contentSubtype}
+              value={contentSubtype}
             >
-              <option value="images" icon={IconImageLine}>
+              <SimpleSelect.Option id="images" value="images" renderBeforeLabel={IconImageLine}>
                 {formatMessage('Images')}
-              </option>
+              </SimpleSelect.Option>
 
-              <option value="documents" icon={IconDocumentLine}>
+              <SimpleSelect.Option
+                id="documents"
+                value="documents"
+                renderBeforeLabel={IconDocumentLine}
+              >
                 {formatMessage('Documents')}
-              </option>
+              </SimpleSelect.Option>
 
-              <option value="media" icon={IconAttachMediaLine}>
+              <SimpleSelect.Option id="media" value="media" renderBeforeLabel={IconAttachMediaLine}>
                 {formatMessage('Media')}
-              </option>
+              </SimpleSelect.Option>
 
-              <option value="all">{formatMessage('All')}</option>
-            </Select>
+              <SimpleSelect.Option id="all" value="all">
+                {formatMessage('All')}
+              </SimpleSelect.Option>
+            </SimpleSelect>
           </Flex.Item>
           {contentSubtype !== 'all' && (
             <Flex.Item grow shrink margin="none none none xx-small">
-              <Select
-                label={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
+              <SimpleSelect
+                renderLabel={<ScreenReaderContent>{formatMessage('Sort By')}</ScreenReaderContent>}
+                assistiveText={formatMessage('Use arrow keys to navigate options.')}
                 onChange={(e, selection) => {
                   onChange({sortValue: selection.value})
                 }}
-                selectedOption={sortValue}
+                value={sortValue}
               >
-                <option value="date_added">{formatMessage('Date Added')}</option>
-                <option value="alphabetical">{formatMessage('Alphabetical')}</option>
-              </Select>
+                <SimpleSelect.Option id="date_added" value="date_added">
+                  {formatMessage('Date Added')}
+                </SimpleSelect.Option>
+                <SimpleSelect.Option id="alphabetical" value="alphabetical">
+                  {formatMessage('Alphabetical')}
+                </SimpleSelect.Option>
+              </SimpleSelect>
             </Flex.Item>
           )}
         </Flex>
       )}
       <View as="div" margin="small none none none">
         <TextInput
-          renderLabel={
-            isContentLoading ? (
-              <ScreenReaderContent>{formatMessage('Loading, please wait')}</ScreenReaderContent>
-            ) : (
-              <ScreenReaderContent>{formatMessage('Search')}</ScreenReaderContent>
-            )
-          }
+          renderLabel={<ScreenReaderContent>{formatMessage('Search')}</ScreenReaderContent>}
           renderBeforeInput={<IconSearchLine inline={false} />}
           renderAfterInput={renderClearButton()}
           messages={[{type: 'hint', text: msg}]}

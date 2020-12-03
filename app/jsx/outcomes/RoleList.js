@@ -24,7 +24,8 @@ import {getSortedRoles} from '../permissions/helper/utils'
 
 const RoleList = ({description, roles}) => {
   if (roles?.length > 0) {
-    const accountAdmin = roles.find(element => element.role === 'AccountAdmin') || {}
+    const accountAdmin = roles.find(element => element.role === 'AccountAdmin')
+
     return (
       <>
         <p>

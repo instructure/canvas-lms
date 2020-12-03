@@ -206,5 +206,16 @@ describe UserContent do
         "</ul></div>"
       expect(html).to eq(expected)
     end
+
+    it "strips existing mathml before adding any new" do
+      string = "<div><img class='equation_image' data-equation-content='\int f(x)/g(x)'/>"\
+        "<span class=\"hidden-readable\"><math>3</math></span></div>"
+
+      html = UserContent.escape(string)
+      expected = "<div>\n"\
+        "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
+        "</div>"
+      expect(html).to eq(expected)
+    end
   end
 end

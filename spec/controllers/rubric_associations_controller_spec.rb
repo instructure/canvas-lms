@@ -96,6 +96,74 @@ describe RubricAssociationsController do
         expect(last_created_event.assignment_id).to eq assignment.id
       end
     end
+
+    describe "rubrics associated in a different" do
+      describe "course" do
+        before do
+          course_factory
+          outcome_with_rubric({mastery_points: 3, context: @context})
+          @course2 = course_factory
+          course_with_teacher_logged_in(active_all: true, course: @course2)
+        end
+
+        it "should duplicate the associated rubric" do
+          expect {
+            post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
+          }.to change {
+            Rubric.count
+          }.by(1)
+          expect(assigns[:rubric].context).to eq @course2
+          expect(assigns[:rubric].data).to eq @rubric.data
+        end
+
+        describe "with the account_level_mastery_scales FF" do
+          describe "enabled" do
+            before do
+              @course2.root_account.enable_feature!(:account_level_mastery_scales)
+              @proficiency = outcome_proficiency_model(@course2)
+            end
+
+            it "should use the new course mastery scales for learning outcome criterion" do
+              post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
+              outcome_criterion = assigns[:rubric].data[0]
+              expect(outcome_criterion[:ratings].length).to eq 2
+              expect(outcome_criterion[:points]).to eq 10
+              expect(outcome_criterion[:mastery_points]).to eq 10
+              expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ["best", "worst"]
+            end
+          end
+
+          describe "disabled" do
+            before do
+              @course2.root_account.disable_feature!(:account_level_mastery_scales)
+              @proficiency = outcome_proficiency_model(@course2)
+            end
+
+            it "should not change the existing criterions" do
+              post 'create', params: {course_id: @course2.id, rubric_association: {rubric_id: @rubric.id}}
+              expect(assigns[:rubric].data). to eq @rubric.data
+            end
+          end
+        end
+      end
+
+      describe "account" do
+        before do
+          account_model
+          outcome_with_rubric({mastery_points: 3, context: @account})
+          course_with_teacher_logged_in(active_all: true, course: @course)
+        end
+
+        it "should not duplicate the rubric" do
+          expect {
+            post 'create', params: {course_id: @course.id, rubric_association: {rubric_id: @rubric.id}}
+          }.to change {
+            Rubric.count
+          }.by(0)
+          expect(assigns[:rubric]).to eq @rubric
+        end
+      end
+    end
   end
 
   describe "PUT 'update'" do

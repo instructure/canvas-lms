@@ -483,9 +483,6 @@ class ProfileController < ApplicationController
   private :require_user_for_private_profile
 
   def observees
-    if @domain_root_account.parent_registration?
-      js_env(AUTH_TYPE: @domain_root_account.parent_auth_type)
-    end
     @user ||= @current_user
     set_active_tab 'observees'
     @context = @user.profile if @user == @current_user

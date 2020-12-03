@@ -37,6 +37,16 @@ RUN --mount=target=/tmp/src \
     -name 'package.json' \
     -exec cp --parents {} /tmp/dst \;
 
+FROM busybox AS cache-helper-collect-packages
+WORKDIR /tmp/src
+RUN --mount=target=/tmp/src \
+  mkdir -p /tmp/dst && \
+  cp --parents -rf \
+    babel.config.js \
+    packages \
+    \
+    /tmp/dst
+
 FROM busybox AS cache-helper-collect-webpack
 WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \

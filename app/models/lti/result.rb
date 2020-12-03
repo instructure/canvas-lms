@@ -44,11 +44,43 @@ class Lti::Result < ApplicationRecord
   belongs_to :user, inverse_of: :lti_results
   belongs_to :line_item, inverse_of: :results, foreign_key: :lti_line_item_id, class_name: 'Lti::LineItem'
   belongs_to :root_account, class_name: 'Account'
+  has_one :assignment, through: :submission
 
   before_save :set_root_account
 
+  # Returns the result_score scaled to the
+  # result_maximum. This is required because
+  # a user can update a score manually in the UI.
+  #
+  # In the future it may be worthwhile to persist
+  # the scaled score on the result in an after_save
+  # callback on submission. Doing so would reuquire
+  # working out some performance issues.
+  def scaled_result_score
+    raw_result_score = read_attribute(:result_score)
+
+    return raw_result_score if raw_result_score.blank? || submission.blank?
+
+    # A negative grader_id indicates that no manual
+    # adjustments were made by a Canvas user to the result.
+    # If that's the case, we can just return the result_score
+    # without additional scaling
+    return raw_result_score if submission.grader_id.blank? || submission.grader_id < 0
+
+    # We can also return the result_score if the assignment
+    # has zero points possible
+    return raw_result_score if assignment.points_possible&.zero?
+
+    # The result was manually updated by a Canvas user.
+    # Because the result_maximum may not be the same as the
+    # assignment's points possible, we need to scale the
+    # result_score to the result_maximum
+    (raw_result_score * result_maximum) / assignment.points_possible.to_f
+  end
+  alias result_score scaled_result_score
+
   private
-  
+
   def set_root_account
     self.root_account_id ||= self.submission&.root_account_id || self.line_item&.root_account_id
   end

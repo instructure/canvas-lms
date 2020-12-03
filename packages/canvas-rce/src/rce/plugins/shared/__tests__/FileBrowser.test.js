@@ -48,4 +48,30 @@ describe('RceFileBrowser', () => {
       class: 'instructure_file_link instructure_scribd_file'
     })
   })
+
+  it('plumbs the media_id when a video file is selected', () => {
+    const onFileSelect = jest.fn()
+    render(<RceFileBrowser onFileSelect={onFileSelect} />)
+    // This is the selectFile prop passed to the Canvas FileBrowser that we mocked above
+    const selectFile = FileBrowser.mock.calls[0][0].selectFile
+    selectFile({
+      name: 'a video',
+      src: '/file/download',
+      api: {
+        url: '/file/download?download_frd=1',
+        'content-type': 'video/mp4',
+        media_entry_id: 'm-deadbeef'
+      }
+    })
+    expect(onFileSelect).toHaveBeenCalledWith({
+      name: 'a video',
+      title: 'a video',
+      href: '/file?wrap=1',
+      embedded_iframe_url: '/media_objects_iframe/m-deadbeef?type=video',
+      media_id: 'm-deadbeef',
+      content_type: 'video/mp4',
+      target: '_blank',
+      class: 'instructure_file_link'
+    })
+  })
 })

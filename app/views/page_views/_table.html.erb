@@ -33,7 +33,7 @@
         <th><%= t('headers.time', "Time") %></th>
         <th>
           <div style="float:<%= direction('right') %>; margin-<%= direction('right') %>: 4px">
-            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'icon-ms-excel') %>
+            <%= link_to("csv", user_page_views_path(@user, :format => :csv), :class => 'icon-ms-excel', :id => 'page_views_csv_link') %>
           </div>
           <%= t('headers.user_agent', "User Agent") %>
         </th>

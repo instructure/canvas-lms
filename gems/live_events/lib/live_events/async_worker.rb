@@ -26,12 +26,6 @@ module LiveEvents
   # CanvasPandaPub::AsyncWorker. Their semantics are a bit different so
   # it may not make sense.
 
-  # TODO: Consider adding batched requests. Kinesis has a put_records call
-  # that is more efficient. (Would also require using aws-sdk-v2 instead of v1.)
-  #
-  # If we do that, we'll want to add an at_exit handler that flushes out the
-  # queue for cases when the process is shutting down.
-
   class AsyncWorker
     attr_accessor :logger, :stream_client, :stream_name
 

@@ -23,6 +23,11 @@
 %>
 
 <h1 class="screenreader-only"><%= t("#titles.learning_outcomes", "Learning Outcomes") %></h1>
+<%
+  if @domain_root_account.feature_enabled?(:improved_outcomes_management)
+    css_bundle :improved_outcomes_management
+  end
+%>
 <% if @domain_root_account.feature_enabled?(:account_level_mastery_scales) %>
   <%
     js_bundle :account_outcome_management

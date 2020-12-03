@@ -126,7 +126,6 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
 
     context 'indent and outdent' do
       it 'should indent and remove indentation for embedded images' do
-        skip('LS-1593 outdent not working with indented image')
         title = 'email.png'
         @root_folder = Folder.root_folders(@course).first
         @image = @root_folder.attachments.build(context: @course)

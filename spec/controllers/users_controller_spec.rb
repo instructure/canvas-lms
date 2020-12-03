@@ -231,6 +231,24 @@ describe UsersController do
       expect(session[:oauth_gdrive_access_token]).to be_nil
       expect(session[:oauth_gdrive_refresh_token]).to be_nil
     end
+
+    it "handles auth failure gracefully" do
+      authorization_mock = double('authorization')
+      allow(authorization_mock).to receive_messages(:code= => nil)
+      allow(authorization_mock).to receive(:fetch_access_token!) do
+        raise Signet::AuthorizationError, "{\"error\": \"invalid_grant\", \"error_description\": \"Bad Request\"}"
+      end
+      drive_mock = Google::APIClient::API.new('mock', {})
+      allow(drive_mock).to receive(:about).and_return(double(get: nil))
+      client_mock = double("client")
+      allow(client_mock).to receive(:authorization).and_return(authorization_mock)
+      allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
+      state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
+      course_with_student_logged_in
+      get :oauth_success, params: {state: state, service: "google_drive", code: "some_code"}
+      expect(response).to be_redirect
+      expect(flash[:error]).to eq "Google Drive failed authorization for current user!"
+    end
   end
 
   context "manageable_courses" do
@@ -2367,6 +2385,22 @@ describe UsersController do
         course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
         expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "some nickname or whatever"
         expect(course_data.detect{|h| h[:id] == @course2.id}[:shortName]).to eq @course2.name
+      end
+
+      context "sharding" do
+        specs_require_sharding
+
+        it "should load nicknames for a cross-shard user" do
+          @shard1.activate do
+            xs_user = user_factory(active_all: true)
+            @course1.enroll_student(xs_user, enrollment_state: 'active')
+            xs_user.set_preference(:course_nicknames, @course1.id, "worst class")
+            user_session(xs_user)
+          end
+          get 'user_dashboard'
+          course_data = assigns[:js_env][:STUDENT_PLANNER_COURSES]
+          expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "worst class"
+        end
       end
     end
   end

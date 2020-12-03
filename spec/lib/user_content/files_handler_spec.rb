@@ -141,6 +141,24 @@ describe UserContent::FilesHandler do
               expect(processed_url).to match(/#{attachment.context_type.tableize}/)
             end
           end
+
+          context 'and file is locked' do
+            let(:attachment) do
+              attachment_with_context(course, { filename: 'test.jpg', content_type: 'image/jpeg' })
+            end
+
+            it 'returns match_url with hidden=1' do
+              attachment.locked = true
+              attachment.save
+              expect(processed_url).to eq "#{match_url}&hidden=1"
+            end
+
+            it 'returns match_url with hidden=1 if within a locked time window' do
+              attachment.unlock_at = 1.hour.from_now
+              attachment.save
+              expect(processed_url).to eq "#{match_url}&hidden=1"
+            end
+          end
         end
       end
 

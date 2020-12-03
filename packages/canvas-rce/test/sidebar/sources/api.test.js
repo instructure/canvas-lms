@@ -453,6 +453,21 @@ describe('sources/api', () => {
           assert.strictEqual(response.url, 'file-url')
         })
       })
+
+      it('handles inst-fs post-flight with global file id', () => {
+        preflightProps.upload_url = 'instfs-upload-url'
+        const fileId = '1023~789'
+        const response = {
+          location: `http://canvas/api/v1/files/${fileId}?foo=bar`,
+          uuid: 'xyzzy'
+        }
+        fetchMock.mock(preflightProps.upload_url, response)
+        return apiSource.uploadFRD(fileDomObject, preflightProps).then(response => {
+          sinon.assert.calledWith(apiSource.getFile, fileId)
+          assert.strictEqual(response.uuid, 'xyzzy')
+          assert.strictEqual(response.url, 'file-url')
+        })
+      })
     })
   })
 

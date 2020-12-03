@@ -160,10 +160,20 @@ class PlannerOverridesController < ApplicationController
       user: @current_user, dismissed: value_to_boolean(params[:dismissed]))
     sync_module_requirement_done(plannable, @current_user, value_to_boolean(params[:marked_complete]))
 
-    if planner_override.save
-      Rails.cache.delete(planner_meta_cache_key)
-      render json: planner_override_json(planner_override, @current_user, session), status: :created
-    else
+    begin
+      if planner_override.save
+        Rails.cache.delete(planner_meta_cache_key)
+        render json: planner_override_json(planner_override, @current_user, session), status: :created
+      else
+        render json: planner_override.errors, status: :bad_request
+      end
+    rescue ActiveRecord::RecordNotUnique => e
+      # although a callback tries to validate the uniqueness here on the model,
+      # there's a race condition where 2 requests try to create a planner
+      # here at almost the exact same time.  This should fail the second
+      # one gracefully rather than sending a 500.
+      Canvas::Errors.capture_exception(:planner_overrides, e, :info)
+      planner_override.errors.add(:plannable_id, :already_exists, message: "A planner override for this item already exists")
       render json: planner_override.errors, status: :bad_request
     end
   end

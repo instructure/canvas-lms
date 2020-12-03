@@ -63,6 +63,7 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
+      options[:jti]= SecureRandom.uuid
       query_params = { token: access_jwt(access_path(attachment), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
@@ -357,7 +358,6 @@ module InstFS
       whole, remainder = number.divmod(step)
       whole * step
     end
-
     # If we just say every token was created at Time.now, since that token
     # is included in the url, every time we make a url it will be a new url and no browser
     # will never be able to get it from their cache. Which means, for example: every time you
@@ -400,6 +400,7 @@ module InstFS
         resource: resource,
         host: options[:oauth_host]
       }
+      claims[:jti] = options[:jti] if options.has_key? :jti
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end

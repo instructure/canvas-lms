@@ -20,7 +20,7 @@
 
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
-def COFFEE_NODE_COUNT = 1
+def COFFEE_NODE_COUNT = 4
 def DEFAULT_NODE_COUNT = 1
 def JSG_NODE_COUNT = 3
 
@@ -109,9 +109,11 @@ pipeline {
                         }
                       }
                     }
-                  }
-
-                  if(env.TEST_SUITE == 'karma') {
+                  } else if(env.TEST_SUITE == 'coffee') {
+                    for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
+                      tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
+                    }
+                  } else if(env.TEST_SUITE == 'karma') {
                     tests['Packages'] = {
                       withEnv(['CONTAINER_NAME=tests-packages']) {
                         try {
@@ -126,10 +128,6 @@ pipeline {
 
                     tests['canvas_quizzes'] = {
                       sh 'build/new-jenkins/js/tests-quizzes.sh'
-                    }
-
-                    for(int i = 0; i < COFFEE_NODE_COUNT; i++) {
-                      tests["Karma - Spec Group - coffee${i}"] = makeKarmaStage('coffee', i, COFFEE_NODE_COUNT)
                     }
 
                     for(int i = 0; i < JSG_NODE_COUNT; i++) {

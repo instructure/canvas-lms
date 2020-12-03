@@ -727,11 +727,10 @@ end
     GuardRail.activate(:secondary) do
       contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
-
-      if preferred_tool && contexts.member?(preferred_tool.context) && (url == nil || preferred_tool.matches_domain?(url))
-        return preferred_tool
-      end
-
+      can_use_preferred_tool = preferred_tool && contexts.member?(preferred_tool.context)
+      
+      # always use the preferred_tool_id if url isn't provided
+      return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
 
       query = ContextExternalTool.shard(context.shard).polymorphic_where(context: contexts).active
@@ -770,6 +769,16 @@ end
         -> (t) { t.domain.present? },
         search_options
       )
+
+      # always use the preferred tool id *unless* the preferred tool is a 1.1 tool
+      # and the matched tool is a 1.3 tool, since 1.3 is the preferred version of a tool
+      if can_use_preferred_tool && preferred_tool.matches_domain?(url)
+        if match&.use_1_3? && !preferred_tool.use_1_3?
+          return match
+        end
+
+        return preferred_tool
+      end
 
       match
     end

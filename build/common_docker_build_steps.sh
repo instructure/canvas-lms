@@ -72,7 +72,7 @@ function check_gemfile {
 'For historical reasons, the Canvas Gemfile.lock is not tracked by git. We may
 need to remove it before we can install gems, to prevent conflicting depencency
 errors.'
-    confirm_command 'rm Gemfile.lock' || true
+    confirm_command 'rm -f Gemfile.lock' || true
   fi
 
   # Fixes 'error while trying to write to `/usr/src/app/Gemfile.lock`'

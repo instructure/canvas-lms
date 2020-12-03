@@ -66,17 +66,10 @@ const MasteryCalculation = ({contextType, contextId}) => {
   }
   const {outcomeCalculationMethod} = data.context
   const roles = ENV.PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES || []
+  const accountRoles = roles.filter(role => role.is_account_role)
   const canManage = ENV.PERMISSIONS.manage_proficiency_calculations
   return (
     <>
-      {canManage && (
-        <RoleList
-          description={I18n.t(
-            'Permission to change this mastery calculation is enabled at the account level for:'
-          )}
-          roles={roles}
-        />
-      )}
       <ProficiencyCalculation
         contextType={contextType}
         contextId={contextId}
@@ -85,6 +78,24 @@ const MasteryCalculation = ({contextType, contextId}) => {
         updateError={setCalculationMethodError}
         canManage={canManage}
       />
+
+      {accountRoles.length > 0 && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery calculation at the account level is enabled for:'
+          )}
+          roles={accountRoles}
+        />
+      )}
+
+      {roles.length > 0 && (
+        <RoleList
+          description={I18n.t(
+            'Permission to change this mastery calculation at the course level is enabled for:'
+          )}
+          roles={roles}
+        />
+      )}
     </>
   )
 }

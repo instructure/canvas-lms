@@ -40,7 +40,7 @@ describe "Importing Rubrics" do
         Importers::RubricImporter.import_from_migration(data, migration)
         expect(context.rubrics.count).to eq 1
         r = Rubric.where(migration_id: data[:migration_id]).first
-        
+
         expect(r.title).to eq data[:title]
         expect(r.description).to include(data[:description]) if data[:description]
         expect(r.points_possible).to eq data[:points_possible].to_f
@@ -55,4 +55,37 @@ describe "Importing Rubrics" do
     end
   end
 
+  context "with the account_level_mastery_scales FF" do
+    before do
+      @data = get_import_data('vista', 'rubric')
+      @context = get_import_context('vista')
+      @migration = @context.content_migrations.create!
+      outcome_proficiency_model(@context.root_account)
+      outcome_with_rubric({mastery_points: 3, context: @context})
+      @data[:data] = [{ learning_outcome_id: @outcome.id, points_possible: 5, ratings: [{ description: "Rating 1" }] }]
+      @data[:rubrics_to_import] = {}
+      @data[:rubrics_to_import][@data[:migration_id]] = true
+    end
+
+    context "enabled" do
+      it "uses imported course's mastery scales for rubrics with learning_outcomes" do
+        @context.root_account.enable_feature!(:account_level_mastery_scales)
+        Importers::RubricImporter.import_from_migration(@data, @migration)
+        rubric = Rubric.where(migration_id: @data[:migration_id]).first
+        outcome_criterion = rubric.data[0]
+        expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ['best', 'worst']
+        expect(outcome_criterion[:mastery_points]).to eq 10
+      end
+    end
+
+    context "disabled" do
+      it "uses imported course's mastery scales for rubrics with learning_outcomes" do
+        @context.root_account.disable_feature!(:account_level_mastery_scales)
+        Importers::RubricImporter.import_from_migration(@data, @migration)
+        rubric = Rubric.where(migration_id: @data[:migration_id]).first
+        outcome_criterion = rubric.data[0]
+        expect(outcome_criterion[:ratings].map { |rating| rating[:description] }).to eq ['Rating 1']
+      end
+    end
+  end
 end

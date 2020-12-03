@@ -1,6 +1,0 @@
----
-default_recaptcha_registration_enable:
-  state: hidden
-  display_name: Enable Recaptcha by default for self-registration
-  description: Requires Recaptcha for self-registration by default
-  applies_to: SiteAdmin

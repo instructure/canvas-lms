@@ -1,0 +1,14 @@
+# GENERATED FILE, DO NOT MODIFY!
+# To update this file please edit the relevant template and run the generation
+# task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
+
+FROM local/ruby-runner
+
+COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
+
+RUN set -eux; \
+  (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
+  && yarn cache clean
+
+COPY --chown=docker:docker --from=local/cache-helper-collect-packages /tmp/dst ${APP_HOME}
+RUN yarn build:packages

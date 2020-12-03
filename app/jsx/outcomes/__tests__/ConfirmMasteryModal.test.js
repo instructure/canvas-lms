@@ -45,8 +45,11 @@ it('does call onConfirm when saved', () => {
   expect(onConfirm).toHaveBeenCalled()
 })
 
-it('renders the modalText and title provided as props', () => {
-  const {getByText} = render(<ConfirmMasteryModal {...defaultProps()} />)
+it('renders the modalText, title and confirmButton provided as props', () => {
+  const {getByText} = render(
+    <ConfirmMasteryModal {...defaultProps()} confirmButtonText="Confirm" />
+  )
   expect(getByText(/title/)).not.toBeNull()
   expect(getByText(/body!!/)).not.toBeNull()
+  expect(getByText(/Confirm/)).not.toBeNull()
 })

@@ -103,12 +103,15 @@ export default class RosterUserView extends Backbone.View {
     json.canLinkStudents = json.isObserver && !ENV.course.concluded
     json.canViewLoginIdColumn = ENV.permissions.view_user_logins
     json.canViewSisIdColumn = ENV.permissions.read_sis
+
+    const candoAdminActions =
+      ENV.permissions.allow_course_admin_actions || ENV.permissions.manage_admin_users
     json.canManage = _.some(['TeacherEnrollment', 'DesignerEnrollment', 'TaEnrollment'], et =>
       this.model.hasEnrollmentType(et)
     )
-      ? ENV.permissions.manage_admin_users
+      ? candoAdminActions
       : this.model.hasEnrollmentType('ObserverEnrollment')
-      ? ENV.permissions.manage_admin_users || ENV.permissions.manage_students
+      ? candoAdminActions || ENV.permissions.manage_students
       : ENV.permissions.manage_students
     json.customLinks = this.model.get('custom_links')
 

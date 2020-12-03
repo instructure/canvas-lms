@@ -898,6 +898,29 @@ describe ContextExternalTool do
         preferred = c1.context_external_tools.create!(:name => "a", :url => "http://www.google.com", :consumer_key => '12345', :shared_secret => 'secret')
         expect(ContextExternalTool.find_external_tool(nil, c1, preferred.id)).to eq preferred
       end
+
+      it "should not return preferred tool if it is 1.1 and there is a matching 1.3 tool" do
+        @tool1_1 = @course.context_external_tools.create!(name: "a", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3 = @course.context_external_tools.create!(name: "b", url: "http://www.google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.save!
+
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @tool1_1.destroy
+        @tool1_3.destroy
+
+        @tool1_1 = @course.context_external_tools.create!(name: "a", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3 = @course.context_external_tools.create!(name: "b", domain: "google.com", consumer_key: '12345', shared_secret: 'secret')
+        @tool1_3.settings[:use_1_3] = true
+        @tool1_3.save!
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_1.id)
+        expect(@found_tool).to eql(@tool1_3)
+        @found_tool = ContextExternalTool.find_external_tool("http://www.google.com", Course.find(@course.id), @tool1_3.id)
+        expect(@found_tool).to eql(@tool1_3)
+      end
     end
 
     context 'when multiple ContextExternalTools have domain/url conflict' do

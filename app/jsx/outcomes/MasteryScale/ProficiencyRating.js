@@ -29,6 +29,7 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-layout'
 import {Flex} from '@instructure/ui-flex'
 import ColorPicker, {PREDEFINED_COLORS} from '../../shared/ColorPicker'
+import ConfirmMasteryModal from '../ConfirmMasteryModal'
 
 function formatColor(color) {
   if (color[0] !== '#') {
@@ -67,7 +68,10 @@ class ProficiencyRating extends React.Component {
 
   constructor(props) {
     super(props)
-    this.state = {showColorPopover: false}
+    this.state = {
+      showColorPopover: false,
+      showDeleteModal: false
+    }
     this.descriptionInput = null
     this.pointsInput = null
     this.trashButton = null
@@ -132,6 +136,15 @@ class ProficiencyRating extends React.Component {
   }
 
   handleDelete = () => {
+    this.setState({showDeleteModal: true})
+  }
+
+  handleCloseDeleteModal = () => {
+    this.setState({showDeleteModal: false})
+  }
+
+  handleRealDelete = () => {
+    this.handleCloseDeleteModal()
     this.props.onDelete()
   }
 
@@ -236,6 +249,14 @@ class ProficiencyRating extends React.Component {
     )
   }
 
+  focusColorPicker = () => {
+    this.colorPickerRef.setFocus()
+  }
+
+  setColorPickerRef = element => {
+    this.colorPickerRef = element
+  }
+
   renderColorPicker = () => {
     const {color, position, canManage, isMobileView} = this.props
     return (
@@ -245,7 +266,14 @@ class ProficiencyRating extends React.Component {
             on="click"
             show={this.state.showColorPopover}
             onToggle={this.handleMenuToggle}
+            onShow={this.focusColorPicker}
             shouldContainFocus
+            // Note: without this prop, there's a focus issue where the window will scroll up
+            // on Chrome which seems to be caused by an issue within Popover (possibly INSTUI-1799)
+            // Including this prop no longer focuses on the ColorPicker
+            // when it mounts (and resolves the scroll behavior), so we manually focus on
+            // mount with focusColorPicker
+            shouldFocusContentOnTriggerBlur
           >
             <Popover.Trigger>
               <Button ref={this.setColorRef} variant="link">
@@ -260,10 +288,10 @@ class ProficiencyRating extends React.Component {
             </Popover.Trigger>
             <Popover.Content>
               <ColorPicker
+                ref={this.setColorPickerRef}
                 parentComponent="ProficiencyRating"
                 colors={PREDEFINED_COLORS}
                 currentColor={formatColor(color)}
-                isOpen
                 hidePrompt
                 nonModal
                 hideOnScroll={false}
@@ -301,6 +329,8 @@ class ProficiencyRating extends React.Component {
 
   renderDeleteButton = () => {
     const {disableDelete, position} = this.props
+    const {showDeleteModal} = this.state
+
     return (
       <div className="deleteButton">
         <IconButton
@@ -311,6 +341,15 @@ class ProficiencyRating extends React.Component {
           onClick={this.handleDelete}
           renderIcon={<IconTrashLine />}
           screenReaderLabel={I18n.t(`Delete mastery level %{position}`, {position})}
+        />
+
+        <ConfirmMasteryModal
+          onConfirm={this.handleRealDelete}
+          modalText={I18n.t('This will remove the mastery level from your mastery scale.')}
+          isOpen={showDeleteModal}
+          onClose={this.handleCloseDeleteModal}
+          title={I18n.t('Remove Mastery Level')}
+          confirmButtonText={I18n.t('Confirm')}
         />
       </div>
     )

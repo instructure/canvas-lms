@@ -25,7 +25,7 @@
 const Handlebars = require('handlebars')
 const EmberHandlebars = require('ember-template-compiler').EmberHandlebars
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
-const PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor').default
+const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
 
 function compileHandlebars(data) {
   const {path, source} = data

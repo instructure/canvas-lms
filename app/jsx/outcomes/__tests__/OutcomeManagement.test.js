@@ -26,6 +26,18 @@ describe('OutcomeManagement', () => {
       const wrapper = shallow(<OutcomeManagement />)
       expect(wrapper.find('OutcomePanel').exists()).toBe(true)
     })
+
+    it('does not render ManagementHeader', () => {
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('ManagementHeader').exists()).toBe(false)
+    })
+
+    it('renders ManagementHeader when improved outcomes enabled', () => {
+      window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
+      const wrapper = shallow(<OutcomeManagement />)
+      expect(wrapper.find('ManagementHeader').exists()).toBe(true)
+      delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
+    })
   }
 
   describe('account', () => {

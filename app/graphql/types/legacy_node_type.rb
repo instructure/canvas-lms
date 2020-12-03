@@ -24,6 +24,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Account"
   value "Assignment"
   value "AssignmentGroup"
+  value "Conversation"
   value "Course"
   value "Discussion"
   value "Enrollment"

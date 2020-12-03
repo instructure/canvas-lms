@@ -21,13 +21,19 @@
 require 'json/jwt'
 
 module Canvas::Security
-  class InvalidToken < RuntimeError
+  class AuthenticationError < RuntimeError
+    def response_status
+      401
+    end
   end
 
-  class TokenExpired < RuntimeError
+  class InvalidToken < AuthenticationError
   end
 
-  class InvalidJwtKey < RuntimeError
+  class TokenExpired < AuthenticationError
+  end
+
+  class InvalidJwtKey < AuthenticationError
   end
 
   def self.encryption_key
