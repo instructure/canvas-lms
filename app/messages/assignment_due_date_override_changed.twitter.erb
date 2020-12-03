@@ -1,7 +1,7 @@
 <% define_content :link do -%>
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
-<%= t('assignment_change', 'Canvas Alert - Date Change: %{assignment_name}, %{course_name} (%{override})', 
+<%= t('assignment_change', 'N1LMS Alert - Date Change: %{assignment_name}, %{course_name} (%{override})', 
         :assignment_name => asset.assignment.title, 
         :course_name => asset.assignment.context.name, 
         :override => asset.title) %>

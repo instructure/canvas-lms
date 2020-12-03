@@ -8,9 +8,9 @@
 
 <% define_content :subject do %>
   <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-    <%= t "%{user_name}, you just sent a message in Canvas.", :user_name => content(:user_name) %>
+    <%= t "%{user_name}, you just sent a message in N1LMS.", :user_name => content(:user_name) %>
   <% else %>
-    <%= t "%{user_name}, you just sent a message in Canvas - Do not reply", :user_name => content(:user_name) %>
+    <%= t "%{user_name}, you just sent a message in N1LMS - Do not reply", :user_name => content(:user_name) %>
   <% end %>
 <% end %>
 
@@ -19,7 +19,7 @@
     <% if IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
       <%= t "View this message in Conversations" %>
     <% else %>
-      <%= t "Reply to this message in Canvas" %>
+      <%= t "Reply to this message in N1LMS" %>
     <% end %>
   </a>
 <% end %>
@@ -82,9 +82,9 @@
 <% if asset.has_media_objects? %>
 <p><%= t :audio_comment, "This message includes media comments. To listen or reply, click the link below:" %></p>
 <% elsif IncomingMailProcessor::MailboxAccount.reply_to_enabled %>
-<p><%= t :reply_to_conversation_message, "You can reply to this message in Canvas by replying directly to this email.  If you need to include an attachment, please log in to Canvas and reply through the Inbox." %></p>
+<p><%= t :reply_to_conversation_message, "You can reply to this message in N1LMS by replying directly to this email.  If you need to include an attachment, please log in to N1LMS and reply through the Inbox." %></p>
 <% else %>
-  <p><%=t :pre_you_can, "You can "%><a href="<%= content :link %>"><%= t"reply to this message in Canvas." %></a></p>
+  <p><%=t :pre_you_can, "You can "%><a href="<%= content :link %>"><%= t"reply to this message in N1LMS." %></a></p>
 <% end %>
 
 <% unless asset.attachments.empty? %>

@@ -9020,7 +9020,7 @@ en-AU:
       Elementary friendly theme, font, and limited course navigation.
       The font update only applies to languages that use the Latin Alphabet.
   email: 
-    default_from_name: "Instructure Canvas"
+    default_from_name: "Nterone N1LMS"
   email_22a7d52d: Email
   email_actions_a9bfe457: "Email Actions"
   email_address_6e0443a5: "Email address"
@@ -11817,7 +11817,7 @@ en-AU:
   here_are_your_assignments_listed_by_due_date_7d8e98e6: "Here are your Assignments, listed by due date."
   here_f44564ee: here.
   here_s_a_great_chance_to_get_to_know_the_calendar__187ce49: "Here's a great chance to get to know the calendar and add any non-assignment events you might have to the course. Don't worry, we'll help you through it."
-  here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Here's some quick tips to get you started in Canvas!"
+  here_s_some_quick_tips_to_get_you_started_in_canva_72425979: "Here's some quick tips to get you started in N1LMS"
   hi_contrast_373b614f: Hi-contrast
   hidden_14a032a7: Hidden
   hidden_available_with_a_link_65ef2bda: "Hidden. Available with a link."
@@ -12284,7 +12284,7 @@ en-AU:
   incomplete_da3c2ea2: Incomplete
   incompleteregistration: 
     get_started: "Get Started"
-    welcome_to_canvas: "Welcome to Canvas!"
+    welcome_to_canvas: "Welcome to N1LMS"
   incorrect_answer_7c17e63b: "Incorrect Answer"
   incorrect_username_and_or_password_2de73abb: "Incorrect username and/or password"
   increase_indent_6af90f7c: "Increase Indent"
@@ -12372,7 +12372,7 @@ en-AU:
         minute: min
     draft: Draft
     errors: 
-      cannot_view_document_in_canvas: "This document cannot be displayed within Canvas."
+      cannot_view_document_in_canvas: "This document cannot be displayed within N1LMS."
       document_preview_processing: "The document preview is currently being processed. Please try again later."
       field_is_required: "This field is required"
       invalid_datetime: "Invalid date/time value"
@@ -12415,12 +12415,12 @@ en-AU:
   instructure_default_old_66ef6e9b: "Instructure Default (Old)"
   instructure_inline_media_comment: 
     alerts: 
-      kaltura_disabled: "Kaltura has been disabled for this Canvas site"
+      kaltura_disabled: "Kaltura has been disabled for this N1LMS site"
     links: 
       minimize_embedded_kaltura_content: "Minimise embedded content"
   instructure_js: 
     alerts: 
-      file_previews_disabled: "File previews have been disabled for this Canvas site"
+      file_previews_disabled: "File previews have been disabled for this N1LMS site"
     buttons: 
       next_module: "Next Module"
       previous_module: "Previous Module"
@@ -12636,7 +12636,7 @@ en-AU:
       previous: Previous
   jquery_doc_previews: 
     errors: 
-      cannot_view_document_in_canvas: "This document cannot be displayed within Canvas."
+      cannot_view_document_in_canvas: "This document cannot be displayed within N1LMS."
       document_preview_processing: "The document preview is currently being processed. Please try again later."
   jquery_media_comments: 
     loading: "Loading media..."
@@ -12757,7 +12757,7 @@ en-AU:
         reset_explanation: "Resetting the test student will clear all history for this student, allowing you to view the course as a brand new student."
         warning_title: "You are currently logged into Student View"
     head: 
-      default_page_title: "Canvas LMS"
+      default_page_title: "N1LMS"
     menu: 
       view_all_accounts: "View all accounts"
       view_all_groups: "View all groups"
@@ -19907,7 +19907,7 @@ en-AU:
       labels: 
         email: Email
         name: Name
-    welcome_to_canvas: "Welcome to Canvas!"
+    welcome_to_canvas: "Welcome to N1LMS"
   registration_url_60e0eaaa: "Registration URL"
   regular_style_checkbox_ee3d71c1: "Regular-style tickbox"
   reinforce_student_understanding_304d18a6: "Reinforce student understanding"
@@ -24798,7 +24798,7 @@ en-AU:
                   those courses are available, you will see information about them here
                   and in the navigation on the left side. In the meantime, feel free to sign up for
                   more courses or set up your profile.
-      welcome_to_happiness: "Welcome to Canvas!"
+      welcome_to_happiness: "Welcome to N1LMS"
   users_act_as_d922940: "Users - act as"
   users_add_remove_observers_d1273d9: "Users - add / remove observers"
   users_add_remove_students_in_courses_efe7e748: "Users - add / remove students in courses"

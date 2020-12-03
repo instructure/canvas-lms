@@ -223,7 +223,7 @@ class UserService < ActiveRecord::Base
       when 'skype'
         "skype:#{service_user_name}?add"
       else
-        'http://www.instructure.com'
+        'https://www.nterone.com'
     end
   end
 

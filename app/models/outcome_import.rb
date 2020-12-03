@@ -152,7 +152,7 @@ class OutcomeImport < ApplicationRecord
       delay_for: 0,
       context: nil,
       path_type: 'email',
-      from_name: "Instructure Canvas"
+      from_name: "Nterone N1LMS"
     })
     message.communication_channel = user.email_channel
     message.user = user
