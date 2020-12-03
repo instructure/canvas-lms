@@ -218,7 +218,7 @@ class Pseudonym < ActiveRecord::Base
     :email_login
   end
 
-  def works_for_account?(account, allow_implicit = false)
+  def works_for_account?(account, allow_implicit = false, ignore_types: [:implicit])
     true
   end
 

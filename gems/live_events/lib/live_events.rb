@@ -34,6 +34,14 @@ module LiveEvents
       @settings.call
     end
 
+    def aws_credentials=(aws_credentials)
+      @aws_credentials = aws_credentials
+    end
+
+    def aws_credentials(config)
+      @aws_credentials.call(config)
+    end
+
     def max_queue_size=(size)
       @max_queue_size = size
     end
