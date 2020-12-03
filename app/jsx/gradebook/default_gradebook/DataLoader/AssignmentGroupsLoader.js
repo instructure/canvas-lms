@@ -17,10 +17,11 @@
  */
 
 export default class AssignmentGroupsLoader {
-  constructor({dispatch, gradebook, performanceControls}) {
+  constructor({dispatch, gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
     this._dispatch = dispatch
     this._gradebook = gradebook
     this._performanceControls = performanceControls
+    this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
   }
 
   loadAssignmentGroups() {
@@ -36,6 +37,8 @@ export default class AssignmentGroupsLoader {
       includes.push('module_ids')
     }
 
+    // Careful when adding new params here. If the param content is too long,
+    // you can end up triggering a '414 Request URI Too Long' from Apache.
     const params = {
       exclude_assignment_submission_types: ['wiki_page'],
       exclude_response_fields: [
@@ -50,7 +53,7 @@ export default class AssignmentGroupsLoader {
     }
 
     const periodId = this._gradingPeriodId()
-    if (periodId) {
+    if (periodId && this.loadAssignmentsByGradingPeriod) {
       return this._loadAssignmentGroupsForGradingPeriods(params, periodId)
     }
 
