@@ -109,6 +109,8 @@ module Api
           context.discussion_topic.course
         when Group
           context.context
+        when WikiPage
+          context.course
         else
           context
         end

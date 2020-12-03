@@ -54,6 +54,13 @@ module Api
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
         end
 
+        it "has media redirect for wiki pages" do
+          course = course_model
+          page = course.wiki_pages.create(:title => "some page")
+          proxy = UrlProxy.new(StubUrlHelper.new, page, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
         it "can produce a redirect route for announcements" do
           course = course_model
           announcement = Announcement.new
