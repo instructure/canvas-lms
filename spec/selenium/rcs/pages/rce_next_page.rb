@@ -295,6 +295,10 @@ module RCENextPage
     f('button[aria-label="More..."]')
   end
 
+  def list_button
+    possibly_hidden_toolbar_button('[role="button"][title="Ordered and Unordered Lists"]')
+  end
+
   def list_toggle_button
     f('[role="button"][title="Ordered and Unordered Lists"] .tox-split-button__chevron')
   end
@@ -338,7 +342,7 @@ module RCENextPage
   end
 
   def superscript_button
-    f(superscript_button_selector)
+    possibly_hidden_toolbar_button(superscript_button_selector)
   end
 
   def subscript_menu_button_selector
@@ -351,6 +355,10 @@ module RCENextPage
 
   def subscript_button
     f(subscript_button_selector)
+  end
+
+  def align_button
+    possibly_hidden_toolbar_button('[role="button"][aria-label="Align"]')
   end
 
   def align_toggle_button
@@ -737,6 +745,10 @@ module RCENextPage
     more_toolbar_button.click
   end
 
+  def click_list_button
+    list_button.click
+  end
+
   def click_list_toggle_button
     list_toggle_button.click
   end
@@ -771,6 +783,10 @@ module RCENextPage
 
   def click_subscript_menu_button
     subscript_menu_button.click
+  end
+
+  def click_align_button
+    align_button.click
   end
 
   def click_align_toggle_button
