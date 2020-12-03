@@ -22,7 +22,7 @@ require 'ritex'
 require 'securerandom'
 
 module UserContent
-  def self.escape(str, current_host = nil, use_updated_math_rendering = false)
+  def self.escape(str, current_host = nil)
     html = Nokogiri::HTML::DocumentFragment.parse(str)
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
@@ -58,7 +58,7 @@ module UserContent
     find_equation_images(html) do |node|
       equation = node['data-equation-content'] || node['alt']
       next if equation.blank?
-      if !use_updated_math_rendering
+      if !Account.site_admin.feature_enabled?(:new_math_equation_handling)
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
         
