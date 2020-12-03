@@ -651,7 +651,9 @@ module Canvas::LiveEvents
       context_type: context.class.to_s,
       lti_context_id: context.lti_context_id,
       context_uuid: context.uuid,
-      import_quizzes_next: import_quizzes_next
+      import_quizzes_next: import_quizzes_next,
+      source_course_lti_id: content_migration.source_course&.lti_context_id,
+      destination_course_lti_id: context.lti_context_id
     }
 
     if context.respond_to?(:root_account)
