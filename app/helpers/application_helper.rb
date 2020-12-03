@@ -735,6 +735,10 @@ module ApplicationHelper
 
   def include_account_js
     return if params[:global_includes] == '0' || !@domain_root_account
+    # custom JS could be used to hijack user stuff.  Let's not allow
+    # it to be rendered unless the pseudonym is really
+    # from this account (or trusts, etc).
+    return if @current_pseudonym && !@current_pseudonym.works_for_account?(brand_config_account)
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:js_overrides]
