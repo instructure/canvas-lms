@@ -363,6 +363,13 @@ describe ApplicationHelper do
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/site_admin\\/account.js}
         end
 
+        it "will not render for user that doesn't work with that account" do
+          @current_pseudonym = pseudonym_model
+          allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
+          expect(helper.include_account_js).to be_nil
+        end
+
         context "sub-accounts" do
           before { set_up_subaccounts }
 
