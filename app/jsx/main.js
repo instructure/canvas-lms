@@ -96,6 +96,18 @@ if (
 ready(() => {
   ;(window.deferredBundles || []).forEach(loadBundle)
 
+  // LS-1662: there are math equations on the page that
+  // we don't see, so remain invisible and aren't
+  // typeset my MathJax. Let's trick Canvas into knowing
+  // there's math on the page by putting some there.
+  if (!/quizzes\/\d*\/edit/.test(window.location.pathname)) {
+    if (document.querySelector('.math_equation_latex')) {
+      const elem = document.createElement('math')
+      elem.innerHTML = '&nbsp;'
+      document.body.appendChild(elem)
+    }
+  }
+
   if (!ENV.FEATURES.new_math_equation_handling) {
     // This is in a setTimeout to have it run on the next time through the event loop
     // so that the code that actually renders the user_content runs first,
