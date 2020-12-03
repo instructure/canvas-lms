@@ -110,8 +110,8 @@ def postFn(status) {
         'requestTime': requestEndTime - requestStartTime,
       ])
 
-      failureReport.publishReportFromArtifacts('Rspec Test Failures', "tmp/spec_failures/rspec/**/*")
-      failureReport.publishReportFromArtifacts('Selenium Test Failures', "tmp/spec_failures/selenium/**/*")
+      failureReport.publishReportFromArtifacts('Rspec Test Failures', 'rspec')
+      failureReport.publishReportFromArtifacts('Selenium Test Failures', 'selenium')
       failureReport.submit()
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {

@@ -120,6 +120,11 @@ def _runRspecTestSuite(
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
 
       archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
+      findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
+        // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+        // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+        failureReport.addFailurePathByCategory(prefix, file.getPath(), file.getPath().split("/")[5])
+      }
 
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
       def preStatus = currentBuild.rawBuild.@result
