@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "قائمة دائرية غير المرتبة"
     },
+    "clear_2084585f": {
+        "message": "مسح"
+    },
     "clear_selected_file_82388e50": {
         "message": "مسح الملف المحدد"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "جارٍ تحميل عناصر المخطِط"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "جارٍ التحميل، يرجى الانتظار"
     },
     "location_3b6ff307": {
         "message": "الموقع:"

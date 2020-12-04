@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "liste ronde non triée"
     },
+    "clear_2084585f": {
+        "message": "Effacer"
+    },
     "clear_selected_file_82388e50": {
         "message": "Effacer le fichier sélectionné"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Chargement des éléments du planificateur"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Chargement en cours, veuillez patienter..."
     },
     "location_3b6ff307": {
         "message": "Emplacement :"
