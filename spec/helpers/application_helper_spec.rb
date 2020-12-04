@@ -269,10 +269,9 @@ describe ApplicationHelper do
             allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
           end
 
-          it "still renders if there's no JS" do
+          it "won't render only JS" do
             allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
-            expect(helper.include_account_css).to_not be_nil
-            expect(helper.include_account_css).to match %r{overrides.css}
+            expect(helper.include_account_css).to be_nil
           end
 
           it "will not render if there's javacscript" do
