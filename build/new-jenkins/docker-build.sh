@@ -63,15 +63,21 @@ WEBPACK_CACHE_ID=$(echo "$BASE_IMAGE_ID $DOCKERFILE_CACHE_MD5 $YARN_CACHE_MD5 $P
 WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
 WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:${WEBPACK_CACHE_LOAD_SCOPE:-$WEBPACK_CACHE_SAVE_SCOPE}-$WEBPACK_CACHE_ID"
 
-# Check first if the primary cache ($WEBPACK_CACHE_LOAD_TAG) exists for these files
-# Fallback to the secondary cache ($WEBPACK_CACHE_SAVE_TAG).
-exit_code=0
-(./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_TAG && docker tag $WEBPACK_CACHE_LOAD_TAG local/webpack-cache) \
-  || (./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SAVE_TAG && docker tag $WEBPACK_CACHE_SAVE_TAG local/webpack-cache) \
-  || exit_code=$?
+# Build / Load Webpack Image
+WEBPACK_CACHE_SELECTED_TAG=""
 
-# If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
-if [[ "$exit_code" != "0" ]]; then
+if ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_TAG; then
+  # Optimize for changes that don't require webpack to re-build. Pull the image that is shared
+  # across all patchsets.
+  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_LOAD_TAG
+
+  docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
+elif ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SAVE_TAG; then
+  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SAVE_TAG
+
+  docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
+else
+  # If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 
   docker build \
@@ -90,12 +96,16 @@ if [[ "$exit_code" != "0" ]]; then
     --tag "local/webpack-cache" \
     --tag "$WEBPACK_CACHE_SAVE_TAG" \
     - < Dockerfile.jenkins.webpack-cache
+
+  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SAVE_TAG
 fi
 
+# Build Final Image
 if [ -n "${1:-}" ]; then
   docker build \
     --build-arg COMPILE_ADDITIONAL_ASSETS="$COMPILE_ADDITIONAL_ASSETS" \
     --file Dockerfile.jenkins.final \
+    --label "WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SELECTED_TAG" \
     --tag "$1" \
     "$WORKSPACE"
 fi
