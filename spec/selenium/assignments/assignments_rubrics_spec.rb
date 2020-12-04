@@ -457,7 +457,7 @@ describe "assignment rubrics" do
         @rubric.update_criteria(rubric_params)
         @rubric.reload
         get "/courses/#{@course.id}/assignments/#{@assignment.id}"
-        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["100.0", "50.0", "20.0"]
+        expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["100", "50", "20"]
 
         f(' .rubric_title .icon-edit').click
         wait_for_ajaximations
