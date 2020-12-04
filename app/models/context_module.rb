@@ -636,6 +636,7 @@ class ContextModule < ActiveRecord::Base
       item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
     elsif params[:type] == "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
+      item = item.submittable_object if item.respond_to?(:submittable_object) && item.submittable_object
     elsif params[:type] == "discussion_topic" || params[:type] == "discussion"
       item = opts[:discussion_topic] || self.context.discussion_topics.active.where(id: params[:id]).first
     elsif params[:type] == "quiz"
