@@ -1246,9 +1246,6 @@ class Attachment < ActiveRecord::Base
     }
     can :read and can :download
 
-    given { |user, session| self.context_type == 'Submission' && self.context&.grant_right?(user, session, :comment) }
-    can :create
-
     given { |user, session|
         session && session['file_access_user_id'].present? &&
         (u = User.where(id: session['file_access_user_id']).first) &&
