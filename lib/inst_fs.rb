@@ -400,7 +400,9 @@ module InstFS
         resource: resource,
         host: options[:oauth_host]
       }
-      claims[:jti] = options[:jti] if options.has_key? :jti
+      original_url = parse_original_url(options[:original_url])
+      claims[:original_url] = original_url if original_url.present?
+      claims[:jti] = options[:jti] if options.key? :jti
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
@@ -477,8 +479,25 @@ module InstFS
       }, expires_in)
     end
 
+    def parse_original_url(url)
+      if url
+        uri = Addressable::URI.parse(url)
+        query = (uri.query_values || {}).with_indifferent_access
+        # We only want to redirect once, if the redirect param is present then we already redirected.
+        # In which case we don't send the original_url param again
+        if !Canvas::Plugin.value_to_boolean(query[:redirect])
+          query[:redirect] = true
+          uri.query_values = query
+          return uri.to_s
+        else
+          return nil
+        end
+      end
+    end
+
     def amend_claims_for_access_token(claims, access_token, root_account)
       return unless access_token
+
       if whitelisted_access_token?(access_token)
         # temporary workaround for legacy API consumers
         claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s

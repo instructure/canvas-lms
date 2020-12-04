@@ -1248,11 +1248,11 @@ module ApplicationHelper
   end
 
   def authenticated_download_url(attachment)
-    file_authenticator.download_url(attachment)
+    file_authenticator.download_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_inline_url(attachment)
-    file_authenticator.inline_url(attachment)
+    file_authenticator.inline_url(attachment, options: {original_url: request.original_url})
   end
 
   def authenticated_thumbnail_url(attachment, options={})
