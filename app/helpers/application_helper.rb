@@ -741,11 +741,6 @@ module ApplicationHelper
     @current_pseudonym.works_for_account?(brand_config_account, ignore_types: [:site_admin])
   end
 
-  def has_custom_js
-    @domain_root_account.allow_global_includes? &&
-      active_brand_config(ignore_high_contrast_preference: true)&.css_and_js_overrides&.[](:js_overrides).present?
-  end
-
   def include_account_js
     return if params[:global_includes] == '0' || !@domain_root_account
     return unless pseudonym_can_see_custom_assets
@@ -775,7 +770,7 @@ module ApplicationHelper
 
   def include_account_css
     return if disable_account_css?
-    return if has_custom_js && !pseudonym_can_see_custom_assets
+    return unless pseudonym_can_see_custom_assets
 
     includes = if @domain_root_account.allow_global_includes? && (abc = active_brand_config(ignore_high_contrast_preference: true))
       abc.css_and_js_overrides[:css_overrides]
