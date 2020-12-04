@@ -255,13 +255,33 @@ describe ApplicationHelper do
           expect(output).to match %r{https://example.com/site_admin/account.css}
         end
 
-
         it "should not include anything if param is set to 0" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
           output = helper.include_account_css
           expect(output).to be_nil
+        end
+
+        context "with user that doesn't work for that account" do
+          before do
+            @current_pseudonym = pseudonym_model
+            allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          end
+
+          it "still renders if there's no JS" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
+            expect(helper.include_account_css).to_not be_nil
+            expect(helper.include_account_css).to match %r{overrides.css}
+          end
+
+          it "will not render if there's javacscript" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(
+              css_overrides: 'https://example.com/root/account.css',
+              js_overrides: 'https://example.com/root/account.js'
+            )
+            expect(helper.include_account_css).to be_nil
+          end
         end
       end
 
