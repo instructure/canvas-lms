@@ -294,6 +294,7 @@ sv:
     turnitin_pledge: "Den inlämnade uppgiften är mitt egna originella arbete"
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Måluppfyllelseskalor för lärandemål på konto- och kursnivå"
   account_and_course_level_outcome_proficiencies_1cfa260: "Lärandemålskompetenser på konto- och kursnivå"
   account_and_subaccount_40c6430: "Konto och underkonto"
   account_authorization_config: 
@@ -1795,8 +1796,10 @@ sv:
   add_course_calendar_events_146154a5: "Lägg till händelser i kurskalendern"
   add_criterion_eb9587ef: "Lägg till kriterium"
   add_custom_link_22059c0: "Lägg till anpassad länk"
+  add_designers_to_courses_9588820b: "Lägg till designers i kurser"
   add_discussion_653dab4c: "Lägg till diskussion"
   add_domain_f15bc6c1: "Lägg till domän"
+  add_edit_delete_sections_d32c5b4d: "lägg till/redigera/ta bort sektioner"
   add_email_address_aef3b61: "Lägg till e-postadress"
   add_existing_content_7e36da66: "Lägg till befintligt innehåll"
   add_external_feed_6d437a28: "Lägg till externt flöde"
@@ -1806,6 +1809,7 @@ sv:
   add_grading_period_6f774dc3: "Lägg till bedömningsperiod"
   add_grading_scheme_81e23c05: " Lägg till bedömningsschema"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Lägg till omdömesschema till administratörsomdömesrapport"
+  add_granularity_to_permissions_around_managing_cou_4a5bc486: "Lägg till granulära behörigheter för hantering av kurssektioner"
   add_group_c84f9e9d: "Lägg till grupp"
   add_group_set_f9809e11: "Lägg till gruppuppsättning"
   add_help_menu_links_de9fc34f: "Lägg till hjälpmenylänkar"
@@ -1817,6 +1821,7 @@ sv:
   add_items_to_score_range_297d413b: "Lägg till innehåll i poängintervall"
   add_link_5c01c1e8: "Lägg till länk"
   add_link_fc336ed6: "Lägg till länk"
+  add_mastery_level_76469d98: "Lägg till måluppfyllelsenivå"
   add_media_cfa37b54: "Lägg till media"
   add_moderator_review_copy_1st_a484c813: "Lägg till moderators-omdöme (1:a kopia)"
   add_moderator_review_copy_2nd_e80d458f: "Lägg till moderators-omdöme (2:a kopia)"
@@ -1834,6 +1839,7 @@ sv:
   add_new_group_7ac49f31: "Lägg till en ny grupp"
   add_new_set_of_due_dates_e8e240f: "Lägg till en ny uppsättning inlämningsdatum"
   add_new_term_d2217c0d: "Lägg till ny termin"
+  add_observers_to_courses_6f494a29: "Lägg till observatörer i kurser"
   add_old_quiz_f4c546a: "Lägg till äldre Quiz"
   add_override_da70f198: "Lägg till åsidosättning"
   add_people_7948b7da: "Lägg till personer"
@@ -1860,6 +1866,7 @@ sv:
   add_sub_account_to_account_name_b104db90: "Lägg till underkonto till %{account_name}"
   add_submission_type_8690db4b: "Lägg till inlämningstyp"
   add_subtitle_9f660cc: "Lägg till undertext"
+  add_tas_to_courses_27741f81: "Lägg till TA:er i kurser"
   add_tas_to_the_course_2aac6e02: "Lägg till lärarassistenter till kursen"
   add_theme_32fa3d50: "Lägg till tema"
   add_to_course_481a51c4: "Lägg till kurs..."
@@ -1875,6 +1882,7 @@ sv:
   add_users_to_name_b8109bbb: "Lägg till användare till %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Lägg till dina uppgifter.  Du kan antingen göra en lång lista eller dela upp dem i grupper – och till och med specificera varje uppgiftsgrupps vikt."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Lägg till din Zendesk institutions anpassade ifyllda ID för varje av följande (filer som inte har ID kommer inte sparas):"
+  added_mastery_level_dd4792d1: "Lade till måluppfyllelsenivå"
   added_new_proficiency_rating_e30cab8a: "Ny färdighetsbedömning har lagts till"
   adding_rss_feed_f1202567: "Lägger till RSS-flöde"
   additional_comments_9aed10bb: "Ytterligare kommentarer"
@@ -1889,6 +1897,7 @@ sv:
   addressbook_performance_tap_98ddf67: "AddressBook Prestanda steg"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Lägger till analyslänk på menyn för användarinställningar."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Lägger till analys på en students kontextkort."
+  adds_granular_permissions_for_adding_and_removing__e1e484a3: "Lägger till granulära behörigheter för att lägga till och ta bort varje roll och en separat behörighet för övriga kursadministratörsåtgärder."
   adjust_final_grade_fa45e7e0: "Justera slutbetyg"
   admin_4d3ba42f: Admin
   admin_csv_f8d1b3eb: "Admin CSV"
@@ -2034,6 +2043,7 @@ sv:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alla vikter måste vara större eller lika med 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Tillåt en annan kollega att se över flera oberoende bedömningar för valda inlämningar"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Lärare kan ange antalet tillåtna försök för en uppgift via gränssnittet"
+  allow_administrative_actions_in_courses_20c33fed: "Tillåt administrativa åtgärder i kurser"
   allow_bb7ce9b1: Tillåt
   allow_blueprint_publishing_after_association_fae6ba95: "Gör det möjligt att publicera Blueprint-kurser efter koppling"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillåt massexport av omdömen till SIS"
@@ -2098,6 +2108,7 @@ sv:
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillåter att skapa diskussioner för en viss sektion"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gör att hjälplänkar kan taggas som befintliga eller nya och visar tydligt befintliga hjälplänkar i hjälpmenyn."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gör lärandemål valbara under migrering av kursinnehåll"
+  allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillåter inställning av skalor och beräkningsmetoder för måluppfyllelse på konto- och kursnivå för att ersätta bedömningar efter kriterier per lärandemål och beräkningsmetoder"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Ger lärare, designer och TA-baserade roller åtkomst till chattverktyget."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gör det möjligt för lärar-/designer-/lärarassistentbaserade roller att komma åt chattverktyget."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gör det möjligt för lärar-/lärarassistentbaserade roller att komma åt närvaroverktyget."
@@ -2111,6 +2122,7 @@ sv:
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillåter kopiering av moduler i Canvas"
   allows_the_duplicating_of_objects_in_canvas_c86f3665: "Tillåter duplicering av föremål i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillåt kopiering av kalenderhändelser"
+  allows_the_gradebook_importer_to_recognize_and_app_6f11fd0c: "Ger bedömningsöversiktsimportörer möjlighet att identifiera och tillämpa ändringar i åsidosatta resultat."
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Tillåter policyverktyget för saknad inlämning att sända submission_updated livehändelser för varje inlämning som markeras som saknad."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillåt schemaläggning av återkommande kalender-event"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Låter användaren navigera bort under återuppladdningen av inlämningar"
@@ -2317,6 +2329,8 @@ sv:
       Gör det möjligt för användaren att skicka ett meddelande till "Alla i [course group]".
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Gör det möjligt för användaren att skicka ett meddelande till \"Alla i [course name]\" eller \"Alla i [course group].\""
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Gör det möjligt för användaren att skicka ett meddelande till enskilda kursdeltagare."
+  allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: "Gör att användare kan ange måluppfyllelseskalor för lärandemål på konto- och kursnivå."
+  allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: "Gör att användare kan ange måluppfyllelseskalor för lärandemål på kursnivå."
   allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "Gör att användare kan ange beräkningar för lärandemålskompetenser på kursnivå."
   allows_user_to_set_outcome_proficiency_calculation_73761bf4: "Gör att användare kan ange beräkningar för lärandemålskompetenser på konto- och kursnivå."
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Gör att användare kan ange skalor för lärandemålskompetenser på konto- och kursnivå."
@@ -2479,6 +2493,8 @@ sv:
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Ett fel uppstod vid förberedelse för nedladdning, försök igen."
   an_error_occurred_updating_the_assignment_7391dd3a: "Ett fel inträffade vid uppdatering av uppgiften."
   an_error_occurred_updating_the_calculation_method_49384084: "Ett fel inträffade under uppdatering av beräkningsmetoden"
+  an_error_occurred_updating_the_mastery_scale_fc11e6e1: "Ett fel uppstod vid uppdatering av måluppfyllelseskalan"
+  an_error_occurred_updating_the_mastery_scale_messa_d9910855: "Ett fel uppstod vid uppdatering av måluppfyllelseskalan: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Ett fel inträffade under uppdatering av kompetensbedömningarna: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Ett fel inträffade under uppdatering av kompetensbedömningarna"
   an_error_occurred_updating_this_assignment_21287c7e: "Ett fel uppstod vid uppdatering av den här uppgiften."
@@ -2494,6 +2510,8 @@ sv:
   an_error_occurred_while_loading_changes_9851b56f: "Ett fel uppstod vid inläsning av ändringarna"
   an_error_occurred_while_loading_courses_11d4571e: "Ett fel uppstod vid inläsningen av kurser"
   an_error_occurred_while_loading_late_policies_c415f676: "Ett fel uppstod vid inläsningen av policyer för sena inlämningar"
+  an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Ett fel uppstod vid inläsning av måluppfyllelseberäkning: %{error}"
+  an_error_occurred_while_loading_the_mastery_scale__871f3531: "Ett fel uppstod vid inläsning av måluppfyllelseskalan: %{error}"
   an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Ett fel uppstod vid inläsning av beräkningar av lärandemål: %{error}"
   an_error_occurred_while_loading_the_proficiency_ra_98492357: "Ett fel uppstod vid inläsning av kompetensbedömningarna: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Ett fel uppstod vid låsning av anslag."
@@ -2504,6 +2522,7 @@ sv:
   an_error_occurred_while_saving_associations_bd66f3f4: "Ett fel uppstod när associationerna skulle sparas"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Ett fel uppstod när uppgiftens publiceringspolicy skulle sparas."
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Ett fel uppstod när kursens publiceringspolicy skulle sparas"
+  an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Ett fel uppstod vid inläsning av måluppfyllelseskala: %{message}"
   an_error_occurred_while_saving_your_settings_b503a31c: "Ett fel uppstod när dina inställningar skulle sparas"
   an_error_occurred_while_starting_migration_8e6015e2: "Ett fel uppstod när migreringen startades"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Ett fel inträffade när ett försök gjordes att ändra användargränssnittet"
@@ -4941,10 +4960,12 @@ sv:
   certificate_fingerprint_b376df90: "Fingeravtryck för certifikat"
   change_applied_89d1aa5a: "Tillämpad ändring"
   change_beginning_date_to_39dbd06e: "Ändra startdatumet till"
+  change_color_for_mastery_level_position_daa51849: "Ändra färg för måluppfyllelsenivå %{position}"
   change_color_for_proficiency_rating_position_48b39bfc: "Ändra färg för kompetensbedömning %{position}"
   change_course_visibility_eaa2ffc: "Ändra kursens synlighet"
   change_dcaa253a: Ändra
   change_description_34c49853: "Ändra beskrivning"
+  change_description_for_mastery_level_position_c3c41be9: "Ändringsbeskrivning för måluppfyllelsenivå %{position}"
   change_description_for_proficiency_rating_position_97626231: "Andra beskrivning för kompetensbedömning %{position}"
   change_ending_date_to_d2cebd54: "Ändra slutdatumet till"
   change_existing_group_2c91a32b: "Ändra befintlig grupp"
@@ -4955,6 +4976,7 @@ sv:
   change_name_c8cce76c: "Ändra namn"
   change_name_to_568374c8: "Ändra \"%{name}\" till"
   change_points_9e5104ac: "Ändra poäng"
+  change_points_for_mastery_level_position_90c1d7e6: "Ändringspoäng för måluppfyllelsenivå %{position}"
   change_points_for_proficiency_rating_position_a385c658: "Ändra poäng för kompetensbedömning %{position}"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
@@ -5275,6 +5297,7 @@ sv:
   colombia_57_c6c75620: "Colombia (+57)"
   colombia_919c87f9: Colombia
   color_a363e1b0: Färg
+  color_color_for_mastery_level_position_35079de: "Färgen %{color} för måluppfyllelsenivån %{position}"
   color_color_for_proficiency_rating_position_273414eb: "Färg %{color} för kompetensbedömning %{position}"
   color_overlay_fb5ecce7: Färgöverlägg
   columns_464bd055: Kolumner
@@ -5517,6 +5540,8 @@ sv:
   confirm_dialog_component: 
     ok: Ok
   confirm_edit_outcome_a9746c99: "Bekräfta redigering av lärandemål"
+  confirm_mastery_calculation_19ad19f9: "Bekräfta måluppfyllelseberäkning"
+  confirm_mastery_scale_9a779252: "Bekräfta måluppfyllelseskala"
   confirm_mastery_scales_c6ef2169: "Bekräfta måluppfyllelseskalor"
   confirm_qr_code_display_49664fa3: "Bekräfta visning av QR-kod"
   confirm_removal_a9bb889: "Bekräfta borttagning"
@@ -6867,7 +6892,10 @@ sv:
     sis_id_taken: "SIS ID ”%{sis_id}” används redan"
   course_section_7a988066: Kurssektion
   course_section_name_ea880ed1: "Kurssektion %{name}"
+  course_sections_add_c6b5dc1: "Kurssektioner – lägg till"
   course_sections_add_edit_delete_c4f4ac19: "Kursavsnitt – lägg till/redigera/ta bort"
+  course_sections_delete_e75e3eeb: "Kurssektioner – ta bort"
+  course_sections_edit_bd783e1: "Kurssektioner – redigera"
   course_selection_245808bf: Kursval
   course_set_up_tutorial_6ab7c2d1: "Handledning i inställning av kurs"
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "Handledningen i inställning av kurs ger tips om hur du kan utnyttja funktionens möjligheter på varje sida i Canvas. Det är särskilt användbart när du är ny på Canvas eller när du ställer in en ny kurs för första gången på länge."
@@ -7978,6 +8006,7 @@ sv:
   delete_in_progress_2d3f0e0d: "Radera pågår"
   delete_key_developername_be80e695: "Ta bort nyckel %{developerName}"
   delete_key_name_c2de8c0c: "Ta bort nyckel %{name}"
+  delete_mastery_level_position_5cf0f8f7: "Ta bort måluppfyllelsenivån %{position}"
   delete_my_account_41060aad: "Radera mitt konto"
   delete_outcome_cc6546f1: "Ta bort lärandemål"
   delete_outcome_group_6b399d34: "Ta bort grupp med lärandemål"
@@ -8121,7 +8150,10 @@ sv:
   desc_12ad2869: "%{desc}"
   description_436c48d7: Beskrivning
   description_61f4296: "* Beskrivning"
+  description_for_mastery_level_position_description_cc17114b: "Beskrivning för måluppfyllelsenivå %{position} %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Beskrivning för kompentensbedömning %{position}: %{description}"
+  designers_add_fe7e1ea9: "Designers – lägg till"
+  designers_remove_3e590bff: "Designers – ta bort"
   details_98a31b68: Information
   details_a6f427c3: "Detaljer:"
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Fastställer synlighet och hantering av lärandemål i kontonavigeringen. Gör att användare kan skapa, redigera och ta bort lärandemål och grupper för lärandemål på konto- och kursnivå."
@@ -8254,6 +8286,7 @@ sv:
   disabled_links_b3bdea99: "Inaktiverade länkar"
   disabled_not_visible_to_students_2c9d693f: "Inaktiverad. Ej synlig för studenter."
   disabled_not_visible_to_students_48d4a90d: "Inaktiverad. Ej synlig för studenter"
+  disables_push_notifications_for_certain_types_3f57cde4: "Inaktivera Push-aviseringar för vissa typer."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Inaktiverar SMS-aviseringar och
       ändringar i omdömen.
@@ -8851,6 +8884,7 @@ sv:
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importera eller kopiera innehåll enkelt från andra Canvas-kurser till
               din kurs, eller importera innehåll från andra format, som Moodle eller QTI.
+  easy_toggle_student_view_82448b0b: "Snabbväxling för studentvy"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege konverterare"
   ecuador_593_dfcc235a: "Ecuador (+593)"
@@ -9468,6 +9502,7 @@ sv:
   error_deleting_name_reason_11f9d399: "Fel vid radering av %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fel vid duplicering av modulen"
   error_during_group_creation_f232994b: "Ett fel inträffade när gruppen skapades"
+  error_embedding_content_from_tool_49bb698e: "Det gick inte att bädda in innehåll från verktyget"
   error_exporting_gradebook_msg_6ea31e2f: "Ett fel uppstod vid export av bedömningsöversikt: %{msg}"
   error_fetching_access_token_1445a9e3: "Fel vid hämtning av åtkomsttoken"
   error_fetching_user_details_7c85d23: "Fel vid hämtning av användarinformation"
@@ -9494,6 +9529,8 @@ sv:
   error_starting_save_operation_81bcb99: "Fel vid start av sparåtgärd:"
   error_submitting_to_plagiarism_service_9b0748cb: "Ett fel inträffade vid inlämning till plagiattjänsten"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Det gick inte att skicka in till plagiattjänsten. Du kan skicka in igen från SpeedGrader."
+  error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Fel: Verktyget returnerade inte en URL till Canvas"
+  error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Fel: Verktyget returnerade en ogiltig innehållstyp \"%{contentType}\""
   error_updating_submission_draft_1d40ade7: "Fel vid uppdatering av inlämningsutkast"
   error_uploading_file_e2d31b56: "Fel vid uppladdning av fil."
   error_uploading_video_audio_recording_16d9730a: "Ett fel uppstod vid uppladdning av video-/ljudinspelningen"
@@ -9822,6 +9859,7 @@ sv:
   failed_to_save_changes_errors_6920f334: "Det gick inte att spara ändringarna: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "Det gick inte med att spara översiktsvalet"
   failed_to_save_please_try_again_later_bb7070fb: "Det gick inte att spara, försök igen senare"
+  failed_to_split_users_d9759007: "Det gick inte att dela användare."
   failed_to_submit_draft_comment_1de83451: "Kunde inte skicka utkast till kommentar"
   failed_to_unpin_discussion_503eab82: "Misslyckades med att av-fästa diskussionen"
   failed_to_update_account_notification_settings_194c1cd4: "Det gick inte att uppdatera inställningar för kontoaviseringar"
@@ -10619,6 +10657,7 @@ sv:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Bedömningsöversikten och SpeedGrader kommer inte att vara tillgängliga om både Omdömen – redigera och Omdömen – visa är inaktiverade."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Bedömningsöversikt och SpeedGrader kommer inte att vara tillgänglig om både Omdömen – redigera och Omdömen – visa alla omdömen är inaktiverade."
   gradebook_context_name_9dbae5bc: "Bedömningsöversikt – %{context_name}"
+  gradebook_csv_headers_include_grading_period_1015185c: "CSV-rubrikerna i bedömningsöversikten inkluderar omdömesperiod"
   gradebook_csvs: 
     grades_filename: Omdömen
   gradebook_data_loading_performance_improvements_421e1c93: "Förbättringar i inläsningsprestanda i bedömningsöversikten"
@@ -11190,6 +11229,8 @@ sv:
   grading_type_type_7d8b42d7: "Betygsättningstyp: %{type}"
   granular_contexttype_notification_settings_will_be_c5dfc901: "Detaljerade %{contextType}-aviseringsinställningar kan konfigureras här i framtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljinställningar för kursaviseringar kan konfigureras här i framtiden."
+  granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granulära behörigheter för administratörsroller för Lägg till/ta bort i kurser."
+  granular_permissions_for_managing_course_sections_da4b04b: "Granulära behörigheter för hantering av kurssektioner"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerade behörigheter för hantering av wikisidor"
   graph_bar_b5daa23d: Diagramstapel
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram med omdöme för varje uppgift"
@@ -12078,6 +12119,7 @@ sv:
       istället för i uppgiften. Detta gör att händelser
       dupliceras om inte prenumerationerna på de kopplade
       plagiatuppgifterna tagits bort.
+  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Om måluppfyllelseskalor är aktiverade kommer rapporten att trunkeras så att den inte innehåller beräkningsmetod, beräkningsheltal, måluppfyllelsepoäng eller bedömningar."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(om inga väljs ska du skicka till alla på hela kontot)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(om ingen väljs ska du skicka till alla på hela underkontot)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Om ingen väljs, visa för alla i hela underkontot)"
@@ -12085,6 +12127,7 @@ sv:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Om även RCE-förbättring har aktiverats,
       kommer RCE att spara ditt arbete automatiskt under tiden du arbetar
+  if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Om inställningen anges kan exportören av bedömningsöversikten fästa titeln för valda omdömesperioder till kolumnrubriker vars värden varierar baserat på omdömesperioden."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Inställningen inaktiverar funktionen för publicering till SIS för uppgifter efter att omdömesperioden stängts. Gäller endast om funktionen Aktivera nya SIS-integrationsinställningar är aktiverad."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Om Statistik – visa eller Användare – hantera inloggningsuppgifter är aktiverade, kan användare generera in- och utloggningsaktiviteter i Administratörsverktyg. Båda behörigheterna måste inaktiveras för att dölja alternativet för in-/utloggningsaktivitet i Administratörsverktyg."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Om Statistik – visa eller Användare – hantera inloggningsuppgifter är aktiverade, kan användare generera in- och utloggningsaktiviteter i Administratörsverktyg. Båda behörigheterna måste inaktiveras för att dölja alternativet för in-/utloggningsaktivitet i Administratörsverktyg."
@@ -12182,6 +12225,7 @@ sv:
   import_groups_3a2ae14b: "Importera grupper"
   import_learning_outcomes_36d28a2b: "Importera läranderesultat"
   import_outcomes_7dda186b: "Importera lärandemål"
+  import_override_scores_in_gradebook_80d51a72: "Importera åsidosatta resultat i bedömningsöversikten"
   import_sis_data_428cc803: "Importera SIS-data"
   import_started_successfully_a3467411: "Importen startade"
   import_status_b147bd27: Importstatus
@@ -13260,6 +13304,7 @@ sv:
       delete_avatar: "Vill du verkligen radera den här användarens profilbild?"
       lock_avatar: "Låser du den här bilden kommer den godkännas och användare kommer inte kunna uppdatera den.  Fortsätt?"
   manage_b88f7150: Hantera
+  manage_course_sections_f482d1b3: "Hantera kurssektioner"
   manage_discussion_title_a2ecb3fb: "Hantera diskussioner %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Hantera registreringsstatus, skapa grupper och lägg till användare från denna sida."
   manage_grading_schemes_in_context_name_e3678273: "Hantera bedömningsscheman i %{context_name}"
@@ -13305,7 +13350,13 @@ sv:
   master_lock_590266b6: Huvudlås
   mastered_34d4c857: "Uppfyllt mål"
   mastery_7ec348b5: Måluppfyllelse
+  mastery_calculation_5fd5f5fe: Måluppfyllelseberäkning
+  mastery_calculation_parameters_f072c3: "Parametrar för måluppfyllelseberäkning"
+  mastery_calculation_saved_df378fdd: "Måluppfyllelseberäkningen sparades"
   mastery_connect_64598f55: "Mastery Connect"
+  mastery_level_deleted_88838a33: "Måluppfyllelsenivå borttagen"
+  mastery_levels_7d4ee512: Måluppfyllelsenivåer
+  mastery_mastery_for_mastery_level_position_5c9c3206: "Måluppfyllelsen %{mastery} för måluppfyllelsenivå %{position}"
   mastery_mastery_for_proficiency_rating_position_74aa3b56: "Måluppfyllelse %{mastery} för kompetensbedömning %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Måluppfyllelse: %{n_mastery_points_precision_2_str} poäng"
   mastery_path_processing_f4471152: "Bearbetning av måluppfyllelse"
@@ -13316,6 +13367,7 @@ sv:
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Val av måluppfyllelseväg har avaktiverats tillfälligt för underhåll."
   mastery_points_f1672cc: måluppfyllelsepoäng
   mastery_scale_abbc3557: Mastery-skala
+  mastery_scale_saved_34c64b6b: "Sparade måluppfyllelseskala"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultatet för måluppfyllelse reflekterar det högsta resultatet som getts för uppgiften eller quizzet."
   mastery_score_reflects_the_most_recent_graded_assi_29fd2e00: "Poängen för måluppfyllelse reflekterar den senaste betygsatta uppgift eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultatet för måluppfyllelse reflekterar den uppgift eller det quiz som bedömts senast."
@@ -16056,6 +16108,7 @@ sv:
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Observera att vissa attribut inte tillämpas för alla användare på Clever."
   note_this_is_not_your_official_score_f2d4582f: "*OBS*! Detta är INTE ditt officiella resultat."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Obs! Inloggningens konto använder delegerad verifiering, men tillåter nödlösningsverifiering av Canvaslösenord. Lösenordsfälten i det här formuläret uppdaterar nödlösning för Canvaslösenordet, *inte* den delegerade verifieringen."
+  note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "OBS! Detta kommer att återställa sammanfogningen så långt det är möjligt. Sammanfogade användare kanske inte blir fullständigt återställda till sitt tidigare tillstånd."
   notes_6cfc3988: "Anteckningar:"
   notes_c42e0fd5: Anteckningar
   notes_d5339f17: "%{notes}"
@@ -16448,7 +16501,9 @@ sv:
     errors: 
       invalid: "Ogiltig kopplingskod"
   observers_672971d: Observatörer
+  observers_add_ab95f683: "Observatörer – lägg till"
   observers_add_remove_b61eaaa5: "Observatörer – lägg till/ta bort"
+  observers_remove_aafc8a88: "Observatörer – ta bort"
   observing_f3c5e759: Observerar
   observing_observee_d31d5fa2: "Observerar: %{observee}"
   occurrence_s_c12d1aad: händelse(r)
@@ -16628,6 +16683,8 @@ sv:
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Lärandemålet ”%{guid}” har redan visats i den här importen"
   outcome_guid_not_in_visible_context_36269663: "Resultat \"%{guid}\" ej i synligt i kontexten"
   outcome_imports_c496a81f: Lärandemålsimporter
+  outcome_mastery_scales_8c3a814d: "Måluppfyllelseskalor för lärandemål"
+  outcome_mastery_scales_add_edit_171551c: "Skalor för lärandemålskompetenser – lägg till/redigera"
   outcome_path_mastery_points: "%{path} poäng för måluppfyllelse"
   outcome_path_result: "%{path} resultat"
   outcome_proficiency_calculations_5959b681: "Beräkningar för lärandemålskompetenser"
@@ -17014,6 +17071,7 @@ sv:
   placement_inactive_click_to_activate_f7fe8c30: "Placering inaktiv, klicka för att aktivera"
   placement_values_c0a2cf56: Placeringsvärden
   placements_5b5e056b: Placeringar
+  places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Placerar en knapp längst upp till höger på kurssidor så att lärare snabbt kan växla till studentvy."
   plagiarism_detection_platform_6ce67e66: "Plattform plagiatdetektering"
   plagiarism_detection_platform_assignments_fc19e0bd: "Uppgifter för plagieringsidentifieringsplattform"
   plagiarism_detection_platform_users_b0e5410f: "Användare för plagieringsidentifieringsplattform"
@@ -17544,6 +17602,7 @@ sv:
   points_bceb5005: poäng
   points_changed_exceptions_b0c771f7: "Undantag för ändrade poäng:"
   points_e63de520: " Poäng"
+  points_for_mastery_level_position_points_9e72ac3f: "Poäng för måluppfyllelsenivå %{position} %{points}"
   points_for_proficiency_rating_position_points_a5c09291: "Poäng för kompentensbedömning %{position}: %{points}"
   points_for_rating_tier_index_not_present_338d94e6: "Poäng för värderingsnivån %{index} finns inte"
   points_for_tier_index_must_be_less_than_points_for_9683c02: "Poäng för nivå  %{index} måste vara mindre än poäng för tidigare nivå (%{points} är större än %{prior})"
@@ -17554,6 +17613,7 @@ sv:
   points_must_be_0_c278c612: "Poäng måste vara >= 0"
   points_must_be_a_number_0_daa4f7dc: "Poängen måste bestå av en siffra >= 0"
   points_must_be_less_than_previous_rating_bc627bec: "Poängen måste var lägre än tidigare bedömning"
+  points_must_be_unique_f1758a4f: "Poängen måste vara unik"
   points_n_e0b20623: "Poäng %{n}"
   points_out_of_total_24f61148: "*%{points}* av **%{total}**"
   points_points_b6b422e2: "Poäng: %{points}"
@@ -18028,9 +18088,11 @@ sv:
   progress_percent_ae80cd55: "%{progress} procent"
   project_groups_1fa0320b: Projektgrupper
   pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomenet matchar inte kontopronomenet eller så har pronomen inte aktiverats för det här kontot, %{user_id}, hoppar över"
+  pronouns_28bbef86: pronomen
   pronouns_d1cd8dd0: Pronomen
   pronouns_for_users_da46fb5: "Pronomen för användare"
   pronouns_users_can_show_after_their_name_e80821c7: "Pronomen användare kan visa efter sina namn"
+  proper_noun_singular_genitive: "%{noun}s"
   provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
       Ge användarna möjlighet att arbeta samtidigt i ett och samma dokument.
                  från din Canvas-kurs.
@@ -19896,6 +19958,7 @@ sv:
   remove_contact_method_ca890ba3: "Ta bort kontaktmetod"
   remove_course_association_name_b760c502: "Ta bort kursassociation %{name}"
   remove_dates_9b9ba2f6: "Ta bort datum"
+  remove_designers_from_courses_42332a57: "Ta bort designers från kurser"
   remove_domain_as_an_allowed_domain_c510a69e: "Ta bort %{domain} som en tillåten domän"
   remove_domain_from_the_whitelist_14c7d5e9: "Ta bort %{domain} från vitlistan"
   remove_due_dates_and_assignment_availability_dates_608cd97b: "Ta bort inlämningsdatum och tillgänglighetsdatum för uppgiften."
@@ -19912,6 +19975,7 @@ sv:
   remove_name_624e06be: "Ta bort %{name}"
   remove_name_as_an_admin_c296cf49: "Ta bort %{name} som admin"
   remove_null_values_from_live_event_payloads_3c826f: "Ta bort null-värden från livehändelsers nyttolaster"
+  remove_observers_from_courses_703edc34: "Ta bort observatörer från kurser"
   remove_placement_90862c13: "Ta bort %{placement}"
   remove_points_from_rubric_dcd4b585: "Ta bort poäng från matris"
   remove_pronouns_5ff760ff: "Ta bort pronomen"
@@ -19926,6 +19990,7 @@ sv:
   remove_student_from_recipients_4b206e35: "Ta bort %{student} från mottagare"
   remove_studentname_16ba8c3a: "Ta bort %{studentName}"
   remove_submission_draft_f5c7f58b: "Ta bort utkast till inlämning"
+  remove_tas_from_courses_13ade851: "Ta bort TA:er från kurser"
   remove_text_8e485c41: "Ta bort %{text}"
   remove_these_dates_48453a81: "Radera dessa datum"
   remove_this_item_from_the_module_4b2ceab7: "Ta bort det här objektet från modulen"
@@ -20023,6 +20088,7 @@ sv:
   restrict_access_84ba6bb8: "Begränsa tillgång"
   restrict_instructors_from_changing_mastery_scales_5af13053: "Begränsa instruktörer från att ändra skalan för måluppfyllelse"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begränsa instruktörer från att ändra beräkningsmetoden för kompetens"
+  restrict_push_notifications_to_select_types_941d9da3: "Begränsa Push-aviseringar till valda typer"
   restrict_sms_to_select_types_9dd6399c: "Begränsa SMS till utvalda typer"
   restrict_student_access: 
     button_text: 
@@ -20111,10 +20177,13 @@ sv:
       manage_links: "Hantera roll och lita på -länkar"
       manage_outcomes: "Hantera lärandemål"
       manage_proficiency_calculations: "Hantera beräkningar för lärandemålskompetenser"
-      manage_proficiency_scales: "Hantera skalor för lärandemålskompetenser"
+      manage_proficiency_scales: "Hantera skalor för måluppfyllelse för lärandemål"
       manage_role_overrides: "Hantera behörigheter"
       manage_rubrics: "Skapa och redigera bedömningsmatriser"
       manage_sections: "Hantera (skapa/redigera/radera) kurssektioner"
+      manage_sections_add: "Lägg till kurssektioner"
+      manage_sections_delete: "Ta bort kurssektioner"
+      manage_sections_edit: "Redigera kurssektioner"
       manage_sis: "Hantera SIS data"
       manage_site_settings: "Hantera inställningar för hela webbplatsen och plugin"
       manage_storage_quotas: "Hantera lagringskvoter"
@@ -20328,6 +20397,7 @@ sv:
   save_grading_period_set_e029fa88: "Spara uppsättning bedömningsperioder"
   save_key_b4dede06: "Spara nyckel"
   save_learning_mastery_82889d8b: "Spara måluppfyllelse"
+  save_mastery_calculation_84fbeb0f: "Spara måluppfyllelseberäkning"
   save_mastery_scale_2b4dc13a: "Spara måluppfyllelseskala"
   save_publish_36440725: "Spara och publicera"
   save_settings_cafe79a5: "Spara inställningarna"
@@ -20662,6 +20732,7 @@ sv:
   sections_94731e51: Sektioner
   security_7a7e8808: Säkerhet
   security_tab_failed_to_load_2d2242a: "Det gick inte att läsa in säkerhetsfliken"
+  see_example_below_to_see_how_different_calculation_618de98d: "Se i exemplet nedan hur olika beräkningsparametrar påverkar måluppfyllelseberäkningen för studenten."
   see_more_in_canvas_guides_fc90a457: "Se mer i Canvas-guider"
   see_other_users_primary_email_address_59c8473f: "Se andra användares primära e-postadress"
   see_rubric_results_62a6447d: "Se matris-resultat"
@@ -22017,6 +22088,8 @@ sv:
   speedgrader_settings_4195099b: "SpeedGrader inställningar"
   speedgrader_settings_c9503705: "Speedgrader inställningar"
   speedgrader_tm_44688790: SpeedGrader™
+  split_74c03348: Dela
+  split_merged_users_6b81c595: "Dela sammanfogade användare"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Delning inaktiverad: nått maximum av tre uppgiftsgrupper i poängintervallet"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Delning inaktiverad: det kan maximalt finnas tre uppgiftsgrupper i ett poängintervall."
   spreadsheet_6d622119: Kalkylblad
@@ -22185,7 +22258,7 @@ sv:
     student_summary_table_ascending: "Elevens sammanfattningstabell är sorterad i stigande ordning efter %{sortText}"
     student_summary_table_descending: "Elevens sammanfattningstabell är sorterad i sjunkande ordning efter %{sortText}"
   student_tour_38b735c8: Studentgenomgång
-  student_view_ac9b672f: Studentvy
+  student_view_ac9b672f: "Studentens vy"
   student_viewed_document_9065adb8: "Dokument som visats av student"
   studentcount_student_scores_updated_232ad7b7: 
     one: "1 studentresultat har uppdaterats"
@@ -22631,6 +22704,9 @@ sv:
   take_the_survey_again_24ce22c2: "Besvara enkäten igen"
   target_link_uri_bbed67d1: "* URI för mållänk"
   target_link_uri_d166858: "URI för mållänk"
+  tas_add_f4a16393: "TA:er – Lägg till"
+  tas_observers_designers_b705118a: "TA:er/observatörer/designers"
+  tas_remove_11059e14: "TA:er – ta bort"
   teacher_5a73b637: Lärare
   teacher_count_teachers_a92f7199: "%{teacher_count} lärare"
   teacher_s_fdefb2c: Lärare
@@ -22808,6 +22884,7 @@ sv:
       Vill du fortsätta ändå?
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Följande användare är redo att läggas till för kursen."
   the_following_users_could_not_be_created_2573360a: "Följande användare kan inte skapas."
+  the_following_users_will_be_split_into_separate_us_d67c54a4: "Följande användare delas upp i separata användarkonton:"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Fullständiga värdnamnet för konto-instansen (something.instructure.com, exempelvis)"
   the_global_context_9c3a8062: "globalt kontext"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Bedömningen för den här uppgiften kommer inte att synkroniseras med studentinformationssystemet."
@@ -22932,6 +23009,7 @@ sv:
   there_are_no_unsaved_changes_9276e87c: "Det finns inga osparade ändringar"
   there_are_no_unsynced_changes_4e8f0838: "Det finns inga osynkroniserade ändringar"
   there_are_no_unsynched_changes_d208547c: "Det finns inga osynkade ändringar"
+  there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Det finns inga användarkonton som kan delas från den här användaren."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Det är en 2-appsgräns för placering i RCE-verktygsfältet Denna inställning gäller endast för det förbättrade RCE."
   there_is_currently_1_available_grader_758e4a21: "Det finns för närvarande 1 tillgänglig bedömare"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Ett fel inträffade när du loggades ut på din IdP"
@@ -23211,8 +23289,11 @@ sv:
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Detta kommer ändra hela sitt konto. Vill du fortsätta?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Det här kommer att tillämpa temat på hela ditt konto. Vill du fortsätta?"
   this_will_update_all_account_and_course_level_rubr_305e821a: "Detta uppdaterar alla matriser på konto- och kursnivå som är knutna till måluppfyllelseskalor och som ännu inte har bedömts."
+  this_will_update_all_account_and_course_level_rubr_3438121e: "Detta uppdaterar alla matriser på konto- och kursnivå som är knutna till måluppfyllelseskalorna och som ännu inte har bedömts."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Detta uppdaterar alla matriser justerade till lärandemål inom den här kursen och som ännu inte har bedömts."
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Detta kommer att uppdatera alla matriser som använder detta lärandemål som ännu inte har utvärderats"
+  this_will_update_all_student_mastery_results_tied__a52301e5: "Detta uppdaterar alla måluppfyllelseresultat som är kopplade till måluppfyllelseberäkningen på kontonivå."
+  this_will_update_all_student_mastery_results_withi_934580d1: "Detta uppdaterar alla måluppfyllelseresultat för studenten i den här kursen."
   threshold_in_hours_to_notify_students_within_f33820aa: "Tröskelvärde (i timmar) som studenter ska aviseras inom"
   threshold_pts_45f0e5d8: "tröskel: %{pts}"
   ticket_successfully_submitted_f6254460: "Ärendet skickades in."
@@ -24467,12 +24548,14 @@ sv:
       twitter: "Twitter är en bra resurs för kommunikation utanför klassrummet."
       yo: "Yo är ett en-klicks noll karaktärs kommunikationsverktyg."
   user_settings_785eed40: Användarinställningar
+  user_split_complete_links_to_split_user_accounts_f_dab79796: "Delning av användare slutförd. Länkar för att dela användarkonton följer:"
   user_succesfully_logged_into_canvas_6cfbe279: "Användaren är inloggad på Canvas"
   user_successfully_deactivated_9d92d80d: "Användaren inaktiverades"
   user_successfully_inactivated_aee66efd: "Användaren avaktiverades"
   user_successfully_re_activated_b897e35b: "Användaren har återaktiverats"
   user_successfully_removed_a366ca5f: "Användaren har tagits bort."
   user_vaildation_issues_panel_66b66945: "Panel för användarvalideringsfrågor"
+  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} inställningar"
   usercount_respondents_1521244: "%{userCount} respondenter"
   usercount_users_found_8c07f1f2: "%{userCount} användare hittades."
   userinfo_d21114ef: Användarinformation
@@ -24747,6 +24830,8 @@ sv:
   users_add_remove_observers_d1273d9: "Användare – lägg till/ta bort observatörer"
   users_add_remove_students_in_courses_efe7e748: "Användare – lägg till/ta bort studenter i kurser"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Användare – lägg till/ta bort lärare, kursdesigners eller lärarassistenter i kurser"
+  users_admin_users_in_courses_2749407f: "Användare – administratörsanvändare i kurser"
+  users_allow_administrative_actions_in_courses_97a2eb19: "Användare – tillåt administrativa åtgärder i kurser"
   users_allowed_to_edit_this_page_d6d316d0: "Användare kan redigera den här sidan"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Användare och villkor ligger på kontonivå, så att SIS-slutpunkten alltid bekräftar användarens behörigheter i enlighet med kontot. Underkonton kan endast äga kurser och avsnitt. De kan inte äga användardata.
