@@ -207,6 +207,26 @@ QUnit.module('mathEquationHelper', {
   }
 })
 
+test('getImageEquationText uses data-equation-content if available', () => {
+  const img = document.createElement('img')
+  img.setAttribute('data-equation-content', 'y = sqrt{x}')
+  equal(mathImageHelper.getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test('getImageEquationText uses img src if missing data-equation-content', () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('src', `http://host/equation_images/${txt}`)
+  equal(mathImageHelper.getImageEquationText(img), 'y = sqrt{x}')
+})
+
+test('getImageEquationText returns undefined if it not an equation image', () => {
+  const img = document.createElement('img')
+  const txt = encodeURIComponent(encodeURIComponent('y = sqrt{x}'))
+  img.setAttribute('src', `http://host/not_equation_images/${txt}`)
+  equal(mathImageHelper.getImageEquationText(img), undefined)
+})
+
 test('catchEquationImages only processes loaded images', assert => {
   const done = assert.async()
   const root = document.getElementById('fixtures')
@@ -235,6 +255,7 @@ test('catchEquationImages defers processing images until loaded', assert => {
   root.innerHTML = `
     <img id="i1"
       class="equation_image"
+      data-equation-content="x"
       src="https://www.instructure.com/themes/instructure_blog/images/logo.svg?_time=${Date.now()}"
     >
   `

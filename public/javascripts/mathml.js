@@ -63,15 +63,17 @@ const mathml = {
             // wait until MathJAx is configured before calling the callback
             cb?.()
           })
-          window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
-            mathImageHelper.catchEquationImages(message[1])
-          })
-          window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
-            mathImageHelper.removeStrayEquationImages(message[1])
-            message[1]
-              .querySelectorAll('.math_equation_latex')
-              .forEach(m => m.classList.add('fade-in-equation'))
-          })
+          if (ENV?.FEATURES?.new_math_equation_handling) {
+            window.MathJax.Hub.Register.MessageHook('Begin PreProcess', function(message) {
+              mathImageHelper.catchEquationImages(message[1])
+            })
+            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+              mathImageHelper.removeStrayEquationImages(message[1])
+              message[1]
+                .querySelectorAll('.math_equation_latex')
+                .forEach(m => m.classList.add('fade-in-equation'))
+            })
+          }
           // leaving this here so I don't have to keep looking up how to see all messages
           // window.MathJax.Hub.Startup.signal.Interest(function (message) {
           //   console.log('>>> Startup:', message[0])
@@ -149,22 +151,35 @@ const mathml = {
 }
 
 const mathImageHelper = {
+  getImageEquationText(img) {
+    let equation_text = img.getAttribute('data-equation-content')
+    if (!equation_text) {
+      const srceq = img.getAttribute('src').split('/equation_images/')[1]
+      if (srceq) {
+        equation_text = decodeURIComponent(decodeURIComponent(srceq))
+      }
+    }
+    return equation_text
+  },
+
   catchEquationImages(refnode) {
     // find equation images and replace with inline LaTeX
     const eqimgs = refnode.querySelectorAll('img.equation_image')
     if (eqimgs.length > 0) {
       eqimgs.forEach(img => {
-        if (img.complete) {
+        if (img.complete && img.naturalWidth) {
           // only process loaded images
           img.setAttribute('mathjaxified', '')
-          const equation_text = img.getAttribute('data-equation-content')
-          const mathtex = document.createElement('span')
-          mathtex.setAttribute('class', 'math_equation_latex')
-          mathtex.textContent = `\\(${equation_text}\\)`
-          if (img.nextSibling) {
-            img.parentElement.insertBefore(mathtex, img.nextSibling)
-          } else {
-            img.parentElement.appendChild(mathtex)
+          const equation_text = this.getImageEquationText(img)
+          if (equation_text) {
+            const mathtex = document.createElement('span')
+            mathtex.setAttribute('class', 'math_equation_latex')
+            mathtex.textContent = `\\(${equation_text}\\)`
+            if (img.nextSibling) {
+              img.parentElement.insertBefore(mathtex, img.nextSibling)
+            } else {
+              img.parentElement.appendChild(mathtex)
+            }
           }
         } else {
           img.addEventListener('load', this.dispatchProcessNewMathOnLoad)
