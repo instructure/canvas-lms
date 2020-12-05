@@ -271,6 +271,7 @@ da-x-k12:
     tab_terms: Skoleår
   account_97b34646: Konto
   account_account_b6b3746b: "Konto: %{account}"
+  account_and_course_level_outcome_mastery_scales_5bfe7a3b: "Skalaer for opfyldelse af læringsmål for læringsudbytter på konto- og fagniveau"
   account_and_course_level_outcome_proficiencies_1cfa260: "Færdigheder for læringsudbytter på konto- og fagniveau"
   account_and_subaccount_40c6430: "Konto og underkonto"
   account_authorization_config: 
@@ -1579,8 +1580,10 @@ da-x-k12:
   add_course_calendar_events_146154a5: "Tilføj begivenheder til fagkalender"
   add_criterion_eb9587ef: "Tilføj kriterie"
   add_custom_link_22059c0: "Tilføj brugertilpasset link"
+  add_designers_to_courses_9588820b: "Føj designere til fag"
   add_discussion_653dab4c: "Tilføj diskussion"
   add_domain_f15bc6c1: "Tilføj domæne"
+  add_edit_delete_sections_d32c5b4d: "tilføj / rediger / slet sektioner"
   add_email_address_aef3b61: "Tilføj e-mailadresse"
   add_existing_content_7e36da66: "Tilføj eksisterende indhold"
   add_external_feed_6d437a28: "Tilføj eksternt feed"
@@ -1590,6 +1593,7 @@ da-x-k12:
   add_grading_period_6f774dc3: "Tilføj vurderingsperiode"
   add_grading_scheme_81e23c05: "Tilføj vurderingsordning"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Føj vurderingssystem til rapporter om admin-vurderinger"
+  add_granularity_to_permissions_around_managing_cou_4a5bc486: "Tilføj detaljer til tilladelser vedrørende styring af fagsektioner"
   add_group_c84f9e9d: "Tilføj gruppe"
   add_group_set_f9809e11: "Tilføj gruppesæt"
   add_help_menu_links_de9fc34f: "Tilføj hjælp-menulinks"
@@ -1601,6 +1605,7 @@ da-x-k12:
   add_items_to_score_range_297d413b: "TIlføj elementer til resultatområde"
   add_link_5c01c1e8: "Tilføj link"
   add_link_fc336ed6: "Tilføj link"
+  add_mastery_level_76469d98: "Tilføj niveau for opfyldelse af læringsmål"
   add_media_cfa37b54: "Tilføj medie"
   add_moderator_review_copy_1st_a484c813: "Tilføj censorbedømmelse (kopier først)"
   add_moderator_review_copy_2nd_e80d458f: "Tilføj censorbedømmelse (kopier anden)"
@@ -1612,6 +1617,7 @@ da-x-k12:
   add_new_group_7ac49f31: "Tilføj ny gruppe"
   add_new_set_of_due_dates_e8e240f: "Tilføj nyt sæt med deadlines"
   add_new_term_d2217c0d: "Tilføj nyt skoleår"
+  add_observers_to_courses_6f494a29: "Føj observatører til fag"
   add_old_quiz_f4c546a: "Tilføj gammel quiz"
   add_override_da70f198: "Tilføj tilsidesættelse"
   add_people_7948b7da: "Tilføj deltagere"
@@ -1638,6 +1644,7 @@ da-x-k12:
   add_sub_account_to_account_name_b104db90: "Tilføj underkonto til %{account_name}"
   add_submission_type_8690db4b: "Tilføj afleveringsform"
   add_subtitle_9f660cc: "Tilføj undertekst"
+  add_tas_to_courses_27741f81: "Føj undervisningsassistenter til fag"
   add_tas_to_the_course_2aac6e02: "Føj undervisningsassistenter til faget"
   add_theme_32fa3d50: "Tilføj tema"
   add_to_course_481a51c4: "Tilføj til fag ..."
@@ -1652,6 +1659,7 @@ da-x-k12:
   add_users_to_name_b8109bbb: "Føj brugere til  %{name}"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Tilføj dine opgaver. Du kan blot lave en lang liste, eller opdele dem i grupper; du kan endda specificere vægtning for hver opgavegruppe."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Føj dit Zendesk Instance kundefelt-id til hvert af de følgende (felter uden id logges ikke):"
+  added_mastery_level_dd4792d1: "Niveau for opfyldelse af læringsmål tilføjet"
   added_new_proficiency_rating_e30cab8a: "Tilføjet ny færdighedsbedømmelse"
   adding_rss_feed_f1202567: "Tilføjer RSS-feed"
   additional_comments_9aed10bb: "Yderligere kommentarer"
@@ -1666,6 +1674,7 @@ da-x-k12:
   addressbook_performance_tap_98ddf67: "AddressBook ydeevne"
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Tilføjer analyselink i menuen Brugerindstillinger."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Føjer analyse til en elevs kontekstkort."
+  adds_granular_permissions_for_adding_and_removing__e1e484a3: "Tilføjer detaljerede tilladelser for tilføjelse og fjernelse af hver rolle og en separat tilladelse til andre fagadministratorhandlinger"
   admin_4d3ba42f: Administrator
   admin_csv_f8d1b3eb: "Admin CSV"
   admin_navigation_menu_77b801a2: Admin-navigationsmenu
@@ -1807,6 +1816,7 @@ da-x-k12:
   all_weights_must_be_greater_than_or_equal_to_0_cc2dcdf1: "Alle vægtninger skal være større end eller lig med 0"
   allow_a_moderator_to_review_multiple_independent_g_752c4b90: "Giv en moderator tilladelse til at evaluere flere uafhængige vurderinger for de valgte afleveringer"
   allow_a_teacher_to_set_the_number_of_allowed_attem_19deb51d: "Lader en lærer angive antallet af tilladte forsøg på en opgave via grænsefladen"
+  allow_administrative_actions_in_courses_20c33fed: "Tillad administrative handlinger på fag"
   allow_bb7ce9b1: Tillad
   allow_blueprint_publishing_after_association_fae6ba95: "Tillad Blueprint-offentliggørelse efter tilknytning"
   allow_bulk_grade_export_to_sis_e11a6e66: "Tillad bulkeksport af vurderinger til SIS"
@@ -1867,6 +1877,7 @@ da-x-k12:
   allows_creating_discussions_for_a_specific_section_6bf44036: "Tillader oprettelse af diskussioner for en bestemt sektion"
   allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Tillader, at hjælpelinks kan markeres som Fremhævede eller Nye og viser tydeligt det fremhævede hjælpelink i hjælpemenuen."
   allows_learning_outcomes_to_be_selectable_when_mig_acf15555: "Gør, at læringsudbytter kan vælges, når man overfører fagindhold"
+  allows_setting_account_course_level_mastery_scales_1939e0fd: "Tillader indstilling af skalaer og beregningsmetoder for opfyldelse af læringsmål på konto- og fagniveau, hvilket erstatter kriteriebedømmelser og beregningsmetoder for læringsudbytter"
   allows_teacher_designer_ta_based_roles_to_access_t_394f069b: "Gør det muligt for roller, der er baseret på lærer, designer, undervisningsassistent, at få adgang til værktøjet Chat."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gør det muligt for roller, der er baseret på lærer/designer/undervisningsassistent, at få adgang til værktøjet Chat."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gør det muligt for roller, der er baseret på lærer/undervisningsassistent, at få adgang til værktøjet Tilstedeværelse."
@@ -1876,6 +1887,7 @@ da-x-k12:
   allows_teacherta_based_roles_to_access_the_attenda_c452f87b: "Gør det muligt for lærer-baserede roller at få adgang til værktøjet Tilstedeværelse."
   allows_the_duplicating_of_modules_in_canvas_2e15b444: "Tillader duplikering af forløb i Canvas"
   allows_the_duplication_of_calendar_events_7bb0d6c5: "Tillader duplikering af kalenderbegivenheder"
+  allows_the_gradebook_importer_to_recognize_and_app_6f11fd0c: "Lader vurderingsoversigt-importøren genkende og anvende ændringer for at tilsidesætte resultater."
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Tillader, at den manglende politik-applikator udsender submission_updated live-begivenheder for hver aflevering, der markeres som manglende."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Tillad planlægning af tilbagevendende kalenderbegivenheder"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Lader brugeren navigere væk, mens afleveringen bliver genindsendt"
@@ -2073,6 +2085,8 @@ da-x-k12:
       Gør det muligt for en bruger at sende en besked til ”Alle i [course group]”.
   allows_user_to_send_a_message_to_all_in_course_nam_992e425: "Gør det muligt for en bruger at sende en besked til ”Alle i [course name]” eller ”Alle i [course group]”."
   allows_user_to_send_messages_to_individual_course__9347e1e2: "Gør det muligt for en bruger at sende beskeder til enkelte af fagets deltagere."
+  allows_user_to_set_outcome_mastery_scales_at_the_a_2a01ea09: "Lader brugeren indstille skalaer for opfyldelse af læringsmål for læringsudbytter på konto- og fagniveau."
+  allows_user_to_set_outcome_mastery_scales_at_the_c_fc85f708: "Lader brugeren indstille skalaer for opfyldelse af læringsmål for læringsudbytter på fagniveau."
   allows_user_to_set_outcome_proficiency_calculation_5c61cd1e: "Giver brugeren mulighed for at indstille beregning af læringsudbyttefærdigheder på fagniveau."
   allows_user_to_set_outcome_proficiency_calculation_73761bf4: "Giver brugeren mulighed for at indstille beregninger af læringsudbyttefærdigheder på konto- og fagniveau."
   allows_user_to_set_outcome_proficiency_scales_at_t_35f96f62: "Giver brugeren mulighed for at indstille skalaer for læringsudbyttefærdigheder på konto- og fagniveau."
@@ -2228,6 +2242,8 @@ da-x-k12:
   an_error_occurred_trying_to_generate_this_theme_pl_b493e2e9: "Der opstod en fejl under forsøget på at generere dette tema, prøv igen."
   an_error_occurred_trying_to_prepare_download_pleas_df6fa596: "Der opstod en fejl under forberedelse af download, prøv igen."
   an_error_occurred_updating_the_calculation_method_49384084: "Der opstod en fejl under opdatering af beregningsmetoden."
+  an_error_occurred_updating_the_mastery_scale_fc11e6e1: "Der opstod en fejl ved forsøg på at opdatere skalaen for opfyldelse af læringsmål"
+  an_error_occurred_updating_the_mastery_scale_messa_d9910855: "Der opstod en fejl ved forsøg på at opdatere skalaen for opfyldelse af læringsmål: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_28d600aa: "Der opstod en fejl under opdatering af​ færdighedsbedømmelserne: %{message}"
   an_error_occurred_updating_the_proficiency_ratings_babe7029: "Der opstod en fejl under opdatering af​ færdighedsbedømmelserne"
   an_error_occurred_updating_this_assignment_21287c7e: "Der opstod en fejl under opdatering af denne opgave."
@@ -2243,6 +2259,8 @@ da-x-k12:
   an_error_occurred_while_loading_changes_9851b56f: "Der opstod en fejl under indlæsning af ændringer"
   an_error_occurred_while_loading_courses_11d4571e: "Der opstod en fejl under indlæsning af fag"
   an_error_occurred_while_loading_late_policies_c415f676: "Der opstod en fejl under indlæsning af sentpolitikker"
+  an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Der opstod en fejl under indlæsning af beregning af opfyldelse af læringsmål: %{error}"
+  an_error_occurred_while_loading_the_mastery_scale__871f3531: "Der opstod en fejl ved forsøg på at indlæse skalaen for opfyldelse af læringsmål: %{error}"
   an_error_occurred_while_loading_the_outcome_calcul_a2a48c57: "Der opstod en fejl under indlæsning af beregning af læringsudbytte: %{error}"
   an_error_occurred_while_loading_the_proficiency_ra_98492357: "Der opstod en fejl under indlæsning af færdighedsbedømmelserne: %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Der opstod en fejl under låsning af beskeder"
@@ -2253,6 +2271,7 @@ da-x-k12:
   an_error_occurred_while_saving_associations_bd66f3f4: "Der opstod en fejl under lagring af associationer"
   an_error_occurred_while_saving_the_assignment_post_94f1184e: "Der opstod en fejl, da opslagspolitikken for opgaver skulle gemmes"
   an_error_occurred_while_saving_the_course_post_pol_b48976dc: "Der opstod en fejl, da politikken for opslag for faget skulle gemmes"
+  an_error_occurred_while_saving_the_mastery_scale_m_30c15545: "Der opstod en fejl ved forsøg på at gemme skalaen for opfyldelse af læringsmål: %{message}"
   an_error_occurred_while_saving_your_settings_b503a31c: "Der opstod en fejl, da du forsøgte at gemme dine indstillinger"
   an_error_occurred_while_starting_migration_8e6015e2: "Der opstod en fejl under opstart af overførsel"
   an_error_occurred_while_trying_to_change_the_ui_bca3b2d2: "Der opstod en fejl under forsøg på at ændre brugergrænsefladen"
@@ -4400,10 +4419,12 @@ da-x-k12:
   certificate_fingerprint_b376df90: Certifikat-fingeraftryk
   change_applied_89d1aa5a: "Ændring anvendt"
   change_beginning_date_to_39dbd06e: "Ændr begyndelsesdato til"
+  change_color_for_mastery_level_position_daa51849: "Ændr farve for niveau for opfyldelse af læringsmål %{position}"
   change_color_for_proficiency_rating_position_48b39bfc: "Skift farve for færdighedsbedømmelse %{position}"
   change_course_visibility_eaa2ffc: "Ændr fagets synlighed"
   change_dcaa253a: Skift
   change_description_34c49853: "Ændr beskrivelse"
+  change_description_for_mastery_level_position_c3c41be9: "Ændr beskrivelse for niveau for opfyldelse af læringsmål %{position}"
   change_description_for_proficiency_rating_position_97626231: "Skift beskrivelse for færdighedsbedømmelse %{position}"
   change_ending_date_to_d2cebd54: "Ændr slutdato til"
   change_existing_group_2c91a32b: "Skift eksisterende gruppe"
@@ -4412,6 +4433,7 @@ da-x-k12:
   change_name_c8cce76c: "Ændr navn"
   change_name_to_568374c8: "Ændr \"%{name}\" til"
   change_points_9e5104ac: "Ændr point"
+  change_points_for_mastery_level_position_90c1d7e6: "Ændr point for niveau for opfyldelse af læringsmål %{position}"
   change_points_for_proficiency_rating_position_a385c658: "Skift point for færdighedsbedømmelse %{position}"
   change_points_possible_to_match_rubric_dialog: 
     prompts: 
@@ -4690,6 +4712,7 @@ da-x-k12:
   collection_of_responsive_improvements_throughout_c_dedfe6dc: "Samling af responsive forbedringer i Canvas"
   colombia_57_c6c75620: "Colombia (+57)"
   color_a363e1b0: Farve
+  color_color_for_mastery_level_position_35079de: "Farve %{color} for niveau for opfyldelse af læringsmål %{position}"
   color_color_for_proficiency_rating_position_273414eb: "Farve %{color} til færdighedsbedømmelse %{position}"
   color_overlay_fb5ecce7: "Farve overlag"
   columns_464bd055: Kolonner
@@ -4908,6 +4931,8 @@ da-x-k12:
   confirm_delete_announcements_3d83b69a: "Bekræft Slet beskeder"
   confirm_deletion_b2efe7d4: "Bekræft sletning"
   confirm_edit_outcome_a9746c99: "Bekræft Rediger læringsudbytte"
+  confirm_mastery_calculation_19ad19f9: "Bekræft beregning af opfyldelse af læringsmål"
+  confirm_mastery_scale_9a779252: "Bekræft skala for opfyldelse af læringsmål"
   confirm_mastery_scales_c6ef2169: "Bekræft skalaer for opfyldelse af læringsmål"
   confirm_qr_code_display_49664fa3: "Bekræft visning af QR-kode"
   confirm_removal_a9bb889: "Bekræft fjernelse"
@@ -6081,7 +6106,10 @@ da-x-k12:
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allerede i brug"
   course_section_7a988066: Fagsektion
   course_section_name_ea880ed1: "Fag-sektion %{name}"
+  course_sections_add_c6b5dc1: "Fagsektioner - tilføj"
   course_sections_add_edit_delete_c4f4ac19: "Fagsektioner - tilføj / rediger / slet"
+  course_sections_delete_e75e3eeb: "Fagsektioner - slet"
+  course_sections_edit_bd783e1: "Fagsektioner - rediger"
   course_selection_245808bf: "Valg af fag"
   course_set_up_tutorial_6ab7c2d1: "Selvstudium til opsætning af fag"
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "Selvstudium for opsætning af fag giver tips om, hvordan man kan udnytte funktionerne på hver side i Canvas. Det er især nyttigt, når du endnu ikke kender Canvas så godt eller er ved at sætte et nyt fag op for første gang i lang tid."
@@ -7006,6 +7034,7 @@ da-x-k12:
   delete_group_86c381ec: "Slet gruppe"
   delete_in_progress_2d3f0e0d: "Sletning i gang"
   delete_key_developername_be80e695: "Slet nøgle %{developerName}"
+  delete_mastery_level_position_5cf0f8f7: "Slet niveau for opfyldelse af læringsmål %{position}"
   delete_my_account_41060aad: "Slet min konto"
   delete_outcome_cc6546f1: "Slet læringsudbytte"
   delete_outcome_group_6b399d34: "Slet gruppe for læringsudbytte"
@@ -7143,7 +7172,10 @@ da-x-k12:
   desc_12ad2869: "%{desc}"
   description_436c48d7: Beskrivelse
   description_61f4296: "* Beskrivelse"
+  description_for_mastery_level_position_description_cc17114b: "Beskrivelse for niveau for opfyldelse af læringsmål %{position}: %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Beskrivelse for færdighedsbedømmelse %{position}: %{description}"
+  designers_add_fe7e1ea9: "Designere - Tilføj"
+  designers_remove_3e590bff: "Designere - Fjern"
   details_98a31b68: "Nærmere oplysninger"
   details_a6f427c3: "Detaljer:"
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Bestemmer synlighed og administration af Læringsudbytter i kontonavigation. Gør det muligt for en bruger at oprette, redigere og slette læringsudbytter og læringsudbytte-grupper på konto- og fagniveau."
@@ -7260,6 +7292,7 @@ da-x-k12:
   disabled_links_b3bdea99: "Deaktiverede links"
   disabled_not_visible_to_students_2c9d693f: "Deaktiveret. Ikke synlig for eleverne."
   disabled_not_visible_to_students_48d4a90d: "Deaktiveret. Ikke synlig for elever"
+  disables_push_notifications_for_certain_types_3f57cde4: "Deaktiver push-meddelelser for bestemte typer."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Deaktiverer SMS-meddelelser for alle typer undtagen beskeder og
       vurderingsændringer.
@@ -7777,6 +7810,7 @@ da-x-k12:
   easily_import_or_copy_content_from_another_canvas__c6312f32: |-
       Importer eller kopier nemt indhold fra et andet Canvas-fag til
               dit fag, eller importer indhold fra andre formater, såsom Moodle eller QTI.
+  easy_toggle_student_view_82448b0b: "Visning for elever, der er nem af skifte"
   ecollege_file_description: Ecollege
   ecollege_name: "Ecollege Converter"
   ecuador_593_dfcc235a: "Ecuador (+593)"
@@ -8341,6 +8375,7 @@ da-x-k12:
   error_deleting_name_reason_11f9d399: "Fejl under sletning af %{name}: %{reason}"
   error_duplicating_module_4b023042: "Fejl ved duplikering af forløb"
   error_during_group_creation_f232994b: "Fejl under oprettelse af gruppe"
+  error_embedding_content_from_tool_49bb698e: "Fejl ved indlejring af indhold fra værktøjet"
   error_exporting_gradebook_msg_6ea31e2f: "Fejl ved eksport af vurderingsoversigt: %{msg}"
   error_fetching_access_token_1445a9e3: "Fejl ved hentning af adgangs-token"
   error_fetching_user_details_7c85d23: "Fejl ved hentning af brugeroplysninger"
@@ -8365,6 +8400,8 @@ da-x-k12:
   error_starting_save_operation_81bcb99: "Fejl ved forsøg på at gemme:"
   error_submitting_to_plagiarism_service_9b0748cb: "Fejl ved indsendelse til plagieringstjeneste"
   error_submitting_to_plagiarism_service_you_may_res_3c89e82d: "Fejl ved indsendelse til plagieringstjeneste. Du kan indsende fra SpeedGrader igen."
+  error_the_tool_did_not_return_a_url_to_canvas_a9afa641: "Fejl: Værktøjet returnerede ikke en URL til Canvas"
+  error_the_tool_returned_an_invalid_content_type_co_10a11c07: "Fejl: Værktøjet returnerede en ugyldig indholdstype \"%{contentType}\""
   error_updating_submission_draft_1d40ade7: "Fejl ved opdatering af afleveringsudkast"
   error_uploading_file_e2d31b56: "Fejl under upload af fil"
   error_uploading_video_audio_recording_16d9730a: "Fejl ved upload af video- / lydoptagelse"
@@ -8594,6 +8631,7 @@ da-x-k12:
   failed_to_save_changes_errors_6920f334: "Kunne ikke gemme ændringer: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "Kunne ikke gemme valg af oversigt"
   failed_to_save_please_try_again_later_bb7070fb: "Kunne ikke gemmes, prøv igen senere"
+  failed_to_split_users_d9759007: "Det mislykkedes at opdele brugere."
   failed_to_submit_draft_comment_1de83451: "Mislykkedes at aflevere kladde-kommentar"
   failed_to_update_account_notification_settings_194c1cd4: "Kunne ikke opdatere indstillinger for kontomeddelelser"
   failed_to_update_course_notification_settings_cbf0eb18: "Kunne ikke opdatere fagmeddelelsesindstillinger"
@@ -9171,6 +9209,7 @@ da-x-k12:
   gradebook_and_speedgrader_will_be_inaccessible_if__e654ff22: "Vurderingsoversigt og SpeedGrader bliver utilgængelige, hvis både ’Vurderinger - redigér’ og ’Vurderinger - vis alle vurderinger’ er deaktiveret."
   gradebook_and_speedgrader_will_be_inaccessible_if__eda88bc3: "Vurderingsoversigt og SpeedGrader bliver utilgængelige, hvis både Vurderinger - rediger og Vurderinger - vis alle vurderinger er deaktiveret."
   gradebook_context_name_9dbae5bc: "Vurderingsoversigt - %{context_name}"
+  gradebook_csv_headers_include_grading_period_1015185c: "Vurderingsoversigtens CSV-overskrifter inkluderer vurderingsperiode"
   gradebook_csvs: 
     grades_filename: Vurderinger
   gradebook_data_loading_performance_improvements_421e1c93: "Vurderingsoversigt-data indlæser præstationsforbedringer"
@@ -9532,6 +9571,8 @@ da-x-k12:
   grading_type_type_7d8b42d7: "Vurderingstype: %{type}"
   granular_contexttype_notification_settings_will_be_c5dfc901: "Granulære %{contextType} meddelelses-indstillinger kan konfigureres her i fremtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Granulære fagmeddelelsesindstillinger vil kunne konfigureres her i fremtiden."
+  granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Detaljerede tilladelser for Tilføj / fjern administratorroller fra fag"
+  granular_permissions_for_managing_course_sections_da4b04b: "Detaljerede tilladelser til administration af fagsektioner"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Granulære tilladelser til styring af wikisider"
   graph_bar_b5daa23d: Graflinje
   graph_of_grades_for_each_assignment_4c44d4d1: "Diagram over vurderinger for hver opgave"
@@ -10228,6 +10269,7 @@ da-x-k12:
       i stedet for i opgaven. Dette vil forårsage, at begivenheder
       duplikeres, medmindre abonnementerne på de tilhørende
       plagiatopgaver bliver slettet.
+  if_mastery_scales_are_enabled_the_report_will_be_t_bf48d520: "Hvis skalaer for opfyldelse af læringsmål er aktiveret, afkortes rapporten til ikke at omfatte beregningsmetode, beregningsheltal, point for opfyldelse af læringsmål eller vurderinger"
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Send til alle i hele kontoen, hvis der ikke vælges nogen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Send til alle i hele underkontoen, hvis der ikke vælges nogen)"
   if_none_are_selected_show_to_everyone_in_the_entir_568a1dfc: "(Vis til alle i hele underkontoen, hvis der ikke vælges noget)"
@@ -10235,6 +10277,7 @@ da-x-k12:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Hvis RCE-forbedringer også er aktiveret,
       gemmer RCE automatisk dit arbejde hen ad vejen
+  if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Hvis indstillet, tilføjer vurderingsoversigtens CSV-eksportør titlen på den valgte vurderingsperiode til kolonneoverskrifter, hvis værdier varierer afhængigt af vurderingsperioden."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Hvis indstillet, skal Slå op til SIS-funktionen deaktiveres for opgaver, når deres vurderingsperiode lukkes. Gælder kun, hvis funktionen \"Aktivér nye SIS-integrationsindstillinger\" er aktiveret."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Hvis statistik - vis eller Brugere - administrer loginoplysninger er aktiveret, kan brugeren generere login- / logoutaktivitet i Admin-værktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Hvis Statistik - vis eller Brugere - administrer loginoplysninger er aktiveret, kan en bruger generere login-/logoutaktivitet i Administratorværktøjer. For at skjule valgmuligheden login-/logoutaktivitet i Administratorværktøjer skal begge af disse tilladelser være deaktiveret."
@@ -10319,6 +10362,7 @@ da-x-k12:
   import_groups_3a2ae14b: "Importer grupper"
   import_learning_outcomes_36d28a2b: "Importer læringsudbytter"
   import_outcomes_7dda186b: "Importer læringsudbytter"
+  import_override_scores_in_gradebook_80d51a72: "Importér tilsidesættelsesresultater i vurderingsoversigten"
   import_sis_data_428cc803: "Importer SIS-data"
   import_started_successfully_a3467411: "Import påbegyndt"
   import_status_b147bd27: "Importer status"
@@ -11287,6 +11331,7 @@ da-x-k12:
       delete_avatar: "Er du sikker på, at du vil slette denne brugers profilbillede?"
       lock_avatar: "Låsning af billedet bekræfter det, og forhindrer brugeren i at opdatere det. Fortsæt?"
   manage_b88f7150: Administrering
+  manage_course_sections_f482d1b3: "Administrer fagsektioner"
   manage_discussion_title_a2ecb3fb: "Administrer diskussion %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Administrer tilmeldings-status, opret grupper og tilføj brugere fra denne side."
   manage_grading_schemes_in_context_name_e3678273: "Styring af vurderingsordninger i  %{context_name}"
@@ -11327,7 +11372,13 @@ da-x-k12:
   master_lock_590266b6: Hovedlås
   mastered_34d4c857: Behersket
   mastery_7ec348b5: Beherskelse
+  mastery_calculation_5fd5f5fe: "Beregning af opfyldelse af læringsmål"
+  mastery_calculation_parameters_f072c3: "Parametre til beregning af opfyldelse af læringsmål"
+  mastery_calculation_saved_df378fdd: "Beregning for opfyldelse af læringsmål gemt"
   mastery_connect_64598f55: "Mastery Connect"
+  mastery_level_deleted_88838a33: "Niveau for opfyldelse af læringsmål slettet"
+  mastery_levels_7d4ee512: "Niveauer for opfyldelse af læringsmål"
+  mastery_mastery_for_mastery_level_position_5c9c3206: "Opfyldelse af læringsmål %{mastery} på niveau %{position}"
   mastery_mastery_for_proficiency_rating_position_74aa3b56: "Opfyldelse af læringsmål %{mastery} for færdighedsbedømmelse %{position}"
   mastery_n_mastery_points_precision_2_str_points_e0ed1b3b: "Opfyldelse af læringsmål: %{n_mastery_points_precision_2_str} point"
   mastery_path_processing_f4471152: "Behandling af læringsstier"
@@ -11337,6 +11388,7 @@ da-x-k12:
   mastery_paths_selection_has_been_temporarily_disab_c40623b9: "Valg af læringsstier er midlertidigt deaktiveret grundet vedligeholdelse."
   mastery_points_f1672cc: "point for opfyldelse af læringsmål"
   mastery_scale_abbc3557: "Skala for opfyldelse af læringsmål"
+  mastery_scale_saved_34c64b6b: "Skala for opfyldelse af læringsmål gemt"
   mastery_score_reflects_the_highest_score_of_a_grad_fd426d1e: "Resultat af opfyldelse af læringsmål afspejler det højeste resultat for en bedømt opgave eller quiz."
   mastery_score_reflects_the_most_recent_graded_assi_921f138f: "Resultat af opfyldelse af læringsmål afspejler den nyligt bedømte opgave eller quiz."
   matching_left_side_900f860b: "Matchende venstre side"
@@ -13717,6 +13769,7 @@ da-x-k12:
   note_that_some_attributes_may_not_be_populated_for_7c1f2854: "Bemærk, at nogle attributter eventuelt ikke er udfyldt for alle brugere hos Clever."
   note_this_is_not_your_official_score_f2d4582f: "*BEMÆRK*: Dette er IKKE dit officielle resultat."
   note_this_login_s_account_uses_delegated_authentic_89227914: "Bemærk: Kontoen til dette login bruger uddelegeret autentifikation, men tillader reserveautentificering af Canvas' adgangskode. Felterne til adgangskoden i denne formular opdaterer fallback-adgangskoden for Canvas, *ikke* den delegerede autentifikation."
+  note_this_will_attempt_to_undo_the_merge_as_fully__41c9c4e9: "BEMÆRK: Dette vil forsøge at fortryde fletningen så vidt muligt, men flettede brugere gendannes muligvis ikke perfekt til deres tidligere tilstand."
   notes_6cfc3988: "Bemærk:"
   notes_c42e0fd5: Noter
   nothing_to_split_off_of_this_user_28ba9dd5: "Intet at opdele fra denne bruger"
@@ -14079,7 +14132,9 @@ da-x-k12:
     errors: 
       invalid: "Ugyldig parringskode"
   observers_672971d: Observatører
+  observers_add_ab95f683: "Observatører - Tilføj"
   observers_add_remove_b61eaaa5: "Observatører - tilføj / fjern"
+  observers_remove_aafc8a88: "Observatører - Fjern"
   observing_f3c5e759: Observerer
   observing_observee_d31d5fa2: "Observerer: %{observee}"
   of_students_5d1af0d2: "# elever"
@@ -14235,6 +14290,8 @@ da-x-k12:
   outcome_guid_has_already_appeared_in_this_import_b9b8b34: "Læringsudbytte \"%{guid}\" er allerede blevet vist i denne import"
   outcome_guid_not_in_visible_context_36269663: "Læringsudbytte \"%{guid}\" ikke i synlig sammenhæng"
   outcome_imports_c496a81f: Læringsudbytte-importer
+  outcome_mastery_scales_8c3a814d: "Skalaer for opfyldelse af læringsmål"
+  outcome_mastery_scales_add_edit_171551c: "Skalaer for opfyldelse af læringsmål for læringsudbytter - tilføj / rediger"
   outcome_path_mastery_points: "%{path} point doe opfyldelse af læringsmål"
   outcome_path_result: "%{path} resultat"
   outcome_proficiency_calculations_5959b681: "Beregninger af læringsudbyttefærdigheder"
@@ -14597,6 +14654,7 @@ da-x-k12:
   placement_inactive_click_to_activate_f7fe8c30: "Placering inaktiv; klik for at aktivere"
   placement_values_c0a2cf56: Placeringsværdier
   placements_5b5e056b: Placeringer
+  places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Placerer en knap øverst til højre på fagsider, der giver lærere mulighed for hurtigt at skifte til visning for elever."
   plagiarism_detection_platform_assignments_fc19e0bd: "Plagiatafsløringsplatform - opgaver"
   plagiarism_detection_platform_users_b0e5410f: "Plagiatafsløringsplatform - brugere"
   plagiarism_detection_submissions_4f322a00: "Plagiatafsløring - afleveringer."
@@ -15094,6 +15152,7 @@ da-x-k12:
   points_bb475533: Point
   points_bceb5005: point
   points_changed_exceptions_b0c771f7: "Point ændrede undtagelser:"
+  points_for_mastery_level_position_points_9e72ac3f: "Point for niveau for opfyldelse af læringsmål %{position}: %{points}"
   points_for_proficiency_rating_position_points_a5c09291: "Point for færdighedsbedømmelse %{position}: %{points}"
   points_for_rating_tier_index_not_present_338d94e6: "Point for rating-niveau %{index} ikke til stede"
   points_for_tier_index_must_be_less_than_points_for_9683c02: "Point for niveau %{index} skal være mindre end point for tidligere niveau (%{points} er større end %{prior})"
@@ -15103,6 +15162,7 @@ da-x-k12:
   points_must_0_3bff353: "Point skal være >= 0"
   points_must_be_a_number_0_daa4f7dc: "Point skal være et tal >= 0"
   points_must_be_less_than_previous_rating_bc627bec: "Point skal være mindre end tidligere bedømmelse"
+  points_must_be_unique_f1758a4f: "Point skal være unikke"
   points_n_e0b20623: "Point %{n}"
   points_out_of_total_24f61148: "*%{points}* ud af **%{total}**"
   points_points_b6b422e2: "Point: %{points}"
@@ -15525,8 +15585,10 @@ da-x-k12:
   progress_percent_ae80cd55: "%{progress} procent"
   project_groups_1fa0320b: Projektgrupper
   pronoun_does_not_match_account_pronoun_or_pronouns_6907bfa2: "Pronomen stemmer ikke overens med kontoens pronomen, eller pronomener er ikke aktiveret for denne konto, %{user_id}, springer over"
+  pronouns_28bbef86: pronomener
   pronouns_d1cd8dd0: Pronomener
   pronouns_for_users_da46fb5: "Pronomen for brugere"
+  proper_noun_singular_genitive: "%{noun}s"
   provide_a_space_for_users_to_work_on_a_single_docu_9e4fc18c: |-
       Giv brugerne et sted til at arbejde på et enkelt dokument
                   samtidigt, direkte fra dit Canvas-fag.
@@ -17099,6 +17161,7 @@ da-x-k12:
   remove_contact_method_ca890ba3: "Fjern kontaktmetode"
   remove_course_association_name_b760c502: "Fjern fag-associationer %{name}"
   remove_dates_9b9ba2f6: "Fjern datoer"
+  remove_designers_from_courses_42332a57: "Fjern designere fra fag"
   remove_domain_as_an_allowed_domain_c510a69e: "Fjern %{domain} som et tilladt domæne"
   remove_domain_from_the_whitelist_14c7d5e9: "Fjern %{domain} fra hvidlisten"
   remove_due_dates_and_assignment_availability_dates_608cd97b: "Fjern opgavens afleverings- og tilgængelighedsdatoer."
@@ -17115,6 +17178,7 @@ da-x-k12:
   remove_name_624e06be: "Fjern %{name}"
   remove_name_as_an_admin_c296cf49: "Fjern %{name} som admin"
   remove_null_values_from_live_event_payloads_3c826f: "Fjern nulværdier fra livebegivenheders nyttedata"
+  remove_observers_from_courses_703edc34: "Fjern observatører fra fag"
   remove_placement_90862c13: "Fjern %{placement}"
   remove_points_from_rubric_dcd4b585: "Fjern point fra vurderingskriterium"
   remove_pronouns_5ff760ff: "Fjern pronomener"
@@ -17128,6 +17192,7 @@ da-x-k12:
   remove_student_from_recipients_4b206e35: "Fjern %{student} fra modtagere"
   remove_studentname_16ba8c3a: "Fjern %{studentName}"
   remove_submission_draft_f5c7f58b: "Fjern udkast til aflevering"
+  remove_tas_from_courses_13ade851: "Fjern undervisningsassistenter fra fag"
   remove_text_8e485c41: "Fjern %{text}"
   remove_these_dates_48453a81: "Fjern disse datoer"
   remove_this_item_from_the_module_4b2ceab7: "Slet dette element fra forløbet"
@@ -17221,6 +17286,7 @@ da-x-k12:
   restored_course_association_course_c9e16045: "Gendannet fagassociation %{course}"
   restrict_instructors_from_changing_mastery_scales_5af13053: "Begræns instruktører fra at ændre skalaen for opfyldelse af læringsmål"
   restrict_instructors_from_changing_proficiency_cal_b4e62c95: "Begræns instruktører fra at ændre metoden til beregning af færdigheder"
+  restrict_push_notifications_to_select_types_941d9da3: "Begræns push-meddelelser til udvalgte typer"
   restrict_sms_to_select_types_9dd6399c: "Begræns SMS for udvalgte typer"
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Forhindr elever i at skaffe adgang til fag efter slutdatoen"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Forhindr elever i at skaffe adgang til fag før startdatoen"
@@ -17292,10 +17358,13 @@ da-x-k12:
       manage_links: "Administrering af rolle og trust links"
       manage_outcomes: "Administrering af læringsudbytte"
       manage_proficiency_calculations: "Administrer beregninger af læringsudbyttefærdigheder"
-      manage_proficiency_scales: "Administrer skalaer for læringsudbyttefærdigheder"
+      manage_proficiency_scales: "Administrer skalaer for opfyldelse af læringsmål for læringsudbytter"
       manage_role_overrides: "Administrering af tilladelser"
       manage_rubrics: "Opret og rediger vurderingskriterier"
       manage_sections: "Administrering af (opret / rediger / slet) fagsektioner"
+      manage_sections_add: "Tilføj fagsektioner"
+      manage_sections_delete: "Slet fagsektioner"
+      manage_sections_edit: "Rediger fagsektioner"
       manage_sis: "Administrering af SIS-data"
       manage_site_settings: "Administrering af alle webstedets og plugin-indstillinger"
       manage_storage_quotas: "Administrering af lagerkvoter"
@@ -17492,6 +17561,7 @@ da-x-k12:
   save_grading_period_set_e029fa88: "Gem vurderingsperiodesæt"
   save_key_b4dede06: "Gem nøgle"
   save_learning_mastery_82889d8b: "Gem opfyldelse af læringsmål"
+  save_mastery_calculation_84fbeb0f: "Gem beregning af opfyldelse af læringsmål"
   save_mastery_scale_2b4dc13a: "Gem skala for opfyldelse af læringsmål"
   save_publish_36440725: "Gem og offentliggør"
   save_settings_cafe79a5: "Gem indstillinger"
@@ -17799,6 +17869,7 @@ da-x-k12:
   sections_94731e51: Sektioner
   security_7a7e8808: Sikkerhed
   security_tab_failed_to_load_2d2242a: "Fanen Sikkerhed kunne ikke indlæses"
+  see_example_below_to_see_how_different_calculation_618de98d: "Se eksemplet nedenfor for at se, hvordan forskellige beregningsparametre påvirker de elevernes beregning af opfyldelse af læringsmål."
   see_more_in_canvas_guides_fc90a457: "Se mere i Canvas-vejledningerne"
   see_other_users_primary_email_address_59c8473f: "Se andre brugeres primære e-mailadresse"
   see_rubric_results_62a6447d: "Se vurderingskriterieresultater"
@@ -18918,6 +18989,8 @@ da-x-k12:
   speedgrader_settings_4195099b: "SpeedGrader Indstillinger"
   speedgrader_settings_c9503705: Speedgrader-indstillinger
   speedgrader_tm_44688790: SpeedGrader
+  split_74c03348: Opdel
+  split_merged_users_6b81c595: "Opdel flettede brugere"
   splitting_disabled_reached_maximum_of_three_assign_716acb13: "Opdeling deaktiveret: nået maksimalt tre opgavegrupper i et resultatområde"
   splitting_disabled_there_can_only_be_a_maximum_of__7070ec11: "Opdeling deaktiveret: der kan kun være maksimalt tre opgavegrupper i et resultatområde."
   spreadsheet_6d622119: Regneark
@@ -19472,6 +19545,9 @@ da-x-k12:
   take_the_survey_again_24ce22c2: "Deltag i spørgeundersøgelsen igen"
   target_link_uri_bbed67d1: "* Mållink URI"
   target_link_uri_d166858: "Mål-link URI"
+  tas_add_f4a16393: "Undervisningsassistenter  - Tilføj"
+  tas_observers_designers_b705118a: "Undervisningsassistenter / observatører / designere"
+  tas_remove_11059e14: "Undervisningsassistenter - Fjern"
   teacher_5a73b637: Lærer
   teacher_count_teachers_a92f7199: "%{teacher_count} lærere"
   teacher_s_fdefb2c: Lærer(e)
@@ -19641,6 +19717,7 @@ da-x-k12:
       Fortsæt alligevel?
   the_following_users_are_ready_to_be_added_to_the_c_1ea01560: "Følgende brugere er klar til at blive tilføjet til faget."
   the_following_users_could_not_be_created_2573360a: "Følgende brugere kunne ikke oprettes."
+  the_following_users_will_be_split_into_separate_us_d67c54a4: "Følgende brugere opdeles i separate brugerkonti:"
   the_full_hostname_for_the_account_instance_somethi_e325da1f: "Det fulde navn for kontoinstans (f.eks. something.instructure.com)"
   the_global_context_9c3a8062: "den globale kontekst"
   the_grade_for_this_assignment_will_not_sync_to_the_3bb4f6f5: "Vurderingen for denne opgave synkroniseres ikke i elevernes informationssystem."
@@ -19750,6 +19827,7 @@ da-x-k12:
   there_are_no_reports_for_you_to_view_b716717a: "Der er ingen rapporter, som du kan se."
   there_are_no_unsaved_changes_9276e87c: "Der er ingen ændringer, der ikke er gemt"
   there_are_no_unsynced_changes_4e8f0838: "Der er ingen usynkroniserede ændringer"
+  there_are_no_user_accounts_to_split_from_this_user_4e132eb1: "Der er ingen brugerkonti, der kan deles fra denne bruger."
   there_is_a_2_app_limit_for_placement_within_the_rc_742bf1b8: "Der er en grænse på 2 apps, der kan placeres i RCE-værktøjslinjen. Denne indstilling gælder kun for den forbedrede RCE."
   there_is_currently_1_available_grader_758e4a21: "Der er i øjeblikket 1 tilgængelig bedømmer"
   there_was_a_failure_logging_out_at_your_idp_30070527: "Der opstod et problem med at logge ud af din IdP"
@@ -19991,8 +20069,11 @@ da-x-k12:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dette giver dig mulighed for at godkende Canvas til at lægge vurderinger ud på SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dette vil anvende dette tema for hele din konto. Ønsker du at fortsætte?"
   this_will_update_all_account_and_course_level_rubr_305e821a: "Dette opdaterer alle vurderingskriterier på konto- og fagniveau, der er knyttet til skalaer for opfyldelse af læringsmål på kontoniveau og endnu ikke er blevet vurderet."
+  this_will_update_all_account_and_course_level_rubr_3438121e: "Dette vil opdatere alle vurderingskriterier på konto- og fagniveau, der er knyttet til niveauet for opfyldelse af læringsmål på kontoniveau og som endnu ikke er blevet vurderet."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Dette vil opdatere alle vurderingskriterier, som er tilpasset til læringsudbytter i dette fag, der endnu ikke er vurderet"
   this_will_update_all_rubrics_using_this_outcome_th_6954ca45: "Dette vil opdatere alle vurderingskriterier, der bruger dette læringsudbytte, der endnu ikke er vurderet"
+  this_will_update_all_student_mastery_results_tied__a52301e5: "Dette opdaterer alle elevernes resultater for opfyldelse af læringsmål, der er knyttet til beregningen på kontoniveau."
+  this_will_update_all_student_mastery_results_withi_934580d1: "Dette opdaterer alle elevernes resultater for opfyldelse af læringsmål inden for dette fag."
   threshold_in_hours_to_notify_students_within_f33820aa: "Tærskel (i timer) til at underrette eleverne"
   threshold_pts_45f0e5d8: "tærskel: %{pts}"
   ticket_successfully_submitted_f6254460: "Supportsag indsendt."
@@ -21163,11 +21244,13 @@ da-x-k12:
       twitter: "Twitter er alle tiders ressource til kommunikation uden for klassen."
       yo: "Yo er et kommunikationsværktøj med enkelttryk og nultegn."
   user_settings_785eed40: Brugerindstillinger
+  user_split_complete_links_to_split_user_accounts_f_dab79796: "Opdeling af brugere afsluttet. Links til opdelte brugerkonti følger:"
   user_succesfully_logged_into_canvas_6cfbe279: "Bruger logget på Canvas"
   user_successfully_deactivated_9d92d80d: "Brugeren blev deaktiveret"
   user_successfully_re_activated_b897e35b: "Bruger blev genaktiveret"
   user_successfully_removed_a366ca5f: "Bruger fjernet."
   user_vaildation_issues_panel_66b66945: "Panel for brugervailderingsspørgsmål"
+  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} Indstillinger"
   usercount_respondents_1521244: "%{userCount} respondenter"
   userinfo_d21114ef: Brugerinfo
   username_47bb5bbe: Brugernavn
@@ -21394,6 +21477,8 @@ da-x-k12:
   users_add_remove_observers_d1273d9: "Brugere - tilføj/fjern observatører"
   users_add_remove_students_in_courses_efe7e748: "Brugere - tilføj/fjern elever i fag"
   users_add_remove_teachers_course_designers_or_tas__b480dd9: "Brugere - tilføj/fjern lærere, fagdesignere eller undervisningsassistenter i fag"
+  users_admin_users_in_courses_2749407f: "Brugere - Admin-brugere i fag"
+  users_allow_administrative_actions_in_courses_97a2eb19: "Brugere - tillad administrative handlinger i fag"
   users_allowed_to_edit_this_page_d6d316d0: "Brugere har tilladelse til at redigere denne side"
   users_and_terms_are_located_at_the_account_so_the__4184557b: |-
       Brugere og skoleår findes på kontoen, således at SIS-slutpunktet altid bekræfter brugerens tilladelser i henhold til kontoen. Underkonti har kun ejerskab af fag og sektioner. De ejer ikke brugerdata.
