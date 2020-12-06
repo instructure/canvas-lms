@@ -97,7 +97,7 @@ const mathml = {
   isMathInElement(elem) {
     if (ENV?.FEATURES?.new_math_equation_handling) {
       // handle the change from image + hidden mathml to mathjax formatted latex
-      if (elem.querySelector('.math_equation_latex')) {
+      if (elem.querySelector('.math_equation_latex,.math_equation_mml')) {
         return true
       }
 
