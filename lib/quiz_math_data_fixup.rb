@@ -28,8 +28,9 @@ module QuizMathDataFixup
     questions = questions.where("updated_at>?", check_date) if check_date
     questions.find_each do |quiz_question|
       begin
-        new_data = fixup_question_data(quiz_question.question_data)
-        quiz_question.question_data = new_data
+        old_data = quiz_question.question_data.to_hash
+        new_data = fixup_question_data(quiz_question.question_data.to_hash)
+        quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
         if quiz_question.changed?
           stat = question_bank ? 'updated_math_qb_question' : 'updated_math_question'
           InstStatsd::Statsd.increment(stat)
@@ -61,13 +62,11 @@ module QuizMathDataFixup
     end
   end
 
-  def fixup_question_data(question)
-    question[:answers]&.each_with_index do |answer, index|
-      old_answer = answer.dup
-      new_answer = fixup_answer(answer)
-      question[:answers][index] = new_answer if new_answer != old_answer
+  def fixup_question_data(data)
+    data[:answers]&.each_with_index do |answer, index|
+      data[:answers][index] = fixup_answer(answer)
     end
-    question
+    data
   end
 
   def fixup_answer(answer)
@@ -82,6 +81,7 @@ module QuizMathDataFixup
       if (answer[shtml] && answer[shtml].length > 0)
         html = answer[shtml]
         html = Nokogiri::HTML::DocumentFragment.parse(html)
+        html.search('[id^="MathJax"]').each(&:remove)
         if html.children.length == 1 && html.children[0].node_type == Nokogiri::XML::Node::TEXT_NODE
           m = %r{equation_images\/([^\s]+)}.match(html.content)
           if m && m[1]
