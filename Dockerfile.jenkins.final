@@ -4,7 +4,16 @@
 
 FROM local/webpack-cache
 
+ARG COMPILE_ADDITIONAL_ASSETS=0
+
 COPY --chown=docker:docker . ${APP_HOME}
 
-ARG COMPILE_ADDITIONAL_ASSETS=0
+RUN cp -v docker-compose/config/redis.yml config && \
+  cp -v docker-compose/config/selenium.yml config/ && \
+  cp -vR docker-compose/config/new-jenkins/* config/ && \
+  cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml && \
+  cp -v config/domain.yml.example config/domain.yml && \
+  cp -v config/external_migration.yml.example config/external_migration.yml && \
+  cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml
+
 RUN bash -c "if [[ "$COMPILE_ADDITIONAL_ASSETS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"

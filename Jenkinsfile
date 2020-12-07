@@ -395,13 +395,25 @@ pipeline {
                 cleanAndSetup()
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.GERRIT_REFSPEC : env.CANVAS_LMS_REFSPEC
                 checkoutRepo("canvas-lms", refspecToCheckout, 100)
+
+                if(env.GERRIT_PROJECT != "canvas-lms") {
+                  dir(env.LOCAL_WORKDIR) {
+                    checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
+                  }
+
+                  // Plugin builds using the checkout above will create this @tmp file, we need to remove it
+                  sh 'rm -vr gems/plugins/*@tmp'
+                }
+
                 buildParameters += string(name: 'CANVAS_BUILDS_REFSPEC', value: "${env.CANVAS_BUILDS_REFSPEC}")
                 buildParameters += string(name: 'PATCHSET_TAG', value: "${env.PATCHSET_TAG}")
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
+
                 if (currentBuild.projectName.contains("rails-6")) {
                   buildParameters += string(name: 'CANVAS_RAILS6_0', value: "${env.CANVAS_RAILS6_0}")
                 }
+
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master.
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(jenkinsFiles, 'HEAD^') ) {
@@ -417,28 +429,26 @@ pipeline {
 
                 gems = configuration.plugins()
                 echo "Plugin list: ${gems}"
-                // fetch plugins
-                gems.each { gem ->
-                  if (env.GERRIT_PROJECT == gem) {
-                    /* this is the commit we're testing */
-                    dir(env.LOCAL_WORKDIR) {
-                      checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
-                    }
+
+                def gemArgs = gems.collect {
+                  if (env.GERRIT_PROJECT == it) {
+                    ""
                   } else {
-                    pullGerritRepo(gem, getPluginVersion(gem), 'gems/plugins')
+                    "{ mkdir -p gems/plugins/$it && git archive --remote=ssh://gerrit.instructure.com:29418/$it ${getPluginVersion(it)} | tar -x -C 'gems/plugins/$it'; } &"
                   }
                 }
-                pullGerritRepo("qti_migration_tool", getPluginVersion('qti_migration_tool'), "vendor")
 
-                // Plugin builds using the checkout above will create this @tmp file, we need to remove it
-                sh(script: 'rm -vr gems/plugins/*@tmp', returnStatus: true)
-                sh 'cp -v docker-compose/config/redis.yml config/'
-                sh 'cp -v docker-compose/config/selenium.yml config/'
-                sh 'cp -vR docker-compose/config/new-jenkins/* config/'
-                sh 'cp -v config/delayed_jobs.yml.example config/delayed_jobs.yml'
-                sh 'cp -v config/domain.yml.example config/domain.yml'
-                sh 'cp -v config/external_migration.yml.example config/external_migration.yml'
-                sh 'cp -v config/outgoing_mail.yml.example config/outgoing_mail.yml'
+                gemArgs << "{ mkdir -p vendor/qti_migration_tool && git archive --remote=ssh://gerrit.instructure.com:29418/qti_migration_tool ${getPluginVersion('qti_migration_tool')} | tar -x -C 'vendor/qti_migration_tool'; } &"
+
+                credentials.withGerritCredentials {
+                  sh """#!/bin/bash
+                    set -ex
+
+                    ${gemArgs.join('\n')}
+
+                    wait
+                  """
+                }
               }
             }
 
