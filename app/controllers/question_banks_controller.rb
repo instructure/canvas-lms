@@ -21,6 +21,7 @@ class QuestionBanksController < ApplicationController
   add_crumb(proc { t('#crumbs.question_banks', "Question Banks") }, :except => :bookmark) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_question_banks_url }
 
   include Api::V1::Outcome
+  include QuizMathDataFixup
 
   def index
     if @context == @current_user || authorized_action(@context, @current_user, :read_question_banks)
@@ -67,6 +68,12 @@ class QuestionBanksController < ApplicationController
     rce_js_env
 
     add_crumb(@bank.title)
+
+    if params[:fixup_quiz_math_questions] == "1" && @bank.grants_right?(@current_user, session, :update)
+      InstStatsd::Statsd.increment("fixingup_quiz_math_banks")
+      @bank = fixup_quiz_questions_with_bad_math(@bank, question_bank: true)
+    end
+
     if authorized_action(@bank, @current_user, :read)
       @alignments = Canvas::ICU.collate_by(@bank.learning_outcome_alignments) { |a| a.learning_outcome.short_description }
       @questions = @bank.assessment_questions.active.paginate(:per_page => 50, :page => 1)
