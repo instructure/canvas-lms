@@ -146,8 +146,10 @@ module Types
 
     field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true
     def conversations_connection
-      load_association(:all_conversations).then do
-        object.conversations
+      if object == context[:current_user]
+        load_association(:all_conversations).then do
+          object.conversations
+        end
       end
     end
 
