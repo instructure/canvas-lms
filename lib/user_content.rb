@@ -58,6 +58,13 @@ module UserContent
     find_equation_images(html) do |node|
       equation = node['data-equation-content'] || node['alt']
       next if equation.blank?
+
+      # there are places in canvas (e.g. classic quizzes) that
+      # inadvertently saved the hidden-readable span, causing
+      # them to multiply everytime the entity is edited.
+      # Strip the ones that shouldn't be there before adding a new one
+      node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
+
       if !Account.site_admin.feature_enabled?(:new_math_equation_handling)
         mathml = UserContent.latex_to_mathml(equation)
         next if mathml.blank?
