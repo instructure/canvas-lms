@@ -23,7 +23,7 @@ import {Selector} from 'testcafe'
 fixture`StatusBar`.page`./testcafe.html`
 
 const tinyIframe = Selector('.tox-edit-area__iframe')
-const application = Selector('[role="application"]')
+const application = Selector('.tox-tinymce[role="document"]')
 const textarea = Selector('#textarea')
 const statusPath = Selector('[data-testid="whole-status-bar-path"]')
 const wordCount = Selector('[data-testid="status-bar-word-count"]')

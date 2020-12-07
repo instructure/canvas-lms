@@ -692,10 +692,13 @@ class RCEWrapper extends React.Component {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
     editor.on('wordCountUpdate', this.onWordCountUpdate)
-    // and an aria-label to the application div that wraps RCE
+    // add an aria-label to the application div that wraps RCE
+    // and change role from "application" to "document" to ensure
+    // the editor gets properly picked up by screen readers
     const tinyapp = document.querySelector('.tox-tinymce[role="application"]')
     if (tinyapp) {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
+      tinyapp.setAttribute('role', 'document')
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
