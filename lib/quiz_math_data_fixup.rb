@@ -91,17 +91,8 @@ module QuizMathDataFixup
                 code
               }' title='#{code} data-equation-content='#{code}>"
             answer[stext] = ''
-            return answer
-          else
-            answer[shtml] = ''
-            if html.content.length > max_len
-              answer[stext] =
-                "#{I18n.t('LENGTHY TEXT TRUNCATED: ')}#{html.content[0, max_len - 100]}"
-            else
-              answer[stext] = html.content[0, 16_384]
-            end
-            return answer
           end
+          return answer
         end
         html.search('.math_equation_latex').each do |latex|
           # find MathJax generated children, extract the eq's mathml
@@ -171,8 +162,6 @@ module QuizMathDataFixup
             }' title='#{code}>"
           answer[stext] = ''
           return answer
-        elsif answer[stext].length > max_len
-          answer[stext] = "#{I18n.t('LENGTHY TEXT TRUNCATED: ')}#{html.content[0, max_len - 100]}"
         end
       end
     end
