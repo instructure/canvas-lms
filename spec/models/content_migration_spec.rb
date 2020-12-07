@@ -791,4 +791,27 @@ describe ContentMigration do
       @cm.import!({})
     end
   end
+
+  context "migration issues" do
+    it "doesn't overreeact to todo issues" do
+      err = StandardError.new("TestError")
+      expect{
+        @cm.add_todo("test todo", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "doesn't overreeact to warning issues" do
+      err = StandardError.new("TestError")
+      expect{
+        @cm.add_warning("test warn", {exception: err})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "reports error issues appropriately" do
+      err = StandardError.new("TestError")
+      expect{
+        @cm.add_error("test error", {exception: err})
+      }.to change{ ErrorReport.count }.by(1)
+    end
+  end
 end
