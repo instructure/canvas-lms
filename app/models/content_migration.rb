@@ -236,12 +236,19 @@ class ContentMigration < ActiveRecord::Base
   # error_report_id - the id to an error report
   # fix_issue_html_url - the url to send the user to to fix problem
   #
+  ISSUE_TYPE_TO_ERROR_LEVEL_MAP = {
+    todo: :info,
+    warning: :warn,
+    error: :error
+  }.freeze
+
   def add_issue(user_message, type, opts={})
     mi = self.migration_issues.build(:issue_type => type.to_s, :description => user_message)
     if opts[:error_report_id]
       mi.error_report_id = opts[:error_report_id]
     elsif opts[:exception]
-      er = Canvas::Errors.capture_exception(:content_migration, opts[:exception])[:error_report]
+      level = ISSUE_TYPE_TO_ERROR_LEVEL_MAP[type]
+      er = Canvas::Errors.capture_exception(:content_migration, opts[:exception], level)[:error_report]
       mi.error_report_id = er
     end
     mi.error_message = opts[:error_message]
