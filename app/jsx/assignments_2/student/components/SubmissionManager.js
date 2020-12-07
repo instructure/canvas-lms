@@ -20,6 +20,7 @@ import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import Confetti from '../../../confetti/components/Confetti'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
@@ -46,6 +47,7 @@ export default class SubmissionManager extends Component {
   state = {
     editingDraft: false,
     openSubmitModal: false,
+    showConfetti: false,
     submittingAssignment: false,
     uploadingFiles: false
   }
@@ -219,6 +221,17 @@ export default class SubmissionManager extends Component {
     }
   }
 
+  handleSuccess() {
+    this.context.setOnSuccess(I18n.t('Submission sent'))
+    const onTime = Date.now() < Date.parse(this.props.assignment.dueAt)
+    this.setState({showConfetti: window.ENV.CONFETTI_ENABLED && onTime})
+    setTimeout(() => {
+      // Confetti is cleaned up after 3000.
+      // Need to reset state after that in case they submit another attempt.
+      this.setState({showConfetti: false})
+    }, 4000)
+  }
+
   renderAttemptTab() {
     return (
       <Mutation
@@ -296,7 +309,7 @@ export default class SubmissionManager extends Component {
           onCompleted={data =>
             data.createSubmission.errors
               ? this.context.setOnFailure(I18n.t('Error sending submission'))
-              : this.context.setOnSuccess(I18n.t('Submission sent'))
+              : this.handleSuccess()
           }
           onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
           // refetch submission histories so we don't lose the currently
@@ -335,6 +348,7 @@ export default class SubmissionManager extends Component {
             return this.shouldRenderSubmit(context) ? this.renderSubmitButton() : null
           }}
         </StudentViewContext.Consumer>
+        {this.state.showConfetti ? <Confetti /> : null}
       </>
     )
   }

@@ -19,7 +19,7 @@
 import {AlertManagerContext} from '../../../../shared/components/AlertManager'
 import {CREATE_SUBMISSION} from '../../graphqlData/Mutations'
 import {SUBMISSION_HISTORIES_QUERY} from '../../graphqlData/Queries'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitForElement} from '@testing-library/react'
 import {mockAssignmentAndSubmission, mockQuery} from '../../mocks'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
@@ -108,6 +108,90 @@ describe('SubmissionManager', () => {
     )
 
     expect(queryByText('Submit')).not.toBeInTheDocument()
+  })
+
+  function testConfetti(testName, {enabled, dueDate, inDocument}) {
+    // eslint-disable-next-line jest/valid-describe
+    describe(`confetti ${enabled ? 'enabled' : 'disabled'}`, () => {
+      beforeEach(() => {
+        window.ENV = {
+          CONFETTI_ENABLED: enabled
+        }
+      })
+
+      it(testName, async () => {
+        jest.spyOn(global.Date, 'parse').mockImplementationOnce(() => new Date(dueDate).valueOf())
+
+        const props = await mockAssignmentAndSubmission({
+          Assignment: {
+            submissionTypes: ['online_text_entry']
+          },
+          Submission: {
+            submissionDraft: {
+              activeSubmissionType: 'online_text_entry',
+              body: 'some text here',
+              meetsTextEntryCriteria: true
+            }
+          }
+        })
+
+        const variables = {
+          assignmentLid: '1',
+          submissionID: '1',
+          type: 'online_text_entry',
+          body: 'some text here'
+        }
+        const createSubmissionResult = await mockQuery(CREATE_SUBMISSION, {}, variables)
+        const submissionHistoriesResult = await mockQuery(
+          SUBMISSION_HISTORIES_QUERY,
+          {Node: {__typename: 'Submission'}},
+          {submissionID: '1'}
+        )
+        const mocks = [
+          {
+            request: {query: CREATE_SUBMISSION, variables},
+            result: createSubmissionResult
+          },
+          {
+            request: {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: '1'}},
+            result: submissionHistoriesResult
+          }
+        ]
+
+        const {getByText, queryByTestId} = render(
+          <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+            <MockedProvider mocks={mocks}>
+              <SubmissionManager {...props} />
+            </MockedProvider>
+          </AlertManagerContext.Provider>
+        )
+
+        const submitButton = getByText('Submit')
+        fireEvent.click(submitButton)
+        expect(await waitForElement(() => getByText('Submit'))).toBeInTheDocument()
+        if (inDocument) {
+          expect(queryByTestId('confetti-canvas')).toBeInTheDocument()
+        } else {
+          expect(queryByTestId('confetti-canvas')).not.toBeInTheDocument()
+        }
+      })
+    })
+  }
+
+  testConfetti('renders confetti for on time submissions', {
+    enabled: true,
+    dueDate: Date.now() + 100000,
+    inDocument: true
+  })
+  testConfetti('does not render confetti if not enabled', {
+    enabled: false,
+    dueDate: Date.now() + 100000,
+    inDocument: false
+  })
+  testConfetti('does not render confetti if past the due date', {
+    enabled: true,
+    dueDate: Date.now() - 100000,
+    inDocument: false
   })
 
   it('disables the submit button after it is pressed', async () => {
