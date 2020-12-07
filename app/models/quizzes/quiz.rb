@@ -672,7 +672,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # set to lock date
     if lock_at && !submission.manually_unlocked
       if !end_at || lock_at < end_at
-        end_at = lock_at
+        lock_at = end_at
       end
     elsif !end_at || (fallback_end_at && fallback_end_at < end_at)
       end_at = fallback_end_at
