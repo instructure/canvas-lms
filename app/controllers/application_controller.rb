@@ -1482,11 +1482,15 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
+  # order from general to specific; precedence
+  # evaluates the LAST one first, so having "Exception"
+  # at the end, for example, would be a problem.
+  # all things would be rescued prior to any specific handlers.
+  rescue_from Exception, with: :rescue_exception
   rescue_from RequestError, with: :rescue_expected_error_type
+  rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
-  rescue_from Exception, :with => :rescue_exception
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
@@ -1499,7 +1503,7 @@ class ApplicationController < ActionController::Base
     set_response_headers
 
     if config.consider_all_requests_local
-      rescue_action_locally(exception)
+      rescue_action_locally(exception, level: level)
     else
       rescue_action_in_public(exception, level: level)
     end
@@ -1649,15 +1653,15 @@ class ApplicationController < ActionController::Base
     data
   end
 
-  def rescue_action_locally(exception)
+  def rescue_action_locally(exception, level: :error)
     if api_request? or exception.is_a? RequestError
       # we want api requests to behave the same on error locally as in prod, to
       # ease testing and development. you can still view the backtrace, etc, in
       # the logs.
-      rescue_action_in_public(exception)
+      rescue_action_in_public(exception, level: level)
     else
       # this ensures the logging will still happen so you can see backtrace, etc.
-      Canvas::Errors.capture(exception)
+      Canvas::Errors.capture(exception, {}, level)
       super
     end
   end
