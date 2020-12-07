@@ -60,11 +60,12 @@ class FileAuthenticator
     })
   end
 
-  def download_url(attachment)
+  def download_url(attachment, options: {})
     return nil unless attachment
+
     migrate_legacy_attachment_to_instfs(attachment)
     if attachment.instfs_hosted?
-      options = instfs_options(attachment, download: true)
+      options.merge!(instfs_options(attachment, download: true))
       InstFS.authenticated_url(attachment, options)
     else
       # s3 doesn't distinguish authenticated and public urls
@@ -72,11 +73,12 @@ class FileAuthenticator
     end
   end
 
-  def inline_url(attachment)
+  def inline_url(attachment, options: {})
     return nil unless attachment
+
     migrate_legacy_attachment_to_instfs(attachment)
     if attachment.instfs_hosted?
-      options = instfs_options(attachment, download: false)
+      options.merge!(instfs_options(attachment, download: false))
       InstFS.authenticated_url(attachment, options)
     else
       # s3 doesn't distinguish authenticated and public urls

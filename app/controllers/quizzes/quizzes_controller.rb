@@ -23,6 +23,7 @@ class Quizzes::QuizzesController < ApplicationController
   include KalturaHelper
   include ::Filters::Quizzes
   include SubmittablesGradingPeriodProtection
+  include QuizMathDataFixup
 
   # If Quiz#one_time_results is on, this flag must be set whenever we've
   # rendered the submission results to the student so that the results can be
@@ -294,6 +295,12 @@ class Quizzes::QuizzesController < ApplicationController
 
   def edit
     if authorized_action(@quiz, @current_user, :update)
+
+      if params[:fixup_quiz_math_questions] == "1"
+        InstStatsd::Statsd.increment("fixingup_quiz_math_question")
+        @quiz = fixup_quiz_questions_with_bad_math(@quiz)
+      end
+
       add_crumb(@quiz.title, named_context_url(@context, :context_quiz_url, @quiz))
       @assignment = @quiz.assignment
       @quiz.title = params[:title] if params[:title]
@@ -925,6 +932,11 @@ class Quizzes::QuizzesController < ApplicationController
     flash[:notice] = t('notices.less_than_allotted_time', "You started this quiz near when it was due, so you won't have the full amount of time to take the quiz.") if @submission.less_than_allotted_time?
     if params[:question_id] && !valid_question?(@submission, params[:question_id])
       redirect_to course_quiz_url(@context, @quiz) and return
+    end
+
+    if params[:fixup_quiz_math_questions] == "1"
+      InstStatsd::Statsd.increment("fixingup_quiz_math_submission")
+      fixup_submission_questions_with_bad_math(@submission)
     end
 
     if !@submission.preview? && (!@js_env || !@js_env[:QUIZ_SUBMISSION_EVENTS_URL])

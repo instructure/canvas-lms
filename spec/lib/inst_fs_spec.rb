@@ -202,6 +202,20 @@ describe InstFS do
           expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
         end
 
+        it "includes the original_url claim with the redirect param" do
+          original_url = "https://example.test/preview"
+          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])[:original_url]).to eq(original_url + "?redirect=true")
+        end
+
+        it "doesn't include the original_url claim if already redirected" do
+          original_url = "https://example.test/preview?redirect=true"
+          url = InstFS.authenticated_url(@attachment, original_url: original_url)
+          token = url.split(/token=/).last
+          expect(Canvas::Security.decode_jwt(token, [ secret ])).not_to have_key(:original_url)
+        end
+
         describe "legacy api claims" do
           let(:root_account) { Account.default }
           let(:access_token) { instance_double("AccessToken", global_developer_key_id: 106) }
