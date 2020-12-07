@@ -332,4 +332,8 @@ module Canvas
   def self.cluster
     nil
   end
+
+  def self.environment
+    Rails.environment
+  end
 end
