@@ -650,10 +650,8 @@ class ActiveRecord::Base
       GuardRail.activate(:primary) do
         if Rails.env.test? ? self.in_transaction_in_test? : connection.open_transactions > 0
           raise "don't run current_xlog_location in a transaction"
-        elsif connection.send(:postgresql_version) >= 100000
-          connection.select_value("SELECT pg_current_wal_lsn()")
         else
-          connection.select_value("SELECT pg_current_xlog_location()")
+          connection.current_wal_lsn
         end
       end
     end
