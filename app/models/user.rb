@@ -441,6 +441,12 @@ class User < ActiveRecord::Base
     !!@skip_updating_account_associations
   end
 
+  def global_root_account_ids
+    root_account_ids&.map do |id|
+      Shard.global_id_for(id, self.shard)
+    end
+  end
+
   # Update the root_account_ids column on the user
   # and all the users CommunicationChannels
   def update_root_account_ids

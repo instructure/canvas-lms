@@ -451,6 +451,12 @@ class CommunicationChannel < ActiveRecord::Base
     end
   end
 
+  def global_root_account_ids
+    root_account_ids&.map do |id|
+      Shard.global_id_for(id, self.shard)
+    end
+  end
+
   def set_root_account_ids(persist_changes: false, log: false)
     # communication_channels always are on the same shard as the user object and
     # can be used for any root_account, so just set root_account_ids from user.

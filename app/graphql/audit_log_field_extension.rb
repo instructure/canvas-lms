@@ -32,33 +32,37 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     end
 
     def log(entry, field_name)
-      @dynamo.put_item(
-        table_name: AuditLogFieldExtension.ddb_table_name,
-        item: {
-          # TODO: this is where you redirect
-          "object_id" => log_entry_id(entry, field_name),
-          "mutation_id" => mutation_id,
-          "timestamp" => @timestamp.iso8601,
-          "expires" => @ttl,
-          "mutation_name" => @mutation.graphql_name,
-          "current_user_id" => @context[:current_user]&.global_id&.to_s,
-          "real_current_user_id" => @context[:real_current_user]&.global_id&.to_s,
-          "params" => @params,
-        },
-        return_consumed_capacity: "TOTAL"
-      )
+      log_entry_ids(entry, field_name).each do |log_entry_id|
+        @dynamo.put_item(
+          table_name: AuditLogFieldExtension.ddb_table_name,
+          item: {
+            # TODO: this is where you redirect
+            "object_id" => log_entry_id,
+            "mutation_id" => mutation_id,
+            "timestamp" => @timestamp.iso8601,
+            "expires" => @ttl,
+            "mutation_name" => @mutation.graphql_name,
+            "current_user_id" => @context[:current_user]&.global_id&.to_s,
+            "real_current_user_id" => @context[:real_current_user]&.global_id&.to_s,
+            "params" => @params,
+          },
+          return_consumed_capacity: "TOTAL"
+        )
+      end
     rescue Aws::DynamoDB::Errors::ServiceError => e
       ::Canvas::Errors.capture_exception(:graphql_mutation_audit_logs, e)
       Rails.logger.error "Couldn't log mutation: #{e}"
     end
 
-    def log_entry_id(entry, field_name)
+    def log_entry_ids(entry, field_name)
       override_entry_method = :"#{field_name}_log_entry"
       entry = @mutation.send(override_entry_method, entry, @context) if @mutation.respond_to?(override_entry_method)
 
-      domain_root_account = root_account_for(entry)
+      domain_root_account_ids = root_account_ids_for(entry)
 
-      "#{domain_root_account.global_id}-#{entry.asset_string}"
+      domain_root_account_ids.map do |domain_root_account_id|
+        "#{domain_root_account_id}-#{entry.asset_string}"
+      end
     end
 
     ##
@@ -69,26 +73,22 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
     #
     # this method will have to know how to resolve a root account for every
     # object that is logged by a mutation
-    def root_account_for(entry)
+    def root_account_ids_for(entry)
       if Progress === entry
         entry = entry.context
       end
 
+      if entry.respond_to? :global_root_account_ids
+        return entry.global_root_account_ids
+      end
+
       if entry.respond_to? :root_account_id
-        return entry.root_account if entry.root_account.present?
+        return [Shard.global_id_for(entry.root_account_id, entry.shard)]
       end
 
       case entry
-      when Course
-        entry.root_account
-      when Assignment, ContextModule, SubmissionComment
-        entry.context.root_account
-      when Submission
-        entry.assignment.course.root_account
       when SubmissionDraft
-        entry.submission.assignment.course.root_account
-      when PostPolicy
-        (entry.assignment&.course || entry.course).root_account
+        [Shard.global_id_for(entry.submission.root_account_id, entry.shard)]
       else
         raise "don't know how to resolve root_account for #{entry.inspect}"
       end
@@ -136,13 +136,9 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next unless AuditLogFieldExtension.enabled?
 
       mutation = field.mutation
-      # TODO: figure out how to resolve root account for user, communication channels, and conversations
-      next if mutation == Mutations::UpdateNotificationPreferences
-      next if mutation == Mutations::CreateConversation
       next if mutation == Mutations::DeleteConversationMessages
       next if mutation == Mutations::DeleteConversations
       next if mutation == Mutations::AddConversationMessage
-      next if mutation == Mutations::UpdateConversationParticipants
 
       logger = Logger.new(mutation, context, arguments)
 

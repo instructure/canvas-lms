@@ -115,16 +115,16 @@ describe AuditLogFieldExtension::Logger do
     })
   end
 
-  context "#log_entry_id" do
+  context "#log_entry_ids" do
     it "uses #asset_string and includes the domain_root_account id for the object_id" do
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
-      expect(logger.log_entry_id(@entry, "some_field")).to eq "#{@course.root_account.global_id}-assignment_#{@entry.id}"
+      expect(logger.log_entry_ids(@entry, "some_field")).to eq ["#{@course.root_account.global_id}-assignment_#{@entry.id}"]
     end
 
     it "allows overriding the logged object" do
       expect(mutation).to receive(:whatever_log_entry) { @entry.context }
       logger = AuditLogFieldExtension::Logger.new(mutation, {}, {input: {}})
-      expect(logger.log_entry_id(@entry, "whatever")).to eq "#{@course.root_account.global_id}-course_#{@course.id}"
+      expect(logger.log_entry_ids(@entry, "whatever")).to eq ["#{@course.root_account.global_id}-course_#{@course.id}"]
     end
   end
 
