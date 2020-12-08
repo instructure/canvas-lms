@@ -233,18 +233,6 @@ def slackSendCacheBuild(registryPath, block) {
 // builds always run correctly. We intentionally ignore overrides for version pins, docker image paths, etc when
 // running real post-merge builds.
 // =========
-def getBuildImage() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.buildRegistryPathDefault() : configuration.buildRegistryPath()
-}
-
-def getPatchsetTag() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.patchsetDefault() : imageTag.patchset()
-}
-
-def getPublishableTag() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.publishableTagDefault() : imageTag.publishableTag()
-}
-
 def getPluginVersion(plugin) {
   if(env.GERRIT_BRANCH.contains('stable/')) {
     return configuration.getString("pin-commit-$plugin", env.GERRIT_BRANCH)
@@ -254,26 +242,6 @@ def getPluginVersion(plugin) {
 
 def getSlackChannel() {
   return env.GERRIT_EVENT_TYPE == 'change-merged' ? '#canvas_builds' : '#devx-bots'
-}
-
-def getDependenciesMergeImage() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.dependenciesMergeImageDefault() : imageTag.dependenciesMergeImage()
-}
-
-def getDependenciesPatchsetImage() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.dependenciesPatchsetImageDefault() : imageTag.dependenciesPatchsetImage()
-}
-
-def getMergeTag() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.mergeTagDefault() : imageTag.mergeTag()
-}
-
-def getExternalTag() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? imageTag.externalTagDefault() : imageTag.externalTag()
-}
-
-def getDependenciesImage() {
-  return env.GERRIT_EVENT_TYPE == 'change-merged' ? configuration.dependenciesImageDefault() : configuration.dependenciesImage()
 }
 
 @groovy.transform.Field def CANVAS_BUILDS_REFSPEC_REGEX = /\[canvas\-builds\-refspec=(.+?)\]/
@@ -314,6 +282,8 @@ def rebaseHelper(branch, commitHistory = 100) {
 
 library "canvas-builds-library@${getCanvasBuildsRefspec()}"
 
+configuration.setUseCommitMessageFlags(env.GERRIT_EVENT_TYPE != 'change-merged')
+
 pipeline {
   agent none
   options {
@@ -325,7 +295,7 @@ pipeline {
     GERRIT_PORT = '29418'
     GERRIT_URL = "$GERRIT_HOST:$GERRIT_PORT"
     BUILD_REGISTRY_FQDN = configuration.buildRegistryFQDN()
-    BUILD_IMAGE = getBuildImage()
+    BUILD_IMAGE = configuration.buildRegistryPath()
     POSTGRES = configuration.postgres()
     POSTGRES_CLIENT = configuration.postgresClient()
     SKIP_CACHE = configuration.skipCache()
@@ -335,16 +305,16 @@ pipeline {
 
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PATCHSET_TAG = getPatchsetTag()
+    PATCHSET_TAG = imageTag.patchset()
 
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
-    PUBLISHABLE_TAG = getPublishableTag()
+    PUBLISHABLE_TAG = imageTag.publishableTag()
 
     // e.g. canvas-lms:master when not on another branch
-    MERGE_TAG = getMergeTag();
+    MERGE_TAG = imageTag.mergeTag()
 
     // e.g. canvas-lms:01.123456.78; this is for consumers like Portal 2 who want to build a patchset
-    EXTERNAL_TAG = getExternalTag();
+    EXTERNAL_TAG = imageTag.externalTag()
 
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
