@@ -356,8 +356,8 @@ pipeline {
 
     WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
 
-    WEBPACK_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
-    WEBPACK_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+    IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
+    IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
 
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
@@ -474,18 +474,19 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  def webpackCacheScope = configuration.isChangeMerged() ? env.WEBPACK_CACHE_MERGE_SCOPE : env.WEBPACK_CACHE_BUILD_SCOPE
+                  def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
                   slackSendCacheBuild(env.WEBPACK_CACHE_PREFIX) {
                     withEnv([
+                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                      "CACHE_SAVE_SCOPE=${cacheScope}",
+                      "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
+                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
-                      "WEBPACK_CACHE_SAVE_SCOPE=${webpackCacheScope}",
-                      "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
-                      "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}"
                     ]) {
                       sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                     }
@@ -554,13 +555,14 @@ pipeline {
                   echo 'adding Build Docker Image Cache'
                   stages['Build Docker Image Cache'] = {
                     withEnv([
+                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                      "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "COMPILE_ADDITIONAL_ASSETS=0",
+                      "JS_BUILD_NO_UGLIFY=1",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
-                      "WEBPACK_CACHE_SAVE_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
-                      "COMPILE_ADDITIONAL_ASSETS=0",
-                      "JS_BUILD_NO_UGLIFY=1"
                     ]) {
                       slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
                         sh "build/new-jenkins/docker-build.sh"

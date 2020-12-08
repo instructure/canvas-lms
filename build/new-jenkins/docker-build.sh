@@ -23,8 +23,14 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $1: final image for this build, including all rails code
 
 # Controls:
-# $WEBPACK_CACHE_LOAD_SCOPE: image prefix for the primary cache image to load
-# $WEBPACK_CACHE_SAVE_SCOPE: image prefix for the target tag and also the secondary cache image to load
+# $CACHE_LOAD_SCOPE: the scope of the primary cache to load.
+#   - typically "master" for post-merge builds and <patchset_number> for pre-merge builds
+# $CACHE_LOAD_FALLBACK_SCOPE: the fallback scope if the primary scope doesn't exist
+#   - typically <patchset_number> for all builds.
+#   - pre-merge builds use this to cache re-trigger attempts and for new revisions without code changes
+#   - post-merge builds use this to pull images from previous pre-merge builds in case it is already built
+# $CACHE_SAVE_SCOPE: the scope to save the image under
+#   - always "master" for post-merge builds and <patchset_number> for pre-merge builds
 
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
@@ -71,8 +77,9 @@ WEBPACK_CACHE_PARTS=(
   $WEBPACK_CACHE_MD5
 )
 WEBPACK_CACHE_ID=$(echo "${WEBPACK_CACHE_PARTS[@]}" | md5sum | cut -d' ' -f1)
-WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
-WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:${WEBPACK_CACHE_LOAD_SCOPE:-$WEBPACK_CACHE_SAVE_SCOPE}-$WEBPACK_CACHE_ID"
+WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_LOAD_SCOPE-$WEBPACK_CACHE_ID"
+WEBPACK_CACHE_LOAD_FALLBACK_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_LOAD_FALLBACK_SCOPE-$WEBPACK_CACHE_ID"
+WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
 
 # Build / Load Webpack Image
 WEBPACK_CACHE_SELECTED_TAG=""
@@ -83,10 +90,12 @@ if ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CA
   WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_LOAD_TAG
 
   docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
-elif ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_SAVE_TAG; then
-  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SAVE_TAG
+  docker tag $WEBPACK_CACHE_SELECTED_TAG $WEBPACK_CACHE_SAVE_TAG
+elif ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_FALLBACK_TAG; then
+  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_LOAD_FALLBACK_TAG
 
   docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
+  docker tag $WEBPACK_CACHE_SELECTED_TAG $WEBPACK_CACHE_SAVE_TAG
 else
   # If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
