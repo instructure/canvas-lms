@@ -247,6 +247,12 @@ describe User do
     end
   end
 
+  describe "#public_lti_id" do
+    subject { User.public_lti_id }
+
+    it { is_expected.to eq "https://canvas.instructure.com/public_user" }
+  end
+
   describe "#cached_recent_stream_items" do
     before(:once) do
       @contexts = []

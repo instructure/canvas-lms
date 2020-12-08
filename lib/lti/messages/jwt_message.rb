@@ -75,7 +75,7 @@ module Lti::Messages
       @message.iat = Time.zone.now.to_i
       @message.iss = Canvas::Security.config['lti_iss']
       @message.nonce = SecureRandom.uuid
-      @message.sub = @user.lookup_lti_id(@context)
+      @message.sub = @user&.lookup_lti_id(@context) || User.public_lti_id
       @message.target_link_uri = target_link_uri
     end
 
@@ -122,19 +122,19 @@ module Lti::Messages
     end
 
     def add_include_name_claims!
-      @message.name = @user.name
-      @message.given_name = @user.first_name
-      @message.family_name = @user.last_name
+      @message.name = @user&.name
+      @message.given_name = @user&.first_name
+      @message.family_name = @user&.last_name
       @message.lis.person_sourcedid = expand_variable('$Person.sourcedId')
       @message.lis.course_offering_sourcedid = expand_variable('$CourseSection.sourcedId')
     end
 
     def add_include_email_claims!
-      @message.email = @user.email
+      @message.email = @user&.email
     end
 
     def add_public_claims!
-      @message.picture = @user.avatar_url
+      @message.picture = @user&.avatar_url
     end
 
     def add_mentorship_claims!
@@ -142,7 +142,7 @@ module Lti::Messages
     end
 
     def add_lti11_legacy_user_id!
-      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user)
+      @message.lti11_legacy_user_id = @tool.opaque_identifier_for(@user) || User.public_lti_id
     end
 
     def include_names_and_roles_service_claims?
@@ -163,6 +163,8 @@ module Lti::Messages
 
     def current_observee_list
       return nil unless @context.is_a?(Course)
+      return nil if @user.blank?
+
       @_current_observee_list ||= begin
         @user.observer_enrollments.current.
           where(course_id: @context.id).

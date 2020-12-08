@@ -120,39 +120,61 @@ describe ExternalToolsController do
       let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
-      before do
-        allow(SecureRandom).to receive(:hex).and_return(verifier)
-        user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: tool.id}
+      before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+
+      context 'when the current user is nil' do
+        context 'and the context is a public course' do
+          subject do
+            get :show, params: {:course_id => @course.id, id: tool.id}
+            response
+          end
+
+          before { @course.update!(is_public: true) }
+
+          it { is_expected.to be_successful }
+
+          it 'uses the public user ID as the ISS' do
+            subject
+            expect(cached_launch['sub']).to eq User.public_lti_id
+          end
+        end
       end
 
-      it 'creates a login message' do
-        expect(assigns[:lti_launch].params.keys).to match_array [
-          "iss",
-          "login_hint",
-          "target_link_uri",
-          "lti_message_hint",
-          "canvas_region",
-          "client_id"
-        ]
-      end
+      context 'when current user is a teacher' do
+        before do
+          user_session(@teacher)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+        end
 
-      it 'sets the "login_hint" to the current user lti id' do
-        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
-      end
-
-      it 'caches the the LTI 1.3 launch' do
-        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-      end
-
-      it 'sets the "canvas_domain" to the request domain' do
-        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
-        expect(message_hint['canvas_domain']).to eq 'localhost'
+        it 'creates a login message' do
+          expect(assigns[:lti_launch].params.keys).to match_array [
+            "iss",
+            "login_hint",
+            "target_link_uri",
+            "lti_message_hint",
+            "canvas_region",
+            "client_id"
+          ]
+        end
+  
+        it 'sets the "login_hint" to the current user lti id' do
+          expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
+        end
+  
+        it 'caches the the LTI 1.3 launch' do
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+        end
+  
+        it 'sets the "canvas_domain" to the request domain' do
+          message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+          expect(message_hint['canvas_domain']).to eq 'localhost'
+        end
       end
 
       context 'current user is a student view user' do
         before do
           user_session(@course.student_view_student)
+          get :show, params: {:course_id => @course.id, id: tool.id}
         end
 
         it 'returns the TestUser claim when viewing as a student' do

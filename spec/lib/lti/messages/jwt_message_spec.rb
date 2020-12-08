@@ -494,10 +494,25 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe 'include name claims' do
-
     before do
       course
       tool.update!(workflow_state: 'name_only')
+    end
+
+    context 'when the user is nil' do
+      let(:user) { nil }
+
+      it 'does not add the name' do
+        expect(decoded_jwt['name']).to be_blank
+      end
+
+      it 'does not add the given name' do
+        expect(decoded_jwt['given_name']).to be_blank
+      end
+
+      it 'does not add the family name' do
+        expect(decoded_jwt['family_name']).to be_blank
+      end
     end
 
     it 'adds the name' do
@@ -702,10 +717,14 @@ describe Lti::Messages::JwtMessage do
   end
 
   describe 'legacy user id claims' do
-    it 'sets the "lti11_legacy_user_id" claim' do
-      expected = decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id']
+    subject { decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id'] }
 
-      expect(expected).to eq tool.opaque_identifier_for(user)
+    it { is_expected.to eq tool.opaque_identifier_for(user) }
+
+    context 'when the user is blank' do
+      let(:user) { nil }
+
+      it { is_expected.to eq User.public_lti_id }
     end
   end
 end

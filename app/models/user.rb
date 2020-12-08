@@ -310,6 +310,10 @@ class User < ActiveRecord::Base
     end
   end
 
+  def self.public_lti_id
+    [Canvas::Security.config['lti_iss'], 'public_user'].join('/')
+  end
+
   def self.order_by_sortable_name(options = {})
     clause = sortable_name_order_by_clause
     sort_direction = options[:direction] == :descending ? 'DESC' : 'ASC'

@@ -72,6 +72,8 @@ module Lti
       end
 
       def validate_current_user!
+        return if public_course? && @current_user.blank?
+
         if !@current_user || Lti::Asset.opaque_identifier_for(@current_user, context: context) != oidc_params[:login_hint]
           set_oidc_error!('login_required', 'Must have an active user session')
         end
@@ -99,6 +101,11 @@ module Lti
           error_description: error_description,
           state: oidc_params[:state]
         }
+      end
+
+      def public_course?
+        # Is the context published and public?
+        context&.is_a?(Course) && context&.available? && context&.is_public?
       end
 
       def verifier
