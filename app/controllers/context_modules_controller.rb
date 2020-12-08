@@ -466,12 +466,11 @@ class ContextModulesController < ApplicationController
     progression = mod.evaluate_for(@current_user)
     progression ||= ContextModuleProgression.new
     if value_to_boolean(should_collapse)
-      progression.collapsed = true
+      progression.collapse!(skip_save: progression.new_record?)
     else
-      progression.uncollapse!
+      progression.uncollapse!(skip_save: progression.new_record?)
     end
-    progression.save unless progression.new_record?
-    progression
+    return progression
   end
 
   def toggle_collapse

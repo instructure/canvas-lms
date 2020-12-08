@@ -56,11 +56,32 @@ class ContextModuleProgression < ActiveRecord::Base
     (self.requirements_met || []).any?{|r| r[:id] == item.id}
   end
 
-  def uncollapse!
-    return unless self.collapsed?
-    self.collapsed = false
-    self.save
+  def collapse!(skip_save: false)
+    update_collapse_state(true, skip_save: skip_save)
   end
+
+  def uncollapse!(skip_save: false)
+    update_collapse_state(false, skip_save: skip_save)
+  end
+
+  def update_collapse_state(collapsed_target_state, skip_save: false)
+    retry_count = 0
+    begin
+      return if self.collapsed == collapsed_target_state
+      self.collapsed = collapsed_target_state
+      self.save unless skip_save
+    rescue ActiveRecord::StaleObjectError => e
+      Canvas::Errors.capture_exception(:context_modules, e, :info)
+      retry_count += 1
+      if retry_count < 5
+        self.reload
+        retry
+      else
+        raise
+      end
+    end
+  end
+  private :update_collapse_state
 
   def uncomplete_requirement(id)
     requirement = requirements_met.find {|r| r[:id] == id}
