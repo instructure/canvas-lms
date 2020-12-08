@@ -272,11 +272,13 @@ describe ContentSharesController do
         expect(@sent_share.receivers.pluck(:id)).to match_array([@teacher_2.id, @teacher_3.id])
       end
 
-      it "disallows sharing with yourself" do
+      it "allows sharing with yourself, because why not" do
         user_session @teacher_1
         post :add_users, params: { user_id: @teacher_1.id, id: @sent_share.id, receiver_ids: [@teacher_1.id, @teacher_3.id] }
-        expect(response).to have_http_status(:bad_request)
-        expect(response.body).to include 'You cannot share with yourself'
+        expect(response).to be_successful
+        json = JSON.parse(response.body.sub(/^while\(1\);/, ''))
+        expect(json['receivers'].map { |r| r['id'] }).to match_array([@teacher_1.id, @teacher_2.id, @teacher_3.id])
+        expect(@sent_share.receivers.pluck(:id)).to match_array([@teacher_1.id, @teacher_2.id, @teacher_3.id])
       end
 
       it "complains if no valid users are included" do

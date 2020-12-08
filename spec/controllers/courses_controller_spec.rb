@@ -3045,13 +3045,13 @@ describe CoursesController do
       expect(json.map{|user| user['name']}).not_to include('account admin', 'sub-account admin')
     end
 
-    it 'should not return the searching user' do
+    it 'should return the searching user' do
       user_session(@teacher)
       @search_context = @course
       course_with_teacher(name: 'course teacher')
       get 'content_share_users', params: {course_id: @search_context.id, search_term: 'teacher'}
       json = json_parse(response.body)
-      expect(json.map{|user| user['name']}).to match_array(['course teacher'])
+      expect(json.map{|user| user['name']}).to match_array(['course teacher', 'search teacher'])
     end
 
     it 'should not return admin roles that do not have the "manage_content" permission' do
