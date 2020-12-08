@@ -354,8 +354,7 @@ pipeline {
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
-    WEBPACK_CACHE_PREMERGE_PREFIX = "$BUILD_IMAGE-pre-merge-cache"
-    WEBPACK_CACHE_POSTMERGE_PREFIX = "$BUILD_IMAGE-post-merge-cache"
+    WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
 
     WEBPACK_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     WEBPACK_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
@@ -473,15 +472,14 @@ pipeline {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
                 } else {
-                  def webpackCachePrefix = configuration.isChangeMerged() ? env.WEBPACK_CACHE_POSTMERGE_PREFIX : env.WEBPACK_CACHE_PREMERGE_PREFIX
                   def webpackCacheScope = configuration.isChangeMerged() ? env.WEBPACK_CACHE_MERGE_SCOPE : env.WEBPACK_CACHE_BUILD_SCOPE
 
-                  slackSendCacheBuild(webpackCachePrefix) {
+                  slackSendCacheBuild(env.WEBPACK_CACHE_PREFIX) {
                     withEnv([
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
-                      "WEBPACK_CACHE_PREFIX=${webpackCachePrefix}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
                       "WEBPACK_CACHE_SAVE_SCOPE=${webpackCacheScope}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
@@ -501,8 +499,8 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
                   slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
 
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_POSTMERGE_PREFIX'
-                  slackSendCacheAvailable(env.WEBPACK_CACHE_POSTMERGE_PREFIX)
+                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX'
+                  slackSendCacheAvailable(env.WEBPACK_CACHE_PREFIX)
 
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
@@ -510,7 +508,7 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
                 } else {
                   sh(script: """
-                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREMERGE_PREFIX
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                   """, label: 'upload pre-merge specific images')
                 }
 
@@ -556,7 +554,7 @@ pipeline {
                     withEnv([
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
-                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREMERGE_PREFIX}",
+                      "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "WEBPACK_CACHE_LOAD_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
                       "WEBPACK_CACHE_SAVE_SCOPE=${env.WEBPACK_CACHE_MERGE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
@@ -566,8 +564,8 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREMERGE_PREFIX"
-                      slackSendCacheAvailable(env.WEBPACK_CACHE_PREMERGE_PREFIX)
+                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX"
+                      slackSendCacheAvailable(env.WEBPACK_CACHE_PREFIX)
                     }
                   }
                 }
