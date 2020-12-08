@@ -81,7 +81,7 @@ table td[data-mce-selected] {
 
 body#tinymce,
 body#tinyrce {
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .Underline-All-Links__enabled
