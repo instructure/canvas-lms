@@ -38,6 +38,8 @@ class Message < ActiveRecord::Base
 
   MAX_TWITTER_MESSAGE_LENGTH = 140
 
+  class QueuedNotFound < StandardError; end
+
   class Queued
     # use this to queue messages for delivery so we find them using the created_at in the scope
     # instead of using id alone when reconstituting the AR object
@@ -46,9 +48,19 @@ class Message < ActiveRecord::Base
       @id, @created_at = id, created_at
     end
 
-    delegate :deliver, :dispatch_at, :to => :message
+    delegate :dispatch_at, :to => :message
+
+    def deliver
+      message.deliver
+    rescue QueuedNotFound => e
+      raise Delayed::RetriableError, "Message does not (yet?) exist"
+    end
+
     def message
-      @message ||= Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      return @message if @message.present?
+      @message = Message.in_partition('id' => id, 'created_at' => @created_at).where(:id => @id, :created_at => @created_at).first || Message.where(:id => @id).first
+      raise QueuedNotFound if @message.nil?
+      @message
     end
   end
 
