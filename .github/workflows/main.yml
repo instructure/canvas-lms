@@ -1,0 +1,24 @@
+name: Deployment
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy-code:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            cd canvas
+            git pull
+            docker-compose build
+            docker-compose run web bash -c "RAILS_ENV=production bundle exec rake db:migrate"
+            docker-compose up -d
