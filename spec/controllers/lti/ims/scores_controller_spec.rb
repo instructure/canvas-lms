@@ -354,18 +354,23 @@ module Lti::Ims
         context 'with different scoreMaximum' do
           let(:params_overrides) { super().merge(scoreGiven: 10, scoreMaximum: 100) }
 
-          it 'does not scale the score for the result' do
+          it 'scales the submission but does not scale the score for the result' do
             result
             send_request
             expect(result.reload.result_score).to eq(params_overrides[:scoreGiven])
-          end
-
-          it 'scales the score for the submission to be the correct ratio between points_possible and scoreMaximum' do
-            result
-            send_request
             expect(result.submission.reload.score).to eq(
               result.reload.result_score * (line_item.score_maximum / 100)
             )
+          end
+        end
+
+        context "with a ZERO score maximum" do
+          let(:params_overrides) { super().merge(scoreGiven: 0, scoreMaximum: 0) }
+
+          it 'will not tolerate invalid score max' do
+            result
+            send_request
+            expect(response.status.to_i).to eq(422)
           end
         end
 
