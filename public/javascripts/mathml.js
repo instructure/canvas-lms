@@ -68,13 +68,28 @@ const mathml = {
                 .querySelectorAll('.math_equation_latex')
                 .forEach(m => m.classList.add('fade-in-equation'))
             })
+          } else {
+            // though isMathInElement ignores <math> w/in .hidden-readable elements,
+            // MathJax does not and will process it anyway. This is a problem when
+            // you open the equation editor while editing a quiz and it adds to the DOM
+            // elements that will get saved with the quiz.
+            // There's a feature request against MathJax (https://github.com/mathjax/MathJax/issues/505)
+            // to add an ignoreClass config prop to the mml2jax processor, but it's not available.
+            // Since we want to ignore <math> in .hidden-readable spans, let's remove the MathJunk™
+            // right after MathJax adds it.
+            window.MathJax.Hub.Register.MessageHook('End Math', function(message) {
+              $(message[1])
+                .find('.hidden-readable [class^="MathJax"], .hidden-readable [id^="MathJax"]')
+                .remove()
+            })
           }
+
           // leaving this here so I don't have to keep looking up how to see all messages
           // window.MathJax.Hub.Startup.signal.Interest(function (message) {
-          //   console.log('>>> Startup:', message[0])
+          //   console.log('>>> MathJax startup:', message)
           // })
           // window.MathJax.Hub.signal.Interest(function(message) {
-          //   console.log('>>> ', message[0])
+          //   console.log('>>> MathJax signal', message)
           // })
           delete window.MathJaxIsLoading
         },
