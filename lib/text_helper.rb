@@ -251,7 +251,7 @@ module TextHelper
   end
 
   def self.round_if_whole(value)
-    if value.is_a?(Float) && (i = value.to_i) == value
+    if value.is_a?(Float) && !value.nan? && (i = value.to_i) == value
       i
     else
       value

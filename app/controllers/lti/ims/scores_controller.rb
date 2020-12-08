@@ -208,8 +208,13 @@ module Lti::Ims
     end
 
     def verify_exclusive_key_pairs
-      return if ignore_score? || params.key?(:scoreMaximum)
-      render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
+      return if ignore_score?
+      if params.key?(:scoreMaximum)
+        return if params[:scoreMaximum].to_f > 0
+        render_error('ScoreMaximum must be greater than 0', :unprocessable_entity)
+      else
+        render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
+      end
     end
 
     def score_submission
@@ -272,6 +277,9 @@ module Lti::Ims
     end
 
     def line_item_score_maximum_scale
+      res_max = scores_params[:result_maximum].to_f
+      # if this doesn't make sense, just don't scale
+      return 1.0 if res_max.nan? || res_max == 0.0
       line_item.score_maximum / scores_params[:result_maximum].to_f
     end
 
