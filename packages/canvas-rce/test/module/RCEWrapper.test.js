@@ -340,10 +340,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="green_square"
-      style="width: 10px; height: 10px;"
+      style="width: 10px; height: 10px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -368,10 +368,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="filename%20%22with%22%20quotes"
-      style="width: 10px; height: 10px;"
+      style="width: 10px; height: 10px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -396,10 +396,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="green_square"
-      style="width: 500px; height: 500px;"
+      style="width: 500px; height: 500px; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -419,10 +419,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.txt"
-      style="width: 8rem; height: 1rem;"
+      style="width: 8rem; height: 1rem; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -440,10 +440,10 @@ describe('RCEWrapper', () => {
           contentType: 'video/quicktime'
         }
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.mov"
-      style="width: 400px; height: 225px;"
+      style="width: 400px; height: 225px; vertical-align: bottom;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -461,10 +461,10 @@ describe('RCEWrapper', () => {
           contentType: 'audio/mp3'
         }
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="file.mp3"
-      style="width: 320px; height: 14.25rem;"
+      style="width: 320px; height: 14.25rem; vertical-align: bottom;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(
@@ -489,10 +489,10 @@ describe('RCEWrapper', () => {
         }
 
         const imageMarkup = `
-    <div
+    <span
       aria-label="Loading"
       data-placeholder-for="square.png"
-      style="width: 10rem; height: 1rem;"
+      style="width: 10rem; height: 1rem; vertical-align: middle;"
     >`
         instance.insertImagePlaceholder(props)
         sinon.assert.calledWith(

@@ -383,6 +383,7 @@ class RCEWrapper extends React.Component {
 
   insertImagePlaceholder(fileMetaProps) {
     let width, height
+    let align = 'middle'
     if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
       const image = new Image()
       image.src = fileMetaProps.domObject.preview
@@ -399,9 +400,11 @@ class RCEWrapper extends React.Component {
     } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
       width = VIDEO_SIZE_DEFAULT.width
       height = VIDEO_SIZE_DEFAULT.height
+      align = 'bottom'
     } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
       width = AUDIO_PLAYER_SIZE.width
       height = AUDIO_PLAYER_SIZE.height
+      align = 'bottom'
     } else {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
@@ -409,20 +412,20 @@ class RCEWrapper extends React.Component {
     // if you're wondering, the &nbsp; scatter about in the svg
     // is because tinymce will strip empty elements
     const markup = `
-    <div
+    <span
       aria-label="${formatMessage('Loading')}"
       data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
-      style="width: ${width}; height: ${height};"
+      style="width: ${width}; height: ${height}; vertical-align: ${align};"
     >
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
-      <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
-        <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-        <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
+        <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
+          <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+          <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+          &nbsp;
+        </g>
         &nbsp;
-      </g>
-      &nbsp;
       </svg>
-    </div>`
+    </span>`
 
     const editor = this.mceInstance()
     editor.undoManager.ignore(() => {

@@ -100,11 +100,11 @@ iframe[data-media-id] {
   background-color: #eee;
 }
 
-/* the svg and keyframe stuyles are lifted from instui spinner */
-div[data-placeholder-for] {
+/* the svg and keyframe styles are lifted from instui spinner */
+span[data-placeholder-for] {
   border: solid 1px #8b969e;
   background-color: #ccc;
-  display: block;
+  display: inline-block;
   max-width: 100%;
   svg {
     max-height: 90%;
