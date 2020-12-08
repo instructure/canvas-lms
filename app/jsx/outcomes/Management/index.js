@@ -28,6 +28,11 @@ import I18n from 'i18n!OutcomeManagement'
 import React from 'react'
 import {GET_OUTCOME_GROUPS_QUERY} from './api'
 import {useQuery} from 'react-apollo'
+/* OutcomeGroupHeader for QA purposes
+ * Remove component after integration
+ * with outcome group display component
+ */
+import OutcomeGroupHeader from './OutcomeGroupHeader'
 
 const OutcomeManagementPanel = ({contextType, contextId}) => {
   const isCourse = contextType === 'Course'
@@ -106,6 +111,19 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
           <Flex.Item width="66%" display="inline-block" position="relative" height="50vh" as="div">
             <View padding="small none none x-small">
               {/* space for outcome group display component */}
+              {/* OutcomeGroupHeader for QA purposes
+               * Remove component after integration
+               * with outcome group display component
+               */}
+              <View as="div" padding="0 medium">
+                <OutcomeGroupHeader
+                  title="Grade.2.Math.3A.Elementary.5B.Calculus.1C"
+                  description={'<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
+                    3
+                  )}
+                  onMenuHandler={() => {}}
+                />
+              </View>
             </View>
           </Flex.Item>
         </Flex>
