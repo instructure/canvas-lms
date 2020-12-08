@@ -428,7 +428,7 @@ class OutcomeResultsController < ApplicationController
   end
 
   def include_outcome_links
-    outcome_results_include_outcome_links_json(@outcome_links)
+    outcome_results_include_outcome_links_json(@outcome_links, @context)
   end
 
   def include_outcome_paths

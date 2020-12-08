@@ -98,8 +98,8 @@ module Api::V1::OutcomeResults
   # Public: Serializes outcome links in a hash that can be added to the linked hash.
   #
   # Returns a Hash containing serialized outcome links.
-  def outcome_results_include_outcome_links_json(outcome_links)
-    ols_json = outcome_links_json(outcome_links, @current_user, session)
+  def outcome_results_include_outcome_links_json(outcome_links, context)
+    outcome_links_json(outcome_links, @current_user, session, {context: context})
   end
 
   # Public: Returns an Array of serialized Course objects for linked hash.
