@@ -36,6 +36,11 @@ class Login::SamlController < ApplicationController
                             institution: @domain_root_account.display_name)
 
     response, relay_state = SAML2::Bindings::HTTP_POST.decode(request.request_parameters)
+    unless response.is_a?(SAML2::Response)
+      # something confusing and wrong has happened
+      logger.error "[SAML] Attempted invalid SAML operation via login endpoint... #{response.class.name}"
+      return render status: :bad_request, plain: "Invalid SAML operation for this endpoint: #{response.class.name}"
+    end
 
     issuer = response.issuer&.id || response.assertions.first&.issuer&.id
 
