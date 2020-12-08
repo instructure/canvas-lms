@@ -12,6 +12,7 @@ jobs:
       - name: 
         uses: appleboy/ssh-action@master
         with:
+          command_timeout: 30m
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USER }}
