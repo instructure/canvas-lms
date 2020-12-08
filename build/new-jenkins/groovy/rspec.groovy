@@ -102,11 +102,6 @@ def _runRspecTestSuite(
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 60) {
         sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-
-        if(prefix == 'selenium') {
-          sh(script: 'build/new-jenkins/docker-compose-pull-selenium.sh', label: 'Pull Selenium Images')
-        }
-
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
