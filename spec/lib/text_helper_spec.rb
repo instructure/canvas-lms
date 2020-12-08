@@ -209,4 +209,18 @@ Ad dolore andouille meatball irure, ham hock tail exercitation minim ribeye sint
       end
     end
   end
+
+  context "round_if_whole" do
+    it "rounds whole floats" do
+      expect(TextHelper.round_if_whole(2.0)).to eq(2)
+    end
+
+    it "returns non-whole floats" do
+      expect(TextHelper.round_if_whole(2.5)).to eq(2.5)
+    end
+
+    it "passes NaN right through because it's not whole" do
+      expect(TextHelper.round_if_whole(Float::NAN).nan?).to be_truthy
+    end
+  end
 end

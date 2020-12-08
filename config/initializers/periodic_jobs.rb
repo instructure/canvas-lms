@@ -252,7 +252,7 @@ Rails.configuration.after_initialize do
     Canvas::Oauth::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
+  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *', {singleton: false} do
     Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
   end
 
