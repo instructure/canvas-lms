@@ -196,6 +196,7 @@ class OutcomeGroupsApiController < ApplicationController
       # ret is now a list of outcomes that have been assessed
       outcome_params[:assessed_outcomes] = ret
     end
+    outcome_params[:context] = @context
 
     render json: outcome_links_json(links, @current_user, session, outcome_params)
   end
@@ -346,6 +347,7 @@ class OutcomeGroupsApiController < ApplicationController
     end
 
     outcome_params = params.slice(:outcome_style)
+    outcome_params[:context] = @context
 
     # preload the links' outcomes' contexts.
     ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)

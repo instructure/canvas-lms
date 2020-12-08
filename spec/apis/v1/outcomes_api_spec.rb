@@ -374,7 +374,7 @@ describe "Outcomes API", type: :request do
           end
 
           describe "with no context provided" do
-            it "should return the outcome mastery scale and calculation method" do
+            it "should not return mastery scale data" do
               raw_api_call(
                 :get,
                 "/api/v1/outcomes/#{@outcome.id}",
@@ -383,8 +383,10 @@ describe "Outcomes API", type: :request do
                 :id => @outcome.id.to_s,
                 :format => 'json'
               )
-              json = controller.outcome_json(@outcome, @account_user.user, session, {context: @account})
-              expect(json).to eq(outcome_json(@outcome))
+              json = controller.outcome_json(@outcome, @account_user.user, session)
+              ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
+                expect(json.key?(key)).to be false
+              end
             end
           end
         end

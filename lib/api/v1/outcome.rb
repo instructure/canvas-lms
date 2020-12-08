@@ -31,6 +31,27 @@ module Api::V1::Outcome
     outcomes.map { |o| outcome_json(o, user, session, opts) }
   end
 
+  def mastery_scale_opts(context)
+    return {} unless (context.is_a?(Course) || context.is_a?(Account)) && mastery_scales_flag_enabled(context)
+
+    @mastery_scale_opts ||= {}
+    @mastery_scale_opts[context.asset_string] ||= begin
+      method = context.resolved_outcome_calculation_method
+      mastery_scale = context.resolved_outcome_proficiency
+      {
+        calculation_method: method&.calculation_method,
+        calculation_int: method&.calculation_int,
+        points_possible: mastery_scale&.points_possible,
+        mastery_points: mastery_scale&.mastery_points,
+        ratings: mastery_scale&.ratings_hash
+      }
+    end
+  end
+
+  def mastery_scales_flag_enabled(context)
+    context&.root_account&.feature_enabled?(:account_level_mastery_scales) || @domain_root_account&.feature_enabled?(:account_level_mastery_scales)
+  end
+
   # style can be :full or :abbrev; anything unrecognized defaults to :full.
   # abbreviated includes only id, title, context id and type, url, and
   # can_edit. full expands on that by adding description and criterion values
@@ -50,15 +71,10 @@ module Api::V1::Outcome
       unless opts[:outcome_style] == :abbrev
         hash['description'] = outcome.description
         context = opts[:context]
-        if (context.is_a?(Course) || context.is_a?(Account)) && context.root_account.feature_enabled?(:account_level_mastery_scales)
-          calculation_method = context.resolved_outcome_calculation_method
-          hash['calculation_method'] = calculation_method.calculation_method
-          hash['calculation_int'] = calculation_method.calculation_int
-          proficiency = context.resolved_outcome_proficiency
-          hash['ratings'] = proficiency.ratings_hash
-          hash['points_possible'] = proficiency.points_possible
-          hash['mastery_points'] = proficiency.mastery_points
-        else
+        mastery_scale_opts = mastery_scale_opts(context)
+        if mastery_scale_opts.any?
+          hash.merge!(mastery_scale_opts)
+        elsif !mastery_scales_flag_enabled(context)
           hash['points_possible'] = outcome.rubric_criterion[:points_possible]
           hash['mastery_points'] = outcome.rubric_criterion[:mastery_points]
           hash['ratings'] = outcome.rubric_criterion[:ratings]&.clone
@@ -141,7 +157,7 @@ module Api::V1::Outcome
         outcome_link.learning_outcome_content,
         user,
         session,
-        opts.slice(:outcome_style, :assessed_outcomes)
+        opts.slice(:outcome_style, :assessed_outcomes, :context)
       )
 
       unless outcome_link.deleted?
