@@ -2,9 +2,14 @@
 # To update this file please edit the relevant template and run the generation
 # task `build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins`
 
-FROM local/ruby-runner
+FROM local/webpack-builder AS webpack-runner
+COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
 
-COPY --chown=docker:docker --from=local/webpack-runner /usr/src/app/public ${APP_HOME}/public
+ARG JS_BUILD_NO_UGLIFY=0
+RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
+
+FROM local/ruby-runner AS webpack-cache
+COPY --chown=docker:docker --from=webpack-runner /usr/src/app/public ${APP_HOME}/public
 
 RUN mkdir -p .yardoc \
              app/stylesheets/brandable_css_brands \

@@ -46,20 +46,31 @@ docker build \
   --tag "$RUBY_RUNNER_TAG" \
   - < Dockerfile.jenkins
 
-# Calculate the MD5SUM of all images / files that compiled webpack assets depend on.
-BASE_IMAGE_ID=$(docker images --filter=reference=local/ruby-runner --format '{{.ID}}')
-DOCKERFILE_CACHE_MD5=$( \
+# Calculate Cache ID For webpack-cache
+RUBY_RUNNER_IMAGE_ID=$(docker images --filter=reference=local/ruby-runner --format '{{.ID}}')
+YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
+PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
+WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
+WEBPACK_CACHE_DOCKERFILE_MD5=$( \
   cat \
     Dockerfile.jenkins.webpack-builder \
-    Dockerfile.jenkins.webpack-runner \
     Dockerfile.jenkins.webpack-cache \
-  | md5sum | cut -d ' ' -f 1 \
+  | md5sum \
 )
-YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
-PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
-WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum | cut -d ' ' -f 1")
 
-WEBPACK_CACHE_ID=$(echo "$BASE_IMAGE_ID $DOCKERFILE_CACHE_MD5 $YARN_CACHE_MD5 $PACKAGES_CACHE_MD5 $WEBPACK_CACHE_MD5" | md5sum | cut -d' ' -f1)
+WEBPACK_CACHE_BUILD_ARGS=(
+  --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY"
+)
+WEBPACK_CACHE_PARTS=(
+  $RUBY_RUNNER_IMAGE_ID
+  "${WEBPACK_CACHE_BUILD_ARGS[@]}"
+  $WEBPACK_CACHE_DOCKERFILE_MD5
+
+  $YARN_CACHE_MD5
+  $PACKAGES_CACHE_MD5
+  $WEBPACK_CACHE_MD5
+)
+WEBPACK_CACHE_ID=$(echo "${WEBPACK_CACHE_PARTS[@]}" | md5sum | cut -d' ' -f1)
 WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$WEBPACK_CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
 WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:${WEBPACK_CACHE_LOAD_SCOPE:-$WEBPACK_CACHE_SAVE_SCOPE}-$WEBPACK_CACHE_ID"
 
@@ -87,14 +98,14 @@ else
     ${WEBPACK_BUILDER_TAG:+ --tag "$WEBPACK_BUILDER_TAG"} \
     - < Dockerfile.jenkins.webpack-builder
 
+  # Using a multi-stage build is safe for the below image because
+  # there is no expectation that we will need to use docker's
+  # built-in caching.
   docker build \
-    --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" \
-    --tag "local/webpack-runner" \
-    - < Dockerfile.jenkins.webpack-runner
-
-  docker build \
+    "${WEBPACK_CACHE_BUILD_ARGS[@]}" \
     --tag "local/webpack-cache" \
     --tag "$WEBPACK_CACHE_SAVE_TAG" \
+    --target webpack-cache \
     - < Dockerfile.jenkins.webpack-cache
 
   WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SAVE_TAG
