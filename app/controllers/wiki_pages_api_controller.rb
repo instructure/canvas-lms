@@ -494,11 +494,13 @@ class WikiPagesApiController < ApplicationController
           # in the yaml.  When that happens, we can't parse it anymore because
           # the html is insufficiently escaped.  This is a fix until it seems
           # like none of these are happening anymore
-          Canvas::Errors.capture_exception(:content_imports, e, :info)
-          # this is a badly escaped media comment
-          clean_version_yaml = WikiPage.reinterpret_version_yaml(revision.yaml)
-          revision.yaml = clean_version_yaml
-          revision.save
+          GuardRail.activate(:primary) do
+            Canvas::Errors.capture_exception(:content_imports, e, :info)
+            # this is a badly escaped media comment
+            clean_version_yaml = WikiPage.reinterpret_version_yaml(revision.yaml)
+            revision.yaml = clean_version_yaml
+            revision.save
+          end
           output_json = wiki_page_revision_json(revision, @current_user, session, include_content, @page.current_version)
         end
         render :json => output_json
