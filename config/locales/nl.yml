@@ -10786,7 +10786,7 @@ nl:
       see_vericite_results: "Zie VeriCite resultaten"
       student_mute_legend: "Jouw cursusleider is op dit moment bezig met de cijfers. Terwijl jouw cursusleider daarmee bezig is, zijn cijfer en informatie over opmerking niet beschikbaar."
       student_mute_notification: "Cursusleider werkt aan de cijfers"
-      submission_score: "*%{score}* vanuit %{possible}"
+      submission_score: "*%{score}* max %{possible}"
       titles: 
         enter_score: "Een score invoeren om te testen"
         revert_score: "Herstellen van originele score"
@@ -11748,8 +11748,8 @@ nl:
     file_a_ticket_for_a_personal_response_from_our_support_team: "Een ticket inleveren om een persoonlijk antwoord van onze helpdesk te krijgen."
     for_an_instant_answer: "Voor een direct antwoord:"
     how_is_this_affecting_you: "Wat voor gevolgen heeft dit voor jou?"
-    i_cant_get_things_done_until_i_hear_back_from_you: "Ik kan niets doen tot ik een antwoord van je terugkrijg"
-    i_need_some_help_but_its_not_urgent: "Ik heb wat hulp nodig, maar het is niet urgent"
+    i_cant_get_things_done_until_i_hear_back_from_you: "Er is een probleem, ik kan niets doen zonder antwoord van jullie"
+    i_need_some_help_but_its_not_urgent: "Ik heb hulp nodig, maar het is niet dringend"
     include_a_link_to_a_screencast_or_screenshot_using_something_like_jing: "Een link naar een screencast/screenshot inschakelen met behulp van bijvoorbeeld *Jing*."
     instructor_question: "Je cursusleider een vraag stellen"
     instructor_question_sub: "Vragen worden bij jouw cursusleider ingezonden"
@@ -11763,7 +11763,7 @@ nl:
     see_if_your_issue_is_addressed_in_the_canvas_guides: "Zien of jouw probleem in de *Canvas-handleidingen* vermeld staat."
     send_message: "Bericht versturen"
     sending: "Bezig met versturen..."
-    somethings_broken_but_i_can_work_around_it_for_now: "Er is iets kapot, maar ik kan er voorlopig omheen werken"
+    somethings_broken_but_i_can_work_around_it_for_now: "Er is een probleem, maar ik kan voorlopig nog verder werken"
     subject: Onderwerp
     submit_this_support_request: "Ticket inleveren"
     which_course_is_this_question_about: "Over welke cursus gaat de vraag?"
@@ -11987,12 +11987,12 @@ nl:
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "Ik ga akkoord met de *gebruiksvoorwaarden* en het **privacybeleid**."
   i_agree_to_the_tool_s_270301a5: "Ik ga akkoord met"
   i_agree_to_the_tool_s_end_user_license_agreement_1ba71197: "Ik ga akkoord met de *Gebruiksrechtovereenkomst van de tool.*"
-  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Ik kan niets doen tot ik een antwoord van je ontvang"
+  i_cannot_get_things_done_until_i_hear_back_from_yo_83ba46b7: "Er is een probleem, ik kan niets doen zonder antwoord van jullie"
   i_cb2f5130: i
   i_have_obtained_permission_to_use_this_file_6386f087: "Ik heb toestemming gekregen om dit bestand te gebruiken."
   i_hold_the_copyright_71ee91b1: "Ik heb het auteursrecht"
   i_ll_write_free_form_comments_when_assessing_stude_5cf50d06: "Ik zal vrije opmerkingen schrijven bij de beoordelingen van cursisten"
-  i_need_some_help_but_it_is_not_urgent_d967ea0a: "Ik heb wat hulp nodig, maar het is niet urgent"
+  i_need_some_help_but_it_is_not_urgent_d967ea0a: "Ik heb hulp nodig, maar het is niet dringend"
   ic_actions: 
     manage: beheren
   iceland_354_1a03c558: "IJsland (+354)"
@@ -16628,9 +16628,9 @@ nl:
   out_of_78a76f91: van
   out_of_formattedoutof_e08e90d5: "van %{formattedOutOf}"
   out_of_n_assignment_points_possible_3b026ea9: "van %{n_assignment.points_possible}"
-  out_of_points_37a749d7: "(vanuit %{points})"
+  out_of_points_37a749d7: "(max %{points})"
   out_of_points_possible_8ab14f7: "van %{points_possible}"
-  out_of_pointspossible_3fb5ee20: "Vanuit %{pointsPossible}"
+  out_of_pointspossible_3fb5ee20: "Max %{pointsPossible}"
   out_of_pointspossible_c163105a: "van %{pointsPossible}"
   outcome_alignment_to_non_scoring_content_3efa45fb: "Leerdoelen afstemmen op niet-scorende inhoud"
   outcome_da397d20: Leerdoel
@@ -16759,7 +16759,7 @@ nl:
       all_outcomes: "alle leerdoelen voor deze cursist"
       attempt_info: "poging #%{attempt_number}, %{attempt_date}"
       outcome_mastered: meesterschap
-      scoring: "%{points} vanuit %{possible_points}"
+      scoring: "%{points} max %{possible_points}"
     outcomes_for: "Leerdoelen voor %{user_name}"
     show: 
       no_aligned_items: "Geen uitgelijnde items"
@@ -16786,7 +16786,7 @@ nl:
       mastery: "Meesterschap bij laatste poging"
       no_mastery: "Geen meesterschap bij laatste poging"
       outcomes_for: "Leerdoelen voor %{user_name}"
-      score_out_of_possible: "%{score}* vanuit %{possible}*"
+      score_out_of_possible: "%{score}* max %{possible}*"
       short_title: 
         attempts: Pogingen
         average_percent: "Gemiddeld percentage"
@@ -17083,7 +17083,7 @@ nl:
   please_select_a_group_set_for_this_assignment_e1da63d3: "Selecteer een groep voor deze opdracht"
   please_select_a_user_role_for_this_link_9fb4e655: "Selecteer een gebruikersrol voor deze koppeling."
   please_select_an_item_30c287ef: "Selecteer een item"
-  please_select_one_f931e883: "Selecteer er een"
+  please_select_one_f931e883: "Maak een keuze"
   please_try_re_establishing_the_connection_to_the_t_9e7bec18: "Probeer de verbinding met de tool opnieuw te maken door de tool nogmaals te selecteren in de opdracht- of module-iteminterface en dan op te slaan."
   please_upload_files_as_a_zip_5a2c799f: "Upload bestanden als een .zip"
   please_wait_2b646bc2: "Een ogenblik geduld."
@@ -20414,8 +20414,8 @@ nl:
   score_muted_82eef66: "Score: (verborgen)"
   score_n_a_34dfdcda: "Score: Niet van toepassing"
   score_of_score_view_in_speedgrader_a7c1c954: "Cijfer van %{score}. In SpeedGrader weergeven"
-  score_out_of_points_84f44331: "(%{score} vanuit %{points})"
-  score_out_of_points_possible_88f370fd: "%{score} vanuit %{points_possible}"
+  score_out_of_points_84f44331: "(%{score} max %{points})"
+  score_out_of_points_possible_88f370fd: "%{score} max %{points_possible}"
   score_out_of_points_possible_points_bbaea991: "%{score} van de %{points_possible} punten"
   score_percent_11941c81: "%{score} percentage"
   score_points_3c48e2a8: "%{score} punten"
@@ -21953,7 +21953,7 @@ nl:
   someone_just_made_a_new_comment_on_the_anonymous_s_3627de61: "Iemand heeft zojuist een nieuwe opmerking gemaakt bij de anonieme inlevering voor cursist (%{user_id}) voor %{assignment_title}"
   someone_just_made_a_new_comment_on_the_anonymous_s_a2e944fc: "Iemand heeft zojuist een nieuwe opmerking gemaakt bij de anonieme inlevering voor cursist (%{user_id}) voor %{assignment_title}."
   something_broke_unexpectedly_6d3720ee: "Er is een onverwachte fout opgetreden."
-  something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Er is iets kapot, maar ik kan er voorlopig omheen werken"
+  something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Er is een probleem, maar ik kan voorlopig nog verder werken"
   something_went_wrong_89195131: "Er is iets misgegaan."
   something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Er is iets misgegaan met de toegang tot je microfoon of webcam."
   something_went_wrong_accessing_your_webcam_6643b87e: "Er is iets misgegaan met de toegang tot je webcam."
