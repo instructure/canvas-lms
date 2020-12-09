@@ -483,6 +483,21 @@ describe SubmissionsController do
         SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
         expect(attachment.instfs_uuid).to eq uuid
       end
+
+      it "gracefully reports a gdrive timeout" do
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
+        expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
+        post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' }})
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq("Timed out while talking to google drive")
+      end
     end
 
     describe "confetti celebrations" do
