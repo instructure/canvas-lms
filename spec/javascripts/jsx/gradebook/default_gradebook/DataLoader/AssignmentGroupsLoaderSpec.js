@@ -31,6 +31,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
   let gradebook
   let network
   let performanceControls
+  let loadAssignmentsByGradingPeriod
 
   suiteHooks.beforeEach(() => {
     const assignments = [
@@ -81,6 +82,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       network = new NetworkFake()
       dispatch = new RequestDispatch()
       performanceControls = new PerformanceControls()
+      loadAssignmentsByGradingPeriod = true
 
       gradebook = createGradebook({
         context_id: '1201'
@@ -93,7 +95,13 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
     })
 
     function loadAssignmentGroups() {
-      const dataLoader = new AssignmentGroupsLoader({dispatch, gradebook, performanceControls})
+      const dataLoader = new AssignmentGroupsLoader({
+        dispatch,
+        gradebook,
+        performanceControls,
+        loadAssignmentsByGradingPeriod
+      })
+
       return dataLoader.loadAssignmentGroups()
     }
 
@@ -150,11 +158,19 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         strictEqual(requests.length, 1)
       })
 
-      test('makes two requests if a specific grading period is selected', async () => {
+      test('makes two requests if a specific grading period is selected and release flag is enabled', async () => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const requests = getRequests()
         strictEqual(requests.length, 2)
+      })
+
+      test('makes one request if a specific grading period is selected and release flag is disabled', async () => {
+        loadAssignmentsByGradingPeriod = false
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const requests = getRequests()
+        strictEqual(requests.length, 1)
       })
 
       test('makes one request to get assignments for the current grading period', async () => {

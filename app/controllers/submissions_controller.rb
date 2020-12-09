@@ -236,11 +236,12 @@ class SubmissionsController < SubmissionsBaseController
         return unless has_file_attached?
       elsif is_google_doc?
         params[:submission][:submission_type] = 'online_upload'
-        attachment = submit_google_doc(params[:google_doc][:document_id])
-        if attachment
-          params[:submission][:attachments] << attachment
+        attachment, err_message = submit_google_doc(params[:google_doc][:document_id])
+        if attachment.nil? || err_message
+          flash[:error] = err_message || t('errors.no_attachment_found', "Could not find an attachment to send to google drive")
+          return redirect_to(course_assignment_url(@context, @assignment))
         else
-          return
+          params[:submission][:attachments] << attachment
         end
       elsif is_media_recording? && !has_media_recording?
         flash[:error] = t('errors.media_file_attached', "There was no media recording in the submission")
@@ -498,26 +499,24 @@ class SubmissionsController < SubmissionsBaseController
   end
   private :is_google_doc?
 
+  # to avoid rendering/redirecting in a helper,
+  # this method returns both the attachment and an error message.
+  # A non-nil error message tells the consuming code that it should not proceed
+  # and should just render the error.
   def submit_google_doc(document_id)
     # fetch document from google
     # since google drive can have many different export types, we need to send along our preferred extensions
     document_response, display_name, file_extension, content_type = google_drive_connection.download(document_id,
-                                                                                         @assignment.allowed_extensions)
+                                                                                        @assignment.allowed_extensions)
 
-    # error handling
     unless document_response.try(:is_a?, Net::HTTPOK) || document_response.status == 200
-      flash[:error] = t('errors.assignment_submit_fail', 'Assignment failed to submit')
+      return nil, t('errors.assignment_submit_fail', 'Assignment failed to submit')
     end
 
     restriction_enabled           = @domain_root_account.feature_enabled?(:google_docs_domain_restriction)
     restricted_google_docs_domain = @domain_root_account.settings[:google_docs_domain]
     if restriction_enabled && !restricted_google_docs_domain.blank? && !@current_user.gmail.match(%r{@#{restricted_google_docs_domain}$})
-      flash[:error] = t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
-    end
-
-    if flash[:error]
-      redirect_to(course_assignment_url(@context, @assignment))
-      return false
+      return nil, t('errors.invalid_google_docs_domain', 'You cannot submit assignments from this google_docs domain')
     end
 
     # process the file and create an attachment
@@ -535,7 +534,10 @@ class SubmissionsController < SubmissionsBaseController
       store_google_doc_attachment(attachment, Rack::Test::UploadedFile.new(path, content_type, true))
       attachment.save!
     end
-    attachment
+    return attachment, nil # error message doesn't exist if we got this far
+  rescue GoogleDrive::ConnectionException => e
+    Canvas::Errors.capture_exception(:google_drive, e, :warn)
+    return nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')
   end
   protected :submit_google_doc
 

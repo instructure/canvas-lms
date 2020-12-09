@@ -451,7 +451,8 @@ class Gradebook {
     if (this.options.dataloader_improvements) {
       this.dataLoader = new DataLoader({
         gradebook: this,
-        performanceControls: new PerformanceControls(camelize(this.options.performance_controls))
+        performanceControls: new PerformanceControls(camelize(this.options.performance_controls)),
+        loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
       })
     } else {
       this.dataLoader = new OldDataLoader(this)
