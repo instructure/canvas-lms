@@ -68,6 +68,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
+  field :delete_conversation_message, mutation: Mutations::DeleteConversationMessage
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

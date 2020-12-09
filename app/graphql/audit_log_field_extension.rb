@@ -139,6 +139,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       # TODO: figure out how to resolve root account for user, communication channels, and conversations
       next if mutation == Mutations::UpdateNotificationPreferences
       next if mutation == Mutations::CreateConversation
+      next if mutation == Mutations::DeleteConversationMessage
 
       logger = Logger.new(mutation, context, arguments)
 
