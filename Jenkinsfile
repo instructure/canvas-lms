@@ -445,7 +445,9 @@ pipeline {
 
                     ${gemArgs.join('\n')}
 
-                    wait
+                    for job in \$(jobs -p); do
+                      wait \$job || exit 1
+                    done
                   """
                 }
               }
