@@ -66,6 +66,9 @@ module QuizMathDataFixup
     %i[neutral_comments_html correct_comments_html incorrect_comments_html].each do |key|
       data[key] = fixup_html(data[key]) if data[key].present?
     end
+    
+    data[:question_text] = fixup_html(data[:question_text]) if data[:question_text].present?
+
     data[:answers].each_with_index do |answer, index|
       %i[html comments_html].each do |key|
         # if there's html, the text field is used as the title attribute/tooltip
@@ -83,9 +86,9 @@ module QuizMathDataFixup
     data
   end
 
-  def fixup_html(html)
-    return html unless html
-    html = Nokogiri::HTML::DocumentFragment.parse(html)
+  def fixup_html(html_str)
+    return html_str unless html_str
+    html = Nokogiri::HTML::DocumentFragment.parse(html_str)
     if html.children.length == 1 && html.children[0].node_type == Nokogiri::XML::Node::TEXT_NODE
       # look for an equation_images URL in the text and extract the latex
       m = %r{equation_images\/([^\s]+)}.match(html.content)
@@ -121,16 +124,22 @@ module QuizMathDataFixup
         mjnodes.each(&:remove)
       end
       if (latex.content.length > 0)
-        code = latex.content.gsub(/(^\\\(|\\\)$)/, '')
-        escaped = URI.escape(URI.escape(code))
-        latex.replace(
-          "<img class='equation_image' src='/equation_images/#{escaped}' alt='LaTeX: #{
-            code
-          }' title='#{code}' data-equation-content='#{code}'/>"
-        )
+        if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/
+          # the content is not delimineted latex,
+          # emove math_equation_latex from the class then leave it alone
+          latex.attribute('class').value = latex.attribute('class').value.sub('math_equation_latex', '').strip
+        else
+          code = latex.content.gsub(/(^\\\(|\\\)$)/, '')
+          escaped = URI.escape(URI.escape(code))
+          latex.replace(
+            "<img class='equation_image' src='/equation_images/#{escaped}' alt='LaTeX: #{
+              code
+            }' title='#{code}' data-equation-content='#{code}'/>"
+          )
+        end
       elsif mml
         latex.replace(
-          "<math xmlns='http://www.w3.org/1998/Math/MathML' class='math_equation_mml'>#{mml}</math>"
+          "<span class='math_equation_mml'><math xmlns='http://www.w3.org/1998/Math/MathML'>#{mml}</math></span>"
         )
       end
     end
@@ -138,6 +147,7 @@ module QuizMathDataFixup
     html.search('[id^="MathJax"]').each(&:remove)
     html.search('span.hidden-readable').each(&:remove)
 
+    return html_str if html.content.length == 0 && html.search('img.equation_image').length == 0
     html.to_s
   end
 
