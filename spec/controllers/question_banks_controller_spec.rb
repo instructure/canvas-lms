@@ -69,6 +69,13 @@ describe QuestionBanksController do
       expect(@bank1.assessment_questions.count).to eq 0
       expect(@bank2.assessment_questions.count).to eq 2
     end
+
+    it "gives an error if you try to move no questions" do
+      post 'move_questions', params: {:course_id => @course.id, :question_bank_id => @bank1.id, :assessment_question_bank_id => @bank2.id, :move => '1'}
+      expect(response.code.to_i).to eq(422)
+      @bank1.reload
+      expect(@bank1.assessment_questions.count).to eq 2
+    end
   end
 
   describe "bookmark" do
