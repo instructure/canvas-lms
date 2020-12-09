@@ -67,7 +67,7 @@ module UserContent
       # inadvertently saved the hidden-readable span, causing
       # them to multiply everytime the entity is edited.
       # Strip the ones that shouldn't be there before adding a new one
-      node.next.remove while node.next && node.next['class'] == 'hidden-readable'
+      node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
 
       if !use_updated_math_rendering
         mathml = UserContent.latex_to_mathml(equation)
