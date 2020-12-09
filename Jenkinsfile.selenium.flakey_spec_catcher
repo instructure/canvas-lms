@@ -199,7 +199,7 @@ pipeline {
     FORCE_FAILURE = configuration.forceFailureFSC()
     // fsc errors when running specs from gems.
     // until we figure out how to run them, we should ignore them
-    FSC_IGNORE_FILES = "gems/.*/spec/"
+    FSC_IGNORE_FILES = "gems/.*/spec/,spec/contracts/"
     POSTGRES_PASSWORD = 'sekret'
     SELENIUM_VERSION = "3.141.59-20200719"
 

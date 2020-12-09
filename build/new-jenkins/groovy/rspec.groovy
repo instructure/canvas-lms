@@ -63,7 +63,7 @@ def runRSpecSuite(total, index) {
       config.max_fail,
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
-      '.*/selenium',
+      '.*/(selenium|contracts)',
       '4',
       config.force_failure,
       config.patchsetTag
