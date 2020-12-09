@@ -313,6 +313,23 @@ describe Attachment do
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.crocodoc_document).to be_nil
       end
+
+      it "downgrades Canvadoc upload timeouts to WARN" do
+        canvadocable = canvadocable_attachment_model content_type: "application/pdf"
+        cd_double = double()
+        allow(canvadocable).to receive(:canvadoc).and_return(cd_double)
+        expect(canvadocable.canvadoc).not_to be_nil
+        expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
+        captured = false
+        allow(Canvas::Errors).to receive(:capture) do |e, error_data, error_level|
+          if e.is_a?(Canvadoc::UploadTimeout)
+            captured = true
+            expect(error_level).to eq(:warn)
+          end
+        end
+        canvadocable.submit_to_canvadocs 1
+        expect(captured).to be_truthy
+      end
     end
   end
 
