@@ -10065,7 +10065,7 @@ da-x-k12:
   highest_28ad71e6: Højeste
   highest_score_e080551e: "Højeste resultat"
   hindi_9bcd4b34: Hindi
-  history_cd3f60a9: Oversigt
+  history_cd3f60a9: Historik
   history_settings_c63dbaaf: Historikindstillinger
   home_351838cd: Startside
   home_page_is_not_valid_2e8a25ae: "Hjemmesiden er ikke gyldig"
@@ -16199,7 +16199,7 @@ da-x-k12:
           access_code: Adgangskode
         quiz_restricted: "Denne quiz begrænses af en adgangskode. Du skal bede din lærer eller tilsynsførende om at indtaste den eller fortælle dig adgangskoden for at tage quizzen."
         survey_restricted: "Denne spørgeundersøgelse begrænses af en adgangskode. Du skal bede din lærer eller tilsynsførende om at indtaste den eller fortælle dig adgangskoden for at deltage i spørgeundersøgelsen."
-      default_history_crumb: Oversigt
+      default_history_crumb: Historik
       default_title: "Ny quiz"
       display_answer: 
         labels: 

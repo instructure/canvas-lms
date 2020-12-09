@@ -2011,7 +2011,7 @@ sv:
   all_get_scopes_59a54304: "Alla GET-omfattningar"
   all_grades_hidden_3092d5b5: "Alla omdömen dolda"
   all_grades_hidden_84409b76: "Alla dolda omdömen"
-  all_grades_posted_616a85ab: "Alla omdömen publicerade"
+  all_grades_posted_616a85ab: "Alla omdömen offentliggjorde"
   all_grades_posted_d5b8cb68: "Alla publicerade omdömen"
   all_grading_period_sets_must_have_a_title_799538f: "Alla uppsättningar med bedömningsperioder måste ha en titel"
   all_grading_period_sets_must_have_at_least_one_enr_20b84ba1: "Alla set med bedömningsperioder måste ha minst en inskrivningstermin"
@@ -2842,7 +2842,7 @@ sv:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Vill du visa studenter omdömen för den här uppgiften?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Vill du göra detta? Det kan inte ångras och kommer att skriva över omdömen i bedömningsöversikten."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Är du säker på att du vill avaktivera denna användaren? De kommer inte kunna delta i kursen när de är inaktiva."
-  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Är du säker på att du vill publicera omdömen för den här uppgiften till studenterna?"
+  are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Är du säker på att du vill offentliggör omdömen för den här uppgiften till studenterna?"
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Är du säker på att du vill publicera den här kommentaren?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Är du säker på att du vill ta bort den här betygsperioden?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Vill du ta bort detta objekt?"
@@ -2919,7 +2919,7 @@ sv:
       gpa_scale: "Skala för genomsnittsbetyg"
       letter_grade: Bokstavsomdöme
       not_graded: Icke-bedömd
-      pass_fail: Färdiga/ofullständiga
+      pass_fail: Färdig/ofullständig
       percent: Procent
       points: Poäng
     group_assignment_must_have_group_set: "Vänligen välj grupper för den här uppgiften"
@@ -3770,7 +3770,7 @@ sv:
   at_791460b3: vid
   at_least_one_scope_must_be_selected_97d6fce9: "Minst en omfattning måste väljas."
   at_least_one_section_must_be_selected_to_hide_grad_f88c946f: "Minst en sektion måste väljas för att dölja omdömen efter sektion."
-  at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Minst en sektion måste väljas för att publicera omdömen efter sektion."
+  at_least_one_section_must_be_selected_to_post_grad_2c140f52: "Minst en sektion måste väljas för att offentliggör omdömen efter sektion."
   at_least_one_term_must_be_attached_24fd2bf5: "Minst en inskrivningstermin måste vara bifogad"
   at_the_bottom_a109f5c8: "Längs ner"
   at_the_bottom_a6a5f0fe: "Längst ned"
@@ -3972,7 +3972,7 @@ sv:
   automatically_apply_grade_for_missing_submissions_2b5c1a72: "Tillämpa automatisk omdöme för inlämningar som saknas"
   automatically_dff02416: Automatiskt
   automatically_disable_post_to_sis_on_assignments_w_dd7e873a: "Inaktiverar Publicera till SIS automatiskt för uppgifter när omömesperioden stängs"
-  automatically_post_grades_29a7eff5: "Publicera omdömen automatiskt"
+  automatically_post_grades_29a7eff5: "Offentliggör omdömen automatiskt"
   avaible_daec2e57: Tillgänglig
   availability_dates_438d71e0: Tillgänglighetsdatum
   availability_dates_changed_exceptions_465ba375: "Undantag för ändrade tillgänglighetsdatum:"
@@ -5409,7 +5409,7 @@ sv:
   complete_registration_by_clicking_the_finish_the_r_6c1c958b: "Slutför registreringen genom att klicka på länken ”slutför registrering” som skickades till din e-postadress."
   complete_registration_by_clicking_the_finish_the_r_fcd13ac8: "Slutför registreringen genom att klicka på länken ”slutför registreringen” som har skickats till din e-postadress."
   complete_title_7482ddcf: "Färdig %{title}"
-  completed_19711ce7: Slutförd
+  completed_19711ce7: Färdig
   completed_9b809e44: färdig
   completed_icon_521596e4: "färdig ikon"
   compose_message_8abd180a: "Skriv meddelande"
@@ -6117,7 +6117,7 @@ sv:
     index: 
       titles: 
         course_modules: Kursmoduler
-    module_complete: Slutförd
+    module_complete: Färdig
     module_empty: "Det finns inga objekt i modulen ”%{module}\""
     module_item_next: 
       drag_to_reorder: "Dra för att ordna om eller flytta objekt till en annan modul"
@@ -8677,7 +8677,7 @@ sv:
   display_course_catalog: "Visa en sökbar lista över kurser på detta rotkonto med flaggan ”Inkludera den här kursen i offentligt kursindex” aktiverad."
   display_grades_as_points_percentages_complete_inco_fa848380: |-
       Visa omdömen som
-            poäng, procenttal, färdiga/ännu inte färdiga eller andra metoder som matchar
+            poäng, procenttal, färdig/ofullständig eller andra metoder som matchar
             ditt kursbedömningsschema och filtrera och ordna poster i bedömningsöversikten
             som du vill. Tillämpa ett omdöme automatiskt för saknade eller
             sena inlämningar, och dölj omdömen till du redo att
@@ -9163,7 +9163,7 @@ sv:
     with_section: "%{course_name}, %{section_name}"
     workflow: 
       active: Aktiv
-      completed: Slutförd
+      completed: Färdig
       deleted: Raderad
       inactive: Inaktiv
       invited: Inbjuden
@@ -10837,8 +10837,8 @@ sv:
       show_concluded_enrollments: "Visa avbrutna anmälningar"
       view_grading_history: "Visa betygshistoria"
     grades: 
-      complete: Slutförd
-      incomplete: Ofullständig
+      complete: Färdig
+      incomplete: ofullständig
     grading_box_extended: 
       labels: 
         grade: Omdöme
@@ -11042,9 +11042,9 @@ sv:
   grades_moderate_317fce84: "Omdömen – moderera"
   grades_posted_c274d9f8: "Publicerade omdömen"
   grades_posted_c5d8dcce: "Omdömen som publicerats"
-  grades_posted_to_students_56b8cb2d: "Omdömen publicerades till studenter"
+  grades_posted_to_students_56b8cb2d: "Omdömen offentliggjordes till studenter"
   grades_posting_bc7cfc1a: "Publicering av omdömen"
-  grades_released_488c2808: "Omdömen publicerades"
+  grades_released_488c2808: "Omdömen offentliggjordes"
   grades_saved_5954b0bb: "Bedömningarna sparades."
   grades_select_final_grade_for_moderation_ae8585d1: "Omdömen – välj slutlig omdöme för moderering"
   grades_select_final_grade_for_moderation_c66284f4: "Omdömen – Välj slutomdöme för moderation"
@@ -11054,14 +11054,14 @@ sv:
   grades_view_change_logs_6bc1b959: "Omdömen – visa ändringsloggar"
   grades_visible_to_students_1584fa83: "Omdömen som studenter kan se"
   grades_were_successfully_published_to_the_gradeboo_79203993: "Omdömena sparades till omdömesboken."
-  grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Omdömen publicerades till omdömesboken"
+  grades_were_successfully_released_to_the_gradebook_4c3b07d6: "Omdömen offentliggjordes till omdömesboken"
   grades_will_be_hidden_by_default_any_grades_that_h_53a7fb03: "\n\
       \x20         Omdömen döljs som standard. Eventuella omdömen som redan har publicerats kommer att förbli synliga.\n\
       \x20         Välj när omdömen för uppgiften ska publiceras i bedömningsöversikten.\n\
       \x20       "
   grades_will_be_hidden_by_default_any_grades_that_h_b6fac5e5: "\n\
       \x20           Omdömen döljs som standard. Omdömen som redan har publicerats forsätter att vara synliga.\n\
-      \x20           Välj när du ska publicera omdömen för uppgiften via kolumnen i bedömningsöversikten.\n\
+      \x20           Välj när du ska offentliggör omdömen för uppgiften via kolumnen i bedömningsöversikten.\n\
       \x20         "
   grades_will_be_made_visible_to_all_students_1cc4d67e: "Omdömen kan ses av alla studenter"
   grades_will_be_made_visible_to_students_with_grade_d83028d5: "Omdömen kan ses av alla studenter med bedömda inlämningar"
@@ -12316,7 +12316,7 @@ sv:
   includes_overridden_course_grades_in_the_gradebook_d58cffb: "Inkluderar åsidosatta kursbedömningar i bedömningsöversiktens historik."
   includes_rubrics_in_the_course_sidebar_navigation_6dd52682: "Innehåller matriser i kursens sidofältsnavigering"
   incomplete_95612d72: "ej fullständig"
-  incomplete_da3c2ea2: Ofullständig
+  incomplete_da3c2ea2: ofullständig
   incompleteregistration: 
     get_started: "Kom igång"
     welcome_to_canvas: "Välkommen till Canvas!"
@@ -13329,7 +13329,7 @@ sv:
   manual_entry_e4a4f99a: "Manuell inmatning"
   manually_9de23e1f: Manuellt
   manually_mark_posts_as_read_afa5d035: "Markera inlägg som lästa manuellt"
-  manually_post_grades_18248306: "Publicera omdömen manuellt"
+  manually_post_grades_18248306: "Offentliggör omdömen manuellt"
   march_2020_responsiveness_f810a65b: "Genomförda åtgärder under mars 2020"
   mark_as_done_6fa48d2f: "Markera som färdig"
   mark_as_done_779556d7: "markera som färdig"
@@ -15809,9 +15809,9 @@ sv:
   name_override_score_7f6a5216: "%{name} åsidosätt resultat"
   name_parent_directory_b61d10a9: ", namn: överordnad mapp "
   name_quiz_15f55961: "%{name} (Quiz)"
-  name_unposted_current_grade_824d0c98: "%{name} opublicerad aktuell omdöme"
+  name_unposted_current_grade_824d0c98: "%{name} ej offentliggjord aktuell omdöme"
   name_unposted_current_score_e98e95fd: "%{name} icke-publicerat nuvarande resultat"
-  name_unposted_final_grade_798491b7: "%{name} opublicerad slutgiltigt omdöme"
+  name_unposted_final_grade_798491b7: "%{name} ej offentliggjord slutgiltigt omdöme"
   name_unposted_final_score_124708d2: "%{name} icke publicerat slutresultat"
   name_user_e44eebed: "%{name} Användare"
   names_and_role_ebff0149: "Namn och roll"
@@ -15986,7 +15986,7 @@ sv:
   no_graders_with_that_name_found_d8204d90: "Inga bedömare med det namnet hittades"
   no_grades_to_hide_2072bbd: "Inga omdömen att dölja"
   no_grades_to_hide_6f51fc5b: "Inga omdömen att dölja"
-  no_grades_to_post_91425bfd: "Inga omdömen att publicera"
+  no_grades_to_post_91425bfd: "Inga omdömen att offentliggör"
   no_grades_to_post_fc148c1b: "Inga omdömen att publicera"
   no_grading_periods_configured_for_this_term_ca22393e: "inga bedömningsperioder har konfigurerats för den här terminen"
   no_grading_periods_set_up_a20a8819: "Inga bedömningsperioder har ställts in"
@@ -16581,7 +16581,7 @@ sv:
   oops_there_was_a_problem_loading_content_locks_4ab29a2a: "Hoppsan, det gick inte att hämta innehållslås."
   oops_there_was_a_problem_re_uploading_submissions__276cb8a1: "Hoppsan! Det gick inte att återuppladda inlämningar. Kontrollera om ZIP-filen är felaktig och försök igen."
   open_color_picker_f117df0a: "Öppna Color Picker"
-  open_complete_incomplete_menu_cfe2033b: "Öppna menyn Färdiga/Ej fullständiga"
+  open_complete_incomplete_menu_cfe2033b: "Öppna menyn Färdig/ofullständig"
   open_discussion_title_for_comments_6baa3fa: "Öppna diskussion  %{title} för kommentarer"
   open_event_menu_e9a21e39: "Öppna event meny"
   open_event_menu_for_783510e3: "Öppna händelsemeny för"
@@ -17665,14 +17665,14 @@ sv:
   possible_pts_f4681c49: "/ %{possible} poäng"
   possible_score_5e0a328e: "Möjlig: %{score}"
   possiblepoints_points_possible_5217ce4a: "%{possiblePoints} Möjliga poäng"
-  post_1e445890: Publicera
+  post_1e445890: Offentliggör
   post_comment_a5a430a6: "Lämna kommentar"
   post_grade_to_sis_disabled_click_to_toggle_6ee5ff3: "Att lämna betyg på SIS är avaktiverat. Klicka för att aktivera."
   post_grade_to_sis_enabled_click_to_toggle_82da8ce8: "Att lämna in betyg på SIS är aktiverat. Klicka för att avaktivera."
-  post_grades_39c52870: "Publicera omdömen"
-  post_grades_3e692d46: "Publicera omdömen"
+  post_grades_39c52870: "Offentliggör omdömen"
+  post_grades_3e692d46: "Offentliggör omdömen"
   post_grades_description: |-
-      I Publicera omdöme kan lärare publicera omdömen till aktiverade SIS-system: Powerschool,
+      I offentliggör omdöme kan lärare offentliggör omdömen till aktiverade SIS-system: Powerschool,
       Aspire (SIS2000), JMC och alla övriga SIF-aktiverade SIS:er som accepterar SIF-elementen GradingCategory,
       GradingAssignment, GradingAssignmentScore.
   post_grades_to_name_e0554f64: "Skicka betyg till %{name}"
@@ -17680,17 +17680,17 @@ sv:
   post_grades_to_sis_97ece878: "Posta betyg till SIS"
   post_grades_to_sis_checkbox_is_enabled_by_default__394a8229: "\"Posta betyg i SIS\" rutan är aktiverad från början för uppgifter, betygsatta diskussioner och Quiz"
   post_grades_tray_83f2fb2e: "Fack för publicering av omdömen"
-  post_or_hide_grades_2d1d7815: "Publicera eller dölj omdömen"
+  post_or_hide_grades_2d1d7815: "Offentliggör eller dölj omdömen"
   post_policies_22f09fea: Publiceringspolicyer
-  post_to_961f8937: "Publicera för"
-  post_to_students_b02df196: "Publicera till studenter"
+  post_to_961f8937: "Offentliggör för"
+  post_to_students_b02df196: "Offentliggör till studenter"
   post_types_93ff86d9: "Publicera typer"
   posted_455862b9: Publicerade
   posted_at_4cfce2c3: "%{posted_at}"
   posted_on_e1010e1e: "Publicerad den:"
-  posted_to_student_861beec9: "Publicerad för studenten"
+  posted_to_student_861beec9: "Offentliggjord för studenten"
   posting_grades_cd7cd758: "Publicerar omdömen"
-  posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Det är inte tillåtet att publicera omdömen eftersom omdömen inte har släppts for den här uppgiften."
+  posting_grades_is_not_allowed_because_grades_have__229d9c9e: "Det är inte tillåtet att offentliggör omdömen eftersom omdömen inte har släppts for den här uppgiften."
   posting_grades_will_refresh_your_browser_this_may__97a9fe12: "Genom att lägga ut omdömen uppdateras din webbläsare. Detta kan ta en stund."
   posting_to_students_eaa57964: "Publicerar till studenter"
   powerschool_a30f0bfc: PowerSchool
@@ -19934,11 +19934,11 @@ sv:
   registration_url_60e0eaaa: Registrerings-URL
   regular_style_checkbox_ee3d71c1: "Vanlig kryssruta"
   reinforce_student_understanding_304d18a6: "Stärk studenternas förståelse"
-  release_grades_c68fbcc: "Publicera omdömen"
+  release_grades_c68fbcc: "Offentliggöra omdömen"
   released_by_mastery_path_b87fcdf5: "Frisläppt av huvudsökväg"
   released_by_mastery_path_cyoe_releasedlabel_14c67a92: "Släppt av måluppfyllelseväg: %{cyoe.releasedLabel}"
   released_by_mastery_path_path_b562d741: "Släppt av målväg: %{path}"
-  releasing_grades_31a57dde: "Publicerar omdömen"
+  releasing_grades_31a57dde: "Offentliggör omdömen"
   reload_the_page_or_navigate_to_a_new_page_for_this_e6335972: "Läs in sidan igen eller navigera till en ny sida för att ändringen ska träda i kraft."
   remember_my_choice_for_this_course_5a3b7206: "Kom ihåg mitt val för den här kursen"
   remind_me_next_time_6402eb7d: "Påminn mig nästa gång"
@@ -20827,7 +20827,7 @@ sv:
   select_type_of_prerequisite_8d6fa902: "Välj typ av förutsättning"
   select_video_file_35b61d4e: "Välj videofil"
   select_what_you_d_like_to_display_on_the_home_page_c1b53804: "Välj vad du vill visa på startsidan."
-  select_whether_to_post_for_all_submissions_or_only_b18d681f: "Välj om du vill publicera för alla inlämningar, eller endast för bedömda."
+  select_whether_to_post_for_all_submissions_or_only_b18d681f: "Välj om du vill offentliggör för alla inlämningar, eller endast för bedömda."
   selectable_outcomes_during_course_content_migratio_3f108a1a: "Valbara lärandemål under migrering av kursinnehåll"
   selected_274ce24f: Markerade
   selected_all_courses_9cfef57f: "Markerade alla kurser"
@@ -22160,10 +22160,10 @@ sv:
   starts_at_29843f98: "Börjar vid"
   starts_ce584f1c: "Startar:"
   state_66a67ba2: Tillstånd
-  state_published_e42697da: "tillstånd: publicerad"
+  state_published_e42697da: "tillstånd: offentliggjord"
   state_published_e8914697: ", tillstånd: publicerad"
   state_unpublished_83c18d01: ", tillstånd: opublicerad"
-  state_unpublished_e19c06e6: "tillstånd: opublicerad"
+  state_unpublished_e19c06e6: "tillstånd: ej offentliggjord"
   statistics: 
     csv_columns: 
       attempt: försök
@@ -22563,8 +22563,8 @@ sv:
   success_grades_for_this_assignment_are_now_visible_e6dafd1e: "Lyckades! Omdömen för den här uppgiften visas nu för studenter."
   success_grades_have_been_hidden_for_assignmentname_4ed03c00: "Klart! Omdömen har dolts för %{assignmentName}."
   success_grades_have_been_hidden_for_the_selected_s_3ad5692: "Klart! Omdömen har dolts för de valda sektionerna av %{assignmentName}."
-  success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Klart! Omdömen har publicerats för de valda sektionerna av %{assignmentName}."
-  success_grades_have_been_posted_to_postedto_for_as_255bc974: "Klart! Omdömen har publicerats på %{postedTo} för %{assignmentName}."
+  success_grades_have_been_posted_for_the_selected_s_54c73ef0: "Klart! Omdömen har offentliggjorts för de valda sektionerna av %{assignmentName}."
+  success_grades_have_been_posted_to_postedto_for_as_255bc974: "Klart! Omdömen har offentliggjorts på %{postedTo} för %{assignmentName}."
   success_grades_were_published_to_the_grade_book_da3b4fba: "Lycka! Omdömena har publicerats i omdömesboken"
   success_the_post_policy_for_name_has_been_updated_ea92283f: "Klart! Publiceringspolicyn för %{name} har uppdaterats."
   success_you_added_hostname_as_an_allowed_domain_4713bfe8: "Klart: Du lade till %{hostname} som en tillåten domän."
@@ -23030,10 +23030,10 @@ sv:
   there_was_a_problem_marking_submission_comments_as_27c2f5c7: "Det gick inte att markera inlämningskommentarer som lästa"
   there_was_a_problem_marking_submission_comments_as_d4ba6711: "Det gick inte att markera inlämningskommentarer som lästa."
   there_was_a_problem_overriding_the_grade_f6d83c4d: "Det gick inte att åsidosätta bedömningen."
-  there_was_a_problem_posting_assignment_grades_958669e8: "Det gick inte att publicera omdömen för uppgifter."
+  there_was_a_problem_posting_assignment_grades_958669e8: "Det gick inte att offentliggör omdömen för uppgifter."
   there_was_a_problem_posting_the_comment_75d15646: "Det uppstod ett problem vid publicering av kommentaren"
   there_was_a_problem_publishing_grades_b0b9202f: "Det gick inte att publicera omdömet."
-  there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att publicera omdömen."
+  there_was_a_problem_releasing_grades_fa0ae6: "Det gick inte att offentliggör omdömen."
   there_was_a_problem_resetting_your_quiz_engine_cho_ba4277c7: "Det gick inte att återställa ditt val av quizmotor"
   there_was_a_problem_saving_the_comment_d94cbac9: "Det gick inte att spara kommentaren"
   there_was_a_problem_saving_the_grade_8ea5d2ac: "Det gick inte att spara bedömningen."
@@ -23124,7 +23124,7 @@ sv:
   this_assignment_is_not_applicable_to_this_student_c149a5ad: "Denna uppgift gäller inte den här studenten"
   this_assignment_is_not_graded_576f1244: "Denna uppgift har inte bedömts."
   this_assignment_is_overdue_a44bea3b: "Uppgiften är sen"
-  this_assignment_is_still_unpublished_a9185624: "Den här uppgiften är fortfarande opublicerad"
+  this_assignment_is_still_unpublished_a9185624: "Den här uppgiften är fortfarande ej offentliggjord"
   this_assignment_is_unpublished_64c0f46c: "Denna uppgift är opublicerad"
   this_assignment_submission_is_my_own_original_work_e820ce4b: "Den inlämnade uppgiften är mitt egna originalarbete"
   this_assignment_will_no_longer_count_towards_your__a6eb6778: "Den här uppgiften kommer inte längre att räknas i din omdöme."
@@ -24144,23 +24144,23 @@ sv:
   unpin_of_discussion_title_failed_852116d4: "Det gick inte att plocka bort den fästa diskussionen %{title}"
   unpin_of_discussion_title_succeeded_ce315adb: "Den fästa diskussionen har %{title} plockats bort"
   unposted_8d9932ec: "Ej publicerad"
-  unposted_current_grade_aa1ea11c: "opublicerad aktuell omdöme"
+  unposted_current_grade_aa1ea11c: "ej offentliggjord aktuell omdöme"
   unposted_current_score_c1dd3879: "icke-publicerat nuvarande resultat"
-  unposted_final_grade_aa5facd6: "opublicerad slutgiltigt omdöme"
+  unposted_final_grade_aa5facd6: "ej offentliggjord slutgiltigt omdöme"
   unposted_final_score_c19c35b3: "icke-publicerat slutresultat"
   unprocessable_entity: "Icke-bearbetningsbar enhet"
   unprocessable_entity_message: "Undertecknat mötes-id är ogiltigt"
   unpublish_9f2d730b: Avpublicera
   unpublish_title_26ae9667: "Avpublicera %{title}"
-  unpublished_8b6107d6: Opublicerad
+  unpublished_8b6107d6: "Ej offentliggjord"
   unpublished_assignments_9cdbcc87: "Opublicerade uppgifter"
   unpublished_click_to_modify_60f9051: "Avpublicerad - Klicka för att ändra"
-  unpublished_click_to_publish_6a6d12e1: "Opublicerad.  Klicka för att publicera."
+  unpublished_click_to_publish_6a6d12e1: "Ej offentliggjord.  Klicka för att publicera."
   unpublished_click_to_publish_c073631a: "Avpublicerad. Klicka för att publicera"
   unpublished_click_to_publish_item_name_614c4952: "Opublicerad. Klicka för att publicera %{item_name}."
   unpublished_click_to_publish_module_name_89f8601c: "Opublicerad. Klicka för att publicera %{module_name}."
   unpublished_click_to_publish_name_10104b5c: "Avpublicerad. Klicka för att publicera %{name}"
-  unpublished_click_to_publish_title_7c57293f: "Opublicerad.  Klicka för att publicera %{title}."
+  unpublished_click_to_publish_title_7c57293f: "Ej offentliggjord.  Klicka för att publicera %{title}."
   unpublished_content_referenced_in_this_resource_865f8ef6: "Den här resursen har referenser till opublicerat innehåll:"
   unpublished_courses_4299148e: "Opublicerade kurser"
   unpublished_courses_count_d35672f0: "Opublicerade kurser (%{count})"
@@ -25319,7 +25319,7 @@ sv:
   you_are_unsubscribed_and_will_not_be_notified_of_n_bf4b96a2: "Du har avslutat prenumerationen och meddelas inte om nya kommentarer. Klicka för att prenumerera"
   you_can_access_the_welcome_tour_here_any_time_as_w_95b44855: "Du hittar välkomstgenomgången eller andra nya resurser här när du vill."
   you_can_also_manage_access_at_this_time_105a2530: "Du kan även hantera åtkomst vid denna tidpunkt:"
-  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "Du kan börja skicka aviseringar igen genom att klicka på länken Publicera omdömen."
+  you_can_begin_sending_notifications_again_by_click_50d3f0cf: "Du kan börja skicka aviseringar igen genom att klicka på länken Offentliggör omdömen."
   you_can_check_out_other_groups_by_clicking_this_li_1c09e4fb: "Klicka på den här länken för att ta en titt på andra grupper: %{link}"
   you_can_check_out_the_group_by_clicking_this_link__10fb5deb: "Klicka på den här länken för att ta en titt på gruppen: %{link}."
   you_can_check_out_the_group_by_clicking_this_link__e49e4f1d: "Klicka på den här länken för att ta en titt på gruppen: %{link}"

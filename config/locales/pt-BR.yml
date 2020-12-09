@@ -3273,7 +3273,7 @@ pt-BR:
       links: 
         download_submissions: "Baixar envios"
         peer_reviews: "Revisão por pares"
-        reupload_submissions: "Carrear Envios Novamente"
+        reupload_submissions: "Carregar Envios Novamente"
       resubmission_count: 
         one: "1 re-envio sem nota"
         other: "%{count} re-envios sem nota"
@@ -8428,7 +8428,7 @@ pt-BR:
         other: "%{count} publicações"
       separated_conversation_notice: "A conversa deste tópico foi separada em grupos separados. Abaixo estão todos os tópicos de grupo que você tem acesso."
     group_discussion: 
-      separated_conversation_notice: "Como isso é uma fórum de grupos, cada grupo tem sua própria conversa para esse assunto. Aqui estão àqueles para os quais você possui acesso:"
+      separated_conversation_notice: "Como isso é um fórum de grupos, cada grupo tem sua própria conversa para esse assunto. Aqui estão os grupos que você possui acesso:"
     group_discussion_locked: "Os alunos já enviaram para esse fórum, portanto, as configurações de grupos não podem ser alteradas."
     group_discussion_title: "Fórum do grupo"
     index: 
@@ -10393,7 +10393,7 @@ pt-BR:
       curve_grades: "Curvar notas"
       download_submissions: "Baixar envios"
       message_students_who: "Enviar mensagem aos alunos que..."
-      re_upload_submissions: "Carrear Envios Novamente"
+      re_upload_submissions: "Carregar Envios Novamente"
       set_default_grade: "Definir nota padrão"
       speedgrader: SpeedGrader
     graded: avaliada
@@ -19730,7 +19730,7 @@ pt-BR:
   re_send_notification_directly_to_users_when_announ_c421cea5: "Reenviar notificação diretamente para usuários quando o anúncio começar"
   re_submission_user_name_assignment_title_621a1cb3: "Re-envio: %{user_name}, %{assignment_title}"
   re_submit_assignment_b3e2bd28: "Reenviar tarefa"
-  re_upload_submissions_125e415d: "Carrear Envios Novamente"
+  re_upload_submissions_125e415d: "Carregar Envios Novamente"
   re_upload_submissions_form: 
     buttons: 
       upload: "Enviar arquivos"
