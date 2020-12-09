@@ -517,6 +517,20 @@ describe Login::SamlController do
           expect(response.location).to match %r{^https://example.com/idp2/slo\?SAMLResponse=}
         end
 
+        it "is a bad request if there's no destination to send the request to" do
+          expect(controller).to_not receive(:logout_current_user)
+          @aac3 = @account.authentication_providers.build(auth_type: 'saml')
+          @aac3.idp_entity_id = "https://example.com/idp3"
+          @aac3.log_in_url = "https://example.com/idp3/sso"
+          @aac3.log_out_url = nil
+          @aac3.save!
+          logout_request = SAML2::LogoutRequest.new
+          logout_request.issuer = SAML2::NameID.new(@aac3.idp_entity_id)
+          expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
+          get :destroy, params: {:SAMLRequest => "foo"}
+          expect(response.status).to eq 400
+        end
+
         it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
           logout_request = SAML2::LogoutRequest.new
           logout_request.issuer = SAML2::NameID.new("hahahahahahaha")
@@ -524,7 +538,6 @@ describe Login::SamlController do
 
           controller.request.env['canvas.domain_root_account'] = @account
           get :destroy, params: {:SAMLRequest => "foo"}
-
           expect(response.status).to eq 400
         end
       end

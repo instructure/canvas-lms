@@ -292,7 +292,10 @@ class Login::SamlController < ApplicationController
         aac.debug_set(:idp_logout_request_destination, message.destination)
         aac.debug_set(:debugging, t('debug.logout_request_redirect_from_idp', "Received LogoutRequest from IdP"))
       end
-
+      sso_idp = aac.idp_metadata.identity_providers.first
+      if sso_idp.single_logout_services.empty?
+        return render status: :bad_request, plain: "IDP Metadata contains no destination to send a logout response"
+      end
       logout_response = SAML2::LogoutResponse.respond_to(message,
                                                          aac.idp_metadata.identity_providers.first,
                                                          SAML2::NameID.new(aac.entity_id))
