@@ -54,6 +54,15 @@ describe 'RCE next tests', ignore_js_errors: true do
       )
     end
 
+    def add_embedded_image(image_name)
+      root_folder = Folder.root_folders(@course).first
+      image = root_folder.attachments.build(context: @course)
+      path = File.expand_path(File.dirname(__FILE__) + "/../../../public/images/#{image_name}")
+      image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
+      image.save!
+      image
+    end
+
     def click_embedded_image_for_options
       in_frame tiny_rce_ifr_id do
         f('img').click
@@ -543,6 +552,87 @@ describe 'RCE next tests', ignore_js_errors: true do
         click_assignments_accordion
         wait_for_ajaximations
         expect(assignment_due_date_exists?(due_at)).to eq true
+      end
+    end
+
+    context 'sidebar search' do
+      it 'searches for wiki course link to create link in body', ignore_js_errors: true do
+        title = 'test_page'
+        title2 = 'test_page2'
+        unpublished = false
+        edit_roles = 'public'
+
+        create_wiki_page(title, unpublished, edit_roles)
+        create_wiki_page(title2, unpublished, edit_roles)
+
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        click_links_toolbar_menu_button
+        click_course_links
+
+        click_pages_accordion
+
+        expect(course_item_links_list.count).to eq(2)
+        enter_search_data('ge2')
+
+        expect(course_item_links_list.count).to eq(1)
+
+        click_course_item_link(title2)
+
+        in_frame rce_page_body_ifr_id do
+          expect(wiki_body_anchor.attribute('title')).to include title2
+          expect(wiki_body_anchor.text).to eq title2
+        end
+      end
+
+      it 'searches for document link to add to body', ignore_js_errors: true do
+        title1 = 'text_file1.txt'
+        title2 = 'text_file2.txt'
+        create_course_text_file(title1)
+        create_course_text_file(title2)
+
+        visit_front_page_edit(@course)
+
+        click_document_toolbar_menu_button
+        click_course_documents
+
+        expect(course_document_links.count).to eq(2)
+
+        enter_search_data('le2')
+
+        expect(course_document_links.count).to eq(1)
+
+        click_document_link(title2)
+
+        in_frame tiny_rce_ifr_id do
+          expect(wiki_body_anchor.attribute('href')).to include course_file_id_path(@text_file)
+        end
+      end
+
+      it 'search for an image in sidebar in image tray', ignore_js_errors: true do
+        title1 = 'email.png'
+        title2 = 'image_icon.gif'
+        add_embedded_image(title1)
+        image2 = add_embedded_image(title2)
+
+        visit_front_page_edit(@course)
+
+        click_images_toolbar_menu_button
+        click_course_images
+        wait_for_ajaximations
+
+        expect(image_links.count).to eq(2)
+
+        enter_search_data('ico')
+
+        expect(image_links.count).to eq(1)
+
+        click_image_link(title2)
+
+        in_frame tiny_rce_ifr_id do
+          expect(wiki_body_image.attribute('src')).to include course_file_id_path(image2)
+        end
       end
     end
 

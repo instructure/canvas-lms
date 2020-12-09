@@ -94,11 +94,11 @@ module RCENextPage
   end
 
   def image_link(title)
-    fj("[aria-label='Course Images'] button:contains('#{title}')")
+    fxpath("//button[.//img[contains(@title,'Click to embed #{title}')]]")
   end
 
   def image_links
-    ff("[aria-label='Course Images'] button")
+    ffxpath("//button[.//img[contains(@title,'Click to embed')]]")
   end
 
   def user_image_links
@@ -115,6 +115,10 @@ module RCENextPage
 
   def course_media_links
     ff("[data-testid='instructure_links-Link']")
+  end
+
+  def search_field
+    f('[placeholder="Search"')
   end
 
   def assignment_published_status
@@ -289,6 +293,10 @@ module RCENextPage
 
   def course_item_link(title)
     fj("[data-testid='instructure_links-Link'] [role='button']:contains('#{title}')")
+  end
+
+  def course_item_links_list
+    ff('[data-testid="instructure_links-Link"]')
   end
 
   def more_toolbar_button
@@ -1005,6 +1013,11 @@ module RCENextPage
     in_frame rce_page_body_ifr_id do
       expect(f("#tinymce #{selectors}").attribute('style')).to be_empty
     end
+  end
+
+  def enter_search_data(search_term)
+    replace_content(search_field, search_term)
+    driver.action.send_keys(:enter).perform
   end
 
   # menubar stuff
