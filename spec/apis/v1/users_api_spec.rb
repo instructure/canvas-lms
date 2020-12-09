@@ -305,6 +305,8 @@ describe Api::V1::User do
       end
 
       it "should return posted course scores as admin" do
+        skip 'FOO-1293 (12/8/2020)'
+
         json = @test_api.user_json(@student, @admin, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",
@@ -320,6 +322,8 @@ describe Api::V1::User do
       end
 
       it "should not return unposted course scores as a student" do
+        skip 'FOO-1293 (12/8/2020)'
+
         json = @test_api.user_json(@student1, @student1, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",
