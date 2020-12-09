@@ -19,6 +19,8 @@
 #
 
 class Canvadoc < ActiveRecord::Base
+  class UploadTimeout < StandardError; end
+
   include Canvadocs::Session
   alias_method :session_url, :canvadocs_session_url
 
@@ -43,7 +45,7 @@ class Canvadoc < ActiveRecord::Base
       self.has_annotations = opts[:annotatable]
       self.save!
     elsif response.nil?
-      raise "no response received (request timed out?)"
+      raise UploadTimeout, "no response received (request timed out?)"
     else
       raise response.inspect
     end
