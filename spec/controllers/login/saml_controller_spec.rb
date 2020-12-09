@@ -76,17 +76,25 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
+    saml_response = SAML2::Response.new
+    allow(saml_response).to receive(:errors).and_return([])
+    allow(saml_response).to receive(:issuer).and_return(double(id: 'such a lie'))
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [double('response2',
-              errors: [],
-              issuer: double(id: 'such a lie')),
-       nil]
+      [saml_response, nil]
     )
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
     controller.request.env['canvas.domain_root_account'] = account1
     post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(login_url)
+  end
+
+  it "wont support logout via login endpoint" do
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [SAML2::LogoutRequest.new,nil]
+    )
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response.status.to_i).to eq(400)
   end
 
   it "searches for assertion issuer" do
@@ -97,12 +105,12 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
+    saml_response = SAML2::Response.new
+    allow(saml_response).to receive(:errors).and_return([])
+    allow(saml_response).to receive(:issuer).and_return(nil)
+    allow(saml_response).to receive(:assertions).and_return([double(issuer: double(id: 'such a lie'))])
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [double('response2',
-              errors: [],
-              issuer: nil,
-              assertions: [double(issuer: double(id: 'such a lie'))]),
-       nil]
+      [saml_response, nil]
     )
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
@@ -425,8 +433,11 @@ describe Login::SamlController do
       end
 
       it "redirects to login screen with message if no AAC found" do
+        saml_response = SAML2::Response.new
+        allow(saml_response).to receive(:errors).and_return([])
+        allow(saml_response).to receive(:issuer).and_return(double(id: "hahahahahahaha"))
         allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-          [double('response2', errors: [], issuer: double(id: "hahahahahahaha")), nil]
+          [saml_response, nil]
         )
 
         session[:sentinel] = true
