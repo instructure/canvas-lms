@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
   after_action :set_user_id_header
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
-  set_callback :html_render, :before, :add_csp_for_root
+  set_callback :html_render, :after, :add_csp_for_root
 
 
   add_crumb(proc {
