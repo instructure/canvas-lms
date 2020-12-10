@@ -559,6 +559,8 @@ import 'vendor/slickgrid/slick.core'
 
       if (columnDef.editorFormatter === 'custom_column') {
         defaultValue = value.new_content
+      } else if (columnDef.editorFormatter === 'override_score') {
+        defaultValue = value.new_score
       } else {
         defaultValue = value.grade
       }
@@ -608,6 +610,9 @@ import 'vendor/slickgrid/slick.core'
         } else if (columnDef.editorFormatter === 'custom_column') {
           $input[0].defaultValue = value.new_content
           $input.val(defaultValue)
+        } else if (columnDef.editorFormatter === 'override_score') {
+          $input[0].defaultValue = value.new_score
+          $input.val(defaultValue)
         }
 
         $input.appendTo($container)
@@ -636,6 +641,8 @@ import 'vendor/slickgrid/slick.core'
           item[columnDef.id].grade = columnDef.editorParser(state)
         } else if (columnDef.editorParser === 'custom_column') {
           item[columnDef.id].new_content = state
+        } else if (columnDef.editorParser === 'override_score') {
+          item[columnDef.id].new_score = state
         } else {
           item[columnDef.id].grade = state
         }
