@@ -149,6 +149,7 @@ module Canvadocs
       unless response.code =~ /\A20./
         err_message = "HTTP Error #{response.code}: #{response.body}"
         klass = Canvadocs::HttpError
+        klass = Canvadocs::ServerError if response.code.to_s == "500" 
         klass = Canvadocs::BadGateway if response.code.to_s == "502"
         klass = Canvadocs::BadRequest if response.code.to_s == "400"
         raise klass, err_message
@@ -199,6 +200,7 @@ module Canvadocs
 
   class Error < StandardError; end
   class HttpError < Error; end
+  class ServerError < HttpError; end
   class BadGateway < HttpError; end
   class BadRequest < HttpError; end
 
