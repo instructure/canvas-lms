@@ -350,6 +350,8 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
+    JS_DEBUG_IMAGE = "$BUILD_IMAGE-js-debug:${imageTagVersion()}-$TAG_SUFFIX"
+
     RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
@@ -604,6 +606,17 @@ pipeline {
                     string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
                   ]
                 )
+
+                if(configuration.getBoolean('upload-js-debug-image', 'false')) {
+                  echo 'adding Javascript (Debug Image Upload)'
+                  buildStage.makeFromJob('Javascript (Debug Image Upload)', '/Canvas/test-suites/JS', stages, buildParameters + [
+                      string(name: 'JS_DEBUG_IMAGE_TAG', value: env.JS_DEBUG_IMAGE),
+                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                      string(name: 'TEST_SUITE', value: "upload"),
+                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    ], true, "testReport"
+                  )
+                }
 
                 echo 'adding Javascript (Jest)'
                 buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
