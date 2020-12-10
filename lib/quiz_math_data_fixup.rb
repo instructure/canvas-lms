@@ -71,10 +71,12 @@ module QuizMathDataFixup
 
     data[:answers].map(&:symbolize_keys).each_with_index do |answer, index|
       %i[html comments_html].each do |key|
-        # if there's html, the text field is used as the title attribute/tooltip
-        # clear it out if we updated the html because it's probably hosed.
-
-        if answer[key].present?
+        if # if there's html, the text field is used as the title attribute/tooltip
+           # clear it out if we updated the html because it's probably hosed.
+           answer[
+             key
+           ]
+             .present?
           answer[key] = fixup_html(answer[key])
 
           text_key = key.to_s.sub(/html/, 'text')
@@ -124,10 +126,13 @@ module QuizMathDataFixup
         mjnodes.each(&:remove)
       end
       if (latex.content.length > 0)
-        if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/
+        if latex.content !~ /^(:?\\\(|\$\$).+(:?\\\)|\$\$)$/ && latex.content !~ /[\\+-^=<>]|{.+}/
           # the content is not delimineted latex,
-          # emove math_equation_latex from the class then leave it alone
-          latex.attribute('class').value = latex.attribute('class').value.sub('math_equation_latex', '').strip
+          # and doesn't even _look like_ latex
+          # remove math_equation_latex from the class then leave it alone
+
+          latex.attribute('class').value =
+            latex.attribute('class').value.sub('math_equation_latex', '').strip
         else
           code = latex.content.gsub(/(^\\\(|\\\)$)/, '')
           escaped = URI.escape(URI.escape(code))
@@ -139,7 +144,9 @@ module QuizMathDataFixup
         end
       elsif mml
         latex.replace(
-          "<span class='math_equation_mml'><math xmlns='http://www.w3.org/1998/Math/MathML'>#{mml}</math></span>"
+          "<span class='math_equation_mml'><math xmlns='http://www.w3.org/1998/Math/MathML'>#{
+            mml
+          }</math></span>"
         )
       end
     end
