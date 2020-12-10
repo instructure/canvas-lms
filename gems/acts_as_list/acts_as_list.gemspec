@@ -17,9 +17,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'rails', ">= 3.2"
-  spec.add_dependency 'activerecord', '5.2.4.4'
 
-  spec.add_development_dependency "bundler", "~> 1.5"
+  spec.add_development_dependency "bundler", ">= 1.5", "< 3.0"
   spec.add_development_dependency "sqlite3"
   spec.add_development_dependency "rspec", "~> 3.5.0"
 end
