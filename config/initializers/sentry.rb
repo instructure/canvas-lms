@@ -30,6 +30,7 @@ if settings.present?
     config.logger = Rails.logger
     config.silence_ready = true
     config.dsn = settings[:dsn]
+    config.current_environment = Canvas.environment
     config.tags = settings.fetch(:tags, {}).merge('canvas_revision' => Canvas.revision)
     config.release = Canvas.revision
     config.sanitize_fields += Rails.application.config.filter_parameters.map(&:to_s)
