@@ -73,86 +73,8 @@ RUN set -eux; \
   && bundle install --jobs $(nproc) \
   && rm -rf $GEM_HOME/cache
 <% end -%>
-<% if jenkins? -%>
-<% set_file_suffix 'webpack-builder' %>
-<%= generation_message %>
-FROM local/ruby-runner
-
-COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP_HOME}
-
-<% end -%>
-RUN set -eux; \
 <% if development? -%>
-  mkdir -p .yardoc \
-           app/stylesheets/brandable_css_brands \
-           app/views/info \
-           client_apps/canvas_quizzes/dist \
-           client_apps/canvas_quizzes/node_modules \
-           client_apps/canvas_quizzes/tmp \
-           config/locales/generated \
-           gems/canvas_i18nliner/node_modules \
-           log \
-           node_modules \
-           packages/canvas-media/es \
-           packages/canvas-media/lib \
-           packages/canvas-media/node_modules \
-           packages/canvas-planner/lib \
-           packages/canvas-planner/node_modules \
-           packages/canvas-rce/canvas \
-           packages/canvas-rce/lib \
-           packages/canvas-rce/node_modules \
-           packages/jest-moxios-utils/node_modules \
-           packages/js-utils/es \
-           packages/js-utils/lib \
-           packages/js-utils/node_modules \
-           packages/k5uploader/es \
-           packages/k5uploader/lib \
-           packages/k5uploader/node_modules \
-           packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
-           pacts \
-           public/dist \
-           public/doc/api \
-           public/javascripts/client_apps \
-           public/javascripts/compiled \
-           public/javascripts/translations \
-           reports \
-           tmp \
-           /home/docker/.bundler/ \
-           /home/docker/.cache/yarn \
-           /home/docker/.gem/
-<% end -%>
-<% if jenkins? -%>
-  (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
-  && yarn cache clean
-
-COPY --chown=docker:docker --from=local/cache-helper-collect-packages /tmp/dst ${APP_HOME}
-RUN yarn build:packages
-<% end -%>
-
-<% if jenkins? -%>
-<% set_file_suffix 'webpack-runner' %>
-<%= generation_message %>
-FROM local/webpack-builder
-COPY --chown=docker:docker --from=local/cache-helper-collect-webpack /tmp/dst ${APP_HOME}
-
-ARG JS_BUILD_NO_UGLIFY=0
-RUN COMPILE_ASSETS_API_DOCS=0 COMPILE_ASSETS_NPM_INSTALL=0 COMPILE_ASSETS_STYLEGUIDE=0 JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY" bundle exec rails canvas:compile_assets
-
-<% if jenkins? -%>
-<% set_file_suffix 'webpack-cache' %>
-<%= generation_message %>
-FROM local/ruby-runner
-
-COPY --chown=docker:docker --from=local/webpack-runner /usr/src/app/public ${APP_HOME}/public
-<% end -%>
-
-RUN mkdir -p <%= docker_compose_volume_paths.join(" \\\n             ") %>
-<% set_file_suffix 'final' %>
-<%= generation_message %>
-FROM local/webpack-cache
-
-COPY --chown=docker:docker . ${APP_HOME}
-
-ARG COMPILE_ADDITIONAL_ASSETS=0
-RUN bash -c "if [[ "$COMPILE_ADDITIONAL_ASSETS" == "1" ]]; then bundle exec rails doc:api css:styleguide; fi"
+RUN set -eux; \
+  mkdir -p \
+    <%= docker_compose_volume_paths.join(" \\\n    ") %>
 <% end -%>
