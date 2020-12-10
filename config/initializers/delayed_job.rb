@@ -178,13 +178,36 @@ Delayed::Worker.lifecycle.before(:exceptional_exit) do |worker, exception|
   Canvas::Errors.capture(exception, info.to_h)
 end
 
+Delayed::Worker.lifecycle.before(:retry) do |worker, job, exception|
+  # any job that fails with a RetriableError gets routed
+  # here if it has any retries left.  We just want the stats
+  info = Canvas::Errors::JobInfo.new(job, worker)
+  begin
+    (job.current_shard || Shard.default).activate do
+      Canvas::Errors.capture(exception, info.to_h, :info)
+    end
+  rescue => e
+    Canvas::Errors.capture_exception(:jobs_lifecycle, e)
+    Canvas::Errors.capture(exception, info.to_h, :info)
+  end
+end
+
+# Delayed::Backend::RecordNotFound happens when a job is queued and then the thing that
+# it's queued on gets deleted.  It happens all the time for stuff
+# like test students (we delete their stuff immediately), and
+# we don't need detailed exception reports for those.
+#
+# Delayed::RetriableError is thrown by any job to indicate the thing
+# that's failing is "kind of expected".  Upstream service backpressure,
+# etc.
+WARNABLE_DELAYED_EXCEPTIONS = [
+  Delayed::Backend::RecordNotFound,
+  Delayed::RetriableError,
+].freeze
+
 Delayed::Worker.lifecycle.before(:error) do |worker, job, exception|
-  # this kind of thing happens when a job is queued and then the thing that
-  # it's queued on gets deleted.  It happens all the time for stuff
-  # like test students (we delete their stuff immediately), and
-  # we don't need detailed exception reports for those.
-  missing_record = exception.is_a?(Delayed::Backend::RecordNotFound)
-  error_level = missing_record ? :warn : :error
+  is_warnable = WARNABLE_DELAYED_EXCEPTIONS.any?{|klass| exception.is_a?(klass) }
+  error_level = is_warnable ? :warn : :error
   info = Canvas::Errors::JobInfo.new(job, worker)
   begin
     (job.current_shard || Shard.default).activate do
