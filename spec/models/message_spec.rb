@@ -829,4 +829,16 @@ describe Message do
       expect(Message.in_partition(partition).unscoped.to_sql).to match(/^SELECT "messages"\.\* FROM .*"messages"$/)
     end
   end
+
+  describe "for_queue" do
+    it "has a clear error path for messages that are missing" do
+      queued = Message.new(id: -1, created_at: Time.zone.now).for_queue
+      begin
+        queued.deliver
+        raise RuntimeError, "#deliver should have failed because this message does not exist"
+      rescue Delayed::RetriableError => e
+        expect(e.cause.is_a?(::Message::QueuedNotFound)).to be_truthy
+      end
+    end
+  end
 end
