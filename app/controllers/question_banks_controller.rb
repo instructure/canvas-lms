@@ -88,6 +88,9 @@ class QuestionBanksController < ApplicationController
     @bank = @context.assessment_question_banks.find(params[:question_bank_id])
     @new_bank = AssessmentQuestionBank.find(params[:assessment_question_bank_id])
     if authorized_action(@bank, @current_user, :update) && authorized_action(@new_bank, @current_user, :manage)
+      unless params[:questions].present?
+        return render json: { error: "must specify questions to move" }, status: :unprocessable_entity
+      end
       ids = []
       params[:questions].each do |key, value|
         ids << key.to_i if value != '0' && key.to_i != 0
