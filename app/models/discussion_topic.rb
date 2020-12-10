@@ -39,9 +39,10 @@ class DiscussionTopic < ActiveRecord::Base
   include LockedFor
 
   restrict_columns :content, [:title, :message]
-  restrict_columns :settings, [:delayed_post_at, :require_initial_post, :discussion_type, :assignment_id,
-                               :lock_at, :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating, :group_category_id]
+  restrict_columns :settings, [:require_initial_post, :discussion_type, :assignment_id,
+                               :pinned, :locked, :allow_rating, :only_graders_can_rate, :sort_by_rating, :group_category_id]
   restrict_columns :state, [:workflow_state]
+  restrict_columns :availability_dates, [:delayed_post_at, :lock_at]
   restrict_assignment_columns
 
   attr_accessor :user_has_posted, :saved_by, :total_root_discussion_entries
@@ -221,9 +222,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   def schedule_delayed_transitions
     return if self.saved_by == :migration
-
-    delay(run_at: delayed_post_at).update_based_on_date if @should_schedule_delayed_post
-    delay(run_at: lock_at).update_based_on_date if @should_schedule_lock_at
+    bp = true if @importing_migration&.migration_type == 'master_course_import'
+    delay(run_at: delayed_post_at).update_based_on_date(for_blueprint: bp) if @should_schedule_delayed_post
+    delay(run_at: lock_at).update_based_on_date(for_blueprint: bp) if @should_schedule_lock_at
     # need to clear these in case we do a save whilst saving (e.g.
     # Announcement#respect_context_lock_rules), so as to avoid the dreaded
     # double delayed job ಠ_ಠ
@@ -727,9 +728,9 @@ class DiscussionTopic < ActiveRecord::Base
   scope :by_last_reply_at, -> { order("discussion_topics.last_reply_at DESC, discussion_topics.created_at DESC, discussion_topics.id DESC") }
 
   scope :by_posted_at, -> { order(Arel.sql(<<~SQL))
-      COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
-      discussion_topics.created_at DESC,
-      discussion_topics.id DESC
+    COALESCE(discussion_topics.delayed_post_at, discussion_topics.posted_at, discussion_topics.created_at) DESC,
+    discussion_topics.created_at DESC,
+    discussion_topics.id DESC
     SQL
   }
 
@@ -776,7 +777,9 @@ class DiscussionTopic < ActiveRecord::Base
 
   # There may be delayed jobs that expect to call this to update the topic, so be sure to alias
   # the old method name if you change it
-  def update_based_on_date
+  # Also: if this method is scheduled by a blueprint sync, ensure it isn't counted as a manual downstream change
+  def update_based_on_date(for_blueprint: false)
+    skip_downstream_changes! if for_blueprint
     transaction do
       reload lock: true # would call lock!, except, oops, workflow overwrote it :P
       lock if should_lock_yet
