@@ -38,6 +38,7 @@ class Types::MutationType < Types::ApplicationObjectType
     super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
+  field :add_conversation_message, mutation: Mutations::AddConversationMessage
   field :create_conversation, mutation: Mutations::CreateConversation
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
   field :hide_assignment_grades, mutation: Mutations::HideAssignmentGrades
