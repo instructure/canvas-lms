@@ -29,7 +29,7 @@ module QuizMathDataFixup
     questions.find_each do |quiz_question|
       begin
         old_data = quiz_question.question_data.to_hash
-        new_data = fixup_question_data(quiz_question.question_data.to_hash)
+        new_data = fixup_question_data(quiz_question.question_data.to_hash.symbolize_keys)
         quiz_question.write_attribute(:question_data, new_data) if new_data != old_data
         if quiz_question.changed?
           stat = question_bank ? 'updated_math_qb_question' : 'updated_math_question'
@@ -66,10 +66,10 @@ module QuizMathDataFixup
     %i[neutral_comments_html correct_comments_html incorrect_comments_html].each do |key|
       data[key] = fixup_html(data[key]) if data[key].present?
     end
-    
+
     data[:question_text] = fixup_html(data[:question_text]) if data[:question_text].present?
 
-    data[:answers].each_with_index do |answer, index|
+    data[:answers].map(&:symbolize_keys).each_with_index do |answer, index|
       %i[html comments_html].each do |key|
         # if there's html, the text field is used as the title attribute/tooltip
         # clear it out if we updated the html because it's probably hosed.
