@@ -1487,11 +1487,14 @@ class ApplicationController < ActionController::Base
   # at the end, for example, would be a problem.
   # all things would be rescued prior to any specific handlers.
   rescue_from Exception, with: :rescue_exception
-  rescue_from RequestError, with: :rescue_expected_error_type
-  rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
+  # Rails exceptions
+  rescue_from ActionController::InvalidCrossOriginRequest, with: :rescue_expected_error_type
   rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
-  rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
+  rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
+  # Canvas exceptions
+  rescue_from RequestError, with: :rescue_expected_error_type
+  rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from SearchTermHelper::SearchTermTooShortError, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
