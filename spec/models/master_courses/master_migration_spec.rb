@@ -2520,6 +2520,38 @@ describe MasterCourses::MasterMigration do
       expect(sub.reload.cached_due_date.to_i).to eq due_at.to_i
     end
 
+    it "handles downstream changes of ungraded discussion dates correctly" do
+      date1 = 1.week.ago.at_noon
+      date2 = 2.weeks.ago.at_noon
+      copy_to = course_factory
+      sub = @template.add_child_course!(copy_to)
+      topic = @copy_from.discussion_topics.create!(lock_at: date1)
+      run_master_migration
+      topic_to = copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
+
+      # ensure schedule_delayed_transitions does not cause a spurious downstream change record
+      expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+
+      Timecop.travel(5.minutes.from_now) do
+        # now actually make a downstream change
+        topic.touch
+        topic_to.lock_at = date2
+        topic_to.save!
+        run_master_migration
+        expect(topic_to.reload.lock_at).to eq date2
+        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
+      end
+
+      # lock the availability dates and ensure the downstream change is overwritten
+      Timecop.travel(10.minutes.from_now) do
+        @template.content_tag_for(topic).update_attribute(:restrictions, {:availability_dates => true})
+        topic.touch
+        run_master_migration
+        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+        expect(topic_to.reload.lock_at).to eq date1
+      end
+    end
+
     context "attachment migration id preservation" do
       def run_course_copy(copy_from, copy_to)
         @cm = ContentMigration.new(:context => copy_to, :user => @user, :source_course => copy_from,
