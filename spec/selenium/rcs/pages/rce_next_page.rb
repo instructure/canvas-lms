@@ -157,6 +157,14 @@ module RCENextPage
     f('[role^="menuitem"][title="External Links"]')
   end
 
+  def course_links_tray
+    f('[role="dialog"][aria-label="Course Links"]')
+  end
+
+  def validate_course_links_tray_closed
+    expect(f('body')).not_to contain_css('[role="dialog"][aria-label="Course Links"]')
+  end
+
   def link_options_button
     f('button[aria-label="Show link options"]')
   end

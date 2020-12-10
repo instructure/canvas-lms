@@ -58,6 +58,12 @@ export default class LinkOptionsTrayController {
       const anchorElm = getAnchorElement(editor, selectedElm)
       editor.selection.select(anchorElm)
     }
+
+    if (bridge.focusedEditor) {
+      // Dismiss any content trays that may already be open
+      bridge.hideTrays()
+    }
+
     this._renderTray()
   }
 

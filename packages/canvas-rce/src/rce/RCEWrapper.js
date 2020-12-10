@@ -715,6 +715,10 @@ class RCEWrapper extends React.Component {
     editor.on('ExecCommand', this._forceCloseFloatingToolbar)
     editor.on('keydown', this.handleKey)
     editor.on('FullscreenStateChanged', this._toggleFullscreen)
+    // This propagates click events on the editor out of the iframe to the parent
+    // document. We need this so that click events get captured properly by instui
+    // focus-trapping components, so they properly ignore trapping focus on click.
+    editor.on('click', () => window.top.document.body.click(), true)
 
     this.announceContextToolbars(editor)
 

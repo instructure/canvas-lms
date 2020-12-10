@@ -228,9 +228,14 @@ export default function CanvasContentTray(props) {
   const {bridge, editor, onTrayClosing} = {...props}
 
   const handleDismissTray = useCallback(() => {
+    // return focus to the RCE if focus was on this tray
+    if (trayRef.current && trayRef.current.contains(document.activeElement)) {
+      bridge.focusActiveEditor(false)
+    }
+
     onTrayClosing && onTrayClosing(CanvasContentTray.globalOpenCount) // tell RCEWrapper we're closing if we're open
     setIsOpen(false)
-  }, [onTrayClosing])
+  }, [bridge, onTrayClosing])
 
   useEffect(() => {
     const controller = {
@@ -258,14 +263,16 @@ export default function CanvasContentTray(props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.id, bridge, handleDismissTray, hidingTrayOnAction])
 
+  function handleOpenTray() {
+    bridge.focusEditor(editor)
+    setHasOpened(true)
+  }
+
   function handleExitTray() {
     onTrayClosing && onTrayClosing(true) // tell RCEWrapper we're closing
   }
 
   function handleCloseTray() {
-    // return focus to the RCE
-    bridge.focusActiveEditor(false)
-
     setHasOpened(false)
     onTrayClosing && onTrayClosing(false) // tell RCEWrapper we're closed
   }
@@ -331,10 +338,7 @@ export default function CanvasContentTray(props) {
           onDismiss={handleDismissTray}
           onClose={handleCloseTray}
           onExit={handleExitTray}
-          onOpen={() => {
-            bridge.focusEditor(editor)
-            setHasOpened(true)
-          }}
+          onOpen={handleOpenTray}
           onEntered={() => {
             const c = document.querySelector('[role="main"]')
             const target_w = c ? c.offsetWidth - trayRef.current?.offsetWidth : 0

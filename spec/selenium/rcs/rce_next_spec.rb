@@ -322,7 +322,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
+            @course,
                     @assignment
                   )
         end
@@ -360,7 +360,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-                    @course,
+            @course,
                     @announcement
                   )
         end
@@ -380,7 +380,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-                    @course,
+            @course,
                     @discussion
                   )
         end
@@ -434,7 +434,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
+            @course,
                     @assignment
                   )
         end
@@ -471,7 +471,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
+            @course,
                     @assignment
                   )
         end
@@ -492,7 +492,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
+            @course,
                     @assignment
                   )
         end
@@ -513,10 +513,40 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-                    @course,
+            @course,
                     @assignment
                   )
         end
+      end
+
+      it 'should close links tray if open when opening link options' do
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<h2>This is plain text</h2><a href="http://example.com">edit me</a>')
+        switch_to_editor_view
+
+        def switch_trays
+          click_links_toolbar_menu_button
+          click_course_links
+          expect(course_links_tray).to be_displayed
+
+          click_link_for_options
+          click_link_options_button
+
+          expect(link_options_tray).to be_displayed
+          validate_course_links_tray_closed
+
+          driver.switch_to.frame('wiki_page_body_ifr')
+          f('h2').click
+          driver.switch_to.default_content
+        end
+
+        # Duplicate trays only appear sporadically, so repeate this several times to make sure
+        # we aren't getting multiple trays open at once.
+        5.times { switch_trays }
       end
 
       it 'should display assignment publish status in links accordion' do
@@ -739,6 +769,36 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_image_options_button
 
       expect(image_options_tray).to be_displayed
+    end
+
+    it 'should close links tray if open when opening image options' do
+      page_title = 'Page1'
+      image = add_embedded_image('email.png')
+      @course.wiki_pages.create!(
+        title: page_title, body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
+      )
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      def switch_trays
+        click_links_toolbar_menu_button
+        click_course_links
+        expect(course_links_tray).to be_displayed
+
+        click_embedded_image_for_options
+        click_image_options_button
+
+        expect(image_options_tray).to be_displayed
+        validate_course_links_tray_closed
+
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('h2').click
+        driver.switch_to.default_content
+      end
+
+      # Duplicate trays only appear sporadically, so run this several times to make sure
+      # we aren't getting multiple trays open at once.
+      5.times { switch_trays }
     end
 
     it 'should change embedded image to link when selecting option' do
