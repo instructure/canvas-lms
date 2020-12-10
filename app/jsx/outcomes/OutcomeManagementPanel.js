@@ -29,16 +29,14 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
         size="large"
         headingLevel="h3"
         heading={
-          <div>
-            {isCourse
-              ? I18n.t('Outcomes have not been added to this course yet.')
-              : I18n.t('Outcomes have not been added to this account yet.')}
-            <br />
-            <br />
-            {isCourse
-              ? I18n.t('Get started by finding, importing or creating your course outcomes.')
-              : I18n.t('Get started by finding, importing or creating your account outcomes.')}
-          </div>
+          isCourse
+            ? I18n.t('Outcomes have not been added to this course yet.')
+            : I18n.t('Outcomes have not been added to this account yet.')
+        }
+        message={
+          isCourse
+            ? I18n.t('Get started by finding, importing or creating your course outcomes.')
+            : I18n.t('Get started by finding, importing or creating your account outcomes.')
         }
         hero={
           <div>
