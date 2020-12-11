@@ -386,7 +386,6 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       end
 
       it 'should close on losing focus' do
-        skip('Adding this test causes the previous one to fail. Go figure!?!')
         in_frame rce_page_body_ifr_id do
           f('#tinymce').send_keys('') # focus
         end

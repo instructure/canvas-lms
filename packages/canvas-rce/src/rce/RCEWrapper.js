@@ -559,7 +559,6 @@ class RCEWrapper extends React.Component {
   handleFocus(_event) {
     if (!this.focused) {
       bridge.focusEditor(this)
-      this._forceCloseFloatingToolbar()
       this.props.onFocus && this.props.onFocus(this)
     }
   }
@@ -639,6 +638,7 @@ class RCEWrapper extends React.Component {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
+    this._forceCloseFloatingToolbar()
     this.handleFocus(event)
   }
 
@@ -687,9 +687,16 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  handleExternalClick = () => {
+    this._forceCloseFloatingToolbar()
+  }
+
   onInit = (_event, editor) => {
     editor.rceWrapper = this
     this.editor = editor
+
+    // Capture click events outside the iframe
+    document.addEventListener('click', this.handleExternalClick)
 
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
@@ -1091,7 +1098,7 @@ class RCEWrapper extends React.Component {
       ],
       contextmenu: '', // show the browser's native context menu
 
-      toolbar_drawer: 'floating',
+      toolbar_mode: 'floating',
       toolbar_sticky: true,
 
       // tiny's external link create/edit dialog config
@@ -1157,7 +1164,7 @@ class RCEWrapper extends React.Component {
     if (tinymce_floating_toolbar_portal) {
       this.observer = new MutationObserver((mutationList, _observer) => {
         mutationList.forEach(mutation => {
-          if (mutation.type === 'childList') {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
             this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
           }
         })
