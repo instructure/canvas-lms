@@ -53,7 +53,7 @@ nb:
       previous: k
       show_assign: f
   AssignmentListItemView: 
-    complete: Fullført
+    complete: Godkjent
     grade_gpa_scale_screenreader: "Karakter: %{grade}"
     grade_letter_grade_screenreader: "Karakter: %{grade}"
     grade_pass_fail_screenreader: "Karakter: %{grade}"
@@ -4301,7 +4301,7 @@ nb:
     show_all_artifacts: "Vis alle artefakter"
     submit: "Send inn"
     unmasquerade: "Stopp forkledning"
-    unpublish: "Fjernet fra publisering"
+    unpublish: Avpubliser
     unpublished: "Ikke publisert"
     update: Oppdater
     view_account_roster: "Se kontodeltagere"
