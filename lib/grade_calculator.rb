@@ -595,6 +595,9 @@ class GradeCalculator
           -- if workflow_state was previously deleted for some reason, update it to active
           workflow_state = COALESCE(NULLIF(excluded.workflow_state, 'deleted'), 'active')
     ")
+  rescue ActiveRecord::Deadlocked => e
+    Canvas::Errors.capture_exception(:grade_calcuator, e, :warn)
+    raise Delayed::RetriableError, "Deadlock in upserting course or grading period scores"
   end
 
   def save_course_and_grading_period_metadata
@@ -723,6 +726,9 @@ class GradeCalculator
         ;
       ")
     end
+  rescue ActiveRecord::Deadlocked => e
+    Canvas::Errors.capture_exception(:grade_calculator, e, :warn)
+    raise Delayed::RetriableError, "Deadlock in upserting assignment group scores"
   end
 
   # returns information about assignments groups in the form:
