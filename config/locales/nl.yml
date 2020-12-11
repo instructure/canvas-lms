@@ -9795,7 +9795,7 @@ nl:
   external_url_e9b87215: "Externe URL's"
   extra_credit_not_permitted_on_outcomes_score_adjus_714dd746: "Geen extra punten toegestaan voor leerdoelen, score aangepast tot mogelijk maximum voor %{outcome}"
   extract_error_error_file_names_a4989ed0: "Fout tijdens ophalen, %{error}: %{file_names}"
-  extreme_critical_emergency_80b3dbda: "EXTREEM NOODGEVAL!"
+  extreme_critical_emergency_80b3dbda: "ER IS EEN PROBLEEM, GRAAG DRINGEND HULP!"
   faculty_journal_5634938e: Faculteitsnieuws
   faculty_journal_manage_entries_efc09599: "Faculteitsnieuws - items beheren"
   fail_62dbb06a: zakken
@@ -11744,7 +11744,7 @@ nl:
     covid: "Canvas-resources voor COVID-19"
     covid_sub: "Tips voor online lesgeven en leren"
     description: Beschrijving
-    extreme_critical_emergency: "EXTREEM NOODGEVAL!"
+    extreme_critical_emergency: "ER IS EEN PROBLEEM, GRAAG DRINGEND HULP!"
     file_a_ticket_for_a_personal_response_from_our_support_team: "Een ticket inleveren om een persoonlijk antwoord van onze helpdesk te krijgen."
     for_an_instant_answer: "Voor een direct antwoord:"
     how_is_this_affecting_you: "Wat voor gevolgen heeft dit voor jou?"

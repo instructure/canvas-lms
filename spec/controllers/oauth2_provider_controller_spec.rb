@@ -702,6 +702,10 @@ describe Oauth2ProviderController do
       expect(response).to redirect_to(oauth2_auth_url(:code => 'code', :state => '1234567890'))
     end
 
+    it "gracefully errors if the session has been destroyed" do
+      post :accept, session: {}
+      expect(response.code.to_i).to eq(400)
+    end
   end
 
   describe 'GET deny' do
