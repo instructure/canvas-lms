@@ -32,6 +32,8 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $CACHE_SAVE_SCOPE: the scope to save the image under
 #   - always "master" for post-merge builds and <patchset_number> for pre-merge builds
 
+source ./build/new-jenkins/docker-build-helpers.sh
+
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-yarn" --target cache-helper-collect-yarn "$WORKSPACE"
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-packages" --target cache-helper-collect-packages "$WORKSPACE"
@@ -76,27 +78,12 @@ WEBPACK_CACHE_PARTS=(
   $PACKAGES_CACHE_MD5
   $WEBPACK_CACHE_MD5
 )
-WEBPACK_CACHE_ID=$(echo "${WEBPACK_CACHE_PARTS[@]}" | md5sum | cut -d' ' -f1)
-WEBPACK_CACHE_LOAD_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_LOAD_SCOPE-$WEBPACK_CACHE_ID"
-WEBPACK_CACHE_LOAD_FALLBACK_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_LOAD_FALLBACK_SCOPE-$WEBPACK_CACHE_ID"
-WEBPACK_CACHE_SAVE_TAG="$WEBPACK_CACHE_PREFIX:$CACHE_SAVE_SCOPE-$WEBPACK_CACHE_ID"
+declare -A WEBPACK_CACHE_TAGS; compute_tags "WEBPACK_CACHE_TAGS" $WEBPACK_CACHE_PREFIX ${WEBPACK_CACHE_PARTS[@]}
 
 # Build / Load Webpack Image
-WEBPACK_CACHE_SELECTED_TAG=""
+WEBPACK_CACHE_SELECTED_TAG=""; pull_first_tag "WEBPACK_CACHE_SELECTED_TAG" ${WEBPACK_CACHE_TAGS[LOAD_TAG]} ${WEBPACK_CACHE_TAGS[LOAD_FALLBACK_TAG]}
 
-if ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_TAG; then
-  # Optimize for changes that don't require webpack to re-build. Pull the image that is shared
-  # across all patchsets.
-  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_LOAD_TAG
-
-  docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
-  docker tag $WEBPACK_CACHE_SELECTED_TAG $WEBPACK_CACHE_SAVE_TAG
-elif ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_CACHE_LOAD_FALLBACK_TAG; then
-  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_LOAD_FALLBACK_TAG
-
-  docker tag $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache
-  docker tag $WEBPACK_CACHE_SELECTED_TAG $WEBPACK_CACHE_SAVE_TAG
-else
+if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
   # If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
 
@@ -112,13 +99,14 @@ else
   # built-in caching.
   docker build \
     "${WEBPACK_CACHE_BUILD_ARGS[@]}" \
-    --tag "local/webpack-cache" \
-    --tag "$WEBPACK_CACHE_SAVE_TAG" \
+    --tag "${WEBPACK_CACHE_TAGS[SAVE_TAG]}" \
     --target webpack-cache \
     - < Dockerfile.jenkins.webpack-cache
 
-  WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SAVE_TAG
+  WEBPACK_CACHE_SELECTED_TAG=${WEBPACK_CACHE_TAGS[SAVE_TAG]}
 fi
+
+tag_many $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache ${WEBPACK_CACHE_TAGS[SAVE_TAG]}
 
 # Build Final Image
 if [ -n "${1:-}" ]; then
