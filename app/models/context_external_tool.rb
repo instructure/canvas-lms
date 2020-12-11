@@ -728,7 +728,7 @@ end
       contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
       can_use_preferred_tool = preferred_tool && contexts.member?(preferred_tool.context)
-      
+
       # always use the preferred_tool_id if url isn't provided
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
