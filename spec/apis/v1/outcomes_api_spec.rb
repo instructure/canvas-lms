@@ -727,6 +727,50 @@ describe "Outcomes API", type: :request do
           end
         end
       end
+
+      context "with account_level_mastery_scales enabled" do
+        before do
+          @outcome.context.root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+        end
+
+        it "should fail when updating mastery points" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :mastery_points => 5 })
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome mastery points cannot be modified.'
+        end
+
+        it "should fail when updating ratings" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :ratings => [
+                     { :points => 10, :description => "Exceeds Expectations" },
+                     { :points => 5, :description => "Meets Expectations" },
+                     { :points => 0, :description => "Does Not Meet Expectations" }
+                   ]})
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome ratings cannot be modified.'
+        end
+
+        it "should fail when updating calculation values" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :calculation_method => 'decaying_average',
+                     :calculation_int => 65 })
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome calculation values cannot be modified.'
+        end
+      end
     end
   end
 
