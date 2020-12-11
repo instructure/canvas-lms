@@ -28,6 +28,7 @@ group :test do
   gem 'simplecov-rcov', '0.2.3', require: false
   gem 'puma', '5.0.0', require: false
 
+  gem 'db-query-matchers', '0.10.0'
   gem 'rspec', '3.9.0'
   gem 'rspec_around_all', '0.2.0'
   gem 'rspec-rails', '4.0.1'
