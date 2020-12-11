@@ -266,6 +266,21 @@ class OutcomesApiController < ApplicationController
   def update
     return unless authorized_action(@outcome, @current_user, :update)
 
+    if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
+      error_msg = nil
+      if params[:mastery_points]
+        error_msg = t('Individual outcome mastery points cannot be modified.')
+      elsif params[:ratings]
+        error_msg = t('Individual outcome ratings cannot be modified.')
+      elsif params[:calculation_method] || params[:calculation_int]
+        error_msg = t('Individual outcome calculation values cannot be modified.')
+      end
+      if error_msg
+        render json: { error: error_msg }, status: :forbidden
+        return
+      end
+    end
+
     update_outcome_criterion(@outcome) if params[:mastery_points] || params[:ratings]
     if @outcome.update(params.permit(*DIRECT_PARAMS))
       render :json => outcome_json(@outcome, @current_user, session, {context: @context})

@@ -104,3 +104,12 @@ export default class Outcome extends Backbone.Model
         when 'add'    then @outcomeGroup.outcomes_url
         when 'edit'   then @get 'url'
         when 'delete' then @outcomeLink.url
+
+  save: (data, saveOpts) ->
+    if ENV.ACCOUNT_LEVEL_MASTERY_SCALES
+      @unset 'mastery_points'
+      @unset 'points_possible'
+      @unset 'ratings'
+      @unset 'calculation_method'
+      @unset 'calculation_int'
+    super
