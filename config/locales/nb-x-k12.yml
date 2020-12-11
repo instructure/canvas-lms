@@ -58,7 +58,7 @@ nb-x-k12:
     grade_pass_fail_screenreader: "Vurdering: %{grade}"
     grade_percent: "%{grade}%"
     grade_percent_screenreader: "Vurdering: %{grade}%"
-    incomplete: "Ikke godkjent"
+    incomplete: "Ikke fullført"
   CollectionView: 
     no_items: "Ingen elementer."
   CreateAssignmentView: 
