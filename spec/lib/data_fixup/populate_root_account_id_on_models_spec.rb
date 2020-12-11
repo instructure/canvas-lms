@@ -545,50 +545,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with Favorite' do
-      context 'with a course context' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Favorite.create!(context: @course, user: @user) }
-          let(:reference_record) { @course }
-        end
-
-        context 'with sharding' do
-          specs_require_sharding
-
-          it "processes all records when there is more than one foreign shard" do
-            expect([Shard.current.id, @shard1.id, @shard2.id].uniq.count).to eq(3)
-            course1 = @shard1.activate { course_model(account: account_model) }
-            course2 = @shard2.activate { course_model(account: account_model) }
-
-            user = user_model
-            fav1 = user.favorites.create!(context: course1)
-            fav2 = user.favorites.create!(context: course2)
-            fav1.update_columns(root_account_id: nil)
-            fav2.update_columns(root_account_id: nil)
-
-            expect(fav1.reload.root_account_id).to be_nil
-            expect(fav2.reload.root_account_id).to be_nil
-            DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(
-              Favorite, {course: :root_account_id}, fav1.id - 1, fav2.id + 1
-            )
-            expect(fav1.reload.root_account_id).to_not be_nil
-            expect(fav2.reload.root_account_id).to_not be_nil
-            expect(fav1.reload.root_account_id).to eq(course1.global_root_account_id)
-            expect(fav2.reload.root_account_id).to eq(course2.global_root_account_id)
-          end
-
-          it_behaves_like 'a datafixup that populates root_account_id' do
-            let(:record) do
-              user = @user
-              user.favorites.create!(context: @shard1.activate { course_model(account: account_model) })
-            end
-            let(:reference_record) { @course }
-            let(:sharded) { true }
-          end
-        end
-      end
-    end
-
     context 'with Folder' do
       context 'with course context' do
         it_behaves_like 'a datafixup that populates root_account_id' do
@@ -1315,48 +1271,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     context 'with_sharding' do
       specs_require_sharding
 
-      it 'should only search current shard when there are no cross-shard foreign keys' do
-        user = @user
-        course_model(account: account_model)
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id])).and_call_original
-        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
-      end
-
-      it 'should find possible shards from cross-shard foreign keys' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id, @shard1.id])).and_call_original
-        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
-      end
-
-      it 'should check current shard for missing root account ids' do
-        user = @user
-        course_model(account: account_model)
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
-      end
-
-      it 'should check other shards for missing root_account_ids' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
-      end
-
       it 'should actually find missing root account ids on current shard' do
         discussion_topic_model(context: @course)
         de = @topic.discussion_entries.create!(user: user_model)
@@ -1402,43 +1316,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:run)
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
-    end
-
-    context 'with_sharding' do
-      specs_require_sharding
-
-      it 'should fill cross-shard data' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, favorite.id, favorite.id)
-        expect(favorite.reload.root_account_id).to eq @course.root_account.global_id
-      end
-
-      it 'should not collide on cross-shard data of different types' do
-        user = @user
-        @shard1.activate do
-          a1 = account_model
-          a2 = account_model
-          course_model(id: 12345, account: a1)
-          group_model(id: 12345, context: a2)
-        end
-
-        f1 = Favorite.create!(context: @course, user: user)
-        f2 = Favorite.create(context: @group, user: user)
-        f1.update_columns(root_account_id: nil)
-        f2.update_columns(root_account_id: nil)
-
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {group: :root_account_id}, f1.id, f2.id)
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, f1.id, f2.id)
-
-        expect(f1.reload.root_account_id).to eq @course.root_account.global_id
-        expect(f2.reload.root_account_id).to eq @group.root_account.global_id
-      end
     end
   end
 
