@@ -288,20 +288,10 @@ describe InstFS do
         end
       end
 
-      it "generates the same url within a cache window of time so it's not unique every time" do
-        url1 = InstFS.authenticated_thumbnail_url(@attachment)
-        url2 = InstFS.authenticated_thumbnail_url(@attachment)
-        expect(url1).to eq(url2)
-
-        Timecop.freeze(1.day.from_now) do
-          url3 = InstFS.authenticated_thumbnail_url(@attachment)
-          expect(url1).to_not eq(url3)
-
-          first_token = url1.split(/token=/).last
-          expect(->{
-            Canvas::Security.decode_jwt(first_token, [ secret ])
-          }).to raise_error(Canvas::Security::TokenExpired)
-        end
+      it "includes a jti in the token" do
+        url = InstFS.authenticated_thumbnail_url(@attachment, expires_in: 1.hour)
+        token = url.split(/token=/).last
+        expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
       end
 
     end
