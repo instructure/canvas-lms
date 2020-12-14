@@ -8871,8 +8871,15 @@ describe Assignment do
           developer_key: dev_key
         )
       end
+      let(:custom_params) do
+        {
+          context_id: '$Context.id',
+          referer_id: 123
+        }
+      end
       let(:assignment) do
         @course.assignments.create!(submission_types: 'external_tool',
+                                    lti_resource_link_custom_params: custom_params.to_json,
                                     external_tool_tag_attributes: { content: tool },
                                     **assignment_valid_attributes)
       end
@@ -8887,6 +8894,7 @@ describe Assignment do
           expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
           expect(assignment.line_items.first.resource_link.context_id).to eq assignment.id
           expect(assignment.line_items.first.resource_link.context_type).to eq 'Assignment'
+          expect(assignment.line_items.first.resource_link.custom).to eq custom_params.with_indifferent_access
           expect(assignment.line_items.first.resource_link.current_external_tool(assignment.context)).to eq tool
           expect(assignment.external_tool_tag.content).to eq tool
           expect(assignment.line_items.first.resource_link.line_items.first).to eq assignment.line_items.first
@@ -8921,6 +8929,38 @@ describe Assignment do
 
         it_behaves_like 'line item and resource link existence check'
         it_behaves_like 'assignment to line item attribute sync check'
+
+        it 'change the `custom` attribute at resource link when it is informed' do
+          assignment.lti_resource_link_custom_params = nil
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+
+          expect(resource_link.custom).to be_nil
+
+          assignment.lti_resource_link_custom_params = "{}"
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+
+          expect(resource_link.custom).to eq({})
+
+          new_custom_params = {
+            context_title: '$Context.title',
+            referer_id: 999,
+            referer_name: 'Custom params changed'
+          }
+
+          assignment.lti_resource_link_custom_params = new_custom_params.to_json
+          assignment.save!
+          assignment.reload
+
+          resource_link = assignment.line_items.first.resource_link
+
+          expect(resource_link.custom).to eq new_custom_params.with_indifferent_access
+        end
 
         context 'and no resource link or line item exist' do
           let(:resource_link) { subject.line_items.first.resource_link }
@@ -9135,6 +9175,7 @@ describe Assignment do
       context 'given an assignment not yet bound to a LTI 1.3 tool' do
         let(:assignment) do
           @course.assignments.create!(submission_types: 'external_tool',
+                                      lti_resource_link_custom_params: custom_params.to_json,
                                       **assignment_valid_attributes)
         end
 

@@ -68,6 +68,8 @@ class Assignment < ActiveRecord::Base
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
 
+  attribute :lti_resource_link_custom_params, :string, default: nil
+
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
   has_many :observer_alerts, through: :all_submissions
@@ -1091,6 +1093,7 @@ class Assignment < ActiveRecord::Base
     if lti_1_3_external_tool_tag? && line_items.empty?
       rl = Lti::ResourceLink.create!(
         context: self,
+        custom: lti_resource_link_custom_params_as_hash,
         resource_link_id: lti_context_id,
         context_external_tool: ContextExternalTool.from_content_tag(
           external_tool_tag,
@@ -1104,8 +1107,32 @@ class Assignment < ActiveRecord::Base
         find(&:assignment_line_item?)&.
         update!(label: title, score_maximum: points_possible)
     end
+
+    if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
+      return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+
+      primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+    end
   end
   protected :update_line_items
+
+  def lti_resource_link_custom_params_as_hash
+    return nil unless lti_resource_link_custom_params
+
+    JSON.parse(lti_resource_link_custom_params, symbolized_keys: true)
+  rescue JSON::ParserError
+    nil
+  end
+  private :lti_resource_link_custom_params_as_hash
+
+  def primary_resource_link
+    @primary_resource_link ||= begin
+      lti_resource_links.find_by(
+        resource_link_id: lti_context_id,
+        context: self
+      )
+    end
+  end
 
   def lti_1_3_external_tool_tag?
     return false unless external_tool?

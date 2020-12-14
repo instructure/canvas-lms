@@ -4866,7 +4866,8 @@ describe AssignmentsApiController, type: :request do
             'url' => 'http://www.example.com',
             'new_tab' => false,
             'resource_link_id' => ContextExternalTool.opaque_identifier_for(@tool_tag, @tool_tag.context.shard),
-            'external_data' => nil
+            'external_data' => nil,
+            'custom' => nil
           })
         end
 

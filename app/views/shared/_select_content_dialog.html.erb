@@ -104,6 +104,7 @@
           <%= t :external_tool_notice, "Select a tool from the list below, or enter a URL for an external tool you already know is configured with Basic LTI to add a link to it to this *module*.", :wrapper => '<span class="holder_type">\1</span>' %>
         </div>
         <a href="<%= context_url(@context, controller:'lti/lti_apps', action:'launch_definitions', :placements => lti_app_placements, :per_page => '100') %>" class="external_tools_url" style="display: none;">&nbsp;</a>
+        <input type="hidden" name="custom_params" id="external_tool_create_custom_params" />
         <table>
           <tr>
             <td colspan="2">
