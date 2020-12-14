@@ -22,4 +22,4 @@ test:
   # warning: the redis database will get cleared before each test, so if you
   # use this server for anything else, make sure to set aside a database id for
   # these tests to use.
-  database: 1
+  db: 1

@@ -509,7 +509,7 @@ pipeline {
 
             timedStage('Run Migrations') {
               timeout(time: 10) {
-                def cacheLoadScope = configuration.isChangeMerged() ? '' : env.IMAGE_CACHE_MERGE_SCOPE
+                def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
                 def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
 
                 libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
@@ -525,7 +525,8 @@ pipeline {
                   "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
                   "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
                   "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
-                  "POSTGRES_PASSWORD=sekret"
+                  "POSTGRES_PASSWORD=sekret",
+                  "RSPEC_PROCESSES=4"
                 ]) {
                   credentials.withStarlordCredentials({ ->
                     sh """

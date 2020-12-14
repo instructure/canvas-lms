@@ -11,6 +11,6 @@ development:
   #
   # url:
   # - localhost
-  # database: 0
+  # db: 0
   #
   #

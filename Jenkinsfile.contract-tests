@@ -41,7 +41,7 @@ def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenki
     try {
       sh script_name
     } finally {
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
     }
   }
 }

@@ -351,8 +351,9 @@ RSpec.configure do |config|
 
   # DOCKER_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
   if ENV['DOCKER_PROCESSES']
+    file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
-    config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
+    config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
   end
 
   if ENV['RSPEC_LOG']
