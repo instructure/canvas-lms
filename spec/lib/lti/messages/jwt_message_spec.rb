@@ -681,16 +681,18 @@ describe Lti::Messages::JwtMessage do
     before { tool.update!(workflow_state: 'public') }
 
     shared_examples 'sets role scope mentor' do
-      it 'adds role scope mentor' do
-        course
-        observer = user_factory
-        observer.update!(lti_context_id: SecureRandom.uuid)
-        observer_enrollment = course.enroll_user(observer, 'ObserverEnrollment')
-        observer_enrollment.update_attribute(:associated_user_id, user.id)
-        allow_any_instance_of(Lti::Messages::JwtMessage).to receive(:current_observee_list).and_return([observer.lti_context_id])
+      let(:student) { user_factory }
 
+      before do
+        course.enroll_student(student)
+        enrollment = course.enroll_user(user, "ObserverEnrollment", associated_user_id: student)
+        enrollment.update!(workflow_state: 'active')
+        course.update!(workflow_state: 'available')
+      end
+
+      it 'adds role scope mentor' do
         expect(decoded_jwt['https://purl.imsglobal.org/spec/lti/claim/role_scope_mentor']).to match_array [
-          observer.lti_context_id
+          student.lti_id
         ]
       end
     end

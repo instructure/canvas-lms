@@ -169,7 +169,7 @@ module Lti::Messages
         @user.observer_enrollments.current.
           where(course_id: @context.id).
           preload(:associated_user).
-          map { |e| e.try(:associated_user).try(:lti_context_id) }.compact
+          map { |e| e.try(:associated_user).try(:lti_id) }.compact
       end
     end
 
