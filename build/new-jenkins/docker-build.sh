@@ -59,12 +59,9 @@ RUBY_RUNNER_IMAGE_ID=$(docker images --filter=reference=local/ruby-runner --form
 YARN_CACHE_MD5=$(docker run local/cache-helper-collect-yarn sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 PACKAGES_CACHE_MD5=$(docker run local/cache-helper-collect-packages sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
 WEBPACK_CACHE_MD5=$(docker run local/cache-helper-collect-webpack sh -c "find /tmp/dst -type f -exec md5sum {} \; | sort -k 2 | md5sum")
-WEBPACK_CACHE_DOCKERFILE_MD5=$( \
-  cat \
-    Dockerfile.jenkins.webpack-builder \
-    Dockerfile.jenkins.webpack-cache \
-  | md5sum \
-)
+YARN_RUNNER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.yarn-runner | md5sum)
+WEBPACK_BUILDER_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-builder | md5sum)
+WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
 
 WEBPACK_CACHE_BUILD_ARGS=(
   --build-arg JS_BUILD_NO_UGLIFY="$JS_BUILD_NO_UGLIFY"
@@ -72,6 +69,8 @@ WEBPACK_CACHE_BUILD_ARGS=(
 WEBPACK_CACHE_PARTS=(
   $RUBY_RUNNER_IMAGE_ID
   "${WEBPACK_CACHE_BUILD_ARGS[@]}"
+  $YARN_RUNNER_DOCKERFILE_MD5
+  $WEBPACK_BUILDER_DOCKERFILE_MD5
   $WEBPACK_CACHE_DOCKERFILE_MD5
 
   $YARN_CACHE_MD5
