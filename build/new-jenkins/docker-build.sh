@@ -86,6 +86,13 @@ WEBPACK_CACHE_SELECTED_TAG=""; pull_first_tag "WEBPACK_CACHE_SELECTED_TAG" ${WEB
 if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
   # If any webpack-related file has changed, we need to pull $WEBPACK_BUILDER_CACHE_TAG and rebuild.
   ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $WEBPACK_BUILDER_CACHE_TAG || true
+  ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_RUNNER_CACHE_TAG || true
+
+  docker build \
+    --cache-from $YARN_RUNNER_CACHE_TAG \
+    --tag "local/yarn-runner" \
+    --tag "$YARN_RUNNER_CACHE_TAG" \
+    - < Dockerfile.jenkins.yarn-runner
 
   docker build \
     --cache-from $WEBPACK_BUILDER_CACHE_TAG \

@@ -353,6 +353,7 @@ pipeline {
     JS_DEBUG_IMAGE = "$BUILD_IMAGE-js-debug:${imageTagVersion()}-$TAG_SUFFIX"
 
     RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
+    YARN_RUNNER_IMAGE = "$BUILD_IMAGE-yarn-runner:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
     WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
@@ -489,6 +490,7 @@ pipeline {
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                      "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
                     ]) {
                       sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                     }
@@ -500,6 +502,9 @@ pipeline {
                 if(configuration.isChangeMerged()) {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE || true"
                   slackSendCacheAvailable(env.WEBPACK_BUILDER_CACHE_IMAGE)
+
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_IMAGE || true"
+                  slackSendCacheAvailable(env.YARN_RUNNER_IMAGE)
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
                   slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
@@ -565,6 +570,7 @@ pipeline {
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
+                      "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
                     ]) {
                       slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
                         sh "build/new-jenkins/docker-build.sh"
