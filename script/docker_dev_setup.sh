@@ -231,6 +231,23 @@ function display_next_steps {
 
     docker-compose run --rm web bundle exec rspec
 
+   Running Selenium tests:
+
+    add docker-compose/selenium.override.yml in the .env file
+      echo ':docker-compose/selenium.override.yml' >> .env
+
+    build the selenium container
+      docker-compose build selenium-chrome
+
+    run selenium
+      docker-compose run --rm web bundle exec rspec spec/selenium
+
+    Virtual network remote desktop sharing to selenium container
+      for Firefox:
+        $ open vnc://secret:secret@seleniumff.docker
+      for chrome:
+        $ open vnc://secret:secret@seleniumch.docker:5901
+
   I'm stuck. Where can I go for help?
 
     FAQ:           https://github.com/instructure/canvas-lms/wiki/FAQ
