@@ -520,8 +520,16 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
-  class ServiceError < DirectUploadError; end
-  class BadRequestError < DirectUploadError; end
+  class ServiceError < DirectUploadError
+    def response_status
+      502
+    end
+  end
+  class BadRequestError < DirectUploadError
+    def response_status
+      400
+    end
+  end
   class ExportReferenceError < StandardError; end
   class DuplicationError < StandardError; end
   class DeletionError < StandardError; end
