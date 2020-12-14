@@ -223,7 +223,7 @@ module AccountReports::ReportHelper
     shards << root_account.shard
     User.preload_shard_associations(users)
     shards = shards & users.map(&:associated_shards).flatten
-    pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users)
+    pseudonyms = Pseudonym.shard(shards.uniq).where(user_id: users.map(&:id))
     pseudonyms = pseudonyms.active unless include_deleted
     pseudonyms.each do |p|
       p.account = root_account if p.account_id == root_account.id
