@@ -324,10 +324,11 @@ pipeline {
 
     RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
     YARN_RUNNER_IMAGE = "$BUILD_IMAGE-yarn-runner:${configuration.gerritBranchSanitized()}"
-    WEBPACK_BUILDER_CACHE_IMAGE = "$BUILD_IMAGE-webpack-builder:${configuration.gerritBranchSanitized()}"
-    WEBPACK_BUILDER_IMAGE = "$BUILD_IMAGE-webpack-builder:${imageTagVersion()}-$TAG_SUFFIX"
 
+    WEBPACK_BUILDER_PREFIX = "$BUILD_IMAGE-webpack-builder"
     WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
+
+    WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:${imageTagVersion()}-$TAG_SUFFIX"
 
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
@@ -457,7 +458,7 @@ pipeline {
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
-                      "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
+                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
@@ -470,8 +471,8 @@ pipeline {
                 sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
                 if(configuration.isChangeMerged()) {
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_CACHE_IMAGE || true"
-                  slackSendCacheAvailable(env.WEBPACK_BUILDER_CACHE_IMAGE)
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true"
+                  slackSendCacheAvailable(env.WEBPACK_BUILDER_PREFIX)
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_IMAGE || true"
                   slackSendCacheAvailable(env.YARN_RUNNER_IMAGE)
@@ -488,6 +489,7 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
                 } else {
                   sh(script: """
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
                     ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                   """, label: 'upload pre-merge specific images')
                 }
@@ -497,7 +499,9 @@ pipeline {
                 // If we are unable to push up the webpack builder image, then this
                 // build should use the currently cached image.
                 if (hasWebpackBuilderImage != 0) {
-                  dockerUtils.tagRemote(env.WEBPACK_BUILDER_CACHE_IMAGE, env.WEBPACK_BUILDER_IMAGE)
+                  def webpackBuilderLabel = sh(script: "docker inspect $PATCHSET_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}'", returnStdout: true)
+
+                  dockerUtils.tagRemote(webpackBuilderLabel, env.WEBPACK_BUILDER_IMAGE)
                 }
 
                 if (isPatchsetPublishable()) {
@@ -538,7 +542,7 @@ pipeline {
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1",
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
-                      "WEBPACK_BUILDER_CACHE_TAG=${env.WEBPACK_BUILDER_CACHE_IMAGE}",
+                      "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
                     ]) {
