@@ -93,20 +93,29 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
   WEBPACK_BUILDER_SELECTED_TAG=""; pull_first_tag "WEBPACK_BUILDER_SELECTED_TAG" ${WEBPACK_BUILDER_TAGS[LOAD_TAG]} ${WEBPACK_BUILDER_TAGS[LOAD_FALLBACK_TAG]}
 
   if [ -z "${WEBPACK_BUILDER_SELECTED_TAG}" ]; then
-    ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_RUNNER_CACHE_TAG || true
+    declare -A YARN_RUNNER_TAGS; compute_tags "YARN_RUNNER_TAGS" $YARN_RUNNER_PREFIX ${YARN_RUNNER_PARTS[@]}
+
+    YARN_RUNNER_SELECTED_TAG=""; pull_first_tag "YARN_RUNNER_SELECTED_TAG" ${YARN_RUNNER_TAGS[LOAD_TAG]} ${YARN_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
+
+    if [ -z "${YARN_RUNNER_SELECTED_TAG}" ]; then
+      docker build \
+        --tag "${YARN_RUNNER_TAGS[SAVE_TAG]}" \
+        - < Dockerfile.jenkins.yarn-runner
+
+      YARN_RUNNER_SELECTED_TAG=${YARN_RUNNER_TAGS[SAVE_TAG]}
+    fi
+
+    tag_many $YARN_RUNNER_SELECTED_TAG local/yarn-runner ${YARN_RUNNER_TAGS[SAVE_TAG]}
 
     docker build \
-      --cache-from $YARN_RUNNER_CACHE_TAG \
-      --tag "local/yarn-runner" \
-      --tag "$YARN_RUNNER_CACHE_TAG" \
-      - < Dockerfile.jenkins.yarn-runner
-
-    docker build \
+      --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
       --tag "${WEBPACK_BUILDER_TAGS[SAVE_TAG]}" \
       ${WEBPACK_BUILDER_TAG:+ --tag "$WEBPACK_BUILDER_TAG"} \
       - < Dockerfile.jenkins.webpack-builder
 
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
+  else
+    YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
   fi
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
@@ -116,6 +125,7 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
   # built-in caching.
   docker build \
     "${WEBPACK_CACHE_BUILD_ARGS[@]}" \
+    --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
     --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
     --tag "${WEBPACK_CACHE_TAGS[SAVE_TAG]}" \
     --target webpack-cache \
@@ -123,6 +133,7 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
 
   WEBPACK_CACHE_SELECTED_TAG=${WEBPACK_CACHE_TAGS[SAVE_TAG]}
 else
+  YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
   WEBPACK_BUILDER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}')
 fi
 
@@ -133,6 +144,7 @@ if [ -n "${1:-}" ]; then
   docker build \
     --build-arg COMPILE_ADDITIONAL_ASSETS="$COMPILE_ADDITIONAL_ASSETS" \
     --file Dockerfile.jenkins.final \
+    --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
     --label "WEBPACK_BUILDER_SELECTED_TAG=$WEBPACK_BUILDER_SELECTED_TAG" \
     --label "WEBPACK_CACHE_SELECTED_TAG=$WEBPACK_CACHE_SELECTED_TAG" \
     --tag "$1" \
