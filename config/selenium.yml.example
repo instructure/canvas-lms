@@ -1,6 +1,7 @@
 test:
   host: "localhost"
   browser: "chrome"
+  chromedriver_version: "87.0.4280.20"
   # auto_open_devtools: true
   # version: "45.0"
   # platform: "Windows 10"

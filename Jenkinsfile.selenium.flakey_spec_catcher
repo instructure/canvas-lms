@@ -201,7 +201,7 @@ pipeline {
     // until we figure out how to run them, we should ignore them
     FSC_IGNORE_FILES = "gems/.*/spec/,spec/contracts/"
     POSTGRES_PASSWORD = 'sekret'
-    SELENIUM_VERSION = "3.141.59-20200719"
+    SELENIUM_VERSION = "3.141.59-20201119"
 
     // Targeting 10 minutes / node, each node runs DOCKER_PROCESSES threads and
     // repeats each test FSC_REPEAT_FACTOR times.
