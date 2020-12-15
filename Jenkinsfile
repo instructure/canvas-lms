@@ -323,8 +323,8 @@ pipeline {
     JS_DEBUG_IMAGE = "$BUILD_IMAGE-js-debug:${imageTagVersion()}-$TAG_SUFFIX"
 
     RUBY_RUNNER_IMAGE = "$BUILD_IMAGE-ruby-runner:${configuration.gerritBranchSanitized()}"
-    YARN_RUNNER_IMAGE = "$BUILD_IMAGE-yarn-runner:${configuration.gerritBranchSanitized()}"
 
+    YARN_RUNNER_PREFIX = "$BUILD_IMAGE-yarn-runner"
     WEBPACK_BUILDER_PREFIX = "$BUILD_IMAGE-webpack-builder"
     WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
 
@@ -461,7 +461,7 @@ pipeline {
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
+                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
                       sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
                     }
@@ -474,8 +474,8 @@ pipeline {
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true"
                   slackSendCacheAvailable(env.WEBPACK_BUILDER_PREFIX)
 
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_IMAGE || true"
-                  slackSendCacheAvailable(env.YARN_RUNNER_IMAGE)
+                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true"
+                  slackSendCacheAvailable(env.YARN_RUNNER_PREFIX)
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_IMAGE"
                   slackSendCacheAvailable(env.RUBY_RUNNER_IMAGE)
@@ -490,6 +490,7 @@ pipeline {
                 } else {
                   sh(script: """
                     ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
                     ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                   """, label: 'upload pre-merge specific images')
                 }
@@ -544,7 +545,7 @@ pipeline {
                       "RUBY_RUNNER_TAG=${env.RUBY_RUNNER_IMAGE}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
-                      "YARN_RUNNER_CACHE_TAG=${env.YARN_RUNNER_IMAGE}",
+                      "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
                       slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
                         sh "build/new-jenkins/docker-build.sh"

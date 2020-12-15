@@ -2,11 +2,13 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
+export CACHE_VERSION="2020-12-15"
+
 function compute_tags {
   local -n tags=$1; shift
   local cachePrefix=$1; shift
   local cacheId=$(echo "$@" | md5sum | cut -d' ' -f1)
-  local cacheSalt=$(echo "$DOCKER_CACHE_SALT" | md5sum | cut -c1-8)
+  local cacheSalt=$(echo "$CACHE_VERSION" | md5sum | cut -c1-8)
 
   tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId"
   tags[LOAD_FALLBACK_TAG]="$cachePrefix:$CACHE_LOAD_FALLBACK_SCOPE-$cacheSalt-$cacheId"
