@@ -496,15 +496,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    it 'should populate the root_account_id on DiscussionEntry' do
-      discussion_topic_model(context: @course)
-      de = @topic.discussion_entries.create!(user: user_model)
-      de.update_columns(root_account_id: nil)
-      expect(de.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(de.reload.root_account_id).to eq @course.root_account_id
-    end
-
     it 'should populate the root_account_id on DiscussionEntryParticipant' do
       discussion_topic_model(context: @course)
       de = @topic.discussion_entries.create!(user: user_model)
@@ -1246,32 +1237,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it 'should ignore nil reflections' do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(LearningOutcome, nil)).to be true
     end
-
-    context 'with_sharding' do
-      specs_require_sharding
-
-      it 'should actually find missing root account ids on current shard' do
-        discussion_topic_model(context: @course)
-        de = @topic.discussion_entries.create!(user: user_model)
-        de.update_columns(root_account_id: nil)
-        @topic.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
-      end
-
-      it 'should actually find missing root account ids on other shards' do
-        @shard1.activate do
-          discussion_topic_model(context: @course)
-        end
-        de = @topic.discussion_entries.create!(user: user_model)
-        de.update_columns(root_account_id: nil)
-        @topic.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
-      end
-    end
-
-
   end
 
   describe '#populate_root_account_ids' do
