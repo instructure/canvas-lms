@@ -39,14 +39,19 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {MediaPlayer} from '@instructure/ui-media-player'
 
-import {RocketSVG, useComputerPanelFocus, isAudio, sizeMediaPlayer} from '@instructure/canvas-media'
+import {
+  RocketSVG,
+  useComputerPanelFocus,
+  isAudio,
+  isPreviewable,
+  sizeMediaPlayer
+} from '@instructure/canvas-media'
 
 import formatMessage from '../../../../format-message'
 import {getIconFromType, isAudioOrVideo, isImage, isText} from '../fileTypeUtils'
 
 function isPreviewableAudioOrVideo(type) {
-  // chrome reports .avi files as video/avi, firefox and safari as video/x-msvideo
-  return type !== 'video/avi' && type !== 'video/x-msvideo' && isAudioOrVideo(type)
+  return isPreviewable(type) && isAudioOrVideo(type)
 }
 
 function readFile(theFile) {
@@ -186,6 +191,9 @@ export default function ComputerPanel({theFile, setFile, setError, accept, label
             style={{textAlign: 'center'}}
           >
             <preview.preview size="medium" />
+            <Text as="p" weight="normal">
+              {formatMessage('No preview is available for this file.')}
+            </Text>
           </div>
         )
       }

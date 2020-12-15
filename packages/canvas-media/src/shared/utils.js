@@ -18,6 +18,16 @@
 
 export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
 
+export const NON_PREVIEWABLE_TYPES = [
+  'audio/x-ms-wma',
+  'video/avi',
+  'video/x-msvideo',
+  'video/x-ms-wma',
+  'video/x-ms-wmv'
+]
+
+export const isPreviewable = type => !NON_PREVIEWABLE_TYPES.includes(type)
+
 export function isVideo(type) {
   return /^video/.test(type)
 }
