@@ -105,28 +105,5 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
         }.to change { record.reload.root_account_ids }.from([]).to([Account.default.id])
       end
     end
-
-    context 'group-related tables' do
-      context 'when there are no groups for the site admin account' do
-        it_behaves_like 'a datafixup that populates missing root account ids', DiscussionTopic do
-          let(:record) do
-            expect(Group.where(root_account_id: Account.site_admin.id).take).to eq(nil)
-            discussion_topic_model(context: course)
-          end
-        end
-      end
-
-      context 'when there are groups for the site admin account' do
-        it "doesn't fill root_account_id in on the group-related model" do
-          group_model(context: Account.site_admin)
-          expect(Group.where(root_account_id: Account.site_admin.id).take).to_not eq(nil)
-          record = discussion_topic_model(context: course)
-          record.update_column(:root_account_id, nil)
-          expect(record.reload.root_account_id).to be_nil
-          described_class.populate_missing_root_account_ids(Account.default.id)
-          expect(record.reload.root_account_id).to be_nil
-        end
-      end
-    end
   end
 end
