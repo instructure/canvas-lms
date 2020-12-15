@@ -35,7 +35,7 @@ export function downloadToWrap(url) {
   delete parsed.search
   delete parsed.query.download_frd
   parsed.query.wrap = '1'
-  parsed.pathname = parsed.pathname.replace(/\/download\/?$/, '')
+  parsed.pathname = parsed.pathname.replace(/\/(?:download|preview)\/?$/, '')
 
   return format(parsed)
 }

@@ -53,6 +53,12 @@ describe('Common file url utils', () => {
       url = downloadToWrap(testurl)
       strictEqual(url, testurl)
     })
+
+    it('strips "preview" too', () => {
+      const testurl = '/some/path/preview'
+      url = downloadToWrap(testurl)
+      strictEqual(url, '/some/path?wrap=1')
+    })
   })
 
   describe('fixupFileUrl', () => {
