@@ -79,11 +79,8 @@ class Canvas::Migration::Worker::CCWorker < Canvas::Migration::Worker::Base
          end
        end
       saved
-    rescue Canvas::Migration::Error
-      cm.add_error($!.message, :exception => $!)
-      cm.workflow_state = :failed
-      cm.job_progress.fail unless cm.skip_job_progress
-      cm.save
+    rescue Canvas::Migration::Error => e
+      cm.fail_with_error!(e, error_message: e.message, issue_level: :warning)
     rescue => e
       cm.fail_with_error!(e) if cm
     end

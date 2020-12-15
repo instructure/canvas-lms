@@ -270,7 +270,8 @@ class ContentMigration < ActiveRecord::Base
   end
 
   def add_error(user_message, opts={})
-    add_issue(user_message, :error, opts)
+    level = opts.fetch(:issue_level, :error)
+    add_issue(user_message, level, opts)
   end
 
   def add_warning(user_message, opts={})
@@ -299,14 +300,15 @@ class ContentMigration < ActiveRecord::Base
     add_warning(t('errors.import_error', "Import Error:") + " #{item_type} - \"#{item_name}\"", warning)
   end
 
-  def fail_with_error!(exception_or_info)
-    opts={}
+  def fail_with_error!(exception_or_info, error_message: nil, issue_level: :error)
+    opts={ issue_level: issue_level }
     if exception_or_info.is_a?(Exception)
       opts[:exception] = exception_or_info
     else
       opts[:error_message] = exception_or_info
     end
-    add_error(t(:unexpected_error, "There was an unexpected error, please contact support."), opts)
+    message = error_message || t(:unexpected_error, "There was an unexpected error, please contact support.")
+    add_error(message, opts)
     self.workflow_state = :failed
     job_progress.fail if job_progress && !skip_job_progress
     save
