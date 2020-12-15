@@ -47,7 +47,7 @@ export default function LtiTool(props) {
         tabIndex="0"
       >
         <span style={{marginRight: '.5rem'}}>
-          <img src={image} alt="" />
+          <img src={image} width="16" height="16" alt="" />
         </span>
         <Text weight="bold">{title}</Text>
       </View>
