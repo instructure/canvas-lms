@@ -83,13 +83,13 @@
     "variable_name": "ic-brand-header-image",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
-    "default": "/images/canvas_logomark_only@2x.png"
+    "default": "/images/NterOne_Logo.png"
   },
   {
     "variable_name": "ic-brand-mobile-global-nav-logo",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg,image/svg+xml,image/svg",
-    "default": "/images/mobile-global-nav-logo.svg"
+    "default": "/images/NterOne_Logo.png"
   }
 ]},
 {
@@ -121,12 +121,12 @@
     "variable_name": "ic-brand-msapplication-tile-square",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg",
-    "default": "/images/windows-tile.png"
+    "default": "/images/NterOne_Logo.png"
   },{
     "variable_name": "ic-brand-msapplication-tile-wide",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg",
-    "default": "/images/windows-tile-wide.png"
+    "default": "/images/NterOne_Logo.png"
   },{
     "variable_name": "ic-brand-right-sidebar-logo",
     "type": "image",
@@ -156,7 +156,7 @@
     "variable_name": "ic-brand-Login-logo",
     "type": "image",
     "accept": "image/png,image/gif,image/jpeg, image/svg+xml,image/svg",
-    "default": "/images/login/canvas-logo.svg"
+    "default": "/images/login/NterOne_Logo.png"
   },
   {
     "variable_name": "ic-brand-Login-Content-bgd-color",
