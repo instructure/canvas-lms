@@ -134,7 +134,8 @@ module Outcomes
           calculation_method: method&.calculation_method,
           calculation_int: method&.calculation_int,
           points_possible: mastery_scale&.points_possible,
-          mastery_points: mastery_scale&.mastery_points
+          mastery_points: mastery_scale&.mastery_points,
+          ratings: mastery_scale&.ratings_hash
         }
       end
     end
