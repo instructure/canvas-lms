@@ -629,20 +629,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with GroupCategory with course context' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { group_category(context: @course) }
-        let(:reference_record) { @course }
-      end
-    end
-
-    context 'with GroupCategory with account context' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { group_category(context: reference_record) }
-        let(:reference_record) { account_model }
-      end
-    end
-
     context 'with LatePolicy' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         # for some reason late_policy_model doesn't save the record
