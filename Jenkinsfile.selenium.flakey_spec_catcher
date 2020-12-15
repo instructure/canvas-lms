@@ -209,7 +209,7 @@ pipeline {
     // Assumption: selenium tests take 500ms * SELENIUM_RATIO / test
     DOCKER_PROCESSES = 3
     FSC_REPEAT_FACTOR = 10
-    MAX_NODES = 10
+    MAX_NODES = configuration.getString('fsc-max-nodes', '10')
     SELENIUM_RATIO = 20
     TESTS_PER_NODE = 200
   }
