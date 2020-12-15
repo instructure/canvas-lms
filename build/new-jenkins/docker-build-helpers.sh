@@ -2,7 +2,7 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-export CACHE_VERSION="2020-12-15"
+export CACHE_VERSION="2020-12-15.1"
 
 function compute_tags {
   local -n tags=$1; shift
