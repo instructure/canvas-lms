@@ -556,7 +556,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     context 'sidebar search' do
-      it 'searches for wiki course link to create link in body', ignore_js_errors: true do
+      it 'should search for wiki course link to create link in body', ignore_js_errors: true do
         title = 'test_page'
         title2 = 'test_page2'
         unpublished = false
@@ -586,7 +586,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'searches for document link to add to body', ignore_js_errors: true do
+      it 'should search for document link to add to body', ignore_js_errors: true do
         title1 = 'text_file1.txt'
         title2 = 'text_file2.txt'
         create_course_text_file(title1)
@@ -610,7 +610,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'search for an image in sidebar in image tray', ignore_js_errors: true do
+      it 'should search for an image in sidebar in image tray', ignore_js_errors: true do
         title1 = 'email.png'
         title2 = 'image_icon.gif'
         add_embedded_image(title1)
@@ -633,6 +633,45 @@ describe 'RCE next tests', ignore_js_errors: true do
         in_frame tiny_rce_ifr_id do
           expect(wiki_body_image.attribute('src')).to include course_file_id_path(image2)
         end
+      end
+
+      it 'should search for items when different accordian section opened', ignore_js_errors: true do
+        # Add two pages
+        title = 'test_page'
+        title2 = 'icon_page'
+        unpublished = false
+        edit_roles = 'public'
+
+        create_wiki_page(title, unpublished, edit_roles)
+        create_wiki_page(title2, unpublished, edit_roles)
+
+        # Add two assignments
+        title = 'icon assignment'
+        title2 = 'random assignment'
+        @course.assignments.create!(name: title)
+        @course.assignments.create!(name: title2)
+
+        # Add two images
+        title1 = 'email.png'
+        title2 = 'image_icon.gif'
+        add_embedded_image(title1)
+        add_embedded_image(title2)
+
+        visit_front_page_edit(@course)
+        click_links_toolbar_menu_button
+        click_course_links
+        enter_search_data('ico')
+        click_pages_accordion
+        expect(course_item_links_list.count).to eq(1)
+
+        click_assignments_accordion
+        expect(course_item_links_list.count).to eq(1)
+
+        change_content_tray_content_type('Files')
+        change_content_tray_content_subtype('Images')
+        change_content_tray_content_type('Course Files')
+        expect(image_links.count).to eq(1)
+
       end
     end
 

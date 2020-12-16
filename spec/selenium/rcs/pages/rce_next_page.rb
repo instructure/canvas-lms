@@ -584,6 +584,19 @@ module RCENextPage
     option.click
   end
 
+  def content_tray_content_subtype
+    fxpath('//input[ancestor::span[. = "Content Subtype"]]')
+  end
+
+  def change_content_tray_content_subtype(subtype)
+    content_subtype = content_tray_content_subtype
+    content_subtype.click
+    options_id = content_subtype.attribute('aria-owns')
+    options = f("##{options_id}")
+    option = fj(":contains(#{subtype})", options)
+    option.click
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
