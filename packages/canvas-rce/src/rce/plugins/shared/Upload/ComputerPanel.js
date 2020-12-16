@@ -90,7 +90,11 @@ function readFile(theFile) {
 export default function ComputerPanel({theFile, setFile, setError, accept, label, bounds}) {
   const [messages, setMessages] = useState([])
   const [preview, setPreview] = useState({preview: null, isLoading: false})
-  const height = 0.8 * (bounds.height - 38 - px('1.5rem')) // the trashcan is 38px tall and the 1.5rem margin-bottom
+  // the trashcan is 38px tall and the 1.5rem margin-bottom
+  // the 350 is to guarantee the video doesn't oveflow into the copyright UI,
+  // which should probably be rendered here and not up in the modal because
+  // dealing with Tabs and size is nearly impossible
+  const height = Math.min(350, 0.8 * (bounds.height - 38 - px('1.5rem')))
   const width = 0.8 * bounds.width
 
   useEffect(() => {

@@ -71,5 +71,18 @@ describe('media utilities', () => {
       expect(sz.width).toEqual('400px')
       expect(sz.height).toEqual('800px')
     })
+    it('constrains the height to be within the container', () => {
+      const sz = sizeMediaPlayer(
+        {videoWidth: 800, videoHeight: 500},
+        'video',
+        {
+          width: 800,
+          height: 400
+        },
+        true
+      )
+      expect(sz.width).toEqual('640px')
+      expect(sz.height).toEqual('400px')
+    })
   })
 })

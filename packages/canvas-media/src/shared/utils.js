@@ -57,6 +57,11 @@ export function sizeMediaPlayer(player, type, container) {
     sz.width = (player.videoWidth / player.videoHeight) * sz.height
   }
 
+  if (sz.height > container.height) {
+    sz.width *= container.height / sz.height
+    sz.height = container.height
+  }
+
   sz.width = `${Math.round(sz.width)}px`
   sz.height = `${Math.round(sz.height)}px`
   return sz
