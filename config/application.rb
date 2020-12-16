@@ -44,6 +44,7 @@ module CanvasRails
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::AccessTokenScopeError'] = 401
     config.action_dispatch.rescue_responses['AuthenticationMethods::LoggedOutError'] = 401
+    config.action_dispatch.rescue_responses['CanvasHttp::CircuitBreakerError'] = 502
     config.action_dispatch.default_headers.delete('X-Frame-Options')
     config.action_dispatch.default_headers['Referrer-Policy'] = 'no-referrer-when-downgrade'
     config.action_controller.forgery_protection_origin_check = true
