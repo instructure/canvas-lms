@@ -187,24 +187,6 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def slackSendCacheAvailable(registryPath) {
-  def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
-
-  slackSend(
-    channel: '#jenkins_cache_noisy',
-    color: 'good',
-    message: """
-      Uploaded New Image
-
-      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
-      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
-      Registry Path: ${registryPath}
-      Revision: ${GIT_REV}
-      Instance: ${env.NODE_NAME}
-    """
-  )
-}
-
 def slackSendCacheBuild(registryPath, block) {
   def buildStartTime = System.currentTimeMillis()
 
@@ -458,30 +440,18 @@ pipeline {
                 sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $PATCHSET_TAG"
 
                 if(configuration.isChangeMerged()) {
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true"
-                  slackSendCacheAvailable(env.WEBPACK_BUILDER_PREFIX)
-
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true"
-                  slackSendCacheAvailable(env.YARN_RUNNER_PREFIX)
-
-                  sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true"
-                  slackSendCacheAvailable(env.RUBY_RUNNER_PREFIX)
-
-                  sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX'
-                  slackSendCacheAvailable(env.WEBPACK_CACHE_PREFIX)
-
                   def GIT_REV = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
                   sh "docker tag \$PATCHSET_TAG \$BUILD_IMAGE:${GIT_REV}"
 
                   sh "./build/new-jenkins/docker-with-flakey-network-protection.sh push \$BUILD_IMAGE:${GIT_REV}"
-                } else {
-                  sh(script: """
-                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
-                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
-                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
-                    ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
-                  """, label: 'upload pre-merge specific images')
                 }
+
+                sh(script: """
+                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                  ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                """, label: 'upload cache images')
 
                 def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
 
@@ -540,7 +510,6 @@ pipeline {
                       }
 
                       sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX"
-                      slackSendCacheAvailable(env.WEBPACK_CACHE_PREFIX)
                     }
                   }
                 }
