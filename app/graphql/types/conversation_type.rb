@@ -33,7 +33,13 @@ module Types
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true
     def conversation_messages_connection
-      load_association(:conversation_messages)
+      load_association(:conversation_messages).then do |messages|
+        Promise.all(
+          messages.map {|message| Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load(message)}
+        ).then do
+          messages.select {|message| message.conversation_message_participants.pluck(:user_id).include?(current_user.id)}
+        end
+      end
     end
 
     field :conversation_participants_connection, Types::ConversationParticipantType.connection_type, null: true

@@ -44,5 +44,16 @@ module Types
     def conversation
       load_association(:conversation)
     end
+
+    field :messages, ConversationMessageType.connection_type, null: true
+    def messages
+      load_association(:conversation_message_participants).then do |participants|
+        Promise.all(
+          participants.map{|participant| Loaders::AssociationLoader.for(ConversationMessageParticipant, :conversation_message).load(participant)}
+        ).then do
+          object.messages
+        end
+      end
+    end
   end
 end
