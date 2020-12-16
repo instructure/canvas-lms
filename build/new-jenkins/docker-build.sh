@@ -17,9 +17,10 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 #    layers not being used, even when their contents have not changed.
 
 # Images:
-# $RUBY_RUNNER_TAG: instructure/ruby-passenger + gems
-# $WEBPACK_BUILDER_TAG: $RUBY_RUNNER_TAG + yarn + compiled packages/
-# $WEBPACK_CACHE_TAG: $RUBY_RUNNER_TAG + final compiled assets
+# $RUBY_RUNNER_PREFIX: instructure/ruby-passenger + gems
+# $YARN_RUNNER_PREFIX: $RUBY_RUNNER_PREFIX + yarn
+# $WEBPACK_BUILDER_PREFIX: $YARN_RUNNER_PREFIX + compiled packages/
+# $WEBPACK_CACHE_PREFIX: $RUBY_RUNNER_PREFIX + final compiled assets
 # $1: final image for this build, including all rails code
 
 # Controls:
@@ -31,6 +32,8 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 #   - post-merge builds use this to pull images from previous pre-merge builds in case it is already built
 # $CACHE_SAVE_SCOPE: the scope to save the image under
 #   - always "master" for post-merge builds and <patchset_number> for pre-merge builds
+# $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
+#   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
