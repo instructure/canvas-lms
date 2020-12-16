@@ -92,31 +92,36 @@ declare -A WEBPACK_CACHE_TAGS; compute_tags "WEBPACK_CACHE_TAGS" $WEBPACK_CACHE_
 WEBPACK_CACHE_SELECTED_TAG=""; pull_first_tag "WEBPACK_CACHE_SELECTED_TAG" ${WEBPACK_CACHE_TAGS[LOAD_TAG]} ${WEBPACK_CACHE_TAGS[LOAD_FALLBACK_TAG]}
 
 if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
-  RUBY_RUNNER_SELECTED_TAG=""; pull_first_tag "RUBY_RUNNER_SELECTED_TAG" ${RUBY_RUNNER_TAGS[LOAD_TAG]} ${RUBY_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
-
-  if [ -z "${RUBY_RUNNER_SELECTED_TAG}" ]; then
-    docker build \
-      "${RUBY_RUNNER_BUILD_ARGS[@]}" \
-      --tag "${RUBY_RUNNER_TAGS[SAVE_TAG]}" \
-      - < Dockerfile.jenkins
-
-    RUBY_RUNNER_SELECTED_TAG=${RUBY_RUNNER_TAGS[SAVE_TAG]}
-  fi
-
-  tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
-
   WEBPACK_BUILDER_SELECTED_TAG=""; pull_first_tag "WEBPACK_BUILDER_SELECTED_TAG" ${WEBPACK_BUILDER_TAGS[LOAD_TAG]} ${WEBPACK_BUILDER_TAGS[LOAD_FALLBACK_TAG]}
 
   if [ -z "${WEBPACK_BUILDER_SELECTED_TAG}" ]; then
     YARN_RUNNER_SELECTED_TAG=""; pull_first_tag "YARN_RUNNER_SELECTED_TAG" ${YARN_RUNNER_TAGS[LOAD_TAG]} ${YARN_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
 
     if [ -z "${YARN_RUNNER_SELECTED_TAG}" ]; then
+      RUBY_RUNNER_SELECTED_TAG=""; pull_first_tag "RUBY_RUNNER_SELECTED_TAG" ${RUBY_RUNNER_TAGS[LOAD_TAG]} ${RUBY_RUNNER_TAGS[LOAD_FALLBACK_TAG]}
+
+      if [ -z "${RUBY_RUNNER_SELECTED_TAG}" ]; then
+        docker build \
+          "${RUBY_RUNNER_BUILD_ARGS[@]}" \
+          --tag "${RUBY_RUNNER_TAGS[SAVE_TAG]}" \
+          - < Dockerfile.jenkins
+
+        RUBY_RUNNER_SELECTED_TAG=${RUBY_RUNNER_TAGS[SAVE_TAG]}
+      fi
+
+      tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
+
       docker build \
         --label "RUBY_RUNNER_SELECTED_TAG=$RUBY_RUNNER_SELECTED_TAG" \
         --tag "${YARN_RUNNER_TAGS[SAVE_TAG]}" \
         - < Dockerfile.jenkins.yarn-runner
 
       YARN_RUNNER_SELECTED_TAG=${YARN_RUNNER_TAGS[SAVE_TAG]}
+    else
+      RUBY_RUNNER_SELECTED_TAG=$(docker inspect $YARN_RUNNER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
+
+      ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_SELECTED_TAG
+      tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
     fi
 
     tag_many $YARN_RUNNER_SELECTED_TAG local/yarn-runner ${YARN_RUNNER_TAGS[SAVE_TAG]}
@@ -130,14 +135,16 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
 
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
   else
+    RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
     YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
 
     # If we're here, that means webpack-builder was re-used, so we need to ensure
-    # that the yarn-runner image is correctly tagged under the SAVE_TAG. The pull
-    # operation should be a no-op, since it's an ancestor to the webpack-builder
-    # image.
+    # that the ancestor images are correctly tagged.
     ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $YARN_RUNNER_SELECTED_TAG
-    docker tag $YARN_RUNNER_SELECTED_TAG ${YARN_RUNNER_TAGS[SAVE_TAG]}
+    tag_many $YARN_RUNNER_SELECTED_TAG local/yarn-runner ${YARN_RUNNER_TAGS[SAVE_TAG]}
+
+    ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $RUBY_RUNNER_SELECTED_TAG
+    tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
   fi
 
   tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
