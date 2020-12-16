@@ -187,26 +187,22 @@ def maybeSlackSendRetrigger() {
   }
 }
 
-def slackSendCacheBuild(registryPath, block) {
+def slackSendCacheBuild(block) {
   def buildStartTime = System.currentTimeMillis()
 
   block()
 
   def buildEndTime = System.currentTimeMillis()
 
-  def PARENT_GIT_REV = sh(script: 'git rev-parse HEAD^', returnStdout: true).trim()
+  def buildLog = sh(script: 'cat tmp/docker-build-short.log', returnStdout: true).trim()
 
   slackSend(
     channel: '#jenkins_cache_noisy',
-    message: """
-      Built Image
-
-      Build: <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
-      Gerrit: <${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}
-      Registry Path: ${registryPath}
-      Parent: ${PARENT_GIT_REV}
+    message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
       Duration: ${buildEndTime - buildStartTime}ms
       Instance: ${env.NODE_NAME}
+
+      ```${buildLog}```
     """
   )
 }
@@ -419,7 +415,7 @@ pipeline {
                 } else {
                   def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
 
-                  slackSendCacheBuild(env.WEBPACK_CACHE_PREFIX) {
+                  slackSendCacheBuild {
                     withEnv([
                       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
@@ -505,7 +501,7 @@ pipeline {
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
-                      slackSendCacheBuild(env.PREMERGE_CACHE_IMAGE) {
+                      slackSendCacheBuild {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 

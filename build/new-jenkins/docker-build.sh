@@ -110,6 +110,8 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
           - < Dockerfile.jenkins
 
         RUBY_RUNNER_SELECTED_TAG=${RUBY_RUNNER_TAGS[SAVE_TAG]}
+
+        add_log "built ${RUBY_RUNNER_SELECTED_TAG}"
       fi
 
       tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
@@ -120,6 +122,8 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
         - < Dockerfile.jenkins.yarn-runner
 
       YARN_RUNNER_SELECTED_TAG=${YARN_RUNNER_TAGS[SAVE_TAG]}
+
+      add_log "built ${YARN_RUNNER_SELECTED_TAG}"
     else
       RUBY_RUNNER_SELECTED_TAG=$(docker inspect $YARN_RUNNER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
 
@@ -137,6 +141,8 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
       - < Dockerfile.jenkins.webpack-builder
 
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
+
+    add_log "built ${WEBPACK_BUILDER_SELECTED_TAG}"
   else
     RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
     YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_BUILDER_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
@@ -165,6 +171,8 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
     - < Dockerfile.jenkins.webpack-cache
 
   WEBPACK_CACHE_SELECTED_TAG=${WEBPACK_CACHE_TAGS[SAVE_TAG]}
+
+  add_log "built ${WEBPACK_CACHE_SELECTED_TAG}"
 else
   RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
   YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
@@ -184,4 +192,6 @@ if [ -n "${1:-}" ]; then
     --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
     --tag "$1" \
     "$WORKSPACE"
+
+  add_log "built $1"
 fi

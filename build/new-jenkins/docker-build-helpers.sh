@@ -4,6 +4,12 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 export CACHE_VERSION="2020-12-15.1"
 
+echo "" > tmp/docker-build-short.log
+
+function add_log {
+  echo -e "$1\n" >> tmp/docker-build-short.log
+}
+
 function compute_tags {
   local -n tags=$1; shift
   local cachePrefix=$1; shift
@@ -21,6 +27,8 @@ function pull_first_tag {
 
   for imageTag in $loadTags; do
     if ./build/new-jenkins/docker-with-flakey-network-protection.sh pull $imageTag; then
+      add_log "using $imageTag"
+
       selectedTag=$imageTag
 
       return
@@ -33,6 +41,8 @@ function tag_many {
   local dstTags=$@
 
   for imageTag in $dstTags; do
+    [ "$srcTag" != "$imageTag" ] && [[ "$imageTag" != "local/"* ]] && add_log "alias\n  from $srcTag\n  to $imageTag"
+
     docker tag $srcTag $imageTag
   done
 }
