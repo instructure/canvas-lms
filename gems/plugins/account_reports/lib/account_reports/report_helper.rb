@@ -341,13 +341,15 @@ module AccountReports::ReportHelper
   end
 
   def build_report_row(row:, row_number: nil, report_runner:, file: nil)
-    # force all fields to strings
-    report_runner.account_report_rows.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
-                                          row_number: row_number,
-                                          file: file,
-                                          account_report_id: report_runner.account_report_id,
-                                          account_report_runner: report_runner,
-                                          created_at: Time.zone.now)
+    report_runner.shard.activate do
+      # force all fields to strings
+      AccountReportRow.new(row: row.map { |field| field&.to_s&.encode(Encoding::UTF_8) },
+                           row_number: row_number,
+                           file: file,
+                           account_report_id: report_runner.account_report_id,
+                           account_report_runner_id: report_runner.id,
+                           created_at: Time.zone.now)
+    end
   end
 
   def number_of_items_per_runner(item_count, min: 25, max: 1000)
