@@ -314,3 +314,13 @@ test('ignores descendents of .mathjax_ignore', () => {
   ignored.appendChild(elem)
   ok(mathml.isMathJaxIgnored(elem))
 })
+
+test('deals with disconnected elements', () => {
+  // even though they should never get here
+  const elem = document.createElement('span')
+  ok(mathml.isMathJaxIgnored(elem))
+})
+
+test('handles missing element', () => {
+  ok(mathml.isMathJaxIgnored())
+})

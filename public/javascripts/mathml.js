@@ -143,12 +143,17 @@ const mathml = {
   },
 
   isMathJaxIgnored(elem) {
+    if (!elem) return true
+
+    // ignore disconnected elements
+    if (!document.body.contains(elem)) return true
+
     // elements to ignore selector
     const ignore_list =
       '.MJX_Assistive_MathML,#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat'
 
     // check if elem is in the ignore list
-    if (elem.parentElement.querySelector(ignore_list) === elem) {
+    if (elem.parentElement?.querySelector(ignore_list) === elem) {
       return true
     }
 
