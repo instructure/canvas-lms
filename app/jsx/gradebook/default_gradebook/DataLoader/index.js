@@ -37,6 +37,7 @@ export default class DataLoader {
     })
 
     const loaderConfig = {
+      requestCharacterLimit: 8000, // apache limit
       dispatch,
       gradebook,
       performanceControls,
