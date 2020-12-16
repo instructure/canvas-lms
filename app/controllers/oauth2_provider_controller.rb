@@ -86,6 +86,7 @@ class Oauth2ProviderController < ApplicationController
   end
 
   def accept
+    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
     redirect_params = Canvas::Oauth::Provider.final_redirect_params(session[:oauth2], @current_user, logged_in_user, remember_access: params[:remember_access])
     redirect_to Canvas::Oauth::Provider.final_redirect(self, redirect_params)
   end

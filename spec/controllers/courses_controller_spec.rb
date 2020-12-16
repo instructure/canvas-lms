@@ -642,8 +642,7 @@ describe CoursesController do
         @teacher = course_with_user("TeacherEnrollment", course: @course, active_all: true).user
       end
 
-      it 'shows the course notification settings page if enabled' do
-        Account.default.enable_feature!(:mute_notifications_by_course)
+      it 'shows the course notification settings page' do
         user_session(@teacher)
         get 'show', params: {id: @course.id, view: 'notifications'}
         expect(response).to be_successful
@@ -653,18 +652,6 @@ describe CoursesController do
           contains_js_bundle = js_bundle.include? :course_notification_settings_show if js_bundle.include? :course_notification_settings_show
         end
         expect(contains_js_bundle).to be true
-      end
-
-      it 'does not show the course notification settings page if disabled' do
-        user_session(@teacher)
-        get 'show', params: {id: @course.id, view: 'notifications'}
-        expect(response).to be_successful
-
-        contains_js_bundle = false
-        assigns['js_bundles'].each do |js_bundle|
-          contains_js_bundle = js_bundle.include? :course_notification_settings_show if js_bundle.include? :course_notification_settings_show
-        end
-        expect(contains_js_bundle).to be false
       end
     end
   end

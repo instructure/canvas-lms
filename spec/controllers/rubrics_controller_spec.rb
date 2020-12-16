@@ -266,6 +266,7 @@ describe RubricsController do
       expect(assigns[:association]).to be_nil
       expect(response).to be_successful
     end
+
     it "should update the rubric even if it doesn't belong to the context, just an association" do
       course_model
       @course2 = @course
@@ -285,7 +286,7 @@ describe RubricsController do
 
     # this happens after a importing content into a new course, before a new
     # association is set up
-    it "should create a new rubrice (and not update the existing rubric) if it doesn't belong to the context or to an association" do
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belong to the context or to an association" do
       course_model
       @course2 = @course
       course_with_teacher_logged_in(:active_all => true)
@@ -294,6 +295,18 @@ describe RubricsController do
       @rubric.save
       @rubric_association.context = @course2
       @rubric_association.save
+      put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
+      expect(assigns[:rubric]).not_to be_nil
+      expect(assigns[:rubric]).not_to eql(@rubric)
+      expect(assigns[:rubric].title).to eql("new title")
+    end
+
+    it "should create a new rubric (and not update the existing rubric) if it doesn't belongs to the same context" do
+      course_model
+      course_with_teacher_logged_in(:active_all => true)
+      rubric_association_model(:user => @user, :context => @course)
+      @rubric.context = @course.root_account
+      @rubric.save
       put 'update', params: {:course_id => @course.id, :id => @rubric.id, :rubric => {:title => "new title"}, :rubric_association_id => @rubric_association.id}
       expect(assigns[:rubric]).not_to be_nil
       expect(assigns[:rubric]).not_to eql(@rubric)

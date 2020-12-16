@@ -44,6 +44,9 @@ class GradebookImporter
 
   class InvalidHeaderRow < StandardError; end
 
+  OverrideColumnInfo = Struct.new(:grading_period_id, :index, keyword_init: true)
+  OverrideScoreChange = Struct.new(:grading_period_id, :student_id, :current_score, :new_score, keyword_init: true)
+
   attr_reader :context, :contents, :attachment, :assignments, :students,
               :submissions, :missing_assignments, :missing_students, :upload
 
@@ -118,8 +121,10 @@ class GradebookImporter
       prevented_changing_read_only_column: false
     }
     @parsed_custom_column_data = {}
+    @override_column_indices = {}
     @gradebook_importer_assignments = {}
     @gradebook_importer_custom_columns = {}
+    @gradebook_importer_override_scores = {}
 
     begin
       csv_stream do |row|
@@ -205,6 +210,8 @@ class GradebookImporter
       end
     end
 
+    set_current_override_scores if allow_override_scores?
+
     translate_pass_fail(@assignments, @students, @gradebook_importer_assignments)
     unless @missing_student
       # weed out assignments with no changes
@@ -258,7 +265,10 @@ class GradebookImporter
       end
 
       @unchanged_assignments = !indexes_to_delete.empty?
-      @students = [] if @assignments.empty? && @custom_gradebook_columns.empty?
+
+      grading_periods_with_updated_overrides = remove_override_scores_for_unchanged_grading_periods!
+
+      @students = [] if @assignments.empty? && @custom_gradebook_columns.empty? && grading_periods_with_updated_overrides.empty?
     end
 
     # remove concluded enrollments
@@ -326,6 +336,9 @@ class GradebookImporter
 
   def process_header(row)
     raise InvalidHeaderRow unless header?(row)
+
+    # Handle override columns before we strip out the "non-assignment" columns
+    @override_column_indices = detect_override_columns(row)
     row = strip_non_assignment_columns(row)
     row = strip_custom_columns(row)
     parse_assignments(row) # requires non-assignment columns to be stripped
@@ -429,6 +442,29 @@ class GradebookImporter
     end.compact
   end
 
+  def detect_override_columns(row)
+    row.map.with_index { |header, index| parse_override_column(header, index) }.compact
+  end
+
+  def parse_override_column(title, index)
+    # Match "Override Score" either on its own or followed by the title of a
+    # grading period (e.g., "Override Score (Fall 2020)")
+    @override_column_re ||= /^Override Score(?:\s*\((.*)\))?$/
+    @grading_periods ||= GradingPeriod.for(@context)
+
+    return unless (match = @override_column_re.match(title))
+
+    grading_period_title = match.captures.first
+    # A match with no grading period is okay, but if a grading period title was
+    # given, make sure it's valid
+    if grading_period_title.present?
+      grading_period = @grading_periods.find_by(title: grading_period_title)
+      return if grading_period.blank?
+    end
+
+    OverrideColumnInfo.new(grading_period_id: grading_period&.id, index: index)
+  end
+
   def prevent_new_assignment_creation?(periods, is_admin)
     return false unless @context.grading_periods?
     return false if is_admin
@@ -509,6 +545,16 @@ class GradebookImporter
 
     @gradebook_importer_custom_columns[student.id] = importer_custom_columns
     @gradebook_importer_assignments[student.id] = importer_submissions
+
+    if allow_override_scores?
+      @gradebook_importer_override_scores[student.id] = @override_column_indices.map do |column|
+        OverrideScoreChange.new(
+          grading_period_id: column.grading_period_id,
+          new_score: row[column.index],
+          student_id: student.id
+        )
+      end
+    end
   end
 
   def assignment_visible_to_student(student, assignment, assignment_id, visible_assignments)
@@ -640,7 +686,9 @@ class GradebookImporter
       :id => student.id,
       :submissions => @gradebook_importer_assignments[student.id],
       :custom_column_data => @gradebook_importer_custom_columns[student.id]&.values
-    }
+    }.tap do |hash|
+      hash[:override_scores] = @gradebook_importer_override_scores[student.id]&.map(&:to_h) if allow_override_scores?
+    end
   end
 
   def assignment_to_hash(assignment)
@@ -690,14 +738,14 @@ class GradebookImporter
     column.deleted? || column.read_only
   end
 
-  def no_change_to_submission?(submission)
-    return true if submission['grade'] == submission['original_grade']
-    return true if submission['original_grade'].blank? && submission['grade'].blank?
+  def no_change_to_value?(new_value:, current_value:, consider_excused: false)
+    return true if new_value == current_value
+    return true if current_value.blank? && new_value.blank?
 
-    return false unless submission['original_grade'].present? && submission['grade'].present?
+    return false unless current_value.present? && new_value.present?
 
-    if (submission['grade'].to_s.casecmp('EX') == 0) || (submission['original_grade'].casecmp('EX') == 0)
-      return false
+    if consider_excused
+      return false if new_value.to_s.casecmp('EX') == 0 || current_value.casecmp('EX') == 0
     end
 
     # The exporter exports scores rounded to two decimal places (which is also
@@ -705,6 +753,68 @@ class GradebookImporter
     # be exported as 123.46. To avoid false reports that scores have changed,
     # compare existing values and new values at that same level of precision,
     # and compare them as strings to match how the exporter outputs them.
-    I18n.n(submission['original_grade'].to_f, precision: 2) == I18n.n(submission['grade'].to_f, precision: 2)
+    I18n.n(current_value, precision: 2) == I18n.n(new_value, precision: 2)
+  end
+
+  def no_change_to_submission?(submission)
+    no_change_to_value?(new_value: submission['grade'], current_value: submission['original_grade'], consider_excused: true)
+  end
+
+  def set_current_override_scores
+    current_override_scores_query.find_each do |existing_score|
+      student_id = existing_score.enrollment.user_id
+      matching_score_change = @gradebook_importer_override_scores[student_id].detect do |score_change|
+        score_change.grading_period_id == existing_score.grading_period_id
+      end
+      matching_score_change&.current_score = existing_score.override_score&.to_s
+    end
+  end
+
+  def current_override_scores_query
+    override_scores_by_grading_period_id = @gradebook_importer_override_scores.values.flatten.
+      group_by { |score| score[:grading_period_id] }
+    return Score.none if override_scores_by_grading_period_id.blank?
+
+    base_scope = Score.active.joins(:enrollment).
+      preload(:enrollment).
+      merge(Enrollment.active).
+      where(enrollments: {course: @context})
+
+    scopes = override_scores_by_grading_period_id.map do |grading_period_id, scores|
+      scope_for_period = base_scope.where(enrollments: {user_id: scores.map(&:student_id)})
+
+      if grading_period_id.nil?
+        scope_for_period.where(course_score: true)
+      else
+        scope_for_period.where(grading_period_id: grading_period_id)
+      end
+    end
+
+    scopes.reduce { |result, scope| result.union(scope) }
+  end
+
+  # Returns a set of grading period IDs with at least one changed override
+  # grade, which will include nil if course override grades were changed
+  def remove_override_scores_for_unchanged_grading_periods!
+    return Set.new unless allow_override_scores?
+
+    grading_period_ids_with_changes = Set.new
+    @gradebook_importer_override_scores.each_value do |scores|
+      changed_scores = scores.reject do |score|
+        no_change_to_value?(new_value: score.new_score, current_value: score.current_score)
+      end
+
+      grading_period_ids_with_changes.merge(changed_scores.map(&:grading_period_id))
+    end
+
+    @gradebook_importer_override_scores.each_value do |scores|
+      scores.select! { |score| grading_period_ids_with_changes.include?(score.grading_period_id) }
+    end
+
+    grading_period_ids_with_changes
+  end
+
+  def allow_override_scores?
+    @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
   end
 end

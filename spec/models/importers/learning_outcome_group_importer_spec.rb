@@ -78,6 +78,25 @@ describe "Importing Learning Outcome Groups" do
     expect(@context.learning_outcome_groups.count).to eq 2
   end
 
+  it "should not generate a new outcome group when already exists a group with the same name in the same folder" do
+    Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
+    expect(@context.learning_outcome_groups.count).to eq 2
+    log_data = group_data(migration_id: 'other-migration-id')
+    expect {
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+    }.to change(@context.learning_outcome_groups, :count).by(0)
+  end
+
+  it "should generate a new outcome group when already exists a deleted group with the same name in the same folder" do
+    Importers::LearningOutcomeGroupImporter.import_from_migration(group_data, @migration)
+    expect(@context.learning_outcome_groups.count).to eq 2
+    LearningOutcomeGroup.find_by(title: "Stuff").destroy
+    log_data = group_data(migration_id: 'other-migration-id')
+    expect {
+      Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
+    }.to change(@context.learning_outcome_groups, :count).by(1)
+  end
+
   describe "with the outcome_guid_course_exports FF enabled" do
     before(:once) { @context.root_account.enable_feature!(:outcome_guid_course_exports) }
     it "should not duplicate an outcome group with the same vendor_guid when it already exists in the context" do
@@ -113,6 +132,7 @@ describe "Importing Learning Outcome Groups" do
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
       expect(@context.learning_outcome_groups.count).to eq 2
       log_data[:migration_id] = "779f2c13-ea41-4804-8d2c-64d46e429210"
+      log_data[:title] = "Stuff 2"
       Importers::LearningOutcomeGroupImporter.import_from_migration(log_data, @migration)
       expect(@context.learning_outcome_groups.count).to eq 3
     end

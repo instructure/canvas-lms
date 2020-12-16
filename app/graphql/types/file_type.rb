@@ -34,7 +34,7 @@ module Types
     # current user, we can overwrite this here since we don't have access to the OG
     # logged_in_user method.
     def logged_in_user
-      @current_user
+      @current_user || context[:current_user]
     end
 
     global_id_field :id

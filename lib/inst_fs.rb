@@ -63,7 +63,6 @@ module InstFS
     end
 
     def authenticated_url(attachment, options={})
-      options[:jti]= SecureRandom.uuid
       query_params = { token: access_jwt(access_path(attachment), options) }
       query_params[:download] = 1 if options[:download]
       access_url(attachment, query_params)
@@ -398,11 +397,11 @@ module InstFS
         iat: iat,
         user_id: options[:user]&.global_id&.to_s,
         resource: resource,
+        jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
       original_url = parse_original_url(options[:original_url])
       claims[:original_url] = original_url if original_url.present?
-      claims[:jti] = options[:jti] if options.key? :jti
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end

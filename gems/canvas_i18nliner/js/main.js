@@ -25,7 +25,7 @@ var babylon = require("@babel/parser");
 var fs = require('fs');
 
 var JsProcessor = require("i18nliner/dist/lib/processors/js_processor").default;
-var HbsProcessor = require("i18nliner-handlebars/dist/lib/hbs_processor").default;
+var HbsProcessor = require("@instructure/i18nliner-handlebars/dist/lib/hbs_processor").default;
 var CallHelpers = require("i18nliner/dist/lib/call_helpers").default;
 
 var glob = require("glob");

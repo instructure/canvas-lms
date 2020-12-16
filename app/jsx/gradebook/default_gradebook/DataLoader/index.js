@@ -29,7 +29,7 @@ import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({gradebook, performanceControls}) {
+  constructor({gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
     this._gradebook = gradebook
 
     const dispatch = new RequestDispatch({
@@ -39,9 +39,10 @@ export default class DataLoader {
     const loaderConfig = {
       dispatch,
       gradebook,
-      performanceControls
+      performanceControls,
+      loadAssignmentsByGradingPeriod
     }
-
+    this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
@@ -123,9 +124,8 @@ export default class DataLoader {
     }
 
     if (options.getAssignmentGroups) {
-      const useNewLoadingStrategy = false
       if (
-        useNewLoadingStrategy &&
+        this.loadAssignmentsByGradingPeriod &&
         gotGradingPeriodAssignments &&
         gradebook.gradingPeriodId !== '0'
       ) {

@@ -361,6 +361,9 @@ class FilesController < ApplicationController
   end
 
   def react_files
+    if !request.format.html?
+      return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
+    end
     if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user

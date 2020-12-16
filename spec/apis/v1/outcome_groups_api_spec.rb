@@ -377,6 +377,33 @@ describe "Outcome Groups API", type: :request do
         )
       end
     end
+
+    describe 'with the account_level_mastery_scales FF enabled' do
+      before do
+        proficiency = outcome_proficiency_model(@account)
+        @ratings_hash = proficiency.ratings_hash
+        @mastery_points = proficiency.mastery_points
+        @points_possible = proficiency.points_possible
+        @account.enable_feature!(:account_level_mastery_scales)
+      end
+
+      it 'should correctly serialize mastery scale data for each link' do
+        json = api_call(
+          :get,
+          "/api/v1/accounts/#{@account.id}/outcome_group_links",
+          controller: 'outcome_groups_api',
+          action: 'link_index',
+          account_id: @account.id,
+          :outcome_style => "full",
+          format: 'json'
+        )
+        json.each do |link|
+          expect(link['outcome']['ratings']).to eq @ratings_hash.map(&:stringify_keys)
+          expect(link['outcome']['mastery_points']).to eq @mastery_points
+          expect(link['outcome']['points_possible']).to eq @points_possible
+        end
+      end
+    end
   end
 
   describe "show" do

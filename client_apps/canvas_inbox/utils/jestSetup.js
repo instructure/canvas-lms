@@ -41,7 +41,8 @@ const globalWarn = console.warn
 const ignoredWarnings = [
   /Warning: componentWillReceiveProps has been renamed/,
   /Warning: \[SimpleSelect\] is experimental.*/,
-  /Warning: \[themeable\] component styles require setting a \'dir\'*/
+  /Warning: \[themeable\] component styles require setting a \'dir\'*/,
+  /Warning: \[Focusable\] Exactly one focusable child is required \(0 found\)/
 ]
 global.console = {
   log: console.log,

@@ -76,46 +76,48 @@ COPY --chown=docker:docker packages     ${APP_HOME}packages
 
 RUN set -eux; \
   mkdir -p .yardoc \
-             app/stylesheets/brandable_css_brands \
-             app/views/info \
-             client_apps/canvas_quizzes/dist \
-             client_apps/canvas_quizzes/node_modules \
-             client_apps/canvas_quizzes/tmp \
-             config/locales/generated \
-             gems/canvas_i18nliner/node_modules \
-             log \
-             node_modules \
-             packages/canvas-media/es \
-             packages/canvas-media/lib \
-             packages/canvas-media/node_modules \
-             packages/canvas-planner/lib \
-             packages/canvas-planner/node_modules \
-             packages/canvas-rce/canvas \
-             packages/canvas-rce/lib \
-             packages/canvas-rce/node_modules \
-             packages/jest-moxios-utils/node_modules \
-             packages/js-utils/es \
-             packages/js-utils/lib \
-             packages/js-utils/node_modules \
-             packages/k5uploader/es \
-             packages/k5uploader/lib \
-             packages/k5uploader/node_modules \
-             packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
-             pacts \
-             public/dist \
-             public/doc/api \
-             public/javascripts/client_apps \
-             public/javascripts/compiled \
-             public/javascripts/translations \
-             reports \
-             tmp \
-             /home/docker/.bundler/ \
-             /home/docker/.cache/yarn \
-             /home/docker/.gem/ \
-  && (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
+               app/stylesheets/brandable_css_brands \
+               app/views/info \
+               client_apps/canvas_quizzes/dist \
+               client_apps/canvas_quizzes/node_modules \
+               client_apps/canvas_quizzes/tmp \
+               config/locales/generated \
+               gems/canvas_i18nliner/node_modules \
+               log \
+               node_modules \
+               packages/canvas-media/es \
+               packages/canvas-media/lib \
+               packages/canvas-media/node_modules \
+               packages/canvas-planner/lib \
+               packages/canvas-planner/node_modules \
+               packages/canvas-rce/canvas \
+               packages/canvas-rce/lib \
+               packages/canvas-rce/node_modules \
+               packages/jest-moxios-utils/node_modules \
+               packages/js-utils/es \
+               packages/js-utils/lib \
+               packages/js-utils/node_modules \
+               packages/k5uploader/es \
+               packages/k5uploader/lib \
+               packages/k5uploader/node_modules \
+               packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules \
+               pacts \
+               public/dist \
+               public/doc/api \
+               public/javascripts/client_apps \
+               public/javascripts/compiled \
+               public/javascripts/translations \
+               reports \
+               tmp \
+               /home/docker/.bundler/ \
+               /home/docker/.cache/yarn \
+               /home/docker/.gem/ \
+    && \
+  (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean
 
 COPY --chown=docker:docker babel.config.js ${APP_HOME}
+COPY --chown=docker:docker packages        ${APP_HOME}packages
 COPY --chown=docker:docker script          ${APP_HOME}script
 
 RUN yarn postinstall

@@ -100,3 +100,21 @@ test('sets course_syllabus_body after mce destruction', () => {
   const body = document.getElementById('course_syllabus_body')
   ok(body !== null)
 })
+
+test('hides student view button when editing syllabus', () => {
+  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>')
+  fixtures.create('<form id="edit_course_syllabus_form"></form>')
+  fixtures.create('<a href="#" id="easy_student_view"></a>')
+  SyllabusBehaviors.bindToEditSyllabus()
+  $('#edit_course_syllabus_form').trigger('edit')
+  equal($('#easy_student_view').is(':hidden'), true)
+})
+
+test('shows student view button again after done editing', () => {
+  fixtures.create('<a href="#" class="edit_syllabus_link">Edit Link</a>')
+  fixtures.create('<form id="edit_course_syllabus_form"></form>')
+  fixtures.create('<a href="#" id="easy_student_view" style="display: none;"></a>')
+  SyllabusBehaviors.bindToEditSyllabus()
+  $('#edit_course_syllabus_form').trigger('hide_edit')
+  equal($('#easy_student_view').is(':hidden'), false)
+})

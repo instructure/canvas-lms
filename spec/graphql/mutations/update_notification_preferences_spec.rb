@@ -27,7 +27,6 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     @course = @account.courses.create!
     @teacher = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     @student = @course.enroll_student(User.create!, enrollemnt_state: 'active').user
-    @account.enable_feature!(:mute_notifications_by_course)
     communication_channel(@teacher, {username: 'two@example.com', active_cc: true})
     @notification = Notification.create!(:name => "Assignment Created", :subject => "Test", :category => 'Due Date')
   end

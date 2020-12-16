@@ -69,7 +69,7 @@ class OutcomeCalculationMethod < ApplicationRecord
     method.workflow_state = 'active'
     method.calculation_method = 'highest'
     method.calculation_int = nil
-    method.save!
+    GuardRail.activate(:primary) { method.save! }
     method
   rescue ActiveRecord::RecordNotUnique
     retry

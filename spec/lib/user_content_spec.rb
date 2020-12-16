@@ -207,23 +207,14 @@ describe UserContent do
       expect(html).to eq(expected)
     end
 
-    it 'strips vestigial hidden-readable spans' do
-      string =
-        "<div><ul><li><img class='equation_image' data-equation-content='\int f(x)/g(x)'/>\n" \
-          "<span class='hidden-readable'><math>who cares</math></math></li>" \
-          "<li><img class='equation_image' data-equation-content='\\sum 1..n'/></li>" \
-          "<li><img class='nothing_special'></li></ul></div>"
+    it "strips existing mathml before adding any new" do
+      string = "<div><img class='equation_image' data-equation-content='\int f(x)/g(x)'/>"\
+        "<span class=\"hidden-readable\"><math>3</math></span></div>"
+
       html = UserContent.escape(string)
-      expected =
-        "<div><ul>\n" \
-          "<li>\n" \
-          "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n" \
-          "</li>\n" \
-          "<li>\n" \
-          "<img class=\"equation_image\" data-equation-content=\"\\sum 1..n\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mo lspace=\"thinmathspace\" rspace=\"thinmathspace\">&amp;Sum;</mo><mn>1</mn><mo>.</mo><mo>.</mo><mi>n</mi></math></span>\n" \
-          "</li>\n" \
-          "<li><img class=\"nothing_special\"></li>\n" \
-          '</ul></div>'
+      expected = "<div>\n"\
+        "<img class=\"equation_image\" data-equation-content=\"int f(x)/g(x)\"><span class=\"hidden-readable\"><math xmlns=\"http://www.w3.org/1998/Math/MathML\" display=\"inline\"><mi>i</mi><mi>n</mi><mi>t</mi><mi>f</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo><mo>/</mo><mi>g</mi><mo stretchy=\"false\">(</mo><mi>x</mi><mo stretchy=\"false\">)</mo></math></span>\n"\
+        "</div>"
       expect(html).to eq(expected)
     end
   end

@@ -71,12 +71,9 @@ module QuizMathDataFixup
 
     data[:answers].map(&:symbolize_keys).each_with_index do |answer, index|
       %i[html comments_html].each do |key|
-        if # if there's html, the text field is used as the title attribute/tooltip
-           # clear it out if we updated the html because it's probably hosed.
-           answer[
-             key
-           ]
-             .present?
+        # if there's html, the text field is used as the title attribute/tooltip
+        # clear it out if we updated the html because it's probably hosed.
+        if answer[key].present?
           answer[key] = fixup_html(answer[key])
 
           text_key = key.to_s.sub(/html/, 'text')

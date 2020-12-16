@@ -168,6 +168,13 @@ describe FilesController do
       expect(response).to be_successful
     end
 
+    it "refuses for a non-html format" do
+      group_with_user_logged_in(:group_context => Account.default)
+      get 'index', params: {:group_id => @group.id}, format: :js
+      expect(response.body).to include("endpoint does not support js")
+      expect(response.code.to_i).to eq(400)
+    end
+
     it "should not show external tools in a group context" do
       group_with_user_logged_in(:group_context => Account.default)
       new_valid_tool(@course)

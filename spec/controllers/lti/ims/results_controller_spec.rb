@@ -27,7 +27,7 @@ describe Lti::Ims::ResultsController do
   include_context 'advantage services context'
 
   let(:assignment) do
-    opts = {course: course}
+    opts = {course: course, points_possible: 5}
     if tool.present?
       opts[:submission_types] = 'external_tool'
       opts[:external_tool_tag_attributes] = {
@@ -40,7 +40,6 @@ describe Lti::Ims::ResultsController do
   end
   let(:context) { course }
   let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
-  let(:result) { lti_result_model assignment: assignment, line_item: assignment.line_items.first }
   let(:json) { JSON.parse(response.body) }
   let(:params_overrides) do
     {
@@ -50,11 +49,27 @@ describe Lti::Ims::ResultsController do
   end
   let(:scope_to_remove) { 'https://purl.imsglobal.org/spec/lti-ags/scope/result.readonly' }
 
+  let(:result) do
+    lti_result_model(
+      assignment: assignment,
+      line_item: assignment.line_items.first,
+      result_score: 0.5,
+      result_maximum: 1
+    )
+  end
+
   describe '#index action' do
     let(:action) { :index }
 
     before do
-      3.times { lti_result_model line_item: result.line_item, assignment: assignment }
+      3.times do
+        lti_result_model(
+          line_item: result.line_item,
+          assignment: assignment,
+          result_score: 0.5,
+          result_maximum: 1
+        )
+      end
     end
 
     it_behaves_like 'advantage services'
@@ -133,6 +148,19 @@ describe Lti::Ims::ResultsController do
         expect(response.headers['Link']).to include 'rel="next"'
       end
     end
+
+    context 'when the score was manually updated' do
+      before do
+        submission_ids = Lti::Result.where(line_item: result.line_item).pluck(:submission_id)
+        Submission.find(submission_ids).each { |s| s.update!(grader_id: 1) }
+      end
+
+      it 'scales the resultScore to the resultMaximum' do
+        send_request
+        scaled_result = json.find { |r| r['resultMaximum'] == 1 }
+        expect(scaled_result['resultScore']).to eq 0.1
+      end
+    end
   end
 
   describe '#show' do
@@ -147,10 +175,24 @@ describe Lti::Ims::ResultsController do
       expect(response).to have_http_status :ok
     end
 
+    it 'includes the scoreMaximum' do
+      send_request
+      expect(json['resultScore']).to eq 0.5
+    end
+
     it 'formats the result correctly' do
       send_request
       rslt = Lti::Result.find(json['id'].split('/').last.to_i)
       expect(rslt).to eq result
+    end
+
+    context 'when the score was manually updated' do
+      before { result.submission.update!(grader_id: 1) }
+
+      it 'scales the resultScore to the resultMaximum' do
+        send_request
+        expect(json['resultScore']).to eq 0.1
+      end
     end
 
     context 'when result requested not in line_item' do

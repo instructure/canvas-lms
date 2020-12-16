@@ -8,4 +8,4 @@ if [[ "${COVERAGE:-}" == "1" ]]; then
   sentry="-e SENTRY_URL -e SENTRY_DSN -e SENTRY_ORG -e SENTRY_PROJECT -e SENTRY_AUTH_TOKEN -e DEPRECATION_SENTRY_DSN"
 fi
 
-docker-compose run --name $CONTAINER_NAME -e COVERAGE -e FORCE_FAILURE $sentry canvas yarn test:packages
+docker-compose --project-name $CONTAINER_NAME run -e COVERAGE -e FORCE_FAILURE $sentry canvas yarn test:packages

@@ -22,8 +22,14 @@ import sinon from 'sinon'
 import ImportOutcomesModal from '../ImportOutcomesModal'
 
 const element = () => sinon.createStubInstance(Element)
+
 it('renders the ConfirmOutcomeEditModal component', () => {
   const modal = shallow(<ImportOutcomesModal toolbar={element()} />)
+  expect(modal.exists()).toBe(true)
+})
+
+it('renders the ConfirmOutcomeEditModal component wihout toolbar', () => {
+  const modal = shallow(<ImportOutcomesModal />)
   expect(modal.exists()).toBe(true)
 })
 

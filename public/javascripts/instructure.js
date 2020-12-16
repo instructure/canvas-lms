@@ -113,15 +113,26 @@ export function enhanceUserContent() {
     .each(function() {
       const $this = $(this)
       $this.find('img').each((i, img) => {
-        const handleWidth = () =>
-          $(img).css(
-            'maxWidth',
-            Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
-          )
+        const handleWidth = () => {
+          const maxw = Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
+          if (maxw > 0) {
+            $(img).css(
+              'maxWidth',
+              Math.min($content.width(), $this.width(), $(img).width() || img.naturalWidth)
+            )
+          }
+        }
         if (img.naturalWidth === 0) {
           img.addEventListener('load', handleWidth)
         } else {
           handleWidth()
+        }
+
+        // if the image file is unpublished it's replaced with the lock image
+        // and canvas adds hidden=1 to the URL.
+        // we also need to strip the alt text
+        if (/hidden=1$/.test(img.getAttribute('src'))) {
+          img.setAttribute('alt', I18n.t('This image is currently unavailable'))
         }
       })
       $this.data('unenhanced_content_html', $this.html())

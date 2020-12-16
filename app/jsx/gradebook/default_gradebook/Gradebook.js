@@ -451,7 +451,8 @@ class Gradebook {
     if (this.options.dataloader_improvements) {
       this.dataLoader = new DataLoader({
         gradebook: this,
-        performanceControls: new PerformanceControls(camelize(this.options.performance_controls))
+        performanceControls: new PerformanceControls(camelize(this.options.performance_controls)),
+        loadAssignmentsByGradingPeriod: this.options.load_assignments_by_grading_period_enabled
       })
     } else {
       this.dataLoader = new OldDataLoader(this)
@@ -827,7 +828,9 @@ class Gradebook {
     let isStudentView, j, len, student
     this.courseContent.assignmentStudentVisibility = {}
     const escapeStudentContent = student2 => {
+      const unescapedName = student2.name
       const escapedStudent = htmlEscape(student2)
+      escapedStudent.name = unescapedName
       escapedStudent?.enrollments.forEach(enrollment => {
         const gradesUrl = enrollment?.grades?.html_url
         if (gradesUrl) {

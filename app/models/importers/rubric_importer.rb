@@ -87,6 +87,7 @@ module Importers
         end
 
         item.skip_updating_points_possible = true
+        item.update_mastery_scales(false)
         migration.add_imported_item(item)
         item.save!
       end

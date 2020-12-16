@@ -37,6 +37,7 @@ npm-debug.log
 /public/dist/
 /public/doc/api/
 /public/javascripts/translations/
+/storybook-static/
 /tmp/*
 !/tmp/.keep
 /vendor/bundle

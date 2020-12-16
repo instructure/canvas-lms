@@ -2,8 +2,7 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-GIT_SSH_COMMAND='ssh -i "$SSH_KEY_PATH" -l "$SSH_USERNAME"' \
-    git fetch --depth 1 --force --no-tags origin "$GERRIT_BRANCH":"$GERRIT_BRANCH"
+git fetch --depth 1 --force --no-tags origin "$GERRIT_BRANCH":"$GERRIT_BRANCH"
 
 inputs=()
 inputs+=("--volume $(pwd)/.git:/usr/src/app/.git")
@@ -44,6 +43,7 @@ USER docker
 RUN mkdir -p /home/docker/gergich
 RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
   cp -rf /tmp/src/. /usr/src/app
+RUN cp -rf config/docker-compose.override.yml.example /usr/src/app/docker-compose.override.yml
 EOF
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
@@ -65,8 +65,20 @@ if ! git merge-base --is-ancestor HEAD~1 \$GERRIT_BRANCH; then
   gergich comment "{\"path\":\"/COMMIT_MSG\",\"position\":1,\"severity\":\"warn\",\"message\":\"\$message\"}"
 fi
 
+# when modifying Dockerfile or Dockerfile.jenkins*, Dockerfile.template must also be modified.
+ruby build/dockerfile_writer.rb --env development --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile
+ruby build/dockerfile_writer.rb --env jenkins --compose-file docker-compose.yml,docker-compose.override.yml --in build/Dockerfile.template --out Dockerfile.jenkins
+if ! git diff --exit-code Dockerfile; then
+  message="This commit makes changes to Dockerfile but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
+  gergich comment "{\"path\":\"\Dockerfile\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+if ! git diff --exit-code Dockerfile.jenkins; then
+  message="This commit makes changes to Dockerfile.jenkins but does not update the Dockerfile.template. Ensure your changes are included in build/Dockerfile.template.\\n"
+  gergich comment "{\"path\":\"\Dockerfile.jenkins\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'"
-./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake i18n:check'"
+./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake js:build_client_app['canvas_quizzes'] i18n:check'"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/brakeman"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/tatl_tael"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/stylelint"
@@ -85,7 +97,7 @@ readarray -t PLUGINS_LIST < config/plugins_list
 rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST[@]}")
 
 export DISABLE_POSTINSTALL=1
-./build/new-jenkins/linters/run-and-collect-output.sh "yarn install"
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1"
 
 if ! git diff --exit-code yarn.lock; then
   message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."

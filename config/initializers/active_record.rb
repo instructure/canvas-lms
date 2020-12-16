@@ -1537,7 +1537,7 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
         fk_name_to_delete = foreign_key_for(from_table, **options)&.name
         return if fk_name_to_delete.nil?
       else
-        fk_name_to_delete = foreign_key_for!(from_table, **options).name        
+        fk_name_to_delete = foreign_key_for!(from_table, **options).name
       end
     end
 
@@ -1545,6 +1545,22 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     at.drop_foreign_key fk_name_to_delete
 
     execute schema_creation.accept(at)
+  end
+
+  def add_replica_identity(table_string, column_name, default_value)
+    klass = table_string.constantize
+    DataFixup::BackfillNulls.run(klass, column_name, default_value: default_value)
+    change_column_null klass.table_name, column_name, false
+    primary_column = klass.primary_key
+    index_name = "index_#{klass.table_name}_replica_identity"
+    add_index klass.table_name, [column_name, primary_column], name: index_name, algorithm: :concurrently, unique: true, if_not_exists: true
+    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY USING INDEX #{index_name}])
+  end
+
+  def remove_replica_identity(table_string)
+    klass = table_string.constantize
+    execute(%[ALTER TABLE #{klass.quoted_table_name} REPLICA IDENTITY DEFAULT])
+    remove_index klass.table_name, name: "index_#{klass.table_name}_replica_identity", if_exists: true
   end
 end
 

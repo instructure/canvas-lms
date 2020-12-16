@@ -757,6 +757,12 @@ en:
   allows_the_gradebook_importer_to_recognize_and_app_6f11fd0c: Allows the Gradebook importer to recognize and apply changes to override scores.
   gradebook_csv_headers_include_grading_period_1015185c: Gradebook CSV Headers Include Grading Period
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: If set, the Gradebook CSV exporter will append the title of the selected grading period to column headers whose values vary based on grading period.
+  enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
+  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
+  granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: Granular permissions for Add/Remove admin roles from Course
+  adds_granular_permissions_for_adding_and_removing__e1e484a3: Adds granular permissions for adding and removing each role, and a separate permission for other course admin actions
+  granular_permissions_for_managing_course_sections_da4b04b: Granular permissions for managing course sections
+  add_granularity_to_permissions_around_managing_cou_4a5bc486: Add granularity to permissions around managing course sections
   product_tours_1e19eb95: Product Tours
   in_product_training_walkthrough_and_tourpoints_for_35aebb17: In-product training walkthrough and tourpoints for admins, teachers, and students
   module_file_upload_enhancements_eecd4d37: Module File Upload Enhancements
@@ -889,8 +895,6 @@ en:
   sets_the_default_option_for_course_copy_and_import_36147e78: Sets the default option for course copy and importing to New Quizzes
   new_quizzes_migration_required_7854aa1a: New Quizzes migration required
   disable_new_quiz_importing_and_migration_checkboxe_3f738b75: Disable New Quiz importing and migration checkboxes, defaulting them to enabled
-  enable_recaptcha_by_default_for_self_registration_af9d50bd: Enable Recaptcha by default for self-registration
-  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: Requires Recaptcha for self-registration by default
   confetti_for_on_time_submissions_394e16ce: Confetti for On-Time Submissions
   displays_confetti_for_users_that_turn_in_an_assign_3e67e13c: |-
     Displays confetti for users that turn in an assignment prior
@@ -905,8 +909,6 @@ en:
     grade changes.
   hide_course_sections_from_students_b7850d64: Hide Course Sections from Students
   allows_teachers_to_hide_course_sections_from_stude_eb69d87b: Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
-  mute_notifications_by_course_440e18be: Mute notifications by course
-  allows_users_to_mute_notifications_on_a_course_lev_775b0362: Allows users to mute notifications on a course level granularity.
   course_level_overrides_for_notification_preference_e86d1725: Course level overrides for notification preferences
   allows_users_to_override_specific_notification_pre_ed2f5555: |-
     Allows users to override specific notification preferences on a
@@ -4541,6 +4543,7 @@ en:
   there_was_a_failure_logging_out_at_your_idp_30070527: There was a failure logging out at your IdP
   we_re_sorry_a_login_error_has_occurred_please_chec_6dae02e2: We're sorry, a login error has occurred, please check your child's credentials and try again.
   you_are_logged_in_at_institution1_using_your_crede_3f5bb205: You are logged in at %{institution1} using your credentials from %{institution2}
+  invalid_redirect_url_6444a1b0: Invalid redirect URL
   lti2:
     register_tool: Register Tool
   resource_url_must_match_the_resource_handler_s_dom_b768cf: resource url must match the resource handler's domain
@@ -6499,6 +6502,7 @@ en:
     page_title: Grades
     service_not_enabled: That service has not been enabled
     google_drive_added: Google Drive account successfully added!
+    google_drive_authorization_failure: Google Drive failed authorization for current user!
     oauth_fail: OAuth Request failed. Couldn't find valid request
     twitter_added: Twitter access authorized!
     twitter_fail_whale: Twitter authorization failed. Please try again
@@ -8021,6 +8025,9 @@ en:
       manage_proficiency_calculations: Manage outcome proficiency calculations
       manage_proficiency_scales: Manage outcome mastery scales
       manage_sections: Manage (create / edit / delete) course sections
+      manage_sections_add: Add course sections
+      manage_sections_edit: Edit course sections
+      manage_sections_delete: Delete course sections
       manage_students: Add/remove students for the course
       manage_user_notes: Manage faculty journal entries
       manage_rubrics: Create and edit assessing rubrics
@@ -8089,6 +8096,21 @@ en:
   lti_add_and_edit_a359d8da: LTI add and edit
   lti_add_edit_delete_15905170: LTI - add / edit / delete
   users_add_remove_teachers_course_designers_or_tas__b480dd9: Users - add / remove teachers, course designers, or TAs in courses
+  allow_administrative_actions_in_courses_20c33fed: Allow administrative actions in courses
+  users_allow_administrative_actions_in_courses_97a2eb19: Users - allow administrative actions in courses
+  add_tas_to_courses_27741f81: Add TAs to courses
+  tas_add_f4a16393: TAs - Add
+  users_admin_users_in_courses_2749407f: Users - Admin users in courses
+  remove_tas_from_courses_13ade851: Remove TAs from courses
+  tas_remove_11059e14: TAs - Remove
+  add_observers_to_courses_6f494a29: Add Observers to courses
+  observers_add_ab95f683: Observers - Add
+  remove_observers_from_courses_703edc34: Remove Observers from courses
+  observers_remove_aafc8a88: Observers - Remove
+  add_designers_to_courses_9588820b: Add Designers to courses
+  designers_add_fe7e1ea9: Designers - Add
+  remove_designers_from_courses_42332a57: Remove Designers from courses
+  designers_remove_3e590bff: Designers - Remove
   assignments_and_quizzes_add_edit_delete_5bac17ed: Assignments and Quizzes - add / edit / delete
   course_calendar_add_edit_delete_events_76b97c04: Course Calendar - add / edit / delete events
   course_content_add_edit_delete_ea877eca: Course Content - add / edit / delete
@@ -8100,6 +8122,10 @@ en:
   outcome_proficiency_calculations_add_edit_5a2217b7: Outcome Proficiency Calculations - add / edit
   outcome_mastery_scales_add_edit_171551c: Outcome Mastery Scales - add / edit
   course_sections_add_edit_delete_c4f4ac19: Course Sections - add / edit / delete
+  course_sections_add_c6b5dc1: Course Sections - add
+  manage_course_sections_f482d1b3: Manage Course Sections
+  course_sections_edit_bd783e1: Course Sections - edit
+  course_sections_delete_e75e3eeb: Course Sections - delete
   users_add_remove_students_in_courses_efe7e748: Users - add / remove students in courses
   faculty_journal_manage_entries_efc09599: Faculty Journal - manage entries
   rubrics_add_edit_delete_8299eff7: Rubrics - add / edit / delete
@@ -13578,6 +13604,7 @@ en:
     buttons:
       previous_module: Previous Module
       next_module: Next Module
+  this_image_is_currently_unavailable_25c68857: This image is currently unavailable
   disableWhileLoading:
     loading: Loading...
   jquery_doc_previews:
@@ -16146,6 +16173,48 @@ en:
   divide_into_equal_time_slots_in_minutes_234312fa: Divide into equal time slots (in minutes
   divide_into_equal_slots_value_is_in_minutes_13fe14d2: Divide into equal slots (value is in minutes)
   create_slots_71dbb2f8: Create Slots
+  replace_attachmentdisplayname_button_94dd8ba1: Replace %{attachmentDisplayName} button
+  add_an_attachment_b2e9092f: Add an attachment
+  record_an_audio_or_video_comment_88425add: Record an audio or video comment
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: Group %{newOptionGroup} entered. %{newOptionContextName}
+  contextname_selected_59de1002: "%{contextName} selected"
+  favorite_courses_fbd356f0: Favorite Courses
+  more_courses_5ebbe998: More Courses
+  concluded_courses_94782e21: Concluded Courses
+  filter_messages_by_course_21a53fc4: Filter messages by course
+  select_course_5b549441: Select course
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: Type or use arrow keys to navigate options
+  all_courses_a7dbb853: All Courses
+  send_an_individual_message_to_each_recipient_e9ddaeb8: Send an individual message to each recipient
+  mailbox_selection_92d9cbf: Mailbox Selection
+  current_volume_level_c55ab825: Current Volume Level
+  recording_98da6bda: Recording
+  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: Something went wrong accessing your mic or webcam.
+  mic_a7f3d311: Mic
+  webcam_fe91b20f: Webcam
+  finish_bc343002: Finish
+  no_video_1ed00b26: No Video
+  please_allow_canvas_to_access_your_microphone_and__dc2c3079: Please allow Canvas to access your microphone and webcam.
+  your_webcam_may_already_be_in_use_6cd64c25: Your webcam may already be in use.
+  pause_12af3bb4: Pause
+  play_1a47eaa7: Play
+  preview_a3f8f854: PREVIEW
+  file_name_8fd421ff: File name
+  start_recording_9a65141a: Start Recording
+  record_upload_media_comment_4d01b943: Record/Upload Media Comment
+  record_media_6637ff19: Record Media
+  upload_media_ce31135a: Upload Media
+  file_upload_9cae6da5: File Upload
+  select_audio_file_7d905cce: Select Audio File
+  select_video_file_35b61d4e: Select Video File
+  more_options_e89670cf: More options
+  forward_d143f64: Forward
+  star_8d156e09: Star
+  reply_389d6fb9: Reply
+  compose_a_new_message_db3a68ed: Compose a new message
+  reply_all_80298bee: Reply all
+  reply_all_b864cd0e: Reply All
+  subject_114b2e98: Subject
   assignment_path_selected_e80191d1: Assignment Path Selected
   choose_assignment_path_8ea55f3a: Choose Assignment Path
   select_one_of_the_options_c8b0c6e4: 'Select one of the options:'
@@ -17425,7 +17494,6 @@ en:
   ticket_successfully_submitted_f6254460: Ticket successfully submitted.
   file_a_ticket_for_a_personal_response_from_our_sup_1e1ffaff: File a ticket for a personal response from our support team.
   for_an_instant_answer_see_if_your_issue_is_address_48280e89: For an instant answer, see if your issue is addressed in the *Canvas Guides*.
-  subject_114b2e98: Subject
   include_a_link_to_a_screencast_screenshot_using_so_4b2fabcb: Include a link to a screencast/screenshot using something like *Jing*.
   how_is_this_affecting_you_b3b6a639: How is this affecting you?
   please_select_one_f931e883: Please select one
@@ -17449,20 +17517,6 @@ en:
   observer_pairing_code:
     errors:
       invalid: Invalid pairing code
-  current_volume_level_c55ab825: Current Volume Level
-  recording_98da6bda: Recording
-  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: Something went wrong accessing your mic or webcam.
-  mic_a7f3d311: Mic
-  webcam_fe91b20f: Webcam
-  finish_bc343002: Finish
-  no_video_1ed00b26: No Video
-  please_allow_canvas_to_access_your_microphone_and__dc2c3079: Please allow Canvas to access your microphone and webcam.
-  your_webcam_may_already_be_in_use_6cd64c25: Your webcam may already be in use.
-  pause_12af3bb4: Pause
-  play_1a47eaa7: Play
-  preview_a3f8f854: PREVIEW
-  file_name_8fd421ff: File name
-  start_recording_9a65141a: Start Recording
   duplicating_module_ae6670b0: Duplicating Module
   duplicating_module_9727f5e4: Duplicating Module...
   move_item_failed_8e4c1db6: Move Item Failed
@@ -17525,7 +17579,6 @@ en:
   no_content_not_visible_to_students_905f8996: No content. Not visible to students.
   my_dashboard_8983c283: My Dashboard
   all_accounts_3bafc860: All Accounts
-  all_courses_a7dbb853: All Courses
   all_groups_cea25817: All Groups
   loading_f99d93d4: "...Loading"
   courses_tray_cec46d6e: Courses tray
@@ -17853,6 +17906,7 @@ en:
   parameter_91ed199: Parameter
   mastery_calculation_5fd5f5fe: Mastery Calculation
   mastery_calculation_parameters_f072c3: Mastery calculation parameters
+  see_example_below_to_see_how_different_calculation_618de98d: See example below to see how different calculation parameters affect student mastery calculation.
   item_scores_9fbfe956: 'Item Scores:'
   final_score_53278fd0: 'Final Score:'
   this_will_update_all_student_mastery_results_withi_934580d1: This will update all student mastery results within this course.
@@ -17862,7 +17916,8 @@ en:
   confirm_mastery_calculation_19ad19f9: Confirm Mastery Calculation
   mastery_calculation_saved_df378fdd: Mastery calculation saved
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: 'An error occurred while loading the mastery calculation: %{error}'
-  permission_to_change_this_mastery_calculation_is_e_91e19659: 'Permission to change this mastery calculation is enabled at the account level for:'
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: 'Permission to change this mastery calculation at the account level is enabled for:'
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: 'Permission to change this mastery calculation at the course level is enabled for:'
   change_description_for_mastery_level_position_c3c41be9: Change description for mastery level %{position}
   description_for_mastery_level_position_description_cc17114b: 'Description for mastery level %{position}: %{description}'
   mastery_mastery_for_mastery_level_position_5c9c3206: Mastery %{mastery} for mastery level %{position}
@@ -17871,6 +17926,9 @@ en:
   change_color_for_mastery_level_position_daa51849: Change color for mastery level %{position}
   color_color_for_mastery_level_position_35079de: Color %{color} for mastery level %{position}
   delete_mastery_level_position_5cf0f8f7: Delete mastery level %{position}
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: This will remove the mastery level from your mastery scale.
+  remove_mastery_level_b1e8dcb0: Remove Mastery Level
+  confirm_6556b3a6: Confirm
   added_mastery_level_dd4792d1: Added mastery level
   mastery_scale_saved_34c64b6b: Mastery scale saved
   an_error_occurred_while_saving_the_mastery_scale_m_30c15545: 'An error occurred while saving the mastery scale: %{message}'
@@ -17890,7 +17948,8 @@ en:
   an_error_occurred_updating_the_mastery_scale_messa_d9910855: 'An error occurred updating the mastery scale: %{message}'
   an_error_occurred_while_loading_the_mastery_scale__871f3531: 'An error occurred while loading the mastery scale: %{error}'
   this_mastery_scale_will_be_used_as_the_default_for_f784ee7d: This mastery scale will be used as the default for all courses within your account.
-  permission_to_change_this_mastery_scale_is_enabled_89066fac: 'Permission to change this mastery scale is enabled at the account level for:'
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: 'Permission to change this mastery scale at the account level is enabled for:'
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: 'Permission to change this mastery scale at the course level is enabled for:'
   can_t_delete_alignments_based_on_rubric_associatio_1a10fcce: "\n              Can't delete alignments based on rubric associations.\n              To remove these associations you need to remove the row from the asset's rubric\"\n            "
   delete_alignment_f33c97d5: Delete alignment
   calculation_d82f6181: Calculation
@@ -17958,6 +18017,8 @@ en:
   what_it_does_d4debc07: What it Does
   additional_considerations_3ee46e5b: Additional Considerations
   create_delete_update_pages_be209769: Create / Delete / Update Pages
+  tas_observers_designers_b705118a: TAs / Observers / Designers
+  add_edit_delete_sections_d32c5b4d: add / edit / delete Sections
   account_settings_fe083453: Account Settings
   allows_user_to_view_and_manage_the_settings_and_no_e223e6b8: Allows user to view and manage the Settings and Notifications tabs in Account Settings.
   authentication_1b518c38: Authentication
@@ -18525,7 +18586,6 @@ en:
   drag_a_file_here_39357b48: Drag a File Here
   record_7c9448b: Record
   embed_828fac4a: Embed
-  upload_media_ce31135a: Upload Media
   clear_selected_file_82388e50: Clear selected file
   embed_video_code_703e10f2: Embed Video Code
   error_uploading_video_audio_recording_16d9730a: Error uploading video/audio recording
@@ -18593,7 +18653,6 @@ en:
   yiddish_f96986df: Yiddish
   delayed_until_58b7af4b: 'Delayed until:'
   posted_on_e1010e1e: 'Posted on:'
-  reply_389d6fb9: Reply
   allow_comments_a1f45d8: Allow Comments
   disallow_comments_6d04b47a: Disallow Comments
   allow_comments_for_title_7ac9e00: Allow comments for %{title}
@@ -19069,8 +19128,6 @@ en:
   discussion_topic_will_be_available_starting_at_46aa7477: Discussion Topic will be available starting at
   discussion_topic_will_be_available_until_f5e3abc8: Discussion Topic will be available until
   if_you_change_an_assignment_s_points_possible_you__25a0edad: If you change an assignment's points possible you must regrade the assignment.
-  observing_f3c5e759: Observing
-  students_being_observed_4de3e520: Students Being Observed
   tool_content_2924d18f: Tool content
   find_flickr_image_view:
     safesearch_warning_flickr: Flickr displays SafeSearch images within the Creative Commons Public Domain. However, safe search results are not guaranteed, as some images may not include a specified safety level by their owners.
@@ -19082,14 +19139,11 @@ en:
       checkbox: Don't show for this course again.
   keyboard_nav_dialog:
     esc_key_notification: Press the escape key before using keyboard shortcuts when navigating the gradebook grid.
-  record_media_6637ff19: Record Media
   this_recorder_uses_flash_as_a_result_you_may_find__427d2ddb: This recorder uses Flash. As a result, you may find it easier to make a recording on your local machine, and then use the media uploader tab to upload it.
   record_with_webcam_af21e07c: Record with Webcam
   record_with_microphone_only_e4ee07aa: Record with Microphone Only
   saving_recording_e111cb05: Saving Recording...
   title_52b8638d: 'Title:'
-  select_audio_file_7d905cce: Select Audio File
-  select_video_file_35b61d4e: Select Video File
   submit_media_file_f334c1ba: Submit Media File
   paginated_view:
     loading_more_results: Loading more results
@@ -19270,9 +19324,6 @@ en:
   change_ending_date_to_d2cebd54: Change ending date to
   checked_883b93fd: checked
   remove_recipient_name_a6b83cef: Remove recipient %{name}
-  favorite_courses_fbd356f0: Favorite Courses
-  more_courses_5ebbe998: More Courses
-  concluded_courses_94782e21: Concluded Courses
   no_subject_970aad80: No subject
   total_messages_af025be6: Total messages
   starred_no_subject_click_to_unstar_bff04bce: Starred "(No subject)", Click to unstar.

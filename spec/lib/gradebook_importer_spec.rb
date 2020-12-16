@@ -1365,6 +1365,364 @@ describe GradebookImporter do
     end
   end
 
+  describe "override score changes" do
+    before(:once) do
+      Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
+      course_model
+      @course.enable_feature!(:final_grades_override)
+      @course.allow_final_grade_override = true
+      @course.save!
+    end
+
+    let(:student_with_override) { User.create!(name: "Cyrus") }
+    let(:student_without_override) { User.create!(name: "Ophilia") }
+
+    before(:each) do
+      @course.enroll_student(student_with_override, enrollment_state: "active")
+      @course.enroll_student(student_without_override, enrollment_state: "active")
+
+      # Run the grade calculator so Score objects get created
+      @course.recompute_student_scores(run_immediately: true)
+      student_with_override.enrollments.first.find_score.update!(override_score: 50.54)
+    end
+
+    it "recognizes changes to override scores" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,60"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students].length).to eq 1
+        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
+        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "60"
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+      end
+    end
+
+    it "recognizes newly-added override scores" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Ophilia,#{student_without_override.id},My Course,0,70"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students].length).to eq 1
+        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "70"
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+      end
+    end
+
+    it "recognizes when override scores are removed" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students].length).to eq 1
+        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
+        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq nil
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+      end
+    end
+
+    it "compares scores with a maximum precision of two decimal places" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,50.5432"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students]).to be_empty
+      end
+    end
+
+    it "returns no records when there are no override score changes" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,50.54"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students]).to be_empty
+      end
+    end
+
+    it "returns records for all students if at least one student's grade changed" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,50.54",
+        "Ophilia,#{student_without_override.id},My Course,0,60"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students].length).to eq 2
+
+        expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
+        expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "50.54"
+        expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+
+        expect(output[:students].second.dig(:override_scores, 0, :current_score)).to eq nil
+        expect(output[:students].second.dig(:override_scores, 0, :new_score)).to eq "60"
+        expect(output[:students].second.dig(:override_scores, 0, :grading_period_id)).to eq nil
+      end
+    end
+
+    it "ignores students with concluded enrollments" do
+      student_with_override.enrollments.first.conclude
+
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,10"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students]).to be_empty
+      end
+    end
+
+    it "produces an empty result if there are no students" do
+      student_with_override.enrollments.first.conclude
+
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students]).to be_empty
+      end
+    end
+
+    it "ignores the 'Override Grade' column even if a grading scheme is active" do
+      @course.grading_standard_enabled = true
+      @course.save!
+
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Grade",
+        "Cyrus,#{student_with_override.id},My Course,0,A+"
+      )
+
+      output = importer.as_json
+      expect(output[:students]).to be_empty
+    end
+
+    context "for a course with grading periods" do
+      before(:each) do
+        enrollment_term = @course.root_account.enrollment_terms.create!
+        @course.update!(enrollment_term: enrollment_term)
+
+        grading_period_group = @course.root_account.grading_period_groups.create!
+        grading_period_group.enrollment_terms << enrollment_term
+
+        now = Time.zone.now
+        grading_period_group.grading_periods.create!(
+          close_date: now,
+          end_date: now,
+          start_date: 1.week.ago(now),
+          title: "First GP"
+        )
+        grading_period_group.grading_periods.create!(
+          close_date: 1.week.from_now(now),
+          end_date: 1.week.from_now(now),
+          start_date: now,
+          title: "Second GP"
+        )
+      end
+
+      let(:first_grading_period) { @course.root_account.grading_period_groups.first.grading_periods.first }
+      let(:second_grading_period) { @course.root_account.grading_period_groups.first.grading_periods.second }
+
+      it "handles override score changes for specific grading periods" do
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (First GP)",
+          "Cyrus,#{student_with_override.id},My Course,0,70"
+        )
+
+        output = importer.as_json
+        overrides = output[:students].first[:override_scores]
+
+        aggregate_failures do
+          expect(overrides.length).to eq 1
+          expect(overrides.first[:grading_period_id]).to eq first_grading_period.id
+          expect(overrides.first[:new_score]).to eq "70"
+        end
+      end
+
+      it "handles multiple grading periods and course scores in the same input" do
+        first_grading_period_score = student_with_override.enrollments.first.find_score({grading_period_id: first_grading_period.id})
+        first_grading_period_score.update!(override_score: 40.0)
+
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (First GP),Override Score (Second GP),Override Score",
+          "Cyrus,#{student_with_override.id},My Course,0,70,60,100"
+        )
+        output = importer.as_json
+        overrides = output[:students].first[:override_scores]
+
+        aggregate_failures do
+          expect(overrides.length).to eq 3
+
+          course_change = overrides.detect { |override| override[:grading_period_id].nil? }
+          expect(course_change[:current_score]).to eq "50.54"
+          expect(course_change[:new_score]).to eq "100"
+
+          first_period_change = overrides.detect { |override| override[:grading_period_id] == first_grading_period.id }
+          expect(first_period_change[:current_score]).to eq "40.0"
+          expect(first_period_change[:new_score]).to eq "70"
+
+          second_period_change = overrides.detect { |override| override[:grading_period_id] == second_grading_period.id }
+          expect(second_period_change[:current_score]).to eq nil
+          expect(second_period_change[:new_score]).to eq "60"
+        end
+      end
+
+      it "filters out any grading periods with no changed override scores" do
+        first_grading_period_score = student_with_override.enrollments.first.find_score({grading_period_id: first_grading_period.id})
+        first_grading_period_score.update!(override_score: 40.0)
+
+        # Make changes to First GP and the course score; leave second GP alone
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (First GP),Override Score (Second GP),Override Score",
+          "Cyrus,#{student_with_override.id},My Course,0,70,,100",
+          "Ophilia,#{student_without_override.id},My Course,0,70,,"
+        )
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 2
+
+          student1_overrides = output[:students].first[:override_scores]
+          expect(student1_overrides.length).to eq 2
+
+          student1_course_change = student1_overrides.detect { |override| override[:grading_period_id].nil? }
+          expect(student1_course_change[:current_score]).to eq "50.54"
+          expect(student1_course_change[:new_score]).to eq "100"
+
+          student1_gp_change = student1_overrides.detect { |override| override[:grading_period_id] == first_grading_period.id }
+          expect(student1_gp_change[:current_score]).to eq "40.0"
+          expect(student1_gp_change[:new_score]).to eq "70"
+
+          student2_overrides = output[:students].second[:override_scores]
+          expect(student2_overrides.length).to eq 2
+
+          student2_course_change = student2_overrides.detect { |override| override[:grading_period_id].nil? }
+          expect(student2_course_change[:current_score]).to eq nil
+          expect(student2_course_change[:new_score]).to eq nil
+
+          student2_gp_change = student2_overrides.detect { |override| override[:grading_period_id] == first_grading_period.id }
+          expect(student2_gp_change[:current_score]).to eq nil
+          expect(student2_gp_change[:new_score]).to eq "70"
+        end
+      end
+
+      it "ignores grading periods whose title it does not recognize" do
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (Unknown GP)",
+          "Cyrus,#{student_with_override.id},My Course,0,40"
+        )
+        output = importer.as_json
+
+        expect(output[:students]).to be_empty
+      end
+
+      it "ignores malformed 'Override Score' headers" do
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score (zzzzzz",
+          "Cyrus,#{student_with_override.id},My Course,0,40"
+        )
+        output = importer.as_json
+
+        expect(output[:students]).to be_empty
+      end
+
+      it "treats an 'empty' grading period title as a course score" do
+        importer = importer_with_rows(
+          "Student,ID,Section,Final Score,Override Score ()",
+          "Cyrus,#{student_with_override.id},My Course,0,50"
+        )
+        output = importer.as_json
+
+        aggregate_failures do
+          expect(output[:students].length).to eq 1
+          expect(output[:students].first.dig(:override_scores, 0, :current_score)).to eq "50.54"
+          expect(output[:students].first.dig(:override_scores, 0, :new_score)).to eq "50"
+          expect(output[:students].first.dig(:override_scores, 0, :grading_period_id)).to eq nil
+        end
+      end
+    end
+
+    it "handles changes to assignments and override scores in the same file" do
+      importer = importer_with_rows(
+        "Student,ID,Section,Assignment 1,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,20,0,60",
+        "Ophilia,#{student_without_override.id},My Course,40,0,"
+      )
+
+      output = importer.as_json
+
+      aggregate_failures do
+        expect(output[:students].length).to eq 2
+
+        student_with_override_data = output[:students].detect { |student| student[:id] == student_with_override.id }
+        expect(student_with_override_data[:submissions].length).to eq 1
+        expect(student_with_override_data.dig(:submissions, 0, "grade")).to eq "20"
+        expect(student_with_override_data[:override_scores].length).to eq 1
+        expect(student_with_override_data.dig(:override_scores, 0, :new_score)).to eq "60"
+
+        student_without_override_data = output[:students].detect { |student| student[:id] == student_without_override.id }
+        expect(student_without_override_data[:submissions].length).to eq 1
+        expect(student_without_override_data.dig(:submissions, 0, "grade")).to eq "40"
+        expect(student_without_override_data[:override_scores].length).to eq 1
+        expect(student_without_override_data.dig(:override_scores, 0, :new_score)).to eq nil
+      end
+    end
+
+    it "ignores changes to override scores if the feature flag is turned off" do
+      Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
+
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,60"
+      )
+
+      output = importer.as_json
+
+      expect(output[:students]).to be_empty
+    end
+
+    it "ignores changes to override scores if the course does not allow override grades" do
+      @course.allow_final_grade_override = false
+      @course.save!
+
+      importer = importer_with_rows(
+        "Student,ID,Section,Final Score,Override Score",
+        "Cyrus,#{student_with_override.id},My Course,0,60"
+      )
+
+      output = importer.as_json
+
+      expect(output[:students]).to be_empty
+    end
+  end
+
   def new_gradebook_importer(attachment = valid_gradebook_contents, upload = nil, user = gradebook_user, progress = nil)
     @user = user
     @progress = progress || Progress.create!(tag: "test", context: @user)

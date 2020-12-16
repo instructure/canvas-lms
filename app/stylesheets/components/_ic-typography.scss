@@ -161,7 +161,7 @@ a {
 /// Underline All Links Feature Flag
 ////////=============
 .Underline-All-Links__enabled {
-  a:not(.Button, .btn, .ui-button, .ui-tabs-anchor) {
+  a:not(.Button):not(.btn):not(.ui-button):not(.ui-tabs-anchor) {
     text-decoration: underline;
     &:focus, &:hover { text-decoration: none; }
 

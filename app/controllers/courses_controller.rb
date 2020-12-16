@@ -2021,10 +2021,7 @@ class CoursesController < ApplicationController
           js_env(:SHOW_ANNOUNCEMENTS => true, :ANNOUNCEMENT_LIMIT => @context.home_page_announcement_limit)
         end
 
-        if @domain_root_account&.feature_enabled?(:mute_notifications_by_course) && params[:view] == 'notifications'
-          render_course_notification_settings
-          return
-        end
+        return render_course_notification_settings if params[:view] == 'notifications'
 
         @contexts = [@context]
         case @course_home_view

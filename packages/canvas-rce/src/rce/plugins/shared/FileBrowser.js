@@ -50,6 +50,7 @@ export default function RceFileBrowser(props) {
       title: fileInfo.name,
       href: url,
       embedded_iframe_url,
+      media_id: fileInfo.api.media_entry_id,
       target: '_blank',
       class: clazz,
       content_type

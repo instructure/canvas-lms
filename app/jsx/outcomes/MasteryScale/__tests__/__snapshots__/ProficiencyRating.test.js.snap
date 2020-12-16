@@ -163,7 +163,7 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         shouldCloseOnDocumentClick={true}
         shouldCloseOnEscape={true}
         shouldContainFocus={true}
-        shouldFocusContentOnTriggerBlur={false}
+        shouldFocusContentOnTriggerBlur={true}
         shouldRenderOffscreen={false}
         shouldReturnFocus={true}
         show={false}
@@ -279,7 +279,6 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
             focusOnMount={false}
             hideOnScroll={false}
             hidePrompt={true}
-            isOpen={true}
             nonModal={true}
             parentComponent="ProficiencyRating"
             setStatusColor={[Function]}
@@ -319,6 +318,14 @@ exports[`ProficiencyRating can manage renders the ProficiencyRating component 1`
         type="button"
         withBackground={false}
         withBorder={false}
+      />
+      <ConfirmMasteryModal
+        confirmButtonText="Confirm"
+        isOpen={false}
+        modalText="This will remove the mastery level from your mastery scale."
+        onClose={[Function]}
+        onConfirm={[Function]}
+        title="Remove Mastery Level"
       />
     </div>
   </Item>

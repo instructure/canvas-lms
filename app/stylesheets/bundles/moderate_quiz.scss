@@ -99,7 +99,7 @@
         font-style: normal;
         font-size: 80%;
         font-weight: 300;
-        color: #888;
+        color: $ic-font-color--subdued;
       }
     }
     .input {
@@ -149,7 +149,7 @@
     margin: 4px 0 0;
     font-size: 80%;
     font-weight: 300;
-    color: #888;
+    color: $ic-font-color--subdued;
   }
   .relative_time {
     input {

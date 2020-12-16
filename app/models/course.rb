@@ -3413,7 +3413,8 @@ class Course < ActiveRecord::Base
     nicknames = user.all_course_nicknames(courses)
     courses.each do |course|
       course.preloaded_favorite = favorite_ids.include?(course.id) if favorite_ids
-      course.preloaded_nickname = nicknames[course.id]
+      # keys in nicknames are relative to the user's shard
+      course.preloaded_nickname = nicknames[Shard.relative_id_for(course.id, course.shard, user.shard)]
     end
   end
 

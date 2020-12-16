@@ -537,6 +537,7 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :allow_course_admin_actions and
       can :manage_students and
       can :moderate_forum and
       can :update
@@ -559,6 +560,7 @@ class Group < ActiveRecord::Base
       can :delete and
       can :manage and
       can :manage_admin_users and
+      can :allow_course_admin_actions and
       can :manage_calendar and
       can :manage_content and
       can :manage_files and

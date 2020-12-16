@@ -1262,6 +1262,7 @@ module ApplicationHelper
   end
 
   def authenticated_thumbnail_url(attachment, options={})
+    options[:original_url] = request.original_url
     file_authenticator.thumbnail_url(attachment, options)
   end
 
@@ -1296,6 +1297,7 @@ module ApplicationHelper
     if @domain_root_account.feature_enabled?(:account_level_mastery_scales)
       js_env(
         ACCOUNT_LEVEL_MASTERY_SCALES: true,
+        IMPROVED_OUTCOMES_MANAGEMENT: @domain_root_account.feature_enabled?(:improved_outcomes_management),
         MASTERY_SCALE: {
           outcome_proficiency: @context.resolved_outcome_proficiency&.as_json,
           outcome_calculation_method: @context.resolved_outcome_calculation_method&.as_json

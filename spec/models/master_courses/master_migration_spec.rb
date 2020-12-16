@@ -810,6 +810,15 @@ describe MasterCourses::MasterMigration do
         expect(@outcome_to.reload).to be_deleted
         expect(@og_to.child_outcome_links.not_deleted.where(content_type: 'LearningOutcome', content_id: @outcome_to)).not_to be_any
       end
+
+      it "doesn't spuriously add the outcome to the root outcome group" do
+        Timecop.freeze(3.minutes.from_now) do
+          @outcome.touch
+        end
+        run_master_migration
+
+        expect(@copy_to.learning_outcome_links.where(content: @outcome_to).count).to eq 1
+      end
     end
 
     it "copies links to account outcomes on rubrics" do
@@ -2509,6 +2518,38 @@ describe MasterCourses::MasterMigration do
       end
 
       expect(sub.reload.cached_due_date.to_i).to eq due_at.to_i
+    end
+
+    it "handles downstream changes of ungraded discussion dates correctly" do
+      date1 = 1.week.ago.at_noon
+      date2 = 2.weeks.ago.at_noon
+      copy_to = course_factory
+      sub = @template.add_child_course!(copy_to)
+      topic = @copy_from.discussion_topics.create!(lock_at: date1)
+      run_master_migration
+      topic_to = copy_to.discussion_topics.where(migration_id: mig_id(topic)).take
+
+      # ensure schedule_delayed_transitions does not cause a spurious downstream change record
+      expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+
+      Timecop.travel(5.minutes.from_now) do
+        # now actually make a downstream change
+        topic.touch
+        topic_to.lock_at = date2
+        topic_to.save!
+        run_master_migration
+        expect(topic_to.reload.lock_at).to eq date2
+        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq(['lock_at'])
+      end
+
+      # lock the availability dates and ensure the downstream change is overwritten
+      Timecop.travel(10.minutes.from_now) do
+        @template.content_tag_for(topic).update_attribute(:restrictions, {:availability_dates => true})
+        topic.touch
+        run_master_migration
+        expect(sub.child_content_tags.polymorphic_where(content: topic_to).take.downstream_changes).to eq([])
+        expect(topic_to.reload.lock_at).to eq date1
+      end
     end
 
     context "attachment migration id preservation" do

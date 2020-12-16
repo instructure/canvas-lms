@@ -29,7 +29,12 @@ export default class ConfirmMasteryModal extends Component {
     modalText: string.isRequired,
     isOpen: bool.isRequired,
     onClose: func.isRequired,
-    title: string.isRequired
+    title: string.isRequired,
+    confirmButtonText: string
+  }
+
+  static defaultProps = {
+    confirmButtonText: I18n.t('Save')
   }
 
   onConfirm = () => {
@@ -55,7 +60,7 @@ export default class ConfirmMasteryModal extends Component {
           <Button onClick={this.onClose}>{I18n.t('Cancel')}</Button>
           &nbsp;
           <Button onClick={this.onConfirm} variant="primary">
-            {I18n.t('Save')}
+            {this.props.confirmButtonText}
           </Button>
         </Modal.Footer>
       </Modal>

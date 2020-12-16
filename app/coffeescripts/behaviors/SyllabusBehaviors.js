@@ -26,6 +26,8 @@ import 'jquery.instructure_misc_plugins' // ifExists, showIf
 import 'jquery.loadingImg'
 import 'vendor/jquery.scrollTo'
 import 'jqueryui/datepicker'
+import easy_student_view from 'easy_student_view'
+import mathml from 'mathml'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -239,6 +241,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     $edit_syllabus_link.hide()
     $course_syllabus.hide()
     $course_syllabus_details.hide()
+    easy_student_view.hide()
     $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
     $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
     RichContentEditor.loadNewEditor($course_syllabus_body, {
@@ -257,6 +260,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     $edit_course_syllabus_form.hide()
     $edit_syllabus_link.show()
     $course_syllabus.show()
+    easy_student_view.show()
     const text = $.trim($course_syllabus.html())
     $course_syllabus_details.showIf(!text)
     RichContentEditor.destroyRCE($course_syllabus_body)
@@ -312,6 +316,15 @@ const bindToEditSyllabus = function(course_summary_enabled) {
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
+      if (!ENV.FEATURES.new_math_equation_handling) {
+        if (mathml.isMathMLOnPage()) {
+          if (mathml.isMathJaxLoaded()) {
+            mathml.reloadElement('content')
+          } else {
+            mathml.loadMathJax(undefined)
+          }
+        }
+      }
     },
 
     error(data) {

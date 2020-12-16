@@ -92,6 +92,8 @@ class LearningOutcomeResult < ActiveRecord::Base
       versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
       if !versions.empty?
         versions.each do |version|
+          InstStatsd::Statsd.increment('learning_outcome_result.create') if new_record?
+
           version_data = YAML::load(version.yaml)
           version_data["score"] = self.score
           version_data["mastery"] = self.mastery

@@ -503,7 +503,46 @@ const rubricEditing = {
     $form.find('.rubric_grading').showIf($assignPoints.length > 0 && $quizPage.length === 0)
     return $rubric
   },
-  editRubric($original_rubric, url) {
+  updateMasteryScale($rubric) {
+    if (!ENV.MASTERY_SCALE?.outcome_proficiency) {
+      return
+    }
+    const mastery_scale = ENV.MASTERY_SCALE.outcome_proficiency.ratings
+    const mastery_points = mastery_scale.find(r => r.mastery).points
+    const points_possible = mastery_scale[0].points
+    $rubric.find('.criterion:not(.blank)').each(function() {
+      const $criterion = $(this)
+      if (!$criterion.hasClass('learning_outcome_criterion')) {
+        return
+      }
+
+      $criterion
+        .find('.criterion_points')
+        .val(points_possible)
+        .blur()
+      $criterion.find('.mastery_points').text(mastery_points)
+
+      const old_ratings = $criterion.find('.rating:not(.blank)')
+      if (old_ratings.length < mastery_scale.length) {
+        for (let i = old_ratings.length; i < mastery_scale.length; i++) {
+          $criterion
+            .find('.rating:not(.blank):first')
+            .addClass('add_column')
+            .click()
+        }
+      }
+
+      $criterion.find('.rating:not(.blank)').each(function(i) {
+        const rating = ENV.MASTERY_SCALE.outcome_proficiency.ratings[i]
+        if (!rating) {
+          $(this).remove()
+        } else {
+          $(this).fillTemplateData({data: rating})
+        }
+      })
+    })
+  },
+  editRubric($original_rubric, url, useMasteryScale = false) {
     let $rubric, data, $tr, $form
     $('#add_criterion_container').remove()
     rubricEditing.isEditing = true
@@ -521,6 +560,10 @@ const rubricEditing = {
       ]
     })
     $original_rubric.hide().after($rubric.show())
+
+    if (useMasteryScale) {
+      rubricEditing.updateMasteryScale($rubric)
+    }
 
     $tr = $('#edit_rubric')
       .clone(true)
@@ -930,18 +973,11 @@ rubricEditing.init = function() {
 
       const $link = $(this),
         $rubric = $link.parents('.rubric'),
-        prompt = I18n.t(
-          'prompts.read_only_rubric',
-          "You can't edit this " +
-            "rubric, either because you don't have permission " +
-            "or it's being used in more than one place. Any " +
-            'changes you make will result in a new rubric based ' +
-            'on the old rubric. Continue anyway?'
-        )
+        useMasteryScale = shouldUseMasteryScale($rubric)
 
       if (rubricEditing.isEditing) return false
-      if (!$link.hasClass('copy_edit') || confirm(prompt)) {
-        rubricEditing.editRubric($rubric, $link.attr('href'))
+      if (!$link.hasClass('copy_edit') || confirm(getEditRubricPrompt(useMasteryScale))) {
+        rubricEditing.editRubric($rubric, $link.attr('href'), useMasteryScale)
       }
     })
 
@@ -1259,6 +1295,10 @@ rubricEditing.init = function() {
           rubricEditing.updateRubricPoints($rubric)
           rubricEditing.hideEditRubric($rubric, false)
           $rubric_dialog.dialog('close')
+          // equivalent check in _rubric.html.erb
+          if (!rubric.permissions?.update) {
+            $rubric.find('.edit_rubric_link').addClass('copy_edit')
+          }
         },
         () => {
           $rubric_dialog.loadingImage('remove')
@@ -1623,6 +1663,39 @@ if (
     <RubricManagement accountId={contextId} />,
     document.getElementById('rubric_management')
   )
+}
+
+const getEditRubricPrompt = useMasteryScale => {
+  if (!useMasteryScale) {
+    return I18n.t(
+      "You can't edit this " +
+        "rubric, either because you don't have permission " +
+        "or it's being used in more than one place. Any " +
+        'changes you make will result in a new rubric based on the old rubric. Continue anyway?'
+    )
+  }
+  if (ENV.context_asset_string.includes('course')) {
+    return I18n.t(
+      "You can't edit this " +
+        "rubric, either because you don't have permission " +
+        "or it's being used in more than one place. Any " +
+        'changes you make will result in a new rubric. Any associated outcome criteria will use the course mastery scale. Continue anyway?'
+    )
+  } else {
+    return I18n.t(
+      "You can't edit this " +
+        "rubric, either because you don't have permission " +
+        "or it's being used in more than one place. Any " +
+        'changes you make will result in a new rubric. Any associated outcome criteria will use the account mastery scale. Continue anyway?'
+    )
+  }
+}
+
+const shouldUseMasteryScale = $rubric => {
+  if (!ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+    return false
+  }
+  return $rubric.find('.criterion').hasClass('learning_outcome_criterion')
 }
 
 export default rubricEditing

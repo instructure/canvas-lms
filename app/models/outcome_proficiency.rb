@@ -112,12 +112,14 @@ class OutcomeProficiency < ApplicationRecord
       return proficiency
     end
 
-    OutcomeProficiency.transaction do
-      proficiency ||= OutcomeProficiency.new(context: context)
-      proficiency.workflow_state = 'active'
-      proficiency.replace_ratings(self.default_ratings)
-      proficiency.save!
-      proficiency
+    GuardRail.activate(:primary) do
+      OutcomeProficiency.transaction do
+        proficiency ||= OutcomeProficiency.new(context: context)
+        proficiency.workflow_state = 'active'
+        proficiency.replace_ratings(self.default_ratings)
+        proficiency.save!
+        proficiency
+      end
     end
   rescue ActiveRecord::RecordNotUnique
     retry

@@ -21,6 +21,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
+import ManagementHeader from './ManagementHeader'
 
 export const OutcomePanel = () => {
   useEffect(() => {
@@ -39,6 +40,7 @@ export const OutcomePanel = () => {
 }
 
 const OutcomeManagement = () => {
+  const improvedManagement = ENV?.IMPROVED_OUTCOMES_MANAGEMENT
   const [selectedIndex, setSelectedIndex] = useState(() => {
     const tabs = {'#mastery_scale': 1, '#mastery_calculation': 2}
     return window.location.hash in tabs ? tabs[window.location.hash] : 0
@@ -56,6 +58,7 @@ const OutcomeManagement = () => {
 
   return (
     <ApolloProvider client={client}>
+      {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
           <OutcomePanel />
