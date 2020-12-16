@@ -401,28 +401,16 @@ pipeline {
 
                 gems = configuration.plugins()
                 echo "Plugin list: ${gems}"
-
-                def gemArgs = gems.collect {
-                  if (env.GERRIT_PROJECT == it) {
-                    ""
-                  } else {
-                    "{ mkdir -p gems/plugins/$it && git archive --remote=ssh://gerrit.instructure.com:29418/$it ${getPluginVersion(it)} | tar -x -C 'gems/plugins/$it'; } &"
+                def pluginsToPull = []
+                gems.each {
+                  if (env.GERRIT_PROJECT != it) {
+                    pluginsToPull.add([name: it, version: getPluginVersion(it), target: "gems/plugins/$it"])
                   }
                 }
 
-                gemArgs << "{ mkdir -p vendor/qti_migration_tool && git archive --remote=ssh://gerrit.instructure.com:29418/qti_migration_tool ${getPluginVersion('qti_migration_tool')} | tar -x -C 'vendor/qti_migration_tool'; } &"
+                pluginsToPull.add([name: 'qti_migration_tool', version: getPluginVersion('qti_migration_tool'), target: "vendor/qti_migration_tool"])
 
-                credentials.withGerritCredentials {
-                  sh """#!/bin/bash
-                    set -ex
-
-                    ${gemArgs.join('\n')}
-
-                    for job in \$(jobs -p); do
-                      wait \$job || exit 1
-                    done
-                  """
-                }
+                pullRepos(pluginsToPull)
               }
             }
 
