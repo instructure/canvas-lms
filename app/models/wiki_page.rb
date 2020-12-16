@@ -415,8 +415,8 @@ class WikiPage < ActiveRecord::Base
     # in the yaml.  This doctors the yaml back, and can be removed
     # when the "content_imports" exception type for psych syntax errors
     # isn't happening anymore.
-    pattern_1 = /(\<a.*?id=.*?"media_comment.*?\/\>)/im
-    pattern_2 = /(\<a.*?id=.*?"media_comment.*?\<\/a\>)/
+    pattern_1 = /(\<a[^<>]*?id=.*?"media_comment.*?\/\>)/im
+    pattern_2 = /(\<a[^<>]*?id=.*?"media_comment.*?\<\/a\>)/
     replacements = []
     [pattern_1, pattern_2].each do |regex_pattern|
       yaml_string.scan(regex_pattern).each do |matched_groups|

@@ -763,5 +763,33 @@ YAML
       expect(good_yaml).to include("style=\\\"text-align: center;\\\">")
       expect(good_yaml).to include("<a id=\\\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\\\"")
     end
+
+    it "isn't overly greedy in matching other anchor tags" do
+      bad_yaml = <<-YAML
+---
+id: 19903
+wiki_id: 513
+title: Jason otitis media treatment
+body: \"<ul>\\r\\n
+                <li\n  class=\\\"distractors\\\"><a class=\\\"radio_link\\\" href=\\\"#\\\">Yes</a></li>\\r\\n
+                <li class=\\\"distractors\\\"><a\n  class=\\\"radio_link answer\\\" href=\\\"#\\\">No</a></li>\\r\\n
+              </ul>\\r\\n</div>\\r\\n
+              <div class=\\\"col-md-4\\\">
+                <img\n  src=\\\"/courses/348/files/102814/preview\\\" alt=\\\"Antibiotics\\\" width=\\\"100%\\\"\n  height=\\\"auto\\\" data-api-endpoint=\\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\\"\n  data-api-returntype=\\\"File\\\">
+              </div>\\r\\n
+            </div>\\r\\n
+            <div class=\\\"feedback\\\">\\r\\n
+              <p>Jason\n  does not need antibiotics at this time. He is not systemically unwell, he has no\n  high-risk complications and there is no discharge from his ear.</p>\\r\\n
+            </div>\\r\\n
+            <div\n  class=\\\"feedback correct\\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
+            <div class=\\\"feedback\n  incorrect\\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
+          </div>\\r\\n
+        </div>\\r\\n<div class=\\\"content-box\\\">\\r\\n<div\n  class=\\\"grid-row spacer center-xs\\\">\\r\\n
+        <div class=\\\"col-md-4 text-left\\\">\\r\\n<p\n  class=\\\"text-info\\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\\"col-md-4\\\">
+        <a id=\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\" class=\"instructure_inline_media_comment audio_comment\" href=\"/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\"/>\"
+YAML
+      good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
+      expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")
+    end
   end
 end
