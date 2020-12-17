@@ -1797,6 +1797,7 @@ pl:
   add_additional_comments_ec34a62f: "Dodaj więcej komentarzy"
   add_alert_b2729c99: "Dodaj alert"
   add_an_assignment_fb73942e: "Dodaj zadanie"
+  add_an_attachment_b2e9092f: "Dodaj załącznik"
   add_an_identity_provider_to_this_account_c2644478: "Dodaj dostawcę tożsamości do tego konta:"
   add_announcement_165c3b05: "Dodaj ogłoszenie"
   add_another_assignment_fc5c908f: "Dodaj kolejne zadanie"
@@ -1917,8 +1918,13 @@ pl:
   additional_settings_for_sis_syncing_f926973e: "Dodatkowe ustawienia dla synchronizacji SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Dodatkowe ustawienia synchronizacji SIS dla dyskusji, quizów i zadań"
   additional_sort_options_for_new_gradebook_2dc1939: "Dodatkowe opcje sortowania dla nowego dziennika ocen"
+  address_use_as_wildcard_48f2cf60: "Adres (użyj * jako elementu zastępczego)"
   addressbook_microservice_a4940422: "AddressBook mikrousługa"
   addressbook_performance_tap_98ddf67: "AddressBook zakładka osiągnięć"
+  adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
+      Dodaje nową kartę Zwrócone wiadomości do Narzędzi administratora konta, co
+      pozwala wyszukiwać adresy e-mail tam, gdzie powiadomienia Canvas
+      zostały zwrócone
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Dodaj link analizy do menu ustawień użytkownika."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Dodaj analizę do karty kontekstowej uczestnika."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Dodaje szczegółowe uprawnienia dodania/usuwania każdej roli oraz oddzielne uprawnienie dot. innych działań administratora kursu"
@@ -4227,6 +4233,8 @@ pl:
   bottom_15a2a9be: Dół
   bounce_count_reset_c4c2218f: "Resetowanie licznik odrzuceń!"
   bounce_reason_689ed4c6: "Resetowanie powodu"
+  bounced_emails_83f293b5: "Zwrócone wiadomości e-mail"
+  bounced_emails_admin_tool_9730a5e4: "Narzędzia administratora dla zwracanych wiadomości"
   brand_configs_b465a03f: "Konfiguracji marki"
   brazil_55_34103ffa: "Brazylia (+55)"
   brazil_c1d6e73a: Brazylia
@@ -5466,6 +5474,7 @@ pl:
   completed_19711ce7: Uzupełnione
   completed_9b809e44: gotowe
   completed_icon_521596e4: "ikona uzupełniona"
+  compose_a_new_message_db3a68ed: "Utwórz nową wiadomość"
   compose_message_8abd180a: "Utwórz wiadomość"
   computer_1d7dfa6f: Komputer
   concluded_63150003: ukończone
@@ -5580,6 +5589,7 @@ pl:
   configure_individual_learning_paths_for_students_b_e2fce294: "Skonfiguruj indywidualne ścieżki edukacyjne dla uczniów na podstawie wyników oceny."
   configure_tool_app_3b1bb50b: "Skonfigurować aplikację %{tool}?"
   configure_toolname_app_651371be: "Skonfigurować aplikację %{toolName}?"
+  confirm_6556b3a6: Potwierdź
   confirm_as_spam_2f8b7105: "Potwierdź, że to jest spam"
   confirm_communication_channel_81c48d08: "Potwierdź kanał komunikacji"
   confirm_contact_method_29d6fe4b: "Zatwierdź metodę kontaktu"
@@ -6281,6 +6291,7 @@ pl:
     many: "%{contextName} i %{count} innych"
     one: "%{contextName} i %{count} inny"
     other: "%{contextName} i %{count} innych"
+  contextname_selected_59de1002: "Wybrano %{contextName}"
   contextscount_more_66b2f99b: "+ %{contextsCount} więcej"
   contexttype_notification_settings_d72acd58: "Ustawienia powiadomień %{contextType}"
   continue_ac067716: Kontynuuj
@@ -10054,6 +10065,7 @@ pl:
   failed_to_log_in_7ceec561: "Błąd w logowaniu"
   failed_to_move_items_e043da6: "Nie udało się przenieść elementów"
   failed_to_open_discussion_for_comments_87412434: "Nie udało się otworzyć dyskusji dla komentarzy"
+  failed_to_perform_search_c918100f: "Nie udało się przeprowadzić wyszukiwania"
   failed_to_pin_discussion_38a60900: "Nie udało się przypiąć dyskusji"
   failed_to_publish_draft_comment_853761e9: "Opublikowanie modelowego komentarza nie powiodło się"
   failed_to_save_changes_errors_6920f334: "Nie udało się zapisać zmian: %{errors}%"
@@ -10212,6 +10224,7 @@ pl:
   file_storage_32477f6: "Magazyn plików"
   file_tree_collapsed_d4b0ae96: "Zwinięte drzewo plików"
   file_tree_expanded_a1d20c4a: "Rozwinięte drzewo plików"
+  file_upload_9cae6da5: "Prześlij plik"
   file_upload_failed_af22dd91: "Niepowodzenie przesyłania pliku."
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Przekazanie pliku, adresu URL lub content_export_id jest wymagane"
   file_upload_submission_740711f: "Przesłane zadanie w formie pliku"
@@ -10299,6 +10312,7 @@ pl:
   filter_discussions_by_unread_6c48322: "filtruj dyskusje według nieprzeczytanych"
   filter_e3398407: Filtruj
   filter_ip_addresses_2f296bd2: "Filtruj adresy IP"
+  filter_messages_by_course_21a53fc4: "Filtruj wiadomości wg kursów"
   filter_replies_by_unread_342e8e90: "Filtruj odpowiedzi według nieprzeczytanych"
   filter_replies_by_unread_caf870ea: "filtruj odpowiedzi według nieprzeczytanych"
   filter_roles_12cf2271: "Filtruj role"
@@ -10420,6 +10434,7 @@ pl:
   formattedgrade_points_90505a61: "%{formattedGrade} pkt"
   formula_many_warning_title: "W banku tym dostępnych jest %{count} pytań ze wzorami, dla których konieczne będzie ponowne wygenerowanie możliwych odpowiedzi"
   formula_warning_title: "Konieczne będzie ponowne wygenerowanie możliwych odpowiedzi dla pytania ze wzorami"
+  forward_d143f64: Przekaż
   found_count_broken_links_9224b8dd: 
     few: "Odnaleziono %{count} uszkodzone łącza"
     many: "Odnaleziono %{count} uszkodzone łącza"
@@ -10466,6 +10481,8 @@ pl:
   germany_49_fc5b8179: "Niemcy (+49)"
   germany_b02d91c9: Niemcy
   get_started_b9507525: Zaczynamy
+  get_started_by_finding_importing_or_creating_your__380b6cfb: "Rozpocznij od szukania, importowania lub tworzenia wyników na koncie."
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: "Rozpocznij od szukania, importowania lub tworzenia wyników kursu."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Pobierz następujące ze swojej aplikacji Salesforce Connected "
   get_your_content_online_9546ecff: "Przenieś zawartość kursów online"
   get_your_content_online_quickly_41fd925b: "Przenieś szybko zawartość kursów online"
@@ -11559,6 +11576,7 @@ pl:
   group_name_group_people_e9d548c1: "%{group_name} - Osoby w grupie"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} w kategorii grupy %{group_category_name}"
   group_name_is_required_5547bc0b: "Wymagana jest nazwa grupy"
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Wpisana grupa %{newOptionGroup}. %{newOptionContextName}"
   group_pages_656556f3: "Strony grupy"
   group_people_50e9785b: "Członkowie grupy"
   group_roster_1846bf84: "Lista grup"
@@ -12758,6 +12776,7 @@ pl:
   invalid_points_for_rating_tier_index_i_400d307e: "Nieprawidłowe punkt dla poziomu oceny %{index}: \"%{i}\""
   invalid_points_possible: "Wartość możliwych punktów za dane zadanie musi wynosić zero lub więcej."
   invalid_recipient_name_56b22b86: "Niepoprawna nazwa odbiorcy."
+  invalid_redirect_url_6444a1b0: "Nieprawidłowy adres URL przekierowania"
   invalid_restrictions_316cd740: "Nieprawidłowe ograniczenia"
   invalid_score_3d247da7: "Nieprawidłowy wynik"
   invalid_sis_sync_status_b68db497: "Nieprawidłowy status synchronizacji SIS"
@@ -12937,6 +12956,8 @@ pl:
   large_course_db3d58b: "Duży kurs:"
   last_assessment_cd5659b6: "Ostatnia ocena: "
   last_attempt_7258ebd7: "Ostatnia próba"
+  last_bounced_after_76f9ce30: "Ostatnie zwrócone po"
+  last_bounced_before_601c221a: "Ostatnie zwrócone przed"
   last_changed_b544504d: "Ostatnia zmiana:"
   last_changed_date_82f1ce56: "Ostatnia zmiana: %{date}"
   last_day_attended_b72d623c: "Ostatni dzień uczestnictwa"
@@ -13516,6 +13537,7 @@ pl:
   m2c_name: "Importer Moodle"
   macedonian_6ed541af: Macedoński
   magenta_4a65993c: Amarantowy
+  mailbox_selection_92d9cbf: "Wybór skrzynki e-mail"
   main_navigation_3f080c80: "Główna nawigacja"
   main_text_color_7d65ab1b: "Kolor głównego tekstu"
   make_key_developername_invisible_212ecf72: "Ukryj klucz %{developerName}"
@@ -15582,6 +15604,7 @@ pl:
   messages_sent_b851d0dd: "Wiadomości wysłane"
   mexico_52_60d635c7: "Meksyk  (+52)"
   mexico_b2d7a271: Meksyk
+  mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Eksport ocen MPG"
   mic_a7f3d311: Mikrofon
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - bezpłatna wersja próbna (strony wiki)"
@@ -15888,6 +15911,7 @@ pl:
   more_information_about_ratings_57cdd446: "Więcej informacji o ocenach"
   more_modules_d9a9f003: "Więcej modułów"
   more_options_272b4953: "Więcej opcji"
+  more_options_e89670cf: "Więcej opcji"
   more_people_options_730e9686: "Więcej opcji dla osób"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Dodano więcej wyników na dole strony."
   more_than_999_submissions_need_grading_bc087dd0: "Ponad 999 przesłanych zadań wymaga oceny"
@@ -16357,7 +16381,9 @@ pl:
   not_now_afa29fa7: "Nie teraz"
   not_published_73f7079: Nieopublikowane
   not_reviewed_c38d9e97: "Nie przejrzane"
+  not_selected_57866888: "nie wybrano"
   not_signed_47acf472: "Nie podpisano"
+  not_starred_98931190: "nieoznaczone gwiazdką"
   not_starred_no_subject_click_to_star_adfefe93: "'Nie wystąpił \"(Brak tematu)\", Kliknij aby wystąpić."
   not_starred_no_subject_click_to_star_dc91380: "'Nie wystąpił \"(Brak tematu)\", Kliknij aby wystąpić."
   not_starred_subject_click_to_star_4ea6eb64: "'Nie wystąpił\"%{subject}\",, Kliknij aby wystąpić."
@@ -17146,6 +17172,8 @@ pl:
   outcomes_csv_format_9005acfb: "Format CSV wyników"
   outcomes_d1b18d33: Wyniki
   outcomes_for_student_9f91d4d: "Wyniki uczestnika"
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: "Wyniki nie zostały jeszcze dodane do tego konta."
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Wyniki nie zostały jeszcze dodane do tego kursu."
   outcomes_import_completed_baff5cb0: "Ukończono importowanie wyników"
   outcomes_import_failed_77efcdf4: "Nie udało się zaimportować wyników"
   outcomes_report_8887bd49: "Raport wyników"
@@ -17327,7 +17355,11 @@ pl:
   performed_by_70b3ce96: "Wykonana przez"
   permission_must_be_enabled_for_someone_397e1ce3: "Pozwolenie musi zostać komuś przypisane"
   permission_not_found_620b80d1: "Nie znaleziono uprawnienia"
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Włączono uprawnienie do zmiany tych obliczeń opanowania materiału na poziomie kursu dla:"
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: "Włączono uprawnienie do zmiany tych obliczeń opanowania materiału na poziomie konta dla:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "Uprawnienie do zmiany tego obliczenia biegłości jest włączone na poziomie konta dla:"
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "Włączono uprawnienie do zmiany tej skali opanowania materiału na poziomie konta dla:"
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "Włączono uprawnienie do zmiany tej skali opanowania materiału na poziomie kursu dla:"
   permission_to_change_this_mastery_scale_is_enabled_89066fac: "Uprawnienie do zmiany tej skali nauki jest włączone na poziomie konta dla:"
   permissions: 
     manage_webhooks: "Webhooki - Zarządzaj"
@@ -20245,11 +20277,13 @@ pl:
       other: "%{count} sekcji"
   recipients_a69b5e55: "Odbiorcy:"
   record_7c9448b: Nagraj
+  record_an_audio_or_video_comment_88425add: "Nagraj komentarz audio lub wideo"
   record_audio_14666880: "Nagraj dźwięk"
   record_audio_video_d9993f6c: "Nagraj audio/wideo"
-  record_media_6637ff19: "Nagraj media"
+  record_media_6637ff19: "Nagraj multimedia"
   record_upload_35dfb2ab: Rejestruj/prześlij
   record_upload_media_5fdce166: "Utwórz/prześlij pliki multimedialne"
+  record_upload_media_comment_4d01b943: "Nagraj/przekaż komentarz multimedialny"
   record_video_70dc8439: "Nagraj dźwięk"
   record_with_microphone_only_e4ee07aa: "Nagraj wyłącznie z mikrofonem"
   record_with_webcam_af21e07c: "Nagraj z użyciem kamery internetowej"
@@ -20360,6 +20394,7 @@ pl:
   remove_image_341340b3: "Usuń obraz"
   remove_label_11d96b8f: "Usuń %{label}"
   remove_linked_student_name_52dc7fce: "Usuń powiązanego uczestnika %{name}"
+  remove_mastery_level_b1e8dcb0: "Usuń poziom opanowania materiału"
   remove_name_624e06be: "Usuń %{name}"
   remove_name_as_an_admin_c296cf49: "Usuń %{name} jako administrator"
   remove_null_values_from_live_event_payloads_3c826f: "Usuń wartości null z ładunków wydarzeń na żywo"
@@ -20401,6 +20436,7 @@ pl:
         am_pm: "rano/po południu"
         hour: godz
         minute: min.
+  replace_attachmentdisplayname_button_94dd8ba1: "Przycisk zastępowania %{attachmentDisplayName}"
   replace_e61834a7: Zastąp
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Zastępuje obecne drzewo folderów nowym, bardziej dostępnym i funkcjonalnym drzewem folderów."
   replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
@@ -20412,6 +20448,8 @@ pl:
       przetworzoną wersją MathJax. Zmiana ta ułatwia dostęp
       i zapewnia czytelnikowi wiele opcji interakcji z równaniami na stronie.
   reply_389d6fb9: Odpowiedz
+  reply_all_80298bee: "Odpowiedz wszystkim"
+  reply_all_b864cd0e: "Odpowiedz wszystkim"
   reply_from_name: "%{name} za pośrednictwem powiadomień z systemu Canvas"
   reply_to_comment_72d96728: "Odpowiedz na komentarz"
   reply_to_conversation_f1aa0d4: "Odpowiedz na dyskusję"
@@ -21183,6 +21221,7 @@ pl:
   select_conversation_subject_3f36074a: "Wybierz rozmowę %{subject}"
   select_country_d21cb85a: "Wybierz kraj"
   select_country_or_region_4e9fb08e: "Wybierz kraj lub region"
+  select_course_5b549441: "Wybierz kurs"
   select_course_5cf89177: "Wybierz kurs"
   select_course_a_selection_is_required_before_recip_f622d9df: "Wybierz kurs: konieczne jest dokonanie wyboru zanim pole odbiorcy zostanie udostępnione"
   select_course_color_cad8e62b: "Wybierz kolor kursu"
@@ -21237,6 +21276,7 @@ pl:
   selected_content_contains_non_lti_links_f9dfd762: "Wybrana zawartość obejmuje łącza inne niż LTI."
   selected_content_is_not_an_lti_link_11780d96: "Wybrana zawartość nie jest łączem LTI."
   selected_course_course_a581f834: "Wybrany kurs %{course}"
+  selected_de3a8019: wybrane
   selected_external_tool_tool_bae095ba: "Wybrane narzędzie zewnętrzne %{tool}"
   selected_filename_7552a8c0: "wybrane %{filename}"
   selected_grade_942f40ba: "Wybrana ocena"
@@ -21295,6 +21335,7 @@ pl:
   send_a_message_to_student_b2e72576: "Wyślij wiadomość do %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Wyślij wiadomość do instruktora"
   send_a_message_to_this_student_ec46b8dd: "Wyślij wiadomość do tego uczestnika"
+  send_an_individual_message_to_each_recipient_e9ddaeb8: "Wyślij indywidualną wiadomość do każdego odbiorcy"
   send_assignment_name_to_another_user_e2ca494d: "Wyślij zadanie %{name}do innego użytkownika..."
   send_authorization_url_in_lti2_registration_287fcb33: "Prześlij adres URL autoryzacji w rejestracji LTI2"
   send_comment_4e05f2fb: "Wyślij komentarz"
@@ -22538,8 +22579,10 @@ pl:
     student_hidden_name: "Uczestnik %{position}"
   sso_settings_ebf98263: "Ustawienia SSO"
   star_2d27c137: gwiazdka
+  star_8d156e09: Gwiazdka
   star_conversation_2e2ba614: "Oznacz konwersację gwiazdką"
   starred_5a9efa8a: "Oznaczone gwiazdką"
+  starred_9523c316: "oznaczone gwiazdką"
   starred_no_subject_click_to_unstar_3191d64: "Wystąpił \"(Brak tematu)\", Kliknij aby cofnąć wystąpienie."
   starred_no_subject_click_to_unstar_bff04bce: "Wystąpił \"(Brak tematu)\", Kliknij aby cofnąć wystąpienie."
   starred_subject_click_to_unstar_6aafcddc: "Wystąpił \"%{subject}\", Kliknij aby cofnąć wystąpienie."
@@ -23617,6 +23660,7 @@ pl:
               kategoryzacja, dopasowanie i porządkowanie. Dostępnych jest także
               więcej funkcji moderowania i akomodacji.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Niniejszy obraz jest wyświetlony jako znak wodny w tle Twojej strony. Akceptowane formaty: png, svg, gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: "Obecnie ten obraz jest niedostępny"
   this_is_a_blueprint_course_5e7b47fe: "To jest kurs Blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Jest to rozdzielona przecinkami lista zaufanych adresów URL. Zaufanie adresom URL na tej liście spowoduje obejście tokena CSRF podczas logowania do systemu Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Jest to ukończony kurs, zatem jedynie zaakceptowane wpisy są dostępne."
@@ -23725,6 +23769,7 @@ pl:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Umożliwi to uwierzytelnienie systemu Canvas w celu zamieszczania ocen w systemie SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Zastosuje niniejsze zmiany do całego konta. Czy chcesz konytnuować?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Zastosuje motyw do całego konta. Czy chcesz kontynuować?"
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Spowoduje to usunięcie poziomu opanowania materiału dla Twojej skali."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Pozwoli to zaktualizować wszystkie kryteria ocen na poziomie konta i kursu, które są powiązane ze skalami biegłości i nie zostały jeszcze poddane ocenie."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Spowoduje to aktualizacje wszystkich kryteriów ocen dla kursu i konta powiązanych ze skalną opanowania materiału na koncie i tych bez oceny."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Pozwoli to zaktualizować wszystkie kryteria ocen dostosowane do wyników w ramach tego kursu, które nie zostały jeszcze ocenione."
@@ -24473,6 +24518,7 @@ pl:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "Rodzaj '%{type}' nie jest prawidłowym rodzajem pliku (spróbuj jpg, png lub gif)"
   type_of_change_1cb24a0e: "Typ zmiany"
   type_of_item_8a37f69d: "Typ elementu"
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Aby przechodzić między opcjami, użyj klawiszów strzałek lub wpisz dane"
   type_to_search_de63ad38: "Wpisz, aby wyszukać"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Aby wyszukać, wpisz dane; użyj klawiszów strzałek do nawigacji między opcjami."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oj! Skontaktuj się ze swym przyjaznym Deweloperem Katalogu. Komunikat o błędzie: %{message}"
@@ -25089,6 +25135,7 @@ pl:
     google_docs_added: "Zautoryzowano dostęp dla usługi Google Docs!"
     google_docs_fail: "Autoryzacja dla usługi Google Docs nie powiodła się. Spróbuj ponownie"
     google_drive_added: "Pomyślnie dodano konto na dysku Google!"
+    google_drive_authorization_failure: "Nieudana autoryzacja Dysku Google dla bieżącego użytkownika!"
     google_drive_fail: "Nie powiodło się uwierzytelnienie dysku Google. Należy spróbować ponownie."
     grades: 
       average_grades: 
