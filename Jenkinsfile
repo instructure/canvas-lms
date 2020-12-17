@@ -194,17 +194,44 @@ def slackSendCacheBuild(block) {
 
   def buildEndTime = System.currentTimeMillis()
 
-  def buildLog = sh(script: 'cat tmp/docker-build-short.log', returnStdout: true).trim()
+  def buildLog = sh(script: 'cat tmp/docker-build.log', returnStdout: true).trim()
+  def buildLogParts = buildLog.split('\n')
+  def buildLogPartsLength = buildLogParts.size()
 
-  slackSend(
-    channel: '#jenkins_cache_noisy',
-    message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+  // slackSend() has a ridiculously low limit of 2k, so we need to split longer logs
+  // into parts.
+  def i = 0
+  def partitions = []
+  def cur_partition = []
+  def max_entries = 5
+
+  while(i < buildLogPartsLength) {
+    cur_partition.add(buildLogParts[i])
+
+    if(cur_partition.size() >= max_entries) {
+      partitions.add(cur_partition)
+
+      cur_partition = []
+    }
+
+    i++
+  }
+
+  if(cur_partition.size() > 0) {
+    partitions.add(cur_partition)
+  }
+
+  for(i = 0; i < partitions.size(); i++) {
+    slackSend(
+      channel: '#jenkins_cache_noisy',
+      message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> (${i} / ${partitions.size() - 1})
       Duration: ${buildEndTime - buildStartTime}ms
       Instance: ${env.NODE_NAME}
 
-      ```${buildLog}```
-    """
-  )
+        ```${partitions[i].join('\n\n')}```
+      """
+    )
+  }
 }
 
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
