@@ -22,7 +22,7 @@ import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
 import ManagementHeader from './ManagementHeader'
-import OutcomeManagementPanel from './OutcomeManagementPanel'
+import OutcomeManagementPanel from './Management'
 
 export const OutcomePanel = () => {
   useEffect(() => {
