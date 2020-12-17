@@ -24,15 +24,15 @@ import {Text} from '@instructure/ui-text'
 import ProficiencyCalculation from './ProficiencyCalculation'
 import RoleList from '../RoleList'
 import {
-  ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-  COURSE_OUTCOME_PROFICIENCY_QUERY,
+  ACCOUNT_OUTCOME_CALCULATION_QUERY,
+  COURSE_OUTCOME_CALCULATION_QUERY,
   SET_OUTCOME_CALCULATION_METHOD
 } from './api'
 import {useQuery, useMutation} from 'react-apollo'
 
-const MasteryCalculation = ({contextType, contextId}) => {
+const MasteryCalculation = ({contextType, contextId, onNotifyPendingChanges}) => {
   const query =
-    contextType === 'Course' ? COURSE_OUTCOME_PROFICIENCY_QUERY : ACCOUNT_OUTCOME_PROFICIENCY_QUERY
+    contextType === 'Course' ? COURSE_OUTCOME_CALCULATION_QUERY : ACCOUNT_OUTCOME_CALCULATION_QUERY
   const {loading, error, data} = useQuery(query, {
     variables: {contextId}
   })
@@ -77,6 +77,7 @@ const MasteryCalculation = ({contextType, contextId}) => {
         update={setCalculationMethod}
         updateError={setCalculationMethodError}
         canManage={canManage}
+        onNotifyPendingChanges={onNotifyPendingChanges}
       />
 
       {accountRoles.length > 0 && (

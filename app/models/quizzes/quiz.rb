@@ -1459,6 +1459,17 @@ class Quizzes::Quiz < ActiveRecord::Base
     delay_if_production(singleton: "quiz_overrides_changed_#{self.global_id}").run_if_overrides_changed!
   end
 
+  # returns visible students for differentiated assignments
+  def visible_students_with_da(context_students)
+    quiz_students = context_students.joins(:quiz_student_visibilities).
+      where('quiz_id = ?', self.id)
+
+    # empty quiz_students means the quiz is for everyone
+    return quiz_students if quiz_students.present?
+
+    context_students
+  end
+
   # This alias exists to handle cases where a method that expects an
   # Assignment is instead passed a quiz (e.g., Submission#submission_zip).
   alias_attribute :anonymous_grading?, :anonymous_submissions

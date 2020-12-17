@@ -147,8 +147,10 @@ SelectContentDialog.handleContentItemResult = function(result, tool) {
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
   }
+
   $('#external_tool_create_url').val(result.url)
   $('#external_tool_create_title').val(result.title || tool.name)
+  $('#external_tool_create_custom_params').val(JSON.stringify(result.custom))
   $('#context_external_tools_select .domain_message').hide()
 }
 
@@ -165,18 +167,23 @@ SelectContentDialog.Events = {
     e.preventDefault()
     const $tool = existingTool || $(this)
     const toolName = $tool.find('a').text()
+
+    SelectContentDialog.resetExternalToolFields()
+
     if ($tool.hasClass('selected') && !$tool.hasClass('resource_selection')) {
       $tool.removeClass('selected')
-      $('#external_tool_create_url').val('')
+
       $.screenReaderFlashMessage(I18n.t('Unselected external tool %{tool}', {tool: toolName}))
       return
     }
+
     $.screenReaderFlashMessage(I18n.t('Selected external tool %{tool}', {tool: toolName}))
     $tool
       .parents('.tools')
       .find('.tool.selected')
       .removeClass('selected')
     $tool.addClass('selected')
+
     if ($tool.hasClass('resource_selection')) {
       const tool = $tool.data('tool')
       const frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100)
@@ -298,8 +305,8 @@ SelectContentDialog.Events = {
               SelectContentDialog.handleContentItemResult(item, tool)
             } else {
               alert(SelectContent.errorForUrlItem(item))
-              $('#external_tool_create_url').val('')
-              $('#external_tool_create_title').val('')
+
+              SelectContentDialog.resetExternalToolFields()
             }
             $('#resource_selection_dialog iframe').attr('src', 'about:blank')
             $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
@@ -338,6 +345,36 @@ SelectContentDialog.Events = {
       $('#external_tool_create_title').val(placement.title)
     }
   }
+}
+
+SelectContentDialog.extractContextExternalToolItemData = function() {
+  const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
+  let tool_type = 'context_external_tool'
+  let tool_id = 0
+
+  if (tool) {
+    if (tool.definition_type == 'Lti::MessageHandler') {
+      tool_type = 'lti/message_handler'
+    }
+
+    tool_id = tool.definition_id
+  }
+
+  return {
+    'item[type]': tool_type,
+    'item[id]': tool_id,
+    'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
+    'item[indent]': $('#content_tag_indent').val(),
+    'item[url]': $('#external_tool_create_url').val(),
+    'item[title]': $('#external_tool_create_title').val(),
+    'item[custom_params]': $('#external_tool_create_custom_params').val()
+  }
+}
+
+SelectContentDialog.resetExternalToolFields = function() {
+  $('#external_tool_create_url').val('')
+  $('#external_tool_create_title').val('')
+  $('#external_tool_create_custom_params').val('')
 }
 
 $(document).ready(function() {
@@ -452,6 +489,7 @@ $(document).ready(function() {
     }
 
     const item_type = $('#add_module_item_select').val()
+
     if (item_type == 'external_url') {
       var item_data = {
         'item[type]': $('#add_module_item_select').val(),
@@ -461,6 +499,7 @@ $(document).ready(function() {
         'item[new_tab]': $('#external_url_create_new_tab').attr('checked') ? '1' : '0',
         'item[indent]': $('#content_tag_indent').val()
       }
+
       item_data['item[url]'] = $('#content_tag_create_url').val()
       item_data['item[title]'] = $('#content_tag_create_title').val()
 
@@ -472,24 +511,10 @@ $(document).ready(function() {
         submit(item_data)
       }
     } else if (item_type == 'context_external_tool') {
-      const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
-      let tool_type = 'context_external_tool'
-      let tool_id = 0
-      if (tool) {
-        if (tool.definition_type == 'Lti::MessageHandler') {
-          tool_type = 'lti/message_handler'
-        }
-        tool_id = tool.definition_id
-      }
-      var item_data = {
-        'item[type]': tool_type,
-        'item[id]': tool_id,
-        'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
-        'item[indent]': $('#content_tag_indent').val()
-      }
-      item_data['item[url]'] = $('#external_tool_create_url').val()
-      item_data['item[title]'] = $('#external_tool_create_title').val()
+      var item_data = SelectContentDialog.extractContextExternalToolItemData()
+
       $dialog.find('.alert-error').remove()
+
       if (item_data['item[url]'] === '') {
         const $errorBox = $('<div />', {class: 'alert alert-error', role: 'alert'}).css({
           marginTop: 8
@@ -575,6 +600,7 @@ $(document).ready(function() {
           if (item_data['item[type]'] == 'assignment') {
             data['assignment[post_to_sis]'] = ENV.DEFAULT_POST_TO_SIS
           }
+
           if (item_data['item[type]'] == 'attachment') {
             if (!ENV?.FEATURES?.module_dnd) {
               const file = $('#module_attachment_uploaded_data')[0].files[0]

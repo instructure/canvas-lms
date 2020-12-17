@@ -116,13 +116,14 @@
 #           "type": "string"
 #         },
 #         "state": {
-#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', or 'on'.",
+#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', 'allowed_on', or 'on'.",
 #           "example": "allowed",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "off",
 #               "allowed",
+#               "allowed_on",
 #               "on"
 #             ]
 #           }

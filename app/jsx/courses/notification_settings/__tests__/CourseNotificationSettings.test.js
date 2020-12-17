@@ -157,8 +157,7 @@ describe('Course Notification Settings', () => {
       NOTIFICATION_PREFERENCES_OPTIONS: {
         send_scores_in_emails_text: {
           label: ''
-        },
-        granular_course_preferences_enabled: true
+        }
       }
     }
     const mocks = await createMutationMocks([

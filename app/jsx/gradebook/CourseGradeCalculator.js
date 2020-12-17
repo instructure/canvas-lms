@@ -173,7 +173,8 @@ function calculateWithGradingPeriods(
 
       groupGrades[assignmentGroup.id] = AssignmentGroupGradeCalculator.calculate(
         submissions,
-        assignmentGroup
+        assignmentGroup,
+        options.ignoreUnpostedAnonymous
       )
       periodBasedAssignmentGroupGrades.push(groupGrades[assignmentGroup.id])
     }
@@ -215,7 +216,11 @@ function calculateWithGradingPeriods(
 
 function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) {
   const assignmentGroupGrades = _.map(assignmentGroups, assignmentGroup =>
-    AssignmentGroupGradeCalculator.calculate(submissions, assignmentGroup)
+    AssignmentGroupGradeCalculator.calculate(
+      submissions,
+      assignmentGroup,
+      options.ignoreUnpostedAnonymous
+    )
   )
 
   return {
@@ -250,6 +255,7 @@ function calculateWithoutGradingPeriods(submissions, assignmentGroups, options) 
 // * id: Canvas id
 // * points_possible: non-negative number
 // * submission_types: [array of strings]
+// * anonymize_students: boolean
 //
 // The weighting scheme is one of [`percent`, `points`]
 //
@@ -328,12 +334,14 @@ function calculate(
   submissions,
   assignmentGroups,
   weightingScheme,
+  ignoreUnpostedAnonymous,
   gradingPeriodSet,
   effectiveDueDates
 ) {
   const options = {
     weightGradingPeriods: gradingPeriodSet && !!gradingPeriodSet.weighted,
-    weightAssignmentGroups: weightingScheme === 'percent'
+    weightAssignmentGroups: weightingScheme === 'percent',
+    ignoreUnpostedAnonymous
   }
 
   if (gradingPeriodSet && effectiveDueDates) {

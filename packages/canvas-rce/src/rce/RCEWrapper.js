@@ -23,7 +23,7 @@ import uniqBy from 'lodash/uniqBy'
 
 import themeable from '@instructure/ui-themeable'
 import {IconKeyboardShortcutsLine} from '@instructure/ui-icons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Alert} from '@instructure/ui-alerts'
 import {Spinner} from '@instructure/ui-spinner'
 
@@ -383,6 +383,7 @@ class RCEWrapper extends React.Component {
 
   insertImagePlaceholder(fileMetaProps) {
     let width, height
+    let align = 'middle'
     if (isImage(fileMetaProps.contentType) && fileMetaProps.displayAs !== 'link') {
       const image = new Image()
       image.src = fileMetaProps.domObject.preview
@@ -399,9 +400,11 @@ class RCEWrapper extends React.Component {
     } else if (isVideo(fileMetaProps.contentType || fileMetaProps.type)) {
       width = VIDEO_SIZE_DEFAULT.width
       height = VIDEO_SIZE_DEFAULT.height
+      align = 'bottom'
     } else if (isAudio(fileMetaProps.contentType || fileMetaProps.type)) {
       width = AUDIO_PLAYER_SIZE.width
       height = AUDIO_PLAYER_SIZE.height
+      align = 'bottom'
     } else {
       width = `${fileMetaProps.name.length}rem`
       height = '1rem'
@@ -409,20 +412,20 @@ class RCEWrapper extends React.Component {
     // if you're wondering, the &nbsp; scatter about in the svg
     // is because tinymce will strip empty elements
     const markup = `
-    <div
+    <span
       aria-label="${formatMessage('Loading')}"
       data-placeholder-for="${encodeURIComponent(fileMetaProps.name)}"
-      style="width: ${width}; height: ${height};"
+      style="width: ${width}; height: ${height}; vertical-align: ${align};"
     >
-    <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
-      <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
-        <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
-        <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+      <svg xmlns="http://www.w3.org/2000/svg" version="1.1" x="0px" y="0px" viewBox="0 0 100 100" height="100px" width="100px">
+        <g style="stroke-width:.5rem;fill:none;stroke-linecap:round;">&nbsp;
+          <circle class="c1" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+          <circle class="c2" cx="50%" cy="50%" r="28px">&nbsp;</circle>
+          &nbsp;
+        </g>
         &nbsp;
-      </g>
-      &nbsp;
       </svg>
-    </div>`
+    </span>`
 
     const editor = this.mceInstance()
     editor.undoManager.ignore(() => {
@@ -556,7 +559,6 @@ class RCEWrapper extends React.Component {
   handleFocus(_event) {
     if (!this.focused) {
       bridge.focusEditor(this)
-      this._forceCloseFloatingToolbar()
       this.props.onFocus && this.props.onFocus(this)
     }
   }
@@ -636,6 +638,7 @@ class RCEWrapper extends React.Component {
     const ifr = this.iframe
     ifr && ifr.parentElement.classList.add('active')
 
+    this._forceCloseFloatingToolbar()
     this.handleFocus(event)
   }
 
@@ -684,18 +687,28 @@ class RCEWrapper extends React.Component {
     }
   }
 
+  handleExternalClick = () => {
+    this._forceCloseFloatingToolbar()
+  }
+
   onInit = (_event, editor) => {
     editor.rceWrapper = this
     this.editor = editor
+
+    // Capture click events outside the iframe
+    document.addEventListener('click', this.handleExternalClick)
 
     if (document.body.classList.contains('Underline-All-Links__enabled')) {
       this.iframe.contentDocument.body.classList.add('Underline-All-Links__enabled')
     }
     editor.on('wordCountUpdate', this.onWordCountUpdate)
-    // and an aria-label to the application div that wraps RCE
+    // add an aria-label to the application div that wraps RCE
+    // and change role from "application" to "document" to ensure
+    // the editor gets properly picked up by screen readers
     const tinyapp = document.querySelector('.tox-tinymce[role="application"]')
     if (tinyapp) {
       tinyapp.setAttribute('aria-label', formatMessage('Rich Content Editor'))
+      tinyapp.setAttribute('role', 'document')
     }
     // Probably should do this in tinymce.scss, but we only want it in new rce
     this.getTextarea().style.resize = 'none'
@@ -1085,7 +1098,7 @@ class RCEWrapper extends React.Component {
       ],
       contextmenu: '', // show the browser's native context menu
 
-      toolbar_drawer: 'floating',
+      toolbar_mode: 'floating',
       toolbar_sticky: true,
 
       // tiny's external link create/edit dialog config
@@ -1148,14 +1161,16 @@ class RCEWrapper extends React.Component {
     const portals = document.querySelectorAll('.tox-tinymce-aux')
     // my portal will be the last one in the doc because tinyumce appends them
     const tinymce_floating_toolbar_portal = portals[portals.length - 1]
-    this.observer = new MutationObserver((mutationList, _observer) => {
-      mutationList.forEach(mutation => {
-        if (mutation.type === 'childList') {
-          this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
-        }
+    if (tinymce_floating_toolbar_portal) {
+      this.observer = new MutationObserver((mutationList, _observer) => {
+        mutationList.forEach(mutation => {
+          if (mutation.type === 'childList' && mutation.addedNodes.length > 0) {
+            this.handleFocusEditor(new FocusEvent('focus', {target: mutation.target}))
+          }
+        })
       })
-    })
-    this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
+      this.observer.observe(tinymce_floating_toolbar_portal, {childList: true})
+    }
   }
 
   componentDidUpdate(_prevProps, prevState) {

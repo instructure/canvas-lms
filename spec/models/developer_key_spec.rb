@@ -88,8 +88,8 @@ describe DeveloperKey do
     specs_require_sharding
     include_context 'lti_1_3_spec_helper'
 
-    let(:developer_key) { @shard1.activate { DeveloperKey.create! } }
     let(:shard_1_account) { @shard1.activate { account_model } }
+    let(:developer_key) { @shard1.activate { DeveloperKey.create!(root_account: shard_1_account) } }
     let(:shard_1_tool) do
       tool = nil
       @shard1.activate do

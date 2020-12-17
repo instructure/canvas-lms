@@ -108,7 +108,7 @@ ready(() => {
     }
   }
 
-  if (!ENV.FEATURES.new_math_equation_handling) {
+  if (!ENV?.FEATURES?.new_math_equation_handling) {
     // This is in a setTimeout to have it run on the next time through the event loop
     // so that the code that actually renders the user_content runs first,
     // because it has to be rendered before we can check if isMathMLOnPage

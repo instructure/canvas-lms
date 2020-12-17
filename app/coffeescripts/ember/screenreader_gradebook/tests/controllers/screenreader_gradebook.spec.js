@@ -846,12 +846,12 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      deepEqual(args[3], srgb.getGradingPeriodSet())
+      deepEqual(args[4], srgb.getGradingPeriodSet())
     })
 
     test('scopes effective due dates to the user', () => {
       srgb.calculate(student)
-      const dueDates = CourseGradeCalculator.calculate.lastCall.args[4]
+      const dueDates = CourseGradeCalculator.calculate.lastCall.args[5]
       deepEqual(Object.keys(dueDates), ['1', '2', '6']) // assignment ids
     })
 
@@ -862,8 +862,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      equal(typeof args[3], 'undefined')
       equal(typeof args[4], 'undefined')
+      equal(typeof args[5], 'undefined')
     })
 
     test('calculates grades without grading period data when effective due dates are not defined', () => {
@@ -873,8 +873,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      equal(typeof args[3], 'undefined')
       equal(typeof args[4], 'undefined')
+      equal(typeof args[5], 'undefined')
     })
   })
 

@@ -164,13 +164,13 @@
           <% ot(:out_of, "%{points} *out of %{total}*", :points => capture { %>
             <span class="rubric_total">
               <%=
-                assessment ? n(assessment.score) : n((rubric.points_possible rescue 5))
+                assessment ? n(round_if_whole(assessment.score)) : n(round_if_whole((rubric.points_possible rescue 5)))
               %>
             </span>
             <%
               },
               wrapper: '<span class="assessing">\1</span>',
-              total: n((rubric.points_possible rescue 5)))
+              total: n(round_if_whole((rubric.points_possible rescue 5))))
             %>
         </span>
       </div>

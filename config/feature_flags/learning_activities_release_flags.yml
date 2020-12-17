@@ -102,3 +102,12 @@ inline_math_everywhere:
     This feature reequires that the "Updated math equation handling"
     flag is also on.
   applies_to: RootAccount
+bounced_emails_admin_tool:
+  state: hidden
+  display_name: Bounced Emails Admin Tool
+  description: |-
+    Adds a new Bounced Emails tab to Account Admin Tools, which
+    allows you to search email addresses where Canvas notifications
+    have bounced
+  applies_to: RootAccount
+

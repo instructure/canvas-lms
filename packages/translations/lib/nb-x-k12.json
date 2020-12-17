@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "sirkel uordnet liste"
     },
+    "clear_2084585f": {
+        "message": "Tøm"
+    },
     "clear_selected_file_82388e50": {
         "message": "Fjern valgt fil"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Laster elementplanlegger"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Laster inn, vennligst vent"
     },
     "location_3b6ff307": {
         "message": "Sted:"

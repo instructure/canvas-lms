@@ -282,11 +282,6 @@ class ContentSharesController < ApplicationController
       return false
     end
 
-    if @receivers.include?(@current_user)
-      render(json: { message: 'You cannot share with yourself' }, status: :bad_request)
-      return false
-    end
-
     # TODO verify we're allowed to send content to these users, once we decide how to do that
   end
 

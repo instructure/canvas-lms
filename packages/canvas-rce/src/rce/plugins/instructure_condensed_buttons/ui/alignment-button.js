@@ -75,7 +75,8 @@ export default function(editor) {
 
     onSetup: api => {
       const $svgContainer = editor.$(
-        editor.editorContainer.querySelector(`[aria-label="${alignButtonLabel}"] .tox-icon`)
+        `.tox-split-button[aria-label="${alignButtonLabel}"] .tox-icon`,
+        document
       )
       const allIcons = editor.ui.registry.getAll().icons
 
@@ -87,6 +88,7 @@ export default function(editor) {
         $svgContainer.html(svg)
       }
 
+      nodeChangeHandler()
       editor.on('NodeChange', nodeChangeHandler)
       return () => editor.off('NodeChange', nodeChangeHandler)
     }

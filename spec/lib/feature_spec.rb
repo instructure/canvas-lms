@@ -132,29 +132,34 @@ describe Feature do
   describe "default_transitions" do
     it "should enumerate SiteAdmin transitions" do
       fd = Feature.definitions['SA']
-      expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_site_admin, 'on')).to eql({"allowed"=>{"locked"=>true},'off'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_site_admin, 'off')).to eql({"allowed"=>{"locked"=>true},'on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_site_admin, 'allowed_on')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_site_admin, 'on')).to eql({"allowed"=>{"locked"=>true},'off'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_site_admin, 'off')).to eql({"allowed"=>{"locked"=>true},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
     end
 
     it "should enumerate RootAccount transitions" do
       fd = Feature.definitions['RA']
-      expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_site_admin, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_site_admin, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_root_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_root_account, 'on')).to eql({'allowed'=>{'locked'=>true},'off'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_root_account, 'off')).to eql({'allowed'=>{'locked'=>true},'on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'allowed_on')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_site_admin, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_root_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_root_account, 'allowed_on')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_root_account, 'on')).to eql({'allowed'=>{'locked'=>true},'off'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
+      expect(fd.default_transitions(t_root_account, 'off')).to eql({'allowed'=>{'locked'=>true},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>true}})
     end
 
     it "should enumerate Account transitions" do
       fd = Feature.definitions['A']
-      expect(fd.default_transitions(t_root_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_root_account, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_root_account, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_sub_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_sub_account, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false}})
-      expect(fd.default_transitions(t_sub_account, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_root_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_root_account, 'allowed_on')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_root_account, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_root_account, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_sub_account, 'allowed')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_sub_account, 'allowed_on')).to eql({'off'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_sub_account, 'on')).to eql({'allowed'=>{'locked'=>false},'off'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
+      expect(fd.default_transitions(t_sub_account, 'off')).to eql({'allowed'=>{'locked'=>false},'on'=>{'locked'=>false},'allowed_on'=>{'locked'=>false}})
     end
 
     it "should enumerate Course transitions" do
@@ -256,7 +261,7 @@ describe "Feature.register" do
   describe 'hidden_in_prod' do
     it "should register as 'allowed' in a test environment" do
       Feature.register({dev_feature: t_hidden_in_prod_feature_hash})
-      expect(Feature.definitions['dev_feature']).to be_allowed
+      expect(Feature.definitions['dev_feature']).to be_can_override
     end
 
     it "should register as 'hidden' in production" do

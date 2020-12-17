@@ -129,6 +129,8 @@ function registerToolIcon(ed, button) {
     svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
     const image = document.createElement('image')
     image.setAttribute('xlink:href', button.image)
+    image.style.width = '100%'
+    image.style.height = '100%'
     svg.appendChild(image)
     button.iconSVG = svg.outerHTML
     button.icon = `lti_tool_${button.id}`

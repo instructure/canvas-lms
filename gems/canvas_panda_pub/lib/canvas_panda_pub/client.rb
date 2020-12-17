@@ -20,6 +20,10 @@
 
 require 'uri'
 require 'json'
+require 'time'
+# the only reason we need 'time' here is because 'json/jwt' requires 'active_support/core_ext',
+# https://github.com/nov/json-jwt/blob/master/lib/json/jwt.rb#L4, which is unsafe until we're
+# on a version of active_support that includes https://github.com/rails/rails/pull/40859
 require 'json/jwt'
 
 module CanvasPandaPub

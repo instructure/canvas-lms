@@ -25,8 +25,6 @@
   <% else %>
     <%= stylesheet_link_tag(css_url_for('lato')) %>
   <% end %>
-  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap" rel="stylesheet">
   <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
     <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
   <% end %>

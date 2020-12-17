@@ -56,6 +56,7 @@ QUnit.module('SelectContentDialog: deepLinkingListner', {
         <div id='resource_selection_dialog'></div>
         <input type='text' id='external_tool_create_url' />
         <input type='text' id='external_tool_create_title' />
+        <input type='text' id='external_tool_create_custom_params' />
         <div id='context_external_tools_select'>
           <span class='domain_message'"
         </div>
@@ -68,6 +69,11 @@ QUnit.module('SelectContentDialog: deepLinkingListner', {
   }
 })
 
+const customParams = {
+  root_account_id: '$Canvas.rootAccount.id',
+  referer: 'LTI test tool example'
+}
+
 const deepLinkingEvent = {
   data: {
     messageType: 'LtiDeepLinkingResponse',
@@ -75,7 +81,9 @@ const deepLinkingEvent = {
       {
         type: 'ltiResourceLink',
         url: 'https://www.my-tool.com/launch-url',
-        title: 'My Tool'
+        title: 'My Tool',
+        new_tab: '0',
+        custom: customParams
       }
     ],
     ltiEndpoint: 'https://canvas.instructure.com/api/lti/deep_linking'
@@ -92,6 +100,42 @@ test('sets the tool title', async () => {
   await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
   const {title} = deepLinkingEvent.data.content_items[0]
   equal($('#external_tool_create_title').val(), title)
+})
+
+test('sets the tool custom params', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+
+  equal($('#external_tool_create_custom_params').val(), JSON.stringify(customParams))
+})
+
+test('recover item data from context external tool item', async () => {
+  await SelectContentDialog.deepLinkingListener(deepLinkingEvent)
+
+  const data = SelectContentDialog.extractContextExternalToolItemData()
+
+  equal(data['item[type]'], 'context_external_tool')
+  equal(data['item[id]'], 0)
+  equal(data['item[new_tab]'], '0')
+  equal(data['item[indent]'], undefined)
+  equal(data['item[url]'], 'https://www.my-tool.com/launch-url')
+  equal(data['item[title]'], 'My Tool')
+  equal(data['item[custom_params]'], JSON.stringify(customParams))
+})
+
+test('reset external tool fields', async () => {
+  $('#external_tool_create_url').val('Sample')
+  $('#external_tool_create_title').val('Sample')
+  $('#external_tool_create_custom_params').val('Sample')
+
+  equal($('#external_tool_create_url').val(), 'Sample')
+  equal($('#external_tool_create_title').val(), 'Sample')
+  equal($('#external_tool_create_custom_params').val(), 'Sample')
+
+  SelectContentDialog.resetExternalToolFields()
+
+  equal($('#external_tool_create_url').val(), '')
+  equal($('#external_tool_create_title').val(), '')
+  equal($('#external_tool_create_custom_params').val(), '')
 })
 
 test('close all dialogs when content items attribute is empty', async () => {

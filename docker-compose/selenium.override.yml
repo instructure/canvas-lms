@@ -3,14 +3,10 @@
 
 version: '2.3'
 services:
-  selenium-firefox:
-    build: ./docker-compose/selenium-firefox
-    ports:
-      - 5900:5900
-    environment:
-      VIRTUAL_HOST: seleniumff.docker
-      remote_url: http://seleniumff.docker/wd/hub
-      browser: firefox
+  web:
+    links:
+      - selenium-chrome
+      #- selenium-firefox
 
   selenium-chrome:
     build: ./docker-compose/selenium-chrome
@@ -20,3 +16,12 @@ services:
       VIRTUAL_HOST: seleniumch.docker
       remote_url: http://seleniumch.docker/wd/hub
       browser: chrome
+
+#  selenium-firefox:
+#    build: ./docker-compose/selenium-firefox
+#    ports:
+#      - 5900:5900
+#    environment:
+#      VIRTUAL_HOST: seleniumff.docker
+#      remote_url: http://seleniumff.docker/wd/hub
+#      browser: firefox

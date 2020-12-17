@@ -48,11 +48,12 @@ describe Multipart::Post do
     file = Tempfile.new(["test","txt"])
     file.write("file on disk")
     file.rewind
-    stream, header = subject.prepare_query_stream(:a => "string", :b => file)
+    stream, header = subject.prepare_query_stream(:a => "string", 'test.txt' => file)
     params = parse_params(stream.read, header)
     expect(params["a"]).to eq("string")
-    expect(params["b"][:filename]).to eq(File.basename(file.path))
-    expect(params["b"][:tempfile].read).to eq("file on disk")
+    expect(params["test.txt"][:filename]).to eq(File.basename(file.path))
+    expect(params["test.txt"][:tempfile].read).to eq("file on disk")
+    expect(params["test.txt"][:head]).to include("Content-Type: text/plain")
   end
 
   it "should prepare_query_stream with a StringIO" do

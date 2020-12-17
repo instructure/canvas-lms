@@ -89,6 +89,16 @@ describe GradebookImporter do
       expect(@gi.students.length).to eq 2
     end
 
+    it "expects and deals with invalid upload files" do
+      user = user_model
+      progress = Progress.create!(tag: "test", context: @user)
+      upload = GradebookUpload.new
+      upload = GradebookUpload.create!(course: gradebook_course, user: gradebook_user, progress: progress)
+      expect do
+        GradebookImporter.create_from(progress, upload, user, invalid_gradebook_contents)
+      end.to raise_error(Delayed::RetriableError)
+    end
+
     context 'when dealing with a file containing semicolon field separators' do
       context 'with interspersed commas to throw you off' do
         before(:each) do
@@ -1741,6 +1751,10 @@ describe GradebookImporter do
 
   def valid_gradebook_contents_with_sis_login_id
     attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks basic_course_with_sis_login_id.csv)))
+  end
+
+  def invalid_gradebook_contents
+    attachment_with_file(File.join(File.dirname(__FILE__), %w(.. fixtures gradebooks wat.csv)))
   end
 
   def attachment_with

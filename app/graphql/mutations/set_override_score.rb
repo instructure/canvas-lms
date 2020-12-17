@@ -35,7 +35,6 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
 
   def resolve(input:)
     enrollment_id = input[:enrollment_id]
-    grading_period_id = input[:grading_period_id]
 
     # If the relevant user has multiple enrollments in this course, we need
     # to update them all to prevent inconsistencies
@@ -49,29 +48,18 @@ class Mutations::SetOverrideScore < Mutations::BaseMutation
     # return the score for the enrollment that was passed to us
     return_value = nil
 
-    score_params = grading_period_id.present? ? {grading_period_id: grading_period_id} : nil
     current_enrollments.each do |enrollment|
-      score = enrollment.find_score(score_params)
-      raise ActiveRecord::RecordNotFound if score.blank?
-      verify_authorized_action!(score.course, :manage_grades)
+      verify_authorized_action!(enrollment.course, :manage_grades)
 
-      old_score = score[:override_score]
-      old_grade = score.override_grade
-      new_score = input[:override_score]
-      score.update(override_score: new_score)
-
-      Canvas::LiveEvents.grade_override(score, old_score, enrollment, enrollment.course)
+      # Only record a grade change for the enrollment matching the requested one
+      score = enrollment.update_override_score(
+        grading_period_id: input[:grading_period_id],
+        override_score: input[:override_score],
+        updating_user: current_user,
+        record_grade_change: enrollment == requested_enrollment
+      )
 
       next unless enrollment == requested_enrollment
-
-      # Only send a grade change event once even if there are multiple enrollments
-      override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
-        grader: current_user,
-        old_grade: old_grade,
-        old_score: old_score,
-        score: score
-      )
-      Auditors::GradeChange.record(override_grade_change: override_grade_change)
 
       return_value = if score.valid?
         {grades: score}

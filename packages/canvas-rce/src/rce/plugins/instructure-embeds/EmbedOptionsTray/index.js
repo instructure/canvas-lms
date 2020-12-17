@@ -20,11 +20,11 @@ import React, {useState} from 'react'
 import {bool, func, shape, string} from 'prop-types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 
-import {Heading} from '@instructure/ui-elements'
-import {RadioInput, RadioInputGroup} from '@instructure/ui-forms'
+import {Heading} from '@instructure/ui-heading'
+import {RadioInput, RadioInputGroup} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
-import {Flex} from '@instructure/ui-layout'
-import {Tray} from '@instructure/ui-overlays'
+import {Flex} from '@instructure/ui-flex'
+import {Tray} from '@instructure/ui-tray'
 
 import formatMessage from '../../../../format-message'
 

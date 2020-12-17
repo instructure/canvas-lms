@@ -105,50 +105,5 @@ describe DataFixup::PopulateMissingRootAccountIdsIfSingleRootAccountInstall do
         }.to change { record.reload.root_account_ids }.from([]).to([Account.default.id])
       end
     end
-
-    context 'group-related tables' do
-      context 'when there are no groups for the site admin account' do
-        it_behaves_like 'a datafixup that populates missing root account ids', DiscussionTopic do
-          let(:record) do
-            expect(Group.where(root_account_id: Account.site_admin.id).take).to eq(nil)
-            discussion_topic_model(context: course)
-          end
-        end
-      end
-
-      context 'when there are groups for the site admin account' do
-        it "doesn't fill root_account_id in on the group-related model" do
-          group_model(context: Account.site_admin)
-          expect(Group.where(root_account_id: Account.site_admin.id).take).to_not eq(nil)
-          record = discussion_topic_model(context: course)
-          record.update_column(:root_account_id, nil)
-          expect(record.reload.root_account_id).to be_nil
-          described_class.populate_missing_root_account_ids(Account.default.id)
-          expect(record.reload.root_account_id).to be_nil
-        end
-      end
-    end
   end
-
-  context '#populate_site_admin_records' do
-    it "fills in developer keys and their access tokens if the dev key's account_id = nil" do
-      dk_acct = DeveloperKey.create!(account: Account.default)
-      at_acct = dk_acct.access_tokens.create!(user: user_model)
-      dk_sa = DeveloperKey.create!(account: nil)
-      at_sa = dk_sa.access_tokens.create!(user: user_model)
-
-      [dk_acct, at_acct, dk_sa, at_sa].each do |model|
-        model.update_column(:root_account_id, nil)
-        expect(model.reload.root_account_id).to be_nil
-      end
-
-      described_class.populate_site_admin_records
-
-      expect(dk_acct.reload.root_account_id).to be_nil
-      expect(at_acct.reload.root_account_id).to be_nil
-      expect(dk_sa.reload.root_account_id).to eq(Account.site_admin.id)
-      expect(at_sa.reload.root_account_id).to eq(Account.site_admin.id)
-    end
-  end
-
 end

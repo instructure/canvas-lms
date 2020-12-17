@@ -74,6 +74,10 @@ describe Types::AccountType do
     expect(account_type.resolve('subAccountsConnection { nodes { _id } }')).to eq [@sub_account.id.to_s]
   end
 
+  it 'works for root_outcome_group' do
+    expect(account_type.resolve('rootOutcomeGroup { _id }')).to eq account.root_outcome_group.id.to_s
+  end
+
   context "sis field" do
     before(:once) do
       @sub_account.update!(sis_source_id: 'sisAccount')

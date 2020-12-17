@@ -440,4 +440,19 @@ describe RubricAssociation do
       expect(@rubric_association.root_account_id).to eq sub_account.root_account_id
     end
   end
+
+  describe "workflow_state" do
+    it "is set to active by default" do
+      course = Course.create!
+      rubric = course.rubrics.create!
+      association = RubricAssociation.create!(
+        rubric: rubric,
+        association_object: course,
+        context: course,
+        purpose: "bookmark"
+      )
+
+      expect(association).to be_active
+    end
+  end
 end

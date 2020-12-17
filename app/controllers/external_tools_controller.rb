@@ -1173,6 +1173,11 @@ class ExternalToolsController < ApplicationController
       end
     end
 
+    # In the case of cross-shard launches, direct the request to the
+    # tool's shard.
+    tool_account_res = direct_to_tool_account(@tool, @context) if @tool.shard != Shard.current
+    return render json: tool_account_res.body, status: tool_account_res.code if tool_account_res&.success?
+
     if @tool.use_1_3?
       # Create a launch URL that uses a session token to
       # initialize a Canvas session and launch the tool.

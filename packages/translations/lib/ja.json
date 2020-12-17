@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "丸い番号無しリスト"
     },
+    "clear_2084585f": {
+        "message": "クリア"
+    },
     "clear_selected_file_82388e50": {
         "message": "選択したファイルを消去する"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "プランナーアイテムをもっと読み込む"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "読み込み中 - しばらくお待ちください"
     },
     "location_3b6ff307": {
         "message": "場所:"

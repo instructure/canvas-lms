@@ -120,39 +120,61 @@ describe ExternalToolsController do
       let(:redis_key) { "#{@course.class.name}:#{Lti::RedisMessageClient::LTI_1_3_PREFIX}#{verifier}" }
       let(:cached_launch) { JSON.parse(Canvas.redis.get(redis_key)) }
 
-      before do
-        allow(SecureRandom).to receive(:hex).and_return(verifier)
-        user_session(@teacher)
-        get :show, params: {:course_id => @course.id, id: tool.id}
+      before { allow(SecureRandom).to receive(:hex).and_return(verifier) }
+
+      context 'when the current user is nil' do
+        context 'and the context is a public course' do
+          subject do
+            get :show, params: {:course_id => @course.id, id: tool.id}
+            response
+          end
+
+          before { @course.update!(is_public: true) }
+
+          it { is_expected.to be_successful }
+
+          it 'uses the public user ID as the ISS' do
+            subject
+            expect(cached_launch['sub']).to eq User.public_lti_id
+          end
+        end
       end
 
-      it 'creates a login message' do
-        expect(assigns[:lti_launch].params.keys).to match_array [
-          "iss",
-          "login_hint",
-          "target_link_uri",
-          "lti_message_hint",
-          "canvas_region",
-          "client_id"
-        ]
-      end
+      context 'when current user is a teacher' do
+        before do
+          user_session(@teacher)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+        end
 
-      it 'sets the "login_hint" to the current user lti id' do
-        expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
-      end
-
-      it 'caches the the LTI 1.3 launch' do
-        expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
-      end
-
-      it 'sets the "canvas_domain" to the request domain' do
-        message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
-        expect(message_hint['canvas_domain']).to eq 'localhost'
+        it 'creates a login message' do
+          expect(assigns[:lti_launch].params.keys).to match_array [
+            "iss",
+            "login_hint",
+            "target_link_uri",
+            "lti_message_hint",
+            "canvas_region",
+            "client_id"
+          ]
+        end
+  
+        it 'sets the "login_hint" to the current user lti id' do
+          expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
+        end
+  
+        it 'caches the the LTI 1.3 launch' do
+          expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
+        end
+  
+        it 'sets the "canvas_domain" to the request domain' do
+          message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
+          expect(message_hint['canvas_domain']).to eq 'localhost'
+        end
       end
 
       context 'current user is a student view user' do
         before do
           user_session(@course.student_view_student)
+          get :show, params: {:course_id => @course.id, id: tool.id}
         end
 
         it 'returns the TestUser claim when viewing as a student' do
@@ -1837,6 +1859,92 @@ describe ExternalToolsController do
         end
       end
 
+      context 'with a cross-shard launch' do
+        specs_require_sharding
+
+        let!(:tool) do
+          t = tool_configuration.new_external_tool(course)
+          t.save!
+          t
+        end
+
+        let(:course) do
+          course = course_model(account: account)
+          course.enroll_user(user, "StudentEnrollment", { enrollment_state: 'active' })
+          course.offer!
+          course
+        end
+
+        let(:user) { @shard2.activate {user_model(name: 'cross-shard user')} }
+        let(:developer_key) { DeveloperKey.create!(account: account) }
+        let(:account) { Account.default }
+        let(:tool_root_account) { account_model }
+        let(:access_token) { pseudonym(user).user.access_tokens.create(purpose: 'test') }
+        let(:account_host) { 'canvas-test.instructure.com' }
+        let(:tool_host) { 'canvas-test-2.instructure.com' }
+        let(:params) { {course_id: course.global_id, id: tool.global_id} }
+
+        before do
+          tool.update_attribute(:root_account_id, tool_root_account.id)
+          tool_root_account.account_domains.create!(host: tool_host)
+          account.account_domains.create!(host: account_host)
+          user_session(user)
+          controller.instance_variable_set :@access_token, access_token
+          request.host = account_host
+        end
+
+        it 'returns the lti 1.3 launch url with a session token' do
+          expect(HTTParty).to receive(:get) do |url, options|
+            expect(url).to eq "http://#{tool_host}/api/v1/courses/#{course.shard.id}~#{course.local_id}/external_tools/sessionless_launch?course_id=#{course.id}&id=#{tool.id}&redirect=true"
+            expect(options[:headers].keys).to include 'Authorization'
+          end
+
+          @shard2.activate { get :generate_sessionless_launch, params: params }
+        end
+
+        context 'with a "redirect" flag' do
+          let(:params) { {course_id: course.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when the context is not a course' do
+          let!(:tool) do
+            t = tool_configuration.new_external_tool(course.account)
+            t.save!
+            t
+          end
+
+          let(:params) { {account_id: course.account.global_id, id: tool.global_id, redirect: true} }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+
+        context 'when an API token is not used' do
+          before { controller.instance_variable_set :@access_token, nil }
+
+          it 'does not return a sessionless launch URI' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(response).to be_unauthorized
+          end
+        end
+
+        context 'when the cross-account request fails' do
+          before { allow(HTTParty).to receive(:get).and_return(double('success?' => false)) }
+
+          it 'uses the request host' do
+            @shard2.activate { get :generate_sessionless_launch, params: params }
+            expect(URI(json_parse['url']).host).to eq account_host
+          end
+        end
+      end
+
       context 'with an assignment launch' do
         before do
           controller.instance_variable_set(
@@ -1913,6 +2021,7 @@ describe ExternalToolsController do
           get :generate_sessionless_launch, params: params
           json_parse['url']
         end
+
 
         let(:course) { @course }
         let(:launch_url) { 'https://www.my-tool.com/login' }

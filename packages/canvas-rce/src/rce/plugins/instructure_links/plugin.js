@@ -181,17 +181,21 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
         })
         callback(items)
       },
-      onAction() {
-        if (getAnchorElement(ed, ed.selection.getNode())) {
-          doMenuItem(ed, 'instructureTrayToEditLink')
-        } else {
-          doMenuItem(ed, 'instructureLinkCreate')
+      onAction(api) {
+        if (!api.isDisabled()) {
+          if (getAnchorElement(ed, ed.selection.getNode())) {
+            doMenuItem(ed, 'instructureTrayToEditLink')
+          } else {
+            doMenuItem(ed, 'instructureLinkCreate')
+          }
         }
       },
       onItemAction: (splitButtonApi, value) => doMenuItem(ed, value),
       onSetup(api) {
         function handleNodeChange(e) {
-          api.setActive(!!getAnchorElement(ed, e.element))
+          if (e !== null) {
+            api.setActive(!!getAnchorElement(ed, e.element))
+          }
           api.setDisabled(!isOKToLink(ed.selection.getContent()))
         }
 
@@ -222,6 +226,8 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
             }
           }
         }
+
+        setTimeout(handleNodeChange, 0, null)
 
         ed.on('NodeChange', handleNodeChange)
         ed.on('Change', deleteEmptyLink)

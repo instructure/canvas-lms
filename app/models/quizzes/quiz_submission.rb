@@ -102,9 +102,18 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
     state :preview
   end
 
+  def unenrolled_user_can_read?(user, session)
+    course = quiz.course
+    !quiz.graded? && course.available? && course.unenrolled_user_can_read?(user, session)
+  end
+
   set_policy do
     given { |user| user && user.id == self.user_id }
     can :read
+
+    # allow anonymous users take ungraded quizzes from a public course
+    given { |user, session| unenrolled_user_can_read?(user, session) }
+    can :record_events
 
     given { |user| user && user.id == self.user_id && end_date_is_valid? }
     can :record_events

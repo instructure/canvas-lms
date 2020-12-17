@@ -102,18 +102,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
             let(:reference_record) { account }
           end
         end
-
-        context 'with DeveloperKey without root_account_id (eg SiteAdmin)' do
-          it 'sets root_account_id to null' do
-            dk = @shard1.activate { DeveloperKey.create!(account: account_model) }
-            at = AccessToken.create!(developer_key: dk, user: user_model)
-            at.update_columns(root_account_id: nil)
-            dk.update_columns(root_account_id: nil)
-            expect(at.reload.root_account_id).to eq nil
-            DataFixup::PopulateRootAccountIdOnModels.run
-            expect(at.reload.root_account_id).to eq nil
-          end
-        end
       end
     end
 
@@ -508,213 +496,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with ContentTag' do
-      let(:content_tag) { ContentTag.create!(context: context, content: content) }
-
-      context 'when context is a Course' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { @course }
-          let(:content) { assignment_model(course: @course) }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is a LearningOutcomeGroup' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { outcome_group_model(context: @course) }
-          let(:content) { assignment_model(course: @course) }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is an Assignment' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { assignment_model(course: @course) }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'when context is an Account' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { @course.account }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course.account }
-        end
-      end
-
-      context 'when context is a Quizzes::Quiz' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:context) { quiz_model(course: @course) }
-          let(:content) { attachment_model }
-          let(:record) { content_tag }
-          let(:reference_record) { @course }
-        end
-      end
-    end
-
-    it 'should populate the root_account_id on DeveloperKey' do
-      dk = DeveloperKey.create!(account: @course.account)
-      dk.update_columns(root_account_id: nil)
-      expect(dk.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dk.reload.root_account_id).to eq @course.root_account_id
-
-      account = account_model(root_account: account_model)
-      dk = DeveloperKey.create!(account: account)
-      dk.update_columns(root_account_id: nil)
-      expect(dk.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dk.reload.root_account_id).to eq account.root_account_id
-    end
-
-    it 'should populate the root_account_id on DeveloperKeyAccountBinding' do
-      account_model
-      dk = DeveloperKey.create!(account: @course.account)
-      dkab = DeveloperKeyAccountBinding.create!(account: @account, developer_key: dk)
-      dkab.update_columns(root_account_id: nil)
-      expect(dkab.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dkab.reload.root_account_id).to eq @account.id
-    end
-
-    it 'should populate the root_account_id on DiscussionEntry' do
-      discussion_topic_model(context: @course)
-      de = @topic.discussion_entries.create!(user: user_model)
-      de.update_columns(root_account_id: nil)
-      expect(de.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(de.reload.root_account_id).to eq @course.root_account_id
-    end
-
-    it 'should populate the root_account_id on DiscussionEntryParticipant' do
-      discussion_topic_model(context: @course)
-      de = @topic.discussion_entries.create!(user: user_model)
-      dep = de.discussion_entry_participants.create!(user: user_model)
-      dep.update_columns(root_account_id: nil)
-      expect(dep.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dep.reload.root_account_id).to eq @course.root_account_id
-    end
-
-    it 'should populate the root_account_id on DiscussionTopic' do
-      discussion_topic_model(context: @course)
-      @topic.update_columns(root_account_id: nil)
-      expect(@topic.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@topic.reload.root_account_id).to eq @course.root_account_id
-
-      discussion_topic_model(context: group_model)
-      @topic.update_columns(root_account_id: nil)
-      expect(@topic.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(@topic.reload.root_account_id).to eq @group.root_account_id
-    end
-
-    it 'should populate the root_account_id on DiscussionTopicParticipants' do
-      discussion_topic_model
-      dtp = @topic.discussion_topic_participants.create!(user: user_model)
-      dtp.update_columns(root_account_id: nil)
-      expect(dtp.reload.root_account_id).to eq nil
-      DataFixup::PopulateRootAccountIdOnModels.run
-      expect(dtp.reload.root_account_id).to eq @topic.root_account_id
-    end
-
     context 'with EnrollmentState' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         let(:record) { reference_record.enrollment_state }
         let(:reference_record) { enrollment_model }
-      end
-    end
-
-    context 'with Favorite' do
-      context 'with a course context' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Favorite.create!(context: @course, user: @user) }
-          let(:reference_record) { @course }
-        end
-
-        context 'with sharding' do
-          specs_require_sharding
-
-          it "processes all records when there is more than one foreign shard" do
-            expect([Shard.current.id, @shard1.id, @shard2.id].uniq.count).to eq(3)
-            course1 = @shard1.activate { course_model(account: account_model) }
-            course2 = @shard2.activate { course_model(account: account_model) }
-
-            user = user_model
-            fav1 = user.favorites.create!(context: course1)
-            fav2 = user.favorites.create!(context: course2)
-            fav1.update_columns(root_account_id: nil)
-            fav2.update_columns(root_account_id: nil)
-
-            expect(fav1.reload.root_account_id).to be_nil
-            expect(fav2.reload.root_account_id).to be_nil
-            DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(
-              Favorite, {course: :root_account_id}, fav1.id - 1, fav2.id + 1
-            )
-            expect(fav1.reload.root_account_id).to_not be_nil
-            expect(fav2.reload.root_account_id).to_not be_nil
-            expect(fav1.reload.root_account_id).to eq(course1.global_root_account_id)
-            expect(fav2.reload.root_account_id).to eq(course2.global_root_account_id)
-          end
-
-          it_behaves_like 'a datafixup that populates root_account_id' do
-            let(:record) do
-              user = @user
-              user.favorites.create!(context: @shard1.activate { course_model(account: account_model) })
-            end
-            let(:reference_record) { @course }
-            let(:sharded) { true }
-          end
-        end
-      end
-    end
-
-    context 'with Folder' do
-      context 'with course context' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Folder.create!(context: @course )}
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'with account context' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Folder.create!(context: reference_record )}
-          let(:reference_record) { account_model }
-        end
-      end
-
-      context 'with group context' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Folder.create!(context: reference_record )}
-          let(:reference_record) { group_model }
-        end
-      end
-
-      context 'with user context' do
-        it 'should ignore record' do
-          folder = Folder.create!(context: user_model)
-          folder.update_columns(root_account_id: nil)
-          expect(folder.reload.root_account_id).to eq nil
-          DataFixup::PopulateRootAccountIdOnModels.run
-          expect(folder.reload.root_account_id).to eq nil
-        end
-      end
-
-      context 'with sharding' do
-        specs_require_sharding
-
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { Folder.create!(context: @shard1.activate { course_model(account: account_model) }) }
-          let(:reference_record) { @course }
-          let(:sharded) { true }
-        end
       end
     end
 
@@ -759,38 +544,10 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       end
     end
 
-    context 'with GroupCategory with course context' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { group_category(context: @course) }
-        let(:reference_record) { @course }
-      end
-    end
-
-    context 'with GroupCategory with account context' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { group_category(context: reference_record) }
-        let(:reference_record) { account_model }
-      end
-    end
-
-    context 'with GroupMembership' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { group_membership_model(group: reference_record) }
-        let(:reference_record) { group_model }
-      end
-    end
-
     context 'with LatePolicy' do
       it_behaves_like 'a datafixup that populates root_account_id' do
         # for some reason late_policy_model doesn't save the record
         let(:record) { late_policy_model(course: @course).tap(&:save!) }
-        let(:reference_record) { @course }
-      end
-    end
-
-    context 'with Lti::LineItem' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { line_item_model(course: @course) }
         let(:reference_record) { @course }
       end
     end
@@ -852,27 +609,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { outcome_result }
           let(:reference_record) { course2 }
         end
-      end
-    end
-
-    context 'with Lti::LineItem' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { line_item_model(course: @course) }
-        let(:reference_record) { @course }
-      end
-    end
-
-    context 'with Lti::Result' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { lti_result_model(course: @course) }
-        let(:reference_record) { record.submission }
-      end
-    end
-
-    context 'with Lti::ResourceLink' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:record) { resource_link_model(overrides: {context: @course}) }
-        let(:reference_record) { @course }
       end
     end
 
@@ -939,14 +675,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
           let(:record) { master_template }
           let(:reference_record) { @course }
         end
-      end
-    end
-
-    context 'with OriginalityReport' do
-      it_behaves_like 'a datafixup that populates root_account_id' do
-        let(:submission) { submission_model }
-        let(:record) { OriginalityReport.create!(submission: submission, workflow_state: :pending) }
-        let(:reference_record) { submission }
       end
     end
 
@@ -1123,27 +851,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
         let(:submission) { submission_model }
         let(:record) { submission_comment_model(submission: submission) }
         let(:reference_record) { submission.assignment.context }
-      end
-    end
-
-    context 'with WebConference*' do
-      let(:conference) do
-        allow(WebConference).to receive(:plugins).and_return([web_conference_plugin_mock("wimba", {:domain => "wimba.test"})])
-        WimbaConference.create!(title: "my conference", user: @user, context: @course)
-      end
-
-      context 'with WebConference' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { conference }
-          let(:reference_record) { @course }
-        end
-      end
-
-      context 'with WebConferenceParticipant' do
-        it_behaves_like 'a datafixup that populates root_account_id' do
-          let(:record) { conference.web_conference_participants.create!(user: user_model) }
-          let(:reference_record) { conference }
-        end
       end
     end
 
@@ -1433,74 +1140,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
     it 'should ignore nil reflections' do
       expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(LearningOutcome, nil)).to be true
     end
-
-    context 'with_sharding' do
-      specs_require_sharding
-
-      it 'should only search current shard when there are no cross-shard foreign keys' do
-        user = @user
-        course_model(account: account_model)
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id])).and_call_original
-        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
-      end
-
-      it 'should find possible shards from cross-shard foreign keys' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(Shard).to receive(:where).with(hash_including(id: [Shard.current.id, @shard1.id])).and_call_original
-        DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])
-      end
-
-      it 'should check current shard for missing root account ids' do
-        user = @user
-        course_model(account: account_model)
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
-      end
-
-      it 'should check other shards for missing root_account_ids' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(Favorite, Favorite.reflections['course'])).to be true
-      end
-
-      it 'should actually find missing root account ids on current shard' do
-        discussion_topic_model(context: @course)
-        de = @topic.discussion_entries.create!(user: user_model)
-        de.update_columns(root_account_id: nil)
-        @topic.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
-      end
-
-      it 'should actually find missing root account ids on other shards' do
-        @shard1.activate do
-          discussion_topic_model(context: @course)
-        end
-        de = @topic.discussion_entries.create!(user: user_model)
-        de.update_columns(root_account_id: nil)
-        @topic.update_columns(root_account_id: nil)
-
-        expect(DataFixup::PopulateRootAccountIdOnModels.check_if_association_has_root_account(DiscussionEntry, DiscussionEntry.reflections['discussion_topic'])).to be false
-      end
-    end
-
-
   end
 
   describe '#populate_root_account_ids' do
@@ -1524,43 +1163,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
 
       expect(DataFixup::PopulateRootAccountIdOnModels).not_to receive(:run)
       DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(ContextModule, {course: :root_account_id}, cm2.id, cm2.id)
-    end
-
-    context 'with_sharding' do
-      specs_require_sharding
-
-      it 'should fill cross-shard data' do
-        user = @user
-        @shard1.activate do
-          course_model(account: account_model)
-        end
-        favorite = Favorite.create!(context: @course, user: user)
-        favorite.update_columns(root_account_id: nil)
-
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, favorite.id, favorite.id)
-        expect(favorite.reload.root_account_id).to eq @course.root_account.global_id
-      end
-
-      it 'should not collide on cross-shard data of different types' do
-        user = @user
-        @shard1.activate do
-          a1 = account_model
-          a2 = account_model
-          course_model(id: 12345, account: a1)
-          group_model(id: 12345, context: a2)
-        end
-
-        f1 = Favorite.create!(context: @course, user: user)
-        f2 = Favorite.create(context: @group, user: user)
-        f1.update_columns(root_account_id: nil)
-        f2.update_columns(root_account_id: nil)
-
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {group: :root_account_id}, f1.id, f2.id)
-        DataFixup::PopulateRootAccountIdOnModels.populate_root_account_ids(Favorite, {course: :root_account_id}, f1.id, f2.id)
-
-        expect(f1.reload.root_account_id).to eq @course.root_account.global_id
-        expect(f2.reload.root_account_id).to eq @group.root_account.global_id
-      end
     end
   end
 
@@ -1616,21 +1218,6 @@ describe DataFixup::PopulateRootAccountIdOnModels do
       association_hash = described_class.hash_association(assoc)
       direct_relation_associations = described_class.replace_polymorphic_associations(table, association_hash)
       described_class.check_if_table_has_root_account(table, direct_relation_associations.keys)
-    end
-
-    context 'DeveloperKey' do
-      it 'ignores site admin keys (null account_id) and cross-shard account_id' do
-        dk2 = DeveloperKey.create!(account_id: nil)
-        dk2.update_columns(root_account_id: nil)
-
-        expect(dk2.root_account_id).to eq(nil)
-        dk3 = DeveloperKey.create!(account: @course.account)
-        expect(dk3.root_account_id).to_not eq(nil)
-
-        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(true)
-        dk3.update_columns(root_account_id: nil)
-        expect(table_has_root_account_id_filled(DeveloperKey)).to eq(false)
-      end
     end
   end
 

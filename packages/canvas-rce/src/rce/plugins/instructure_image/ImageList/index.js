@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {arrayOf, func, instanceOf, shape} from 'prop-types'
-import {Flex} from '@instructure/ui-layout'
+import {Flex} from '@instructure/ui-flex'
 
 import Image from './Image'
 

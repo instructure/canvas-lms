@@ -368,14 +368,11 @@ rce_enhancements:
       state: hidden
 new_features_ui:
   state: hidden
-  applies_to: RootAccount
+  applies_to: SiteAdmin
   display_name: New Feature Flags
   description: This feature creates a SiteAdmin Release Flag tab to be able
     to release features to users through the UI. It also reworks the UI for
     the old Feature Options tabs.
-  environments:
-    production:
-      state: disabled
 direct_share:
   state: hidden
   applies_to: RootAccount

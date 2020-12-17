@@ -170,7 +170,7 @@ describe DueDateCacher do
       expect(@instance).to receive(:delay_if_production).
         with(singleton: "cached_due_date:calculator:Course:#{@course.global_id}", max_attempts: 10).
         and_return(@instance)
-      expect(@instance).to receive(:recompute)  
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_course(@course.id)
     end
 
@@ -260,7 +260,7 @@ describe DueDateCacher do
           max_attempts: 10
         ).
         and_return(@instance)
-      expect(@instance).to receive(:recompute)  
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_users_for_course(student_1.id, @course)
     end
 
@@ -270,7 +270,7 @@ describe DueDateCacher do
       expect(@instance).to receive(:delay_if_production).
         with(singleton: "what:up:dog", max_attempts: 10).
         and_return(@instance)
-      expect(@instance).to receive(:recompute)  
+      expect(@instance).to receive(:recompute)
       DueDateCacher.recompute_users_for_course(student_1.id, @course, nil, singleton: "what:up:dog")
     end
 
@@ -1155,6 +1155,24 @@ describe DueDateCacher do
       }.not_to change {
         AnonymousOrModerationEvent.where(assignment: assignment, event_type: 'submission_updated').count
       }
+    end
+  end
+
+  context "error trapping" do
+    let(:due_date_cacher) { DueDateCacher.new(@course, @assignment) }
+
+    describe ".perform_submission_upsert" do
+      it "raises Delayed::RetriableError when deadlocked" do
+        allow(Submission.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
+
+        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+      end
+
+      it "raises Delayed::RetriableError when unique record violations occur" do
+        allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::RecordNotUnique)
+
+        expect { due_date_cacher.send(:perform_submission_upsert, []) }.to raise_error(Delayed::RetriableError)
+      end
     end
   end
 end

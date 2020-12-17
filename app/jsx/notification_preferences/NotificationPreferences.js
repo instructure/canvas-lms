@@ -71,36 +71,14 @@ const NotificationPreferences = props => {
     }
   }
 
-  const renderNotificationPreferences = () => {
-    if (
-      props.contextType === 'account' ||
-      ENV.NOTIFICATION_PREFERENCES_OPTIONS?.granular_course_preferences_enabled
-    ) {
-      return (
-        <Flex.Item>
-          <NotificationPreferencesTable
-            preferences={props.notificationPreferences}
-            updatePreference={props.updatePreference}
-          />
-        </Flex.Item>
-      )
-    } else {
-      return (
-        <Flex.Item>
-          <View as="div" margin="large 0 medium 0" textAlign="center">
-            <Text size="large">
-              {I18n.t(
-                'Granular course notification settings will be configurable here in the future.'
-              )}
-            </Text>
-          </View>
-          <div style={{textAlign: 'center'}}>
-            <img alt="" src={PleaseWaitWristWatch} style={{width: '200px'}} />
-          </div>
-        </Flex.Item>
-      )
-    }
-  }
+  const renderNotificationPreferences = () => (
+    <Flex.Item>
+      <NotificationPreferencesTable
+        preferences={props.notificationPreferences}
+        updatePreference={props.updatePreference}
+      />
+    </Flex.Item>
+  )
 
   const renderNotificationInfoAlert = () => (
     <Flex.Item>

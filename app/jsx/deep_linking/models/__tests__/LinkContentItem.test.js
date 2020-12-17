@@ -26,7 +26,11 @@ const json = {
   text: 'some text',
   icon: 'https://www.test.com/icon',
   thumbnail,
-  invalidProp: 'banana'
+  invalidProp: 'banana',
+  custom: {
+    root_account_id: '$Canvas.rootAccount.id',
+    referer: 'LTI test tool example'
+  }
 }
 
 const linkContentItem = (overrides, selection) => {
@@ -57,6 +61,10 @@ describe('constructor', () => {
 
   it('does not set invalid props', () => {
     expect(linkContentItem().invalidProp).toBeUndefined()
+  })
+
+  it('sets the custom when present', () => {
+    expect(linkContentItem().custom).toEqual(json.custom)
   })
 
   describe('when there is a user selection', () => {

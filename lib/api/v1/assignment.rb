@@ -226,6 +226,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
+      tool_attributes.merge!('custom' => assignment.primary_resource_link&.custom)
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -499,6 +500,7 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+
     return false unless prepared_create[:valid]
 
     response = :created
@@ -913,6 +915,9 @@ module Api::V1::Assignment
     updated_assignment = update_from_params(assignment, assignment_params, user, context)
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
+
+    custom_params = assignment_params.dig(:external_tool_tag_attributes, :custom_params)
+    assignment.lti_resource_link_custom_params = custom_params if custom_params.present?
 
     {
       assignment: assignment,

@@ -1554,9 +1554,11 @@ CanvasRails::Application.routes.draw do
       get 'users/:user_id/communication_channels', action: :index, as: 'communication_channels'
       post 'users/:user_id/communication_channels', action: :create
       post 'users/:user_id/communication_channels/:id', action: :reset_bounce_count, as: 'reset_bounce_count'
-      get 'accounts/:account_id/bounced_communication_channels.csv', action: :bouncing_channel_report
+      get 'accounts/:account_id/bounced_communication_channels.csv', action: :bouncing_channel_report, defaults: { format: :csv }
+      get 'accounts/:account_id/bounced_communication_channels', action: :bouncing_channel_report
       post 'accounts/:account_id/bounced_communication_channels/reset', action: :bulk_reset_bounce_counts
-      get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report
+      get 'accounts/:account_id/unconfirmed_communication_channels.csv', action: :unconfirmed_channel_report, defaults: { format: :csv }
+      get 'accounts/:account_id/unconfirmed_communication_channels', action: :unconfirmed_channel_report
       post 'accounts/:account_id/unconfirmed_communication_channels/confirm', action: :bulk_confirm
       delete 'users/self/communication_channels/push', action: :delete_push_token
       delete 'users/:user_id/communication_channels/:id', action: :destroy
@@ -2296,6 +2298,10 @@ CanvasRails::Application.routes.draw do
 
     scope(controller: :history) do
       get 'users/:user_id/history', action: 'index', as: :user_history
+    end
+
+    scope(controller: :gradebooks) do
+      put "courses/:course_id/update_final_grade_overrides", action: "update_final_grade_overrides"
     end
   end
 

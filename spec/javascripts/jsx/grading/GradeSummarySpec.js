@@ -185,7 +185,7 @@ function setPageHtmlFixture() {
 }
 
 function commonSetup() {
-  fakeENV.setup()
+  fakeENV.setup({grade_calc_ignore_unposted_anonymous_enabled: true})
   $fixtures.html('')
 }
 
@@ -626,7 +626,7 @@ test('calculates grades using data in the env', () => {
 
 test('normalizes the grading period set before calculation', () => {
   GradeSummary.calculateGrades()
-  const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[3]
+  const gradingPeriodSet = CourseGradeCalculator.calculate.getCall(0).args[4]
   deepEqual(gradingPeriodSet.id, '1501')
   equal(gradingPeriodSet.gradingPeriods.length, 2)
   deepEqual(_.map(gradingPeriodSet.gradingPeriods, 'id'), ['701', '702'])
@@ -634,7 +634,7 @@ test('normalizes the grading period set before calculation', () => {
 
 test('scopes effective due dates to the user', () => {
   GradeSummary.calculateGrades()
-  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[4]
+  const dueDates = CourseGradeCalculator.calculate.getCall(0).args[5]
   deepEqual(dueDates, {201: {grading_period_id: '701'}})
 })
 
@@ -645,8 +645,8 @@ test('calculates grades without grading period data when the grading period set 
   equal(args[0], ENV.submissions)
   equal(args[1], ENV.assignment_groups)
   equal(args[2], ENV.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
 test('calculates grades without grading period data when effective due dates are not defined', () => {
@@ -656,8 +656,8 @@ test('calculates grades without grading period data when effective due dates are
   equal(args[0], ENV.submissions)
   equal(args[1], ENV.assignment_groups)
   equal(args[2], ENV.group_weighting_scheme)
-  equal(typeof args[3], 'undefined')
   equal(typeof args[4], 'undefined')
+  equal(typeof args[5], 'undefined')
 })
 
 test('returns course grades when no grading period id is provided', () => {

@@ -486,6 +486,7 @@ module InstFS
         # In which case we don't send the original_url param again
         if !Canvas::Plugin.value_to_boolean(query[:redirect])
           query[:redirect] = true
+          query[:no_cache] = true
           uri.query_values = query
           return uri.to_s
         else
@@ -520,8 +521,16 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
-  class ServiceError < DirectUploadError; end
-  class BadRequestError < DirectUploadError; end
+  class ServiceError < DirectUploadError
+    def response_status
+      502
+    end
+  end
+  class BadRequestError < DirectUploadError
+    def response_status
+      400
+    end
+  end
   class ExportReferenceError < StandardError; end
   class DuplicationError < StandardError; end
   class DeletionError < StandardError; end

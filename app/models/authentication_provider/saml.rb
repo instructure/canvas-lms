@@ -108,12 +108,22 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     ap.sig_alg ||= 'RSA-SHA256' if ap.new_record?
   end
 
+  def destroy
+    super
+    if account.settings[:saml_entity_id] &&
+      !account.authentication_providers.active.where(auth_type: 'saml').exists?
+      account.settings.delete(:saml_entity_id)
+      account.save!
+    end
+    true
+  end
+
   def auth_provider_filter
     [nil, self]
   end
 
   def entity_id
-    self.class.saml_default_entity_id_for_account(self.account)
+    self.class.saml_default_entity_id_for_account(self.account, persist: !new_record?)
   end
 
   def set_saml_defaults
@@ -165,9 +175,11 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     }
   end
 
-  def self.saml_default_entity_id_for_account(account)
+  def self.saml_default_entity_id_for_account(account, persist: true)
     unless account.settings[:saml_entity_id]
-      account.settings[:saml_entity_id] = "http://#{HostUrl.context_host(account)}/saml2"
+      new_entity_id = "http://#{HostUrl.context_host(account)}/saml2"
+      return new_entity_id unless persist
+      account.settings[:saml_entity_id] = new_entity_id
       account.save!
     end
     account.settings[:saml_entity_id]
@@ -370,11 +382,12 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   end
 
   def self.sp_metadata_for_account(account, current_host = nil, include_all_encryption_certificates: true)
-    entity = sp_metadata(saml_default_entity_id_for_account(account),
+    aps = account.authentication_providers.active.where(auth_type: 'saml').to_a
+    entity = sp_metadata(saml_default_entity_id_for_account(account, persist: aps.length != 0),
                          HostUrl.context_hosts(account, current_host),
                          include_all_encryption_certificates: include_all_encryption_certificates)
     prior_configs = Set.new
-    account.authentication_providers.active.where(auth_type: 'saml').each do |ap|
+    aps.each do |ap|
       federated_attributes = ap.federated_attributes
       next if federated_attributes.empty?
       next if prior_configs.include?(federated_attributes)

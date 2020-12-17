@@ -87,6 +87,9 @@ export default class MediaAttempt extends React.Component {
   }
 
   renderMediaPlayer = (mediaObject, renderTrashIcon) => {
+    if (!mediaObject) {
+      return null
+    }
     mediaObject.mediaSources.forEach(mediaSource => {
       mediaSource.label = `${mediaSource.width}x${mediaSource.height}`
     })

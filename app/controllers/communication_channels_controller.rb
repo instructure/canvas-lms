@@ -580,16 +580,25 @@ class CommunicationChannelsController < ApplicationController
   end
 
   protected
+
+  def account
+    @account ||= params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
+  end
+
   def bulk_action_args
-    account = params[:account_id] == 'self' ? @domain_root_account : Account.find(params[:account_id])
-    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type).to_unsafe_h.symbolize_keys
+    args = params.permit(:after, :before, :pattern, :with_invalid_paths, :path_type, :order).to_unsafe_h.symbolize_keys
     args.merge!({account: account})
   end
 
   def generate_bulk_report
-    if authorized_action(Account.site_admin, @current_user, :read_messages)
+    if account.grants_right?(@current_user, session, :view_bounced_emails)
       action = yield
-      send_data(action.report, type: 'text/csv')
+      respond_to do |format|
+        format.csv { send_data(action.csv_report, type: 'text/csv') }
+        format.json { send_data(action.json_report, type: 'application/json') }
+      end
+    else
+      render_unauthorized_action
     end
   end
 

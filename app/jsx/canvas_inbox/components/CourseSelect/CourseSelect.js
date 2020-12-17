@@ -228,7 +228,7 @@ export class CourseSelect extends React.Component {
           {this.renderGroups()}
         </Select>
         <Alert
-          liveRegion={() => document.getElementById('screenreader_alert_holder')}
+          liveRegion={() => document.getElementById('flash_screenreader_holder')}
           liveRegionPoliteness="assertive"
           screenReaderOnly
         >

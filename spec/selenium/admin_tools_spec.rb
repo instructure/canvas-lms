@@ -582,4 +582,50 @@ describe "admin_tools" do
       expect(fj('.ui-dialog dl dd:last').text).to eq @course.name
     end
   end
+
+  context "bounced emails search" do
+    before do
+      u1 = user_with_pseudonym
+      u2 = user_with_pseudonym
+      u1.communication_channels.create!(path: 'one@example.com', path_type: 'email') do |cc|
+        cc.workflow_state = 'active'
+        cc.bounce_count = 1
+        cc.last_bounce_at = 2.days.ago
+      end
+      u1.communication_channels.create!(path: 'two@example.com', path_type: 'email') do |cc|
+        cc.workflow_state = 'active'
+        cc.bounce_count = 2
+        cc.last_bounce_at = 4.days.ago
+      end
+      u2.communication_channels.create!(path: 'three@example.com', path_type: 'email') do |cc|
+        cc.workflow_state = 'active'
+        cc.bounce_count = 3
+        cc.last_bounce_at = 6.days.ago
+        cc.last_bounce_details = {'bouncedRecipients' => [{'diagnosticCode' => '550 what a luser'}]}
+      end
+      @account.enable_feature!(:bounced_emails_admin_tool)
+      @user = @account_admin
+    end
+
+    it "does not appear if the user lacks permission" do
+      load_admin_tools_page
+      expect(f('#adminToolsTabNav')).not_to contain_css('a[href="#bouncedEmailsPane"]')
+    end
+
+    it "performs searches" do
+      @account.settings[:admins_can_view_notifications] = true
+      @account.save!
+      load_admin_tools_page
+      f('a[href="#bouncedEmailsPane"]').click
+      replace_content fj('label:contains("Address") input'), '*@example.com'
+      replace_content fj('label:contains("Last bounced after") input'), 5.days.ago.iso8601
+      replace_content fj('label:contains("Last bounced before") input'), 3.days.ago.iso8601
+      fj('button:contains("Search")').click
+      wait_for_ajaximations
+      data = ff('#bouncedEmailsPane table td').map(&:text)
+      expect(data).not_to include 'one@example.com'
+      expect(data).to include 'two@example.com'
+      expect(data).not_to include 'three@example.com'
+    end
+  end
 end

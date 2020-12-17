@@ -63,7 +63,7 @@ def runRSpecSuite(total, index) {
       config.max_fail,
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
-      '.*/selenium',
+      '.*/(selenium|contracts)',
       '4',
       config.force_failure,
       config.patchsetTag
@@ -94,7 +94,7 @@ def _runRspecTestSuite(
       "DOCKER_PROCESSES=$docker_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
-      "SELENIUM_VERSION=3.141.59-20200719",
+      "SELENIUM_VERSION=3.141.59-20201119",
       "PATCHSET_TAG=$patchsetTag",
   ]) {
     try {
@@ -102,11 +102,6 @@ def _runRspecTestSuite(
       sh 'rm -rf ./tmp && mkdir -p tmp'
       timeout(time: 60) {
         sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
-
-        if(prefix == 'selenium') {
-          sh(script: 'build/new-jenkins/docker-compose-pull-selenium.sh', label: 'Pull Selenium Images')
-        }
-
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
@@ -120,6 +115,11 @@ def _runRspecTestSuite(
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
 
       archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
+      findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
+        // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+        // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+        failureReport.addFailurePathByCategory(prefix, file.getPath(), file.getPath().split("/")[5])
+      }
 
       // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
       def preStatus = currentBuild.rawBuild.@result

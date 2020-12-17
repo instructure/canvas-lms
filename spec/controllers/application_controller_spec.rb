@@ -739,7 +739,8 @@ RSpec.describe ApplicationController do
           content_id: 44,
           tag_type: 'context_module',
           context_type: 'Account',
-          context_id: 1
+          context_id: 1,
+          root_account_id: Account.default
         }.merge(overrides)
       )
     end

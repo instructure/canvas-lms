@@ -68,5 +68,7 @@ module Types
         account.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
+
+    field :root_outcome_group, LearningOutcomeGroupType, null: false
   end
 end

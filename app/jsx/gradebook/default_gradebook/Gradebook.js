@@ -1456,6 +1456,7 @@ class Gradebook {
       this.submissionsForStudent(student),
       this.assignmentGroups,
       this.options.group_weighting_scheme,
+      this.options.grade_calc_ignore_unposted_anonymous_enabled,
       hasGradingPeriods ? this.gradingPeriodSet : undefined,
       hasGradingPeriods
         ? EffectiveDueDates.scopeToUser(this.effectiveDueDates, student.id)

@@ -93,8 +93,8 @@ LINTER_PID=$!
 
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
 set -ex
-readarray -t PLUGINS_LIST < config/plugins_list
-rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST[@]}")
+PLUGINS_LIST_ARR=("$PLUGINS_LIST")
+rm -rf \$(printf 'gems/plugins/%s ' "\${PLUGINS_LIST_ARR[@]}")
 
 export DISABLE_POSTINSTALL=1
 ./build/new-jenkins/linters/run-and-collect-output.sh "yarn install --ignore-optional || yarn install --ignore-optional --network-concurrency 1"

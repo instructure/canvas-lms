@@ -158,6 +158,7 @@ export default class TrayController {
 
     const element = (
       <VideoOptionsTray
+        id="video-options-tray"
         key={this._renderId}
         videoOptions={vo}
         onEntered={() => {

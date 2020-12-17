@@ -69,9 +69,11 @@ module Lti
 
     def login_request(lti_params)
       message_hint = cache_payload(lti_params)
+      login_hint = Lti::Asset.opaque_identifier_for(@user, context: @context) || User.public_lti_id
+
       LtiAdvantage::Messages::LoginRequest.new(
         iss: Canvas::Security.config['lti_iss'],
-        login_hint: Lti::Asset.opaque_identifier_for(@user, context: @context),
+        login_hint: login_hint,
         client_id: @tool.global_developer_key_id,
         target_link_uri: target_link_uri,
         lti_message_hint: message_hint,

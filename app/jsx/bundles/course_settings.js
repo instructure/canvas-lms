@@ -27,6 +27,7 @@ import configureStore from '../course_settings/store/configureStore'
 import initialState from '../course_settings/store/initialState'
 import 'course_settings'
 import 'grading_standards'
+import FeatureFlags from '../feature_flags/FeatureFlags'
 
 const blueprint = document.getElementById('blueprint_menu')
 if (blueprint) {
@@ -44,8 +45,12 @@ if (blueprint) {
 
 const navView = new NavigationView({el: $('#tab-navigation')})
 
-const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
-featureFlagView.collection.fetchAll()
+if (window.ENV.NEW_FEATURES_UI) {
+  ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
+} else {
+  const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
+  featureFlagView.collection.fetchAll()
+}
 
 $(() => navView.render())
 

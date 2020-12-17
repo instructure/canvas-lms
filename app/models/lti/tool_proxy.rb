@@ -184,13 +184,21 @@ module Lti
       # of when created from the individual assignments, so we are creating them on
       # the tool. We only want subscriptions for plagiarism tools, though. These
       # new subscriptions will get all events for the whole root account, and are
-      # filtered by the vendor code and product code inside the live events
+      # filtered by the associatedIntegrationId (tool guid) inside the live events
       # publish tool.
-      if subscription_id.blank? && workflow_state == 'active' && plagiarism_tool?
-        self.update_columns(subscription_id: find_or_create_plagiarism_subscription)
-      elsif subscription_id.present? && workflow_state != 'active'
+      if self.subscription_id.blank? && workflow_state == 'active' && plagiarism_tool?
+        subscription_id = Lti::PlagiarismSubscriptionsHelper.new(self)&.create_subscription
+        self.update_columns(subscription_id: subscription_id)
+      elsif self.subscription_id.present? && workflow_state != 'active'
         delete_subscription
       end
+    end
+
+    def delete_subscription
+      return if subscription_id.nil?
+
+      Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(subscription_id)
+      self.update_columns(subscription_id: nil)
     end
 
     def plagiarism_tool?
@@ -201,42 +209,6 @@ module Lti
       raw_data.try(:dig, 'tool_profile', 'service_offered')&.find do |service|
         service['@id'].include?('#vnd.Canvas.SubmissionEvent')
       end&.dig('endpoint')
-    end
-
-    scope :with_event_endpoint, -> (endpoint) do
-      where("raw_data like '%vnd.Canvas.SubmissionEvent%'").
-        # This is not a good way to do this.  Yaml serialization can change, but right now it's all I've got.
-        # We should put this into a real field.
-        where("raw_data like '%endpoint: #{endpoint}%'")
-    end
-
-    def find_or_create_plagiarism_subscription
-      # Tools with subscriptions and which match the current tool installation's product code, vendor code, and
-      # SubmissionEvent endpoint
-      tool_proxies = Lti::ToolProxy.active.joins(:product_family).
-        with_event_endpoint(event_endpoint).
-        where(lti_product_families: {product_code: product_family&.product_code, vendor_code: product_family&.vendor_code}).
-        where.not(subscription_id: nil)
-      # Search the accounts under the same root account to see if a subscription already exists
-      # (we only need one subscription per root account)
-      subscription_id = tool_proxies.joins(:account).
-        # we should replace this with the tool_proxy root_account_id if/when we fill that
-        find_by("coalesce(accounts.root_account_id, accounts.id) = ?", context&.resolved_root_account_id)&.subscription_id
-      # Then search courses in case the tool was only directly installed on a course
-      subscription_id ||= tool_proxies.joins(:course).
-        find_by(courses: {root_account_id: self.context&.root_account_id})&.subscription_id
-      # Then if we haven't found a subscription at all, we'll create a new one
-      subscription_id || Lti::PlagiarismSubscriptionsHelper.new(self)&.create_subscription
-    end
-
-    def delete_subscription
-      return if subscription_id.blank?
-      old_subscription_id = subscription_id
-      self.update_columns(subscription_id: nil)
-      # We'll only delete the subscription from the live events publish tool if there
-      # are no other tools using it
-      return if Lti::ToolProxy.active.where(subscription_id: old_subscription_id).any?
-      Lti::PlagiarismSubscriptionsHelper.new(self).destroy_subscription(old_subscription_id)
     end
   end
 end

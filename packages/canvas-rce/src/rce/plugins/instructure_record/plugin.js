@@ -116,15 +116,18 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         })
         callback(items)
       },
-      onAction() {
-        const first = getMenuItems(ed)[0].value
-        doMenuItem(ed, first)
+      onAction(api) {
+        if (!api.isDisabled()) {
+          const first = getMenuItems(ed)[0].value
+          doMenuItem(ed, first)
+        }
       },
       onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
       onSetup(api) {
         function handleNodeChange(_e) {
           api.setDisabled(!isOKToLink(ed.selection.getContent()))
         }
+        setTimeout(handleNodeChange)
         ed.on('NodeChange', handleNodeChange)
         return () => {
           ed.off('NodeChange', handleNodeChange)

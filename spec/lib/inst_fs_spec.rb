@@ -202,11 +202,11 @@ describe InstFS do
           expect(Canvas::Security.decode_jwt(token, [ secret ])).to have_key(:jti)
         end
 
-        it "includes the original_url claim with the redirect param" do
+        it "includes the original_url claim with the redirect and no_cache param" do
           original_url = "https://example.test/preview"
           url = InstFS.authenticated_url(@attachment, original_url: original_url)
           token = url.split(/token=/).last
-          expect(Canvas::Security.decode_jwt(token, [ secret ])[:original_url]).to eq(original_url + "?redirect=true")
+          expect(Canvas::Security.decode_jwt(token, [ secret ])[:original_url]).to eq(original_url + "?no_cache=true&redirect=true")
         end
 
         it "doesn't include the original_url claim if already redirected" do

@@ -55,15 +55,22 @@ If you want to migrate the existing database, use docker_dev_update.sh
   message "Creating new database"
   docker-compose run --rm web \
     bundle exec rake db:create
-  docker-compose run --rm web \
-    bundle exec rake db:migrate
+  # initial_setup runs db:migrate for development
   docker-compose run ${jenkinsBuild} --rm web \
     bundle exec rake db:initial_setup
+  # Rails db:migrate only runs on development by default
+  # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
+  docker-compose run --rm web \
+    bundle exec rake db:migrate RAILS_ENV=test
 }
 
 function build_images {
   message 'Building docker images...'
-  docker-compose build --pull
+  if [[ "$(uname)" == 'Linux' ]]; then
+    docker-compose build --pull --build-arg USER_ID=$(id -u)
+  else
+    docker-compose build --pull
+  fi
 }
 
 function check_gemfile {
@@ -83,6 +90,11 @@ permissions so we can install gems."
     touch Gemfile.lock
     confirm_command 'chmod a+rw Gemfile.lock' || true
   fi
+}
+
+function build_assets {
+  message "Building assets..."
+  docker-compose run --rm web ./script/install_assets.sh
 }
 
 function database_exists {

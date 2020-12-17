@@ -1005,7 +1005,7 @@ module ApplicationHelper
   end
 
   def add_csp_for_root
-    return unless request.format.html? || request.format == "*/*"
+    return unless response.media_type == 'text/html'
     return unless csp_enabled?
     return if csp_report_uri.empty? && !csp_enforced?
 

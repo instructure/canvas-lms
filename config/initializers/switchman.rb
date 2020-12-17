@@ -86,24 +86,35 @@ Rails.application.config.after_initialize do
     scope :in_region, ->(region) do
       next in_current_region if region.nil?
 
-      servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
-      if servers.include?(Shard.default.database_server.id)
-        where("database_server_id IN (?) OR database_server_id IS NULL", servers)
+      dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
+      db_count_in_this_region = dbs_by_region[region]&.length.to_i + dbs_by_region[nil]&.length.to_i
+      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region
+
+      dbs_in_this_region = dbs_by_region[region]&.map(&:id) || []
+      dbs_in_this_region += dbs_by_region[nil]&.map(&:id) || [] if Shard.default.database_server.in_region?(region)
+
+      if db_count_in_this_region <= db_count_in_other_regions
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id IN (?) OR database_server_id IS NULL", dbs_in_this_region)
+        else
+          where(database_server_id: dbs_in_this_region)
+        end
       else
-        where(database_server_id: servers)
+        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id NOT IN (?) OR database_server_id IS NULL", dbs_not_in_this_region)
+        else
+          where.not(database_server_id: dbs_not_in_this_region)
+        end
       end
     end
 
     scope :in_current_region, -> do
-      if !default.is_a?(Switchman::Shard)
-        # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
-        # either way there's only one shard, and we always want to see it
-        [default]
-      elsif !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-        all
-      else
-        in_region(ApplicationController.region)
-      end
+      # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
+      # either way there's only one shard, and we always want to see it
+      return [default] unless default.is_a?(Switchman::Shard)
+      return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
+      in_region(ApplicationController.region)
     end
   end
 

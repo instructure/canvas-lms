@@ -87,7 +87,7 @@ describe DataFixup::UpdateAnonymousGradingSettings do
     it 'does nothing for an account with anonymous_grading set to allowed' do
       set_anonymous_grading_flag(course_or_account: @account, state: 'allowed')
       run_for_account
-      expect(@account.feature_flag(:anonymous_grading)).to be_allowed
+      expect(@account.feature_flag(:anonymous_grading)).to be_can_override
     end
 
     it 'does nothing for an account with anonymous_grading disabled' do

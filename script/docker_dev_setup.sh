@@ -183,6 +183,8 @@ function setup_docker_environment {
     message "Copying default configuration from config/docker-compose.override.yml.example to docker-compose.override.yml"
     cp config/docker-compose.override.yml.example docker-compose.override.yml
   fi
+
+  echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env
 }
 
 function copy_docker_config {
@@ -195,11 +197,9 @@ function setup_canvas {
   message 'Now we can set up Canvas!'
   copy_docker_config
   build_images
-
   check_gemfile
-  docker-compose run --rm web ./script/canvas_update -n code -n data
+  build_assets
   create_db
-  docker-compose run --rm web ./script/canvas_update -n code -n deps
 }
 
 function display_next_steps {
@@ -230,6 +230,23 @@ function display_next_steps {
   Running the tests:
 
     docker-compose run --rm web bundle exec rspec
+
+   Running Selenium tests:
+
+    add docker-compose/selenium.override.yml in the .env file
+      echo ':docker-compose/selenium.override.yml' >> .env
+
+    build the selenium container
+      docker-compose build selenium-chrome
+
+    run selenium
+      docker-compose run --rm web bundle exec rspec spec/selenium
+
+    Virtual network remote desktop sharing to selenium container
+      for Firefox:
+        $ open vnc://secret:secret@seleniumff.docker
+      for chrome:
+        $ open vnc://secret:secret@seleniumch.docker:5901
 
   I'm stuck. Where can I go for help?
 

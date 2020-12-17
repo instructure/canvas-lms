@@ -29,12 +29,12 @@ describe Course do
 
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
 
     it { is_expected.to have_many(:post_policies).dependent(:destroy).inverse_of(:course) }
-    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
     it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
-
     it { is_expected.to have_many(:feature_flags) }
+    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
   describe 'lti2 proxies' do
