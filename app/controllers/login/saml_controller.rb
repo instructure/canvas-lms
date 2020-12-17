@@ -182,9 +182,16 @@ class Login::SamlController < ApplicationController
   end
 
   rescue_from SAML2::InvalidMessage, with: :saml_error
+  rescue_from SAML2::InvalidSignature, with: :saml_error
+  rescue_from OpenSSL::X509::CertificateError, with: :saml_config_error
   def saml_error(error)
     Canvas::Errors.capture_exception(:saml, error, :warn)
     render status: :bad_request, plain: error.to_s
+  end
+
+  def saml_config_error(error)
+    Canvas::Errors.capture_exception(:saml, error, :warn)
+    render status: :unprocessable_entity, plain: error.to_s
   end
 
   def destroy
