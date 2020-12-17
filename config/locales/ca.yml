@@ -1137,6 +1137,7 @@ ca:
   add_additional_comments_ec34a62f: "Afegeix comentaris addicionals"
   add_alert_b2729c99: "Afegeix una alerta"
   add_an_assignment_fb73942e: "Afegeix una tasca"
+  add_an_attachment_b2e9092f: "Afegeix un fitxer adjunt"
   add_an_identity_provider_to_this_account_c2644478: "Afegeix un proveïdor d'identitats en aquest compte:"
   add_announcement_165c3b05: "Afegeix un anunci"
   add_another_assignment_fc5c908f: "Afegeix una altra tasca"
@@ -1235,6 +1236,11 @@ ca:
   additional_settings_20362654: "Configuració addicional"
   additional_settings_for_sis_syncing_f926973e: "Configuració addicional per a la sincronització del SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Configuració de la sincronització del SIS addicional per a tasques, qüestionaris i debats"
+  address_use_as_wildcard_48f2cf60: "Adreça (utilitzeu * com a comodí)"
+  adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
+      Afegeix una nova pestanya Adreces electròniques retornades a les Eines d'administrador del compte, que
+      us permet cercar les adreces electròniques en què les notificacions del Canvas
+      s’han retornat.
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Afegeix l'enllaç a les analítiques al menú de configuració de l'usuari."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Afegeix les analítiques a la targeta de context d'un estudiant."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Afegeix permisos de granularitat per afegir i suprimir cada rol, i un permís a part per a altres accions d’administrador del curs"
@@ -2784,6 +2790,8 @@ ca:
   both_discussions_create_and_discussions_moderate_a_1c00baf0: "Debats - crea i Debats - modera permeten a l'usuari crear un debat a la pàgina Debats. Si aquest permís s'habilita, Debats - crea no és necessari. Per visualitzar els debats d'un curs, Debats - visualitza s'ha d'habilitar. Per respondre a un debat, Debats - publica també s'ha d'habilitar. Per editar els detalls de la tasca en un debat, Tasques i qüestionaris - afegeix/edita/suprimeix cursos també ha d'estar habilitat."
   bounce_count_reset_c4c2218f: "S'ha restablert el recompte de retorn!"
   bounce_reason_689ed4c6: "Motiu del retorn"
+  bounced_emails_83f293b5: "Adreces electròniques retornades"
+  bounced_emails_admin_tool_9730a5e4: "Eina d'administrador d’adreces electròniques retornades"
   brand_configs_b465a03f: "Configuracions de marca"
   brazil_55_34103ffa: "Brasil (+55)"
   breadcrumb_1_cb3c504: "Ruta de navegació 1"
@@ -3740,6 +3748,7 @@ ca:
   complete_title_7482ddcf: "%{title} complet"
   completed_19711ce7: Completat
   completed_9b809e44: completat
+  compose_a_new_message_db3a68ed: "Redacta un missatge nou"
   compose_message_8abd180a: "Redacta un missatge"
   computer_1d7dfa6f: Ordinador
   concluded_63150003: finalitzat
@@ -3835,6 +3844,7 @@ ca:
   configure_individual_learning_paths_for_students_b_e2fce294: "Permet configurar camins d'aprenentatge individuals per als estudiants en funció dels resultats de l'avaluació."
   configure_tool_app_3b1bb50b: "Voleu configurar l'aplicació %{tool}?"
   configure_toolname_app_651371be: "Configura l'aplicació %{toolName}"
+  confirm_6556b3a6: Confirma
   confirm_as_spam_2f8b7105: "Confirma com a correu brossa"
   confirm_communication_channel_81c48d08: "Confirma el canal de comunicació"
   confirm_contact_method_29d6fe4b: "Confirma el mètode de contacte"
@@ -4349,6 +4359,7 @@ ca:
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} i %{count} més"
     other: "%{contextName} i %{count} més"
+  contextname_selected_59de1002: "%{contextName} seleccionats"
   contexttype_notification_settings_d72acd58: "Configuració de les notificacions de %{contextType}"
   continue_ac067716: Continua
   continue_typing_to_find_additional_sections_or_stu_49786085: "Continueu escrivint per cerca seccions o estudiants addicionals."
@@ -7044,6 +7055,7 @@ ca:
   failed_to_load_more_submissions_148ff11f: "No s'han pogut carregar més entregues"
   failed_to_load_recent_activity_d3e5adeb: "No s'ha pogut carregar l'activitat recent"
   failed_to_log_in_7ceec561: "No s'ha pogut iniciar la sessió"
+  failed_to_perform_search_c918100f: "No s'ha pogut realitzar la cerca"
   failed_to_save_changes_errors_6920f334: "No s'han pogut desar els canvis: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "No s'ha pogut desar la selecció del tauler"
   failed_to_save_please_try_again_later_bb7070fb: "No s'ha pogut desar, torneu-ho a provar més tard"
@@ -7152,6 +7164,7 @@ ca:
   file_storage_32477f6: "Emmagatzematge de fitxers"
   file_tree_collapsed_d4b0ae96: "Arbre de fitxers reduït"
   file_tree_expanded_a1d20c4a: "Arbre de fitxers desplegat"
+  file_upload_9cae6da5: "Penjada de fitxer"
   file_upload_failed_af22dd91: "No s'ha pogut carregar el fitxer"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Es requereix una càrrega de fitxer, file_url o content_export_id"
   file_upload_submission_740711f: "Entrega de càrrega de fitxer"
@@ -7202,6 +7215,7 @@ ca:
   filter_conversations_by_type_1ce8c064: "Filtra les converses per tipus"
   filter_e3398407: Filtre
   filter_ip_addresses_2f296bd2: "Filtra per adreces IP"
+  filter_messages_by_course_21a53fc4: "Filtra els missatges per curs"
   filter_replies_by_unread_342e8e90: "Filtra les respostes per les no llegides"
   filter_roles_12cf2271: "Filtra els rols"
   filter_speedgrader_by_student_group_53683142: "Filtra SpeedGrader per grups d'estudiants"
@@ -7303,6 +7317,7 @@ ca:
   form_background_fb654518: "Fons del formulari"
   form_border_f61f12dc: "Vora del formulari"
   formattedgrade_points_90505a61: "%{formattedGrade} punts"
+  forward_d143f64: Reenvia
   found_count_broken_links_9224b8dd: 
     one: "S'ha trobat un enllaç que no funciona"
     other: "S'han trobat %{count} enllaços que no funcionen"
@@ -7335,6 +7350,8 @@ ca:
   german_3ec99bbb: Alemany
   germany_49_fc5b8179: "Alemanya (+49)"
   get_started_b9507525: Comença
+  get_started_by_finding_importing_or_creating_your__380b6cfb: "Per començar, cerqueu, importeu o creeu els vostres resultats del compte."
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: "Per començar, cerqueu, importeu o creeu els vostres resultats del curs."
   get_your_content_online_9546ecff: "Posar el vostre contingut en línia"
   get_your_content_online_quickly_41fd925b: "Posar el vostre contingut en línia ràpidament"
   getting_started_with_collaborations_794240ba: "Introducció a les col·laboracions"
@@ -7817,6 +7834,7 @@ ca:
   group_name_group_people_e9d548c1: "%{group_name} - Persones del grup"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} a la categoria de grup %{group_category_name}"
   group_name_is_required_5547bc0b: "El nom del grup és obligatori"
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Grup %{newOptionGroup} introduït. %{newOptionContextName}"
   group_pages_656556f3: "Pàgines del grup"
   group_people_50e9785b: "Persones del grup"
   group_roster_1846bf84: "Llista de participants del grup"
@@ -8626,6 +8644,7 @@ ca:
   invalid_points_8e929c3f: "Punts no vàlids"
   invalid_points_possible: "El valor de punts possibles per a aquesta tasca ha de ser igual o més gran que zero."
   invalid_recipient_name_56b22b86: "Nom de destinatari no vàlid."
+  invalid_redirect_url_6444a1b0: "URL de redirecció no vàlida"
   invalid_restrictions_316cd740: "Restriccions no vàlides"
   invalid_score_3d247da7: "Puntuació no vàlida"
   invalid_sis_sync_status_b68db497: "Estat de sincronització al SIS no vàlid"
@@ -8793,6 +8812,8 @@ ca:
   large_course_db3d58b: "Curs gran:"
   last_assessment_cd5659b6: "Última avaluació: "
   last_attempt_7258ebd7: "Últim intent"
+  last_bounced_after_76f9ce30: "Últim retorn després de"
+  last_bounced_before_601c221a: "Últim retorn abans de"
   last_changed_b544504d: "Última modificació:"
   last_day_attended_b72d623c: "Últim dia d'assistència"
   last_edit_ascending_6a18dba4: "Última edició: Ascendent"
@@ -9274,6 +9295,7 @@ ca:
   m2c_name: "Importador del Moodle"
   macedonian_6ed541af: Macedoni
   magenta_4a65993c: Magenta
+  mailbox_selection_92d9cbf: "Selecció de bústia"
   main_text_color_7d65ab1b: "Color del text principal"
   make_key_developername_invisible_212ecf72: "Fes invisible la clau %{developerName}"
   make_key_developername_visible_97c404bf: "Fes visible la clau %{developerName}"
@@ -10913,6 +10935,7 @@ ca:
     other: "Missatges suprimits!"
   messages_sent_b851d0dd: "Missatges enviats"
   mexico_52_60d635c7: "Mèxic (+52)"
+  mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportació de qualificacions MGP"
   mic_a7f3d311: Micròfon
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Prova gratuïta (pàgines wiki)"
@@ -11061,6 +11084,7 @@ ca:
   more_information_about_ratings_57cdd446: "Més informació sobre les classificacions"
   more_modules_d9a9f003: "Més mòduls"
   more_options_272b4953: "Més opcions"
+  more_options_e89670cf: "Més opcions"
   more_people_options_730e9686: "Més opcions de persones"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "S'han afegit més resultats al final de la pàgina."
   more_than_999_submissions_need_grading_bc087dd0: "Més de 999 entregues requereixen qualificació"
@@ -11413,7 +11437,7 @@ ca:
   no_users_found_64a043ff: "No s'ha trobat cap usuari"
   no_users_were_selected_to_add_to_the_course_a51c6083: "No s'ha seleccionat a cap usuari per afegir-lo al curs"
   no_valid_lti_resource_was_returned_11f7f91f: "No s'ha retornat cap recurs LTI vàlid"
-  no_video_1ed00b26: "Sense vídeo"
+  no_video_1ed00b26: "No hi ha cap vídeo"
   no_violations_have_been_reported_977a08d1: "No s'ha informat de cap infracció."
   no_way_to_export_gradebooks_provided_b4c2939d: "No es poden exportar els llibres de qualificacions proporcionats!"
   no_way_to_monitor_gradebook_exports_provided_b451236a: "No es poden supervisar les exportacions del llibre de qualificacions proporcionades!"
@@ -11449,7 +11473,9 @@ ca:
   not_now_afa29fa7: "Ara no"
   not_published_73f7079: "No publicat"
   not_reviewed_c38d9e97: "No revisat"
+  not_selected_57866888: "no seleccionat"
   not_signed_47acf472: "No signat"
+  not_starred_98931190: "no marcat amb estrelles"
   not_starred_no_subject_click_to_star_adfefe93: "\"(Sense assumpte)\" no està marcat amb una estrella, feu clic per marcar-ho."
   not_starred_no_subject_click_to_star_dc91380: "\"(Sense assumpte)\" no està marcat amb una estrella, feu clic per marcar-ho."
   not_starred_subject_click_to_star_4ea6eb64: "\"%{subject}\" no està marcat amb una estrella, feu clic per marcar-ho."
@@ -12057,6 +12083,8 @@ ca:
   outcomes_csv_format_9005acfb: "Format CSV dels resultats"
   outcomes_d1b18d33: Resultats
   outcomes_for_student_9f91d4d: "Resultats de l'estudiant"
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: "Els resultats encara no s’han afegit a aquest compte."
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Els resultats encara no s’han afegit a aquest curs."
   outcomes_import_completed_baff5cb0: "Importació de resultats completada"
   outcomes_import_failed_77efcdf4: "No s'han pogut importar els resultats"
   outcomes_report_8887bd49: "Informe de resultats"
@@ -12179,7 +12207,7 @@ ca:
   paste_zoom_into_calendar_events_announcements_disc_d873358e: "Enganxeu el Zoom als esdeveniments del calendari, els anuncis, els debats i en qualsevol altre lloc on utilitzeu l'editor de contingut enriquit (RCE)."
   path_4f9abf12: Camí
   pathtype_93f80de1: "%{pathType}"
-  pause_12af3bb4: Pausa
+  pause_12af3bb4: "Posa en pausa"
   pdf_4e842f10: pdf
   pdf_d8236d9a: PDF
   peer_review_assignment_7d314c59: "Tasca de revisió entre companys"
@@ -12213,7 +12241,11 @@ ca:
   performed_by_70b3ce96: "Realitzat per"
   permission_must_be_enabled_for_someone_397e1ce3: "El permís ha d'estar habilitat per a algú"
   permission_not_found_620b80d1: "No s'ha trobat cap permís"
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: "El permís per canviar aquest càlcul de domini a nivell del curs s’ha habilitat per a:"
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: "El permís per canviar aquest càlcul de domini a nivell del compte s’ha habilitat per a:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "El permís per modificar el càlcul d’aquest domini està habilitat a nivell del compte per:"
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "El permís per canviar aquesta escala de domini a nivell del compte s’ha habilitat per a:"
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "El permís per canviar aquesta escala de domini a nivell del curs s’ha habilitat per a:"
   permission_to_change_this_mastery_scale_is_enabled_89066fac: "El permís per modificar l’escala d'aquest domini està habilitat a nivell del compte per:"
   permissions_365c49e: Permisos
   permissions_manage_9eea4f8f: "Permisos - administra"
@@ -12258,7 +12290,7 @@ ca:
   please_add_at_least_one_non_blank_answer_213c2c8e: "Afegiu com a mínim una resposta que no estigui en blanc."
   please_add_at_least_one_non_blank_answer_for_each__a05a55f9: "Afegiu com a mínim una resposta que no estigui en blanc per a cada variable."
   please_adjust_your_security_preferences_before_con_fd568e8d: "Ajusteu les vostres preferències de seguretat abans de continuar."
-  please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Permeteu al Canvas accedir al vostre micròfon i càmera web."
+  please_allow_canvas_to_access_your_microphone_and__dc2c3079: "Permeteu que Canvas accedeixi al micròfon i a la càmera web."
   please_contact_your_lms_administrator_for_more_det_635afd97: "Per obtenir més informació, poseu-vos en contacte amb l’administrador de la plataforma d’ensenyament virtual."
   please_create_a_group_set_8db6e8fe: "Seleccioneu un conjunt de grups"
   please_do_not_reply_to_this_email_it_will_not_be_d_1e49982a: "No respongueu aquest correu electrònic, no es lliurarà."
@@ -14260,9 +14292,11 @@ ca:
       other: "%{count} seccions"
   recipients_a69b5e55: "Destinataris:"
   record_7c9448b: Enregistra
+  record_an_audio_or_video_comment_88425add: "Enregistra un comentari d'àudio o vídeo"
   record_audio_video_d9993f6c: "Enregistra àudio/vídeo"
   record_media_6637ff19: "Enregistra multimèdia"
   record_upload_35dfb2ab: Enregistra/carrega
+  record_upload_media_comment_4d01b943: "Enregistra/Carrega el comentari multimèdia"
   record_with_microphone_only_e4ee07aa: "Enregistra només amb el micròfon"
   record_with_webcam_af21e07c: "Enregistra amb la càmera web"
   recording_98da6bda: "S'està enregistrant"
@@ -14359,6 +14393,7 @@ ca:
   remove_image_341340b3: "Suprimeix la imatge"
   remove_label_11d96b8f: "Suprimeix %{label}"
   remove_linked_student_name_52dc7fce: "Suprimeix l'estudiant enllaçat %{name}"
+  remove_mastery_level_b1e8dcb0: "Suprimeix el nivell de domini"
   remove_name_624e06be: "Suprimeix %{name}"
   remove_name_as_an_admin_c296cf49: "Suprimeix a %{name} com a administrador"
   remove_null_values_from_live_event_payloads_3c826f: "Suprimeix els valors nuls de les càrregues d'esdeveniments en directe"
@@ -14395,6 +14430,7 @@ ca:
         am_pm: am/pm
         hour: h
         minute: min
+  replace_attachmentdisplayname_button_94dd8ba1: "Substitueix el botó %{attachmentDisplayName}"
   replace_e61834a7: Substitueix
   replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
       Substitueix la imatge existent de l’equació matemàtica i el mathml ocult
@@ -14405,6 +14441,8 @@ ca:
       per una versió processada per MathJax. Aquest canvi ofereix una millor accessibilitat
       i vàries opcions perquè el lector interactuï amb l’equació a la pàgina.
   reply_389d6fb9: Respon
+  reply_all_80298bee: "Respon a tots"
+  reply_all_b864cd0e: "Respon a tots"
   reply_from_name: "Notificacions de %{name} a través del Canvas"
   reply_to_comment_72d96728: "Respon el comentari"
   reply_to_conversation_f1aa0d4: "Respon a la conversa"
@@ -15007,6 +15045,7 @@ ca:
       find_links_using_service: "Cerca enllaços mitjançant el %{service}"
   select_conversation_subject_3f36074a: "Selecciona la conversa %{subject}"
   select_country_or_region_4e9fb08e: "Selecciona el país o regió"
+  select_course_5b549441: "Selecciona el curs"
   select_course_5cf89177: "Selecciona el curs"
   select_course_a_selection_is_required_before_recip_f622d9df: "Selecciona el curs: cal fer una selecció perquè el camp de destinataris es torni disponible"
   select_course_color_cad8e62b: "Selecciona el color del curs"
@@ -15052,6 +15091,7 @@ ca:
   selected_content_contains_non_lti_links_f9dfd762: "El contingut seleccionat conté enllaços que no són d'LTI."
   selected_content_is_not_an_lti_link_11780d96: "En contingut seleccionat no és un enllaç d'LTI."
   selected_course_course_a581f834: "S'ha seleccionat el curs %{course}"
+  selected_de3a8019: seleccionat
   selected_external_tool_tool_bae095ba: "Eina externa seleccionada %{tool}"
   selected_filename_7552a8c0: "%{filename} seleccionat"
   selected_grade_942f40ba: "Qualificació seleccionada"
@@ -15108,6 +15148,7 @@ ca:
   send_a_message_4600821d: "Envia un missatge"
   send_a_message_to_student_b2e72576: "Envia un missatge a %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Envia un missatge al professor"
+  send_an_individual_message_to_each_recipient_e9ddaeb8: "Envia un missatge individual a cada destinatari"
   send_assignment_name_to_another_user_e2ca494d: "Envia la tasca %{name} a un altre usuari"
   send_comment_4e05f2fb: "Envia el comentari"
   send_comment_to_instructor_only_4295a109: "Envia el comentari només a l'instructor"
@@ -15763,7 +15804,7 @@ ca:
   something_broke_unexpectedly_6d3720ee: "S'ha produït un error inesperat."
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Alguna cosa no funciona bé però per ara puc seguir treballant"
   something_went_wrong_89195131: "S'ha produït un error."
-  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "S'ha produït un error en accedir al micròfon o la càmera web."
+  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Alguna cosa no ha anat bé en accedir al micròfon o a la càmera web."
   something_went_wrong_creating_the_course_please_tr_431adff5: "S'ha produït un error en crear el curs. Torneu-ho a provar."
   something_went_wrong_d238c551: "S'ha produït un error"
   something_went_wrong_downloading_submissions_pleas_6d069a09: "S'ha produït un error en baixar les entregues. Torneu a provar-ho més endavant."
@@ -15890,8 +15931,10 @@ ca:
     student_hidden_name: "Estudiant %{position}"
   sso_settings_ebf98263: "Configuració d'SSO"
   star_2d27c137: "marca amb una estrella"
+  star_8d156e09: "Marca amb una estrella"
   star_conversation_2e2ba614: "Marca la conversa amb una estrella"
   starred_5a9efa8a: "Marcat amb una estrella"
+  starred_9523c316: "marcat amb estrelles"
   starred_no_subject_click_to_unstar_3191d64: "S'ha marcat \"(Sense assumpte)\" amb una estrella, feu clic per anul·lar-ho."
   starred_no_subject_click_to_unstar_bff04bce: "S'ha marcat \"(Sense assumpte)\" amb una estrella, feu clic per anul·lar-ho."
   starred_subject_click_to_unstar_6aafcddc: "S'ha marcat \"%{subject}\" amb una estrella, feu clic per anul·lar-ho."
@@ -15902,7 +15945,7 @@ ca:
   start_link_validation_dc0ac99c: "Inicia la validació d'enllaços"
   start_over_f7552aa9: "Torna a començar"
   start_participating_f0c75256: "Comença a participar"
-  start_recording_9a65141a: "Inicia l'enregistrament"
+  start_recording_9a65141a: "Comença a enregistrar"
   start_time_2c3d11b5: "Hora d'inici"
   start_tls_26e4b0dc: "Inicia el TLS"
   start_tour_29787099: "Comença la visita guiada"
@@ -16745,6 +16788,7 @@ ca:
               categorització, coincidències i ordre. També té
               més característiques de moderació i acomodació.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Aquesta imatge apareix com a filigrana de fons a la pàgina. Formats acceptats: png, svg, gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: "En aquest moment, aquesta imatge no està disponible."
   this_is_a_blueprint_course_5e7b47fe: "Aquest és un curs plantilla"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Aquesta és una llista separada per comes d'URLs de confiança. En confiar en qualsevol dels URL d'aquest llista s'ometrà el testimoni CSRF quan s'iniciï la sessió al Canvas."
   this_is_a_feature_to_allow_the_development_of_a_re_8452eb0d: "Aquesta característica permet el desenvolupament d'un disseny adaptatiu"
@@ -16821,6 +16865,7 @@ ca:
   this_will_affect_every_customer_are_you_sure_a1e0cac6: "Això afectarà tots els clients. N'esteu segur?"
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Això us permetrà autenticar el Canvas per publicar les qualificacions al SIS"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Això aplicarà aquest tema a tot el vostre compte. Voleu continuar?"
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Això suprimirà el nivell de domini de la vostra escala de domini."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Això actualitzarà totes les rúbriques de nivell del compte i del curs que estiguin vinculades a les escales de domini a nivell del compte i que encara no s’hagin avaluat."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Això actualitzarà totes les rúbriques de nivell del compte i del curs que estiguin vinculades a l’escala de domini a nivell del compte i que encara no s’hagin avaluat."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Això actualitzarà totes les rúbriques alineades amb els resultats d'aquest curs que encara no s'hagin avaluat."
@@ -17349,6 +17394,7 @@ ca:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "''%{type}' no és un tipus d'imatge vàlid (proveu jpg, png, o gif)"
   type_of_change_1cb24a0e: "Tipus de modificació"
   type_of_item_8a37f69d: "Tipus d'element"
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Escriviu o utilitzeu les tecles de fletxes per navegar per les opcions."
   type_to_search_de63ad38: "Escriviu per cercar"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Escriviu per cercar o utilitzeu les tecles de fletxes per navegar per les opcions."
   ukrainian_945b00b7: Ucraïnès
@@ -17528,7 +17574,7 @@ ca:
   upload_files_a228f20f: "Penja fitxers"
   upload_gradebook_386a46c8: "Carrega el llibre de qualificacions"
   upload_image_6120b609: "Carrega una imatge"
-  upload_media_ce31135a: "Carrega elements multimèdia"
+  upload_media_ce31135a: "Penja l'element multimèdia"
   upload_not_available_for_this_folder_8f8623c6: "La càrrega no està disponible per a aquesta carpeta"
   upload_successful_ca47465f: "Càrrega correcta"
   upload_your_outcomes_bceeadbe: "Carregueu els vostres resultats!"
@@ -17830,6 +17876,7 @@ ca:
       no_teacher_courses: "No hi ha cap curs compartit entre aquest professor i estudiant"
       user_not_teacher: "Aquest usuari no és un professor d'aquest curs"
     google_drive_added: "El compte del Google Drive s'ha afegit correctament!"
+    google_drive_authorization_failure: "Ha fallat l’autorització del Google Drive per a l’usuari actual."
     grades: 
       average_grades: 
         one: "mitjana d'1 estudiant"
@@ -18575,7 +18622,7 @@ ca:
     other: "S'han produït els errors següents durant la vostra cerca:"
   your_submission_has_not_been_graded_yet_d6963e53: "La vostra entrega encara no s'ha qualificat"
   your_time_for_this_quiz_has_been_reduced_394652e9: "El vostre temps per a aquest qüestionari s'ha reduït."
-  your_webcam_may_already_be_in_use_6cd64c25: "Pot ser que la vostra càmera web ja s'estigui utilitzant."
+  your_webcam_may_already_be_in_use_6cd64c25: "És possible que la càmera web ja s'estigui utilitzant."
   yyyy_mm_dd_hh_mm_a01b6081: "DD.MM.AAAA hh:mm"
   z_a_b48d8903: "Z - A"
   z_a_be2ab67c: Z–A

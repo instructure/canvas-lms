@@ -1770,6 +1770,7 @@ nl:
   add_additional_comments_ec34a62f: "Aanvullende opmerkingen toevoegen"
   add_alert_b2729c99: "Waarschuwing toevoegen"
   add_an_assignment_fb73942e: "Een opdracht toevoegen"
+  add_an_attachment_b2e9092f: "Een bijlage toevoegen"
   add_an_identity_provider_to_this_account_c2644478: "Een identiteit van provider aan deze account toevoegen"
   add_announcement_165c3b05: "Aankondiging toevoegen"
   add_another_assignment_fc5c908f: "Een andere opdracht toevoegen"
@@ -1890,8 +1891,13 @@ nl:
   additional_settings_for_sis_syncing_f926973e: "Extra instellingen voor SIS-synchronisatie"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Extra SIS-synchronisatieopdracht, toets en discussie-instellingen"
   additional_sort_options_for_new_gradebook_2dc1939: "Aanvullende sorteeropties voor de Nieuwe cijferlijst"
+  address_use_as_wildcard_48f2cf60: "Adres (gebruik * als jokerteken)"
   addressbook_microservice_a4940422: "AddressBook microservice"
   addressbook_performance_tap_98ddf67: "AddressBook performance tap"
+  adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
+      Voegt het nieuwe tabblad Niet bezorgde e-mails toe aan Accountbeheertools waarmee
+      je e-mailadressen kunt zoeken waar Canvas-meldingen
+      niet zijn bezorgd
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Hiermee wordt een analyselink toegevoegd aan het menu met gebruikersinstellingen."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Hiermee wordt een analyse toegevoegd aan de contextkaart van een cursist."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Voegt gedetailleerde machtigingen toe voor toevoegen en verwijderen van elke rol, en een afzonderlijke machtiging voor andere acties van de cursusbeheerder"
@@ -4168,6 +4174,8 @@ nl:
   bottom_15a2a9be: Onder
   bounce_count_reset_c4c2218f: "Aantal keren niet bezorgd reset!"
   bounce_reason_689ed4c6: "Reden niet bezorgd"
+  bounced_emails_83f293b5: "Niet bezorgde e-mails"
+  bounced_emails_admin_tool_9730a5e4: "Beheertool voor niet bezorgde e-mails"
   brand_configs_b465a03f: Huisstijlconfiguraties
   brazil_55_34103ffa: "Brazilië (+55)"
   brazil_c1d6e73a: Brazilië
@@ -5396,6 +5404,7 @@ nl:
   completed_19711ce7: Voltooid
   completed_9b809e44: voltooid
   completed_icon_521596e4: "voltooid pictogram"
+  compose_a_new_message_db3a68ed: "Een nieuw bericht opstellen"
   compose_message_8abd180a: "Bericht opstellen"
   computer_1d7dfa6f: Computer
   concluded_63150003: voltooid
@@ -5506,6 +5515,7 @@ nl:
   configure_individual_learning_paths_for_students_b_e2fce294: "Individuele cursuspaden configureren voor cursisten op basis van resultaten van opdracht."
   configure_tool_app_3b1bb50b: "%{tool} app configureren?"
   configure_toolname_app_651371be: "%{toolName} app configureren"
+  confirm_6556b3a6: Bevestigen
   confirm_as_spam_2f8b7105: "Bevestigen als spam"
   confirm_communication_channel_81c48d08: "Communicatiekanaal bevestigen"
   confirm_contact_method_29d6fe4b: "Contactmethode bevestigen"
@@ -6205,6 +6215,7 @@ nl:
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} en %{count} andere"
     other: "%{contextName} en %{count} anderen"
+  contextname_selected_59de1002: "%{contextName} geselecteerd"
   contextscount_more_66b2f99b: "+ %{contextsCount} meer"
   contexttype_notification_settings_d72acd58: "%{contextType} Instellingen voor meldingen"
   continue_ac067716: Doorgaan
@@ -9831,6 +9842,7 @@ nl:
   failed_to_log_in_7ceec561: "Kon niet aanmelden"
   failed_to_move_items_e043da6: "Kan items niet verplaatsen"
   failed_to_open_discussion_for_comments_87412434: "Kan discussie niet openen voor opmerkingen"
+  failed_to_perform_search_c918100f: "Kan zoekopdracht niet uitvoeren"
   failed_to_pin_discussion_38a60900: "Kan discussie niet vastzetten"
   failed_to_publish_draft_comment_853761e9: "Kon concept commentaar niet publiceren"
   failed_to_save_changes_errors_6920f334: "Kan de wijzigingen niet opslaan: %{errors}%"
@@ -9990,6 +10002,7 @@ nl:
   file_storage_32477f6: Bestandsopslag
   file_tree_collapsed_d4b0ae96: "Bestandsstructuur samengevouwen"
   file_tree_expanded_a1d20c4a: "Bestandsstructuur uitgevouwen"
+  file_upload_9cae6da5: "Bestand uploaden"
   file_upload_failed_af22dd91: "Bestand uploaden mislukt"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Uploaden van bestand, file_url of content_export_id is vereist"
   file_upload_submission_740711f: "Bestand uploaden als inzending"
@@ -10077,6 +10090,7 @@ nl:
   filter_discussions_by_unread_6c48322: "discussies op ongelezen filteren"
   filter_e3398407: Filter
   filter_ip_addresses_2f296bd2: "IP-adressen filteren"
+  filter_messages_by_course_21a53fc4: "Berichten filteren per cursus"
   filter_replies_by_unread_342e8e90: "Antwoorden ongelezen filteren"
   filter_replies_by_unread_caf870ea: "Antwoorden op ongelezen gefilterd"
   filter_roles_12cf2271: "Functies filteren"
@@ -10198,6 +10212,7 @@ nl:
   formattedgrade_points_90505a61: "%{formattedGrade} punten"
   formula_many_warning_title: "Er zijn %{count} formulevragen in deze toetsbank waarvoor de mogelijke antwoorden opnieuw moeten worden gegenereerd"
   formula_warning_title: "Mogelijke antwoorden zullen voor formule vragen opnieuw gegenereerd moeten worden"
+  forward_d143f64: Doorsturen
   found_count_broken_links_9224b8dd: 
     one: "1 onderbroken link gevonden"
     other: "%{count} onderbroken links gevonden"
@@ -10240,6 +10255,8 @@ nl:
   germany_49_fc5b8179: "Duitsland (+49)"
   germany_b02d91c9: Duitsland
   get_started_b9507525: "Aan de slag"
+  get_started_by_finding_importing_or_creating_your__380b6cfb: "Ga aan de slag met zoeken, importeren of maken van de leerdoelen van je account."
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: "Ga aan de slag met zoeken, importeren of maken van de leerdoelen van je cursus."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Ontvang het volgende van uw Salesforce verbonden App"
   get_your_content_online_9546ecff: "Je content online zetten"
   get_your_content_online_quickly_41fd925b: "Je content snel online zetten"
@@ -11310,6 +11327,7 @@ nl:
   group_name_group_people_e9d548c1: "%{group_name} - Groep personen"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} in %{group_category_name} groepscategorie"
   group_name_is_required_5547bc0b: "Groepsnaam is vereist"
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Groep %{newOptionGroup} ingevoerd. %{newOptionContextName}"
   group_pages_656556f3: Groepspagina's
   group_people_50e9785b: "Groep personen"
   group_roster_1846bf84: Groepsrooster
@@ -12490,6 +12508,7 @@ nl:
   invalid_points_for_rating_tier_index_i_400d307e: "Ongeldige punten voor beoordelingscategorie %{index}: \"%{i}\""
   invalid_points_possible: "De waarde van mogelijke punten voor deze opdracht moet nul of hoger zijn."
   invalid_recipient_name_56b22b86: "Ongeldige naam ontvanger."
+  invalid_redirect_url_6444a1b0: "Ongeldige redirect-URL"
   invalid_restrictions_316cd740: "Ongeldige beperkingen"
   invalid_score_3d247da7: "Ongeldige score"
   invalid_sis_sync_status_b68db497: "Ongeldige SIS-synchronisatiestatus"
@@ -12668,6 +12687,8 @@ nl:
   large_course_db3d58b: "Grote cursus:"
   last_assessment_cd5659b6: "Laatste beoordeling: "
   last_attempt_7258ebd7: "Laatste poging"
+  last_bounced_after_76f9ce30: "Laatste keer niet bezorgd na"
+  last_bounced_before_601c221a: "Laatste keer niet bezorgd vóór"
   last_changed_b544504d: "Laatst gewijzigd:"
   last_changed_date_82f1ce56: "Laatst gewijzigd: %{date}"
   last_day_attended_b72d623c: "Datum laatste keer bijgewoond"
@@ -13237,6 +13258,7 @@ nl:
   m2c_name: "Moodle Importer"
   macedonian_6ed541af: Macedonisch
   magenta_4a65993c: Magenta
+  mailbox_selection_92d9cbf: Mailboxselectie
   main_navigation_3f080c80: Hoofdnavigatie
   main_text_color_7d65ab1b: "Kleur van hoofdtekst"
   make_key_developername_invisible_212ecf72: "Sleutel %{developerName} onzichtbaar maken"
@@ -15281,6 +15303,7 @@ nl:
   messages_sent_b851d0dd: "Verzonden berichten"
   mexico_52_60d635c7: "Mexico (+52)"
   mexico_b2d7a271: Mexico
+  mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP Cijferexport"
   mic_a7f3d311: Mic
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Insluitende lezer - Gratis proefversie (wiki-pagina's)"
@@ -15579,6 +15602,7 @@ nl:
   more_information_about_ratings_57cdd446: "Meer informatie over scores"
   more_modules_d9a9f003: "Meer modules"
   more_options_272b4953: "Meer opties"
+  more_options_e89670cf: "Meer opties"
   more_people_options_730e9686: "Meer opties voor personen"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Er zijn meer resultaten toegevoegd aan het eind van de pagina."
   more_than_999_submissions_need_grading_bc087dd0: "Meer dan 999 inzendingen moeten beoordeeld worden"
@@ -16046,7 +16070,9 @@ nl:
   not_now_afa29fa7: "Niet nu"
   not_published_73f7079: "Niet gepubliceerd"
   not_reviewed_c38d9e97: "Niet gecontroleerd"
+  not_selected_57866888: "niet geselecteerd"
   not_signed_47acf472: "Niet ondertekend"
+  not_starred_98931190: "zonder ster"
   not_starred_no_subject_click_to_star_adfefe93: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
   not_starred_no_subject_click_to_star_dc91380: "'Niet met ster gemarkeerd \"(Geen Onderwerp)\", Klik om met ster te markeren."
   not_starred_subject_click_to_star_4ea6eb64: "'Niet met ster gemarkeerd \"%{subject}\", Klik om met ster te markeren."
@@ -16818,6 +16844,8 @@ nl:
   outcomes_csv_format_9005acfb: "Leerdoelen CSV-indeling"
   outcomes_d1b18d33: Leerdoelen
   outcomes_for_student_9f91d4d: "Leerdoelen voor cursist"
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: "Leerdoelen zijn nog niet toegevoegd aan dit account."
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Leerdoelen zijn nog niet toegevoegd aan deze cursus."
   outcomes_import_completed_baff5cb0: "Importeren van leerdoelen voltooid"
   outcomes_import_failed_77efcdf4: "Importeren van leerdoelen mislukt"
   outcomes_report_8887bd49: "Rapport Leerresultaten"
@@ -16999,7 +17027,11 @@ nl:
   performed_by_70b3ce96: "Uitgevoerd door"
   permission_must_be_enabled_for_someone_397e1ce3: "Machtiging moet voor iemand zijn ingeschakeld"
   permission_not_found_620b80d1: "Machtiging niet gevonden"
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Toestemming om deze vakbeheersingsberekening op cursusniveau te wijzigen is ingeschakeld voor:"
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: "Toestemming om deze vakbeheersingsberekening op accountniveau te wijzigen is ingeschakeld voor:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "Toestemming om deze vakbeheersingsberekening te wijzigen is ingeschakeld op accountniveau voor:"
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "Toestemming om deze vakbeheersingsschaal op accountniveau te wijzigen is ingeschakeld voor:"
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "Toestemming om deze vakbeheersingsschaal op cursusniveau te wijzigen is ingeschakeld voor:"
   permission_to_change_this_mastery_scale_is_enabled_89066fac: "Toestemming om deze vakbeheersingsschaal te wijzigen is ingeschakeld op accountniveau voor:"
   permissions: 
     manage_webhooks: "Webhooks - beheren"
@@ -19829,11 +19861,13 @@ nl:
       other: "%{count} secties"
   recipients_a69b5e55: "Geadresseerden:"
   record_7c9448b: Opnemen
+  record_an_audio_or_video_comment_88425add: "Een audio- of video-opmerking opnemen"
   record_audio_14666880: "Audio opnemen"
   record_audio_video_d9993f6c: "Audio/video opnemen"
   record_media_6637ff19: "Media opnemen"
   record_upload_35dfb2ab: Opnemen/uploaden
   record_upload_media_5fdce166: "Media opnemen/uploaden"
+  record_upload_media_comment_4d01b943: "Media-opmerking opnemen/uploaden"
   record_video_70dc8439: "Video opnemen"
   record_with_microphone_only_e4ee07aa: "Alleen met microfoon opnemen"
   record_with_webcam_af21e07c: "Met webcam opnemen"
@@ -19944,6 +19978,7 @@ nl:
   remove_image_341340b3: "Afbeelding verwijderen"
   remove_label_11d96b8f: "Verwijderen %{label}"
   remove_linked_student_name_52dc7fce: "Gekoppelde cursist verwijderen %{name}"
+  remove_mastery_level_b1e8dcb0: "Vakbeheersingsniveau verwijderen"
   remove_name_624e06be: "Verwijder %{name}"
   remove_name_as_an_admin_c296cf49: "%{name} verwijderen als beheerder"
   remove_null_values_from_live_event_payloads_3c826f: "Lege waarden verwijderen uit payloads met live gebeurtenissen"
@@ -19985,6 +20020,7 @@ nl:
         am_pm: am/pm
         hour: uur
         minute: min
+  replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName} knop vervangen"
   replace_e61834a7: Vervangen
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Vervangt de huidige bestandsstructuur met een nieuwe toegankelijke en rijke bestandsstructuur met meer functies."
   replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
@@ -19995,7 +20031,9 @@ nl:
       Vervangt de bestaande afbeelding van de wiskundige vergelijking plus de verborgen mathml
       door een MathJax verwerkte versie. Deze wijziging zorgt voor betere toegankelijkheid
       en veel opties voor de lezer voor interactie met de vergelijking op de pagina.
-  reply_389d6fb9: Antwoord
+  reply_389d6fb9: Beantwoorden
+  reply_all_80298bee: "Allen beantwoorden"
+  reply_all_b864cd0e: "Allen beantwoorden"
   reply_from_name: "%{name} via Canvas waarschuwingen"
   reply_to_comment_72d96728: "Antwoorden om commentaar te geven"
   reply_to_conversation_f1aa0d4: "Op gesprek antwoorden"
@@ -20753,6 +20791,7 @@ nl:
   select_conversation_subject_3f36074a: "Gesprek selecteren %{subject}"
   select_country_d21cb85a: "Land selecteren"
   select_country_or_region_4e9fb08e: "Land of regio selecteren"
+  select_course_5b549441: "Cursus selecteren"
   select_course_5cf89177: "Cursus selecteren"
   select_course_a_selection_is_required_before_recip_f622d9df: "Een cursus selecteren: een selectie is verplicht voordat het veld geadresseerde verschijnt"
   select_course_color_cad8e62b: "Selecteer Cursuskleur"
@@ -20807,6 +20846,7 @@ nl:
   selected_content_contains_non_lti_links_f9dfd762: "Geselecteerde inhoud bevat niet-LTI-links."
   selected_content_is_not_an_lti_link_11780d96: "Geselecteerde inhoud is geen LTI-link."
   selected_course_course_a581f834: "Geselecteerde cursus %{course}"
+  selected_de3a8019: geselecteerd
   selected_external_tool_tool_bae095ba: "Geselecteerde externe tool %{tool}"
   selected_filename_7552a8c0: "geselecteerd %{filename}"
   selected_grade_942f40ba: "Geselecteerd cijfer"
@@ -20865,6 +20905,7 @@ nl:
   send_a_message_to_student_b2e72576: "Een bericht verzenden naar %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Een bericht naar de docent sturen"
   send_a_message_to_this_student_ec46b8dd: "Een bericht naar deze student sturen"
+  send_an_individual_message_to_each_recipient_e9ddaeb8: "Een persoonlijk bericht naar elke geadresseerde verzenden"
   send_assignment_name_to_another_user_e2ca494d: "Stuur opdracht %{name} naar een andere gebruiker"
   send_authorization_url_in_lti2_registration_287fcb33: "Autorisatie-URL verzenden in LTI2-registratie"
   send_comment_4e05f2fb: "Opmerking verzenden"
@@ -22103,8 +22144,10 @@ nl:
     student_hidden_name: "Cursist %{position}"
   sso_settings_ebf98263: SSO-instellingen
   star_2d27c137: ster
+  star_8d156e09: Ster
   star_conversation_2e2ba614: "Gesprek met ster"
   starred_5a9efa8a: "Met ster"
+  starred_9523c316: "met ster"
   starred_no_subject_click_to_unstar_3191d64: "Met ster gemarkeerd \"(Geen Onderwerp)\", Klik om de ster te verwijderen."
   starred_no_subject_click_to_unstar_bff04bce: "Met ster gemarkeerd \"(Geen Onderwerp)\", Klik om de ster te verwijderen."
   starred_subject_click_to_unstar_6aafcddc: "Met ster gemarkeerd \"%{subject}\", Klik om de ster te verwijderen."
@@ -23155,6 +23198,7 @@ nl:
               categorisering, vergelijking en rangschikking. Er zijn ook
               meer functies voor modereren en aanpassing.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Deze afbeelding verschijnt als een achtergrond watermerk op je pagina. Geaccepteerde formaten: png, svg, gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: "Deze afbeelding is momenteel niet beschikbaar"
   this_is_a_blueprint_course_5e7b47fe: "Dit is een blauwdrukcursus"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Dit is een door komma's gescheiden lijst van URL's die vertrouwd kunnen worden. Iedere vertrouwde URL in deze lijst zal de code voor CSRF overslaan wanneer je op Canvas aanmeldt."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Dit is een afgesloten cursus, dus alleen afgesloten inschrijvingen zijn beschikbaar."
@@ -23263,6 +23307,7 @@ nl:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Dit zal het je toestaan om Canvas te verifiëren om eindcijfers in SIS te posten"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Dit zal wijzigingen in je hele account aanbrengen. Doorgaan?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Dit is van toepassing op je hele account. Wil je doorgaan?"
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Hiermee wordt het vakbeheersingsniveau van je vakbeheersingsschaal verwijderd."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Hiermee worden alle account- en cursusniveau rubrieken bijgewerkt die verbonden zijn aan accountniveau vakbeheersingsschalen en die nog niet beoordeeld zijn."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Hiermee worden alle account- en cursusniveau rubrieken bijgewerkt die gekoppeld zijn aan de accountniveau vakbeheersingsschaal en die nog niet beoordeeld zijn."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Hiermee worden alle rubrieken bijgewerkt die zijn gekoppeld aan leerdoelen binnen deze cursus en die nog niet beoordeeld zijn."
@@ -24007,6 +24052,7 @@ nl:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' is geen geldige afbeeldingsoort (probeer jpg, png of gif)"
   type_of_change_1cb24a0e: "Type wijziging"
   type_of_item_8a37f69d: "Type item"
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Typ of gebruik de pijltoetsen om door opties te navigeren"
   type_to_search_de63ad38: "Typ om te zoeken"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Typ om te zoeken, gebruik pijltoetsen om door de opties te navigeren."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Oh oh! Neem contact op met je vriendelijke catalogus ontwikkelaar. Foutbericht: %{message}"
@@ -24606,6 +24652,7 @@ nl:
     google_docs_added: "Toegang tot Google Docs geautoriseerd!"
     google_docs_fail: "Google Drive-autorisatie mislukt. Probeer het opnieuw."
     google_drive_added: "Google Drive account succesvol toegevoegd!"
+    google_drive_authorization_failure: "Google Drive heeft geen autorisatie voor huidige gebruiker!"
     google_drive_fail: "Google Drive machtiging mislukt. Probeer het nogmaals"
     grades: 
       average_grades: 

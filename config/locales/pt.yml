@@ -1771,6 +1771,7 @@ pt:
   add_additional_comments_ec34a62f: "Adicionar comentários adicionais"
   add_alert_b2729c99: "Adicionar alerta"
   add_an_assignment_fb73942e: "Adicionar uma tarefa"
+  add_an_attachment_b2e9092f: "Adicionar um anexo"
   add_an_identity_provider_to_this_account_c2644478: "Adicionar um fornecedor de identidade a esta conta"
   add_announcement_165c3b05: "Adicionar anúncio"
   add_another_assignment_fc5c908f: "Adicionar outra tarefa"
@@ -1891,8 +1892,13 @@ pt:
   additional_settings_for_sis_syncing_f926973e: "Configurações adicionais para a sincronização do SIS"
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: "Configurações adicionais de Tarefa de Sincronização do SIS, Questionário e Discussão"
   additional_sort_options_for_new_gradebook_2dc1939: "Opções adicionais de ordenação para Novo  Livro de Notas"
+  address_use_as_wildcard_48f2cf60: "Endereço (utilizar * como wildcard)"
   addressbook_microservice_a4940422: "AddressBook microserviço"
   addressbook_performance_tap_98ddf67: "AddressBook Toque de desempenho"
+  adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
+      Adiciona um novo separador de Emails Guardados às Ferramentas de Administração de Conta, o que lhe
+      permite pesquisar endereços de correio electrónico onde as notificações do Canvas
+      foram devolvidas
   adds_analytics_link_on_the_user_settings_menu_3a048816: "Adiciona a ligação de análise no menu de configurações do utilizador."
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: "Adiciona análises ao cartão de contexto de um aluno."
   adds_granular_permissions_for_adding_and_removing__e1e484a3: "Adiciona permissões granulares para adicionar e remover cada função, e uma permissão separada para outras ações administrativas da disciplina"
@@ -4172,6 +4178,8 @@ pt:
   bottom_15a2a9be: Inferior
   bounce_count_reset_c4c2218f: "Reiniciar o contador!"
   bounce_reason_689ed4c6: "Reiniciar motivo"
+  bounced_emails_83f293b5: "Correios electrónicos devolvidos"
+  bounced_emails_admin_tool_9730a5e4: "Ferramenta de Administração de E-mails Guardados"
   brand_configs_b465a03f: "Configurações de marca"
   brazil_55_34103ffa: "Brasil (+55)"
   brazil_c1d6e73a: Brasil
@@ -5408,6 +5416,7 @@ pt:
   completed_19711ce7: Concluído
   completed_9b809e44: concluído
   completed_icon_521596e4: "ícone completo"
+  compose_a_new_message_db3a68ed: "Compor uma nova mensagem"
   compose_message_8abd180a: "Compor Mensagem"
   computer_1d7dfa6f: Computador
   concluded_63150003: concluído
@@ -5522,6 +5531,7 @@ pt:
   configure_individual_learning_paths_for_students_b_e2fce294: "Configure percursos de aprendizagem individuais para estudantes com base em resultados."
   configure_tool_app_3b1bb50b: "Configurar %{tool} App?"
   configure_toolname_app_651371be: "Configurar a aplicação %{toolName}"
+  confirm_6556b3a6: Confirmar
   confirm_as_spam_2f8b7105: "Confirmar como Spam"
   confirm_communication_channel_81c48d08: "Confirmar canal de comunicação"
   confirm_contact_method_29d6fe4b: "Confirmar método de contato"
@@ -6221,6 +6231,7 @@ pt:
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} e %{count} outro"
     other: "%{contextName} e %{count} outros"
+  contextname_selected_59de1002: "%{contextName} selecionado"
   contextscount_more_66b2f99b: "+ %{contextsCount} mais"
   contexttype_notification_settings_d72acd58: "%{contextType} Configurações de Notificação"
   continue_ac067716: Continuar
@@ -9849,6 +9860,7 @@ pt:
   failed_to_log_in_7ceec561: "Falhou registar"
   failed_to_move_items_e043da6: "Falha ao mover itens"
   failed_to_open_discussion_for_comments_87412434: "Falha ao abrir discussão para comentários"
+  failed_to_perform_search_c918100f: "Falha na realização da pesquisa"
   failed_to_pin_discussion_38a60900: "Falha ao afixar a discussão"
   failed_to_publish_draft_comment_853761e9: "Falhou a publicação do comentário em rascunho"
   failed_to_save_changes_errors_6920f334: "Falha ao salvar as alterações: %{errors}%"
@@ -10008,6 +10020,7 @@ pt:
   file_storage_32477f6: "Armazenamento de arquivos"
   file_tree_collapsed_d4b0ae96: "Árvore de ficheiro recolhida"
   file_tree_expanded_a1d20c4a: "Árvore de ficheiro expandida"
+  file_upload_9cae6da5: "Carregar de arquivos"
   file_upload_failed_af22dd91: "Carregamento de ficheiro falhou"
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "Carregamento de ficheiro, file_url ou content_export_id é obrigatório"
   file_upload_submission_740711f: "Envio de carregamento de ficheiro"
@@ -10095,6 +10108,7 @@ pt:
   filter_discussions_by_unread_6c48322: "filtrar discussões por não lidas"
   filter_e3398407: Filtro
   filter_ip_addresses_2f296bd2: "Filtrar Endereços IP"
+  filter_messages_by_course_21a53fc4: "Filtrar mensagens por disciplina"
   filter_replies_by_unread_342e8e90: "filtrar respostas por não lidas"
   filter_replies_by_unread_caf870ea: "filtrar respostas por não lidas"
   filter_roles_12cf2271: "Funções de filtro"
@@ -10216,6 +10230,7 @@ pt:
   formattedgrade_points_90505a61: "%{formattedGrade} Pontos"
   formula_many_warning_title: "Existem %{count} perguntas de Fórmula neste banco que têm de ter as suas respostas possíveis regeneradas"
   formula_warning_title: "Será necessário gerar de novo as respostas possíveis para a pergunta de fórmula"
+  forward_d143f64: Encaminhar
   found_count_broken_links_9224b8dd: 
     one: "Encontrada 1 ligação quebrada"
     other: "Encontradas %{count} ligações quebradas"
@@ -10258,6 +10273,8 @@ pt:
   germany_49_fc5b8179: "Alemanha (+49)"
   germany_b02d91c9: Alemanha
   get_started_b9507525: Começar
+  get_started_by_finding_importing_or_creating_your__380b6cfb: "Comece por encontrar, importar ou criar os resultados da sua conta."
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: "Comece por encontrar, importar ou criar os resultados da sua disciplina."
   get_the_following_from_your_salesforce_connected_a_881fc9a3: "Consiga através da sua Salesforce Connected App"
   get_your_content_online_9546ecff: "Colocar o seu conteúdo online"
   get_your_content_online_quickly_41fd925b: "Obter o seu conteúdo online de forma rápida"
@@ -11327,6 +11344,7 @@ pt:
   group_name_group_people_e9d548c1: "%{group_name} - Pessoas do Grupo"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_name} na categoria de grupo %{group_category_name}"
   group_name_is_required_5547bc0b: "É necessário o nome do grupo"
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "Grupo %{newOptionGroup} inserido. %{newOptionContextName}"
   group_pages_656556f3: "Páginas do grupo"
   group_people_50e9785b: "Pessoas do Grupo"
   group_roster_1846bf84: "Rol de grupos"
@@ -12517,6 +12535,7 @@ pt:
   invalid_points_for_rating_tier_index_i_400d307e: "Pontos inválidos para classificação %{index}: \"%{i}\""
   invalid_points_possible: "O valor de possíveis pontos para esta tarefa tem de ser zero ou superior."
   invalid_recipient_name_56b22b86: "Nome de recetor inválido."
+  invalid_redirect_url_6444a1b0: "URL de redireccionamento inválido"
   invalid_restrictions_316cd740: "Restrições inválidas"
   invalid_score_3d247da7: "Pontuação inválida"
   invalid_sis_sync_status_b68db497: "Estado de sincronização SIS inválido"
@@ -12696,6 +12715,8 @@ pt:
   large_course_db3d58b: "Disciplina Ampla:"
   last_assessment_cd5659b6: "Última Avaliação: "
   last_attempt_7258ebd7: "Última tentativa"
+  last_bounced_after_76f9ce30: "Último salto após"
+  last_bounced_before_601c221a: "Último salto antes"
   last_changed_b544504d: "Última alteração:"
   last_changed_date_82f1ce56: "Última alteração: %{date}"
   last_day_attended_b72d623c: "Último dia atendido"
@@ -13265,6 +13286,7 @@ pt:
   m2c_name: "Importador Moodle"
   macedonian_6ed541af: Macedônio
   magenta_4a65993c: Magenta
+  mailbox_selection_92d9cbf: "Seleção Caixa de correio"
   main_navigation_3f080c80: "Navegação principal"
   main_text_color_7d65ab1b: "Cor Texto Principal"
   make_key_developername_invisible_212ecf72: "Chave %{developerName} invisível"
@@ -15308,6 +15330,7 @@ pt:
   messages_sent_b851d0dd: "Mensagens enviadas"
   mexico_52_60d635c7: "México (+52)"
   mexico_b2d7a271: México
+  mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "Exportação de notas MGP"
   mic_a7f3d311: Mic
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Teste gratuito (Páginas Wiki)"
@@ -15606,6 +15629,7 @@ pt:
   more_information_about_ratings_57cdd446: "Mais informações sobre avaliações"
   more_modules_d9a9f003: "Mais módulos"
   more_options_272b4953: "Mais opções"
+  more_options_e89670cf: "Mais opções"
   more_people_options_730e9686: "Mais opções de pessoas"
   more_results_were_added_at_the_bottom_of_the_page_dc323877: "Mais resultados foram adicionados na parte inferior da página."
   more_than_999_submissions_need_grading_bc087dd0: "Mais de 9 entregas precisam de classificação"
@@ -16073,7 +16097,9 @@ pt:
   not_now_afa29fa7: "Agora não"
   not_published_73f7079: "Não publicado"
   not_reviewed_c38d9e97: "Não revisto"
+  not_selected_57866888: "não selecionado"
   not_signed_47acf472: "Não assinado"
+  not_starred_98931190: "não marcada como favorita"
   not_starred_no_subject_click_to_star_adfefe93: "'Não designado \"(Sem Sujeito)\", Clique para destacar."
   not_starred_no_subject_click_to_star_dc91380: "Não designado \"(Sem Sujeito)\", Clique para destacar."
   not_starred_subject_click_to_star_4ea6eb64: "Não designado \"%{subject}\", Clique para destacar."
@@ -16850,6 +16876,8 @@ pt:
   outcomes_csv_format_9005acfb: "Formato do CSV de resultados"
   outcomes_d1b18d33: Resultados
   outcomes_for_student_9f91d4d: "Resultados para o aluno"
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: "Os resultados ainda não foram acrescentados a esta conta."
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: "Os resultados ainda não foram adicionados a esta disciplina."
   outcomes_import_completed_baff5cb0: "Importação de resultados concluída"
   outcomes_import_failed_77efcdf4: "Falha na Importação de Resultados"
   outcomes_report_8887bd49: "Relatório de resultados"
@@ -17031,7 +17059,11 @@ pt:
   performed_by_70b3ce96: "Executado por"
   permission_must_be_enabled_for_someone_397e1ce3: "A autorização tem de ser permitida por alguém"
   permission_not_found_620b80d1: "Permissão não encontrada"
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: "Permissão para alterar este cálculo de domínio ao nível da disciplina está ativada para"
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: "A permissão para alterar este cálculo de domínio ao nível da conta é permitida:"
   permission_to_change_this_mastery_calculation_is_e_91e19659: "A permissão para alterar este cálculo de domínio é permitida ao nível da conta:"
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: "A permissão para alterar esta escala de domínio ao nível da conta é permitida:"
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: "Permissão para alterar esta escala de domínio ao nível da disciplina está ativada para:"
   permission_to_change_this_mastery_scale_is_enabled_89066fac: "A permissão para alterar esta escala de domínio é ativada ao nível da conta para:"
   permissions: 
     manage_webhooks: "Webhooks - gerir"
@@ -19861,11 +19893,13 @@ pt:
       other: "%{count} secções"
   recipients_a69b5e55: "Destinatários:"
   record_7c9448b: Gravar
+  record_an_audio_or_video_comment_88425add: "Gravar comentário áudio ou vídeo"
   record_audio_14666880: "Gravar Audio"
   record_audio_video_d9993f6c: "Gravar áudio/vídeo"
   record_media_6637ff19: "Gravar Multimédia"
   record_upload_35dfb2ab: Gravar/Carregar
   record_upload_media_5fdce166: "Gravar/Carregar Mídia"
+  record_upload_media_comment_4d01b943: "Gravação/Carregamento de comentário em mídia"
   record_video_70dc8439: "Gravar Vídeo"
   record_with_microphone_only_e4ee07aa: "Gravar com Microfone Apenas"
   record_with_webcam_af21e07c: "Gravar com webcam"
@@ -19976,6 +20010,7 @@ pt:
   remove_image_341340b3: "Remover imagem"
   remove_label_11d96b8f: "Eliminar %{label}"
   remove_linked_student_name_52dc7fce: "Eliminar aluno vinculado %{name}"
+  remove_mastery_level_b1e8dcb0: "Remover o nível de domínio"
   remove_name_624e06be: "Remover %{name}"
   remove_name_as_an_admin_c296cf49: "Remover %{name} como administrador"
   remove_null_values_from_live_event_payloads_3c826f: "Remover valores nulos das cargas úteis do evento em direto"
@@ -20017,6 +20052,7 @@ pt:
         am_pm: am/pm
         hour: hr
         minute: mín
+  replace_attachmentdisplayname_button_94dd8ba1: "Substituir %{attachmentDisplayName} botão"
   replace_e61834a7: Substituir
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: "Substitui o atual esquema de pasta por um novo acesso e mais características."
   replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
@@ -20028,6 +20064,8 @@ pt:
       oculta sempre com uma MathJax versão processada. Esta alteração proporciona melhor acessibilidade
       e muitas opções para o leitor interagir com a equação na página.
   reply_389d6fb9: Responder
+  reply_all_80298bee: "Responder a todos"
+  reply_all_b864cd0e: "Responder a todos"
   reply_from_name: "%{name} através de Notificações do Canvas"
   reply_to_comment_72d96728: "Responder a comentário"
   reply_to_conversation_f1aa0d4: "Responder à conversa"
@@ -20785,6 +20823,7 @@ pt:
   select_conversation_subject_3f36074a: "Selecionar conversa %{subject}"
   select_country_d21cb85a: "Selecionar País"
   select_country_or_region_4e9fb08e: "Selecione País ou Região"
+  select_course_5b549441: "Selecionar disciplina"
   select_course_5cf89177: "Seleccionar disciplina"
   select_course_a_selection_is_required_before_recip_f622d9df: "Selecionar curso: é necessário uma seleção antes do campo dos recetores estar disponível"
   select_course_color_cad8e62b: "Selecione a Cor do Curso"
@@ -20839,6 +20878,7 @@ pt:
   selected_content_contains_non_lti_links_f9dfd762: "O conteúdo selecionado contém ligações não-LTI."
   selected_content_is_not_an_lti_link_11780d96: "O conteúdo selecionado não é uma ligação LTI."
   selected_course_course_a581f834: "Disciplina selecionada %{course}"
+  selected_de3a8019: selecionado
   selected_external_tool_tool_bae095ba: "Ferramenta externa selecionada %{tool}"
   selected_filename_7552a8c0: "selecionado %{filename}"
   selected_grade_942f40ba: "Classificação selecionada"
@@ -20897,6 +20937,7 @@ pt:
   send_a_message_to_student_b2e72576: "Enviar uma mensagem para %{student}"
   send_a_message_to_the_teacher_1ae115b6: "Enviar uma mensagem ao professor"
   send_a_message_to_this_student_ec46b8dd: "Enviar uma mensagem a este aluno"
+  send_an_individual_message_to_each_recipient_e9ddaeb8: "Enviar uma mensagem individual para cada destinatário"
   send_assignment_name_to_another_user_e2ca494d: "Enviar atribuição %{name} para outro utilizador"
   send_authorization_url_in_lti2_registration_287fcb33: "Enviar URL de Autorização no LTI2 Registration"
   send_comment_4e05f2fb: "Enviar Comentário"
@@ -21993,7 +22034,7 @@ pt:
   something_broke_unexpectedly_6d3720ee: "Algo quebrou inesperadamente."
   something_is_broken_but_i_can_work_around_it_for_n_7fcedb9d: "Algo não está a funcionar bem, mas posso contornar o problema por enquanto"
   something_went_wrong_89195131: "Algo deu errado."
-  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Algo deu errado ao acessar seu microfone ou webcam."
+  something_went_wrong_accessing_your_mic_or_webcam_6e3cad12: "Algo deu errado ao acder seu microfone ou webcam."
   something_went_wrong_accessing_your_webcam_6643b87e: "Algo deu errado ao aceder sua webcam."
   something_went_wrong_creating_course_please_try_ag_5198931d: "Algo deu errado na criação de uma disciplina. É favor tentar novamente."
   something_went_wrong_creating_the_course_please_tr_431adff5: "Algo deu errado na criação de uma disciplina. É favor tentar novamente."
@@ -22141,8 +22182,10 @@ pt:
     student_hidden_name: "Aluno %{position}"
   sso_settings_ebf98263: "Configurações SSO"
   star_2d27c137: estrela
+  star_8d156e09: Marcar
   star_conversation_2e2ba614: "Marcar conversa"
   starred_5a9efa8a: "Marcada como favorita"
+  starred_9523c316: "marcada como favorita"
   starred_no_subject_click_to_unstar_3191d64: "Designado \"(Sem Sujeito)\", Clique para esquecer."
   starred_no_subject_click_to_unstar_bff04bce: "Designado \"(Sem Sujeito)\", Clique para esquecer."
   starred_subject_click_to_unstar_6aafcddc: "Designado \"%{subject}\", Clique para esquecer."
@@ -23200,6 +23243,7 @@ pt:
               categorização, correspondência e pedidos. Também tem
               mais moderação e características de acomodação.
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "Esta imagem aparece como a marca de água da imagem de fundo para a sua página. Formatos permitidos: png, svg,gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: "Esta imagem está actualmente indisponível"
   this_is_a_blueprint_course_5e7b47fe: "Esta é uma disciplina blueprint"
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "Esta é uma lista separada por vírgulas de endereços URL fidedignos. Confiar em qualquer um dos endereços URL desta lista ultrapassará o token CSRF quando se iniciar sessão no Canvas."
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: "Esta é uma disciplina concluída, o que significa que só estão disponíveis inscrições concluídas."
@@ -23308,6 +23352,7 @@ pt:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "Com isto poderá autenticar o Canvas para publicar notas no SIS"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: "Isto vai aplicar estas alterações a toda a conta. Gostaria de continuar?"
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: "Isto vai aplicar este tema a toda a conta. Gostaria de continuar?"
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: "Isto irá remover o nível de domínio da sua escala de domínio."
   this_will_update_all_account_and_course_level_rubr_305e821a: "Isto irá atualizar todas as rubricas de nível de conta e da curso que estão ligadas a escalas de domínio de nível de conta e que ainda não foram avaliadas."
   this_will_update_all_account_and_course_level_rubr_3438121e: "Isto irá atualizar todas as rubricas de nível de conta e de disciplina que estão ligadas à escala de domínio de nível de conta e que ainda não foram avaliadas."
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: "Isto irá atualizar todas as rubricas alinhadas com os resultados desta disciplina que ainda não tenham sido avaliadas."
@@ -24052,6 +24097,7 @@ pt:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}' não é um tipo de imagem válido (try jpg, png, ou gif)"
   type_of_change_1cb24a0e: "Tipo de alteração"
   type_of_item_8a37f69d: "Tipo de item"
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: "Digite ou use as teclas de seta para navegar pelas opções"
   type_to_search_de63ad38: "Digitar para pesquisar"
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: "Digite para pesquisar, use as setas do teclado para navegar."
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "Uh Oh! Contacte A Ajuda do Catálogo. Mensagem de Erro: %{message}"
@@ -24654,6 +24700,7 @@ pt:
     google_docs_added: "Acesso do Google Docs autorizado!"
     google_docs_fail: "Falha na autorização do Google Docs Tente novamente"
     google_drive_added: "Conta de Google Drive adicionada com sucesso!"
+    google_drive_authorization_failure: "Google Drive falhou a autorização para o utilizador actual!"
     google_drive_fail: "Falha na autorização de Google Drive. Tente novamente."
     grades: 
       average_grades: 
