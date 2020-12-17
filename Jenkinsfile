@@ -532,7 +532,14 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX"
+                      // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
+                      // has changed between the post-merge build and this pre-merge build.
+                      sh(script: """
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                      """, label: 'upload cache images')
                     }
                   }
                 }
