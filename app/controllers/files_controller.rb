@@ -449,7 +449,7 @@ class FilesController < ApplicationController
     @submission = Submission.active.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
-    if ((@submission && authorized_action(@submission, @current_user, :read)) || 
+    if ((@submission && authorized_action(@submission, @current_user, :read)) ||
         ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
       render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
@@ -1251,11 +1251,13 @@ class FilesController < ApplicationController
   def image_thumbnail
     cancel_cache_buster
 
+    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
+
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
     cache_key = ['thumbnail_url2', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
     url, instfs = Rails.cache.read(cache_key)
-    unless url
+    if !url || no_cache
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
