@@ -21,6 +21,8 @@
 # This model is used internally by DiscussionTopic, it's not intended to be
 # queried directly by other code.
 class DiscussionTopic::MaterializedView < ActiveRecord::Base
+  class ReplicationTimeoutError < StandardError; end
+
   include Api::V1::DiscussionTopics
   include Api
   include Rails.application.routes.url_helpers
@@ -143,7 +145,7 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
         run_at = Setting.get("discussion_materialized_view_replication_failure_retry", "300").to_i.seconds.from_now
         delay(singleton: "materialized_discussion:#{ Shard.birth.activate { self.discussion_topic_id } }", run_at: run_at).
           update_materialized_view(synchronous: true, xlog_location: xlog_location, use_master: use_master)
-        raise "timed out waiting for replication"
+        raise ReplicationTimeoutError, "timed out waiting for replication"
       end
     end
     self.generation_started_at = Time.zone.now
@@ -153,6 +155,9 @@ class DiscussionTopic::MaterializedView < ActiveRecord::Base
     self.participants_array = user_ids
     self.entry_ids_array = entry_lookup
     self.save!
+  rescue ReplicationTimeoutError => e
+    Canvas::Errors.capture_exception(:discussion_materialization, e, :warn)
+    raise Delayed::RetriableError, e.message
   end
 
   handle_asynchronously :update_materialized_view,
