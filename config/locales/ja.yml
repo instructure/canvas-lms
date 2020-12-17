@@ -1770,6 +1770,7 @@ ja:
   add_additional_comments_ec34a62f: 追加のコメントを追加
   add_alert_b2729c99: アラートの追加
   add_an_assignment_fb73942e: 課題の追加
+  add_an_attachment_b2e9092f: 添付ファイルの追加
   add_an_identity_provider_to_this_account_c2644478: "このアカウントに ID プロバイダーを追加:"
   add_announcement_165c3b05: アナウンスメントを追加
   add_another_assignment_fc5c908f: 別の課題の追加
@@ -1890,8 +1891,13 @@ ja:
   additional_settings_for_sis_syncing_f926973e: SIS同期の追加設定
   additional_sis_sync_assignment_quiz_and_discussion_d941fa5: 追加のSIS同期割り当て、クイズ、ディスカッション設定
   additional_sort_options_for_new_gradebook_2dc1939: 新しい成績表の追加の並べ替えオプション
+  address_use_as_wildcard_48f2cf60: "アドレス (*をワイルドカードとして使用)"
   addressbook_microservice_a4940422: "AddressBook マイクロサービス"
   addressbook_performance_tap_98ddf67: "AddressBook パフォーマンスタップ"
+  adds_a_new_bounced_emails_tab_to_account_admin_too_6714c09d: |-
+      アカウント管理ツールに新しい[バウンスメール]
+      タブを追加します。これにより、はCanvas通知が
+      バウンスされたメールアドレスを検索できます。
   adds_analytics_link_on_the_user_settings_menu_3a048816: ユーザー設定メニューに分析リンクを追加します。
   adds_analytics_to_a_student_s_context_card_d4c1e3a3: 受講生のコンテキストカードに分析機能を追加します。
   adds_granular_permissions_for_adding_and_removing__e1e484a3: 各役割を追加および削除するためのきめ細かい権限と、他のコース管理者アクションのための個別の権限を追加します
@@ -4171,6 +4177,8 @@ ja:
   bottom_15a2a9be: 下
   bounce_count_reset_c4c2218f: バウンスカウントをリセット！
   bounce_reason_689ed4c6: バウンスの理由
+  bounced_emails_83f293b5: バウンスメール
+  bounced_emails_admin_tool_9730a5e4: バウンスメール管理ツール
   brand_configs_b465a03f: ブランド設定
   brazil_55_34103ffa: "ブラジル (+55)"
   brazil_c1d6e73a: ブラジル
@@ -5401,6 +5409,7 @@ ja:
   completed_19711ce7: 完了
   completed_9b809e44: 完了
   completed_icon_521596e4: 完了したアイコン
+  compose_a_new_message_db3a68ed: 新しいメッセージの作成
   compose_message_8abd180a: メッセージを作成
   computer_1d7dfa6f: コンピュータ
   concluded_63150003: 完了
@@ -5511,6 +5520,7 @@ ja:
   configure_individual_learning_paths_for_students_b_e2fce294: 評価結果に基づいて、受講生の個別の学習パスを設定します。
   configure_tool_app_3b1bb50b: "%{tool} アプリを設定しますか?"
   configure_toolname_app_651371be: "%{toolName} アプリの設定"
+  confirm_6556b3a6: 確認
   confirm_as_spam_2f8b7105: スパムとして確認
   confirm_communication_channel_81c48d08: 通信チャンネルを確認する
   confirm_contact_method_29d6fe4b: 連絡方法を確認
@@ -6210,6 +6220,7 @@ ja:
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} および %{count} その他"
     other: "%{contextName} および %{count} その他"
+  contextname_selected_59de1002: "%{contextName}が選択されました"
   contextscount_more_66b2f99b: "+ %{contextsCount} より多く"
   contexttype_notification_settings_d72acd58: "%{contextType}通知設定"
   continue_ac067716: 続行
@@ -9837,6 +9848,7 @@ ja:
   failed_to_log_in_7ceec561: ログインに失敗しました
   failed_to_move_items_e043da6: 項目の移動に失敗しました
   failed_to_open_discussion_for_comments_87412434: コメントのディスカッションを開くことができませんでした
+  failed_to_perform_search_c918100f: 検索の実行に失敗しました
   failed_to_pin_discussion_38a60900: ディスカッションを固定できませんでした
   failed_to_save_changes_errors_6920f334: "変更の保存に失敗しました:%{errors}%"
   failed_to_save_dashboard_selection_32e71c72: ダッシュボード選択の保存に失敗しました
@@ -9995,6 +10007,7 @@ ja:
   file_storage_32477f6: "ファイル ストレージ"
   file_tree_collapsed_d4b0ae96: ファイルツリーが折りたたまれている
   file_tree_expanded_a1d20c4a: ファイルツリーが展開されている
+  file_upload_9cae6da5: ファイルのアップロード
   file_upload_failed_af22dd91: ファイルのアップロードに失敗しました
   file_upload_file_url_or_content_export_id_is_requi_23c1fe68: "ファイルアップロード、file_url、または content_export_id が必要です"
   file_upload_submission_740711f: "ファイル アップロードの提出"
@@ -10082,6 +10095,7 @@ ja:
   filter_discussions_by_unread_6c48322: 未読のディスカッションのみを表示
   filter_e3398407: フィルタ
   filter_ip_addresses_2f296bd2: IPアドレスをフィルターにかける
+  filter_messages_by_course_21a53fc4: コースでメッセージをフィルタ
   filter_replies_by_unread_342e8e90: 未読の返信のみを表示
   filter_replies_by_unread_caf870ea: 未読の返信のみを表示
   filter_roles_12cf2271: 役割をフィルタリングする
@@ -10203,6 +10217,7 @@ ja:
   formattedgrade_points_90505a61: "%{formattedGrade} ポイント"
   formula_many_warning_title: "このバンクには%{count}数式問題があり、考えられる解答を再生成する必要があります"
   formula_warning_title: 数式問題について、考えられる解答を再生成する必要があります
+  forward_d143f64: 転送
   found_count_broken_links_9224b8dd: 
     one: "%{count}個のリンク切れが見つかりました"
     other: "リンク切れが%{count}見つかりました"
@@ -10245,6 +10260,8 @@ ja:
   germany_49_fc5b8179: "ドイツ (+49)"
   germany_b02d91c9: ドイツ
   get_started_b9507525: 開始する
+  get_started_by_finding_importing_or_creating_your__380b6cfb: アカウントの結果を検索、インポート、または作成することから始めましょう。
+  get_started_by_finding_importing_or_creating_your__6b62c1d9: コースの結果を検索、インポート、または作成することから始めましょう。
   get_the_following_from_your_salesforce_connected_a_881fc9a3: あなたのセールスフォースに接続されたアプリからフォロー獲得
   get_your_content_online_9546ecff: コンテンツをオンライン化する
   get_your_content_online_quickly_41fd925b: コンテンツを素早くオンライン化する
@@ -11312,6 +11329,7 @@ ja:
   group_name_group_people_e9d548c1: "%{group_name} - グループメンバー"
   group_name_in_group_category_name_group_category_29bf3254: "%{group_category_name} グループ カテゴリの %{group_name}"
   group_name_is_required_5547bc0b: グループ名が必要です
+  group_newoptiongroup_entered_newoptioncontextname_9eaf1b13: "グループ%{newOptionGroup}が入力されました%{newOptionContextName}"
   group_pages_656556f3: "グループ ページ"
   group_people_50e9785b: グループの人々
   group_roster_1846bf84: グループ名簿
@@ -12497,6 +12515,7 @@ ja:
   invalid_points_for_rating_tier_index_i_400d307e: "ティア %{index} 採点時に無効なポイント\"%{i}\""
   invalid_points_possible: この課題の配点の数値は、0以上である必要があります。
   invalid_recipient_name_56b22b86: 無効の受信者名。
+  invalid_redirect_url_6444a1b0: リダイレクトURLが無効
   invalid_restrictions_316cd740: 無効な制限
   invalid_score_3d247da7: 無効なスコア
   invalid_sis_sync_status_b68db497: SISの同期ステータスが無効です
@@ -12675,6 +12694,8 @@ ja:
   large_course_db3d58b: "大コース:"
   last_assessment_cd5659b6: "最終アセスメント： "
   last_attempt_7258ebd7: 最終試行
+  last_bounced_after_76f9ce30: 後に最後にバウンスされた
+  last_bounced_before_601c221a: 前に最後にバウンスされた
   last_changed_b544504d: 最終変更：
   last_changed_date_82f1ce56: "最終変更：%{date}"
   last_day_attended_b72d623c: 最終出席日
@@ -13244,6 +13265,7 @@ ja:
   m2c_name: "Moodle インポーター"
   macedonian_6ed541af: マケドニア語
   magenta_4a65993c: マジェンタ
+  mailbox_selection_92d9cbf: メールボックスの選択
   main_navigation_3f080c80: "メイン ナビゲーション"
   main_text_color_7d65ab1b: メインのテキストカラー
   make_key_developername_invisible_212ecf72: "%{developerName}キーを非表示にする"
@@ -15288,6 +15310,7 @@ ja:
   messages_sent_b851d0dd: メッセージを送信しました
   mexico_52_60d635c7: "メキシコ (+52)"
   mexico_b2d7a271: メキシコ
+  mfoster_708c21fb: mfoster@*
   mgp_grade_export_d29b471f: "MGP 成績のエクスポート"
   mic_a7f3d311: マイク
   microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - 無料トライアル版（Wikiページ）"
@@ -15586,6 +15609,7 @@ ja:
   more_information_about_ratings_57cdd446: 格付け評価に関する詳細情報
   more_modules_d9a9f003: より多くのモジュール
   more_options_272b4953: その他のオプション
+  more_options_e89670cf: その他のオプション
   more_people_options_730e9686: より多くの人々のオプション
   more_results_were_added_at_the_bottom_of_the_page_dc323877: さらなる結果がページの最後に追加されました。
   more_than_999_submissions_need_grading_bc087dd0: 999点以上の提出物の採点が必要です
@@ -16053,7 +16077,9 @@ ja:
   not_now_afa29fa7: 今は実行しない
   not_published_73f7079: 未公開
   not_reviewed_c38d9e97: 未確認
+  not_selected_57866888: 選択されていません
   not_signed_47acf472: 署名されていません
+  not_starred_98931190: スターなし
   not_starred_no_subject_click_to_star_adfefe93: "' \"(No Subject)\" に星がありません。 クリックして星を付けてください。"
   not_starred_no_subject_click_to_star_dc91380: "\"(No Subject)\" に星がありません。 クリックして星を付けてください。"
   not_starred_subject_click_to_star_4ea6eb64: "\"%{subject}\" に星がありません。 クリックして星を付けてください。"
@@ -16827,6 +16853,8 @@ ja:
   outcomes_csv_format_9005acfb: 成果CSV形式
   outcomes_d1b18d33: 結果
   outcomes_for_student_9f91d4d: 受講生の結果
+  outcomes_have_not_been_added_to_this_account_yet_908ade88: 成果はこのアカウントにまだ追加されていません。
+  outcomes_have_not_been_added_to_this_course_yet_7b761b8c: 成果はこのコースにまだ追加されていません。
   outcomes_import_completed_baff5cb0: 成果のインポートが完了しました
   outcomes_import_failed_77efcdf4: 成果のインポートに失敗しました
   outcomes_report_8887bd49: カスタマーレポート
@@ -17007,7 +17035,11 @@ ja:
   performed_by_70b3ce96: 実行者
   permission_must_be_enabled_for_someone_397e1ce3: 誰かのために許可を有効にする必要があります
   permission_not_found_620b80d1: 権限が見つかりません
+  permission_to_change_this_mastery_calculation_at_t_9b1966c5: コースレベルでこの達成計算を変更する権限は、次の場合に有効になります：
+  permission_to_change_this_mastery_calculation_at_t_f292da7a: アカウントレベルでこの達成計算を変更する権限は、次の場合に有効になります：
   permission_to_change_this_mastery_calculation_is_e_91e19659: この習熟度計算を変更する権限は、次のアカウントレベルで有効です：
+  permission_to_change_this_mastery_scale_at_the_acc_ea75238f: アカウントレベルでこの達成スケールを変更する権限は、次の場合に有効になります：
+  permission_to_change_this_mastery_scale_at_the_cou_58677e7f: コースレベルでこの達成スケールを変更する権限は、次の場合に有効になります：
   permission_to_change_this_mastery_scale_is_enabled_89066fac: この習熟度スケールを変更する権限は、次のアカウントレベルで有効です：
   permissions: 
     manage_webhooks: "Webhooks - 管理する"
@@ -19826,11 +19858,13 @@ ja:
       other: "%{count} 件のセクション"
   recipients_a69b5e55: "受信者:"
   record_7c9448b: 記録
+  record_an_audio_or_video_comment_88425add: "オーディオまたはビデオ コメントを記録する"
   record_audio_14666880: オーディオを録音する
   record_audio_video_d9993f6c: オーディオ/ビデオ回答を記録する
   record_media_6637ff19: メディアを記録
   record_upload_35dfb2ab: 記録/アップロード
   record_upload_media_5fdce166: メディアの記録/アップロード
+  record_upload_media_comment_4d01b943: "メディア コメントの記録/アップロード"
   record_video_70dc8439: 動画を録画する
   record_with_microphone_only_e4ee07aa: マイクロホンでの録音のみ
   record_with_webcam_af21e07c: ウェブカムでの録音
@@ -19941,6 +19975,7 @@ ja:
   remove_image_341340b3: 画像を削除
   remove_label_11d96b8f: "削除%{label}"
   remove_linked_student_name_52dc7fce: "リンクされた受講者を削除する%{name}"
+  remove_mastery_level_b1e8dcb0: 達成度を削除する
   remove_name_624e06be: "%{name}を削除する"
   remove_name_as_an_admin_c296cf49: "%{name}管理者として削除"
   remove_null_values_from_live_event_payloads_3c826f: ライブイベントペイロードからゼロ値を削除する
@@ -19982,6 +20017,7 @@ ja:
         am_pm: 午前/午後
         hour: 時間
         minute: 最小
+  replace_attachmentdisplayname_button_94dd8ba1: "%{attachmentDisplayName}ボタンを交換"
   replace_e61834a7: 置換
   replaces_the_current_folder_tree_with_a_new_access_6f9d15c2: 現在のフォルダツリーを新しいアクセスで、より機能が豊富なフォルダツリーに置き換えます。
   replaces_the_existing_image_of_the_math_equation_p_aa266b62: |-
@@ -19993,6 +20029,8 @@ ja:
       処理されたバージョン MathJax に置き換えます。この変更により、読者がページ上
       の方程式を操作するためのアクセス性と多数のオプションが向上します。
   reply_389d6fb9: 返信
+  reply_all_80298bee: すべてに返信
+  reply_all_b864cd0e: 全員に返信
   reply_from_name: "%{name} (Canvas のお知らせから)"
   reply_to_comment_72d96728: コメントに返信
   reply_to_conversation_f1aa0d4: 会話に返答
@@ -20749,6 +20787,7 @@ ja:
   select_conversation_subject_3f36074a: "会話を選択%{subject}"
   select_country_d21cb85a: 国を選択
   select_country_or_region_4e9fb08e: 国または地域を選択する
+  select_course_5b549441: コースの選択
   select_course_5cf89177: コースの選択
   select_course_a_selection_is_required_before_recip_f622d9df: "コースを選択: 受信者フィールドが利用可能になる前に、選択することが必要です"
   select_course_color_cad8e62b: コースカラーを選択
@@ -20803,6 +20842,7 @@ ja:
   selected_content_contains_non_lti_links_f9dfd762: 選択したコンテンツはLTIリンクではありません。
   selected_content_is_not_an_lti_link_11780d96: 選択したコンテンツはLTIリンクではありません。
   selected_course_course_a581f834: "選択コース%{course}"
+  selected_de3a8019: 選択されました
   selected_external_tool_tool_bae095ba: "外部ツールを選択%{tool}"
   selected_filename_7552a8c0: "選択されました%{filename}"
   selected_grade_942f40ba: 選択された成績
@@ -20861,6 +20901,7 @@ ja:
   send_a_message_to_student_b2e72576: "～へメッセージの送信%{student}"
   send_a_message_to_the_teacher_1ae115b6: この講師にメッセージを送る
   send_a_message_to_this_student_ec46b8dd: この受講生にメッセージを送信する
+  send_an_individual_message_to_each_recipient_e9ddaeb8: 各受信者に個別メッセージを送信する
   send_assignment_name_to_another_user_e2ca494d: "課題 %{name} を別のユーザーに送信する"
   send_authorization_url_in_lti2_registration_287fcb33: LTI2登録で認証URLを送信します
   send_comment_4e05f2fb: コメントを送信する
@@ -22095,8 +22136,10 @@ ja:
     student_hidden_name: "受講生 %{position}"
   sso_settings_ebf98263: SSO設定
   star_2d27c137: スター
+  star_8d156e09: スター
   star_conversation_2e2ba614: 会話にスターを付ける
   starred_5a9efa8a: スターあり
+  starred_9523c316: スター付き
   starred_no_subject_click_to_unstar_3191d64: "\"(No Subject)\" に星が付いています。 クリックして星を消してください。"
   starred_no_subject_click_to_unstar_bff04bce: "\"(No Subject)\" に星が付いています。 クリックして星を消してください。"
   starred_subject_click_to_unstar_6aafcddc: "\"%{subject}\" に星が付いています。 クリックして星を消してください。"
@@ -22306,7 +22349,7 @@ ja:
   subaccount_settings_8549eff7: サブカウント設定
   subaccounts_efd02bd4: サブカウント
   subdomain_url_1e43b6f0: サブドメインURL
-  subject_114b2e98: 科目
+  subject_114b2e98: 件名
   subject_1bc03dea: 件名：
   subject_must_contain_fewer_than_255_characters_2e72cd02: 件名は255文字未満でなければなりません。
   subject_reply_to: "Re: %{subject}"
@@ -23151,6 +23194,7 @@ ja:
               より多くの質問タイプがあります。また、
               さらなる調整機能と適応機能も備えています。
   this_image_appears_as_a_background_watermark_to_yo_1c6b4497: "この画像はあなたのページの透かし拝啓として表示されます。使用可能な定式: png, svg, gif, jpeg"
+  this_image_is_currently_unavailable_25c68857: この画像は現在利用できません
   this_is_a_blueprint_course_5e7b47fe: これは青写真のコースです
   this_is_a_comma_separated_list_of_url_s_to_trust_t_a6611f4: "これは、信頼する URL のカンマ区切りリストです。このリストの URL を信頼すると、Canvas へのログインの際に CSRF トークンがパイパスされます。"
   this_is_a_concluded_course_so_only_concluded_enrol_e6e3a9d9: これは完了したコースなので、完了済みの登録のみ使用できます。
@@ -23259,6 +23303,7 @@ ja:
   this_will_allow_you_to_authenticate_canvas_for_pos_fdfca40: "これによって、Canvas が SIS に成績を投稿することを認証できます"
   this_will_apply_these_changes_to_your_entire_accou_22b86cde: これは、あなたのアカウント全体にこれらの変更を適用します。続行しますか？
   this_will_apply_this_theme_to_your_entire_account__4cfabbe5: これは、アカウント全体にこのテーマを適用します。続行しますか？
+  this_will_remove_the_mastery_level_from_your_maste_1f4130ea: これにより、達成スケールから達成度が削除されます。
   this_will_update_all_account_and_course_level_rubr_305e821a: これにより、アカウントレベルの習熟度スケールに関連付けられているがまだ評価されていない、すべてのアカウントおよびコースレベルのルーブリックが更新されます。
   this_will_update_all_account_and_course_level_rubr_3438121e: これにより、アカウントレベルの達成度スケールに関連付けられているがまだ評価されていない、すべてのアカウントおよびコースレベルのルーブリックが更新されます。
   this_will_update_all_rubrics_aligned_to_outcomes_w_59d8d04b: これにより、まだ評価されていないこのコース内の結果に合わせたすべてのルーブリックが更新されます。
@@ -24003,6 +24048,7 @@ ja:
   type_is_not_a_valid_image_type_try_jpg_png_or_gif_1c109633: "'%{type}'は有効な画像形式ではありません(jpg、 png、またはgifをお試しください)"
   type_of_change_1cb24a0e: 変更の種類
   type_of_item_8a37f69d: アイテムの種類
+  type_or_use_arrow_keys_to_navigate_options_7507d3d2: タイプまたは矢印キーを使用してオプションをナビゲートします。
   type_to_search_de63ad38: タイプして検索する
   type_to_search_use_arrow_keys_to_navigate_options_5d538c0: テイプして検索、矢印キーを使用してオプションを移動します。
   uh_oh_contact_your_friendly_catalog_developer_erro_861aaf3d: "うわー！フレンドリーなCatalog開発者に連絡してください。 エラーメッセージ: %{message}"
@@ -24605,6 +24651,7 @@ ja:
     google_docs_added: "Google ドキュメントへのアクセスが承認されました!"
     google_docs_fail: "Google ドキュメントの認証に失敗しました。もう一度、試してください"
     google_drive_added: "Google ドライブ アカウントが正常に追加されました。"
+    google_drive_authorization_failure: Googleドライブが現在のユーザーの認証に失敗しました！
     google_drive_fail: "Google ドライブの認証に失敗しました。もう一度やり直してください"
     grades: 
       average_grades: 
