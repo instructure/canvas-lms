@@ -825,4 +825,41 @@ describe ContentMigration do
       }.to change{ ErrorReport.count }.by(0)
     end
   end
+
+  describe "imported_migration_items_for_insert_type" do
+    it "does not explode if the import type isn't in the migration item hash" do
+      @cm.migration_settings[:insert_into_module_type] = "assignment"
+      output = @cm.imported_migration_items_for_insert_type
+      expect(output).to eq([])
+    end
+  end
+
+  describe "import_class_name" do
+    it "converts various forms of name to the proper AR class name" do
+      expect(ContentMigration.import_class_name('assignment')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('assignments')).to eq 'Assignment'
+      expect(ContentMigration.import_class_name('announcement')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('announcements')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
+      expect(ContentMigration.import_class_name('attachment')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('attachments')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('file')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('files')).to eq 'Attachment'
+      expect(ContentMigration.import_class_name('page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_page')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('wiki_pages')).to eq 'WikiPage'
+      expect(ContentMigration.import_class_name('quiz')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
+      expect(ContentMigration.import_class_name('module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_module')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('context_modules')).to eq 'ContextModule'
+      expect(ContentMigration.import_class_name('module_item')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('module_items')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tag')).to eq 'ContentTag'
+      expect(ContentMigration.import_class_name('content_tags')).to eq 'ContentTag'
+    end
+  end
 end

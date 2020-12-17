@@ -242,22 +242,12 @@ module Importers
       mod = course.context_modules.find_by_id(module_id)
       return unless mod
 
-      import_type = migration.migration_settings[:insert_into_module_type]
-      imported_items = if import_type.present?
-        migration.imported_migration_items_hash[import_class_name(import_type)].values
-      else
-        migration.imported_migration_items
-      end
+      imported_items = migration.imported_migration_items_for_insert_type
       return unless imported_items.any?
 
       start_pos = migration.migration_settings[:insert_into_module_position]
       start_pos = start_pos.to_i unless start_pos.nil? # 0 = start; nil = end
       mod.insert_items(imported_items, start_pos)
-    end
-
-    def self.import_class_name(import_type)
-      prefix = ContentMigration.asset_string_prefix(ContentMigration.collection_name(import_type.pluralize))
-      ActiveRecord::Base.convert_class_name(prefix)
     end
 
     def self.move_to_assignment_group(course, migration)
