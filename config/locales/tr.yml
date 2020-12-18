@@ -5683,6 +5683,7 @@ tr:
     sis_id_taken: "ÖBS ID \"%{sis_id}\" zaten kullanılıyor"
   course_section_7a988066: "Ders Bölümü"
   course_section_name_ea880ed1: "Ders Bölümü %{name}"
+  course_sections: "Ders Bölümleri"
   course_sections_add_edit_delete_c4f4ac19: "Ders Bölümleri - ekle / düzenle / sil"
   course_selection_245808bf: "Ders Seçimi"
   course_set_up_tutorial_6ab7c2d1: "Ders Oluşturma Yönergesi"
@@ -7554,6 +7555,10 @@ tr:
   enrollment_terms_8753ec11: "Kayıt Dönemleri"
   enrollment_type_699c944: "katılım tipi"
   enrollments_e250c9c3: Kayıtlar
+  enrollments_observers: Gözlemciler
+  enrollments_students: Öğrenciler
+  enrollments_tas: "Öğretim Yardımcıları"
+  enrollments_teachers: Öğretmenler
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "İsteğe bağlı bir renk kullanmak için bir hexcode girin."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Kullanıcının kök hesabı alan adını değiştireceğiniz \"{{ACCOUNT_DOMAIN}}\" i girin."
   enter_canvas_user_id_to_substitute_the_user_s_uniq_b2a75735: "Kullanıcının özel Canvas Kimliğini değiştireceğiniz \"{{CANVAS_USER_ID}}\" i girin."
@@ -17503,6 +17508,7 @@ tr:
     users: 
       user_search_label: "Kullanıcı Arama"
       users_matching_label: "Eşleşen Kullanıcılar"
+  site_admin_d0417171: "Site Yöneticisi"
   size_b30e1077: Boyut
   skip_to_content_22ad1d00: "İçeriğe Atla"
   skipped_file_filename_due_to_error_94f0194: "Hatadan dolayı %{filename} dosyası atlandı"
@@ -17656,6 +17662,7 @@ tr:
   student_assignment_outcome_map_title: "Öğrenci Yeterliliği"
   student_collaborations_create_b9e312c1: "Öğrencilerin İşbirliğine Yönelik Çalışması - oluştur"
   student_context_card_ad59967e: "Öğrenci Durum Kartı"
+  student_groups: "Öğrenci Grupları"
   student_groups_863201c1: "Öğrenci Grupları"
   student_groups_desc: |-
       Bu, bir hesapta yeni öğrenci grup sayfasını etkinleştirir. Yeni sayfa, daha dinamik grup hesabı oluşturma deneyimi sağlamak
@@ -19307,6 +19314,7 @@ tr:
   you_can_t_delete_a_root_account_5673c62d: "root_account silemezsiniz."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "İçinde dersler bulunan bir alt hesabı silemezsiniz."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Altında hesap bulunan alt hesapları silemezsiniz."
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "İzniniz olmadığı ya da birden fazla yerde kullanıldığı için bu yönergeyi düzenleyemezsiniz. Yapacağınız değişiklikler eski yönergeyi baz alan yeni bir yönerge oluşturacaktır. Devam etmek istiyor musunuz?"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Bu kullanıcının bilgilerinden bazılarını güncelleyebilirsiniz fakat isterlerse kendileri tekrar değiştirebilir."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Bu alt hesapta temaları düzenleyemezsiniz."
   you_currently_have_no_discussions_with_closed_comm_366a9dab: "Şu anda yorumlara kapalı bir tartışmanız yok"
