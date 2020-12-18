@@ -2570,7 +2570,7 @@ class Course < ActiveRecord::Base
                   visibilities.map{|s| s[:course_section_id]}, false)
     when :restricted
       user_ids = visibilities.map { |s| s[:associated_user_id] }.compact
-      scope.where(enrollments: { user_id: user_ids + [user.id] })
+      scope.where(enrollments: { user_id: (user_ids + [user&.id]).compact })
     else
       scope.none
     end

@@ -4579,6 +4579,11 @@ describe Course, "section_visibility" do
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
     end
 
+    it "is safely empty for a nil user" do
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, nil)
+      expect(visible_enrollments.count).to eq(0)
+    end
+
     it "should return student view students to account admins who are also observers for some reason" do
       @course.student_view_student
       @admin = account_admin_user
