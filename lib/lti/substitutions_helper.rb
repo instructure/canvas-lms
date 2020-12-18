@@ -214,10 +214,6 @@ module Lti
       previous_course_ids_and_context_ids.map(&:last).compact.join(',')
     end
 
-    def recursively_fetch_previous_lti_context_ids
-      recursively_fetch_previous_course_ids_and_context_ids.map(&:last).compact.join(',')
-    end
-
     def previous_course_ids
       previous_course_ids_and_context_ids.map(&:first).sort.join(',')
     end
@@ -248,6 +244,48 @@ module Lti
       e || @user.email
     end
 
+    def recursively_fetch_previous_lti_context_ids
+      return '' unless @context.is_a?(Course)
+
+      # now find all parents for locked folders
+      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
+      return '' unless last_migration_id
+
+      # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
+      # until a new copy is made to _this_ course
+      Rails.cache.fetch(["recursive_copied_course_lti_context_ids", @context.global_id, last_migration_id].cache_key) do
+        # Finds content migrations for this course and recursively, all content
+        # migrations for the source course of the migration -- that is, all
+        # content migrations that directly or indirectly provided content to
+        # this course. From there we get theunique list of courses, ordering by
+        # which has the migration with the latest timestamp.
+        results = Course.connection.select_rows(<<-SQL)
+          WITH RECURSIVE all_contexts AS (
+            SELECT context_id, source_course_id
+            FROM #{ContentMigration.quoted_table_name}
+            WHERE context_id=#{@context.id}
+            UNION
+            SELECT content_migrations.context_id, content_migrations.source_course_id
+            FROM #{ContentMigration.quoted_table_name}
+              INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
+          ),
+          results AS (
+            SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
+            FROM #{Course.quoted_table_name}
+            INNER JOIN #{ContentMigration.quoted_table_name} ct
+            ON ct.source_course_id = courses.id
+            AND ct.workflow_state = 'imported'
+            AND (ct.context_id IN (
+              SELECT x.context_id
+              FROM all_contexts x))
+            ORDER BY courses.lti_context_id, ct.finished_at DESC
+          )
+          SELECT lti_context_id FROM results ORDER BY finished_at DESC
+        SQL
+        results.map(&:last).compact.join(',')
+      end
+    end
+
     private
 
     def lti1?
@@ -259,43 +297,6 @@ module Lti
       @previous_ids ||= Course.where(
         "EXISTS (?)", ContentMigration.where(context_id: @context.id, workflow_state: :imported).where("content_migrations.source_course_id = courses.id")
       ).pluck(:id, :lti_context_id)
-    end
-
-    def recursively_fetch_previous_course_ids_and_context_ids
-      return [] unless @context.is_a?(Course)
-
-      # now find all parents for locked folders
-      last_migration_id = @context.content_migrations.where(workflow_state: :imported).order(id: :desc).limit(1).pluck(:id).first
-      return [] unless last_migration_id
-
-      # we can cache on the last migration because even if copies are done elsewhere they won't affect anything
-      # until a new copy is made to _this_ course
-      Rails.cache.fetch(["recursive_copied_course_lti_ids", @context.global_id, last_migration_id].cache_key) do
-        Course.connection.select_rows(<<-SQL)
-          WITH RECURSIVE all_contexts AS (
-            SELECT context_id, source_course_id
-            FROM #{ContentMigration.quoted_table_name}
-            WHERE context_id=#{@context.id}
-            UNION
-            SELECT content_migrations.context_id, content_migrations.source_course_id
-            FROM #{ContentMigration.quoted_table_name}
-              INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
-          ),
-          interesting_contexts AS (
-            SELECT DISTINCT context_id
-            FROM all_contexts
-          )
-          SELECT courses.id, ct.finished_at, courses.lti_context_id
-          FROM #{Course.quoted_table_name}
-          INNER JOIN #{ContentMigration.quoted_table_name} ct
-          ON ct.source_course_id = courses.id
-          AND ct.workflow_state = 'imported'
-          AND (ct.context_id IN (
-            SELECT x.context_id
-            FROM interesting_contexts x))
-          ORDER BY ct.finished_at DESC
-        SQL
-      end
     end
   end
 end
