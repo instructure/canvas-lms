@@ -122,10 +122,6 @@ end
 
 ### lifecycle callbacks
 
-Delayed::Pool.on_fork = ->{
-  Canvas.reconnect_redis
-}
-
 Delayed::Worker.lifecycle.around(:perform) do |worker, job, &block|
   Canvas::Reloader.reload! if Canvas::Reloader.pending_reload
   Canvas::Redis.clear_idle_connections
