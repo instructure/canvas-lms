@@ -129,7 +129,7 @@ const TinyMCEPayloadGenerators = {
           alt: tinyMCEContentItem.text
         })
       )
-    } else if (window.tinyMCE.activeEditor.selection.getContent()) {
+    } else if (window.tinyMCE.activeEditor?.selection.getContent()) {
       $link[0].innerHTML = linkText(tinyMCEContentItem)
     } else {
       // don't inject tool provided content into the page HTML

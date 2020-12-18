@@ -16,7 +16,8 @@
     ],
     "nohoist": [
       "canvas_quizzes/grunt*",
-      "canvas_quizzes/jasmine*"
+      "canvas_quizzes/jasmine*",
+      "**/tinymce","**/tinymce/**"
     ]
   },
   "dependencies": {
@@ -272,6 +273,7 @@
     "style-loader": "^0.23",
     "stylelint": "^10",
     "through2": "^3",
+    "tinymce": "^5",
     "waait": "^1",
     "webpack": "^4",
     "webpack-cleanup-plugin": "^0.5",

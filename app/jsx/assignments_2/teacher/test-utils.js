@@ -260,15 +260,6 @@ export function mockUser(overrides) {
 // values need to match the defaults for TeacherViewContext
 export const mockTeacherContext = () => ({...TeacherViewContextDefaults})
 
-// because jsdom doesn't define matchMedia
-window.matchMedia =
-  window.matchMedia ||
-  (() => ({
-    matches: false,
-    addListener: () => {},
-    removeListener: () => {}
-  }))
-
 export function itBehavesLikeADialog({
   // render may be async.
   render,

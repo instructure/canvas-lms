@@ -86,3 +86,12 @@ if (!('MutationObserver' in window)) {
     value: require('@sheerun/mutationobserver-shim')
   })
 }
+
+if (!('matchMedia' in window)) {
+  window.matchMedia = () => ({
+    matches: false,
+    addListener: () => {},
+    removeListener: () => {}
+  })
+  window.matchMedia._mocked = true
+}

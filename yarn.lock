@@ -6139,12 +6139,13 @@
   resolved "https://registry.yarnpkg.com/@testing-library/user-event/-/user-event-4.2.4.tgz#9029bdf35d7f0557954452916f22ba0e9f11eff9"
   integrity sha512-Hi74+nCCjTM+HFRmN1CASq3Y1DC8XZk/oF0Ov/sIRXS5izvXCXtjxJcpPNzyi7YL5jGjWuldzsQTiPPtYbudwg==
 
-"@tinymce/tinymce-react@^3.0.1":
-  version "3.3.2"
-  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-react/-/tinymce-react-3.3.2.tgz#044e21c54f123d0d85933e7e994a6ed20702297b"
-  integrity sha512-5STyLVPtkvYwKrd5srXC++vrhoOhC8cx525PGVGOWIYK2Oqe5ey6o5s31Abg79XPJsCxiWU4daHBL5eaMBBhEg==
+"@tinymce/tinymce-react@^3.8.4":
+  version "3.8.4"
+  resolved "https://registry.yarnpkg.com/@tinymce/tinymce-react/-/tinymce-react-3.8.4.tgz#c652f23735bf63812ce2077a06682fe335b24fee"
+  integrity sha512-wk9UTyuopeSs2UPxfMY2t4ZK4094aH7bfbHz+kAoHQ/lAQB01qojM9Khsg9dGwlMg8ZmUcvQdoiAOwYNUztKww==
   dependencies:
     prop-types "^15.6.2"
+    tinymce "^5.6.2"
 
 "@types/anymatch@*":
   version "1.3.1"
@@ -26176,10 +26177,10 @@ tinymce@^4.5.7:
   resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-4.9.2.tgz#c20ba7aa082125f16e0372fbc2f844c83236b75e"
   integrity sha512-ZRoTGG4GAsOI73QPSNkabO7nkoYw9H6cglRB44W2mMkxSiqxYi8WJlgkUphk0fDqo6ZD6r3E+NSP4UHxF2lySg==
 
-tinymce@^5:
-  version "5.3.1"
-  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.3.1.tgz#e7f32d276272db0bfe53971116c5cb074bd1b224"
-  integrity sha512-pIo0yb9oncUXjB+aA06v/hmUTbY7MU5K2qvpP0XPo3ng2sAFR4DnX1QzDKBi0nEomjNKwYs/82cyBXO1KA9HNw==
+tinymce@^5, tinymce@^5.6.2:
+  version "5.6.2"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.6.2.tgz#4c20c22e328c5d0baab204928dbc2b0ecbed18b4"
+  integrity sha512-z7zvM5seOPiW86/vqf08kStwW5Zs5U9oQfuqh2rTj4jEcT2QzxT0v72i2zw3W6rbTLldkAej6edFZphj5ee5zg==
 
 title-case@^2.1.0:
   version "2.1.1"
