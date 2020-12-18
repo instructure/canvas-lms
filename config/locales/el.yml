@@ -4300,6 +4300,7 @@ el:
   course_section: 
     sis_id_taken: "To SIS ID \"%{sis_id}\" χρησιμοποιείται ήδη"
   course_section_7a988066: "Τμήμα Μαθήματος"
+  course_sections: "Τομείς Μαθήματος"
   course_settings: 
     buttons: 
       add_section: "Προσθήκη Τομέα"
@@ -5662,6 +5663,10 @@ el:
       delete_term_with_courses: "Δεν μπορείτε να διαγράψετε μια περίοδο που περιέχει ενεργά μαθήματα"
   enrollment_term_7bfe840: "Περίοδος Εγγραφής"
   enrollments_e250c9c3: Εγγραφές
+  enrollments_observers: Παρατηρητές
+  enrollments_students: Μαθητές
+  enrollments_tas: "Βοηθοί Διδασκαλίας"
+  enrollments_teachers: Καθηγητές
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Εισάγετε έναν εξαψήφιο κωδικό/hex εδώ για να χρησιμοποιήσετε ένα προσαρμοσμένο χρώμα."
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "Εισαγάγετε «{{ACCOUNT_DOMAIN}}» για να υποκαταστήσετε τον τομέα λογαριασμού ρίζας του χρήστη"
   enter_or_find_an_external_tool_url_6aebbd0d: "Εισαγωγή ή εύρεση URL Εξωτερικού Εργαλείου"
@@ -13454,6 +13459,7 @@ el:
         logout: Αποσύνδεση
         stop_masquerading: "[Τερματισμός Μεταμφίεσης]"
       page_title: "To ίδρυμα αυτό έχει ανασταλεί"
+  site_admin_d0417171: "Διαχειριστής Ιστοτόπου"
   size_b30e1077: Μέγεθος
   skipped_file_filename_due_to_error_94f0194: "Παραλήφθηκε το αρχείο %{filename} λόγω σφάλματος"
   skipping_unknown_file_type_cd1086ee: "Παράλειψη άγνωστου τύπου αρχείου"
@@ -13578,6 +13584,7 @@ el:
   student_5da6bfd1: "Μαθητής "
   student_921b864d: σπουδαστής
   student_assignment_outcome_map_title: "Ικανότητες Σπουδαστή"
+  student_groups: "Ομάδες Μαθητών"
   student_groups_863201c1: "Ομάδες Μαθητών"
   student_id: "Αναγνωριστικό -ID- Σπουδαστή/ιας"
   student_interactions_report_7717b685: "Αναφορά Αλληλεπιδράσεων Σπουδαστή"
@@ -15011,6 +15018,7 @@ el:
   you_can_review_the_submission_details_by_clicking__9abc5515: "<mrk mid=\"371\" mtype=\"seg\">Μπορείτε να ελέγξετε τις λεπτομέρειες υποβολής κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"372\" mtype=\"seg\">%{link}.</mrk>"
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "<mrk mid=\"4917\" mtype=\"seg\">Μπορείτε να δείτε λεπτομέρειες για αυτή την ομάδα κάνοντας κλικ σε αυτόν τον σύνδεσμο:</mrk> <mrk mid=\"4918\" mtype=\"seg\">%{link}.</mrk>"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Δεν μπορείτε να διαγράψετε ένα υπολογαριασμό που περιέχει μαθήματα."
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "<mrk mid=\"862\" mtype=\"seg\">Δεν μπορείτε να επεξεργαστείτε αυτή τη ρουμπρίκα είτε επειδή δεν έχετε άδεια ή επειδή χρησιμοποιείται σε περισσότερα από ένα σημεία.</mrk> <mrk mid=\"863\" mtype=\"seg\">Τυχόν αλλαγές που θα πραγματοποιήσετε θα έχουν ως αποτέλεσμα μια νέα ρουμπρίκα βασισμένη στην παλιά ρουμπρίκα.</mrk> <mrk mid=\"864\" mtype=\"seg\">Θέλετε, παρόλα αυτά, να συνεχίσετε;</mrk>"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Μπορείτε να χρησιμοποιήσετε ένα μεμονωμένο 16x16, 32x32, 48x48 αρχείο τύπου ico."
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Δεν μπορείτε να τροποποιήσετε θέματα σε αυτό τον υπο-λογαρισμό"
   you_cannot_remove_this_enrollment_c87be1cb: "Δεν μπορείτε να αφαιρέσετε αυτή την εγγραφή."
