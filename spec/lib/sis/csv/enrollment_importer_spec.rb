@@ -623,6 +623,16 @@ describe SIS::CSV::EnrollmentImporter do
     )
   end
 
+  describe "#persist_errors" do
+    it "gracefully handles string errors" do
+      batch = Account.default.sis_batches.create!
+      csv = double(root_account: Account.default, batch: batch, :[] => nil)
+      importer = SIS::CSV::EnrollmentImporter.new(csv)
+      importer.persist_errors(csv, ['a string error message'], batch)
+      expect(batch.sis_batch_errors.count).to eq(1)
+    end
+  end
+
   it 'should only queue up one recache_grade_distribution job per course' do
     Course.create!(account: @account, sis_source_id: 'C001', workflow_state: 'available')
     user_with_managed_pseudonym(account: @account, sis_user_id: 'U001')
