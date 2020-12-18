@@ -5537,6 +5537,7 @@ he:
     sis_id_taken: "מזהה SIS \"%{sis_id}\" כבר נמצא בשימוש"
   course_section_7a988066: "הקבצת קורס"
   course_section_name_ea880ed1: "הקבצת הקורס %{name}"
+  course_sections: "הקבצות הקורס"
   course_selection_245808bf: "בחירת קורס"
   course_set_up_tutorial_6ab7c2d1: "מדריך התקנת קורס"
   course_set_up_tutorial_provides_tips_on_how_to_lev_3c098131: "מדריך בנית קורס מספק טיפים כיצד למנף את התכונות הזמינות בכל דף של קנבס. הדבר יעיל במיוחד אם אתם חדשים לקנבס או שפותחים קורס חדש בפעם הראשונה לאחר זמן רב."
@@ -7382,6 +7383,10 @@ he:
       not_unique: "מזהה מערכת בית ספרית \"%{sis_source_id}\" כבר בשימוש"
   enrollment_term_7bfe840: "תקופת הרשמה"
   enrollments_e250c9c3: הרשמות
+  enrollments_observers: "משקיפים "
+  enrollments_students: תלמידים
+  enrollments_tas: "עוזרי הוראה"
+  enrollments_teachers: מורים
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "יש להזין כאן hexcode כדי לקבל צבע בעצוב ייחודי."
   enter_a_what_if_score_668c91a3: "הקלדת ציון ל\"מה יקרה אם\""
   enter_account_domain_to_substitute_the_user_s_root_1b79eac2: "הקלד/י \"{{ACCOUNT_DOMAIN}}\" כדי להחליף את חשבון הבסיס של דומיין המשתמש"
@@ -17662,6 +17667,7 @@ he:
     users: 
       user_search_label: "חיפוש משתמשים"
       users_matching_label: "התאמת משתמשים"
+  site_admin_d0417171: "מנהל אתר"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "אתר מנהלי מערכת בלבד. משלוח אל 1 / %{denominator} משתמשים עם חשבונות פעילים בכל חודש."
   size_b30e1077: גודל
   skip_to_content_22ad1d00: "דילוג אל התוכן "
@@ -17852,6 +17858,7 @@ he:
   student_details_49901ceb: "פרטי תלמיד"
   student_extensions_d35a907: "תוספות התלמיד"
   student_grades_4cbc59a1: "הערכות תלמיד"
+  student_groups: "קבוצות תלמידים "
   student_groups_863201c1: "קבוצות תלמידים "
   student_groups_desc: |-
       הדבר מאפשר את דף קבוצת תלמידים החדש לחשבון. הדף החדש נבנה כדי לאפשר
@@ -19762,6 +19769,7 @@ he:
   you_can_review_the_submission_details_by_clicking__9abc5515: "ניתן לעיין בפרטי ההגשות בהקלקה על הקישור הזה: %{link}."
   you_can_see_details_for_this_group_by_clicking_thi_acaf07e5: "ניתן לעיין בפרטי הקבוצה הזו ע\"י הקלקה על הקישור: %{link}."
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "אין אפשרות לבטל חשבון משנה הכולל בתוכו קורסים"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "אינך יכול/ה לערוך רובריקה זו, בין אם אין לך הרשאות לבין אם היא נמצאת בשימוש ביותר ממקום אחד. כל שינוי שייעשה יתבטא ברובריקה חדשה המבוססת על הישונה. להמשיך בכל מקרה?"
   you_can_try_to_log_in_again_2b23ef0f: "ניתן לנסות *להתחבר שוב*"
   you_can_update_some_of_this_user_s_information_but_8e99a045: "ניתן לעדכן חלק מהמידע על המשתמש, אך הם יכולים לשנות זאת חזרה אם ירצו בכך."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "ניתן להשתמש בקובץ יחיד מסוג ICO בגודל  16x16, 32x32, 48x48."

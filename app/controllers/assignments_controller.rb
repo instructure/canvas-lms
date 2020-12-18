@@ -187,7 +187,7 @@ class AssignmentsController < ApplicationController
           eligible_categories = eligible_categories.where(id: @assignment.group_category) if @assignment.group_category.present?
           env[:group_categories] = group_categories_json(eligible_categories, @current_user, session, {include: ['groups']})
 
-          selected_group_id = @current_user.get_preference(:gradebook_settings, @context.global_id)&.dig('filter_rows_by', 'student_group_id')
+          selected_group_id = @current_user&.get_preference(:gradebook_settings, @context.global_id)&.dig('filter_rows_by', 'student_group_id')
           # If this is a group assignment and we had previously filtered by a
           # group that isn't part of this assignment's group set, behave as if
           # no group is selected.

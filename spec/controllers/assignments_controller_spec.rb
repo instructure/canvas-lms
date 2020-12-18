@@ -540,11 +540,22 @@ describe AssignmentsController do
       assert_status(404)
     end
 
-    it "doesn't fail on a public course with a nil user" do
-      course = course_factory(:active_all => true, :is_public => true)
-      assignment = assignment_model(:course => course, :submission_types => "online_url")
-      get 'show', params: {:course_id => course.id, :id => assignment.id}
-      assert_status(200)
+    context "with public course" do
+      let(:course){ course_factory(:active_all => true, :is_public => true) }
+      let(:assignment){ assignment_model(:course => course, :submission_types => "online_url") }
+
+      it "doesn't fail on a public course with a nil user" do
+        get 'show', params: {:course_id => course.id, :id => assignment.id}
+        assert_status(200)
+      end
+
+      it "doesn't fail on a public course with a nil user EVEN IF filter_speed_grader_by_student_group is in play" do
+        course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        course.update!(filter_speed_grader_by_student_group: true)
+        expect(course.reload.filter_speed_grader_by_student_group).to be_truthy
+        get 'show', params: {:course_id => course.id, :id => assignment.id}
+        assert_status(200)
+      end
     end
 
     it "should return unauthorized if not enrolled" do

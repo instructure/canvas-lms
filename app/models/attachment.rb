@@ -1702,7 +1702,11 @@ class Attachment < ActiveRecord::Base
       update_attribute(:workflow_state, 'processing')
     end
   rescue => e
-    warnable_errors = [Canvadocs::BadGateway, Canvadoc::UploadTimeout]
+    warnable_errors = [
+      Canvadocs::BadGateway,
+      Canvadoc::UploadTimeout,
+      Canvadocs::ServerError
+    ]
     error_level = warnable_errors.any?{|kls| e.is_a?(kls) } ? :warn : :error
     update_attribute(:workflow_state, 'errored')
     error_data = {type: :canvadocs, attachment_id: id, annotatable: opts[:wants_annotation]}
