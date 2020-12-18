@@ -174,8 +174,6 @@ Rails.application.config.after_initialize do
     end
   end
 
-  Switchman.config[:on_fork_proc] = -> { Canvas.reconnect_redis }
-
   Object.send(:remove_const, :Shard) if defined?(::Shard)
   Object.send(:remove_const, :DatabaseServer) if defined?(::DatabaseServer)
   ::Shard = Switchman::Shard
