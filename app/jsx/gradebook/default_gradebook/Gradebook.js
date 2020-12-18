@@ -2881,7 +2881,9 @@ class Gradebook {
     if (!(this.contentLoadStates.submissionsLoaded && this.assignmentsLoadedForCurrentView())) {
       return []
     }
-    return Object.values(this.assignments).filter(assignment => {
+
+    const assignmentsToConsider = this.filterAssignments(Object.values(this.assignments))
+    return assignmentsToConsider.filter(assignment => {
       const submission = this.getSubmission(studentId, assignment.id)
       // Ignore anonymous assignments when deciding whether to show the
       // "hidden" icon, as including them could reveal which students have
