@@ -4552,6 +4552,7 @@ hy:
   course_section: 
     sis_id_taken: " %{sis_id} SIS ID-ն արդեն իսկ գործածվում է"
   course_section_7a988066: "Դասընթացի բաժին"
+  course_sections: "Դասընթացի բաժիններ"
   course_settings: 
     buttons: 
       add_section: "Ավելացնել բաժին"
@@ -6121,6 +6122,10 @@ hy:
       not_unique: "\"%{sis_source_id}\" SIS ID-ն արդեն գործածվում է"
   enrollment_term_7bfe840: "Գրանցման պայմաններ"
   enrollments_e250c9c3: Գրանցումներ
+  enrollments_observers: Դիտորդներ
+  enrollments_students: Ունկնդիրներ
+  enrollments_tas: "Դասավանդողների օգնականներ"
+  enrollments_teachers: Դասավանդողներ
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Մուտքագրել hexcode լրացուցիչ գույն օգտագործելու համար"
   enter_your_question_and_multiple_answers_31370054: "Մուտքագրեք Ձեր հարցը եւ պատասխանների տարբերակները:"
   enter_your_question_text_4729b886: "Մուտքագրեք Ձեր հարցը"
@@ -15143,6 +15148,7 @@ hy:
     users: 
       user_search_label: "Օգտատիրոջ որոնում"
       users_matching_label: "Օգտատերերի համապատասխանեցում"
+  site_admin_d0417171: "Կայքի ադմինիստրատոր"
   size_b30e1077: Չափ
   skip_to_content_22ad1d00: "Անցնել բովանդակությանը"
   skipped_file_filename_due_to_error_94f0194: "բաց է թողնված ֆայլը %{filename} սխալի պատճառով"
@@ -15284,6 +15290,7 @@ hy:
   student_5da6bfd1: Ունկնդիր
   student_921b864d: ունկնդիր
   student_assignment_outcome_map_title: "Ունկնդրի իրավասությունները"
+  student_groups: "Ունկնդիրների խմբեր"
   student_groups_863201c1: "Ունկնդիրների խմբեր"
   student_groups_desc: |-
       Սա թույլ  է տալիս հաշվի համար բացել նոր ուսանողական խմբի էջ: Նոր էջը կառուցված է խմբի  գրանցման ավելի դինամիկ
@@ -16818,6 +16825,7 @@ hy:
   you_can_see_which_groups_you_re_a_part_of_for_this_6efda22c: "Այս հղման միջոցով դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"
   you_can_see_which_groups_you_re_a_part_of_for_this_827a3706: "Այս հղման միջոցով Դուք կարող եք տեսնել, թե այս դասընթացի շրջանակներում ինչ խմբերում եք դուք ընդգրկվել. %{link}"
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Դուք չեք կարող ջնջել ենթահաշիվ, որը դասընթացներ ունի իր մեջ:"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Դուք չեք կարող խմբագրել այս ռուբրիկը, որովհետև  թույլտվություն չունեք, կամ այն օգտագործվում է մեկից ավելի տեղերում: Ձեր կատարած ցանկացած փոփոխություն կհանգեցնի հին ռուբրիկի վրա հիմնված նոր ռուբրիկի: Ցանկանո՞ւմ եք շարունակել: "
   you_can_try_to_log_in_again_2b23ef0f: "Դուք կարող եք փորձել *կրկին մուտք գործել:*"
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Դուք կարող եք օգտագործել 16x16, 32x32, 48x48 ico ֆայլերը"
   you_cannot_edit_themes_on_this_subaccount_63ceaaf3: "Դուք չեք կարող խմբագրել թեմաներն այս ենթահաշվում:"
