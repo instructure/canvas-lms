@@ -594,4 +594,10 @@ describe CourseSection, "moving to new course" do
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq false
     end
   end
+
+  it "delegates account to course" do
+    course = course_model(account_id: Account.default)
+    section = course.course_sections.create!
+    expect(section.account).to eq(Account.default)
+  end
 end
