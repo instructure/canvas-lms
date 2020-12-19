@@ -15,7 +15,15 @@
 /.yardoc/
 /.ruby-version
 /app/views/info/styleguide.html.erb
-/config/*.yml
+
+/config/security.yml
+/config/outgoing_mail.yml
+/config/external_migration.yml
+/config/delayed_jobs.yml
+/config/dynamic_settings.yml
+/config/database.yml
+/config/domain.yml
+
 /config/environments/*-local.rb
 /config/locales/generated/
 /config/RAILS6_0
