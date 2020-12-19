@@ -75,7 +75,7 @@ class NotificationFailureProcessor
   def process_failure_summary(summary)
     global_id = summary['global_id']
     error_message = summary['error']
-    is_disabled_endpoint = error_message.include? "EndpointDisabled"
+    is_disabled_endpoint = error_message&.include? "EndpointDisabled"
     error_context = summary['error_context']
 
     message_id, timestamp = Message.parse_notification_service_id(global_id)
