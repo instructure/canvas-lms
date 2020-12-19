@@ -1038,7 +1038,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def assignment_quizzes_json(serializer_options)
-    old_quizzes = scoped_quizzes.select{ |q| q.quiz_type == QUIZ_TYPE_ASSIGNMENT }
+    old_quizzes = scoped_quizzes_index.select{ |q| q.quiz_type == QUIZ_TYPE_ASSIGNMENT }
     unless @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       return quizzes_json(old_quizzes, *serializer_options)
     end
