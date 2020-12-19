@@ -581,7 +581,8 @@ class ContextModulesController < ApplicationController
     if authorized_action(@module, @current_user, :update)
       @tag = @module.add_item(params[:item])
       unless @tag&.valid?
-        return render :json => @tag.errors, :status => :bad_request
+        body = @tag.nil? ? { error: "Could not find item to tag" } : @tag.errors
+        return render :json => body, :status => :bad_request
       end
       json = @tag.as_json
       json['content_tag'].merge!(
