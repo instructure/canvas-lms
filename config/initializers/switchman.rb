@@ -83,12 +83,18 @@ Rails.application.config.after_initialize do
 
     delegate :in_current_region?, to: :database_server
 
+    class << self
+      def non_existent_database_servers
+        @non_existent_database_servers ||= Shard.distinct.pluck(:database_server_id).compact - DatabaseServer.all.map(&:id)
+      end
+    end
+
     scope :in_region, ->(region) do
       next in_current_region if region.nil?
 
       dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
       db_count_in_this_region = dbs_by_region[region]&.length.to_i + dbs_by_region[nil]&.length.to_i
-      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region
+      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region + non_existent_database_servers.length
 
       dbs_in_this_region = dbs_by_region[region]&.map(&:id) || []
       dbs_in_this_region += dbs_by_region[nil]&.map(&:id) || [] if Shard.default.database_server.in_region?(region)
@@ -100,7 +106,7 @@ Rails.application.config.after_initialize do
           where(database_server_id: dbs_in_this_region)
         end
       else
-        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region
+        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region + non_existent_database_servers
         if dbs_in_this_region.include?(Shard.default.database_server.id)
           where("database_server_id NOT IN (?) OR database_server_id IS NULL", dbs_not_in_this_region)
         else
