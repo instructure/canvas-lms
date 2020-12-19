@@ -319,8 +319,8 @@ module ApplicationHelper
     possibly_customized_favicon = brand_variable('ic-brand-favicon')
     default_favicon = BrandableCSS.brand_variable_value('ic-brand-favicon')
     if possibly_customized_favicon == default_favicon
-      return "favicon-green.ico" if Rails.env.development?
-      return "favicon-yellow.ico" if Rails.env.test?
+      return "NterOne_Globe_and_Stripes.png" if Rails.env.development?
+      return "NterOne_Globe_and_Stripes.png" if Rails.env.test?
     end
     possibly_customized_favicon
   end

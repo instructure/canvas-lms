@@ -107,12 +107,12 @@
     "variable_name": "ic-brand-favicon",
     "type": "image",
     "accept": "image/vnd.microsoft.icon,image/x-icon,image/png,image/gif",
-    "default": "/images/favicon.ico"
+    "default": "/images/NterOne_Globe_and_Stripes.png"
   },{
     "variable_name": "ic-brand-apple-touch-icon",
     "type": "image",
     "accept": "image/png",
-    "default": "/images/apple-touch-icon.png"
+    "default": "/images/NterOne_Globe_and_Stripes.png"
   },{
     "variable_name": "ic-brand-msapplication-tile-color",
     "type": "color",
