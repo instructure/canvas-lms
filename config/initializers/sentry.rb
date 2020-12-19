@@ -46,6 +46,7 @@ if settings.present?
       ActionController::InvalidAuthenticityToken
       Folio::InvalidPage
       Turnitin::Errors::SubmissionNotScoredError
+      Rack::QueryParser::InvalidParameterError
     }
   end
 
