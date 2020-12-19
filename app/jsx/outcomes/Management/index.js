@@ -15,6 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import {PresentationContent} from '@instructure/ui-a11y'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
@@ -30,7 +31,13 @@ import React, {useEffect, useState} from 'react'
 import {useApolloClient} from 'react-apollo'
 import SVGWrapper from '../../shared/SVGWrapper'
 import {CHILD_GROUPS_QUERY} from './api'
-import OutcomeGroupHeader from './OutcomeGroupHeader'
+import ManageOutcomesView from './ManageOutcomesView'
+import ManageOutcomesFooter from './ManageOutcomesFooter'
+import useSearch from '../../shared/hooks/useSearch'
+
+// Mocked data for ManageOutcomesView QA
+// Remove after data is retrieved via GraphQL
+import {outcomeGroup} from './__tests__/mocks'
 
 const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
   return I18n.t('%{groups} Groups | %{outcomes} Outcomes', {
@@ -98,6 +105,17 @@ const NoOutcomesBillboard = ({contextType}) => {
 const ROOT_ID = 0
 
 const OutcomeManagementPanel = ({contextType, contextId}) => {
+  const [selectedOutcomes, setSelectedOutcomes] = useState({})
+  const selected = Object.keys(selectedOutcomes).length
+  const onSelectOutcomesHandler = id =>
+    setSelectedOutcomes(prevState => {
+      const updatedState = {...prevState}
+      prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
+      return updatedState
+    })
+  const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
+  const noop = () => {}
+
   const isCourse = contextType === 'Course'
   const [initialLoading, setInitialLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -199,63 +217,80 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
       {!hasOutcomes ? (
         <NoOutcomesBillboard contextType={contextType} />
       ) : (
-        <Flex>
-          <Flex.Item width="33%" display="inline-block" position="relative" height="50vh" as="div">
-            <View padding="small none none x-small">
-              <Text size="large" weight="light" fontStyle="normal">
-                {I18n.t('Outcome Groups')}
-              </Text>
-              <div>
-                <TreeBrowser
-                  margin="small 0 0"
-                  collections={collections}
-                  items={{}}
-                  onCollectionToggle={onCollectionToggle}
-                  collectionIcon={() => (
-                    <span style={{display: 'inline-block', marginRight: '0.8em'}}>
-                      <IconArrowOpenEndLine size="x-small" />
-                    </span>
-                  )}
-                  collectionIconExpanded={() => (
-                    <span style={{display: 'inline-block', marginRight: '0.8em'}}>
-                      <IconArrowOpenDownLine size="x-small" />
-                    </span>
-                  )}
-                  rootId={ROOT_ID}
-                  showRootCollection={false}
-                />
-              </div>
-            </View>
-          </Flex.Item>
-          <Flex.Item
-            width="1%"
-            display="inline-block"
-            position="relative"
-            padding="small none large none"
-            margin="small none none none"
-            borderWidth="none small none none"
-            height="50vh"
-            as="div"
-          />
-          <Flex.Item width="66%" display="inline-block" position="relative" height="50vh" as="div">
-            <View padding="small none none x-small">
-              {/* space for outcome group display component */}
-              {/* OutcomeGroupHeader for QA purposes
-               * Remove component after integration
-               * with outcome group display component
-               */}
-              <View as="div" padding="0 medium">
-                <OutcomeGroupHeader
-                  title="Grade.2.Math.3A.Elementary.5B.Calculus.1C"
-                  description={'<p>This is a <strong><em>description</em></strong>. And because it’s so <strong>long</strong>, it will run out of space and hence be truncated. </p>'.repeat(
-                    3
-                  )}
-                  onMenuHandler={() => {}}
+        <>
+          <Flex>
+            <Flex.Item
+              width="33%"
+              display="inline-block"
+              position="relative"
+              height="60vh"
+              as="div"
+            >
+              <View as="div" padding="small none none x-small">
+                <Text size="large" weight="light" fontStyle="normal">
+                  {I18n.t('Outcome Groups')}
+                </Text>
+                <div>
+                  <TreeBrowser
+                    margin="small 0 0"
+                    collections={collections}
+                    items={{}}
+                    onCollectionToggle={onCollectionToggle}
+                    collectionIcon={() => (
+                      <span style={{display: 'inline-block', marginRight: '0.8em'}}>
+                        <IconArrowOpenEndLine size="x-small" />
+                      </span>
+                    )}
+                    collectionIconExpanded={() => (
+                      <span style={{display: 'inline-block', marginRight: '0.8em'}}>
+                        <IconArrowOpenDownLine size="x-small" />
+                      </span>
+                    )}
+                    rootId={ROOT_ID}
+                    showRootCollection={false}
+                  />
+                </div>
+              </View>
+            </Flex.Item>
+            <Flex.Item
+              width="1%"
+              display="inline-block"
+              position="relative"
+              padding="small none large none"
+              margin="small none none none"
+              borderWidth="none small none none"
+              height="60vh"
+              as="div"
+            />
+            <Flex.Item
+              as="div"
+              width="66%"
+              display="inline-block"
+              position="relative"
+              height="60vh"
+              overflowY="visible"
+              overflowX="auto"
+            >
+              <View as="div" padding="none none none x-small">
+                {/* space for outcome group display component */}
+                <ManageOutcomesView
+                  outcomeGroup={outcomeGroup}
+                  selectedOutcomes={selectedOutcomes}
+                  searchString={searchString}
+                  onSelectOutcomesHandler={onSelectOutcomesHandler}
+                  onOutcomeGroupMenuHandler={noop}
+                  onOutcomeMenuHandler={noop}
+                  onSearchChangeHandler={onSearchChangeHandler}
+                  onSearchClearHandler={onSearchClearHandler}
                 />
               </View>
-            </View>
-          </Flex.Item>
-        </Flex>
+            </Flex.Item>
+          </Flex>
+          <hr />
+          {Object.keys(outcomeGroup.children).length > 0 && (
+            <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
+          )}
+        </>
       )}
     </div>
   )
