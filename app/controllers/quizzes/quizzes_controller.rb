@@ -69,14 +69,14 @@ class Quizzes::QuizzesController < ApplicationController
       quiz_options = Rails.cache.fetch(
         [
           'quiz_user_permissions', @context.id, @current_user,
-          scoped_quizzes.map(&:id), # invalidate on add/delete of quizzes
-          scoped_quizzes.map(&:updated_at).sort.last # invalidate on modifications
+          scoped_quizzes_index.map(&:id), # invalidate on add/delete of quizzes
+          scoped_quizzes_index.map(&:updated_at).sort.last # invalidate on modifications
         ].cache_key
       ) do
         if can_manage
-          Quizzes::Quiz.preload_can_unpublish(scoped_quizzes)
+          Quizzes::Quiz.preload_can_unpublish(scoped_quizzes_index)
         end
-        scoped_quizzes.each_with_object({}) do |quiz, quiz_user_permissions|
+        scoped_quizzes_index.each_with_object({}) do |quiz, quiz_user_permissions|
           quiz_user_permissions[quiz.id] = {
             can_update: can_manage,
             can_unpublish: can_manage && quiz.can_unpublish?
@@ -84,8 +84,8 @@ class Quizzes::QuizzesController < ApplicationController
         end
       end
 
-      practice_quizzes   = scoped_quizzes.select{ |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
-      surveys            = scoped_quizzes.select{ |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
+      practice_quizzes   = scoped_quizzes_index.select{ |q| q.quiz_type == QUIZ_TYPE_PRACTICE }
+      surveys            = scoped_quizzes_index.select{ |q| QUIZ_TYPE_SURVEYS.include?(q.quiz_type) }
       serializer_options = [@context, @current_user, session, {
         permissions: quiz_options,
         skip_date_overrides: true,
@@ -1038,7 +1038,7 @@ class Quizzes::QuizzesController < ApplicationController
   end
 
   def assignment_quizzes_json(serializer_options)
-    old_quizzes = scoped_quizzes.select{ |q| q.quiz_type == QUIZ_TYPE_ASSIGNMENT }
+    old_quizzes = scoped_quizzes_index.select{ |q| q.quiz_type == QUIZ_TYPE_ASSIGNMENT }
     unless @context.root_account.feature_enabled?(:newquizzes_on_quiz_page)
       return quizzes_json(old_quizzes, *serializer_options)
     end
@@ -1079,6 +1079,19 @@ class Quizzes::QuizzesController < ApplicationController
 
   def hide_quiz?
     !@submission.posted?
+  end
+
+  def scoped_quizzes_index
+    return @_quizzes_index if @_quizzes_index
+    scope = @context.quizzes.active.preload(:assignment).select(*(Quizzes::Quiz.columns.map(&:name) - ["quiz_data"]))
+
+    # students only get to see published quizzes, and they will fetch the
+    # overrides later using the API:
+    scope = scope.available unless @context.grants_right?(@current_user, session, :read_as_admin)
+
+    scope = DifferentiableAssignment.scope_filter(scope, @current_user, @context)
+
+    @_quizzes_index = sort_quizzes(scope)
   end
 
   def scoped_quizzes
