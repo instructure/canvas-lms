@@ -303,7 +303,7 @@ class Notification < ActiveRecord::Base
 
   # Return a hash with information for a related user option if one exists.
   def related_user_setting(user, root_account)
-    if self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
+    if user.present? && self.category == 'Grading' && root_account.settings[:allow_sending_scores_in_emails] != false
       {
         name: :send_scores_in_emails,
         value: user.preferences[:send_scores_in_emails],
