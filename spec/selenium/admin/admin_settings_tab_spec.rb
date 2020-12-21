@@ -585,13 +585,14 @@ describe "admin settings tab" do
     f("#tab-features-link").click
     wait_for_ajaximations
 
+    features_text = f("#tab-features").text
     Feature.applicable_features(Account.site_admin).each do |feature|
       next if feature.visible_on && !feature.visible_on.call(Account.site_admin)
       # We don't want flags that are enabled in code to appear in the UI
       if feature.enabled?
-        expect(f(".feature")).to_not contain_jqcss(".#{feature.feature}")
+        expect(features_text).not_to include(feature.display_name.call)
       else
-        expect(f(".feature.#{feature.feature}")).to be_displayed
+        expect(features_text).to include(feature.display_name.call)
       end
     end
   end

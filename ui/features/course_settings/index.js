@@ -20,7 +20,6 @@ import $ from 'jquery'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import NavigationView from './backbone/views/NavigationView'
-import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
 import CourseColorSelector from './react/components/CourseColorSelector'
 import CourseImageSelector from './react/components/CourseImageSelector'
 import BlueprintLockOptions from './react/components/BlueprintLockOptions'
@@ -49,12 +48,7 @@ if (blueprint) {
 const navView = new NavigationView({el: $('#tab-navigation')})
 
 if (document.getElementById('tab-features')) {
-  if (window.ENV.NEW_FEATURES_UI) {
-    ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
-  } else {
-    const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
-    featureFlagView.collection.fetchAll()
-  }
+  ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
 }
 
 $(() => navView.render())

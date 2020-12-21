@@ -32,20 +32,6 @@ describe "Tutorials" do
       user_session(@teacher)
       get "/profile/settings"
     end
-
-    it "the course setup tutorial checkbox is uncheckable", priority: "1", test_id: 3165147 do
-      element = f('#ff_toggle_new_user_tutorial_on_off')
-      element.find_element(:xpath, "../../label").click
-      expect(element[:checked]).to eq nil
-    end
-
-    it "the course setup tutorial checkbox is checkable", priority: "1", test_id: 3165148 do
-      element = f('#ff_toggle_new_user_tutorial_on_off')
-      button = element.find_element(:xpath, "../../label")
-      button.click # Disable the button to check that it enables properly
-      button.click
-      expect(element[:checked]).to eq "true"
-    end
   end
 
   context "In Course Pages" do
@@ -181,8 +167,6 @@ describe "Tutorials" do
         fj("button:contains('Okay')").click
       end
       expect(driver).not_to contain_css(".NewUserTutorialTray")
-      get "/profile/settings"
-      expect(f('#ff_toggle_new_user_tutorial_on_off')).not_to contain_css('[checked]')
     end
 
     it "the 'x' button closes the End Course Set-up Tutorial modal", priority: "1", test_id: 3165170 do
@@ -199,41 +183,6 @@ describe "Tutorials" do
       fj("span button:contains('Cancel')").click
       expect(f('.NewUserTutorialTray')).to be_displayed
       expect(driver).not_to contain_css("End Course Set-up Tutorial")
-    end
-
-    it "the New User Tutorial description toggle button toggles the description", priority: "1", test_id: 3189023 do
-      get "/profile/settings"
-      feature_container = f("div[class*=new_user_tutorial]")
-      description_container = f("div[id*=new_user_tutorial]")
-      expect(description_container).not_to be_displayed
-      description_toggle_button = f("span[class=element_toggler]", feature_container)
-      description_toggle_button.click
-
-      expect(description_container).to be_displayed
-      expect(description_container).to include_text("Course set-up tutorial provides tips on how to")
-      expect(description_container).to include_text("setting up a new course for the first time in a long time")
-
-      description_toggle_button.click
-      expect(description_container).not_to be_displayed
-    end
-  end
-
-  context "as an admin" do
-    before :once do
-      course_with_teacher
-      account_admin_user
-    end
-
-    before :each do
-      user_session(@admin)
-    end
-
-    it "the tutorial feature flag can be enabled", priority: "1", test_id: 3165145 do
-      get "/accounts/#{@course.account_id}/settings"
-      f("li[aria-labelledby='tab-features-link']").click
-      flag_container = f("div[class*=new_user_tutorial]")
-      f('label', flag_container).click
-      expect((f'input', flag_container)[:checked]).to eq "true"
     end
   end
 end

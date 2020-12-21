@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import I18n from 'i18n!account_settings_jsx_bundle'
-import FeatureFlagAdminView from '@canvas/feature-flag-admin-view'
 import CustomHelpLinkSettings from './react/custom_help_link_settings/CustomHelpLinkSettings'
 import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-view'
@@ -29,12 +28,7 @@ import FeatureFlags from '@canvas/feature-flags'
 import ready from '@instructure/ready'
 
 ready(() => {
-  if (window.ENV.NEW_FEATURES_UI) {
-    ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
-  } else {
-    const featureFlags = new FeatureFlagAdminView({el: '#tab-features'})
-    featureFlags.collection.fetchAll()
-  }
+  ReactDOM.render(<FeatureFlags />, document.getElementById('tab-features'))
 
   if (document.getElementById('custom_help_link_settings')) {
     ReactDOM.render(
