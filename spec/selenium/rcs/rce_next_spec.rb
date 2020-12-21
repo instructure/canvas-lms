@@ -1111,7 +1111,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(
           driver.switch_to.active_element
-        ) # put the cursor in the table
+        )
       end
     end
 

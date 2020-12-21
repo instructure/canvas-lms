@@ -76,6 +76,57 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       click_insert_menu_button
     end
 
+    context 'links' do
+      it 'menu should include external and course links' do
+        rce_wysiwyg_state_setup(@course)
+
+        click_links_toolbar_menu_button
+        # it's the links_toolbar_button that owns the popup menu, not the chevron
+        # use it to find the menu, then assert we have the right number of menu items
+        expect(ff("##{links_toolbar_button.attribute('aria-owns')} [role='menuitemcheckbox']").length).to eq(2)
+        expect(external_links).to be_displayed
+        expect(course_links).to be_displayed
+      end
+
+      it 'menu should include Remove Link when a link is selected' do
+        rce_wysiwyg_state_setup(@course, 'this is <div id="one_link"><a>a link</a></div> <a>another link</a>.', html: true)
+        select_in_tiny(f("textarea.body"), '#one_link')
+        click_links_toolbar_menu_button
+        expect(ff("##{links_toolbar_button.attribute('aria-owns')} [role='menuitemcheckbox']").length).to eq(3)
+        expect(remove_link).to be_displayed
+
+        click_remove_link
+        driver.switch_to.frame('wiki_page_body_ifr')
+        link_count = count_elems_by_tagname('a')
+        expect(link_count).to eq(1)
+      end
+
+      it 'menu should include Remove Links when multiple links are selected' do
+        rce_wysiwyg_state_setup(@course, 'this is <a>a link</a> and <a>another link</a>.', html: true)
+        select_all_wiki
+        click_links_toolbar_menu_button
+        expect(ff("##{links_toolbar_button.attribute('aria-owns')} [role='menuitemcheckbox']").length).to eq(3)
+        expect(remove_links).to be_displayed
+
+        click_remove_links
+        driver.switch_to.frame('wiki_page_body_ifr')
+        link_count = count_elems_by_tagname('a')
+        expect(link_count).to eq(0)
+      end
+
+      it 'should show links popup toolbar' do
+        skip "routinely fails flakey spec catcher 1/10 times with 'no such window', but passes flakey spec catcher locally"
+        rce_wysiwyg_state_setup(@course, 'this is <a href="http://example.com">a link</a>.', html: true)
+
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('a').click
+
+        driver.switch_to.default_content
+        expect(fj('.tox-pop__dialog button:contains("Link Options")')).to be_displayed
+        expect(fj('.tox-pop__dialog button:contains("Remove Link")')).to be_displayed
+      end
+    end
+
     context 'list types' do
       it 'should add bullet lists' do
         rce_wysiwyg_state_setup(@course)

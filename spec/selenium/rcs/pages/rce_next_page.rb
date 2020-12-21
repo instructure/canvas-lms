@@ -157,6 +157,14 @@ module RCENextPage
     f('[role^="menuitem"][title="External Links"]')
   end
 
+  def remove_link
+    f('[role^="menuitem"][title="Remove Link"]')
+  end
+
+  def remove_links
+    f('[role^="menuitem"][title="Remove Links"]')
+  end
+
   def course_links_tray
     f('[role="dialog"][aria-label="Course Links"]')
   end
@@ -697,6 +705,14 @@ module RCENextPage
     external_links.click
   end
 
+  def click_remove_link
+    remove_link.click
+  end
+
+  def click_remove_links
+    remove_links.click
+  end
+
   def click_images_toolbar_button
     images_toolbar_button.click
   end
@@ -925,6 +941,13 @@ module RCENextPage
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
+  end
+
+  def count_elems_by_tagname(tagname)
+    # if I use ff('a').length, it takes much longer to timeout before finally
+    # throwing the Selenium::WebDriver::Error::NoSuchElementError
+    # so ignore Gergich's whining.
+    driver.execute_script("return document.querySelectorAll('#{tagname}').length")
   end
 
   def create_external_link(text, href)
