@@ -60,11 +60,12 @@ After you have [installed the dependencies](getting_docker.md). You'll need to c
 over the required configuration files.
 
 The `docker-compose/config` directory has some config files already set up to use
-the linked containers supplied by config. You can just copy them to
+the linked containers supplied by config. Only copy yamls, not the contents of new-jenkins folder. 
+You can just copy them to
 `config/`:
 
 ```
-$ cp docker-compose/config/* config/
+$ cp docker-compose/config/*.yml config/
 ```
 
 Now you're ready to build all of the containers. This will take a while as a lot is going on here.
@@ -74,20 +75,22 @@ Now you're ready to build all of the containers. This will take a while as a lot
 - Assets are compiled
 
 ```bash
-docker-compose run --rm web bundle install
-docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:compile_assets
+docker-compose build
+docker-compose run --rm web ./script/install_assets.sh
+docker-compose run --rm web bundle exec rake db:create db:initial_setup
+docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
 ```bash
 docker-compose up
-open http://web.canvaslms.docker
+open http://canvas.docker/
 ```
 
 ## Normal Usage
 
 Normally you can just start everything with `docker-compose up`, and
-access Canvas at http://web.canvaslms.docker/.
+access Canvas at http://canvas.docker/
 
 After pulling new code, you'll want to update all your local gems, rebuild your
 docker images, pull plugin code, run migrations, and recompile assets. This can
@@ -95,13 +98,6 @@ all be done with one command:
 
 ```
 ./script/docker_dev_update.sh
-```
-
-Note that this command will pull `master` and all plugin code by default. If you
-want to update without switching from your local `HEAD`, run:
-
-```
-./script/docker_dev_update.sh -n code
 ```
 
 Changes you're making are not showing up? See the Caveats section below.
