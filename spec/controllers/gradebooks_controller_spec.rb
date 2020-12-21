@@ -2916,6 +2916,7 @@ describe GradebooksController do
     before(:each) do
       user_session(@teacher)
 
+      Account.site_admin.enable_feature!(:import_override_scores_in_gradebook)
       @course.enable_feature!(:final_grades_override)
       @course.allow_final_grade_override = true
       @course.save!
@@ -2937,6 +2938,12 @@ describe GradebooksController do
       @course.allow_final_grade_override = false
       @course.save!
 
+      put :update_final_grade_overrides, params: update_params, format: :json
+      assert_unauthorized
+    end
+
+    it "returns unauthorized when the importing override scores is not enabled" do
+      Account.site_admin.disable_feature!(:import_override_scores_in_gradebook)
       put :update_final_grade_overrides, params: update_params, format: :json
       assert_unauthorized
     end
