@@ -1044,7 +1044,8 @@ class GradebooksController < ApplicationController
   #
   # Set multiple final grade override scores for a course. The course must have
   # final grade override enabled, and the caller must have permission to
-  # manage grades.
+  # manage grades. Additionally, the "Import Override Scores in Gradebook" feature
+  # flag must be enabled.
   #
   # @argument grading_period_id [Integer]
   #   The grading period to apply the override scores to. If omitted, override
@@ -1079,7 +1080,9 @@ class GradebooksController < ApplicationController
   def update_final_grade_overrides
     return unless authorized_action(@context, @current_user, :manage_grades)
 
-    render_unauthorized_action and return unless @context.allow_final_grade_override?
+    unless @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+      render_unauthorized_action and return
+    end
 
     if params[:grading_period_id]
       grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
