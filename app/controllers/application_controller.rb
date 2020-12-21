@@ -1489,6 +1489,7 @@ class ApplicationController < ActionController::Base
   rescue_from Exception, with: :rescue_exception
   # Rails exceptions
   rescue_from ActionController::InvalidCrossOriginRequest, with: :rescue_expected_error_type
+  rescue_from ActionController::ParameterMissing, with: :rescue_expected_error_type
   rescue_from ActionController::UnknownFormat, with: :rescue_expected_error_type
   rescue_from ActiveRecord::RecordInvalid, with: :rescue_expected_error_type
   rescue_from ActionView::MissingTemplate, with: :rescue_expected_error_type
@@ -1496,6 +1497,7 @@ class ApplicationController < ActionController::Base
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from SearchTermHelper::SearchTermTooShortError, with: :rescue_expected_error_type
+  rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)

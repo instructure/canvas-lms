@@ -3133,6 +3133,11 @@ class Assignment < ActiveRecord::Base
     Assignments::NeedsGradingCountQuery.new(self).manual_count
   end
 
+  def can_publish?
+    return true if new_record?
+    ['unpublished', 'published'].include?(workflow_state)
+  end
+
   def can_unpublish?
     return true if new_record?
     return @can_unpublish unless @can_unpublish.nil?

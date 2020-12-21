@@ -106,6 +106,7 @@ module Lti
     end
 
     def user_in_account?(user, account)
+      return false unless user.present?
       user.associated_accounts.include? account
     end
   end

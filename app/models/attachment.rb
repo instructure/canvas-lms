@@ -933,7 +933,7 @@ class Attachment < ActiveRecord::Base
     end
   rescue FailedResponse, Net::ReadTimeout, Net::OpenTimeout => e
     if (retries += 1) < Setting.get(:streaming_download_retries, '5').to_i
-      Canvas::Errors.capture_exception(:attachment, e)
+      Canvas::Errors.capture_exception(:attachment, e, :info)
       retry
     else
       raise e

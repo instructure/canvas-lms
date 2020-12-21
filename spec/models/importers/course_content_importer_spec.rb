@@ -573,35 +573,6 @@ describe Course do
     end
   end
 
-  describe "import_class_name" do
-    it "converts various forms of name to the proper AR class name" do
-      expect(Importers::CourseContentImporter.import_class_name('assignment')).to eq 'Assignment'
-      expect(Importers::CourseContentImporter.import_class_name('assignments')).to eq 'Assignment'
-      expect(Importers::CourseContentImporter.import_class_name('announcement')).to eq 'DiscussionTopic'
-      expect(Importers::CourseContentImporter.import_class_name('announcements')).to eq 'DiscussionTopic'
-      expect(Importers::CourseContentImporter.import_class_name('discussion_topic')).to eq 'DiscussionTopic'
-      expect(Importers::CourseContentImporter.import_class_name('discussion_topics')).to eq 'DiscussionTopic'
-      expect(Importers::CourseContentImporter.import_class_name('attachment')).to eq 'Attachment'
-      expect(Importers::CourseContentImporter.import_class_name('attachments')).to eq 'Attachment'
-      expect(Importers::CourseContentImporter.import_class_name('file')).to eq 'Attachment'
-      expect(Importers::CourseContentImporter.import_class_name('files')).to eq 'Attachment'
-      expect(Importers::CourseContentImporter.import_class_name('page')).to eq 'WikiPage'
-      expect(Importers::CourseContentImporter.import_class_name('pages')).to eq 'WikiPage'
-      expect(Importers::CourseContentImporter.import_class_name('wiki_page')).to eq 'WikiPage'
-      expect(Importers::CourseContentImporter.import_class_name('wiki_pages')).to eq 'WikiPage'
-      expect(Importers::CourseContentImporter.import_class_name('quiz')).to eq 'Quizzes::Quiz'
-      expect(Importers::CourseContentImporter.import_class_name('quizzes')).to eq 'Quizzes::Quiz'
-      expect(Importers::CourseContentImporter.import_class_name('module')).to eq 'ContextModule'
-      expect(Importers::CourseContentImporter.import_class_name('modules')).to eq 'ContextModule'
-      expect(Importers::CourseContentImporter.import_class_name('context_module')).to eq 'ContextModule'
-      expect(Importers::CourseContentImporter.import_class_name('context_modules')).to eq 'ContextModule'
-      expect(Importers::CourseContentImporter.import_class_name('module_item')).to eq 'ContentTag'
-      expect(Importers::CourseContentImporter.import_class_name('module_items')).to eq 'ContentTag'
-      expect(Importers::CourseContentImporter.import_class_name('content_tag')).to eq 'ContentTag'
-      expect(Importers::CourseContentImporter.import_class_name('content_tags')).to eq 'ContentTag'
-    end
-  end
-
   describe "move to assignment group" do
     before :once do
       course_factory

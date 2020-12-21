@@ -535,6 +535,9 @@ class SubmissionsController < SubmissionsBaseController
       attachment.save!
     end
     return attachment, nil # error message doesn't exist if we got this far
+  rescue GoogleDrive::WorkflowError => e
+    Canvas::Errors.capture_exception(:google_drive, e, :warn)
+    return nil, t('errors.google_drive_workflow', 'Google Drive entry was unable to be downloaded')
   rescue GoogleDrive::ConnectionException => e
     Canvas::Errors.capture_exception(:google_drive, e, :warn)
     return nil, t('errors.googld_drive_timeout', 'Timed out while talking to google drive')
