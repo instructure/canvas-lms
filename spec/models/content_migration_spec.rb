@@ -793,25 +793,36 @@ describe ContentMigration do
   end
 
   context "migration issues" do
+    let(:err){ StandardError.new("TestError") }
+
     it "doesn't overreeact to todo issues" do
-      err = StandardError.new("TestError")
       expect{
         @cm.add_todo("test todo", {exception: err})
       }.to change{ ErrorReport.count }.by(0)
     end
 
     it "doesn't overreeact to warning issues" do
-      err = StandardError.new("TestError")
       expect{
         @cm.add_warning("test warn", {exception: err})
       }.to change{ ErrorReport.count }.by(0)
     end
 
     it "reports error issues appropriately" do
-      err = StandardError.new("TestError")
       expect{
         @cm.add_error("test error", {exception: err})
       }.to change{ ErrorReport.count }.by(1)
+    end
+
+    it "accepts downgrades for real errors" do
+      expect{
+        @cm.add_error("test error", {exception: err, issue_level: :warning})
+      }.to change{ ErrorReport.count }.by(0)
+    end
+
+    it "accepts issue level option when failing a migration" do
+      expect{
+        @cm.fail_with_error!(err, error_message: "foo", issue_level: :warning)
+      }.to change{ ErrorReport.count }.by(0)
     end
   end
 end
