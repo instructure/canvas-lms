@@ -20,6 +20,8 @@ class UserListsController < ApplicationController
   skip_before_action :verify_authenticity_token
   before_action :require_context
 
+  rescue_from UserListV2::ParameterError, with: :rescue_expected_error_type
+
   # POST /courses/:course_id/user_lists.json
   # POST /accounts/:account_id/user_lists.json
   def create
