@@ -17,6 +17,7 @@
  */
 
 import I18n from 'i18n!feature_flags'
+import React from 'react'
 
 export function buildTransitions(flag, allowsDefaults) {
   const ret = {}
@@ -118,6 +119,26 @@ export function transitionLocked(flag, name) {
   }
 
   return null
+}
+
+export function transitionMessage(flag, name) {
+  let message = null
+  if (flag.transitions[name]) {
+    message = flag.transitions[name].message
+  }
+
+  if (ENV.ACCOUNT?.site_admin) {
+    // It is relatively unlikely that there will ever be another message
+    // But ensure it is displayed if it exists
+    message = (
+      <div>
+        <p>{I18n.t('This will affect every customer. Are you sure?')}</p>
+        <p>{message}</p>
+      </div>
+    )
+  }
+
+  return message
 }
 
 export function isEnabled(flag) {
