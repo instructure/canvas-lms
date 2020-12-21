@@ -70,11 +70,10 @@ describe 'RCE Next autosave feature', ignore_js_errors: true do
     end
 
     it 'should autosave htmlview entered content' do
-      skip 'LS-1700 12/14/2020'
       create_and_edit_announcement
-
       switch_to_html_view
       f('textarea#discussion-topic-message10').send_keys('html text')
+      f("#discussion-title").send_keys("New Discussion Title")
       driver.navigate.refresh
       accept_alert
       wait_for_rce
