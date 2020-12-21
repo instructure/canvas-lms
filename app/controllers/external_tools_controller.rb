@@ -481,10 +481,14 @@ class ExternalToolsController < ApplicationController
       else
         basic_lti_launch_request(tool, selection_type, opts)
     end
-  rescue Lti::Errors::UnauthorizedError
+  rescue Lti::Errors::UnauthorizedError => e
+    Canvas::Errors.capture_exception(:lti_launch, e, :info)
     render_unauthorized_action
     nil
-  rescue Lti::Errors::UnsupportedExportTypeError, Lti::Errors::InvalidMediaTypeError
+  rescue Lti::Errors::UnsupportedExportTypeError,
+         Lti::Errors::InvalidMediaTypeError,
+         Lti::Errors::UnsupportedPlacement => e
+    Canvas::Errors.capture_exception(:lti_launch, e, :info)
     respond_to do |format|
       err = t('There was an error generating the tool launch')
       format.html do
