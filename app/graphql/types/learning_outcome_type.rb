@@ -20,6 +20,15 @@
 
 module Types
   class LearningOutcomeType < ApplicationObjectType
+    class AssessedLoader < GraphQL::Batch::Loader
+      def perform(outcomes)
+        assessed_ids = LearningOutcomeResult.where(learning_outcome_id: outcomes).distinct.pluck(:learning_outcome_id)
+        outcomes.each do |outcome|
+          fulfill(outcome, assessed_ids.include?(outcome.id))
+        end
+      end
+    end
+
     alias outcome object
     implements GraphQL::Types::Relay::Node
     implements Interfaces::LegacyIDInterface
@@ -31,10 +40,8 @@ module Types
     field :context_type, String, null: true
     field :title, String, null: false
     field :description, String, null: true
-    field :assessed, Boolean, null: false, method: :assessed?
     field :display_name, String, null: true
     field :vendor_guid, String, null: true
-
 
     field :can_edit, Boolean, null: false
     def can_edit
@@ -45,6 +52,11 @@ module Types
       end
 
       Account.site_admin.grants_right?(current_user, session, :manage_global_outcomes)
+    end
+
+    field :assessed, Boolean, null: false
+    def assessed
+      AssessedLoader.load(outcome)
     end
 
     private

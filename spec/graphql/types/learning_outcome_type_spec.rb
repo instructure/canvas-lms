@@ -63,4 +63,20 @@ describe Types::LearningOutcomeType do
       expect(outcome_type.resolve("_id")).to be_nil
     end
   end
+
+  context "assessed" do
+    before(:once) do
+      outcome_with_rubric(outcome: @outcome, context: Account.default)
+      course_with_student
+    end
+
+    it "returns false when not assessed" do
+      expect(outcome_type.resolve("assessed")).to eq false
+    end
+
+    it "returns true when assessed" do
+      rubric_assessment_model(rubric: @rubric, user: @student)
+      expect(outcome_type.resolve("assessed")).to eq true
+    end
+  end
 end

@@ -45,7 +45,7 @@ module Types
     end
 
     def nodes
-      edges.map(&:content)
+      Loaders::AssociationLoader.for(ContentTagContentType, :content).load_many(edges)
     end
   end
 end
