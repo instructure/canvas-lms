@@ -23,9 +23,9 @@ function convertManageableCoursesToApi(courses) {
   return courses.map(course => ({name: course.label, ...course}))
 }
 
-export default function useManagedCourseSearchApi(fetchApiOpts) {
+export default function useManagedCourseSearchApi(fetchApiOpts, includeConcluded = true) {
   useFetchApi({
-    path: '/users/self/manageable_courses',
+    path: `/users/self/manageable_courses${includeConcluded ? '?include=concluded' : ''}`,
     convert: convertManageableCoursesToApi,
     ...fetchApiOpts
   })
