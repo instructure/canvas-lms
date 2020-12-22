@@ -428,7 +428,7 @@ pipeline {
                   }
 
                   if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
-                      error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
+                    error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
                   }
                 }
               }
