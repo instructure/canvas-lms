@@ -41,4 +41,11 @@ describe "submission_graded" do
     message = generate_message(:submission_graded, :summary, asset, user: observer)
     expect(message.body).to match("For #{@submission.user.name}")
   end
+
+  it "should not fail for twitter message" do
+    observer = user_model
+    observer.preferences[:send_observed_names_in_notifications] = true
+    message = generate_message(:submission_graded, :twitter, asset, user: observer)
+    expect(message.body).to match("#{@submission.user.name}")
+  end
 end
