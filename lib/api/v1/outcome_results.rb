@@ -189,7 +189,11 @@ module Api::V1::OutcomeResults
     section_ids_func = if @section
                          ->(user) { [@section.id] }
                        else
-                         enrollments = @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                        enrollments = if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
+                          @context.all_accepted_student_enrollments.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                        else
+                          @context.student_enrollments.active.where(:user_id => serialized_rollup_pairs.map{|pair| pair[0].context.id}).to_a
+                        end
                          ->(user) { enrollments.select{|e| e.user_id == user.id}.map(&:course_section_id) }
                        end
 
