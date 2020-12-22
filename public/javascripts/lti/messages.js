@@ -135,8 +135,11 @@ export function ltiMessageHandler(e) {
         break
 
       case 'lti.screenReaderAlert':
-        $.screenReaderFlashMessageExclusive(message.body.html || message.body)
+        $.screenReaderFlashMessageExclusive(
+          typeof(message.body) === 'string' ? message.body : JSON.stringify(message.body)
+        )
         break
+
       case 'lti.enableScrollEvents': {
         const iframe = findDomForWindow(e.source)
         if (iframe) {

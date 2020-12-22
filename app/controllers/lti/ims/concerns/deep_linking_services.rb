@@ -34,8 +34,7 @@ module Lti::Ims::Concerns
     end
 
     def messaging_value(type)
-      value = deep_linking_jwt["#{CLAIM_PREFIX}#{type}"]
-      value.presence
+      deep_linking_jwt["#{CLAIM_PREFIX}#{type}"].presence&.to_s
     end
 
     def content_items
