@@ -117,6 +117,45 @@ module Lti
           end
         end
 
+        context 'when two students with enrollments were merged' do
+          let_once(:user_to_merge) { student_in_course(course: context).user }
+          let(:lti_id) { user_to_merge.lti_id }
+          let(:valid_params) do
+            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+          end
+
+          before do
+            user.enrollments.first.update!(workflow_state: 'active')
+            user_to_merge.enrollments.first.update!(workflow_state: 'active')
+
+            UserMerge.from(user_to_merge).into(user)
+          end
+
+          it 'successfuly find the active user using the user past lti id' do
+            get :index, params: valid_params
+
+            expect(response.code).to eq '200'
+            expect(parsed_response_body['user_id']).to eq user.id
+          end
+        end
+
+        context 'when student was deleted and it was not merged (is not a past user)' do
+          let(:lti_id) { user.lti_id }
+          let(:valid_params) do
+            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+          end
+
+          before do
+            user.update!(workflow_state: 'deleted')
+          end
+
+          it 'fails to find user' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+            expect(JSON.parse(response.body)['errors']['message']).to eq('User not found in course or is not a student')
+          end
+        end
+
         context 'when line item does not exist' do
           before { user.enrollments.first.update!(workflow_state: 'active') }
 
