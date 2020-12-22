@@ -244,7 +244,6 @@ describe UsersController do
       allow(client_mock).to receive(:authorization).and_return(authorization_mock)
       allow(GoogleDrive::Client).to receive(:create).and_return(client_mock)
       state = Canvas::Security.create_jwt({'return_to_url' => 'http://localhost.com/return', 'nonce' => 'abc123'})
-      course_with_student_logged_in
       get :oauth_success, params: {state: state, service: "google_drive", code: "some_code"}
       expect(response).to be_redirect
       expect(flash[:error]).to eq "Google Drive failed authorization for current user!"
