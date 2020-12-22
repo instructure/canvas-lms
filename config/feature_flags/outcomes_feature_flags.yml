@@ -42,8 +42,7 @@ account_level_mastery_scales:
   description: Allows setting Account & Course Level mastery scales and calculation methods,
     replacing per-outcome criterion ratings & calculation methods
   after_state_change_proc: mastery_scales_after_change_hook
-  applies_to: Account
-  root_opt_in: true
+  applies_to: RootAccount
 usage_rights_discussion_topics:
   state: hidden
   applies_to: RootAccount
