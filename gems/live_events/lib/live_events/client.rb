@@ -64,7 +64,14 @@ module LiveEvents
       aws[:region] = plugin_config['aws_region'].presence || 'us-east-1'
 
       if plugin_config['aws_endpoint'].present?
-        aws[:endpoint] = plugin_config['aws_endpoint']
+        # to expose the strange error where this endpoint is present but not a real endpoint
+        # and to avoid breaking live events if that error occurs
+        endpoint = URI.parse(plugin_config['aws_endpoint'])
+        if URI::HTTPS === endpoint || URI::HTTP === endpoint
+          aws[:endpoint] = plugin_config['aws_endpoint']
+        else
+          LiveEvents.logger.warn("invalid endpoint value #{plugin_config['aws_endpoint']}")
+        end
       end
 
       aws

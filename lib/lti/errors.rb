@@ -22,6 +22,7 @@ module Lti
     class UnauthorizedError < StandardError; end
     class UnsupportedExportTypeError < StandardError; end
     class UnsupportedMessageTypeError < StandardError; end
+    class UnsupportedPlacement < StandardError; end
     class InvalidMediaTypeError < StandardError; end
     class UnauthorizedToolError < StandardError; end
   end

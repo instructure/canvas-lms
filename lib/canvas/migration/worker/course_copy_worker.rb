@@ -79,7 +79,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.migration_settings[:last_error] = "ContentExport failed to export course."
           cm.save
         end
-      rescue InstFS::ServiceError => e
+      rescue InstFS::ServiceError, ActiveRecord::RecordInvalid => e
         Canvas::Errors.capture_exception(:course_copy, e, :warn)
         cm.fail_with_error!(e)
         raise Delayed::RetriableError, e.message
