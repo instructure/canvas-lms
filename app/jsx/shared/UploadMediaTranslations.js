@@ -62,7 +62,20 @@ const UploadMediaStrings = {
   CLOSED_CAPTIONS_ADD_SUBTITLE_SCREENREADER: I18n.t('Add Subtitle'),
   CLOSED_CAPTIONS_CHOOSE_FILE: I18n.t('Choose File'),
   CLOSED_CAPTIONS_SELECT_LANGUAGE: I18n.t('Select Language'),
-  MEDIA_RECORD_NOT_AVAILABLE: I18n.t('Media record not available')
+  MEDIA_RECORD_NOT_AVAILABLE: I18n.t('Media record not available'),
+  ADDED_CAPTION: I18n.t('Added caption'),
+  DELETED_CAPTION: I18n.t('Deleted caption'),
+  REMOVE_FILE: I18n.t('Remove file'),
+  NO_FILE_CHOSEN: I18n.t('No file selected'),
+  SUPPORTED_FILE_TYPES: I18n.t('Supported file types: .vtt, .srt'),
+  ADD_NEW_CAPTION_OR_SUBTITLE: I18n.t('Add new caption or subtitle')
 }
 
-export {MediaCaptureStrings, UploadMediaStrings}
+const SelectStrings = {
+  USE_ARROWS: I18n.t('Use Arrows'),
+  LIST_COLLAPSED: I18n.t('List Collapsed'),
+  LIST_EXPANDED: I18n.t('List Expanded'),
+  OPTION_SELECTED: I18n.t('{option} Selected')
+}
+
+export {MediaCaptureStrings, UploadMediaStrings, SelectStrings}
