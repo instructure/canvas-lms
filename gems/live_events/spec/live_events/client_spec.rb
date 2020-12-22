@@ -52,6 +52,10 @@ describe LiveEvents::Client do
     def error(data)
       data
     end
+
+    def warn(data)
+      data
+    end
   end
 
   let(:test_stream_name) { 'my_stream' }
@@ -82,6 +86,15 @@ describe LiveEvents::Client do
       })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
+      LiveEvents.worker.stop!
+    end
+
+    it "should ignore invalid endpoints" do
+      res = LiveEvents::Client.aws_config({
+        "aws_endpoint" => "example.com:6543/"
+      })
+
+      expect(res.key?(:endpoint)).to eq false
       LiveEvents.worker.stop!
     end
 
