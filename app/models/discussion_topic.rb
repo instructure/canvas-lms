@@ -165,10 +165,16 @@ class DiscussionTopic < ActiveRecord::Base
 
   def default_values
     self.context_code = "#{self.context_type.underscore}_#{self.context_id}"
-    self.title ||= t '#discussion_topic.default_title', "No Title"
+
+    if self.title.blank?
+      self.title = t('#discussion_topic.default_title', "No Title")
+    end
+
     self.discussion_type = DiscussionTypes::SIDE_COMMENT if !read_attribute(:discussion_type)
     @content_changed = self.message_changed? || self.title_changed?
+    
     default_submission_values
+    
     if self.has_group_category?
       self.subtopics_refreshed_at ||= Time.zone.parse("Jan 1 2000")
     end
