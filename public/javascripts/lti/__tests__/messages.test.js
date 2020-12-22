@@ -57,4 +57,12 @@ describe('ltiMessageHander', () => {
     ltiMessageHandler({data: JSON.stringify({subject: 'lti.screenReaderAlert', body: 'Hi'})})
     expect(flashMessage).toHaveBeenCalledWith('Hi')
   })
+
+  it('prevents html from being passed to screenReaderFlashMessageExclusive', () => {
+    const flashMessage = jest.spyOn($, 'screenReaderFlashMessageExclusive')
+    ltiMessageHandler({
+      data: JSON.stringify({subject: 'lti.screenReaderAlert', body: {html: 'abc'}})
+    })
+    expect(flashMessage).toHaveBeenCalledWith('{"html":"abc"}')
+  })
 })
