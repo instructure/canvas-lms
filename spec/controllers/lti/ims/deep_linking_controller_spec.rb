@@ -48,6 +48,23 @@ module Lti
           subject
         end
 
+        context 'when the messages/logs passed in are not strings' do
+          let(:message) { {html: 'some message'} }
+          let(:error_message) { {html: 'some error message'} }
+          let(:log) { {html: 'some log'} }
+          let(:error_log) { {html: 'some error log'} }
+
+          it 'turns them into strings before calling js_env to prevent HTML injection' do
+            expect(controller).to receive(:js_env).with(hash_including(
+              message: '{"html"=>"some message"}',
+              log: '{"html"=>"some log"}',
+              error_message: '{"html"=>"some error message"}',
+              error_log: '{"html"=>"some error log"}'
+            ))
+            subject
+          end
+        end
+
         shared_examples_for 'errors' do
           let(:response_message) { raise 'set in examples' }
 
