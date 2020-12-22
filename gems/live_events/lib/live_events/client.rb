@@ -31,7 +31,13 @@ module LiveEvents
 
     def self.config
       res = LiveEvents.settings
-      return true if res['stub_kinesis']
+      if res['stub_kinesis']
+        return true if !Rails.env.production?
+        
+        LiveEvents.logger.warn(
+          "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
+        )
+      end
       return nil unless res && !res['kinesis_stream_name'].blank? &&
                                (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
 
