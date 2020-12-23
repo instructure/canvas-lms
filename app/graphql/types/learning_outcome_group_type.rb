@@ -28,8 +28,11 @@ module Types
 
     field :parent_outcome_group, Types::LearningOutcomeGroupType, null: true
     field :child_groups, Types::LearningOutcomeGroupType.connection_type,
-          null: true,
-          method: :child_outcome_groups
+          null: true
+    def child_groups
+      object.child_outcome_groups.active
+    end
+
     field :context_id, Integer, null: true
     field :context_type, String, null: true
     field :title, String, null: false

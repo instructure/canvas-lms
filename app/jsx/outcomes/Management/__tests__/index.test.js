@@ -16,77 +16,106 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import $ from 'jquery'
+import {MockedProvider} from '@apollo/react-testing'
+import {act, render, fireEvent} from '@testing-library/react'
 import 'compiled/jquery.rails_flash_notifications'
 import React from 'react'
-import {render, waitForElementToBeRemoved} from '@testing-library/react'
-import {MockedProvider} from '@apollo/react-testing'
-import {courseMocks, accountMocks} from './mocks'
+import {createCache} from '../../../canvas-apollo'
 import OutcomeManagementPanel from '../index'
+import {accountMocks, courseMocks, groupMocks} from './mocks'
+
+jest.useFakeTimers()
 
 describe('OutcomeManagementPanel', () => {
+  let cache
+
+  beforeEach(() => {
+    cache = createCache()
+  })
+
   it('renders the empty billboard for accounts without child outcomes', async () => {
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={accountMocks({childGroupsCount: 0})}>
+    const {getByText} = render(
+      <MockedProvider cache={cache} mocks={accountMocks({childGroupsCount: 0})}>
         <OutcomeManagementPanel contextType="Account" contextId="1" />
       </MockedProvider>
     )
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+
+    await act(async () => jest.runAllTimers())
     expect(getByText(/Outcomes have not been added to this account yet/)).not.toBeNull()
   })
 
   it('renders the empty billboard for courses without child outcomes', async () => {
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={courseMocks({childGroupsCount: 0})}>
+    const {getByText} = render(
+      <MockedProvider cache={cache} mocks={courseMocks({childGroupsCount: 0})}>
         <OutcomeManagementPanel contextType="Course" contextId="2" />
       </MockedProvider>
     )
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    await act(async () => jest.runAllTimers())
     expect(getByText(/Outcomes have not been added to this course yet/)).not.toBeNull()
   })
 
   it('loads outcome group data for Account', async () => {
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={accountMocks()}>
+    const {getByText, getAllByText} = render(
+      <MockedProvider cache={cache} mocks={accountMocks({childGroupsCount: 2})}>
         <OutcomeManagementPanel contextType="Account" contextId="1" />
       </MockedProvider>
     )
-    expect(getByText('Loading')).toBeInTheDocument()
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    await act(async () => jest.runAllTimers())
     expect(getByText(/Outcome Groups/)).toBeInTheDocument()
+    expect(getByText('Account folder 0')).toBeInTheDocument()
+    expect(getByText('Account folder 1')).toBeInTheDocument()
+    expect(getAllByText('10 Groups | 2 Outcomes').length).toBe(2)
   })
 
   it('loads outcome group data for Course', async () => {
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={courseMocks()}>
+    const {getByText, getAllByText} = render(
+      <MockedProvider cache={cache} mocks={courseMocks({childGroupsCount: 2})}>
         <OutcomeManagementPanel contextType="Course" contextId="2" />
       </MockedProvider>
     )
-    expect(getByText('Loading')).toBeInTheDocument()
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    await act(async () => jest.runAllTimers())
     expect(getByText(/Outcome Groups/)).toBeInTheDocument()
+    expect(getByText('Course folder 0')).toBeInTheDocument()
+    expect(getByText('Course folder 1')).toBeInTheDocument()
+    expect(getAllByText('10 Groups | 2 Outcomes').length).toBe(2)
+  })
+
+  it('loads nested groups', async () => {
+    const {getByText} = render(
+      <MockedProvider
+        cache={cache}
+        mocks={[...accountMocks({childGroupsCount: 2}), ...groupMocks({groupId: 100})]}
+      >
+        <OutcomeManagementPanel contextType="Account" contextId="1" />
+      </MockedProvider>
+    )
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account folder 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Group 100 folder 0')).toBeInTheDocument()
   })
 
   it('displays an error on failed request for course outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={[]}>
+    const {getByText} = render(
+      <MockedProvider cache={cache} mocks={[]}>
         <OutcomeManagementPanel contextType="Course" contextId="2" />
       </MockedProvider>
     )
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     expect(getByText(/course/)).toBeInTheDocument()
   })
 
   it('displays an error on failed request for account outcome groups', async () => {
     const flashMock = jest.spyOn($, 'flashError').mockImplementation()
-    const {getByText, queryByText} = render(
-      <MockedProvider mocks={[]}>
+    const {getByText} = render(
+      <MockedProvider cache={cache} mocks={[]}>
         <OutcomeManagementPanel contextType="Account" contextId="1" />
       </MockedProvider>
     )
 
-    await waitForElementToBeRemoved(() => queryByText('Loading'))
+    await act(async () => jest.runAllTimers())
     expect(flashMock).toHaveBeenCalledWith('An error occurred while loading account outcomes.')
     expect(getByText(/account/)).toBeInTheDocument()
   })
