@@ -400,9 +400,12 @@ ul.user_list div.enrollment_type.pending {
 
   // A few small exceptions
   .course-visibility-row,
-  .course-conclude-at-row {
+  .course-conclude-at-row,
+  .course-participation-row,
+  .language-row {
     align-items: flex-start;
     padding-top: 0.5rem;
+    padding-bottom: 0.5rem;
   }
 }
 

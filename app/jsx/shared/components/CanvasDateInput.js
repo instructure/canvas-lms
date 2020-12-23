@@ -79,6 +79,10 @@ import {IconArrowOpenEndSolid, IconArrowOpenStartSolid} from '@instructure/ui-ic
  *   invalidDateMessage  [string | function]
  *      Specifies the error message shown under the input when it contains an invalid date.
  *      Defaults to just "Invalid date".
+ *
+ *   layout  [string: "stacked" | "inline"]
+ *      Passed along to DateInput. Controls whether the label is stacked on top of the input
+ *      or placed next to the input.
  */
 
 CanvasDateInput.propTypes = {
@@ -91,7 +95,8 @@ CanvasDateInput.propTypes = {
   interaction: string,
   placement: string,
   withRunningValue: bool,
-  invalidDateMessage: oneOfType([string, func])
+  invalidDateMessage: oneOfType([string, func]),
+  layout: string
 }
 
 CanvasDateInput.defaultProps = {
@@ -101,7 +106,8 @@ CanvasDateInput.defaultProps = {
   messages: [],
   interaction: 'enabled',
   placement: 'bottom center',
-  withRunningValue: false
+  withRunningValue: false,
+  layout: 'stacked'
 }
 
 export default function CanvasDateInput({
@@ -114,7 +120,8 @@ export default function CanvasDateInput({
   interaction,
   placement,
   withRunningValue,
-  invalidDateMessage
+  invalidDateMessage,
+  layout
 }) {
   const todayMoment = moment().tz(timezone)
   const selectedMoment = selectedDate && moment.tz(selectedDate, timezone)
@@ -313,6 +320,7 @@ export default function CanvasDateInput({
       renderNextMonthButton={renderMonthChangeButton('next')}
       renderWeekdayLabels={renderWeekdayLabels()}
       interaction={interaction}
+      layout={layout}
     >
       {renderDays()}
     </DateInput>

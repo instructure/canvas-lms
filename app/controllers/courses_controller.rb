@@ -1389,7 +1389,8 @@ class CoursesController < ApplicationController
           :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
           :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
           :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
-          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags)
+          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
+          :manage => @context.grants_right?(@current_user, session, :manage)
         },
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
@@ -1403,7 +1404,10 @@ class CoursesController < ApplicationController
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
-        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui)
+        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
+        NEW_COURSE_AVAILABILITY_UI: Account.site_admin.feature_enabled?(:new_course_availability_ui),
+        RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
+        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked]
       })
 
       set_tutorial_js_env
