@@ -29,6 +29,7 @@ module Types
     field :user_id, ID, null: false
     field :workflow_state, String, null: false
     field :label, String, null: true
+    field :subscribed, Boolean, null: false
 
     field :user, UserType, null: false
     def user
