@@ -58,6 +58,11 @@ module Lti::Messages
       @message.resource_link.title = resource_link && assignment&.title
     end
 
+    def unexpanded_custom_parameters
+      # Add in link-specific custom params (e.g. created by deep linking)
+      super.merge!(assignment_resource_link&.custom || {})
+    end
+
     def context_resource_link_id
       Lti::Asset.opaque_identifier_for(@context)
     end
