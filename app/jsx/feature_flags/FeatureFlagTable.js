@@ -65,6 +65,7 @@ export default function FeatureFlagTable({title, rows, disableDefaults}) {
               </Cell>
               <Cell>
                 <FeatureFlagButton
+                  displayName={feature.display_name}
                   featureFlag={feature.feature_flag}
                   disableDefaults={disableDefaults}
                 />

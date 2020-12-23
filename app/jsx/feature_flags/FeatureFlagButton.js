@@ -17,7 +17,7 @@
  */
 
 import React, {useState, useRef} from 'react'
-import {bool, object} from 'prop-types'
+import {bool, object, string} from 'prop-types'
 import I18n from 'i18n!feature_flags'
 import {Text} from '@instructure/ui-text'
 import {Flex} from '@instructure/ui-flex'
@@ -33,6 +33,7 @@ import {Spinner} from '@instructure/ui-spinner'
 import {Popover} from '@instructure/ui-popover'
 import doFetchApi from 'jsx/shared/effects/doFetchApi'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
+import {showConfirmationDialog} from 'jsx/shared/ConfirmationDialog'
 
 import * as flagUtils from './util'
 
@@ -51,7 +52,7 @@ function removeFlag(flagName) {
   })
 }
 
-export default function FeatureFlagButton({featureFlag, disableDefaults}) {
+export default function FeatureFlagButton({featureFlag, disableDefaults, displayName}) {
   const [updatedFlag, setUpdatedFlag] = useState(undefined)
   const [apiBusy, setApiBusy] = useState(false)
   const popoverEl = useRef(null)
@@ -59,6 +60,16 @@ export default function FeatureFlagButton({featureFlag, disableDefaults}) {
 
   async function updateFlag(state) {
     if (apiBusy) return
+    const message = flagUtils.transitionMessage(effectiveFlag, state)
+    if (message) {
+      const res = await showConfirmationDialog({
+        label: displayName,
+        body: message
+      })
+      if (!res) {
+        return
+      }
+    }
     setApiBusy(true)
     try {
       if (flagUtils.shouldDelete(effectiveFlag, allowsDefaults, state)) {
@@ -188,5 +199,6 @@ export default function FeatureFlagButton({featureFlag, disableDefaults}) {
 
 FeatureFlagButton.propTypes = {
   featureFlag: object.isRequired,
+  displayName: string,
   disableDefaults: bool
 }
