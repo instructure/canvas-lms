@@ -393,6 +393,9 @@ export default class EventDataSource {
       this.processNextRequest()
       return
     }
+    if ('per_page' in options) {
+      params.per_page = options.per_page
+    }
     const requestResults = {}
     const dataCB = (data, url, params) => {
       let key
