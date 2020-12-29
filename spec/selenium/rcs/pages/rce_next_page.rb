@@ -591,6 +591,14 @@ module RCENextPage
     f('input[aria-haspopup="listbox"]', fj(':contains("Content Type")'))
   end
 
+  def editor_view_button
+    f('[data-btn-id="rce-edit-btn"]')
+  end
+
+  def fullscreen_element
+    driver.execute_script('return document.fullscreenElement')
+  end
+
   def change_content_tray_content_type(which)
     content_type = content_tray_content_type
     content_type.click
@@ -923,12 +931,16 @@ module RCENextPage
     wait_for_animations
   end
 
+  def click_editor_view_button
+    editor_view_button.click
+  end
+
   def switch_to_html_view
-    fj('button:contains("Switch to raw html editor")').click
+    click_editor_view_button
   end
 
   def switch_to_editor_view
-    fj('button:contains("Switch to rich text editor")').click
+    click_editor_view_button
   end
 
   def tiny_rce_ifr_id

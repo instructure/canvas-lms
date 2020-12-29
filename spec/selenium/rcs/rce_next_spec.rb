@@ -322,7 +322,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
+                    @course,
                     @assignment
                   )
         end
@@ -360,7 +360,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include announcement_id_path(
-            @course,
+                    @course,
                     @announcement
                   )
         end
@@ -380,7 +380,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(
-            @course,
+                    @course,
                     @discussion
                   )
         end
@@ -434,7 +434,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
+                    @course,
                     @assignment
                   )
         end
@@ -471,7 +471,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
+                    @course,
                     @assignment
                   )
         end
@@ -492,7 +492,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
+                    @course,
                     @assignment
                   )
         end
@@ -513,7 +513,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
         in_frame rce_page_body_ifr_id do
           expect(wiki_body_anchor.attribute('href')).to include assignment_id_path(
-            @course,
+                    @course,
                     @assignment
                   )
         end
@@ -665,7 +665,8 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should search for items when different accordian section opened', ignore_js_errors: true do
+      it 'should search for items when different accordian section opened',
+         ignore_js_errors: true do
         # Add two pages
         title = 'test_page'
         title2 = 'icon_page'
@@ -701,7 +702,6 @@ describe 'RCE next tests', ignore_js_errors: true do
         change_content_tray_content_subtype('Images')
         change_content_tray_content_type('Course Files')
         expect(image_links.count).to eq(1)
-
       end
     end
 
@@ -775,7 +775,8 @@ describe 'RCE next tests', ignore_js_errors: true do
       page_title = 'Page1'
       image = add_embedded_image('email.png')
       @course.wiki_pages.create!(
-        title: page_title, body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
+        title: page_title,
+        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
       )
 
       visit_existing_wiki_edit(@course, page_title)
@@ -1338,6 +1339,72 @@ describe 'RCE next tests', ignore_js_errors: true do
         change_content_tray_content_type('Links')
         wait_for_ajaximations
         expect(fj("li:contains('#{title}')")).to be_displayed
+      end
+    end
+
+    describe 'the html editors' do
+      after(:each) do
+        driver.execute_script('if (document.fullscreenElement) document.exitFullscreen()')
+      end
+
+      describe 'with the use_rce_pretty_html_editor flag off' do
+        before(:each) { Account.site_admin.disable_feature! :rce_pretty_html_editor }
+
+        it 'switches between wysiwyg and raw html view' do
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        end
+
+        it 'displays the editor in fullscreen' do
+          rce_wysiwyg_state_setup(@course)
+
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('textarea#wiki_page_body'))
+        end
+      end
+
+      describe 'with the use_rce_pretty_html_editor flag on' do
+        before(:each) { Account.site_admin.enable_feature! :rce_pretty_html_editor }
+
+        it 'switches between wysiwyg and raw html view' do
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          # click edit button -> fancy editor
+          click_editor_view_button
+          expect(f('.RceHtmlEditor')).to be_displayed
+
+          # click edit button -> back to the rce
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          # shift-click edit button -> raw editor
+          shift_click_button('[data-btn-id="rce-edit-btn"]')
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          # click "Pretty HTML Editor" status bar button -> fancy editor
+          fj('button:contains("Pretty HTML Editor")').click
+          expect(f('.RceHtmlEditor')).to be_displayed
+        end
+
+        it 'displays the editor in fullscreen' do
+          rce_wysiwyg_state_setup(@course)
+
+          click_editor_view_button
+          expect(f('.RceHtmlEditor')).to be_displayed
+
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
+        end
       end
     end
   end

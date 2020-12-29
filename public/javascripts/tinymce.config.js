@@ -130,8 +130,7 @@ export default class EditorConfig {
       content_css: window.ENV.url_to_what_gets_loaded_inside_the_tinymce_editor_css,
       browser_spellcheck: true,
       init_instance_callback: ed => {
-        $(`#${ed.id}`) // eslint-disable-line no-undef
-          .parent()
+        $(`#tinymce-parent-of-${ed.id}`) // eslint-disable-line no-undef
           .css('visibility', 'visible')
       },
       // if kalturaSettings is missing, we have no kaltura to upload to

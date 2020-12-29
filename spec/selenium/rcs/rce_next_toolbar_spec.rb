@@ -250,7 +250,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
       it 'should remove subscript from text in rce' do
         text = '<p><sub>This is my text</sub></p>'
         rce_wysiwyg_state_setup(@course, text, html: true)
-
+        select_in_tiny(f('#wiki_page_body'), 'sub')
         shift_click_button(subscript_button_selector)
 
         in_frame rce_page_body_ifr_id do

@@ -2238,6 +2238,13 @@
   dependencies:
     "@babel/runtime" "^7.9.2"
 
+"@instructure/debounce@^7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@instructure/debounce/-/debounce-7.3.2.tgz#fc0a3f1b87f6c76293025be5508f562557120bf7"
+  integrity sha512-I4OghEdkCaAiYgFqdGa7fBu9xLyScH/8dwiWzmMsWHcXPDzJ/wKcJ/ncSacGviDYBLdcj1k7dHUcHAZ8cPYeSg==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+
 "@instructure/i18nliner-handlebars@^1.0.0":
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/@instructure/i18nliner-handlebars/-/i18nliner-handlebars-1.0.0.tgz#a823bb28b76967540d5e4a3b5d2ca8d60690e821"
@@ -2562,6 +2569,14 @@
     classnames "^2"
     prop-types "^15"
 
+"@instructure/ui-axe-check@^7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-axe-check/-/ui-axe-check-7.3.2.tgz#a891018ce0bd08a82a168edd87ba02843c940a7c"
+  integrity sha512-Ud1S5UoEfXjW6yxKk6lQqzXdGQbh/suWih6CEKGG/F+QqBHK56Nd9RZDyKem0/MMsfafsu7RQ3vf56nZJBgTlg==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    axe-core "^3.3.2"
+
 "@instructure/ui-babel-preset@6", "@instructure/ui-babel-preset@^6":
   version "6.24.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-babel-preset/-/ui-babel-preset-6.24.0.tgz#073287468ea66e92cb50e4bc103373ad1869f67e"
@@ -2813,6 +2828,25 @@
     classnames "^2"
     keycode "^2"
     prop-types "^15"
+
+"@instructure/ui-code-editor@7.3.0":
+  version "7.3.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-code-editor/-/ui-code-editor-7.3.0.tgz#9085152bcc71efb9163b8196ee1b0a127c900282"
+  integrity sha512-8tDauB5MLiwwwtv/MeE7v0v9H8pv8CQFNm2YQ/PT5M8gLqHZ6+iiPE/9VNlg9tmzD7zMzDr++UfNhsyREI2Kaw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/ui-a11y-content" "^7.3.0"
+    "@instructure/ui-color-utils" "^7.3.0"
+    "@instructure/ui-dom-utils" "^7.3.0"
+    "@instructure/ui-react-utils" "^7.3.0"
+    "@instructure/ui-test-locator" "^7.3.0"
+    "@instructure/ui-testable" "^7.3.0"
+    "@instructure/ui-themeable" "^7.3.0"
+    "@instructure/uid" "^7.3.0"
+    classnames "^2"
+    codemirror "^5.48.4"
+    prop-types "^15"
+    react-codemirror2 "^7.1.0"
 
 "@instructure/ui-color-utils@6", "@instructure/ui-color-utils@^6.17.0", "@instructure/ui-color-utils@^6.22.0", "@instructure/ui-color-utils@^6.24.0", "@instructure/ui-color-utils@^6.26.0", "@instructure/ui-color-utils@^6.27.0":
   version "6.27.0"
@@ -4516,6 +4550,34 @@
     "@instructure/ui-view" "^7.3.0"
     classnames "^2"
     prop-types "^15"
+
+"@instructure/ui-test-locator@^7.3.0":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-locator/-/ui-test-locator-7.3.2.tgz#d08e769f700e7441df576cfd9b85775261cec67e"
+  integrity sha512-pYh/A7AJcMHlT4pO8nm5GBpxt4scSQ1tWRbH94K66TZ5tuSUNHv7VQWkZrlJ64EdZ0b9UKlT8pr0wktenNgqAA==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/ui-test-queries" "^7.3.2"
+
+"@instructure/ui-test-queries@^7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-queries/-/ui-test-queries-7.3.2.tgz#9d31c66918ee719330290f686ea43001e0ae170f"
+  integrity sha512-F+mso8ZXaQDNlSI8ldhy0X9xDzOuyVFW2eqaQagN+eCQC60e565F/bIgldKZQ4kYuRIzSn4+uedyC69D0LqHdA==
+  dependencies:
+    "@instructure/debounce" "^7.3.2"
+    "@instructure/ui-axe-check" "^7.3.2"
+    "@instructure/ui-test-sandbox" "^7.3.2"
+    keycode "^2"
+    pretty-format "^24.9.0"
+    sizzle "^2.3.4"
+
+"@instructure/ui-test-sandbox@^7.3.2":
+  version "7.3.2"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-test-sandbox/-/ui-test-sandbox-7.3.2.tgz#d89e868a9d5c36afbce77056027bae2597263941"
+  integrity sha512-1+XJ91HccNgCNIXnYQMPX6j3x6hF67t5/WBkjhNhCXqAS5LueTlHwXU9w0wV4jVhQGhBEBSmr+Q+EC4V9HYPKw==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    sinon "^7.4.2"
 
 "@instructure/ui-testable@^5.52.3":
   version "5.52.3"
@@ -7939,6 +8001,11 @@ aws4@^1.8.0:
   resolved "https://registry.yarnpkg.com/aws4/-/aws4-1.8.0.tgz#f0e003d9ca9e7f59c7a508945d7b2ef9a04a542f"
   integrity sha512-ReZxvNHIOv88FlT7rxcXIIC0fPt4KZqZbOlivyWtXLt8ESx84zd3kMC6iK5jVeS2qt+g7ftS7ye4fi06X5rtRQ==
 
+axe-core@^3.3.2:
+  version "3.5.5"
+  resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-3.5.5.tgz#84315073b53fa3c0c51676c588d59da09a192227"
+  integrity sha512-5P0QZ6J5xGikH780pghEdbEKijCTrruK9KxtPZCFWUpef0f6GipO+xEZ5GKCb020mmqgbiNO6TcA55CriL784Q==
+
 axe-core@~2.1.7:
   version "2.1.7"
   resolved "https://registry.yarnpkg.com/axe-core/-/axe-core-2.1.7.tgz#4f66f2b3ee3b58ec2d3db4339dd124c5b33b79c3"
@@ -10436,6 +10503,11 @@ codemirror@^5.47.0:
   resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.49.0.tgz#adedbffcc81091e4a0334bcb96b1ae3b7ada5e3f"
   integrity sha512-Hyzr0HToBdZpLBN9dYFO/KlJAsKH37/cXVHPAqa+imml0R92tb9AkmsvjnXL+SluEvjjdfkDgRjc65NG5jnMYA==
 
+codemirror@^5.48.4:
+  version "5.59.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.59.0.tgz#6d8132055459aabf21d04cae5cf5c430e5c57bb9"
+  integrity sha512-UGzSkCacY9z0rSpQ3wnTWRN2nvRE6foDXnJltWW8pazInR/R+3gXHrao4IFQMv/bSBvFBxt8/HPpkpKAS54x5Q==
+
 coffee-loader@~0.7.2:
   version "0.7.3"
   resolved "https://registry.yarnpkg.com/coffee-loader/-/coffee-loader-0.7.3.tgz#fadbc6efd6fc7ecc88c5b3046a2c292066bcb54a"
@@ -10742,6 +10814,14 @@ confetti-js@^0.0.17:
   version "0.0.17"
   resolved "https://registry.yarnpkg.com/confetti-js/-/confetti-js-0.0.17.tgz#f95ad3c265a2d1e905c3092ec830acdc06cf945a"
   integrity sha512-fuXRujAzoOZ5D2mT2Mtytp094DANipXjB3fc+8T9wrhv9grXUWJwhpwTs3r2YfwFYeriouWySB1vkVpHTi2u+A==
+
+config-chain@^1.1.12:
+  version "1.1.12"
+  resolved "https://registry.yarnpkg.com/config-chain/-/config-chain-1.1.12.tgz#0fde8d091200eb5e808caf25fe618c02f48e4efa"
+  integrity sha512-a1eOIcu8+7lUInge4Rpf/n4Krkf3Dd9lqhljRzII1/Zno/kRtUWnznPO3jOKBmTEktkt3fkxisUcivoj0ebzoA==
+  dependencies:
+    ini "^1.3.4"
+    proto-list "~1.2.1"
 
 confusing-browser-globals@^1.0.7:
   version "1.0.9"
@@ -12199,6 +12279,16 @@ ecc-jsbn@~0.1.1:
   dependencies:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
+
+editorconfig@^0.15.3:
+  version "0.15.3"
+  resolved "https://registry.yarnpkg.com/editorconfig/-/editorconfig-0.15.3.tgz#bef84c4e75fb8dcb0ce5cee8efd51c15999befc5"
+  integrity sha512-M9wIMFx96vq0R4F+gRpY3o2exzb8hEj/n9S8unZtHSvYjibBp/iMufSzvmOcV/laG0ZtuTVGtiJggPOSW2r93g==
+  dependencies:
+    commander "^2.19.0"
+    lru-cache "^4.1.5"
+    semver "^5.6.0"
+    sigmund "^1.0.1"
 
 ee-first@1.1.1:
   version "1.1.1"
@@ -17772,6 +17862,17 @@ js-base64@^2.1.8, js-base64@^2.1.9:
   resolved "https://registry.yarnpkg.com/js-base64/-/js-base64-2.5.1.tgz#1efa39ef2c5f7980bb1784ade4a8af2de3291121"
   integrity sha512-M7kLczedRMYX4L8Mdh4MzyAMM9O5osx+4FcOQuTvr3A9F2D9S5JXheN0ewNbrvK2UatkTRhL5ejGmGSjNMiZuw==
 
+js-beautify@1:
+  version "1.13.0"
+  resolved "https://registry.yarnpkg.com/js-beautify/-/js-beautify-1.13.0.tgz#a056d5d3acfd4918549aae3ab039f9f3c51eebb2"
+  integrity sha512-/Tbp1OVzZjbwzwJQFIlYLm9eWQ+3aYbBXLSaqb1mEJzhcQAfrqMMQYtjb6io+U6KpD0ID4F+Id3/xcjH3l/sqA==
+  dependencies:
+    config-chain "^1.1.12"
+    editorconfig "^0.15.3"
+    glob "^7.1.3"
+    mkdirp "^1.0.4"
+    nopt "^5.0.0"
+
 js-levenshtein@^1.1.3:
   version "1.1.6"
   resolved "https://registry.yarnpkg.com/js-levenshtein/-/js-levenshtein-1.1.6.tgz#c6cee58eb3550372df8deb85fad5ce66ce01d59d"
@@ -18941,7 +19042,7 @@ lru-cache@2.6.3:
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-2.6.3.tgz#51ccd0b4fc0c843587d7a5709ce4d3b7629bedc5"
   integrity sha1-UczQtPwMhDWH16VwnOTTt2Kb7cU=
 
-lru-cache@4.1.x, lru-cache@^4.0.1:
+lru-cache@4.1.x, lru-cache@^4.0.1, lru-cache@^4.1.5:
   version "4.1.5"
   resolved "https://registry.yarnpkg.com/lru-cache/-/lru-cache-4.1.5.tgz#8bbe50ea85bed59bc9e33dcab8235ee9bcf443cd"
   integrity sha512-sWZlbEP2OsHNkXrMl5GYk/jKk70MBng6UU4YI/qGDYbgf6YbP4EvmqISbXCoJiRKs+1bSpFHVgQxvJ17F2li5g==
@@ -20198,6 +20299,13 @@ nopt@^4.0.1:
   dependencies:
     abbrev "1"
     osenv "^0.1.4"
+
+nopt@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/nopt/-/nopt-5.0.0.tgz#530942bb58a512fccafe53fe210f13a25355dc88"
+  integrity sha512-Tbj67rffqceeLpcRXrT7vKAN8CwfPeIBgM7E6iBkmKLV7bEMwpGgYLGv0jACUsECaa/vuxP0IjEont6umdMgtQ==
+  dependencies:
+    abbrev "1"
 
 nopt@~1.0.10:
   version "1.0.10"
@@ -22260,6 +22368,11 @@ property-information@^5.0.0, property-information@^5.3.0:
   dependencies:
     xtend "^4.0.0"
 
+proto-list@~1.2.1:
+  version "1.2.4"
+  resolved "https://registry.yarnpkg.com/proto-list/-/proto-list-1.2.4.tgz#212d5bfe1318306a420f6402b8e26ff39647a849"
+  integrity sha1-IS1b/hMYMGpCD2QCuOJv85ZHqEk=
+
 proxy-addr@~2.0.5:
   version "2.0.5"
   resolved "https://registry.yarnpkg.com/proxy-addr/-/proxy-addr-2.0.5.tgz#34cbd64a2d81f4b1fd21e76f9f06c8a45299ee34"
@@ -22576,6 +22689,11 @@ react-clientside-effect@^1.2.2:
   integrity sha512-nRmoyxeok5PBO6ytPvSjKp9xwXg9xagoTK1mMjwnQxqM9Hd7MNPl+LS1bOSOe+CV2+4fnEquc7H/S8QD3q697A==
   dependencies:
     "@babel/runtime" "^7.0.0"
+
+react-codemirror2@^7.1.0:
+  version "7.2.1"
+  resolved "https://registry.yarnpkg.com/react-codemirror2/-/react-codemirror2-7.2.1.tgz#38dab492fcbe5fb8ebf5630e5bb7922db8d3a10c"
+  integrity sha512-t7YFmz1AXdlImgHXA9Ja0T6AWuopilub24jRaQdPVbzUJVNKIYuy3uCFZYa7CE5S3UW6SrSa5nAqVQvtzRF9gw==
 
 react-color@^2.13.4:
   version "2.17.3"
@@ -24569,7 +24687,7 @@ side-channel@^1.0.2:
     es-abstract "^1.18.0-next.0"
     object-inspect "^1.8.0"
 
-sigmund@~1.0.0:
+sigmund@^1.0.1, sigmund@~1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/sigmund/-/sigmund-1.0.1.tgz#3ff21f198cad2175f9f3b781853fd94d0d19b590"
   integrity sha1-P/IfGYytIXX587eBhT/ZTQ0ZtZA=
@@ -24596,7 +24714,7 @@ sinon@^1.10.3:
     samsam "1.1.2"
     util ">=0.10.3 <1"
 
-sinon@^7:
+sinon@^7, sinon@^7.4.2:
   version "7.5.0"
   resolved "https://registry.yarnpkg.com/sinon/-/sinon-7.5.0.tgz#e9488ea466070ea908fd44a3d6478fd4923c67ec"
   integrity sha512-AoD0oJWerp0/rY9czP/D6hDTTUYGpObhZjMpd7Cl/A6+j0xBE+ayL/ldfggkBXUs0IkvIiM1ljM8+WkOc5k78Q==
@@ -24613,6 +24731,11 @@ sisteransi@^1.0.3:
   version "1.0.4"
   resolved "https://registry.yarnpkg.com/sisteransi/-/sisteransi-1.0.4.tgz#386713f1ef688c7c0304dc4c0632898941cad2e3"
   integrity sha512-/ekMoM4NJ59ivGSfKapeG+FWtrmWvA1p6FBZwXrqojw90vJu8lBmrTxCMuBCydKtkaUe2zt4PlxeTKpjwMbyig==
+
+sizzle@^2.3.4:
+  version "2.3.5"
+  resolved "https://registry.yarnpkg.com/sizzle/-/sizzle-2.3.5.tgz#ef7ccfbbcfeed2a18c2e5ce05603d6ffab64d89a"
+  integrity sha512-mncpQHS12IwzOpuMReKd2matojaS5M5Ofms96LUKOOg8S1M7jIh90OQyd2I6sBoHpxg/HoduOJNDTvRCmnm0YA==
 
 skin-deep@^1:
   version "1.2.0"
