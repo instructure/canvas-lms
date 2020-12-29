@@ -21,6 +21,7 @@ import {Tabs} from '@instructure/ui-tabs'
 import MasteryScale from 'jsx/outcomes/MasteryScale'
 import MasteryCalculation from 'jsx/outcomes/MasteryCalculation'
 import {ApolloProvider, createClient} from 'jsx/canvas-apollo'
+import OutcomesContext from './contexts/OutcomesContext'
 import ManagementHeader from './ManagementHeader'
 import OutcomeManagementPanel from './Management'
 
@@ -88,11 +89,16 @@ export const OutcomeManagementWithoutGraphql = () => {
   }, [hasUnsavedChangesRef])
 
   const [snakeContextType, contextId] = ENV.context_asset_string.split('_')
-
   const contextType = snakeContextType === 'course' ? 'Course' : 'Account'
+  const contextStore = {
+    env: {
+      contextType,
+      contextId
+    }
+  }
 
   return (
-    <>
+    <OutcomesContext.Provider value={contextStore}>
       {improvedManagement && <ManagementHeader />}
       <Tabs onRequestTabChange={handleTabChange}>
         <Tabs.Panel renderTitle={I18n.t('Manage')} isSelected={selectedIndex === 0}>
@@ -117,7 +123,7 @@ export const OutcomeManagementWithoutGraphql = () => {
           />
         </Tabs.Panel>
       </Tabs>
-    </>
+    </OutcomesContext.Provider>
   )
 }
 
