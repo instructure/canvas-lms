@@ -1,0 +1,8 @@
+{
+  "files": [
+    {
+      "pattern": "**/*.{coffee,js}",
+      "processor": "js"
+    }
+  ]
+}
