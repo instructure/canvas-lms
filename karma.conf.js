@@ -129,7 +129,7 @@ if (process.env.COVERAGE) {
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post',
-    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/
   })
 }
 

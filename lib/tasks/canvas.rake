@@ -48,32 +48,18 @@ namespace :canvas do
         ('js:yarn_install' if npm_install)
       ].compact
 
-      task 'i18n:generate_js' => [
-        # canvas_quizzes is quirky in that we can only extract its phrases from
-        # its build artifacts and not from its source! this is unlike other
-        # client apps
-        'js:build_client_app[canvas_quizzes]'
-      ] if build_js
-
-      task 'js:build_client_app[canvas_quizzes]' => [ 'css:compile' ] do |name|
-        {
-          name: name,
-          runner: -> { Rake::Task['js:build_client_app'].invoke('canvas_quizzes') }
-        }
-      end if build_js
+      task 'i18n:generate_js' => [] if build_js
 
       task 'js:webpack_development' => [
         # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
         # to exist before we run handlebars stuff, so we have to do this first
         'css:compile',
         'i18n:generate_js',
-        'js:build_client_app[canvas_quizzes]',
       ] if build_js && build_dev_js
 
       task 'js:webpack_production' => [
         'css:compile',
         'i18n:generate_js',
-        'js:build_client_app[canvas_quizzes]',
       ] if build_js && build_prod_js
     end
 

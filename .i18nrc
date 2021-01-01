@@ -16,7 +16,6 @@
 
   "include": [
     "app/coffeescripts/.i18nrc",
-    "client_apps/canvas_quizzes/.i18nrc",
     "gems/plugins/.i18nrc",
     "public/javascripts/.i18nrc"
   ]

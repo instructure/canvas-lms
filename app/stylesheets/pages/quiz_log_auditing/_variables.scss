@@ -1,0 +1,92 @@
+/*
+ * Copyright (C) 2014 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+// $whitespace is a special, and very powerful, layouting variable. It should
+// be used anytime you want to define spacing; whether it is inside an element,
+// or between groups of elements. Using this variable allows us to define a
+// very consistent and "easy-reading" layout.
+//
+// A bit about using this variable effectively:
+//
+// You may/should use multipliers (such as *2) to define visual relationships
+// between elements. For example, two textual elements inside a single
+// <header /> component should be normally separated by 1 $whitespace unit,
+// while the header itself could be separated from other elements by two
+// $whitespace units to "give it more space to breathe" and the user can
+// naturally break the components apart, merely thanks to whitespace.
+//
+// DON'T:
+//
+// - define inconsistent axis padding or margins unless design depicts it, like:
+//   `padding: $whitespace 0;` or `margin: $whitespace*2 $whitespace;`
+// - use this variable with weird multipliers to achieve some 55px spacing
+//   design had decided to put only to the left of the element; use on regular
+//   basis, don't use for "special" elements
+//
+// Further reading to hone your whitespace killer skillz:
+//
+//   - http://blog.teamtreehouse.com/white-space-in-web-design-what-it-is-and-why-you-should-use-it
+//   - http://uxmyths.com/post/2059998441/myth-28-white-space-is-wasted-space
+//   - Google for "whitespace in web design"
+//
+$whitespace: 12px;
+
+$brandColor: var(--ic-brand-primary);
+
+$primaryFg: #333;
+
+// $active and $inactive variables should be used for coloring interactive sets
+// in which elements can be "activated" and the rest would become deactivated,
+// like navigation pills or tabs.
+$activeBg: $brandColor;
+$activeFg: white;
+$inactiveBg: #efefef;
+$inactiveFg: inherit;
+
+// Foreground of elements that are currently disabled.
+$disabledFg: #333;
+
+// Foreground of textual elements that are considered supplementary, or less
+// interesting than siblings.
+$muteFg: #949494;
+
+// A dark shade of grey usually coupled with $highlightColor to highlight a
+// certain element in a set.
+$contrastColor: #2a333b;
+
+// A bright green for drawing attention.
+$highlightColor: #349e67;
+
+// You could use this for anything abnormal, or for negative numbers.
+$negativeColor: $ic-color-danger;
+
+// An accessible, mid-tone grey.
+$borderColor: #ddd;
+
+// Functional Colors
+// =================
+// This section contains colors that may not be used widely enough to warrant
+// a generic variable.
+//
+// Try to use a semantically clear name for these variables so we know what's
+// going on.
+
+$summaryPercentileChartBarColor: #BEDFF1;
+$activeOrHoverQuestionBoxBg: #f4f4f4;
+
+$visitedLinkFg: #609;

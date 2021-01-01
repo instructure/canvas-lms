@@ -70,7 +70,6 @@ RUN bash -c ' \
     /root/.node-gyp \
     /tmp/phantomjs \
     .yardoc \
-    client_apps/canvas_quizzes/{tmp,node_modules} \
     config/locales/generated \
     gems/*/node_modules \
     gems/plugins/*/node_modules \

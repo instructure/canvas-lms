@@ -8,13 +8,11 @@ services:
     volumes:
       - .:/usr/src/app
       - brandable_css_brands:/usr/src/app/app/stylesheets/brandable_css_brands
-      - generated_1:/usr/src/app/public/javascripts/client_apps
       - generated_2:/usr/src/app/public/dist
       - generated_3:/usr/src/app/public/javascripts/compiled
       - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
-      - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
       - tmp:/usr/src/app/tmp
       - yarn-cache:/home/docker/.cache/yarn
     environment:

@@ -1,7 +1,6 @@
 {
   "ignoreFiles": [
     "app/stylesheets/vendor/**",
-    "client_apps/canvas_quizzes/vendor/**",
     "public/**",
   ],
   "rules": {

@@ -18,7 +18,6 @@ services:
       - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
       - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
       - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
-      - generated_1:/usr/src/app/public/javascripts/client_apps
       - generated_2:/usr/src/app/public/dist
       - generated_3:/usr/src/app/public/javascripts/compiled
       - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
@@ -34,9 +33,6 @@ services:
       - node_modules:/usr/src/app/node_modules
       - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
       - pacts:/usr/src/app/pacts
-      - quizzes_dist:/usr/src/app/client_apps/canvas_quizzes/dist
-      - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
-      - quizzes_tmp:/usr/src/app/client_apps/canvas_quizzes/tmp
       - reports:/usr/src/app/reports
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp

@@ -137,10 +137,6 @@ pipeline {
                       }
                     }
 
-                    tests['canvas_quizzes'] = {
-                      sh 'build/new-jenkins/js/tests-quizzes.sh'
-                    }
-
                     for(int i = 0; i < JSG_NODE_COUNT; i++) {
                       tests["Karma - Spec Group - jsg${i}"] = makeKarmaStage('jsg', i, JSG_NODE_COUNT)
                     }

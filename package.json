@@ -11,12 +11,9 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/plugins/*",
-      "packages/*",
-      "client_apps/*"
+      "packages/*"
     ],
     "nohoist": [
-      "canvas_quizzes/grunt*",
-      "canvas_quizzes/jasmine*",
       "**/tinymce",
       "**/tinymce/**"
     ]
@@ -146,6 +143,7 @@
     "react-lazy-load": "^3.0.13",
     "react-modal": "^3",
     "react-redux": "^5.1.1",
+    "react-router-dom": "^5.2.0",
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
     "redux": "^4.0.1",
@@ -189,6 +187,7 @@
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-transform-amd-to-commonjs": "^1.4.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
+    "chai-assert-change": "^2.0.0",
     "clean-webpack-plugin": "^3",
     "coffee-loader": "~0.7.2",
     "coffee-script": "^1",
@@ -245,7 +244,6 @@
     "jest-moxios-utils": "^1",
     "jest-raw-loader": "^1",
     "json-loader": "^0.5.7",
-    "jsx-loader": "0.11.2",
     "karma": "^3",
     "karma-chrome-launcher": "^2",
     "karma-coverage-istanbul-reporter": "^2",

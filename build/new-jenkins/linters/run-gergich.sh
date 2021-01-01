@@ -83,7 +83,7 @@ if ! git diff --exit-code Dockerfile.jenkins; then
 fi
 
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'"
-./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake js:build_client_app['canvas_quizzes'] i18n:check'"
+./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake i18n:check'"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/brakeman"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/tatl_tael"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/stylelint"

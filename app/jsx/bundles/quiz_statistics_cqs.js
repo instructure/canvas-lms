@@ -16,4 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import 'quiz_statistics_cqs'
+import $ from 'jquery'
+import { configure, mount } from '../canvas_quizzes/statistics/main.js'
+
+configure({
+  ajax: $.ajax,
+  loadOnStartup: true,
+  quizStatisticsUrl: ENV.quiz_statistics_url,
+  quizReportsUrl: ENV.quiz_reports_url,
+  courseSectionsUrl: ENV.course_sections_url
+})
+
+mount(document.body.querySelector('#content')).then(() => {
+  console.log('Yeah!!!')
+})
