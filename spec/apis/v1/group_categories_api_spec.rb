@@ -73,15 +73,33 @@ describe "Group Categories API", type: :request do
         end
       end
 
-      it "should return users for a group_category" do
-        status = raw_api_call(:get, api_url, api_route)
-        expect(status).to eq 200
-        csv = CSV.parse(response.body)
-        expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
-        expect(csv.count).to eq(5)
-        5.times do
-          p = Pseudonym.by_unique_id(csv.first[3]).take
-          expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
+      context 'basic roster' do
+        shared_examples 'basic course roster' do
+          it "should return users for a group_category" do
+            status = raw_api_call(:get, api_url, api_route)
+            expect(status).to eq 200
+            csv = CSV.parse(response.body)
+            expect(csv.shift).to eq(["name", "canvas_user_id", "user_id", "login_id", "sections", "group_name"])
+            expect(csv.count).to eq(5)
+            5.times do
+              p = Pseudonym.by_unique_id(csv.first[3]).take
+              expect(csv.shift).to eq([p.user.name, p.user_id.to_s, p.sis_user_id, p.unique_id, @course.name, nil])
+            end
+          end
+        end
+
+        context 'future course should work' do
+          before do
+            @course.start_at = 1.week.from_now
+            @course.restrict_enrollments_to_course_dates = true
+            @course.save!
+          end
+
+          include_examples 'basic course roster'
+        end
+
+        context 'normal course' do
+          include_examples 'basic course roster'
         end
       end
 
