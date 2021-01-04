@@ -53,3 +53,7 @@ it('leaves schemeless absolute urls alone', () => {
 it('leaves relative urls alone', () => {
   expect(sanitizeUrl('lolcats.gif')).toBe('lolcats.gif')
 })
+
+it('replaces totally invalid urls with about:blank', () => {
+  expect(sanitizeUrl('https://#')).toBe('about:blank')
+})
