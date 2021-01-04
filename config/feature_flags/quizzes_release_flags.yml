@@ -24,3 +24,8 @@ require_migration_to_new_quizzes:
   applies_to: RootAccount
   state: hidden
   beta: true
+new_quizzes_modules_support:
+  display_name: New Quizzes support for Modules
+  description: Improved New Quizzes support with Modules including creating New Quizzes from Modules
+  applies_to: SiteAdmin
+  state: hidden
