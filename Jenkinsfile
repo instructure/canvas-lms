@@ -325,12 +325,12 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    JS_DEBUG_IMAGE = "$BUILD_IMAGE-js-debug:${imageTagVersion()}-$TAG_SUFFIX"
+    JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
-    RUBY_RUNNER_PREFIX = "$BUILD_IMAGE-ruby-runner"
-    YARN_RUNNER_PREFIX = "$BUILD_IMAGE-yarn-runner"
-    WEBPACK_BUILDER_PREFIX = "$BUILD_IMAGE-webpack-builder"
-    WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
+    RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
+    YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
+    WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath("webpack-builder")
+    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath("webpack-cache")
 
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:${imageTagVersion()}-$TAG_SUFFIX"
 
