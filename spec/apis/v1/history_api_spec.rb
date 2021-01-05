@@ -90,6 +90,13 @@ describe HistoryController, type: :request do
                         format: 'json', user_id: 'self')
         expect(json.map { |item| item['asset_name'] }).to eq(['Course People', 'Assign 1'])
       end
+
+      it "gracefully handles a pv4 timeout" do
+        allow(Api).to receive(:paginate).and_raise(PageView::Pv4Client::Pv4Timeout)
+        json = api_call(:get, "/api/v1/users/self/history", controller: 'history', action: 'index',
+                        format: 'json', user_id: 'self', expected_status: :bad_gateway)
+        expect(json['error']).to_not be_nil
+      end
     end
 
     context 'permissions' do
