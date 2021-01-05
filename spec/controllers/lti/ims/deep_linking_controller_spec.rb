@@ -28,7 +28,7 @@ module Lti
       describe '#deep_linking_response' do
         subject { post :deep_linking_response, params: params }
 
-        let(:params) { {JWT: deep_linking_jwt, account_id: account.id} }
+        let(:params) { {JWT: deep_linking_jwt, account_id: account.id } }
 
         it { is_expected.to be_ok }
 
@@ -45,6 +45,7 @@ module Lti
             ),
             reload_page: false
           )
+
           subject
         end
 
@@ -65,6 +66,45 @@ module Lti
           end
         end
 
+        context 'create resource links' do
+          let(:launch_url) { 'http://tool.url/launch' }
+          let(:content_items) {
+            [
+              { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
+              { type: 'link', url: 'http://too.url/sample', title: 'Item 2' }
+            ]
+          }
+          let!(:tool) do
+            tool = external_tool_model(
+              context: account,
+              opts: {
+                url: 'http://tool.url/login',
+                developer_key: developer_key
+              }
+            )
+            tool.settings[:use_1_3] = true
+            tool.save!
+            tool
+          end
+
+          it 'create a resource link into the account context' do
+            subject
+
+            expect(account.lti_resource_links.size).to eq 1
+            expect(account.lti_resource_links.first.current_external_tool(account)).to eq tool
+            expect(account.lti_resource_links.first.context).to eq account
+          end
+
+          it 'add the lookup_id to the to the content item' do
+            subject
+
+            content_items = controller.content_items
+            lti_resource_links = account.lti_resource_links
+
+            expect(content_items.first['lookup_id']).to eq lti_resource_links.first.lookup_id
+          end
+        end
+
         shared_examples_for 'errors' do
           let(:response_message) { raise 'set in examples' }
 
@@ -80,7 +120,7 @@ module Lti
           let(:jti) { 'static value' }
           let(:nonce_key) { "nonce::#{jti}" }
 
-          before {  Lti::Security.check_and_store_nonce(nonce_key, iat, 30.seconds) }
+          before { Lti::Security.check_and_store_nonce(nonce_key, iat, 30.seconds) }
 
           it { is_expected.to be_successful }
         end
@@ -164,6 +204,7 @@ module Lti
           context 'when an empty object is returned' do
             let(:public_jwk_url_response) { {} }
             let(:response_message) { 'JWT verification failure' }
+
             before do
               developer_key.update!(public_jwk_url: url)
             end
@@ -261,7 +302,7 @@ module Lti
           let(:context_external_tool) {
             ContextExternalTool.create!(
               context: course.account,
-              url: 'https://www.test.com',
+              url: 'http://tool.url/login',
               name: 'test tool',
               shared_secret: 'secret',
               consumer_key: 'key',
@@ -270,27 +311,47 @@ module Lti
           }
 
           let(:params) { super().merge({course_id: course.id, context_module_id: context_module.id})}
+          let(:launch_url) { 'http://tool.url/launch' }
           let(:content_items) {
             [
-              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 1"},
-              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 2"},
-              { type: 'ltiResourceLink', url: 'http://tool.url', title: "Item 3"}
+              { type: 'ltiResourceLink', url: launch_url, title: 'Item 1' },
+              { type: 'ltiResourceLink', url: launch_url, title: 'Item 2' },
+              { type: 'ltiResourceLink', url: launch_url, title: 'Item 3' }
             ]
           }
 
-          it 'creates multiple modules items' do
+          before do
             course
             user_session(@user)
             context_external_tool
+          end
+
+          it 'creates multiple modules items' do
             subject
             is_expected.to be_successful
             expect(context_module.content_tags.count).to eq(3)
           end
 
+          it 'create all resource links' do
+            expect(course.lti_resource_links).to be_empty
+            subject
+            is_expected.to be_successful
+            expect(course.lti_resource_links.size).to eq 3
+          end
+
+          it 'add the lookup_id to the content item' do
+            subject
+            is_expected.to be_successful
+
+            content_items = controller.content_items
+            lti_resource_links = course.lti_resource_links
+
+            expect(content_items.first['lookup_id']).to eq lti_resource_links.first.lookup_id
+            expect(content_items.second['lookup_id']).to eq lti_resource_links.second.lookup_id
+            expect(content_items.last['lookup_id']).to eq lti_resource_links.last.lookup_id
+          end
+
           it 'does not pass launch dimensions' do
-            course
-            user_session(@user)
-            context_external_tool
             subject
             is_expected.to be_successful
             expect(context_module.content_tags[0][:link_settings]).to be(nil)
@@ -299,16 +360,13 @@ module Lti
           context 'when content items have iframe property' do
             let(:content_items) {
               [
-                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 1"},
-                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 2"},
-                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: "Item 3"}
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 1'},
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 2'},
+                { type: 'ltiResourceLink', url: 'http://tool.url', iframe: { width: 642, height: 842 }, title: 'Item 3'}
               ]
             }
 
             it 'passes launch dimensions as link_settings' do
-              course
-              user_session(@user)
-              context_external_tool
               subject
               is_expected.to be_successful
               expect(context_module.content_tags[0][:link_settings]['selection_width']).to be(642)

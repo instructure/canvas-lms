@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -29,7 +31,10 @@ module Lti
       before_action :validate_jwt
 
       def deep_linking_response
+        create_lti_resource_links
+
         add_module_items
+
         # Set content items and messaging values in JS env
         js_env({
           content_items: content_items,
@@ -43,7 +48,6 @@ module Lti
 
         render layout: 'bare'
       end
-
     end
   end
 end

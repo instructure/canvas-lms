@@ -705,6 +705,10 @@ end
     self.active.where(:consumer_key => consumer_key).polymorphic_where(:context => contexts_to_search(context)).first
   end
 
+  def self.find_active_external_tool_by_client_id(client_id, context)
+    self.active.where(developer_key_id: client_id).polymorphic_where(context: contexts_to_search(context)).first
+  end
+
   def self.find_external_tool_by_id(id, context)
     self.where(:id => id).polymorphic_where(:context => contexts_to_search(context)).first
   end
@@ -1024,7 +1028,7 @@ end
     scope.
       where(content_tags: { content_id: nil}).
       select("assignments.*", "content_tags.url as tool_url").
-      each do |a| 
+      each do |a|
         # again, look for the 1.1 tool by excluding self from this query.
         # an unavoidable N+1, sadly
         a_tool = self.class.find_external_tool(a.tool_url, a, nil, id)
