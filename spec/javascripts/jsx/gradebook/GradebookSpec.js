@@ -9817,6 +9817,91 @@ QUnit.module('Gradebook#toggleViewUngradedAsZero', hooks => {
   })
 })
 
+QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
+  let gradebook
+
+  const confirmationDialog = () =>
+    document.querySelector('span[role=dialog][aria-label="View Ungraded as Zero"]')
+  const acceptConfirmation = () => {
+    const okButton = [...confirmationDialog().querySelectorAll('button')].find(
+      button => button.textContent === 'OK'
+    )
+    okButton.click()
+  }
+  const denyConfirmation = () => {
+    const cancelButton = [...confirmationDialog().querySelectorAll('button')].find(
+      button => button.textContent === 'Cancel'
+    )
+    cancelButton.click()
+  }
+
+  hooks.beforeEach(() => {
+    gradebook = createGradebook({
+      accepted_view_ungraded_as_zero_dialog: false,
+      grid: {
+        getColumns: () => [],
+        updateCell: sinon.stub()
+      },
+      settings: {
+        allow_view_ungraded_as_zero: 'true'
+      }
+    })
+    sinon.stub(gradebook, 'toggleViewUngradedAsZero')
+  })
+
+  test('shows a confirmation dialog if not previously accepted', async () => {
+    const promise = gradebook.confirmViewUngradedAsZero()
+
+    ok(confirmationDialog())
+    acceptConfirmation()
+    await promise
+  })
+
+  test('does not a show a confirmation dialog if previously accepted', async () => {
+    gradebook.options.accepted_view_ungraded_as_zero_dialog = true
+    const promise = gradebook.confirmViewUngradedAsZero()
+
+    notOk(confirmationDialog())
+    await promise
+  })
+
+  QUnit.module('when the confirmation is requested and accepted', () => {
+    const confirmAndAccept = async () => {
+      const promise = gradebook.confirmViewUngradedAsZero()
+      acceptConfirmation()
+      await promise
+    }
+
+    test('sets accepted_view_ungraded_as_zero_dialog to true', async () => {
+      await confirmAndAccept()
+      strictEqual(gradebook.options.accepted_view_ungraded_as_zero_dialog, true)
+    })
+
+    test('calls toggleViewUngradedAsZero', async () => {
+      await confirmAndAccept()
+      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 1)
+    })
+  })
+
+  QUnit.module('when the confirmation is requested and denied', () => {
+    const confirmAndDeny = async () => {
+      const promise = gradebook.confirmViewUngradedAsZero()
+      denyConfirmation()
+      await promise
+    }
+
+    test('does not set accepted_view_ungraded_as_zero_dialog to true', async () => {
+      await confirmAndDeny()
+      strictEqual(gradebook.options.accepted_view_ungraded_as_zero_dialog, false)
+    })
+
+    test('does not call toggleViewUngradedAsZero', async () => {
+      await confirmAndDeny()
+      strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 0)
+    })
+  })
+})
+
 QUnit.module('Gradebook', suiteHooks => {
   let $container
   let gradebook

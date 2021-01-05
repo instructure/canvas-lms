@@ -83,6 +83,7 @@ import {IconSettingsSolid} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import * as FlashAlert from 'jsx/shared/FlashAlert'
 import {deferPromise} from 'jsx/shared/async'
+import {showConfirmationDialog} from 'jsx/shared/ConfirmationDialog'
 import 'jquery.ajaxJSON'
 import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
@@ -341,6 +342,7 @@ class Gradebook {
     this.initShowUnpublishedAssignments = this.initShowUnpublishedAssignments.bind(this)
     this.toggleUnpublishedAssignments = this.toggleUnpublishedAssignments.bind(this)
     this.toggleViewUngradedAsZero = this.toggleViewUngradedAsZero.bind(this)
+    this.confirmViewUngradedAsZero = this.confirmViewUngradedAsZero.bind(this)
     this.setAssignmentsLoaded = this.setAssignmentsLoaded.bind(this)
     this.setAssignmentGroupsLoaded = this.setAssignmentGroupsLoaded.bind(this)
     this.setContextModulesLoaded = this.setContextModulesLoaded.bind(this)
@@ -1988,7 +1990,7 @@ class Gradebook {
       onSelectShowStatusesModal: () => {
         return this.statusesModal.open()
       },
-      onSelectViewUngradedAsZero: this.toggleViewUngradedAsZero,
+      onSelectViewUngradedAsZero: this.confirmViewUngradedAsZero,
       viewUngradedAsZero: this.gridDisplaySettings.viewUngradedAsZero,
       allowViewUngradedAsZero: this.courseFeatures.allowViewUngradedAsZero
     }
@@ -3504,6 +3506,28 @@ class Gradebook {
       () => {},
       toggleableAction
     ) // on success, do nothing since the render happened earlier
+  }
+
+  confirmViewUngradedAsZero() {
+    const showDialog = () =>
+      showConfirmationDialog({
+        body: I18n.t(
+          'This setting only affects your view of student grades and displays grades as if all ungraded assignments were given a score of zero. This setting is a visual change only and does not affect grades for students or other users of this Gradebook. When this setting is enabled, Canvas will not populate zeros in the Gradebook for student submissions within individual assignments. Only the assignment groups and total columns will automatically factor scores of zero into the overall percentages for each student.'
+        ),
+        confirmText: I18n.t('OK'),
+        label: I18n.t('View Ungraded as Zero')
+      })
+
+    const confirmationPromise = this.options.accepted_view_ungraded_as_zero_dialog
+      ? Promise.resolve(true)
+      : showDialog()
+
+    return confirmationPromise.then(userAccepted => {
+      if (userAccepted) {
+        this.options.accepted_view_ungraded_as_zero_dialog = true
+        this.toggleViewUngradedAsZero()
+      }
+    })
   }
 
   toggleViewUngradedAsZero() {
