@@ -255,7 +255,7 @@ def getCanvasBuildsRefspec() {
   def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
 
   if(env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
-    return 'master'
+    return env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
   }
 
   return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
