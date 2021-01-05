@@ -352,6 +352,14 @@ pipeline {
     stage('Environment') {
       steps {
         script {
+          if (configuration.skipCi()) {
+            node('master') {
+              currentBuild.result = 'NOT_BUILT'
+              gerrit.submitCodeReview("-2", "Build not executed due to skip-ci flag")
+              error "[skip-ci] flag enabled: skipping the build"
+              return
+            }
+          }
           // Ensure that all build flags are compatible.
           if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
             error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
