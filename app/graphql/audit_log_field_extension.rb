@@ -140,7 +140,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next if mutation == Mutations::UpdateNotificationPreferences
       next if mutation == Mutations::CreateConversation
       next if mutation == Mutations::DeleteConversationMessage
-      next if mutation == Mutations::DeleteConversation
+      next if mutation == Mutations::DeleteConversations
       next if mutation == Mutations::AddConversationMessage
       next if mutation == Mutations::UpdateConversationParticipant
 
