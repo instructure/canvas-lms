@@ -108,6 +108,7 @@ module LiveEvents
         rescue Exception => e
           logger.error("Exception making LiveEvents async call: #{e}")
         end
+        LiveEvents.on_work_unit_end&.call
       end
     end
 
