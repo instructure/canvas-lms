@@ -778,11 +778,14 @@ describe UserMerge do
         account = Account.create!
         @shard_course = course_factory(account: account)
         @shard_course.enroll_user(@user2)
+        group = account.groups.create!
         @fav = Favorite.create!(user: @user2, context: @shard_course)
+        @fav2 = Favorite.create!(user: @user2, context: group)
       end
       user1 = user_model
       UserMerge.from(@user2).into(user1)
-      expect(user1.favorites.take.context_id).to eq @shard_course.global_id
+      expect(user1.favorites.where(context_type: 'Course').take.context).to eq @shard_course
+      expect(user1.favorites.where(context_type: 'Group').count).to eq 1
     end
 
     it 'handles duplicate favorites' do
