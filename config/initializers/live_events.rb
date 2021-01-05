@@ -52,4 +52,7 @@ Rails.configuration.to_prepare do
     end
   }
   LiveEvents.stream_client = StubbedClient if ENV['STUB_LIVE_EVENTS_KINESIS']
+  # sometimes this async worker thread grabs a connection on a Setting read or similar.
+  # We need it to be released or the main thread can have a real problem.
+  LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
 end
