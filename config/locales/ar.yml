@@ -26245,6 +26245,15 @@ ar:
   windows_tile_color_2b786bd9: "لون لوحة Windows"
   windows_tile_square_b91d2b33: "لوحة Windows: مربعة"
   windows_tile_wide_4d40910: "لوحة Windows: عريضة"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      من خلال هذه الميزة، ستتم معالجة معادلات LaTex الرياضية إلى أكثر
+      حقول الإدخال النصي في Canvas بواسطة MathJax.
+      LaTex المقسومة بـ \(...\) تصبح معادلات مضمّنة، في حين ستُعالج
+      $$...$$ ككتلة.  على سبيل المثال،
+      يمكنك أن تختار منح عنوان لمهمة \(\sqrt{x}\)، أو
+      إدخال $$ax^2 + by + c = 0$$ في تعليق إرسال.
+      تتطلب هذه الميزة تشغيل علامة
+      "معالجة محدّثة للمعادلة الرياضية".
   withdrawn_4c838347: "تم السحب"
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "عذرًا... يبدو أنه لا يوجد شيء هنا!"
