@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {saveMediaRecording} from '@instructure/canvas-media'
 import * as files from './files'
 import * as images from './images'
 import bridge from '../../bridge'
@@ -258,6 +259,18 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
 
     dispatch(activateMediaUpload(fileMetaProps))
     const {source, jwt, host, contextId, contextType} = getState()
+
+    if (tabContext === 'media' && fileMetaProps.domObject) {
+      return saveMediaRecording(
+        fileMetaProps.domObject,
+        contextId,
+        contextType,
+        (err, uploadData) => {
+          dispatch(mediaUploadComplete(err, uploadData))
+        }
+      )
+    }
+
     return source
       .fetchMediaFolder({jwt, host, contextId, contextType})
       .then(({folders}) => {

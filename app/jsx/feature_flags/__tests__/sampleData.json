@@ -1,0 +1,104 @@
+{
+  "allowedFeature": {
+    "feature": "feature1",
+    "applies_to": "RootAccount",
+    "root_opt_in": true,
+    "display_name": "Feature 1",
+    "description": "This does great feature1y things",
+    "feature_flag": {
+      "feature": "feature1",
+      "state": "allowed",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    }
+  },
+  "allowedOnFeature": {
+    "feature": "feature2",
+    "applies_to": "Account",
+    "root_opt_in": true,
+    "display_name": "Feature 2",
+    "description": "This does great feature2y things",
+    "feature_flag": {
+      "feature": "feature2",
+      "state": "allowed_on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    }
+  },
+  "onFeature": {
+    "feature": "feature3",
+    "applies_to": "Course",
+    "root_opt_in": true,
+    "display_name": "Feature 3",
+    "description": "This does great feature3y things",
+    "feature_flag": {
+      "feature": "feature3",
+      "state": "on",
+      "transitions": {
+        "off": {
+          "locked": false
+        },
+        "allowed": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    }
+  },
+  "offFeature": {
+    "feature": "feature4",
+    "applies_to": "User",
+    "root_opt_in": true,
+    "display_name": "Feature 4",
+    "description": "This does great feature4y things",
+    "autoexpand": true,
+    "feature_flag": {
+      "feature": "feature4",
+      "state": "off",
+      "transitions": {
+        "allowed": {
+          "locked": false
+        },
+        "on": {
+          "locked": false
+        },
+        "allowed_on": {
+          "locked": false
+        }
+      },
+      "locked": false,
+      "hidden": false,
+      "parent_state": "allowed"
+    }
+  }
+}
+  

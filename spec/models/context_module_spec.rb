@@ -304,8 +304,11 @@ describe ContextModule do
   end
 
   describe "add_item" do
-    it "should add an assignment" do
+    before :once do
       course_module
+    end
+
+    it "should add an assignment" do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
 
@@ -314,13 +317,23 @@ describe ContextModule do
     end
 
     it "should not add an invalid assignment" do
-      course_module
       @tag = @module.add_item({:id => 21, :type => 'assignment'})
       expect(@tag).to be_nil
     end
 
+    it "prefers the linked discussion topic when a graded topic's assignment is added" do
+      topic = graded_discussion_topic(context: @course)
+      tag = @module.add_item({:id => topic.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql topic
+    end
+
+    it "prefers the linked quiz when a quiz's assignment is added" do
+      quiz = quiz_model(course: @course, quiz_type: :assignment)
+      tag = @module.add_item({:id => quiz.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql quiz
+    end
+
     it "should add a wiki page" do
-      course_module
       @page = @course.wiki_pages.create!(:title => "some page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
 
@@ -329,7 +342,6 @@ describe ContextModule do
     end
 
     it "should not add invalid wiki pages" do
-      course_module
       @course.wiki
       other_course = Account.default.courses.create!
       @page = other_course.wiki_pages.create!(:title => "new page")
@@ -338,7 +350,6 @@ describe ContextModule do
     end
 
     it "should add an attachment" do
-      course_module
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
       @tag = @module.add_item({:id => @file.id, :type => 'attachment'}) #@file)
 
@@ -347,7 +358,6 @@ describe ContextModule do
     end
 
     it "should allow adding items more than once" do
-      course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag1 = @module.add_item(:id => @assignment.id, :type => "assignment")
       @tag2 = @module.add_item(:id => @assignment.id, :type => "assignment")
@@ -363,13 +373,11 @@ describe ContextModule do
     end
 
     it "should add a header as unpublished" do
-      course_module
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
 
     it "should add an external url" do
-      course_module
       @tag = @module.add_item(
         :type => 'external_url',
         :url => "http://www.instructure.com",

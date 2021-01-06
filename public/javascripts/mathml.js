@@ -83,12 +83,13 @@ const mathml = {
                 .remove()
             })
           }
+
           // leaving this here so I don't have to keep looking up how to see all messages
           // window.MathJax.Hub.Startup.signal.Interest(function (message) {
-          //   console.log('>>> Startup:', message[0])
+          //   console.log('>>> MathJax startup:', message)
           // })
           // window.MathJax.Hub.signal.Interest(function(message) {
-          //   console.log('>>> ', message[0])
+          //   console.log('>>> MathJax signal', message)
           // })
           delete window.MathJaxIsLoading
         },
@@ -142,12 +143,17 @@ const mathml = {
   },
 
   isMathJaxIgnored(elem) {
+    if (!elem) return true
+
+    // ignore disconnected elements
+    if (!document.body.contains(elem)) return true
+
     // elements to ignore selector
     const ignore_list =
       '.MJX_Assistive_MathML,#header,#mobile-header,#left-side,#quiz-elapsed-time,.ui-menu-carat'
 
     // check if elem is in the ignore list
-    if (elem.parentElement.querySelector(ignore_list) === elem) {
+    if (elem.parentElement?.querySelector(ignore_list) === elem) {
       return true
     }
 

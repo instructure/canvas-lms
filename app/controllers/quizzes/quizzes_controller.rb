@@ -742,7 +742,8 @@ class Quizzes::QuizzesController < ApplicationController
 
   def moderate
     if authorized_action(@quiz, @current_user, :grade)
-      @students = @context.students_visible_to(@current_user, include: :inactive)
+      @students = @context.students_visible_to(@current_user)
+      @students = @quiz.visible_students_with_da(@students)
       @students = @students.name_like(params[:search_term]) if params[:search_term].present?
       @students = @students.distinct.order_by_sortable_name
       @students = @students.order(:uuid) if @quiz.survey? && @quiz.anonymous_submissions

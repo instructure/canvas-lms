@@ -29,12 +29,12 @@ describe Course do
 
   describe 'relationships' do
     it { is_expected.to have_one(:late_policy).dependent(:destroy).inverse_of(:course) }
+    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
 
     it { is_expected.to have_many(:post_policies).dependent(:destroy).inverse_of(:course) }
-    it { is_expected.to have_one(:default_post_policy).inverse_of(:course) }
     it { is_expected.to have_many(:assignment_post_policies).inverse_of(:course) }
-
     it { is_expected.to have_many(:feature_flags) }
+    it { is_expected.to have_many(:lti_resource_links).class_name('Lti::ResourceLink') }
   end
 
   describe 'lti2 proxies' do
@@ -4577,6 +4577,11 @@ describe Course, "section_visibility" do
       @admin = account_admin_user
       visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, @admin)
       expect(visible_enrollments.map(&:user)).to be_include(@course.student_view_student)
+    end
+
+    it "is safely empty for a nil user" do
+      visible_enrollments = @course.apply_enrollment_visibility(@course.student_enrollments, nil)
+      expect(visible_enrollments.count).to eq(0)
     end
 
     it "should return student view students to account admins who are also observers for some reason" do

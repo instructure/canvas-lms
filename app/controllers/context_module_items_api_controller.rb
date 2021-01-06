@@ -491,7 +491,11 @@ class ContextModuleItemsApiController < ApplicationController
 
       if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
-          @tag.publish
+          if module_item_publishable?(@tag)
+            @tag.publish
+          else
+            return render json: {message: "item can't be published"}, status: :unprocessable_entity
+          end
         else
           if module_item_unpublishable?(@tag)
             @tag.unpublish

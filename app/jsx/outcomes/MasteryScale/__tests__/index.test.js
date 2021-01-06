@@ -20,8 +20,9 @@ import React from 'react'
 import {render, wait, fireEvent} from '@testing-library/react'
 import {MockedProvider} from '@apollo/react-testing'
 import moxios from 'moxios'
-import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY, COURSE_OUTCOME_PROFICIENCY_QUERY} from '../api'
+import {ACCOUNT_OUTCOME_PROFICIENCY_QUERY} from '../api'
 import MasteryScale from '../index'
+import {masteryScalesGraphqlMocks as mocks} from '../../__tests__/mocks'
 
 describe('MasteryScale', () => {
   beforeEach(() => {
@@ -51,70 +52,6 @@ describe('MasteryScale', () => {
   afterEach(() => {
     window.ENV = null
   })
-
-  const outcomeProficiency = {
-    __typename: 'OutcomeProficiency',
-    _id: '1',
-    contextId: 1,
-    contextType: 'Account',
-    locked: false,
-    proficiencyRatingsConnection: {
-      __typename: 'ProficiencyRatingConnection',
-      nodes: [
-        {
-          __typename: 'ProficiencyRating',
-          _id: '2',
-          color: '009606',
-          description: 'Rating A',
-          mastery: false,
-          points: 9
-        },
-        {
-          __typename: 'ProficiencyRating',
-          _id: '6',
-          color: 'EF4437',
-          description: 'Rating B',
-          mastery: false,
-          points: 6
-        }
-      ]
-    }
-  }
-
-  const mocks = [
-    {
-      request: {
-        query: ACCOUNT_OUTCOME_PROFICIENCY_QUERY,
-        variables: {
-          contextId: '11'
-        }
-      },
-      result: {
-        data: {
-          context: {
-            __typename: 'Account',
-            outcomeProficiency
-          }
-        }
-      }
-    },
-    {
-      request: {
-        query: COURSE_OUTCOME_PROFICIENCY_QUERY,
-        variables: {
-          contextId: '12'
-        }
-      },
-      result: {
-        data: {
-          context: {
-            __typename: 'Course',
-            outcomeProficiency
-          }
-        }
-      }
-    }
-  ]
 
   it('loads proficiency data', async () => {
     const {getByText, getByDisplayValue} = render(

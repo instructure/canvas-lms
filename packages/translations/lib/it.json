@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "cerchia elenco non ordinato"
     },
+    "clear_2084585f": {
+        "message": "Cancella"
+    },
     "clear_selected_file_82388e50": {
         "message": "Cancella file selezionato"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Caricamento voci agenda"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Caricamento in corso, attendere"
     },
     "location_3b6ff307": {
         "message": "Posizione:"

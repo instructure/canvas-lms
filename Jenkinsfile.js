@@ -51,9 +51,11 @@ def makeKarmaStage(group, ciNode, ciTotal) {
 def cleanupFn() {
   timeout(time: 5) {
     try {
-      archiveArtifacts artifacts: 'tmp/**/*.xml'
-      junit "tmp/**/*.xml"
-      sh 'find ./tmp -path "*.xml"'
+      if(env.TEST_SUITE != 'upload') {
+        archiveArtifacts artifacts: 'tmp/**/*.xml'
+        junit "tmp/**/*.xml"
+        sh 'find ./tmp -path "*.xml"'
+      }
     } finally {
       execute 'bash/docker-cleanup.sh --allow-failure'
     }
@@ -97,7 +99,12 @@ pipeline {
                 script {
                   def tests = [:]
 
-                  if(env.TEST_SUITE == 'jest') {
+                  if(env.TEST_SUITE == 'upload') {
+                    sh """
+                      docker tag local/js-runner $JS_DEBUG_IMAGE_TAG
+                      docker push $JS_DEBUG_IMAGE_TAG
+                    """
+                  } else if(env.TEST_SUITE == 'jest') {
                     tests['Jest'] = {
                       withEnv(['CONTAINER_NAME=tests-jest']) {
                         try {

@@ -116,6 +116,7 @@ class AssignmentsController < ApplicationController
 
     js_env({
       ASSIGNMENT_ID: params[:id],
+      CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
       COURSE_ID: @context.id,
       PREREQS: assignment_prereqs,
       SUBMISSION_ID: graphql_submisison_id

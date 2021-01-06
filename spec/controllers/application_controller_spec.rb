@@ -432,6 +432,12 @@ RSpec.describe ApplicationController do
     end
   end
 
+  describe "response_code_for_rescue" do
+    it "maps certain exceptions declared outside core canvas to known codes" do
+      e = CanvasHttp::CircuitBreakerError.new
+      expect(controller.send(:response_code_for_rescue, e)).to eq(502)
+    end
+  end
   describe "#reject!" do
     it "sets the message and status in the error json" do
       expect { controller.reject!('test message', :not_found) }.to(raise_error(RequestError) do |e|
@@ -739,7 +745,8 @@ RSpec.describe ApplicationController do
           content_id: 44,
           tag_type: 'context_module',
           context_type: 'Account',
-          context_id: 1
+          context_id: 1,
+          root_account_id: Account.default
         }.merge(overrides)
       )
     end

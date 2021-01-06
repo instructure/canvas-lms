@@ -247,6 +247,12 @@ describe User do
     end
   end
 
+  describe "#public_lti_id" do
+    subject { User.public_lti_id }
+
+    it { is_expected.to eq "https://canvas.instructure.com/public_user" }
+  end
+
   describe "#cached_recent_stream_items" do
     before(:once) do
       @contexts = []
@@ -1864,11 +1870,12 @@ describe User do
   describe "event methods" do
     describe "upcoming_events" do
       before(:once) { course_with_teacher(:active_all => true) }
+
       it "handles assignments where the applied due_at is nil" do
         assignment = @course.assignments.create!(:title => "Should not throw",
-                                                 :due_at => 1.days.from_now)
+                                                 :due_at => 2.days.from_now)
         assignment2 = @course.assignments.create!(:title => "Should not throw2",
-                                                  :due_at => 1.days.from_now)
+                                                  :due_at => 1.day.from_now)
         section = @course.course_sections.create!(:name => "VDD Section")
         override = assignment.assignment_overrides.build
         override.set = section
@@ -1907,6 +1914,26 @@ describe User do
           EnrollmentState.recalculate_expired_states # runs periodically in background
           expect(User.find(@user.id).upcoming_events).not_to include(event) # re-find user to clear cached_contexts
         end
+      end
+
+      it "shows assignments assigned to a section in correct order" do
+        assignment1 = @course.assignments.create!(:title => "A1",
+                                                 :due_at => 1.day.from_now)
+        assignment2 = @course.assignments.create!(:title => "A2",
+                                                  :due_at => 3.days.from_now)
+        assignment3 = @course.assignments.create!(:title => "A3 - for a section",
+                                                  :due_at => 4.days.from_now)
+        section = @course.course_sections.create!(:name => "Section 1")
+        override = assignment3.assignment_overrides.build
+        override.set = section
+        override.due_at = 2.days.from_now
+        override.due_at_overridden = true
+        override.save!
+
+        events = @user.upcoming_events(:end_at => 1.week.from_now)
+        expect(events.first).to eq assignment1
+        expect(events.second).to eq assignment3
+        expect(events.third).to eq assignment2
       end
 
       context "after db section context_code filtering" do

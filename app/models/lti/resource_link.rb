@@ -21,12 +21,15 @@
 class Lti::ResourceLink < ApplicationRecord
   include Canvas::SoftDeletable
 
-  validates :resource_link_id, presence: true
-  validates :context_external_tool_id, presence: true
+  validates :context_external_tool_id, :context_id, :context_type, :lookup_id,
+            :resource_link_id, presence: true
+  validates :lookup_id, uniqueness: true
 
   belongs_to :context_external_tool
-  alias_method :original_context_external_tool, :context_external_tool
+  belongs_to :context, polymorphic: [:account, :assignment, :course]
   belongs_to :root_account, class_name: 'Account'
+
+  alias_method :original_context_external_tool, :context_external_tool
 
   has_many :line_items,
             inverse_of: :resource_link,
@@ -35,6 +38,7 @@ class Lti::ResourceLink < ApplicationRecord
             foreign_key: :lti_resource_link_id
 
   before_validation :generate_resource_link_id, on: :create
+  before_validation :generate_lookup_id, on: :create
   before_save :set_root_account
 
   def context_external_tool
@@ -52,6 +56,10 @@ class Lti::ResourceLink < ApplicationRecord
   end
 
   private
+
+  def generate_lookup_id
+    self.lookup_id ||= SecureRandom.uuid
+  end
 
   def generate_resource_link_id
     self.resource_link_id ||= SecureRandom.uuid

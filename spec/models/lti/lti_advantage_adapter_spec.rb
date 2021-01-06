@@ -109,6 +109,14 @@ describe Lti::LtiAdvantageAdapter do
       end
     end
 
+    context 'when the user is nil' do
+      let(:user) { nil }
+
+      it 'sets the "login_hint" to the public user ID' do
+        expect(login_message['login_hint']).to eq User.public_lti_id
+      end
+    end
+
     it "generates a resource link request if the tool's resource type setting is 'ResourceLinkRequest'" do
       expect(params["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
     end

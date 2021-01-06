@@ -456,6 +456,19 @@ module PostgreSQLAdapterExtensions
     @collations = nil
     I18n.locale = original_locale
   end
+
+  def current_wal_lsn
+    unless instance_variable_defined?(:@has_wal_func)
+      @has_wal_func = select_value("SELECT true FROM pg_proc WHERE proname IN ('pg_current_wal_lsn','pg_current_xlog_location') LIMIT 1")
+    end
+    return unless @has_wal_func
+
+    if postgresql_version >= 100000
+      select_value("SELECT pg_current_wal_lsn()")
+    else
+      select_value("SELECT pg_current_xlog_location()")
+    end
+  end
 end
 
 ActiveRecord::ConnectionAdapters::PostgreSQLAdapter.prepend(PostgreSQLAdapterExtensions)

@@ -180,14 +180,28 @@ const getModalText = contextType => {
   )
 }
 
-const ProficiencyCalculation = ({method, update, updateError, canManage, contextType}) => {
+const ProficiencyCalculation = ({
+  method,
+  update,
+  updateError,
+  canManage,
+  contextType,
+  onNotifyPendingChanges
+}) => {
   const {calculationMethod: initialMethodKey, calculationInt: initialInt} = method
 
   const [calculationMethodKey, setCalculationMethodKey] = useState(initialMethodKey)
   const [calculationInt, setCalculationInt] = useState(initialInt)
 
-  const [allowSave, setAllowSave] = useState(false)
+  const [allowSave, realSetAllowSave] = useState(false)
   const [showConfirmation, setShowConfirmationModal] = useState(false)
+
+  const setAllowSave = newAllowSave => {
+    realSetAllowSave(newAllowSave)
+    if (onNotifyPendingChanges) {
+      onNotifyPendingChanges(newAllowSave)
+    }
+  }
 
   useEffect(() => {
     if (updateError) {
@@ -284,6 +298,7 @@ ProficiencyCalculation.propTypes = {
   }),
   canManage: PropTypes.bool,
   update: PropTypes.func.isRequired,
+  onNotifyPendingChanges: PropTypes.func,
   updateError: PropTypes.string,
   contextType: PropTypes.string.isRequired
 }

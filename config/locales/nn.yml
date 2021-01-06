@@ -6144,6 +6144,7 @@ nn:
     sis_id_taken: "SIS-ID \"%{sis_id}\" er allereie i bruk"
   course_section_7a988066: Emneseksjonar
   course_section_name_ea880ed1: "Emneseksjonar %{name}"
+  course_sections: "Seksjonar på emnet"
   course_sections_add_edit_delete_c4f4ac19: "Emneseksjonar - legg til / endre / slett"
   course_selection_245808bf: Emneval
   course_set_up_tutorial_6ab7c2d1: "Sett opp emne-rettleiing"
@@ -8136,6 +8137,10 @@ nn:
   enrollment_term_7bfe840: "Påmelding semester"
   enrollment_terms_8753ec11: "Påmelding semester"
   enrollments_e250c9c3: Påmeldingar
+  enrollments_observers: Observatørar
+  enrollments_students: Studentar
+  enrollments_tas: Undervisingsassistentar
+  enrollments_teachers: Faglærarar
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi ei hex-kode slik at du kan bruke eigendefinert farge."
   enter_a_valid_date_46d77547: "Legg inn ein gyldig dato"
   enter_a_what_if_score_668c91a3: "Oppgi eit kva-skjer-dersom-resultat."
@@ -19084,6 +19089,7 @@ nn:
         logout: "Logg av"
         stop_masquerading: "[Stopp forkleding]"
       page_title: "Institusjonen er suspendert"
+  site_admin_d0417171: Områdeadministrator
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Kun for systemadmin. Send til 1 / %{denominator} brukarar i aktiverte kontoar kvar månad."
   size_b30e1077: Storleik
   size_size_a77bd760: "storleik: %{size}"
@@ -19337,6 +19343,7 @@ nn:
   student_extensions_d35a907: "Utvidingar for studentar"
   student_grades_4cbc59a1: "Vurderingar for student"
   student_group_filter_185fb085: "Filter for studentgrupper"
+  student_groups: Studentgrupper
   student_groups_863201c1: Studentgrupper
   student_id: Student-ID
   student_id_236970d8: student_id
@@ -21934,6 +21941,7 @@ nn:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan ikkje slette ein underkonto som inneheld emne."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Du kan ikkje slette ein underkonto som inneheld underkontoar. "
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Du kan ikkje slette %{account_name} fordi han har emne knytta til seg "
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Dette vurderingsskjemaet er i bruk fleire stader. Dersom du redigerer her, vil det bli oppretta ein kopi av vurderingsskjemaet og endringane vil ikkje påverka det opphavlege skjemaet. Vil du halde fram likevel?"
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge på igjen*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Du kan oppdatere noko av denne brukaren sin informasjon, men dei kan endre det om dei vil."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke ei enkelt ico-fil på 16 x 16, 32 x 32, 48 x 48."

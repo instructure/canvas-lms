@@ -34,6 +34,7 @@ export default class AdminToolsView extends Backbone.View {
     this.child('restoreContentPaneView', '#restoreContentPane')
     this.child('messageContentPaneView', '#commMessagesPane')
     this.child('loggingContentPaneView', '#loggingPane')
+    this.child('bouncedEmailsPaneView', '#bouncedEmailsPane')
     this.optionProperty('tabs')
 
     this.prototype.template = template
@@ -52,6 +53,7 @@ export default class AdminToolsView extends Backbone.View {
     json.courseRestore = this.tabs.courseRestore
     json.viewMessages = this.tabs.viewMessages
     json.logging = this.tabs.logging
+    json.bouncedEmails = this.tabs.bouncedEmails
     return json
   }
 }

@@ -52,6 +52,7 @@ pipeline {
             stage('Copy Canvas Config') {
               sh 'cp -vr docker-compose/config/*.yml config/'
               sh 'cp -vr config/docker-compose.override.yml.example docker-compose.override.yml'
+              sh 'echo -n "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml" > .env'
             }
 
             stage('Build Canvas') {
@@ -61,8 +62,8 @@ pipeline {
 
                 build_images
                 check_gemfile
+                build_assets
               '''
-              sh 'docker-compose run --rm web ./script/canvas_update -n code -n data'
             }
 
             stage('Create DB and Migrate') {
@@ -72,7 +73,6 @@ pipeline {
 
                  create_db
                '''
-               sh 'docker-compose run --rm web ./script/canvas_update -n code -n deps'
             }
 
             stage('Start Canvas Container') {

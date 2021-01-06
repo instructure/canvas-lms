@@ -32,7 +32,12 @@ module Types
 
     field :user, UserType, null: false
     def user
-      load_association(:user)
+      load_association(:user).then do |u|
+        # This is necessary because the user association doesn't contain all the attributes
+        # we might want after creating a conversation. Doing the following load off of the
+        # ID will get us the full user object and all attributes we might need.
+        Loaders::IDLoader.for(User).load(u.id)
+      end
     end
 
     field :conversation, ConversationType, null: false

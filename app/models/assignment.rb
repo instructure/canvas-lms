@@ -68,6 +68,8 @@ class Assignment < ActiveRecord::Base
   restrict_assignment_columns
   restrict_columns :state, [:workflow_state]
 
+  attribute :lti_resource_link_custom_params, :string, default: nil
+
   has_many :submissions, -> { active.preload(:grading_period) }, inverse_of: :assignment
   has_many :all_submissions, class_name: 'Submission', dependent: :delete_all
   has_many :observer_alerts, through: :all_submissions
@@ -107,9 +109,14 @@ class Assignment < ActiveRecord::Base
   has_many :moderation_grader_users, through: :moderation_graders, source: :user
 
   has_many :auditor_grade_change_records,
-    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
-    dependent: :destroy,
-    inverse_of: :assignment
+           class_name: 'Auditors::ActiveRecord::GradeChangeRecord',
+           dependent: :destroy,
+           inverse_of: :assignment
+  has_many :lti_resource_links,
+           as: :context,
+           inverse_of: :context,
+           class_name: 'Lti::ResourceLink',
+           dependent: :destroy
 
   has_many :conditional_release_rules, class_name: "ConditionalRelease::Rule", dependent: :destroy, foreign_key: 'trigger_assignment_id', inverse_of: :trigger_assignment
   has_many :conditional_release_associations, class_name: "ConditionalRelease::AssignmentSetAssociation", dependent: :destroy, inverse_of: :assignment
@@ -1085,6 +1092,8 @@ class Assignment < ActiveRecord::Base
     # which Tool it's bound to.
     if lti_1_3_external_tool_tag? && line_items.empty?
       rl = Lti::ResourceLink.create!(
+        context: self,
+        custom: lti_resource_link_custom_params_as_hash,
         resource_link_id: lti_context_id,
         context_external_tool: ContextExternalTool.from_content_tag(
           external_tool_tag,
@@ -1098,8 +1107,32 @@ class Assignment < ActiveRecord::Base
         find(&:assignment_line_item?)&.
         update!(label: title, score_maximum: points_possible)
     end
+
+    if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
+      return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+
+      primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+    end
   end
   protected :update_line_items
+
+  def lti_resource_link_custom_params_as_hash
+    return nil unless lti_resource_link_custom_params
+
+    JSON.parse(lti_resource_link_custom_params, symbolized_keys: true)
+  rescue JSON::ParserError
+    nil
+  end
+  private :lti_resource_link_custom_params_as_hash
+
+  def primary_resource_link
+    @primary_resource_link ||= begin
+      lti_resource_links.find_by(
+        resource_link_id: lti_context_id,
+        context: self
+      )
+    end
+  end
 
   def lti_1_3_external_tool_tag?
     return false unless external_tool?
@@ -1498,6 +1531,12 @@ class Assignment < ActiveRecord::Base
   end
 
   def self.preload_unposted_anonymous_submissions(assignments)
+    # Don't do anything if there are no assignments OR unposted anonymous submissions are already preloaded
+    if assignments.is_a?(Array) &&
+      (assignments.empty? || assignments.all? { |a| !a.unposted_anonymous_submissions.nil? })
+      return
+    end
+
     assignment_ids_with_unposted_anonymous_submissions = Assignment.
       where(id: assignments, anonymous_grading: true).
       where(
@@ -1512,6 +1551,8 @@ class Assignment < ActiveRecord::Base
     assignments.each do |assignment|
       assignment.unposted_anonymous_submissions = assignment_ids_with_unposted_anonymous_submissions.include?(assignment.id)
     end
+
+    nil
   end
 
   def touch_on_unlock_if_necessary
@@ -3090,6 +3131,11 @@ class Assignment < ActiveRecord::Base
 
   def needs_grading_count
     Assignments::NeedsGradingCountQuery.new(self).manual_count
+  end
+
+  def can_publish?
+    return true if new_record?
+    ['unpublished', 'published'].include?(workflow_state)
   end
 
   def can_unpublish?

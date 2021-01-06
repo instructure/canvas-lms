@@ -35,6 +35,10 @@ describe Types::CourseType do
     expect(course_type.resolve("name")).to eq course.name
   end
 
+  it 'works for root_outcome_group' do
+    expect(course_type.resolve('rootOutcomeGroup { _id }')).to eq course.root_outcome_group.id.to_s
+  end
+
   context "top-level permissions" do
     it "needs read permission" do
       course_with_student

@@ -22,10 +22,11 @@ import {arrayOf, bool, func, number, string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 import keycode from 'keycode'
 import {Button} from '@instructure/ui-buttons'
-import {Flex, View} from '@instructure/ui-layout'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import {
   IconA11yLine,

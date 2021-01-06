@@ -117,6 +117,24 @@ describe Quizzes::QuizSubmissionEventsApiController, type: :request do
       @quiz_submission = @quiz.quiz_submissions.create!(user: @user, workflow_state: 'settings_only')
       expect(api_create({raw: true}, {'quiz_submission_events' => events_data})).to eq 404
     end
+
+    context 'for an ungraded quiz in a public course' do
+      before do
+        @course.is_public = true
+        @course.is_public_to_auth_users = true
+        @course.save!
+        @quiz.quiz_type = 'practice_quiz'
+        @quiz.save!
+      end
+
+      it 'should respond with no_content success' do
+        student_in_course
+        @user = @teacher
+        @quiz_submission = @quiz.quiz_submissions.last
+        api_create({raw: true}, {})
+        assert_status(204)
+      end
+    end
   end
 
   describe 'GET /courses/:course_id/quizzes/:quiz_id/submissions/:id/events [index]' do

@@ -19,7 +19,7 @@
 import React from 'react'
 import {func, string} from 'prop-types'
 import classnames from 'classnames'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {downloadToWrap} from '../../../common/fileUrl'
 import {mediaPlayerURLFromFile} from './fileTypeUtils'
 

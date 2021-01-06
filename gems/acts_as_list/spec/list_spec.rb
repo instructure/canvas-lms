@@ -278,7 +278,7 @@ describe "ListTest" do
 
   class Mixin < ActiveRecord::Base
     def self.nulls(first_or_last, column, direction = nil)
-      "#{column} IS#{' NOT' unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip
+      Arel.sql("#{column} IS#{' NOT' unless first_or_last == :last} NULL, #{column} #{direction.to_s.upcase}".strip)
     end
   end
 

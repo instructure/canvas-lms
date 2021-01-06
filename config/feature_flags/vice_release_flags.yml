@@ -30,14 +30,6 @@ hide_course_sections_from_students:
     Allows teachers to hide course sections from students on the People page when there is more than one section in the course.
   applies_to: RootAccount
 
-notification_granular_course_preferences:
-  state: hidden
-  display_name: Course level overrides for notification preferences
-  description: |-
-    Allows users to override specific notification preferences on a
-    course by course basis.
-  applies_to: SiteAdmin
-
 notification_update_account_ui:
   state: hidden
   display_name: Account level notification preferences UI update

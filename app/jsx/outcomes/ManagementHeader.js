@@ -25,7 +25,7 @@ const ManagementHeader = () => {
   const noop = () => {}
 
   return (
-    <div className="management-header">
+    <div className="management-header" data-testid="managementHeader">
       <div>
         <h2 className="title">{I18n.t('Outcomes')}</h2>
       </div>

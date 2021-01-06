@@ -57,7 +57,6 @@ const configToState = data => {
   return {
     rows,
     savedRows: rows,
-    allowSave: false,
     showConfirmation: false
   }
 }
@@ -68,7 +67,8 @@ class ProficiencyTable extends React.Component {
     update: PropTypes.func.isRequired,
     focusTab: PropTypes.func,
     breakpoints: breakpointsShape,
-    contextType: PropTypes.string.isRequired
+    contextType: PropTypes.string.isRequired,
+    onNotifyPendingChanges: PropTypes.func
   }
 
   static defaultProps = {
@@ -96,11 +96,20 @@ class ProficiencyTable extends React.Component {
   componentDidUpdate() {
     if (this.fieldWithFocus()) {
       // eslint-disable-next-line react/no-did-update-set-state
-      this.setState(({rows}) => ({rows: rows.map(row => row.delete('focusField'))}))
+      this.setState(
+        ({rows}) => ({rows: rows.map(row => row.delete('focusField'))}),
+        this.notifyPendingChanges
+      )
     }
   }
 
-  allowSave = () => {
+  notifyPendingChanges = () => {
+    if (this.props.onNotifyPendingChanges) {
+      this.props.onNotifyPendingChanges(this.hasPendingChanges())
+    }
+  }
+
+  hasPendingChanges = () => {
     const {rows, savedRows} = this.state
 
     return !_.isEqual(rows, savedRows)
@@ -125,6 +134,7 @@ class ProficiencyTable extends React.Component {
         return {rows: rows.push(newRow)}
       },
       () => {
+        this.notifyPendingChanges()
         $.screenReaderFlashMessage(I18n.t('Added mastery level'))
       }
     )
@@ -149,6 +159,7 @@ class ProficiencyTable extends React.Component {
         }
       },
       () => {
+        this.notifyPendingChanges()
         this.props
           .update(this.stateToConfig())
           .then(() => $.flashMessage(I18n.t(`Mastery scale saved`)))
@@ -158,7 +169,7 @@ class ProficiencyTable extends React.Component {
                 message: e.message
               })
             )
-            this.setState({savedRows: oldRows})
+            this.setState({savedRows: oldRows}, this.notifyPendingChanges)
           })
       }
     )
@@ -171,7 +182,7 @@ class ProficiencyTable extends React.Component {
         .setIn([masteryIndex, 'mastery'], false)
         .setIn([index, 'mastery'], true)
       return {rows: adjustedRows}
-    })
+    }, this.notifyPendingChanges)
   })
 
   handleDescriptionChange = _.memoize(index => value => {
@@ -181,7 +192,7 @@ class ProficiencyTable extends React.Component {
       }
       rows = rows.setIn([index, 'description'], value)
       return {rows}
-    })
+    }, this.notifyPendingChanges)
   })
 
   handlePointsChange = _.memoize(index => value => {
@@ -192,13 +203,16 @@ class ProficiencyTable extends React.Component {
       }
       rows = rows.setIn([index, 'points'], parsed)
       return {rows}
-    })
+    }, this.notifyPendingChanges)
   })
 
   handleColorChange = _.memoize(index => value => {
-    this.setState(({rows}) => ({
-      rows: rows.update(index, row => row.set('color', unformatColor(value)))
-    }))
+    this.setState(
+      ({rows}) => ({
+        rows: rows.update(index, row => row.set('color', unformatColor(value)))
+      }),
+      this.notifyPendingChanges
+    )
   })
 
   handleDelete = _.memoize(index => () => {
@@ -214,12 +228,17 @@ class ProficiencyTable extends React.Component {
     }
 
     if (index === 0) {
-      this.setState({rows})
+      this.setState({rows}, this.notifyPendingChanges)
       if (this.props.focusTab) {
         setTimeout(this.props.focusTab, 700)
       }
     } else {
-      this.setState({rows: rows.setIn([index - 1, 'focusField'], 'trash')})
+      this.setState(
+        {
+          rows: rows.setIn([index - 1, 'focusField'], 'trash')
+        },
+        this.notifyPendingChanges
+      )
     }
     $.screenReaderFlashMessage(I18n.t('Mastery level deleted'))
   })
@@ -289,7 +308,7 @@ class ProficiencyTable extends React.Component {
       return r
     })
     if (changed) {
-      this.setState({rows})
+      this.setState({rows}, this.notifyPendingChanges)
     }
     return hasError
   }
@@ -395,7 +414,7 @@ class ProficiencyTable extends React.Component {
             <div className="save">
               <Button
                 variant="primary"
-                interaction={this.allowSave() ? 'enabled' : 'disabled'}
+                interaction={this.hasPendingChanges() ? 'enabled' : 'disabled'}
                 onClick={this.confirmSubmit}
               >
                 {I18n.t('Save Mastery Scale')}

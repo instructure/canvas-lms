@@ -77,7 +77,7 @@ class ApplicationController < ActionController::Base
   after_action :set_user_id_header
   after_action :set_response_headers
   after_action :update_enrollment_last_activity_at
-  set_callback :html_render, :before, :add_csp_for_root
+  set_callback :html_render, :after, :add_csp_for_root
 
 
   add_crumb(proc {
@@ -1497,6 +1497,7 @@ class ApplicationController < ActionController::Base
   rescue_from RequestError, with: :rescue_expected_error_type
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from SearchTermHelper::SearchTermTooShortError, with: :rescue_expected_error_type
+  rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)

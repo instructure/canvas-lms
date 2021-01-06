@@ -24,7 +24,7 @@ import {View} from '@instructure/ui-view'
 import {TextInput} from '@instructure/ui-text-input'
 import {SimpleSelect} from '@instructure/ui-simple-select'
 import {IconButton} from '@instructure/ui-buttons'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {
   IconLinkLine,
   IconFolderLine,

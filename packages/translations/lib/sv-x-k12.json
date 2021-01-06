@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "cirkelmarkera oordnad lista"
     },
+    "clear_2084585f": {
+        "message": "Rensa"
+    },
     "clear_selected_file_82388e50": {
         "message": "Rensa vald fil"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Läser in Planner-objekt"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Läser in, vänta"
     },
     "location_3b6ff307": {
         "message": "Plats:"

@@ -161,6 +161,9 @@
     "circle_unordered_list_9e3a0763": {
         "message": "rhestr cylchoedd sydd ddim mewn trefn"
     },
+    "clear_2084585f": {
+        "message": "Clirio"
+    },
     "clear_selected_file_82388e50": {
         "message": "Clirio''r ffeil dan sylw"
     },
@@ -691,6 +694,9 @@
     },
     "loading_planner_items_947a813d": {
         "message": "Wrthi’n llwytho eitemau’r trefnydd"
+    },
+    "loading_please_wait_d276220a": {
+        "message": "Wrthi’n llwytho, arhoswch funud"
     },
     "location_3b6ff307": {
         "message": "Lleoliad:"

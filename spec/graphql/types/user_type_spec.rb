@@ -320,4 +320,55 @@ describe Types::UserType do
       ).to be nil
     end
   end
+
+  context 'recipients' do
+    let(:type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it 'returns nil if the user is not the current user' do
+      result = user_type.resolve('recipients { usersConnection { nodes { _id } } }')
+      expect(result).to be nil
+    end
+
+    it 'returns known users' do
+      known_users = @student.address_book.search_users().paginate(per_page: 3)
+      result = type.resolve('recipients { usersConnection { nodes { _id } } }')
+      expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    end
+
+    it 'returns contexts' do
+      result = type.resolve('recipients { contextsConnection { nodes { name } } }')
+      expect(result[0]).to eq(@course.name)
+    end
+
+    it 'searches users' do
+      known_users = @student.address_book.search_users().paginate(per_page: 3)
+      User.find(known_users.first.id).update!(name: 'Matthew Lemon')
+      result = type.resolve('recipients(search: "lemon") { usersConnection { nodes { _id } } }')
+      expect(result[0]).to eq(known_users.first.id.to_s)
+
+      result = type.resolve('recipients(search: "morty") { usersConnection { nodes { _id } } }')
+      expect(result).to match_array([])
+    end
+
+    it 'searches contexts' do
+      result = type.resolve('recipients(search: "unnamed") { contextsConnection { nodes { name } } }')
+      expect(result[0]).to eq(@course.name)
+
+      result = type.resolve('recipients(search: "Lemon") { contextsConnection { nodes { name } } }')
+      expect(result).to match_array([])
+    end
+
+    it 'filters results based on context' do
+      known_users = @student.address_book.search_users(context: "course_#{@course.id}_students").paginate(per_page: 3)
+      result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { _id } } }")
+      expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    end
+  end
 end

@@ -40,6 +40,7 @@ module Factories
       # it tries to load it from the db.)
       allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
       allow(pseudonym).to receive(:unique_id).and_return('unique_id')
+      allow(pseudonym).to receive(:global_id).and_return(10000000000001)
     end
 
     session = double('PseudonymSession',

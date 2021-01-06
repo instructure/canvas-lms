@@ -39,7 +39,7 @@ export default class KeyboardNavDialog extends View
     activeElement = null
     $(document).keydown((e) =>
       isQuestionMark = e.keyCode == 191 && e.shiftKey
-      if (isQuestionMark && !$(e.target).is(":input"))
+      if (isQuestionMark && !$(e.target).is(":input") && !ENV.disable_keyboard_shortcuts)
         e.preventDefault()
         if(@$el.is(":visible"))
           @$el.dialog("close")

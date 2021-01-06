@@ -115,14 +115,17 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
         })
         callback(items)
       },
-      onAction() {
-        doMenuItem(editor, 'instructure_upload_image')
+      onAction(api) {
+        if (!api.isDisabled()) {
+          doMenuItem(editor, 'instructure_upload_image')
+        }
       },
       onItemAction: (_splitButtonApi, value) => doMenuItem(editor, value),
       onSetup(api) {
         function handleNodeChange(_e) {
           api.setDisabled(!isOKToLink(editor.selection.getContent()))
         }
+        setTimeout(handleNodeChange)
         editor.on('NodeChange', handleNodeChange)
         return () => {
           editor.off('NodeChange', handleNodeChange)

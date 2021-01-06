@@ -250,7 +250,11 @@ module Canvas::LiveEvents
         product_code: actl.tool_product_code,
         resource_type_code: actl.tool_resource_type_code
       ).first)
-        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
       end
     end
     event
@@ -356,7 +360,11 @@ module Canvas::LiveEvents
         product_code: actl.tool_product_code,
         resource_type_code: actl.tool_resource_type_code
       ).first)
-        event[:associated_integration_id] = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_id] = tool_proxy.guid
+        # TEMPORARY: to switch over from the old format to guid,
+        # send both formats until all subscriptions have been changed
+        old_format = [actl.tool_vendor_code, actl.tool_product_code, tool_proxy.event_endpoint].join('_')
+        event[:associated_integration_ids] = [tool_proxy.guid, old_format]
       end
     end
     event
@@ -643,7 +651,9 @@ module Canvas::LiveEvents
       context_type: context.class.to_s,
       lti_context_id: context.lti_context_id,
       context_uuid: context.uuid,
-      import_quizzes_next: import_quizzes_next
+      import_quizzes_next: import_quizzes_next,
+      source_course_lti_id: content_migration.source_course&.lti_context_id,
+      destination_course_lti_id: context.lti_context_id
     }
 
     if context.respond_to?(:root_account)

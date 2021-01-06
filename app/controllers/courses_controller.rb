@@ -1125,7 +1125,7 @@ class CoursesController < ApplicationController
     reject!('Search term required') unless params[:search_term]
     return unless authorized_action(@context, @current_user, :read_as_admin)
 
-    users_scope = User.shard(Shard.current).where.not(id: @current_user.id).active.distinct
+    users_scope = User.shard(Shard.current).active.distinct
     union_scope = teacher_scope(name_scope(users_scope), @context.root_account_id).
       union(
         teacher_scope(email_scope(users_scope), @context.root_account_id),
@@ -1401,7 +1401,8 @@ class CoursesController < ApplicationController
         PUBLISHING_ENABLED: @publishing_enabled,
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
-        COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions
+        COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
+        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui)
       })
 
       set_tutorial_js_env
@@ -2128,7 +2129,6 @@ class CoursesController < ApplicationController
     js_env(
       course_name: @context.name,
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        granular_course_preferences_enabled: Account.site_admin.feature_enabled?(:notification_granular_course_preferences),
         deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
         reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),

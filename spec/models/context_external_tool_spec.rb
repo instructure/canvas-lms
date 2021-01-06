@@ -1775,6 +1775,12 @@ describe ContextExternalTool do
   end
 
   describe "opaque_identifier_for" do
+    context 'when the asset is nil' do
+      subject { ContextExternalTool.opaque_identifier_for(nil, Shard.first) }
+
+      it { is_expected.to be_nil }
+    end
+
     it "should create lti_context_id for asset" do
       expect(@course.lti_context_id).to eq nil
       @tool = @course.context_external_tools.create!(:name => "a", :domain => "google.com", :consumer_key => '12345', :shared_secret => 'secret')

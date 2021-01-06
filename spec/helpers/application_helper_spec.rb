@@ -1155,6 +1155,7 @@ describe ApplicationHelper do
 
       allow(helper).to receive(:headers).and_return(headers)
       allow(helper).to receive(:js_env) { |env| js_env.merge!(env) }
+      response.content_type = 'text/html'
     end
 
     context "on root account" do
@@ -1168,6 +1169,14 @@ describe ApplicationHelper do
         expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
         expect(headers).to_not have_key('Content-Security-Policy')
         expect(js_env).not_to have_key(:csp)
+      end
+
+      it "doesn't set the CSP header for non-html requests" do
+        response.content_type = 'application/json'
+        account.enable_csp!
+        helper.add_csp_for_root
+        expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
+        expect(headers).to_not have_key('Content-Security-Policy')
       end
 
       it "sets the CSP full header when active" do

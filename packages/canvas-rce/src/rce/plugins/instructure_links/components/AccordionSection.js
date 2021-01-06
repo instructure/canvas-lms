@@ -21,8 +21,8 @@ import {bool, func, node, string} from 'prop-types'
 import formatMessage from '../../../../format-message'
 
 import {ToggleGroup} from '@instructure/ui-toggle-details'
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 export default function AccordionSection({collection, children, onToggle, expanded, label}) {
   const toggleLabel = expanded

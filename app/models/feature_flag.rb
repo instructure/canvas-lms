@@ -41,15 +41,15 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def enabled?
-    state == 'on'
+    state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
   end
 
-  def allowed?
-    state == 'allowed'
+  def can_override?
+    state == Feature::STATE_DEFAULT_OFF || state == Feature::STATE_DEFAULT_ON
   end
 
   def locked?(query_context)
-    !allowed? && (context_id != query_context.id || context_type != query_context.class.name)
+    !can_override? && (context_id != query_context.id || context_type != query_context.class.name)
   end
 
   def clear_cache
@@ -73,7 +73,9 @@ class FeatureFlag < ActiveRecord::Base
   private
 
   def valid_state
-    errors.add(:state, "is not valid in context") unless %w(off on).include?(state) || context.is_a?(Account) && state == 'allowed'
+    unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)
+      errors.add(:state, "is not valid in context")
+    end
   end
 
   def feature_applies

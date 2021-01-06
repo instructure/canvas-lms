@@ -102,6 +102,20 @@ describe.skip('MediaAttempt', () => {
     })
   })
 
+  describe('graded', () => {
+    it('renders without a mediaObject', async () => {
+      const props = await makeProps({
+        Submission: {
+          mediaObject: null,
+          state: 'graded'
+        }
+      })
+      render(<MediaAttempt {...props} uploadingFiles={false} />)
+      // doesn't render anything, so nothing to check for
+      // expect no errors to be thrown
+    })
+  })
+
   // This will crash given the media modal requires browser specifics
   // fwiw get a real browser or test with selenium
   // it('opens media modal when button is clicked', async () => {

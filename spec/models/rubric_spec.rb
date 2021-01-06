@@ -91,16 +91,84 @@ describe Rubric do
       end
 
       context 'from mastery scales' do
-        it 'should update scale and points from mastery scales' do
+        before do
           Account.default.enable_feature! :account_level_mastery_scales
-          outcome_proficiency_model(Account.default)
+          @outcome_proficiency = outcome_proficiency_model(Account.default)
           @rubric.update_mastery_scales
+        end
 
+        it 'should update scale and points from mastery scales' do
           rubric_criterion = @rubric.criteria_object.first
           expect(rubric_criterion.description).to eq 'Outcome row'
           expect(rubric_criterion.long_description).to eq @outcome.description
           expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'worst']
           expect(@rubric.points_possible).to eq 15
+        end
+
+        context 'it should update' do
+          it 'when number of ratings changes' do
+            @outcome_proficiency.outcome_proficiency_ratings.create! description: 'new', points: 5, color: 'abbaab', mastery: false
+            @rubric.reload.update_mastery_scales
+
+            rubric_criterion = @rubric.criteria_object.first
+            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'new', 'worst']
+            expect(rubric_criterion.ratings.map(&:points)).to eq [10, 5, 0]
+          end
+
+          it 'when text of rating changes' do
+            ratings = @outcome_proficiency.ratings_hash
+            ratings.first[:description] = 'new best'
+            @outcome_proficiency.replace_ratings(ratings)
+            @outcome_proficiency.save!
+            @rubric.reload.update_mastery_scales
+
+            rubric_criterion = @rubric.criteria_object.first
+            expect(rubric_criterion.ratings.map(&:description)).to eq ['new best', 'worst']
+            expect(rubric_criterion.ratings.map(&:points)).to eq [10, 0]
+          end
+
+          it 'when score of rating changes' do
+            ratings = @outcome_proficiency.ratings_hash
+            ratings.first[:points] = 3
+            @outcome_proficiency.replace_ratings(ratings)
+            @outcome_proficiency.save!
+            @rubric.reload.update_mastery_scales
+
+            rubric_criterion = @rubric.criteria_object.first
+            expect(rubric_criterion.ratings.map(&:description)).to eq ['best', 'worst']
+            expect(rubric_criterion.ratings.map(&:points)).to eq [3, 0]
+            expect(rubric_criterion[:points]).to eq 3
+          end
+
+          it 'when proficiency is destroyed' do
+            @outcome_proficiency.destroy
+            @rubric.reload.update_mastery_scales
+
+            rubric_criterion = @rubric.criteria_object.first
+            expect(rubric_criterion.ratings.map(&:description)).to eq OutcomeProficiency.default_ratings.map { |r| r[:description] }
+          end
+        end
+
+        context 'it should not update' do
+          before do
+            @rubric.update_mastery_scales
+            @last_update = 2.days.ago
+            @rubric.touch(time: @last_update)
+          end
+
+          it 'when mastery scale unchanged' do
+            @rubric.update_mastery_scales
+            expect(@rubric.reload.updated_at).to eq @last_update
+          end
+
+          it 'when only color is changed' do
+            ratings = @outcome_proficiency.ratings_hash
+            ratings[0]['color'] = 'ffffff'
+            @outcome_proficiency.replace_ratings(ratings)
+
+            @rubric.update_mastery_scales
+            expect(@rubric.reload.updated_at).to eq @last_update
+          end
         end
       end
     end

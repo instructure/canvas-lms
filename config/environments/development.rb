@@ -38,7 +38,7 @@ environment_configuration(defined?(config) && config) do |config|
   # Option to DISABLE_RUBY_DEBUGGING is helpful IDE-based debugging.
   # The ruby debug gems conflict with the IDE-based debugger gem.
   # Set this option in your dev environment to disable.
-  unless ENV['DISABLE_RUBY_DEBUGGING']
+  unless ENV['DISABLE_RUBY_DEBUGGING'] || RUBY_ENGINE != 'ruby'
     require 'byebug'
     if ENV['REMOTE_DEBUGGING_ENABLED']
       require 'byebug/core'

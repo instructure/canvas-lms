@@ -728,7 +728,7 @@ end
       contexts = contexts_to_search(context)
       preferred_tool = ContextExternalTool.active.where(id: preferred_tool_id).first if preferred_tool_id
       can_use_preferred_tool = preferred_tool && contexts.member?(preferred_tool.context)
-      
+
       # always use the preferred_tool_id if url isn't provided
       return preferred_tool if url.blank? && can_use_preferred_tool
       return nil unless url
@@ -927,6 +927,8 @@ end
   end
 
   def self.opaque_identifier_for(asset, shard, context: nil)
+    return if asset.blank?
+
     shard.activate do
       lti_context_id = context_id_for(asset, shard)
       Lti::Asset.set_asset_context_id(asset, lti_context_id, context: context)

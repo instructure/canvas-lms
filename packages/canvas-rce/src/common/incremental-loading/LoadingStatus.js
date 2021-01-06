@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {number, shape} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 
 import formatMessage from '../../format-message'
 

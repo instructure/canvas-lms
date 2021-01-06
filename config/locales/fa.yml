@@ -6302,6 +6302,7 @@ fa:
   course_section_7a988066: "بخش درس"
   course_section_name_ea880ed1: "بخش درس %{name}"
   course_section_status_4fac842a: "وضعیت بخش درس"
+  course_sections: "بخش های درس"
   course_sections_add_edit_delete_c4f4ac19: "بخش درس -  افزودن / ویرایش / حذف کردن "
   course_selection_245808bf: "انتخاب درس"
   course_set_up_tutorial_6ab7c2d1: "خودآموز راه اندازی درس"
@@ -8356,6 +8357,10 @@ fa:
   enrollment_terms_8753ec11: "نیمسال های ثبت نام"
   enrollment_type_699c944: "نوع ثبت نام"
   enrollments_e250c9c3: "ثبت نام ها"
+  enrollments_observers: "بیننده ها"
+  enrollments_students: دانشجویان
+  enrollments_tas: "دستیارهای آموزشی"
+  enrollments_teachers: اساتید
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "در اینجا یک کد هگزا برای استفاده از رنگ سفارشی وارد نمایید."
   enter_a_valid_date_46d77547: "یک تاریخ معتبر وارد کنید"
   enter_a_what_if_score_668c91a3: "یک نمره احتمالی وارد کنید."
@@ -19938,6 +19943,7 @@ fa:
     users: 
       user_search_label: "جستجوی کاربر"
       users_matching_label: "کاربران نظیر"
+  site_admin_d0417171: "مدیر تارنما"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "فقط مدیر تارنما. برای 1 / %{denominator} کاربر در حساب های فعال شده در هر ماه ارسال شود."
   size_b30e1077: اندازه
   size_size_a77bd760: "اندازه: %{size}"
@@ -20190,6 +20196,7 @@ fa:
   student_extensions_d35a907: "تمدیدهای دانشجو"
   student_grades_4cbc59a1: "نمره های دانشجو"
   student_group_filter_185fb085: "فیلتر گروه دانشجویی"
+  student_groups: "گروه‌های دانشجویی"
   student_groups_863201c1: "گروه‌های دانشجویی"
   student_groups_desc: |-
       این گزینه صفحه گروه دانشجویی جدید برای یک حساب را فعال می کند. صفحه جدید برای فراهم کردن یک تجربه پویا تر ثبت نام در گروه
@@ -22790,6 +22797,7 @@ fa:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "نمی توانید یک زیر حساب که دارای درس است را حذف کنید"
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "نمی توانید یک زیر حساب که دارای زیر حساب است را حذف کنید."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: " به علت وجود درس در %{account_name} نمی‌توانید آن را حذف کنید"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "نمی توانید این دستورالعمل ارزیابی را ویرایش کنید، یا به این علت که اجازه ندارید و یا اینکه در بیش از یک جا استفاده شده است. هر گونه تغییری که انجام می دهید به یک دستورالعمل ارزیابی جدید بر مبنای دستورالعمل ارزیابی قدیمی منجر می شود. با این وجود ادامه می دهید؟"
   you_can_try_to_log_in_again_2b23ef0f: "می توانید سعی کنید *دوباره وارد شوید*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "شما می توانید بعضی از اطلاعات این کاربر را بهنگام کنید ولی این کاربر می تواند تغییرات را به حالت اولیه برگرداند."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "می توانید از یک فایل 16x16، 32x32، 48x48 ico استفاده کنید."

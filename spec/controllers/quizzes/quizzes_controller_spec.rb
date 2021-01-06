@@ -893,6 +893,93 @@ describe Quizzes::QuizzesController do
 
       expect(assigns[:students].sort_by(&:id)).to eq [@student, @student2].sort_by(&:id)
     end
+
+    context "for a differentiated quiz" do
+      let(:students) do
+        (1..3).map do |i|
+          user_with_pseudonym(active_all: true, name: "Student#{i}", :username => "student#{i}@instructure.com")
+        end
+      end
+
+      let(:assignments) do
+        (1..3).map do |i|
+          @course.assignments.create(
+            title: "Test Assignment#{i}",
+            workflow_state: 'available',
+            submission_types: 'online_quiz'
+          )
+        end
+      end
+
+      let(:quizzes) do
+        (1..3).map do |i|
+          questions = [{ question_data: { name: "test #{i}" } }]
+
+          quiz = Quizzes::Quiz.where(assignment_id: assignments[i-1].id).first
+
+          quiz.quiz_type = 'assignment'
+          quiz.only_visible_to_overrides = true
+
+          questions.each { |q| quiz.quiz_questions.create!(q) }
+          quiz.generate_quiz_data
+          quiz.save!
+          quiz
+        end
+      end
+
+      let(:sections) do
+        (0..1).map do
+          @course.course_sections.create!
+        end
+      end
+
+      before do
+        (0..2).each do |i|
+          @course.enroll_student(students[i])
+        end
+
+        (0..1).each do |i|
+          quizzes[i].assignment_overrides.create!(
+            set: sections[i]
+          )
+        end
+
+        # make quizzes[2] available to everyone
+        quizzes[2].only_visible_to_overrides = false
+        quizzes[2].save!
+
+        students[0].enrollments.update_all(course_section_id: sections[0].id)
+        students[1].enrollments.update_all(course_section_id: sections[1].id)
+        # make an inactive enrollment
+        students[2].enrollments.update_all(course_section_id: sections[1].id, workflow_state: 'inactive')
+      end
+
+      it "only returns students in the assigned course sections" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[0].id}
+
+        expect(assigns[:students].count).to eq 1
+        expect(assigns[:students].first).to eq students[0]
+      end
+
+      it "does not includes inactive enrollments" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[1].id}
+
+        expect(assigns[:students].count).to eq 1
+        expect(assigns[:students]).to contain_exactly(students[1])
+      end
+
+      it "return every active enrollments in the course for a non-differentiated quiz" do
+        user_session(@teacher)
+
+        get 'moderate', params: {:course_id => @course.id, :quiz_id => quizzes[2].id}
+
+        expect(assigns[:students].count).to eq @course.student_enrollments.count
+      end
+    end
   end
 
   describe "POST 'take'" do

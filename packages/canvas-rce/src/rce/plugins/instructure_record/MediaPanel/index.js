@@ -21,8 +21,8 @@ import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {mediaObjectShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import Link from '../../instructure_documents/components/Link'
 import {
   LoadMoreButton,

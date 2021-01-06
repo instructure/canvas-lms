@@ -3867,6 +3867,7 @@ ko:
   course_section: 
     sis_id_taken: "SIS ID \"%{sis_id}\"이(가) 이미 사용 중임"
   course_section_7a988066: "과목 섹션"
+  course_sections: "과목 섹션"
   course_sections_add_edit_delete_c4f4ac19: "과목 섹션 - 추가 / 편집 / 삭제"
   course_set_up_tutorial_6ab7c2d1: "과목 설정 튜토리얼"
   course_settings: 
@@ -5132,6 +5133,10 @@ ko:
       not_unique: "\"%{sis_source_id}\" SIS ID를 이미 사용 중임"
   enrollment_terms_8753ec11: "등록 학기"
   enrollments_e250c9c3: 등록
+  enrollments_observers: 감독자
+  enrollments_students: 학생
+  enrollments_tas: 조교
+  enrollments_teachers: 교사
   eportfolio: 
     buttons: 
       done_editing: "편집 마침"
@@ -12536,6 +12541,7 @@ ko:
     users: 
       user_search_label: "사용자 검색"
       users_matching_label: "일치하는 사용자"
+  site_admin_d0417171: "사이트 관리자"
   size_b30e1077: 크기
   size_size_a77bd760: "크기: %{size}"
   skype_18850ba7: Skype
@@ -12610,6 +12616,7 @@ ko:
   status_e7fdbe06: 상태
   step: 단계
   student_5da6bfd1: 학생
+  student_groups: "학생 그룹"
   student_groups_863201c1: "학생 그룹"
   student_id_7cc45fb5: "학생 ID"
   student_name_b446c661: "학생 이름"
@@ -13795,6 +13802,7 @@ ko:
   wrap_event_titles_in_calendar_month_view_cbb29fd8: "달력 월별 보기에서 행사 제목 줄바꿈하기"
   wrong_answer_comments_14963a24: "오답 의견"
   you_can_now_set_regrade_options_for_students_who_h_c1ceb1c4: "이제 이 퀴즈를 이미 치른 학생을 위한 다시 평가하기 옵션을 설정할 수 있습니다."
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "권한이 없거나 한 곳 이상의 장소에서 사용하고 있으므로 이 루브릭을 편집할 수 없습니다. 변경한 내용은 기존 루브릭을 바탕으로 한 새 루브릭이 됩니다. 계속 진행하시겠습니까?"
   you_created_an_announcement_in_course_c49e3d70: "%{course}에 공지를 생성했습니다"
   you_currently_have_no_pinned_discussions_6f0078b8: "고정한 토론이 없음"
   you_must_allow_at_least_one_group_to_attend_68531eab: "적어도 하나 이상의 참가할 그룹을 허용해야 합니다."

@@ -18,8 +18,11 @@
 
 import React from 'react'
 import {func, instanceOf, number, shape, string} from 'prop-types'
-import {Img, Link, Text, TruncateText} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Img} from '@instructure/ui-img'
+import {Link} from '@instructure/ui-link'
+import {Text} from '@instructure/ui-text'
+import {TruncateText} from '@instructure/ui-truncate-text'
+import {View} from '@instructure/ui-view'
 
 import dragHtml from '../../../../sidebar/dragHtml'
 import formatMessage from '../../../../format-message'

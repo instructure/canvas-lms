@@ -20,9 +20,9 @@ import React, {Component, useRef} from 'react'
 import {bool, func, string} from 'prop-types'
 import {linksShape, linkType} from './propTypes'
 import formatMessage from '../../../../format-message'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {List} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import uid from '@instructure/uid'
 
 import {

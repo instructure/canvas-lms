@@ -202,6 +202,15 @@ describe GoogleDrive::Connection do
         )
       end
 
+      it "won't try to download a nil url" do
+        stub_request(:get, files_url).to_return(
+          :status => http_status,
+          body: load_fixture('bad_file_data.json'),
+          headers: {'Content-Type' => 'application/json'}
+        )
+        expect{ connection.download("42", nil) }.to raise_error(GoogleDrive::WorkflowError)
+      end
+
       context 'with 307 temporary redirect response' do
         before do
           stub_request(:get, redirect_url).to_return(

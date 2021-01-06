@@ -1526,16 +1526,26 @@ QUnit.module('Assignment#quizzesRespondusEnabled', hooks => {
   })
 })
 
-QUnit.module('Assignment#externalToolData', hooks => {
+QUnit.module('Assignment#externalToolTagAttributes', hooks => {
+  const externalData = {
+    key1: 'val1'
+  }
+  const customParams = {
+    root_account_id: '$Canvas.rootAccount.id',
+    referer: 'LTI test tool example'
+  }
   let assignment
-  const ext_data = {key1: 'val1'}
 
   hooks.beforeEach(() => {
     assignment = new Assignment({
-      name: 'foo',
+      name: 'Sample Assignment',
       external_tool_tag_attributes: {
-        url: 'https://www.test.com/blti?foo',
-        external_data: ext_data
+        content_id: 999,
+        content_type: 'context_external_tool',
+        custom: customParams,
+        new_tab: '0',
+        url: 'http://lti13testtool.docker/launch',
+        external_data: externalData
       }
     })
     fakeENV.setup({current_user_roles: []})
@@ -1545,9 +1555,31 @@ QUnit.module('Assignment#externalToolData', hooks => {
     fakeENV.teardown()
   })
 
-  test('returns external data from the assignments content tag', () => {
+  test(`returns url from assignment's external tool attributtes`, () => {
+    const url = assignment.externalToolUrl()
+
+    equal(url, 'http://lti13testtool.docker/launch')
+  })
+
+  test(`returns external data from assignment's external tool attributtes`, () => {
     const data = assignment.externalToolData()
+
     equal(data.key1, 'val1')
-    ok(assignment.externalToolDataStringified())
+
+    equal(assignment.externalToolDataStringified(), JSON.stringify(externalData))
+  })
+
+  test(`returns custom params from assignment's external tool attributtes`, () => {
+    equal(assignment.externalToolCustomParams(), customParams)
+  })
+
+  test(`returns custom params stringified from assignment's external tool attributtes`, () => {
+    const data = assignment.externalToolCustomParamsStringified()
+
+    equal(data, JSON.stringify(customParams))
+  })
+
+  test(`returns new tab from assignment's external tool attributtes`, () => {
+    equal(assignment.externalToolNewTab(), '0')
   })
 })

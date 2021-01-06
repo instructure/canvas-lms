@@ -179,6 +179,15 @@ describe "course rubrics" do
       expect(fj('.rubric_grading:hidden')).not_to be_nil
     end
 
+    it "should display integer and float ratings" do
+      assignment_with_editable_rubric(2)
+      get "/courses/#{@course.id}/rubrics/#{@rubric.id}"
+
+      expect(ff('.points').map(&:text).reject!(&:empty?)).to eq ["2", "0.6", "0"]
+      expect(ff('.display_criterion_points').map(&:text).reject!(&:empty?)).to eq ["2"]
+      expect(f('#rubrics span .rubric_total').text).to eq "2"
+    end
+
     context "with the account_level_mastery_scales FF enabled" do
       before :each do
         @course.account.enable_feature!(:account_level_mastery_scales)

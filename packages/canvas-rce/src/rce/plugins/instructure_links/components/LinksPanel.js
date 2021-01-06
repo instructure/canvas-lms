@@ -24,7 +24,7 @@ import {collectionsShape} from './propTypes'
 import NavigationPanel from './NavigationPanel'
 import CollectionPanel from './CollectionPanel'
 
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {pickProps} from '@instructure/ui-react-utils'
 
 function LinksPanel(props) {

@@ -33,8 +33,8 @@
 
 require 'nokogiri'
 require 'cgi'
-require 'active_support/core_ext/module/remove_method' # https://github.com/rails/rails/issues/28918
 require 'active_support'
+require 'time' # https://github.com/rails/rails/pull/40859
 require 'active_support/core_ext'
 require 'sanitize'
 require 'canvas_text_helper'

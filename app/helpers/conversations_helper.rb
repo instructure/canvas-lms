@@ -48,4 +48,171 @@ module ConversationsHelper
     result
   end
 
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil)
+    if defined?(params)
+      recipients ||= params[:recipients]
+      context_code ||= params[:context_code]
+      conversation_id ||= params[:from_conversation_id]
+    end
+
+    return unless recipients
+
+    unless recipients.is_a? Array
+      recipients = recipients.split ","
+      params[:recipients] = recipients if defined?(params)
+    end
+
+    # unrecognized context codes are ignored
+    if AddressBook.valid_context?(context_code)
+      context = AddressBook.load_context(context_code)
+      raise InvalidContextError if context.nil?
+    end
+
+    users, contexts = AddressBook.partition_recipients(recipients)
+    known = @current_user.address_book.known_users(
+      users,
+      context: context,
+      conversation_id: conversation_id,
+      strict_checks: !Account.site_admin.grants_right?(@current_user, session, :send_messages)
+    )
+    contexts.each { |c| known.concat(@current_user.address_book.known_in_context(c)) }
+    @recipients = known.uniq(&:id)
+    @recipients.reject! { |u| u.id == @current_user.id } unless @recipients == [@current_user] && recipients.count == 1
+    @recipients
+  end
+
+  def all_recipients_are_instructors?(context, recipients)
+    if context.is_a?(Course)
+      return recipients.inject(true) do |all_recipients_are_instructors, recipient|
+        all_recipients_are_instructors && context.user_is_instructor?(recipient)
+      end
+    end
+    false
+  end
+
+  def observer_to_linked_students(recipients)
+    observee_ids = @current_user.enrollments.where(type: "ObserverEnrollment").distinct.pluck(:associated_user_id)
+    return false if observee_ids.empty?
+
+    recipients.each do |recipient|
+      return false if observee_ids.exclude?(recipient.id)
+    end
+
+    true
+  end
+
+  def valid_context?(context)
+    case context
+    when nil then false
+    when Account then valid_account_context?(context)
+    when Course, Group then context.membership_for_user(@current_user) || context.grants_right?(@current_user, session, :send_messages)
+    else false
+    end
+  end
+
+  def valid_account_context?(account)
+    return false unless account.root_account?
+    return true if account.grants_right?(@current_user, session, :read_roster)
+    account.shard.activate do
+      user_sub_accounts = @current_user.associated_accounts.where(root_account_id: account).to_a
+      if user_sub_accounts.any? { |a| a.grants_right?(@current_user, session, :read_roster) }
+        return true
+      end
+    end
+
+    false
+  end
+
+  def build_message
+    Conversation.build_message(*build_message_args)
+  end
+
+  def build_message_args(
+    body: nil,
+    attachment_ids: nil,
+    forwarded_message_ids: nil,
+    domain_root_account_id: nil,
+    media_comment_id: nil,
+    media_comment_type: nil,
+    user_note: nil
+  )
+    if defined?(params)
+      body ||= params[:body]
+      attachment_ids ||= params[:attachment_ids]
+      forwarded_message_ids ||= params[:forwarded_message_ids]
+      domain_root_account_id ||= @domain_root_account.id
+      media_comment_id ||= params[:media_comment_id]
+      media_comment_type ||= params[:media_comment_type]
+      user_note = params[:user_note] if user_note.nil?
+    end
+    [
+      @current_user,
+      body,
+      {
+        attachment_ids: attachment_ids,
+        forwarded_message_ids: forwarded_message_ids,
+        root_account_id: domain_root_account_id,
+        media_comment: infer_media_comment(media_comment_id, media_comment_type),
+        generate_user_note: user_note
+      }
+    ]
+  end
+
+  def infer_media_comment(media_id, media_type)
+    if media_id.present? && media_type.present?
+      media_comment = MediaObject.by_media_id(media_id).by_media_type(media_type).first
+      unless media_comment
+        media_comment ||= MediaObject.new
+        media_comment.media_type = media_type
+        media_comment.media_id = media_id
+        media_comment.root_account_id = @domain_root_account.id
+        media_comment.user = @current_user
+      end
+      media_comment.context = @current_user
+      media_comment.save
+      media_comment
+    end
+  end
+
+  def infer_tags(tags: nil, recipients: nil, context_code: nil)
+    tags = defined?(params) ? param_array(:tags) : Array(tags || []).compact
+    recipients = defined?(params) ? param_array(:recipients) : Array(recipients || []).compact
+    context_code = defined?(params) ? param_array(:context_code) : Array(context_code || []).compact
+
+    tags = tags.concat(recipients).concat(context_code)
+    tags = SimpleTags.normalize_tags(tags)
+    tags += tags.grep(/\Agroup_(\d+)\z/){ g = Group.where(id: $1.to_i).first and g.context.asset_string }.compact
+    @tags = tags.uniq
+  end
+
+  # look up the param and cast it to an array. treat empty string same as empty
+  def param_array(key)
+    Array(params[key].presence || []).compact
+  end
+
+  def validate_context(context, recipients)
+    recipients_are_instructors = all_recipients_are_instructors?(context, recipients)
+
+    if context.is_a?(Course) &&
+      !recipients_are_instructors &&
+      !observer_to_linked_students(recipients) &&
+      !context.grants_right?(@current_user, session, :send_messages)
+
+      raise InvalidContextPermissionsError
+    elsif !valid_context?(context)
+      raise InvalidContextError
+    end
+
+    if context.is_a?(Course) && context.workflow_state == 'completed' && !context.grants_right?(@current_user, session, :read_as_admin)
+      raise CourseConcludedError
+    end
+  end
+
+  class InvalidContextError < StandardError; end
+
+  class InvalidContextPermissionsError < StandardError; end
+
+  class CourseConcludedError < StandardError; end
+
+  class InvalidRecipientsError < StandardError; end
 end

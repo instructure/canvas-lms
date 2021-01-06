@@ -287,7 +287,7 @@ module CustomSeleniumActions
     # cumbersome is because tinymce has it's actual interaction point down in
     # an iframe.
     src = %Q{
-      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('[role="application"]').find('iframe');
+      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('[role="application"],[role="document"]').find('iframe');
       var iframeDoc = $iframe[0].contentDocument;
       var domElement = iframeDoc.getElementsByTagName("body")[0];
       var selection = iframeDoc.getSelection();

@@ -23,6 +23,7 @@ require 'google/api_client'
 module GoogleDrive
   require 'google_drive/no_token_error'
   require 'google_drive/connection_exception'
+  require 'google_drive/workflow_error'
 
   require 'google_drive/client'
   require 'google_drive/connection'

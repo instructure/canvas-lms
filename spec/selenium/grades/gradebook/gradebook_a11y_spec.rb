@@ -136,7 +136,7 @@ describe "Gradebook" do
       expect(keyboard_nav).to be_displayed
     end
 
-    it 'keyboard shorcut "SHIFT-?"' do
+    it 'keyboard shortcut "SHIFT-?"' do
       driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
       keyboard_nav = f('#keyboard_navigation')
       expect(keyboard_nav).to be_displayed

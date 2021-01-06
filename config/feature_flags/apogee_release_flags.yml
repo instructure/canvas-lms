@@ -71,3 +71,16 @@ gradebook_load_assignments_by_grading_period:
   display_name: Load Gradebook Assignments by Grading Period
   description: If set, the Gradebook will chunk out loading of assignments, loading those for the selected
     grading period first.
+grade_calc_ignore_unposted_anonymous:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Ignore Unposted Anonymous Assignments in Grade Calculation
+  description: If set, the grade calculator will ignore unposted anonymous assignments when calculating
+    totals.
+  environments:
+    ci:
+      state: on # enable for automated testings builds and local testing
+    development:
+      state: on # enable for local development
+    test:
+      state: on # enable for the deployed 'test' environment

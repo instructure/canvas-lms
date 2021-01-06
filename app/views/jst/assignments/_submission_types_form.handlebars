@@ -216,6 +216,9 @@
             <label class="ic-Label" for="assignment_external_tool_tag_attributes_url">
               {{#t}}Enter or find an External Tool URL{{/t}}
             </label>
+            <input type="hidden" id="assignment_external_tool_tag_attributes_custom_params"
+              name="external_tool_tag_attributes[custom_params]"
+              value="{{externalToolCustomParamsStringified}}" />
             <div class="ic-Input-group">
               <div class="ic-Input-group__add-on" aria-hidden="true">
                 <i class="icon-link"></i>

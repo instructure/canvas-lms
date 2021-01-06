@@ -67,6 +67,9 @@ module GoogleDrive
       file = response.data.to_hash
       entry = GoogleDrive::Entry.new(file, extensions)
       @uri = entry.download_url
+      if @uri.nil?
+        raise WorkflowError, "Fetched entry contains no url, cannot download"
+      end
       redirect_limit = 3
       loop do
         raise(ConnectionException) if redirect_limit <= 0

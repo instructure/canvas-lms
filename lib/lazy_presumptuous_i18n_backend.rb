@@ -45,6 +45,7 @@ class LazyPresumptuousI18nBackend
   def initialize(meta_keys: [], logger: nil)
     @meta_keys = meta_keys.map(&:to_s)
     @logger = logger
+    @initialized = false
     @locale_metadata = {}
     @lazy_translations = {}
     @registered_translations = {}
@@ -84,6 +85,7 @@ class LazyPresumptuousI18nBackend
 
   def reload!
     log "reloading i18n backend"
+    @initialized = false
     @locale_metadata = {}
     @lazy_translations = {}
     @registered_translations = {}
@@ -94,16 +96,19 @@ class LazyPresumptuousI18nBackend
   # used when they want to retrieve the full database of translations. so
   # eager-load everything before handing it over.
   def translations
-    available_locales.each { |loc| load_locale(loc) }
+    eager_load!
     lazy_translations
   end
 
   private
 
-  attr_reader :registered_translations, :lazy_translations, :locale_metadata, :meta_keys
+  attr_reader :registered_translations, :lazy_translations, :locale_metadata, :meta_keys, :initialized
 
   def ensure_initialized
-    load_translations if registered_translations.empty?
+    unless initialized
+      load_translations
+      @initialized = true
+    end
   end
 
   def log(msg)

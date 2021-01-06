@@ -276,9 +276,9 @@ module SeleniumDriverSetup
     def ruby_chrome_driver
       puts "Thread: provisioning local chrome driver"
       # in your selenium.yml you can define a different chromedriver version
-      # by adding 'chromedriver_version: <version>' for the version you want.
+      # by modifying 'chromedriver_version: <version>' for the version you want.
       # otherwise this will use the default version matching what is used in docker.
-      Webdrivers::Chromedriver.required_version = (CONFIG[:chromedriver_version] || "84.0.4147.30")
+      Webdrivers::Chromedriver.required_version = CONFIG[:chromedriver_version]
       chrome_options = Selenium::WebDriver::Chrome::Options.new
       # put `auto_open_devtools: true` in your selenium.yml if you want to have
       # the chrome dev tools open by default by selenium

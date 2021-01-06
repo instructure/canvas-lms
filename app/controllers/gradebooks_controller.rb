@@ -30,7 +30,7 @@ class GradebooksController < ApplicationController
   include Api::V1::RubricAssessment
 
   before_action :require_context
-  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics]
+  before_action :require_user, only: [:speed_grader, :speed_grader_settings, :grade_summary, :grading_rubrics, :update_final_grade_overrides]
 
   batch_jobs_in_actions :only => :update_submission, :batch => { :priority => Delayed::LOW_PRIORITY }
 
@@ -121,6 +121,7 @@ class GradebooksController < ApplicationController
     grading_period = @grading_periods && @grading_periods.find { |period| period[:id] == gp_id }
 
     ags_json = light_weight_ags_json(@presenter.groups, {student: @presenter.student})
+    root_account = @context.root_account
 
     js_hash = {
       submissions: submissions_json,
@@ -128,6 +129,7 @@ class GradebooksController < ApplicationController
       assignment_sort_options: @presenter.sort_options,
       group_weighting_scheme: @context.group_weighting_scheme,
       show_total_grade_as_points: @context.show_total_grade_as_points?,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       grading_scheme: @context.grading_standard_or_default.data,
       current_grading_period_id: @current_grading_period_id,
       current_assignment_sort_order: @presenter.assignment_order,
@@ -137,7 +139,7 @@ class GradebooksController < ApplicationController
       courses_with_grades: courses_with_grades_json,
       effective_due_dates: effective_due_dates,
       exclude_total: @exclude_total,
-      gradebook_non_scoring_rubrics_enabled: @context.root_account.feature_enabled?(:non_scoring_rubrics),
+      gradebook_non_scoring_rubrics_enabled: root_account.feature_enabled?(:non_scoring_rubrics),
       rubric_assessments: rubric_assessments_json(@presenter.rubric_assessments, @current_user, session, style: 'full'),
       rubrics: rubrics_json(@presenter.rubrics, @current_user, session, style: 'full'),
       save_assignment_order_url: course_save_assignment_order_url(@context),
@@ -383,6 +385,7 @@ class GradebooksController < ApplicationController
     grading_standard = @context.grading_standard_or_default
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
     visible_sections = @context.sections_visible_to(@current_user)
+    root_account = @context.root_account
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -442,13 +445,14 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
-      login_handle_name: @context.root_account.settings[:login_handle_name],
+      login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
@@ -468,11 +472,11 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
+      show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
       sis_app_url: Setting.get('sis_app_url', nil),
-      sis_name: @context.root_account.settings[:sis_name],
+      sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       # TODO: remove `students_stateless_url` with TALLY-831
@@ -507,6 +511,7 @@ class GradebooksController < ApplicationController
     grading_standard = @context.grading_standard_or_default
     graded_late_submissions_exist = @context.submissions.graded.late.exists?
     visible_sections = @context.sections_visible_to(@current_user)
+    root_account = @context.root_account
 
     gradebook_options = {
       active_grading_periods: active_grading_periods_json,
@@ -557,13 +562,14 @@ class GradebooksController < ApplicationController
       gradebook_csv_progress: last_exported_gradebook_csv.try(:progress),
       gradebook_import_url: new_course_gradebook_upload_path(@context),
       gradebook_is_editable: gradebook_is_editable,
+      grade_calc_ignore_unposted_anonymous_enabled: root_account.feature_enabled?(:grade_calc_ignore_unposted_anonymous),
       graded_late_submissions_exist: graded_late_submissions_exist,
       grading_period_set: grading_period_group_json,
       grading_schemes: GradingStandard.for(@context).as_json(include_root: false),
       grading_standard: @context.grading_standard_enabled? && grading_standard.data,
       group_weighting_scheme: @context.group_weighting_scheme,
       late_policy: @context.late_policy.as_json(include_root: false),
-      login_handle_name: @context.root_account.settings[:login_handle_name],
+      login_handle_name: root_account.settings[:login_handle_name],
       has_modules: @context.has_modules?,
       new_gradebook_development_enabled: new_gradebook_development_enabled?,
       outcome_gradebook_enabled: outcome_gradebook_enabled?,
@@ -584,11 +590,11 @@ class GradebooksController < ApplicationController
       setting_update_url: api_v1_course_settings_url(@context),
       settings: gradebook_settings(@context.global_id),
       settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
-      show_similarity_score: @context.root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
+      show_similarity_score: root_account.feature_enabled?(:new_gradebook_plagiarism_indicator),
       show_total_grade_as_points: @context.show_total_grade_as_points?,
       sis_app_token: Setting.get('sis_app_token', nil),
       sis_app_url: Setting.get('sis_app_url', nil),
-      sis_name: @context.root_account.settings[:sis_name],
+      sis_name: root_account.settings[:sis_name],
       speed_grader_enabled: @context.allows_speed_grader?,
       student_groups: group_categories_json(@context.group_categories.active, @current_user, session, {include: ['groups']}),
       submissions_url: api_v1_course_student_submissions_url(@context, grouped: '1'),
@@ -1032,6 +1038,62 @@ class GradebooksController < ApplicationController
 
     final_grade_overrides = ::Gradebook::FinalGradeOverrides.new(@context, @current_user)
     render json: { final_grade_overrides: final_grade_overrides.to_h }
+  end
+
+  # @API Bulk update final grade overrides
+  #
+  # Set multiple final grade override scores for a course. The course must have
+  # final grade override enabled, and the caller must have permission to
+  # manage grades. Additionally, the "Import Override Scores in Gradebook" feature
+  # flag must be enabled.
+  #
+  # @argument grading_period_id [Integer]
+  #   The grading period to apply the override scores to. If omitted, override
+  #   scores will be applied to the total grades for the course.
+  #
+  # @argument override_scores[] [Required, Array]
+  #   An array of hashes representing the new scores to assign.
+  #
+  # @argument override_scores[student_id] [Integer]
+  #   The ID of the student to update.
+  #
+  # @argument override_scores[override_score] [Float]
+  #   The new score to assign as a percentage.
+  #
+  # @example_request
+  #
+  # {
+  #   "grading_period_id": "10",
+  #   "override_scores": [
+  #     {
+  #       "student_id": "124",
+  #       "override_score": "80.0"
+  #     },
+  #     {
+  #       "student_id": "126",
+  #       "override_score": "70.0"
+  #     }
+  #   ]
+  # }
+  #
+  # @returns Progress
+  def update_final_grade_overrides
+    return unless authorized_action(@context, @current_user, :manage_grades)
+
+    unless @context.allow_final_grade_override? && Account.site_admin.feature_enabled?(:import_override_scores_in_gradebook)
+      render_unauthorized_action and return
+    end
+
+    if params[:grading_period_id]
+      grading_period = GradingPeriod.for(@context).find_by(id: params[:grading_period_id])
+      render json: {error: :invalid_grading_period}, status: :bad_request and return if grading_period.blank?
+    end
+
+    params.require(:override_scores)
+    override_score_updates = params.permit(override_scores: [:student_id, :override_score]).to_h[:override_scores]
+
+    progress = ::Gradebook::FinalGradeOverrides.queue_bulk_update(@context, @current_user, override_score_updates, grading_period)
+    render json: progress_json(progress, @current_user, session)
   end
 
   def user_ids
