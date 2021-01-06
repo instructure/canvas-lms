@@ -305,6 +305,7 @@
     "test:jest": "jest --color",
     "test:jest:coverage": "NODE_OPTIONS=\"--max_old_space_size=8192\" jest --color --coverage",
     "test:jest:debug": "node --inspect-brk node_modules/.bin/jest --runInBand",
+    "test:jest:watch": "jest --color --watch",
     "test:karma": "yarn run test:karma:watch --single-run",
     "test:karma:concurrently": "concurrently --names \"coffee,jsa,jsg,jsh\" \"JSPEC_GROUP=coffee yarn test:karma:headless\" \"JSPEC_GROUP=jsa yarn test:karma:headless\" \"JSPEC_GROUP=jsg yarn test:karma:headless\" \"JSPEC_GROUP=jsh yarn test:karma:headless\"",
     "test:karma:headless": "yarn run test:karma --browsers ChromeHeadlessNoSandbox",
