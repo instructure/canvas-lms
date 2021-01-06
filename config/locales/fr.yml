@@ -25279,6 +25279,15 @@ fr:
   windows_tile_color_2b786bd9: "Couleur de la mosaïque Windows"
   windows_tile_square_b91d2b33: "Mosaïque Windows : Carrée"
   windows_tile_wide_4d40910: "Mosaïque Windows : Large"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Grâce à cette fonctionnalité, les équations mathématiques LaTex saisies dans la plupart des
+      champs de saisie de texte dans Canvas seront traitées par MathJax.
+      Le contenu LaTex délimité par \(...\) est converti en équations incorporées à la ligne, tandis que le contenu
+      délimité par $$...$$ est rendu sous forme de bloc.  À titre d’exemple,
+      vous pouvez choisir de donner à un travail le titre \(\sqrt{x}\), ou bien
+      saisir $$ax^2 + by + c = 0$$ dans un commentaire de soumission.
+      Cette fonction exige d'avoir également activé le drapeau
+      « Nouvelle gestion des équations mathématiques ».
   withdrawn_4c838347: Retiré
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Oups... Il semblerait qu'il n'y ait rien ici !"
