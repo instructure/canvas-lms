@@ -312,6 +312,14 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    it 'has createdAt field for conversationMessagesConnection' do
+      c = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      expect(
+        type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
+      ).to eq c.conversation.conversation_messages.first.created_at.iso8601
+    end
+
     it 'does not return conversations for other users' do
       conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
