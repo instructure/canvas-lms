@@ -26,14 +26,15 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 const TerserPlugin = require('terser-webpack-plugin')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
+const glob = require('glob')
 const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
-const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
 const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
+const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
 require('./bundles')
 
@@ -333,8 +334,12 @@ module.exports = {
     // instead of public/javascripts/compiled/foobar.js
     new CompiledReferencePlugin(),
 
-    // handle the way we hook into bundles from our rails plugins like analytics
-    new BundleExtensionsPlugin(),
+    // allow plugins to extend source files
+    new SourceFileExtensionsPlugin({
+      context: root,
+      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), { absolute: true }),
+      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions'),
+    }),
 
     new WebpackHooks(),
 

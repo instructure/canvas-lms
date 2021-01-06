@@ -17,7 +17,8 @@
     "nohoist": [
       "canvas_quizzes/grunt*",
       "canvas_quizzes/jasmine*",
-      "**/tinymce","**/tinymce/**"
+      "**/tinymce",
+      "**/tinymce/**"
     ]
   },
   "dependencies": {
@@ -258,6 +259,7 @@
     "karma-webpack": "instructure/karma-webpack#patch1",
     "lint-staged": "^9",
     "merge-stream": "^2",
+    "mkdirp": "^1.0.4",
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
