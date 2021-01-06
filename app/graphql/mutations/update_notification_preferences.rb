@@ -67,6 +67,7 @@ class NotificationCategoryType < Types::BaseEnum
 end
 
 class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
+  ValidationError = Class.new(StandardError)
   graphql_name 'UpdateNotificationPreferences'
 
   argument :account_id, ID, required: false, prepare: GraphQLHelpers.relay_or_legacy_id_prepare_func('Account')
@@ -129,15 +130,16 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     raise GraphQL::ExecutionError, 'not found'
   rescue ActiveRecord::RecordInvalid => invalid
     errors_for(invalid.record)
-  rescue => error
+  rescue ::Mutations::UpdateNotificationPreferences::ValidationError => error
     return validation_error(error.message)
   end
 
   def validate_input(input)
-    if input[:context_type] == 'Course'
-      raise I18n.t('Course level notification preferences require a course_id to update') unless input[:course_id]
-    elsif input[:context_type] == 'Account'
-      raise I18n.t('Account level notification preferences require an account_id to update') unless input[:account_id]
+    err_klass = ::Mutations::UpdateNotificationPreferences::ValidationError
+    if input[:context_type] == 'Course' && !input[:course_id]
+      raise err_klass, I18n.t('Course level notification preferences require a course_id to update')
+    elsif input[:context_type] == 'Account' && !input[:account_id]
+      raise err_klass, I18n.t('Account level notification preferences require an account_id to update') 
     end
 
     validate_policy_update_input(input)
@@ -152,7 +154,8 @@ class Mutations::UpdateNotificationPreferences < Mutations::BaseMutation
     # We require that the 4 arguments listed above be present in order
     # to update notification policies or policy overrides
     if !policy_update_input.all? && !policy_update_input.none?
-      raise I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
+      err_klass = ::Mutations::UpdateNotificationPreferences::ValidationError
+      raise err_klass, I18n.t('Notification policies requires the communication channel id, the notification category, and the frequency to update')
     end
   end
 
