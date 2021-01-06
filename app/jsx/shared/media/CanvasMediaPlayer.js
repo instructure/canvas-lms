@@ -201,6 +201,7 @@ export default function CanvasMediaPlayer(props) {
           tracks={props.media_tracks}
           hideFullScreen={!includeFullscreen}
           onLoadedMetadata={handleLoadedMetadata}
+          captionPosition="bottom"
         />
       ) : (
         renderNoPlayer()

@@ -18,6 +18,10 @@
 
 @import 'base/environment';
 
+#player_container {
+  font-family: $ic-font-family;
+}
+
 .audio-player {
   background-color: $lightBackground;
   background-repeat: no-repeat;
