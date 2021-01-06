@@ -18,6 +18,18 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti::Messages
+  # A "factory" class that builds an ID Token (JWT) to be used in LTI Advantage
+  # LTI Resource Link Requests (a.k.a standard LTI 1.3 tool launches).
+  #
+  # This class relies on a another class (LtiAdvantage::Messages::ResourceLinkRequest)
+  # to model the data in the JWT body and produce a signature.
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti/v1p3/.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class ResourceLinkRequest < JwtMessage
     def initialize(tool:, context:, user:, expander:, return_url:, opts: {})
       super

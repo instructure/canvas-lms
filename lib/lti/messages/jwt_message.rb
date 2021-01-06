@@ -20,6 +20,22 @@
 require 'lti_advantage'
 
 module Lti::Messages
+
+  # Base class for all LTI Message "factory" classes.
+  #
+  # This class, and it's child classes, are responsible
+  # for constructing and ID token suitable for LTI 1.3
+  # authentication responses (LTI launches).
+  #
+  # These class have counterparts for simply modeling the
+  # data  at "gems/lti-advantage/lib/lti_advantage/messages".
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti/v1p3/.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class JwtMessage
     EXTENSION_PREFIX = 'https://www.instructure.com/'.freeze
 

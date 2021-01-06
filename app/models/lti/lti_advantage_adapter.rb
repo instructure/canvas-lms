@@ -20,6 +20,46 @@
 require 'lti_advantage'
 
 module Lti
+
+  # Responsible for generating parameters for both Login requests
+  # and Authentication Responses (ID token).
+  #
+  # This class serves a similar purpose to LtiOutboundAdapter
+  # (and exposes the same interface), but is only
+  # used for LTI 1.3. LtiOutboundAdapter is used only for LTI 1.x.
+  #
+  # Please refer to the following IMS specification sections:
+  # - https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login
+  # - http://www.imsglobal.org/spec/lti/v1p3/#additional-login-parameters
+  #
+  # LtiAdvantageAdapter offers various methods that provide
+  # context-tailored parameters for login requests and authentication
+  # responses:
+  #   - generate_post_payload_for_assignment
+  #   - generate_post_payload_for_homework_submission
+  #   - generate_post_payload
+  #
+  # These are the primary methods used to interface with
+  # LtiAdvantageAdapter from external classes. A brief
+  # overview of each can be found in method-specific
+  # documentation.
+  #
+  # In general, the formation of the login request (and later
+  # authentication response) is handled in the following way:
+  #
+  # 1. Generate the complete, signed id_token that will be sent
+  #    in the authentication response from Canvas to the tool.
+  # 2. Create a random cache key, and store the id_token in
+  #    cache for later retrieval if authentication with the
+  #    the tool succeeds.
+  # 3. Include the cache key as the "lti_message_hint" parameter
+  #    in the login request. This value is passed back to Canvas
+  #    By the tool in the authentication request (handled by
+  #    app/controllers/lti/ims/authentication_controller.rb#authorize).
+  #
+  # For information on how the cached ID token is eventually retrieved
+  # and sent to a tool, please refer to the inline documentation of
+  # app/controllers/lti/ims/authentication_controller.rb
   class LtiAdvantageAdapter
     MESSAGE_HINT_LIFESPAN = 5.minutes
 
@@ -35,14 +75,64 @@ module Lti
       @target_link_uri = opts[:launch_url]
     end
 
+    # Generates a login request pointing to a cached launch (ID token)
+    # suitable for assignment LTI launches.
+    #
+    # This ensures, for example, that Assignment and Grade services
+    # parameters are included in the cached launch.
+    #
+    # See method-level documentation of "generate_post_payload" for
+    # more details.
+    #
+    # For information on how the cached ID token is eventually retrieved
+    # and sent to a tool, please refer to the inline documentation of
+    # app/controllers/lti/ims/authentication_controller.rb
     def generate_post_payload_for_assignment(*args)
       login_request(resource_link_request.generate_post_payload_for_assignment(*args))
     end
 
+    # Generates a login request pointing to a cached launch (ID token)
+    # suitable for submission LTI launches.
+    #
+    # These launches occur when a student launches a tool with
+    # the intent of selecting some document or link that will
+    # be used as their submission for an assignment.
+    #
+    # See method-level documentation of "generate_post_payload" for
+    # more details.
+    #
+    # For information on how the cached ID token is eventually retrieved
+    # and sent to a tool, please refer to the inline documentation of
+    # app/controllers/lti/ims/authentication_controller.rb
     def generate_post_payload_for_homework_submission(*args)
       login_request(resource_link_request.generate_post_payload_for_homework_submission(*args))
     end
 
+    # Generates a login request pointing to a general-use
+    # cached launch (ID token).
+    #
+    # This method, along with all other "generate_post_payload_for_*"
+    # methods, generates a login request in the following way:
+    #
+    # 1. Determine what the message type should be. For now this
+    #    is always either "LtiResourceLinkRequest" or "DeepLinkingRequest".
+    #    Default to "LtiResourceLink" if the requested message type is
+    #    not recognized.
+    # 2. Invoke the constructor for the "factory" class that builds
+    #    the requested message type. At the time of writting, these
+    #    classes live in "lib/lti/messages".
+    # 3. Cache the ID token returned from the factory class (this is a
+    #    signed JWT, so always a string)
+    # 4. Construct the login request parameters with a lti_message_hint
+    #    that points to the cached ID token.
+    #
+    # Please refer to the following IMS specification sections:
+    # - https://www.imsglobal.org/spec/security/v1p0#step-1-third-party-initiated-login
+    # - http://www.imsglobal.org/spec/lti/v1p3/#additional-login-parameters
+    #
+    # For information on how the cached ID token is eventually retrieved
+    # and sent to a tool, please refer to the inline documentation of
+    # app/controllers/lti/ims/authentication_controller.rb
     def generate_post_payload
       login_request(generate_lti_params)
     end
