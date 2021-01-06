@@ -25268,6 +25268,15 @@ ja:
   windows_tile_color_2b786bd9: "Windows のタイル カラー"
   windows_tile_square_b91d2b33: "Windows タイル: 四角"
   windows_tile_wide_4d40910: "Windows タイル: ワイド"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      この機能を使うと、
+      テキストに入れられたLaTex数学方程式はMathJaxで処理されるようになります。\(...\) で区切られた
+      LaTexは、インラインの方程式となり、
+      $$...$$ はブロックとしてレンダリングされます。たとえば、
+      課題を \(\sqrt{x}\) というタイトルをつけるか、
+      $$ax^2 + by + c = 0$$ を提出コメントに入力することを選択できます。
+      この機能は、"更新された数学方程式の取り扱い」
+      フラグがオンになっていることも必須です。
   withdrawn_4c838347: 引き出した
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: おっと...ここには何もないようです！
