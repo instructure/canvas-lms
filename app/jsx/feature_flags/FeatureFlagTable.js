@@ -60,7 +60,7 @@ export default function FeatureFlagTable({title, rows, disableDefaults}) {
                   }
                   defaultExpanded={feature.autoexpand}
                 >
-                  {feature.description}
+                  <div dangerouslySetInnerHTML={{__html: feature.description}} />
                 </ToggleDetails>
               </Cell>
               <Cell>
