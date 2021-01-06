@@ -25326,6 +25326,15 @@ pt:
   windows_tile_color_2b786bd9: "Cor de mosaico do Windows"
   windows_tile_square_b91d2b33: "Mosaico do Windows: Quadrado"
   windows_tile_wide_4d40910: "Mosaico do Windows: Largura"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Com este recurso, as LaTex equações matemáticas introduzidas na maioria dos campos
+      de entrada de texto no Canvas serão processadas por MathJax.
+      LaTex delimitadas por \(...\) tornam-se equações em linha, enquanto
+      $$...$$ serão entregues como um bloco.  Por exemplo,
+      poderá optar por intitular uma Atribuição \(\sqrt{x}\), ou
+      introduzir $$$ax^2 + por + c = 0$$$ num comentário de submissão.
+      Este recurso requer que a bandeira "Tratamento de equações matemáticas atualizadas"
+      esteja também ligada.
   withdrawn_4c838347: Retirado
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Oops... Parece que nada está aqui!"
