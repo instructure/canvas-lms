@@ -30,6 +30,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 22)
     timestamps()
   }
 

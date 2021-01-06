@@ -26,6 +26,7 @@ def partitions = []
 def changed_tests = ''
 @groovy.transform.Field
 def fsc_status = null
+def FSC_TIMEOUT = configuration.getInteger('fsc-timeout', 20)
 
 def isPlugin() {
   return env.GERRIT_PROJECT == "canvas-lms" ? "0" : "1"
@@ -141,13 +142,12 @@ def computeTestCount() {
 def executeFlakeySpecCatcher(prefix = 'main') {
   sh 'rm -vrf tmp'
   try {
-    timeout(30) {
-      sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
-    }
+    sh 'seq 0 $((DOCKER_PROCESSES-1)) | parallel "build/new-jenkins/rspec-flakey-spec-catcher.sh {}"'
   } catch (org.jenkinsci.plugins.workflow.steps.FlowInterruptedException e) {
     if (e.causes[0] instanceof org.jenkinsci.plugins.workflow.steps.TimeoutStepExecution.ExceededTimeout) {
-      echo "Not failing the build due to timeouts"
+      echo "Failing the build due to timeouts"
       fsc_status = 'timeout'
+      throw e
     } else if(e.causes[0] instanceof jenkins.model.CauseOfInterruption.UserInterruption) {
       echo "Build aborted"
       fsc_status = 'aborted'
@@ -185,6 +185,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: FSC_TIMEOUT)
     timestamps()
   }
 

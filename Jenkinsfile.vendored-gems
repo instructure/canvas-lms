@@ -49,6 +49,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 15)
     timestamps()
   }
 
@@ -66,7 +67,7 @@ pipeline {
           protectedNode('canvas-docker', { cleanupFn() }) {
             stage ('Setup') {
               cleanAndSetup()
-              timeout(time: 5) {
+              timeout(time: 2) {
                def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                checkoutRepo("canvas-lms", refspecToCheckout, 1)

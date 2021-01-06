@@ -50,6 +50,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 15)
     timestamps()
   }
 
@@ -72,7 +73,7 @@ pipeline {
             }
 
             stage('Start Docker Images') {
-              timeout(time: 10) {
+              timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
@@ -86,19 +87,19 @@ pipeline {
               def stages = [:]
 
               stages['Android'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test1', 'android')
                 }
               }
 
               stages['Canvas iOS'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test2', 'canvas-ios')
                 }
               }
 
               stages['Generic'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test3', 'Generic Consumer')
                 }
               }
@@ -110,7 +111,7 @@ pipeline {
               }
 
               stages['Sistemic'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test5', 'Sistemic')
                 }
               }

@@ -293,6 +293,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 1, unit: 'HOURS')
     timestamps()
   }
 
@@ -373,7 +374,7 @@ pipeline {
           // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
           protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             timedStage('Setup') {
-              timeout(time: 5) {
+              timeout(time: 2) {
                 echo "Cleaning Workspace From Previous Runs"
                 sh 'ls -A1 | xargs rm -rf'
                 sh 'find .'
@@ -443,7 +444,7 @@ pipeline {
             }
 
             timedStage('Build Docker Image') {
-              timeout(time: 30) {
+              timeout(time: 20) {
                 if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
