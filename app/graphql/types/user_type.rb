@@ -262,6 +262,32 @@ module Types
         current_user: context[:current_user], session: context[:session]
       ).load(object)
     end
+
+    field :favorite_courses_connection, Types::CourseType.connection_type, null: true
+    def favorite_courses_connection
+      return unless object == current_user
+
+      load_association(:enrollments).then do |enrollments|
+        Promise.all([
+          Loaders::AssociationLoader.for(Enrollment, :course).load_many(enrollments),
+          load_association(:favorites)
+        ]).then do
+          object.menu_courses
+        end
+      end
+    end
+
+    field :favorite_groups_connection, Types::GroupType.connection_type, null: true
+    def favorite_groups_connection
+      return unless object == current_user
+
+      load_association(:groups).then do |groups|
+        load_association(:favorites).then do
+          favorite_groups = groups.active.shard(object).where(id: object.favorite_context_ids("Group"))
+          favorite_groups.any? ? favorite_groups : object.groups.active.shard(object)
+        end
+      end
+    end
   end
 end
 
