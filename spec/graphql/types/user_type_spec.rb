@@ -320,6 +320,20 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.created_at.iso8601
     end
 
+    it 'has updatedAt field for conversations and conversationParticipants' do
+      convo = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
+      expect(res_node).to eq convo.conversation.updated_at.iso8601
+    end
+
+    it 'has updatedAt field for conversationParticipantsConnection' do
+      convo = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
+      expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+    end
+
     it 'does not return conversations for other users' do
       conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)

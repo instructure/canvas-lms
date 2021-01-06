@@ -22,14 +22,13 @@ module Types
   class ConversationParticipantType < ApplicationObjectType
     graphql_name 'ConversationParticipant'
 
-    implements Interfaces::TimestampInterface
-
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
     field :user_id, ID, null: false
     field :workflow_state, String, null: false
     field :label, String, null: true
     field :subscribed, Boolean, null: false
+    field :updated_at, Types::DateTimeType, null: true
 
     field :user, UserType, null: false
     def user

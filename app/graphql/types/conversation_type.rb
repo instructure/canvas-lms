@@ -23,13 +23,13 @@ module Types
     graphql_name 'Conversation'
 
     implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
     field :context_type, String, null: true
     field :context_id, Integer, null: true
     field :subject, String, null: true
+    field :updated_at, Types::DateTimeType, null: true
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true
     def conversation_messages_connection
