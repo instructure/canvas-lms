@@ -22666,6 +22666,15 @@ is:
   windows_tile_color_2b786bd9: "Litur flísa í Windows"
   windows_tile_square_b91d2b33: "Windows-flísar: Ferningslaga"
   windows_tile_wide_4d40910: "Windows-flísar: Breiðar"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Með þessum eiginleika LaTex fara stærðfræðijöfnur sem slegnar eru inn í flesta
+      textareiti í Canvas í úrvinnslu hjá MathJax.
+      LaTex afmarkað af \(...\) breytast í innfelldar jöfnur, á meðan
+      $$...$$ verða lagðar fram sem bálkur.  Til dæmis
+      gætir þú valið að titla verkefni \(\sqrt{x}\), eða
+      slá inn $$ax^2 + by + c = 0$$ í athugasemd við skil.
+      Þessi eiginleiki krefst þess að merkið „Uppfærð meðhöndlun á stærðfræðijöfnu“
+      sé einnig á.
   withdrawn_4c838347: Afturkallað
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Úbbs… Það virðist ekki vera neitt hérna!"
