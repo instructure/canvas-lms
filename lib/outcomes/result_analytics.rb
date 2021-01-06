@@ -59,7 +59,9 @@ module Outcomes
     #
     # Returns the resulting relation
     def order_results_for_rollup(relation)
-      relation.joins(:user).order(User.sortable_name_order_by_clause).order('learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
+      relation.joins(:user).
+        order(User.sortable_name_order_by_clause).
+        order('users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
     end
 
     # Public: Generates a rollup of each outcome result for each user.
@@ -77,9 +79,9 @@ module Outcomes
     #            determining the current_method chosen for calculating rollups.
     #
     # Returns an Array of Rollup objects.
-    def outcome_results_rollups(results: , users: [], excludes: [], context: nil)
+    def outcome_results_rollups(results:, users: [], excludes: [], context: nil)
       ActiveRecord::Associations::Preloader.new.preload(results, :learning_outcome)
-      rollups = results.chunk(&:user_id).map do |_, user_results|
+      rollups = results.group_by(&:user_id).map do |_, user_results|
         Rollup.new(user_results.first.user, rollup_user_results(user_results, context))
       end
       if excludes.include? 'missing_user_rollups'
@@ -126,6 +128,7 @@ module Outcomes
 
     def mastery_scale_opts(context)
       return {} unless context.is_a?(Course) && context.root_account.feature_enabled?(:account_level_mastery_scales)
+
       @mastery_scale_opts ||= {}
       @mastery_scale_opts[context.asset_string] ||= begin
         method = context.resolved_outcome_calculation_method
@@ -182,6 +185,7 @@ module Outcomes
     def to_percents(count_arr)
       total = count_arr.sum
       return count_arr if total.zero?
+
       count_arr.map {|v| (100.0 * v / total).round}
     end
 
