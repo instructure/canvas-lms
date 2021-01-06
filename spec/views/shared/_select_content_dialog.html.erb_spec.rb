@@ -64,6 +64,48 @@ describe "shared/_select_content_dialog" do
     end
   end
 
+  describe "with new_quizzes_modules_support disabled" do
+    before(:each) do
+      course_with_teacher
+      view_context
+      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
+    end
+
+    it "only renders classic quizzes when Quiz is selected" do
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#quizs_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ New Quiz ]", "A", "C"])
+    end
+  end
+
+  describe "with new_quizzes_modules_support enabled" do
+    before(:each) do
+      course_with_teacher
+      view_context
+      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+    end
+
+    after(:each) do
+      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
+    end
+
+    it "renders classic quizzes and new quizzes together when Quiz is selected" do
+      assign(:combined_active_quizzes, [
+        [1, 'A', 'quiz'],
+        [2, 'B', 'quiz'],
+        [1, 'C', 'assignment']
+      ])
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#quizs_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ New Quiz ]", "A", "B", "C"])
+    end
+  end
+
   it "should include unpublished wiki pages" do
     course_with_teacher
     published_page = @course.wiki_pages.build title: 'published_page'

@@ -22,6 +22,7 @@
 <% only ||= nil # only is an optimization, so that tabs that aren't going to be used won't have their data loaded %>
 <% lti_app_placements ||= [] %>
 <% module_dnd = !!@context.root_account.feature_enabled?(:module_dnd) %>
+<% new_quizzes_modules_support_enabled = !!Account.site_admin.feature_enabled?(:new_quizzes_modules_support) %>
 <% cache([@context, 'select_context_content_dialog_1', only, module_dnd].cache_key) do %>
   <div id="select_context_content_dialog" style="display: none;">
     <div style="margin-bottom: 5px; <%= hidden if only && only.size == 1 %>">
@@ -220,8 +221,14 @@
           <% if @context.grants_right?(@current_user, session, :manage_assignments) %>
             <option value="new"><%= t :new_quiz_option, "[ New Quiz ]" %></option>
           <% end %>
-          <% @context.quizzes.active.reorder(Quizzes::Quiz.best_unicode_collation_key('title')).limit(400).pluck(:id, :title).each do |id, title| %>
-            <option value="<%= id %>"><%= title %></option>
+          <% if new_quizzes_modules_support_enabled %>
+            <% @combined_active_quizzes.each do |id, title, type| %>
+              <option value="<%= id %>"><%= title %></option>
+            <% end %>
+          <% else %>
+            <% @context.quizzes.active.reorder(Quizzes::Quiz.best_unicode_collation_key('title')).limit(400).pluck(:id, :title).each do |id, title| %>
+              <option value="<%= id %>"><%= title %></option>
+            <% end %>
           <% end %>
         </select>
         </div>

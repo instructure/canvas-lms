@@ -168,7 +168,6 @@ describe Course do
     end
   end
 
-
   describe '#moderators' do
     before(:once) do
       @course = Course.create!
