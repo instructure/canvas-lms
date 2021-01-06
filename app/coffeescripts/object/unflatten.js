@@ -78,5 +78,5 @@ export default function unflatten(obj) {
     }
 
     return newObj
-  }, {})
+  }, Object.create(null))
 }
