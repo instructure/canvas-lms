@@ -40,6 +40,13 @@ module Lti::Messages
         document_targets: %w(iframe window).freeze,
         media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
       }.freeze,
+      'collaboration' => {
+        accept_multiple: false,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: true,
+        document_targets: %w(iframe).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze,
       'conference_selection' => {
         accept_multiple: false,
         accept_types: %w(link html).freeze,
