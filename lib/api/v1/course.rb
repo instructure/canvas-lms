@@ -120,6 +120,15 @@ module Api::V1::Course
           hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
         end
       end
+      # undocumented; used in AccountCourseUserSearch
+      if includes.include?('active_teachers')
+        course.shard.activate do
+          scope =
+            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
+          hash['teachers'] =
+            User.where(id: scope).map { |teacher| user_display_json(teacher) }
+        end
+      end
       hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')
       hash['locale'] = course.locale unless course.locale.nil?
       hash['account'] = account_json(course.account, user, session, []) if includes.include?('account')

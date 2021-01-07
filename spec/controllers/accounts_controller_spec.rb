@@ -1302,6 +1302,40 @@ describe AccountsController do
       expect(JSON.parse(response.body.sub("while(1)\;", '')).length).to eq 2
     end
 
+    it "should exclude teachers that don't have an active enrollment workflow state" do
+      user = user_factory(name: 'rejected')
+      enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+      enrollment.update!(workflow_state: 'rejected')
+
+      user2 = user_factory(name: 'inactive')
+      enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+      enrollment2.update!(workflow_state: 'inactive')
+
+      user3 = user_factory(name: 'completed')
+      enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+      enrollment3.update!(workflow_state: 'completed')
+
+      user4 = user_factory(name: 'deleted')
+      enrollment4 = @c1.enroll_user(user4, 'TeacherEnrollment')
+      enrollment4.update!(workflow_state: 'deleted')
+
+      user5 = user_factory(name: 'Teachy McTeacher')
+      enrollment5 = @c1.enroll_user(user5, 'TeacherEnrollment')
+      enrollment5.update!(workflow_state: 'active')
+
+      admin_logged_in(@account)
+
+      get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                  order: 'asc', search_by: 'course',
+                                  include: ['active_teachers']}
+
+      expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+      expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+      expect(response.body).not_to match(/\"display_name\":\"completed\"/)
+      expect(response.body).not_to match(/\"display_name\":\"deleted\"/)
+      expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+    end
+
     it "should be able to search by course name" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
@@ -1347,6 +1381,69 @@ describe AccountsController do
       expect(response.body).not_to match(/\"name\":\"Apps\"/)
     end
 
+    context "sharding" do
+      specs_require_sharding
+
+      it "excludes inactive teachers regardless of requestor's active shard" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        @shard1.activate do
+          get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                      order: 'asc', search_by: 'course',
+                                      include: ['active_teachers']}
+        end
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+
+      it "excludes cross-shard teachers without an active enrollment workflow state" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                    order: 'asc', search_by: 'course',
+                                    include: ['active_teachers']}
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+    end
   end
 
   describe "#eportfolio_moderation" do

@@ -703,6 +703,7 @@ class AccountsController < ApplicationController
 
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:account, :root_account, course_account_associations: :account])
       preload_teachers(@courses) if includes.include?("teachers")
+      preload_teachers(@courses) if includes.include?("active_teachers")
       ActiveRecord::Associations::Preloader.new.preload(@courses, [:enrollment_term]) if includes.include?("term") || includes.include?('concluded')
 
       if includes.include?("total_students")
