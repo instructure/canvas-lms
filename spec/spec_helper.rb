@@ -853,6 +853,8 @@ RSpec.configure do |config|
   end
 end
 
+require 'lazy_presumptuous_i18n_backend'
+
 class LazyPresumptuousI18nBackend
   def stub(translations)
     @stubs = translations.with_indifferent_access
