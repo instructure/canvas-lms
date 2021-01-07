@@ -1498,6 +1498,8 @@ class ApplicationController < ActionController::Base
   rescue_from Canvas::Security::TokenExpired, with: :rescue_expected_error_type
   rescue_from SearchTermHelper::SearchTermTooShortError, with: :rescue_expected_error_type
   rescue_from CanvasHttp::CircuitBreakerError, with: :rescue_expected_error_type
+  rescue_from InstFS::ServiceError, with: :rescue_expected_error_type
+  rescue_from InstFS::BadRequestError, with: :rescue_expected_error_type
 
   def rescue_expected_error_type(error)
     rescue_exception(error, level: :info)
