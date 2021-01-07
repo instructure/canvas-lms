@@ -39,9 +39,9 @@ module Services
         token: 'AN_API_TOKEN'
       }
     end
-    
+
     subject { described_class.new(config) }
-    
+
     context ".snapshot_url_to_file" do
       it 'calls the provided url' do
         @stub = stub_request(:get, config[:url]).
@@ -49,7 +49,20 @@ module Services
           to_return(status: 200, body: "IMAGE_GOES_HERE")
 
         Tempfile.create('example.png') do |f|
-          subject.snapshot_url_to_file("https://www.example.com", f)
+          result = subject.snapshot_url_to_file("https://www.example.com", f)
+          expect(result).to be_truthy
+        end
+        expect(@stub).to have_been_requested.times(1)
+      end
+
+      it 'returns false if it gets a non-200' do
+        @stub = stub_request(:get, config[:url]).
+          with(query: { url: 'https://www.example.com' }).
+          to_return(status: 500, body: "IMAGE_GOES_HERE")
+
+        Tempfile.create('example.png') do |f|
+          result = subject.snapshot_url_to_file("https://www.example.com", f)
+          expect(result).to be_falsey
         end
         expect(@stub).to have_been_requested.times(1)
       end
