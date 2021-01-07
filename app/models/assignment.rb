@@ -131,6 +131,7 @@ class Assignment < ActiveRecord::Base
                 where("EXISTS (?)", ContextExternalTool.where("context_external_tools.id=content_tags.content_id").quiz_lti.offset(0)).offset(0))
     end
   }
+  scope :not_type_quiz_lti, -> { where.not(id: type_quiz_lti) }
 
   validates_associated :external_tool_tag, :if => :external_tool?
   validate :group_category_changes_ok?

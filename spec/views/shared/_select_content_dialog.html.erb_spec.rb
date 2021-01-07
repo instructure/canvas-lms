@@ -80,6 +80,14 @@ describe "shared/_select_content_dialog" do
       options = page.css('#quizs_select .module_item_select option').map(&:text)
       expect(options).to eq(["[ New Quiz ]", "A", "C"])
     end
+
+    it "renders New Quizzes as Assignments" do
+      new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#assignments_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ New Assignment ]", "Some New Quiz"])
+    end
   end
 
   describe "with new_quizzes_modules_support enabled" do
@@ -103,6 +111,15 @@ describe "shared/_select_content_dialog" do
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map(&:text)
       expect(options).to eq(["[ New Quiz ]", "A", "B", "C"])
+    end
+
+    it "does not render New Quizzes as Assignments" do
+      assign(:combined_active_quizzes, [])
+      new_quizzes_assignment(:course => @course, :title => 'Some New Quiz')
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#assignments_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ New Assignment ]"])
     end
   end
 

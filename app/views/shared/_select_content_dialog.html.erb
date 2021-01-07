@@ -271,7 +271,12 @@
           <% end %>
           <% @context.assignment_groups.active.include_active_assignments.reorder(AssignmentGroup.best_unicode_collation_key('name')).each do |group| %>
             <optgroup label="<%= group.name %>">
-            <% group.active_assignments.no_submittables.reorder(Assignment.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
+            <% if new_quizzes_modules_support_enabled %>
+              <% assignments = group.active_assignments.no_submittables.not_type_quiz_lti %>
+            <% else %>
+              <% assignments = group.active_assignments.no_submittables %>
+            <% end %>
+            <% assignments.reorder(Assignment.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
               <option value="<%= id %>"><%= title %></option>
             <% end %>
             </optgroup>
