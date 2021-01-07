@@ -66,7 +66,7 @@ If you want to migrate the existing database, use docker_dev_update.sh
 
 function build_images {
   message 'Building docker images...'
-  if [[ "$(uname)" == 'Linux' ]]; then
+  if [[ "$(uname)" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
     docker-compose build --pull --build-arg USER_ID=$(id -u)
   else
     docker-compose build --pull
