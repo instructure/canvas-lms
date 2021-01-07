@@ -22,7 +22,7 @@ require 'inst_statsd'
 
 module LiveEvents
   class << self
-    attr_accessor :logger, :cache, :statsd
+    attr_accessor :logger, :cache, :statsd, :on_work_unit_end
     attr_reader :stream_client
 
     # rubocop:disable Style/TrivialAccessors

@@ -22343,6 +22343,15 @@ cy:
   windows_tile_color_2b786bd9: "Lliw Teils Ffenestri"
   windows_tile_square_b91d2b33: "Teils Ffenestri: Sgwâr"
   windows_tile_wide_4d40910: "Teils Ffenestri: Llydan"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Gyda'r nodwedd hon, LaTex bydd hafaliadau mathemateg sy’n cael eu rhoi yn y rhan fwyaf o
+      feysydd testun yn Canvas yn cael eu prosesu gan MathJax.
+      LaTex wedi’i derfyn gan \(...\) yn hafaliadau mewn llinell, tra y bydd
+      $$...$$ yn cael ei ddangos fel bloc.  Er enghraifft,
+      gallech chi ddewis rhoi teitl i Aseiniad \(\sqrt{x}\), neu
+      roi $$ax^2 + by + c = 0$$ mewn sylw cyflwyno.
+      Mae'r nodwedd hon yn gofyn bod y fflag "Wedi diweddaru delio â hafaliadau mathemateg"
+      yn weithredol hefyd.
   withdrawn_4c838347: "Wedi tynnu’n ôl"
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Wps... Mae'n ymddangos nad oes dim byd yma!"

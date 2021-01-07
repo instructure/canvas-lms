@@ -22446,6 +22446,15 @@ it:
   windows_tile_color_2b786bd9: "Colore riquadro finestre"
   windows_tile_square_b91d2b33: "Riquadro finestre: Quadrato"
   windows_tile_wide_4d40910: "Riquadro finestre: Ampio"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Con questa funzione, le equazioni matematiche LaTex inserire nella maggior parte dei campi di inserimento testo
+      in Canvas saranno elaborate da MathJax.
+      LaTex delimitato da \(...\) diventa le equazioni inline, mentre
+      $$...$$ sarà reso come blocco.  Ad esempio,
+      potresti scegliere di intitolare un compito \(\sqrt{x}\) o
+      inserire $$ax^2 + by + c = 0$$ in un commenti consegna.
+      Questa funzione richiede che anche la flag "Gestione equazione matematica aggiornata"
+      sia attiva.
   withdrawn_4c838347: Ritirato
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Ops... Sembra che non ci sia niente qui!"

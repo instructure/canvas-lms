@@ -22,7 +22,7 @@ require 'canvas_http'
 
 module CanvasPandaPub
   class << self
-    attr_accessor :logger, :cache
+    attr_accessor :logger, :cache, :on_work_unit_end
 
     def plugin_settings=(settings)
       @plugin_settings = settings
