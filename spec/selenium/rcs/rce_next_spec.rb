@@ -520,6 +520,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
 
       it 'should close links tray if open when opening link options' do
+        skip('Fails spuriously about 5% of the time. Needs to be fixed in LS-1744')
         visit_front_page_edit(@course)
         wait_for_tiny(edit_wiki_css)
 
