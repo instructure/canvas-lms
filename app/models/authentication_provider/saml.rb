@@ -105,7 +105,10 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
   before_validation :download_metadata
   after_initialize do |ap|
     # default to the most secure signature we support, but only for new objects
-    ap.sig_alg ||= 'RSA-SHA256' if ap.new_record?
+    if ap.new_record?
+      ap.sig_alg ||= 'RSA-SHA256' 
+      ap.identifier_format ||= SAML2::NameID::Format::UNSPECIFIED
+    end
   end
 
   def destroy
@@ -241,7 +244,15 @@ class AuthenticationProvider::SAML < AuthenticationProvider::Delegated
     self.log_in_url = idp.single_sign_on_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.log_out_url = idp.single_logout_services.find { |ep| ep.binding == SAML2::Bindings::HTTPRedirect::URN }.try(:location)
     self.certificate_fingerprint = idp.signing_keys.map(&:fingerprint).join(' ').presence || idp.keys.first&.fingerprint
-    self.identifier_format = (idp.name_id_formats & self.class.name_id_formats).first
+
+    recognized_formats = (idp.name_id_formats & self.class.name_id_formats)
+    if recognized_formats.length == 1
+      self.identifier_format = recognized_formats.first
+    elsif identifier_format != SAML2::NameID::Format::UNSPECIFIED &&
+      !recognized_formats.include?(identifier_format)
+      self.identifier_format = SAML2::NameID::Format::UNSPECIFIED
+    end
+
     self.settings[:signing_certificates] = idp.signing_keys.map(&:x509)
     case idp.want_authn_requests_signed?
     when true
