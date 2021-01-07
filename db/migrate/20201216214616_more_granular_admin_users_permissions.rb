@@ -20,6 +20,7 @@
 
 class MoreGranularAdminUsersPermissions < ActiveRecord::Migration[5.2]
   tag :postdeploy
+  disable_ddl_transaction!
 
   def up
     DataFixup::AddRoleOverridesForNewPermission.run(:manage_admin_users, :allow_course_admin_actions)
