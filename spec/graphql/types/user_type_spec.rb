@@ -365,6 +365,8 @@ describe Types::UserType do
       conversation(@teacher, @student, {body: 'oh yea =)'})
       conversation(@student, @random_person, {body: 'Whats up?', starred: true})
 
+      # used for the sent scope
+      conversation(@random_person, @teacher, {body: 'Help! Please make me non-random!'})
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(scope: \"inbox\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
@@ -377,6 +379,15 @@ describe Types::UserType do
       )
       expect(result.count).to eq 1
       expect(result[0][0]).to eq 'Whats up?'
+
+      type = GraphQLTypeTester.new(
+        @random_person,
+        current_user: @random_person,
+        domain_root_account: @random_person.account,
+        request: ActionDispatch::TestRequest.create
+      )
+      result = type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+      expect(result[0][0]).to eq "Help! Please make me non-random!"
     end
   end
 

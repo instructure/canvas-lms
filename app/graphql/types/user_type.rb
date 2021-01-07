@@ -159,7 +159,7 @@ module Types
           when 'starred'
             object.starred_conversations
           when 'sent'
-            object.conversations.sent
+            object.all_conversations.sent
           when 'archived'
             object.conversations.archived
           else
