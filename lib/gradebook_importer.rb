@@ -45,7 +45,11 @@ class GradebookImporter
   class InvalidHeaderRow < StandardError; end
 
   OverrideColumnInfo = Struct.new(:grading_period_id, :index, keyword_init: true)
-  OverrideScoreChange = Struct.new(:grading_period_id, :student_id, :current_score, :new_score, keyword_init: true)
+  OverrideScoreChange = Struct.new(:grading_period_id, :student_id, :current_score, :new_score, keyword_init: true) do
+    def course_score?
+      grading_period_id.nil?
+    end
+  end
 
   attr_reader :context, :contents, :attachment, :assignments, :students,
               :submissions, :missing_assignments, :missing_students, :upload
@@ -271,9 +275,9 @@ class GradebookImporter
 
       @unchanged_assignments = !indexes_to_delete.empty?
 
-      grading_periods_with_updated_overrides = remove_override_scores_for_unchanged_grading_periods!
+      grading_period_ids_with_updated_overrides = remove_override_scores_for_unchanged_grading_periods!
 
-      @students = [] if @assignments.empty? && @custom_gradebook_columns.empty? && grading_periods_with_updated_overrides.empty?
+      @students = [] if @assignments.empty? && @custom_gradebook_columns.empty? && grading_period_ids_with_updated_overrides.empty?
     end
 
     # remove concluded enrollments
@@ -582,10 +586,27 @@ class GradebookImporter
       :unchanged_assignments => @unchanged_assignments,
       :warning_messages => @warning_messages,
       :custom_columns => custom_gradebook_columns.map { |cc| custom_columns_to_hash(cc) },
-    }
+    }.tap do |hash|
+      hash[:override_scores] = override_score_json if allow_override_scores?
+    end
   end
 
   protected
+
+  def override_score_json
+    includes_course_scores = false
+    grading_period_ids = Set.new
+
+    @gradebook_importer_override_scores.each_value do |changes_for_student|
+      includes_course_scores ||= changes_for_student.any?(&:course_score?)
+      grading_period_ids = grading_period_ids.merge(changes_for_student.map(&:grading_period_id).compact)
+    end
+
+    {
+      grading_periods: GradingPeriod.periods_json(@grading_periods.where(id: grading_period_ids), @user),
+      includes_course_scores: includes_course_scores
+    }
+  end
 
   def custom_gradebook_columns
     @custom_gradebook_columns ||= @context.custom_gradebook_columns.active.to_a

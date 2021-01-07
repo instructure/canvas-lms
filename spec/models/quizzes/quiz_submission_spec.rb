@@ -1857,4 +1857,62 @@ describe Quizzes::QuizSubmission do
       expect(@quiz_submission.root_account_id).to eq Account.default.id
     end
   end
+
+  describe "#filter_attributes_for_user" do
+    let(:quiz_submission) do
+      quiz_with_graded_submission([])
+      @quiz_submission
+    end
+    let(:assignment) { quiz_submission.quiz.assignment }
+    let(:student) { quiz_submission.user }
+    let(:teacher) { @course.enroll_teacher(User.create!, "workflow_state" => "active").user }
+
+    context "when the quiz is a practice quiz" do
+      let(:practice_quiz_submission) do
+        practice_quiz_with_submission
+        @qsub
+      end
+
+      it "does not remove the score or kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          practice_quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is hidden from the student" do
+      before(:each) do
+        quiz_submission.submission.update!(posted_at: nil)
+      end
+
+      it "removes the score and kept_score fields when the user cannot see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        quiz_submission.filter_attributes_for_user(json, student, nil)
+        expect(json).to eq({"id" => 1})
+      end
+
+      it "keeps the score and kept_score fields when the user can see the grade" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, teacher, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+
+    context "when the quiz submission is posted to the student" do
+      it "always keeps the score and kept_score fields" do
+        json = {"id" => 1, "kept_score" => 10, "score" => 10}
+        expect {
+          quiz_submission.filter_attributes_for_user(json, student, nil)
+        }.not_to change {
+          json
+        }
+      end
+    end
+  end
 end

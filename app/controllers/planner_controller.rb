@@ -248,7 +248,7 @@ class PlannerController < ApplicationController
 
   def unread_assignment_collection
     assign_scope = Assignment.active.where(:context_type => "Course", :context_id => @local_course_ids)
-    disc_assign_ids = DiscussionTopic.active.where(context_type: 'Course', context_id: @local_course_ids).
+    disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids).
       where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
     scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted").
       # we can assume content participations because they're automatically created when comments

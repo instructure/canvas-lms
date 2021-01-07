@@ -312,12 +312,71 @@ describe Types::UserType do
       ).to eq c.conversation.conversation_messages.first.body
     end
 
+    it 'has createdAt field for conversationMessagesConnection' do
+      c = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      expect(
+        type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { createdAt } } } } }')[0][0]
+      ).to eq c.conversation.conversation_messages.first.created_at.iso8601
+    end
+
+    it 'has updatedAt field for conversations and conversationParticipants' do
+      convo = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      res_node = type.resolve('conversationsConnection { nodes { updatedAt }}')[0]
+      expect(res_node).to eq convo.conversation.updated_at.iso8601
+    end
+
+    it 'has updatedAt field for conversationParticipantsConnection' do
+      convo = conversation(@student, @teacher)
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      res_node = type.resolve('conversationsConnection { nodes { conversation { conversationParticipantsConnection { nodes { updatedAt } } } } }')[0][0]
+      expect(res_node).to eq convo.conversation.conversation_participants.first.updated_at.iso8601
+    end
+
     it 'does not return conversations for other users' do
       conversation(@student, @teacher)
       type = GraphQLTypeTester.new(@teacher, current_user: @student, domain_root_account: @teacher.account, request: ActionDispatch::TestRequest.create)
       expect(
         type.resolve('conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }')
       ).to be nil
+    end
+
+    it 'filters the conversations' do
+      conversation(@student, @teacher, {body: 'Howdy Partner'})
+      conversation(@student, @random_person, {body: 'Not in course'})
+
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      result = type.resolve(
+        "conversationsConnection(filter: \"course_#{@course.id}\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.count).to eq 1
+      expect(result[0][0]).to eq 'Howdy Partner'
+
+      result = type.resolve(
+        "conversationsConnection { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.count).to eq 2
+      expect(result.flatten).to match_array ['Howdy Partner', 'Not in course']
+    end
+
+    it 'scopes the conversations' do
+      conversation(@student, @teacher, {body: 'You get that thing I sent ya?'})
+      conversation(@teacher, @student, {body: 'oh yea =)'})
+      conversation(@student, @random_person, {body: 'Whats up?', starred: true})
+
+      type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
+      result = type.resolve(
+        "conversationsConnection(scope: \"inbox\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.flatten.count).to eq 3
+      expect(result.flatten).to match_array ['You get that thing I sent ya?', 'oh yea =)', 'Whats up?']
+
+      result = type.resolve(
+        "conversationsConnection(scope: \"starred\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
+      )
+      expect(result.count).to eq 1
+      expect(result[0][0]).to eq 'Whats up?'
     end
   end
 

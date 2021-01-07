@@ -23,8 +23,9 @@ describe "profile communication settings" do
   include_context "in-process server selenium tests"
 
   before :once do
-    Notification.create(:name => "Conversation Message", :category => "DiscussionEntry")
-    Notification.create(:name => "Added To Conversation", :category => "Discussion")
+    Notification.create(:name => "DiscussionEntry", :category => "DiscussionEntry")
+    Notification.create(:name => "Conversation Message", :category => "Conversation Message")
+    Notification.create(:name => "Conversation Created", :category => "Conversation Created")
     Notification.create(:name => "GradingStuff1", :category => "Grading")
     @sub_comment = Notification.create(:name => "Submission Comment1", :category => "Submission Comment")
   end
@@ -58,7 +59,10 @@ describe "profile communication settings" do
         get "/profile/communication"
         expect(f('#breadcrumbs')).to include_text('Account Notification Settings')
         expect(f("h1").text).to eq "Account Notification Settings"
-        expect(fj("div:contains('Account-level notifications apply to all courses.')")).to be
+        expect(fj("div:contains('Account-level notifications apply to all courses.')")).to be_present
+        expect(fj("thead span:contains('Course Activities')")).to be_present
+        expect(fj("thead span:contains('Discussions')")).to be_present
+        expect(fj("thead span:contains('Conversations')")).to be_present
       end
 
       it "should display the users email address as channel" do
@@ -118,6 +122,16 @@ describe "profile communication settings" do
         expect(focus_button_changed.text).to eq desired_setting
         policy.reload
         expect(policy.frequency).to eq Notification::FREQ_IMMEDIATELY
+      end
+
+      it "should remove Conversations category when opted out" do
+        Account.site_admin.enable_feature! :allow_opt_out_of_inbox
+        @user.preferences[:disable_inbox] = true
+        @user.save!
+        get "/profile/communication"
+        expect(fj("thead span:contains('Course Activities')")).to be_present
+        expect(fj("thead span:contains('Discussions')")).to be_present
+        expect(f("thead")).not_to contain_jqcss("span:contains('Conversations')")
       end
     end
 

@@ -31,7 +31,7 @@ describe 'assignments' do
   include CopyToTrayPage
   include SendToDialogPage
   include AccountContentSharePage
-  
+
   let(:setup) {
     # Two Courses
     @course1 = Course.create!(:name => "First Course1")
@@ -52,10 +52,18 @@ describe 'assignments' do
     @item_before = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment BEFORE this one').id
     @item_after = @module1.add_item :type => 'assignment', :id => @course1.assignments.create!(:title => 'assignment AFTER this one').id
     @module2 = @course2.context_modules.create!(:name => "My Module2")
+    # Third course has already concluded, but should still show up in Direct Share
+    @term = EnrollmentTerm.new(:name => "Term Over", :start_at => 1.month.ago, :end_at => 1.week.ago)
+    @term.root_account_id = Account.default.id
+    @term.save!
+    @course3 = Course.create!(:name => "Third Course3", :start_at => 1.month.ago, :conclude_at => 1.week.ago, :enrollment_term => @term)
+    @course3.enroll_teacher(@teacher1, :enrollment_state => 'active')
+    @course3.enroll_teacher(@teacher2, :enrollment_state => 'active')
   }
 
   let(:copy_assignment_to_course2) {
     course_search_dropdown.click
+    wait_for_ajaximations
     course_dropdown_item(@course2.name).click
     copy_button.click
     run_jobs
@@ -69,7 +77,6 @@ describe 'assignments' do
   let(:send_item) {
     user_search.click
     user_search.send_keys("teac")
-    wait_for_animations
     user_dropdown(@teacher2.name).click
     send_button.click
     run_jobs
@@ -115,14 +122,23 @@ describe 'assignments' do
 
       it 'copy tray lists user managed courses' do
         course_search_dropdown.click
+        wait_for_ajaximations
 
         expect(course_dropdown_list[0].text).to include 'First Course1'
         expect(course_dropdown_list[0].text).to include 'Second Course2'
       end
 
+      it 'copy tray lists concluded courses' do
+        course_search_dropdown.click
+        wait_for_ajaximations
+
+        expect(course_dropdown_list[0].text).to include 'Third Course3'
+      end
+
       it 'copy tray lists course modules' do
         select_course
         module_search_dropdown.click
+        wait_for_ajaximations
 
         expect(module_dropdown_list.text).to include 'My Module1'
         expect(module_dropdown_list.text).to include 'My Module2'
@@ -131,8 +147,9 @@ describe 'assignments' do
       it 'copy tray allows placement' do
         select_course_and_module_in_tray
         placement_dropdown.click
+        wait_for_ajaximations
         @place_options_text = placement_dropdown_options
-        
+
         expect(@place_options_text[0].text).to include 'At the Top'
         expect(@place_options_text[1].text).to include 'Before..'
         expect(@place_options_text[2].text).to include 'After..'
@@ -175,6 +192,14 @@ describe 'assignments' do
           preview_received_item.click
           # can view the mocked preview page
           expect(page_body.text).to include "Preview"
+        end
+
+        it 'can be imported into concluded courses', custom_timeout: 120 do
+          import_content_share.click
+          course_search_dropdown.click
+          wait_for_ajaximations
+
+          expect(course_dropdown_list[0].text).to include 'Third Course3'
         end
 
         it 'can be imported into a course', custom_timeout: 30 do

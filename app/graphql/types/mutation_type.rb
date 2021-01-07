@@ -38,6 +38,7 @@ class Types::MutationType < Types::ApplicationObjectType
     super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
+  field :add_conversation_message, mutation: Mutations::AddConversationMessage
   field :create_conversation, mutation: Mutations::CreateConversation
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
   field :hide_assignment_grades, mutation: Mutations::HideAssignmentGrades
@@ -68,6 +69,9 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
+  field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
+  field :delete_conversations, mutation: Mutations::DeleteConversations
+  field :update_conversation_participant, mutation: Mutations::UpdateConversationParticipant
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

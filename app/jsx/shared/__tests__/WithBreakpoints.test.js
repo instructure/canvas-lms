@@ -38,7 +38,7 @@ describe('WithBreakpoints', () => {
 
   let matchMedia
   const mockWindowWidth = width => {
-    if (window.matchMedia) {
+    if (window.matchMedia && !window.matchMedia._mocked) {
       throw new Error('cannot mock when window.mediaQuery is defined')
     }
     matchMedia = query => ({

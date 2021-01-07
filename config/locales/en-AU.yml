@@ -25365,6 +25365,15 @@ en-AU:
   windows_tile_color_2b786bd9: "Windows Tile Colour"
   windows_tile_square_b91d2b33: "Windows Tile: Square"
   windows_tile_wide_4d40910: "Windows Tile: Wide"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      With this feature, LaTex maths equations entered into most
+      text entry fields in Canvas will be processed by MathJax.
+      LaTex delimited by \(...\) become inline equations, while
+      $$...$$ will be rendered as a block.  For example,
+      you could choose to title an Assignment \(\sqrt{x}\), or
+      enter $$ax^2 + by + c = 0$$ in a submission comment.
+      This feature requires that the "Updated maths equation handling"
+      flag is also on.
   withdrawn_4c838347: Withdrawn
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Woops... Looks like nothing is here!"

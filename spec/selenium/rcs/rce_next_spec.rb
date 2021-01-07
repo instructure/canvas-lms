@@ -519,6 +519,36 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
+      it 'should close links tray if open when opening link options' do
+        visit_front_page_edit(@course)
+        wait_for_tiny(edit_wiki_css)
+
+        switch_to_html_view
+        html_view = f('textarea#wiki_page_body')
+        html_view.send_keys('<h2>This is plain text</h2><a href="http://example.com">edit me</a>')
+        switch_to_editor_view
+
+        def switch_trays
+          click_links_toolbar_menu_button
+          click_course_links
+          expect(course_links_tray).to be_displayed
+
+          click_link_for_options
+          click_link_options_button
+
+          expect(link_options_tray).to be_displayed
+          validate_course_links_tray_closed
+
+          driver.switch_to.frame('wiki_page_body_ifr')
+          f('h2').click
+          driver.switch_to.default_content
+        end
+
+        # Duplicate trays only appear sporadically, so repeate this several times to make sure
+        # we aren't getting multiple trays open at once.
+        5.times { switch_trays }
+      end
+
       it 'should display assignment publish status in links accordion' do
         title = 'Assignment-Title'
         @assignment = @course.assignments.create!(name: title, workflow_state: 'published')
@@ -635,7 +665,8 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should search for items when different accordian section opened', ignore_js_errors: true do
+      it 'should search for items when different accordian section opened',
+         ignore_js_errors: true do
         # Add two pages
         title = 'test_page'
         title2 = 'icon_page'
@@ -671,7 +702,6 @@ describe 'RCE next tests', ignore_js_errors: true do
         change_content_tray_content_subtype('Images')
         change_content_tray_content_type('Course Files')
         expect(image_links.count).to eq(1)
-
       end
     end
 
@@ -739,6 +769,37 @@ describe 'RCE next tests', ignore_js_errors: true do
       click_image_options_button
 
       expect(image_options_tray).to be_displayed
+    end
+
+    it 'should close links tray if open when opening image options' do
+      page_title = 'Page1'
+      image = add_embedded_image('email.png')
+      @course.wiki_pages.create!(
+        title: page_title,
+        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
+      )
+
+      visit_existing_wiki_edit(@course, page_title)
+
+      def switch_trays
+        click_links_toolbar_menu_button
+        click_course_links
+        expect(course_links_tray).to be_displayed
+
+        click_embedded_image_for_options
+        click_image_options_button
+
+        expect(image_options_tray).to be_displayed
+        validate_course_links_tray_closed
+
+        driver.switch_to.frame('wiki_page_body_ifr')
+        f('h2').click
+        driver.switch_to.default_content
+      end
+
+      # Duplicate trays only appear sporadically, so run this several times to make sure
+      # we aren't getting multiple trays open at once.
+      5.times { switch_trays }
     end
 
     it 'should change embedded image to link when selecting option' do
@@ -1051,7 +1112,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         driver.switch_to.default_content
         expect(f('.tox-pop__dialog button[title="Show link options"]')).to eq(
           driver.switch_to.active_element
-        ) # put the cursor in the table
+        )
       end
     end
 
@@ -1278,6 +1339,72 @@ describe 'RCE next tests', ignore_js_errors: true do
         change_content_tray_content_type('Links')
         wait_for_ajaximations
         expect(fj("li:contains('#{title}')")).to be_displayed
+      end
+    end
+
+    describe 'the html editors' do
+      after(:each) do
+        driver.execute_script('if (document.fullscreenElement) document.exitFullscreen()')
+      end
+
+      describe 'with the use_rce_pretty_html_editor flag off' do
+        before(:each) { Account.site_admin.disable_feature! :rce_pretty_html_editor }
+
+        it 'switches between wysiwyg and raw html view' do
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+        end
+
+        it 'displays the editor in fullscreen' do
+          rce_wysiwyg_state_setup(@course)
+
+          click_editor_view_button
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('textarea#wiki_page_body'))
+        end
+      end
+
+      describe 'with the use_rce_pretty_html_editor flag on' do
+        before(:each) { Account.site_admin.enable_feature! :rce_pretty_html_editor }
+
+        it 'switches between wysiwyg and raw html view' do
+          rce_wysiwyg_state_setup(@course)
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          # click edit button -> fancy editor
+          click_editor_view_button
+          expect(f('.RceHtmlEditor')).to be_displayed
+
+          # click edit button -> back to the rce
+          click_editor_view_button
+          expect(f('[aria-label="Rich Content Editor"]')).to be_displayed
+
+          # shift-click edit button -> raw editor
+          shift_click_button('[data-btn-id="rce-edit-btn"]')
+          expect(f('textarea#wiki_page_body')).to be_displayed
+
+          # click "Pretty HTML Editor" status bar button -> fancy editor
+          fj('button:contains("Pretty HTML Editor")').click
+          expect(f('.RceHtmlEditor')).to be_displayed
+        end
+
+        it 'displays the editor in fullscreen' do
+          rce_wysiwyg_state_setup(@course)
+
+          click_editor_view_button
+          expect(f('.RceHtmlEditor')).to be_displayed
+
+          click_full_screen_button
+          expect(fullscreen_element).to eq(f('.RceHtmlEditor'))
+        end
       end
     end
   end

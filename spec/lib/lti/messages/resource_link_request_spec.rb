@@ -72,6 +72,37 @@ describe Lti::Messages::ResourceLinkRequest do
       expect(jws.dig('https://purl.imsglobal.org/spec/lti/claim/resource_link', 'title')).to eq assignment.title
     end
 
+    describe 'custom parameters' do
+      context 'when link-level custom params are given' do
+        it 'merges them in with tool/placement parameters' do
+          expected_assignment_line_item.resource_link.update(
+            custom: {
+              link_has_expansion: "$Canvas.assignment.id",
+              no_expansion: "overrides tool param"
+            }
+          )
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'link_has_expansion' => assignment.id,
+            'has_expansion' => user.id,
+            'no_expansion' => 'overrides tool param'
+          )
+        end
+      end
+
+      context 'when the link-level params are null' do
+        it 'gives only the tool/placement custom params' do
+          expected_assignment_line_item.resource_link.update(
+            custom: nil
+          )
+
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'has_expansion' => user.id,
+            'no_expansion' => 'foo'
+          )
+        end
+      end
+    end
+
     context 'when assignment and grade service enabled' do
       let(:developer_key_scopes) do
         [
@@ -133,7 +164,7 @@ describe Lti::Messages::ResourceLinkRequest do
       end
     end
 
-    context 'when assignment not configured for external tool lauch' do
+    context 'when assignment not configured for external tool launch' do
       let(:api_message) { 'Assignment not configured for external tool launches' }
 
       before do

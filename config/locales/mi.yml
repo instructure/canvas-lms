@@ -25213,6 +25213,15 @@ mi:
   windows_tile_color_2b786bd9: "Tae Tira Matapihi"
   windows_tile_square_b91d2b33: "Tira Matapihi: Tapawha"
   windows_tile_wide_4d40910: "Tira Matapihi: Whānui"
+  with_this_feature_latex_math_equations_entered_int_f226b1f3: |-
+      Me tēnei  āhuatanga LaTex pangarau whārite whakauru ki te nuinga o ngā
+      tāurunga Kuputuhi i roto o Canvas ka whakahaeretia mā MathJax.
+      LaTex whakaiti mā \(...\) whakamahi hei whārite rārangi i te wā
+      $$...$$ ka tukuna hei aukati. Hei tauir
+      ka taea e koe te kōwhiri te taitara  he Whakataunga \(\sqrt{x}\) ara
+      whakauru $$ax^2 + mā + c = 0$$ i roto i te tukunga kōrero
+      Ko tēnei āhuatanga e hiahiatia ana ko te "Whakahou pangarau whārite whakamahi"
+      haki kei te mahi hoki
   withdrawn_4c838347: "Mawehe atu"
   wmv_1119d032: WMV
   woops_looks_like_nothing_is_here_ce69ad5: "Aue ... Anō nei kaore he mea i konei!"

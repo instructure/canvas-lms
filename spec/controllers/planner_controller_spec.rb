@@ -188,7 +188,6 @@ describe PlannerController do
         expect(response_json.select{|i| i['plannable_type'] == 'announcement'}.map{|i| i['plannable_id']}).to eq [a1.id]
       end
 
-
       it "should show planner overrides created on quizzes" do
         quiz = quiz_model(course: @course, due_at: 1.day.from_now)
         PlannerOverride.create!(plannable_id: quiz.id, plannable_type: Quizzes::Quiz, user_id: @student.id)
@@ -1122,6 +1121,23 @@ describe PlannerController do
             expect(response_json.first["plannable"]["id"]).to eq topic.id
 
             reply.change_read_state('read', @student)
+            get :index, params: {filter: "new_activity"}
+            expect(json_parse(response.body)).to be_empty
+          end
+
+          it "should exclude unpublished graded discussion topics" do
+            @topic.change_read_state('read', @student)
+            assign = assignment_model(course: @course, due_at: Time.zone.now)
+            topic = @course.discussion_topics.create!(course: @course, assignment: assign)
+            topic.publish!
+
+            get :index, params: {filter: "new_activity"}
+            response_json = json_parse(response.body)
+            expect(response_json.length).to eq 1
+            expect(response_json.first["plannable_id"]).to eq topic.id
+            expect(response_json.first["plannable"]["id"]).to eq topic.id
+
+            topic.unpublish!
             get :index, params: {filter: "new_activity"}
             expect(json_parse(response.body)).to be_empty
           end

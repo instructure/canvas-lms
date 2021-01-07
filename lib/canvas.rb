@@ -334,6 +334,6 @@ module Canvas
   end
 
   def self.environment
-    Rails.environment
+    Rails.env
   end
 end

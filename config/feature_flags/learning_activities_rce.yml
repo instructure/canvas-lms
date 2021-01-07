@@ -16,3 +16,8 @@ rce_lti_favorites:
   display_name: Support favorite LTI tools in the RCE
   description: Let the site administrator select up to 2 LTI apps as favorites, which will then be displayed in the RCE's toolbar
   applies_to: SiteAdmin
+rce_pretty_html_editor:
+  state: hidden
+  display_name: Pretty RCE HTML Editor
+  description: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
+  applies_to: SiteAdmin

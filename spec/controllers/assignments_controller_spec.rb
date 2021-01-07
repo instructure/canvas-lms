@@ -1762,16 +1762,27 @@ describe AssignmentsController do
   end
 
   describe "GET list_google_docs" do
-    it "passes errors through to Canvas::Errors" do
+    let(:connection){ double() }
+    let(:params){ {course_id: @course.id, id: @assignment.id} }
+
+    before(:each) do
       user_session(@teacher)
-      connection = double()
-      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       allow(controller).to receive(:google_drive_connection).and_return(connection)
       allow_any_instance_of(Assignment).to receive(:allow_google_docs_submission?).and_return(true)
+    end
+
+    it "passes errors through to Canvas::Errors" do
+      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
-      params = {course_id: @course.id, id: @assignment.id}
       get 'list_google_docs', params: params, format: 'json'
       expect(response.code).to eq("200")
+    end
+
+    it "gives appropriate error code to connection errors" do
+      allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
+      get 'list_google_docs', params: params, format: 'json'
+      expect(response.code).to eq("504")
+      expect(response.body).to include("Unable to connect to Google Drive")
     end
   end
 

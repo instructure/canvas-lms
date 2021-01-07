@@ -148,3 +148,267 @@ test('number formatter delegates to GradeFormatHelper#formatGrade', () => {
   formatter(null, null, {})
   ok(formatGradeSpy.calledOnce)
 })
+
+QUnit.module('override score changes', hooks => {
+  let gridStub
+  let headerGridArgs
+  let mainGridArgs
+  let gradeReviewRow
+
+  let defaultUploadedGradebook
+
+  hooks.beforeEach(() => {
+    fixtures.innerHTML = `
+      <div id='gradebook_grid'>
+      </div>
+      <div id='gradebook_grid_header'>
+      </div>
+    `
+
+    defaultUploadedGradebook = {
+      assignments: [
+        {grading_type: null, id: '-1', points_possible: 10, previous_id: null, title: 'imported'}
+      ],
+      custom_columns: [],
+      missing_objects: {
+        assignments: [
+          {
+            grading_type: 'points',
+            id: '73',
+            points_possible: 10,
+            previous_id: null,
+            title: 'existing'
+          }
+        ],
+        students: []
+      },
+      original_submissions: [{assignment_id: '73', gradeable: true, score: '', user_id: '1'}],
+      override_scores: {
+        grading_periods: [
+          {id: 1, title: 'first GP'},
+          {id: 2, title: 'second GP'},
+          {id: 3, title: 'third GP'}
+        ],
+        includes_course_scores: false
+      },
+      students: [
+        {
+          custom_column_data: [],
+          id: '1',
+          last_name_first: 'Efron, Zac',
+          name: 'Zac Efron',
+          override_scores: [
+            {
+              current_score: '70',
+              grading_period_id: '1',
+              new_score: '80'
+            },
+            {
+              current_score: '71',
+              grading_period_id: '2',
+              new_score: '61'
+            },
+            {
+              current_score: '50',
+              new_score: null
+            }
+          ],
+          previous_id: '1',
+          submissions: [{assignment_id: '-1', grade: '0.0', gradeable: true, original_grade: null}]
+        }
+      ],
+      warning_messages: {
+        prevented_grading_ungradeable_submission: false,
+        prevented_new_assignment_creation_in_closed_period: false
+      }
+    }
+
+    gridStub = sinon.stub(gradebook_uploads, 'createGrid')
+
+    // Creation of the actual grid, including "From" and "To" headers
+    gridStub.onFirstCall().callsFake((_, {data, columns, options}) => {
+      mainGridArgs = {data, columns, options}
+      return {
+        invalidateRow: () => {},
+        render: () => {},
+        setCellCssStyles: (_style, reviewRow) => {
+          gradeReviewRow = reviewRow
+        }
+      }
+    })
+
+    // Creation of the ersatz grid containing headers, which is not
+    // referenced after being created
+    gridStub.onSecondCall().callsFake((_, {data, columns, options}) => {
+      headerGridArgs = {data, columns, options}
+      return {}
+    })
+  })
+
+  hooks.afterEach(() => {
+    gridStub.restore()
+  })
+
+  const initGradebook = function(uploadedGradebook = defaultUploadedGradebook) {
+    gradebook_uploads.init(uploadedGradebook)
+  }
+
+  QUnit.module('column creation', () => {
+    test('creates a pair of columns for each grading period in the grading_periods hash', () => {
+      initGradebook()
+
+      const columnIds = mainGridArgs.columns
+        .map(column => column.id)
+        .filter(id => id.includes('override_score'))
+
+      deepEqual(columnIds, [
+        'override_score_1_conflicting',
+        'override_score_1',
+        'override_score_2_conflicting',
+        'override_score_2',
+        'override_score_3_conflicting',
+        'override_score_3'
+      ])
+    })
+
+    test('adds a header for each grading period including the title of the grading period', () => {
+      initGradebook()
+
+      const headers = headerGridArgs.columns
+        .map(column => column.name)
+        .filter(name => name.includes('Override Score'))
+
+      deepEqual(headers, [
+        'Override Score (first GP)',
+        'Override Score (second GP)',
+        'Override Score (third GP)'
+      ])
+    })
+
+    test('creates a column for course scores if includes_course_scores is true', () => {
+      defaultUploadedGradebook.override_scores.includes_course_scores = true
+      defaultUploadedGradebook.override_scores.grading_periods = []
+
+      initGradebook()
+
+      const gradingPeriodColumn = mainGridArgs.columns.find(
+        column => column.id === 'override_score_course'
+      )
+      ok(gradingPeriodColumn)
+    })
+
+    test('adds a header for course scores with the label of plain old "Override Grade"', () => {
+      defaultUploadedGradebook.override_scores.includes_course_scores = true
+      defaultUploadedGradebook.override_scores.grading_periods = []
+
+      initGradebook()
+
+      const gradingPeriodColumn = headerGridArgs.columns.find(
+        column => column.name === 'Override Score'
+      )
+      ok(gradingPeriodColumn)
+    })
+
+    test('does not create a column for course scores if includes_course_scores is false', () => {
+      initGradebook()
+
+      const gradingPeriodColumn = mainGridArgs.columns.find(
+        column => column.id === 'override_score_course'
+      )
+      notOk(gradingPeriodColumn)
+    })
+  })
+
+  QUnit.module('value population', () => {
+    test('populates the grid data with course override scores for each student', () => {
+      initGradebook()
+
+      const dataForStudent = mainGridArgs.data.find(datum => datum.id === '1')
+      deepEqual(dataForStudent.override_score_course, {
+        current_score: '50',
+        new_score: null
+      })
+    })
+
+    test('populates the grid data with grading period override scores for each student', () => {
+      initGradebook()
+
+      const dataForStudent = mainGridArgs.data.find(datum => datum.id === '1')
+      deepEqual(dataForStudent.override_score_1, {
+        current_score: '70',
+        grading_period_id: '1',
+        new_score: '80'
+      })
+    })
+
+    test('highlights cells if the override score has gone down', () => {
+      initGradebook()
+
+      const firstStudentRow = gradeReviewRow[0]
+      strictEqual(
+        firstStudentRow.override_score_2_conflicting,
+        'left-highlight',
+        'current score is highlighted'
+      )
+      strictEqual(
+        firstStudentRow.override_score_2,
+        'right-highlight',
+        'updated (lowered) score is highlighted'
+      )
+    })
+
+    test('highlights cells if the override score has been removed', () => {
+      initGradebook()
+
+      const firstStudentRow = gradeReviewRow[0]
+      strictEqual(
+        firstStudentRow.override_score_course_conflicting,
+        'left-highlight',
+        'current score is highlighted'
+      )
+      strictEqual(
+        firstStudentRow.override_score_course,
+        'right-highlight',
+        'updated (removed) score is highlighted'
+      )
+    })
+
+    test('does not highlight cells if the override score has gone up', () => {
+      initGradebook()
+
+      const firstStudentRow = gradeReviewRow[0]
+      notOk(firstStudentRow.override_score_1_conflicting, 'current score is not highlighted')
+      notOk(firstStudentRow.override_score_1, 'updated (increased) score is not highlighted')
+    })
+
+    test('does not highlight cells if the override score has not changed', () => {
+      defaultUploadedGradebook.students[0].override_scores = [
+        {
+          current_score: '70',
+          grading_period_id: '1',
+          new_score: '70'
+        }
+      ]
+      initGradebook()
+
+      // setCellCssStyles should be called with an empty hash since nothing to
+      // highlight
+      deepEqual(gradeReviewRow, {}, 'no highlightable changes')
+    })
+
+    test('does not highlight cells if the override score is newly added', () => {
+      defaultUploadedGradebook.students[0].override_scores = [
+        {
+          current_score: null,
+          grading_period_id: '1',
+          new_score: '70'
+        }
+      ]
+      initGradebook()
+
+      // setCellCssStyles should be called with an empty hash since nothing to
+      // highlight
+      deepEqual(gradeReviewRow, {}, 'no highlightable changes')
+    })
+  })
+})

@@ -160,8 +160,8 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   })
 
   test('renders a warning when there is an invalid assignment group', () => {
-    gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: 'Math'}])
-    equal(getTooltip(), 'Score does not include Math because it has no points possible')
+    gradebook.listInvalidAssignmentGroups.returns([{id: '2401', name: '<Math>'}])
+    equal(getTooltip(), 'Score does not include <Math> because it has no points possible')
   })
 
   test('renders a warning icon when there is an invalid assignment group', () => {
@@ -172,11 +172,11 @@ QUnit.module('GradebookGrid TotalGradeCellFormatter', hooks => {
   test('renders a warning when there are multiple invalid assignment groups', () => {
     gradebook.listInvalidAssignmentGroups.returns([
       {id: '2401', name: 'Math'},
-      {id: '2402', name: 'English'}
+      {id: '2402', name: '<English>'}
     ])
     equal(
       getTooltip(),
-      'Score does not include Math and English because they have no points possible'
+      'Score does not include Math and <English> because they have no points possible'
     )
   })
 

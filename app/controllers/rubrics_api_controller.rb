@@ -263,7 +263,6 @@ class RubricsApiController < ApplicationController
   before_action :require_user
   before_action :require_context
   before_action :validate_args
-  before_action :find_rubric, only: [:show]
 
   VALID_ASSESSMENT_SCOPES = %w(assessments graded_assessments peer_assessments).freeze
   VALID_ASSOCIATION_SCOPES = %w(associations assignment_associations course_associations account_associations).freeze
@@ -289,10 +288,14 @@ class RubricsApiController < ApplicationController
 
   def show
     return unless authorized_action(@context, @current_user, :manage_rubrics)
+
+    rubric = @context.rubrics.active.find_by(id: params[:id])
+    return render json: {message: "Rubric not found"}, status: :not_found unless rubric.present?
+
     if !@context.errors.present?
-      assessments = rubric_assessments
-      associations = rubric_associations
-      render json: rubric_json(@rubric, @current_user, session,
+      assessments = rubric_assessments(rubric)
+      associations = rubric_associations(rubric)
+      render json: rubric_json(rubric, @current_user, session,
              assessments: assessments,
              associations: associations,
              style: params[:style])
@@ -303,15 +306,11 @@ class RubricsApiController < ApplicationController
 
   private
 
-  def find_rubric
-    @rubric = Rubric.find(params[:id])
-  end
-
-  def rubric_assessments
+  def rubric_assessments(rubric)
     scope = if @context.is_a? Course
-              RubricAssessment.for_course_context(@context.id).where(rubric_id: @rubric.id)
+              RubricAssessment.for_course_context(@context.id).where(rubric_id: rubric.id)
             else
-              RubricAssessment.where(rubric_id: @rubric.id)
+              RubricAssessment.where(rubric_id: rubric.id)
             end
     case (api_includes & VALID_ASSESSMENT_SCOPES)[0]
     when 'assessments'
@@ -323,8 +322,8 @@ class RubricsApiController < ApplicationController
     end
   end
 
-  def rubric_associations
-    scope = @rubric.rubric_associations
+  def rubric_associations(rubric)
+    scope = rubric.rubric_associations
     case (api_includes & VALID_ASSOCIATION_SCOPES)[0]
     when 'associations'
       scope

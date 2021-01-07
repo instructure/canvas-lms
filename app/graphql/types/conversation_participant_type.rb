@@ -22,13 +22,13 @@ module Types
   class ConversationParticipantType < ApplicationObjectType
     graphql_name 'ConversationParticipant'
 
-    implements Interfaces::TimestampInterface
-
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
     field :user_id, ID, null: false
     field :workflow_state, String, null: false
     field :label, String, null: true
+    field :subscribed, Boolean, null: false
+    field :updated_at, Types::DateTimeType, null: true
 
     field :user, UserType, null: false
     def user
@@ -43,6 +43,17 @@ module Types
     field :conversation, ConversationType, null: false
     def conversation
       load_association(:conversation)
+    end
+
+    field :messages, ConversationMessageType.connection_type, null: true
+    def messages
+      load_association(:conversation_message_participants).then do |participants|
+        Promise.all(
+          participants.map{|participant| Loaders::AssociationLoader.for(ConversationMessageParticipant, :conversation_message).load(participant)}
+        ).then do
+          object.messages
+        end
+      end
     end
   end
 end

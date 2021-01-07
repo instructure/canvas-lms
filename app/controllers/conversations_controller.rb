@@ -887,6 +887,7 @@ class ConversationsController < ApplicationController
   #   }
   #
   def add_message
+    # TODO: VICE-1037 logic is mostly duplicated in AddConversationMessage
     get_conversation(true)
 
     context = @conversation.conversation.context
@@ -908,26 +909,7 @@ class ConversationsController < ApplicationController
       # find included_messages
       message_ids = params[:included_messages]
       message_ids = message_ids.split(/,/) if message_ids.is_a?(String)
-
-      # these checks could be folded into the initial ConversationMessage lookup for better efficiency
-      if message_ids
-
-        # sanity check: are the messages part of this conversation?
-        db_ids = ConversationMessage.where(:id => message_ids, :conversation_id => @conversation.conversation_id).pluck(:id)
-        unless db_ids.count == message_ids.count
-          return render_error('included_messages', 'not for this conversation')
-        end
-        message_ids = db_ids
-
-        # sanity check: can the user see the included messages?
-        found_count = 0
-        Shard.partition_by_shard(message_ids) do |shard_message_ids|
-          found_count += ConversationMessageParticipant.where(:conversation_message_id => shard_message_ids, :user_id => @current_user).count
-        end
-        unless found_count == message_ids.count
-          return render_error('included_messages', 'not a participant')
-        end
-      end
+      validate_message_ids(message_ids, @conversation)
 
       message_args = build_message_args
       if @conversation.should_process_immediately?
@@ -941,6 +923,10 @@ class ConversationsController < ApplicationController
     else
       render :json => {}, :status => :bad_request
     end
+  rescue ConversationsHelper::InvalidMessageForConversationError
+    render_error('included_messages', 'not for this conversation')
+  rescue ConversationsHelper::InvalidMessageParticipantError
+    render_error('included_messages', 'not a participant')
   end
 
   # @API Delete a message

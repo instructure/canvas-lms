@@ -185,7 +185,7 @@ describe('RCE Plugins > CanvasContentTray', () => {
       renderComponent()
     })
 
-    it('is set on tinymce after tray closes', async () => {
+    it('is set on tinymce after tray closes if focus was on the tray', async () => {
       const mockFocus = jest.fn()
       props.bridge.focusActiveEditor = mockFocus
 
@@ -194,13 +194,31 @@ describe('RCE Plugins > CanvasContentTray', () => {
         expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
       )
 
-      const closeBtn = component.getByText('Close')
+      const closeBtn = component.getByRole('button', {name: 'Close'})
+      closeBtn.focus()
       closeBtn.click()
       // immediately after being asked to close, INSTUI Tray removes role='dialog' and
       // adds aria-hidden='true', so the getTray() function above does not work
       await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
 
       expect(mockFocus).toHaveBeenCalledWith(false)
+    })
+
+    it('is not set on tinymce after tray closes if focus was elsewhere', async () => {
+      const mockFocus = jest.fn()
+      props.bridge.focusActiveEditor = mockFocus
+
+      await showTrayForPlugin('links')
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+      )
+
+      props.bridge.hideTrays()
+      // immediately after being asked to close, INSTUI Tray removes role='dialog' and
+      // adds aria-hidden='true', so the getTray() function above does not work
+      await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+
+      expect(mockFocus).not.toHaveBeenCalled()
     })
   })
 })

@@ -174,12 +174,15 @@ module Lti::Messages
     end
 
     def custom_parameters
-      custom_params_hash = @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
+      @expander.expand_variables!(unexpanded_custom_parameters)
+    end
+
+    def unexpanded_custom_parameters
+      @tool.set_custom_fields(@opts[:resource_type]).transform_keys do |k|
         key = k.dup
         key.slice! 'custom_'
         key
       end
-      @expander.expand_variables!(custom_params_hash)
     end
 
     def include_claims?(claim_group)

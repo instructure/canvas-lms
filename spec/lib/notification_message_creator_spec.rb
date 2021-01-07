@@ -30,7 +30,7 @@ def notification_set(opts = {})
   user_model({:workflow_state => 'registered'}.merge(user_opts))
   communication_channel_model.confirm!
   notification_policy_model(:notification => @notification,
-                            :communication_channel => @communication_channel)
+                            :communication_channel => @communication_channel) unless opts[:no_policy]
 
   @notification.reload
 end
@@ -401,6 +401,17 @@ describe NotificationMessageCreator do
       messages = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user).create_message
       expect(messages.select{|m| m.to != 'dashboard'}).to be_empty
       expect(NotificationPolicy.count).to eq 2
+    end
+
+    it "doesn't crash when multiple jobs are trying to find an effective policy" do
+      notification_set(no_policy: true)
+      nmc = NotificationMessageCreator.new(@notification, @assignment, :to_list => @user)
+      channels = nmc.to_user_channels[@user]
+      expect(channels.size).to eq(1)
+      policy = nmc.send(:effective_policy_for, @user, channels.first)
+      policy2 = nmc.send(:effective_policy_for, @user, channels.first)
+      expect(policy2.id).to_not be_nil
+      expect(policy2.id).to eq(policy.id)
     end
 
     it "should not send to bouncing channels" do

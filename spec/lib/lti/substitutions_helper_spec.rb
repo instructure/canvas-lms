@@ -483,13 +483,13 @@ module Lti
       end
     end
 
-    describe '#recursively_fetch_previous_course_ids_and_context_ids' do
+    describe '#recursively_fetch_previous_lti_context_ids' do
       context 'without any course copies' do
         before do
           course.save!
         end
 
-        it "should return empty to previous lti context_ids" do
+        it "should return empty (no previous lti context_ids)" do
           expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
         end
       end
@@ -503,12 +503,10 @@ module Lti
           @c1.lti_context_id = 'abc'
           @c1.save
 
-          course.content_migrations.create!.tap do |cm|
-            cm.context = course
-            cm.workflow_state = 'imported'
-            cm.source_course = @c1
-            cm.save!
-          end
+          course.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c1
+          )
 
           @c2 = Course.create!
           @c2.root_account = root_account
@@ -516,12 +514,10 @@ module Lti
           @c2.lti_context_id = 'def'
           @c2.save!
 
-          course.content_migrations.create!.tap do |cm|
-            cm.context = course
-            cm.workflow_state = 'imported'
-            cm.source_course = @c2
-            cm.save!
-          end
+          course.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c2
+          )
 
           @c3 = Course.create!
           @c3.root_account = root_account
@@ -529,12 +525,10 @@ module Lti
           @c3.lti_context_id = 'ghi'
           @c3.save!
 
-          @c1.content_migrations.create!.tap do |cm|
-            cm.context = @c1
-            cm.workflow_state = 'imported'
-            cm.source_course = @c3
-            cm.save!
-          end
+          @c1.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c3
+          )
         end
 
         it "should return previous lti context_ids" do
@@ -551,6 +545,19 @@ module Lti
             @c5 = Course.create!(root_account: root_account, account: account, lti_context_id: 'mno')
             course.content_migrations.create!(workflow_state: 'imported', source_course: @c5) # direct copy
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'mno,jkl,ghi,def,abc'
+          end
+        end
+
+        context "when there are multiple content migrations pointing to the same source course" do
+          before do
+            @c3.content_migrations.create!(
+              workflow_state: 'imported',
+              source_course: @c2
+            )
+          end
+
+          it "should not return duplicates but still return in chronological order" do
+            expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'def,ghi,abc'
           end
         end
       end

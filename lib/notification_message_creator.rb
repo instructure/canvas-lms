@@ -223,9 +223,16 @@ class NotificationMessageCreator
     # that should be respected.
     policy = override_policy_for(channel, 'Course')
     policy ||= override_policy_for(channel, 'Account')
-
     if !policy && should_use_default_policy?(user, channel)
-      policy ||= channel.notification_policies.new(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+      begin
+        policy = channel.notification_policies.create!(notification_id: @notification.id, frequency: @notification.default_frequency(user))
+      rescue ActiveRecord::RecordNotUnique => e
+        # there is a race condition here that can happen if multiple jobs are trying to create the same
+        # flavor of policy for the same user at the same time.  If we fail to save this one,
+        # we should just allow the process to continue because it will find the right policy in the
+        # next step of this method.
+        Canvas::Errors.capture_exception(:notifications, e, :info)
+      end
     end
     policy ||= channel.notification_policies.find { |np| np.notification_id == @notification.id }
     policy

@@ -31,7 +31,7 @@
     padding-#{direction(left)}: 4px;
     padding-#{direction(right)}: 4px;
   }
-  .hide-overflow, .hide-overflow span {
+  .hide-overflow, .hide-overflow a {
     max-width: 40vw;
     overflow: hidden;
     text-overflow: ellipsis;
