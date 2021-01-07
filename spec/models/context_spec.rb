@@ -191,6 +191,18 @@ describe Context do
       tag = mod.add_item type: 'wiki_page', id: page.id
       expect(Context.find_asset_by_url("/courses/#{@course.id}/modules/items/#{tag.id}")).to eq tag
     end
+
+    it 'should find media objects' do
+      at = attachment_model(:context => @course, :uploaded_data => stub_file_data('video1.mp4', nil, 'video/mp4'))
+      data = {
+        :entries => [
+            { :entryId => "test", :originalId => "#{at.id}" }
+        ]
+      }
+      mo = MediaObject.create!(:context => @course, :media_id => "test")
+      MediaObject.build_media_objects(data, Account.default.id)
+      expect(Context.find_asset_by_url("/media_objects_iframe/test")).to eq mo
+    end
   end
 
   context "self.names_by_context_types_and_ids" do

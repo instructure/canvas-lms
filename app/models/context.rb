@@ -261,6 +261,9 @@ module Context
     user = User.find(params[:user_id]) if params[:user_id]
     context = course || group || user
 
+    media_obj = MediaObject.where(:media_id => params[:media_object_id]).first if params[:media_object_id]
+    context = media_obj.context if media_obj
+
     return nil unless context
     case params[:controller]
     when 'files'
@@ -288,6 +291,8 @@ module Context
       else
         object = context.context_modules.find_by(id: params[:id])
       end
+    when 'media_objects'
+      object = media_obj
     else
       object = context.try(params[:controller].sub(/^.+\//, ''))&.find_by(id: params[:id])
     end
