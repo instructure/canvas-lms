@@ -108,8 +108,16 @@ describe Outcomes::ResultAnalytics do
       expect(results.length).to eq 2
     end
 
-    it 'does not return muted assignment results' do
+    it 'does return muted assignment results with auto post policy' do
       @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: false)
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'does not return muted assignment results with manual post policy' do
+      @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: true)
       results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 0
     end

@@ -17,7 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
@@ -94,14 +93,34 @@ describe LearningOutcomeResult do
         end
       end
 
-      context 'assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          # By default, an automatic post policy (post_manually: false) is associated to 
+          # an assignment.  Now that post policy is included in exclude_muted_associations
+          # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
+          # post policy assignment until the submission is posted.  See "manual posting 
+          # policy" test cases below.
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'not graded assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          assignment.update!(grading_type: 'not_graded')
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'graded assignment with unposted submissions with manual posting policy' do
+        it 'excludes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
         end
       end
 
-      context 'not graded assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'not graded assignment with unposted submissions with manual posting policy' do
+        it 'includes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           assignment.update!(grading_type: 'not_graded')
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end

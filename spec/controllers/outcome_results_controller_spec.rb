@@ -131,7 +131,7 @@ describe OutcomeResultsController do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 
@@ -184,9 +184,9 @@ describe OutcomeResultsController do
       expect(response).not_to be_successful
     end
 
-    context 'with muted assignment' do
+    context 'with manual post policy assignment' do
       before do
-        outcome_assignment.mute!
+        outcome_assignment.ensure_post_policy(post_manually: true)
       end
 
       it 'teacher should see result' do
@@ -211,6 +211,36 @@ describe OutcomeResultsController do
                         format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 0
+      end
+    end
+
+    context 'with auto post policy (default) assignment' do
+      before do
+        outcome_assignment.ensure_post_policy(post_manually: false)
+      end
+
+      it 'teacher should see result' do
+        user_session(@teacher)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = JSON.parse(response.body.gsub("while(1);", ""))
+        expect(json['outcome_results'].length).to eq 1
+      end
+
+      it 'student should see result' do
+        user_session(@student)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = parse_response(response)
+        expect(json['outcome_results'].length).to eq 1
       end
     end
 
