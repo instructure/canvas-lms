@@ -23,7 +23,7 @@ module Services
     def initialize(config)
       @config = config.with_indifferent_access
     end
-        
+
     def snapshot_url_to_file(url, tmpfile)
       url_params = { url: url }.to_query
       full_url = "#{@config[:url]}?#{url_params}"
@@ -32,10 +32,9 @@ module Services
           http_response.read_body do |chunk|
             tmpfile.write chunk
           end
-  
           tmpfile.close
         else
-          logger.error("Snapshot failed with error code #{http_response.code}")
+          Rails.logger.error("Snapshot failed with error code #{http_response.code}")
           return false
         end
       end
