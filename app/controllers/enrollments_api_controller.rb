@@ -650,7 +650,6 @@ class EnrollmentsApiController < ApplicationController
     return render_create_errors(errors) if errors.present?
 
     # create enrollment
-
     params[:enrollment][:no_notify] = true unless value_to_boolean(params[:enrollment][:notify])
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action && return
@@ -663,7 +662,6 @@ class EnrollmentsApiController < ApplicationController
     api_user_id = params[:enrollment].delete(:user_id)
     user = api_find(User, api_user_id)
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
-
     if @context.concluded?
       # allow moving users already in the course to open sections
       unless @section && user.enrollments.shard(@context.shard).where(course_id: @context).exists? && !@section.concluded?
@@ -676,6 +674,9 @@ class EnrollmentsApiController < ApplicationController
 
     DueDateCacher.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
+      if @enrollment.assigned_observer? && !user.observation_link?(@enrollment.associated_user, @context.root_account_id)
+        UserObservationLink.create_or_restore(student: @enrollment.associated_user, observer: user, root_account: @context.root_account)
+      end
     end
 
     @enrollment.valid? ?

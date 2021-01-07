@@ -3083,6 +3083,14 @@ class User < ActiveRecord::Base
     observer_pairing_codes.create(expires_at: 7.days.from_now, code: code)
   end
 
+  def observation_link?(student, root_account = nil)
+    return true if self.id == student.id
+
+    scope = self.as_observer_observation_links.where(student: student)
+    scope = scope.for_root_accounts(root_account) if root_account
+    scope.any?
+  end
+
   def pronouns
     translate_pronouns(read_attribute(:pronouns))
   end
