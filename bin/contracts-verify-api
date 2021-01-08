@@ -4,10 +4,22 @@ set -e
 
 if [ -f "config/consul.yml" ]; then # canvas is running in docker
   docker-compose run --rm \
+    -e DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
+    -e DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/canvas_test \
+    -e PACT_API_CONSUMER="$1" \
+    -e PACT_BROKER_HOST=pact-broker.docker \
+    -e PACT_BROKER_PASSWORD=broker \
+    -e PACT_BROKER_USERNAME=pact \
     -e RAILS_ENV=test \
     -e RUN_API_CONTRACT_TESTS=1 \
     web bundle exec rake pact:verify
 else
+  DATABASE_CLEANER_ALLOW_REMOTE_DATABASE_URL=true \
+  DATABASE_URL=postgres://postgres:${POSTGRES_PASSWORD}@postgres:5432/canvas_test \
+  PACT_API_CONSUMER="$1" \
+  PACT_BROKER_HOST=pact-broker.docker \
+  PACT_BROKER_PASSWORD=broker \
+  PACT_BROKER_USERNAME=pact \
   RAILS_ENV=test \
   RUN_API_CONTRACT_TESTS=1 \
   bundle exec rake pact:verify
