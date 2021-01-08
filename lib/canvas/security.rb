@@ -149,9 +149,15 @@ module Canvas::Security
   end
 
   def self.verify_hmac_sha512(message, signature, signing_secret=services_signing_secret)
-    comparison = sign_hmac_sha512(message, signing_secret)
-
-    ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
+    secrets_to_check = [signing_secret]
+    if signing_secret == services_signing_secret && services_previous_signing_secret
+      secrets_to_check << services_previous_signing_secret
+    end
+    secrets_to_check.each do |cur_secret|
+      comparison = sign_hmac_sha512(message, cur_secret)
+      return true if ActiveSupport::SecurityUtils.secure_compare(signature, comparison)
+    end
+    false
   end
 
   # Creates a JWT token string
@@ -227,14 +233,22 @@ module Canvas::Security
   def self.decrypt_services_jwt(token, signing_secret=nil, encryption_secret=nil, ignore_expiration: false)
     signing_secret ||= services_signing_secret
     encryption_secret ||= services_encryption_secret
-    begin
-      signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
-      raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, signing_secret)
-      verify_jwt(raw_jwt, ignore_expiration: ignore_expiration)
-      raw_jwt.with_indifferent_access
-    rescue JSON::JWS::VerificationFailed
-      raise Canvas::Security::InvalidToken
+
+    secrets_to_check = [signing_secret]
+    if signing_secret == services_signing_secret && services_previous_signing_secret
+      secrets_to_check << services_previous_signing_secret
     end
+    secrets_to_check.each do |cur_secret|
+      begin
+        signed_coded_jwt = JSON::JWT.decode(token, encryption_secret)
+        raw_jwt = JSON::JWT.decode(signed_coded_jwt.plain_text, cur_secret)
+        verify_jwt(raw_jwt, ignore_expiration: ignore_expiration)
+        return raw_jwt.with_indifferent_access
+      rescue JSON::JWS::VerificationFailed => e
+        Canvas::Errors.capture_exception(:security_auth_old_key, e, :info)
+      end
+    end
+    raise Canvas::Security::InvalidToken
   end
 
   def self.base64_encode(token_string)
@@ -404,11 +418,15 @@ module Canvas::Security
     end
 
     def services_encryption_secret
-      Canvas::DynamicSettings.find("canvas")["encryption-secret"]
+      Canvas::Security::ServicesJwt.encryption_secret
     end
 
     def services_signing_secret
-      Canvas::DynamicSettings.find("canvas")["signing-secret"]
+      Canvas::Security::ServicesJwt.signing_secret
+    end
+
+    def services_previous_signing_secret
+      Canvas::Security::ServicesJwt.previous_signing_secret
     end
   end
 end
