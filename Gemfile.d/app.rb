@@ -50,14 +50,14 @@ gem 'brotli', '0.2.3', require: false
 gem 'browser', '5.1.0', require: false
 gem 'builder', '3.2.4'
 gem 'canvas_connect', '0.3.11'
-  gem 'adobe_connect', '1.0.8', require: false
+  gem 'adobe_connect', '1.0.9', require: false
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
 gem 'ddtrace', '0.42.0', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
 gem 'ffi', '1.13.1', require: false
-gem 'gepub', '1.0.11', github: 'skoji/gepub', ref: '04c8c2542f9fa3f8d99652f9058d77c8a23c1fd9'
+gem 'gepub', '1.0.13'
 gem 'graphql', '1.9.17'
 gem 'graphql-batch', '0.4.3'
 gem 'hashery', '2.1.2', require: false
@@ -94,7 +94,7 @@ gem 'mime-types', '3.3.1'
 gem 'mini_magick', '4.11.0'
 gem 'multi_json', '1.15.0'
 gem 'net-ldap', '0.16.3', require: false
-gem 'nokogiri', '1.10.10', require: false
+gem 'nokogiri', '1.11.0', require: false
 gem 'nokogumbo', '2.0.4'
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
@@ -107,7 +107,7 @@ gem 'rack-brotli', '1.0.0'
 gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 gem 'rails-observers', '0.1.5'
-gem 'ratom-nokogiri', '0.10.8', require: false
+gem 'ratom-nokogiri', '0.10.10', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
@@ -116,7 +116,7 @@ gem 'ruby-duration', '3.2.3', require: false
 gem 'rubycas-client', '2.3.9', require: false
 gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
-gem 'saml2', '3.0.9'
+gem 'saml2', '3.0.11'
   gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
 gem 'sanitize', '5.2.3', require: false
 gem 'sentry-raven', '2.13.0', require: false
