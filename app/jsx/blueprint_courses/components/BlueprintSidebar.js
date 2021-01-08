@@ -66,6 +66,13 @@ export default class BlueprintCourseSidebar extends Component {
     this.setState({isOpen: false})
   }
 
+  componentDidMount() {
+    const easyStudentBtn = document.getElementById('easy_student_view')
+    if (easyStudentBtn) {
+      easyStudentBtn.classList.add('mr3')
+    }
+  }
+
   render() {
     return (
       <div className="bcs__wrapper">
