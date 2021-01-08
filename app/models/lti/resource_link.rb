@@ -45,7 +45,7 @@ class Lti::ResourceLink < ApplicationRecord
     return if context.nil? || tool.nil?
 
     context.lti_resource_links.create!(
-      custom: custom_params,
+      custom: Lti::DeepLinkingUtil.validate_custom_params(custom_params),
       context_external_tool: tool
     )
   end

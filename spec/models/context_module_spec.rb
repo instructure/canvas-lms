@@ -390,6 +390,44 @@ describe ContextModule do
 
       expect(@module.content_tags).to be_include(@tag)
     end
+
+    describe 'when adding an LTI 1.3 external tool' do
+      let(:tool) {
+        @course.context_external_tools.create!(
+          name: 'tool', consumer_key: '1', shared_secret: '1',
+          url: 'http://example.com/', developer_key: DeveloperKey.create!,
+          settings: {use_1_3: true}
+        )
+      }
+
+      let(:args) {
+        {
+          type: 'context_external_tool',
+          id: tool.id,
+          title: 'The tool',
+          url: 'http://example.com/',
+          indent: 0,
+          position: 0,
+          tag_type: 'context_module',
+        }
+      }
+
+      it 'should add an external tool with resource link and custom params' do
+        @tag = @module.add_item(args.merge(custom_params: {'foo' => 'bar'}))
+        @module.workflow_state = 'published'
+        @module.save!
+
+        expect(@module.content_tags).to be_include(@tag)
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
+
+      it 'should add an external tool with custom params in a JSON string' do
+        @tag = @module.add_item(args.merge(custom_params: '{"foo":"bar"}'))
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
+    end
   end
 
   describe "insert_items" do

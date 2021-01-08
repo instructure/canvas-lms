@@ -37,7 +37,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group],
+  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: 'Lti::ResourceLink'],
              polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome

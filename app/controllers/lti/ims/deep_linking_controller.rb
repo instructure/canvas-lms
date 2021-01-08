@@ -29,11 +29,13 @@ module Lti
 
       before_action :require_context
       before_action :validate_jwt
+      before_action :add_module_items # renders if unauthorized
 
       def deep_linking_response
-        create_lti_resource_links
-
-        add_module_items
+        # Adding one module item creates the resource link
+        # in ContextModule#add_item, adding multiple creates links in
+        # add_module_items before action
+        create_lti_resource_links unless adding_module_item?
 
         # Set content items and messaging values in JS env
         js_env({

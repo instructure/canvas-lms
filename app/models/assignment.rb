@@ -1118,11 +1118,7 @@ class Assignment < ActiveRecord::Base
   protected :update_line_items
 
   def lti_resource_link_custom_params_as_hash
-    return nil unless lti_resource_link_custom_params
-
-    JSON.parse(lti_resource_link_custom_params, symbolized_keys: true)
-  rescue JSON::ParserError
-    nil
+    Lti::DeepLinkingUtil.validate_custom_params(lti_resource_link_custom_params)
   end
   private :lti_resource_link_custom_params_as_hash
 

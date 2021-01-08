@@ -1836,7 +1836,9 @@ class ApplicationController < ActionController::Base
             context: @context,
             return_url: @return_url,
             expander: variable_expander,
-            opts: opts
+            opts: opts.merge(
+              resource_link_for_custom_params: @tag.associated_asset_lti_resource_link
+            )
           )
         else
           Lti::LtiOutboundAdapter.new(@tool, @current_user, @context).prepare_tool_launch(@return_url, variable_expander, opts)
