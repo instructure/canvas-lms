@@ -175,8 +175,9 @@ module Lti
     end
 
     def current_lis_roles
-      enrollments = course_enrollments + account_enrollments
-      enrollments.size > 0 ? enrollments_to_lis_roles(enrollments).join(',') : LtiOutbound::LTIRoles::System::NONE
+      roles = enrollments_to_lis_roles(course_enrollments + account_enrollments)
+      roles.push(*LIS_ROLE_MAP['siteadmin']) if Account.site_admin.account_users_for(@user).present?
+      roles.join(',').presence || LtiOutbound::LTIRoles::System::NONE
     end
 
     def concluded_course_enrollments
