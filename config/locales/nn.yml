@@ -2720,6 +2720,7 @@ nn:
     titles: 
       assignment_rubric_details: "Detaljar om vurderingsskjemaet"
   assignment_976578a8: Oppgåve
+  assignment_allowed_attempts_7e3d43ee: "Oppgåver - tillatne forsøk"
   assignment_assignment_submission_paper_view_8a4c9776: "Oppgåveinnlevering %{assignment} dokumentvising"
   assignment_assignment_submission_plain_text_view_b217d372: "Oppgåveinnlevering %{assignment} rein tekst-vising"
   assignment_comments_e43ed898: Oppgåvekommentarar
@@ -2744,6 +2745,7 @@ nn:
   assignment_details_expanded_20c6f0c7: "oppgåvedetaljar viser"
   assignment_does_not_exist_74178c34: "finn ikkje oppgåve"
   assignment_edit_6dced39f: "Rediger oppgåve"
+  assignment_enhancements_student_557372ab: "Oppgåveforbetringar - Student"
   assignment_excused_eb6c08fa: "Fritak for oppgåva"
   assignment_extensions_cac06daa: Oppgåveutvidingar
   assignment_graded_grade_on_assignment_name_in_cour_5082fd1: "Oppgåve er vurdert: %{grade}på %{assignment_name}i%{course_code}"
@@ -7354,6 +7356,7 @@ nn:
   disable_and_lock_7d0ef0e8: "Slå av og lås"
   disable_content_security_policy_8660a787: "Slå av retningslinjer for innhaldstryggleik"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterval"
+  disable_keyboard_shortcuts_9db78832: "Deaktiver hurtigtastar"
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_sync_to_name_10c371dc: "Slå av synkronisering til %{name}"
   disable_toolname_44d6397c: "Deaktiver %{toolName}"
@@ -8059,6 +8062,7 @@ nn:
       Fleire karaktersetjingsperiodar gjer at faglærarar og administratorar kan opprette karaktersetjingsperiodar med fastsette
       fristdagar. Oppgåver kan filtrerast etter desse karaktersetjingsperiodane i karakterboka."
   enable_new_sis_integration_settings_ab6780a4: "Aktiver nye innstillingar for SIS-integrasjon"
+  enable_recaptcha_by_default_for_self_registration_af9d50bd: "Aktiver Recaptcha som standard for eigenregistrering"
   enable_recording_for_this_conference_b8adff6: "Aktiver opptak for denne konferansen"
   enable_reregistration_for_lti_2_b2a10444: "Aktiver ny registrering for LTI 2 "
   enable_scope_ac28b832: "Aktiver omfang"
@@ -10636,9 +10640,11 @@ nn:
   immediately_c128ede6: "Med ein gong"
   import_1b31507: Importer
   import_a_set_of_outcomes_6b782192: "Importer eit sett med læringsmål"
+  import_commons_favorites_e68fce81: "Importer Commons-favorittar"
   import_content_b2fd6620: "Importer innhald"
   import_learning_outcomes_36d28a2b: "Importer læringsmål"
   import_outcomes_7dda186b: "Importer læringsmål"
+  import_override_scores_in_gradebook_80d51a72: "Importer overstyrte resultat til vurderingsoversikt"
   import_sis_data_428cc803: "Importer SIS-data"
   import_status_b147bd27: Importstatus
   import_tutorial_tray_8b92e956: "Importer opplæringsmeny"
@@ -14679,6 +14685,7 @@ nn:
   page_name_21defa75: Sidenamn
   page_name_is_required_d8c2736e: "Sidenamn er obligatorisk"
   page_not_found_2b0d05f5: "Finn ikkje side"
+  page_page_59070cd8: "Side %{page}"
   page_pagenum_20dbfeb8: "Side %{pageNum}"
   page_views: 
     download_filename: "Sidevisingar for %{user}"
@@ -17169,6 +17176,7 @@ nn:
   ratio_answered_correctly_b0c1e7d: "%{ratio}% korrekte svar"
   ratio_responded_correctly_6d890107: "%{ratio}% korrekt respons"
   raw_html_editor_e3993e41: HTML-redigeringsprogram
+  rce_auto_save_f004fba9: Auto-lagring
   rce_contents_replace_description: "Slå på full tekst-erstatning i editoren frå LTI-ar"
   rce_contents_replace_display_name: "Erstatt innahald i redigeringsprogram"
   rce_enhancements_5701e06: "Forbedringar i redigeringsprogrammet"
@@ -17230,6 +17238,7 @@ nn:
   received_content_53049822: "Fått innhald"
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
+  recent_history_bcb0f4c0: "Nyleg historikk"
   recent_student: 
     last_logged_in: "sist pålogga %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} minkande gjennomsnitt"
@@ -17422,6 +17431,7 @@ nn:
   required_values_1eb5841f: "Etterspurde verdiar"
   requirement_f5b75da1: Krav
   requirement_subject_7cfac6c8: "Krav om tittel"
+  requires_recaptcha_for_self_registration_by_defaul_c1a9db63: "Recaptcha som standard er obligatorisk for eigenregistrering"
   reregister_9ab95a57: "Ny registrering"
   reregister_toolname_3dde0bfc: "Registrer %{toolName} på nytt"
   reschedule_9f780bb8: "Planlegg på nytt"
@@ -19700,7 +19710,9 @@ nn:
       global_support_desk_description: "Vår førstelinje er koordinatorar (ASC) som kan hjelpe deg via Global Support Desk når det gjeld problemstillingar som krev ekstra oppfølging."
       networking_academy_description: "Sjå svar frå Cisco på dei mest vanlege spørsmåla."
       networking_academy_faqs: "Vanlege spørsmål i Networking Academy"
+      student_support: "NetAcad-støtte - Student"
       support_desk_livechat: "Brukarstøtte direkte"
+  support_favorite_lti_tools_in_the_rce_1680436d: "Støtte for favoritter av LTI-verktøy i teksteditoren"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sverige
@@ -20403,6 +20415,7 @@ nn:
     port_moresby: "Port Moresby"
     prague: Praha
     pretoria: Pretoria
+    puerto_rico: "Puerto Rico"
     quito: Quito
     rangoon: Yangôn
     riga: Riga
@@ -21842,7 +21855,9 @@ nn:
   will_keep_the_highest_of_all_your_scores_6ae5bbd1: "Held dei høgaste av alle resultata dine"
   will_keep_the_latest_of_all_your_scores_431d23f9: "Held dei siste av alle resultata dine"
   will_paginate: 
+    container_aria_label: Sidenummerering
     next_label: "Neste &#8594;"
+    page_aria_label: "Side %{page}"
     page_entries_info: 
       multi_page: "Viser %{model} %{from} – %{to} av %{count} totalt"
       multi_page_html: "Viser %{model} <b>%{from}&nbsp;-&nbsp;%{to}</b> of <b>%{count}</b> totalt"
