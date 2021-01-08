@@ -37,7 +37,6 @@ export const MailboxSelectionDropdown = ({...props}) => {
       renderLabel={() => <ScreenReaderContent>{I18n.t('Mailbox Selection')}</ScreenReaderContent>}
       onChange={(_event, data) => props.onSelect(data.value)}
       value={props.activeMailbox}
-      size="small"
     >
       {Object.entries(mailboxLabels).map(([mailbox, translateLabel]) => (
         <SimpleSelect.Option id={mailbox} key={mailbox} value={mailbox}>

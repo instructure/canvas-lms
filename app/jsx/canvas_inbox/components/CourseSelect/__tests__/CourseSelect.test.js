@@ -44,6 +44,7 @@ const createProps = overrides => {
         {id: 3, contextName: "Dumbledore's Army", contextId: 'group_3'}
       ]
     },
+    onCourseFilterSelect: () => {},
     ...overrides
   }
 }

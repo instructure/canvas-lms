@@ -23,8 +23,7 @@ import ErrorBoundary from 'jsx/shared/components/ErrorBoundary'
 import GenericErrorPage from 'jsx/shared/components/GenericErrorPage/index'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import AlertManager from 'jsx/shared/components/AlertManager'
-// TODO: dummy component, remove once real queries are defined
-import CanvasInbox from './CanvasInbox'
+import CanvasInbox from './containers/CanvasInbox'
 
 const client = createClient()
 

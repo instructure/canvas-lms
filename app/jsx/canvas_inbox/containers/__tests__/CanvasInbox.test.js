@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -16,10 +16,15 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import CanvasInbox from '../CanvasInbox'
 import React from 'react'
+import {render} from '@testing-library/react'
 
-const CanvasInbox = () => {
-  return <div>Inbox!</div>
-}
-
-export default CanvasInbox
+describe('CanvasInbox App Container', () => {
+  describe('rendering', () => {
+    it('should render', () => {
+      const component = render(<CanvasInbox />)
+      expect(component).toBeTruthy()
+    })
+  })
+})

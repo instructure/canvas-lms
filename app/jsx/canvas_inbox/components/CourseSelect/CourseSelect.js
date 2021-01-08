@@ -56,7 +56,8 @@ export class CourseSelect extends React.Component {
           contextId: PropTypes.string
         })
       )
-    }).isRequired
+    }).isRequired,
+    onCourseFilterSelect: PropTypes.func
   }
 
   state = {
@@ -134,6 +135,7 @@ export class CourseSelect extends React.Component {
     const option = this.getOptionById(id)
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
+    this.props.onCourseFilterSelect(id)
     this.setState({
       selectedOptionId: id,
       inputValue: option.contextName,
