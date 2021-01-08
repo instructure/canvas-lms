@@ -3,6 +3,8 @@ test:
   browser: "chrome"
   chromedriver_version: "87.0.4280.20"
   # auto_open_devtools: true
+  # headless: true
+  # window_size: "1237,974"
   # version: "45.0"
   # platform: "Windows 10"
   # remote_url: "https://instructure:secret_key@ondemand.saucelabs.com:80/wd/hub"
