@@ -234,6 +234,10 @@ module CanvasRails
           Imperium::Client.reset_default_client
           Imperium::Events.reset_default_client
           Imperium::KV.reset_default_client
+          # it's really important to reset the default clients
+          # BEFORE letting dynamic setting pull a new one.
+          # do not change this order.
+          Canvas::DynamicSettings.on_fork!
         else
           # We're in direct spawning mode. We don't need to do anything.
         end

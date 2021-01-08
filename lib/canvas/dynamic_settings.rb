@@ -36,7 +36,7 @@ module Canvas
 
     class << self
       attr_accessor :config, :environment
-      attr_reader :fallback_data
+      attr_reader :fallback_data, :kv_client
 
       def config=(conf_hash)
         @config = conf_hash
@@ -61,6 +61,12 @@ module Canvas
           @kv_client = nil
           @default_service = :canvas
         end
+      end
+
+      # if we don't clear out the kv_client we can end up
+      # with a shared file descriptor between processes
+      def on_fork!
+        @kv_client = Imperium::KV.default_client unless @kv_client.nil?
       end
 
       # Set the fallback data to use in leiu of Consul
