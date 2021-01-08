@@ -22,12 +22,6 @@ class AddReplicaIdentityForContentTags < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    until ContentTag.left_outer_joins(:assignment).
-      where(context_type: 'Assignment', root_account_id: nil, assignments: {id: nil}).limit(1_000).delete_all < 1_000
-    end
-    until ContentTag.left_outer_joins(:course).
-      where(context_type: 'Course', root_account_id: nil, courses: {id: nil}).limit(1_000).delete_all < 1_000
-    end
     add_replica_identity 'ContentTag', :root_account_id, 0
     remove_index :content_tags, name: 'index_content_tags_on_root_account_id', if_exists: true
   end
