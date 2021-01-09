@@ -1864,7 +1864,7 @@ pt-BR:
   add_sub_account_to_account_name_b104db90: "Adicionar subconta a %{account_name}"
   add_submission_type_8690db4b: "Adicionar tipo de envio"
   add_subtitle_9f660cc: "Adicionar legenda"
-  add_tas_to_courses_27741f81: "Adicionar TAs aos cursos"
+  add_tas_to_courses_27741f81: "Adicionar assistentes aos cursos"
   add_tas_to_the_course_2aac6e02: "Adicionar assistentes ao curso"
   add_theme_32fa3d50: "Adicionar Tema"
   add_to_course_481a51c4: "Adicionar ao curso..."
@@ -19998,7 +19998,7 @@ pt-BR:
   remove_student_from_recipients_4b206e35: "Remover %{student} de destinatários"
   remove_studentname_16ba8c3a: "Remover %{studentName}"
   remove_submission_draft_f5c7f58b: "Remover rascunho do envio"
-  remove_tas_from_courses_13ade851: "Remover TAs dos cursos"
+  remove_tas_from_courses_13ade851: "Remover assistentes dos cursos"
   remove_text_8e485c41: "Remover %{text}"
   remove_these_dates_48453a81: "Remover Essas Datas"
   remove_this_item_from_the_module_4b2ceab7: "Remover este item do módulo"
@@ -22725,9 +22725,9 @@ pt-BR:
   take_the_survey_again_24ce22c2: "Fazer a pesquisa novamente"
   target_link_uri_bbed67d1: "* URI do link de destino"
   target_link_uri_d166858: "URI do link de destino"
-  tas_add_f4a16393: "TAs - Adicionar"
-  tas_observers_designers_b705118a: TAs/observadores/designers
-  tas_remove_11059e14: "TAs - Remover"
+  tas_add_f4a16393: "Assistentes - Adicionar"
+  tas_observers_designers_b705118a: assistentes/observadores/designers
+  tas_remove_11059e14: "Assistentes - Remover"
   teacher_5a73b637: Professor
   teacher_count_teachers_a92f7199: "%{teacher_count} professores"
   teacher_s_fdefb2c: Professor(es)
