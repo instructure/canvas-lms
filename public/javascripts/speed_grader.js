@@ -3746,7 +3746,7 @@ function renderPostGradesMenu() {
   const submissions = window.jsonData.studentsWithSubmissions.map(student => student.submission)
 
   const hasGradesOrPostableComments = submissions.some(
-    submission => isGraded(submission) || submission.has_postable_comments
+    submission => submission && (isGraded(submission) || submission.has_postable_comments)
   )
   const allowHidingGradesOrComments = submissions.some(
     submission => submission && submission.posted_at != null

@@ -375,6 +375,19 @@ describe ContentMigration do
             expect(@copy_to.conclude_at.utc).to eq Time.zone.parse('2012-12-15 08:00:00 UTC')
           end
         end
+
+        context "implicit start date" do
+          let(:old_date) { DateTime.new(2021, 3, 3) }
+          let(:old_start_date) { nil }
+          let(:old_end_date) { nil }
+          let(:new_start_date) { nil }
+          let(:new_end_date) { '2021-01-01T00:00:00Z' }
+
+          it "doesn't implicitly set course dates based on assignment dates" do
+            expect { copy_assignment }.not_to raise_error
+            expect(@copy_to.start_at).to be_nil
+          end
+        end
       end
     end
 
