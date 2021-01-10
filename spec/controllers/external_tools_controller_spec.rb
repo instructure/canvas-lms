@@ -916,6 +916,41 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
     end
 
+    context 'for Quizzes Next launch' do
+      let(:assignment) { assignment_model(course: @course) }
+
+      before do
+        params = {
+          :name => "Quizzes.Next",
+          :url => 'http://example.com/launch',
+          :domain => "example.com",
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :privacy_level => 'public',
+          :tool_id => 'Quizzes 2'
+        }
+        account.context_external_tools.create!(params)
+        assignment.submission_types = 'external_tool'
+        assignment.external_tool_tag_attributes = {url: "http://example.com/launch"}
+        assignment.save!
+      end
+
+      it 'sets consistent resource_link_id with that in regular lti launch' do
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        user_session(@user)
+
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id:assignment.id,
+          url: 'http://example.com/launch'
+        }
+
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq assignment.lti_resource_link_id
+        expect(assigns[:lti_launch].params['context_id']).to eq opaque_id(@course)
+      end
+    end
+
     context 'collaborations' do
       let(:collab) do
         collab = ExternalToolCollaboration.new(

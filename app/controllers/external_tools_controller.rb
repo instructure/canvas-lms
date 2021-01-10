@@ -537,9 +537,15 @@ class ExternalToolsController < ApplicationController
         selected_html: params[:selection],
         domain: HostUrl.context_host(@domain_root_account, request.host)
     }
+
     opts = default_opts.merge(opts)
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
+
+    # from specs, seems this is only a fix for Quizzes Next
+    # resource_link_id in regular QN launches is assignment.lti_resource_link_id
+    opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
+
     expander = variable_expander(assignment: assignment,
       tool: tool, launch: lti_launch,
       post_message_token: opts[:launch_token],
