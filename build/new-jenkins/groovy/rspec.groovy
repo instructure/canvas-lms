@@ -142,7 +142,7 @@ def _runRspecTestSuite(
       }
 
       sh 'rm -rf ./tmp'
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

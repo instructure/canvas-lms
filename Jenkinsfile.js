@@ -57,7 +57,7 @@ def cleanupFn() {
         sh 'find ./tmp -path "*.xml"'
       }
     } finally {
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

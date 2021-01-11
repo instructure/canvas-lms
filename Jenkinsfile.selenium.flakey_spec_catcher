@@ -177,7 +177,7 @@ def cleanupFn(status) {
     }
   } finally {
     sh 'rm -vrf ./tmp/'
-    execute 'bash/docker-cleanup.sh --allow-failure'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -260,7 +260,7 @@ pipeline {
                       }
                       finally {
                         sh 'rm -vrf ./tmp'
-                        execute 'bash/docker-cleanup.sh --allow-failure'
+                        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
                       }
                     }
                   }

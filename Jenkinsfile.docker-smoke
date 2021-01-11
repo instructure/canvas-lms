@@ -23,7 +23,7 @@ import org.jenkinsci.plugins.workflow.steps.FlowInterruptedException
 library "canvas-builds-library@${env.CANVAS_BUILDS_REFSPEC}"
 
 def cleanupFn() {
-  execute 'bash/docker-cleanup.sh --allow-failure'
+  libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
 }
 
 pipeline {

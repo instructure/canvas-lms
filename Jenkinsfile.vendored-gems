@@ -41,7 +41,7 @@ def cleanupFn() {
     ]
   } finally {
     sh 'rm -vrf ./spec_results/'
-    execute 'bash/docker-cleanup.sh --allow-failure'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 

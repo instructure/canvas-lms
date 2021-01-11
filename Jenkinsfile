@@ -94,7 +94,7 @@ def isPatchsetRetriggered() {
 
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
-    execute 'bash/docker-cleanup.sh --allow-failure'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 

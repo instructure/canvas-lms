@@ -60,7 +60,9 @@ pipeline {
 
   post {
     cleanup {
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      script {
+        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+      }
     }
   }
 }
