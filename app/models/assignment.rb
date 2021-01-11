@@ -3196,14 +3196,34 @@ class Assignment < ActiveRecord::Base
 
   def in_closed_grading_period?
     return @in_closed_grading_period unless @in_closed_grading_period.nil?
+
     @in_closed_grading_period = if !context.grading_periods?
       false
     elsif submissions.loaded?
       # no need to check grading_periods are loaded because of
       # submissions association preload(:grading_period)
-      submissions.map(&:grading_period).compact.any? { |gp| gp.workflow_state == 'active' && gp.closed? }
+
+      submissions_in_closed_gp = submissions.select do |submission|
+        submission.grading_period.present? &&
+          submission.grading_period.workflow_state == 'active' &&
+          submission.grading_period.closed?
+      end
+
+      return false if submissions_in_closed_gp.blank?
+
+      # Only submissions from currently-enrolled students count when determining
+      # whether this assignment has submissions in a closed grading period
+      # (the student_enrollments scope returns only active students)
+      course.student_enrollments.
+        where(user_id: submissions_in_closed_gp.map(&:user_id)).
+        exists?
     else
-      GradingPeriod.joins(:submissions).active.where(submissions: { assignment: self }).closed.exists?
+      submissions.active.
+        joins(:grading_period, {user: :enrollments}).
+        merge(GradingPeriod.active.closed).
+        where(users: {enrollments: {course: course, type: "StudentEnrollment"}}).
+        merge(Enrollment.active_or_pending).
+        exists?
     end
   end
 
