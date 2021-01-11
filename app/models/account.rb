@@ -196,7 +196,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_proficiency
-    cache_key = [cache_key(:resolved_outcome_proficiency), cache_key(:account_chain)].cache_key
+    cache_key = ['outcome_proficiency', cache_key(:resolved_outcome_proficiency), cache_key(:account_chain)].cache_key
     Rails.cache.fetch(cache_key) do
       if outcome_proficiency&.active?
         outcome_proficiency
@@ -209,7 +209,7 @@ class Account < ActiveRecord::Base
   end
 
   def resolved_outcome_calculation_method
-    cache_key = [cache_key(:resolved_outcome_calculation_method), cache_key(:account_chain)].cache_key
+    cache_key = ['outcome_calculation_method', cache_key(:resolved_outcome_calculation_method), cache_key(:account_chain)].cache_key
     Rails.cache.fetch(cache_key) do
       if outcome_calculation_method&.active?
         outcome_calculation_method
