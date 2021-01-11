@@ -23,6 +23,7 @@ import 'compiled/jquery.rails_flash_notifications'
 import {CHILD_GROUPS_QUERY} from '../Management/api'
 import {FIND_GROUPS_QUERY} from '../api'
 import {useCanvasContext} from './hooks'
+import useGroupDetail from '../Management/useGroupDetail'
 
 const ROOT_ID = 0
 const ACCOUNT_FOLDER_ID = -1
@@ -32,7 +33,7 @@ const defaultStruct = (id, name) => ({
   name,
   collections: [],
   outcomesCount: 0,
-  loadInfo: 'loading'
+  loadInfo: 'loading',
 })
 
 const mergeCollections = (groups, collections, parentGroupId) => {
@@ -42,7 +43,7 @@ const mergeCollections = (groups, collections, parentGroupId) => {
     }
     return {
       ...memo,
-      [g._id]: structFromGroup(g)
+      [g._id]: structFromGroup(g),
     }
   }, collections)
 
@@ -50,7 +51,10 @@ const mergeCollections = (groups, collections, parentGroupId) => {
     newCollections[parentGroupId] = {
       ...newCollections[parentGroupId],
       loadInfo: 'loaded',
-      collections: [...newCollections[parentGroupId].collections, ...(groups || []).map(g => g._id)]
+      collections: [
+        ...newCollections[parentGroupId].collections,
+        ...(groups || []).map((g) => g._id),
+      ],
     }
   }
 
@@ -60,19 +64,19 @@ const mergeCollections = (groups, collections, parentGroupId) => {
 const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
   return I18n.t('%{groups} Groups | %{outcomes} Outcomes', {
     groups: childGroupsCount,
-    outcomes: outcomesCount
+    outcomes: outcomesCount,
   })
 }
 
-const structFromGroup = g => ({
+const structFromGroup = (g) => ({
   id: g._id,
   name: g.title,
   descriptor: groupDescriptor(g),
   collections: [],
-  outcomesCount: g.outcomesCount
+  outcomesCount: g.outcomesCount,
 })
 
-const getCounts = rootGroups => {
+const getCounts = (rootGroups) => {
   return rootGroups.reduce(
     (acc, group) => {
       return [acc[0] + group.outcomesCount, acc[1] + group.childGroupsCount]
@@ -89,7 +93,7 @@ const useTreeBrowser = () => {
   const [error, setError] = useState(null)
   const [selectedCollection, setSelectedCollection] = useState(null)
 
-  const updateSelectedCollection = props => {
+  const updateSelectedCollection = (props) => {
     const {id} = props
     setSelectedCollection(id)
     queryCollections(props)
@@ -104,8 +108,8 @@ const useTreeBrowser = () => {
       ...collections,
       [id]: {
         ...collections[id],
-        loadInfo: 'loading'
-      }
+        loadInfo: 'loading',
+      },
     }
 
     client
@@ -113,13 +117,13 @@ const useTreeBrowser = () => {
         query: CHILD_GROUPS_QUERY,
         variables: {
           id,
-          type: 'LearningOutcomeGroup'
-        }
+          type: 'LearningOutcomeGroup',
+        },
       })
       .then(({data}) => {
         setCollections(mergeCollections(data?.context?.childGroups?.nodes, newCollections, id))
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err)
       })
   }
@@ -143,22 +147,35 @@ const useTreeBrowser = () => {
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
   }
 }
 
 export const useManageOutcomes = () => {
   const {contextId, contextType} = useCanvasContext()
+  const [selectedGroupId, setSelectedGroupId] = useState(null)
+
+  const {
+    loading: detailGroupIsLoading,
+    group: detailGroup,
+    loadMore: detailGroupLoadMore,
+  } = useGroupDetail(selectedGroupId)
+
   const client = useApolloClient()
   const {
     collections,
     setCollections,
-    queryCollections,
+    queryCollections: treeBrowserQueryCollection,
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
   } = useTreeBrowser()
+
+  const queryCollections = ({id}) => {
+    setSelectedGroupId(id)
+    treeBrowserQueryCollection({id})
+  }
 
   useEffect(() => {
     client
@@ -166,8 +183,8 @@ export const useManageOutcomes = () => {
         query: CHILD_GROUPS_QUERY,
         variables: {
           id: contextId,
-          type: contextType
-        }
+          type: contextType,
+        },
       })
       .then(({data}) => {
         setCollections(
@@ -181,7 +198,7 @@ export const useManageOutcomes = () => {
       .finally(() => {
         setIsLoading(false)
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -192,11 +209,15 @@ export const useManageOutcomes = () => {
     isLoading,
     collections,
     queryCollections,
-    rootId: ROOT_ID
+    rootId: ROOT_ID,
+    detailGroupIsLoading,
+    detailGroup,
+    detailGroupLoadMore,
+    selectedGroupId,
   }
 }
 
-export const useFindOutcomeModal = open => {
+export const useFindOutcomeModal = (open) => {
   const {contextType, contextId} = useCanvasContext()
   const client = useApolloClient()
   const {
@@ -209,7 +230,7 @@ export const useFindOutcomeModal = open => {
     setIsLoading,
     selectedCollection,
     setSelectedCollection,
-    updateSelectedCollection
+    updateSelectedCollection,
   } = useTreeBrowser()
 
   useEffect(() => {
@@ -227,8 +248,8 @@ export const useFindOutcomeModal = open => {
           id: contextId,
           type: contextType,
           rootGroupId: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID || 0,
-          includeGlobalRootGroup: !!ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID
-        }
+          includeGlobalRootGroup: !!ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID,
+        },
       })
       .then(({data}) => {
         const {context, globalRootGroup} = data
@@ -239,7 +260,7 @@ export const useFindOutcomeModal = open => {
         } else {
           accounts = context.parentAccountsConnection?.nodes
         }
-        const rootGroups = accounts.map(account => account.rootOutcomeGroup)
+        const rootGroups = accounts.map((account) => account.rootOutcomeGroup)
         const [outcomesCount, childGroupsCount] = getCounts(rootGroups)
         newCollections = mergeCollections(
           // Create 'Account Standards' Folder within the root
@@ -248,8 +269,8 @@ export const useFindOutcomeModal = open => {
               _id: ACCOUNT_FOLDER_ID,
               title: I18n.t('Account Standards'),
               childGroupsCount,
-              outcomesCount
-            }
+              outcomesCount,
+            },
           ],
           newCollections,
           ROOT_ID
@@ -264,8 +285,8 @@ export const useFindOutcomeModal = open => {
                 _id: ENV.GLOBAL_ROOT_OUTCOME_GROUP_ID,
                 title: I18n.t('State Standards'),
                 childGroupsCount: globalRootGroup.childGroupsCount,
-                outcomesCount: globalRootGroup.outcomesCount
-              }
+                outcomesCount: globalRootGroup.outcomesCount,
+              },
             ],
             newCollections,
             ROOT_ID
@@ -276,7 +297,7 @@ export const useFindOutcomeModal = open => {
       .finally(() => {
         setIsLoading(false)
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err)
       })
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -289,6 +310,6 @@ export const useFindOutcomeModal = open => {
     queryCollections,
     selectedCollection,
     updateSelectedCollection,
-    rootId: ROOT_ID
+    rootId: ROOT_ID,
   }
 }

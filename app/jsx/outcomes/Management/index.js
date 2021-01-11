@@ -32,10 +32,6 @@ import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
 import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
 
-// Mocked data for ManageOutcomesView QA
-// Remove after data is retrieved via GraphQL
-import {outcomeGroup} from './__tests__/mocks'
-
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
 
@@ -70,15 +66,25 @@ const OutcomeManagementPanel = () => {
   const {contextType} = useCanvasContext()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
-  const onSelectOutcomesHandler = id =>
-    setSelectedOutcomes(prevState => {
+  const onSelectOutcomesHandler = (id) =>
+    setSelectedOutcomes((prevState) => {
       const updatedState = {...prevState}
       prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
       return updatedState
     })
   const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const noop = () => {}
-  const {error, isLoading, collections, queryCollections, rootId} = useManageOutcomes()
+  const {
+    error,
+    isLoading,
+    collections,
+    queryCollections,
+    rootId,
+    detailGroupIsLoading,
+    detailGroup,
+    detailGroupLoadMore,
+    selectedGroupId,
+  } = useManageOutcomes()
 
   if (isLoading) {
     return (
@@ -148,22 +154,26 @@ const OutcomeManagementPanel = () => {
               overflowX="auto"
             >
               <View as="div" padding="none none none x-small">
-                {/* space for outcome group display component */}
-                <ManageOutcomesView
-                  outcomeGroup={outcomeGroup}
-                  selectedOutcomes={selectedOutcomes}
-                  searchString={searchString}
-                  onSelectOutcomesHandler={onSelectOutcomesHandler}
-                  onOutcomeGroupMenuHandler={noop}
-                  onOutcomeMenuHandler={noop}
-                  onSearchChangeHandler={onSearchChangeHandler}
-                  onSearchClearHandler={onSearchClearHandler}
-                />
+                {selectedGroupId && (
+                  <ManageOutcomesView
+                    key={selectedGroupId}
+                    outcomeGroup={detailGroup}
+                    loading={detailGroupIsLoading}
+                    selectedOutcomes={selectedOutcomes}
+                    searchString={searchString}
+                    onSelectOutcomesHandler={onSelectOutcomesHandler}
+                    onOutcomeGroupMenuHandler={noop}
+                    onOutcomeMenuHandler={noop}
+                    onSearchChangeHandler={onSearchChangeHandler}
+                    onSearchClearHandler={onSearchClearHandler}
+                    loadMore={detailGroupLoadMore}
+                  />
+                )}
               </View>
             </Flex.Item>
           </Flex>
           <hr />
-          {Object.keys(outcomeGroup.children).length > 0 && (
+          {selectedGroupId && (
             <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
           )}
         </>
