@@ -103,12 +103,11 @@ pipeline {
                 }
               }
 
-              // skipped (QUIZ-8109 1/7/2021)
-              // stages['Quiz LTI'] = {
-              //   timeout(time: 10) {
-              //     runAndCopyResults('pact_test4', 'Quiz LTI')
-              //   }
-              // }
+              stages['Quiz LTI'] = {
+                timeout(time: 10) {
+                  runAndCopyResults('pact_test4', 'Quiz LTI')
+                }
+              }
 
               stages['Sistemic'] = {
                 timeout(time: 10) {
