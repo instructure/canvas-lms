@@ -17,3 +17,6 @@
  */
 
 export const whitelist = ['requestFullWindowLaunch', 'lti.resourceImported']
+
+// These are handled elsewhere so ignore them
+export const ignorelist = ['LtiDeepLinkingResponse']

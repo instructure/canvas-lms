@@ -36,19 +36,45 @@ function postMessageEvent(data, origin, source) {
   }
 }
 
+function invalidMessageTypeErrorCalls() {
+  // eslint-disable-next-line no-console
+  return console.error.mock.calls.filter(x => x.toString().includes('invalid messageType'))
+}
+
 describe('handleLtiPostMessage', () => {
+  beforeEach(() => {
+    jest.spyOn(console, 'error')
+  })
+
+  afterEach(() => {
+    // eslint-disable-next-line no-console
+    console.error.mockRestore()
+  })
+
   describe('when a whitelisted event is processed', () => {
     it('attempts to call the message handler', async () => {
       ENV.context_asset_string = 'account_1'
       const wasCalled = await handleLtiPostMessage(postMessageEvent(requestFullWindowLaunchMessage))
       expect(wasCalled).toBeTruthy()
+      expect(invalidMessageTypeErrorCalls().length).toBe(0)
     })
   })
 
   describe('when a non-whitelisted event is processed', () => {
-    it('does not attempt to call the message handler', async () => {
+    it('does not error nor attempt to call the message handler', async () => {
       const wasCalled = await handleLtiPostMessage(postMessageEvent({messageType: 'notSupported'}))
       expect(wasCalled).toBeFalsy()
+      expect(invalidMessageTypeErrorCalls().length).toBe(1)
+    })
+  })
+
+  describe('when an ignored event is processed', () => {
+    it('does not attempt to call the message handler', async () => {
+      const wasCalled = await handleLtiPostMessage(
+        postMessageEvent({messageType: 'LtiDeepLinkingResponse'})
+      )
+      expect(wasCalled).toBeFalsy()
+      expect(invalidMessageTypeErrorCalls().length).toBe(0)
     })
   })
 
