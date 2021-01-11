@@ -167,8 +167,8 @@ describe Canvas::Security do
   end
 
   describe "hmac_sha512" do
+    let(:message){ "asdf1234"}
     it "verifies items signed with the same secret" do
-      message = "asdf1234"
       shared_secret = "super-sekrit"
       signature = Canvas::Security.sign_hmac_sha512(message, shared_secret)
       verification = Canvas::Security.verify_hmac_sha512(message, signature, shared_secret)
@@ -176,10 +176,17 @@ describe Canvas::Security do
     end
 
     it "rejects items signed with different secrets" do
-      message = "asdf1234"
       signature = Canvas::Security.sign_hmac_sha512(message, "super-sekrit")
       verification = Canvas::Security.verify_hmac_sha512(message, signature, "sekrit-super")
       expect(verification).to be_falsey
+    end
+
+    it "internally manages signing-secret rotation" do
+      allow(Canvas::Security).to receive(:services_signing_secret).and_return("current_secret")
+      allow(Canvas::Security).to receive(:services_previous_signing_secret).and_return("previous_secret")
+      signature = Canvas::Security.sign_hmac_sha512(message, "previous_secret")
+      verification = Canvas::Security.verify_hmac_sha512(message, signature, "current_secret")
+      expect(verification).to be_truthy
     end
   end
 
