@@ -33,7 +33,7 @@ describe '/quizzes/quizzes/take_quiz' do
       params
     ))
     render 'quizzes/quizzes/take_quiz'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css('#quiz-instructions').first.content.strip).to eq 'Hello'
     expect(response).not_to be_nil
   end
@@ -83,7 +83,7 @@ describe '/quizzes/quizzes/take_quiz' do
       params
     ))
     render 'quizzes/quizzes/take_quiz'
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     expect(doc.css('.timer_autosubmit_disabled').first.content.strip).not_to be_nil
     expect(response).not_to be_nil
   end

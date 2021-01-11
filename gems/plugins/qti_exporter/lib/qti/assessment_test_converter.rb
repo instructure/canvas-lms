@@ -107,7 +107,7 @@ class AssessmentTestConverter
           @quiz[:questions].unshift({:question_type => 'text_only_question', :question_text => intro, :migration_id => unique_local_id})
         end
         if html = get_node_att(meta, 'instructureField[name=assessment_rubric_html]', 'value')
-          if node = (Nokogiri::HTML::DocumentFragment.parse(html) rescue nil)
+          if node = (Nokogiri::HTML5.fragment(html) rescue nil)
             description = sanitize_html_string(node.text)
             @quiz[:description] = description if description.present?
           end

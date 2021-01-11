@@ -50,7 +50,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       @image.uploaded_data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
       @image.save!
       @course.wiki_pages.create!(
-        title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}"
+        title: page_title, body: "<p><img src=\"/courses/#{@course.id}/files/#{@image.id}\"></p>"
       )
     end
 
@@ -802,7 +802,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       image = add_embedded_image('email.png')
       @course.wiki_pages.create!(
         title: page_title,
-        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}>"
+        body: "<h2>This is plain text</h2><img src=\"/courses/#{@course.id}/files/#{image.id}\">"
       )
 
       visit_existing_wiki_edit(@course, page_title)

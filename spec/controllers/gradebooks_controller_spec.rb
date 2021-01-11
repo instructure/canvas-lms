@@ -715,7 +715,7 @@ describe GradebooksController do
       it "prefetches user ids" do
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
         expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
       end
 
@@ -731,14 +731,14 @@ describe GradebooksController do
 
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
         expect(scripts).to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
       end
 
       it "does not prefetch grading period assignments when the course has no grading periods" do
         get :show, params: { course_id: @course.id }
 
-        scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+        scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
         expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
       end
 
@@ -753,7 +753,7 @@ describe GradebooksController do
         it "does not prefetch user ids" do
           get :show, params: { course_id: @course.id }
 
-          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
           expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\buser_ids\b/)
         end
 
@@ -769,7 +769,7 @@ describe GradebooksController do
 
           get :show, params: { course_id: @course.id }
 
-          scripts = Nokogiri::HTML(response.body).css('script').map(&:text)
+          scripts = Nokogiri::HTML5(response.body).css('script').map(&:text)
           expect(scripts).not_to include a_string_matching(/\bprefetched_xhrs\b.*\bgrading_period_assignments\b/)
         end
       end

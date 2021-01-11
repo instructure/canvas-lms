@@ -95,6 +95,7 @@ gem 'mini_magick', '4.11.0'
 gem 'multi_json', '1.15.0'
 gem 'net-ldap', '0.16.3', require: false
 gem 'nokogiri', '1.10.10', require: false
+gem 'nokogumbo', '2.0.4'
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
 gem 'oj', '3.10.16'
@@ -117,7 +118,7 @@ gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
 gem 'saml2', '3.0.9'
   gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
-gem 'sanitize', '2.1.1', require: false
+gem 'sanitize', '5.2.3', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false

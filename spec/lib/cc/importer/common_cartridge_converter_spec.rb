@@ -60,11 +60,11 @@ describe "Standard Common Cartridge importing" do
     file2_id = @course.attachments.where(migration_id: "I_00006_Media").first.id
 
     dt =  @course.discussion_topics.where(migration_id: "I_00006_R").first
-    expect(dt.message).to match_ignoring_whitespace(%{<p>Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview"></p>})
+    expect(dt.message).to match_ignoring_whitespace(%{Your face is ugly. <br><img src="/courses/#{@course.id}/files/#{file1_id}/preview">})
     dt.attachment_id = file2_id
 
     dt =  @course.discussion_topics.where(migration_id: "I_00009_R").first
-    expect(dt.message).to eq %{<p>Monkeys: Go!</p>\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>}
+    expect(dt.message).to match_ignoring_whitespace(%{Monkeys: Go!\n<ul>\n<li>\n<a href="/courses/#{@course.id}/files/#{file2_id}/preview">angry_person.jpg</a>\n</li>\n<li>\n<a href="/courses/#{@course.id}/files/#{file1_id}/preview">smiling_dog.jpg</a>\n</li>\n</ul>})
   end
 
   # This also tests the WebLinks, they are just content tags and don't have their own class

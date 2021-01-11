@@ -238,7 +238,7 @@ shared_context "in-process server selenium tests" do
 
     if example.exception
       html = f('body').attribute('outerHTML')
-      document = Nokogiri::HTML(html)
+      document = Nokogiri::HTML5(html)
       example.metadata[:page_html] = document.to_html
     end
 

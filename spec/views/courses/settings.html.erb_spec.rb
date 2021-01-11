@@ -190,7 +190,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, @user)
 
       render
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
       #select.children.count.should == 3
@@ -204,7 +204,7 @@ describe "courses/settings.html.erb" do
       view_context(@course, @user)
 
       render
-      doc = Nokogiri::HTML(response.body)
+      doc = Nokogiri::HTML5(response.body)
       select = doc.at_css("select#course_account_id")
       expect(select).not_to be_nil
       all_accounts = [Account.default] + Account.default.all_accounts

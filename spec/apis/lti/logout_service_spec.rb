@@ -60,7 +60,7 @@ describe LtiApiController, type: :request do
     user_session(@student, p)
     get "/courses/#{@course.id}/external_tools/#{@tool.id}"
     expect(response).to be_successful
-    doc = Nokogiri::HTML(response.body)
+    doc = Nokogiri::HTML5(response.body)
     logout_service_url = doc.css('#custom_sub_logout_service_url').attr('value').value
     match = %r{\Ahttp://www.example.com/api/lti/v1/logout_service/([a-z0-9-]+)\z}.match(logout_service_url)
     expect(match).not_to be_nil

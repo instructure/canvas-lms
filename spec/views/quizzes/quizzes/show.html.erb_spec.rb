@@ -100,7 +100,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     render "quizzes/quizzes/show"
 
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     doc.css(".control-group .controls .value").each do |node|
         expect(node.content).not_to include("#{points}") if node.parent.parent.content.include? "Points"
     end
@@ -120,7 +120,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
   end
 
@@ -129,7 +129,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     expect(doc.css('.direct-share-send-to-menu-item')).to be_empty
   end
 
@@ -142,7 +142,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
   end
 
@@ -152,7 +152,7 @@ describe "/quizzes/quizzes/show" do
     view_context
     assign(:quiz, @course.quizzes.create!)
     render 'quizzes/quizzes/show'
-    doc = Nokogiri::HTML(response)
+    doc = Nokogiri::HTML5(response)
     expect(doc.css('.direct-share-send-to-menu-item')).not_to be_empty
   end
 

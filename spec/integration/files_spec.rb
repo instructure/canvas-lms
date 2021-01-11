@@ -142,7 +142,7 @@ describe FilesController do
         # the response will be on the main domain, with an iframe pointing to the files domain and the actual uploaded html file
         expect(response).to be_successful
         expect(response.media_type).to eq 'text/html'
-        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        doc = Nokogiri::HTML5.fragment(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://files-test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
@@ -154,7 +154,7 @@ describe FilesController do
         expect(URI.parse(location).path).to eq "/users/#{@me.id}/files/#{@att.id}"
         get location
         expect(response.media_type).to eq 'text/html'
-        doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+        doc = Nokogiri::HTML5.fragment(response.body)
         expect(doc.at_css('iframe#file_content')['src']).to match %r{^http://test.host/users/#{@me.id}/files/#{@att.id}/my%20files/unfiled/ohai.html}
       end
 
@@ -300,7 +300,7 @@ describe FilesController do
     get "http://test.host/courses/#{@course.id}/files/#{@att.id}?fd_cookie_set=1" # just send in the param since other specs test the cookie redirect
     expect(response).to be_successful
     expect(response.media_type).to eq 'text/html'
-    doc = Nokogiri::HTML::DocumentFragment.parse(response.body)
+    doc = Nokogiri::HTML5.fragment(response.body)
     location = doc.at_css('iframe#file_content')['src']
 
     # now reset the user session (simulating accessing via a separate domain), grab the document,

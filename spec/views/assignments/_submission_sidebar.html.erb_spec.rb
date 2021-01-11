@@ -46,7 +46,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       submission.update!(posted_at: Time.zone.now)
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div.module div").text).to include "Grade: 23"
     end
 
@@ -54,7 +54,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       assignment.grade_student(student, grader: teacher, score: 23)
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div.module div").text).not_to include "Grade: 23"
     end
 
@@ -63,7 +63,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       submission.update!(posted_at: Time.zone.now)
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div#comment-#{comment.id}").text).to include "a comment!"
     end
 
@@ -71,7 +71,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       comment = submission.add_comment(author: teacher, comment: "a comment!")
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div#comment-#{comment.id}").text).not_to include "a comment!"
     end
   end
@@ -85,7 +85,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       assignment.grade_student(student, grader: teacher, score: 23)
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div.module div").text).to include "Grade: 23"
     end
 
@@ -93,7 +93,7 @@ describe "assignments/_submission_sidebar.html.erb" do
       comment = submission.add_comment(author: teacher, comment: "a comment!")
       assign(:current_user_submission, submission)
       render
-      html = Nokogiri::HTML.fragment(response.body)
+      html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div#comment-#{comment.id}").text).to include "a comment!"
     end
   end
