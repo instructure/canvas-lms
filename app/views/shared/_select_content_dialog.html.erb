@@ -223,11 +223,11 @@
           <% end %>
           <% if new_quizzes_modules_support_enabled %>
             <% @combined_active_quizzes.each do |id, title, type| %>
-              <option value="<%= id %>"><%= title %></option>
+              <option value="<%= type + '_' + id.to_s %>"><%= title %></option>
             <% end %>
           <% else %>
             <% @context.quizzes.active.reorder(Quizzes::Quiz.best_unicode_collation_key('title')).limit(400).pluck(:id, :title).each do |id, title| %>
-              <option value="<%= id %>"><%= title %></option>
+              <option value="<%= 'quiz_' + id.to_s %>"><%= title %></option>
             <% end %>
           <% end %>
         </select>

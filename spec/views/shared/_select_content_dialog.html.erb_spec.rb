@@ -146,7 +146,7 @@ describe "shared/_select_content_dialog" do
     view_context
     render partial: 'shared/select_content_dialog'
     page = Nokogiri(response.body)
-    expect(page.css(%Q{#quizs_select .module_item_select option[value="#{existing_quiz.id}"]})).not_to be_empty
+    expect(page.css(%Q{#quizs_select .module_item_select option[value="quiz_#{existing_quiz.id}"]})).not_to be_empty
     expect(page.css(%Q{#quizs_select .module_item_select option[value="new"]})).to be_empty
     expect(page.css(%Q{#assignments_select .module_item_select option[value="new"]})).to be_empty
   end
@@ -193,7 +193,7 @@ describe "shared/_select_content_dialog" do
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map { |option| [option.text, option.attribute('value').to_s] }
-      expect(options).to eq([["[ New Quiz ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
+      expect(options).to eq([["[ New Quiz ]", "new"], ["A", "quiz_#{a.id}"], ["B", "quiz_#{b.id}"], ["C", "quiz_#{c.id}"]])
       groups = page.css('select[name="quiz[assignment_group_id]"] option').map { |option| [option.text, option.attribute('value').to_s] }
       expect(groups).to eq([["group A", @groupA.id.to_s], ["group B", @groupB.id.to_s]])
     end

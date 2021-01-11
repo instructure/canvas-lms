@@ -544,11 +544,17 @@ $(document).ready(function() {
       )
       $options.each(function() {
         const $option = $(this)
+        let item_id = $option.val()
+        let quiz_type
+        if (item_type === 'quiz' && item_id !== 'new') {
+          ;[quiz_type, item_id] = item_id.split('_')
+        }
         const item_data = {
-          'item[type]': item_type,
-          'item[id]': $option.val(),
+          'item[type]': quiz_type || item_type,
+          'item[id]': item_id,
           'item[title]': $option.text(),
-          'item[indent]': $('#content_tag_indent').val()
+          'item[indent]': $('#content_tag_indent').val(),
+          quiz_lti: quiz_type === 'assignment'
         }
         if (item_data['item[id]'] == 'new') {
           if (!ENV?.FEATURES?.module_dnd) {
@@ -590,8 +596,9 @@ $(document).ready(function() {
               item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             }
             const $option = $(document.createElement('option'))
-            $option.val(obj.id).text(item_data['item[title]'])
-            $('#' + item_data['item[type]'] + 's_select')
+            const obj_id = item_type === 'quiz' ? `quiz_${obj.id}` : obj.id
+            $option.val(obj_id).text(item_data['item[title]'])
+            $('#' + item_type + 's_select')
               .find('.module_item_select option:last')
               .after($option)
             submit(item_data, done)

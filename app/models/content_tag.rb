@@ -666,4 +666,17 @@ class ContentTag < ActiveRecord::Base
       self.root_account_id = self.context&.root_account_id
     end
   end
+
+  def quiz_lti
+    @quiz_lti ||= has_attribute?(:content_type) && content_type == 'Assignment' ? content&.quiz_lti? : false
+  end
+
+  def to_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
+  def as_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
 end
