@@ -47,7 +47,10 @@ export default function AssignmentToggleDetails(props) {
               data-test-id="assignments-2-assignment-toggle-details-text"
             >
               {/* html is sanitized on the server side */}
-              <div dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}} />
+              <div
+                className="user_content"
+                dangerouslySetInnerHTML={{__html: apiUserContent.convert(props.description)}}
+              />
             </Text>
           </View>
         ) : (
