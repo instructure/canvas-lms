@@ -32,6 +32,7 @@ module CdcFixtures
     return Delayed::Backend::ActiveRecord::Job.new(
       id: 2,
       run_at: Time.zone.now,
+      queue: 'test',
     )
   end
 end
