@@ -105,23 +105,13 @@ module Lti::Messages
 
     private
 
-    def accept_multiple_overrides
-      {
-        'link_selection' => Account.site_admin.feature_enabled?(:process_multiple_content_items_modules_index)
-      }
-    end
-
     def add_deep_linking_request_claims!
       @message.deep_linking_settings.deep_link_return_url = return_url
       @message.deep_linking_settings.accept_types = DEEP_LINKING_DETAILS.dig(placement, :accept_types)
       @message.deep_linking_settings.accept_presentation_document_targets = DEEP_LINKING_DETAILS.dig(placement, :document_targets)
       @message.deep_linking_settings.accept_media_types = DEEP_LINKING_DETAILS.dig(placement, :media_types).join(',')
       @message.deep_linking_settings.auto_create = DEEP_LINKING_DETAILS.dig(placement, :auto_create)
-      @message.deep_linking_settings.accept_multiple = if accept_multiple_overrides.key?(placement)
-        accept_multiple_overrides[placement]
-      else
-        DEEP_LINKING_DETAILS.dig(placement, :accept_multiple)
-      end
+      @message.deep_linking_settings.accept_multiple = DEEP_LINKING_DETAILS.dig(placement, :accept_multiple)
     end
 
     def placement
