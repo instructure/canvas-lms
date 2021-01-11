@@ -120,7 +120,7 @@ gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
 gem 'switchman', '2.0.2'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '3.1.0'
+gem 'switchman-inst-jobs', '3.1.1'
 gem 'twilio-ruby', '5.36.0', require: false
 gem 'tzinfo', '1.2.7'
 gem 'vault', '0.15.0', require: false
