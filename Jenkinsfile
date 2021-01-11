@@ -490,7 +490,7 @@ pipeline {
                 // If we are unable to push up the webpack builder image, then this
                 // build should use the currently cached image.
                 if (hasWebpackBuilderImage != 0) {
-                  def webpackBuilderLabel = sh(script: "docker inspect $PATCHSET_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}'", returnStdout: true)
+                  def webpackBuilderLabel = sh(script: "docker inspect $PATCHSET_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}'", returnStdout: true).trim()
 
                   dockerUtils.tagRemote(webpackBuilderLabel, env.WEBPACK_BUILDER_IMAGE)
                 }
