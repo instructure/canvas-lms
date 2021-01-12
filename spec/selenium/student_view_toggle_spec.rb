@@ -40,10 +40,10 @@ describe "student view toggle" do
     f("a#easy_student_view")
   end
 
-  it "should be visible from course home with a title" do
+  it "should be visible from course home with text in button" do
     get "/courses/#{@course.id}"
     expect(student_view_toggle).to be_displayed
-    expect(student_view_toggle).to have_attribute("title", "Student View")
+    expect(student_view_toggle).to include_text("Student View")
   end
 
   it "should redirect to student view on click from assignments index" do
@@ -79,5 +79,12 @@ describe "student view toggle" do
     expect(student_view_toggle).not_to be_displayed
     fj("#bulkEditRoot button:contains('Cancel')").click
     expect(student_view_toggle).to be_displayed
+  end
+
+  it "should be visible in the new mobile nav view" do
+    @course.root_account.enable_feature!(:responsive_layout)
+    driver.manage.window.resize_to(450, 800)
+    get "/courses/#{@course.id}"
+    expect(f("#mobile-header")).to contain_css("#mobile-student-view")
   end
 end
