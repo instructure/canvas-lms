@@ -54,6 +54,7 @@ export default function AccountNotificationSettingsManager(props) {
             channelId: data.channel?._id,
             category: data.category?.split(' ').join('_'),
             frequency: data.frequency,
+            hasReadPrivacyNotice: data.hasReadPrivacyNotice,
             sendScoresInEmails: data.sendScoresInEmails,
             sendObservedNamesInNotifications: data.sendObservedNamesInNotifications
           }
