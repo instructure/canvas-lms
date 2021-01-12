@@ -2524,6 +2524,14 @@ class UsersController < ApplicationController
     end
   end
 
+  def destroy
+    user = api_find(User, params[:id])
+    if user && authorized_action(@domain_root_account, @current_user, :manage_site_settings)
+      user.destroy
+      render json: { status: "ok" }
+    end
+  end
+
   protected
 
   def teacher_activity_report(teacher, course, student_enrollments)

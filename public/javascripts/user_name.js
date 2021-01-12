@@ -26,6 +26,8 @@ import 'compiled/jquery/fixDialogButtons'
 import 'compiled/jquery.rails_flash_notifications'
 import './jquery.templateData'
 
+import {showConfirmationDialog} from 'jsx/shared/ConfirmationDialog'
+
 $(document).ready(function() {
   $('#name_and_email').delegate('.edit_user_link', 'click', event => {
     event.preventDefault()
@@ -37,7 +39,7 @@ $(document).ready(function() {
       .select()
   })
   $('#edit_student_form').formSubmit({
-    beforeSubmit(data) {
+    beforeSubmit(_data) {
       $(this)
         .find('button')
         .attr('disabled', true)
@@ -53,7 +55,7 @@ $(document).ready(function() {
       $('#name_and_email .user_details').fillTemplateData({data})
       $('#edit_student_dialog').dialog('close')
     },
-    error(data) {
+    error(_data) {
       $(this)
         .find('button')
         .attr('disabled', false)
@@ -69,15 +71,16 @@ $(document).ready(function() {
   $('#edit_student_dialog .cancel_button').click(() => {
     $('#edit_student_dialog').dialog('close')
   })
-  $('.remove_avatar_picture_link').click(function(event) {
+  $('.remove_avatar_picture_link').click(async function(event) {
     event.preventDefault()
     const $link = $(this)
-    const result = confirm(
-      I18n.t(
+    const result = await showConfirmationDialog({
+      label: I18n.t('Confirm Removal'),
+      body: I18n.t(
         'confirms.remove_profile_picture',
         "Are you sure you want to remove this user's profile picture?"
       )
-    )
+    })
     if (!result) {
       return
     }
@@ -86,14 +89,14 @@ $(document).ready(function() {
       $link.attr('href'),
       'PUT',
       {'avatar[state]': 'none'},
-      data => {
+      _data => {
         $link
           .parents('tr')
           .find('.avatar_image')
           .remove()
         $link.remove()
       },
-      data => {
+      _data => {
         $link.text(
           I18n.t('errors.failed_to_remove_image', 'Failed to remove the image, please try again')
         )
@@ -109,11 +112,11 @@ $(document).ready(function() {
       $link.attr('href'),
       'POST',
       {},
-      data => {
+      _data => {
         $link.after(htmlEscape(I18n.t('notices.image_reported', 'This image has been reported')))
         $link.remove()
       },
-      data => {
+      _data => {
         $link.text(
           I18n.t('errors.failed_to_report_image', 'Failed to report the image, please try again')
         )
@@ -132,6 +135,28 @@ $(document).ready(function() {
       },
       _data => {
         $.flashMessage(I18n.t('Failed to clear cache'))
+      }
+    )
+  })
+  $('.destroy_user_link').click(async function(event) {
+    event.preventDefault()
+    const result = await showConfirmationDialog({
+      label: I18n.t('Confirm Deletion'),
+      body: I18n.t('Are you sure you want to permanently remove the user from ALL accounts')
+    })
+    if (!result) {
+      return
+    }
+    const $link = $(this)
+    $.ajaxJSON(
+      $link.attr('href'),
+      'DELETE',
+      {},
+      _data => {
+        $.flashMessage(I18n.t('User removed successfully'))
+      },
+      _data => {
+        $.flashMessage(I18n.t('Failed to remove user'))
       }
     )
   })

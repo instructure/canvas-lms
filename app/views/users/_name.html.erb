@@ -95,8 +95,13 @@
             <a href="<%= account_confirm_delete_user_url(root_account.id, @user.id) %>"><%= t('delete_from_account', 'Delete from %{account}', :account => root_account.name) %></a>
           <% end %>
 
+          <% if @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
+            <%= "|" unless first %><% first = false %>
+            <a class="destroy_user_link" href="<%= api_v1_destroy_user_url(@user) %>"><%= t('Delete from ALL accounts') %></a>
+          <% end %>
+
           <% if Canvas::CacheRegister.enabled? && @domain_root_account.grants_right?(@current_user, :manage_site_settings) %>
-            <%= "|" unless first %>
+            <%= "|" unless first %><% first = false %>
             <a class="clear_user_cache_link" href="<%= api_v1_clear_cache_url(@user) %>"><%= t('Clear User Cache') %></a>
           <% end %>
         </td>
