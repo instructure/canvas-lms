@@ -21,6 +21,18 @@ function compute_tags {
   tags[SAVE_TAG]="$cachePrefix:$CACHE_SAVE_SCOPE-$cacheSalt-$cacheId"
 }
 
+function has_remote_tags {
+  local checkTags=$@
+
+  for imageTag in $checkTags; do
+    if ! DOCKER_CLI_EXPERIMENTAL=enabled docker manifest inspect $imageTag; then
+      return 1
+    fi
+  done
+
+  return 0
+}
+
 function pull_first_tag {
   local -n selectedTag=$1; shift
   local loadTags=$@
@@ -44,5 +56,20 @@ function tag_many {
     [ "$srcTag" != "$imageTag" ] && [[ "$imageTag" != "local/"* ]] && add_log "alias $imageTag"
 
     docker tag $srcTag $imageTag
+  done
+}
+
+function tag_remote_async {
+  local -n childPID=$1; shift
+  local srcTag=$1; shift
+  local dstTag=$1; shift
+
+  ./build/new-jenkins/docker-tag-remote.sh $srcTag $dstTag &
+  childPID=$!
+}
+
+function wait_for_children {
+  for job in $(jobs -p); do
+    wait $job
   done
 }

@@ -328,19 +328,23 @@ pipeline {
 
     JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
+    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
+    DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
     WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath("webpack-builder")
     WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath("webpack-cache")
 
-    WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:${imageTagVersion()}-$TAG_SUFFIX"
-
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
 
-    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
-    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
-    POSTGRES_IMAGE_TAG=imageTag.postgres()
+    CASSANDRA_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    DYNAMODB_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    POSTGRES_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
     CANVAS_BUILDS_REFSPEC = getCanvasBuildsRefspec()
@@ -502,24 +506,49 @@ pipeline {
               }
             }
 
-
             timedStage('Run Migrations') {
               timeout(time: 10) {
+                def cacheLoadScope = configuration.isChangeMerged() ? '' : env.IMAGE_CACHE_MERGE_SCOPE
+                def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
+
+                libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
+
                 withEnv([
+                  "CACHE_LOAD_SCOPE=${cacheLoadScope}",
+                  "CACHE_SAVE_SCOPE=${cacheSaveScope}",
+                  "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
+                  "CASSANDRA_IMAGE_TAG=${imageTag.cassandra()}",
+                  "CASSANDRA_PREFIX=${env.CASSANDRA_PREFIX}",
                   "COMPOSE_FILE=docker-compose.new-jenkins.yml",
+                  "DYNAMODB_IMAGE_TAG=${imageTag.dynamodb()}",
+                  "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
+                  "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
+                  "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
                   "POSTGRES_PASSWORD=sekret"
                 ]) {
-                  migrations.runMigrations()
-                  sh 'docker-compose down --remove-orphans'
+                  credentials.withStarlordCredentials({ ->
+                    sh """
+                      # Due to https://issues.jenkins.io/browse/JENKINS-15146, we have to set it to empty string here
+                      export CACHE_LOAD_SCOPE=\${CACHE_LOAD_SCOPE:-}
+                      export CACHE_SAVE_SCOPE=\${CACHE_SAVE_SCOPE:-}
+                      ./build/new-jenkins/run-migrations.sh
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $CASSANDRA_PREFIX || true
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $DYNAMODB_PREFIX || true
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTGRES_PREFIX || true
+                    """
+                  })
                 }
+
+                archiveArtifacts(artifacts: "migrate-*.log", allowEmptyArchive: true)
+                sh 'docker-compose down --remove-orphans'
               }
             }
 
             stage('Parallel Run Tests') {
               withEnv([
-                "CASSANDRA_IMAGE_TAG=${migrations.cassandraTag()}",
-                "DYNAMODB_IMAGE_TAG=${migrations.dynamodbTag()}",
-                "POSTGRES_IMAGE_TAG=${migrations.postgresTag()}"
+                  "CASSANDRA_IMAGE_TAG=${env.CASSANDRA_IMAGE}",
+                  "DYNAMODB_IMAGE_TAG=${env.DYNAMODB_IMAGE}",
+                  "POSTGRES_IMAGE_TAG=${env.POSTGRES_IMAGE}",
               ]) {
                 def stages = [:]
 
