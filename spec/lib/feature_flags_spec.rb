@@ -193,15 +193,21 @@ describe FeatureFlags do
       end
 
       context "with site admin feature flag" do
-        before do
-          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature'
-        end
-
         it "should not find the feature beneath the root account" do
+          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature'
+
           expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
           expect(t_root_account.lookup_feature_flag('root_opt_in_feature')).to be_new_record
           expect(t_sub_account.lookup_feature_flag('root_opt_in_feature')).to be_nil
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
+        end
+
+        it "should find the default_on feature beneath the root account" do
+          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature', state: Feature::STATE_DEFAULT_ON
+          expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_root_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_sub_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_course.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
         end
       end
 

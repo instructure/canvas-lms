@@ -20,6 +20,8 @@
 
 class PageView
   class Pv4Client
+    class Pv4Timeout < StandardError; end
+
     def initialize(uri, access_token)
       uri = URI.parse(uri) if uri.is_a?(String)
       @uri, @access_token = uri, access_token
@@ -60,6 +62,8 @@ class PageView
 
         PageView.from_attributes(pv)
       end
+    rescue Net::ReadTimeout => e
+      raise Pv4Timeout, "failed to load page view history due to service timeout"
     end
 
     def for_user(user_id, oldest: nil, newest: nil)
