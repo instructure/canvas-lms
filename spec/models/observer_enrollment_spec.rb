@@ -48,6 +48,43 @@ describe ObserverEnrollment do
       @student_enrollment.destroy
       expect(ObserverEnrollment.observed_students(@course1, @observer)).to eq({})
     end
+
+    describe 'date restricted future sections' do
+
+      let(:unrestricted_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2, include_restricted_access: false) }
+      let(:all_observed_students) { ObserverEnrollment.observed_students(@course1, @observer2) }
+
+      before do
+        @course1.restrict_student_future_view = true
+        @course1.save!
+        @student2 = user_factory
+        @observer2 = user_with_pseudonym(active_all: true)
+        @section = @course1.course_sections.create!
+        @section.start_at = 1.day.from_now
+        @section.restrict_enrollments_to_section_dates = true
+        @section.save!
+
+        add_linked_observer(@student2, @observer2)
+        @student_enrollment = @section.enroll_user(@student2, 'StudentEnrollment')
+      end
+
+      it 'does not include students in future sections with restricted access when called with current_only' do
+
+        expect(unrestricted_observed_students).not_to have_key(@student2)
+      end
+
+      it 'includes all students when called without current_only' do
+
+        expect(all_observed_students).to include(@student2 => [@student_enrollment])
+      end
+
+      it 'includes all students in future sections without restricted access when called with current_only' do
+        @section.restrict_enrollments_to_section_dates = false
+        @section.save!
+
+        expect(unrestricted_observed_students).to include(@student2 => [@student_enrollment])
+      end
+    end
   end
   describe 'observed_student_ids_by_observer_id' do
     it "should return a properly formatted hash" do

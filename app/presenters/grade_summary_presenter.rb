@@ -72,7 +72,7 @@ class GradeSummaryPresenter
   end
 
   def observed_students
-    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user)
+    @observed_students ||= ObserverEnrollment.observed_students(@context, @current_user, include_restricted_access: false)
   end
 
   def observed_student
