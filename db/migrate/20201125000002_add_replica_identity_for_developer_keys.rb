@@ -22,7 +22,7 @@ class AddReplicaIdentityForDeveloperKeys < ActiveRecord::Migration[5.2]
   disable_ddl_transaction!
 
   def up
-    until DeveloperKey.where(root_account_id: nil, account_id: nil).limit(1_000).update_all(root_account_id: Account.site_admin.id) < 1_000; end
+    until DeveloperKey.where(root_account_id: nil, account_id: nil).limit(1_000).update_all(root_account_id: Account.site_admin&.id) < 1_000; end
     add_replica_identity 'DeveloperKey', :root_account_id, 0
     remove_index :developer_keys, name: 'index_developer_keys_on_root_account_id', if_exists: true
   end
