@@ -2975,6 +2975,78 @@ describe 'Submissions API', type: :request do
       expect(json['excused']).to eq false
     end
 
+    it "sets the submission grader to the current user when setting late_policy_status" do
+      submission = @assignment.submission_for_student(@student)
+      submission.update!(grader: nil)
+
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+        {
+          controller: 'submissions_api',
+          action: 'update',
+          format: 'json',
+          course_id: @course.id.to_s,
+          assignment_id: @assignment.id.to_s,
+          user_id: @student.id.to_s
+        }, {
+          submission: { late_policy_status: "missing" }
+        }
+      )
+
+      expect(submission.reload.grader_id).to be @teacher.id
+    end
+
+    it "creates a new submission version when setting late_policy_status results in a different grade" do
+      submission = @assignment.submission_for_student(@student)
+      # The first grade given to a submission doesn't result in a new version.
+      @assignment.grade_student(@student, score: 1, grader: @teacher)
+
+      expect {
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: 'submissions_api',
+            action: 'update',
+            format: 'json',
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: { late_policy_status: "missing" }
+          }
+        )
+      }.to change {
+        submission.reload.versions.count
+      }.by(1)
+    end
+
+    it "setting late_policy_status and grade in same request do not create two versions" do
+      submission = @assignment.submission_for_student(@student)
+      # The first grade given to a submission doesn't result in a new version.
+      @assignment.grade_student(@student, score: 1, grader: @teacher)
+
+      expect {
+        api_call(
+          :put,
+          "/api/v1/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@student.id}.json",
+          {
+            controller: 'submissions_api',
+            action: 'update',
+            format: 'json',
+            course_id: @course.id.to_s,
+            assignment_id: @assignment.id.to_s,
+            user_id: @student.id.to_s
+          }, {
+            submission: { late_policy_status: "missing", posted_grade: "1" }
+          }
+        )
+      }.to change {
+        submission.reload.versions.count
+      }.by(1)
+    end
+
     context "group assignments" do
       before do
         @student2 = @course.enroll_student(User.create!, enrollment_state: :active).user

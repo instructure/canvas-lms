@@ -807,9 +807,11 @@ class SubmissionsApiController < ApplicationController
           submission[:url] = params[:submission][:url]
         end
       end
+
       if submission[:grade] || submission[:excuse]
         begin
           @submissions = @assignment.grade_student(@user, submission)
+          graded_just_now = true
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           return render json: { error: e.to_s }, status: 400
@@ -833,7 +835,11 @@ class SubmissionsApiController < ApplicationController
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
-          sub.save!
+          sub.grader = @current_user
+          # If we've called Assignment#grade_student, it has already created a
+          # new submission version on this request.
+          previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
+          previously_graded ? sub.save! : sub.with_versioning(explicit: true) { sub.save! }
         end
       end
 
