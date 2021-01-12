@@ -110,7 +110,10 @@ class RubricAssessment < ActiveRecord::Base
     end
 
     # title
-    result.title = "#{user.name}, #{rubric_association.title}"
+    result.title = CanvasTextHelper.truncate_text(
+      "#{user.name}, #{rubric_association.title}",
+      {max_length: 250}
+    )
 
     # non-scoring rubrics
     result.hide_points = self.hide_points

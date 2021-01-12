@@ -308,6 +308,23 @@ describe RubricAssessment do
         expect(LearningOutcomeResult.last.hide_points).to be true
       end
 
+      it "should truncate the learning outcome result title to 250 characters" do
+        @association.update!(title: 'a'*255)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "5"
+            }
+          }
+        })
+        expect(LearningOutcomeResult.last.title.length).to eq 250
+      end
+
       it "propagates hide_outcome_results value" do
         @association.update!(hide_outcome_results: true)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
