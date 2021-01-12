@@ -17,6 +17,31 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
+#
+#
+#
+# What is a past lti id and why do we have it.
+# when a user_a is merged into user_b, user_a is deleted, and user_b remains
+# active. Now any courses, groups, or accounts
+# that user_a was in at the time of the merge will get a past_lti_id.
+#
+# => UserPastLtiId(id: integer, user_id: integer, context_id: integer, context_type: string,
+#    user_uuid: string, user_lti_id: text, user_lti_context_id: string)
+#
+# On the past_lti_id we store uuid, lti_id, lti_context_id for a user in a context.
+#
+# Anytime user_b launches an lti_tool from a context that user_a was a member of,
+# they will get the past_lti_ids for user_a even if both user_a and user_b were
+# members of that context. In that case we wouldn't know that user_b was there
+# prior and we always serve a past_lti_id if there is one present.
+#
+# This is happening because when a user is merged lti_tools may break or stop
+# working because they were using one of those ids as the unique identifier for
+# the lti_launch and it could break the lti_tool for the user.
+#
+# All past_lti_ids are stored on the same shard as the context so that a user
+# can always be looked up from the context's shard.
+#
 class UserPastLtiId < ActiveRecord::Base
   belongs_to :user
   belongs_to :context, polymorphic: [:account, :course, :group]
