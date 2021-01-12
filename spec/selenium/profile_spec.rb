@@ -389,6 +389,15 @@ describe "profile" do
     end
   end
 
+  it 'show /profile when enable_profiles = true' do
+    user_logged_in
+    account = Account.default
+    account.settings[:enable_profiles] = true
+    account.save!
+    get '/profile'
+    expect(fj("h1:contains('User Profile')").attribute('class')).to eq 'screenreader-only'
+  end
+
   describe "profile pictures s3 tests" do
     # TODO: reimplement per CNVS-29611, but make sure we're testing at the right level
     it "should successfully upload profile pictures"
