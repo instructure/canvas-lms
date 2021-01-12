@@ -114,6 +114,11 @@ def _runRspecTestSuite(
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
       sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
 
+      if(configuration.getBoolean('upload-docker-logs', 'false')) {
+        sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${index}.log"
+        archiveArtifacts(artifacts: "tmp/docker-${prefix}-${index}.log")
+      }
+
       archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
       findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
         // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
