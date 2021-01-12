@@ -227,6 +227,7 @@ module Api::V1::User
       json[:role_id] = enrollment.role_id
       json[:last_activity_at] = enrollment.last_activity_at
       json[:total_activity_time] = enrollment.total_activity_time
+      json[:completed_at] = enrollment.completed_at
       if enrollment.root_account.grants_right?(user, session, :manage_sis)
         json[:sis_import_id] = enrollment.sis_batch_id
       end
