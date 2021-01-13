@@ -92,6 +92,7 @@ class Oauth2ProviderController < ApplicationController
   end
 
   def deny
+    return render plain: t("Invalid or missing session for oauth"), status: 400 unless session[:oauth2]
     params = { error: "access_denied" }
     params[:state] = session[:oauth2][:state] if session[:oauth2].key? :state
     redirect_to Canvas::Oauth::Provider.final_redirect(self, params)

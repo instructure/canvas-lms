@@ -724,6 +724,11 @@ describe Oauth2ProviderController do
       expect(response).to be_redirect
       expect(response.location).not_to match(/state=/)
     end
+
+    it "doesn't error on an empty session" do
+      get 'deny', session: {}
+      expect(response).to be_bad_request
+    end
   end
 
   describe 'DELETE token' do
