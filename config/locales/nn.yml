@@ -1786,6 +1786,7 @@ nn:
     default_name: "Utan namn"
   add_cc_subtitle_a9ef4a66: "Legg til undertekst"
   add_collaboration_da9665ac: "Legg til samarbeid"
+  add_conferences_from_calendar_98cb86b1: "Legg til konferansar frå kalender"
   add_contact_method_d2dfea03: "Legg til kontaktmetode"
   add_content_58b4305a: "Legg til innhald"
   add_content_to_module_name_589a8d54: "Legg innhald til %{module_name}"
@@ -2038,6 +2039,7 @@ nn:
       GraphQL-mutasjonar.
   allows_assessors_to_view_the_assessment_audit_tray_84c0c4c2: "Tillat å sjå vurderingsloggen i SpeedGrader for anonyme oppgåver eller oppgåver med fleire rettarar eller retteperiodar. "
   allows_creating_announcements_for_a_specific_secti_14e0a63d: "Tillet oppretting av kunngjeringar for ein spesifikk seksjon"
+  allows_help_links_to_be_tagged_as_featured_or_new__ed5742c2: "Gjer at hjelpelenker merkast som Framheva eller Ny og at dei får ei utheva vising i hjelpemenyen."
   allows_teacher_designer_ta_based_roles_to_access_t_d480279: "Gir rollene faglærar/designar/undervisingsassistent tilgang til chatverktøyet."
   allows_teacher_ta_based_roles_to_access_the_attend_bf5b2a17: "Gir rollene faglærar/designar/undervisingsassistent tilgang til frammøteverktøyet."
   allows_teachers_to_mark_grade_data_to_be_exported__a6bf77cf: "Gir faglærarar løyve til å markere vurderingsdata for masseeksport til SIS-integrasjonar."
@@ -6950,6 +6952,7 @@ nn:
   data_services_manage_9b8f96da: "Datateneste - administrer"
   data_set_identifier_data_set_id_c228b5df: "Datasett-ID: %{data_set_id}"
   database_error_err_6393d244: "Databasefeil (%{err})"
+  datadog_rum_js_agent_4c3bea75: "Datadog RUM JS Agent"
   date: 
     abbr_day_names: 
       - sun
@@ -7352,11 +7355,19 @@ nn:
   disableWhileLoading: 
     loading: Lastar...
   disable_a5c05db3: Deaktiver
+  disable_alert_timeouts_description: |-
+      Aktivering av denne funksjonen fjernar timeout for popup-varsel og gir
+      brukaren høve til å ha varselmeldinga open så lenge hen vil inntil den vert lukka.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle omfang med kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
+      Deaktiver Canvas-hurtigtastar. Brukarar som treng skjermlesar eller navigerer med tastatur
+      får ein betre oppleving når hurtigtastane er slått av.
+  disable_celebrations_description: "Aktivering av denne funksjonen skjuler alle feiringsanimasjonar."
   disable_content_security_policy_8660a787: "Slå av retningslinjer for innhaldstryggleik"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterval"
   disable_keyboard_shortcuts_9db78832: "Deaktiver hurtigtastar"
+  disable_post_to_sis_for_assignment_in_closed_gradi_921b0271: "Deaktiver Post-til-SIS for oppgåver i lukka karaktersetjingsperiodar"
   disable_scope_6ba4e4d4: "Deaktiver omfang"
   disable_sync_to_name_10c371dc: "Slå av synkronisering til %{name}"
   disable_toolname_44d6397c: "Deaktiver %{toolName}"
@@ -7873,6 +7884,7 @@ nn:
   e_g_jon_doe_77233e3b: "f.eks. Nordmann, Ola"
   e_g_jondoe_example_com_98656fb5: "f.eks. jondoe@example.com"
   e_mail_only_2cc5e513: "Kun e-post"
+  easy_toggle_student_view_82448b0b: "Vis/skjul studentvising"
   ecollege_file_description: eCollege
   ecollege_name: eCollege-konverteringsprogram
   ecuador_593_dfcc235a: "Ecuador (+593) "
@@ -7887,6 +7899,8 @@ nn:
   edit_assignment_name_mastery_paths_40b50541: "Rediger oppgåve %{name} meistringsstiar"
   edit_bank_92eb8e14: "Rediger %{bank}"
   edit_c5fbea07: Rediger
+  edit_closed_captions_e5fdeb79: "Endre undertekstar"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Endre undertekstar på videoer frå videomenyen i editoren"
   edit_collaboration_b014c18b: "Endre samarbeid"
   edit_comment_comment_e74afa04: "Rediger kommentar: %{comment}"
   edit_conference_title_6e234815: "Endre \"%{conference_title}\""
@@ -8708,11 +8722,14 @@ nn:
   feature_options_enable_disable_7e748054: "Funksjonsval - tillat/ikkje tillat"
   feature_options_view_a170e80c: "Funksjonsval - vis"
   feature_preview_5e1216a0: "Førehandsvisning av funksjonar"
+  featured_help_links_d805fe44: "Framheva hjelpelenker"
   features: 
     allow_opt_out_of_inbox: "Tillat brukarar å velje vekk innboksen."
     canvas_parent_display_name: "Canvas Parent"
+    disable_alert_timeouts: "Deaktiver timeout for varsel"
     google_docs_domain_restriction: "Google Docs domeneavgrensing"
     gradebook_list_students_by_sortable_name: "Vurderingsoversikt – før opp studentar etter standard sortering "
+    hide_celebrations: "Deaktiver feiringsanimasjonar"
     high_contrast: "Høgkontrast brukargrensesnitt"
     k12: "K-12 spesifikke funksjonar"
     learning_mastery_gradebook: "Vurderingsoversikt for meistringsbasert læring "
@@ -8811,6 +8828,7 @@ nn:
         folder_locked: "Mappa \"%{folder},\" som inneheld denne fila, er låst."
   files_and_folder_contents_only_available_to_studen_944f9166: "Fil- og mappeinnhald er er berre tilgjengeleg for studentar med lenketilgang. Ikkje synleg i studentmapper."
   files_c300e900: Filer
+  files_drag_and_drop_enhancements_da55de57: "Dra og slipp-forbetringer i Filer"
   files_quota_percentused_of_bytesavailable_used_7f62792c: "Filkvote: %{percentUsed} av %{bytesAvailable} brukte"
   files_quota_percentused_of_bytesavailable_used_d208857a: "Filkvote: %{percentUsed}% av %{bytesAvailable} brukte"
   files_toolbar_2f2f0976: "Verktøylinje filer"
@@ -10395,6 +10413,7 @@ nn:
     training_services_portal_sub: "Gå til Canvas sine opplæringsvideoar og -emne"
     which_course_is_this_question_about: "Kva emne gjeld spørsmålet?"
     your_email_address: "E-postadressa di"
+  help_for_unpublished_courses_512a08d7: "Hjelp for upubliserte emne"
   help_menu_links_51184b65: Hjelpemeny-lenke
   help_menu_options_7ecf7031: Hjelpemeny-val
   help_us_improve_by_telling_us_what_happened_d6392f18: "Hjelp oss å bli betre ved å fortelje kva som har skjedd"
@@ -10554,6 +10573,7 @@ nn:
   if_an_attribute_is_marked_as_provisioning_only_the_6545b46f: "Dersom ein attributt er merka som 'berre for klargjering', blir han berre nytta når 'Siste liten-klargjering' opprettar ein ny brukar. Attributten vil ikkje bli oppdatert kvar gong brukaren loggar inn. "
   if_both_grades_edit_and_grades_view_all_grades_are_795578a5: "Dersom både 'Vurderingar - endre' og 'Vurderingar - sjå alle vurderingar' er slått av, vil vurderingsoversikta vere skjult i emnenavigasjonen."
   if_both_grades_edit_and_grades_view_all_grades_are_ed522d43: "Dersom både 'Vurderingar - endre' og 'Vurderingar - vis alle vurderingar' er slått av, vil vurderingsoversikta vere skjult i emnemenyen."
+  if_commons_is_installed_allows_importing_favorited_eff368f: "Dersom Commons er installert vert favorisert innhald importert frå Canvas."
   if_disabled_the_outcomes_page_becomes_read_only_an_29ea1940: "Dersom deaktivert, vil læringsmålsida kun vere i lesemodus og knappen administrer vurderingsskjema er skjult. Ein brukar kan framleis sjå vurderingsskjema for individuelle oppgåver frå Oppgåver. "
   if_disabled_user_can_still_view_and_download_files_336ffc30: "Dersom deaktivert kan brukar framleis sjå, laste ned og pakke filer i ei zipfil. "
   if_disabled_user_will_still_have_access_to_course__6816d525: |-
@@ -10577,6 +10597,10 @@ nn:
   if_enabled_the_option_will_be_presented_to_have_no_5f91d8d0: "Ein får valet om å ha vurderingskriterium utan moglege poeng dersom dette er slått på."
   if_none_are_selected_send_to_everyone_in_the_entir_16aa0bb0: "(Dersom ingen er markerte sender du til alle som tilhøyrer kontoen)"
   if_none_are_selected_send_to_everyone_in_the_entir_21119709: "(Dersom ingen er markerte sender du til alle som tilhøyrer underkontoen)"
+  if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
+      Dersom forbetringane av den nye teksteditoren òg er aktivert,
+      vil editoren autolagre innhaldet ditt mens du arbeider
+  if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Dersom denne er på, slår den av Post-til-SIS-funksjonalitet for oppgåver når karaktersetjingsperiode lukker, Gjeld kun når innstillingane for \"Aktiver ny SIS-integrasjon\" er aktivert. "
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøy. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av. "
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar eller observatørar til eit emne via e-postadresse eller innloggings-ID sjølv om studenten eller observatøren ikke har ein Canvaskonto frå før."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
@@ -10682,6 +10706,7 @@ nn:
   importing_name_8f2b131d: "Importerer \"%{name}\""
   importing_outcomes_e62a0375: "Importerer læringsmål"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Auk tilgjengelegheita til venstremenyen gjennom betre bruk av fargar, i tillegg til visuelle indikatorar og skjermlesarindikatorar for inaktive menyelement. "
+  improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbetra visuell påminning til faglærar om å publisere emne"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "i %{asset_link} klikkar studentane på %{bad_link}, som går til ei side i emnet ditt som ikkje eksisterar. "
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald i eit anna emne."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald dei ikkje har tilgang til."
@@ -10706,6 +10731,7 @@ nn:
   include_scores_when_alerting_about_grades_if_your__b221c2c8: |-
       Inkluder resultat i varsel om vurdering.
       Dersom e-postadressa ikkje er ei institusjonsadresse, betyr det at sensitivt innhald blir sendt ut av institusjonen.
+  include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Inkluder Datadog RUM JS Agent i metadata til dokumentet."
   include_this_assignment_s_grades_when_posting_to_y_6bff3323: "Inkluder karakterane for oppgåva når du du sender ho til institusjonen sitt SIS"
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder vurderingane for oppgåva når du synkroniserer ho til institusjonen sitt SIS"
   include_unpublished_assignments_83ebbaec: "Inkluder upubliserte oppgåver"
@@ -11183,6 +11209,7 @@ nn:
   let_students_see_the_correct_answers_dacc2faf: "La  studentane sjå dei korrekte svara"
   let_students_see_their_quiz_responses_fbc07d14: "La studentane sjå prøvesvara sine"
   let_students_see_their_quiz_responses_incorrect_qu_f5c9cb70: "La studentar sjå quizresultata sine (spørsmål med galt svar er markert i tilbakemeldinga)"
+  let_the_site_administrator_select_up_to_2_lti_apps_df016781: "Lar systemadministrator velje inntil 2 LTI-apper som favorittar, som så blir vist i verktøymenyen i editoren"
   letter_grade_29ff1938: Bokstavkarakter
   letter_grade_f00fedc4: bokstavkarakter
   level_5fdf654a: Nivå
@@ -11215,6 +11242,9 @@ nn:
       status_unauthorized: uautorisert
     basic_lti: 
       bad_score: "Resultatet er ikkje mellom 0 og 1"
+      no_parseable_score: 
+        result: "Kunne ikkje analysere resultScore: %{grade}"
+        result_total: "Kunne ikkje analysere resultTotalScore: %{grade}"
       no_points_comment: |-
           Eit eksternt verktøy prøvde å vurdere oppgåva til %{grade}, men mislukkast
           fordi oppgåva ikkje har moglege poeng.
@@ -11580,7 +11610,10 @@ nn:
   make_key_invisible_e66af89: "Gjer nøkkel usynleg"
   make_key_visible_5c03fa34: "Gjer nøkkel synleg"
   make_new_settings_for_sis_integrations_visible_and_875039ca: "Gjer nye innstillingar for SIS-integrasjonar synlege og aktive"
+  make_the_course_summary_list_of_assignments_and_ev_f739be33: "Gjer emnesamandrag (liste med innleveringar og hendingar) valfritt i emneoversikt"
   make_this_course_publicly_visible_student_data_wil_3954d6c8: "Gjer dette kurset offentleg og synleg for alle (studentdata er framleis privat)"
+  makes_a_microsoft_immersive_reader_link_option_sho_4dc2fcfb: "Gjer at eit Microsoft Immersive Reader-lenkeval viser på innhaldssider/wikisider."
+  makes_the_student_grades_page_responsive_c13e00eb: "Gjer vurderingssidene for studentar responsive."
   making_a_copy_of_originalassignmentname_b7268992: "Oppretta kopi av \"%{originalAssignmentName}\""
   malay_f5dddce4: Malayisk
   malaysia_60_7d357b28: "Malaysia (+60)"
@@ -13414,6 +13447,7 @@ nn:
   mexico_b2d7a271: Mexico
   mgp_grade_export_d29b471f: MGP-vurderingseksport
   mic_a7f3d311: Mic
+  microsoft_immersive_reader_free_trial_wiki_pages_f41b29d5: "Microsoft Immersive Reader - Prøv gratis (wiki)"
   migrate_67c9f753: Overfør
   migrate_quiz_5d0f777: "Overfør quiz"
   migration: 
@@ -14825,6 +14859,7 @@ nn:
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Plasshalder for webhooks-tilgong i Canvas Catalog."
   placement_values_c0a2cf56: Passeringsverdiar
   placements_5b5e056b: Plasseringar
+  places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Plasserer ein knapp i øvste høgre hjørne av ein emneside som gir faglærar adgang til å enkelt byte til studentvising."
   plagiarism_detection_platform_6ce67e66: "Plattform for plagiatkontroll"
   plagiarism_detection_platform_assignments_fc19e0bd: "Oppgåver til plagiatkontrollplattformen"
   plagiarism_detection_platform_users_b0e5410f: Plagiatkontrollbrukarar
@@ -15408,6 +15443,7 @@ nn:
     labels: 
       requirements_must_be_completed: "Følgande vilkår må oppfyllast før denne sida kan låsast opp"
   presentation_2d9387ca: Presentasjon
+  presents_the_quiz_setting_to_avoid_automatic_submi_363b91ff: "Viser quiz-innstillinga for å kunne unngå at innlevering skjer automatisk i ein tidsstyrt quiz når tida er ute.  "
   press_the_comma_key_or_shift_question_mark_to_see__930af9df: "Trykk komma eller shift + spørsmålstekn for å sjå ei liste med hurtigtastar"
   press_the_comma_key_or_shift_to_see_a_list_of_keyb_155d8ca3: "Trykk komma eller shift + ? for å sjå ei liste med hurtigtastar"
   press_the_esc_key_to_close_this_modal_14d10601: "Trykk esc for å lukke"
@@ -18961,6 +18997,7 @@ nn:
   short_name_ad9bf84f: "kort namn"
   should_be_self_evident_the_canvas_id_of_the_report_44378262: "Må vere sjølvforklarande, Canvas-ID-en til rapporteringsbrukaren"
   show_76c0ed1c: Vis
+  show_a_list_of_recently_visited_pages_in_the_canva_8a2a37e7: "Vis ei liste over nyleg besøkte sider i globalmenyen i Canvas"
   show_account_navigation_menu_d97270a9: "Vis meny for kontonavigasjon"
   show_admin_navigation_menu_92fb579f: "Vis admin-navigeringsmeny "
   show_all_artifacts_34b91a83: "Vis alle artefaktar"
@@ -19711,6 +19748,7 @@ nn:
       networking_academy_description: "Sjå svar frå Cisco på dei mest vanlege spørsmåla."
       networking_academy_faqs: "Vanlege spørsmål i Networking Academy"
       student_support: "NetAcad-støtte - Student"
+      student_support_description: "Faglærar eller administrasjon er første kontaktpunkt. Dei kan enten svare på spørsmål eller kontakte brukarstøtte for deg. Ta kontakt via Meldingar. "
       support_desk_livechat: "Brukarstøtte direkte"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtte for favoritter av LTI-verktøy i teksteditoren"
   svg_d5969386: SVG
