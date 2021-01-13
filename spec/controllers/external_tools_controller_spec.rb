@@ -875,6 +875,15 @@ describe ExternalToolsController do
       expect(assigns[:lti_launch].params['custom_collaboration_url']).to eq api_v1_collaboration_members_url(collab)
     end
 
+    it "messages appropriately when there is a launch error because of missing permissions" do
+      user_session(@teacher)
+      tool = new_valid_tool(@course)
+      tool.settings[:course_navigation] = { 'required_permissions' => 'not-real-permissions,nor-this-one' }
+      tool.save!
+      get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/basic_lti"}
+      expect(response).to be_unauthorized
+    end
+
     it "should remove query params when post_only is set" do
       u = user_factory(active_all: true)
       account.account_users.create!(user: u)

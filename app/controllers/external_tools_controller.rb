@@ -159,6 +159,7 @@ class ExternalToolsController < ApplicationController
       secure_params: params[:secure_params],
       post_live_event: true
     )
+    return unless @lti_launch
     display_override = params['borderless'] ? 'borderless' : params[:display]
     render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: display_override)
   rescue InvalidSettingsError => e
