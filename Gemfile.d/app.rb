@@ -25,7 +25,7 @@ else
   gem 'rails', '6.0.3.4'
 end
 
-gem 'academic_benchmarks', '0.0.11', require: false
+gem 'academic_benchmarks', '1.0.1', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'

@@ -1,282 +1,427 @@
 [
   {
-    "code": "NRC",
+    "acronym": null,
+    "descr": "Georgia DOE",
+    "guid": "91296E80-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "VDOE",
+    "descr": "Virginia DOE",
+    "guid": "912F0480-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "New York State Education Department",
+    "acronym": "NYSED",
+    "guid": "9127D390-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "9129D578-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Maryland State Department of Education"
+  },
+  {
+    "descr": "Alberta MOE",
+    "acronym": null,
+    "guid": "91396308-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "TEA",
+    "descr": "Texas Education Agency",
+    "guid": "912830F6-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912A2F14-F1B9-11E5-862E-0938DC287387",
+    "acronym": "CDE",
+    "descr": "Colorado DOE"
+  },
+  {
+    "acronym": null,
+    "descr": "Tennessee DOE",
+    "guid": "912E6516-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Quebec MOE",
+    "acronym": null,
+    "guid": "913C36E6-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912AE0E4-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Arkansas DOE"
+  },
+  {
+    "acronym": "OSPI",
+    "descr": "Washington Office of Superintendent of Public Instruction",
+    "guid": "912F3F40-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912A57AA-F1B9-11E5-862E-0938DC287387",
+    "acronym": "ADE",
+    "descr": "Arizona DOE"
+  },
+  {
+    "guid": "9129A0F8-F1B9-11E5-862E-0938DC287387",
+    "acronym": "KSDE",
+    "descr": "Kansas State Department of Education"
+  },
+  {
+    "guid": "913D623C-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "New South Wales DOE"
+  },
+  {
+    "descr": "Pennsylvania DOE",
+    "acronym": "PDE",
+    "guid": "912DF40A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Mississippi DOE",
+    "acronym": null,
+    "guid": "912C7652-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "DESE",
+    "descr": "Missouri Department of Elementary and Secondary Education",
+    "guid": "912CA96A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "9128B2EC-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Indiana DOE"
+  },
+  {
+    "guid": "913B783C-F1B9-11E5-862E-0938DC287387",
+    "descr": "Ontario MOE",
+    "acronym": null
+  },
+  {
+    "descr": "Kentucky DOE",
+    "acronym": null,
+    "guid": "91287D9A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Ohio DOE",
+    "acronym": null,
+    "guid": "9127A816-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Illinois State Board of Education",
+    "acronym": "ISBE",
+    "guid": "9128DC22-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "9129243E-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "South Carolina DOE"
+  },
+  {
+    "guid": "912F7CEE-F1B9-11E5-862E-0938DC287387",
+    "descr": "West Virginia DOE",
+    "acronym": null
+  },
+  {
+    "acronym": "NDDPI",
+    "descr": "North Dakota Department of Public Instruction",
+    "guid": "912DCC82-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912BBD16-F1B9-11E5-862E-0938DC287387",
+    "descr": "Idaho State Department of Education",
+    "acronym": null
+  },
+  {
+    "descr": "Oregon DOE",
+    "acronym": null,
+    "guid": "912A05A2-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "SDE",
+    "descr": "Oklahoma State Department of Education",
+    "guid": "91301A1E-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "91304A20-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "New Jersey DOE"
+  },
+  {
+    "descr": "Utah State Board of Education",
+    "acronym": "USBE",
+    "guid": "912E8D02-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "California State Board of Education",
+    "acronym": "SBE",
+    "guid": "68B555A8-ACA0-11E9-8BB2-0A11CDE56ADE"
+  },
+  {
+    "guid": "912A8036-F1B9-11E5-862E-0938DC287387",
+    "descr": "Alabama State Department of Education",
+    "acronym": "ALSDE"
+  },
+  {
+    "guid": "912C136A-F1B9-11E5-862E-0938DC287387",
+    "descr": "Massachusetts Department of Elementary and Secondary Education",
+    "acronym": "DESE"
+  },
+  {
+    "descr": "Louisiana DOE",
+    "acronym": null,
+    "guid": "913084B8-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "913A8422-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Newfoundland and Labrador MOE"
+  },
+  {
+    "descr": "Wisconsin Department of Public Instruction",
+    "acronym": "DPI",
+    "guid": "912FB65A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": null,
+    "descr": "Nova Scotia MOE",
+    "guid": "913AC7E8-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "FDOE",
+    "descr": "Florida DOE",
+    "guid": "9127FF50-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912E414E-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "South Dakota DOE"
+  },
+  {
+    "guid": "91290080-F1B9-11E5-862E-0938DC287387",
+    "descr": "Michigan DOE",
+    "acronym": "MDE"
+  },
+  {
+    "acronym": "HIDOE",
+    "descr": "Hawaiʻi State Department of Education",
+    "guid": "912B97B4-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912D3F60-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Nevada DOE"
+  },
+  {
+    "acronym": "DEED",
+    "descr": "Alaska Department of Education & Early Development",
+    "guid": "912AA9F8-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": null,
+    "descr": "British Columbia MOE",
+    "guid": "91398EA0-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Iowa DOE",
+    "acronym": null,
+    "guid": "9136CE2C-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "OPI",
+    "descr": "Montana Office of Public Instruction",
+    "guid": "912CDD90-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "OSSE",
+    "descr": "DC Office of the State Superintendent of Education",
+    "guid": "912B7522-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "North Carolina Department of Public Instruction",
+    "acronym": "NCDPI",
+    "guid": "91294914-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912D66F2-F1B9-11E5-862E-0938DC287387",
+    "descr": "New Hampshire DOE",
+    "acronym": null
+  },
+  {
+    "guid": "912EC0BA-F1B9-11E5-862E-0938DC287387",
+    "descr": "Vermont Agency of Education",
+    "acronym": null
+  },
+  {
+    "guid": "913B47AE-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Northwest Territories MOE"
+  },
+  {
+    "acronym": "NMPED",
+    "descr": "New Mexico Public Education Department",
+    "guid": "912D9294-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912B0D3A-F1B9-11E5-862E-0938DC287387",
+    "descr": "Connecticut State Department of Education",
+    "acronym": "CSDE"
+  },
+  {
+    "descr": "Saskatchewan MOE",
+    "acronym": null,
+    "guid": "913C8DBC-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "913BDA0C-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Prince Edward Island Department of Education and Lifelong Learning"
+  },
+  {
+    "descr": "Australian Curriculum, Assessment and Reporting Authority",
+    "acronym": "acara",
+    "guid": "4C75AFB9-E149-11E9-8BB2-0A11CDE56ADE"
+  },
+  {
+    "guid": "912D16F2-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Nebraska DOE"
+  },
+  {
+    "descr": "New Brunswick MOE",
+    "acronym": null,
+    "guid": "913A3E40-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912B368E-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Delaware DOE"
+  },
+  {
+    "acronym": null,
+    "descr": "Manitoba MOE",
+    "guid": "913A05F6-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "912BE962-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Maine DOE"
+  },
+  {
+    "descr": "Minnesota DOE",
+    "acronym": null,
+    "guid": "912C406A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": null,
+    "descr": "Rhode Island DOE",
+    "guid": "912E1E12-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": null,
+    "descr": "Wyoming DOE",
+    "guid": "912FF340-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": "CDE",
+    "descr": "California DOE",
+    "guid": "91285B44-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "descr": "Idaho Department of Health and Welfare",
+    "acronym": "DHW",
+    "guid": "1E07A723-ACAE-11E9-8BB2-0A11CDE56ADE"
+  },
+  {
+    "acronym": null,
+    "descr": "Puerto Rico DOE",
+    "guid": "913FD5B2-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "9139C820-F1B9-11E5-862E-0938DC287387",
+    "descr": "Council of Atlantic Ministers of Education and Training",
+    "acronym": "CAMET"
+  },
+  {
+    "guid": "9138DA5A-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Wales Department for Education and Skills"
+  },
+  {
+    "acronym": null,
+    "descr": "Council of Ministers of Education",
+    "guid": "9139DE14-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "acronym": null,
+    "descr": "Scottish Government",
+    "guid": "91389A9A-F1B9-11E5-862E-0938DC287387"
+  },
+  {
+    "guid": "913FFCFE-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Virgin Islands DOE"
+  },
+  {
+    "acronym": "CC",
+    "descr": "NGA Center/CCSSO",
+    "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22"
+  },
+  {
+    "guid": "408436D9-AC98-11E9-8BB2-0A11CDE56ADE",
+    "acronym": "DECE",
+    "descr": "Alabama Department of Early Childhood Education"
+  },
+  {
+    "descr": "Kentucky Governor’s Office of Early Childhood",
+    "acronym": null,
+    "guid": "3E3DF630-ACA7-11E9-8BB2-0A11CDE56ADE"
+  },
+  {
+    "guid": "9137E802-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "UK Department for Education"
+  },
+  {
+    "guid": "913CEBC2-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Yukon MOE"
+  },
+  {
     "guid": "095383F6-BBCB-11E1-9321-88419DFF4B22",
-    "description": "Achieve"
+    "descr": "Achieve",
+    "acronym": null
   },
   {
-    "code": "AL",
-    "guid": "A8325A6C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Alabama"
+    "guid": "B2AF078E-ACAF-11E9-8BB2-0A11CDE56ADE",
+    "acronym": "IWLA",
+    "descr": "Iowa World Languages Association"
   },
   {
-    "code": "AK",
-    "guid": "A83250D0-901A-11DF-A622-0C319DFF4B22",
-    "description": "Alaska"
+    "guid": "913820CE-F1B9-11E5-862E-0938DC287387",
+    "acronym": null,
+    "descr": "Northern Ireland Department of Education"
   },
   {
-    "code": "AZ",
-    "guid": "A83274AC-901A-11DF-A622-0C319DFF4B22",
-    "description": "Arizona"
+    "acronym": "DHS",
+    "descr": "Arkansas Department of Human Services",
+    "guid": "80740BCF-AC9B-11E9-8BB2-0A11CDE56ADE"
   },
   {
-    "code": "AR",
-    "guid": "A8326336-901A-11DF-A622-0C319DFF4B22",
-    "description": "Arkansas"
+    "guid": "25FF5134-8871-11E6-B384-7FC529C466BA",
+    "descr": "Ontario",
+    "acronym": null
   },
   {
-    "code": "AU",
-    "guid": "A8326BEC-901A-11DF-A622-0C319DFF4B22",
-    "description": "Australia"
+    "acronym": "ISTE",
+    "descr": "International Society for Technology in Education",
+    "guid": "52E4650E-56EE-11E6-BB2A-43D229C466BA"
   },
   {
-    "code": "CA",
-    "guid": "A832862C-901A-11DF-A622-0C319DFF4B22",
-    "description": "California"
+    "guid": "FFB43E29-D80E-11EA-BB5B-0E20088BB29A",
+    "acronym": "NHAWLT",
+    "descr": "New Hampshire Association of World Language Teachers"
   },
   {
-    "code": "CO",
-    "guid": "A832A9A4-901A-11DF-A622-0C319DFF4B22",
-    "description": "Colorado"
-  },
-  {
-    "code": "CT",
-    "guid": "A832BBEC-901A-11DF-A622-0C319DFF4B22",
-    "description": "Connecticut"
-  },
-  {
-    "code": "DE",
-    "guid": "A832CDE4-901A-11DF-A622-0C319DFF4B22",
-    "description": "Delaware"
-  },
-  {
-    "code": "DC",
-    "guid": "A832C4DE-901A-11DF-A622-0C319DFF4B22",
-    "description": "District of Columbia"
-  },
-  {
-    "code": "FL",
-    "guid": "A832E0B8-901A-11DF-A622-0C319DFF4B22",
-    "description": "Florida"
-  },
-  {
-    "code": "GA",
-    "guid": "A832E9D2-901A-11DF-A622-0C319DFF4B22",
-    "description": "Georgia"
-  },
-  {
-    "code": "HI",
-    "guid": "A832F2EC-901A-11DF-A622-0C319DFF4B22",
-    "description": "Hawaii"
-  },
-  {
-    "code": "ID",
-    "guid": "A833087C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Idaho"
-  },
-  {
-    "code": "IL",
-    "guid": "A8333252-901A-11DF-A622-0C319DFF4B22",
-    "description": "Illinois"
-  },
-  {
-    "code": "IN",
-    "guid": "A8334A58-901A-11DF-A622-0C319DFF4B22",
-    "description": "Indiana"
-  },
-  {
-    "code": "IA",
-    "guid": "A832FC24-901A-11DF-A622-0C319DFF4B22",
-    "description": "Iowa"
-  },
-  {
-    "code": "KS",
-    "guid": "A833636C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Kansas"
-  },
-  {
-    "code": "KY",
-    "guid": "A8337BFE-901A-11DF-A622-0C319DFF4B22",
-    "description": "Kentucky"
-  },
-  {
-    "code": "LA",
-    "guid": "A8339404-901A-11DF-A622-0C319DFF4B22",
-    "description": "Louisiana"
-  },
-  {
-    "code": "ME",
-    "guid": "A833DCB6-901A-11DF-A622-0C319DFF4B22",
-    "description": "Maine"
-  },
-  {
-    "code": "MD",
-    "guid": "A833C528-901A-11DF-A622-0C319DFF4B22",
-    "description": "Maryland"
-  },
-  {
-    "code": "MA",
-    "guid": "A833AC96-901A-11DF-A622-0C319DFF4B22",
-    "description": "Massachusetts"
-  },
-  {
-    "code": "MI",
-    "guid": "A833F5CA-901A-11DF-A622-0C319DFF4B22",
-    "description": "Michigan"
-  },
-  {
-    "code": "MN",
-    "guid": "A8340E5C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Minnesota"
-  },
-  {
-    "code": "MS",
-    "guid": "A8343EFE-901A-11DF-A622-0C319DFF4B22",
-    "description": "Mississippi"
-  },
-  {
-    "code": "MO",
-    "guid": "A83425EA-901A-11DF-A622-0C319DFF4B22",
-    "description": "Missouri"
-  },
-  {
-    "code": "MT",
-    "guid": "A83457FE-901A-11DF-A622-0C319DFF4B22",
-    "description": "Montana"
-  },
-  {
-    "code": "NT",
-    "guid": "A834CC02-901A-11DF-A622-0C319DFF4B22",
-    "description": "National Standards"
-  },
-  {
-    "code": "NE",
-    "guid": "A834A0B0-901A-11DF-A622-0C319DFF4B22",
-    "description": "Nebraska"
-  },
-  {
-    "code": "NV",
-    "guid": "A834D620-901A-11DF-A622-0C319DFF4B22",
-    "description": "Nevada"
-  },
-  {
-    "code": "NH",
-    "guid": "A834AE7A-901A-11DF-A622-0C319DFF4B22",
-    "description": "New Hampshire"
-  },
-  {
-    "code": "NJ",
-    "guid": "A834B848-901A-11DF-A622-0C319DFF4B22",
-    "description": "New Jersey"
-  },
-  {
-    "code": "NM",
-    "guid": "A834C22A-901A-11DF-A622-0C319DFF4B22",
-    "description": "New Mexico"
-  },
-  {
-    "code": "NY",
-    "guid": "A834E00C-901A-11DF-A622-0C319DFF4B22",
-    "description": "New York"
-  },
-  {
-    "code": "CC",
-    "guid": "A83297F2-901A-11DF-A622-0C319DFF4B22",
-    "description": "NGA Center/CCSSO"
-  },
-  {
-    "code": "NC",
-    "guid": "A8346F1E-901A-11DF-A622-0C319DFF4B22",
-    "description": "North Carolina"
-  },
-  {
-    "code": "ND",
-    "guid": "A834881E-901A-11DF-A622-0C319DFF4B22",
-    "description": "North Dakota"
-  },
-  {
-    "code": "OH",
-    "guid": "A834F40C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Ohio"
-  },
-  {
-    "code": "OK",
-    "guid": "A834FE5C-901A-11DF-A622-0C319DFF4B22",
-    "description": "Oklahoma"
-  },
-  {
-    "code": "OR",
-    "guid": "A8350866-901A-11DF-A622-0C319DFF4B22",
-    "description": "Oregon"
-  },
-  {
-    "code": "PA",
-    "guid": "A8351270-901A-11DF-A622-0C319DFF4B22",
-    "description": "Pennsylvania"
-  },
-  {
-    "code": "RI",
-    "guid": "A8351CA2-901A-11DF-A622-0C319DFF4B22",
-    "description": "Rhode Island"
-  },
-  {
-    "code": "SC",
-    "guid": "A835312E-901A-11DF-A622-0C319DFF4B22",
-    "description": "South Carolina"
-  },
-  {
-    "code": "SD",
-    "guid": "A8353B56-901A-11DF-A622-0C319DFF4B22",
-    "description": "South Dakota"
-  },
-  {
-    "code": "TN",
-    "guid": "A836285E-901A-11DF-A622-0C319DFF4B22",
-    "description": "Tennessee"
-  },
-  {
-    "code": "TX",
-    "guid": "A8363358-901A-11DF-A622-0C319DFF4B22",
-    "description": "Texas"
-  },
-  {
-    "code": "UK",
-    "guid": "A8363E2A-901A-11DF-A622-0C319DFF4B22",
-    "description": "United Kingdom"
-  },
-  {
-    "code": "UT",
-    "guid": "A83653D8-901A-11DF-A622-0C319DFF4B22",
-    "description": "Utah"
-  },
-  {
-    "code": "VT",
-    "guid": "A83669D6-901A-11DF-A622-0C319DFF4B22",
-    "description": "Vermont"
-  },
-  {
-    "code": "VA",
-    "guid": "A8365EE6-901A-11DF-A622-0C319DFF4B22",
-    "description": "Virginia"
-  },
-  {
-    "code": "WA",
-    "guid": "A83674DA-901A-11DF-A622-0C319DFF4B22",
-    "description": "Washington"
-  },
-  {
-    "code": "WV",
-    "guid": "A8368AEC-901A-11DF-A622-0C319DFF4B22",
-    "description": "West Virginia"
-  },
-  {
-    "code": "WI",
-    "guid": "A8367FDE-901A-11DF-A622-0C319DFF4B22",
-    "description": "Wisconsin"
-  },
-  {
-    "code": "WY",
-    "guid": "A83695FA-901A-11DF-A622-0C319DFF4B22",
-    "description": "Wyoming"
+    "guid": "58682CAF-ACA3-11E9-8BB2-0A11CDE56ADE",
+    "descr": "Connecticut Office of Early Childhood",
+    "acronym": "OEC"
   }
 ]

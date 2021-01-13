@@ -23,7 +23,15 @@ module AcademicBenchmarks
   module Standards
     class Document
       include Common
-      def build_outcomes(ratings={}, _parent=nil)
+      def build_outcomes(ratings={}, parent=nil)
+        title = if parent.is_a?(Publication) &&
+          parent.children.count {|c| c.description == description} > 1 &&
+          adopt_year.present?
+          "#{description} (#{adopt_year})"
+        else
+          description
+        end
+
         build_common_outcomes(ratings).merge!({
           title: title,
           description: title,

@@ -20,107 +20,90 @@
 require 'spec_helper'
 
 describe AcademicBenchmark::Converter do
-  def common_std
-    {
-      "placeholder"=>"N",
-      "date_modified"=>"2004-11-30 17:05:24",
-      "subject"=>{"code"=>"TECH", "broad"=>"TECH"},
-      "deepest"=>"Y",
-      "version"=>"0",
-      "status"=>"Active",
-      "document"=>{"guid"=>"99395B3C-C0DA-11DA-8BD7-97BD8BBE078D", "title"=>"NETS for Students", "acronym"=>"ISTE"},
-      "descr"=>"Use input devices (e.g., mouse, keyboard, remote control) and output devices (e.g., monitor, printer) to successfully operate computers, VCRs, audiotapes, and other technologies. (1)",
-      "grade"=>{"seq"=>"150", "high"=>"2", "low"=>"PK"},
-      "level"=>1,
-      "authority"=>{"code"=>"NT", "guid"=>"A834CC02-901A-11DF-A622-0C319DFF4B22", "descr"=>"National Standards"},
-      "self"=>"http://api.academicbenchmarks.com/rest/v3/standards/e5a9ee98-33ac-446f-90a6-e8bbb053020f",
-      "adopt_year"=>"2000"
-    }
+  def raw_standard
+    {"attributes"=>
+       {"status"=>"active",
+        "education_levels"=>{"grades"=>[{"code"=>"5"}]},
+        "guid"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93",
+        "statement"=>
+         {"descr"=>
+           "Identify major events of the American Revolution, including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown."},
+        "number"=>{"raw"=>"8.", "enhanced"=>"8"},
+        "label"=>"Content Standard",
+        "section"=>
+         {"guid"=>"b6a72362-7ca2-4f00-85ef-6ff44917460b",
+          "descr"=>
+           "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution"},
+        "level"=>1,
+        "disciplines"=>{"subjects"=>[{"code"=>"SOC"}]},
+        "document"=>
+         {"guid"=>"fe79c173-62e4-490b-ad02-a9ee8db932ad",
+          "adopt_year"=>"2010",
+          "descr"=>"Social Studies",
+          "publication"=>
+           {"authorities"=>
+             [{"guid"=>"912A8036-F1B9-11E5-862E-0938DC287387",
+               "descr"=>"Alabama State Department of Education",
+               "acronym"=>"ALSDE"}],
+            "guid"=>"9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
+            "descr"=>"Course of Study"}}},
+      "relationships"=>{"parent"=>{"data"=>{}}},
+      "type"=>"standards",
+      "id"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93"}
   end
-  let(:raw_standard) do
-    {"data"=>
-      common_std.merge({
-        "label"=>"Performance Indicator",
-        "guid"=>"e5a9ee98-33ac-446f-90a6-e8bbb053020f",
-        "subject_doc"=>{"guid"=>"E437624A-FC32-11D9-8407-9AE6FB2C8371", "descr"=>"Performance Indicators (2000)"},
-        "course"=>{"guid"=>"82486BA4-4302-11D9-8407-9AE6FB2C8371", "descr"=>"PreK-2"},
-        "number"=>"1"
-      })
-    }
+
+  def raw_standard2
+    {"id"=>"0003631b-ca53-4985-8963-b7907320f8d9",
+      "attributes"=>
+       {"document"=>
+         {"adopt_year"=>"2010",
+          "descr"=>"Social Studies",
+          "publication"=>
+           {"guid"=>"9935E84E-C0DA-11DA-844D-F1B58A7EE3C7",
+            "descr"=>"Course of Study",
+            "authorities"=>
+             [{"acronym"=>"ALSDE",
+               "guid"=>"912A8036-F1B9-11E5-862E-0938DC287387",
+               "descr"=>"Alabama State Department of Education"}]},
+          "guid"=>"fe79c173-62e4-490b-ad02-a9ee8db932ad"},
+        "number"=>{"raw"=>nil, "enhanced"=>"8.5"},
+        "guid"=>"0003631b-ca53-4985-8963-b7907320f8d9",
+        "level"=>2,
+        "status"=>"active",
+        "education_levels"=>{"grades"=>[{"code"=>"5"}]},
+        "section"=>
+         {"descr"=>
+           "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution",
+          "guid"=>"b6a72362-7ca2-4f00-85ef-6ff44917460b"},
+        "label"=>nil,
+        "statement"=>
+         {"descr"=>
+           "Locating on a map major battle sites of the American Revolution," \
+           " including the battles of Lexington and Concord, Bunker Hill, Saratoga, and Yorktown"},
+        "disciplines"=>{"subjects"=>[{"code"=>"SOC"}]},
+        "utilizations"=>[{"type"=>"alignable"}]},
+      "type"=>"standards",
+      "relationships"=>
+       {"parent"=>
+         {"links"=>
+           {"related"=>
+             "https://api.abconnect.certicaconnect.com/rest/v4.1/standards/0003631b-ca53-4985-8963-b7907320f8d9/parent"},
+          "data"=>
+           {"id"=>"e248c361-6dd7-40fe-9d3e-0a44e2710e93",
+            "type"=>"standards"}}}}
   end
-  # same subject and same course
-  let(:raw_standard2) do
-    {"data"=>
-      common_std.merge({
-        "label"=>"Performance Indicator 2",
-        "guid"=>"e5a9ee98-33ac-446f-90a6-e8bbb053021f",
-        "subject_doc"=>{"guid"=>"E437624A-FC32-11D9-8407-9AE6FB2C8371", "descr"=>"Performance Indicators (2000)"},
-        "course"=>{"guid"=>"82486BA4-4302-11D9-8407-9AE6FB2C8371", "descr"=>"PreK-2"}
-      })
-    }
-  end
-  # new subject and new course
-  let(:raw_standard3) do
-    {"data"=>
-      common_std.merge({
-        "label"=>"Performance Indicator 3",
-        "guid"=>"e5a9ee98-33ac-446f-90a6-e8bbb053022f",
-        "subject_doc"=>{"guid"=>"E437624A-FC32-11D9-8407-9AE6FB2C8372", "descr"=>"Performance Indicators (2016)"},
-        "course"=>{"guid"=>"82486BA4-4302-11D9-8407-9AE6FB2C8373", "descr"=>"4-6"},
-        "number"=>"1"
-      })
-    }
-  end
-  # same subject but new course
-  let(:raw_standard4) do
-    {"data"=>
-      common_std.merge({
-        "label"=>"Performance Indicator 4",
-        "guid"=>"e5a9ee98-33ac-446f-90a6-e8bbb053023f",
-        "subject_doc"=>{"guid"=>"E437624A-FC32-11D9-8407-9AE6FB2C8371", "descr"=>"Performance Indicators (2000)"},
-        "course"=>{"guid"=>"82486BA4-4302-11D9-8407-9AE6FB2C8372", "descr"=>"2-4"}
-      })
-    }
-  end
-  # Child of standard4
-  let(:raw_standard5) do
-    {"data"=>
-      common_std.merge({
-        "label"=>"Performance Indicator 5",
-        "guid"=>"e5a9ee98-33ac-446f-90a6-e8bbb053024f",
-        "parent"=>"e5a9ee98-33ac-446f-90a6-e8bbb053023f",
-        "subject_doc"=>{"guid"=>"E437624A-FC32-11D9-8407-9AE6FB2C8371", "descr"=>"Performance Indicators (2000)"},
-        "course"=>{"guid"=>"82486BA4-4302-11D9-8407-9AE6FB2C8372", "descr"=>"2-4"},
-        "number"=>"2"
-      })
-    }
-  end
+
   let(:raw_authority) do
-    raw_standard['data']['authority']
-  end
-  let(:raw_document) do
-    raw_standard['data']['document']
+    raw_standard.dig('attributes', 'document', 'publication', 'authorities', 0)
   end
   let(:authority_instance) do
     AcademicBenchmarks::Standards::Authority.from_hash(raw_authority)
-  end
-  let(:document_instance) do
-    AcademicBenchmarks::Standards::Document.from_hash(raw_document)
   end
   let(:standard_instance) do
     AcademicBenchmarks::Standards::Standard.new(raw_standard)
   end
   let(:standard_instance2) do
     AcademicBenchmarks::Standards::Standard.new(raw_standard2)
-  end
-  let(:standard_instance3) do
-    AcademicBenchmarks::Standards::Standard.new(raw_standard3)
-  end
-  let(:standard_instance4) do
-    AcademicBenchmarks::Standards::Standard.new(raw_standard4)
-  end
-  let(:standard_instance5) do
-    AcademicBenchmarks::Standards::Standard.new(raw_standard5)
   end
   let(:root_account) { Account.site_admin }
   let(:admin_user) { account_admin_user(account: root_account, active_all: true) }
@@ -159,8 +142,7 @@ describe AcademicBenchmark::Converter do
     allow(AcademicBenchmark).to receive(:config).and_return({partner_id: "instructure", partner_key: "key"})
     standards_mock = double("standards")
     allow(standards_mock).to receive(:authority_tree).and_return(
-      AcademicBenchmarks::Standards::StandardsForest.new([standard_instance, standard_instance2, standard_instance3,
-        standard_instance4, standard_instance5]).consolidate_under_root(authority_instance)
+      AcademicBenchmarks::Standards::StandardsForest.new([standard_instance, standard_instance2]).consolidate_under_root(authority_instance)
     )
     allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     @user = admin_user
@@ -202,45 +184,53 @@ describe AcademicBenchmark::Converter do
         expect(course["learning_outcomes"].count).to eql 1
         authority = course["learning_outcomes"].first
         expect(authority['type']).to eql "learning_outcome_group"
-        expect(authority['title']).to eql "National Standards"
+        expect(authority['title']).to eql "Alabama State Department of Education"
         expect(authority["outcomes"].count).to eql 1
-        document = authority["outcomes"].first
-        expect(document['type']).to eql "learning_outcome_group"
-        expect(document['title']).to eql "NETS for Students"
-        expect(document["outcomes"].count).to eql 2
-        group1 = document["outcomes"].first
-        group2 = document["outcomes"].second
+        publication = authority["outcomes"].first
+        expect(publication['type']).to eql "learning_outcome_group"
+        expect(publication['title']).to eql "Course of Study"
+        expect(publication["outcomes"].count).to eq 1
+        group1 = publication["outcomes"].first
         expect(group1['type']).to eql "learning_outcome_group"
-        expect(group1['title']).to eql "Performance Indicators (2000)"
-        expect(group2['type']).to eql "learning_outcome_group"
-        expect(group2['title']).to eql "Performance Indicators (2016)"
-        expect(group1["outcomes"].count).to eql 2
-        expect(group2["outcomes"].count).to eql 1
+        expect(group1['title']).to eql "Social Studies"
+        expect(group1["outcomes"].count).to eq 1
         group11 = group1["outcomes"].first
-        group12 = group1["outcomes"].second
         expect(group11['type']).to eql "learning_outcome_group"
-        expect(group11['title']).to eql "PreK-2"
-        expect(group12['type']).to eql "learning_outcome_group"
-        expect(group12['title']).to eql "2-4"
-        expect(group11["outcomes"].count).to eql 2
-        outcome = group11["outcomes"].first
+        expect(group11['title']).to eql "Fifth Grade - United States Studies: Beginnings to the Industrial Revolution"
+        expect(group11["outcomes"].count).to eq 1
+        group111 = group11["outcomes"].first
+        expect(group111['type']).to eql "learning_outcome_group"
+        expect(group111['title']).to eql "8 - Identify major events of the American Revolution, "
+        expect(group111["outcomes"].count).to eq 1
+        outcome = group111["outcomes"].first
         expect(outcome['type']).to eql "learning_outcome"
-        expect(outcome['title']).to eql "1"
+        expect(outcome['title']).to eql "8.5"
         expect(outcome['mastery_points']).to eql 6
         expect(outcome['points_possible']).to eql 10
         expect(outcome['ratings'].length).to eql 2
-        outcome = group11["outcomes"].second
-        expect(outcome['type']).to eql "learning_outcome"
-        expect(outcome['title']).to eql "Use input devices (e.g., mouse, keyboard, remote c"
-        group21 = group2["outcomes"].first
-        expect(group21['type']).to eql "learning_outcome_group"
-        expect(group21['title']).to eql "4-6"
-        expect(group12["outcomes"].count).to eql 1
-        group121 = group12["outcomes"].first
-        expect(group121['title']).to eql "Use input devices (e.g., mouse, keyboard, remote c"
-        expect(group121["outcomes"].count).to eql 1
-        outcome = group121["outcomes"].first
-        expect(outcome["title"]).to eql "2"
+      end
+
+      context 'different documents with the same name' do
+        # Remove parent association with standard_instance
+        # and place under a different document
+        let(:standard_instance2) do
+          dup_hash = raw_standard2.dup
+          dup_hash['relationships']['parent'] = {"data" => {}}
+          dup_hash['attributes']['document']['adopt_year'] = "2025"
+          dup_hash['attributes']['document']['guid'] = 'future_guid'
+          AcademicBenchmarks::Standards::Standard.new(dup_hash)
+        end
+
+        it 'appends adoption year' do
+          expect(course = converter.export).to be_truthy
+          expect(course["learning_outcomes"].count).to eql 1
+          authority = course["learning_outcomes"].first
+          expect(authority["outcomes"].count).to eql 1
+          publication = authority["outcomes"][0]
+          expect(publication["outcomes"].count).to eql 2
+          expect(publication["outcomes"][0]['title']).to eq 'Social Studies (2010)'
+          expect(publication["outcomes"][1]['title']).to eq 'Social Studies (2025)'
+        end
       end
     end
   end
