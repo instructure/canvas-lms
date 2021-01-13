@@ -104,6 +104,13 @@ if ! git diff --exit-code yarn.lock; then
   gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn dedupe-yarn"
+
+if ! git diff --exit-code yarn.lock; then
+  message="yarn.lock changes need to be de-duplicated. Make sure you run 'yarn dedupe-yarn'."
+  gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+
 gergich status
 echo "YARN_LOCK OK!"
 EOF
