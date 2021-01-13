@@ -827,12 +827,15 @@ class Gradebook {
   }
 
   gotChunkOfStudents(students) {
-    let isStudentView, j, len, student
     this.courseContent.assignmentStudentVisibility = {}
-    const escapeStudentContent = student2 => {
-      const unescapedName = student2.name
-      const escapedStudent = htmlEscape(student2)
+    const escapeStudentContent = student => {
+      const unescapedName = student.name
+      const unescapedSortableName = student.sortable_name
+
+      const escapedStudent = htmlEscape(student)
       escapedStudent.name = unescapedName
+      escapedStudent.sortable_name = unescapedSortableName
+
       escapedStudent?.enrollments.forEach(enrollment => {
         const gradesUrl = enrollment?.grades?.html_url
         if (gradesUrl) {
@@ -841,15 +844,14 @@ class Gradebook {
       })
       return escapedStudent
     }
-    for (j = 0, len = students.length; j < len; j++) {
-      student = students[j]
+    students.forEach(student => {
       student.enrollments = _.filter(student.enrollments, function(e) {
         return e.type === 'StudentEnrollment' || e.type === 'StudentViewEnrollment'
       })
-      isStudentView = student.enrollments[0].type === 'StudentViewEnrollment'
       student.sections = student.enrollments.map(function(e) {
         return e.course_section_id
       })
+      const isStudentView = student.enrollments[0].type === 'StudentViewEnrollment'
       if (isStudentView) {
         this.studentViewStudents[student.id] = escapeStudentContent(student)
       } else {
@@ -865,7 +867,7 @@ class Gradebook {
       })
       student.cssClass = `student_${student.id}`
       this.updateStudentRow(student)
-    }
+    })
     this.gridReady.then(() => {
       return this.setupGrading(students)
     })
