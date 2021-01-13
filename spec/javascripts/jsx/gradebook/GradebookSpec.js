@@ -4602,7 +4602,8 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       {
         id: '1101',
         name: "Adam Jone's",
-        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}]
+        enrollments: [{type: 'StudentEnrollment', grades: {html_url: 'http://example.url/'}}],
+        sortable_name: "Jone's, Adam"
       },
       {
         id: '1102',
@@ -4651,6 +4652,12 @@ QUnit.module('Gradebook Assignment Student Visibility', moduleHooks => {
       gradebook.gotChunkOfStudents(allStudents)
       const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
       strictEqual(student.name, "Adam Jone's")
+    })
+
+    test('does not escape the sortable name of the student', () => {
+      gradebook.gotChunkOfStudents(allStudents)
+      const student = gradebook.studentsThatCanSeeAssignment('2301')['1101']
+      strictEqual(student.sortable_name, "Jone's, Adam")
     })
 
     test('returns all students when the assignment is visible to everyone', () => {
