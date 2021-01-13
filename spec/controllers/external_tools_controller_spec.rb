@@ -156,18 +156,27 @@ describe ExternalToolsController do
             "client_id"
           ]
         end
-  
+
         it 'sets the "login_hint" to the current user lti id' do
           expect(assigns[:lti_launch].params['login_hint']).to eq Lti::Asset.opaque_identifier_for(@teacher)
         end
-  
+
         it 'caches the the LTI 1.3 launch' do
           expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/message_type"]).to eq "LtiResourceLinkRequest"
         end
-  
+
         it 'sets the "canvas_domain" to the request domain' do
           message_hint = JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)
           expect(message_hint['canvas_domain']).to eq 'localhost'
+        end
+      end
+
+      context "with a bad launch url" do
+        it "fails gracefully" do
+          user_session(@teacher)
+          allow(controller).to receive(:basic_lti_launch_request).and_raise(Lti::Errors::InvalidLaunchUrlError)
+          get :show, params: {:course_id => @course.id, id: tool.id}
+          expect(response).to be_redirect
         end
       end
 

@@ -490,6 +490,7 @@ class ExternalToolsController < ApplicationController
     render_unauthorized_action
     nil
   rescue Lti::Errors::UnsupportedExportTypeError,
+         Lti::Errors::InvalidLaunchUrlError,
          Lti::Errors::InvalidMediaTypeError,
          Lti::Errors::UnsupportedPlacement => e
     Canvas::Errors.capture_exception(:lti_launch, e, :info)
