@@ -146,7 +146,7 @@ module Api::V1::Submission
       hash['turnitin_data'] = turnitin_hash
     end
 
-    if attempt.vericite_data(false).present? &&
+    if @current_user && attempt.vericite_data(false).present? &&
       attempt.can_view_plagiarism_report('vericite', @current_user, session) &&
       attempt.assignment.vericite_enabled?
       vericite_hash = attempt.vericite_data(false).dup
