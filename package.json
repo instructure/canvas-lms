@@ -254,7 +254,8 @@
     "karma-sourcemap-loader": "^0.3",
     "karma-spec-reporter": "^0.0.32",
     "karma-verbose-reporter": "^0.0.6",
-    "karma-webpack": "^3",
+    "karma-webpack": "necessary until https://github.com/ryanclark/karma-webpack/pull/449 is merged",
+    "karma-webpack": "instructure/karma-webpack#patch1",
     "lint-staged": "^9",
     "merge-stream": "^2",
     "mockdate": "^2.0.2",
@@ -345,6 +346,8 @@
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
-    "graphael": "https://github.com/instructure/graphael.git"
+    "graphael": "https://github.com/instructure/graphael.git",
+    "babel-plugin-dynamic-import-node": "if we let this upgrade to recent versions, we hit https://github.com/babel/babel/issues/11607",
+    "babel-plugin-dynamic-import-node": "2.3.0"
   }
 }
