@@ -25,7 +25,7 @@
 <% @favorite_course_ids = @current_user.courses_with_primary_enrollment(:favorite_courses).map(&:id) %>
 <% @show_star_column = true %>
   <div class="header-bar">
-    <h2><%= t('headings.my_courses', %{All Courses}) %></h2>
+    <h1><%= t('headings.my_courses', %{All Courses}) %></h1>
   </div>
 
   <div class="ic-Action-header content--hasMarginTop">
