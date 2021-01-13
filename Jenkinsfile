@@ -327,6 +327,7 @@ pipeline {
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
     JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
+    LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath("linter-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
@@ -587,7 +588,8 @@ pipeline {
                   timedStage('Linters', stages, {
                     credentials.withGerritCredentials {
                       withEnv([
-                        "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+                        "PLUGINS_LIST=${configuration.plugins().join(' ')}",
+                        "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
                       ]) {
                         sh 'build/new-jenkins/linters/run-gergich.sh'
                       }

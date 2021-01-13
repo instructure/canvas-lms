@@ -46,12 +46,17 @@ RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
 RUN cp -rf config/docker-compose.override.yml.example /usr/src/app/docker-compose.override.yml
 EOF
 
+if [ "$UPLOAD_DEBUG_IMAGE" = "true" ]; then
+  docker tag local/gergich $LINTER_DEBUG_IMAGE
+  docker push $LINTER_DEBUG_IMAGE
+fi
+
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
 set -ex
 export COMPILE_ASSETS_NPM_INSTALL=0
 export JS_BUILD_NO_FALLBACK=1
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets 'rake canvas:compile_assets'"
-
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 gergich status
 echo "WEBPACK_BUILD OK!"
 EOF
@@ -85,6 +90,7 @@ fi
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/rlint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/lint_commit_message"
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 
 gergich status
 echo "LINTER OK!"
