@@ -45,12 +45,18 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
 
     gradebook.setStudentGroups([
       {
-        groups: [{id: '1', name: 'First Category 1'}, {id: '2', name: 'First Category 2'}],
+        groups: [
+          {id: '1', name: 'First Category 1'},
+          {id: '2', name: 'First Category 2'}
+        ],
         id: '1',
         name: 'First Category'
       },
       {
-        groups: [{id: '3', name: 'Second Category 1'}, {id: '4', name: 'Second Category 2'}],
+        groups: [
+          {id: '3', name: 'Second Category 1'},
+          {id: '4', name: 'Second Category 2'}
+        ],
         id: '2',
         name: 'Second Category'
       }
@@ -107,9 +113,8 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
       equal(studentGradesLink().innerHTML, student.name)
     })
 
-    test('does not escape html in the student name when displaying names as "first, last"', () => {
-      // student names have already been escaped
-      student.name = '&lt;span&gt;Adam Jones&lt;/span&gt;'
+    test('escapes HTML in the student name when displaying names as "first, last"', () => {
+      student.name = '<span>Adam Jones</span>'
       equal(studentGradesLink().innerHTML, '&lt;span&gt;Adam Jones&lt;/span&gt;')
     })
 
@@ -118,10 +123,9 @@ QUnit.module('GradebookGrid StudentCellFormatter', hooks => {
       equal(studentGradesLink().innerHTML, 'Jones, Adam')
     })
 
-    test('does not escape html in the student name when displaying names as "last, first"', () => {
-      // student names have already been escaped
+    test('escapes HTML in the student name when displaying names as "last, first"', () => {
       gradebook.setSelectedPrimaryInfo('last_first', true) // skipRedraw
-      student.sortable_name = '&lt;span&gt;Jones, Adam&lt;/span&gt;'
+      student.sortable_name = '<span>Jones, Adam</span>'
       equal(studentGradesLink().innerHTML, '&lt;span&gt;Jones, Adam&lt;/span&gt;')
     })
 
