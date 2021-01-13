@@ -35,6 +35,8 @@ module Types
   class CourseType < ApplicationObjectType
     graphql_name "Course"
 
+    implements Interfaces::AssetStringInterface
+
     alias :course :object
 
     class CourseWorkflowState < BaseEnum

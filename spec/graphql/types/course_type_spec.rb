@@ -560,4 +560,11 @@ describe Types::CourseType do
       expect(course_type.resolve("imageUrl")).to eq "http://some.cool/gif.gif"
     end
   end
+
+  describe 'AssetString' do
+    it 'returns the asset string' do
+      result = course_type.resolve('assetString')
+      expect(result).to eq @course.asset_string
+    end
+  end
 end

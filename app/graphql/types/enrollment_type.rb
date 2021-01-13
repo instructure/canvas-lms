@@ -46,6 +46,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssetStringInterface
 
     alias :enrollment :object
 

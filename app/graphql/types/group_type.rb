@@ -27,6 +27,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssetStringInterface
 
     global_id_field :id
 
