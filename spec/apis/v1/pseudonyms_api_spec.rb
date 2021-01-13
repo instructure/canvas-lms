@@ -272,6 +272,11 @@ describe PseudonymsController, type: :request do
         expect(response.code).to eql '400'
       end
 
+      it "returns 400 if no parameters" do
+        raw_api_call(:put, @path, @path_options, {})
+        expect(response.code).to eql '400'
+      end
+
       it "should return 200 if a user's sis id is updated to its current value" do
         @student.pseudonym.update_attribute(:sis_user_id, 'old-12345')
         json = api_call(:put, @path, @path_options, {
