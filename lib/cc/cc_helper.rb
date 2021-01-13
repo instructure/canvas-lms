@@ -317,9 +317,9 @@ module CCHelper
         obj = MediaObject.by_media_id(media_id).first
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          anchor['href'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+          anchor['href'] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
       end
 
@@ -329,9 +329,9 @@ module CCHelper
         obj = MediaObject.by_media_id(media_id).take
         if obj && migration_id = @key_generator.create_key(obj)
           @used_media_objects << obj
-          info = CCHelper.media_object_info(obj, nil, media_object_flavor)
+          info = CCHelper.media_object_info(obj, course: @course, flavor: media_object_flavor)
           @media_object_infos[obj.id] = info
-          iframe['src'] = File.join(WEB_CONTENT_TOKEN, MEDIA_OBJECTS_FOLDER, info[:filename])
+          iframe['src'] = File.join(WEB_CONTENT_TOKEN, info[:path])
         end
       end
 
@@ -359,7 +359,7 @@ module CCHelper
     end
   end
 
-  def self.media_object_info(obj, client = nil, flavor = nil)
+  def self.media_object_info(obj, course: nil, client: nil, flavor: nil)
     unless client
       client = CanvasKaltura::ClientV3.new
       client.startSession(CanvasKaltura::SessionType::ADMIN)
@@ -371,10 +371,17 @@ module CCHelper
     else
       asset = client.flavorAssetGetOriginalAsset(obj.media_id)
     end
-    # we use the media_id as the export filename, since it is guaranteed to
-    # be unique
-    filename = "#{obj.media_id}.#{asset[:fileExt]}" if asset
-    { :asset => asset, :filename => filename }
+    attachment = course && obj.attachment_id && course.attachments.not_deleted.find_by_id(obj.attachment_id)
+    path = if attachment
+      # if the media object is associated with a file in the course, use the file's path in the export, to avoid exporting it twice
+      attachment.full_display_path.sub(/^#{Regexp.quote(Folder::ROOT_FOLDER_NAME)}/, '')
+    else
+      # otherwise export to a file named after the media id
+      filename = obj.media_id
+      filename += ".#{asset[:fileExt]}" if asset
+      File.join(MEDIA_OBJECTS_FOLDER, filename)
+    end
+    { :asset => asset, :path => path }
   end
 
   # sub_path is the last part of a file url: /courses/1/files/1(/download)

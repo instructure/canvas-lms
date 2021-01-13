@@ -105,6 +105,32 @@ describe CC::CCHelper do
       expect(@exporter.media_object_infos[@obj.id][:asset][:id]).to eq 'one'
     end
 
+    it "links media to exported file if it exists" do
+      folder = folder_model(name: 'something', context: @course)
+      att = attachment_model(display_name: 'lolcats.mp4', context: @course, folder: folder, uploaded_data: stub_file_data('lolcats_.mp4', '...', 'video/mp4'))
+      @obj.attachment = att
+      @obj.save!
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to include %{src="%24IMS-CC-FILEBASE%24/something/lolcats.mp4"}
+    end
+
+    it "does not link media to file in another course" do
+      temp = @course
+      other_course = course_factory
+      folder = folder_model(name: 'something', context: other_course)
+      att = attachment_model(display_name: 'lolcats.mp4', context: other_course, folder: folder, uploaded_data: stub_file_data('lolcats_.mp4', '...', 'video/mp4'))
+      @obj.attachment = att
+      @obj.save!
+      @course = temp
+      @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
+      html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/abcde?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="abcde"></iframe>}
+      translated = @exporter.html_content(html)
+      expect(translated).to include %{src="%24IMS-CC-FILEBASE%24/media_objects/abcde.mp4"}
+    end
+
+
     it "ignores new RCE media iframes with an unknown media id" do
       @exporter = CC::CCHelper::HtmlContentExporter.new(@course, @user)
       html = %{<iframe style="width: 400px; height: 225px; display: inline-block;" title="this is a media comment" data-media-type="video" src="http://example.com/media_objects_iframe/deadbeef?type=video" allowfullscreen="allowfullscreen" allow="fullscreen" data-media-id="deadbeef"></iframe>}
