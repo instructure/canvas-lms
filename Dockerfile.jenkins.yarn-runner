@@ -5,4 +5,4 @@ COPY --chown=docker:docker --from=local/cache-helper-collect-yarn /tmp/dst ${APP
 RUN set -eux; \
   (DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile || DISABLE_POSTINSTALL=1 yarn install --ignore-optional --pure-lockfile --network-concurrency 1) \
   && yarn cache clean \
-  && ./script/fix_inst_esm.sh
+  && ./script/fix_inst_esm.js
