@@ -3590,14 +3590,10 @@ class Course < ActiveRecord::Base
   end
 
   def sections_hidden_on_roster_page?(current_user:)
-    if root_account.feature_enabled?('hide_course_sections_from_students')
-      course_sections.active.many? &&
-          hide_sections_on_course_users_page? &&
-          !current_user.enrollments.active.where(course: self).empty? &&
-          current_user.enrollments.active.where(course: self).all?(&:student?)
-    else
-      false
-    end
+    course_sections.active.many? &&
+      hide_sections_on_course_users_page? &&
+      !current_user.enrollments.active.where(course: self).empty? &&
+      current_user.enrollments.active.where(course: self).all?(&:student?)
   end
 
   def resolved_outcome_proficiency

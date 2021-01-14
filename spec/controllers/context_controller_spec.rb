@@ -176,7 +176,6 @@ describe ContextController do
 
     describe 'hide_sections_on_course_users_page setting is Off' do
       before :once do
-        @course.root_account.enable_feature!(:hide_course_sections_from_students)
         @student2 = student_in_course(course: @course, active_all: true).user
       end
 
@@ -263,10 +262,6 @@ describe ContextController do
       end
 
       context 'hide course sections from students feature enabled' do
-        before :once do
-          @course.root_account.enable_feature!(:hide_course_sections_from_students)
-        end
-
         it 'sets js_env with hide sections setting to true for roster_user' do
           @course.hide_sections_on_course_users_page = true
           @course.save!
