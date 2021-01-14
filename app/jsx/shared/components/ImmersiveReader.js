@@ -56,7 +56,7 @@ function handleClick({title, content}, readerSDK) {
             chunks: [{content, mimeType: 'text/html'}]
           }
           const options = {
-            cookiePolicy: CookiePolicy.Enable
+            cookiePolicy: CookiePolicy.Disable
           }
           launchAsync(token, subdomain, requestContent, options)
         })
