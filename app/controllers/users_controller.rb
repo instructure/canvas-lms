@@ -575,7 +575,7 @@ class UsersController < ApplicationController
     if CANVAS_RAILS5_2
       render :formats => 'html', :layout => false
     else
-      render format: 'html', layout: false
+      render formats: :html, layout: false
     end
   end
 

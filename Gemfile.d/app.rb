@@ -121,7 +121,7 @@ gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
 gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '2.0.2'
+gem 'switchman', '2.0.3'
   gem 'open4', '1.3.4', require: false
 gem 'switchman-inst-jobs', '3.1.1'
 gem 'twilio-ruby', '5.36.0', require: false
