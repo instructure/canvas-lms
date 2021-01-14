@@ -165,7 +165,11 @@ module InstFS
       data = {}
       data[file_name] = file_object
 
-      response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+      begin
+        response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+      rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
+        raise InstFS::ServiceError, "unable to communicate with instfs"
+      end
       if response.class == Net::HTTPCreated
         json_response = JSON.parse(response.body)
         return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")
