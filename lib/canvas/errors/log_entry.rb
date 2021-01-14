@@ -23,6 +23,9 @@ module Canvas
     # through this subsystem as a digestable stack trace in
     # canvas debug logs.  Intended to be hooked into
     # Canvas::Errors as a callback in an initializer.
+    #
+    # The exception itself, the backtrace, and any key/val submitted
+    # as accompanying data will all get logged.
     class LogEntry
       # 'exception' can also just be a string
       # which is itself a message, sometimes we assert
@@ -39,24 +42,40 @@ module Canvas
       end
 
       def message
-        msg = +""
+        msg = ""
         ActiveSupport::Deprecation.silence do
           msg << "\n\n[CANVAS_ERRORS] EXCEPTION LOG"
-          if @ex.is_a?(String)
+          if @ex.is_a?(String) || @ex.is_a?(Symbol)
             msg << "\n#{@ex}\n"
           else
-            msg << "\n#{@ex.class}"
-            msg << " (#{@ex.message}):" if @ex.respond_to?(:message)
-            msg << "\n"
-            msg << @ex.annoted_source_code.to_s if @ex.respond_to?(:annoted_source_code)
-            if @ex.respond_to?(:backtrace)
-              b_trace = @ex.backtrace&.join("\n  ")
-              msg << "  " << b_trace if b_trace
+            msg << log_entry_for_exception(@ex)
+            caused_by = @ex.try(:cause)
+            while caused_by.present?
+              msg << "\n****Caused By****\n"
+              msg << log_entry_for_exception(caused_by)
+              caused_by = caused_by.cause
             end
           end
           msg << "CONTEXT: #{@data}\n\n"
         end
         msg
+      end
+
+      def log_entry_for_exception(e)
+        entry = ""
+        entry << "\n#{e.class}"
+        begin
+          entry << " (#{e.message}):" if e.respond_to?(:message)
+        rescue StandardError => new_err
+          entry << "\n***[WARNING]: Unable to extract error message due to #{new_err}"
+        end
+        entry << "\n"
+        entry << e.annoted_source_code.to_s if e.respond_to?(:annoted_source_code)
+        if e.respond_to?(:backtrace)
+          b_trace = e.backtrace&.join("\n  ")
+          entry << "  " << b_trace if b_trace
+        end
+        entry
       end
     end
   end
