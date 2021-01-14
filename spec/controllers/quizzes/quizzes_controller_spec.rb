@@ -526,7 +526,7 @@ describe Quizzes::QuizzesController do
       @course.update_attribute :is_public, true
       course_quiz !!:active
       get 'show', params: { course_id: @course.id, id: @quiz.id, take: '1'}
-      expect(response).to be_success
+      expect(response).to be_successful
     end
 
     it "should set session[headless_quiz] if persist_headless param is sent" do

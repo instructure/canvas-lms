@@ -42,7 +42,11 @@ module PostgreSQLAdapterExtensions
     begin
       result.check
     rescue => e
-      raise translate_exception(e, "COPY FROM STDIN")
+      if CANVAS_RAILS5_2
+        raise translate_exception(e, "COPY FROM STDIN")
+      else
+        raise translate_exception(e, message: e.message, sql: "COPY FROM STDIN", binds: [])
+      end
     end
     result.cmd_tuples
   end

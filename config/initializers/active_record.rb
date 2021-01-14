@@ -1494,15 +1494,28 @@ ActiveRecord::ConnectionAdapters::SchemaStatements.class_eval do
     end
   end
 
-  def foreign_key_for(from_table, options_or_to_table = {})
-    return unless supports_foreign_keys?
-    fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
-    # prefer a FK on a column named after the table
-    unless options_or_to_table.is_a?(Hash)
-      column = foreign_key_column_for(options_or_to_table) if options_or_to_table
-      return fks.find { |fk| fk.column == column} || fks.first
+  if CANVAS_RAILS5_2
+    def foreign_key_for(from_table, options_or_to_table = {})
+      return unless supports_foreign_keys?
+      fks = foreign_keys(from_table).select { |fk| fk.defined_for? options_or_to_table }
+      # prefer a FK on a column named after the table
+      unless options_or_to_table.is_a?(Hash)
+        column = foreign_key_column_for(options_or_to_table) if options_or_to_table
+        return fks.find { |fk| fk.column == column} || fks.first
+      end
+      fks.first
     end
-    fks.first
+  else
+    def foreign_key_for(from_table, **options)
+      return unless supports_foreign_keys?
+      fks = foreign_keys(from_table).select { |fk| fk.defined_for?(options) }
+      # prefer a FK on a column named after the table
+      if options[:to_table]
+        column = foreign_key_column_for(options[:to_table])
+        return fks.find { |fk| fk.column == column } || fks.first
+      end
+      fks.first
+    end
   end
 
   def remove_foreign_key(from_table, *args)
