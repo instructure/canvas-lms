@@ -18,6 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti
+
   class LtiOutboundAdapter
     cattr_writer :consumer_instance_class
 
@@ -82,13 +83,17 @@ module Lti
       hash = @tool_launch.generate(@overrides)
       hash[:ext_lti_assignment_id] = assignment&.lti_context_id if assignment&.lti_context_id.present?
       hash[:ext_lti_student_id] = student_id if student_id
-      Lti::Security.signed_post_params(
-        hash,
-        @tool_launch.url,
-        @tool.consumer_key,
-        @tool.shared_secret,
-        disable_post_only?
-      )
+      begin
+        return Lti::Security.signed_post_params(
+          hash,
+          @tool_launch.url,
+          @tool.consumer_key,
+          @tool.shared_secret,
+          disable_post_only?
+        )
+      rescue URI::InvalidURIError
+        raise ::Lti::Errors::InvalidLaunchUrlError, "Invalid launch url: #{@tool_launch.url}"
+      end
     end
 
     def generate_post_payload_for_assignment(assignment, outcome_service_url, legacy_outcome_service_url, lti_turnitin_outcomes_placement_url)

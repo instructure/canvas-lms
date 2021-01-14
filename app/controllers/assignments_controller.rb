@@ -347,10 +347,18 @@ class AssignmentsController < ApplicationController
     # prevent masquerading users from accessing google docs
     if assignment.allow_google_docs_submission? && @real_current_user.blank?
       docs = {}
+      status_code = :ok
       begin
         docs = google_drive_connection.list_with_extension_filter(assignment.allowed_extensions)
-      rescue GoogleDrive::NoTokenError, Google::APIClient::AuthorizationError => e
+      rescue GoogleDrive::NoTokenError,
+             Google::APIClient::AuthorizationError => e
         Canvas::Errors.capture_exception(:oauth, e, :warn)
+        docs =  { errors: { base: t("Auth failure in connecting to Google Drive.") } }
+        status_code = :unauthorized
+      rescue GoogleDrive::ConnectionException => e
+        Canvas::Errors.capture_exception(:oauth, e, :warn)
+        docs =  { errors: { base: t("Unable to connect to Google Drive.") } }
+        status_code = :gateway_timeout
       rescue ArgumentError => e
         Canvas::Errors.capture_exception(:oauth, e)
       rescue => e
@@ -358,7 +366,7 @@ class AssignmentsController < ApplicationController
         raise e
       end
       respond_to do |format|
-        format.json { render json: docs.to_hash }
+        format.json { render json: docs.to_hash, status: status_code }
       end
     else
       error_object = {errors:
