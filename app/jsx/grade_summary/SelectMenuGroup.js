@@ -20,9 +20,9 @@ import PropTypes from 'prop-types'
 import React from 'react'
 
 import {Button} from '@instructure/ui-buttons'
-import {Flex} from '@instructure/ui-layout'
-import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
-import {Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import WithBreakpoints, {breakpointsShape} from '../shared/WithBreakpoints'
 
 import {showFlashError} from '../shared/FlashAlert'
@@ -89,8 +89,8 @@ class SelectMenuGroup extends React.Component {
     this.props.displayPageContent()
   }
 
-  onSelection = (state, event) => {
-    this.setState({[state]: event.target.value})
+  onSelection = (state, _event, {value}) => {
+    this.setState({[state]: value})
   }
 
   onSubmit = () => {

@@ -37,7 +37,6 @@
     "@instructure/ui-buttons": "6",
     "@instructure/ui-calendar": "6",
     "@instructure/ui-checkbox": "6",
-    "@instructure/ui-core": "^5",
     "@instructure/ui-date-input": "6",
     "@instructure/ui-decorator": "6",
     "@instructure/ui-editable": "6",

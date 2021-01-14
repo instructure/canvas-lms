@@ -18,25 +18,19 @@
 import React from 'react'
 import {mount} from 'enzyme'
 import SelectMenu from 'jsx/grade_summary/SelectMenu'
+import {
+  makeSelection,
+  selectedValue,
+  getSelectMenuOptions,
+  isSelectDisabled
+} from './SelectMenuHelpers'
 
 QUnit.module('SelectMenu', hooks => {
   let props
   let wrapper
 
   function mountComponent() {
-    return mount(<SelectMenu {...props} />)
-  }
-
-  function selectMenu() {
-    return wrapper.find('select')
-  }
-
-  function selectMenuOptions() {
-    return selectMenu().instance().options
-  }
-
-  function selectedOption() {
-    return selectMenuOptions()[selectMenu().instance().selectedIndex]
+    return mount(<SelectMenu {...props} />, {attachTo: document.getElementById('fixtures')})
   }
 
   hooks.beforeEach(() => {
@@ -64,60 +58,74 @@ QUnit.module('SelectMenu', hooks => {
 
   test('initializes showing the option with the default value', () => {
     wrapper = mountComponent()
-    strictEqual(selectedOption().innerText, 'Jane Doe')
+    strictEqual(selectedValue(wrapper), 'Jane Doe')
   })
 
   test('generates one option per item in the options prop', () => {
     wrapper = mountComponent()
-    strictEqual(selectMenuOptions().length, 3)
+
+    strictEqual(getSelectMenuOptions(wrapper).length, 3)
   })
 
   test('uses the textAttribute prop to determine the text for each option', () => {
     props.textAttribute = 'url'
     wrapper = mountComponent()
-    strictEqual(selectedOption().innerText, '/some/url/14')
+    const options = getSelectMenuOptions(wrapper)
+    options.forEach((o, i) => {
+      strictEqual(o.textContent, props.options[i].url)
+    })
   })
 
   test('textAttribute can be a number that represents the index of the text attribute', () => {
     props.defaultValue = 'due_date'
-    props.options = [['Title', 'title'], ['Due Date', 'due_date']]
+    props.options = [
+      ['Title', 'title'],
+      ['Due Date', 'due_date']
+    ]
     props.textAttribute = 0
     props.valueAttribute = 1
     wrapper = mountComponent()
-    strictEqual(selectedOption().innerText, 'Due Date')
+    const options = getSelectMenuOptions(wrapper)
+    options.forEach((o, i) => {
+      strictEqual(o.textContent, props.options[i][0])
+    })
   })
 
   test('uses the valueAttribute prop to determine the value for each option', () => {
     props.defaultValue = '/some/url/14'
     props.valueAttribute = 'url'
     wrapper = mountComponent()
-    strictEqual(selectedOption().value, '/some/url/14')
+    const options = getSelectMenuOptions(wrapper)
+    options.forEach((o, i) => {
+      strictEqual(o.getAttribute('value'), props.options[i].url)
+    })
   })
 
   test('valueAttribute can be a number that represents the index of the value attribute', () => {
     props.defaultValue = 'due_date'
-    props.options = [['Title', 'title'], ['Due Date', 'due_date']]
+    props.options = [
+      ['Title', 'title'],
+      ['Due Date', 'due_date']
+    ]
     props.textAttribute = 0
     props.valueAttribute = 1
     wrapper = mountComponent()
-    strictEqual(selectedOption().value, 'due_date')
+    const options = getSelectMenuOptions(wrapper)
+    options.forEach((o, i) => {
+      strictEqual(o.getAttribute('value'), props.options[i][1])
+    })
   })
 
   test('is disabled if passed disabled: true', () => {
     props.disabled = true
     wrapper = mountComponent()
-    strictEqual(
-      selectMenu()
-        .instance()
-        .getAttribute('aria-disabled'),
-      'true'
-    )
+    strictEqual(isSelectDisabled(wrapper), true)
   })
 
   test('calls onChange when the menu is changed', () => {
     props.onChange = sinon.stub()
     wrapper = mountComponent()
-    selectMenu().simulate('change', {target: {value: '3'}})
+    makeSelection(wrapper, undefined, '3')
     strictEqual(props.onChange.callCount, 1)
   })
 })

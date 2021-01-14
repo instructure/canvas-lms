@@ -418,8 +418,12 @@ module CustomSeleniumActions
 
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
-    select = Selenium::WebDriver::Support::Select.new(element)
-    select.select_by(select_by, option_text)
+    if element.tag_name == 'input'
+      click_INSTUI_Select_option(element, option_text, select_by)
+    else
+      select = Selenium::WebDriver::Support::Select.new(element)
+      select.select_by(select_by, option_text)
+    end
   end
 
   def INSTUI_select(elem_or_css)
@@ -427,11 +431,16 @@ module CustomSeleniumActions
   end
 
   # implementation of click_option for use with INSTU's Select
-  # (tested with the CanvasSelect wrapper, untested with a raw instui Select)
+  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
+  # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
     cselect = INSTUI_select(select)
-    cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
+    if option_list_id.blank?
+      cselect.click
+      option_list_id = cselect.attribute('aria-controls')
+    end
+    
     if select_by == :text
       fj("##{option_list_id} [role='option']:contains(#{option_text})").click
     else

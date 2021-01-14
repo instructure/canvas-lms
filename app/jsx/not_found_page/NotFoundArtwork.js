@@ -19,27 +19,28 @@
 import I18n from 'i18n!not_found_index'
 import React from 'react'
 
-import Container from '@instructure/ui-core/lib/components/Container'
-import Heading from '@instructure/ui-core/lib/components/Heading'
-import Text from '@instructure/ui-core/lib/components/Text'
+import {View} from '@instructure/ui-view'
+import {Heading} from '@instructure/ui-heading'
+import {Text} from '@instructure/ui-text'
 
 import SVGWrapper from '../shared/SVGWrapper'
 
 const NotFoundArtwork = () => (
   <div className="not_found_page_artwork">
-    <Container margin="large auto" textAlign="center" display="block">
-      <Container margin="large auto" size="small" display="block">
+    <View margin="large auto" textAlign="center" display="block">
+      {/* maxWidth="small" is being ignored in instui v6.27 */}
+      <View margin="large auto" maxWidth="30rem" display="block">
         <SVGWrapper url="/images/not_found_page/empty-planet.svg" />
-      </Container>
+      </View>
       <Heading level="h2" as="h1" margin="x-small 0 0">
         {I18n.t('Whoops... Looks like nothing is here!')}
       </Heading>
-      <Container margin="small" display="block">
+      <View margin="small" display="block">
         <Text level="h4" margin="x-small">
           {I18n.t("We couldn't find that page!")}
         </Text>
-      </Container>
-    </Container>
+      </View>
+    </View>
   </div>
 )
 
