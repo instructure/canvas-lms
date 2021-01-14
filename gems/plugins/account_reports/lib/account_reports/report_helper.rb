@@ -178,7 +178,7 @@ module AccountReports::ReportHelper
   end
 
   def check_report_key(key)
-    AccountReports.available_reports[@account_report.report_type][:parameters].keys.include? key
+    AccountReports.available_reports[@account_report.report_type].parameters.key? key
   end
 
   def report_extra_text
