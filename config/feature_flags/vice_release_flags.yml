@@ -31,14 +31,6 @@ notification_update_account_ui:
     and updated user experience
   applies_to: SiteAdmin
 
-past_announcements:
-  state: hidden
-  display_name: Show past account level announcements to users
-  description: |-
-    Show past account level announcements to users. Allows
-    a user to view announcemnts that have ended or been dismissed.
-  applies_to: RootAccount
-
 react_announcement_discussion_edit:
   state: hidden
   display_name: Update announcement/discussion edit page to use react/instui

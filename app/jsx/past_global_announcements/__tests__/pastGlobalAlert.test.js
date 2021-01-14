@@ -22,10 +22,6 @@ import {render} from '@testing-library/react'
 import React from 'react'
 
 describe('render past global announcement alert', () => {
-  beforeAll(() => {
-    window.ENV.PAST_ANNOUNCEMENTS_ENABLED = true
-  })
-
   it('renders alert with message', async () => {
     const {findByTestId} = render(<PastGlobalAlert />)
     const event = new Event('globalAlertShouldRender')

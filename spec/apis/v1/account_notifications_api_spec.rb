@@ -69,14 +69,12 @@ describe 'Account Notification API', type: :request do
 
     it "should include dismissed past announcements" do
       @user.close_announcement(second_announcement)
-      @account.enable_feature!(:past_announcements)
       json = api_call(:get, @path, @api_params.merge(include_past: true),)
       expect(json.length).to eq 2
     end
 
     it "should not include dismissed past announcements by default" do
       @user.close_announcement(second_announcement)
-      @account.enable_feature!(:past_announcements)
       json = api_call(:get, @path, @api_params,)
       expect(json.length).to eq 1
     end
