@@ -704,12 +704,16 @@
 
   /* MAKE INSTUI ICONS THE SAME SIZE AS THE DEFAULT TINYMCE ONES */
   /* this is because instUI icons don't have a "height" attribute like tinymce ones do, so this will make them consistent */
-  .tox .tox-icon svg:not([height]) {
+  .tox .tox-icon svg:not([height]),
+  .tox .tox-collection__item-icon svg:not([height]) {
     height: 16px;
   }
-  /* this is for instUI icons that that dropdown from a SplitButton like in our advlist plugin */
-  .tox .tox-collection__item-icon svg:not([height]) {
+
+  /* the default icon size for tinymce's large toolbar groups is 24px, so since we shrink all icons to 16px, we also need
+     to shrink the padding around these large groups */
+  .tox .tox-collection--toolbar-lg .tox-collection__item-icon {
     height: 30px;
+    width: 30px;
   }
 
   .tox-selectfield__icon-js svg {
