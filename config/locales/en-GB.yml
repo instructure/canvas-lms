@@ -1854,6 +1854,7 @@ en-GB:
   add_quiz_ip_filter_c7b37dc5: "Add quiz IP filter"
   add_rating_89d7fbde: "Add rating"
   add_recipient_ff135ed7: "Add recipient"
+  add_remove_in_courses_fa1c9081: "Add / Remove in courses"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Add, remove or rearrange sections for this portfolio"
   add_review_2fb1590c: "Add review"
   add_role_3dc4d273: "Add role"
@@ -1869,6 +1870,7 @@ en-GB:
   add_subtitle_9f660cc: "Add Subtitle"
   add_tas_to_courses_27741f81: "Add TAs to courses"
   add_tas_to_the_course_2aac6e02: "Add TAs to the course"
+  add_teachers_to_courses_48ac7a7a: "Add Teachers to courses"
   add_theme_32fa3d50: "Add theme"
   add_to_course_481a51c4: "Add to course..."
   add_to_rce_toolbar_e5b3e3b4: "Add to RCE toolbar"
@@ -2482,6 +2484,7 @@ en-GB:
   an_error_occured_please_try_again_e59b65b: "An error occurred. Please try again."
   an_error_occured_saving_the_assignment_d71cb3d2: "An error occurred saving the assignment"
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "An error occurred trying to generate this theme; please try again."
+  an_error_occured_updating_the_flag_7df5de0a: "An error occurred updating the flag"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "An error occured while deleting the grading period set"
   an_error_occured_while_deleting_the_grading_period_c8343484: "An error occured while deleting the grading period"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "An error occured while fetching enrolment terms."
@@ -2513,10 +2516,14 @@ en-GB:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "An error occurred while attempting to contact Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "An error occurred while checking the migration status"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "An error occurred while deleting announcements."
+  an_error_occurred_while_loading_account_outcomes_8f337857: "An error occurred while loading account outcomes."
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "An error occurred while loading account outcomes: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "An error occurred while loading account proficiency ratings: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "An error occurred while loading account proficiency ratings"
   an_error_occurred_while_loading_associations_9699b3ee: "An error occurred while loading associations"
   an_error_occurred_while_loading_changes_9851b56f: "An error occurred while loading changes"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: "An error occurred while loading course outcomes."
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "An error occurred while loading course outcomes: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "An error occurred while loading courses"
   an_error_occurred_while_loading_late_policies_c415f676: "An error occurred while loading late policies"
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "An error occurred while loading the mastery calculation: %{error}"
@@ -2854,6 +2861,7 @@ en-GB:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Are you sure you want to do this? It cannot be undone and will override existing grades in the gradebook."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Are you sure you want to inactivate this user? User will be unable to participate in the course while inactive."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Are you sure you want to post grades for this assignment to students?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Are you sure you want to proceed? Changes you made will not be saved."
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Are you certain you want to remove this marking period?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Are you sure you want to remove this item?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Are you sure you want to remove this tool?"
@@ -3846,6 +3854,7 @@ en-GB:
   australia_e8d44bf8: Australia
   austria_43_7bc58b34: "Austria (+43)"
   austria_82178475: Austria
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Auth failure in connecting to Google Drive."
   auth_logging: 
     corrupted: "Details not available"
     login: LOGIN
@@ -4068,6 +4077,7 @@ en-GB:
   belgium_ef8739b6: Belgium
   below_mastery_abd1dca5: "Below Mastery"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Below this search field is a list of %{content_type}. As you type, the list will be filtered to match your query. Conversation messages will be filtered by whichever option you select."
+  beta_cb5f307e: Beta
   beta_url_3c7b88ec: "Beta URL:"
   better_file_browsing_description: |-
       A new, simpler, more user friendly file browsing interface.  If you turn this on at the course level,
@@ -6707,6 +6717,7 @@ en-GB:
   course_cards_6029a05c: "Course cards"
   course_catalog_4cc7c8ce: "Course Catalog"
   course_collaborations_dadb327e: "Course collaborations"
+  course_concluded_unable_to_send_messages_b99b6b6d: "Course concluded, unable to send messages"
   course_conferences_3d914c96: "Course conferences"
   course_content_a92eca20: "Course Content"
   course_content_add_edit_delete_ea877eca: "Course content - add / edit / delete"
@@ -6904,6 +6915,7 @@ en-GB:
     sis_id_taken: "SIS ID \"%{sis_id}\" is already in use"
   course_section_7a988066: "Course section"
   course_section_name_ea880ed1: "Course section %{name}"
+  course_sections: "Course sections"
   course_sections_add_c6b5dc1: "Course Sections - add"
   course_sections_add_edit_delete_c4f4ac19: "Course sections - add / edit / delete"
   course_sections_delete_e75e3eeb: "Course Sections - delete"
@@ -8297,8 +8309,10 @@ en-GB:
   disabled_by_default_7d822dcb: "Disabled by Default"
   disabled_in_course_settings_d15ee35d: "* Disabled in course settings"
   disabled_links_b3bdea99: "Disabled links"
+  disabled_locked_dab351d6: "Disabled (locked)"
   disabled_not_visible_to_students_2c9d693f: "Disabled. Not visible to students."
   disabled_not_visible_to_students_48d4a90d: "Disabled. Not visible to students"
+  disabled_unlocked_1588a6d1: "Disabled (unlocked)"
   disables_push_notifications_for_certain_types_3f57cde4: "Disables Push notifications for certain types."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Disables SMS notifications for all types except announcements and
@@ -9129,6 +9143,8 @@ en-GB:
   enabled_ba7cab66: Enabled
   enabled_by_default_e530d6ed: "Enabled by Default"
   enabled_links_be110215: "Enabled Links"
+  enabled_locked_3cf7c256: "Enabled (locked)"
+  enabled_unlocked_8d3a5df7: "Enabled (unlocked)"
   enabled_web_services_f620b2be: "Enabled web services"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Enables display of plagiarism reports and similarity scores in the New Gradebook submission tray."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Enables new API endpoints for the course and user data provided by New Analytics."
@@ -9214,6 +9230,10 @@ en-GB:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Enrolments may be added by your institution student information system (SIS). If an enrolment is created via SIS, only admins can remove the enrolment from the course.
               To view the list of users in the course, Users - view list must be enabled. To view SIS IDs, SIS Data - read must be enabled. To add a user to a course via SIS ID, SIS Data - manage must also be enabled. To edit a teacher or TA's section, Conversations - send messages to individual course members must also be enabled. To link an observer to a student, Conversations - send messages to individual course members must also be enabled.
+  enrollments_observers: Observers
+  enrollments_students: Students
+  enrollments_tas: "Teaching assistants"
+  enrollments_teachers: Teachers
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Ensures that outcomes that have already been imported into a course are not duplicated if they are imported again"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Ensures that users without the Import Outcomes permission cannot see the button within the Outcomes tab"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Enter a hex code here to use a custom colour."
@@ -12152,7 +12172,9 @@ en-GB:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       If RCE Enhancements are also enabled,
       the RCE will auto-save your work as you go
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "If set, the grade calculator will ignore unposted anonymous assignments when calculating totals."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "If set, the Gradebook CSV exporter will append the title of the selected grading period to column headers whose values vary based on grading period."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "If set, the Gradebook will chunk out loading of assignments, loading those for the selected grading period first."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "If set, turns off post-to-SIS functionality for assignments when their grading period closes. Only applies if the \"Enable new SIS integration settings\" feature is enabled."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "If Statistics - view or Users - manage login details is enabled, the user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin tools, both of these permissions need to be disabled."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "If Statistics - view or Users - manage login details is enabled, a user will be able to generate login/logout activity in Admin Tools. To hide the login/logout activity option in Admin tools, both of these permissions need to be disabled."
@@ -12219,6 +12241,7 @@ en-GB:
   ignore_name_55edc6fe: "Ignore %{name}"
   ignore_these_3940f6f5: "Ignore these"
   ignore_this_assignment_b7a71f80: "Ignore this assignment"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Ignore Unposted Anonymous Assignments in Grade Calculation"
   ignore_until_new_mark_77eb512: "Ignore until New Mark"
   ignore_until_new_mark_935e00a2: "Ignore until new mark"
   ignore_until_new_submission_87f32b4: "Ignore until new submission"
@@ -12336,6 +12359,7 @@ en-GB:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Include this assignment's grades when syncing to your school's Student Information System"
   include_unpublished_assignments_83ebbaec: "Include Unpublished Assignments"
   include_unpublished_courses_7a0e7aab: "Include unpublished courses"
+  included_messages_not_for_this_conversation_986a60bf: "included_messages not for this conversation"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Includes a link to SpeedGrader in the assignment header menu in Gradebook."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Includes grade values in the admin grade reports."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Includes Outcomes Service alignments when exporting and importing course content"
@@ -12356,6 +12380,9 @@ en-GB:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Indicates the image is for decorative purposes only and should not be read by screen readers"
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Individual Assignment Grade Posting"
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Individual outcome calculation values cannot be modified."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Individual outcome mastery points cannot be modified."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Individual outcome ratings cannot be modified."
   individual_view_81c2f124: "Individual view"
   individual_view_d60b9132: "Individual view…"
   indonesia_62_4c35bd62: "Indonesia (+62)"
@@ -12558,10 +12585,12 @@ en-GB:
   invalid_grade_passback_setting_a1d209d1: "Invalid grade_passback_setting"
   invalid_hexcode_9124519f: "Invalid hexcode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Invalid hexcode. Enter a valid hexcode here to use a custom colour."
+  invalid_or_missing_session_for_oauth_3ce4b605: "Invalid or missing session for oauth"
   invalid_points_8e929c3f: "Invalid points"
   invalid_points_for_rating_tier_index_i_400d307e: "Invalid points for rating tier %{index}: \"%{i}\""
   invalid_points_possible: "The value of possible points for this assignment must be zero or greater."
   invalid_recipient_name_56b22b86: "Invalid recipient name."
+  invalid_recipients_5fd7c594: "Invalid recipients"
   invalid_redirect_url_6444a1b0: "Invalid redirect URL"
   invalid_restrictions_316cd740: "Invalid restrictions"
   invalid_score_3d247da7: "Invalid score"
@@ -13050,6 +13079,7 @@ en-GB:
   load_bank: 
     error_loading_banks: "Error loading banks"
     loading_banks: "Loading banks..."
+  load_gradebook_assignments_by_grading_period_919dfd3c: "Load Gradebook Assignments by Grading Period"
   load_more_9ca37ccc: "Load more..."
   load_more_a36f9cf9: "Load more"
   load_more_comments_dc00ac34: "Load More Comments"
@@ -16005,6 +16035,7 @@ en-GB:
   no_content_has_been_shared_with_you_667fde6c: "No content has been shared with you."
   no_content_not_visible_to_students_905f8996: "No content. Not visible to students."
   no_content_not_visible_to_students_b59f4867: "No content. Not visible to students"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "No context found for the following context code: %{context_code}"
   no_courses_favorited_4e69fd63: "No courses favourited"
   no_courses_found_12d68a74: "No courses found"
   no_courses_to_display_700f94c4: "No courses to display"
@@ -16916,6 +16947,8 @@ en-GB:
   override_3de65b2c: Override
   override_grade_385adf30: "override grade"
   override_score_53994655: "override score"
+  override_score_5f3c1189: "Override Score"
+  override_score_gradingperiod_286ac51b: "Override Score (%{gradingPeriod})"
   overrides: 
     blank_override: "You must have a student or section selected"
     everyone: Everyone
@@ -19925,6 +19958,7 @@ en-GB:
       one: "1 section"
       other: "%{count} sections"
   recipients_a69b5e55: "Recipients:"
+  recipients_restricted_by_role_22c4c843: "Recipients restricted by role"
   record_7c9448b: Record
   record_an_audio_or_video_comment_88425add: "Record an audio or video comment"
   record_audio_14666880: "Record audio"
@@ -20063,6 +20097,7 @@ en-GB:
   remove_studentname_16ba8c3a: "Remove %{studentName}"
   remove_submission_draft_f5c7f58b: "Remove submission draft"
   remove_tas_from_courses_13ade851: "Remove TAs from courses"
+  remove_teachers_from_courses_353d5217: "Remove Teachers from courses"
   remove_text_8e485c41: "Remove %{text}"
   remove_these_dates_48453a81: "Remove these dates"
   remove_this_item_from_the_module_4b2ceab7: "Remove this item from the module"
@@ -20654,7 +20689,7 @@ en-GB:
       titles: 
         all_courses: "All courses"
     all_courses_inner: 
-      join_course: "Join this course"
+      join_course: "Join this Course"
       next: Next
       previous: Previous
     course_sections: "Course sections"
@@ -22015,6 +22050,7 @@ en-GB:
     users: 
       user_search_label: "User search"
       users_matching_label: "Users matching"
+  site_admin_d0417171: "Site admin"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Site admin only. Send to 1 / %{denominator} users in enabled accounts each month."
   size_b30e1077: Size
   size_f1873a2: ", size: "
@@ -22304,6 +22340,7 @@ en-GB:
   student_extensions_d35a907: "Student extensions"
   student_grades_4cbc59a1: "Student grades"
   student_group_filter_185fb085: "Student Group Filter"
+  student_groups: "Student Groups"
   student_groups_863201c1: "Student Groups"
   student_groups_desc: |-
       This enables the new student group page for an account. The new page was build to provide a more dynamic group signup
@@ -22511,10 +22548,13 @@ en-GB:
     errors: 
       assignment_submit_fail: "Assignment failed to submit"
       can_not_submit_locked_assignment: "You can't submit an assignment when it is locked"
+      googld_drive_timeout: "Timed out while talking to Google Drive"
+      google_drive_workflow: "Google Drive entry was unable to be downloaded"
       invalid_file_type: "Invalid file type"
       invalid_google_docs_domain: "You cannot submit assignments from this google_docs domain"
       media_file_attached: "There was no media recording in the submission"
       no_attached_file: "You must attach at least one file to this assignment"
+      no_attachment_found: "Could not find an attachment to send to google drive"
       no_report: "Couldn't find a report for that submission item"
       student_not_enrolled: "The specified user is not a student in this course"
       student_not_enrolled_id: "The specified user (%{id}) is not a student in this course"
@@ -23993,6 +24033,8 @@ en-GB:
   tolerance_value_9e96573c: "Tolerance value"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Too many failed log-in attempts. Please try again later or contact your system administrator."
   too_many_members_b8b15069: "Too many members"
+  too_many_participants_for_group_conversation_1743cd8: "Too many participants for group conversation"
+  too_many_recipients_for_group_conversation_906a4b69: "Too many recipients for group conversation"
   tool_configuration_63cd43b0: "Tool configuration"
   tool_content_2924d18f: "Tool content"
   tool_content_e699e813: "Tool content"
@@ -24136,6 +24178,7 @@ en-GB:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Unable to access specific student. Go to assignment in SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Unable to align some outcomes to a page"
   unable_to_align_some_outcomes_to_title_53467231: "Unable to align some outcomes to \"%{title}\""
+  unable_to_connect_to_google_drive_34886e7a: "Unable to connect to Google Drive."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Unable to curve grades because this assignment is due in a closed grading period for at least one student"
   unable_to_delete_assignment_abcf8d62: "Unable to delete assignment"
   unable_to_dismiss_update_df1e32eb: "Unable to dismiss update"
@@ -24147,6 +24190,7 @@ en-GB:
   unable_to_read_file_2d04b0c: "Unable to read file"
   unable_to_remove_app_4293cb53: "Unable to remove app"
   unable_to_save_new_discussion_topic_99239f3f: "unable to save new discussion topic"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Unable to send messages to users in %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Unable to set default grade because this assignment is due in a closed grading period for at least one student"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Unable to set up drag and drop for modules"
   unable_to_toggle_placement_833db6ff: "Unable to toggle placement"
@@ -24157,6 +24201,7 @@ en-GB:
   unauthorized: unauthorised
   unauthorized_message: "JWT signature invalid"
   unauthorized_to_delete_this_file_a1271224: "Unauthorised to delete this file"
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Unauthorised, unable to add messages to conversation"
   unavailable_46d2c344: Unavailable
   unavailable_c04e4c93: unavailable
   unbookmark_bank_70569249: "Remove bookmark %{bank}"
@@ -24937,14 +24982,18 @@ en-GB:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Users can access and create (but not edit) individual assignment rubrics through Assignments when Assignments and Quizzes - add / edit / delete is enabled."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Users can access the Manage question banks link on the Quizzes index page when Course content - view and Assignments and quizzes - add / edit / delete are enabled."
   users_d1b60cb0: Users
+  users_designers_22195c6f: "Users - Designers"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Users - generate observer pairing codes for students"
   users_generate_observer_pairing_codes_for_students_6975caad: "Users - generate observer pairing codes for students"
   users_manage_log_in_details_b944568b: "Users - manage login details"
   users_manage_login_details_9462b30f: "Users - manage login details"
   users_matching_search_term_c604db9e: "Users matching '%{search_term}'"
   users_moderate_content_36d6eed7: "Users - moderate content"
+  users_observers_e0e66c52: "Users - Observers"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Users of screen readers might need to turn off the virtual cursor in order to use these keyboard shortcuts"
   users_over_time_9a2ee74a: "users over time"
+  users_tas_27117894: "Users - TAs"
+  users_teachers_a5d5d1af: "Users - Teachers"
   users_view_list_861c7a3f: "Users - view list"
   users_view_login_ids_a2e6a85: "Users - view login IDs"
   users_view_primary_email_address_14f4978f: "Users - view primary email address"
@@ -25468,6 +25517,9 @@ en-GB:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "You cannot delete a sub-account that has courses in it."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "You can't delete a sub-account that has sub-accounts in it."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "You can't delete %{account_name} because it has courses in it"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric. Any associated outcome criteria will use the course mastery scale. Continue anyway?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric. Any associated outcome criteria will use the account mastery scale. Continue anyway?"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "You can't edit this rubric, either because you don't have permission or it's being used in more than one place. Any changes you make will result in a new rubric based on the old rubric. Continue anyway?"
   you_can_try_to_log_in_again_2b23ef0f: "You may try to *log in again*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "You can update some of this user's information, but s/he can change it back if s/he chooses."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "You can use a single 16x16, 32x32, 48x48 ico file."
