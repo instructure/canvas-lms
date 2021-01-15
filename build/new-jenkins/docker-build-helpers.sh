@@ -2,8 +2,6 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
-export CACHE_VERSION="2020-12-15.1"
-
 echo "" > tmp/docker-build.log
 
 function add_log {
@@ -11,9 +9,17 @@ function add_log {
 }
 
 function compute_tags {
-  local -n tags=$1; shift
+  local tags=$1; shift
   local cachePrefix=$1; shift
   local cacheId=$(echo "$@" | md5sum | cut -d' ' -f1)
+
+  compute_tags_from_hash $tags $cachePrefix $cacheId
+}
+
+function compute_tags_from_hash {
+  local -n tags=$1; shift
+  local cachePrefix=$1; shift
+  local cacheId=$1; shift
   local cacheSalt=$(echo "$CACHE_VERSION" | md5sum | cut -c1-8)
 
   [ ! -z "${CACHE_LOAD_SCOPE-}" ] && tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
