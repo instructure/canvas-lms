@@ -69,33 +69,37 @@ describe('with mock api', () => {
   describe('initializePlanner', () => {
     it('cannot be called twice', () => {
       initializePlanner(defaultPlannerOptions())
-      expect(() => initializePlanner(defaultPlannerOptions())).toThrow()
+      return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
     })
 
-    it('requires flash methods', () => {
-      ;['flashError', 'flashMessage', 'srFlashMessage'].forEach(flash => {
-        const options = defaultPlannerOptions()
-        options[flash] = null
-        expect(() => initializePlanner(options)).toThrow()
-      })
+    it('requires flash methods', async () => {
+      ;(
+        await Promise.allSettled(
+          ['flashError', 'flashMessage', 'srFlashMessage'].map(flash => {
+            const options = defaultPlannerOptions()
+            options[flash] = null
+            return initializePlanner(options)
+          })
+        )
+      ).forEach(({status}) => expect(status).toBe('rejected'))
     })
 
     it('requires convertApiUserContent', () => {
       const options = defaultPlannerOptions()
       options.convertApiUserContent = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires timezone', () => {
       const options = defaultPlannerOptions()
       options.env.TIMEZONE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires locale', () => {
       const options = defaultPlannerOptions()
       options.env.MOMENT_LOCALE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
   })
 

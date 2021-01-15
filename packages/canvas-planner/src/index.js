@@ -140,52 +140,57 @@ function initializeCourseAndGroupColors(options) {
 // forCourse,                   <optional - course id if this is a sidebar for a specific course page>
 let initializedOptions = null
 export function initializePlanner(options) {
-  if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
+  return new Promise(resolve => {
+    if (initializedOptions) throw new Error('initializePlanner may not be called more than once')
 
-  options = mergeDefaultOptions(options)
+    options = mergeDefaultOptions(options)
 
-  if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
-    throw new Error('env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner')
-  }
+    if (!(options.env.MOMENT_LOCALE && options.env.TIMEZONE)) {
+      throw new Error(
+        'env.MOMENT_LOCALE and env.TIMEZONE are required options for initializePlanner'
+      )
+    }
 
-  const {flashError, flashMessage, srFlashMessage} = options
-  if (!(flashError && flashMessage && srFlashMessage)) {
-    throw new Error('flash message callbacks are required options for initializePlanner')
-  }
+    const {flashError, flashMessage, srFlashMessage} = options
+    if (!(flashError && flashMessage && srFlashMessage)) {
+      throw new Error('flash message callbacks are required options for initializePlanner')
+    }
 
-  if (!options.convertApiUserContent) {
-    throw new Error('convertApiUserContent is a required option for initializePlanner')
-  }
+    if (!options.convertApiUserContent) {
+      throw new Error('convertApiUserContent is a required option for initializePlanner')
+    }
 
-  externalPlannerActive = () => options.getActiveApp() === 'planner'
+    externalPlannerActive = () => options.getActiveApp() === 'planner'
 
-  i18n.init(options.env.MOMENT_LOCALE)
-  moment.locale(options.env.MOMENT_LOCALE)
-  moment.tz.setDefault(options.env.TIMEZONE)
-  initializeAlerts({
-    visualSuccessCallback: flashMessage,
-    visualErrorCallback: flashError,
-    srAlertCallback: srFlashMessage
+    i18n.init(options.env.MOMENT_LOCALE)
+    moment.locale(options.env.MOMENT_LOCALE)
+    moment.tz.setDefault(options.env.TIMEZONE)
+    initializeAlerts({
+      visualSuccessCallback: flashMessage,
+      visualErrorCallback: flashError,
+      srAlertCallback: srFlashMessage
+    })
+    initializeContent(options)
+    initializeDateTimeFormatters(options.dateTimeFormatters)
+
+    options.plannerNewActivityButtonId = plannerNewActivityButtonId
+    dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
+
+    if (options.externalFallbackFocusable) {
+      dynamicUiManager.registerAnimatable(
+        'item',
+        externalFocusableWrapper(options.externalFallbackFocusable),
+        -1,
+        [specialFallbackFocusId('item')]
+      )
+    }
+
+    initializeCourseAndGroupColors(options)
+
+    initializedOptions = options
+    store.dispatch(initialOptions(options))
+    resolve(initializedOptions)
   })
-  initializeContent(options)
-  initializeDateTimeFormatters(options.dateTimeFormatters)
-
-  options.plannerNewActivityButtonId = plannerNewActivityButtonId
-  dynamicUiManager.setOffsetElementIds(plannerHeaderId, plannerNewActivityButtonId)
-
-  if (options.externalFallbackFocusable) {
-    dynamicUiManager.registerAnimatable(
-      'item',
-      externalFocusableWrapper(options.externalFallbackFocusable),
-      -1,
-      [specialFallbackFocusId('item')]
-    )
-  }
-
-  initializeCourseAndGroupColors(options)
-
-  initializedOptions = options
-  store.dispatch(initialOptions(options))
 }
 
 export function resetPlanner() {
@@ -193,17 +198,19 @@ export function resetPlanner() {
 }
 
 function loading() {
-  return <Spinner size="small" />
+  return <Spinner renderTitle="Loading..." size="small" />
 }
 
-function render(element) {
+export function createPlannerApp() {
   registerScrollEvents({
     scrollIntoPast: handleScrollIntoPastAttempt,
     scrollIntoFuture: handleScrollIntoFutureAttempt,
     scrollPositionChange: pos => dynamicUiManager.handleScrollPositionChange(pos)
   })
 
-  ReactDOM.render(
+  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+
+  return (
     <DynamicUiProvider manager={dynamicUiManager}>
       <Provider store={store}>
         <Suspense fallback={loading()}>
@@ -216,11 +223,12 @@ function render(element) {
           />
         </Suspense>
       </Provider>
-    </DynamicUiProvider>,
-    element
+    </DynamicUiProvider>
   )
+}
 
-  store.dispatch(getPlannerItems(moment.tz(initializedOptions.env.timeZone).startOf('day')))
+function renderApp(element) {
+  ReactDOM.render(createPlannerApp(), element)
 }
 
 // This method allows you to render the header items into a separate DOM node
@@ -279,7 +287,7 @@ export function loadPlannerDashboard() {
   const headerAuxElement = document.getElementById('dashboard-planner-header-aux')
 
   if (element) {
-    render(element)
+    renderApp(element)
   }
 
   if (headerElement) {

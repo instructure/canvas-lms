@@ -2407,6 +2407,55 @@ describe UsersController do
         end
       end
     end
+
+    context "with canvas for elementary feature flag" do
+      before(:once) do
+        @account = Account.default
+      end
+
+      context "disabled" do
+        it "sets ENV.K5_MODE to false" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_env][:K5_MODE]).to be_falsy
+        end
+
+        it "only returns classic dashboard bundles" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+        end
+      end
+
+      context "enabled" do
+        before(:once) do
+          @account.enable_feature!(:canvas_for_elementary)
+        end
+
+        it "sets ENV.K5_MODE to true when canvas_for_elementary flag is enabled" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_env][:K5_MODE]).to be_truthy
+        end
+
+        it "returns K-5 dashboard bundles" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :dashboard
+        end
+      end
+
+    end
   end
 
   describe "#pandata_events_token" do

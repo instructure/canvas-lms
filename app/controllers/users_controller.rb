@@ -474,6 +474,7 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
+    @k5_mode = @context.account.feature_enabled?(:canvas_for_elementary)
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -482,6 +483,7 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
+      :K5_MODE => @k5_mode,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],
@@ -499,8 +501,14 @@ class UsersController < ApplicationController
       content_for_head helpers.auto_discovery_link_tag(:atom, feeds_user_format_path(@current_user.feed_code, :atom), {:title => t('user_atom_feed', "User Atom Feed (All Courses)")})
     end
 
-    css_bundle :dashboard
-    js_bundle :dashboard
+    if @k5_mode
+      css_bundle :k5_dashboard
+      css_bundle :dashboard_card
+      js_bundle :k5_dashboard
+    else
+      css_bundle :dashboard
+      js_bundle :dashboard
+    end
     add_body_class "dashboard-is-planner" if show_planner?
   end
 

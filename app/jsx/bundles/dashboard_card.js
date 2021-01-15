@@ -24,25 +24,28 @@ import {asJson, getPrefetchedXHR} from '@instructure/js-utils'
 
 let promiseToGetDashboardCards
 
-export default function loadCardDashboard() {
+export function createDashboardCards(dashboardCards) {
   const Box = getDroppableDashboardCardBox()
-  const dashboardContainer = document.getElementById('DashboardCard_Container')
 
   // Decide which dashboard to show based on role
   const current_roles = window.ENV.current_user_roles || []
   const isTeacher = current_roles.includes('teacher')
 
-  function render(dashboardCards) {
-    ReactDOM.render(
-      <Box
-        showSplitDashboardView={window.ENV?.FEATURES?.unpublished_courses && isTeacher}
-        courseCards={dashboardCards}
-        hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
-      />,
-      dashboardContainer
-    )
-  }
+  return (
+    <Box
+      showSplitDashboardView={window.ENV?.FEATURES?.unpublished_courses && isTeacher}
+      courseCards={dashboardCards}
+      hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
+    />
+  )
+}
 
+function renderIntoDOM(dashboardCards) {
+  const dashboardContainer = document.getElementById('DashboardCard_Container')
+  ReactDOM.render(createDashboardCards(dashboardCards), dashboardContainer)
+}
+
+export default function loadCardDashboard(renderFn = renderIntoDOM) {
   if (!promiseToGetDashboardCards) {
     let xhrHasReturned = false
     let sessionStorageTimeout
@@ -67,8 +70,8 @@ export default function loadCardDashboard() {
     Promise.race([promiseToGetDashboardCards, promiseToGetCardsFromSessionStorage]).then(
       dashboardCards => {
         clearTimeout(sessionStorageTimeout)
-        render(dashboardCards)
-        if (!xhrHasReturned) promiseToGetDashboardCards.then(render)
+        renderFn(dashboardCards)
+        if (!xhrHasReturned) promiseToGetDashboardCards.then(renderFn)
       }
     )
 
@@ -78,6 +81,6 @@ export default function loadCardDashboard() {
       sessionStorage.setItem(sessionStorageKey, JSON.stringify(dashboardCards))
     )
   } else {
-    promiseToGetDashboardCards.then(render)
+    promiseToGetDashboardCards.then(renderFn)
   }
 }

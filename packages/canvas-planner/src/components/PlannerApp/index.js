@@ -112,7 +112,7 @@ export class PlannerApp extends Component {
 
   componentWillUnmount() {
     this.props.appRef(null)
-    window.removeEventListenet('resize', this.onResize, false)
+    window.removeEventListener('resize', this.onResize, false)
   }
 
   fixedElementForItemScrolling() {

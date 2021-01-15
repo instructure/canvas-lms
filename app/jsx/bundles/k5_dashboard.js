@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016 - present Instructure, Inc.
+ * Copyright (C) 2020 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,23 +15,24 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react'
+import ReactDOM from 'react-dom'
+import K5Dashboard from '../dashboard/K5Dashboard'
+import k5Theme from '../dashboard/k5-theme'
+import ready from '@instructure/ready'
 
-import {DropTarget} from 'react-dnd'
-import compose from '../shared/helpers/compose'
-import ItemTypes from './Types'
-import DashboardCardBox from './DashboardCardBox'
-import DefaultDragDropContext from './DefaultDragDropContext'
+k5Theme.use()
 
-const cardTarget = {
-  drop() {}
-}
-
-const getDroppableDashboardCardBox = (withDragDropContext = DefaultDragDropContext) =>
-  compose(
-    withDragDropContext,
-    DropTarget(ItemTypes.CARD, cardTarget, connect => ({
-      connectDropTarget: connect.dropTarget()
-    }))
-  )(DashboardCardBox)
-
-export default getDroppableDashboardCardBox
+ready(() => {
+  const dashboardContainer = document.getElementById('dashboard-app-container')
+  if (dashboardContainer) {
+    ReactDOM.render(
+      <K5Dashboard
+        currentUser={ENV.current_user}
+        plannerEnabled={ENV.STUDENT_PLANNER_ENABLED}
+        env={window.ENV}
+      />,
+      dashboardContainer
+    )
+  }
+})

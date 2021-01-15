@@ -33,7 +33,7 @@ import theme from './theme'
 
 class PlannerEmptyState extends Component {
   static propTypes = {
-    changeDashboardView: func.isRequired,
+    changeDashboardView: func,
     onAddToDo: func.isRequired,
     isCompletelyEmpty: bool,
     responsiveSize: string
@@ -74,10 +74,15 @@ class PlannerEmptyState extends Component {
           <div className={styles.subtitle}>
             {formatMessage("Looks like there isn't anything here")}
           </div>
-          <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
-            {formatMessage('Go to Card View Dashboard')}
-          </Link>
-          |{this.renderAddToDoButton()}
+          {this.props.changeDashboardView && (
+            <>
+              <Link id="PlannerEmptyState_CardView" onClick={this.handleDashboardCardLinkClick}>
+                {formatMessage('Go to Card View Dashboard')}
+              </Link>
+              |
+            </>
+          )}
+          {this.renderAddToDoButton()}
         </div>
       </div>
     )

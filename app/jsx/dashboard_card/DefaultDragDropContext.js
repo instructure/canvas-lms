@@ -16,22 +16,12 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DropTarget} from 'react-dnd'
-import compose from '../shared/helpers/compose'
-import ItemTypes from './Types'
-import DashboardCardBox from './DashboardCardBox'
-import DefaultDragDropContext from './DefaultDragDropContext'
+import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
+import {DragDropContext} from 'react-dnd'
 
-const cardTarget = {
-  drop() {}
-}
-
-const getDroppableDashboardCardBox = (withDragDropContext = DefaultDragDropContext) =>
-  compose(
-    withDragDropContext,
-    DropTarget(ItemTypes.CARD, cardTarget, connect => ({
-      connectDropTarget: connect.dropTarget()
-    }))
-  )(DashboardCardBox)
-
-export default getDroppableDashboardCardBox
+// Exporting as a separate module prevents the HTML5 backend from being
+// reinitialized multiple times if the consuming component is re-rendered.
+// This allows the Dashboard card components to be reused in more places,
+// and consumers can still pass in a custom context using a different backend
+// if they want. See https://github.com/react-dnd/react-dnd/issues/186.
+export default DragDropContext(ReactDnDHTML5Backend)

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-@import "pages/dashboard/dashboard_activity";
+@import "base/environment";
 
 .ic-dashboard-app {
   margin-top: -($ic-sp * 2);
@@ -30,8 +30,6 @@
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  border-bottom: 1px solid $ic-border-light;
-  background: rgba($ic-color-light, 0.95);
   box-sizing: border-box;
   height: $ic-breadcrumbs-height;
   &.small {
@@ -44,14 +42,9 @@
   }
 }
 
-.ic-Dashboard-Activity { padding: $ic-sp; }
-
-.ic-Dashboard-header__title {
-  margin-top: 0;
+h1.ic-Dashboard-header__title {
+  margin-top: 12px;
   margin-bottom: 0;
-  flex: 1;
-  padding-#{direction(right)}: $ic-sp;
-  box-sizing: border-box;
 }
 
 .ic-Dashboard-header__actions {
@@ -61,38 +54,37 @@
   justify-content: flex-end;
 }
 
-@supports (position: sticky) or (position: -webkit-sticky) {
-  // If the browser supports sticky positioning:
-  // 1) Give ALL dashboard headers sticky positioning per product design
-  .ic-Dashboard-header,
-  body.dashboard-is-planner .ic-Dashboard-header {
-    position: sticky;
-    top: 0;
-    z-index: 5;
+// These overrides are only here because the Dashboard cards don't fully use InstUI.
+// Once they are on InstUI they can be removed
+.ic-DashboardCard {
+  font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
+
+  & h1, h2, h3, h4, h5, h6 {
+    font-family: inherit;
   }
 
-  .ic-Dashboard-header__layout {
-    height: auto;
-    min-height: $ic-breadcrumbs-height;
+  & h3.ic-DashboardCard__header-title {
+    font-size: 1rem;
+  }
+}
+
+// These overrides are required because InstUI Tabs don't natively support icons or
+// themeable "selected" colors.
+.ic-Dashboard-tabs {
+  & [role="tab"] {
+    padding: 0.75rem 1.25rem;
   }
 
-  // 2) Undo all the fixed positioning CSS rules we needed for IE for Planner
-  body.dashboard-is-planner {
-    .ic-dashboard-app {
-      padding-top: 0;
+  & .ic-Dashboard-tabs__tab {
+    display: flex;
+    align-items: flex-end;
+
+    &.selected {
+      color: var(--ic-brand-primary);
     }
 
-    .ic-Dashboard-header {
-      #{direction(left)}: auto;
-      width: auto;
-      height: auto;
-    }
-
-    &.primary-nav-expanded {
-      .ic-Dashboard-header {
-        #{direction(left)}: auto;
-        width: auto;
-      }
+    & svg {
+      margin-right: 0.5em;
     }
   }
 }

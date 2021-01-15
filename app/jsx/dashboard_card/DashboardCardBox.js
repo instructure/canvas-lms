@@ -47,7 +47,7 @@ export default class DashboardCardBox extends React.Component {
     this.handleRerenderCards = this.handleRerenderCards.bind(this)
   }
 
-  componentWillMount() {
+  UNSAFE_componentWillMount() {
     this.setState({
       courseCards: this.props.courseCards
     })
@@ -58,12 +58,15 @@ export default class DashboardCardBox extends React.Component {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     DashboardCardBackgroundStore.setDefaultColors(this.allCourseAssetStrings())
 
-    this.setState({
-      courseCards: newProps.courseCards
-    })
+    // Only reset card state if the passed-in card props actually changed
+    if (this.props.courseCards !== newProps.courseCards) {
+      this.setState({
+        courseCards: newProps.courseCards
+      })
+    }
   }
 
   componentWillUnmount() {
