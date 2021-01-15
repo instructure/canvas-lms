@@ -466,7 +466,8 @@ describe UsersController, type: :request do
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
         'blueprint' => false,
-        'license' => nil
+        'license' => nil,
+        'homeroom_course' => false
       },
 
       'user' => {
@@ -598,7 +599,8 @@ describe UsersController, type: :request do
         'time_zone' => 'America/Denver',
         'uuid' => @course.uuid,
         'blueprint' => false,
-        'license' => nil
+        'license' => nil,
+        'homeroom_course' => false
       },
 
       'user' => {

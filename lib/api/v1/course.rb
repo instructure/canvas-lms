@@ -48,6 +48,7 @@ module Api::V1::Course
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:syllabus_course_summary] = course.syllabus_course_summary?
+    settings[:homeroom_course] = course.homeroom_course?
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image

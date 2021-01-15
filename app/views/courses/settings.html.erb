@@ -444,6 +444,15 @@
           </div>
         </div>
       <% end %>
+      <% if @context.account.feature_enabled?(:canvas_for_elementary) %>
+        <div class="form-row">
+          <div class="form-label nobr"><%= f.blabel :homeroom_course_header, :en => "Homeroom Course" %></div>
+          <div class="nobr">
+            <%= f.check_box :homeroom_course, :disabled => !can_manage %>
+            <%= f.label :homeroom_course, :en => "Enable as homeroom course" %><br/>
+          </div>
+        </div>
+      <% end %>
       <div class="form-row">
         <div class="form-label"><label for="course_public_description"><%= before_label('course_description', %{Description}) %></label></div>
         <div colspan="3">
