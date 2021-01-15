@@ -58,7 +58,7 @@ module Importers
           end
         end
 
-        outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if prevent_duplicate_guids?(context, hash)
+        outcome ||= LearningOutcome.active.find_by(vendor_guid: hash[:vendor_guid]) if hash[:vendor_guid].present?
         if outcome
           # Help prevent linking to the wrong outcome if copying into a different install of canvas
           # (using older migration packages that lack the root account uuid)
@@ -165,11 +165,6 @@ module Importers
       migration.outcome_to_id_map[hash[:migration_id]] = item.id
 
       item
-    end
-
-    def self.prevent_duplicate_guids?(context, hash)
-      context.root_account.feature_enabled?(:outcome_guid_course_exports) &&
-      hash[:vendor_guid].present?
     end
   end
 end

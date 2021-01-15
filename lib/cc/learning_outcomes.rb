@@ -63,9 +63,8 @@ module CC
       node.learningOutcomeGroup(:identifier=>migration_id) do |group_node|
         group_node.title group.title unless group.title.blank?
         group_node.description @html_exporter.html_content(group.description) unless group.description.blank?
-        if @course.root_account.feature_enabled?(:outcome_guid_course_exports)
-          group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
-        end
+        group_node.vendor_guid group.vendor_guid if group.vendor_guid.present?
+
         group_node.learningOutcomes do |lo_node|
           process_outcome_group_content(lo_node, group, force_export)
         end
@@ -101,10 +100,7 @@ module CC
         out_node.description @html_exporter.html_content(item.description) if item.description.present?
         out_node.calculation_method item.calculation_method if item.calculation_method.present?
         out_node.calculation_int item.calculation_int if item.calculation_int.present?
-
-        if @course.root_account.feature_enabled?(:outcome_guid_course_exports)
-          out_node.vendor_guid item.vendor_guid if item.vendor_guid.present?
-        end
+        out_node.vendor_guid item.vendor_guid if item.vendor_guid.present?
 
         if item.context != @course
           out_node.is_global_outcome !item.context
