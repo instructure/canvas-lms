@@ -1824,6 +1824,7 @@ de:
   add_quiz_ip_filter_c7b37dc5: "Quiz-IP-Filter hinzufügen"
   add_rating_89d7fbde: "Bewertung hinzufügen"
   add_recipient_ff135ed7: "Empfänger hinzufügen"
+  add_remove_in_courses_fa1c9081: "Zu Kurs hinzufügen/entfernen"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Abschnitte für dieses Portfolio hinzufügen, entfernen oder neu anordnen"
   add_review_2fb1590c: "Prüfung hinzufügen"
   add_role_3dc4d273: "Rolle hinzufügen"
@@ -1839,6 +1840,7 @@ de:
   add_subtitle_9f660cc: "Untertitel hinzufügen"
   add_tas_to_courses_27741f81: "TAs zu Kursen hinzufügen"
   add_tas_to_the_course_2aac6e02: "Lehrassistenten zum Kurs hinzufügen"
+  add_teachers_to_courses_48ac7a7a: "Lehrer zu Kursen hinzufügen"
   add_theme_32fa3d50: "Thema hinzufügen"
   add_to_course_481a51c4: "Zum Kurs hinzufügen ..."
   add_to_rce_toolbar_e5b3e3b4: "RCE-Symbolleiste hinzufügen"
@@ -2447,6 +2449,7 @@ de:
   an_error_occured_please_try_again_e59b65b: "Ein Fehler ist aufgetreten. Bitte versuchen Sie es noch einmal."
   an_error_occured_saving_the_assignment_d71cb3d2: "Fehler beim Speichern der Aufgabe"
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Bei der Erstellung dieses Themas ist ein Fehler aufgetreten. Bitte versuchen Sie es noch einmal."
+  an_error_occured_updating_the_flag_7df5de0a: "Fehler beim Aktualisieren der Markierung"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Beim Löschen des Benotungszeitraum-Sets ist ein Fehler aufgetreten."
   an_error_occured_while_deleting_the_grading_period_c8343484: "Beim Löschen des Benotungszeitraums ist ein Fehler aufgetreten."
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Beim Abruf der Einschreibungssemester ist ein Fehler aufgetreten."
@@ -2478,10 +2481,14 @@ de:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Beim Versuch, Turnitin zu kontaktieren, ist ein Fehler aufgetreten."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Fehler beim Überprüfen des Migrationsstatus"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Fehler beim Löschen von Ankündigungen"
+  an_error_occurred_while_loading_account_outcomes_8f337857: "Fehler beim Laden der Konto-Lernziele."
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Fehler beim Laden der Konto-Lernziele: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "Fehler beim Laden der Konto-Kompetenzeinstufungen: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "Fehler beim Laden der Konto-Kompetenzeinstufungen"
   an_error_occurred_while_loading_associations_9699b3ee: "Fehler beim Laden von Verknüpfungen"
   an_error_occurred_while_loading_changes_9851b56f: "Fehler beim Laden von Änderungen"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: "Fehler beim Laden der Kurs-Lernziele."
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Fehler beim Laden der Kurs-Lernziele: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Fehler beim Laden von Kursen"
   an_error_occurred_while_loading_late_policies_c415f676: "Fehler beim Laden der Richlinien bei Verspätungen"
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Fehler beim Laden der Leistungszielberechnung: %{error}"
@@ -2817,6 +2824,7 @@ de:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Möchten Sie dies wirklich tun? Dieser Vorgang kann nicht rückgängig gemacht werden. Dadurch werden bestehende Benotungen im Notenheft überschrieben."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Möchten Sie dieses Benutzer wirklich desaktivieren? Er/sie kann, während er/sie inaktiv ist, dann nicht mehr an diesem Kurs teilnehmen."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Möchten Sie den Studenten wirklich die Noten für diese Aufgabe zeigen?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Sind Sie sicher, dass Sie fortfahren möchten? Vorgenommene Änderungen werden nicht gespeichert."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Möchten Sie diesen Kommentar wirklich veröffentlichen?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Möchten Sie diese Benotungsperiode wirklich entfernen?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Möchten Sie dieses Objekt wirklich entfernen?"
@@ -3805,6 +3813,7 @@ de:
   australia_e8d44bf8: Australien
   austria_43_7bc58b34: "Österreich (+43)"
   austria_82178475: Österreich
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Authentifizierungs-Fehler beim Verbinden mit Google Drive."
   auth_logging: 
     corrupted: "Details nicht verfügbar"
     login: ANMELDEN
@@ -4026,6 +4035,7 @@ de:
   belgium_ef8739b6: Belgien
   below_mastery_abd1dca5: "Unterhalb des Leistungsziels"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Unter diesem Suchfeld finden Sie eine Liste mit %{content_type}. Beim Eingeben von Text wird die Liste entsprechend Ihrer Anfrage gefiltert. Konversationsnachrichten werden entsprechend der von Ihnen gewählten Option gefiltert."
+  beta_cb5f307e: Beta
   beta_url_3c7b88ec: "Beta-URL:"
   better_file_browsing_description: |-
       Eine neue, einfachere und bedienungsfreundlichere Benutzeroberfläche zum Durchsuchen von Dateien. Wenn Sie diese auf Kursebene aktivieren,
@@ -4140,7 +4150,7 @@ de:
   bounce_count_reset_c4c2218f: Bounce-Zähler-Reset!
   bounce_reason_689ed4c6: Bounce-Grund
   bounced_emails_83f293b5: "Unzustellbare E-Mails"
-  bounced_emails_admin_tool_9730a5e4: "Unzustellbare E-Mails – Admin-Tool"
+  bounced_emails_admin_tool_9730a5e4: "Unzustellbare E-Mails – Admin-Tool"
   brand_configs_b465a03f: Markenkonfigurationen
   brazil_55_34103ffa: "Brasilien (+55)"
   brazil_c1d6e73a: Brasilien
@@ -6181,7 +6191,7 @@ de:
   contextname_and_count_others_9dda769b: 
     one: "%{contextName} und %{count} andere"
     other: "%{contextName} und %{count} andere"
-  contextname_selected_59de1002: "%{contextName} ausgewählt"
+  contextname_selected_59de1002: "%{contextName} ausgewählt"
   contextscount_more_66b2f99b: "+ %{contextsCount} mehr"
   contexttype_notification_settings_d72acd58: "%{contextType}-Benachrichtigungseinstellungen"
   continue_ac067716: Fortfahren
@@ -6649,6 +6659,7 @@ de:
   course_cards_6029a05c: Kurskarten
   course_catalog_4cc7c8ce: Kurskatalog
   course_collaborations_dadb327e: Kurs-Collaborations
+  course_concluded_unable_to_send_messages_b99b6b6d: "Kurs abgeschlossen, kann keine Nachrichten senden"
   course_conferences_3d914c96: Kurskonferenzen
   course_content_a92eca20: Kursinhalt
   course_content_add_edit_delete_ea877eca: "Kursinhalt – hinzufügen/bearbeiten/löschen"
@@ -6844,6 +6855,7 @@ de:
     sis_id_taken: "Die SIS-ID „%{sis_id}“ wird bereits verwendet."
   course_section_7a988066: Kursabschnitt
   course_section_name_ea880ed1: "Kursabschnitt %{name}"
+  course_sections: Kursabschnitte
   course_sections_add_c6b5dc1: "Kursabschnitte – hinzufügen"
   course_sections_add_edit_delete_c4f4ac19: "Kursabschnitte – hinzufügen/bearbeiten/löschen"
   course_sections_delete_e75e3eeb: "Kursabschnitte – löschen"
@@ -8236,8 +8248,10 @@ de:
   disabled_by_default_7d822dcb: "Standardmäßig deaktiviert"
   disabled_in_course_settings_d15ee35d: "* In den Kurseinstellungen deaktiviert"
   disabled_links_b3bdea99: "Deaktivierte Links"
+  disabled_locked_dab351d6: "Deaktiviert (gesperrt)"
   disabled_not_visible_to_students_2c9d693f: "Deaktiviert. Für Studenten nicht sichtbar."
   disabled_not_visible_to_students_48d4a90d: "Deaktiviert. Für Studenten nicht sichtbar"
+  disabled_unlocked_1588a6d1: "Deaktiviert (entsperrt)"
   disables_push_notifications_for_certain_types_3f57cde4: "Deaktiviert Push-Benachrichtigungen für bestimmte Typen"
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Deaktiviert die SMS-Benachrichtigungen aller Art außer Ankündigungen und
@@ -9062,6 +9076,8 @@ de:
   enabled_ba7cab66: Aktiviert
   enabled_by_default_e530d6ed: "Standardmäßig aktiviert"
   enabled_links_be110215: "Aktivierte Links"
+  enabled_locked_3cf7c256: "Aktiviert (gesperrt)"
+  enabled_unlocked_8d3a5df7: "Aktiviert (entsperrt)"
   enabled_web_services_f620b2be: "Aktivierte Webservices"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ermöglicht die Anzeige von Plagiatsberichten und Ähnlichkeitsbewertungen in der Abgabe-Ablage des neuen Notenbuchs."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiviert neue API-Endpunkte für den Kurs und Benutzerdaten durch New Analytics."
@@ -9147,6 +9163,10 @@ de:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
               Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Lehrers oder TAs zu ändern, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
+  enrollments_observers: Beobachter
+  enrollments_students: Studenten
+  enrollments_tas: Lehrassistenten
+  enrollments_teachers: Dozenten
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Stellt sicher, dass Lernziele, die bereits in einen Kurs importiert wurden, bei einem erneuten Import nicht dupliziert werden"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Stellt sicher, dass Benutzer ohne die Berechtigung zum Import von Lernzielen die Schaltfläche in der Registerkarte \"Lernziele\" nicht sehen können"
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Zur Verwendung einer benutzerdefinierten Farbe, bitte hier einen Hexcode eingeben."
@@ -12066,7 +12086,9 @@ de:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Falls RCE-Erweiterungen ebenfalls aktiviert sind, wird
       das RCE Ihre Arbeit automatisch speichern, wenn Sie gehen
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Wenn diese Option aktiviert ist, ignoriert der Notenrechner nicht gebuchte anonyme Aufgabenlisten bei der Berechnung der Gesamtergebnisse."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Falls aktiviert, fügt der Exporteur der Notenbuch-CSV-Datei den Titel des ausgewählten Benotungszeitraums zu den Spaltenüberschriften hinzu, deren Werte je nach Benotungszeitraum variieren."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Wenn diese Option aktiviert ist, teilt das Notenbuch das Laden von Aufgabenlisten auf und lädt zuerst die Aufgabenliste für den ausgewählten Bewertungszeitraum."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Wenn diese Option aktiviert ist, wird die Funktion Veröffentlichen im SIS für Aufgaben deaktiviert, wenn deren Benotungszeitraum endet. Gilt nur, wenn die Funktion \"Neue SIS-Integrationseinstellungen aktivieren\" aktiviert ist."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
@@ -12132,6 +12154,7 @@ de:
   ignore_name_55edc6fe: "%{name} ignorieren"
   ignore_these_3940f6f5: "Diese ignorieren"
   ignore_this_assignment_b7a71f80: "Diese Aufgabe ignorieren"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Nicht gepostete anonyme Aufgabenlisten bei der Notenberechnung ignorieren"
   ignore_until_new_mark_77eb512: "Bis zur neuen Note ignorieren"
   ignore_until_new_mark_935e00a2: "Bis zur neuen Markierung ignorieren"
   ignore_until_new_submission_87f32b4: "Ignorieren bis zur erneuten Einsendung"
@@ -12249,6 +12272,7 @@ de:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Diese Aufgabenbenotungen bei der Synchronisierung mit dem Studenteninformationssystem Ihres Instituts mit einbeziehen"
   include_unpublished_assignments_83ebbaec: "Nicht veröffentlichte Aufgaben einbeziehen"
   include_unpublished_courses_7a0e7aab: "Nicht veröffentlichte Kurse mit einbeziehen"
+  included_messages_not_for_this_conversation_986a60bf: "included_messages nicht für diese Conversation"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Nimmt einen Link auf SpeedGrader in das Aufgaben-Header-Menü im Notenbuch auf."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Fügt Notenwerte in Admin-Bewertungsberichte ein."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Umfasst Serviceausrichtungen für Lernziele beim Export und Import von Kursinhalten"
@@ -12269,6 +12293,9 @@ de:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Zeigt an, dass das Bild nur dekorative Zwecke erfüllt und nicht von Screenreaders gelesen werden sollte"
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Individuelle Notenvergabe für Aufgaben"
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Einzelne Lernzielberechnungswerte können nicht geändert werden."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Einzelne Lernziel-Punkte können nicht geändert werden."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Einzelne Lernzielbewertungen können nicht geändert werden."
   individual_view_81c2f124: Einzelansicht
   individual_view_d60b9132: "Einzelansicht ..."
   indonesia_62_4c35bd62: "Indonesien (+62)"
@@ -12455,10 +12482,12 @@ de:
   invalid_grade_passback_setting_a1d209d1: "grade_passback_setting ungültig"
   invalid_hexcode_9124519f: "Hexcode ungültig"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ungültiger Hexcode. Geben Sie hier einen gültigen Hexcode zur Verwendung einer benutzerdefinierten Farbe ein."
+  invalid_or_missing_session_for_oauth_3ce4b605: "Ungültige oder fehlende Sitzung für oauth"
   invalid_points_8e929c3f: "Ungültige Punkte"
   invalid_points_for_rating_tier_index_i_400d307e: "Ungültige Punkte für die Bewertungsstufe %{index}: „%{i}“"
   invalid_points_possible: "Der Wert der möglichen Punkte für diese Aufgabe muss 0 oder größer sein."
   invalid_recipient_name_56b22b86: "Ungültiger Empfänger-Name"
+  invalid_recipients_5fd7c594: "Ungültige Empfänger"
   invalid_redirect_url_6444a1b0: "Ungültige Umleitungs-URL"
   invalid_restrictions_316cd740: "Ungültige Einschränkungen"
   invalid_score_3d247da7: "Ungültige Punktzahl"
@@ -12945,6 +12974,7 @@ de:
   load_bank: 
     error_loading_banks: "Fehler beim Laden von Fragenpools"
     loading_banks: "Fragenpools werden geladen ..."
+  load_gradebook_assignments_by_grading_period_919dfd3c: "Notenbuch-Aufgabenlisten nach Benotungszeitraum laden"
   load_more_9ca37ccc: "Mehr laden ..."
   load_more_a36f9cf9: "Mehr laden"
   load_more_comments_dc00ac34: "Mehr Kommentare laden"
@@ -15894,6 +15924,7 @@ de:
   no_content_has_been_shared_with_you_667fde6c: "Es wurde kein Content mit Ihnen geteilt."
   no_content_not_visible_to_students_905f8996: "Kein Content. Für Studenten nicht sichtbar."
   no_content_not_visible_to_students_b59f4867: "Kein Content. Für Studenten nicht sichtbar"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "Kein Kontext für den folgenden Kontextcode gefunden: %{context_code}"
   no_courses_favorited_4e69fd63: "Keine Kurse favorisiert"
   no_courses_found_12d68a74: "Keine Kurs gefunden"
   no_courses_to_display_700f94c4: "Keine Kurse anzuzeigen"
@@ -16799,6 +16830,8 @@ de:
   override_3de65b2c: "Außer Kraft setzen"
   override_grade_385adf30: "Note überschreiben"
   override_score_53994655: "Punktzahl überschreiben"
+  override_score_5f3c1189: "Punktzahl überschreiben"
+  override_score_gradingperiod_286ac51b: "Punktzahl überschreiben (%{gradingPeriod})"
   overrides: 
     blank_override: "Sie müssen einen Studenten oder Abschnitt ausgewählt haben."
     everyone: Jeder
@@ -19786,6 +19819,7 @@ de:
       one: "1 Kursabschnitt"
       other: "%{count} Kursabschnitte"
   recipients_a69b5e55: "Empfänger:"
+  recipients_restricted_by_role_22c4c843: "Empfänger durch Rolle beschränkt"
   record_7c9448b: Aufnehmen
   record_an_audio_or_video_comment_88425add: "Audio- oder Videokommentar aufzeichnen"
   record_audio_14666880: "Audio aufnehmen"
@@ -19924,6 +19958,7 @@ de:
   remove_studentname_16ba8c3a: "%{studentName} entfernen"
   remove_submission_draft_f5c7f58b: "Abgabeentwurf entfernen"
   remove_tas_from_courses_13ade851: "TAs aus Kursen entfernen"
+  remove_teachers_from_courses_353d5217: "Lehrer aus Kursen entfernen"
   remove_text_8e485c41: "%{text} entfernen"
   remove_these_dates_48453a81: "Diese Daten entfernen"
   remove_this_item_from_the_module_4b2ceab7: "Dieses Element aus dem Modul entfernen"
@@ -20514,8 +20549,8 @@ de:
       titles: 
         all_courses: "Alle Kurse"
     all_courses_inner: 
-      join_course: "Für diesen Kurs einschreiben"
-      next: Nächste/r
+      join_course: "An diesem Kurs teilnehmen"
+      next: Weiter
       previous: Vorherige
     course_sections: Kursabschnitte
     enrollments_observers: Beobachter
@@ -21864,6 +21899,7 @@ de:
     users: 
       user_search_label: Benutzersuche
       users_matching_label: "Benutzer stimmen überein"
+  site_admin_d0417171: Website-Administrator
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Nur für Website-Administratoren. Jeden Monat an 1/%{denominator} Benutzer in aktivierten Konten senden."
   size_b30e1077: Größe
   size_f1873a2: ", Größe: "
@@ -22153,6 +22189,7 @@ de:
   student_extensions_d35a907: "Verlängerungen für Studenten"
   student_grades_4cbc59a1: Studentennoten
   student_group_filter_185fb085: Studentengruppenfilter
+  student_groups: Studentengruppen
   student_groups_863201c1: Studentengruppen
   student_groups_desc: "Hierdurch wird die neue Seite für eine Studentengruppe für ein Konto aktiviert. Die neue Seite wurde entwickelt, um die Anmeldung bei einer Gruppe dynamischer zu gestalten."
   student_id: Studenten-ID
@@ -22351,10 +22388,13 @@ de:
     errors: 
       assignment_submit_fail: "Das Abgeben der Aufgabe ist fehlgeschlagen."
       can_not_submit_locked_assignment: "Gesperrte Aufgaben können nicht abgegeben werden."
+      googld_drive_timeout: "Zeitüberschreitung bei Kommunikation mit Google Drive"
+      google_drive_workflow: "Google Drive-Eintrag konnte nicht heruntergeladen werden"
       invalid_file_type: "Ungültiges Dateiformat"
       invalid_google_docs_domain: "Sie können über diese google_docs-Domäne keine Aufgaben einreichen."
       media_file_attached: "Die Abgabe beinhaltete keine Medienaufzeichnung"
       no_attached_file: "Sie müssen mindestens eine Datei an diese Aufgabe anhängen."
+      no_attachment_found: "Konnte keine Anlage zum Senden an Google Drive finden"
       no_report: "Für dieses Element der Abgabe wurde kein Bericht gefunden."
       student_not_enrolled: "Der angegebene Benutzer ist kein Student dieses Kurses"
       student_not_enrolled_id: "Der angegebene Benutzer (%{id}) ist kein Student dieses Kurses"
@@ -23833,6 +23873,8 @@ de:
   tolerance_value_9e96573c: Toleranzwert
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Zu viele fehlgeschlagene Anmeldeversuche. Versuchen Sie es später erneut, oder wenden Sie sich an Ihren Systemadministrator."
   too_many_members_b8b15069: "Zu viele Mitglieder"
+  too_many_participants_for_group_conversation_1743cd8: "Zu viele Teilnehmer für die Gruppen-Conversation"
+  too_many_recipients_for_group_conversation_906a4b69: "Zu viele Empfänger für die Gruppen-Conversation"
   tool_configuration_63cd43b0: Tool-Konfiguration
   tool_content_2924d18f: Tool-Inhalt
   tool_content_e699e813: Tool-Inhalt
@@ -23976,6 +24018,7 @@ de:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Zugriff auf einen bestimmten Studenten ist nicht möglich. Weiter mit Zuweisung in SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Einige Ergebnisse lassen sich nicht an einer Seite ausrichten"
   unable_to_align_some_outcomes_to_title_53467231: "Einige Ergebnisse lassen sich nicht an \"%{title}\" ausrichten"
+  unable_to_connect_to_google_drive_34886e7a: "Die Verbindung zu Google Drive kann nicht hergestellt werden."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Die Noten konnten nicht angepasst werden, weil diese Aufgabe für mindestens einen Schüler innerhalb eines abgeschlossenen Benotungszeitraums fällig ist."
   unable_to_delete_assignment_abcf8d62: "Aufgabe konnte nicht gelöscht werden"
   unable_to_dismiss_update_df1e32eb: "Aktualisierung kann nicht verworfen werden."
@@ -23987,6 +24030,7 @@ de:
   unable_to_read_file_2d04b0c: "Die Datei konnte nicht gelesen werden."
   unable_to_remove_app_4293cb53: "Die App kann nicht entfernt werden."
   unable_to_save_new_discussion_topic_99239f3f: "Neues Diskussionsthema konnte nicht gespeichert werden"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Nachrichten können nicht an Benutzer in %{context_name} gesendet werden"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Es konnte keine Standardnote festgelegt werden, weil diese Aufgabe für mindestens einen Schüler innerhalb eines abgeschlossenen Benotungszeitraums fällig ist."
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Drag & Drop für Module kann nicht eingerichtet werden"
   unable_to_toggle_placement_833db6ff: "Umschalten der Platzierung ncht möglich"
@@ -23997,6 +24041,7 @@ de:
   unauthorized: "nicht berechtigt"
   unauthorized_message: "JWT-Signatur ungültig"
   unauthorized_to_delete_this_file_a1271224: "Nicht berechtigt, diese Datei zu löschen"
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Nicht autorisiert, kann keine Nachrichten zur Konversation hinzufügen"
   unavailable_46d2c344: "Nicht verfügbar"
   unavailable_c04e4c93: "nicht verfügbar"
   unbookmark_bank_70569249: "Lesezeichen entfernen %{bank}"
@@ -24771,14 +24816,18 @@ de:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Benutzer können auf individuelle Zuweisungsschemata zugreifen und sie erstellen (aber nicht bearbeiten), wenn „Zuweisungen“ und „Quizze - Hinzufügen / Bearbeiten / Löschen“ aktiviert sind."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Die Benutzer können auf der Indexseite Quizze auf den Link „Fragenpools verwalten“ zugreifen, wenn „Kurs-Content – anzeigen“ und „Aufgaben und Quizze – hinzufügen / ändern / löschen“ aktiviert ist."
   users_d1b60cb0: Benutzer
+  users_designers_22195c6f: "Benutzer – Designer"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Benutzer – für einen Studenten einen Beobachter-Pairing-Code generieren"
   users_generate_observer_pairing_codes_for_students_6975caad: "Benutzer – für einen Studenten einen Beobachter-Pairing-Code generieren"
   users_manage_log_in_details_b944568b: "Benutzer – Protokoll in Details verwalten"
   users_manage_login_details_9462b30f: "Benutzer – Anmeldedetails verwalten"
   users_matching_search_term_c604db9e: "Benutzer, die mit \"%{search_term}\" übereinstimmen"
   users_moderate_content_36d6eed7: "Benutzer – Content moderieren"
+  users_observers_e0e66c52: "Benutzer – Beobachter"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Benutzer von Screenreadern müssen den virtuellen Cursor ausschalten, und diese Tastenkombinationen verwenden."
   users_over_time_9a2ee74a: "Benutzer im Laufe der Zeit"
+  users_tas_27117894: "Benutzer – TAs"
+  users_teachers_a5d5d1af: "Benutzer – Lehrer"
   users_view_list_861c7a3f: "Benutzer – Liste anzeigen"
   users_view_login_ids_a2e6a85: "Benutzer – Login-IDs anzeigen"
   users_view_primary_email_address_14f4978f: "Benutzer – primäre E-Mail-Adresse anzeigen"
@@ -25287,6 +25336,9 @@ de:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Sie können ein Unterkonto, das Kurse enthält, nicht löschen."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Unterkonten mit Unterkonten können nicht gelöscht werden."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "%{account_name} kann nicht gelöscht werden, weil es noch Kurse enthält."
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernzielkriterien werden die Skala für das Kurs-Leistungsziel verwenden. Trotzdem fortfahren?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik. Alle zugehörigen Lernzielkriterien werden die Skala für das Konto-Leistungsziel verwenden. Trotzdem fortfahren?"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Sie können diese Rubrik nicht bearbeiten, entweder weil Sie keine Berechtigung haben oder weil sie an mehreren Stellen verwendet wird. Jede Änderung, die Sie vornehmen, führt zu einer neuen Rubrik, die auf der alten Rubrik basiert. Trotzdem fortfahren?"
   you_can_try_to_log_in_again_2b23ef0f: "Sie können versuchen, sich *erneut anzumelden*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Sie können bestimmte Daten des Benutzers aktualisieren, dieser kann die Änderungen jedoch rückgängig machen."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Sie können eine einzige 16x16-, 32x32-, 48x48-ICO-Datei verwenden."
