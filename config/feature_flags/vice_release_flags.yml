@@ -15,14 +15,6 @@ confetti_for_valid_links:
     a course and no issues are found.
   applies_to: RootAccount
 
-deprecate_sms:
-  state: hidden
-  display_name: Restrict SMS to Select Types
-  description: |-
-    Disables SMS notifications for all types except announcements and
-    grade changes.
-  applies_to: SiteAdmin
-
 notification_update_account_ui:
   state: hidden
   display_name: Account level notification preferences UI update

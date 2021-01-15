@@ -2131,7 +2131,6 @@ class CoursesController < ApplicationController
     js_env(
       course_name: @context.name,
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
         reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
         allowed_push_categories: Notification.categories_to_send_in_push,
