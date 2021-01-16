@@ -19,7 +19,10 @@
 <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_text_entry_form", :class => "submit_assignment_form"}) do %>
     <%= hidden_field :submission, :submission_type, :value => "online_text_entry" %>
     <%= hidden_field :submission, :eula_agreement_timestamp, :id => "eula_agreement_timestamp" %>
-    <table class="formtable" style="width: 100%;">
+    <!-- fixed layout works because I know there is only 1 column (look at turnitin and vericite too) 
+         it is necessary to keep the RCE from overflowing its container in mobile  -->
+
+    <table class="formtable" style="width: 100%; table-layout: fixed;"> 
       <tr>
         <td>
         <%= t 'instructions.online_text_entry', "Copy and paste or type your submission right here." %>
