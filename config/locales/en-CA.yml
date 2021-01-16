@@ -22578,7 +22578,7 @@ en-CA:
       text entry fields in Canvas will be processed by MathJax.
       LaTex delimited by \(...\) become inline equations, while
       $$...$$ will be rendered as as a block.  For example,
-      you could choose to title an Assignment \(\sqrt{x}\), or
+      you could choose to title an Assignment \(\(\sqrt{x}\)), or
       enter $$ax^2 + by + c = 0$$ in a submission comment.
       This feature reequires that the "Updated math equation handling"
       flag is also on.
