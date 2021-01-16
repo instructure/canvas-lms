@@ -38,7 +38,8 @@ class ItemCog extends React.Component {
     model: customPropTypes.filesystemObject,
     modalOptions: PropTypes.object.isRequired,
     externalToolsForContext: PropTypes.arrayOf(PropTypes.object),
-    userCanManageFilesForContext: PropTypes.bool,
+    userCanEditFilesForContext: PropTypes.bool,
+    userCanDeleteFilesForContext: PropTypes.bool,
     userCanRestrictFilesForContext: PropTypes.bool.isRequired,
     usageRightsRequiredForContext: PropTypes.bool
   }
@@ -166,70 +167,73 @@ class ItemCog extends React.Component {
       )
     }
 
-    if (this.props.userCanManageFilesForContext && !this.isMasterCourseRestricted()) {
-      // Rename Link
-      menuItems.push(
-        <li key="rename" role="presentation">
-          <a
-            href="#"
-            onClick={preventDefault(this.props.startEditingName)}
-            ref="editName"
-            role="menuitem"
-            tabIndex="-1"
-          >
-            {I18n.t('Rename')}
-          </a>
-        </li>
-      )
-      // Move Link
-      menuItems.push(
-        <li key="move" role="presentation">
-          <a
-            href="#"
-            onClick={wrap(openMoveDialog, {
-              clearSelectedItems: this.props.clearSelectedItems,
-              onMove: this.props.onMove
-            })}
-            ref="move"
-            role="menuitem"
-            tabIndex="-1"
-          >
-            {I18n.t('Move')}
-          </a>
-        </li>
-      )
-
-      if (this.props.usageRightsRequiredForContext) {
-        // Manage Usage Rights Link
+    if (!this.isMasterCourseRestricted()) {
+      if (this.props.userCanEditFilesForContext) {
+        // Rename Link
         menuItems.push(
-          <li key="manageUsageRights" className="ItemCog__OpenUsageRights" role="presentation">
+          <li key="rename" role="presentation">
             <a
               href="#"
-              onClick={preventDefault(this.openUsageRightsDialog)}
-              ref="usageRights"
+              onClick={preventDefault(this.props.startEditingName)}
+              ref="editName"
               role="menuitem"
               tabIndex="-1"
             >
-              {I18n.t('Manage Usage Rights')}
+              {I18n.t('Rename')}
+            </a>
+          </li>
+        )
+        // Move Link
+        menuItems.push(
+          <li key="move" role="presentation">
+            <a
+              href="#"
+              onClick={wrap(openMoveDialog, {
+                clearSelectedItems: this.props.clearSelectedItems,
+                onMove: this.props.onMove
+              })}
+              ref="move"
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Move')}
+            </a>
+          </li>
+        )
+        // Manage Usage Rights Link
+        if (this.props.usageRightsRequiredForContext) {
+          menuItems.push(
+            <li key="manageUsageRights" className="ItemCog__OpenUsageRights" role="presentation">
+              <a
+                href="#"
+                onClick={preventDefault(this.openUsageRightsDialog)}
+                ref="usageRights"
+                role="menuitem"
+                tabIndex="-1"
+              >
+                {I18n.t('Manage Usage Rights')}
+              </a>
+            </li>
+          )
+        }
+      }
+
+      if (this.props.userCanDeleteFilesForContext) {
+        // Delete Link
+        menuItems.push(
+          <li key="delete" role="presentation">
+            <a
+              href="#"
+              onClick={wrap(this.deleteItem)}
+              ref="deleteLink"
+              role="menuitem"
+              tabIndex="-1"
+            >
+              {I18n.t('Delete')}
             </a>
           </li>
         )
       }
-
-      // Delete Link
-      menuItems.push(
-        <li key="delete" role="presentation">
-          <a
-            href="#"
-            onClick={wrap(this.deleteItem)}
-            ref="deleteLink"
-            role="menuitem"
-            tabIndex="-1"
-          >
-            {I18n.t('Delete')}
-          </a>
-        </li>
-      )
     }
 
     return (

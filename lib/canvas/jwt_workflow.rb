@@ -61,7 +61,7 @@ module Canvas
           context.grants_any_right?(
             user,
             :manage_files,
-            *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            :manage_files_add
           )
         ) || false,
         can_create_pages: (

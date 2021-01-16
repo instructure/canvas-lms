@@ -40,7 +40,7 @@ module Services
       env_hash[:RICH_CONTENT_CAN_UPLOAD_FILES] = (
         user &&
         context &&
-        context.grants_any_right?(user, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+        context.grants_any_right?(user, :manage_files, :manage_files_add)
       ) || false
       env_hash
     end

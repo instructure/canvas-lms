@@ -42,7 +42,12 @@ export default class Toolbar extends React.Component {
     currentFolder: customPropTypes.folder, // not required as we don't have it on the first render
     contextType: customPropTypes.contextType.isRequired,
     contextId: customPropTypes.contextId.isRequired,
-    showingSearchResults: PropTypes.bool
+    showingSearchResults: PropTypes.bool,
+    usageRightsRequiredForContext: PropTypes.bool,
+    userCanAddFilesForContext: PropTypes.bool,
+    userCanEditFilesForContext: PropTypes.bool,
+    userCanDeleteFilesForContext: PropTypes.bool,
+    userCanRestrictFilesForContext: PropTypes.bool
   }
 
   componentWillMount() {
@@ -253,8 +258,8 @@ export default class Toolbar extends React.Component {
     }
   }
 
-  renderManageUsageRightsButton() {
-    if (this.props.userCanManageFilesForContext && this.props.usageRightsRequiredForContext) {
+  renderManageUsageRightsButton(canManage) {
+    if (canManage) {
       return (
         <button
           ref="usageRightsBtn"
@@ -342,7 +347,7 @@ export default class Toolbar extends React.Component {
     }
   }
 
-  renderRestrictedAccessButtons(canManage) {
+  renderManageAccessPermissionsButton(canManage) {
     if (canManage) {
       return (
         <button
@@ -370,10 +375,16 @@ export default class Toolbar extends React.Component {
     const restrictedByMasterCourse = this.props.selectedItems.some(
       item => item.get('restricted_by_master_course') && item.get('is_master_course_child_content')
     )
-    const canManage =
-      this.props.userCanManageFilesForContext &&
-      !submissionsFolderSelected &&
-      !restrictedByMasterCourse
+    const {
+      userCanRestrictFilesForContext,
+      userCanAddFilesForContext,
+      userCanEditFilesForContext,
+      userCanDeleteFilesForContext
+    } = this.props
+
+    const canManage = permission => {
+      return permission && !submissionsFolderSelected && !restrictedByMasterCourse
+    }
 
     this.showingButtons = this.props.selectedItems.length
 
@@ -432,13 +443,13 @@ export default class Toolbar extends React.Component {
               <i className="icon-eye" />
             </a>
 
-            {this.renderRestrictedAccessButtons(
-              canManage && this.props.userCanRestrictFilesForContext
-            )}
+            {this.renderManageAccessPermissionsButton(canManage(userCanRestrictFilesForContext))}
             {this.renderDownloadButton()}
-            {this.renderCopyCourseButton(canManage)}
-            {this.renderManageUsageRightsButton(canManage)}
-            {this.renderDeleteButton(canManage)}
+            {this.renderCopyCourseButton(canManage(userCanEditFilesForContext))}
+            {this.renderManageUsageRightsButton(
+              canManage(userCanEditFilesForContext && this.props.usageRightsRequiredForContext)
+            )}
+            {this.renderDeleteButton(canManage(userCanDeleteFilesForContext))}
           </div>
           <span className="ef-selected-count hidden-tablet hidden-phone">
             {I18n.t(
@@ -446,7 +457,7 @@ export default class Toolbar extends React.Component {
               {count: this.props.selectedItems.length}
             )}
           </span>
-          {this.renderUploadAddFolderButtons(canManage)}
+          {this.renderUploadAddFolderButtons(canManage(userCanAddFilesForContext))}
         </div>
       </header>
     )

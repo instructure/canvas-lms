@@ -2121,7 +2121,7 @@ modules.initModuleManagement = function() {
       const props = {
         model: file,
         togglePublishClassOn: $el.parents('.ig-row')[0],
-        userCanManageFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files,
+        userCanEditFilesForContext: ENV.MODULE_FILE_PERMISSIONS.manage_files_edit,
         usageRightsRequiredForContext: ENV.MODULE_FILE_PERMISSIONS.usage_rights_required,
         fileName: file.displayName()
       }

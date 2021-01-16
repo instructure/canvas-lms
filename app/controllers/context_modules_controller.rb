@@ -91,12 +91,12 @@ class ContextModulesController < ApplicationController
         :MODULE_FILE_DETAILS => module_file_details,
         :MODULE_FILE_PERMISSIONS => {
            usage_rights_required: @context.usage_rights_required?,
-           manage_files:
+           manage_files_edit:
             @context.grants_any_right?(
               @current_user,
               session,
               :manage_files,
-              *RoleOverride::GRANULAR_FILE_PERMISSIONS
+              :manage_files_edit
             )
         },
         :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},

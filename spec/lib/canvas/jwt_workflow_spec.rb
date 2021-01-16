@@ -76,7 +76,7 @@ module Canvas
 
         it 'sets can_upload_files to false' do
           expect(@c).to receive(:grants_any_right?).with(
-            @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            @u, :manage_files, :manage_files_add
           ).and_return(false)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be false
@@ -84,7 +84,7 @@ module Canvas
 
         it 'sets can_upload_files to true' do
           expect(@c).to receive(:grants_any_right?).with(
-            @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+            @u, :manage_files, :manage_files_add
           ).and_return(true)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be true
@@ -97,7 +97,7 @@ module Canvas
 
           it 'sets can_upload_files to false' do
             expect(@c).to receive(:grants_any_right?).with(
-              @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+              @u, :manage_files, :manage_files_add
             ).and_return(false)
             state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
             expect(state[:can_upload_files]).to be false
@@ -105,7 +105,7 @@ module Canvas
 
           it 'sets can_upload_files to true' do
             expect(@c).to receive(:grants_any_right?).with(
-              @u, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS
+              @u, :manage_files, :manage_files_add
             ).and_return(true)
             state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
             expect(state[:can_upload_files]).to be true

@@ -397,11 +397,23 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files: @context.grants_any_right?(
+            manage_files_add: context.grants_any_right?(
               @current_user,
               session,
               :manage_files,
-              *RoleOverride::GRANULAR_FILE_PERMISSIONS
+              :manage_files_add
+            ),
+            manage_files_edit: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_edit
+            ),
+            manage_files_delete: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_delete
             ),
           },
           file_menu_tools: file_menu_tools,
