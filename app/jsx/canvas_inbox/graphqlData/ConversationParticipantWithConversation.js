@@ -17,21 +17,37 @@
  */
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
+import {Conversation} from './Conversation'
+import {ConversationParticipant} from './ConversationParticipant'
+import {User} from './User'
 
-export const MediaTrack = {
+export const ConversationParticipantWithConversation = {
   fragment: gql`
-    fragment MediaTrack on MediaTrack {
-      _id
-      content
-      locale
-      kind
+    fragment ConversationParticipantWithConversation on ConversationParticipant {
+      ...ConversationParticipant
+      conversation {
+        ...Conversation
+      }
     }
+    ${ConversationParticipant.fragment}
+    ${Conversation.fragment}
   `,
 
   shape: shape({
     _id: string,
-    content: string,
-    locale: string,
-    kind: string
+    id: string,
+    label: string,
+    conversation: Conversation.shape,
+    user: User.shape
+  })
+}
+
+export const DefaultMocks = {
+  ConversationParticipant: () => ({
+    _id: 'mock_id',
+    id: 'mockId',
+    label: 'someLabel',
+    conversation: {},
+    user: {}
   })
 }

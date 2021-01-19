@@ -18,37 +18,52 @@
 
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {ConversationMessage} from './ConversationMessage'
-import {ConversationParticipant} from './ConversationParticipant'
+import {Attachment} from './Attachment'
+import {User} from './User'
+import {MediaComment} from './MediaComment'
 
-export const Conversation = {
+export const ConversationMessage = {
   fragment: gql`
-    fragment Conversation on Conversation {
+    fragment ConversationMessage on ConversationMessage {
       _id
-      contextId
-      contextType
-      subject
-      conversationMessagesConnection {
+      id
+      createdAt
+      body
+      attachmentsConnection {
         nodes {
-          ...ConversationMessage
+          ...Attachment
         }
       }
-      conversationParticipantsConnection {
-        nodes {
-          ...ConversationParticipant
-        }
+      author {
+        ...User
+      }
+      mediaComment {
+        ...MediaComment
       }
     }
-    ${ConversationMessage.fragment}
-    ${ConversationParticipant.fragment}
+    ${Attachment.fragment}
+    ${User.fragment}
+    ${MediaComment.fragment}
   `,
 
   shape: shape({
     _id: string,
-    contextId: string,
-    contextType: string,
-    subject: string,
-    conversationMessagesConnection: ConversationMessage.shape,
-    conversationParticipantsConnection: ConversationParticipant.shape
+    createdAt: string,
+    body: string,
+    attachmentsConnection: Attachment.shape,
+    author: User.shape,
+    mediaComment: MediaComment.shape
+  })
+}
+
+export const DefaultMocks = {
+  ConversationMessage: () => ({
+    _id: '1a',
+    conversationId: 'mockConversation',
+    body: 'This is the body of a mocked message',
+    createdAt: 'November 5, 2020 at 2:25pm',
+    author: {},
+    mediaComment: {},
+    attachmentConnection: [{}]
   })
 }

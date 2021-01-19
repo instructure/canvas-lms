@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,28 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {User} from './User'
 
-export const ConversationParticipant = {
+export const FavoriteGroupsConnection = {
   fragment: gql`
-    fragment ConversationParticipant on ConversationParticipant {
+    fragment FavoriteGroupsConnection on Group {
       _id
-      id
-      label
-      userId
-      user {
-        ...User
-      }
+      contextName: name
+      assetString
     }
-    ${User.fragment}
   `,
-
   shape: shape({
-    _id: string,
     id: string,
-    label: string,
-    user: User.shape
+    contextName: string,
+    assetString: string
+  })
+}
+
+export const DefaultMocks = {
+  Group: () => ({
+    id: 'someId',
+    contextName: 'someContextName',
+    assetString: 'someContextId'
   })
 }

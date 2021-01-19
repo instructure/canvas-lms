@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -15,42 +15,29 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
 import gql from 'graphql-tag'
-import {shape, string, bool} from 'prop-types'
-import {MediaSource} from './MediaSource'
-import {MediaTrack} from './MediaTrack'
+import {shape, string} from 'prop-types'
 
-export const MediaComment = {
+export const FavoriteCoursesConnection = {
   fragment: gql`
-    fragment MediaComment on MediaObject {
+    fragment FavoriteCoursesConnection on Course {
       _id
-      id
-      title
-      canAddCaptions
-      mediaSources {
-        ...MediaSource
-      }
-      mediaTracks {
-        ...MediaTrack
-      }
+      contextName: name
+      assetString
     }
-    ${MediaSource.fragment}
-    ${MediaTrack.fragment}
   `,
-
   shape: shape({
-    _id: string,
     id: string,
-    title: string,
-    canAddCaptions: bool,
-    mediaSources: MediaSource.shape,
-    mediaTracks: MediaTrack.shape
+    contextName: string,
+    assetString: string
   })
 }
 
 export const DefaultMocks = {
-  MediaComment: () => ({
-    title: 'Test Media Comment Video',
-    canAddCaptions: true
+  Course: () => ({
+    id: 'someId',
+    contextName: 'someString',
+    assetString: 'someId'
   })
 }
