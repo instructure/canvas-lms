@@ -148,6 +148,33 @@ it('will render the latest grade instead of the displayed submissions grade', as
   expect(queryByText('131/150 Points')).not.toBeInTheDocument()
 })
 
+it('will not render the grade if the latest submission is excused', async () => {
+  const latestSubmission = await mockSubmission({
+    Submission: {
+      ...SubmissionMocks.excused,
+      grade: '147',
+      enteredGrade: '147'
+    }
+  })
+
+  const props = await mockAssignmentAndSubmission({
+    Assignment: {pointsPossible: 150},
+    Submission: {
+      ...SubmissionMocks.graded,
+      grade: '131',
+      enteredGrade: '131'
+    }
+  })
+
+  const {getByTestId} = render(
+    <StudentViewContext.Provider value={{latestSubmission}}>
+      <Header {...props} />
+    </StudentViewContext.Provider>
+  )
+
+  expect(getByTestId('grade-display').textContent).toEqual('Excused!')
+})
+
 it('will render the unavailable pizza tracker if there is a module prereq lock', async () => {
   const props = await mockAssignmentAndSubmission()
   props.assignment.env.modulePrereq = 'simulate not null'
@@ -165,6 +192,14 @@ it('will render a New Attempt button if submitted and there are more attempts', 
 
 it('will not render a New Attempt button if not submitted', async () => {
   const props = await mockAssignmentAndSubmission()
+  const {queryByTestId} = render(<Header {...props} />)
+  expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
+})
+
+it('will not render a New Attempt button if excused', async () => {
+  const props = await mockAssignmentAndSubmission({
+    Submission: {...SubmissionMocks.excused}
+  })
   const {queryByTestId} = render(<Header {...props} />)
   expect(queryByTestId('new-attempt-button')).not.toBeInTheDocument()
 })

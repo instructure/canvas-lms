@@ -95,11 +95,12 @@ class Header extends React.Component {
   renderLatestGrade = () => (
     <StudentViewContext.Consumer>
       {context => {
-        const {latestSubmission} = context
+        const submission = context.latestSubmission || {grade: null, gradingStatus: null}
         return (
           <GradeDisplay
+            gradingStatus={submission.gradingStatus}
             gradingType={this.props.assignment.gradingType}
-            receivedGrade={latestSubmission ? latestSubmission.grade : null}
+            receivedGrade={submission.grade}
             pointsPossible={this.props.assignment.pointsPossible}
           />
         )
@@ -112,6 +113,7 @@ class Header extends React.Component {
     return (
       !assignment.lockInfo.isLocked &&
       (submission.state === 'graded' || submission.state === 'submitted') &&
+      submission.gradingStatus !== 'excused' &&
       context.isLatestAttempt &&
       (assignment.allowedAttempts === null || submission.attempt < assignment.allowedAttempts)
     )
