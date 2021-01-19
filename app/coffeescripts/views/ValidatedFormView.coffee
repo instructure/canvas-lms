@@ -75,15 +75,15 @@ export default class ValidatedFormView extends Backbone.View
   submit: (event, sendFunc = send) ->
     event?.preventDefault()
     @hideErrors()
-    
+
 
     rceInputs = @$el.find('textarea[data-rich_text]').toArray()
-    
+
     okayToContinue = true
     if rceInputs.length > 0
       if window.ENV.use_rce_enhancements
         okayToContinue = rceInputs.map((rce) => sendFunc($(rce), 'checkReadyToGetCode', window.confirm)).every((value) => value)
-    
+
     if !okayToContinue
       return
 
@@ -106,7 +106,7 @@ export default class ValidatedFormView extends Backbone.View
       # Indicate to the RCE that the page is closing.
       if rceInputs.length > 0
         rceInputs.forEach((rce) => sendFunc($(rce), "RCEClosed"))
-          
+
       @trigger 'submit'
       saveDfd
     else
@@ -125,6 +125,9 @@ export default class ValidatedFormView extends Backbone.View
         null
       ), 50)
 
+  cancel: ->
+    rceInputs = @$el.find('textarea[data-rich_text]').toArray()
+    rceInputs.forEach((rce) => send($(rce), "RCEClosed"))
 
   ##
   # Converts the form to an object. Override this if the form's input names

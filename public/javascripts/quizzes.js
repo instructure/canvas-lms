@@ -2250,6 +2250,7 @@ $(document).ready(function() {
     object_name: 'quiz',
 
     processData(data) {
+      RichContentEditor.closeRCE($('#quiz_description'))
       $(this).attr('method', 'PUT')
       const quiz_title = $("input[name='quiz[title]']").val()
       const postToSIS = data['quiz[post_to_sis]'] === '1'
@@ -2462,6 +2463,10 @@ $(document).ready(function() {
         $(this).formErrors(data)
       }
     }
+  })
+
+  $quiz_edit_wrapper.find('#cancel_button').click(_event => {
+    RichContentEditor.closeRCE($('#quiz_description'))
   })
 
   $quiz_edit_wrapper

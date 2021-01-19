@@ -181,6 +181,7 @@ export default class EditView extends ValidatedFormView
 
   handleCancel: (ev) =>
     ev.preventDefault()
+    RichContentEditor.closeRCE(@$textarea) unless @lockedItems.content
     @unwatchUnload()
     @redirectAfterCancel()
 
@@ -198,16 +199,16 @@ export default class EditView extends ValidatedFormView
 
   render: =>
     super
-    $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).css('display', 'none')
+    @$textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).css('display', 'none')
 
     unless @lockedItems.content
       RichContentEditor.initSidebar()
       _.defer =>
-        @loadNewEditor($textarea)
+        @loadNewEditor(@$textarea)
         $('.rte_switch_views_link').click (event) ->
           event.preventDefault()
           event.stopPropagation()
-          RichContentEditor.callOnRCE($textarea, 'toggle')
+          RichContentEditor.callOnRCE(@$textarea, 'toggle')
           # hide the clicked link, and show the other toggle link.
           # todo: replace .andSelf with .addBack when JQuery is upgraded.
           $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle().focus()

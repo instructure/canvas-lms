@@ -190,6 +190,8 @@ $(document).ready(function() {
       })
     if (!valid) return false
 
+    RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
+
     $(this)
       .find("button[type='submit']")
       .text(I18n.t('messages.submitting', 'Submitting...'))
@@ -396,6 +398,7 @@ $(document).ready(function() {
   })
 
   $('.submit_assignment_form .cancel_button').click(() => {
+    RichContentEditor.closeRCE($('#submit_online_text_entry_form textarea:first'))
     $('#submit_assignment').hide()
     $('.submit_assignment_link').show()
   })

@@ -58,7 +58,10 @@ class Reply {
       .find('form.discussion-reply-form:first')
       .submit(preventDefault(this.submit))
     this.textArea = this.getEditingElement()
-    this.form.find('.cancel_button').click(this.hide)
+    this.form.find('.cancel_button').click(e => {
+      RichContentEditor.closeRCE(this.textArea)
+      this.hide()
+    })
     this.form.on('click', '.toggle-wrapper a', e => {
       e.preventDefault()
       RichContentEditor.callOnRCE(this.textArea, 'toggle')
@@ -173,6 +176,7 @@ class Reply {
         if (!okayToContinue) return
       }
     }
+    RichContentEditor.closeRCE(this.textArea)
 
     this.hide()
     this.view.model.set(
