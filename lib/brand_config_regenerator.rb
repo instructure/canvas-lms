@@ -23,17 +23,40 @@ class BrandConfigRegenerator
 
   attr_reader :progresses
 
-  def initialize(account, current_user, new_brand_config)
+  class << self
+    def process(account, current_user, new_brand_config)
+      progress = Progress.new(
+        context: account,
+        tag: "brand_config_regenerate_for_#{account.root_account.global_id}".to_sym,
+        message: I18n.t("Regenerating themes...")
+      )
+      progress.user = current_user
+      progress.reset!
+      new_brand_config.save! if new_brand_config&.changed?
+      progress.process_job(BrandConfigRegenerator,
+        :process_sync,
+        { priority: Delayed::HIGH_PRIORITY, singleton: progress.tag.to_s },
+        account, new_brand_config)
+      progress
+    end
+
+    def process_sync(progress, account, new_brand_config)
+      new(progress, account, new_brand_config)
+    end
+  end
+
+  def initialize(progress, account, new_brand_config)
+    @progress = progress
     @account = account
-    @current_user = current_user
     old_config_md5 = @account.brand_config_md5
     @account.brand_config = new_brand_config
     @account.save!
     @new_configs = {}
     @new_configs[old_config_md5] = new_brand_config if old_config_md5
-    @progresses = []
     process
   end
+
+  private
 
   def things_that_need_to_be_regenerated
     @things_that_need_to_be_regenerated ||= begin
@@ -78,21 +101,21 @@ class BrandConfigRegenerator
 
     account = thing.is_a?(SharedBrandConfig) ? thing.account : thing
     job_type = thing.is_a?(SharedBrandConfig) ? :sync_to_s3_and_save_to_shared_brand_config! : :sync_to_s3_and_save_to_account!
-    progress = Progress.new(
-      context: @current_user,
-      tag: "#{job_type}_for_#{thing.id}".to_sym,
-      message: "Syncing for #{account.name}#{thing.is_a?(SharedBrandConfig) ? ": #{thing.name}" : ''}"
-    )
-    progress.user = @current_user
-    progress.reset!
-    progress.process_job(new_config, job_type, { priority: Delayed::HIGH_PRIORITY, strand: "brand_config_regenerate_#{thing.global_asset_string}" }, thing.id)
+    new_config.send(job_type, @progress, thing.id)
 
     @new_configs[config.md5] = new_config
-    @progresses << progress
   end
 
   def process
+    # signify we started "1% completion"
+    @progress.update_completion!(1)
     things_left_to_process = things_that_need_to_be_regenerated.dup
+    # every "thing" gets 5 units of work
+    total = things_left_to_process.length * 5
+    # the initial query shoud get us to 5%; recalculate so that the balance is 95%
+    five_percent = total * 5.0 / 95.0
+    total += five_percent
+    @progress.calculate_completion!(five_percent, total)
     while thing = things_left_to_process.sample
       next unless ready_to_process?(thing)
       regenerate(thing)

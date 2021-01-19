@@ -30,6 +30,7 @@ class Progress < ActiveRecord::Base
   validates_presence_of :tag
 
   serialize :results
+  attr_reader :total
 
   include Workflow
   workflow do
@@ -62,7 +63,22 @@ class Progress < ActiveRecord::Base
   end
 
   def calculate_completion!(current_value, total)
-    update_completion!(100.0 * current_value / total)
+    @total = total
+    @current_value = current_value
+    update_completion!(100.0 * @current_value / @total)
+  end
+
+  def increment_completion!(increment)
+    raise "`increment_completion!` can only be invoked after a total has been set with `calculate_completion!`" if @total.nil?
+
+    @current_value += increment
+    new_value = 100.0 * @current_value / @total
+    # only update the db if we're at a different integral percentage point or it's been > 15s
+    if new_value.to_i != completion.to_i || (Time.now.utc - updated_at) > 15
+      update_completion!(new_value)
+    else
+      self.completion = new_value
+    end
   end
 
   def pending?

@@ -61,11 +61,9 @@ describe BrandConfigRegenerator do
       brand_config_md5: second_config.md5
     )
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
+    BrandConfigRegenerator.process(@parent_account, user_factory, new_brand_config)
 
-    # 5 = 2 "inheriting" accounts + 3 "inheriting" shared configs
     Delayed::Testing.drain
-    expect(regenerator.progresses.count).to eq(5)
 
     # make sure the child account's brand config is based on this new brand config
     expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
@@ -97,10 +95,9 @@ describe BrandConfigRegenerator do
     child_config.save!
     @child_account.save!
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, new_brand_config)
+    BrandConfigRegenerator.process(@parent_account, user_factory, new_brand_config)
 
     Delayed::Testing.drain
-    expect(regenerator.progresses.count).to eq(4)
 
     expect(@child_account.reload.brand_config.parent).to eq(new_brand_config)
   end
@@ -108,10 +105,9 @@ describe BrandConfigRegenerator do
   it "handles reverting to default (nil) theme correctly" do
     setup_account_family_with_configs
 
-    regenerator = BrandConfigRegenerator.new(@parent_account, user_factory, nil)
+    BrandConfigRegenerator.process(@parent_account, user_factory, nil)
 
     Delayed::Testing.drain
-    expect(regenerator.progresses.count).to eq(4)
 
     expect(@child_account.reload.brand_config.parent).to eq(nil)
     expect(@child_shared_config.reload.brand_config.parent).to eq(nil)
@@ -127,11 +123,9 @@ describe BrandConfigRegenerator do
     site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
     site_admin_config.save!
 
-    regenerator = BrandConfigRegenerator.new(Account.site_admin, user_factory, new_brand_config)
+    BrandConfigRegenerator.process(Account.site_admin, user_factory, new_brand_config)
 
-    # 6 = 3 "inheriting" accounts = 3 "inheriting" shared configs
     Delayed::Testing.drain
-    expect(regenerator.progresses.count).to eq(6)
 
     expect(Account.site_admin.brand_config).to eq(new_brand_config)
 
