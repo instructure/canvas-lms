@@ -16,9 +16,12 @@ function compute_tags {
   local cacheId=$(echo "$@" | md5sum | cut -d' ' -f1)
   local cacheSalt=$(echo "$CACHE_VERSION" | md5sum | cut -c1-8)
 
-  tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId"
-  tags[LOAD_FALLBACK_TAG]="$cachePrefix:$CACHE_LOAD_FALLBACK_SCOPE-$cacheSalt-$cacheId"
-  tags[SAVE_TAG]="$cachePrefix:$CACHE_SAVE_SCOPE-$cacheSalt-$cacheId"
+  [ ! -z "${CACHE_LOAD_SCOPE-}" ] && tags[LOAD_TAG]="$cachePrefix:$CACHE_LOAD_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
+  [ ! -z "${CACHE_LOAD_FALLBACK_SCOPE-}" ] && tags[LOAD_FALLBACK_TAG]="$cachePrefix:$CACHE_LOAD_FALLBACK_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
+  [ ! -z "${CACHE_SAVE_SCOPE-}" ] && tags[SAVE_TAG]="$cachePrefix:$CACHE_SAVE_SCOPE-$cacheSalt-$cacheId${CACHE_SUFFIX-}"
+  [ ! -z "${CACHE_UNIQUE_SCOPE-}" ] && tags[UNIQUE_TAG]="$cachePrefix:$CACHE_UNIQUE_SCOPE"
+
+  return 0
 }
 
 function has_remote_tags {

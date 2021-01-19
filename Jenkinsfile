@@ -461,11 +461,11 @@ pipeline {
                       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
                       "CACHE_SAVE_SCOPE=${cacheScope}",
+                      "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                      "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
