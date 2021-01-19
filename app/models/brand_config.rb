@@ -202,6 +202,7 @@ class BrandConfig < ActiveRecord::Base
     account.brand_config_md5 = md5
     account.save!
     BrandConfig.destroy_if_unused(old_md5)
+    progress&.increment_completion!(1)
   end
 
   def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_id)
@@ -211,12 +212,12 @@ class BrandConfig < ActiveRecord::Base
     shared_brand_config.brand_config_md5 = md5
     shared_brand_config.save!
     BrandConfig.destroy_if_unused(old_md5)
+    progress&.increment_completion!(1)
   end
 
   def save_and_sync_to_s3!(progress=nil)
-    progress.update_completion!(5) if progress
     save_all_files!
-    progress.update_completion!(80) if progress
+    progress.increment_completion!(4) if progress&.total
   end
 
   def self.destroy_if_unused(md5)
