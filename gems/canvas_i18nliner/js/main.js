@@ -24,25 +24,32 @@ var CoffeeScript = require("coffee-script");
 var babylon = require("@babel/parser");
 var fs = require('fs');
 
-var AbstractProcessor = require("i18nliner/dist/lib/processors/abstract_processor").default;
 var JsProcessor = require("i18nliner/dist/lib/processors/js_processor").default;
 var HbsProcessor = require("@instructure/i18nliner-handlebars/dist/lib/hbs_processor").default;
 var CallHelpers = require("i18nliner/dist/lib/call_helpers").default;
 
-var scanner = require("./scanner");
+var glob = require("glob");
 
 // tell i18nliner's babylon how to handle `import('../foo').then`
 I18nliner.config.babylonPlugins.push('dynamicImport')
 I18nliner.config.babylonPlugins.push('optionalChaining')
 
-AbstractProcessor.prototype.checkFiles = function() {
-  const processor = this.constructor.name.replace(/Processor/, '').toLowerCase()
-  const files = scanner.processorFiles[processor]
+// explict subdirs, to work around perf issues
+// https://github.com/jenseng/i18nliner-js/issues/7
+JsProcessor.prototype.directories = [
+    "public/javascripts",
+    "app/coffeescripts",
+    "app/jsx"
+  ].concat(glob.sync("gems/plugins/*/app/jsx"))
+   .concat(glob.sync("gems/plugins/*/app/coffeescripts"))
+   .concat(glob.sync("gems/plugins/*/public/javascripts"));
+JsProcessor.prototype.defaultPattern = ["*.js", "*.jsx", "*.coffee"];
 
-  for (const file of files) {
-    this.checkWrapper(file, this.checkFile.bind(this))
-  }
-}
+HbsProcessor.prototype.directories = [
+    "app/views/jst",
+    "app/coffeescripts/ember"
+]  .concat(glob.sync("gems/plugins/*/app/views/jst"))
+HbsProcessor.prototype.defaultPattern = ["*.hbs", "*.handlebars"];
 
 JsProcessor.prototype.sourceFor = function(file) {
   var source = fs.readFileSync(file).toString();
@@ -69,14 +76,8 @@ var ScopedTranslationHash = require("./scoped_translation_hash");
 
 // remove path stuff we don't want in the scope
 var pathRegex = new RegExp(
-  '.*(' +
-    "app/views/jst" +
-    "|app/coffeescripts/ember" +
-    '|gems/plugins/[^/]+/app/views/jst' +
-  ')' +
-  '(/plugins/[^/]+)?/' // remove plugins bit once we drop requirejs/handlebars_tasks/plugin symlinks
-)
-
+  ".*(" + HbsProcessor.prototype.directories.join("|") + ")(/plugins/[^/]+)?/" // remove plugins bit once we drop requirejs/handlebars_tasks/plugin symlinks
+);
 ScopedHbsExtractor.prototype.normalizePath = function(path) {
   return path.replace(pathRegex, "").replace(/^([^\/]+\/)templates\//, '$1');
 };
@@ -91,16 +92,9 @@ HbsProcessor.prototype.Extractor = ScopedHbsExtractor;
 CallHelpers.keyPattern = /^\#?\w+(\.\w+)+$/ // handle our absolute keys
 
 module.exports = {
-  I18nliner,
+  I18nliner: I18nliner,
   runCommand: function(argv) {
     argv = require('minimist')(argv);
-
-    scanner.scanFilesFromI18nrc(
-      scanner.loadConfigFromI18nrc(
-        require('path').resolve(__dirname, '../../../.i18nrc')
-      )
-    )
-
     Commands.run(argv._[0], argv) || (process.exitCode = 1);
   }
 };

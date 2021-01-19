@@ -1,2 +1,2 @@
-plugins/**/*
-ember/shared/helpers/t.js
+/plugins
+/ember/shared/helpers/t.js
