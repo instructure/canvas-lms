@@ -36,6 +36,8 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
     before(:each) do
       course_with_teacher_logged_in
       Account.default.enable_feature!(:rce_enhancements)
+      Account.site_admin.enable_feature!(:new_math_equation_handling)
+      Account.site_admin.enable_feature!(:inline_math_everywhere)
       stub_rcs_config
     end
 
@@ -399,13 +401,13 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
 
         select_math_equation_from_toolbar
         select_squareroot_symbol
+        add_squareroot_value
         click_insert_equation
 
         # Verify image in rce
         in_frame rce_page_body_ifr_id do
           expect(wiki_body).to contain_css('img.equation_image')
         end
-
         # Select to re-edit math equation
         in_frame rce_page_body_ifr_id do
           select_math_image
@@ -418,6 +420,22 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
         click_page_save_button
         wait_for_ajaximations
         expect(math_rendering_exists?).to eq true
+      end
+
+      it 'renders math equations for inline math with "\("' do
+        title = 'Assignment-Title with Math \(x^2\)'
+        @assignment = @course.assignments.create!(name: title)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
+        wait_for_ajaximations
+        expect(mathjax_element_exists_in_title?).to eq true
+      end
+
+      it 'renders math equations for inline math with $$' do
+        title = 'Assignment-Title with Math $$x^2$$'
+        @assignment = @course.assignments.create!(name: title)
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}/"
+        wait_for_ajaximations
+        expect(mathjax_element_exists_in_title?).to eq true
       end
     end
 
