@@ -40,7 +40,6 @@ def ignoreBuildNeverStartedError(block) {
 }
 
 def getMigrationsTag(name) {
-
   (env.GERRIT_REFSPEC.contains('master')) || !migrations.cacheLoadFailed() ? migrations.imageMergeTag(name) : migrations.imagePatchsetTag(name)
 }
 
@@ -66,6 +65,7 @@ pipeline {
     CASSANDRA_IMAGE_TAG=imageTag.cassandra()
     DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
     POSTGRES_IMAGE_TAG=imageTag.postgres()
+    RSPEC_PROCESSES=4
   }
 
   stages {
@@ -87,9 +87,9 @@ pipeline {
           distribution.addSeleniumSuites(stages)
 
           withEnv([
-            "CASSANDRA_IMAGE_TAG=${getMigrationsTag('cassandra')}",
-            "DYNAMODB_IMAGE_TAG=${getMigrationsTag('dynamodb')}",
-            "POSTGRES_IMAGE_TAG=${getMigrationsTag('postgres')}"
+            "CASSANDRA_IMAGE_TAG=${getMigrationsTag('cassandra')}-${RSPEC_PROCESSES}",
+            "DYNAMODB_IMAGE_TAG=${getMigrationsTag('dynamodb')}-${RSPEC_PROCESSES}",
+            "POSTGRES_IMAGE_TAG=${getMigrationsTag('postgres')}-${RSPEC_PROCESSES}"
           ]) {
             parallel(stages)
           }
