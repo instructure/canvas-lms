@@ -1238,6 +1238,7 @@ fi:
   add_quiz_ip_filter_c7b37dc5: "Lisää testin IP-suodatin"
   add_rating_89d7fbde: "Lisää luokitus"
   add_recipient_ff135ed7: "Lisää vastaanottaja"
+  add_remove_in_courses_fa1c9081: "Lisää/poista kursseja"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Lisää, poista tai järjestä uudelleen tämän portfolion osioita"
   add_role_3dc4d273: "Lisää rooli"
   add_rubric_3636d9a6: "Lisää arviointitauluko"
@@ -1251,6 +1252,7 @@ fi:
   add_subtitle_9f660cc: "Lisää tekstitys"
   add_tas_to_courses_27741f81: "Lisää apuopettajia kurssille"
   add_tas_to_the_course_2aac6e02: "Lisää apuopettajia kurssille"
+  add_teachers_to_courses_48ac7a7a: "Lisää opettajia kursseille"
   add_theme_32fa3d50: "Lisää teema"
   add_to_rce_toolbar_e5b3e3b4: "Lisää RCE-työkalupalkkiin"
   add_to_student_to_do_58e66b4b: "Lisää opiskelijoiden tehtävälistalle"
@@ -1815,6 +1817,7 @@ fi:
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "Automaattisesti luotu kronologinen yhteenveto kurssistasi"
   an_error_occured_please_try_again_e59b65b: "Tapahtui virhe. Yritä uudelleen."
   an_error_occured_saving_the_assignment_d71cb3d2: "Ilmeni virhe tehtävää tallennettaessa"
+  an_error_occured_updating_the_flag_7df5de0a: "Ilmeni virhe vikailmoituksen päivityksessä"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Ilmeni virhe, kun poistettiin arvosanojen antojaksojen joukkoa."
   an_error_occured_while_deleting_the_grading_period_c8343484: "Ilmeni virhe arvosanojen antojaksoa poistettaessa"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Ilmeni virhe ilmoittautumisehtoja noudettaessa."
@@ -1843,10 +1846,14 @@ fi:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "Ilmeni virhe, kun yritettiin luoda yhteyttä Turnitiniin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Ilmeni virhe, kun tarkastettiin siirron tilaa"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Ilmoitusten poistamisessa tapahtui virhe"
+  an_error_occurred_while_loading_account_outcomes_8f337857: "Virhe ladattaessa kurssituloksia."
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Virhe ladattaessa tilin tuloksia: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "Osaamisen luokitusta ladattaessa ilmeni virhe: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "Osaamisen luokitusta ladattaessa ilmeni virhe: "
   an_error_occurred_while_loading_associations_9699b3ee: "Liitosten lataamisen yhteydessä tapahtui virhe"
   an_error_occurred_while_loading_changes_9851b56f: "Muutosten lataamisen yhteydessä tapahtui virhe"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: "Virhe ladattaessa kurssituloksia."
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Virhe ladattaessa kurssituloksia: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Kurssien lataamisen yhteydessä tapahtui virhe"
   an_error_occurred_while_loading_late_policies_c415f676: "Ilmeni virhe ladattaessa myöhästymisiä koskevia käytäntöjä"
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Ilmeni virhe ladattaessa hallinnan laskentaa: %{error}"
@@ -2096,6 +2103,7 @@ fi:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Haluatko varmasti näyttää tämän tehtävän arvosanat opiskelijoille?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Haluatko varmasti tehdä näin? Toimintoa ei voi kumota ja se korvaa arvosanakirjassa jo olevat arvosanat."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Haluatko varmasti lähettää tämän tehtävän arvosanat opiskelijoille?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Haluatko varmasti jatkaa? Tekemiäsi muutoksia ei tallenneta."
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Haluatko varmasti poistaa tämän kohteen?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Haluatko varmasti poistaa tämän työkalun?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Haluatko varmasti poistaa tämän käyttäjän?"
@@ -2893,6 +2901,7 @@ fi:
   audio_dd489fcc: Ääni
   australia_61_eb9bb701: "Australia (+61)"
   austria_43_7bc58b34: "Itävalta (+43)"
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Todennusvirhe yhteyden muodostamisessa Google Driveen."
   auth_logging: 
     corrupted: "Tietoja ei saatavilla"
     login: SISÄÄNKIRJAUTUMINEN
@@ -3061,6 +3070,7 @@ fi:
   belgium_32_e5f5b598: "Belgia (+32)"
   below_mastery_abd1dca5: "Vähemmän kuin osaamisen hallinta"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Tämän hakukentän alla on %{content_type} luettelo. Kun kirjoitat, luettelo suodatetaan vastaamaan kyselyäsi. Viestit suodatetaan minkä tahansa valitsemasi vaihtoehdon mukaan."
+  beta_cb5f307e: Beta
   between_1_and_5_f2a74bcf: "1 ja 5 välillä"
   between_1_and_99_d421a4c0: "1-99 % välillä"
   big_blue_button_conference: 
@@ -5165,6 +5175,7 @@ fi:
   course_card_image_5285f1bf: "Kurssikortin kuva"
   course_catalog_4cc7c8ce: Kurssiluettelo
   course_collaborations_dadb327e: "Kurssin yhteistyöt"
+  course_concluded_unable_to_send_messages_b99b6b6d: "Kurssi suoritettu loppuun, viestien lähettäminen ei onnistu"
   course_conferences_3d914c96: "Kurssin verkkotapaamiset"
   course_content_a92eca20: Kurssisisältö
   course_content_add_edit_delete_ea877eca: "Kurssin sisältö - lisää/muokkaa/poista"
@@ -5351,6 +5362,7 @@ fi:
     sis_id_taken: "SIS ID \"%{sis_id}\" on jo käytössä"
   course_section_7a988066: "Kurssin osio"
   course_section_name_ea880ed1: "Kurssin osio %{name}"
+  course_sections: "Kurssin osiot"
   course_sections_add_c6b5dc1: "Kurssin osiot - lisää"
   course_sections_add_edit_delete_c4f4ac19: "Kurssin osiot - lisää/muokkaa/poista"
   course_sections_delete_e75e3eeb: "Kurssin osiot - poista"
@@ -6421,8 +6433,10 @@ fi:
   disabled_and_locked_d14dc6c2: "Pois käytöstä ja lukittu"
   disabled_in_course_settings_d15ee35d: "* Poistettu käytöstä kurssiasetuksissa"
   disabled_links_b3bdea99: "Käytöstä poistetut linkit"
+  disabled_locked_dab351d6: "Pois käytöstä (lukittu)"
   disabled_not_visible_to_students_2c9d693f: "Poistettu käytöstä Ei näkyvissä opiskelijoille."
   disabled_not_visible_to_students_48d4a90d: "Poistettu käytöstä Ei näkyvissä opiskelijoille"
+  disabled_unlocked_1588a6d1: "Pois käytöstä (lukitus avattu)"
   disables_push_notifications_for_certain_types_3f57cde4: "Poistaa työntöilmoitukset käytöstä määrätyille tyypeille."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Poistaa tekstiviesti-ilmoitukset kaikista muista kuin ilmoituksista ja
@@ -7057,6 +7071,8 @@ fi:
   enabled_and_locked_49ff3de4: "Käytössä ja lukittu"
   enabled_ba7cab66: Käytössä
   enabled_links_be110215: "Ota linkit käyttöön"
+  enabled_locked_3cf7c256: "Käytössä (lukittu)"
+  enabled_unlocked_8d3a5df7: "Käytössä (lukitus avattu)"
   enabled_web_services_f620b2be: "Käytössä olevat verkkopalvelut"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Ottaa käyttöön plagiointiraportit ja samankaltaisuuden pisteet uuden arvosanakirjan tehtäväpalautuspaneelissa."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Mahdollistaa uusien API-päätepisteiden käytön uuden analytiikan tarjoamassa kurssi- ja käyttäjädatassa."
@@ -7134,6 +7150,10 @@ fi:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Rekisteröitymiset voidaan lisätä laitoksen opiskelijajärjestelmän (SIS) perusteella. Jos rekisteröityminen on luotu SIS:n kautta, vain järjestelmäkäyttäjät voivat poistaa rekisteröitymisen kurssilta.
               Jos haluat tarkastella käyttäjiä kurssilla, Käyttäjät - tarkastele luetteloa täytyy olla käytössä. Tarkastellaksesi SIS-tunnuksia, SIS-data - lue täytyy olla käytössä. Lisätäksesi käyttäjän kurssille SIS-tunnuksen kautta, SIS-data - hallitse täytyy myös olla käytössä. Muokataksesi opettajan tai apuopettajan osiota, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä. Linkittääksesi tarkkailijan opiskelijaan, Viestit - lähetä viestejä yksittäisille kurssin jäsenille täytyy myös olla käytössä.
+  enrollments_observers: Tarkkailijat
+  enrollments_students: Opiskelijat
+  enrollments_tas: Apuopettajat
+  enrollments_teachers: Opettajat
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Varmistaa, että jo kurssille tuoduista tuloksista ei luoda kaksoiskappaleita, jos ne tuodaan tuodaan uudelleen"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Varmistaa, että käyttäjät, joilla ei ole Tuo oppimistulokset -käyttöoikeuksia, eivät voi nähdä painiketta Tulos-välilehdessä."
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Syötä hex-värikoodi tähän käyttääksesi mukautettua väriä."
@@ -9208,7 +9228,9 @@ fi:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Jos sisältöeditorin laajennukset on myös otettu käyttöön,
       editori tallentaa tekemäsi muutokset automaattisesti.
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Jos tämä on määritetty, arvosanan laskuri ohittaa postittamattomat nimettömät tehtävät, kun lasketaan yhteenvetoja."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Jos asetukset on tehty, arvosanakirjan CSV-vientitoiminto liittää valitun arvosanojen antojakson niihin sarakeotsikoihin, joiden arvot vaihtelevat arvosanojen antojakson perusteella."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Jos tämä on määritetty, arvosanakirja jakaa tehtävien määrityksen, ja lataa ensin valitun arvosanojen antojakson."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Jos tämä on määritetty, Lähetä SIS-ominaisuus -toiminnollisuus tehtäville kytkeytyy pois päältä, kun niiden arvosanojen antojakso sulkeutuu. Koskee vain, jos ”Ota uudet SIS-integraatioasetukset” -toiminto on käytössä."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Jos Tilastot - tarkastele tai Käyttäjät - hallitse sisäänkirjautumistietoja -valinnat ovat käytössä, käyttäjä pystyy luomaan sisään-/uloskirjautumisaktiviteetin Pääkäyttäjän työkaluissa. Jos haluat piilottaa sisään-/uloskirjautumisasetuksen pääkäyttäjän työkaluissa, molempien näistä valinnoista tulee olla pois käytöstä."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Jos Tilastot - tarkastele tai Käyttäjät - hallitse sisäänkirjautumistietoja on käytössä, käyttäjä pystyy luomaan sisään-/uloskirjautumisaktiviteetin Pääkäyttäjän työkaluissa. Jos haluat kätkeä sisään-/uloskirjautumisasetuksen pääkäyttäjän työkaluissa, molemmat näistä käyttöoikeuksista täytyy poistaa käytöstä."
@@ -9270,6 +9292,7 @@ fi:
   ignore_name_55edc6fe: "Ohita %{name}"
   ignore_these_3940f6f5: "Ohita nämä"
   ignore_this_assignment_b7a71f80: "Ohita tämä tehtävä"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Ohita lähettämättömät nimettömät tehtävät arvosanakokoelmassa"
   ignore_until_new_mark_935e00a2: "Ohita uuteen arvosanaan asti"
   ignore_until_new_submission_90ba19b7: "Ohita uuteen tehtäväpalautukseen asti"
   illegal_element_focus_request_b3cea847: "Laiton elementin kohdistamispyyntö"
@@ -9364,6 +9387,7 @@ fi:
   include_speedgrader_in_assignment_header_menu_69cd8656: "Sisällytä SpeedGrader tehtävän otsikkovalikkoon arvosanakirjassa"
   include_the_datadog_rum_js_agent_in_the_document_h_dab3570d: "Sisällytä Datadog RUM JS -agentti asiakirjaan HEAD."
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Sisällytä tämän tehtävän arvosanat, kun synkronoit koulusi opiskelijatietojärjestelmään"
+  included_messages_not_for_this_conversation_986a60bf: "included_messages ei tälle keskustelulle"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Lisää arvosanakirjan tehtäväkohtaiseen otsikkovalikkoon linkin kohteeseen SpeedGrader ."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Sisällyttää arvosanan arvot pääkäyttäjän arvosanaraportteihin."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Sisältää tulosten palvelun linjaukset, kun kurssin sisältöä viedään ja tuodaan"
@@ -9381,6 +9405,9 @@ fi:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Ilmaisee, että kuva on vain elävöittämässä sisältöä, eikä ruudunlukuohjelman ole tarkoitus lukea sitä."
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Yksittäisen tehtävän arvosanan lähetys"
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Yksilöllisiä tuloksen laskenta-arvoja ei voida muokata."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Yksilöllisiä tuloksen hallintapisteitä ei voida muokata."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Yksilöllisiä tuloksen arvosteluita ei voida muokata."
   individual_view_81c2f124: "Yksilöllinen näkymä"
   individual_view_d60b9132: "Yksilöllinen näkymä..."
   indonesia_62_4c35bd62: "Indonesia (+62)"
@@ -9540,9 +9567,11 @@ fi:
   invalid_grade_passback_setting_a1d209d1: "Virheellinen grade_passback_setting"
   invalid_hexcode_9124519f: "Virheellinen heksakoodi."
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Virheellinen heksakoodi. Syötä heksakoodin segmentti tähän käyttääksesi mukautettua väriä."
+  invalid_or_missing_session_for_oauth_3ce4b605: "Oauth-sovelluksen virheellinen tai puuttuva istunto"
   invalid_points_8e929c3f: "Virheellinen pistemäärä"
   invalid_points_possible: "Mahdollisten pisteiden arvo tälle tehtävälle täytyy olla nolla tai tätä suurempi."
   invalid_recipient_name_56b22b86: "Vastaanottajan nimi ei kelpaa."
+  invalid_recipients_5fd7c594: "Kelpaamattomat vastaanottajat"
   invalid_redirect_url_6444a1b0: "URL:n uudelleenohjaus ei kelpaa"
   invalid_restrictions_316cd740: "Virheelliset rajoitukset"
   invalid_score_3d247da7: "Virheellinen pistemäärä"
@@ -9987,6 +10016,7 @@ fi:
   load_bank: 
     error_loading_banks: "Virhe pankkeja ladattaessa"
     loading_banks: "Ladataan pankkeja..."
+  load_gradebook_assignments_by_grading_period_919dfd3c: "Lataa arvosanakirjan tehtävät arvosanojen antojakson perusteella"
   load_more_a36f9cf9: "Lataa lisää"
   load_more_comments_dc00ac34: "Lataa lisää kommentteja"
   load_more_results_460f49a9: "Lataa lisää tuloksia"
@@ -12366,6 +12396,7 @@ fi:
   no_content_has_been_shared_with_you_667fde6c: "Sisältöä ei ole jaettu kanssasi."
   no_content_not_visible_to_students_905f8996: "Ei sisältöä. Ei näkyvissä opiskelijoille."
   no_content_not_visible_to_students_b59f4867: "Ei sisältöä. Ei näkyvissä opiskelijoille"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "Seuraavalle kontekstikoodille ei löytynyt kontekstilöytöä: %{context_code}"
   no_courses_favorited_4e69fd63: "Ei suosikiksi merkittyjä kursseja"
   no_courses_found_12d68a74: "Ei löytynyt kursseja"
   no_courses_to_display_700f94c4: "Ei näytettäviä kursseja"
@@ -13162,6 +13193,8 @@ fi:
   override_3de65b2c: Korvaa
   override_grade_385adf30: "uusi ohittava arvosana"
   override_score_53994655: korvauspistemäärä
+  override_score_5f3c1189: Korvauspistemäärä
+  override_score_gradingperiod_286ac51b: "Korvauspistemäärä (%{gradingPeriod})"
   overrides: 
     everyone: Kaikki
     everyone_else: "Kaikki muut"
@@ -15532,6 +15565,7 @@ fi:
       one: "1 osio"
       other: "%{count} osiota"
   recipients_a69b5e55: "Vastaanottajat:"
+  recipients_restricted_by_role_22c4c843: "Vastaanottaji rajoitetaan roolin mukaan"
   record_7c9448b: Nauhoita
   record_an_audio_or_video_comment_88425add: "Nauhoita ääni- tai videokommentti"
   record_audio_14666880: "Nauhoita ääni"
@@ -15662,6 +15696,7 @@ fi:
   remove_studentname_16ba8c3a: "Poista %{studentName}"
   remove_submission_draft_f5c7f58b: "Poista tehtäväpalautuksen luonnos"
   remove_tas_from_courses_13ade851: "Poista apuopettajia kursseilta"
+  remove_teachers_from_courses_353d5217: "Poista opettajia kursseilta"
   remove_text_8e485c41: "Poista %{text}"
   remove_these_dates_48453a81: "Poista nämä päivämäärät"
   remove_this_item_from_the_module_4b2ceab7: "Poista tämä kohde moduulista"
@@ -17187,6 +17222,7 @@ fi:
   sis_syncing_635bfb63: "Opiskelijatietojärjestelmän (SIS) synkronointi"
   site: 
     view_privacy_policy: "Tarkastele tietosuojakäytäntöä"
+  site_admin_d0417171: "Sivuston pääkäyttäjä"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Vain sivuston pääkäyttäjä. Lähetä 1/%{denominator} käyttäjälle käytössä olevilla tileillä joka kuukausi."
   size_b30e1077: Koko
   size_f1873a2: ", koko: "
@@ -17433,6 +17469,7 @@ fi:
   student_extensions_d35a907: "Opiskelijan lisäaika tai -yritykset"
   student_grades_4cbc59a1: "Opiskelijoiden arvosanat"
   student_group_filter_185fb085: "Opiskelijaryhmän suodatin"
+  student_groups: Opiskelijaryhmät
   student_groups_863201c1: Opiskelijaryhmät
   student_id: "Opiskelijan tunnus"
   student_id_236970d8: student_id
@@ -17610,10 +17647,13 @@ fi:
     errors: 
       assignment_submit_fail: "Tehtävän lähetys epäonnistui"
       can_not_submit_locked_assignment: "Et voi lähettää tehtävää, kun se on lukittu"
+      googld_drive_timeout: "Tapahtui aikakatkaisu, kun Google Drivelle puhuttiin"
+      google_drive_workflow: "Google Driven syötettä ei voitu ladata"
       invalid_file_type: "Virheellinen tiedostotyyppi"
       invalid_google_docs_domain: "Et voi lähettää tehtäviä tästä google_docs verkkotunnuksesta"
       media_file_attached: "Tehtäväpalauksessa ei ollut medianauhoitusta"
       no_attached_file: "Sinun täytyy liittää vähintään yksi tiedosto tähän tehtävään"
+      no_attachment_found: "Ei löytynyt liitettä lähetettäväksi Google Driveen"
     finished_redirecting: "Valmis!  Uudelleenohjataan tiedostoon..."
     gathering_files: "Kerätään tiedostoja (%{progress})..."
     gathering_files_progress: "Kerätään tiedostoja (%{progress})..."
@@ -18933,6 +18973,8 @@ fi:
   tolerance_value_9e96573c: "Toleranssin arvo"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Liian monta epäonnistunutta kirjautumisyritystä. Yritä myöhemmin uudelleen tai ota yhteyttä pääkäyttäjääsi."
   too_many_members_b8b15069: "Liian monta jäsentä"
+  too_many_participants_for_group_conversation_1743cd8: "Liian monia ihmisiä ryhmäkeskusteluun"
+  too_many_recipients_for_group_conversation_906a4b69: "Liian monia ihmisiä ryhmäkeskusteluun"
   tool_configuration_63cd43b0: "Työkalun konfigurointi"
   tool_content_2924d18f: "Työkalun sisältö"
   tool_content_e699e813: "Työkalun sisältö"
@@ -19065,6 +19107,7 @@ fi:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Ei pääsyä tietyn opiskelijan tietoihin. Siirrytäänkö tehtävään SpeedGraderissa?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Joidenkin tulosten linjaus sivulle ei onnistu"
   unable_to_align_some_outcomes_to_title_53467231: "Joidenkin tulosten linjaus ei onnistu kohteeseen \"%{title}\""
+  unable_to_connect_to_google_drive_34886e7a: "Google-asemaan ei saada yhteyttä."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Arvosanojen asettaminen jakaumalle ei onnistunut, koska tämän tehtävän määräpäivä on suljetulla arvosanojen antojaksolla vähintään yhdelle opiskelijalle."
   unable_to_delete_assignment_abcf8d62: "Tehtävän poistaminen ei onnistu"
   unable_to_dismiss_update_df1e32eb: "Päivitystä ei voida ohittaa"
@@ -19074,6 +19117,7 @@ fi:
   unable_to_read_file_2d04b0c: "Faili lugemine ei ole võimalik."
   unable_to_remove_app_4293cb53: "Sovellusta ei voida poistaa"
   unable_to_save_new_discussion_topic_99239f3f: "uuden keskustelun aiheen tallentaminen ei onnistunut"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Ei pystytty lähettämään viestejä käyttäjille %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Oletusarvosanan määrittäminen ei onnistunut, koska tämän tehtävän määräpäivä on suljetulla arvosanojen antojaksolla vähintään yhdelle opiskelijalle."
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Vedä ja pudota -moduuleiden määrittäminen ei onnistunut"
   unable_to_toggle_placement_833db6ff: "Sijoituksen vaihto ei onnistu"
@@ -19084,6 +19128,7 @@ fi:
   unauthorized: valtuuttamaton
   unauthorized_message: "JWT-allekirjoitus ei ole voimassa"
   unauthorized_to_delete_this_file_a1271224: "Tämän tiedoston poistoa ei ole valtuutettu"
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Valtuuttamaton, viestin lisääminen keskusteluun ei onnistu"
   unavailable_46d2c344: "Ei saatavissa"
   unavailable_c04e4c93: "ei saatavissa"
   unbookmark_bank_70569249: "Poista kirjanmerkki kohteesta %{bank}"
@@ -19746,11 +19791,15 @@ fi:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Käyttäjät voivat käyttää ja luoda (mutta ei muokata) yksittäisiä tehtävän rubriikkeja tehtävien kautta, kun Tehtävät ja kyselyt - lisää/muokkaa/poista ovat käytössä."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Käyttäjät voivat käyttää Hallitse kysymyspankkeja -linkkiä Testit-pääsivulla, kun Kurssin sisältö - tarkastele ja Tehtävät ja Testit - lisää/muokkaa/poista ovat käytössä."
   users_d1b60cb0: Käyttäjät
+  users_designers_22195c6f: "Käyttäjät - Suunnittelijat"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Käyttäjät - luo tarkkailijan yhdistämiskoodeja opiskelijoille"
   users_manage_login_details_9462b30f: "Käyttäjät - hallitse sisäänkirjautumistietoja"
   users_moderate_content_36d6eed7: "Käyttäjät - moderoi sisältöä"
+  users_observers_e0e66c52: "Käyttäjät - tarkkailijat"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Näytönlukijan käyttäjien täytyy ehkä kytkeä virtuaalinen kohdistin pois päältä voidakseen käyttää näitä näppäimistön pikakuvakkeita."
   users_over_time_9a2ee74a: "käyttäjiä ajan mittaan"
+  users_tas_27117894: "Käyttäjät - Apuopettajat"
+  users_teachers_a5d5d1af: "Käyttäjät - Opettajat"
   users_view_list_861c7a3f: "Käyttäjät - tarkastele luetteloa"
   users_view_login_ids_a2e6a85: "Käyttäjät - näytä kirjautumistunnukset"
   users_view_primary_email_address_14f4978f: "Käyttäjät - tarkastele ensisijaista sähköpostiosoitetta"
@@ -20199,6 +20248,9 @@ fi:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Et voi poistaa alatiliä, jolla on kursseja."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Et voi poistaa alatiliä, jolla on alatilejä."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Et voi poistaa kohdetta %{account_name}, koska siinä on kursseja."
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Et voi muokata tätä arviointitaulukkoa joko sen vuoksi, että sinulla ei ole käyttöoikeuksia tai sitä käytetään useammassa kuin yhdessä paikassa. Mistä tahansa tekemistäsi muutoksista aiheutuu uusi rubriikki. Kaikki liitetyt tulosehdot käyttävät kurssin hallinta-asteikkoa. Jatketaanko joka tapauksessa?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Et voi muokata tätä arviointitaulukkoa joko sen vuoksi, että sinulla ei ole käyttöoikeuksia tai sitä käytetään useammassa kuin yhdessä paikassa. Mistä tahansa tekemistäsi muutoksista aiheutuu uusi rubriikki. Kaikki liitetyt tulosehdot käyttävät tilin hallinta-asteikkoa. Jatketaanko joka tapauksessa?"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Et voi muokata tätä arviointitaulukkoa joko sen vuoksi, että sinulla ei ole käyttöoikeuksia tai sitä käytetään useammassa kuin yhdessä paikassa. Kaikki muutokset, jotka teet, johtavat uuden arviointitaulukon luontiin vanhan arviointitaulukon perusteella. Jatketaanko joka tapauksessa?"
   you_can_try_to_log_in_again_2b23ef0f: "Voit yrittää *kirjautua sisään uudelleen*."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Voit käyttää yhtä 16x16, 32x32, 48x48 kuvatiedostoa."
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-

@@ -181,11 +181,8 @@ class UserMerge
   end
 
   def copy_favorites
-    from_user.favorites.find_each do |f|
-      Favorite.unique_constraint_retry do
-        fave = target_user.favorites.where(context_type: 'Course', context_id: f.context_id).take
-        target_user.favorites.create!(context_type: 'Course', context_id: f.context_id) unless fave
-      end
+    from_user.favorites.preload(:context).find_each do |f|
+      target_user.favorites.find_or_create_by!(context: f.context, root_account_id: f.context.root_account_id)
     end
   end
 
