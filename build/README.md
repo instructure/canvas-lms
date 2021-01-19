@@ -93,11 +93,6 @@ docker image inspect starlord.inscloudgate.net/jenkins/canvas-lms:20.255220.11-p
 }
 ```
 
-The build currently relies on the post-merge build re-building webpack due to $JS_BUILD_NO_UGLIFY being different for
-pre-merge builds. If this changes, the post-merge build will start to share images with the pre-merge build, and this
-will lead to the ruby-runner / yarn-runner / webpack-builder images not being transferred correctly to the post-merge
-scope. This can be fixed by using the `dockerUtils.tagRemote()` pattern for ruby-runner / yarn-runner / webpack-builder.
-
 # FAQ
 
 Q: I added a new file dependency to `bundle exec rake canvas:compile_assets` or similar task, and

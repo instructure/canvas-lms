@@ -438,6 +438,8 @@ pipeline {
                 pluginsToPull.add([name: 'qti_migration_tool', version: getPluginVersion('qti_migration_tool'), target: "vendor/qti_migration_tool"])
 
                 pullRepos(pluginsToPull)
+
+                libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
               }
             }
 
@@ -477,7 +479,9 @@ pipeline {
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
-                      sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      credentials.withStarlordCredentials({ ->
+                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      })
                     }
                   }
                 }
@@ -498,16 +502,6 @@ pipeline {
                   ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                 """, label: 'upload cache images')
 
-                def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
-
-                // If we are unable to push up the webpack builder image, then this
-                // build should use the currently cached image.
-                if (hasWebpackBuilderImage != 0) {
-                  def webpackBuilderLabel = sh(script: "docker inspect $PATCHSET_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}'", returnStdout: true).trim()
-
-                  dockerUtils.tagRemote(webpackBuilderLabel, env.WEBPACK_BUILDER_IMAGE)
-                }
-
                 if (isPatchsetPublishable()) {
                   sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
@@ -519,8 +513,6 @@ pipeline {
               timeout(time: 10) {
                 def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
                 def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
-
-                libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
 
                 withEnv([
                   "CACHE_LOAD_SCOPE=${cacheLoadScope}",
