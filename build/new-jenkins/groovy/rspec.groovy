@@ -146,7 +146,7 @@ def _runRspecTestSuite(
       }
 
       if (env.RSPEC_LOG == '1') {
-        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime_rspec_tests.log ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
         archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
       }
 

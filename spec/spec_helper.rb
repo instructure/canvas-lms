@@ -357,7 +357,7 @@ RSpec.configure do |config|
   end
 
   if ENV['RSPEC_LOG']
-    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime_rspec_tests.log"
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.log"
   end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
