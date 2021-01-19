@@ -62,10 +62,16 @@ pipeline {
     // e.g. canvas-lms:01.123456.78-postgres-12-ruby-2.6
     PATCHSET_TAG = getPatchsetTag()
 
-    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
-    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
-    POSTGRES_IMAGE_TAG=imageTag.postgres()
-    RSPEC_PROCESSES=4
+    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
+    DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
+
+    IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+    RSPEC_PROCESSES = 4
+
+    CASSANDRA_IMAGE_TAG = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    DYNAMODB_IMAGE_TAG = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_IMAGE_TAG = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
   }
 
   stages {
@@ -86,13 +92,7 @@ pipeline {
           distribution.addRSpecSuites(stages)
           distribution.addSeleniumSuites(stages)
 
-          withEnv([
-            "CASSANDRA_IMAGE_TAG=${getMigrationsTag('cassandra')}-${RSPEC_PROCESSES}",
-            "DYNAMODB_IMAGE_TAG=${getMigrationsTag('dynamodb')}-${RSPEC_PROCESSES}",
-            "POSTGRES_IMAGE_TAG=${getMigrationsTag('postgres')}-${RSPEC_PROCESSES}"
-          ]) {
-            parallel(stages)
-          }
+          parallel(stages)
         }
       }
     }

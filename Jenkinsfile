@@ -116,6 +116,9 @@ def postFn(status) {
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
+        dockerUtils.tagRemote(env.CASSANDRA_IMAGE, env.CASSANDRA_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.DYNAMODB_IMAGE, env.DYNAMODB_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.POSTGRES_IMAGE, env.POSTGRES_MERGE_IMAGE)
       }
     }
   } finally {
@@ -325,6 +328,7 @@ pipeline {
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
+    RSPEC_PROCESSES = 4
 
     JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
     LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath("linter-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
@@ -345,6 +349,10 @@ pipeline {
     DYNAMODB_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+
+    CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
 
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
@@ -525,8 +533,7 @@ pipeline {
                   "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
                   "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
                   "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
-                  "POSTGRES_PASSWORD=sekret",
-                  "RSPEC_PROCESSES=4"
+                  "POSTGRES_PASSWORD=sekret"
                 ]) {
                   credentials.withStarlordCredentials({ ->
                     sh """
