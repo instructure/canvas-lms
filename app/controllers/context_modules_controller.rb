@@ -94,7 +94,8 @@ class ContextModulesController < ApplicationController
            manage_files: @context.grants_right?(@current_user, session, :manage_files)
         },
         :MODULE_TRAY_TOOLS => {:module_index_menu => @module_index_tools, :module_group_menu => @module_group_tools},
-        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account)
+        :DEFAULT_POST_TO_SIS => @context.account.sis_default_grade_export[:value] && !AssignmentUtil.due_date_required_for_account?(@context.account),
+        :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
 
       is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
       is_child_course = MasterCourses::ChildSubscription.is_child_course?(@context)

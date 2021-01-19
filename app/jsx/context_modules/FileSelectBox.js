@@ -125,10 +125,23 @@ export default class FileSelectBox extends React.Component {
 
   render() {
     const moduleDnd = window?.ENV?.FEATURES?.module_dnd
-    const ariaLabel = moduleDnd
+    const newQuizzesModulesSupport = window?.ENV?.new_quizzes_modules_support
+    const ariaLabel = newQuizzesModulesSupport
+      ? moduleDnd
+        ? I18n.t(
+            'Select the files you want to associate, or add files by selecting "Create File(s)".'
+          )
+        : I18n.t('Select the file you want to associate, or add a file by selecting "Create File".')
+      : moduleDnd
       ? I18n.t('Select the files you want to associate, or add files by selecting "New File(s)".')
       : I18n.t('Select the file you want to associate, or add a file by selecting "New File".')
-    const newFile = moduleDnd ? I18n.t('[ New File(s) ]') : I18n.t('[ New File ]')
+    const newFile = newQuizzesModulesSupport
+      ? moduleDnd
+        ? I18n.t('[ Create File(s) ]')
+        : I18n.t('[ Create File ]')
+      : moduleDnd
+      ? I18n.t('[ New File(s) ]')
+      : I18n.t('[ New File ]')
     return (
       <div>
         <select

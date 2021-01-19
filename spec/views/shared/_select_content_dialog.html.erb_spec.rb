@@ -110,7 +110,7 @@ describe "shared/_select_content_dialog" do
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map(&:text)
-      expect(options).to eq(["[ New Quiz ]", "A", "B", "C"])
+      expect(options).to eq(["[ Create Quiz ]", "A", "B", "C"])
     end
 
     it "does not render New Quizzes as Assignments" do
@@ -119,7 +119,7 @@ describe "shared/_select_content_dialog" do
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#assignments_select .module_item_select option').map(&:text)
-      expect(options).to eq(["[ New Assignment ]"])
+      expect(options).to eq(["[ Create Assignment ]"])
     end
   end
 
