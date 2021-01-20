@@ -117,83 +117,85 @@ export default function FeatureFlagButton({featureFlag, disableDefaults, display
 
   // The popover is lifted out of Menu to prevent stupid scrolling to the top of the page
   return (
-    <Flex direction="row">
-      <Popover
-        placement="bottom center"
-        on={['click']}
-        shouldContainFocus
-        shouldReturnFocus
-        // This ensures we don't get the funky scroll behavior (i don't know why, but it works)
-        shouldRenderOffscreen
-        renderTrigger={
-          <IconButton
-            interaction={isReadonly || apiBusy ? 'disabled' : 'enabled'}
-            size="medium"
-            withBackground={false}
-            withBorder={false}
-            color={isEnabled ? 'success' : 'danger'}
-            screenReaderLabel={description}
-          >
-            {isEnabled ? IconPublishSolid : IconTroubleLine}
-          </IconButton>
-        }
-        ref={popoverEl}
-      >
-        <Menu placement="bottom center" defaultShow>
-          <Menu.Item
-            value={transitions.enabled}
-            selected={isSelected(transitions.enabled) || isSelected('allowed_on')}
-            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.enabled)}
-            onSelect={() => {
-              hidePopover()
-              updateFlag(transitions.enabled)
-            }}
-            type="checkbox"
-          >
-            {I18n.t('Enabled')}
-          </Menu.Item>
-          <Menu.Item
-            value={transitions.disabled}
-            selected={isSelected(transitions.disabled) || isSelected('allowed')}
-            disabled={flagUtils.transitionLocked(effectiveFlag, transitions.disabled)}
-            onSelect={() => {
-              hidePopover()
-              updateFlag(transitions.disabled)
-            }}
-            type="checkbox"
-          >
-            {I18n.t('Disabled')}
-          </Menu.Item>
-          {allowsDefaults ? <Menu.Separator /> : null}
-          {allowsDefaults ? (
+    <div title={description}>
+      <Flex direction="row">
+        <Popover
+          placement="bottom center"
+          on={['click']}
+          shouldContainFocus
+          shouldReturnFocus
+          // This ensures we don't get the funky scroll behavior (i don't know why, but it works)
+          shouldRenderOffscreen
+          renderTrigger={
+            <IconButton
+              interaction={isReadonly || apiBusy ? 'disabled' : 'enabled'}
+              size="medium"
+              withBackground={false}
+              withBorder={false}
+              color={isEnabled ? 'success' : 'danger'}
+              screenReaderLabel={description}
+            >
+              {isEnabled ? IconPublishSolid : IconTroubleLine}
+            </IconButton>
+          }
+          ref={popoverEl}
+        >
+          <Menu placement="bottom center" defaultShow>
             <Menu.Item
-              value={transitions.lock}
-              selected={isLocked}
-              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.lock)}
+              value={transitions.enabled}
+              selected={isSelected(transitions.enabled) || isSelected('allowed_on')}
+              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.enabled)}
               onSelect={() => {
                 hidePopover()
-                updateFlag(transitions.lock)
+                updateFlag(transitions.enabled)
               }}
               type="checkbox"
             >
-              {I18n.t('Lock')}
+              {I18n.t('Enabled')}
             </Menu.Item>
-          ) : null}
-        </Menu>
-      </Popover>
-      <Flex direction="column" margin="none none none xx-small">
-        {allowsDefaults && (
-          <Flex.Item size="24px">
-            <Text color="primary">{isLocked ? <IconLockSolid /> : <IconUnlockLine />}</Text>
-          </Flex.Item>
-        )}
-        {apiBusy && (
-          <Flex.Item size="24px" overflowX="visible" overflowY="visible">
-            <Spinner size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
-          </Flex.Item>
-        )}
+            <Menu.Item
+              value={transitions.disabled}
+              selected={isSelected(transitions.disabled) || isSelected('allowed')}
+              disabled={flagUtils.transitionLocked(effectiveFlag, transitions.disabled)}
+              onSelect={() => {
+                hidePopover()
+                updateFlag(transitions.disabled)
+              }}
+              type="checkbox"
+            >
+              {I18n.t('Disabled')}
+            </Menu.Item>
+            {allowsDefaults ? <Menu.Separator /> : null}
+            {allowsDefaults ? (
+              <Menu.Item
+                value={transitions.lock}
+                selected={isLocked}
+                disabled={flagUtils.transitionLocked(effectiveFlag, transitions.lock)}
+                onSelect={() => {
+                  hidePopover()
+                  updateFlag(transitions.lock)
+                }}
+                type="checkbox"
+              >
+                {I18n.t('Lock')}
+              </Menu.Item>
+            ) : null}
+          </Menu>
+        </Popover>
+        <Flex direction="column" margin="none none none xx-small">
+          {allowsDefaults && (
+            <Flex.Item size="24px">
+              <Text color="primary">{isLocked ? <IconLockSolid /> : <IconUnlockLine />}</Text>
+            </Flex.Item>
+          )}
+          {apiBusy && (
+            <Flex.Item size="24px" overflowX="visible" overflowY="visible">
+              <Spinner size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
+            </Flex.Item>
+          )}
+        </Flex>
       </Flex>
-    </Flex>
+    </div>
   )
 }
 

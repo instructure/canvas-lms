@@ -50,17 +50,17 @@ export function buildDescription(flag, allowsDefaults) {
   if (allowsDefaults) {
     switch (flag.state) {
       case 'on':
-        description = I18n.t('Enabled (locked)')
+        description = I18n.t('Enabled for all subaccounts/courses')
         break
       case 'off':
       case 'hidden':
-        description = I18n.t('Disabled (locked)')
+        description = I18n.t('Disabled for all subaccounts/courses')
         break
       case 'allowed':
-        description = I18n.t('Disabled (unlocked)')
+        description = I18n.t('Allowed for subaccounts/courses, default off')
         break
       case 'allowed_on':
-        description = I18n.t('Enabled (unlocked)')
+        description = I18n.t('Allowed for subaccounts/courses, default on')
         break
     }
   } else {
