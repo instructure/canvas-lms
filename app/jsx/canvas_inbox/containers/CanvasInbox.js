@@ -27,6 +27,7 @@ const CanvasInbox = () => {
   const [courseFilter, setCourseFilter] = useState()
   const [selectedIds, setSelectedIds] = useState([])
   const [composeModal, setComposeModal] = useState(false)
+  const [deleteDisabled, setDeleteDisabled] = useState(true)
 
   const toggleSelectedMessages = conversation => {
     const updatedSelectedIds = selectedIds
@@ -37,6 +38,7 @@ const CanvasInbox = () => {
       updatedSelectedIds.push(conversation._id)
     }
     setSelectedIds(updatedSelectedIds)
+    setDeleteDisabled(selectedIds.length === 0)
   }
 
   return (
@@ -44,10 +46,15 @@ const CanvasInbox = () => {
       <Flex height="100vh" width="100%" as="div" direction="column">
         <Flex.Item>
           <MessageListActionContainer
+            activeMailbox={scope}
+            course={courseFilter}
+            scope={scope}
             onSelectMailbox={setScope}
             onCourseFilterSelect={setCourseFilter}
             selectdIds={selectedIds}
             onCompose={() => setComposeModal(true)}
+            deleteDisabled={deleteDisabled}
+            deleteToggler={setDeleteDisabled}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>

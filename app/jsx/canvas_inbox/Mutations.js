@@ -1,0 +1,56 @@
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+import gql from 'graphql-tag'
+import {ConversationParticipant} from './graphqlData/ConversationParticipant'
+
+export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
+  mutation UpdateConversationParticipants(
+    $conversationIds: [ID!]!
+    $starred: Boolean
+    $subscribed: Boolean
+    $workflowState: String
+  ) {
+    updateConversationParticipants(
+      input: {
+        conversationIds: $conversationIds
+        starred: $starred
+        subscribed: $subscribed
+        workflowState: $workflowState
+      }
+    ) {
+      conversationParticipants {
+        ...ConversationParticipant
+      }
+      errors {
+        message
+      }
+    }
+  }
+  ${ConversationParticipant.fragment}
+`
+
+export const DELETE_CONVERSATIONS = gql`
+  mutation DeleteConversations($ids: [ID!]!) {
+    deleteConversations(input: {ids: $ids}) {
+      conversationIds
+      errors {
+        message
+      }
+    }
+  }
+`

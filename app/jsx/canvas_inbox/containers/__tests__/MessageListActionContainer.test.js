@@ -19,7 +19,7 @@
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import MessageListActionContainer from '../MessageListActionContainer'
 import {createCache} from '../../../canvas-apollo'
-import {COURSES_QUERY} from '../../Queries'
+import {COURSES_QUERY, CONVERSATIONS_QUERY} from '../../Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
@@ -38,6 +38,30 @@ const createGraphqlMocks = () => {
           Node: {
             __typename: 'User'
           }
+        }
+      }
+    },
+    {
+      request: {
+        query: CONVERSATIONS_QUERY,
+        variables: {
+          userID: '1',
+          scope: 'inbox',
+          course: 'course_123'
+        },
+        overrides: {
+          Node: {
+            __typename: 'User'
+          },
+          Conversation: () => ({
+            _id: '1a',
+            contextType: 'context',
+            contextId: 2,
+            subject: 'Second Subject',
+            updateAt: new Date(),
+            conversationMessageConnections: [{}],
+            conversationParticipantsConnection: [{}]
+          })
         }
       }
     }
@@ -163,5 +187,27 @@ describe('MessageListActionContainer', () => {
 
       expect(mailboxDropdown).toBeTruthy()
     })
+  })
+
+  it('should have delete button disabled on load', async () => {
+    const component = await setup({
+      deleteDisabled: true
+    })
+
+    await waitForApolloLoading()
+
+    const button = await component.getByTestId('delete')
+    expect(button).toBeDisabled()
+  })
+
+  it('should have delete button enabled when there are deleteDisabled = false', async () => {
+    const component = await setup({
+      deleteDisabled: false
+    })
+
+    await waitForApolloLoading()
+
+    const button = await component.getByTestId('delete')
+    expect(button).not.toBeDisabled()
   })
 })
