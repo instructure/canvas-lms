@@ -105,6 +105,8 @@ Rails.application.config.after_initialize do
         else
           where(database_server_id: dbs_in_this_region)
         end
+      elsif db_count_in_other_regions == 0
+        all
       else
         dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region + non_existent_database_servers
         if dbs_in_this_region.include?(Shard.default.database_server.id)
