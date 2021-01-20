@@ -57,7 +57,8 @@ mutagen forums, this will go away.)
 
 **Q: Help! My file changes aren't reflecting in the docker container if I use `mutagen compose run ...`**
 
-**A:** Be sure to run `mutagen compose up --no-start web` first or files won't sync. (Run doesn't activate the
+**A:** Be sure to run `mutagen compose up --no-start web` first or files won't sync. (Run doesn't activate the mutagen
+daemon or container.)
 
 **Q: Something seems to be wrong with the sync process, how do I get more information?**
 
