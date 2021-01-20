@@ -18,8 +18,6 @@ services:
       - canvas-rce_canvas:/usr/src/app/packages/canvas-rce/canvas
       - canvas-rce_lib:/usr/src/app/packages/canvas-rce/lib
       - canvas-rce_node_modules:/usr/src/app/packages/canvas-rce/node_modules
-      - generated_2:/usr/src/app/public/dist
-      - generated_3:/usr/src/app/public/javascripts/compiled
       - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
       - jest-moxios-utils_node_modules:/usr/src/app/packages/jest-moxios-utils/node_modules
       - js-utils_es:/usr/src/app/packages/js-utils/es
@@ -33,6 +31,8 @@ services:
       - node_modules:/usr/src/app/node_modules
       - old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules:/usr/src/app/packages/old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock/node_modules
       - pacts:/usr/src/app/pacts
+      - public_dist:/usr/src/app/public/dist
+      - public_javascripts_compiled:/usr/src/app/public/javascripts/compiled
       - reports:/usr/src/app/reports
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp
@@ -80,9 +80,6 @@ volumes:
   canvas-rce_canvas: {}
   canvas-rce_lib: {}
   canvas-rce_node_modules: {}
-  generated_1: {}
-  generated_2: {}
-  generated_3: {}
   i18nliner_node_modules: {}
   jest-moxios-utils_node_modules: {}
   js-utils_es: {}
@@ -97,9 +94,8 @@ volumes:
   old-copy-of-react-14-that-is-just-here-so-if-analytics-is-checked-out-it-doesnt-change-yarn.lock_node_modules: {}
   pg_data: {}
   pacts: {}
-  quizzes_dist: {}
-  quizzes_node_modules: {}
-  quizzes_tmp: {}
+  public_dist: {}
+  public_javascripts_compiled: {}
   reports: {}
   styleguide: {}
   tmp: {}
