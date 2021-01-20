@@ -549,23 +549,35 @@ $(document).ready(function() {
         if (item_type === 'quiz' && item_id !== 'new') {
           ;[quiz_type, item_id] = item_id.split('_')
         }
+        if (item_type === 'quiz' && item_id === 'new') {
+          quiz_type = $('input[name=quiz_engine_selection]:checked').val()
+        }
+        const quiz_lti = quiz_type === 'assignment'
         const item_data = {
           'item[type]': quiz_type || item_type,
           'item[id]': item_id,
           'item[title]': $option.text(),
           'item[indent]': $('#content_tag_indent').val(),
-          quiz_lti: quiz_type === 'assignment'
+          quiz_lti
         }
         if (item_data['item[id]'] == 'new') {
           if (!ENV?.FEATURES?.module_dnd) {
             $('#select_context_content_dialog').loadingImage()
           }
-          let url = $(
+          const $urls = $(
             '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url'
-          ).attr('href')
+          )
+          let url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
           ).getFormData()
+          if (quiz_lti) {
+            data = {
+              'assignment[title]': data['quiz[title]'],
+              'assignment[assignment_group_id]': data['quiz[assignment_group_id]'],
+              quiz_lti: 1
+            }
+          }
           const process_upload = function(data, done = true) {
             let obj
 
@@ -596,7 +608,7 @@ $(document).ready(function() {
               item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             }
             const $option = $(document.createElement('option'))
-            const obj_id = item_type === 'quiz' ? `quiz_${obj.id}` : obj.id
+            const obj_id = item_type === 'quiz' ? `${quiz_type || 'quiz'}_${obj.id}` : obj.id
             $option.val(obj_id).text(item_data['item[title]'])
             $('#' + item_type + 's_select')
               .find('.module_item_select option:last')

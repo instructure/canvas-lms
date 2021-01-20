@@ -88,6 +88,13 @@ describe "shared/_select_content_dialog" do
       options = page.css('#assignments_select .module_item_select option').map(&:text)
       expect(options).to eq(["[ New Assignment ]", "Some New Quiz"])
     end
+
+    it "does not render radios for quiz engine selection" do
+      assign(:combined_active_quizzes, [])
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      expect(page.at_css('#quizs_select .new input[type="radio"]')).to be_nil
+    end
   end
 
   describe "with new_quizzes_modules_support enabled" do
@@ -120,6 +127,73 @@ describe "shared/_select_content_dialog" do
       page = Nokogiri(response.body)
       options = page.css('#assignments_select .module_item_select option').map(&:text)
       expect(options).to eq(["[ Create Assignment ]"])
+    end
+
+    it "renders radios for quiz engine selection" do
+      assign(:combined_active_quizzes, [])
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      expect(page.at_css('#quizs_select .new input[type="radio"]')).not_to be_nil
+    end
+
+    context "with quiz engine selection saved" do
+      it "hides radios and honors selection for New Quizzes" do
+        assign(:combined_active_quizzes, [])
+        expect(@course).to receive(:settings).and_return({
+          engine_selected: {
+            user_id: {
+              newquizzes_engine_selected: 'true'
+            }
+          }
+        })
+        render partial: 'shared/select_content_dialog'
+        page = Nokogiri(response.body)
+        expect(page.css('#quizs_select .new tr').first['style']).to eq 'display: none;'
+        expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).not_to be_nil
+      end
+
+      it "hides radios and honors selection for Classic Quizzes" do
+        assign(:combined_active_quizzes, [])
+        expect(@course).to receive(:settings).and_return({
+          engine_selected: {
+            user_id: {
+              newquizzes_engine_selected: 'false'
+            }
+          }
+        })
+        render partial: 'shared/select_content_dialog'
+        page = Nokogiri(response.body)
+        expect(page.css('#quizs_select .new tr').first['style']).to eq 'display: none;'
+        expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).to be_nil
+      end
+    end
+
+    context "with quiz engine never selected" do
+      it "shows radios and selects new quizzes by default" do
+        assign(:combined_active_quizzes, [])
+        expect(@course).to receive(:settings).and_return({})
+        render partial: 'shared/select_content_dialog'
+        page = Nokogiri(response.body)
+        expect(page.css('#quizs_select .new tr').first['style']).to eq ''
+        expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).not_to be_nil
+      end
+    end
+
+    context "with quiz engine selection revoked" do
+      it "shows radios and selects new quizzes by default" do
+        assign(:combined_active_quizzes, [])
+        expect(@course).to receive(:settings).and_return({
+          engine_selected: {
+            user_id: {
+              newquizzes_engine_selected: 'null'
+            }
+          }
+        })
+        render partial: 'shared/select_content_dialog'
+        page = Nokogiri(response.body)
+        expect(page.css('#quizs_select .new tr').first['style']).to eq ''
+        expect(page.at_css('#quizs_select .new input[type="radio"][checked]')).not_to be_nil
+      end
     end
   end
 
@@ -225,6 +299,5 @@ describe "shared/_select_content_dialog" do
       expect(options).to eq([["[ New Topic ]", "new"], ["A", a.id.to_s], ["B", b.id.to_s], ["C", c.id.to_s]])
     end
   end
-
 end
 
