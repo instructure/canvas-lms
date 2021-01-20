@@ -375,7 +375,8 @@ module Importers
           (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
 
         if needs_new_tag
-          tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          tag = current_tag || item.build_external_tool_tag
+          tag.update(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
           if hash[:external_tool_id] && migration && !migration.cross_institution?
             tool_id = hash[:external_tool_id].to_i
 
