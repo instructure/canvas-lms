@@ -100,6 +100,7 @@ class RubricAssociation < ActiveRecord::Base
     p.data { course_broadcast_data }
   end
 
+  scope :active, -> { where("rubric_associations.workflow_state<>'deleted'") }
   scope :bookmarked, -> { where(:bookmarked => true) }
   scope :for_purpose, lambda { |purpose| where(:purpose => purpose) }
   scope :for_grading, -> { where(:purpose => 'grading') }

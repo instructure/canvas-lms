@@ -33,6 +33,11 @@ describe Quizzes::QuizStatistics do
     @quiz.save!
   end
 
+  it 'should delegate context to quiz' do
+    stats = @quiz.current_statistics_for 'item_analysis'
+    expect(stats.context).to eq @quiz.context
+  end
+
   def csv(opts = {}, quiz = @quiz)
     stats = quiz.statistics_csv('student_analysis', opts)
     run_jobs
@@ -207,6 +212,25 @@ describe Quizzes::QuizStatistics do
 
         expect(Quizzes::QuizStatistics.large_quiz?(quiz)).to be_falsey
       end
+    end
+  end
+
+  describe 'policy' do
+    let(:stats) { @quiz.current_statistics_for 'item_analysis' }
+
+    it 'allows teachers to manage files' do
+      teacher_in_course(active_all: true)
+      expect(stats.grants_right?(@teacher, :manage_files)).to be true
+    end
+
+    it 'allows admins to manage files' do
+      account_admin_user
+      expect(stats.grants_right?(@admin, :manage_files)).to be true
+    end
+
+    it 'does not allow users without manage_file in course to manage files' do
+      student_in_course(active_all: true)
+      expect(stats.grants_right?(@student, :manage_files)).to be false
     end
   end
 end

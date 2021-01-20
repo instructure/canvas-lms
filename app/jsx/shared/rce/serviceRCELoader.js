@@ -249,7 +249,8 @@ const RCELoader = {
       trayProps: getTrayProps(),
       languages,
       autosave,
-      instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED
+      instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
+      use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor
     }
   }
 }

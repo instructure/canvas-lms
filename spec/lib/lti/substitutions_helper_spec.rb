@@ -18,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require 'spec_helper'
+require 'sharding_spec_helper'
 require_dependency "lti/substitutions_helper"
 
 module Lti
@@ -558,6 +558,45 @@ module Lti
 
           it "should not return duplicates but still return in chronological order" do
             expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'def,ghi,abc'
+          end
+        end
+
+        context "when there are more than (limit=1000) content migration courses in the history" do
+          it 'should truncate after the limit of ids' do
+            4.upto(11) do
+              c = Course.create!
+              c.root_account = root_account
+              c.account = account
+              c.lti_context_id = SecureRandom.hex 3
+              c.save
+
+              course.content_migrations.create!(
+                workflow_state: 'imported',
+                source_course: c
+              )
+            end
+
+            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 10)
+            expect(recursive_course_lti_ids.split(',').length).to eq(11)
+            expect(recursive_course_lti_ids).to include 'truncated'
+          end
+
+          it "courses with nil lti_context_ids shouldn't block 'truncated' from showing properly" do
+            [nil, 'lti_context_id5'].each do |item|
+              c = Course.create!
+              c.root_account = root_account
+              c.account = account
+              c.lti_context_id = item
+              c.save
+
+              course.content_migrations.create!(
+                workflow_state: 'imported',
+                source_course: c
+              )
+            end
+
+            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 3)
+            expect(recursive_course_lti_ids).to eq 'lti_context_id5,ghi,def,truncated'
           end
         end
       end

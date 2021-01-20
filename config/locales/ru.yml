@@ -1878,6 +1878,7 @@ ru:
   add_quiz_ip_filter_c7b37dc5: "Добавить IP-фильтры контрольной работы"
   add_rating_89d7fbde: "Добавить оценки"
   add_recipient_ff135ed7: "Добавить получателя"
+  add_remove_in_courses_fa1c9081: "Добавить / удалить в курсах"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Добавить, удалить или изменить порядок разделов для этого портфолио"
   add_review_2fb1590c: "Добавить отзыв"
   add_role_3dc4d273: "Добавить роль"
@@ -1893,6 +1894,7 @@ ru:
   add_subtitle_9f660cc: "Добавить субтитры"
   add_tas_to_courses_27741f81: "Добавить TA в курсы"
   add_tas_to_the_course_2aac6e02: "Добавить ассистентов к курсу"
+  add_teachers_to_courses_48ac7a7a: "Добавить Преподавателей в курсы"
   add_theme_32fa3d50: "Добавить тему"
   add_to_course_481a51c4: "Добавить к курсу..."
   add_to_rce_toolbar_e5b3e3b4: "Добавить на панель инструментов RCE"
@@ -2506,6 +2508,7 @@ ru:
   an_error_occured_please_try_again_e59b65b: "Произошла ошибка. Пожалуйста, попробуйте еще раз."
   an_error_occured_saving_the_assignment_d71cb3d2: "Произошла ошибка при сохранении задания"
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: "Произошла ошибка при генерировании темы. Пожалуйста, повторите попытку."
+  an_error_occured_updating_the_flag_7df5de0a: "Произошла ошибка при обновлении флажка"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Возникла ошибка при удалении набора периода оценивания"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Возникла ошибка при удалении периода оценивания"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Возникла ошибка при извлечении условий зачисления."
@@ -2537,10 +2540,14 @@ ru:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "При попытке связаться с Turnitin произошла ошибка."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Произошла ошибка во время проверки статуса миграции"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Произошла ошибка при удалении аннотаций."
+  an_error_occurred_while_loading_account_outcomes_8f337857: "Произошла ошибка при загрузке результатов учетной записи."
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Произошла ошибка при загрузке результатов учетной записи: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "Произошла ошибка при загрузке оценок по специальной подготовке для учетной записи: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "Произошла ошибка при загрузке оценок по специальной подготовке для учетной записи"
   an_error_occurred_while_loading_associations_9699b3ee: "Произошла ошибка при загрузке ассоциаций"
   an_error_occurred_while_loading_changes_9851b56f: "Произошла ошибка при загрузке изменений"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: "Произошла ошибка при загрузке результатов курса."
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Произошла ошибка при загрузке результатов курса: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Произошла ошибка при загрузке курсов"
   an_error_occurred_while_loading_late_policies_c415f676: "Произошла ошибка при загрузке политик опозданий"
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Произошла ошибка при загрузке расчета уровня усвоения: %{error}"
@@ -2886,6 +2893,7 @@ ru:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Вы уверены, что хотите это сделать? Это не может быть отменено и отменит все существующие оценки в Зачетной книжке."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Вы уверены, что хотите дезактивировать этого пользователя? Они будут не в состоянии участвовать в процессе, если будут неактивными."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Вы уверены, что вы хотите опубликовать оценки за это задание для студентов?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Вы действительно хотите продолжить? Внесенные вами изменения не будут сохранены."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Вы уверены, что хотите опубликовать этот комментарий?"
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: "Вы уверены, что хотите удалить этот оценочный период?"
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Вы уверены, что хотите удалить этот элемент?"
@@ -3905,6 +3913,7 @@ ru:
   australia_e8d44bf8: Австралия
   austria_43_7bc58b34: "Австрия (+43)"
   austria_82178475: Австрия
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Сбой аутентификации при подключении к Google Drive."
   auth_logging: 
     corrupted: "Сведения недоступны"
     login: "ВХОД В СИСТЕМУ"
@@ -4127,6 +4136,7 @@ ru:
   belgium_ef8739b6: Бельгия
   below_mastery_abd1dca5: "Ниже уровня усвоения"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Под этим поисковым полем находится список %{content_type}. Во время набора список будет фильтроваться в соответствии с вашим запросом. Сообщения из разговора будут фильтроваться по выбранному вами критерию."
+  beta_cb5f307e: Бета
   beta_url_3c7b88ec: "Бета URL:"
   better_file_browsing_description: |-
       Новый, упрощенный и более удобный для пользователя интерфейс поиска файлов. Если вы включите эту опцию на уровне курса,
@@ -6836,6 +6846,7 @@ ru:
   course_cards_6029a05c: "Карточки курса"
   course_catalog_4cc7c8ce: "Каталог курсов"
   course_collaborations_dadb327e: "Совместные работы курса"
+  course_concluded_unable_to_send_messages_b99b6b6d: "Курс завершен, отправка сообщений невозможна"
   course_conferences_3d914c96: "Конференции курса"
   course_content_a92eca20: "Содержание курса"
   course_content_add_edit_delete_ea877eca: "Содержание курса - добавить / редактировать / удалить"
@@ -7033,6 +7044,7 @@ ru:
     sis_id_taken: "Идентификатор SIS \"%{sis_id}\" уже используется"
   course_section_7a988066: "Раздел курса"
   course_section_name_ea880ed1: "Раздел курса %{name}"
+  course_sections: "Разделы курса"
   course_sections_add_c6b5dc1: "Разделы курса — добавить"
   course_sections_add_edit_delete_c4f4ac19: "Разделы курса - добавить / редактировать / удалить"
   course_sections_delete_e75e3eeb: "Разделы курса — удалить"
@@ -8465,8 +8477,10 @@ ru:
   disabled_by_default_7d822dcb: "Отключено по умолчанию"
   disabled_in_course_settings_d15ee35d: "* Отключено в настройках курса"
   disabled_links_b3bdea99: "Отключенные ссылки"
+  disabled_locked_dab351d6: "Отключено (заблокировано)"
   disabled_not_visible_to_students_2c9d693f: "Отключено. Не отображается для студентов."
   disabled_not_visible_to_students_48d4a90d: "Отключено. Не отображается для студентов"
+  disabled_unlocked_1588a6d1: "Отключено (разблокировано)"
   disables_push_notifications_for_certain_types_3f57cde4: "Отключает Push-уведомления для определенных типов."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Отключает SMS-уведомления для всех типов, кроме объявлений и
@@ -9315,6 +9329,8 @@ ru:
   enabled_ba7cab66: Включено
   enabled_by_default_e530d6ed: "Включено по умолчанию"
   enabled_links_be110215: "Включенные ссылки"
+  enabled_locked_3cf7c256: "Включено (заблокировано)"
+  enabled_unlocked_8d3a5df7: "Включено (разблокировано)"
   enabled_web_services_f620b2be: "Включенные веб-сервисы"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Позволяет показывать отчеты о плагиате и оценки сходства в лотке отправки нового журнала оценок."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Включает конечные точки API для курса и данные пользователя, предоставленные New Analytics."
@@ -9400,6 +9416,10 @@ ru:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Зачисления могут быть добавлены вашей системой информации о студентах учебного заведения (SIS). Если зачисление создано через SIS, только администраторы могут удалять зачисление из курса.
               Для просмотра списка пользователей в курсе необходимо включить список Пользователи - просмотр. Для просмотра идентификаторов SIS необходимо включить параметр «Данные SIS - чтение». Чтобы добавить пользователя в курс посредством идентификатора SIS, необходимо также включить «Данные SIS - управлять». Чтобы отредактировать раздел преподавателя или ассистента преподавателя, также должен быть включен параметр «Беседы - разослать сообщения отдельным участникам курса». Чтобы связать наблюдателя со студентом, также должен быть включен параметр «Беседы - разослать сообщения отдельным участникам курса».
+  enrollments_observers: Наблюдатели
+  enrollments_students: Студенты
+  enrollments_tas: Ассистенты
+  enrollments_teachers: Учителя
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Исключает вероятность дублирования результатов, которые уже были импортированы в курс, в случае их повторного импорта"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Обеспечивает, чтобы пользователи, не имеющие разрешения на импорт результатов, не могли видеть кнопку на вкладке «Результаты»."
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Введите hexcode здесь, чтобы использовать собственный цвет."
@@ -12389,7 +12409,9 @@ ru:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Если улучшения RCE также активированы,
       RCE будет выполнять автосохранение вашей работы по мере продвижения вперед
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Если этот параметр установлен, калькулятор оценок будет игнорировать неопубликованные анонимные задания при расчете итоговых значений."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Если этот параметр задан, модуль экспорта журнала успеваемости в формате CSV добавит заголовок выбранного периода выставления оценок к заголовкам столбцов, значения которых изменяются в зависимости от периода выставления оценок."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Если этот параметр задан, журнал успеваемости будет разделять загрузку заданий, сначала загружая задания для выбранного периода выставления оценок."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Если установлено, отключает функцию «post-to-SIS» для заданий после закрытия их периода выставления оценок. Действует только в том случае, если активирована функция «Активировать новые настройки интеграции SIS»."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Если включен параметр «Статистика - просмотр» или «Пользователи - управление регистрационными данными», пользователь сможет генерировать активность входа / выхода из системы в средствах администрирования. Чтобы скрыть параметр активности входа / выхода из системы в средствах администрирования, оба этих разрешения должны быть отключены."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Если включен параметр «Статистика - просмотр» или «Пользователи - управление регистрационными данными», пользователь сможет генерировать активность входа / выхода из системы в средствах администрирования. Чтобы скрыть параметр активности входа / выхода из системы в средствах администрирования, оба этих разрешения должны быть отключены."
@@ -12456,6 +12478,7 @@ ru:
   ignore_name_55edc6fe: "Игнорировать %{name}"
   ignore_these_3940f6f5: "Игнорировать эти"
   ignore_this_assignment_b7a71f80: "Игнорировать это задание"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Игнорировать неопубликованные анонимные задания в расчете оценок"
   ignore_until_new_mark_77eb512: "Игнорировать до новой оценки"
   ignore_until_new_mark_935e00a2: "Игнорировать до новой оценки"
   ignore_until_new_submission_87f32b4: "Игнорировать до новой отправки"
@@ -12573,6 +12596,7 @@ ru:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Включить оценки этого задания при синхронизации в информационную систему обучения вашей школы"
   include_unpublished_assignments_83ebbaec: "Включить Неопубликованные Задания"
   include_unpublished_courses_7a0e7aab: "Включить неопубликованные курсы"
+  included_messages_not_for_this_conversation_986a60bf: "included_messages не для этого обсуждения"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Включает ссылку в SpeedGrader в меню заголовка заданий в журнале оценок."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Включает значения оценок в административные отчеты об успеваемости."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "В том числе, результатов совмещения услуг при экспорте и импорте содержания курса"
@@ -12593,6 +12617,9 @@ ru:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Указывает на то, что изображение используется только для декоративных целей и не должно считываться скринридерами"
   indigo_2035fc55: Индиго
   individual_assignment_grade_posting_d8322b99: "Публикация оценок за индивидуальные задания"
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Невозможно изменить значения расчетов индивидуальных результатов."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Нельзя изменить баллы за усвоение навыков при индивидуальном оценивании результатов."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Индивидуальные оценки результатов не могут быть изменены."
   individual_view_81c2f124: "Индивидуальный просмотр"
   individual_view_d60b9132: "Индивидуальный просмотр…"
   indonesia_62_4c35bd62: "Индонезия (+62)"
@@ -12792,10 +12819,12 @@ ru:
   invalid_grade_passback_setting_a1d209d1: "Неверная grade_passback_setting"
   invalid_hexcode_9124519f: "Неверный шестнадцатеричный код"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Неверный шестнадцатеричный код. Введите верный шестнадцатеричный код для использования пользовательского цвета."
+  invalid_or_missing_session_for_oauth_3ce4b605: "Недопустимый или отсутствующий сеанс для проверки подлинности"
   invalid_points_8e929c3f: "Недопустимые баллы"
   invalid_points_for_rating_tier_index_i_400d307e: "Недопустимые баллы для определения рейтинга уровня %{index}: «%{i}»"
   invalid_points_possible: "Величина возможных баллов за это задание должна быть больше или равняться нулю."
   invalid_recipient_name_56b22b86: "Неверное имя получателя."
+  invalid_recipients_5fd7c594: "Недопустимые получатели"
   invalid_redirect_url_6444a1b0: "Недопустимый URL-адрес перенаправления"
   invalid_restrictions_316cd740: "Недействительные ограничения"
   invalid_score_3d247da7: "Недействительная оценка"
@@ -13293,6 +13322,7 @@ ru:
   load_bank: 
     error_loading_banks: "Ошибка загрузки банков"
     loading_banks: "Загрузка банков..."
+  load_gradebook_assignments_by_grading_period_919dfd3c: "Загрузить назначения журнала по периоду выставления оценок"
   load_more_9ca37ccc: "Загрузить больше..."
   load_more_a36f9cf9: "Загрузить еще"
   load_more_comments_dc00ac34: "Загрузить больше комментариев"
@@ -16282,6 +16312,7 @@ ru:
   no_content_has_been_shared_with_you_667fde6c: "Вам не был предоставлен общий доступ к содержимому."
   no_content_not_visible_to_students_905f8996: "Нет содержания. Не отображается для студентов."
   no_content_not_visible_to_students_b59f4867: "Нет содержания. Не отображается для студентов"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "Не найден контекст для следующего кода контекста: %{context_code}"
   no_courses_favorited_4e69fd63: "Ни один курс не задан как предпочтительный"
   no_courses_found_12d68a74: "Курсы не найдены"
   no_courses_to_display_700f94c4: "Нет курсов для отображения"
@@ -17202,6 +17233,8 @@ ru:
   override_3de65b2c: Отмена
   override_grade_385adf30: "игнорировать оценку"
   override_score_53994655: "переопределить оценку"
+  override_score_5f3c1189: "Переопределить оценку"
+  override_score_gradingperiod_286ac51b: "Переопределить оценку (%{gradingPeriod})"
   overrides: 
     blank_override: "Вы должны выбрать студента или раздел"
     everyone: Все
@@ -20303,6 +20336,7 @@ ru:
       one: "1 секция"
       other: " %{count} секции(й)"
   recipients_a69b5e55: "Получатели:"
+  recipients_restricted_by_role_22c4c843: "Получатели ограничены ролью"
   record_7c9448b: Запись
   record_an_audio_or_video_comment_88425add: "Записать аудио- или видеокомментарий"
   record_audio_14666880: "Записать аудио"
@@ -20441,6 +20475,7 @@ ru:
   remove_studentname_16ba8c3a: "Удалить %{studentName}"
   remove_submission_draft_f5c7f58b: "Удалить черновик отправки"
   remove_tas_from_courses_13ade851: "Удалить TA из курсов"
+  remove_teachers_from_courses_353d5217: "Удалить Преподавателей из курсов"
   remove_text_8e485c41: "Удалить %{text}"
   remove_these_dates_48453a81: "Удалить эти даты"
   remove_this_item_from_the_module_4b2ceab7: "Удалить этот элемент из модуля"
@@ -21042,7 +21077,7 @@ ru:
     all_courses_inner: 
       join_course: "Присоединиться к этому курсу"
       next: Далее
-      previous: Назад
+      previous: Предыдущий
     course_sections: "Разделы курса"
     enrollments_observers: Наблюдатели
     enrollments_students: Студенты
@@ -22419,6 +22454,7 @@ ru:
     users: 
       user_search_label: "Поиск пользователей"
       users_matching_label: "Подходящие пользователи"
+  site_admin_d0417171: "Администратор сайта"
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Только для админа сайта. Отправлять ежемесячно 1 / %{denominator} пользователям с активными учетными записями."
   size_b30e1077: Размер
   size_f1873a2: ", размер: "
@@ -22710,6 +22746,7 @@ ru:
   student_extensions_d35a907: "Расширения студента"
   student_grades_4cbc59a1: "Оценки успеваемости учащихся"
   student_group_filter_185fb085: "Фильтр групп студентов"
+  student_groups: "Группы студентов"
   student_groups_863201c1: "Группы студентов"
   student_groups_desc: |-
       Это разрешает новую страницу группы студента для учетной записи. Новая страница была создана для того, чтобы обеспечить более динамичное взаимодействие при
@@ -22929,10 +22966,13 @@ ru:
     errors: 
       assignment_submit_fail: "Ошибка отправки задания"
       can_not_submit_locked_assignment: "Нельзя отправить заблокированное задание"
+      googld_drive_timeout: "Истекло время обмена данными с Google Drive"
+      google_drive_workflow: "Не удалось скачать элемент Google Drive"
       invalid_file_type: "Неверный тип файла"
       invalid_google_docs_domain: "Вы не можете отправить задания с данного домена google_docs"
       media_file_attached: "В отправке нет записи мультимедийных данных"
       no_attached_file: "Вы должны приложить хотя бы один файл к данному заданию"
+      no_attachment_found: "Не удалось найти вложение для отправки в Google Drive"
       no_report: "Невозможно найти отчет для этого типа отправки"
       student_not_enrolled: "Указанный пользователь не является студентом этого курса"
       student_not_enrolled_id: "Указанный пользователь (%{id}) Указанный студент"
@@ -24426,6 +24466,8 @@ ru:
   tolerance_value_9e96573c: "Значение допуска"
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "Слишком много неудачных попыток входа. Повторите попытку позже или обратитесь к системному администратору."
   too_many_members_b8b15069: "Слишком много участников"
+  too_many_participants_for_group_conversation_1743cd8: "Слишком много участников для группового обсуждения"
+  too_many_recipients_for_group_conversation_906a4b69: "Слишком много получателей для группового обсуждения"
   tool_configuration_63cd43b0: "Настройка инструментов"
   tool_content_2924d18f: "Контент инструмента"
   tool_content_e699e813: "Контент Инструмента"
@@ -24569,6 +24611,7 @@ ru:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Нет доступа к конкретному студенту. Перейти к заданию в SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Невозможно привязать некоторые результаты к странице"
   unable_to_align_some_outcomes_to_title_53467231: "Невозможно привязать некоторые результаты к \"%{title}\""
+  unable_to_connect_to_google_drive_34886e7a: "Не удается подключиться к Google Drive."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Невозможно построить график успеваемости, потому что данное задание приходится на закрытый период оценки успеваемости как минимум для одного учащегося"
   unable_to_delete_assignment_abcf8d62: "Невозможно удалить задание"
   unable_to_dismiss_update_df1e32eb: "Невозможно отклонить обновление"
@@ -24580,6 +24623,7 @@ ru:
   unable_to_read_file_2d04b0c: "Невозможно прочитать файл"
   unable_to_remove_app_4293cb53: "Невозможно удалить приложение."
   unable_to_save_new_discussion_topic_99239f3f: "невозможно сохранить новую тему дискуссии"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Не удается отправить сообщения пользователям в %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Невозможно задать оценку по умолчанию, потому что данное задание приходится на закрытый период оценки успеваемости как минимум для одного учащегося"
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Невозможно задать перетаскивание для модулей"
   unable_to_toggle_placement_833db6ff: "Невозможно переключить размещение"
@@ -24590,6 +24634,7 @@ ru:
   unauthorized: "не авторизован"
   unauthorized_message: "Подпись JWT не действительна"
   unauthorized_to_delete_this_file_a1271224: "Нет прав для удаления этого файла"
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Нет разрешения, невозможно добавить сообщения в обсуждение"
   unavailable_46d2c344: Недоступно
   unavailable_c04e4c93: недоступно
   unbookmark_bank_70569249: "Удалить из закладок %{bank}"
@@ -25382,14 +25427,18 @@ ru:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "У пользователей есть доступ к отдельным рубрикам заданий и возможность их создания (но не редактирования) через «Задания», когда включен параметр «Задания и тесты - добавить / редактировать / удалить»."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Пользователи могут получать доступ к ссылке управления банками вопросов на странице-указателе «Тесты», когда включены параметры «Содержание курса - просмотреть» и «Задания и тесты - добавить / редактировать / удалить»."
   users_d1b60cb0: Пользователи
+  users_designers_22195c6f: "Пользователи - Дизайнеры"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Пользователи - создание кодов сопряжения наблюдателей для студентов"
   users_generate_observer_pairing_codes_for_students_6975caad: "Пользователи - Создание кодов сопряжения наблюдателей для студентов"
   users_manage_log_in_details_b944568b: "Пользователи - управление подробными сведениями регистрации"
   users_manage_login_details_9462b30f: "Пользователи - управление регистрационными данными"
   users_matching_search_term_c604db9e: "Пользователи с совпадением \"%{search_term}\""
   users_moderate_content_36d6eed7: "Пользователи - модерировать контент"
+  users_observers_e0e66c52: "Пользователи - Наблюдатели"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Пользователям программ для чтения с экрана может потребоваться отключить виртуальный курсор, чтобы использовать эти сочетания клавиш"
   users_over_time_9a2ee74a: "пользователей в течение длительного времени"
+  users_tas_27117894: "Пользователи - TA"
+  users_teachers_a5d5d1af: "Пользователи - Преподаватели"
   users_view_list_861c7a3f: "Пользователи - просмотреть список"
   users_view_login_ids_a2e6a85: "Пользователи - просмотреть идентификаторы входа"
   users_view_primary_email_address_14f4978f: "Пользователи - просмотреть основной адрес электронной почты"
@@ -25925,6 +25974,9 @@ ru:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Невозможно удалить дополнительную учетную запись с курсами."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Вы не можете удалить субучетную запись, в которой есть другие субучетные записи."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Вы не можете удалить учетную запись %{account_name}, потому что в ней содержатся курсы"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Вы не можете редактировать эту рубрику, так как у вас нет разрешения или она используется более чем в одном месте. Любые внесенные вами изменения приведут к появлению новой рубрики. Все связанные критерии результата будут использовать шкалу мастерства курса. Все равно продолжить?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Вы не можете редактировать эту рубрику, так как у вас нет разрешения или она используется более чем в одном месте. Любые внесенные вами изменения приведут к появлению новой рубрики. Все связанные критерии результата будут использовать шкалу мастерства учетной записи. Все равно продолжить?"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Вы не можете редактировать эту рубрику, так как у вас нет разрешения или она используется более чем в одном месте. Любые внесенные вами изменения приведут к появлению новой рубрики, основанной на старой рубрике. Все равно продолжить?"
   you_can_try_to_log_in_again_2b23ef0f: "Вы можете попробовать *войти еще раз*."
   you_can_update_some_of_this_user_s_information_but_8e99a045: "Можно обновить некоторую информацию об этом пользователе, но он сможет изменить это."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Вы можете использовать один файл 16x16, 32x32, 48x48 с расширением .ico."

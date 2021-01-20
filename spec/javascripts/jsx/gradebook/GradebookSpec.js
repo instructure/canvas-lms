@@ -2056,6 +2056,16 @@ QUnit.module('#listHiddenAssignments', hooks => {
       }
     }
     gradebook.gotSubmissionsChunk(submissionsChunk)
+    gradebook.setAssignmentGroups([
+      {
+        id: '1',
+        assignments: [gradedAssignment]
+      },
+      {
+        id: '2',
+        assignments: [notGradedAssignment]
+      }
+    ])
     gradebook.setAssignmentsLoaded()
     gradebook.setSubmissionsLoaded(true)
   })
@@ -2068,6 +2078,13 @@ QUnit.module('#listHiddenAssignments', hooks => {
   test('excludes "not_graded" assignments even when submission is postable', function() {
     const hiddenAssignments = gradebook.listHiddenAssignments('1101')
     notOk(hiddenAssignments.find(assignment => assignment.id === notGradedAssignment.id))
+  })
+
+  test('ignores assignments excluded by the current set of filters', function() {
+    gradebook.setFilterColumnsBySetting('assignmentGroupId', '2')
+
+    const hiddenAssignments = gradebook.listHiddenAssignments('1101')
+    notOk(hiddenAssignments.find(assignment => assignment.id === gradedAssignment.id))
   })
 })
 

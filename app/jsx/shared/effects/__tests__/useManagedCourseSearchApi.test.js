@@ -44,12 +44,43 @@ describe('useManagedCourseSearchApi', () => {
     setupManagedCoursesResponse()
     const success = jest.fn()
     const error = jest.fn()
-    renderHook(() => useManagedCourseSearchApi({success}))
+    renderHook(() => useManagedCourseSearchApi({error, success}))
     await fetchMock.flush(true)
     expect(error).not.toHaveBeenCalled()
     expect(success).toHaveBeenCalledWith([
       expect.objectContaining({id: '1', name: 'Board Game Basics'}),
       expect.objectContaining({id: '2', name: 'Settlers of Catan 101'})
     ])
+  })
+
+  it('passes "include" query param if "includeConcluded" is truthy', async () => {
+    setupManagedCoursesResponse()
+    renderHook(() => useManagedCourseSearchApi({}, true))
+    await fetchMock.flush(true)
+    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?include=concluded')
+  })
+
+  it('does not pass an "include" query param if "includeConcluded" is falsy', async () => {
+    setupManagedCoursesResponse()
+    renderHook(() => useManagedCourseSearchApi({}, false))
+    await fetchMock.flush(true)
+    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses')
+  })
+
+  it('passes "include" query param properly in addition to existing params', async () => {
+    const params = {search_term: 'Course'}
+    setupManagedCoursesResponse()
+    renderHook(() => useManagedCourseSearchApi({params}, true))
+    await fetchMock.flush(true)
+    expect(fetchMock.lastCall()[0]).toBe(
+      '/users/self/manageable_courses?search_term=Course&include=concluded'
+    )
+  })
+
+  it('sets "include" query parameter properly even if no arguments are passed', async () => {
+    setupManagedCoursesResponse()
+    renderHook(useManagedCourseSearchApi)
+    await fetchMock.flush(true)
+    expect(fetchMock.lastCall()[0]).toBe('/users/self/manageable_courses?include=concluded')
   })
 })

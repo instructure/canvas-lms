@@ -29,7 +29,7 @@ const editorExtensions = {
 
   focus() {
     if (tinymce !== undefined) {
-      const editor = tinymce.get(this._textareaEl.id)
+      const editor = tinymce.get(this.getTextarea().id)
       editor && editor.focus(true)
     }
   }

@@ -34,6 +34,11 @@ describe UserListV2 do
     expect(ul.errors).to eq [{:address => "i\x01nstructure", :details => :unparseable}]
   end
 
+  it "responds responsibly to incorrect search type" do
+    expect { UserListV2.new "instructure", search_type: 'tarnation_declaration' }.
+      to raise_error(UserListV2::ParameterError)
+  end
+
   it "should not fail with unicode names" do
     ul = UserListV2.new '"senor molé" <blah@instructure.com>', search_type: 'unique_id'
     expect(ul.missing_results.map{|x| [x[:user_name], x[:address]]}).to eq [["senor molé", "blah@instructure.com"]]

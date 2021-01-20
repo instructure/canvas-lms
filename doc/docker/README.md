@@ -11,6 +11,8 @@ This command should get you going:
 ./script/docker_dev_setup.sh
 ```
 
+Be sure to pay attention to any `Next Steps` output from the script that you may need to run.
+
 Now you can do `docker-compose up` and you should be good to go. If you're
 using Dinghy or Dory. You should be able to access Canvas by going to: [http://canvas.docker/](http://canvas.docker/)
 

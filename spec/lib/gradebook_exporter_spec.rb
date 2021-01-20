@@ -68,6 +68,14 @@ describe GradebookExporter do
 
         expect(assignment_headers).to eq(expected_headers)
       end
+
+      it "includes a column for anonymized assignments" do
+        @assignments[0].update!(anonymous_grading: true)
+        csv = GradebookExporter.new(@course, @teacher).to_csv
+        headers = CSV.parse(csv, headers: true).headers
+
+        expect(headers).to include(/First group assignment/)
+      end
     end
 
     describe "custom columns" do
@@ -650,17 +658,22 @@ describe GradebookExporter do
   context "when a course has unposted assignments" do
     let(:posted_assignment) { @course.assignments.create!(title: "Posted", points_possible: 10) }
     let(:unposted_assignment) { @course.assignments.create!(title: "Unposted", points_possible: 10) }
+    let(:unposted_anonymous_assignment) do
+      @course.assignments.create!(title: "Unposted Anon", points_possible: 10, anonymous_grading: true)
+    end
 
     before(:each) do
       @course.assignments.create!(title: "Ungraded", points_possible: 10)
 
       posted_assignment.ensure_post_policy(post_manually: true)
       unposted_assignment.ensure_post_policy(post_manually: true)
+      unposted_anonymous_assignment.ensure_post_policy(post_manually: true)
 
       student_in_course active_all: true
 
       posted_assignment.grade_student @student, grade: 9, grader: @teacher
       unposted_assignment.grade_student @student, grade: 3, grader: @teacher
+      unposted_anonymous_assignment.grade_student @student, grade: 1, grader: @teacher
 
       posted_assignment.post_submissions
     end

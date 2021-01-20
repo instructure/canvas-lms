@@ -219,6 +219,23 @@ describe RubricAssessment do
         @course.enroll_student(@student, enrollment_state: :active)
       end
 
+      it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome_result.create')
+        @outcome.update!(data: nil)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => '3'
+            }
+          }
+        })
+      end
+
       it 'should use default ratings for scoring' do
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym

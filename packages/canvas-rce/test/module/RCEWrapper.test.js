@@ -126,12 +126,15 @@ describe('RCEWrapper', () => {
       getContent: () => editor.content,
       getBody: () => editor.content,
       hidden: false,
+      hide: () => (editor.hidden = true),
+      show: () => (editor.hidden = false),
       isHidden: () => {
         return editor.hidden
       },
       execCommand: editorCommandSpy,
       serializer: {serialize: sinon.stub()},
-      ui: {registry: {addIcon: () => {}}}
+      ui: {registry: {addIcon: () => {}}},
+      isDirty: () => false
     }
 
     fakeTinyMCE = {
@@ -681,7 +684,9 @@ describe('RCEWrapper', () => {
 
   describe('is_dirty()', () => {
     it('is true if not hidden and defaultContent is not equal to getConent()', () => {
-      const c = createBasicElement({defaultContent: 'different'})
+      editor.serializer.serialize.returns(editor.content)
+      const c = createBasicElement()
+      c.setCode('different')
       editor.hidden = false
       assert(c.is_dirty())
     })
@@ -703,7 +708,7 @@ describe('RCEWrapper', () => {
     it('is false if hidden and defaultContent is equal to textarea value', () => {
       const defaultContent = 'default content'
       editor.serializer.serialize.returns(defaultContent)
-      const c = createBasicElement({textareaId, defaultContent})
+      const c = createBasicElement({textareaId, defaultContent, editorView: 'RAW'})
       editor.hidden = true
       document.getElementById(textareaId).value = defaultContent
       assert(!c.is_dirty())

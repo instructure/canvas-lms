@@ -940,4 +940,11 @@ class Quizzes::QuizSubmission < ActiveRecord::Base
   def end_at_without_time_limit
     quiz.build_submission_end_at(self, false)
   end
+
+  def filter_attributes_for_user(hash, user, session)
+    if submission.present? && !submission.user_can_read_grade?(user, session)
+      secret_keys = %w(score kept_score)
+      hash.except!(*secret_keys)
+    end
+  end
 end

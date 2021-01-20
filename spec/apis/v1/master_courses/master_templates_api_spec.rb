@@ -417,36 +417,39 @@ describe MasterCourses::MasterTemplatesController, type: :request do
         @minions = (1..2).map do |n|
           @template.add_child_course!(course_factory(:name => "Minion #{n}", :active_all => true)).child_course
         end
-
         # set up some stuff
         @file = attachment_model(:context => @master, :display_name => 'Some File')
         @assignment = @master.assignments.create! :title => 'Blah', :points_possible => 10
+      end
+
+      Timecop.travel(55.minutes.ago) do
         @full_migration = run_master_migration
       end
 
-      # prepare some exceptions
-      @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
-      @minions.first.syllabus_body = 'go away'; @minions.first.save!
-      @minions.last.assignments.first.update_attribute :points_possible, 11
+      Timecop.travel(5.minutes.ago) do
+        # prepare some exceptions
+        @minions.first.attachments.first.update_attribute :display_name, 'Some Renamed Nonsense'
+        @minions.first.syllabus_body = 'go away'; @minions.first.save!
+        @minions.last.assignments.first.update_attribute :points_possible, 11
 
-      # now push some incremental changes
-      @page = @master.wiki_pages.create! :title => 'Unicorn'
-      page_tag = @template.content_tag_for(@page)
-      page_tag.restrictions = @template.default_restrictions
-      page_tag.save!
-      @quiz = @master.quizzes.create! :title => 'TestQuiz'
-      @file.update_attribute :display_name, 'I Can Rename Files Too'
-      @assignment.destroy
-      @master.syllabus_body = 'syllablah frd'; @master.save!
+        # now push some incremental changes
+        @page = @master.wiki_pages.create! :title => 'Unicorn'
+        page_tag = @template.content_tag_for(@page)
+        page_tag.restrictions = @template.default_restrictions
+        page_tag.save!
+        @quiz = @master.quizzes.create! :title => 'TestQuiz'
+        @file.update_attribute :display_name, 'I Can Rename Files Too'
+        @assignment.destroy
+        @master.syllabus_body = 'syllablah frd'; @master.save!
+      end
       run_master_migration(:copy_settings => true)
     end
 
     it "returns change information from the blueprint side" do
-      skip('LA-376')
       json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@master.id}/blueprint_templates/default/migrations/#{@migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :template_id => 'default',
                  :id => @migration.to_param, :course_id => @master.to_param, :action => 'migration_details')
-      expect(json).to match_array([
+      expected_result = [
          {"asset_id"=>@page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
           "html_url"=>"http://www.example.com/courses/#{@master.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
          {"asset_id"=>@quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
@@ -462,11 +465,11 @@ describe MasterCourses::MasterTemplatesController, type: :request do
            "exceptions"=>[{"course_id"=>@minions.first.id,"conflicting_changes"=>["content"]}]},
          {"asset_id"=>@master.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
            "html_url"=>"http://www.example.com/courses/#{@master.id}/settings","locked"=>false,"exceptions"=>[]}
-      ])
+      ]
+      expect(json).to match_array(expected_result)
     end
 
     it "returns change information from the minion side" do
-      skip('LA-377')
       skip 'Requires QtiMigrationTool' unless Qti.qti_enabled?
 
       minion = @minions.first
@@ -479,7 +482,7 @@ describe MasterCourses::MasterTemplatesController, type: :request do
                  "/api/v1/courses/#{minion.id}/blueprint_subscriptions/default/migrations/#{minion_migration.id}/details",
                  :controller => 'master_courses/master_templates', :format => 'json', :subscription_id => 'default',
                  :id => minion_migration.to_param, :course_id => minion.to_param, :action => 'import_details')
-      expect(json).to match_array([
+      expected_result = [
          {"asset_id"=>minion_page.id,"asset_type"=>"wiki_page","asset_name"=>"Unicorn","change_type"=>"created",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/pages/unicorn","locked"=>true,"exceptions"=>[]},
          {"asset_id"=>minion_quiz.id,"asset_type"=>"quiz","asset_name"=>"TestQuiz","change_type"=>"created",
@@ -494,7 +497,8 @@ describe MasterCourses::MasterTemplatesController, type: :request do
           "exceptions"=>[{"course_id"=>minion.id,"conflicting_changes"=>["content"]}]},
          {"asset_id"=>minion.id,"asset_type"=>"settings","asset_name"=>"Course Settings","change_type"=>"updated",
           "html_url"=>"http://www.example.com/courses/#{minion.id}/settings","locked"=>false,"exceptions"=>[]}
-      ])
+      ]
+      expect(json).to match_array(expected_result)
     end
 
     it "returns empty for a non-selective migration" do

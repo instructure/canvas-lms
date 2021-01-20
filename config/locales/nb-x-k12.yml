@@ -1696,6 +1696,7 @@ nb-x-k12:
   add_quiz_ip_filter_c7b37dc5: "Legg til IP-filter for test"
   add_rating_89d7fbde: "Legg til vurdering"
   add_recipient_ff135ed7: "Legg til mottaker"
+  add_remove_in_courses_fa1c9081: "Legg til/fjern i faget"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: "Legge til, fjerne eller omorganisere seksjoner for denne porteføljen"
   add_review_2fb1590c: "Legg til en vurdering"
   add_role_3dc4d273: "Legg til rolle"
@@ -1711,6 +1712,7 @@ nb-x-k12:
   add_subtitle_9f660cc: "Legg til undertekst"
   add_tas_to_courses_27741f81: "Legg til lærerassistenter (LA-er) i fag"
   add_tas_to_the_course_2aac6e02: "Legg til Læringsassistenter til faget"
+  add_teachers_to_courses_48ac7a7a: "Legg til Lærere i faget"
   add_theme_32fa3d50: "Legg til tema"
   add_to_course_481a51c4: "Legg til valgt fag ..."
   add_to_rce_toolbar_e5b3e3b4: "Legg til RCE-verktøyslinje"
@@ -2296,6 +2298,7 @@ nb-x-k12:
   an_auto_generated_chronological_summary_of_your_co_eeafee13: "En automatisk generert kronologisk oppsummering av faget"
   an_error_occured_please_try_again_e59b65b: "Det oppsto en feil. Vennligst prøv igjen."
   an_error_occured_saving_the_assignment_d71cb3d2: "Det skjedde et avvik ved lagring av oppgaven"
+  an_error_occured_updating_the_flag_7df5de0a: "Det oppsto en feil ved oppdatgering av flagget"
   an_error_occured_while_deleting_the_grading_period_81bb16e5: "Det oppsto et avvik ved sletting av vurderingsperiode settet"
   an_error_occured_while_deleting_the_grading_period_c8343484: "Det oppsto et avvik ved sletting av vurderingsperioden"
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: "Det oppsto et avvik ved henting av påmeldings terminer."
@@ -2326,10 +2329,14 @@ nb-x-k12:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "En avvik oppstod under forsøket på å kontakte Turnitin."
   an_error_occurred_while_checking_the_migration_sta_d17035b1: "Det oppstod en feil under kontrollering av migreringsstatus"
   an_error_occurred_while_deleting_announcements_ab1ff3f6: "Det oppstod en feil under sletting av beskjeder."
+  an_error_occurred_while_loading_account_outcomes_8f337857: "Det oppsto en feil ved lasting av læringsmål for konto."
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "Det oppsto en feil ved lasting av læringsmål for konto: %{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "En feil oppstod under nedlasting av kontoferdighetsvurderinger: %{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: "En feil oppstod under nedlasting av kontoferdighetsvurderinger"
   an_error_occurred_while_loading_associations_9699b3ee: "Det oppstod en feil under lasting av foreninger"
   an_error_occurred_while_loading_changes_9851b56f: "En feil oppsto under lasting av endringer"
+  an_error_occurred_while_loading_course_outcomes_320ccc44: "Det oppsto en feil ved lasting av læringsmål for faget."
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "Det oppsto en feil ved lasting av læringsmål for faget: %{error}"
   an_error_occurred_while_loading_courses_11d4571e: "Det oppstod en feil ved lasting av fag"
   an_error_occurred_while_loading_late_policies_c415f676: "En feil oppsto under lasting av for sent-regler"
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Det oppsto en feil ved lasting av ekspertiseberegningen: %{error}"
@@ -2643,6 +2650,7 @@ nb-x-k12:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Er du sikker på at du vil vise vurderinger for denne oppgaven til elever?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Er du sikker på at du vil gjøre dette? Det kan ikke angres og vil overstyre eksisterende vurderinger i vurderingsoversikten."
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Er du sikker på at du ønsker å vise elevene vurderingene på denne oppgaven?"
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Er du sikker på at du vil fortsette? Endringene dine blir ikke lagret."
   are_you_sure_you_want_to_remove_this_item_7887ce31: "Er du sikker på at du vil fjerne dette elementet?"
   are_you_sure_you_want_to_remove_this_tool_7363f90b: "Er du sikker på at du vil fjerne dette verktøyet?"
   are_you_sure_you_want_to_remove_this_user_8d1a8295: "Er du sikker på at du ønsker å fjerne denne brukeren?"
@@ -3463,6 +3471,7 @@ nb-x-k12:
   audio_dd489fcc: Lyd
   australia_61_eb9bb701: "Australia (+61)"
   austria_43_7bc58b34: "Østerrike (+43)"
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Autentiseringsfeil ved tilkobling til Google Drive."
   auth_logging: 
     corrupted: "Detaljer Ikke Tilgjengelig"
     login: "LOGG INN"
@@ -3675,6 +3684,7 @@ nb-x-k12:
   belgium_32_e5f5b598: "Belgia (+32)"
   below_mastery_abd1dca5: "Under mestring"
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "Nedenfor dette søkefeltet er en liste over %{content_type}. Etter hvert som du skriver, vil listen bli filtrert i samsvar med søket. Samtalemeldinger vil bli filtrert av hvilke alternativ du valgte."
+  beta_cb5f307e: Beta
   beta_url_3c7b88ec: "Beta URL:"
   between_1_and_5_f2a74bcf: "Mellom 1 og 5"
   between_1_and_99_d421a4c0: "Mellom 1% og 99%"
@@ -6003,6 +6013,7 @@ nb-x-k12:
   course_card_image_5285f1bf: Fagkortbilde
   course_catalog_4cc7c8ce: Fagkatalog
   course_collaborations_dadb327e: Fagsamarbeid
+  course_concluded_unable_to_send_messages_b99b6b6d: "Fag avsluttet, kan ikke sende meldinger"
   course_conferences_3d914c96: "Konferanser for fag"
   course_content_a92eca20: Faginnhold
   course_content_add_edit_delete_ea877eca: "Fag-innhold - legg til / rediger / slett"
@@ -6191,6 +6202,7 @@ nb-x-k12:
     sis_id_taken: "SIS ID \"%{sis_id}\" er allerede i bruk"
   course_section_7a988066: Fagseksjon
   course_section_name_ea880ed1: "Fagseksjon %{name}"
+  course_sections: Fagseksjon
   course_sections_add_c6b5dc1: "Fagseksjoner - legg til"
   course_sections_add_edit_delete_c4f4ac19: "Fagseksjoner - legg til / rediger / slett"
   course_sections_delete_e75e3eeb: "Fagseksjoner - slett"
@@ -7377,8 +7389,10 @@ nb-x-k12:
   disabled_by_default_7d822dcb: "Deaktivert som Standard"
   disabled_in_course_settings_d15ee35d: "* Deaktivert i faginnstillinger"
   disabled_links_b3bdea99: "Deaktiverte lenker"
+  disabled_locked_dab351d6: "Deaktivert (låst)"
   disabled_not_visible_to_students_2c9d693f: "Deaktivert. Ikke synlig for elever."
   disabled_not_visible_to_students_48d4a90d: "Deaktivert. Ikke synlig for elevene"
+  disabled_unlocked_1588a6d1: "Deaktiver (ulåst)"
   disables_push_notifications_for_certain_types_3f57cde4: "Deaktiver push-varslinger for bestemte typer."
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       Deaktiverer SMS-varslinger for alle typer unntatt beskjeder og
@@ -8101,6 +8115,8 @@ nb-x-k12:
   enabled_ba7cab66: "Slått på"
   enabled_by_default_e530d6ed: "Aktivert som Standard"
   enabled_links_be110215: "Aktiverte lenker"
+  enabled_locked_3cf7c256: "Aktivert (låst)"
+  enabled_unlocked_8d3a5df7: "Aktivert (ulåst)"
   enabled_web_services_f620b2be: "Påslåtte nett-tjenester"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer visning av plagiatrapporter og likhetsscore i innleveringsskuffen til Ny vurderingsoversikt."
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkter for faget og brukerdata fra Ny Analytics."
@@ -8185,6 +8201,10 @@ nb-x-k12:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Påmeldte kan legges til av institusjonens elevinformasjonssystem (SIS). Hvis en påmelding opprettes via SIS, kan bare administratorer fjerne påmeldingen fra faget.
               For å se listen over brukere i faget, må Brukere - vis liste være aktivert. For å vise SIS-ID-er, må 'SIS-data - lese'  være aktivert. For å legge til en bruker til et fag via SIS-ID må 'SIS-data - administrer' også være aktivert. For å redigere en lærers eller LAs seksjon må 'Samtaler - send meldinger til individuelle fagdeltakere' også være aktivert. For å lenke en observatør til en elev må 'Samtaler - send meldinger til individuelle fagdeltakere' også være aktivert.
+  enrollments_observers: Observatører
+  enrollments_students: Elever
+  enrollments_tas: Læringsassistenter
+  enrollments_teachers: Lærere
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: "Sørger for at utfallene som allerede er importert i et emne ikke dupliseres hvis de importeres igjen"
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: "Sikrer at brukere uten tillatelsen Importerer mål ikke kan se knappen i Mål-fanen."
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "Oppgi en hexkode her for å bruke en tilpasset farge."
@@ -10379,7 +10399,9 @@ nb-x-k12:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Hvis RCE Enhancements også er aktivert,
       vil RCE automatisk lagre arbeidet ditt mens du jobber
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Hvis angitt, vil karakterkalkulatoren ignorere ikke-publiserte, anonyme oppgaver ved beregning av totalsummer."
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "Hvis angitt, vil Vurderingsoversikt CSV-eksportøren legge til overskriften for valgt vurderingsperiode til kolonneoverskriftene hvis verdier varierer basert på vurderingsperioden."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Hvis det er angitt, vil vurderingsoversikt dele opp innlasting av oppgaver, og laste inn de for den valgte vurderingsperiode først."
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Hvis den er satt, slår du av publiser til SIS-funksjonen for oppgaver når vurderingsperioden lukkes. Gjelden kun hvis funksjonen “Aktiver nye SIS-integrasjonsinnstillinger” er aktivert."
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Hvis «Statistikk - vis» eller «Brukere - administrere innloggingsdetaljer» er aktiverte vil brukeren kunne generere inn-/utloggingsaktivitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Hvis «Statistikk - vis» eller «Brukere - administrere innloggingsdetaljer» er aktiverte vil en bruker kunne generere inn-/utloggingsaktiveitet i administrasjonsverktøyet. For å skjule alternativet for inn-/utloggingsaktivitet i administrasjonsverktøyet må begge disse tillatelsene være deaktiverte."
@@ -10441,6 +10463,7 @@ nb-x-k12:
   ignore_name_55edc6fe: "Ignorer %{name}"
   ignore_these_3940f6f5: "Ignorer disse"
   ignore_this_assignment_b7a71f80: "Ignorer denne oppgaven"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Ignorer ikke-publiserte, anonyme oppgaver i vurderingberegningen"
   ignore_until_new_mark_935e00a2: "Overse inntil ny vurdering"
   ignore_until_new_submission_90ba19b7: "Overse frem til ny innlevering"
   illegal_element_focus_request_b3cea847: "Ulovlig forespørsel om elementfokus"
@@ -10537,6 +10560,7 @@ nb-x-k12:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: "Inkluder denne oppgavens vurderinger ved synkronisering til skolens elevinformasjonssystem"
   include_unpublished_assignments_83ebbaec: "Inkluder ikkepubliserte oppgaver"
   include_unpublished_courses_7a0e7aab: "Inkluder ikke-publiserte fag"
+  included_messages_not_for_this_conversation_986a60bf: "included_messages ikke for denne samtalen"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "Inneholder en lenke til SpeedGrader i menyen oppgaveoverskrift i Vurderingsoversikten."
   includes_grade_values_in_the_admin_grade_reports_a28200da: "Inkluderer vurderingsverdier i administrators vurderingsrapport."
   includes_outcomes_service_alignments_when_exportin_6c578a35: "Inkluderer tilpasning av mål-tjenesten ved eksport og import av faginnhold"
@@ -10555,6 +10579,9 @@ nb-x-k12:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: "Viser at bilde kun er i dekorative formål og skal ikke leses av skjermlesere."
   indigo_2035fc55: Indigo
   individual_assignment_grade_posting_d8322b99: "Individuelle oppgaver vurderingpostering"
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: "Verdier for beregning av individuelle læringsmål kan ikke endres."
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: "Mestringspoeng for individuelle læringsmål kan ikke endres."
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: "Vurderinger for individuelle læringsmål kan ikke endres."
   individual_view_81c2f124: "Individuell visning"
   individual_view_d60b9132: "Individuell visning …"
   indonesia_62_4c35bd62: "Indonesia (+ 62)"
@@ -10725,9 +10752,11 @@ nb-x-k12:
   invalid_grade_passback_setting_a1d209d1: "Ugyldig grade_passback_setting"
   invalid_hexcode_9124519f: "Ugyldig hex-kode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "Ugyldig hex-kode. Angi en gyldig hex-kode her for å velge en tilpasset farge."
+  invalid_or_missing_session_for_oauth_3ce4b605: "Ugyldig eller manglende økt for oauth"
   invalid_points_8e929c3f: "Ugyldige poeng"
   invalid_points_possible: "Antall mulige poeng for denne oppgaven må være større eller lik null."
   invalid_recipient_name_56b22b86: "Ugyldig mottakernavn."
+  invalid_recipients_5fd7c594: "Ugyldige mottakere"
   invalid_redirect_url_6444a1b0: "Ugyldig omdirigering av URL"
   invalid_restrictions_316cd740: "Ugyldige restriksjoner"
   invalid_score_3d247da7: "Ugyldig resultat"
@@ -11183,6 +11212,7 @@ nb-x-k12:
   load_bank: 
     error_loading_banks: "Kunne ikke laste banker"
     loading_banks: "Laster banker …"
+  load_gradebook_assignments_by_grading_period_919dfd3c: "Last inn vurderingoversiktoppgaver etter vurderingsperiode"
   load_more_a36f9cf9: "Last mer"
   load_more_comments_dc00ac34: "Last  Flere Kommentarer"
   load_more_results_460f49a9: "Last flere resultater"
@@ -13746,6 +13776,7 @@ nb-x-k12:
   no_content_has_been_shared_with_you_667fde6c: "Det er ikke delt noe innhold med deg."
   no_content_not_visible_to_students_905f8996: "ingen innhold. Ikke synlig for elever."
   no_content_not_visible_to_students_b59f4867: "ingen innhold. Ikke synlig for elevene"
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "Ingen kontekst funnet for følgende kontekstkode: %{context_code}"
   no_courses_favorited_4e69fd63: "Ingen fagfavoritt"
   no_courses_found_12d68a74: "Ingen fag funnet"
   no_courses_to_display_700f94c4: "Ingen fag å vise"
@@ -14587,6 +14618,8 @@ nb-x-k12:
   override_3de65b2c: Opphev
   override_grade_385adf30: "overskriv vurdering"
   override_score_53994655: resultatsopphevelse
+  override_score_5f3c1189: "Opphev poengsum"
+  override_score_gradingperiod_286ac51b: "Opphev poengsum (%{gradingPeriod})"
   overrides: 
     everyone: Alle
     everyone_else: "Alle andre"
@@ -17198,6 +17231,7 @@ nb-x-k12:
       one: "1 seksjon"
       other: "%{count} seksjoner"
   recipients_a69b5e55: "Mottakere:"
+  recipients_restricted_by_role_22c4c843: "Mottakere begrenset av rolle"
   record_7c9448b: Registrering
   record_an_audio_or_video_comment_88425add: "Spill inn en lyd- eller videokommentar"
   record_audio_video_d9993f6c: "Ta opp lyd/video"
@@ -17329,6 +17363,7 @@ nb-x-k12:
   remove_studentname_16ba8c3a: "Fjern %{studentName}"
   remove_submission_draft_f5c7f58b: "Slett innleveringsutkast"
   remove_tas_from_courses_13ade851: "Fjern LA-er fra fag"
+  remove_teachers_from_courses_353d5217: "Fjern Lærere fra faget"
   remove_text_8e485c41: "Fjern %{text}"
   remove_these_dates_48453a81: "Fjern disse datoene"
   remove_this_item_from_the_module_4b2ceab7: "Fjern dette elementet fra modul"
@@ -18997,6 +19032,7 @@ nb-x-k12:
         logout: "Logg ut"
         stop_masquerading: "[Stopp forkledning]"
       page_title: "Institusjonen er suspendert"
+  site_admin_d0417171: Site-admin
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "Kun sideadmin. Send til 1 / %{denominator} brukere med aktive kontoer hver måned."
   size_b30e1077: Størrelse
   size_size_a77bd760: "størrelse: %{size}"
@@ -19250,6 +19286,7 @@ nb-x-k12:
   student_extensions_d35a907: Elevtillegg
   student_grades_4cbc59a1: Elevvurderinger
   student_group_filter_185fb085: "Filter for elevgruppe"
+  student_groups: Elevgrupper
   student_groups_863201c1: Elevgrupper
   student_id: "Elev ID"
   student_id_236970d8: student_id
@@ -19434,10 +19471,13 @@ nb-x-k12:
     errors: 
       assignment_submit_fail: "Levering av oppgave mislyktes"
       can_not_submit_locked_assignment: "Du kan ikke levere en oppgave mens den er låst"
+      googld_drive_timeout: "Tidsavbrudd ved kommunikasjon med google drive"
+      google_drive_workflow: "Google Drive-oppføringen kunne ikke lastes ned"
       invalid_file_type: "Ugyldig filtype"
       invalid_google_docs_domain: "Du kan ikke levere oppgaver fra dette google_docs-domenet"
       media_file_attached: "Det var ingen medieinnspillinger i innleveringen"
       no_attached_file: "Du må legge ved minst en fil i denne oppgave"
+      no_attachment_found: "Fant ikke et vedlegg å sende til google drive"
       no_report: "Kunne ikke finne en rapport for den innleveringen"
     errors_update_failed: "Oppdatering mislyktes"
     finished_redirecting: "Ferdig! Omdirigerer til filen..."
@@ -20816,6 +20856,8 @@ nb-x-k12:
   tolerance_value_9e96573c: Toleranseverdi
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: "For mange innloggingsforsøk. Prøv igjen senere eller kontakt systemadministrator."
   too_many_members_b8b15069: "For mange medlemmer"
+  too_many_participants_for_group_conversation_1743cd8: "For mange deltakere for gruppesamtale"
+  too_many_recipients_for_group_conversation_906a4b69: "For mange mottakere for gruppesamtale"
   tool_configuration_63cd43b0: Verktøy-konfigurasjon
   tool_content_2924d18f: Verktøy-innhold
   tool_content_e699e813: Verktøy-innhold
@@ -20952,6 +20994,7 @@ nb-x-k12:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "Ikke mulig å få tilgang til spesifikk elev. Gå til oppgave i SpeedGrader?"
   unable_to_align_some_outcomes_to_a_page_65f7d412: "Kan ikke justere noen mål for en side"
   unable_to_align_some_outcomes_to_title_53467231: "Kan ikke justere noen mål for «%{title}\""
+  unable_to_connect_to_google_drive_34886e7a: "Kan ikke koble til Google Drive."
   unable_to_curve_grades_because_this_assignment_is__17f78c27: "Kan ikke opprette resultatstatistikk fordi denne oppgaven har en forfallsdato innenfor en stengt vurderingsperiode for minst en elev."
   unable_to_delete_assignment_abcf8d62: "Kan ikke slette oppgave"
   unable_to_dismiss_update_df1e32eb: "Kan ikke fjerne oppdatering"
@@ -20962,6 +21005,7 @@ nb-x-k12:
   unable_to_read_file_2d04b0c: "Kan ikke lese filen"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
   unable_to_save_new_discussion_topic_99239f3f: "Kunne ikke lagre nytt diskusjonstema"
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "Kan ikke sende meldinger til brukere i %{context_name}"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: "Kan ikke sette en standard vurdering fordi denne oppgaven har en forfallsdato i en stengt vurderingsperiode for minst en elev."
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: "Kunne ikke sette opp dra og slipp for moduler"
   unable_to_toggle_placement_833db6ff: "Kan ikke velge plassering"
@@ -20972,6 +21016,7 @@ nb-x-k12:
   unauthorized: uautorisert
   unauthorized_message: "JWT-signatur ugyldig"
   unauthorized_to_delete_this_file_a1271224: "Uautorisert slette denne filen"
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: "Uautorisert, kan ikke legge til meldinger i samtalen"
   unavailable_46d2c344: Utilgjengelig
   unavailable_c04e4c93: utilgjengelig
   unbookmark_bank_70569249: "Fjern bokmerke %{bank}"
@@ -21649,14 +21694,18 @@ nb-x-k12:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "Brukere kan bruke og opprette (men ikke redigere) individuelle vurderingskriterier for oppgaver via Oppgaver når “Oppgaver og tester - legg til / rediger / slett” er aktivert."
   users_can_access_the_manage_question_banks_link_on_e411d01: "Brukere kan bruke administrer spørsmålsbank-lenken på innholdsfortegnelsen til tester når «Faginnhold - vis» og «Oppgaver og tester - legg til / rediger / slett» er aktiverte."
   users_d1b60cb0: Brukere
+  users_designers_22195c6f: "Brukere - Designere"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "Brukere - genererer observasjon-paringskoder for elever"
   users_generate_observer_pairing_codes_for_students_6975caad: "Brukere - generer observatørparingskoder for elever"
   users_manage_log_in_details_b944568b: "Brukere - behandle innloggingsdetaljer"
   users_manage_login_details_9462b30f: "Brukere - administrer innloggingsdetaljer"
   users_matching_search_term_c604db9e: "Brukere som matcher \"%{search_term}\""
   users_moderate_content_36d6eed7: "Brukere - moderer innhold"
+  users_observers_e0e66c52: "Brukere - Observatører"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: "Brukere av skjermlesere trenger kanskje å slå av den virtuelle markøren for å kunne bruke disse tastatursnarveiene"
   users_over_time_9a2ee74a: "brukere over tid"
+  users_tas_27117894: "Brukere - TA-er"
+  users_teachers_a5d5d1af: "Brukere - Lærere"
   users_view_list_861c7a3f: "Brukere - se liste"
   users_view_login_ids_a2e6a85: "Brukere - se innloggings-ID-er"
   users_view_primary_email_address_14f4978f: "Brukere - se primære e-postadresser"
@@ -22129,6 +22178,9 @@ nb-x-k12:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: "Du kan ikke slette en underkonto som har fag i seg."
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: "Du kan ikke slette en underkonto som har underkontoer i seg."
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "Du kan ikke slette %{account_name} fordi den har fag i seg"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: "Du kan ikke redigere dette vurderingskriteriet, enten fordi du ikke har tillatelse eller fordi den brukes på mer enn ett sted. Endringer du gjør vil føre til en nytt vurderingskriterium. Tilknyttede læringsmålkriterier bruker fagmestringsskalaen. Vil du fortsette allikevel?"
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: "Du kan ikke redigere dette vurderingskriteriet, enten fordi du ikke har tillatelse eller fordi den brukes på mer enn ett sted. Endringer du gjør vil føre til en nytt vurderingskriterium. Tilknyttede læringsmålkriterier bruker kontomestringsskalaen. Vil du fortsette allikevel?"
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: "Du kan ikke redigere denne rubrikken, enten fordi du ikke har tillatelse eller fordi den brukes på mer enn ett sted. Endringer du gjør vil resultere i et nytt vurderingskriterium basert på den gamle. Vil du fortsette allikevel?"
   you_can_try_to_log_in_again_2b23ef0f: "Du kan prøve å *logge inn igjen*."
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "Du kan bruke en enkel 16x16, 32x32, 48x48 ico-fil."
   you_can_view_dismissed_announcements_by_going_to_a_7f6f4f08: |-

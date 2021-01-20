@@ -415,7 +415,7 @@ class GroupCategoriesController < ApplicationController
         include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
         csv_string = CSV.generate do |csv|
           section_names = @context.course_sections.select(:id, :name).index_by(&:id)
-          users = @context.participating_students_by_date.
+          users = @context.participating_students.
             select("users.id, users.sortable_name,
                   -- we just want any that have an sis_pseudonym_id populated
                   MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,

@@ -40,8 +40,9 @@ export default function ResizeHandle(props) {
     }
   }
 
-  function handleFocus() {
+  function handleFocus(event) {
     setIsFocused(true)
+    props.onFocus?.(event)
   }
 
   function handleBlur() {
@@ -64,6 +65,7 @@ export default function ResizeHandle(props) {
   return (
     <View
       aria-label={formatMessage('Drag handle. Use up and down arrows to resize')}
+      title={formatMessage('Resize')}
       as="span"
       borderRadius="medium"
       display="inline-block"
@@ -71,6 +73,7 @@ export default function ResizeHandle(props) {
       padding="0 0 0 xx-small"
       position="relative"
       role="button"
+      data-btn-id={props['data-btn-id']}
       tabIndex={props.tabIndex}
       onKeyDown={handleKey}
       onFocus={handleFocus}
@@ -93,7 +96,9 @@ export default function ResizeHandle(props) {
 
 ResizeHandle.propTypes = {
   onDrag: func,
-  tabIndex: string
+  onFocus: func,
+  tabIndex: string,
+  'data-btn-id': string
 }
 
 ResizeHandle.defaultProps = {

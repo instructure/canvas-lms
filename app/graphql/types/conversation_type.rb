@@ -23,17 +23,23 @@ module Types
     graphql_name 'Conversation'
 
     implements GraphQL::Types::Relay::Node
-    implements Interfaces::TimestampInterface
 
     global_id_field :id
     field :_id, ID, "legacy canvas id", method: :id, null: false
     field :context_type, String, null: true
     field :context_id, Integer, null: true
     field :subject, String, null: true
+    field :updated_at, Types::DateTimeType, null: true
 
     field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true
     def conversation_messages_connection
-      load_association(:conversation_messages)
+      load_association(:conversation_messages).then do |messages|
+        Promise.all(
+          messages.map {|message| Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load(message)}
+        ).then do
+          messages.select {|message| message.conversation_message_participants.pluck(:user_id).include?(current_user.id)}
+        end
+      end
     end
 
     field :conversation_participants_connection, Types::ConversationParticipantType.connection_type, null: true

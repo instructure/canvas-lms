@@ -108,7 +108,7 @@ class GradebookExporter
     submissions = {}
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
-    assignments = select_in_grading_period calc.assignments
+    assignments = select_in_grading_period calc.gradable_assignments
 
     ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
     assignments.sort_by! do |a|

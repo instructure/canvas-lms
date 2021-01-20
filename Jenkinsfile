@@ -194,17 +194,44 @@ def slackSendCacheBuild(block) {
 
   def buildEndTime = System.currentTimeMillis()
 
-  def buildLog = sh(script: 'cat tmp/docker-build-short.log', returnStdout: true).trim()
+  def buildLog = sh(script: 'cat tmp/docker-build.log', returnStdout: true).trim()
+  def buildLogParts = buildLog.split('\n')
+  def buildLogPartsLength = buildLogParts.size()
 
-  slackSend(
-    channel: '#jenkins_cache_noisy',
-    message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}>
+  // slackSend() has a ridiculously low limit of 2k, so we need to split longer logs
+  // into parts.
+  def i = 0
+  def partitions = []
+  def cur_partition = []
+  def max_entries = 5
+
+  while(i < buildLogPartsLength) {
+    cur_partition.add(buildLogParts[i])
+
+    if(cur_partition.size() >= max_entries) {
+      partitions.add(cur_partition)
+
+      cur_partition = []
+    }
+
+    i++
+  }
+
+  if(cur_partition.size() > 0) {
+    partitions.add(cur_partition)
+  }
+
+  for(i = 0; i < partitions.size(); i++) {
+    slackSend(
+      channel: '#jenkins_cache_noisy',
+      message: """<${env.GERRIT_CHANGE_URL}|#${env.GERRIT_CHANGE_NUMBER}> on ${env.GERRIT_PROJECT}. Build <${env.BUILD_URL}|#${env.BUILD_NUMBER}> (${i} / ${partitions.size() - 1})
       Duration: ${buildEndTime - buildStartTime}ms
       Instance: ${env.NODE_NAME}
 
-      ```${buildLog}```
-    """
-  )
+        ```${partitions[i].join('\n\n')}```
+      """
+    )
+  }
 }
 
 // These functions are intentionally pinned to GERRIT_EVENT_TYPE == 'change-merged' to ensure that real post-merge
@@ -228,7 +255,7 @@ def getCanvasBuildsRefspec() {
   def commitMessage = env.GERRIT_CHANGE_COMMIT_MESSAGE ? new String(env.GERRIT_CHANGE_COMMIT_MESSAGE.decodeBase64()) : null
 
   if(env.GERRIT_EVENT_TYPE == 'change-merged' || !commitMessage || !(commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).find()) {
-    return 'master'
+    return env.GERRIT_BRANCH.contains('stable/') ? env.GERRIT_BRANCH : 'master'
   }
 
   return (commitMessage =~ CANVAS_BUILDS_REFSPEC_REGEX).findAll()[0][1]
@@ -298,12 +325,12 @@ pipeline {
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
 
-    JS_DEBUG_IMAGE = "$BUILD_IMAGE-js-debug:${imageTagVersion()}-$TAG_SUFFIX"
+    JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
-    RUBY_RUNNER_PREFIX = "$BUILD_IMAGE-ruby-runner"
-    YARN_RUNNER_PREFIX = "$BUILD_IMAGE-yarn-runner"
-    WEBPACK_BUILDER_PREFIX = "$BUILD_IMAGE-webpack-builder"
-    WEBPACK_CACHE_PREFIX = "$BUILD_IMAGE-webpack-cache"
+    RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
+    YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
+    WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath("webpack-builder")
+    WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath("webpack-cache")
 
     WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:${imageTagVersion()}-$TAG_SUFFIX"
 
@@ -325,6 +352,14 @@ pipeline {
     stage('Environment') {
       steps {
         script {
+          if (configuration.skipCi()) {
+            node('master') {
+              currentBuild.result = 'NOT_BUILT'
+              gerrit.submitCodeReview("-2", "Build not executed due to skip-ci flag")
+              error "[skip-ci] flag enabled: skipping the build"
+              return
+            }
+          }
           // Ensure that all build flags are compatible.
           if(configuration.getBoolean('change-merged') && configuration.isValueDefault('build-registry-path')) {
             error "Manually triggering the change-merged build path must be combined with a custom build-registry-path"
@@ -401,7 +436,7 @@ pipeline {
                   }
 
                   if(!env.JOB_NAME.endsWith('Jenkinsfile') && git.changedFiles(jenkinsFiles, 'origin/master')) {
-                      error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
+                    error "Jenkinsfile has been updated. Please retrigger your patchset for the latest updates."
                   }
                 }
               }
@@ -505,7 +540,14 @@ pipeline {
                         sh "build/new-jenkins/docker-build.sh"
                       }
 
-                      sh "build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX"
+                      // We need to attempt to upload all prefixes here in case instructure/ruby-passenger
+                      // has changed between the post-merge build and this pre-merge build.
+                      sh(script: """
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $YARN_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $RUBY_RUNNER_PREFIX || true
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
+                      """, label: 'upload cache images')
                     }
                   }
                 }

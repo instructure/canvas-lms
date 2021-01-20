@@ -4,10 +4,10 @@ set -o errexit -o errtrace -o nounset -o pipefail -o xtrace
 
 export CACHE_VERSION="2020-12-15.1"
 
-echo "" > tmp/docker-build-short.log
+echo "" > tmp/docker-build.log
 
 function add_log {
-  echo -e "$1\n" >> tmp/docker-build-short.log
+  echo "$1" >> tmp/docker-build.log
 }
 
 function compute_tags {
@@ -41,7 +41,7 @@ function tag_many {
   local dstTags=$@
 
   for imageTag in $dstTags; do
-    [ "$srcTag" != "$imageTag" ] && [[ "$imageTag" != "local/"* ]] && add_log "alias\n  from $srcTag\n  to $imageTag"
+    [ "$srcTag" != "$imageTag" ] && [[ "$imageTag" != "local/"* ]] && add_log "alias $imageTag"
 
     docker tag $srcTag $imageTag
   done

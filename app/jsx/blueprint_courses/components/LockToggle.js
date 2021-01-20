@@ -80,6 +80,7 @@ class LockToggle extends Component {
 
   static setupRootNode(wrapperSelector, childIndex, cb) {
     const toggleNode = document.createElement('span')
+    toggleNode.style.display = 'inline-block'
     // sometimes we have to wait for the DOM to settle down first
     const intId = setInterval(() => {
       const wrapperNode = document.querySelector(wrapperSelector)

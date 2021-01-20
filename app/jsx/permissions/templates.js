@@ -44,7 +44,10 @@ export const PERMISSION_DETAIL_SECTIONS = [
 
 export const GROUP_PERMISSION_DESCRIPTIONS = {
   manage_wiki: () => I18n.t('Create / Delete / Update Pages'),
-  manage_course_admin_users: () => I18n.t('TAs / Observers / Designers'),
+  manage_course_teacher_enrollments: () => I18n.t('Add / Remove in courses'),
+  manage_course_ta_enrollments: () => I18n.t('Add / Remove in courses'),
+  manage_course_observer_enrollments: () => I18n.t('Add / Remove in courses'),
+  manage_course_designer_enrollments: () => I18n.t('Add / Remove in courses'),
   manage_sections: () => I18n.t('add / edit / delete Sections')
 }
 

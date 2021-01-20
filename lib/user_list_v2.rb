@@ -18,6 +18,12 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class UserListV2
+  class ParameterError < StandardError
+    def response_status
+      400
+    end
+  end
+
   # not really much better than the first one
   # stealing some things from it because I don't feel like reinventing the whole wheel
   # but with some key differences that would make it difficult to keep in one class
@@ -40,7 +46,9 @@ class UserListV2
     @root_account = root_account
     @current_user = current_user
     @can_read_sis = can_read_sis
-    raise "search_type must be one of #{SEARCH_TYPES}" unless SEARCH_TYPES.include?(search_type)
+    unless SEARCH_TYPES.include?(search_type)
+      raise ParameterError, "search_type must be one of #{SEARCH_TYPES}"
+    end
 
     parse_list(list_in)
 

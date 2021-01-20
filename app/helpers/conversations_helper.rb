@@ -48,7 +48,7 @@ module ConversationsHelper
     result
   end
 
-  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil)
+  def normalize_recipients(recipients: nil, context_code: nil, conversation_id: nil, current_user: @current_user)
     if defined?(params)
       recipients ||= params[:recipients]
       context_code ||= params[:context_code]
@@ -69,15 +69,15 @@ module ConversationsHelper
     end
 
     users, contexts = AddressBook.partition_recipients(recipients)
-    known = @current_user.address_book.known_users(
+    known = current_user.address_book.known_users(
       users,
       context: context,
       conversation_id: conversation_id,
-      strict_checks: !Account.site_admin.grants_right?(@current_user, session, :send_messages)
+      strict_checks: !Account.site_admin.grants_right?(current_user, session, :send_messages)
     )
-    contexts.each { |c| known.concat(@current_user.address_book.known_in_context(c)) }
+    contexts.each { |c| known.concat(current_user.address_book.known_in_context(c)) }
     @recipients = known.uniq(&:id)
-    @recipients.reject! { |u| u.id == @current_user.id } unless @recipients == [@current_user] && recipients.count == 1
+    @recipients.reject! { |u| u.id == current_user.id } unless @recipients == [current_user] && recipients.count == 1
     @recipients
   end
 
@@ -134,7 +134,8 @@ module ConversationsHelper
     domain_root_account_id: nil,
     media_comment_id: nil,
     media_comment_type: nil,
-    user_note: nil
+    user_note: nil,
+    current_user: @current_user
   )
     if defined?(params)
       body ||= params[:body]
@@ -146,7 +147,7 @@ module ConversationsHelper
       user_note = params[:user_note] if user_note.nil?
     end
     [
-      @current_user,
+      current_user,
       body,
       {
         attachment_ids: attachment_ids,
@@ -208,6 +209,23 @@ module ConversationsHelper
     end
   end
 
+  def validate_message_ids(message_ids, conversation, current_user: @current_user)
+    if message_ids
+      # sanity check: are the messages part of this conversation?
+      db_ids = ConversationMessage.where(id: message_ids, conversation_id: conversation.conversation_id).pluck(:id)
+      raise InvalidMessageForConversationError unless db_ids.count == message_ids.count
+
+      message_ids = db_ids
+
+      # sanity check: can the user see the included messages?
+      found_count = 0
+      Shard.partition_by_shard(message_ids) do |shard_message_ids|
+        found_count += ConversationMessageParticipant.where(conversation_message_id: shard_message_ids, user_id: current_user).count
+      end
+      raise InvalidMessageParticipantError unless found_count == message_ids.count
+    end
+  end
+
   class InvalidContextError < StandardError; end
 
   class InvalidContextPermissionsError < StandardError; end
@@ -215,4 +233,8 @@ module ConversationsHelper
   class CourseConcludedError < StandardError; end
 
   class InvalidRecipientsError < StandardError; end
+
+  class InvalidMessageForConversationError < StandardError; end
+
+  class InvalidMessageParticipantError < StandardError; end
 end

@@ -100,7 +100,7 @@ def _runRspecTestSuite(
     try {
       cleanAndSetup()
       sh 'rm -rf ./tmp && mkdir -p tmp'
-      timeout(time: 60) {
+      timeout(time: 15) {
         sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
         sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
         sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')

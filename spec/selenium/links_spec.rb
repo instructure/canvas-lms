@@ -109,10 +109,12 @@ describe "links", priority: "2" do
     end
 
     context "right side links" do
-
-      it "should navigate user to conversations page after inbox link is clicked" do
-        expect_new_page_load { fj('#global_nav_conversations_link').click}
-        expect(f("i.icon-email")).to be_displayed
+      context 'when react_inbox feature flag is off' do
+        it "should navigate user to conversations page after inbox link is clicked" do
+          Account.default.set_feature_flag! :react_inbox, 'off'
+          expect_new_page_load { fj('#global_nav_conversations_link').click}
+          expect(f("i.icon-email")).to be_displayed
+        end
       end
 
       it "should navigate user to user settings page after settings link is clicked" do

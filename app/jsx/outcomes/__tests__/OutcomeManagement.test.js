@@ -23,7 +23,11 @@ import {
   OutcomePanel,
   OutcomeManagementWithoutGraphql as OutcomeManagement
 } from '../OutcomeManagement'
-import {masteryCalculationGraphqlMocks, masteryScalesGraphqlMocks} from './mocks'
+import {
+  masteryCalculationGraphqlMocks,
+  masteryScalesGraphqlMocks,
+  outcomeGroupsMocks
+} from './mocks'
 
 jest.useFakeTimers()
 
@@ -42,20 +46,32 @@ describe('OutcomeManagement', () => {
 
     it('renders ManagementHeader when improved outcomes enabled', () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const {queryByTestId} = render(<OutcomeManagement />)
-      expect(queryByTestId('managementHeader')).toBeInTheDocument()
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={[...outcomeGroupsMocks]}>
+          <OutcomeManagement />
+        </MockedProvider>
+      )
+      expect(getByText(/Loading/)).toBeInTheDocument()
+      act(() => jest.runAllTimers())
+      expect(getByTestId('managementHeader')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 
-    it('does not render OutcomeManagementPanel when improved outcomes disabled', () => {
+    it('does not render OutcomeManagementPanel', () => {
       const {queryByTestId} = render(<OutcomeManagement />)
       expect(queryByTestId('outcomeManagementPanel')).not.toBeInTheDocument()
     })
 
     it('renders OutcomeManagementPanel when improved outcomes enabled', () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
-      const {queryByTestId} = render(<OutcomeManagement />)
-      expect(queryByTestId('outcomeManagementPanel')).toBeInTheDocument()
+      const {getByText, getByTestId} = render(
+        <MockedProvider mocks={[...outcomeGroupsMocks]}>
+          <OutcomeManagement />
+        </MockedProvider>
+      )
+      expect(getByText(/Loading/)).toBeInTheDocument()
+      act(() => jest.runAllTimers())
+      expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
 

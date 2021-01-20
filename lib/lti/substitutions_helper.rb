@@ -244,7 +244,7 @@ module Lti
       e || @user.email
     end
 
-    def recursively_fetch_previous_lti_context_ids
+    def recursively_fetch_previous_lti_context_ids(limit: 1000)
       return '' unless @context.is_a?(Course)
 
       # now find all parents for locked folders
@@ -257,10 +257,9 @@ module Lti
         # Finds content migrations for this course and recursively, all content
         # migrations for the source course of the migration -- that is, all
         # content migrations that directly or indirectly provided content to
-        # this course. From there we get theunique list of courses, ordering by
+        # this course. From there we get the unique list of courses, ordering by
         # which has the migration with the latest timestamp.
-        results = Course.connection.select_rows(<<-SQL)
-          WITH RECURSIVE all_contexts AS (
+        results = Course.from("(WITH RECURSIVE all_contexts AS (
             SELECT context_id, source_course_id
             FROM #{ContentMigration.quoted_table_name}
             WHERE context_id=#{@context.id}
@@ -268,21 +267,24 @@ module Lti
             SELECT content_migrations.context_id, content_migrations.source_course_id
             FROM #{ContentMigration.quoted_table_name}
               INNER JOIN all_contexts t ON content_migrations.context_id = t.source_course_id
-          ),
-          results AS (
-            SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
-            FROM #{Course.quoted_table_name}
-            INNER JOIN #{ContentMigration.quoted_table_name} ct
-            ON ct.source_course_id = courses.id
-            AND ct.workflow_state = 'imported'
-            AND (ct.context_id IN (
-              SELECT x.context_id
-              FROM all_contexts x))
-            ORDER BY courses.lti_context_id, ct.finished_at DESC
           )
-          SELECT lti_context_id FROM results ORDER BY finished_at DESC
-        SQL
-        results.map(&:last).compact.join(',')
+          SELECT DISTINCT ON (courses.lti_context_id) courses.id, ct.finished_at, courses.lti_context_id
+          FROM #{Course.quoted_table_name}
+          INNER JOIN #{ContentMigration.quoted_table_name} ct
+          ON ct.source_course_id = courses.id
+          AND ct.workflow_state = 'imported'
+          AND (ct.context_id IN (
+            SELECT x.context_id
+            FROM all_contexts x))
+          ORDER BY courses.lti_context_id, ct.finished_at DESC
+          ) as courses").
+          where.not(lti_context_id: nil).order(finished_at: :desc).limit(limit + 1).pluck(:lti_context_id)
+
+        # We discovered that at around 3000 lti_context_ids, the form data gets too
+        # big and breaks the LTI launch. We decided to truncate after 1000 and note
+        # it in the launch as "truncated"
+        results = results.first(limit) << 'truncated' if results.length > limit
+        results.join(',')
       end
     end
 

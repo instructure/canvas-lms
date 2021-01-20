@@ -157,6 +157,22 @@ module RCENextPage
     f('[role^="menuitem"][title="External Links"]')
   end
 
+  def remove_link
+    f('[role^="menuitem"][title="Remove Link"]')
+  end
+
+  def remove_links
+    f('[role^="menuitem"][title="Remove Links"]')
+  end
+
+  def course_links_tray
+    f('[role="dialog"][aria-label="Course Links"]')
+  end
+
+  def validate_course_links_tray_closed
+    expect(f('body')).not_to contain_css('[role="dialog"][aria-label="Course Links"]')
+  end
+
   def link_options_button
     f('button[aria-label="Show link options"]')
   end
@@ -575,6 +591,14 @@ module RCENextPage
     f('input[aria-haspopup="listbox"]', fj(':contains("Content Type")'))
   end
 
+  def editor_view_button
+    f('[data-btn-id="rce-edit-btn"]')
+  end
+
+  def fullscreen_element
+    driver.execute_script('return document.fullscreenElement')
+  end
+
   def change_content_tray_content_type(which)
     content_type = content_tray_content_type
     content_type.click
@@ -687,6 +711,14 @@ module RCENextPage
 
   def click_external_links
     external_links.click
+  end
+
+  def click_remove_link
+    remove_link.click
+  end
+
+  def click_remove_links
+    remove_links.click
   end
 
   def click_images_toolbar_button
@@ -899,12 +931,16 @@ module RCENextPage
     wait_for_animations
   end
 
+  def click_editor_view_button
+    editor_view_button.click
+  end
+
   def switch_to_html_view
-    fj('button:contains("Switch to raw html editor")').click
+    click_editor_view_button
   end
 
   def switch_to_editor_view
-    fj('button:contains("Switch to rich text editor")').click
+    click_editor_view_button
   end
 
   def tiny_rce_ifr_id
@@ -917,6 +953,13 @@ module RCENextPage
       tinyrce_element.click
       tinyrce_element.send_keys("#{text}\n") # newline guarantees a tinymce change event
     end
+  end
+
+  def count_elems_by_tagname(tagname)
+    # if I use ff('a').length, it takes much longer to timeout before finally
+    # throwing the Selenium::WebDriver::Error::NoSuchElementError
+    # so ignore Gergich's whining.
+    driver.execute_script("return document.querySelectorAll('#{tagname}').length")
   end
 
   def create_external_link(text, href)

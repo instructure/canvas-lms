@@ -252,10 +252,6 @@ Rails.configuration.after_initialize do
     Canvas::Oauth::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
-    Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
-  end
-
   Delayed::Periodic.cron 'Purgatory.expire_old_purgatories', '0 0 * * *', priority: Delayed::LOWER_PRIORITY do
     with_each_shard_by_database(Purgatory, :expire_old_purgatories, local_offset: true)
   end

@@ -26,8 +26,8 @@
 # ```
 #
 
-# On a new installation, you will need some config files
-#cp docker-compose/config/* config/
+# On a new installation, you will need some config files. Do not copy contents of new-jenkins folder, just yamls.
+#ccp docker-compose/config/*.yml config/
 
 docker-compose down
 docker-compose pull web

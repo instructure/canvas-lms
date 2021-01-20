@@ -35,6 +35,7 @@ class Group < ActiveRecord::Base
 
   has_many :group_memberships, -> { where("group_memberships.workflow_state<>'deleted'") }, dependent: :destroy
   has_many :users, -> { where("users.workflow_state<>'deleted'") }, through: :group_memberships
+  has_many :user_past_lti_ids, as: :context, inverse_of: :context
   has_many :participating_group_memberships, -> { where(workflow_state: 'accepted') }, class_name: "GroupMembership"
   has_many :participating_users, :source => :user, :through => :participating_group_memberships
   belongs_to :context, polymorphic: [:course, { context_account: 'Account' }]

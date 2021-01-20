@@ -146,11 +146,30 @@ module Types
       end
     end
 
-    field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true
-    def conversations_connection
+    field :conversations_connection, Types::ConversationParticipantType.connection_type, null: true do
+      argument :scope, String, required: false
+      argument :filter, String, required: false
+    end
+    def conversations_connection(scope: nil, filter: nil)
       if object == context[:current_user]
         load_association(:all_conversations).then do
-          object.conversations
+          conversations_scope = case scope
+          when 'unread'
+            object.conversations.unread
+          when 'starred'
+            object.starred_conversations
+          when 'sent'
+            object.conversations.sent
+          when 'archived'
+            object.conversations.archived
+          else
+            object.conversations.default
+          end
+
+          filter_mode = :or
+          filters = Array(filter || [])
+          conversations_scope = conversations_scope.tagged(*filters, :mode => filter_mode) if filters.present?
+          conversations_scope
         end
       end
     end

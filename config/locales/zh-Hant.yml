@@ -1851,6 +1851,7 @@ zh-Hant:
   add_quiz_ip_filter_c7b37dc5: "添加測驗 IP 篩選器"
   add_rating_89d7fbde: 添加評級
   add_recipient_ff135ed7: 添加收件者
+  add_remove_in_courses_fa1c9081: "於課程添加 / 移除"
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: 添加、刪除或重新排列此檔案袋的部分
   add_review_2fb1590c: 添加檢閲
   add_role_3dc4d273: 添加角色
@@ -1866,6 +1867,7 @@ zh-Hant:
   add_subtitle_9f660cc: 新增字幕
   add_tas_to_courses_27741f81: 添加助教至課程
   add_tas_to_the_course_2aac6e02: 添加助教至課程
+  add_teachers_to_courses_48ac7a7a: 添加教師至課程
   add_theme_32fa3d50: 添加主題
   add_to_course_481a51c4: 添加到課程......
   add_to_rce_toolbar_e5b3e3b4: "添加至 RCE 工具欄"
@@ -2478,6 +2480,7 @@ zh-Hant:
   an_error_occured_please_try_again_e59b65b: 發生錯誤。請重試。
   an_error_occured_saving_the_assignment_d71cb3d2: 儲存作業時發生錯誤
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: 創建本主題時發生錯誤，請再試一次。
+  an_error_occured_updating_the_flag_7df5de0a: 更新標記時發生錯誤
   an_error_occured_while_deleting_the_grading_period_81bb16e5: 刪除評分時段組時發生錯誤
   an_error_occured_while_deleting_the_grading_period_c8343484: 刪除評分時段時發生錯誤
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: 獲取報名學期時發生錯誤。
@@ -2509,10 +2512,14 @@ zh-Hant:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: "試圖聯絡 Turnitin 時發生錯誤。"
   an_error_occurred_while_checking_the_migration_sta_d17035b1: 檢查遷移狀態時發生錯誤
   an_error_occurred_while_deleting_announcements_ab1ff3f6: 刪除通告時發生錯誤。
+  an_error_occurred_while_loading_account_outcomes_8f337857: 載入帳戶成果時發生錯誤。
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "載入帳戶成果時發生錯誤：%{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "載入帳戶能力評級時發生錯誤：%{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: 載入帳戶能力評級時發生錯誤
   an_error_occurred_while_loading_associations_9699b3ee: 載入關聯時發生錯誤
   an_error_occurred_while_loading_changes_9851b56f: 載入變更時發生錯誤
+  an_error_occurred_while_loading_course_outcomes_320ccc44: 載入課程成果時發生錯誤。
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "載入課程成果時發生錯誤：%{error}"
   an_error_occurred_while_loading_courses_11d4571e: 載入課程時發生錯誤
   an_error_occurred_while_loading_late_policies_c415f676: 載入遲交規則時發生錯誤
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "載入掌握程度計算時發生錯誤：%{error}"
@@ -2846,6 +2853,7 @@ zh-Hant:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 您是否確定要這樣做？其將無法撤銷，並且將會覆蓋成績單中的分數。
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: 是否確定要阻止該用戶活動？該用戶將無法參加課程。
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: 是否確定要向學生公佈此作業的成績？
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: 是否確定要繼續？您所做的變更將不會儲存。
   are_you_sure_you_want_to_publish_this_comment_26989c2f: 是否確定要公佈此註解？
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: 您確定要刪除此評分時段嗎？
   are_you_sure_you_want_to_remove_this_item_7887ce31: 是否確定要移除此項目？
@@ -3835,6 +3843,7 @@ zh-Hant:
   australia_e8d44bf8: 澳大利亞
   austria_43_7bc58b34: "奧地利 (+43)"
   austria_82178475: 澳大利亞
+  auth_failure_in_connecting_to_google_drive_a20aad43: "連接至 Google Drive 時授權失敗。"
   auth_logging: 
     corrupted: 詳細資料不可用
     login: 登入
@@ -4057,6 +4066,7 @@ zh-Hant:
   belgium_ef8739b6: 比利時
   below_mastery_abd1dca5: 掌握程度不足
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "此搜索字段下方是 %{content_type} 列表。當您輸入時，將篩選該列表以匹配您的查詢。將按您所選擇的任何選項來篩選交談（Conversation）訊息。"
+  beta_cb5f307e: 測試版
   beta_url_3c7b88ec: "試用 URL："
   better_file_browsing_description: 新的、更簡單、更人性化的檔案瀏覽介面。如果在課程層面上啟用此介面，那麼該課程的所有使用者會看到該新介面。為了在有人進入到使用者的個人檔案頁面（「/檔案」）時顯示介面，則需要為其作為成員之一的帳戶打開該介面。
   between_1_and_5_f2a74bcf: "在 1 和 5 之間"
@@ -6694,6 +6704,7 @@ zh-Hant:
   course_cards_6029a05c: 課程卡
   course_catalog_4cc7c8ce: 課程目錄
   course_collaborations_dadb327e: 課程協作
+  course_concluded_unable_to_send_messages_b99b6b6d: 課程已結束，無法發送訊息
   course_conferences_3d914c96: 課程會議
   course_content_a92eca20: 課程內容
   course_content_add_edit_delete_ea877eca: "課程內容 - 添加 / 編輯 / 刪除"
@@ -6891,6 +6902,7 @@ zh-Hant:
     sis_id_taken: "SIS ID『%{sis_id}』已在使用中"
   course_section_7a988066: 課程班別
   course_section_name_ea880ed1: "課程班別%{name}"
+  course_sections: 課程分班
   course_sections_add_c6b5dc1: "課程分班 - 添加"
   course_sections_add_edit_delete_c4f4ac19: "課程分班 - 添加 / 編輯 / 刪除"
   course_sections_delete_e75e3eeb: "課程分班 - 刪除"
@@ -8283,8 +8295,10 @@ zh-Hant:
   disabled_by_default_7d822dcb: 默認停用
   disabled_in_course_settings_d15ee35d: "* 已在課程設定內停用"
   disabled_links_b3bdea99: 已停用的連結
+  disabled_locked_dab351d6: 已停用（已鎖定）
   disabled_not_visible_to_students_2c9d693f: 已停用。學生看不到。
   disabled_not_visible_to_students_48d4a90d: 已停用。看不到學生
+  disabled_unlocked_1588a6d1: 已停用（已解鎖）
   disables_push_notifications_for_certain_types_3f57cde4: 停用某些類型的推送通知。
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       停用除通知和
@@ -9109,6 +9123,8 @@ zh-Hant:
   enabled_ba7cab66: 啟用
   enabled_by_default_e530d6ed: 默認啟用
   enabled_links_be110215: 已啟用的連接
+  enabled_locked_3cf7c256: 已啟用（已鎖定）
+  enabled_unlocked_8d3a5df7: 已啟用（已解鎖）
   enabled_web_services_f620b2be: "啟用的 Web 服務"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 在新成績單提交項目托盤中啟用抄襲報告和相似度評分的顯示。
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "對新分析工具提供的課程和使用者資料啟用新的 API 端點。"
@@ -9194,6 +9210,10 @@ zh-Hant:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       您的機構學生資訊系統 (SIS) 可添加註冊學生。如果註冊學生是透過 SIS 建立，僅管理員可以從課程中移除註冊學生。
               要檢視課程中的使用者清單，必須啟用「使用者 - 檢視清單」。要檢視 SIS ID，必須啟用「SIS 資料 - 讀取」。要透過 SIS ID 添加使用者至課程，必須同時啟用「SIS 資料 - 管理」。要編輯一名教師或助教的分班，必須同時啟用「交談 - 傳送訊息至個別課程成員」。要將觀察者與學生進行連結，必須同時啟用「交談 - 傳送訊息至個別課程成員」。
+  enrollments_observers: 觀察者
+  enrollments_students: 學生
+  enrollments_tas: 教學助理
+  enrollments_teachers: 教師
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: 確保已經匯入至課程的成果不會因再次匯入而重複
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: 確保沒有匯入學習成果權限的使用者無法在學習成果標籤中檢視此按鈕
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: "此處插入 hexcode 自定義顏色"
@@ -12118,7 +12138,9 @@ zh-Hant:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       如果 RCE 強化也已啟用，
       RCE 將在您離開時自動儲存您的工作
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: 設定後，評分計算機將在計算總分時忽略未發佈的匿名作業。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: "設定後，成績單 CSV 匯出工具將把已選的評分期附加到欄位標題，而欄位標題值將根據評分期而有所不同。"
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: 設定後，成績單將在載入作業時優先載入已選評分期內的作業。
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "設定後，將在作業的評分期完結後關閉「公佈至 SIS」功能。只適用於啟用了「啟用新 SIS 集成設定」功能的帳戶。"
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "如果已啟用「統計 - 檢視」或「使用者 - 管理登入詳細資料」，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "如果已啟用「統計 - 檢視」或「使用者 - 管理」登入詳細資料，使用者將可以於管理員工具中產生登入/登出活動。要隱藏管理員工具中的登入/登出活動選項，需要同時停用這兩個權限。"
@@ -12184,6 +12206,7 @@ zh-Hant:
   ignore_name_55edc6fe: "忽略 %{name}"
   ignore_these_3940f6f5: 忽略這些
   ignore_this_assignment_b7a71f80: 忽略此作業
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: 計算評分時忽略未發佈匿名作業
   ignore_until_new_mark_77eb512: 忽略直到有新評分
   ignore_until_new_mark_935e00a2: 直到有新評分前忽略
   ignore_until_new_submission_87f32b4: 忽略直到有新提交件
@@ -12301,6 +12324,7 @@ zh-Hant:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: 在同步到您所在學校的學生資訊系統上時，包括該作業的成績
   include_unpublished_assignments_83ebbaec: 包括未發佈的任務
   include_unpublished_courses_7a0e7aab: 包括未發佈的課程
+  included_messages_not_for_this_conversation_986a60bf: "included_messages 不屬於此交談"
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: "納入連結到成績單中的作業標題選單中的 SpeedGrader。"
   includes_grade_values_in_the_admin_grade_reports_a28200da: 在管理員評分報告中包括評分值。
   includes_outcomes_service_alignments_when_exportin_6c578a35: 匯出和匯入課程內容時包括學習成果服務校準項目
@@ -12321,6 +12345,9 @@ zh-Hant:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: 指出圖像僅用於裝飾目的，及不應該被屏幕閱讀器讀取
   indigo_2035fc55: 靛藍色
   individual_assignment_grade_posting_d8322b99: 個人作業成績公佈中
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: 不能修改個別成果計算值。
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: 不能修改個別成果掌握程度分數。
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: 不能修改個別成果評分。
   individual_view_81c2f124: 個人視圖
   individual_view_d60b9132: 個人視圖...
   indonesia_62_4c35bd62: "印尼 (+62)"
@@ -12507,10 +12534,12 @@ zh-Hant:
   invalid_grade_passback_setting_a1d209d1: "無效的 grade_passback_setting"
   invalid_hexcode_9124519f: "無效 hexcode"
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: "無效 hexcode。請在此輸入有效 hexcode 以使用自訂顏色。"
+  invalid_or_missing_session_for_oauth_3ce4b605: "無效或遺失的 OAuth 工作階段"
   invalid_points_8e929c3f: 無效的分數
   invalid_points_for_rating_tier_index_i_400d307e: "評分等級的 %{index} 無效分數：\"%{i}\""
   invalid_points_possible: 該作業可能的分值必須為零或大於零。
   invalid_recipient_name_56b22b86: 無效的收件人姓名。
+  invalid_recipients_5fd7c594: 無效收件人
   invalid_redirect_url_6444a1b0: "無效的重新導向 URL"
   invalid_restrictions_316cd740: 無效限制
   invalid_score_3d247da7: 有效分數
@@ -12999,6 +13028,7 @@ zh-Hant:
   load_bank: 
     error_loading_banks: 載入題庫時發生錯誤
     loading_banks: 正在載入題庫…
+  load_gradebook_assignments_by_grading_period_919dfd3c: 根據評分期載入成績單作業
   load_more_9ca37ccc: 載入更多…
   load_more_a36f9cf9: 載入更多
   load_more_comments_dc00ac34: 載入更多評論
@@ -15951,6 +15981,7 @@ zh-Hant:
   no_content_has_been_shared_with_you_667fde6c: 沒有與您共用的內容。
   no_content_not_visible_to_students_905f8996: 沒有內容。學生看不到。
   no_content_not_visible_to_students_b59f4867: 沒有內容。看不到學生
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "找不到以下群組編號的群組：%{context_code}"
   no_courses_favorited_4e69fd63: 無收藏的課程
   no_courses_found_12d68a74: 找不到課程
   no_courses_to_display_700f94c4: 沒有可顯示的課程
@@ -16859,6 +16890,8 @@ zh-Hant:
   override_3de65b2c: 重寫
   override_grade_385adf30: 重寫評分
   override_score_53994655: 重寫分數
+  override_score_5f3c1189: 重寫分數
+  override_score_gradingperiod_286ac51b: "重寫分數（%{gradingPeriod}）"
   overrides: 
     blank_override: 您必須選中一個學生或班別
     everyone: 所有人
@@ -19856,6 +19889,7 @@ zh-Hant:
       one: "%{count} 個章節"
       other: "%{count} 個班別"
   recipients_a69b5e55: 收件者：
+  recipients_restricted_by_role_22c4c843: 收件人受身份限制
   record_7c9448b: 錄製
   record_an_audio_or_video_comment_88425add: 錄製音訊或視頻評論
   record_audio_14666880: 錄製音訊
@@ -19994,6 +20028,7 @@ zh-Hant:
   remove_studentname_16ba8c3a: "移除 %{studentName}"
   remove_submission_draft_f5c7f58b: 移除提交項目草稿
   remove_tas_from_courses_13ade851: 從課程移除助教
+  remove_teachers_from_courses_353d5217: 從課程移除教師
   remove_text_8e485c41: "刪除%{text}"
   remove_these_dates_48453a81: 刪除這些日期
   remove_this_item_from_the_module_4b2ceab7: 從單元移除此項目
@@ -20580,7 +20615,7 @@ zh-Hant:
       name: 名稱
       open_enrollment_only: 只打開註冊課程
       public_only: 只公共課程
-      search: 搜索
+      search: 搜尋
       titles: 
         all_courses: 所有課程
     all_courses_inner: 
@@ -21932,6 +21967,7 @@ zh-Hant:
     users: 
       user_search_label: 使用者搜尋
       users_matching_label: 使用者相符
+  site_admin_d0417171: 網站管理員
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "僅限網站管理員。每月發送給已啟用的帳戶中 1 / %{denominator} 的使用者。"
   size_b30e1077: 大小
   size_f1873a2: "，大小： "
@@ -22221,6 +22257,7 @@ zh-Hant:
   student_extensions_d35a907: 學生延期
   student_grades_4cbc59a1: 學生成績
   student_group_filter_185fb085: 學生群組篩選
+  student_groups: 學生群組
   student_groups_863201c1: 學生群組
   student_groups_desc: 這為帳戶啟用新學生群組頁面。新頁面用於提供更動態的群組註冊體驗。
   student_id: "學生 ID"
@@ -22422,10 +22459,13 @@ zh-Hant:
     errors: 
       assignment_submit_fail: 作業提交失敗
       can_not_submit_locked_assignment: 作業被鎖定時無法提交
+      googld_drive_timeout: "與 Google Drive 通話時逾時"
+      google_drive_workflow: "無法下載 Google Drive 入口"
       invalid_file_type: 無效的文檔類型
       invalid_google_docs_domain: "您不能從此 google_docs 網域提交作業"
       media_file_attached: 提交件中沒有媒體記錄
       no_attached_file: 必須為此作業附加至少一個文檔
+      no_attachment_found: "找不到要發送至 Google Drive 的附件"
       no_report: 找不到該提交項目的報告
       student_not_enrolled: 指定的使用者不是這門課程的學生
       student_not_enrolled_id: "指定的使用者(%{id})不是這門課程的學生"
@@ -23905,6 +23945,8 @@ zh-Hant:
   tolerance_value_9e96573c: 公差值
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: 太多失敗的登入嘗試。請稍後再試，或者聯繫您的系統管理員。
   too_many_members_b8b15069: 成員太多
+  too_many_participants_for_group_conversation_1743cd8: 群組交談參與者過多
+  too_many_recipients_for_group_conversation_906a4b69: 群組交談收件人過多
   tool_configuration_63cd43b0: 工具配置
   tool_content_2924d18f: 工具內容
   tool_content_e699e813: 工具內容
@@ -24048,6 +24090,7 @@ zh-Hant:
   unable_to_access_specific_student_go_to_assignment_585e05e9: "無法訪問特定的學生。前往 SpeedGrader 中的作業？"
   unable_to_align_some_outcomes_to_a_page_65f7d412: 有部分學習成果無法校準至一個頁面
   unable_to_align_some_outcomes_to_title_53467231: "有部分學習成果無法校準至 \"%{title}\""
+  unable_to_connect_to_google_drive_34886e7a: "無法連接至 Google Drive。"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: 因為此作業至少在一個學生的封閉評分期內到期，所以無法常模參照評級
   unable_to_delete_assignment_abcf8d62: 無法刪除作業
   unable_to_dismiss_update_df1e32eb: 無法解除更新
@@ -24059,6 +24102,7 @@ zh-Hant:
   unable_to_read_file_2d04b0c: 無法讀取檔案
   unable_to_remove_app_4293cb53: 無法刪除應用程式
   unable_to_save_new_discussion_topic_99239f3f: 無法儲存新的討論主題
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "無法發送訊息予%{context_name}內的使用者"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: 因為此作業至少在一個學生的封閉評分期內到期，所以無法設定預設評分
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: 無法為單元設置拖放
   unable_to_toggle_placement_833db6ff: 無法切換配置
@@ -24069,6 +24113,7 @@ zh-Hant:
   unauthorized: 未授權
   unauthorized_message: "JWT 簽名無效"
   unauthorized_to_delete_this_file_a1271224: 無權刪除此文檔
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: 未授權，無法添加訊息至交談中
   unavailable_46d2c344: 不可用
   unavailable_c04e4c93: 不可用
   unbookmark_bank_70569249: "刪除書籤%{bank}"
@@ -24846,14 +24891,18 @@ zh-Hant:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "啟用「作業及測驗 - 添加/編輯/刪除」後，使用者可以透過作業清單存取及建立（但不能編輯）個別作業評分標準。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "啟用「課程內容 - 查看」及「作業及測驗 - 添加 / 編輯 / 刪除」後，使用者可以存取測驗索引頁的「管理題庫」連結。"
   users_d1b60cb0: 使用者
+  users_designers_22195c6f: "使用者 - 設計者"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "使用者 - 為學生產生觀察者配對代碼"
   users_generate_observer_pairing_codes_for_students_6975caad: "使用者 - 為學生產生觀察者配對代碼"
   users_manage_log_in_details_b944568b: "使用者 - 管理日誌詳細資料"
   users_manage_login_details_9462b30f: "使用者 - 管理登入詳細資料"
   users_matching_search_term_c604db9e: "使用者符合『%{search_term}』"
   users_moderate_content_36d6eed7: "使用者 - 調整分數內容"
+  users_observers_e0e66c52: "使用者 - 觀察者"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: 使用屏幕閱讀器的使用者或許需要關閉虛擬光標，以便使用這些鍵盤快捷鍵。
   users_over_time_9a2ee74a: 使用者超時
+  users_tas_27117894: "使用者 - 助教"
+  users_teachers_a5d5d1af: "使用者 - 教師"
   users_view_list_861c7a3f: "使用者 - 查看清單"
   users_view_login_ids_a2e6a85: "使用者 - 查看登入 ID"
   users_view_primary_email_address_14f4978f: "使用者 - 查看主電子郵件地址"
@@ -25362,6 +25411,9 @@ zh-Hant:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: 無法刪除其中含有課程的子帳戶
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: 無法刪除其中含有子帳戶的子帳戶。
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "無法刪除 %{account_name} 因為其中仍然含有課程"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: 您不能編輯此評分標準，因為您沒有相關權限，或因為評分標準正用於多個地方。您所做的任何更改都將產生新評分標準。任何關聯的成果標準將使用課程掌握程度。仍然繼續？
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: 您不能編輯此評分標準，因為您沒有相關權限，或因為評分標準正用於多個地方。您所做的任何更改都將產生新評分標準。任何關聯的成果標準將使用帳戶掌握程度。仍然繼續？
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: 您不能編輯此評分標準，因為您沒有相關權限，或因為評分標準正用於多個地方。您所做的任何更改都將產生以舊評分標準為基礎的新評分標準。仍然繼續？
   you_can_try_to_log_in_again_2b23ef0f: "您可以嘗試 *稍後登入*。"
   you_can_update_some_of_this_user_s_information_but_8e99a045: 您可以更新此使用者的一些資訊，但如果他們選擇進行更改，他們可以將其改回去。
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "您可以使用單一的16x16、32x32、48x48 圖標文檔。"

@@ -2,7 +2,7 @@
   <%= polymorphic_url([asset.assignment.context, asset.assignment]) %>
 <% end -%>
 <% if send_student_names(asset, user) %>
-  <%= t "Canvas Alert - Graded: %{assignment}, %{context} for %{name}", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: user.asset.name %>
+  <%= t "Canvas Alert - Graded: %{assignment}, %{context} for %{name}", :assignment => asset.assignment.title, :context => asset.assignment.context.name, name: asset.user.name %>
 <% else %>
   <%= t :tweet, "Canvas Alert - Graded: %{assignment}, %{context}", :assignment => asset.assignment.title, :context => asset.assignment.context.name %>
 <% end %>

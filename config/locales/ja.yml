@@ -1851,6 +1851,7 @@ ja:
   add_quiz_ip_filter_c7b37dc5: "クイズ IP フィルタの追加"
   add_rating_89d7fbde: 評価を追加する
   add_recipient_ff135ed7: 受信者の追加
+  add_remove_in_courses_fa1c9081: コース内で追加/削除
   add_remove_or_rearrange_sections_for_this_portfoli_4628320a: このポートフォリオにセクションを追加、削除または再配置
   add_review_2fb1590c: 評価を追加
   add_role_3dc4d273: 役割を追加
@@ -1866,6 +1867,7 @@ ja:
   add_subtitle_9f660cc: サブタイトルを追加する
   add_tas_to_courses_27741f81: TAをコースに追加する
   add_tas_to_the_course_2aac6e02: "TA をコースに追加"
+  add_teachers_to_courses_48ac7a7a: 教師をコースに追加
   add_theme_32fa3d50: テーマの追加
   add_to_course_481a51c4: コースに追加...
   add_to_rce_toolbar_e5b3e3b4: RCEツールバーに追加
@@ -2478,6 +2480,7 @@ ja:
   an_error_occured_please_try_again_e59b65b: エラーが発生しました。もう一度やり直してください。
   an_error_occured_saving_the_assignment_d71cb3d2: 課題を保存する際にエラーが発生しました
   an_error_occured_trying_to_generate_this_theme_ple_6ae581d: このテーマ生成の準備中にエラーが発生しました。もう一度やり直してください。
+  an_error_occured_updating_the_flag_7df5de0a: フフラグを更新する際にエラーが発生しました。
   an_error_occured_while_deleting_the_grading_period_81bb16e5: 採点期間のセットを削除する際にエラーが発生しました
   an_error_occured_while_deleting_the_grading_period_c8343484: 採点期間を削除する際にエラーが発生しました
   an_error_occured_while_fetching_enrollment_terms_1b7b4ac: 登録期間のフェッチ中にエラーが発生しました。
@@ -2509,10 +2512,14 @@ ja:
   an_error_occurred_while_attempting_to_contact_turn_b7de17d6: Turnitinに連絡中にエラーが発生しました。
   an_error_occurred_while_checking_the_migration_sta_d17035b1: 移行ステータスの確認中にエラーが発生しました
   an_error_occurred_while_deleting_announcements_ab1ff3f6: アナウンスメントの削除中にエラーが発生しました。
+  an_error_occurred_while_loading_account_outcomes_8f337857: アカウント結果を読み込み中にエラーが起こりました
+  an_error_occurred_while_loading_account_outcomes_e_d79afc2d: "アカウント結果を読み込み中にエラーが起こりました：%{error}"
   an_error_occurred_while_loading_account_proficienc_c7d6568b: "アカウント熟練度評価を読み込み中にエラーが起こりました：%{m}"
   an_error_occurred_while_loading_account_proficienc_d38554c8: アカウント熟練度評価を読み込み中にエラーが起こりました
   an_error_occurred_while_loading_associations_9699b3ee: 関連付けの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_changes_9851b56f: 変更内容の読み込み中にエラーが発生しました
+  an_error_occurred_while_loading_course_outcomes_320ccc44: コース結果の読み込み中にエラーが発生しました
+  an_error_occurred_while_loading_course_outcomes_er_accefe77: "コース結果の読み込み中にエラーが発生しました%{error}"
   an_error_occurred_while_loading_courses_11d4571e: コースの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_late_policies_c415f676: 遅延ポリシーの読み込み中にエラーが発生しました
   an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "達成度計算の読み込み中にエラーが発生しました：%{error}"
@@ -2846,6 +2853,7 @@ ja:
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: 本当にこれを実行してもよろしいですか？元に戻すことが不可能となり、評定表内に存在する成績を上書きします。
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: このユーザーを無効にしますか？無効の間、彼らはコースに参加することができません。
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: この課題の成績を受講生に掲示してもよろしいですか？
+  are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: ほんとうに進めますか。行われた変更は保存されません。
   are_you_sure_you_want_to_remove_this_grading_perio_e3251c09: この採点期間を削除しますか？
   are_you_sure_you_want_to_remove_this_item_7887ce31: このアイテムを削除してもよろしいですか？
   are_you_sure_you_want_to_remove_this_tool_7363f90b: このツールを削除してもよろしいですか?
@@ -3835,6 +3843,7 @@ ja:
   australia_e8d44bf8: オーストラリア
   austria_43_7bc58b34: "オーストリア (+43)"
   austria_82178475: オーストリア
+  auth_failure_in_connecting_to_google_drive_a20aad43: "Google Driveへの接続で認証に失敗しました。"
   auth_logging: 
     corrupted: 詳細なし
     login: ログイン
@@ -4059,6 +4068,7 @@ ja:
   belgium_ef8739b6: ベルギー
   below_mastery_abd1dca5: 熟達スコア未満
   below_this_search_field_is_a_list_of_content_type__58aaa03f: "この検索フィールドの下には、%{content_type} のリストがあります。入力すると、入力内容に応じてリストがフィルタリングされます。会話メッセージは、選択した任意のオプションでフィルタリングされます。"
+  beta_cb5f307e: Beta
   beta_url_3c7b88ec: "べータ URL:"
   better_file_browsing_description: |-
       新しい、シンプルで使いやすいファイル参照インターフェイスです。これをコースレベルで有効にすると、
@@ -6690,6 +6700,7 @@ ja:
   course_cards_6029a05c: コースカード
   course_catalog_4cc7c8ce: "コース カタログ"
   course_collaborations_dadb327e: コース共同作業
+  course_concluded_unable_to_send_messages_b99b6b6d: コースは終了しています、メッセージを送信できません
   course_conferences_3d914c96: コースの会議
   course_content_a92eca20: コースの内容
   course_content_add_edit_delete_ea877eca: "コース内容 - 追加/編集/削除"
@@ -6887,6 +6898,7 @@ ja:
     sis_id_taken: "SIS ID \"%{sis_id}\" は既に使用されています"
   course_section_7a988066: "コース セクション"
   course_section_name_ea880ed1: "コース セクション%{name}"
+  course_sections: "コース セクション"
   course_sections_add_c6b5dc1: "コースセクション - 追加"
   course_sections_add_edit_delete_c4f4ac19: "コースセクション - 追加/編集/削除"
   course_sections_delete_e75e3eeb: "コースセクション - 削除"
@@ -8276,8 +8288,10 @@ ja:
   disabled_by_default_7d822dcb: デフォルトで無効
   disabled_in_course_settings_d15ee35d: "* コース設定で無効"
   disabled_links_b3bdea99: 無効のリンク
+  disabled_locked_dab351d6: 無効（ロック済み）
   disabled_not_visible_to_students_2c9d693f: 無効になっています。受講生には非表示。
   disabled_not_visible_to_students_48d4a90d: 無効になっています。受講生には非表示
+  disabled_unlocked_1588a6d1: 無効（ロック解除）
   disables_push_notifications_for_certain_types_3f57cde4: 特定のタイプのプッシュ通知を無効にします。
   disables_sms_notifications_for_all_types_except_an_d2d94f2a: |-
       お知らせと成績の変更を除くすべてのタイプの SMS 通知を
@@ -9106,6 +9120,8 @@ ja:
   enabled_ba7cab66: 有効
   enabled_by_default_e530d6ed: デフォルトで有効
   enabled_links_be110215: 有効なリンク
+  enabled_locked_3cf7c256: 有効（ロック済み）
+  enabled_unlocked_8d3a5df7: 有効（ロック解除）
   enabled_web_services_f620b2be: "使用可能になっている Web サービス"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: 新しい成績表提出トレイで、盗作レポートと類似性スコアの表示を有効にします。
   enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "New Analyticsが提供するコースとユーザーデータの新しいAPIエンドポイントを有効にします。"
@@ -9191,6 +9207,10 @@ ja:
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       登録は、所属機関の受講生情報システム（SIS）によって追加される場合があります。SIS経由で登録が作成された場合、管理者のみがコースから登録を削除できます。
               コース内のユーザーリストを表示するには、ユーザー - リストの表示を有効にする必要があります。SIS ID を表示するには、SISデータ - 読み取りが有効にされていなければなりません。SIS ID を使用してコースにユーザーを追加するには、SIS データ - 管理も有効にされていなければなりません。講師またはTAのセクションを編集するには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。オブザーバーを受講生にリンクするには、会話 - 個々のコースメンバーにメッセージを送信するも有効にされていなければなりません。
+  enrollments_observers: オブザーバー
+  enrollments_students: 受講生
+  enrollments_tas: 授業助手
+  enrollments_teachers: 講師
   ensures_that_outcomes_that_have_already_been_impor_c3ca3173: コースに既にインポートされている結果が再度インポートされた場合、重複しないようにします
   ensures_that_users_without_the_import_outcomes_per_42dfc56d: 「成果のインポート」権限のないユーザーが「成果」タブ内のボタンを表示できないようにします
   enter_a_hexcode_here_to_use_a_custom_color_51ecccce: ここにhexcordを入力して、カスタムカラーを使用してください。
@@ -12122,7 +12142,9 @@ ja:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       RCE 機能強化も有効になっている場合、
       RCE が作業を自動で保存します
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: そう設定されている場合、成績計算機は合計を計算するときに未提出の匿名の課題を無視します。
   if_set_the_gradebook_csv_exporter_will_append_the__ae62c6a6: 設定されている場合、成績表CSVエクスポータが選択された評価期間のタイトルを評価期間に基づいて値が変化する列ヘッダーに追加します。
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: そう設定されている場合、成績表は課題の読み込みを切り離し、これを選択された採点期間の課題に読み込みます。
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: 設定されている場合、採点期間終了時に、課題のSISへの掲載機能をオフにします。「新しいSIS統合設定を有効にする」機能が有効な場合にのみ適用されます。
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "統計 - 表示またはユーザー - ログインの詳細の管理が有効な場合、ユーザーは管理ツールでログイン/ログアウトアクティビティを生成できます。管理ツールでログイン/ログアウトアクティビティオプションを非表示にするには、これらの権限が両方とも無効にされていなければなりません。"
@@ -12188,6 +12210,7 @@ ja:
   ignore_name_55edc6fe: "%{name} を無視"
   ignore_these_3940f6f5: これらを無視
   ignore_this_assignment_b7a71f80: この課題を無視
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: 成績計算内の未提出の匿名の課題は無視します
   ignore_until_new_mark_77eb512: 新しいマークがあるまで無視する
   ignore_until_new_mark_935e00a2: 新しいマークがあるまで無視する
   ignore_until_new_submission_87f32b4: 新しい提出があるまで無視
@@ -12305,6 +12328,7 @@ ja:
   include_this_assignment_s_grades_when_syncing_to_y_55bfa487: あなたの学校の受講生情報システムと同期するとき、にこの課題の成績を含める
   include_unpublished_assignments_83ebbaec: 未公開の課題を含む
   include_unpublished_courses_7a0e7aab: 未公開のコースを含む
+  included_messages_not_for_this_conversation_986a60bf: included_messagesはこの会話ではありません
   includes_a_link_to_speedgrader_in_the_assignment_h_fbe07e2c: グレードブックの課題ヘッダメニューにSpeedGraderへのリンクを含めます。
   includes_grade_values_in_the_admin_grade_reports_a28200da: 管理者の成績レポートに成績値を含めます。
   includes_outcomes_service_alignments_when_exportin_6c578a35: コースコンテンツのエクスポートおよびインポート時には、結果サービスの調整を含みます
@@ -12325,6 +12349,9 @@ ja:
   indicates_the_image_is_for_decorative_purposes_onl_82064b55: イメージは装飾的な目的のためのみであり、スクリーンリーダーによって読み取られるべきではないことを示します
   indigo_2035fc55: インディゴ
   individual_assignment_grade_posting_d8322b99: 個別の課題成績掲示
+  individual_outcome_calculation_values_cannot_be_mo_9193a7ed: 個々の結果の計算値は変更できません。
+  individual_outcome_mastery_points_cannot_be_modifi_cf390a79: 個々の結果習熟度ポイントは変更できません。
+  individual_outcome_ratings_cannot_be_modified_9fcdfb90: 個々の結果評価は変更できません。
   individual_view_81c2f124: 個別ビュー
   individual_view_d60b9132: 個別のビュー...
   indonesia_62_4c35bd62: インドネシア（+62）
@@ -12511,10 +12538,12 @@ ja:
   invalid_grade_passback_setting_a1d209d1: 無効な成績帳設定
   invalid_hexcode_9124519f: 無効な16進コード
   invalid_hexcode_enter_a_valid_hexcode_here_to_use__fc0f2741: 無効な16進コード。カスタム色を使用するには、ここに有効な16進コードを入力してください。
+  invalid_or_missing_session_for_oauth_3ce4b605: oauthのセッションが無効または欠落しています
   invalid_points_8e929c3f: 無効なポイント
   invalid_points_for_rating_tier_index_i_400d307e: "ティア %{index} 採点時に無効なポイント\"%{i}\""
   invalid_points_possible: この課題の配点の数値は、0以上である必要があります。
   invalid_recipient_name_56b22b86: 無効の受信者名。
+  invalid_recipients_5fd7c594: 無効な受信者
   invalid_redirect_url_6444a1b0: リダイレクトURLが無効
   invalid_restrictions_316cd740: 無効な制限
   invalid_score_3d247da7: 無効なスコア
@@ -13003,6 +13032,7 @@ ja:
   load_bank: 
     error_loading_banks: バンクを読み込む際にエラーが発生しました
     loading_banks: バンクを読み込んでいます...
+  load_gradebook_assignments_by_grading_period_919dfd3c: 採点期間ごとに成績表の課題を読み込む
   load_more_9ca37ccc: その他を読み込んでいます...
   load_more_a36f9cf9: もっと読み込む
   load_more_comments_dc00ac34: より多くのコメントをロードする
@@ -15957,6 +15987,7 @@ ja:
   no_content_has_been_shared_with_you_667fde6c: あなたと共有されているコンテンツはありません
   no_content_not_visible_to_students_905f8996: コンテンツがありません。受講生には非表示。
   no_content_not_visible_to_students_b59f4867: コンテンツがありません。受講生には非表示
+  no_context_found_for_the_following_context_code_co_a2f6a1a7: "次のコンテキストコードのコンテキストが見つかりません：%{context_code}"
   no_courses_favorited_4e69fd63: お気に入りのコースはありません
   no_courses_found_12d68a74: コースが見つかりません
   no_courses_to_display_700f94c4: 表示するコースなし
@@ -16864,6 +16895,8 @@ ja:
   override_3de65b2c: 上書き
   override_grade_385adf30: 成績を上書きする
   override_score_53994655: スコアをオーバーライドする
+  override_score_5f3c1189: スコアを上書きする
+  override_score_gradingperiod_286ac51b: "(%{gradingPeriod})スコアを上書きする"
   overrides: 
     blank_override: 選択された受講生かセクションを有している必要があります
     everyone: 全員
@@ -19857,6 +19890,7 @@ ja:
       one: "%{count} 件のセクション"
       other: "%{count} 件のセクション"
   recipients_a69b5e55: "受信者:"
+  recipients_restricted_by_role_22c4c843: 役割によって制限された受信者
   record_7c9448b: 記録
   record_an_audio_or_video_comment_88425add: "オーディオまたはビデオ コメントを記録する"
   record_audio_14666880: オーディオを録音する
@@ -19995,6 +20029,7 @@ ja:
   remove_studentname_16ba8c3a: "%{studentName}を削除する"
   remove_submission_draft_f5c7f58b: 提出ドラフトを削除する
   remove_tas_from_courses_13ade851: TAをコースから削除
+  remove_teachers_from_courses_353d5217: 教師をコースから削除
   remove_text_8e485c41: "%{text} を削除する"
   remove_these_dates_48453a81: これらの日付を削除
   remove_this_item_from_the_module_4b2ceab7: このアイテムをモジュールから削除
@@ -20587,7 +20622,7 @@ ja:
     all_courses_inner: 
       join_course: このコースに参加
       next: 次へ
-      previous: 前へ
+      previous: 前
     course_sections: "コース セクション"
     enrollments_observers: オブザーバ
     enrollments_students: 受講生
@@ -21937,6 +21972,7 @@ ja:
     users: 
       user_search_label: ユーザの検索
       users_matching_label: 一致するユーザ
+  site_admin_d0417171: サイト管理者
   site_admin_only_send_to_1_denominator_users_in_ena_b4b3ed14: "サイトの管理者のみです。毎月有効なアカウントの 1 / %{denominator}のユーザーに、送信します。"
   size_b30e1077: サイズ
   size_f1873a2: "、サイズ： "
@@ -22226,6 +22262,7 @@ ja:
   student_extensions_d35a907: 受講生の延長時間
   student_grades_4cbc59a1: 受講生の成績
   student_group_filter_185fb085: 受講生グループフィルタ
+  student_groups: 受講生グループ
   student_groups_863201c1: 受講生グループ
   student_groups_desc: |-
       これにより、アカウントの新しい受講生グループ ページが有効になります。新しいページでは、グループのサインアップをより動的に
@@ -22429,10 +22466,13 @@ ja:
     errors: 
       assignment_submit_fail: 課題の提出に失敗しました
       can_not_submit_locked_assignment: ロックされている課題は提出できません
+      googld_drive_timeout: Googleドライブと対話中にタイムアウトしました
+      google_drive_workflow: Googleドライブのエントリをダウンロードできませんでした
       invalid_file_type: "無効なファイル タイプです"
       invalid_google_docs_domain: "この Google ドキュメント ドメインからは課題を提出できません"
       media_file_attached: 提出物には、メディアに記録されたデータがありませんでした
       no_attached_file: "この課題には 1 個以上のファイルを添付する必要があります"
+      no_attachment_found: Googleドライブに送信する添付ファイルが見つかりませんでした
       no_report: その課題アイテムに対するレポートが見つかりませんでした
       student_not_enrolled: 指定されたユーザは、このコースの受講生ではありません
       student_not_enrolled_id: "指定されたユーザ (%{id}) は、このコースの受講生ではありません"
@@ -23914,6 +23954,8 @@ ja:
   tolerance_value_9e96573c: 公差値
   too_many_failed_login_attempts_please_try_again_la_f8e0d7c8: ログインの試行回数が多すぎます。後でもう一度、試してください。または、システム管理者までご連絡ください。
   too_many_members_b8b15069: メンバーが多すぎます
+  too_many_participants_for_group_conversation_1743cd8: グループ会話には参加者が多すぎます
+  too_many_recipients_for_group_conversation_906a4b69: グループ会話には受信者が多すぎます
   tool_configuration_63cd43b0: ツールの設定
   tool_content_2924d18f: ツールコンテンツ
   tool_content_e699e813: ツールコンテンツ
@@ -24057,6 +24099,7 @@ ja:
   unable_to_access_specific_student_go_to_assignment_585e05e9: 特定の受講生にアクセスできません。SpeedGraderの課題に進みますか？
   unable_to_align_some_outcomes_to_a_page_65f7d412: 一部の結果をページに合わせることができません
   unable_to_align_some_outcomes_to_title_53467231: "一部の結果を\"%{title}\"に合わせることができません"
+  unable_to_connect_to_google_drive_34886e7a: "Google Driveに接続できません。"
   unable_to_curve_grades_because_this_assignment_is__17f78c27: この課題は、少なくとも1人の受講生の終了後の採点期間に終了する予定であるため、成績をカーブすることができません
   unable_to_delete_assignment_abcf8d62: 課題を削除できません
   unable_to_dismiss_update_df1e32eb: 解散の更新ができません
@@ -24068,6 +24111,7 @@ ja:
   unable_to_read_file_2d04b0c: ファイルが読めません
   unable_to_remove_app_4293cb53: アプリを削除できません
   unable_to_save_new_discussion_topic_99239f3f: 新しいディスカッショントピックを保存できません
+  unable_to_send_messages_to_users_in_context_name_7d6997b6: "%{context_name}のユーザーにメッセージを送信できません"
   unable_to_set_default_grade_because_this_assignmen_d19842a9: この課題は、少なくとも1人の受講生の終了後の採点期間に終了する予定であるため、デフォルトの成績を設定することができません
   unable_to_set_up_drag_and_drop_for_modules_4d339f1d: モジュールのドラッグアンドドロップを設定できません
   unable_to_toggle_placement_833db6ff: 配置を切り替えることができません
@@ -24078,6 +24122,7 @@ ja:
   unauthorized: 権限がありません
   unauthorized_message: "JWT サインは無効です。"
   unauthorized_to_delete_this_file_a1271224: このファイルを削除ことは承認されていません
+  unauthorized_unable_to_add_messages_to_conversatio_d8b9558c: 許可されていない、会話にメッセージを追加できない
   unavailable_46d2c344: 利用不可能
   unavailable_c04e4c93: 利用不可能
   unbookmark_bank_70569249: "ブックマークを消去する%{bank}"
@@ -24856,14 +24901,18 @@ ja:
   users_can_access_and_create_but_not_edit_individua_c8a62c74: "ユーザーは、課題とクイズ - 追加/編集/削除が有効になっているときには、課題を介して個々の課題の規定にアクセス・作成することはできますが、編集することはできません。"
   users_can_access_the_manage_question_banks_link_on_e411d01: "ユーザーは、コース内容 - 表示、課題とクイズ - 追加/編集/削除が有効になっているときに、クイズインデックスページの問題バンクの管理リンクにアクセスできます。"
   users_d1b60cb0: ユーザー
+  users_designers_22195c6f: "ユーザー - デザイナー"
   users_generate_observer_pairing_codes_for_students_2c25d52a: "ユーザー - 受講生用のオブザーバーペアリングコードを生成する"
   users_generate_observer_pairing_codes_for_students_6975caad: "ユーザー - 受講生用のオブザーバーペアリングコードを生成する"
   users_manage_log_in_details_b944568b: "ユーザー - ログインの詳細を管理する"
   users_manage_login_details_9462b30f: "ユーザー - ログインの詳細を管理する"
   users_matching_search_term_c604db9e: "一致するユーザ \"%{search_term}\""
   users_moderate_content_36d6eed7: "ユーザー - 中程度のコンテンツ"
+  users_observers_e0e66c52: "ユーザー - オブザーバー"
   users_of_screen_readers_may_need_to_turn_off_the_v_98811cd: スクリーンリーダーのユーザーは、これらのキーボードショートカットを使用するために、バーチャルカーソルをオフにすることが必要になる可能性があります
   users_over_time_9a2ee74a: 経時ユーザー
+  users_tas_27117894: "ユーザー - TA"
+  users_teachers_a5d5d1af: "ユーザー - 教師"
   users_view_list_861c7a3f: "ユーザー - 表示リスト"
   users_view_login_ids_a2e6a85: "ユーザー - ログインIDを表示する"
   users_view_primary_email_address_14f4978f: "ユーザー - プライマリ電子メールアドレスを表示する"
@@ -25372,6 +25421,9 @@ ja:
   you_can_t_delete_a_sub_account_that_has_courses_in_c4f439cf: コースが含まれているサブアカウントは削除できません
   you_can_t_delete_a_sub_account_that_has_sub_accoun_7d815421: その中にサブアカウントを持つサブアカウントは削除できません。
   you_can_t_delete_account_name_because_it_has_cours_a81c57c9: "その中にコースがあるため、%{account_name}は削除できません"
+  you_can_t_edit_this_rubric_either_because_you_don__5247d35d: このルーブリックは、権限がないか、複数の場所で使用されているため、編集できません。変更を加えると、新しい基準が作成されます。関連する結果基準はすべて、コース習熟度スケールを使用します。それでも続けますか？
+  you_can_t_edit_this_rubric_either_because_you_don__ab22f243: このルーブリックは、権限がないか、複数の場所で使用されているため、編集できません。変更を加えると、新しい基準が作成されます。関連する結果基準は、アカウント習熟度スケールを使用します。それでも続けますか？
+  you_can_t_edit_this_rubric_either_because_you_don__c2472826: このルーブリックは、権限がないか、複数の場所で使用されているため、編集できません。変更を加えると、古いルーブリックに基づいて新しいルーブリックが作成されます。それでも続けますか？
   you_can_try_to_log_in_again_2b23ef0f: "*ログインを再度*行うことができます。"
   you_can_update_some_of_this_user_s_information_but_8e99a045: このユーザの情報を一部更新することはできますが、ユーザの意思により元に戻される可能性もあります。
   you_can_use_a_single_16x16_32x32_48x48_ico_file_85da88b5: "シングル 16x16, 32x32, 48x48の icoファイルを使用することが可能です。"

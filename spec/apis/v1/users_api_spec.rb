@@ -288,26 +288,23 @@ describe Api::V1::User do
 
     context "computed scores" do
       before :once do
-        @enrollment.scores.create!
         assignment_group = @course.assignment_groups.create!
-        @enrollment.find_score(course_score: true).
-          update!(current_score: 95.0, final_score: 85.0, unposted_current_score: 90.0, unposted_final_score: 87.0)
-        @enrollment.find_score(assignment_group_id: assignment_group).
-          update!(current_score: 50.0, final_score: 40.0, unposted_current_score: 55.0, unposted_final_score: 45.0)
         @student1 = @student
-        @student1_enrollment = @enrollment
+        @student1_enrollment = @student1.enrollments.first
+        @student1_enrollment.scores.create! if @student1_enrollment.scores.blank?
+        @student1_enrollment.find_score(course_score: true).
+          update!(current_score: 95.0, final_score: 85.0, unposted_current_score: 90.0, unposted_final_score: 87.0)
+        @student1_enrollment.find_score(assignment_group_id: assignment_group.id).
+          update!(current_score: 50.0, final_score: 40.0, unposted_current_score: 55.0, unposted_final_score: 45.0)
         @student2 = course_with_student(:course => @course).user
       end
 
       before :each do
-        @course.grading_standard_enabled = true
-        @course.save!
+        @course.update!(grading_standard_enabled: true)
       end
 
       it "should return posted course scores as admin" do
-        skip 'FOO-1293 (12/8/2020)'
-
-        json = @test_api.user_json(@student, @admin, {}, [], @course, [@student1_enrollment])
+        json = @test_api.user_json(@student1, @admin, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",
           "current_score" => 95.0,
@@ -322,8 +319,6 @@ describe Api::V1::User do
       end
 
       it "should not return unposted course scores as a student" do
-        skip 'FOO-1293 (12/8/2020)'
-
         json = @test_api.user_json(@student1, @student1, {}, [], @course, [@student1_enrollment])
         expect(json['enrollments'].first['grades']).to eq({
           "html_url" => "",

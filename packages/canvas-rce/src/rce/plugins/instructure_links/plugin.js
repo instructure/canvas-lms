@@ -73,10 +73,18 @@ const trayController = new LinkOptionsTrayController()
 const COURSE_PLUGIN_KEY = 'course_links'
 const GROUP_PLUGIN_KEY = 'group_links'
 
+function selectedAnchorCount(ed) {
+  return ed.selection
+    .getRng()
+    .cloneContents()
+    .querySelectorAll('a').length
+}
 function getMenuItems(ed) {
   const contextType = ed.settings.canvas_rce_user_context.type
+  const sel_anchors = ed.selection.isCollapsed() ? 0 : selectedAnchorCount(ed)
   let items
   if (getAnchorElement(ed, ed.selection.getNode())) {
+    // cursor is on an anchor, edit or remove it
     items = [
       {
         text: formatMessage('Edit Link'),
@@ -105,6 +113,16 @@ function getMenuItems(ed) {
         value: 'instructure_group_links'
       })
     }
+    if (sel_anchors > 0) {
+      // selection contains anchor(s), so the user can remove them
+      items.push({
+        text: formatMessage.plural(sel_anchors, {
+          one: 'Remove Link',
+          other: 'Remove Links'
+        }),
+        value: 'instructureUnlinkAll'
+      })
+    }
   }
   return items
 }
@@ -120,8 +138,13 @@ function doMenuItem(ed, value) {
         const selectedElm = ed.selection.getNode()
         const anchorElm = getAnchorElement(ed, selectedElm)
         ed.selection.select(anchorElm)
+        ed.undoManager.add()
         ed.execCommand('unlink')
       }
+      break
+    case 'instructureUnlinkAll':
+      ed.undoManager.add()
+      ed.execCommand('unlink')
       break
     case 'instructure_course_links':
       ed.focus(true) // activate the editor without changing focus
@@ -239,8 +262,7 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
       }
     })
 
-    // the context toolbar button
-    const buttonAriaLabel = formatMessage('Show link options')
+    // the context toolbar buttons
     ed.ui.registry.addButton('instructure-link-options', {
       onAction(/* buttonApi */) {
         // show the tray
@@ -248,11 +270,21 @@ tinymce.create('tinymce.plugins.InstructureLinksPlugin', {
       },
 
       text: formatMessage('Link Options'),
-      tooltip: buttonAriaLabel
+      tooltip: formatMessage('Show link options')
+    })
+    const remButtonLabel = formatMessage('Remove Link')
+    ed.ui.registry.addButton('instructureUnlink', {
+      onAction(/* buttonApi */) {
+        // show the tray
+        ed.undoManager.add()
+        ed.execCommand('Unlink')
+      },
+
+      text: remButtonLabel
     })
 
     ed.ui.registry.addContextToolbar('instructure-link-toolbar', {
-      items: 'instructure-link-options',
+      items: 'instructure-link-options instructureUnlink',
       position: 'node',
       predicate: elem => !!getAnchorElement(ed, elem),
       scope: 'node'
