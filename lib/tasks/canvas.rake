@@ -48,7 +48,9 @@ namespace :canvas do
         ('js:yarn_install' if npm_install)
       ].compact
 
-      task 'i18n:generate_js' => [] if build_js
+      task 'i18n:generate_js' => [
+        ('js:yarn_install' if npm_install)
+      ].compact if build_js
 
       task 'js:webpack_development' => [
         # public/dist/brandable_css/brandable_css_bundles_with_deps.json needs
