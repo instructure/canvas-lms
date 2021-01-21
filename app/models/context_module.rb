@@ -248,7 +248,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def available_for?(user, opts={})
-    enrollment = Enrollment.where(user_id: user.id, course_id: context.id).first
+    enrollment = Enrollment.active.where(user_id: user.id, course_id: context.id).first
 
     if enrollment
       settings = enrollment ? SettingsService.get_enrollment_settings(id: enrollment.id) : {}
