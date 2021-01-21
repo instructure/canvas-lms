@@ -4,6 +4,31 @@ set -e
 
 source build/common_docker_build_steps.sh
 
+trap '_canvas_lms_telemetry_report_status' ERR EXIT
+SCRIPT_NAME=$0
+
+function installed {
+  type "$@" &> /dev/null
+}
+
+function _canvas_lms_telemetry_report_status() {
+  exit_status=$?
+  if installed _inst_report_status && _canvas_lms_telemetry_enabled; then
+    _inst_report_status $exit_status
+  fi
+}
+
+function _canvas_lms_opt_in_telemetry() {
+  if installed _canvas_lms_activate_telemetry; then
+    _canvas_lms_activate_telemetry
+    if installed _inst_setup_telemetry && _inst_setup_telemetry "canvas-lms:$SCRIPT_NAME"; then
+        _inst_track_os
+    fi
+  fi
+}
+
+_canvas_lms_opt_in_telemetry
+
 # shellcheck disable=1004
 echo '
   ________  ________  ________   ___      ___ ________  ________
@@ -35,10 +60,6 @@ DINGHY_CPUS='4'
 DINGHY_DISK='150'
 # docker-compose version 1.20.0 introduced build-arg that we use for linux
 DOCKER_COMPOSE_MIN_VERSION='1.20.0'
-
-function installed {
-  type "$@" &> /dev/null
-}
 
 if [[ $OS == 'Darwin' ]]; then
   #docker-compose is checked separately
@@ -138,7 +159,7 @@ function create_dinghy_vm {
   prompt "How big should the VM's disk be (in GB)? [$DINGHY_DISK]" disk
 
   message "OK let's do this."
-  dinghy create \
+  _canvas_lms_track dinghy create \
     --provider=virtualbox \
     --memory "${memory:-$DINGHY_MEMORY}" \
     --cpus "${cpus:-$DINGHY_CPUS}" \
@@ -147,7 +168,7 @@ function create_dinghy_vm {
 
 function start_dinghy_vm {
   if dinghy status | grep -q 'stopped'; then
-    dinghy up
+    _canvas_lms_track dinghy up
   else
     message 'Looks like the dinghy VM is already running. Moving on...'
   fi

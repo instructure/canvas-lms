@@ -122,3 +122,37 @@ function compile_assets {
   echo_console_and_log "  Compiling assets (css and js only, no docs or styleguide) ..."
   bundle exec rake canvas:compile_assets_dev >>"$LOG" 2>&1
 }
+
+function _canvas_lms_track {
+  command="$@"
+  if type _inst_telemetry >/dev/null 2>&1 &&  _canvas_lms_telemetry_enabled; then
+    _inst_telemetry $command
+  else
+    $command
+  fi
+}
+
+function _canvas_lms_telemetry_enabled() {
+  if [[ ${TELEMETRY_OPT_IN-n} == 'y' ]];
+  then
+    return 0
+  fi
+  return 1
+}
+
+function prompt {
+  read -r -p "$1 " "$2"
+}
+
+function message {
+  echo ''
+  echo "$BOLD> $*$NORMAL"
+}
+
+function confirm_command {
+  if [ -z "${JENKINS-}" ]; then
+    prompt "OK to run '$*'? [y/n]" confirm
+    [[ ${confirm:-n} == 'y' ]] || return 1
+  fi
+  eval "$*"
+}

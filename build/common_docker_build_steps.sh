@@ -1,26 +1,10 @@
 #!/bin/bash
 
 set -e
+source script/common.sh
 
 BOLD="$(tput bold)"
 NORMAL="$(tput sgr0)"
-
-function prompt {
-  read -r -p "$1 " "$2"
-}
-
-function message {
-  echo ''
-  echo "$BOLD> $*$NORMAL"
-}
-
-function confirm_command {
-  if [ -z "${JENKINS-}" ]; then
-    prompt "OK to run '$*'? [y/n]" confirm
-    [[ ${confirm:-n} == 'y' ]] || return 1
-  fi
-  eval "$*"
-}
 
 function create_db {
   # if Jenkins build, run initial_setup with rails test env to skip prompts
@@ -49,27 +33,27 @@ If you want to migrate the existing database, use docker_dev_update.sh
       prompt "type NUKE in all caps: " nuked
       [[ ${nuked:-n} == 'NUKE' ]] || exit 1
     fi
-    docker-compose run --rm web bundle exec rake db:drop
+    _canvas_lms_track docker-compose run --rm web bundle exec rake db:drop
   fi
 
   message "Creating new database"
-  docker-compose run --rm web \
+  _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:create
   # initial_setup runs db:migrate for development
-  docker-compose run ${jenkinsBuild} --rm web \
+  _canvas_lms_track docker-compose run -e TELEMETRY_OPT_IN ${jenkinsBuild} --rm web \
     bundle exec rake db:initial_setup
   # Rails db:migrate only runs on development by default
   # https://discuss.rubyonrails.org/t/db-drop-create-migrate-behavior-with-rails-env-development/74435
-  docker-compose run --rm web \
+  _canvas_lms_track docker-compose run --rm web \
     bundle exec rake db:migrate RAILS_ENV=test
 }
 
 function build_images {
   message 'Building docker images...'
   if [[ "$(uname)" == 'Linux' && -z "${CANVAS_SKIP_DOCKER_USERMOD:-}" ]]; then
-    docker-compose build --pull --build-arg USER_ID=$(id -u)
+    _canvas_lms_track docker-compose build --pull --build-arg USER_ID=$(id -u)
   else
-    docker-compose build --pull
+    _canvas_lms_track docker-compose build --pull
   fi
 }
 
@@ -94,7 +78,9 @@ permissions so we can install gems."
 
 function build_assets {
   message "Building assets..."
-  docker-compose run --rm web ./script/install_assets.sh
+  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c bundle
+  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c yarn
+  _canvas_lms_track docker-compose run --rm web ./script/install_assets.sh -c compile
 }
 
 function database_exists {

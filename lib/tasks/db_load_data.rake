@@ -10,6 +10,15 @@ def create_notification(values = {})
   Canvas::MessageHelper.create_notification(values)
 end
 
+def telemetry_enabled?
+  return (ENV['TELEMETRY_OPT_IN'] || "").present?
+end
+
+def obfuscate_input_or_echo(password = false)
+  echo = password ? "*" : true
+  return telemetry_enabled? ? false : echo
+end
+
 namespace :db do
   desc "Generate security.yml key"
   task :generate_security_key do
@@ -117,15 +126,19 @@ namespace :db do
 
       while !Rails.env.test? do
 
+        if telemetry_enabled?
+          print "\e[33mInput fields will be hidden to ensure that entered data will not be sent to the telemetry service.\nWe do not recommend using sensitive data for development environments.\e[0m\n"
+        end
+
         while true do
-          email = ask("What email address will the site administrator account use? > ") { |q| q.echo = true }
-          email_confirm = ask("Please confirm > ") { |q| q.echo = true }
+          email = ask("What email address will the site administrator account use? > ") { |q| q.echo = obfuscate_input_or_echo }
+          email_confirm = ask("Please confirm > ") { |q| q.echo =  obfuscate_input_or_echo }
           break if email == email_confirm
         end
 
         while true do
-          password = ask("What password will the site administrator use? > ") { |q| q.echo = "*" }
-          password_confirm = ask("Please confirm > ") { |q| q.echo = "*" }
+          password = ask("What password will the site administrator use? > ") { |q| q.echo = obfuscate_input_or_echo(true) }
+          password_confirm = ask("Please confirm > ") { |q| q.echo = obfuscate_input_or_echo(true) }
           break if password == password_confirm
         end
 
@@ -182,7 +195,12 @@ namespace :db do
       require 'highline/import'
 
       if !Rails.env.test?
-        name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = true }
+        while true do
+          name = ask("What do you want users to see as the account name? This should probably be the name of your organization. > ") { |q| q.echo = obfuscate_input_or_echo }
+          break if !telemetry_enabled?
+          name_confirm = ask("Please confirm > ") { |q| q.echo =  obfuscate_input_or_echo }
+          break if name == name_confirm
+        end
 
         a = Account.default.reload
         a.name = name
