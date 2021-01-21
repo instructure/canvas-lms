@@ -176,6 +176,7 @@ class AssignmentsController < ApplicationController
         log_asset_access(@assignment, "assignments", @assignment.assignment_group)
 
         if render_a2_student_view?
+          js_env({ enrollment_state: @context_enrollment&.state_based_on_date })
           rce_js_env
           render_a2_student_view
           return

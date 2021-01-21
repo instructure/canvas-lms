@@ -34,7 +34,7 @@ function renderContentBaseOnAvailability({assignment, submission}) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (submission === null) {
-    // NOTE: handles case where user is not logged in
+    // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
         <AssignmentToggleDetails description={assignment.description} />

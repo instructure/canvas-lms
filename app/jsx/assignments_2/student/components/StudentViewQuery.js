@@ -36,6 +36,7 @@ function getAssignmentEnvVariables() {
     assignmentUrl: `${baseUrl}/assignments`,
     courseId: ENV.context_asset_string.split('_')[1],
     currentUser: ENV.current_user,
+    enrollmentState: ENV.enrollment_state,
     modulePrereq: null,
     moduleUrl: `${baseUrl}/modules`
   }

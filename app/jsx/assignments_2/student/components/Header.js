@@ -38,13 +38,14 @@ class Header extends React.Component {
   static propTypes = {
     allSubmissions: arrayOf(Submission.shape),
     assignment: Assignment.shape,
-    onChangeSubmission: func.isRequired,
+    onChangeSubmission: func,
     scrollThreshold: number.isRequired,
     submission: Submission.shape
   }
 
   static defaultProps = {
-    scrollThreshold: 150
+    scrollThreshold: 150,
+    onChangeSubmission: () => {}
   }
 
   state = {
@@ -201,7 +202,7 @@ class Header extends React.Component {
               )}
             </Flex.Item>
           </Flex>
-          {!this.state.isSticky && (
+          {!this.state.isSticky && this.props.submission && this.props.allSubmissions && (
             <AttemptSelect
               allSubmissions={this.props.allSubmissions}
               onChangeSubmission={this.props.onChangeSubmission}
