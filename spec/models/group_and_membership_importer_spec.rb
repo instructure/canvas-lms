@@ -143,6 +143,15 @@ describe GroupAndMembershipImporter do
       expect(@user.groups.pluck(:name)).to eq ["first group"]
     end
 
+    it 'should work for future courses' do
+      @course.start_at = 1.week.from_now
+      @course.restrict_enrollments_to_course_dates = true
+      @course.save!
+      import_csv_data(%{canvas_user_id,group_name
+                        #{@user.id}, first group})
+      expect(@user.groups.pluck(:name)).to eq ["first group"]
+    end
+
     it 'should find users by login_id' do
       import_csv_data(%{login_id,group_name
                         #{@user.pseudonym.unique_id}, first group})
