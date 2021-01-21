@@ -345,7 +345,7 @@ class CoursesController < ApplicationController
 
   before_action :require_user, :only => [:index, :activity_stream, :activity_stream_summary, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
   before_action :require_user_or_observer, :only=>[:user_index]
-  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export]
+  before_action :require_context, :only => [:roster, :locks, :create_file, :ping, :effective_due_dates, :offline_web_exports, :start_offline_web_export, :user_progress]
   skip_after_action :update_enrollment_last_activity_at, only: [:enrollment_invitation, :activity_stream_summary]
 
   include Api::V1::Course
@@ -632,6 +632,24 @@ class CoursesController < ApplicationController
   def user_index
     GuardRail.activate(:secondary) do
       render json: courses_for_user(@user, paginate_url: api_v1_user_courses_url(@user))
+    end
+  end
+
+  # @API Get user progress
+  # Return progress information for the user and course
+  #
+  # You can supply +self+ as the user_id to query your own progress in a course. To query another user's progress,
+  # you must be a teacher in the course, an administrator, or a linked observer of the user.
+  #
+  # @returns CourseProgress
+  def user_progress
+    # NOTE: this endpoint must remain on the primary db since it's queried in response to a live event
+    target_user = api_find(@context.users, params[:user_id])
+    if @context.grants_right?(@current_user, session, :view_all_grades) || target_user.grants_right?(@current_user, session, :read)
+      json = CourseProgress.new(@context, target_user, read_only: true).to_json
+      render :json => json, :status => json.key?(:error) ? :bad_request : :ok
+    else
+      render_unauthorized_action
     end
   end
 
