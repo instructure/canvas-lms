@@ -3520,13 +3520,12 @@ class Gradebook {
         label: I18n.t('View Ungraded as Zero')
       })
 
-    const confirmationPromise = this.options.accepted_view_ungraded_as_zero_dialog
+    const confirmationPromise = this.gridDisplaySettings.viewUngradedAsZero
       ? Promise.resolve(true)
       : showDialog()
 
     return confirmationPromise.then(userAccepted => {
       if (userAccepted) {
-        this.options.accepted_view_ungraded_as_zero_dialog = true
         this.toggleViewUngradedAsZero()
       }
     })

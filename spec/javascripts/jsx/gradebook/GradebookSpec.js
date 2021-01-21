@@ -9844,7 +9844,6 @@ QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
 
   hooks.beforeEach(() => {
     gradebook = createGradebook({
-      accepted_view_ungraded_as_zero_dialog: false,
       grid: {
         getColumns: () => [],
         updateCell: sinon.stub()
@@ -9856,7 +9855,7 @@ QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
     sinon.stub(gradebook, 'toggleViewUngradedAsZero')
   })
 
-  test('shows a confirmation dialog if not previously accepted', async () => {
+  test('shows a confirmation dialog if not viewing ungraded as zero', async () => {
     const promise = gradebook.confirmViewUngradedAsZero()
 
     ok(confirmationDialog())
@@ -9864,8 +9863,8 @@ QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
     await promise
   })
 
-  test('does not a show a confirmation dialog if previously accepted', async () => {
-    gradebook.options.accepted_view_ungraded_as_zero_dialog = true
+  test('does not show a confirmation dialog if already viewing ungraded as zero', async () => {
+    gradebook.gridDisplaySettings.viewUngradedAsZero = true
     const promise = gradebook.confirmViewUngradedAsZero()
 
     notOk(confirmationDialog())
@@ -9879,11 +9878,6 @@ QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
       await promise
     }
 
-    test('sets accepted_view_ungraded_as_zero_dialog to true', async () => {
-      await confirmAndAccept()
-      strictEqual(gradebook.options.accepted_view_ungraded_as_zero_dialog, true)
-    })
-
     test('calls toggleViewUngradedAsZero', async () => {
       await confirmAndAccept()
       strictEqual(gradebook.toggleViewUngradedAsZero.callCount, 1)
@@ -9896,11 +9890,6 @@ QUnit.module('Gradebook#confirmViewUngradedAsZero', hooks => {
       denyConfirmation()
       await promise
     }
-
-    test('does not set accepted_view_ungraded_as_zero_dialog to true', async () => {
-      await confirmAndDeny()
-      strictEqual(gradebook.options.accepted_view_ungraded_as_zero_dialog, false)
-    })
 
     test('does not call toggleViewUngradedAsZero', async () => {
       await confirmAndDeny()

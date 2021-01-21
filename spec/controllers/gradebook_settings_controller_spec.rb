@@ -184,23 +184,6 @@ RSpec.describe GradebookSettingsController, type: :controller do
           expect(colors).not_to have_key "missing"
         end
       end
-
-      describe "view ungraded as zero" do
-        it "records that the user has accepted the confirmation dialog if set to true" do
-          put :update, params: valid_params
-          expect(teacher.get_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog)).to eq "true"
-        end
-
-        it "does not record acceptance of the confirmation dialog if set to false" do
-          params = {
-            "course_id" => @course.id,
-            "gradebook_settings" => gradebook_settings.merge("view_ungraded_as_zero" => "false")
-          }
-          put :update, params: params
-
-          expect(teacher.get_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog)).to be nil
-        end
-      end
     end
 
     context "given invalid params" do
