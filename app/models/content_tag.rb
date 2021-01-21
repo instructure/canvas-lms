@@ -37,7 +37,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group],
+  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: 'Lti::ResourceLink'],
              polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
@@ -495,7 +495,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def has_rubric_association?
-    content.respond_to?(:rubric_association) && content.rubric_association
+    content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
   scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
@@ -666,4 +666,17 @@ class ContentTag < ActiveRecord::Base
       self.root_account_id = self.context&.root_account_id
     end
   end
+
+  def quiz_lti
+    @quiz_lti ||= has_attribute?(:content_type) && content_type == 'Assignment' ? content&.quiz_lti? : false
+  end
+
+  def to_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
+  def as_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
 end

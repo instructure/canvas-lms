@@ -45,6 +45,11 @@
       </div>
     </div>
   <% end %>
+  <% if @user.workflow_state == 'deleted' %>
+    <div class="alert alert-danger">
+      <i class="icon-warning" aria-hidden="true"></i> <%= t("This user has been deleted") %>
+    </div>
+  <% end %>
   <h2><%= @user.short_name %> <% if @user.pronouns %><i>(<%= @user.pronouns %>)</i><% end %></h2>
 
 <style type="text/css" media="screen">

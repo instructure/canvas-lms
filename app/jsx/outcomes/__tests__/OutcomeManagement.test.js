@@ -28,10 +28,17 @@ import {
   masteryScalesGraphqlMocks,
   outcomeGroupsMocks
 } from './mocks'
+import {createCache} from '../../canvas-apollo'
 
 jest.useFakeTimers()
 
 describe('OutcomeManagement', () => {
+  let cache
+
+  beforeEach(() => {
+    cache = createCache()
+  })
+
   const sharedExamples = () => {
     it('renders the OutcomeManagement and shows the "outcomes" div', () => {
       document.body.innerHTML = '<div id="outcomes" style="display:none">Outcomes Tab</div>'
@@ -44,15 +51,15 @@ describe('OutcomeManagement', () => {
       expect(queryByTestId('managementHeader')).not.toBeInTheDocument()
     })
 
-    it('renders ManagementHeader when improved outcomes enabled', () => {
+    it('renders ManagementHeader when improved outcomes enabled', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
       const {getByText, getByTestId} = render(
-        <MockedProvider mocks={[...outcomeGroupsMocks]}>
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
         </MockedProvider>
       )
       expect(getByText(/Loading/)).toBeInTheDocument()
-      act(() => jest.runAllTimers())
+      await act(async () => jest.runAllTimers())
       expect(getByTestId('managementHeader')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
@@ -62,15 +69,15 @@ describe('OutcomeManagement', () => {
       expect(queryByTestId('outcomeManagementPanel')).not.toBeInTheDocument()
     })
 
-    it('renders OutcomeManagementPanel when improved outcomes enabled', () => {
+    it('renders OutcomeManagementPanel when improved outcomes enabled', async () => {
       window.ENV.IMPROVED_OUTCOMES_MANAGEMENT = true
       const {getByText, getByTestId} = render(
-        <MockedProvider mocks={[...outcomeGroupsMocks]}>
+        <MockedProvider cache={cache} mocks={[...outcomeGroupsMocks]}>
           <OutcomeManagement />
         </MockedProvider>
       )
       expect(getByText(/Loading/)).toBeInTheDocument()
-      act(() => jest.runAllTimers())
+      await act(async () => jest.runAllTimers())
       expect(getByTestId('outcomeManagementPanel')).toBeInTheDocument()
       delete window.ENV.IMPROVED_OUTCOMES_MANAGEMENT
     })
@@ -97,7 +104,10 @@ describe('OutcomeManagement', () => {
 
       it("Doesn't ask to confirm tab change when there is not change", () => {
         const {getByText} = render(
-          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+          <MockedProvider
+            cache={cache}
+            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
+          >
             <OutcomeManagement />
           </MockedProvider>
         )
@@ -108,42 +118,51 @@ describe('OutcomeManagement', () => {
         expect(window.confirm).not.toHaveBeenCalled()
       })
 
-      it('Asks to confirm tab change when there is changes', () => {
+      it('Asks to confirm tab change when there is changes', async () => {
         const {getByText, getByLabelText, getByTestId} = render(
-          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+          <MockedProvider
+            cache={cache}
+            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
+          >
             <OutcomeManagement />
           </MockedProvider>
         )
 
         fireEvent.click(getByText('Calculation'))
-        act(() => jest.runAllTimers())
+        await act(async () => jest.runAllTimers())
         fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
         fireEvent.click(getByText('Mastery'))
-        act(() => jest.runAllTimers())
+        await act(async () => jest.runAllTimers())
         expect(window.confirm).toHaveBeenCalled()
         expect(getByTestId('masteryScales')).toBeInTheDocument()
       })
 
-      it("Doesn't change tabs when doesn't confirm", () => {
+      it("Doesn't change tabs when doesn't confirm", async () => {
         // mock decline from user
         window.confirm = () => false
 
         const {getByText, getByLabelText, queryByTestId} = render(
-          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+          <MockedProvider
+            cache={cache}
+            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
+          >
             <OutcomeManagement />
           </MockedProvider>
         )
 
         fireEvent.click(getByText('Calculation'))
-        act(() => jest.runAllTimers())
+        await act(async () => jest.runAllTimers())
         fireEvent.input(getByLabelText('Parameter'), {target: {value: ''}})
         fireEvent.click(getByText('Mastery'))
         expect(queryByTestId('masteryScales')).not.toBeInTheDocument()
       })
 
-      it("Allows to leave page when doesn't have changes", () => {
+      it("Allows to leave page when doesn't have changes", async () => {
         const {getByText} = render(
-          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+          <MockedProvider
+            cache={cache}
+            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
+          >
             <OutcomeManagement />
           </MockedProvider>
         )
@@ -151,7 +170,7 @@ describe('OutcomeManagement', () => {
         const calculationButton = getByText('Calculation')
         fireEvent.click(calculationButton)
 
-        act(() => jest.runAllTimers())
+        await act(async () => jest.runAllTimers())
 
         const e = jest.mock()
         e.preventDefault = jest.fn()
@@ -161,7 +180,10 @@ describe('OutcomeManagement', () => {
 
       it("Doesn't Allow to leave page when has changes", async () => {
         const {getByText, getByLabelText} = render(
-          <MockedProvider mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}>
+          <MockedProvider
+            cache={cache}
+            mocks={[...masteryCalculationGraphqlMocks, ...masteryScalesGraphqlMocks]}
+          >
             <OutcomeManagement />
           </MockedProvider>
         )
@@ -169,7 +191,7 @@ describe('OutcomeManagement', () => {
         const calculationButton = getByText('Calculation')
         fireEvent.click(calculationButton)
 
-        act(() => jest.runAllTimers())
+        await act(async () => jest.runAllTimers())
 
         const parameter = getByLabelText(/Parameter/)
         fireEvent.input(parameter, {target: {value: '88'}})

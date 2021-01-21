@@ -1,8 +1,0 @@
-{
-  "files": [
-    {
-      "pattern": "**/*.hbs",
-      "processor": "hbs"
-    }
-  ]
-}

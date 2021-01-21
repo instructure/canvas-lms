@@ -170,6 +170,28 @@ describe DiscussionTopic do
     end
   end
 
+  describe 'default values' do
+    subject(:discussion_topic) { @course.discussion_topics.create!(title: title) }
+    
+    let(:default_title) { I18n.t('#discussion_topic.default_title', "No Title") }
+     
+    context 'when the title is an empty string' do
+      let(:title) { '' }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
+    end
+
+    context 'when the title is nil' do
+      let(:title) { nil }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
+    end
+  end
+
   it "should santize message" do
     @course.discussion_topics.create!(:message => "<a href='#' onclick='alert(12);'>only this should stay</a>")
     expect(@course.discussion_topics.first.message).to eql("<a href=\"#\">only this should stay</a>")

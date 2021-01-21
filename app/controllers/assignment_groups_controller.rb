@@ -109,7 +109,8 @@ class AssignmentGroupsController < ApplicationController
   #  If "observed_users" is passed along with "assignments" and "submission", submissions for observed users will also be included as an array.
   #
   # @argument assignment_ids[] [String]
-  #  If "assignments" are included, optionally return only assignments having their ID in this array.
+  #  If "assignments" are included, optionally return only assignments having their ID in this array. This argument may also be passed as
+  #  a comma separated string.
   #
   # @argument exclude_assignment_submission_types[] [String, "online_quiz"|"discussion_topic"|"wiki_page"|"external_tool"]
   #  If "assignments" are included, those with the specified submission types
@@ -401,12 +402,18 @@ class AssignmentGroupsController < ApplicationController
   def visible_assignments(context, current_user, groups)
     return Assignment.none unless include_params.include?('assignments')
 
+    assignment_ids = if params[:assignment_ids].is_a?(String)
+      params[:assignment_ids].split(",")
+    else
+      params[:assignment_ids]
+    end
+
     assignments = AssignmentGroup.visible_assignments(
       current_user,
       context,
       groups,
       includes: assignment_includes,
-      assignment_ids: params[:assignment_ids]
+      assignment_ids: assignment_ids
     )
 
     if params[:exclude_assignment_submission_types].present?

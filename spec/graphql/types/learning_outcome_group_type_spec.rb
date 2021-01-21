@@ -28,11 +28,14 @@ describe Types::LearningOutcomeGroupType do
     @account_user = Account.default.account_users.first
     @parent_group = outcome_group_model(context: Account.default)
     @child_group = outcome_group_model(context: Account.default)
+    @child_group2 = outcome_group_model(context: Account.default, workflow_state: 'deleted')
     outcome_group_model(context: Account.default, vendor_guid: "vendor_guid")
     @outcome_group.learning_outcome_group = @parent_group
     @outcome_group.save!
     @child_group.learning_outcome_group = @outcome_group
     @child_group.save!
+    @child_group2.learning_outcome_group = @outcome_group
+    @child_group2.save
     @user = @admin
     @outcome1 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "BBBB")
     @outcome2 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "AAAA")

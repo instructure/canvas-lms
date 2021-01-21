@@ -109,6 +109,7 @@ class GradebookExporter
     calc.submissions.each { |s| submissions[[s.user_id, s.assignment_id]] = s }
 
     assignments = select_in_grading_period calc.gradable_assignments
+    Assignment.preload_unposted_anonymous_submissions(assignments)
 
     ActiveRecord::Associations::Preloader.new.preload(assignments, :assignment_group)
     assignments.sort_by! do |a|
@@ -170,8 +171,8 @@ class GradebookExporter
           row << nil
         end
 
-        # This is not translated since we look for this exact string when we upload to gradebook.
-        row.concat(assignments.map { |assignment| show_as_hidden?(assignment) ? hidden_assignment_text : nil })
+        hidden_assignments_text = assignments.map { |assignment| hidden_assignment_text(assignment) }
+        row.concat(hidden_assignments_text)
 
         if should_show_totals
           row.concat([nil] * group_filler_length)
@@ -250,7 +251,7 @@ class GradebookExporter
           student = student_enrollment.user
           student_sections = student_section_names[student.id].sort.to_sentence
           student_submissions = assignments.map do |a|
-            if visible_assignments[a.id].include? student.id
+            if visible_assignments[a.id].include?(student.id) && !a.unposted_anonymous_submissions?
               submission = submissions[[student.id, a.id]]
               if submission.try(:excused?)
                 "EX"
@@ -416,8 +417,15 @@ class GradebookExporter
     assignment.post_manually?
   end
 
-  def hidden_assignment_text
-    "Manual Posting"
+  def hidden_assignment_text(assignment)
+    return nil unless show_as_hidden?(assignment)
+
+    # We don't translate "Manual Posting" since we look for this exact string when we upload to gradebook.
+    if assignment.unposted_anonymous_submissions?
+      I18n.t("%{manual_posting} (scores hidden from instructors)", { manual_posting: "Manual Posting" })
+    else
+      "Manual Posting"
+    end
   end
 
   def include_grading_period_in_headers?

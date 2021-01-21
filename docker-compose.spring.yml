@@ -22,7 +22,6 @@ services:
       - canvas-docker-gems:/home/docker/.gem/
       - canvas-planner_node_modules:/usr/src/app/packages/canvas-planner/node_modules
       - canvas-planner_lib:/usr/src/app/packages/canvas-planner/lib
-      - generated_1:/usr/src/app/public/javascripts/client_apps
       - generated_2:/usr/src/app/public/dist
       - generated_3:/usr/src/app/public/javascripts/compiled
       - i18nliner_node_modules:/usr/src/app/gems/canvas_i18nliner/node_modules
@@ -30,9 +29,6 @@ services:
       - log:/usr/src/app/log
       - node_modules:/usr/src/app/node_modules
       - pacts:/usr/src/app/pacts
-      - quizzes_dist:/usr/src/app/client_apps/canvas_quizzes/dist
-      - quizzes_node_modules:/usr/src/app/client_apps/canvas_quizzes/node_modules
-      - quizzes_tmp:/usr/src/app/client_apps/canvas_quizzes/tmp
       - reports:/usr/src/app/reports
       - styleguide:/usr/src/app/app/views/info
       - tmp:/usr/src/app/tmp

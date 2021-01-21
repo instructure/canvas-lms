@@ -46,12 +46,17 @@ RUN --mount=type=bind,target=/tmp/src,source=/usr/src/app,from=patchset \
 RUN cp -rf config/docker-compose.override.yml.example /usr/src/app/docker-compose.override.yml
 EOF
 
+if [ "$UPLOAD_DEBUG_IMAGE" = "true" ]; then
+  docker tag local/gergich $LINTER_DEBUG_IMAGE
+  docker push $LINTER_DEBUG_IMAGE
+fi
+
 cat <<EOF | docker run --interactive ${inputs[@]} --volume $GERGICH_VOLUME:/home/docker/gergich local/gergich /bin/bash - &
 set -ex
 export COMPILE_ASSETS_NPM_INSTALL=0
 export JS_BUILD_NO_FALLBACK=1
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/compile_assets:Gergich::CompileAssets 'rake canvas:compile_assets'"
-
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 gergich status
 echo "WEBPACK_BUILD OK!"
 EOF
@@ -78,13 +83,14 @@ if ! git diff --exit-code Dockerfile.jenkins; then
 fi
 
 ./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture custom:./build/gergich/xsslint:Gergich::XSSLint 'node script/xsslint.js'"
-./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake js:build_client_app['canvas_quizzes'] i18n:check'"
+./build/new-jenkins/linters/run-and-collect-output.sh "gergich capture i18nliner 'rake i18n:check'"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/brakeman"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/tatl_tael"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/stylelint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/rlint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/eslint"
 ./build/new-jenkins/linters/run-and-collect-output.sh "bundle exec ruby script/lint_commit_message"
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn lint:browser-code"
 
 gergich status
 echo "LINTER OK!"
@@ -101,6 +107,13 @@ export DISABLE_POSTINSTALL=1
 
 if ! git diff --exit-code yarn.lock; then
   message="yarn.lock changes need to be checked in. Make sure you run 'yarn install' without private canvas-lms plugins installed."
+  gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
+fi
+
+./build/new-jenkins/linters/run-and-collect-output.sh "yarn dedupe-yarn"
+
+if ! git diff --exit-code yarn.lock; then
+  message="yarn.lock changes need to be de-duplicated. Make sure you run 'yarn dedupe-yarn'."
   gergich comment "{\"path\":\"yarn.lock\",\"position\":1,\"severity\":\"error\",\"message\":\"\$message\"}"
 fi
 

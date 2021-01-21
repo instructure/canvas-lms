@@ -188,7 +188,7 @@
         </div>
 
         <div class="content_box">
-          <% if @assignment.rubric_association %>
+          <% if @assignment.active_rubric_association? %>
           <div id="rubric_full" style="display: none;">
             <div id="rubric_full_resizer">
               <div id="rubric_full_resizer_handle"></div>
@@ -213,7 +213,7 @@
           </div>
           <% end %>
 
-          <% if  @assignment.rubric_association || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
+          <% if  @assignment.active_rubric_association? || can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
           <div id="grading">
             <h2 class="gradebookHeader--rightside"><%= t('headers.assessment', "Assessment") %></h2>
             <% if can_do(@context, @current_user, :manage_grades) || (@context.concluded? && can_do(@context, @current_user, :read_as_admin)) %>
@@ -227,7 +227,7 @@
               <div id="grading_details_mount_point"></div>
             <% end %>
 
-            <% if @assignment.rubric_association %>
+            <% if @assignment.active_rubric_association? %>
               <div id="rubric_summary_holder">
                 <div id="rubric_assessments_list_and_edit_button_holder">
                   <span id="rubric_assessments_list">

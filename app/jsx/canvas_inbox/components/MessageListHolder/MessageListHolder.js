@@ -32,16 +32,19 @@ export const MessageListHolder = ({...props}) => {
       overflowY="auto"
       borderWidth="small"
     >
-      {props.conversations.map(conversation => (
-        <MessageListItem
-          conversation={conversation.conversation}
-          isUnread={conversation.workflowState === 'unread'}
-          onOpen={props.onOpen}
-          onSelect={props.onSelect}
-          onStar={props.onStar}
-          key={conversation.id}
-        />
-      ))}
+      {props.conversations?.map(conversation => {
+        return (
+          <MessageListItem
+            conversation={conversation.conversation}
+            isStarred={conversation.label === 'starred'}
+            isUnread={conversation.workflowState === 'unread'}
+            onOpen={props.onOpen}
+            onSelect={props.onSelect}
+            onStar={props.onStar}
+            key={conversation.id}
+          />
+        )
+      })}
     </View>
   )
 }

@@ -18,13 +18,44 @@
 
 import {gql} from 'jsx/canvas-apollo'
 
-export const GET_OUTCOME_GROUPS_QUERY = contextType =>
-  gql`
-  query GetRootOutcomeGroups($contextId: ID!) {
-    context: ${contextType} (id: $contextId) {
-      rootOutcomeGroup {
+const groupFragment = gql`
+  fragment GroupFragment on LearningOutcomeGroup {
+    _id
+    childGroups {
+      nodes {
+        description
+        _id
+        outcomesCount
         childGroupsCount
+        title
       }
     }
   }
+`
+
+export const CHILD_GROUPS_QUERY = gql`
+  query LearningOutcomesGroupQuery($id: ID!, $type: NodeType!) {
+    context: legacyNode(type: $type, _id: $id) {
+      ... on Account {
+        _id
+        rootOutcomeGroup {
+          ...GroupFragment
+          outcomesCount
+          childGroupsCount
+        }
+      }
+      ... on Course {
+        _id
+        rootOutcomeGroup {
+          ...GroupFragment
+          outcomesCount
+          childGroupsCount
+        }
+      }
+      ... on LearningOutcomeGroup {
+        ...GroupFragment
+      }
+    }
+  }
+  ${groupFragment}
 `

@@ -16,9 +16,6 @@ docker-compose/
 docker-compose.local.*.yml
 docker-compose.override.yml
 
-client_apps/canvas_quizzes/dist/
-client_apps/canvas_quizzes/node_modules/
-client_apps/canvas_quizzes/tmp/
 coverage/
 coverage-js/
 gems/*/node_modules/
@@ -32,7 +29,6 @@ packages/*/node_modules/
 packages/canvas-planner/lib
 public/dist/
 public/doc/
-public/javascripts/client_apps/
 public/javascripts/translations/
 !public/javascripts/translations/_core_en.js
 tmp/*

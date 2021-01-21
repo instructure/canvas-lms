@@ -99,6 +99,17 @@ describe GradebookImporter do
       end.to raise_error(Delayed::RetriableError)
     end
 
+    it "ignores the line denoting manually posted anonymous assignments if present" do
+      importer_with_rows(
+        'Student,ID,Section,Assignment 1,Final Score',
+        'Points Possible,,,10,',
+        ', ,,Manual Posting (scores cachés aux instructeurs),',
+        '"Blend, Bill",6,My Course,-,',
+        '"Farner, Todd",4,My Course,-,'
+      )
+      expect(@gi.students.length).to eq 2
+    end
+
     context 'when dealing with a file containing semicolon field separators' do
       context 'with interspersed commas to throw you off' do
         before(:each) do
@@ -671,6 +682,32 @@ describe GradebookImporter do
     expect(submission['original_grade']).to eq '8.0'
     expect(submission['grade']).to eq '10'
     expect(submission['assignment_id']).to eq @assignment1.id
+  end
+
+  context "anonymous assignments" do
+    before(:each) do
+      @student = User.create!
+      course_with_student(user: @student, active_all: true)
+      @assignment = @course.assignments.create!(name: "Assignment 1", anonymous_grading: true, points_possible: 10)
+      @assignment.grade_student(@student, grade: 8, grader: @teacher)
+    end
+
+    it "does not include grade changes for anonymous unposted assignments" do
+      importer_with_rows(
+        "Student,ID,Section,Assignment 1",
+        ",#{@student.id},,10"
+      )
+      expect(@gi.assignments).to be_empty
+    end
+
+    it "includes grade changes for anonymous posted assignments" do
+      @assignment.post_submissions
+      importer_with_rows(
+        "Student,ID,Section,Assignment 1",
+        ",#{@student.id},,10"
+      )
+      expect(@gi.assignments).not_to be_empty
+    end
   end
 
   context "custom gradebook columns" do

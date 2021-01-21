@@ -328,6 +328,10 @@ class MediaObject < ActiveRecord::Base
     attachment.save!
   end
 
+  def deleted?
+    self.workflow_state == 'deleted'
+  end
+
   scope :active, -> { where("media_objects.workflow_state<>'deleted'") }
 
   scope :by_media_id, lambda { |media_id| where(:media_id => media_id).or(where(:old_media_id => media_id)) }

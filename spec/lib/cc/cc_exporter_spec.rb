@@ -363,7 +363,7 @@ describe "Common Cartridge exporting" do
 
       allow(CC::CCHelper).to receive(:media_object_info).and_return({
         :asset => { :id => "some-kaltura-id", :size => 1234, :status => '2' },
-        :filename => "some-kaltura-id"
+        :path => "media_objects/some-kaltura-id"
       })
       allow(CanvasKaltura::ClientV3).to receive(:config).and_return({})
       allow(CanvasKaltura::ClientV3).to receive(:startSession)
@@ -566,7 +566,7 @@ describe "Common Cartridge exporting" do
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:startSession)
       allow_any_instance_of(CanvasKaltura::ClientV3).to receive(:flavorAssetGetPlaylistUrl).and_return('http://www.example.com/blah.flv')
       stub_request(:get, 'http://www.example.com/blah.flv').to_return(body: "", status: 200)
-      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, filename: 'blah.flv'})
+      allow(CC::CCHelper).to receive(:media_object_info).and_return({asset: {id: 1, status: '2'}, path: 'blah.flv'})
       obj = @course.media_objects.create! media_id: '0_deadbeef'
       track = obj.media_tracks.create! kind: 'subtitles', locale: 'tlh', content: "Hab SoSlI' Quch!"
       page = @course.wiki_pages.create!(:title => "wiki", :body => "ohai")

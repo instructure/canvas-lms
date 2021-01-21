@@ -58,14 +58,14 @@ class AssessmentRequest < ActiveRecord::Base
     p.dispatch :rubric_assessment_submission_reminder
     p.to { self.assessor }
     p.whenever { |record|
-      record.assigned? && @send_reminder && rubric_association
+      record.assigned? && @send_reminder && active_rubric_association?
     }
     p.data { course_broadcast_data }
 
     p.dispatch :peer_review_invitation
     p.to { self.assessor }
     p.whenever { |record|
-      send_notification = record.assigned? && @send_reminder && !rubric_association
+      send_notification = record.assigned? && @send_reminder && !active_rubric_association?
       # Do not send notifications if the context is an unpublished course
       # or if the asset is a submission and the assignment is unpublished
       send_notification = false if self.context.is_a?(Course) && !self.context.workflow_state.in?(['available', 'completed'])
@@ -147,7 +147,7 @@ class AssessmentRequest < ActiveRecord::Base
   end
 
   def comment_added(comment)
-    self.workflow_state = "completed" unless self.rubric_association && self.rubric_association.rubric
+    self.workflow_state = "completed" unless active_rubric_association? && self.rubric_association.rubric
   end
 
   def asset_user_name
@@ -161,5 +161,9 @@ class AssessmentRequest < ActiveRecord::Base
       override = PlannerOverride.find_by(plannable_id: self.id, plannable_type: 'AssessmentRequest', user: assessor)
       override.update(marked_complete: true) if override.present?
     end
+  end
+
+  def active_rubric_association?
+    !!self.rubric_association&.active?
   end
 end

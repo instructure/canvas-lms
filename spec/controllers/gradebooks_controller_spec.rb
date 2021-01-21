@@ -858,6 +858,30 @@ describe GradebooksController do
         end
       end
 
+      describe "accepted_view_ungraded_as_zero_dialog" do
+        context "when default gradebook is enabled" do
+          it "is set to true if the user is noted as having accepted the dialog" do
+            @teacher.set_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog, "true")
+
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:accepted_view_ungraded_as_zero_dialog)).to be true
+          end
+
+          it "is set to false if no acceptance of the dialog has been recorded" do
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:accepted_view_ungraded_as_zero_dialog)).to be false
+          end
+
+          it "is set to false if a different user has accepted the dialog but the current user has not" do
+            other_teacher = User.create!
+            other_teacher.set_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog, "true")
+
+            get :show, params: { course_id: @course.id }
+            expect(gradebook_options.fetch(:accepted_view_ungraded_as_zero_dialog)).to be false
+          end
+        end
+      end
+
       describe "dataloader_improvements" do
         # TODO: remove this entire block with TALLY-831
 
@@ -1537,6 +1561,22 @@ describe GradebooksController do
               get :show, params: {course_id: @course.id}
               expect(returned_section_ids).to match_array([@section_2.id, @course.default_section.id])
             end
+          end
+        end
+
+        describe 'inactive_concluded_lmgb_filters' do
+          it 'is false if the feature flag is off' do
+            @course.root_account.disable_feature! :inactive_concluded_lmgb_filters
+            get :show, params: {course_id: @course.id}
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:inactive_concluded_lmgb_filters]).to be_falsey
+          end
+
+          it 'is true if the feature flag is on' do
+            @course.root_account.enable_feature! :inactive_concluded_lmgb_filters
+            get :show, params: {course_id: @course.id}
+            gradebook_env = assigns[:js_env][:GRADEBOOK_OPTIONS]
+            expect(gradebook_env[:inactive_concluded_lmgb_filters]).to be_truthy
           end
         end
       end

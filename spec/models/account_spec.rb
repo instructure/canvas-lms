@@ -98,6 +98,21 @@ describe Account do
           expect(subsubaccount.reload.resolved_outcome_proficiency).to eq old_proficiency
         end
       end
+
+      it 'does not conflict with other caches' do
+        enable_cache do
+          Timecop.freeze do
+            outcome_proficiency_model(@root_account)
+            outcome_calculation_method_model(@root_account)
+
+            # cache proficiency
+            @root_account.resolved_outcome_proficiency
+
+            calc_method = @root_account.resolved_outcome_calculation_method
+            expect(calc_method.class).to eq OutcomeCalculationMethod
+          end
+        end
+      end
     end
 
     context "with the account_level_mastery_scales FF enabled" do

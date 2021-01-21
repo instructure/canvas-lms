@@ -22,10 +22,6 @@ require_relative '../../conditional_release_spec_helper'
 require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
 
 describe ConditionalRelease::Service do
-  before do
-    skip 'LS-1684 (12/7/2020)'
-  end
-
   Service = ConditionalRelease::Service
 
   def enable_service

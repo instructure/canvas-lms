@@ -28,23 +28,69 @@ const successMessage = I18n.t(
     'Gradebook is correct before making additional changes.'
 )
 
+function overrideScoreHasChanged(score) {
+  const currentScore = Number.parseFloat(score.current_score)
+  const newScore = Number.parseFloat(score.new_score)
+
+  if (Number.isNaN(currentScore) && Number.isNaN(newScore)) {
+    return false
+  }
+
+  return currentScore !== newScore
+}
+
 const ProcessGradebookUpload = {
   upload(gradebook) {
-    if (
-      gradebook != null &&
-      (_.isArray(gradebook.assignments) || _.isArray(gradebook.custom_columns)) &&
-      _.isArray(gradebook.students)
-    ) {
-      if (gradebook.custom_columns && gradebook.custom_columns.length > 0) {
-        this.uploadCustomColumnData(gradebook)
-      }
-
-      const createAssignmentsResponses = this.createAssignments(gradebook)
-      return $.when(...createAssignmentsResponses).then((...responses) => {
-        this.uploadGradeData(gradebook, responses)
-      })
+    if (gradebook == null || gradebook.students == null || gradebook.students.length === 0) {
+      return
     }
-    return undefined
+
+    // Between assignment creation, score updates, custom column updates, and
+    // override score updates, we very possibly have multiple requests to send
+    // off. Make sure they've all returned (even if just returning a Progress
+    // object) before we direct the user back to Gradebook.
+    let uploadingBulkData = false
+    const deferreds = []
+    if (gradebook.custom_columns && gradebook.custom_columns.length > 0) {
+      const deferred = this.uploadCustomColumnData(gradebook)
+      if (deferred != null) {
+        uploadingBulkData = true
+        deferreds.push(deferred)
+      }
+    }
+
+    const overrideScoresExist = gradebook.students.some(
+      student => student.override_scores != null && student.override_scores.length > 0
+    )
+    if (overrideScoresExist && ENV.bulk_update_override_scores_path != null) {
+      const updateRequests = this.createOverrideUpdateRequests(gradebook)
+      if (updateRequests.length > 0) {
+        uploadingBulkData = true
+        deferreds.push(...updateRequests)
+      }
+    }
+
+    const createAssignmentsDfds = this.createAssignments(gradebook)
+    const uploadGradeDataDfd = $.Deferred()
+    $.when(...createAssignmentsDfds).then((...responses) => {
+      const uploadRequest = this.uploadGradeData(gradebook, responses)
+      if (uploadRequest != null) {
+        uploadingBulkData = true
+        $.when(uploadRequest).then(_response => {
+          uploadGradeDataDfd.resolve()
+        })
+      } else {
+        uploadGradeDataDfd.resolve()
+      }
+    })
+    deferreds.push(...createAssignmentsDfds, uploadGradeDataDfd)
+
+    return $.when(...deferreds).then(() => {
+      if (uploadingBulkData) {
+        alert(successMessage) // eslint-disable-line no-alert
+      }
+      this.goToGradebook()
+    })
   },
 
   uploadCustomColumnData(gradebook) {
@@ -57,12 +103,8 @@ const ProcessGradebookUpload = {
     }, {})
 
     if (!_.isEmpty(customColumnData)) {
-      this.parseCustomColumnData(customColumnData)
-    }
-
-    if (!gradebook.assignments.length) {
-      alert(successMessage) // eslint-disable-line no-alert
-      this.goToGradebook()
+      const parsedData = this.parseCustomColumnData(customColumnData)
+      return this.submitCustomColumnData(parsedData)
     }
   },
 
@@ -77,8 +119,6 @@ const ProcessGradebookUpload = {
         })
       })
     })
-
-    this.submitCustomColumnData(data)
     return data
   },
 
@@ -87,6 +127,48 @@ const ProcessGradebookUpload = {
       ENV.bulk_update_custom_columns_path,
       'PUT',
       JSON.stringify({column_data: data}),
+      null,
+      null,
+      {contentType: 'application/json'}
+    )
+  },
+
+  createOverrideUpdateRequests(gradebook) {
+    const changedOverrideScores = gradebook.students
+      .map(student =>
+        (student.override_scores || []).map(score => ({...score, student_id: student.id}))
+      )
+      .flat()
+      .filter(score => overrideScoreHasChanged(score))
+
+    // If we have updates for multiple grading periods--which will never happen
+    // with the default gradebook export but could happen if someone uploads a
+    // CSV with multiple "Override Score" columns--send off one request to the
+    // endpoint for each grading period.
+    const scoresByGradingPeriod = _.groupBy(
+      changedOverrideScores,
+      score => score.grading_period_id || 'course'
+    )
+
+    return Object.entries(scoresByGradingPeriod).map(([gradingPeriodId, scores]) => {
+      const submittableScores = scores.map(score => ({
+        override_score: score.new_score,
+        student_id: score.student_id
+      }))
+      return this.createOverrideScoreRequest(gradingPeriodId, submittableScores)
+    })
+  },
+
+  createOverrideScoreRequest(gradingPeriodId, scores) {
+    const params = {override_scores: scores}
+    if (gradingPeriodId !== 'course') {
+      params.grading_period_id = gradingPeriodId
+    }
+
+    return $.ajaxJSON(
+      ENV.bulk_update_override_scores_path,
+      'PUT',
+      JSON.stringify(params),
       null,
       null,
       {contentType: 'application/json'}
@@ -123,14 +205,7 @@ const ProcessGradebookUpload = {
   uploadGradeData(gradebook, responses) {
     const gradeData = this.populateGradeData(gradebook, responses)
 
-    if (_.isEmpty(gradeData)) {
-      this.goToGradebook()
-    } else {
-      this.submitGradeData(gradeData).then(progress => {
-        alert(successMessage) // eslint-disable-line no-alert
-        ProcessGradebookUpload.goToGradebook()
-      })
-    }
+    return _.isEmpty(gradeData) ? null : this.submitGradeData(gradeData)
   },
 
   populateGradeData(gradebook, responses) {

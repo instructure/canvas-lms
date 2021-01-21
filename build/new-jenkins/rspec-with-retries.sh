@@ -4,54 +4,69 @@
 # has a lot of unset variables and needs to be addressed independently
 set -o errexit -o errtrace -o xtrace
 
+PROCESSES=$((${RSPEC_PROCESSES:=1}-1))
 export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Initial"
 
 success_status=0
 test_failure_status=1
-
-runs_remaining=$((1+${RERUNS_RETRY:=2}))
+runs_remaining=${RERUNS_RETRY:=2}
 
 echo "STARTING"
 while true; do
-  set +e
+  last_statuses=()
+  command_pids=()
+
   if [[ $reruns_started ]]; then
     if [ $1 ] && [ $1 = 'performance' ]; then
-      build/new-jenkins/rspec-with-wait.sh "docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99"
-    else
-      build/new-jenkins/rspec-with-wait.sh "build/new-jenkins/rspec-tests.sh only-failures"
+      commands+=("docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --only-failures --failure-exit-code 99")
     fi
   else
     if [ $1 ] && [ $1 = 'performance' ]; then
-      build/new-jenkins/rspec-with-wait.sh "docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99"
+      commands+=("docker-compose --project-name canvas-lms0 exec -T canvas bundle exec rspec --options spec/spec.opts spec/selenium/performance/ --failure-exit-code 99")
     else
-      build/new-jenkins/rspec-with-wait.sh "build/new-jenkins/rspec-tests.sh"
+      for i in $(seq 0 $PROCESSES); do
+        commands+=("build/new-jenkins/rspec-tests.sh $i")
+      done
     fi
   fi
-  last_status=$?
-  set -e
 
-  [[ ! $reruns_started ]] && echo "FINISHED"
-  [[ $last_status == $success_status ]] && break
+  for command in "${commands[@]}"; do
+    ./build/new-jenkins/linters/run-and-collect-output.sh "$command" 2>&1 &
+    command_pids[$!]=$command
+  done
 
-  if [[ $last_status != $success_status && $last_status != $test_failure_status ]]; then
-    echo "unexpected exit code $last_status! perhaps the code is horribly broken :("
-    break
-  fi
+  for command_pid in "${!command_pids[@]}"; do
+    wait $command_pid || last_statuses[$command_pid]=$?
+  done
 
-  if [[ $last_status == $test_failure_status ]]; then
-    runs_remaining=$((runs_remaining-1))
+  exit_code=0
+  commands=()
+  for command_pid in ${!last_statuses[@]}; do
+    last_status="${last_statuses[$command_pid]}"
+    if [[ $last_status == $success_status ]]; then
+      continue
+    elif [[ $last_status == $test_failure_status ]]; then
+      export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Rerun_$runs_remaining"
 
-    [[ $runs_remaining == 0 ]] && { echo "reruns failed $num_failures failure(s)"; break; }
-    export ERROR_CONTEXT_BASE_PATH="/usr/src/app/log/spec_failures/Rerun_$runs_remaining"
+      if [[ $runs_remaining == 0 ]]; then
+        exit_code=$last_status
+        break 2
+      fi
 
-    echo -e "failed, re-trying, $runs_remaining attempt(s) left\n\n\n"
-    if [[ ! $reruns_started ]]; then
       reruns_started=1
-      echo "RERUN STARTING"
+      echo -e "RERUN STARTING: failed in running command: ${command_pids[$command_pid]}, $runs_remaining attempt(s) left\n\n\n"
+      commands+=("${command_pids[$command_pid]} only-failures")
+      exit_code=$last_status
+    else
+      echo "unexpected exit code $last_status! perhaps the code is horribly broken :("
+      exit_code=$last_status
+      break 2
     fi
-  fi
+  done
+
+  [[ $exit_code == 0 ]] && break
+  runs_remaining=$((runs_remaining-1))
 done
 
-[[ $reruns_started ]] && echo " FINISHED"
-echo "rspec-queue-with-retries exiting with $last_status"
-exit $last_status
+echo "FINISHED: rspec-queue-with-retries exiting with $exit_code"
+exit $exit_code

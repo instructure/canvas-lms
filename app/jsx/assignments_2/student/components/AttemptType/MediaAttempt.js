@@ -27,7 +27,11 @@ import React from 'react'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Submission} from '../../graphqlData/Submission'
 import UploadMedia from '@instructure/canvas-media'
-import {UploadMediaStrings, MediaCaptureStrings} from '../../../../shared/UploadMediaTranslations'
+import {
+  UploadMediaStrings,
+  MediaCaptureStrings,
+  SelectStrings
+} from '../../../../shared/UploadMediaTranslations'
 
 import {Billboard} from '@instructure/ui-billboard'
 import {Button} from '@instructure/ui-buttons'
@@ -171,7 +175,7 @@ export default class MediaAttempt extends React.Component {
         contextType="course"
         open={this.state.mediaModalOpen}
         tabs={{embed: false, record: true, upload: true}}
-        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings}}
+        uploadMediaTranslations={{UploadMediaStrings, MediaCaptureStrings, SelectStrings}}
         liveRegion={() => document.getElementById('flash_screenreader_holder')}
         languages={languages}
       />

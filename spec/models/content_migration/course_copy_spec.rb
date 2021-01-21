@@ -459,6 +459,7 @@ describe ContentMigration do
       @copy_from.enable_offline_web_export = true
       @copy_from.is_public_to_auth_users = true
       @copy_from.syllabus_course_summary = false
+      @copy_from.homeroom_course = true
       @copy_from.save!
 
       run_course_copy
@@ -476,6 +477,7 @@ describe ContentMigration do
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
       expect(@copy_to.syllabus_course_summary).to eq false
+      expect(@copy_to.homeroom_course).to eq true
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS

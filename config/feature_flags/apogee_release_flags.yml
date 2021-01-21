@@ -84,3 +84,8 @@ grade_calc_ignore_unposted_anonymous:
       state: on # enable for local development
     test:
       state: on # enable for the deployed 'test' environment
+use_cloudfront_for_docviewer:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: Use CloudFront for DocViewer
+  description: Request that DocViewer use CloudFront for serving pdf assets.

@@ -1038,9 +1038,18 @@ RSpec.describe ApplicationController do
           end
 
           context 'module items' do
-            before { content_tag.update!(context: course.account) }
+            before do
+              content_tag.update!(
+                context: course,
+                associated_asset: Lti::ResourceLink.create_with(course, tool, abc: 'def')
+              )
+            end
 
-            it_behaves_like 'a placement that caches the launch'
+            it_behaves_like 'a placement that caches the launch' do
+              it 'sets link-level custom parameters' do
+                expect(cached_launch["https://purl.imsglobal.org/spec/lti/claim/custom"]).to include('abc' => 'def')
+              end
+            end
           end
           # rubocop:enable RSpec/NestedGroups
         end

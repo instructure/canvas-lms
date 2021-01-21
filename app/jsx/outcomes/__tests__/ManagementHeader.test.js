@@ -42,4 +42,11 @@ describe('ManagementHeader', () => {
     fireEvent.click(importButton)
     expect(showImportOutcomesModal).toHaveBeenCalledTimes(1)
   })
+
+  it('opens FindOutcomesModal when Find button is clicked', () => {
+    const {getByText} = render(<ManagementHeader />)
+    const findButton = getByText('Find')
+    fireEvent.click(findButton)
+    expect(getByText('Add Outcomes to Account')).toBeInTheDocument()
+  })
 })

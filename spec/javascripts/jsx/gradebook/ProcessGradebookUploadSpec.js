@@ -487,6 +487,7 @@ QUnit.module('ProcessGradebookUpload.upload', {
     fakeENV.setup()
     ENV.create_assignment_path = '/create_assignment_path/url'
     ENV.bulk_update_path = '/bulk_update_path/url'
+    ENV.bulk_update_override_scores_path = '/bulk_update_override_scores_path/url'
   },
   teardown() {
     xhr.restore()
@@ -930,6 +931,159 @@ test('does not call uploadCustomColumnData if custom_columns is empty', () => {
   ProcessGradebookUpload.uploadCustomColumnData.restore()
 })
 
+test('creates requests for override score changes if an update URL is set', () => {
+  const gradebook = {
+    assignments: [],
+    custom_columns: [],
+    students: [
+      {
+        id: '1',
+        override_scores: [
+          {
+            current_score: '75',
+            new_score: '80'
+          }
+        ],
+        submissions: []
+      }
+    ]
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(requests.length, 1)
+})
+
+test('ignores override score changes if no update URL is set', () => {
+  const gradebook = {
+    assignments: [],
+    custom_columns: [],
+    students: [
+      {
+        id: '1',
+        override_scores: [
+          {
+            current_score: '75',
+            new_score: '80'
+          }
+        ],
+        submissions: []
+      }
+    ]
+  }
+  delete ENV.bulk_update_override_scores_path
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(requests.length, 0)
+})
+
+test('shows an alert if any bulk data is being uploaded', () => {
+  const gradebook = {
+    assignments: [
+      {
+        title: 'a new assignment',
+        id: -1,
+        points_possible: 10
+      },
+      {
+        title: 'an even newer assignment',
+        id: -2,
+        points_possible: 20
+      }
+    ],
+    students: [
+      {
+        id: '1',
+        submissions: [{assignment_id: -1, grade: '10', original_grade: '9'}]
+      }
+    ]
+  }
+
+  ProcessGradebookUpload.upload(gradebook)
+
+  // Respond to assignment creation requests
+  requests.forEach((request, idx) => {
+    request.respond(200, {}, JSON.stringify({id: idx + 1000}))
+  })
+
+  // Respond to grade upload requests
+  requests
+    .filter(request => request.url === '/bulk_update_path/url')
+    .forEach(request => {
+      request.respond(200, {}, JSON.stringify(progressQueued))
+    })
+
+  strictEqual(window.alert.callCount, 1)
+})
+
+test('does not show an alert if the only changes involve creating new assignments', () => {
+  const gradebook = {
+    assignments: [
+      {
+        title: 'a new assignment',
+        id: -1,
+        points_possible: 10
+      },
+      {
+        title: 'an even newer assignment',
+        id: -2,
+        points_possible: 20
+      }
+    ],
+    students: [
+      {
+        id: '1',
+        submissions: []
+      }
+    ]
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  strictEqual(window.alert.callCount, 0)
+})
+
+test('does not redirect to gradebook until all requests have completed', () => {
+  const gradebook = {
+    assignments: [newAssignment1, oldAssignment1],
+    students: [
+      {
+        id: 1,
+        submissions: [submissionOld1Change, submissionNew1Change],
+        override_scores: [{current_score: '70', new_score: '75'}]
+      }
+    ]
+  }
+  ProcessGradebookUpload.upload(gradebook)
+
+  const createAssignmentRequests = requests.filter(
+    request => request.url === '/create_assignment_path/url'
+  )
+  createAssignmentRequests.forEach((request, idx) => {
+    request.respond(200, {}, JSON.stringify({id: idx + 1000}))
+  })
+
+  const overrideScoreRequests = requests.filter(
+    request => request.url === '/bulk_update_override_scores_path/url'
+  )
+  overrideScoreRequests.forEach(request => {
+    request.respond(200, {}, JSON.stringify(progressQueued))
+  })
+
+  strictEqual(
+    ProcessGradebookUpload.goToGradebook.callCount,
+    0,
+    'goToGradebook should not be called before submission bulk updates have started'
+  )
+
+  const uploadSubmissionsRequests = requests.filter(
+    request => request.url === '/bulk_update_path/url'
+  )
+  uploadSubmissionsRequests.forEach(request => {
+    request.respond(200, {}, JSON.stringify(progressQueued))
+  })
+
+  strictEqual(ProcessGradebookUpload.goToGradebook.callCount, 1)
+})
+
 QUnit.module('ProcessGradebookUpload.parseCustomColumnData')
 
 test('correctly parses data for one student', () => {
@@ -1037,4 +1191,136 @@ test('correctly submits custom column data', () => {
   equal(bulkUpdateRequest.column_data[1].column_id, 3)
   equal(bulkUpdateRequest.column_data[1].user_id, 4)
   equal(bulkUpdateRequest.column_data[1].content, 'test content 2')
+})
+
+QUnit.module('ProcessGradebookUpload.createOverrideUpdateRequests', hooks => {
+  const studentWithCourseGradeUpdate = {
+    id: '1',
+    override_scores: [
+      {
+        current_score: '80',
+        new_score: '90'
+      }
+    ]
+  }
+  const studentWithGradingPeriodUpdate = {
+    id: '2',
+    override_scores: [
+      {
+        current_score: '80',
+        grading_period_id: '1',
+        new_score: '90'
+      }
+    ]
+  }
+  const studentWithMultipleUpdates = {
+    id: '3',
+    override_scores: [
+      {
+        current_score: '80',
+        grading_period_id: '1',
+        new_score: '90'
+      },
+      {
+        current_score: '80',
+        grading_period_id: '2',
+        new_score: '90'
+      },
+      {
+        current_score: '40',
+        new_score: '50'
+      }
+    ]
+  }
+  const studentWithNoActualChanges = {
+    id: '999',
+    override_scores: [
+      {
+        current_score: '80',
+        new_score: '80'
+      },
+      {
+        current_score: '70',
+        grading_period_id: '1',
+        new_score: '70.0'
+      },
+      {
+        current_score: '',
+        grading_period_id: '2',
+        new_score: null
+      },
+      {
+        current_score: 'null',
+        grading_period_id: '3',
+        new_score: null
+      }
+    ]
+  }
+
+  let gradebook
+
+  hooks.beforeEach(() => {
+    xhr = sinon.useFakeXMLHttpRequest()
+    requests = []
+
+    xhr.onCreate = function(request) {
+      requests.push(request)
+    }
+
+    fakeENV.setup({bulk_update_override_scores_path: '/bulk_update_override_scores_path'})
+
+    gradebook = {
+      students: []
+    }
+  })
+
+  hooks.afterEach(() => {
+    xhr.restore()
+    fakeENV.teardown()
+  })
+
+  test('creates an update request for each grading period/course with changed scores', () => {
+    gradebook.students.push(studentWithMultipleUpdates)
+
+    ProcessGradebookUpload.createOverrideUpdateRequests(gradebook)
+    strictEqual(requests.length, 3, 'creates an update for each grading period/course')
+
+    const urls = requests.map(request => request.url)
+    strictEqual(
+      urls[0],
+      '/bulk_update_override_scores_path',
+      'uses the URL specified in the environment'
+    )
+  })
+
+  test('includes the grading_period_id in the parameters for updates for that grading period', () => {
+    gradebook.students.push(studentWithGradingPeriodUpdate)
+    ProcessGradebookUpload.createOverrideUpdateRequests(gradebook)
+
+    const body = JSON.parse(requests[0].requestBody)
+    strictEqual(body.grading_period_id, '1')
+  })
+
+  test('does not include grading_period_id if updating course scores', () => {
+    gradebook.students.push(studentWithCourseGradeUpdate)
+    ProcessGradebookUpload.createOverrideUpdateRequests(gradebook)
+
+    const body = JSON.parse(requests[0].requestBody)
+    equal(body.grading_period_id, null)
+  })
+
+  test('only includes override score updates containing changes to the scores', () => {
+    gradebook.students.push(studentWithNoActualChanges)
+    ProcessGradebookUpload.createOverrideUpdateRequests(gradebook)
+
+    strictEqual(requests.length, 0)
+  })
+
+  test('includes the new score and student ID in the body of each request', () => {
+    gradebook.students.push(studentWithGradingPeriodUpdate)
+    ProcessGradebookUpload.createOverrideUpdateRequests(gradebook)
+
+    const body = JSON.parse(requests[0].requestBody)
+    deepEqual(body.override_scores, [{override_score: '90', student_id: '2'}])
+  })
 })

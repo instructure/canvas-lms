@@ -19,8 +19,12 @@ module Lti::Ims::Concerns
   module DeepLinkingModules
     extend ActiveSupport::Concern
 
+    def adding_module_item?
+      params[:context_module_id].present?
+    end
+
     def multiple_module_items?
-      params[:context_module_id].present? && content_items.length > 1
+      adding_module_item? && content_items.length > 1
     end
 
     def valid_content_items?
@@ -31,11 +35,13 @@ module Lti::Ims::Concerns
       @context_module ||= @context.context_modules.not_deleted.find(params[:context_module_id])
     end
 
+    # Renders if unauthorized so should be used in a before_action
     def add_module_items
       unless multiple_module_items? && valid_content_items?
         return
       end
-      return render_unauthorized_action unless authorized_action(context_module, @current_user, :update) && tool.present?
+      return unless authorized_action(context_module, @current_user, :update)
+      return render_unauthorized_action if tool.blank?
 
       content_items.each do |content_item|
         # the iframe property in a deep linking response can contain
@@ -54,7 +60,8 @@ module Lti::Ims::Concerns
           url: content_item[:url],
           title: content_item[:title],
           position: 1,
-          link_settings: launch_dimensions
+          link_settings: launch_dimensions,
+          custom_params: Lti::DeepLinkingUtil.validate_custom_params(content_item[:custom])
         })
         return render :json => tag.errors, :status => :bad_request unless tag&.valid?
         @context.touch

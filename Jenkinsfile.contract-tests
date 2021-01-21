@@ -29,7 +29,7 @@ def cleanupFn(status) {
     }
   } finally {
     sh 'rm -vrf tmp/spec_results'
-    execute 'bash/docker-cleanup.sh --allow-failure'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -41,7 +41,7 @@ def runAndCopyResults(database_name, consumer_name, script_name='build/new-jenki
     try {
       sh script_name
     } finally {
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results/ tmp/spec_results/${DATABASE_NAME} ${DATABASE_NAME} --allow-error --clean-dir'
     }
   }
 }
@@ -50,6 +50,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 15)
     timestamps()
   }
 
@@ -72,7 +73,7 @@ pipeline {
             }
 
             stage('Start Docker Images') {
-              timeout(time: 10) {
+              timeout(time: 3) {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
@@ -86,19 +87,19 @@ pipeline {
               def stages = [:]
 
               stages['Android'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test1', 'android')
                 }
               }
 
               stages['Canvas iOS'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test2', 'canvas-ios')
                 }
               }
 
               stages['Generic'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test3', 'Generic Consumer')
                 }
               }
@@ -110,7 +111,7 @@ pipeline {
               }
 
               stages['Sistemic'] = {
-                timeout(time: 10) {
+                timeout(time: 5) {
                   runAndCopyResults('pact_test5', 'Sistemic')
                 }
               }

@@ -174,7 +174,7 @@
             <% end %>
           <% end %>
         <% end %>
-        <% if @assignment.rubric_association && (
+        <% if @assignment.active_rubric_association? && (
              @submission.user_can_read_grade?(@current_user, session) ||
              @assignment.rubric_association.user_can_assess_for?(assessor: @current_user, assessee: @submission.user) ||
              @assignment.rubric_association.user_did_assess_for?(assessor: @current_user, assessee: @submission.user) ||
@@ -232,7 +232,7 @@
         <%= t('peer_review_steps_complete', 'You have finished the required steps for this peer review.') %>
       </div>
       <div class="assessment_request_incomplete_message" style="<%= hidden if @assessment_request.completed? %>">
-        <% if @assessment_request && @assessment_request.rubric_association %>
+        <% if @assessment_request && @assessment_request.active_rubric_association? %>
           <%= mt('peer_review_not_done_rubric', "**This peer review is not finished yet.**  For it to be considered finished, you need to leave at least one comment and fill out the rubric form to the right.")
           %>
         <% else %>
@@ -245,7 +245,7 @@
     <% end %>
   </div>
 
-  <% if @assignment.rubric_association %>
+  <% if @assignment.active_rubric_association? %>
     <% @visible_rubric_assessments ||= [] %>
   <div id="rubric_holder" style="position: absolute; <%= direction('right') %>: 0px; padding: 5px; background-color: #fff; border: 1px solid #aaa; border-<%= direction('right') %>-width: 0; display: none;">
     <a

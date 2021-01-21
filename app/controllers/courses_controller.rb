@@ -1350,7 +1350,8 @@ class CoursesController < ApplicationController
   #     "hide_distribution_graphs": false,
   #     "hide_sections_on_course_users_page": false,
   #     "lock_all_announcements": true,
-  #     "usage_rights_required": false
+  #     "usage_rights_required": false,
+  #     "homeroom_course": false
   #   }
   def api_settings
     get_context
@@ -1388,7 +1389,8 @@ class CoursesController < ApplicationController
           :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
           :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
           :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
-          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags)
+          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
+          :manage => @context.grants_right?(@current_user, session, :manage)
         },
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
@@ -1402,7 +1404,10 @@ class CoursesController < ApplicationController
         COURSE_IMAGES_ENABLED: course_card_images_enabled,
         use_unsplash_image_search: course_card_images_enabled && PluginSetting.settings_for_plugin(:unsplash)&.dig('access_key')&.present?,
         COURSE_VISIBILITY_OPTION_DESCRIPTIONS: @context.course_visibility_option_descriptions,
-        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui)
+        NEW_FEATURES_UI: Account.site_admin.feature_enabled?(:new_features_ui),
+        NEW_COURSE_AVAILABILITY_UI: Account.site_admin.feature_enabled?(:new_course_availability_ui),
+        RESTRICT_STUDENT_PAST_VIEW_LOCKED: @context.account.restrict_student_past_view[:locked],
+        RESTRICT_STUDENT_FUTURE_VIEW_LOCKED: @context.account.restrict_student_future_view[:locked]
       })
 
       set_tutorial_js_env
@@ -1542,7 +1547,8 @@ class CoursesController < ApplicationController
       :restrict_student_future_view,
       :show_announcements_on_home_page,
       :syllabus_course_summary,
-      :home_page_announcement_limit
+      :home_page_announcement_limit,
+      :homeroom_course
     )
     changes = changed_settings(@course.changes, @course.settings, old_settings)
     @course.delay_if_production(priority: Delayed::LOW_PRIORITY).
@@ -2129,7 +2135,6 @@ class CoursesController < ApplicationController
     js_env(
       course_name: @context.name,
       NOTIFICATION_PREFERENCES_OPTIONS: {
-        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
         reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
         allowed_push_categories: Notification.categories_to_send_in_push,
@@ -2569,6 +2574,9 @@ class CoursesController < ApplicationController
   #   Example usage:
   #     course[blueprint_restrictions_by_object_type][assignment][content]=1
   #
+  # @argument course[homeroom_course] [Boolean]
+  #   Sets the course as a homeroom course. The setting takes effect only when the Canvas for Elementary feature
+  #   is enabled in the course's account.
   #
   # @example_request
   #   curl https://<canvas>/api/v1/courses/<course_id> \
@@ -3413,7 +3421,7 @@ class CoursesController < ApplicationController
       :restrict_student_past_view, :restrict_student_future_view, :grading_standard, :grading_standard_enabled,
       :locale, :integration_id, :hide_final_grades, :hide_distribution_graphs, :hide_sections_on_course_users_page, :lock_all_announcements, :public_syllabus,
       :quiz_engine_selected, :public_syllabus_to_auth, :course_format, :time_zone, :organize_epub_by_content_type, :enable_offline_web_export,
-      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group
+      :show_announcements_on_home_page, :home_page_announcement_limit, :allow_final_grade_override, :filter_speed_grader_by_student_group, :homeroom_course
     )
   end
 end

@@ -18,6 +18,7 @@
 <% provide :page_title, "User Profile" %>
 
 <div class="ic-Profile-layout">
+  <h1 class="screenreader-only"><%= t("User Profile") %></h1>
   <div class="ic-Profile-layout__Primary">
     <%= render 'shared/profile' %>
   </div>

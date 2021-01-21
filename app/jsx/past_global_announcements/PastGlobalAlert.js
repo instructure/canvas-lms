@@ -39,7 +39,7 @@ export default class PastGlobalAlert extends React.Component {
   }
 
   render() {
-    if (this.state.shouldRender && ENV.PAST_ANNOUNCEMENTS_ENABLED) {
+    if (this.state.shouldRender) {
       return (
         <Alert renderCloseButtonLabel={I18n.t('Close')}>
           <div data-testid="globalAnnouncementsAlert">

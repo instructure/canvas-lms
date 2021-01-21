@@ -24,13 +24,12 @@ WORKDIR /tmp/src
 RUN --mount=target=/tmp/src \
   mkdir -p /tmp/dst && \
   cp --parents -rf \
-    script/fix_inst_esm.sh \
+    script/fix_inst_esm.js \
     package.json \
     yarn.lock \
     \
     /tmp/dst && \
   find \
-    client_apps/* \
     gems/canvas_i18nliner \
     gems/plugins/* \
     packages/* \
@@ -76,7 +75,6 @@ RUN --mount=target=/tmp/src \
     app/stylesheets \
     app/views/jst \
     bin \
-    client_apps \
     config/environments \
     config/locales \
     frontend_build \
@@ -92,11 +90,9 @@ RUN --mount=target=/tmp/src \
     config/canvas_rails_switcher.rb \
     config/environment.rb \
     config/initializers/plugin_symlinks.rb \
-    config/initializers/client_app_symlinks.rb \
     config/initializers/json.rb \
     config/initializers/revved_asset_urls.rb \
     db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb \
-    gems/plugins/.i18n* \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
     lib/canvas_yaml.rb \

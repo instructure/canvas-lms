@@ -56,6 +56,7 @@ class ContextModulesController < ApplicationController
       @modules.each(&:check_for_stale_cache_after_unlocking!)
       @collapsed_modules = ContextModuleProgression.for_user(@current_user).for_modules(@modules).pluck(:context_module_id, :collapsed).select{|cm_id, collapsed| !!collapsed }.map(&:first)
       @section_visibility = @context.course_section_visibility(@current_user)
+      @combined_active_quizzes = combined_active_quizzes
 
       @can_edit = can_do(@context, @current_user, :manage_content)
       @can_view_grades = can_do(@context, @current_user, :view_all_grades)
@@ -107,6 +108,24 @@ class ContextModulesController < ApplicationController
 
       conditional_release_js_env(includes: :active_rules)
     end
+
+    private
+    def combined_active_quizzes
+      classic_quizzes = @context.
+        active_quizzes.
+        reorder(Quizzes::Quiz.best_unicode_collation_key('title')).
+        limit(400).
+        pluck(:id, :title, Arel.sql("'quiz' AS type"))
+
+      lti_quizzes = @context.
+        active_assignments.
+        type_quiz_lti.
+        reorder(Assignment.best_unicode_collation_key('title')).
+        limit(400).
+        pluck(:id, :title, Arel.sql("'assignment' AS type"))
+
+      (classic_quizzes + lti_quizzes).sort_by{ |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
+    end
   end
   include ModuleIndexHelper
 
@@ -124,10 +143,7 @@ class ContextModulesController < ApplicationController
       end
       add_body_class('padless-content')
       js_bundle :context_modules
-      js_env(
-        CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url),
-        PROCESS_MULTIPLE_CONTENT_ITEMS: Account.site_admin.feature_enabled?(:process_multiple_content_items_modules_index)
-      )
+      js_env(CONTEXT_MODULE_ASSIGNMENT_INFO_URL: context_url(@context, :context_context_modules_assignment_info_url))
       css_bundle :content_next, :context_modules2
       render stream: can_stream_template?
     end

@@ -92,7 +92,7 @@ class AccountNotificationsController < ApplicationController
   #
   # @returns [AccountNotification]
   def user_index
-    include_past = value_to_boolean(params[:include_past]) && @domain_root_account.feature_enabled?('past_announcements')
+    include_past = value_to_boolean(params[:include_past])
     notifications = AccountNotification.for_user_and_account(@current_user, @domain_root_account, include_past: include_past)
     render :json => account_notifications_json(notifications, @current_user, session)
   end

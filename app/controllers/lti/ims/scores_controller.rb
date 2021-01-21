@@ -92,7 +92,7 @@ module Lti::Ims
     #
     # @argument userId [Required, String]
     #   The lti_user_id or the Canvas user_id.
-    #   Returns a 412 if user not found in Canvas or is not a student.
+    #   Returns a 422 if user not found in Canvas or is not a student.
     #
     # @argument activityProgress [Required, String]
     #   Indicate to Canvas the status of the user towards the activity's completion.

@@ -145,8 +145,10 @@ pipeline {
     }
 
     cleanup {
-      sh 'rm -vrf ./tmp/spec_failures/'
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      script {
+        sh 'rm -vrf ./tmp/spec_failures/'
+        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+      }
     }
   }
 }

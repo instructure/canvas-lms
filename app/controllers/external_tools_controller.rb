@@ -22,6 +22,8 @@
 #
 # NOTE: Placements not documented here should be considered beta features and are not officially supported.
 class ExternalToolsController < ApplicationController
+  class InvalidSettingsError < StandardError; end
+
   before_action :require_context
   before_action :require_tool_create_rights, only: [:create, :create_tool_from_tool_config]
   before_action :require_tool_configuration, only: [:create_tool_from_tool_config]
@@ -145,9 +147,7 @@ class ExternalToolsController < ApplicationController
   def retrieve
     @tool = ContextExternalTool.find_external_tool(params[:url], @context, nil, nil, params[:client_id])
     if !@tool
-      flash[:error] = t "#application.errors.invalid_external_tool", "Couldn't find valid settings for this link"
-      redirect_to named_context_url(@context, :context_url)
-      return
+      raise InvalidSettingsError, t("#application.errors.invalid_external_tool", "Couldn't find valid settings for this link")
     end
     placement = placement_from_params
     add_crumb(@context.name, named_context_url(@context, :context_url))
@@ -162,6 +162,9 @@ class ExternalToolsController < ApplicationController
     return unless @lti_launch
     display_override = params['borderless'] ? 'borderless' : params[:display]
     render Lti::AppUtil.display_template(@tool.display_type(placement), display_override: display_override)
+  rescue InvalidSettingsError => e
+    flash[:error] = e.message
+    redirect_to named_context_url(@context, :context_url)
   end
 
   # @API Get a sessionless launch url for an external tool.
@@ -503,6 +506,31 @@ class ExternalToolsController < ApplicationController
   end
   protected :lti_launch
 
+  # Get resource link from `resource_link_lookup_id` query param, and
+  # ensure the tool matches the resource link.
+  # Used for link-level custom params, but may in the future be used to
+  # determine resource_link_id to send to tool.
+  def lookup_resource_link(tool)
+    return nil unless params[:resource_link_lookup_id]
+
+    Lti::ResourceLink.where(
+      lookup_id: params[:resource_link_lookup_id],
+      context: @context,
+      root_account_id: tool.root_account_id
+    ).active.take.tap do |resource_link|
+      if resource_link.nil?
+        raise InvalidSettingsError, t(
+          "Couldn't find valid settings for this link: Resource link not found"
+        )
+      elsif tool.global_developer_key_id !=
+          resource_link&.current_external_tool(@context)&.global_developer_key_id
+        raise InvalidSettingsError, t(
+          "Couldn't find valid settings for this link: Resource link not valid for tool"
+        )
+      end
+    end
+  end
+
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
     lti_launch = tool.settings['post_only'] ? Lti::Launch.new(post_only: true) : Lti::Launch.new
     default_opts = {
@@ -510,9 +538,15 @@ class ExternalToolsController < ApplicationController
         selected_html: params[:selection],
         domain: HostUrl.context_host(@domain_root_account, request.host)
     }
+
     opts = default_opts.merge(opts)
 
     assignment = api_find(@context.assignments.active, params[:assignment_id]) if params[:assignment_id]
+
+    # from specs, seems this is only a fix for Quizzes Next
+    # resource_link_id in regular QN launches is assignment.lti_resource_link_id
+    opts[:link_code] = @tool.opaque_identifier_for(assignment.external_tool_tag) if assignment.present? && assignment.quiz_lti?
+
     expander = variable_expander(assignment: assignment,
       tool: tool, launch: lti_launch,
       post_message_token: opts[:launch_token],
@@ -525,7 +559,9 @@ class ExternalToolsController < ApplicationController
         context: @context,
         return_url: @return_url,
         expander: expander,
-        opts: opts
+        opts: opts.merge(
+          resource_link_for_custom_params: lookup_resource_link(tool)
+        )
       )
 
       # Prevent attempting OIDC login flow with the target link uri

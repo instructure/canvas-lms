@@ -365,6 +365,8 @@ describe Types::UserType do
       conversation(@teacher, @student, {body: 'oh yea =)'})
       conversation(@student, @random_person, {body: 'Whats up?', starred: true})
 
+      # used for the sent scope
+      conversation(@random_person, @teacher, {body: 'Help! Please make me non-random!'})
       type = GraphQLTypeTester.new(@student, current_user: @student, domain_root_account: @student.account, request: ActionDispatch::TestRequest.create)
       result = type.resolve(
         "conversationsConnection(scope: \"inbox\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }"
@@ -377,6 +379,15 @@ describe Types::UserType do
       )
       expect(result.count).to eq 1
       expect(result[0][0]).to eq 'Whats up?'
+
+      type = GraphQLTypeTester.new(
+        @random_person,
+        current_user: @random_person,
+        domain_root_account: @random_person.account,
+        request: ActionDispatch::TestRequest.create
+      )
+      result = type.resolve("conversationsConnection(scope: \"sent\") { nodes { conversation { conversationMessagesConnection { nodes { body } } } } }")
+      expect(result[0][0]).to eq "Help! Please make me non-random!"
     end
   end
 
@@ -428,6 +439,60 @@ describe Types::UserType do
       known_users = @student.address_book.search_users(context: "course_#{@course.id}_students").paginate(per_page: 3)
       result = type.resolve("recipients(context: \"course_#{@course.id}_students\") { usersConnection { nodes { _id } } }")
       expect(result).to match_array(known_users.pluck(:id).map(&:to_s))
+    end
+  end
+
+  context 'favorite_courses' do
+    before(:once) do
+      @course1 = @course
+      course_with_user("StudentEnrollment", user: @student, active_all: true)
+      @course2 = @course
+    end
+
+    let(:type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it 'returns primary enrollment courses if there are no favorite courses' do
+      result = type.resolve('favoriteCoursesConnection { nodes { _id } }')
+      expect(result).to match_array([@course1.id.to_s, @course2.id.to_s])
+    end
+
+    it 'returns favorite courses' do
+      @student.favorites.create!(context: @course1)
+      result = type.resolve('favoriteCoursesConnection { nodes { _id } }')
+      expect(result).to match_array([@course1.id.to_s])
+    end
+  end
+
+  context 'favorite_groups' do
+    let(:type) do
+      GraphQLTypeTester.new(
+        @student,
+        current_user: @student,
+        domain_root_account: @course.account.root_account,
+        request: ActionDispatch::TestRequest.create
+      )
+    end
+
+    it 'returns all groups if there are no favorite groups' do
+      group_with_user(user: @student, active_all: true)
+      result = type.resolve('favoriteGroupsConnection { nodes { _id } }')
+      expect(result).to match_array([@group.id.to_s])
+    end
+
+    it 'return favorite groups' do
+      2.times do
+        group_with_user(user: @student, active_all: true)
+      end
+      @student.favorites.create!(context: @group)
+      result = type.resolve('favoriteGroupsConnection { nodes { _id } }')
+      expect(result).to match_array([@group.id.to_s])
     end
   end
 end

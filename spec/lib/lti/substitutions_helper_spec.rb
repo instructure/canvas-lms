@@ -269,6 +269,12 @@ module Lti
         expect(lis_roles).to include 'Learner'
         expect(lis_roles).to include 'urn:lti:instrole:ims/lis/Administrator'
       end
+
+      it 'returns the correct role for a site admin user' do
+        Account.site_admin.account_users.create!(user: user)
+        lis_roles = subject.current_lis_roles
+        expect(lis_roles).to eq 'urn:lti:sysrole:ims/lis/SysAdmin'
+      end
     end
 
     describe '#concluded_course_enrollments' do

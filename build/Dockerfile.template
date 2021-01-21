@@ -1,7 +1,11 @@
 <%= generation_message %>
 ARG RUBY=2.6-p6.0.4
 
+<% if development? -%>
 FROM instructure/ruby-passenger:$RUBY
+<% else -%>
+FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
+<% end -%>
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12

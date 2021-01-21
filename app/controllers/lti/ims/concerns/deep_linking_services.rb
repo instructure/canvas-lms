@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -41,8 +43,24 @@ module Lti::Ims::Concerns
       @content_items ||= deep_linking_jwt["#{CLAIM_PREFIX}content_items"]
     end
 
+    def client_id
+      deep_linking_jwt.developer_key
+    end
+
     def tool
-      @tool ||= @context.root_account.context_external_tools.active.find_by(developer_key: deep_linking_jwt.developer_key)
+      @tool ||= ContextExternalTool.find_active_external_tool_by_client_id(client_id, @context)
+    end
+
+    def lti_resource_links
+      content_items.filter { |item| item[:type] == 'ltiResourceLink' }
+    end
+
+    def create_lti_resource_links
+      lti_resource_links.each do |content_item|
+        resource_link = Lti::ResourceLink.create_with(context, tool, content_item[:custom])
+
+        content_item[:lookup_id] = resource_link&.lookup_id
+      end
     end
 
     class DeepLinkingJwt

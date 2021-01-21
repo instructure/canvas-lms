@@ -108,8 +108,16 @@ describe Outcomes::ResultAnalytics do
       expect(results.length).to eq 2
     end
 
-    it 'does not return muted assignment results' do
+    it 'does return muted assignment results with auto post policy' do
       @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: false)
+      results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
+      expect(results.length).to eq 1
+    end
+
+    it 'does not return muted assignment results with manual post policy' do
+      @assignment.mute!
+      @assignment.ensure_post_policy(post_manually: true)
       results = ra.find_outcome_results(@student, users: [@student], context: @course, outcomes: [@outcome])
       expect(results.length).to eq 0
     end
@@ -257,6 +265,19 @@ describe Outcomes::ResultAnalytics do
       rollups.each.with_index do |rollup, _|
         expect(rollup.scores.map(&:outcome_results).flatten).to eq rollup_scores.find_all {|score| score.user.id == rollup.context.id}
       end
+    end
+
+    it 'correctly handles users with the same name' do
+      results = [
+        outcome_from_score(5.0, {method: 'decaying_average', user: User.new(id: 20, name: 'b')}),
+        outcome_from_score(3.0, {method: 'decaying_average', user: User.new(id: 30, name: 'b')}),
+        outcome_from_score(2.0, {method: 'decaying_average', user: User.new(id: 30, name: 'b')}),
+        outcome_from_score(4.0, {method: 'decaying_average', user: User.new(id: 20, name: 'b')})
+      ]
+      users = [User.new(id: 20, name:'b'), User.new(id: 30, name: 'b')]
+      rollups = ra.outcome_results_rollups(results: results, users: users)
+      scores_by_user = [4.35, 2.35]
+      expect(rollups.flat_map(&:scores).map(&:score)).to eq scores_by_user
     end
 
     it 'excludes missing user rollups' do

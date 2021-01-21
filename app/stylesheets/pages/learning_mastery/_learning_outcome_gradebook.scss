@@ -367,3 +367,11 @@ $page-dark: #ebeff2;
   &.near-mastery { background: $near-color; }
   &.remedial     { background: $remedial-color; }
 }
+
+#learning-mastery-gradebook-filter {
+  margin-#{direction(right)}: 3px;
+}
+
+#lmgb-average-filter {
+  margin-#{direction(right)}: 10px;
+}

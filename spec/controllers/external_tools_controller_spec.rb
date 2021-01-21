@@ -727,15 +727,97 @@ describe ExternalToolsController do
         tool
       end
 
+      let(:launch_hash) {
+        lti_launch = assigns[:lti_launch]
+        decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
+        cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
+        JSON.parse(cached_launch)
+      }
+
       before do
         lti_1_3_tool
         user_session(@teacher)
       end
 
-      it 'does stuff' do
-        get 'retrieve', params: {:course_id => @course.id, :url => "http://www.example.com/launch"}
+      it 'assigns @lti_launch.resource_url' do
+        get 'retrieve', params: {course_id: @course.id, url: "http://www.example.com/launch"}
         expect(assigns[:lti_launch].resource_url).to eq lti_1_3_tool.url
       end
+
+      context 'when resource_link_lookup_id is passed' do
+        let(:rl) {
+          Lti::ResourceLink.create!(
+            context_external_tool: lti_1_3_tool,
+            context: @course,
+            custom: {abc: 'def', expans: '$Canvas.user.id'}
+          )
+        }
+
+        let(:get_page) {
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_id: rl.lookup_id
+          }
+        }
+
+        it 'sets the custom parameters in the launch hash' do
+          get_page
+          expect(launch_hash['https://purl.imsglobal.org/spec/lti/claim/custom']).to include(
+            'abc' => 'def',
+            'expans' => @teacher.id
+          )
+        end
+
+        it 'errors if the resource_link_lookup_id cannot be found' do
+          get 'retrieve', params: {
+            course_id: @course.id,
+            url: 'http://www.example.com/launch',
+            resource_link_lookup_id: 'wrong_do_it_again'
+          }
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link_lookup_id is for the wrong context' do
+          rl.update(context: Course.create(course_valid_attributes))
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link is inactive' do
+          rl.update(workflow_state: 'deleted')
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
+        end
+
+        it 'errors if the resource_link is for the wrong tool' do
+          tool2 = @course.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example2.com/launch', use_1_3: true,
+            developer_key: DeveloperKey.create!
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not valid for tool"
+        end
+
+        it 'succeeds if the resource_link is for a tool with the same url and client ID' do
+          tool2 = @course.account.context_external_tools.create!(
+            name: 'test', consumer_key: 'key', shared_secret: 'secret',
+            url: 'http://www.example.com/launch', use_1_3: true,
+            developer_key: tool.developer_key
+          )
+          rl.update(context_external_tool: tool2)
+          get_page
+          expect(response).to be_redirect
+          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not valid for tool"
+        end
+      end
+
       context 'tool is used for assignment_selection' do
         it 'uses secure params to pass along lti_assignment_id for 1.3' do
           lti_1_3_tool.assignment_selection = { enable: true }
@@ -745,10 +827,6 @@ describe ExternalToolsController do
           lti_assignment_id = SecureRandom.uuid
           jwt = Canvas::Security.create_jwt({ lti_assignment_id: lti_assignment_id })
           get :show, params: { course_id: @course.id, id: lti_1_3_tool.id, secure_params: jwt, launch_type: "assignment_selection"}
-          lti_launch = assigns[:lti_launch]
-          decoded_jwt = Canvas::Security.decode_jwt(lti_launch.params["lti_message_hint"])
-          cached_launch = fetch_and_delete_launch(@course, decoded_jwt["verifier"])
-          launch_hash = JSON.parse(cached_launch)
           expect(launch_hash["https://purl.imsglobal.org/spec/lti/claim/custom"]["assignment_id"]).to eq(lti_assignment_id)
         end
       end
@@ -845,6 +923,41 @@ describe ExternalToolsController do
       jwt = Canvas::Security.create_jwt({lti_assignment_id: lti_assignment_id})
       get :retrieve, params: {url: tool.url, account_id:account.id, secure_params: jwt}
       expect(assigns[:lti_launch].params['ext_lti_assignment_id']).to eq lti_assignment_id
+    end
+
+    context 'for Quizzes Next launch' do
+      let(:assignment) { assignment_model(course: @course) }
+
+      before do
+        params = {
+          :name => "Quizzes.Next",
+          :url => 'http://example.com/launch',
+          :domain => "example.com",
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :privacy_level => 'public',
+          :tool_id => 'Quizzes 2'
+        }
+        account.context_external_tools.create!(params)
+        assignment.submission_types = 'external_tool'
+        assignment.external_tool_tag_attributes = {url: "http://example.com/launch"}
+        assignment.save!
+      end
+
+      it 'sets consistent resource_link_id with that in regular lti launch' do
+        u = user_factory(active_all: true)
+        account.account_users.create!(user: u)
+        user_session(@user)
+
+        get :retrieve, params: {
+          course_id: @course.id,
+          assignment_id:assignment.id,
+          url: 'http://example.com/launch'
+        }
+
+        expect(assigns[:lti_launch].params['resource_link_id']).to eq assignment.lti_resource_link_id
+        expect(assigns[:lti_launch].params['context_id']).to eq opaque_id(@course)
+      end
     end
 
     context 'collaborations' do

@@ -1110,7 +1110,6 @@ class Quizzes::QuizzesController < ApplicationController
   def quiz_engine_selection
     selection = nil
     if @context.is_a?(Course) && @context.settings.dig(:engine_selected, :user_id)
-      user_id = @current_user.id
       selection_obj = @context.settings.dig(:engine_selected, :user_id)
       if selection_obj[:expiration] > Time.zone.today
         selection = selection_obj[:newquizzes_engine_selected]

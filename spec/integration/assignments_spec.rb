@@ -408,6 +408,56 @@ describe "assignments_2 feature flag and parameter" do
     end
   end
 
+  describe "as an observer" do
+    before(:once) do
+      course_with_student(active_all: true)
+      @assignment = @course.assignments.create!(title: "Some Assignment")
+      @observer = user_factory(active_all: true, active_state: 'active')
+      @course.enroll_user(
+        @observer,
+        'ObserverEnrollment',
+        section: @course.course_sections.first,
+        enrollment_state: 'active', allow_multiple_enrollments: true
+      )
+      add_linked_observer(@student, @observer)
+    end
+
+    before(:each) do
+      user_session(@observer)
+    end
+
+    let(:old_assignment_page_indicator) { Nokogiri::HTML(response.body).at_css('div#assignment_show') }
+
+    context "with the feature disabled" do
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        expect(old_assignment_page_indicator).to be_present
+      end
+
+      it "shows the old assignments page without the query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(old_assignment_page_indicator).to be_present
+      end
+    end
+
+    context "with the feature enabled" do
+      before :once do
+        Account.default.enable_feature! :assignments_2_student
+      end
+
+      # we always send observers to the 'old' assignments page
+      it "shows the old assignments page even with query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}?assignments_2=1"
+        expect(old_assignment_page_indicator).to be_present
+      end
+
+      it "shows the old assignments page without the query parameter" do
+        get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+        expect(old_assignment_page_indicator).to be_present
+      end
+    end
+  end
+
   describe "description" do
     before :each do
       skip "TODO doesn't work right because public_user_content is wonky"

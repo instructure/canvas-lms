@@ -26,7 +26,7 @@ import {
   COURSE_OUTCOME_CALCULATION_QUERY
 } from '../MasteryCalculation/api'
 
-import {GET_OUTCOME_GROUPS_QUERY} from '../Management/api'
+import {courseMocks, accountMocks} from '../Management/__tests__/mocks'
 
 const outcomeCalculationMethod = {
   __typename: 'OutcomeCalculationMethod',
@@ -137,42 +137,6 @@ export const masteryCalculationGraphqlMocks = [
 ]
 
 export const outcomeGroupsMocks = [
-  {
-    request: {
-      query: GET_OUTCOME_GROUPS_QUERY('account'),
-      variables: {
-        contextId: '11'
-      }
-    },
-    result: {
-      data: {
-        context: {
-          rootOutcomeGroup: {
-            childGroupsCount: 1,
-            __typename: 'LearningOutcomeGroup'
-          },
-          __typename: 'Account'
-        }
-      }
-    }
-  },
-  {
-    request: {
-      query: GET_OUTCOME_GROUPS_QUERY('course'),
-      variables: {
-        contextId: '12'
-      }
-    },
-    result: {
-      data: {
-        context: {
-          rootOutcomeGroup: {
-            childGroupsCount: 1,
-            __typename: 'LearningOutcomeGroup'
-          },
-          __typename: 'Course'
-        }
-      }
-    }
-  }
+  ...accountMocks({accountId: '11'}),
+  ...courseMocks({courseId: '12'})
 ]

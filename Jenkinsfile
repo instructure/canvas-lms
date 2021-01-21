@@ -94,7 +94,7 @@ def isPatchsetRetriggered() {
 
 def cleanupFn(status) {
   ignoreBuildNeverStartedError {
-    execute 'bash/docker-cleanup.sh --allow-failure'
+    libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
   }
 }
 
@@ -116,6 +116,9 @@ def postFn(status) {
 
       if(status == 'SUCCESS' && configuration.isChangeMerged() && isPatchsetPublishable()) {
         dockerUtils.tagRemote(env.PATCHSET_TAG, env.MERGE_TAG)
+        dockerUtils.tagRemote(env.CASSANDRA_IMAGE, env.CASSANDRA_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.DYNAMODB_IMAGE, env.DYNAMODB_MERGE_IMAGE)
+        dockerUtils.tagRemote(env.POSTGRES_IMAGE, env.POSTGRES_MERGE_IMAGE)
       }
     }
   } finally {
@@ -293,6 +296,7 @@ pipeline {
   agent none
   options {
     ansiColor('xterm')
+    timeout(time: 1, unit: 'HOURS')
     timestamps()
   }
 
@@ -324,22 +328,32 @@ pipeline {
     ALPINE_MIRROR = configuration.alpineMirror()
     NODE = configuration.node()
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
+    RSPEC_PROCESSES = 4
 
     JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
+    LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath("linter-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
+    CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
+    DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
     WEBPACK_BUILDER_PREFIX = configuration.buildRegistryPath("webpack-builder")
     WEBPACK_CACHE_PREFIX = configuration.buildRegistryPath("webpack-cache")
 
-    WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:${imageTagVersion()}-$TAG_SUFFIX"
-
     IMAGE_CACHE_BUILD_SCOPE = configuration.gerritChangeNumber()
     IMAGE_CACHE_MERGE_SCOPE = configuration.gerritBranchSanitized()
+    IMAGE_CACHE_UNIQUE_SCOPE = "${imageTagVersion()}-$TAG_SUFFIX"
 
-    CASSANDRA_IMAGE_TAG=imageTag.cassandra()
-    DYNAMODB_IMAGE_TAG=imageTag.dynamodb()
-    POSTGRES_IMAGE_TAG=imageTag.postgres()
+    CASSANDRA_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    DYNAMODB_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    POSTGRES_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+    WEBPACK_BUILDER_IMAGE = "$WEBPACK_BUILDER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
+
+    CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+
     // This is primarily for the plugin build
     // for testing canvas-lms changes against plugin repo changes
     CANVAS_BUILDS_REFSPEC = getCanvasBuildsRefspec()
@@ -373,7 +387,7 @@ pipeline {
           // extremely long wait times for a restart. Investigation in DE-166 / DE-158.
           protectedNode('canvas-docker-nospot', { status -> cleanupFn(status) }, { status -> postFn(status) }) {
             timedStage('Setup') {
-              timeout(time: 5) {
+              timeout(time: 2) {
                 echo "Cleaning Workspace From Previous Runs"
                 sh 'ls -A1 | xargs rm -rf'
                 sh 'find .'
@@ -424,6 +438,8 @@ pipeline {
                 pluginsToPull.add([name: 'qti_migration_tool', version: getPluginVersion('qti_migration_tool'), target: "vendor/qti_migration_tool"])
 
                 pullRepos(pluginsToPull)
+
+                libraryScript.load('bash/docker-tag-remote.sh', './build/new-jenkins/docker-tag-remote.sh')
               }
             }
 
@@ -443,7 +459,7 @@ pipeline {
             }
 
             timedStage('Build Docker Image') {
-              timeout(time: 30) {
+              timeout(time: 20) {
                 if (!configuration.isChangeMerged() && configuration.skipDockerBuild()) {
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh pull $MERGE_TAG'
                   sh 'docker tag $MERGE_TAG $PATCHSET_TAG'
@@ -455,15 +471,17 @@ pipeline {
                       "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                       "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
                       "CACHE_SAVE_SCOPE=${cacheScope}",
+                      "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
-                      "WEBPACK_BUILDER_TAG=${env.WEBPACK_BUILDER_IMAGE}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
                       "YARN_RUNNER_PREFIX=${env.YARN_RUNNER_PREFIX}",
                     ]) {
-                      sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      credentials.withStarlordCredentials({ ->
+                        sh "build/new-jenkins/docker-build.sh $PATCHSET_TAG"
+                      })
                     }
                   }
                 }
@@ -484,16 +502,6 @@ pipeline {
                   ./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_CACHE_PREFIX
                 """, label: 'upload cache images')
 
-                def hasWebpackBuilderImage = sh(script: "./build/new-jenkins/docker-with-flakey-network-protection.sh push $WEBPACK_BUILDER_IMAGE", returnStatus: true)
-
-                // If we are unable to push up the webpack builder image, then this
-                // build should use the currently cached image.
-                if (hasWebpackBuilderImage != 0) {
-                  def webpackBuilderLabel = sh(script: "docker inspect $PATCHSET_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}'", returnStdout: true)
-
-                  dockerUtils.tagRemote(webpackBuilderLabel, env.WEBPACK_BUILDER_IMAGE)
-                }
-
                 if (isPatchsetPublishable()) {
                   sh 'docker tag $PATCHSET_TAG $EXTERNAL_TAG'
                   sh './build/new-jenkins/docker-with-flakey-network-protection.sh push $EXTERNAL_TAG'
@@ -501,24 +509,47 @@ pipeline {
               }
             }
 
-
             timedStage('Run Migrations') {
               timeout(time: 10) {
+                def cacheLoadScope = configuration.isChangeMerged() || configuration.getBoolean('skip-cache') ? '' : env.IMAGE_CACHE_MERGE_SCOPE
+                def cacheSaveScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : ''
+
                 withEnv([
+                  "CACHE_LOAD_SCOPE=${cacheLoadScope}",
+                  "CACHE_SAVE_SCOPE=${cacheSaveScope}",
+                  "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
+                  "CASSANDRA_IMAGE_TAG=${imageTag.cassandra()}",
+                  "CASSANDRA_PREFIX=${env.CASSANDRA_PREFIX}",
                   "COMPOSE_FILE=docker-compose.new-jenkins.yml",
+                  "DYNAMODB_IMAGE_TAG=${imageTag.dynamodb()}",
+                  "DYNAMODB_PREFIX=${env.DYNAMODB_PREFIX}",
+                  "POSTGRES_IMAGE_TAG=${imageTag.postgres()}",
+                  "POSTGRES_PREFIX=${env.POSTGRES_PREFIX}",
                   "POSTGRES_PASSWORD=sekret"
                 ]) {
-                  migrations.runMigrations()
-                  sh 'docker-compose down --remove-orphans'
+                  credentials.withStarlordCredentials({ ->
+                    sh """
+                      # Due to https://issues.jenkins.io/browse/JENKINS-15146, we have to set it to empty string here
+                      export CACHE_LOAD_SCOPE=\${CACHE_LOAD_SCOPE:-}
+                      export CACHE_SAVE_SCOPE=\${CACHE_SAVE_SCOPE:-}
+                      ./build/new-jenkins/run-migrations.sh
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $CASSANDRA_PREFIX || true
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $DYNAMODB_PREFIX || true
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $POSTGRES_PREFIX || true
+                    """
+                  })
                 }
+
+                archiveArtifacts(artifacts: "migrate-*.log", allowEmptyArchive: true)
+                sh 'docker-compose down --remove-orphans'
               }
             }
 
             stage('Parallel Run Tests') {
               withEnv([
-                "CASSANDRA_IMAGE_TAG=${migrations.cassandraTag()}",
-                "DYNAMODB_IMAGE_TAG=${migrations.dynamodbTag()}",
-                "POSTGRES_IMAGE_TAG=${migrations.postgresTag()}"
+                  "CASSANDRA_IMAGE_TAG=${env.CASSANDRA_IMAGE}",
+                  "DYNAMODB_IMAGE_TAG=${env.DYNAMODB_IMAGE}",
+                  "POSTGRES_IMAGE_TAG=${env.POSTGRES_IMAGE}",
               ]) {
                 def stages = [:]
 
@@ -557,7 +588,8 @@ pipeline {
                   timedStage('Linters', stages, {
                     credentials.withGerritCredentials {
                       withEnv([
-                        "PLUGINS_LIST=${configuration.plugins().join(' ')}"
+                        "PLUGINS_LIST=${configuration.plugins().join(' ')}",
+                        "UPLOAD_DEBUG_IMAGE=${configuration.getBoolean('upload-linter-debug-image', 'false')}",
                       ]) {
                         sh 'build/new-jenkins/linters/run-gergich.sh'
                       }

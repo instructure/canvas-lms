@@ -49,7 +49,7 @@ def makeKarmaStage(group, ciNode, ciTotal) {
 }
 
 def cleanupFn() {
-  timeout(time: 5) {
+  timeout(time: 2) {
     try {
       if(env.TEST_SUITE != 'upload') {
         archiveArtifacts artifacts: 'tmp/**/*.xml'
@@ -57,14 +57,18 @@ def cleanupFn() {
         sh 'find ./tmp -path "*.xml"'
       }
     } finally {
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
 
 pipeline {
   agent none
-  options { ansiColor('xterm') }
+  options {
+    ansiColor('xterm')
+    timeout(time: 20)
+    timestamps()
+  }
 
   environment {
     COMPOSE_DOCKER_CLI_BUILD=1
@@ -84,7 +88,7 @@ pipeline {
           protectedNode('canvas-docker', { cleanupFn() }) {
             stage('Setup') {
               cleanAndSetup()
-              timeout(time: 10) {
+              timeout(time: 3) {
                 sh 'rm -vrf ./tmp/*'
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
@@ -95,7 +99,7 @@ pipeline {
             }
 
             stage('Run Tests') {
-              timeout(time: 60) {
+              timeout(time: 10) {
                 script {
                   def tests = [:]
 
@@ -131,10 +135,6 @@ pipeline {
                           copyFiles(env.CONTAINER_NAME, 'packages', "./tmp/${env.CONTAINER_NAME}")
                         }
                       }
-                    }
-
-                    tests['canvas_quizzes'] = {
-                      sh 'build/new-jenkins/js/tests-quizzes.sh'
                     }
 
                     for(int i = 0; i < JSG_NODE_COUNT; i++) {

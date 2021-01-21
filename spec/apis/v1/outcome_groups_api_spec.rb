@@ -290,7 +290,7 @@ describe "Outcome Groups API", type: :request do
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome, can_edit) do
-          expect(outcome).to eq({
+          expect(outcome).to include({
             "id" => @outcome.id,
             "vendor_guid" => @outcome.vendor_guid,
             "context_type" => @account.class.to_s,
@@ -306,8 +306,8 @@ describe "Outcome Groups API", type: :request do
 
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
-          expect(outcome_link).to eq({
-          "context_type" => context.class.to_s,
+          expect(outcome_link).to include({
+            "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,
@@ -824,6 +824,7 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => outcome.id),
           "assessed" => false,
           "can_unlink" => true,
+          "quiz_lti" => false,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -922,7 +923,7 @@ describe "Outcome Groups API", type: :request do
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome) do
-          expect(outcome).to eq({
+          expect(outcome).to include({
             "id" => @outcome.id,
             "vendor_guid" => @outcome.vendor_guid,
             "context_type" => @account.class.to_s,
@@ -938,7 +939,7 @@ describe "Outcome Groups API", type: :request do
 
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_unlink) do
-          expect(outcome_link).to eq({
+          expect(outcome_link).to include({
           "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
@@ -1152,6 +1153,7 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),
           "assessed" => false,
           "can_unlink" => true,
+          "quiz_lti" => false,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -1494,7 +1496,7 @@ describe "Outcome Groups API", type: :request do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      expect(json).to eq({
+      expect(json).to include({
         "context_type" => "Account",
         "context_id" => @account.id,
         "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),

@@ -503,8 +503,8 @@ module Importers
       result[:time_zone] = Time.find_zone(options[:time_zone])
       result[:time_zone] ||= course.root_account.default_time_zone unless course.root_account.nil?
       time_zone = result[:time_zone] || Time.zone
-      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue result[:new_start_date]
-      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue result[:new_end_date]
+      result[:default_start_at] = time_zone.parse(options[:new_start_date]) rescue nil
+      result[:default_conclude_at] = time_zone.parse(options[:new_end_date]) rescue nil
       result
     end
 

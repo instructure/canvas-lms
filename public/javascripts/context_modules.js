@@ -551,7 +551,7 @@ window.modules = (function() {
         modules.evaluateItemCyoe($item, data)
       }
       $item.addClass(data.type + '_' + data.id)
-      $item.addClass(data.type)
+      $item.addClass(data.quiz_lti ? 'lti-quiz' : data.type)
       if (data.is_duplicate_able) {
         $item.addClass('dupeable')
       }

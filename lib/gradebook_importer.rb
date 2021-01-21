@@ -108,12 +108,15 @@ class GradebookImporter
   def parse!
     # preload a ton of data that presumably we'll be querying
     @context.preload_user_roles!
-    @all_assignments = @context.assignments
-      .preload({ context: :account })
-      .published
-      .gradeable
-      .select(ASSIGNMENT_PRELOADED_FIELDS)
-      .index_by(&:id)
+    @all_assignments = @context.assignments.
+      preload({ context: :account }).
+      published.
+      gradeable.
+      select(ASSIGNMENT_PRELOADED_FIELDS).
+      to_a
+
+    Assignment.preload_unposted_anonymous_submissions(@all_assignments)
+    @all_assignments = @all_assignments.index_by(&:id)
     @all_students = @context.all_students
       .select(['users.id', :name, :sortable_name, 'users.updated_at'])
       .index_by(&:id)
@@ -657,7 +660,7 @@ class GradebookImporter
       return true
     end
 
-    if row.compact.all? { |column| column =~ /^\s*(Muted|Manual Posting)?\s*$/i }
+    if row.compact.all? { |column| column =~ /^\s*(Muted|Manual Posting.*)?\s*$/i }
       # This row indicates muted assignments (or manually posted assignments if
       # post policies is enabled) and should not be processed at all
       return true
@@ -748,6 +751,9 @@ class GradebookImporter
     # `submission#grants_right?` will check if the user
     # is an admin, but if we've pre-loaded that value already
     # to avoid an N+1, check that first.
+    assignment = @all_assignments[submission.assignment_id]
+    return false if assignment&.unposted_anonymous_submissions?
+
     is_admin || submission.grants_right?(@user, :grade)
   end
 

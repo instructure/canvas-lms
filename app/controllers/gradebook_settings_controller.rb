@@ -101,6 +101,13 @@ class GradebookSettingsController < ApplicationController
     @color_settings = @current_user.get_preference(:gradebook_settings, :colors) || {}
     @color_settings.deep_merge!(valid_colors(gradebook_settings_params.fetch('colors', {})).to_unsafe_h)
 
+    # If the user has set "view ungraded as 0" to true, we can assume they've
+    # seen the confirmation modal and accepted it (or are otherwise enabling
+    # the setting with some measure of intentionality)
+    if @course_settings["view_ungraded_as_zero"] == "true"
+      @current_user.set_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog, "true")
+    end
+
     @current_user.set_preference(:gradebook_settings, @context.global_id, @course_settings) &&
       @current_user.set_preference(:gradebook_settings, :colors, @color_settings)
   end

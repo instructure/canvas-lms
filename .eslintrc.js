@@ -97,6 +97,55 @@ module.exports = {
     'react/no-render-return-value': 'warn', // In future versions of react this will fail
     'react/state-in-constructor': 'off',
     'react/static-property-placement': 'off',
+
+    // don't restrict Math.pow for ** operator
+    // ref: https://github.com/airbnb/javascript/blob/1f786e154f6c32385607e1688370d7f2d053f88f/packages/eslint-config-airbnb-base/rules/best-practices.js#L225
+    'no-restricted-properties': ['error',
+      {
+        object: 'arguments',
+        property: 'callee',
+        message: 'arguments.callee is deprecated',
+      },
+      {
+        object: 'global',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead',
+      },
+      {
+        object: 'self',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead',
+      },
+      {
+        object: 'window',
+        property: 'isFinite',
+        message: 'Please use Number.isFinite instead',
+      },
+      {
+        object: 'global',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead',
+      },
+      {
+        object: 'self',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead',
+      },
+      {
+        object: 'window',
+        property: 'isNaN',
+        message: 'Please use Number.isNaN instead',
+      },
+      {
+        property: '__defineGetter__',
+        message: 'Please use Object.defineProperty instead.',
+      },
+      {
+        property: '__defineSetter__',
+        message: 'Please use Object.defineProperty instead.',
+      },
+    ],
+
     'no-restricted-syntax': [
       // This is here because we are turning off 2 items from what AirBnB cares about.
       'error',
@@ -183,6 +232,15 @@ module.exports = {
         'import/no-unresolved': 'off',
         'import/no-webpack-loader-syntax': 'off'
       }
-    }
+    },
+    {
+      files: ['app/jsx/canvas_quizzes/**/*'],
+      rules: {
+        'react/prop-types': 'off',
+        'prefer-const': 'warn',
+        'prettier/prettier': 'off',
+        'react/no-string-refs': 'warn',
+      }
+    },
   ]
 }

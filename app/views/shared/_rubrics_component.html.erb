@@ -25,7 +25,7 @@
   <% end %>
 
   <div id="rubrics" style="margin-bottom: 10px;">
-    <% if @assignment.rubric_association && @assignment.rubric_association.rubric %>
+    <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric %>
       <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => can_do(@assignment.rubric_association, @current_user, :update) } %>
     <% end %>
     <div style="display: none;" id="rubric_parameters">
@@ -34,7 +34,7 @@
       <input type="hidden" name="rubric_association[purpose]" value="grading"/>
     </div>
     <% if can_do(@assignment, @current_user, :update) %>
-      <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.rubric_association && @assignment.rubric_association.rubric} %>
+      <%= render :partial => "shared/rubric_dialog", :locals => {:assignment => @assignment, :rubric => @assignment.active_rubric_association? ? @assignment.rubric_association.rubric : nil} %>
     <% end %>
     <%= render :partial => "shared/rubric_criterion_dialog" %>
   </div>
@@ -44,7 +44,7 @@
 
   <% if can_do(@assignment, @current_user, :update) %>
     <div style="text-align: center; font-size: 1.2em; margin-top: 10px; display: none;">
-      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.rubric_association %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
+      <a href="<%= context_url(@context, :context_rubrics_url) %>" class="add_rubric_link rubric" style="<%= hidden if @assignment.active_rubric_association? %>"><%= t 'links.assign_rubric', 'Assign Rubric' %></a>
     </div>
   <% end %>
   <%= render :partial => "shared/sequence_footer", :locals => {:asset => @assignment} if !@assignment.context_module_tags.empty? %>

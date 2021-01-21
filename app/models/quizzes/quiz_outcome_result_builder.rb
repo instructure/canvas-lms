@@ -76,7 +76,10 @@ module Quizzes
       question_result.attempt = @qs.attempt
 
       # title
-      question_result.title = "#{@qs.user.name}, #{@qs.quiz.title}: #{cached_question[:name]}"
+      question_result.title = CanvasTextHelper.truncate_text(
+        "#{@qs.user.name}, #{@qs.quiz.title}: #{cached_question[:name]}",
+        {max_length: 250}
+      )
 
       question_result.submitted_at = @qs.finished_at
       question_result.assessed_at = Time.zone.now
@@ -126,7 +129,10 @@ module Quizzes
         result.calculate_percent!
         result.mastery = determine_mastery(result, alignment)
         result.attempt = @qs.attempt
-        result.title = "#{@qs.user.name}, #{@qs.quiz.title}"
+        result.title = CanvasTextHelper.truncate_text(
+          "#{@qs.user.name}, #{@qs.quiz.title}",
+          {max_length: 250}
+        )
         result.assessed_at = Time.zone.now
         result.submitted_at = @qs.finished_at
         result.save_to_version(result.attempt)

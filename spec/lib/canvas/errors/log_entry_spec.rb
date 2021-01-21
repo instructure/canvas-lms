@@ -68,6 +68,48 @@ module Canvas
         end
       end
 
+      describe "a nested exception" do
+        before(:each) do
+          @raised_error = nil
+          begin
+            begin
+              raise RuntimeError, "FOO"
+            rescue RuntimeError
+              raise ArgumentError, "Test Message"
+            end
+          rescue ArgumentError => e
+            raise StandardError, "TopException"
+          end
+        rescue StandardError => e
+          @raised_error = e
+          @entry = LogEntry.new(e, data)
+        end
+
+        describe "#message" do
+          let(:message){ @entry.message }
+
+          it "includes an easily greppable tag" do
+            expect(message).to include("[CANVAS_ERRORS]")
+          end
+
+          it "contains all the errors" do
+            expect(message).to include("RuntimeError")
+            expect(message).to include("ArgumentError")
+            expect(message).to include("StandardError")
+          end
+
+          it "has breaks between exception levels" do
+            expect(message).to include("****Caused By****")
+          end
+
+          it "splats the data context" do
+            expect(message).to include("tags")
+            expect(message).to include("foo")
+            expect(message).to include("bar")
+          end
+        end
+      end
+
       describe "capturing a message without exception" do
         it "just reports the string, no backtrace" do
           entry = LogEntry.new("some logging message", data)

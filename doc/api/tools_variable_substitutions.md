@@ -553,6 +553,15 @@ returns the current course sis source id.
 ```
 1234
 ```
+## com.instructure.Course.integrationId
+returns the current course integration id.
+
+**Availability**: *when launched in a course*
+
+
+```
+1234
+```
 ## Canvas.course.startAt
 returns the current course start date.
 

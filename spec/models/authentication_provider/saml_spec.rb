@@ -112,6 +112,45 @@ describe AuthenticationProvider::SAML do
       saml.populate_from_metadata(entity)
       expect(saml.sig_alg).to eq SAML2::Bindings::HTTPRedirect::SigAlgs::RSA_SHA1
     end
+
+    context "identifier format" do
+      let(:saml) { AuthenticationProvider::SAML.new }
+      let(:entity) { SAML2::Entity.new }
+      let(:idp) { SAML2::IdentityProvider.new }
+
+      before { entity.roles << idp }
+
+      it "overwrites if metadata only has one" do
+        idp.name_id_formats << SAML2::NameID::Format::EMAIL_ADDRESS
+        expect(saml.identifier_format).to eq(SAML2::NameID::Format::UNSPECIFIED)
+        saml.populate_from_metadata(entity)
+        expect(saml.identifier_format).to eq(SAML2::NameID::Format::EMAIL_ADDRESS)
+      end
+
+      it "does not overwrite if there are multiple and we're set to unspecified" do
+        idp.name_id_formats << SAML2::NameID::Format::EMAIL_ADDRESS
+        idp.name_id_formats << SAML2::NameID::Format::TRANSIENT
+        saml.identifier_format = SAML2::NameID::Format::UNSPECIFIED
+        saml.populate_from_metadata(entity)
+        expect(saml.identifier_format).to eq(SAML2::NameID::Format::UNSPECIFIED)
+      end
+
+      it "sets to unspecified if there are multiple and we're set to something else" do
+        idp.name_id_formats << SAML2::NameID::Format::EMAIL_ADDRESS
+        idp.name_id_formats << SAML2::NameID::Format::TRANSIENT
+        saml.identifier_format = SAML2::NameID::Format::PERSISTENT
+        saml.populate_from_metadata(entity)
+        expect(saml.identifier_format).to eq(SAML2::NameID::Format::UNSPECIFIED)
+      end
+
+      it "does not overwrite if there are multiple and we're set to one of the valid ones" do
+        idp.name_id_formats << SAML2::NameID::Format::EMAIL_ADDRESS
+        idp.name_id_formats << SAML2::NameID::Format::TRANSIENT
+        saml.identifier_format = SAML2::NameID::Format::TRANSIENT
+        saml.populate_from_metadata(entity)
+        expect(saml.identifier_format).to eq(SAML2::NameID::Format::TRANSIENT)
+      end
+    end
   end
 
   describe '.resolve_saml_key_path' do
