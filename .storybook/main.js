@@ -34,7 +34,9 @@ module.exports = {
       path.resolve(__dirname, '../frontend_build/'),
       'node_modules'
     ]
-    config.resolve.alias['coffeescripts/str/i18nLolcalize.js'] = path.resolve(__dirname, '../app/coffeescripts/str/i18nLolcalize.js')
+    config.resolve.alias['coffeescripts'] = path.resolve(__dirname, '../app/coffeescripts'),
+    config.resolve.alias['jsx'] = path.resolve(__dirname, '../app/jsx'),
+    config.resolve.alias['node_modules-version-of-react-modal'] = require.resolve('react-modal')
     return config;
   }
 }
