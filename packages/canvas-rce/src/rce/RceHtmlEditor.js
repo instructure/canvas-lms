@@ -60,6 +60,7 @@ const inline_elems = [
 const RceHtmlEditor = React.forwardRef((props, editorRef) => {
   const [code, setCode] = useState(props.code)
   const label = formatMessage('html code editor')
+  const [dir, setDir] = useState(getComputedStyle(document.body, null).direction)
 
   useEffect(() => {
     // INSTUI sets the CodeEditor's surrounding label's
@@ -82,7 +83,9 @@ const RceHtmlEditor = React.forwardRef((props, editorRef) => {
       `
       document.head.appendChild(stylesheet)
     }
-  }, [])
+    // odds are, this won't change the dir.
+    setDir(getComputedStyle(editorRef.current || document.body, null).direction)
+  }, [dir, editorRef])
 
   useEffect(() => {
     // scoping querySelector to the container div makes sure we're targeting this CodeEditor
@@ -103,7 +106,7 @@ const RceHtmlEditor = React.forwardRef((props, editorRef) => {
     <div
       ref={editorRef}
       className="RceHtmlEditor"
-      style={{height: props.height, overflow: 'hidden'}}
+      style={{height: props.height, overflow: 'hidden', textAlign: 'start'}}
     >
       <CodeEditor
         label={label}
@@ -114,7 +117,9 @@ const RceHtmlEditor = React.forwardRef((props, editorRef) => {
           autofocus: false,
           spellcheck: true,
           extraKeys: {Tab: false, 'Shift-Tab': false},
-          screenReaderLabel: label
+          screenReaderLabel: label,
+          direction: dir,
+          rtlMoveVisually: true
         }}
         value={code}
         onChange={value => {

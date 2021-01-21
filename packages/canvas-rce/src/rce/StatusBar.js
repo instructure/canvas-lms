@@ -77,7 +77,7 @@ function emptyTagIcon() {
   return (
     <SVGIcon viewBox="0 0 24 24" fontSize="24px">
       <g role="presentation">
-        <text textAnchor="start" x="0" y="18px" fontSize="16">
+        <text textAnchor="middle" x="12px" y="18px" fontSize="16">
           &lt;/&gt;
         </text>
       </g>
