@@ -520,6 +520,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       end
 
       it 'should close links tray if open when opening link options', custom_timeout: 300 do
+        skip('still flakey. Needs to be addressed in LS-1814')
         visit_front_page_edit(@course)
         wait_for_tiny(edit_wiki_css)
 
@@ -773,6 +774,7 @@ describe 'RCE next tests', ignore_js_errors: true do
     end
 
     it 'should close links tray if open when opening image options' do
+      skip('still flakey. Needs to be addressed in LS-1814')
       page_title = 'Page1'
       image = add_embedded_image('email.png')
       @course.wiki_pages.create!(
@@ -785,6 +787,7 @@ describe 'RCE next tests', ignore_js_errors: true do
       def switch_trays
         click_links_toolbar_menu_button
         click_course_links
+        wait_for_ajaximations
         expect(course_links_tray).to be_displayed
 
         click_embedded_image_for_options
@@ -800,7 +803,7 @@ describe 'RCE next tests', ignore_js_errors: true do
 
       # Duplicate trays only appear sporadically, so run this several times to make sure
       # we aren't getting multiple trays open at once.
-      5.times { switch_trays }
+      3.times { switch_trays }
     end
 
     it 'should change embedded image to link when selecting option' do
