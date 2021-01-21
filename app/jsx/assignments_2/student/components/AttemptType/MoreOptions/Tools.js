@@ -22,6 +22,7 @@ import {ExternalTool} from '../../../graphqlData/ExternalTool'
 import I18n from 'i18n!assignments_2_MoreOptions_Tools'
 import React, {useState} from 'react'
 import {UserGroups} from '../../../graphqlData/UserGroups'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 import {Tabs} from '@instructure/ui-tabs'
 
@@ -72,6 +73,7 @@ const Tools = props => {
         >
           <div style={tabContentStyle}>
             <iframe
+              allow={iframeAllowances()}
               style={iframeStyle}
               src={launchUrl(props.assignmentID, props.courseID, tool)}
               title={tool.name}
