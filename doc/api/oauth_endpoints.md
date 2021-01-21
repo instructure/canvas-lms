@@ -243,7 +243,7 @@ See <a href="http://tools.ietf.org/html/rfc6749#section-4.1.3">Section 4.1.3</a>
   {
     "iss": "https://www.my-tool.com",
     "sub": "&lt;client_id&gt;",
-    "aud": "http://&lt;canvas_domain&gt;/login/oauth2/token",
+    "aud": "https://&lt;canvas_domain&gt;/login/oauth2/token",
     "iat": 1561750031,
     "exp": 1561750631,
     "jti": "dffdbdce-a9f1-427b-8fca-604182198783"
