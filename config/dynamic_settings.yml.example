@@ -54,6 +54,11 @@ development:
       # datadog_apm.yml: |
       #   sample_rate: 0.0
       #   host_sample_rate: 0.0
+      # immersive_reader.yml: |
+      #   ir_tenant_id: ""
+      #   ir_client_id: ""
+      #   ir_client_secret: ""
+      #   ir_subdomain: "canvasir"
       # use a unique subdomain per attachment, so that browsers will enforce security
       # permissions (such as microphone/camera access) per-file. You must have wildcard
       # DNS set up for this to work.
