@@ -44,6 +44,13 @@ export function renderIntoDiv(editorEl, props, cb) {
     // unlike the pretranslated builds, in the default, non-pretranslated build,
     // this will cause a new network round trip to get all the locale info we
     // and tinymce need.
-    import(`./locales/${language}`).then(() => render(editorEl, props, cb))
+    import(`./locales/${language}`)
+      .then(() => render(editorEl, props, cb))
+      .catch(() => {
+        console.error(
+          `Failed to find a language file for "${language}". RCE is falling back to English.`
+        )
+        render(editorEl, props, cb)
+      })
   }
 }

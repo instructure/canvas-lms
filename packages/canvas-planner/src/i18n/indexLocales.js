@@ -57,6 +57,7 @@ export default {
   'en-gb': enGB,
   en,
   es,
+  fa: faIR,
   'fa-ir': faIR,
   'fr-ca': frCA,
   fr,
