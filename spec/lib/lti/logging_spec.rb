@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 #
-# Copyright (C) 2020 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -18,25 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Utility for logging LTI-related messages
-module Lti::Logging
-  PREFIX_MAP = {
-    lti_1: "LTI 1.1",
-    lti_1_3: "LTI 1.3"
-  }.freeze
+require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper.rb')
 
-  def self.lti_1_launch_generated(base_string)
-    log("Generated launch with base string #{base_string}")
-  end
-
-  def self.lti_1_api_signature_verification_failed(base_string)
-    log("API request signature verification failed, expected base string #{base_string}")
-  end
-
-  def self.log(message, version: :lti_1, level: :info)
-    Rails.logger.send(
-      level,
-      "[#{PREFIX_MAP[version]}] #{message}"
-    )
+describe Lti::Logging do
+  describe '.lti_1_api_signature_verification_failed' do
+    it 'logs an info message' do
+      expect(Rails.logger).to receive(:info).with(
+        "[LTI 1.1] API request signature verification failed, expected base string 123abc"
+      )
+      Lti::Logging.lti_1_api_signature_verification_failed('123abc')
+    end
   end
 end

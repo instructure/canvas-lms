@@ -155,7 +155,10 @@ class LtiApiController < ApplicationController
     # verify the request oauth signature, timestamp and nonce
     begin
       @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
-      @signature.verify() or raise OAuth::Unauthorized.new(request)
+      unless @signature.verify
+        Lti::Logging.lti_1_api_signature_verification_failed(@signature.signature_base_string)
+        raise OAuth::Unauthorized.new, request
+      end
 
     rescue OAuth::Signature::UnknownSignatureMethod, OAuth::Unauthorized => e
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({error_class: e.class.name}))
