@@ -265,6 +265,11 @@ module CC
         node.external_tool_url assignment.external_tool_tag.url
         node.external_tool_data_json assignment.external_tool_tag.external_data.to_json if assignment.external_tool_tag.external_data
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
+
+        # Exporting the lookup_id allows Canvas to rebind
+        # the custom params to the assignment on import.
+        resource_link = assignment.primary_resource_link
+        node.resource_link_lookup_uuid resource_link.lookup_uuid if resource_link.present?
       end
 
       node.tag!(:turnitin_settings, (assignment.send(:turnitin_settings).to_json)) if assignment.turnitin_enabled || assignment.vericite_enabled
