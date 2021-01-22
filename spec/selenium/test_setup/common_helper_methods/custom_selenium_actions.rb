@@ -340,11 +340,12 @@ module CustomSeleniumActions
 
   def type_in_tiny(tiny_controlling_element, text, clear: false)
     selector = tiny_controlling_element.to_s.to_json
+    mce_class = Account.default.feature_enabled?(:rce_enhancements) ? ".tox-tinymce" : ".mce-tinymce"
     keep_trying_until do
-      driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').length > 0;")
+      driver.execute_script("return $(#{selector}).siblings('#{mce_class}').length > 0;")
     end
 
-    iframe_id = driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').find('iframe')[0];")['id']
+    iframe_id = driver.execute_script("return $(#{selector}).siblings('#{mce_class}').find('iframe')[0];")['id']
 
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
