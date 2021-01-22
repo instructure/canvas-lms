@@ -128,6 +128,16 @@ class AssignmentsController < ApplicationController
       })
     end
 
+    if @assignment.turnitin_enabled? || @assignment.vericite_enabled?
+      similarity_pledge = {
+        EULA_URL: tool_eula_url,
+        COMMENTS: plagiarism_comments,
+        PLEDGE_TEXT: pledge_text,
+      }
+
+      js_env({SIMILARITY_PLEDGE: similarity_pledge})
+    end
+
     js_env({
       ASSIGNMENT_ID: params[:id],
       CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
@@ -853,6 +863,14 @@ class AssignmentsController < ApplicationController
     pledge ||= @context.vericite_pledge.presence || closest_pledge if @assignment.vericite_enabled?
 
     pledge || (@assignment.course.account.closest_turnitin_pledge if @assignment.tool_settings_tool.present?)
+  end
+
+  def plagiarism_comments
+    if @assignment.turnitin_enabled?
+      @context.all_turnitin_comments
+    elsif @assignment.vericite_enabled?
+      @context.vericite_comments
+    end
   end
 
   def quiz_lti_tool_enabled?

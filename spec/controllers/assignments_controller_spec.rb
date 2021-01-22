@@ -1116,7 +1116,7 @@ describe AssignmentsController do
         end
       end
 
-      context "with the assignments_2_student flag enabled" do
+      context "when viewing as a student with the assignments_2_student flag enabled" do
         let(:course) { @course }
         let(:assignment) { @assignment }
         let(:student) { @student }
@@ -1125,6 +1125,11 @@ describe AssignmentsController do
           course.enable_feature!(:assignments_2_student)
           assignment.update!(submission_types: "online_upload")
           user_session(student)
+
+          # stub this call because for some reason the invocation in
+          # render_a2_student_view takes long enough that it causes
+          # requests to time out
+          allow(CanvasSchema).to receive(:resolve_type).and_return(Types::SubmissionType)
         end
 
         describe "CONTEXT_MODULE_ITEM" do
@@ -1141,24 +1146,24 @@ describe AssignmentsController do
             end
 
             it "sets 'id' to the module item ID" do
-              get :show, params: {course_id: @course.id, id: @assignment.id}
+              get :show, params: {course_id: course.id, id: assignment.id}
               expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module1_assignment_item.id
             end
 
             it "sets 'module_id' to the module ID" do
-              get :show, params: {course_id: @course.id, id: @assignment.id}
+              get :show, params: {course_id: course.id, id: assignment.id}
               expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:module_id]).to eq module1.id
             end
 
             it "sets 'done' to true if the user has completed the item" do
               module1_assignment_item.context_module_action(student, :done)
 
-              get :show, params: {course_id: @course.id, id: @assignment.id}
+              get :show, params: {course_id: course.id, id: assignment.id}
               expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be true
             end
 
             it "sets 'done' to false if the user has not completed the item" do
-              get :show, params: {course_id: @course.id, id: @assignment.id}
+              get :show, params: {course_id: course.id, id: assignment.id}
               expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be false
             end
 
@@ -1170,15 +1175,96 @@ describe AssignmentsController do
               module2.completion_requirements = [{id: module2_assignment_item.id, type: "must_mark_done"}]
               module2.save!
 
-              get :show, params: {course_id: @course.id, id: @assignment.id, module_item_id: module2_assignment_item.id}
+              get :show, params: {course_id: course.id, id: assignment.id, module_item_id: module2_assignment_item.id}
               expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module2_assignment_item.id
             end
           end
 
           it "is not included when the assignment does not have a 'mark as done' requirement" do
-            get :show, params: {course_id: @course.id, id: @assignment.id}
+            get :show, params: {course_id: course.id, id: assignment.id}
 
             expect(assigns[:js_env]).not_to have_key :CONTEXT_MODULE_ITEM
+          end
+        end
+
+        describe "SIMILARITY_PLEDGE" do
+          let(:turnitin_assignment) do
+            course.assignments.create!(
+              submission_types: "online_upload",
+              turnitin_enabled: true
+            )
+          end
+          let(:vericite_assignment) do
+            course.assignments.create!(
+              lti_context_id: "blah",
+              submission_types: "online_upload",
+              vericite_enabled: true
+            )
+          end
+          let(:pledge_settings) { assigns[:js_env][:SIMILARITY_PLEDGE] }
+
+          def enable_vericite!(comments: "vericite comments")
+            plugin = Canvas::Plugin.find(:vericite)
+            plugin_setting = PluginSetting.find_by(name: plugin.id) || PluginSetting.new(name: plugin.id, settings: plugin.default_settings)
+            plugin_setting.posted_settings = {comments: comments}
+            plugin_setting.save!
+          end
+
+          it "is included if the assignment returns a tool EULA URL" do
+            allow(controller).to receive(:tool_eula_url).and_return("http://some.url")
+            get :show, params: {course_id: course.id, id: turnitin_assignment.id}
+            expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "is included if the account includes pledge text" do
+            course.account.update!(turnitin_pledge: "a pledge")
+
+            get :show, params: {course_id: course.id, id: turnitin_assignment.id}
+            expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "is included if vericite is enabled instead of turnitin" do
+            enable_vericite!
+
+            get :show, params: {course_id: course.id, id: vericite_assignment.id}
+            expect(assigns[:js_env]).to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "is not included if neither turnitin nor vericite is enabled" do
+            get :show, params: {course_id: course.id, id: assignment.id}
+            expect(assigns[:js_env]).not_to have_key(:SIMILARITY_PLEDGE)
+          end
+
+          it "includes the assignment tool URL in the EULA_URL field" do
+            allow(controller).to receive(:tool_eula_url).and_return("http://some.url")
+            get :show, params: {course_id: course.id, id: turnitin_assignment.id}
+            expect(pledge_settings[:EULA_URL]).to eq "http://some.url"
+          end
+
+          it "includes the pledge text in the PLEDGE_TEXT field" do
+            course.account.update!(turnitin_pledge: "a pledge")
+
+            get :show, params: {course_id: course.id, id: turnitin_assignment.id}
+            expect(pledge_settings[:PLEDGE_TEXT]).to eq "a pledge"
+          end
+
+          describe "COMMENTS" do
+            before(:each) do
+              course.account.update!(turnitin_comments: "turnitin comments")
+            end
+
+            it "includes turnitin comments if turnitin is enabled" do
+              get :show, params: {course_id: course.id, id: turnitin_assignment.id}
+
+              expect(pledge_settings[:COMMENTS]).to eq "turnitin comments"
+            end
+
+            it "includes vericite comments if vericite is enabled" do
+              enable_vericite!
+
+              get :show, params: {course_id: course.id, id: vericite_assignment.id}
+              expect(pledge_settings[:COMMENTS]).to eq "vericite comments"
+            end
           end
         end
       end
