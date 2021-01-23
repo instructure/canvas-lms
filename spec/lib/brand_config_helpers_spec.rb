@@ -84,7 +84,7 @@ describe BrandConfigHelpers do
     it "should work with site_admin" do
       site_admin_config = BrandConfig.for(variables: {"ic-brand-primary" => "orange"})
       site_admin_config.save!
-      regenerator = BrandConfigRegenerator.new(Account.site_admin, user_factory, site_admin_config)
+      BrandConfigRegenerator.process(Account.site_admin, user_factory, site_admin_config)
 
       Delayed::Testing.drain
 

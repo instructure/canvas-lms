@@ -388,7 +388,6 @@ class GradebooksController < ApplicationController
     root_account = @context.root_account
 
     gradebook_options = {
-      accepted_view_ungraded_as_zero_dialog: accepted_view_ungraded_as_zero_dialog?,
       active_grading_periods: active_grading_periods_json,
       allow_view_ungraded_as_zero: allow_view_ungraded_as_zero?,
       # TODO: remove `api_max_per_page` with TALLY-831
@@ -1437,9 +1436,5 @@ class GradebooksController < ApplicationController
 
   def allow_view_ungraded_as_zero?
     Account.site_admin.feature_enabled?(:view_ungraded_as_zero)
-  end
-
-  def accepted_view_ungraded_as_zero_dialog?
-    @current_user.get_preference(:gradebook_settings, :accepted_view_ungraded_as_zero_dialog) == "true"
   end
 end
