@@ -10503,6 +10503,7 @@ nn:
   highest_score_e080551e: "Høgaste resultat"
   hindi_9bcd4b34: Hindi
   history_cd3f60a9: Historikk
+  history_settings_c63dbaaf: Historikkinnstillingar
   home_351838cd: Heim
   home_page_is_not_valid_2e8a25ae: "Emneforsida er ikkje gyldig"
   home_tutorial_tray_66826983: "Heim opplæringsmeny"
@@ -17275,6 +17276,9 @@ nn:
   recent_activity_51239235: "Nyleg aktivitet"
   recent_announcements_8becc59c: "Nylege kunngjeringar"
   recent_history_bcb0f4c0: "Nyleg historikk"
+  recent_history_tray_241a384e: "Nyleg historikk-meny"
+  recent_history_unavailable_in_beta_869b4762: "Nyleg historikk er utilgjengeleg i betamiljøet"
+  recent_history_unavailable_in_test_d1753d0d: "Nyleg historikk er utilgengeleg i testmiljøet"
   recent_student: 
     last_logged_in: "sist pålogga %{last_login}"
   recentint_remainderint_decaying_average_79bc09fb: "%{recentInt}/%{remainderInt} minkande gjennomsnitt"
