@@ -23094,7 +23094,7 @@ pl:
   summary_statistics_f74852a5: "Podsumowanie statystyk"
   support: 
     array: 
-      last_word_connector: "oraz "
+      last_word_connector: " oraz "
       or: 
         last_word_connector: " lub "
         two_words_connector: " lub "
