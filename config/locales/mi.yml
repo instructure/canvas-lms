@@ -22580,11 +22580,11 @@ mi:
   summary_statistics_f74852a5: "Tatauranga Whakarāpopoto"
   support: 
     array: 
-      last_word_connector: ", me"
+      last_word_connector: ", me "
       or: 
-        last_word_connector: ", rānei"
-        two_words_connector: rānei
-      two_words_connector: a
+        last_word_connector: ", rānei "
+        two_words_connector: " rānei "
+      two_words_connector: " a "
       words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: "hāpori tautoko"
