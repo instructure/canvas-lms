@@ -50,7 +50,7 @@ module Submissions
 
       @headers = false
       if authorized_action(@submission, @current_user, :read)
-        if redirect?
+        if redirect? && @assignment&.quiz&.id
           redirect_to(named_context_url(@context, redirect_path_name, @assignment.quiz.id, redirect_params))
         else
           @anonymize_students = anonymize_students?

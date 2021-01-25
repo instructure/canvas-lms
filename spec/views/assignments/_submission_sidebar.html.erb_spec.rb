@@ -74,6 +74,13 @@ describe "assignments/_submission_sidebar.html.erb" do
       html = Nokogiri::HTML5.fragment(response.body)
       expect(html.css("div#comment-#{comment.id}").text).not_to include "a comment!"
     end
+
+    it "must render when the submission type is online_quiz but assignment lacks of quiz.id" do
+      submission[:submission_type] = "online_quiz"
+      assign(:current_user_submission, submission)
+      render
+      expect(response).not_to be_nil
+    end
   end
 
   context "when assignment posts automatically" do
