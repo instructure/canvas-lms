@@ -1355,6 +1355,24 @@ class AccountsController < ApplicationController
     css_bundle :addpeople
     @page_title = @account.name
     add_crumb '', '?' # the text for this will be set by javascript
+    js_permissions = {
+      can_read_course_list: can_read_course_list,
+      can_read_roster: can_read_roster,
+      can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
+      can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
+      analytics: @account.service_enabled?(:analytics),
+      can_masquerade: @account.grants_right?(@current_user, session, :become_user),
+      can_message_users: @account.grants_right?(@current_user, session, :send_messages),
+      can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
+      can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
+    }
+    if @account.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+      js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :allow_course_admin_actions)
+      js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
+    else
+      js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users)
+      js_permissions[:can_manage_admin_users] = @account.grants_right?(@current_user, session, :manage_admin_users)
+    end
     js_env({
              ROOT_ACCOUNT_NAME: @account.root_account.name, # used in AddPeopleApp modal
              ACCOUNT_ID: @account.id,
@@ -1362,19 +1380,7 @@ class AccountsController < ApplicationController
              customized_login_handle_name: @account.root_account.customized_login_handle_name,
              delegated_authentication: @account.root_account.delegated_authentication?,
              SHOW_SIS_ID_IN_NEW_USER_FORM: @account.root_account.allow_sis_import && @account.root_account.grants_right?(@current_user, session, :manage_sis),
-             PERMISSIONS: {
-               can_read_course_list: can_read_course_list,
-               can_read_roster: can_read_roster,
-               can_create_courses: @account.grants_right?(@current_user, session, :manage_courses),
-               can_create_enrollments: @account.grants_any_right?(@current_user, session, :manage_students, :manage_admin_users),
-               can_create_users: @account.root_account.grants_right?(@current_user, session, :manage_user_logins),
-               analytics: @account.service_enabled?(:analytics),
-               can_masquerade: @account.grants_right?(@current_user, session, :become_user),
-               can_message_users: @account.grants_right?(@current_user, session, :send_messages),
-               can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
-               can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
-               can_manage_admin_users: @account.grants_right?(@current_user, session, :manage_admin_users)  # access to manage user avatars page?
-             }
+             PERMISSIONS: js_permissions
            })
     render html: '', layout: true
   end

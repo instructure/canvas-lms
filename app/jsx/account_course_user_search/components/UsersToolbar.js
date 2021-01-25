@@ -49,7 +49,7 @@ export default function UsersToolbar(props) {
             <CanvasSelect.Option key="all" id="all" value="">
               {I18n.t('All Roles')}
             </CanvasSelect.Option>
-            {props.roles.map(role => (
+            {props.roles.map((role) => (
               <CanvasSelect.Option key={role.id} id={role.id} value={role.id}>
                 {role.label}
               </CanvasSelect.Option>
@@ -62,8 +62,8 @@ export default function UsersToolbar(props) {
           value={props.search_term}
           label={<ScreenReaderContent>{placeholder}</ScreenReaderContent>}
           placeholder={placeholder}
-          onChange={e => props.onUpdateFilters({search_term: e.target.value})}
-          onKeyUp={e => {
+          onChange={(e) => props.onUpdateFilters({search_term: e.target.value})}
+          onKeyUp={(e) => {
             if (e.key === 'Enter') {
               props.toggleSRMessage(true)
             } else {
@@ -96,7 +96,11 @@ export default function UsersToolbar(props) {
 }
 
 function renderKabobMenu(accountId) {
-  const showAvatarItem = ENV.PERMISSIONS.can_manage_admin_users // see accounts_controller#avatars
+  const newCourseAdminGranulars = ENV.FEATURES.granular_permissions_manage_admin_users
+  // see accounts_controller#avatars for the showAvatarItem logic
+  const showAvatarItem = newCourseAdminGranulars
+    ? ENV.PERMISSIONS.can_allow_course_admin_options
+    : ENV.PERMISSIONS.can_manage_admin_users
   const showGroupsItem = ENV.PERMISSIONS.can_manage_groups // see groups_controller#context_index
   if (showAvatarItem || showGroupsItem) {
     return (
@@ -134,9 +138,9 @@ UsersToolbar.propTypes = {
   roles: arrayOf(
     shape({
       id: string.isRequired,
-      label: string.isRequired
+      label: string.isRequired,
     })
-  ).isRequired
+  ).isRequired,
 }
 
 UsersToolbar.defaultProps = {
@@ -144,5 +148,5 @@ UsersToolbar.defaultProps = {
   role_filter_id: '',
   errors: {},
   accountId: '',
-  roles: []
+  roles: [],
 }

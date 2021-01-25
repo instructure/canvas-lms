@@ -88,7 +88,10 @@ const createUsersView = new CreateUsersView({
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
   resendInvitationsUrl: ENV.resend_invitations_url,
-  canResend: ENV.permissions.manage_students || ENV.permissions.manage_admin_users
+  canResend:
+    ENV.permissions.manage_students ||
+    ENV.permissions.manage_admin_users ||
+    ENV.permissions.allow_course_admin_actions
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}

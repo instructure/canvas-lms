@@ -2653,15 +2653,22 @@ class User < ActiveRecord::Base
   end
 
   def can_create_enrollment_for?(course, session, type)
+    granular_admin = course.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
     return false if type == "StudentEnrollment" && MasterCourses::MasterTemplate.is_master_course?(course)
-    if type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
+    if !granular_admin && type != "StudentEnrollment" && course.grants_right?(self, session, :manage_admin_users)
       return true
+    end
+    if granular_admin
+      return true if type == 'TaEnrollment' && course.grants_right?(self, session, :add_ta_to_course)
+      return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
+      return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
     end
     if course.grants_right?(self, session, :manage_students)
       if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
         return true
       end
     end
+    false
   end
 
   def can_be_enrolled_in_course?(course)

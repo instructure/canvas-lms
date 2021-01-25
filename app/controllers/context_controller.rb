@@ -132,32 +132,43 @@ class ContextController < ApplicationController
 
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
+      manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
+      manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+        @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+      else
+        @context.grants_right?(@current_user, session, :manage_admin_users)
+      end
+      js_permissions = {
+        read_sis: @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
+        view_user_logins: @context.grants_right?(@current_user, session, :view_user_logins),
+        manage_students: manage_students,
+        add_users: manage_students || manage_admins,
+        read_reports: @context.grants_right?(@current_user, session, :read_reports)
+      }
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+        js_permissions[:allow_course_admin_actions] = manage_admins
+      else
+        js_permissions[:manage_admin_users] = manage_admins
+      end
       js_env({
-        :ALL_ROLES => all_roles,
-        :SECTIONS => sections.map { |s| { :id => s.id.to_s, :name => s.name} },
-        :CONCLUDED_SECTIONS => concluded_sections,
-        :USER_LISTS_URL => polymorphic_path([@context, :user_lists], :format => :json),
-        :ENROLL_USERS_URL => course_enroll_users_url(@context),
-        :SEARCH_URL => search_recipients_url,
-        :COURSE_ROOT_URL => "/courses/#{ @context.id }",
-        :CONTEXTS => @contexts,
-        :resend_invitations_url => course_re_send_invitations_url(@context),
-        :permissions => {
-          :read_sis => @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis),
-          :view_user_logins => @context.grants_right?(@current_user, session, :view_user_logins),
-          :manage_students => (manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)),
-          :manage_admin_users => (manage_admins = @context.grants_right?(@current_user, session, :manage_admin_users)),
-          :add_users => manage_students || manage_admins,
-          :read_reports => @context.grants_right?(@current_user, session, :read_reports)
-        },
-        :course => {
-          :id => @context.id,
-          :completed => @context.completed?,
-          :soft_concluded => @context.soft_concluded?,
-          :concluded => @context.concluded?,
-          :teacherless => @context.teacherless?,
-          :available => @context.available?,
-          :pendingInvitationsCount => @context.invited_count_visible_to(@current_user),
+        ALL_ROLES: all_roles,
+        SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name} },
+        CONCLUDED_SECTIONS: concluded_sections,
+        USER_LISTS_URL: polymorphic_path([@context, :user_lists], format: :json),
+        ENROLL_USERS_URL: course_enroll_users_url(@context),
+        SEARCH_URL: search_recipients_url,
+        COURSE_ROOT_URL: "/courses/#{@context.id}",
+        CONTEXTS: @contexts,
+        resend_invitations_url: course_re_send_invitations_url(@context),
+        permissions: js_permissions,
+        course: {
+          id: @context.id,
+          completed: @context.completed?,
+          soft_concluded: @context.soft_concluded?,
+          concluded: @context.concluded?,
+          teacherless: @context.teacherless?,
+          available: @context.available?,
+          pendingInvitationsCount: @context.invited_count_visible_to(@current_user),
           hideSectionsOnCourseUsersPage: @context.sections_hidden_on_roster_page?(current_user: @current_user)
         }
       })
@@ -189,7 +200,10 @@ class ContextController < ApplicationController
   end
 
   def prior_users
-    if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users, :read_prior_roster])
+    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) ?
+      :allow_course_admin_actions :
+      :manage_admin_users
+    if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])
       @prior_users = @context.prior_users.
         by_top_enrollment.merge(Enrollment.not_fake).
         paginate(:page => params[:page], :per_page => 20)

@@ -167,7 +167,7 @@ export default class RosterUserView extends Backbone.View {
     }
   }
 
-  resendInvitation(e) {
+  resendInvitation() {
     if (!invitationDialog) {
       invitationDialog = new InvitationsView()
     }
@@ -175,7 +175,7 @@ export default class RosterUserView extends Backbone.View {
     return invitationDialog.render().show()
   }
 
-  editSections(e) {
+  editSections() {
     if (!editSectionsDialog) {
       editSectionsDialog = new EditSectionsView()
     }
@@ -183,7 +183,7 @@ export default class RosterUserView extends Backbone.View {
     return editSectionsDialog.render().show()
   }
 
-  editRoles(e) {
+  editRoles() {
     if (!editRolesDialog) {
       editRolesDialog = new EditRolesView()
     }
@@ -191,7 +191,7 @@ export default class RosterUserView extends Backbone.View {
     return editRolesDialog.render().show()
   }
 
-  linkToStudents(e) {
+  linkToStudents() {
     if (!linkToStudentsDialog) {
       linkToStudentsDialog = new LinkToStudentsView()
     }
@@ -201,7 +201,8 @@ export default class RosterUserView extends Backbone.View {
 
   deactivateUser() {
     if (
-      !confirm(
+      // eslint-disable-next-line no-alert
+      !window.confirm(
         I18n.t(
           'Are you sure you want to deactivate this user? They will be unable to participate in the course while inactive.'
         )
@@ -255,7 +256,8 @@ export default class RosterUserView extends Backbone.View {
   }
 
   removeFromCourse(e) {
-    if (!confirm(I18n.t('Are you sure you want to remove this user?'))) {
+    // eslint-disable-next-line no-alert
+    if (!window.confirm(I18n.t('Are you sure you want to remove this user?'))) {
       return
     }
     this.$el.hide()

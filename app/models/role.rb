@@ -276,17 +276,58 @@ class Role < ActiveRecord::Base
     manageable.uniq.sort
   end
 
+  def self.add_delete_roles_by_user(user, context, other_manageable)
+    addable = []
+    deleteable = []
+    addable += ['TaEnrollment'] if context.grants_right?(user, :add_ta_to_course)
+    addable += ['ObserverEnrollment'] if context.grants_right?(user, :add_observer_to_course)
+    addable += ['DesignerEnrollment'] if context.grants_right?(user, :add_designer_to_course)
+    deleteable += ['TaEnrollment'] if context.grants_right?(user, :remove_ta_from_course)
+    deleteable += ['ObserverEnrollment'] if context.grants_right?(user, :remove_observer_from_course)
+    deleteable += ['DesignerEnrollment'] if context.grants_right?(user, :remove_designer_from_course)
+
+    # should this be yet another granular add/remove permission instead? maybe next evolution
+    if other_manageable.include? 'TeacherEnrollment'
+      addable += ['TeacherEnrollment']
+      deleteable += ['TeacherEnrollment']
+    end
+
+    if other_manageable.include? 'StudentEnrollment'
+      addable += ['StudentEnrollment']
+      deleteable += ['StudentEnrollment']
+    end
+
+    if other_manageable.include? 'ObserverEnrollment'
+      addable += ['ObserverEnrollment']
+      deleteable += ['ObserverEnrollment']
+    end
+
+    [addable, deleteable]
+  end
+
   def self.compile_manageable_roles(role_data, user, context)
     # for use with the old sad enrollment dialog
     manageable = self.manageable_roles_by_user(user, context)
+    granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+    addable, deleteable = self.add_delete_roles_by_user(user, context, manageable) if granular_admin
     role_data.inject([]) { |roles, role|
-      is_manageable = manageable.include?(role[:base_role_name])
-      role[:manageable_by_user] = is_manageable
+      is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin
+      is_addable = addable.include?(role[:base_role_name]) if granular_admin
+      is_deleteable = deleteable.include?(role[:base_role_name]) if granular_admin
+      role[:manageable_by_user] = is_manageable unless granular_admin
+      if granular_admin
+        role[:addable_by_user] = is_addable
+        role[:deleteable_by_user] = is_deleteable
+      end
       custom_roles = role.delete(:custom_roles)
       roles << role
 
       custom_roles.each do |custom_role|
-        custom_role[:manageable_by_user] = is_manageable
+        custom_role[:manageable_by_user] = is_manageable unless granular_admin
+        if granular_admin
+          role[:addable_by_user] = is_addable
+          role[:deleteable_by_user] = is_deleteable
+        end
         roles << custom_role
       end
       roles

@@ -1394,6 +1394,18 @@ class CoursesController < ApplicationController
       add_crumb(t('#crumbs.settings', "Settings"), named_context_url(@context, :context_details_url))
 
       course_card_images_enabled = @context.feature_enabled?(:course_card_images)
+      js_permissions = {
+        :manage_students => @context.grants_right?(@current_user, session, :manage_students),
+        :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
+        :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
+        :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
+        :manage => @context.grants_right?(@current_user, session, :manage)
+      }
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+        js_permissions[:allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
+      else
+        js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
+      end
       js_env({
         COURSE_ID: @context.id,
         USERS_URL: "/api/v1/courses/#{@context.id}/users",
@@ -1402,14 +1414,7 @@ class CoursesController < ApplicationController
         SEARCH_URL: search_recipients_url,
         CONTEXTS: @contexts,
         USER_PARAMS: {:include => ['email', 'enrollments', 'locked', 'observed_users']},
-        PERMISSIONS: {
-          :manage_students => @context.grants_right?(@current_user, session, :manage_students),
-          :manage_admin_users => @context.grants_right?(@current_user, session, :manage_admin_users),
-          :manage_account_settings => @context.account.grants_right?(@current_user, session, :manage_account_settings),
-          :create_tool_manually => @context.grants_right?(@current_user, session, :create_tool_manually),
-          :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
-          :manage => @context.grants_right?(@current_user, session, :manage)
-        },
+        PERMISSIONS: js_permissions,
         APP_CENTER: {
           enabled: Canvas::Plugin.find(:app_center).enabled?
         },
@@ -1638,7 +1643,7 @@ class CoursesController < ApplicationController
 
   def re_send_invitations
     get_context
-    if authorized_action(@context, @current_user, [:manage_students, :manage_admin_users])
+    if authorized_action(@context, @current_user, [:manage_students, manage_admin_users_perm])
       @context.delay_if_production.re_send_invitations!(@current_user)
 
       respond_to do |format|
@@ -2189,7 +2194,7 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     can_remove = @enrollment.is_a?(StudentEnrollment) && @context.grants_right?(@current_user, session, :manage_students)
-    can_remove ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    can_remove ||= @context.grants_right?(@current_user, session, manage_admin_users_perm)
     if can_remove
       respond_to do |format|
         if @enrollment.unconclude
@@ -2206,7 +2211,7 @@ class CoursesController < ApplicationController
   def limit_user
     get_context
     @user = @context.users.find(params[:id])
-    if authorized_action(@context, @current_user, :manage_admin_users)
+    if authorized_action(@context, @current_user, manage_admin_users_perm)
       if params[:limit] == "1"
         Enrollment.limit_privileges_to_course_section!(@context, @user, true)
         render :json => {:limited => true}
@@ -2307,7 +2312,7 @@ class CoursesController < ApplicationController
 
   def link_enrollment
     get_context
-    if authorized_action(@context, @current_user, :manage_admin_users)
+    if authorized_action(@context, @current_user, manage_admin_users_perm)
       enrollment = @context.observer_enrollments.find(params[:enrollment_id])
       student = nil
       student = @context.students.find(params[:student_id]) if params[:student_id] != 'none'
@@ -2322,7 +2327,7 @@ class CoursesController < ApplicationController
     get_context
     @enrollment = @context.enrollments.find(params[:id])
     can_move = [StudentEnrollment, ObserverEnrollment].include?(@enrollment.class) && @context.grants_right?(@current_user, session, :manage_students)
-    can_move ||= @context.grants_right?(@current_user, session, :manage_admin_users)
+    can_move ||= @context.grants_right?(@current_user, session, manage_admin_users_perm)
     can_move &&= @context.grants_any_right?(@current_user, session, :manage_account_settings, :manage_sis) if @enrollment.defined_by_sis?
     if can_move
       respond_to do |format|
@@ -3432,6 +3437,12 @@ class CoursesController < ApplicationController
 
   def effective_due_dates_params
     params.permit(assignment_ids: [])
+  end
+
+  def manage_admin_users_perm
+    @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) ?
+      :allow_course_admin_actions :
+      :manage_admin_users
   end
 
   def course_params
