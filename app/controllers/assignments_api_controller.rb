@@ -1159,6 +1159,8 @@ class AssignmentsApiController < ApplicationController
   #   assignment lists.
   #
   # @argument assignment[submission_types][] [String, "online_quiz"|"none"|"on_paper"|"discussion_topic"|"external_tool"|"online_upload"|"online_text_entry"|"online_url"|"media_recording"|"student_annotation"]
+  #   Only applies if the assignment doesn't have student submissions.
+  #
   #   List of supported submission types for the assignment.
   #   Unless the assignment is allowing online submissions, the array should
   #   only have one element.

@@ -576,4 +576,28 @@ describe "Api::V1::Assignment" do
       end
     end
   end
+
+  describe 'when the assignment has one student submission' do
+    let(:user) { user_model }
+    let(:course) { course_factory }
+    let(:student) { course.enroll_student(User.create!, enrollment_state: 'active').user }
+    let(:assignment_update_params) do
+      ActionController::Parameters.new(
+        name: 'Edited name',
+        submission_types: ['on_paper']
+      )
+    end
+
+    it 'should not update the submission_types field' do
+      assignment.submit_homework(student, :body => "my homework")
+
+      expect(assignment.submissions.having_submission.count).to eq 1
+
+      response = api.update_api_assignment(assignment, assignment_update_params, user)
+
+      expect(response).to eq :ok
+      expect(assignment.name).to eq 'Edited name'
+      expect(assignment.submission_types).to eq 'none'
+    end
+  end
 end
