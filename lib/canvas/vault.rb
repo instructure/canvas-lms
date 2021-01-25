@@ -54,12 +54,14 @@ module Canvas::Vault
     end
 
     def api_client
-      return Canvas::Vault::FileClient.get_client if addr == "file"
+      # Default to flat file if vault is unconfigured
+      return Canvas::Vault::FileClient.get_client if addr.nil? || addr == "file"
+
       Vault::Client.new(address: addr, token: token)
     end
 
     def kv_mount
-      config[:kv_mount]
+      config[:kv_mount] || 'app-canvas'
     end
 
     private

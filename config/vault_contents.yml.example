@@ -10,6 +10,11 @@ development:
     access_key: 'fake-access-key'
     secret_key: 'fake-secret-key'
     security_token: 'fake-security-token'
+#  'app-canvas/data/secrets':
+#    data:
+#      raven_dsn: garbage-dsn-here
+#      google_docs_creds:
+#        secret_key: so-secret
 test:
   'sts/testaccount/sts/canvas-shards-lookupper-test':
     access_key: 'fake-access-key'
