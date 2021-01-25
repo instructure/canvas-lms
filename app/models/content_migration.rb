@@ -574,6 +574,13 @@ class ContentMigration < ActiveRecord::Base
         self.master_course_subscription.load_tags! # load child content tags
         self.master_course_subscription.master_template.preload_restrictions!
 
+        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
+        data = prepare_data(data)
+
+        # handle deletions before files are copied
+        deletions = data['deletions'].presence
+        process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         if source_export.selective_export?
@@ -591,9 +598,6 @@ class ContentMigration < ActiveRecord::Base
         MasterCourses::FolderHelper.update_folder_names_and_states(self.context, source_export)
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
         MasterCourses::FolderHelper.recalculate_locked_folders(self.context)
-
-        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
-        data = prepare_data(data)
       else
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -613,11 +617,11 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-      deletions = self.for_master_course_import? && data['deletions'].presence
-      process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
       import!(data)
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
+
       if !self.import_immediately?
         update_import_progress(100)
       end

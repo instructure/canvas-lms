@@ -1897,6 +1897,7 @@ class Attachment < ActiveRecord::Base
 
   scope :uploadable, -> { where(:workflow_state => 'pending_upload') }
   scope :active, -> { where(:file_state => 'available') }
+  scope :deleted, -> { where(:file_state => 'deleted') }
   scope :by_display_name, -> { order(display_name_order_by_clause('attachments')) }
   scope :by_position_then_display_name, -> { order(:position, display_name_order_by_clause('attachments')) }
   def self.serialization_excludes; [:uuid, :namespace]; end
