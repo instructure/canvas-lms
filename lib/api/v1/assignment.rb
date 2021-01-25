@@ -654,7 +654,7 @@ module Api::V1::Assignment
   end
 
   def update_from_params(assignment, assignment_params, user, context = assignment.context)
-    update_params = assignment_params.permit(allowed_assignment_input_fields)
+    update_params = assignment_params.permit(allowed_assignment_input_fields(assignment))
 
     if update_params.key?('peer_reviews_assign_at')
       update_params['peer_reviews_due_at'] = update_params['peer_reviews_assign_at']
@@ -1044,15 +1044,16 @@ module Api::V1::Assignment
     end
   end
 
-  def allowed_assignment_input_fields
+  def allowed_assignment_input_fields(assignment)
     API_ALLOWED_ASSIGNMENT_INPUT_FIELDS + [
-      'turnitin_settings' => strong_anything,
-      'vericite_settings' => strong_anything,
-      'allowed_extensions' => strong_anything,
-      'integration_data' => strong_anything,
-      'external_tool_tag_attributes' => strong_anything,
-      'submission_types' => strong_anything
-    ]
+      {'turnitin_settings' => strong_anything},
+      {'vericite_settings' => strong_anything},
+      {'allowed_extensions' => strong_anything},
+      {'integration_data' => strong_anything},
+      {'external_tool_tag_attributes' => strong_anything},
+      # prevent editing submission_types via the REST API if the assignment has submissions
+      ({'submission_types' => strong_anything} if assignment.submissions.having_submission.empty?)
+    ].compact
   end
 
   def update_lockdown_browser?(assignment_params)
