@@ -3,7 +3,7 @@
   "license": "AGPL-3.0",
   "version": "0.0.0",
   "engines": {
-    "node": ">=12.5.0",
+    "node": ">=14.0.0",
     "yarn": "^1.19.1"
   },
   "private": true,
