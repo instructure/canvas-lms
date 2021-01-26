@@ -60,19 +60,21 @@ class BrandConfigRegenerator
 
   def things_that_need_to_be_regenerated
     @things_that_need_to_be_regenerated ||= begin
-      all_subaccounts = @account.sub_accounts_recursive(100000, nil)
+      all_subaccounts = Account.active.select([:id, :brand_config_md5].union(Account::BASIC_COLUMNS_FOR_CALLBACKS)).preload(:brand_config).sub_accounts_recursive(@account.id)
+      # can't do the condition in the query above, because we'd stop going down branches if
+      # an intermediate sub account didn't have a brand config
       result = all_subaccounts.select(&:brand_config_md5)
-      result.concat(SharedBrandConfig.where(account_id: all_subaccounts))
+      result.concat(SharedBrandConfig.where(account_id: all_subaccounts).preload(:brand_config))
       if @account.site_admin?
         # note: this is only root accounts on the same shard as site admin
         @account.shard.activate do
-          root_scope = Account.root_accounts.active.non_shadow.where.not(id: @account)
-          result.concat(root_scope.select(&:brand_config_md5))
-          result.concat(SharedBrandConfig.where(account_id: root_scope))
+          root_scope = Account.root_accounts.active.non_shadow.where.not(id: @account).preload(:brand_config)
+          result.concat(root_scope.where.not(brand_config_md5: nil))
+          result.concat(SharedBrandConfig.where(account_id: root_scope).preload(:brand_config))
 
-          sub_scope = Account.active.where(root_account_id: root_scope)
-          result.concat(sub_scope.select(&:brand_config_md5))
-          result.concat(SharedBrandConfig.where(account_id: sub_scope))
+          sub_scope = Account.active.where(root_account_id: root_scope).preload(:brand_config)
+          result.concat(sub_scope.where.not(brand_config_md5: nil))
+          result.concat(SharedBrandConfig.where(account_id: sub_scope).preload(:brand_config))
         end
       end
       result
@@ -101,7 +103,7 @@ class BrandConfigRegenerator
 
     account = thing.is_a?(SharedBrandConfig) ? thing.account : thing
     job_type = thing.is_a?(SharedBrandConfig) ? :sync_to_s3_and_save_to_shared_brand_config! : :sync_to_s3_and_save_to_account!
-    new_config.send(job_type, @progress, thing.id)
+    new_config.send(job_type, @progress, thing)
 
     @new_configs[config.md5] = new_config
   end
@@ -116,10 +118,16 @@ class BrandConfigRegenerator
     five_percent = total * 5.0 / 95.0
     total += five_percent
     @progress.calculate_completion!(five_percent, total)
-    while thing = things_left_to_process.sample
-      next unless ready_to_process?(thing)
+    # take things off the queue from front-to-back
+    while thing = things_left_to_process.shift
+      # if for some reason this one isn't ready (it _should_ be by default,
+      # because we get higher tiers first) put it back on the queue to try
+      # again later
+      unless ready_to_process?(thing)
+        things_left_to_process.push(thing)
+        next
+      end
       regenerate(thing)
-      things_left_to_process.delete(thing)
     end
   end
 

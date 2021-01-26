@@ -423,7 +423,7 @@ class AccountsController < ApplicationController
       @accounts = PaginatedCollection.build do |pager|
         per_page = pager.per_page
         current_page = [pager.current_page.to_i, 1].max
-        sub_accounts = @account.sub_accounts_recursive(per_page + 1, (current_page - 1) * per_page)
+        sub_accounts = Account.active.offset((current_page - 1) * per_page).limit(per_page + 1).sub_accounts_recursive(@account.id)
 
         if sub_accounts.length > per_page
           sub_accounts.pop
