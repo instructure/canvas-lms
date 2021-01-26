@@ -2150,6 +2150,7 @@ nn:
   allows_user_to_edit_blueprint_lock_settings_on_the_9f51663c: "Gir ein brukar løyve til å endre låseinnstillingane for filer i eit Blueprint-masteremne. "
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Gir ein brukar løyve til å endre konfigurasjonar for eksterne appar som er lagt til manuelt. "
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Gir ein brukar løyve til å endre vurderingar og legge til kommentarar i SpeedGrader."
+  allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Gir ein brukar løyve til å endre vurderingar i vurderingsoversikta. Gir ein brukar løyve til å sjå vurderingshistorikken. Gir ein brukar løyve til å sjå vurderingsoversikta for meistringslæring (dersom den er aktivert). "
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
       Gir ein brukar løyve til å endre vurderingar i vurderingsoversikta.
       Gir ein brukar løyve til å sjå vurderingshistorikken.
@@ -2239,6 +2240,7 @@ nn:
   allows_user_to_view_create_edit_delete_and_publish_48716e21: |-
       Gir ein brukar løyve til å sjå, opprette, endre, slette og publisere/avpublisere sider.
       Gir ein brukar løyve til å sjå sidehistorikk og setje forside.
+  allows_user_to_view_create_edit_delete_and_publish_7e087ae8: "Gir ein brukar løyve til å sjå, opprette, endre, slette og publisere/avpublisere sider. Gir ein brukar løyve til å sjå sidehistorikk og velje ei forside. "
   allows_user_to_view_create_edit_delete_and_publish_9d6c0bfa: |-
       Gir ein brukar løyve til å sjå, opprette, endre, slette og publisere/avpublisere sider.
       Gir ein brukar løyve til å sjå sidehistorikk og setje ei forside.
