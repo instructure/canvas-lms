@@ -348,7 +348,9 @@
       <% end %>
     </div>
 
-    <% if can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
+    <%= preview_mode = can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
+
+    <% if preview_mode %>
       <div class="preview_quiz_button">
         <%= link_to_preview_quiz('class' => "btn btn-primary", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>
@@ -403,7 +405,7 @@
   <% end %>
 
   <% if @quiz.cant_go_back? %>
-    <%= render 'cant_go_back_warning' %>
+    <%= render 'cant_go_back_warning', preview: preview_mode %>
   <% end %>
 
   <%= prefetch_assignment_external_tools %>
