@@ -17792,9 +17792,9 @@ fi:
   sum_of_all_files_in_mb_2b705055: "kaikki tiedostot yhteensä (Mt)"
   support: 
     array: 
-      last_word_connector: "ja "
+      last_word_connector: " ja "
       or: 
-        last_word_connector: "tai "
+        last_word_connector: " tai "
         two_words_connector: " tai "
       two_words_connector: " ja "
       words_connector: ", "

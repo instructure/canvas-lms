@@ -22561,7 +22561,7 @@ de:
       or: 
         last_word_connector: ", oder "
         two_words_connector: " oder "
-      two_words_connector: "und "
+      two_words_connector: " und "
       words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: "Support Community"

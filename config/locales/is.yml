@@ -20165,11 +20165,11 @@ is:
   summary_statistics_f74852a5: Samtölur
   support: 
     array: 
-      last_word_connector: ", og"
+      last_word_connector: ", og "
       or: 
-        last_word_connector: ", eða"
-        two_words_connector: eða
-      two_words_connector: og
+        last_word_connector: ", eða "
+        two_words_connector: " eða "
+      two_words_connector: " og "
       words_connector: ", "
     help_menu: 
       cisco_netacad_facebook: Stuðningssamfélag

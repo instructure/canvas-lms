@@ -19478,7 +19478,7 @@ sv-x-k12:
   summary_statistics_f74852a5: Sammanfattningsstatistik
   support: 
     array: 
-      last_word_connector: "och "
+      last_word_connector: " och "
       or: 
         last_word_connector: ", eller "
         two_words_connector: " eller "
