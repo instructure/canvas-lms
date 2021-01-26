@@ -23,6 +23,8 @@ require 'crocodoc'
 
 # See the uploads controller and views for examples on how to use this model.
 class Attachment < ActiveRecord::Base
+  class UniqueRenameFailure < StandardError; end
+
   self.ignored_columns = %i[last_lock_at last_unlock_at enrollment_id cached_s3_url s3_url_cached_at
       scribd_account_id scribd_user scribd_mime_type_id submitted_to_scribd_at scribd_doc scribd_attempts
       cached_scribd_thumbnail last_inline_view local_filename]
@@ -751,23 +753,33 @@ class Attachment < ActiveRecord::Base
 
     deleted_attachments = []
     if method == :rename
-      self.save! unless self.id
+      begin
+        self.save! unless self.id
 
-      valid_name = false
-      self.shard.activate do
-        while !valid_name
-          existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
-          new_name = opts[:name] || self.display_name
-          self.display_name = Attachment.make_unique_filename(new_name, existing_names)
+        valid_name = false
+        self.shard.activate do
+          iter_count = 1
+          while !valid_name
+            existing_names = self.folder.active_file_attachments.where("id <> ?", self.id).pluck(:display_name)
+            new_name = opts[:name] || self.display_name
+            self.display_name = Attachment.make_unique_filename(new_name, existing_names, iter_count)
 
-          if Attachment.where("id = ? AND NOT EXISTS (?)", self,
-                              Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
-                                self, display_name, folder_id, 'deleted')).
-              limit(1).
-              update_all(display_name: display_name) > 0
-            valid_name = true
+            if Attachment.where("id = ? AND NOT EXISTS (?)", self,
+                                Attachment.where("id <> ? AND display_name = ? AND folder_id = ? AND file_state <> ?",
+                                  self, display_name, folder_id, 'deleted')).
+                limit(1).
+                update_all(display_name: display_name) > 0
+              valid_name = true
+            end
+            iter_count += 1
+            raise UniqueRenameFailure if iter_count >= 10
           end
         end
+      rescue UniqueRenameFailure => e
+        Canvas::Errors.capture_exception(:attachment, e, :warn)
+        # Failed to uniquely rename attachment, slapping on a UUID and moving on
+        self.display_name = self.display_name + SecureRandom.uuid
+        Attachment.where("id = ?", self).limit(1).update_all(display_name: display_name)
       end
     elsif method == :overwrite && atts.any?
       shard.activate do
@@ -1893,22 +1905,25 @@ class Attachment < ActiveRecord::Base
   # filename that makes it unique. you can either pass existing_files as string
   # filenames, in which case it'll test against those, or a block that'll be
   # called repeatedly with a filename until it returns true.
-  def self.make_unique_filename(filename, existing_files = [], &block)
+  def self.make_unique_filename(filename, existing_files = [], attempts = 1, &block)
     unless block
       block = proc { |fname| !existing_files.include?(fname) }
     end
 
-    return filename if block.call(filename)
+    return filename if attempts <= 1 && block.call(filename)
 
     new_name = filename
-    addition = 1
+    addition = attempts || 1
     dir = File.dirname(filename)
     dir = dir == "." ? "" : "#{dir}/"
     extname = filename[/(\.[A-Za-z][A-Za-z0-9]*)*(\.[A-Za-z0-9]*)$/] || ''
     basename = File.basename(filename, extname)
 
+    random_backup_name = "#{dir}#{basename}-#{SecureRandom.uuid}#{extname}"
+    return random_backup_name if attempts >= 8
     until block.call(new_name = "#{dir}#{basename}-#{addition}#{extname}")
       addition += 1
+      return random_backup_name if addition >= 8
     end
     new_name
   end
