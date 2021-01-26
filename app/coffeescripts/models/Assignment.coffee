@@ -439,7 +439,10 @@ export default class Assignment extends Model
     return I18n.t('Assignment')
 
   htmlUrl: =>
-    @get 'html_url'
+    if @isQuizLTIAssignment() && canManage() && ENV.FLAGS && ENV.FLAGS.new_quizzes_modules_support
+      return @htmlEditUrl()
+    else
+      return @get 'html_url'
 
   htmlEditUrl: =>
     "#{@get 'html_url'}/edit"

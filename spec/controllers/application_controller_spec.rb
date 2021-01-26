@@ -765,6 +765,24 @@ RSpec.describe ApplicationController do
       controller.send(:content_tag_redirect, Account.default, tag, nil)
     end
 
+    context 'when manage and new_quizzes_modules_support enabled' do
+      let(:course){ course_model }
+
+      before do
+        controller.instance_variable_set(:"@context", course)
+        allow(course).to receive(:grants_right?).and_return true
+        Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      end
+
+      it 'redirects to edit for a quiz_lti assignment' do
+        tag = create_tag(content_type: 'Assignment')
+        allow(tag).to receive(:quiz_lti).and_return true
+        expect(controller).to receive(:named_context_url).with(Account.default, :edit_context_assignment_url, 44, {module_item_id: 42}).and_return('nil')
+        allow(controller).to receive(:redirect_to)
+        controller.send(:content_tag_redirect, Account.default, tag, nil)
+      end
+    end
+
     it 'redirects for a quiz' do
       tag = create_tag(content_type: 'Quizzes::Quiz')
       expect(controller).to receive(:named_context_url).with(Account.default, :context_quiz_url, 44, {module_item_id: 42}).and_return('nil')
