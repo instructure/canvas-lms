@@ -4454,9 +4454,9 @@ describe 'Submissions API', type: :request do
           end
         end
 
-        it "returns upload_params" do
+        it "returns upload_params infering the filename from the URL" do
           upload_json = {
-            "filename" => nil,
+            "filename" => "test",
             "content_type" => nil,
             "target_url" => "http://example.com/test"
           }
