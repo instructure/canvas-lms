@@ -51,9 +51,10 @@
 class Quizzes::QuizSubmissionQuestionsController < ApplicationController
   include Api::V1::QuizSubmissionQuestion
   include ::Filters::QuizSubmissions
+  include ActionView::Helpers::NumberHelper
 
   before_action :require_user, :require_quiz_submission, :export_scopes
-  before_action :require_question, only: [ :show, :flag, :unflag ]
+  before_action :require_question, only: [ :show, :flag, :unflag, :formatted_answer ]
   before_action :prepare_service, only: [ :answer, :flag, :unflag ]
   before_action :validate_ldb_status!, only: [ :answer, :flag, :unflag ]
 
@@ -161,6 +162,42 @@ class Quizzes::QuizSubmissionQuestionsController < ApplicationController
     @service.update_question(record, @quiz_submission, params[:attempt])
 
     render json: quiz_submission_questions_json(quiz_questions.all, @quiz_submission.reload, censored: true)
+  end
+
+  # @API Get a formatted student numerical answer.
+  #
+  # Matches the intended behavior of the UI when a numerical answer is entered
+  # and returns the resulting formatted number
+  #
+  # @argument answer [Required, Numeric]
+  #
+  # @example_response
+  #  {
+  #    "formatted_answer": 12.1234
+  #  }
+  def formatted_answer
+    student_answer = params[:answer]
+
+    if student_answer.blank?
+      reject! 'answer param is required', 422
+    end
+
+    question = @question.question_data.question
+    question_type = question["question_type"]
+
+    if question_type == "numerical_question"
+      ## matches behavior of public/javascript/take_quiz.js when entering a numerical answer
+      question_has_precision_answers =
+        question[:answers].any? {|answer| answer[:numerical_answer_type] == 'precision_answer'}
+      formatting_options = {
+        precision: question_has_precision_answers ? 16 : 4,
+        strip_insignificant_zeros: true,
+        significant: question_has_precision_answers
+      }
+      student_answer = number_with_precision(student_answer, formatting_options)
+    end
+
+    render json: {formatted_answer: student_answer}
   end
 
   # @API Flagging a question.

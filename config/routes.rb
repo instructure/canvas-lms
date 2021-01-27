@@ -1877,6 +1877,7 @@ CanvasRails::Application.routes.draw do
     scope(controller: 'quizzes/quiz_submission_questions') do
       get '/quiz_submissions/:quiz_submission_id/questions', action: :index, as: 'quiz_submission_questions'
       post '/quiz_submissions/:quiz_submission_id/questions', action: :answer, as: 'quiz_submission_question_answer'
+      get '/quiz_submissions/:quiz_submission_id/questions/:id/formatted_answer', action: :formatted_answer, as: 'quiz_submission_question_formatted_answer'
       get '/quiz_submissions/:quiz_submission_id/questions/:id', action: :show, as: 'quiz_submission_question'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/flag', action: :flag, as: 'quiz_submission_question_flag'
       put '/quiz_submissions/:quiz_submission_id/questions/:id/unflag', action: :unflag, as: 'quiz_submission_question_unflag'
