@@ -80,19 +80,6 @@
                   '#' => '<input class="precision_value" type="text" style="width: 50px;" name="answer_precision" aria-label="\1" title="' + t('number between 1 and 16 inclusive') + '"/>' }) %>
           </span>
         </div>
-        <div class="answer_comments comment empty">
-          <div class="comment_top"></div>
-          <% edit_comment_text = t("Click to enter comments, if the student chooses this answer") %>
-          <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
-            <span class="ellipsis" aria-hidden="true">...</span>
-            <i class="icon-edit standalone-icon"></i>
-            <span class="commentAnswerId screenreader-only"></span>
-            <span class="screenreader-only"><%= edit_comment_text %></span>
-          </a>
-          <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
-          <input type="hidden" name="answer_comment_html" />
-          <div class="answer_comment_html comment_html"></div>
-        </div>
         <div style="display: none;">
           <span class="blank_id">&nbsp;</span>
           <span class="id">&nbsp;</span>
@@ -112,6 +99,23 @@
             <span class="deleteAnswerId screenreader-only"></span>
             <span class="screenreader-only"><%= delete_html_text %></span>
           </a>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td colspan="3">
+       <div class="answer_comments comment empty">
+        <div class="comment_top"></div>
+         <% edit_comment_text = t("Click to enter comments, if the student chooses this answer") %>
+         <a href="#" class="comment_focus" title="<%= edit_comment_text %>">
+           <span class="ellipsis" aria-hidden="true">...</span>
+           <i class="icon-edit standalone-icon"></i>
+           <span class="commentAnswerId screenreader-only"></span>
+           <span class="screenreader-only"><%= edit_comment_text %></span>
+         </a>
+          <span id="comments_header" class="details"><%= before_label(:answer_comments, "Comments, if the student chooses this answer") %></span>
+          <input type="hidden" name="answer_comment_html" />
+          <div class="answer_comment_html comment_html"></div>
         </div>
       </td>
     </tr>

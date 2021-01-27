@@ -2870,22 +2870,12 @@ $(document).ready(function() {
 
     // create toggler instance on the first click
     if (!toggler) {
-      const tinyOptions = {}
 
       const inputColumn = $comment.parents().find('.answer_type:visible')[0]
 
-      if (inputColumn) {
-        const rightMargin = parseInt($comment.css('marginRight')) || 0
-        const leftMargin = parseInt($comment.css('marginLeft')) || 0
-        const commentMargin = rightMargin + leftMargin
-
-        const rceWidth = inputColumn.offsetWidth - commentMargin
-        tinyOptions.width = rceWidth
-      }
 
       toggler = new EditorToggle($comment_html, {
-        editorBoxLabel: $link.title,
-        tinyOptions
+        editorBoxLabel: $link.title
       })
 
       toggler.editButton = $link
