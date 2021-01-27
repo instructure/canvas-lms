@@ -412,9 +412,10 @@ pipeline {
                 buildParameters += string(name: 'POSTGRES', value: "${env.POSTGRES}")
                 buildParameters += string(name: 'RUBY', value: "${env.RUBY}")
 
-                if (currentBuild.projectName.contains("rails-6")) {
-                  buildParameters += string(name: 'CANVAS_RAILS6_0', value: "${env.CANVAS_RAILS6_0}")
-                }
+                // if (currentBuild.projectName.contains("rails-6")) {
+                  // when updating this for future rails versions, change the value back to ${env.CANVAS_RAILSX_Y}
+                  buildParameters += string(name: 'CANVAS_RAILS6_0', value: "1")
+                // }
 
                 // If modifying any of our Jenkinsfiles set JENKINSFILE_REFSPEC for sub-builds to use Jenkinsfiles in
                 // the gerrit rather than master.

@@ -35,7 +35,7 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
-export CACHE_VERSION="2020-12-15.1"
+export CACHE_VERSION="2021-02-08.1"
 
 source ./build/new-jenkins/docker-build-helpers.sh
 
@@ -59,7 +59,7 @@ WEBPACK_CACHE_DOCKERFILE_MD5=$(cat Dockerfile.jenkins.webpack-cache | md5sum)
 BASE_IMAGE_ID=$(docker images --filter=reference=instructure/ruby-passenger:$RUBY --format '{{.ID}}')
 
 RUBY_RUNNER_BUILD_ARGS=(
-  --build-arg CANVAS_RAILS6_0=${CANVAS_RAILS6_0:-0}
+  --build-arg CANVAS_RAILS6_0=${CANVAS_RAILS6_0:-1}
   --build-arg POSTGRES_CLIENT="$POSTGRES_CLIENT"
   --build-arg RUBY="$RUBY"
 )
