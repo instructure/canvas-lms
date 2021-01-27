@@ -34,6 +34,8 @@ class CommunicationChannel < ActiveRecord::Base
   has_many :delayed_messages, :dependent => :destroy
   has_many :messages
 
+  # IF ANY CALLBACKS ARE ADDED please check #bounce_for_path to see if it should
+  # happen there too.
   before_save :set_root_account_ids
   before_save :assert_path_type, :set_confirmation_code
   before_save :consider_building_pseudonym
@@ -272,7 +274,7 @@ class CommunicationChannel < ActiveRecord::Base
   # Returns a boolean.
   def imported?
     id.present? &&
-      Pseudonym.where(:sis_communication_channel_id => self).exists?
+      Pseudonym.where(:sis_communication_channel_id => self).shard(user).exists?
   end
 
   # Return the 'path' for simple communication channel types like email and sms.
@@ -524,20 +526,25 @@ class CommunicationChannel < ActiveRecord::Base
 
   def self.bounce_for_path(path:, timestamp:, details:, permanent_bounce:, suppression_bounce:)
     Shard.with_each_shard(CommunicationChannel.associated_shards(path)) do
-      CommunicationChannel.unretired.email.by_path(path).each do |channel|
-        channel.bounce_count = channel.bounce_count + 1 if permanent_bounce
+      CommunicationChannel.unretired.email.by_path(path).where("bounce_count<?", RETIRE_THRESHOLD).find_in_batches do |batch|
+        update = if suppression_bounce
+                   { last_suppression_bounce_at: timestamp, updated_at: Time.zone.now }
+                 elsif permanent_bounce
+                   ["bounce_count = bounce_count + 1, updated_at=NOW(), last_bounce_at=?, last_bounce_details=?", timestamp, details.to_yaml]
+                 else
+                   { last_transient_bounce_at: timestamp, last_transient_bounce_details: details, updated_at: Time.zone.now }
+                 end
 
-        if suppression_bounce
-          channel.last_suppression_bounce_at = timestamp
-        elsif permanent_bounce
-          channel.last_bounce_at = timestamp
-          channel.last_bounce_details = details
-        else
-          channel.last_transient_bounce_at = timestamp
-          channel.last_transient_bounce_details = details
+        CommunicationChannel.where(id: batch).update_all(update)
+
+        # replacement for check_if_bouncing_changed callback.
+        # We know the channel is not and was not retired, we also know that the
+        # "bouncing? state" changed.
+        if permanent_bounce
+          CommunicationChannel.where(id: batch).preload(:user).find_each do |channel|
+            channel.user.update_bouncing_channel_message!(channel)
+          end
         end
-
-        channel.save!
       end
     end
   end
