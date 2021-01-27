@@ -8465,7 +8465,7 @@ nb:
         other: "%{count} innlegg"
       separated_conversation_notice: "Diskusjonene for dette temaet har blitt delt i flere grupper. Nedenfor er samtlige temaer du har tilgang til."
     group_discussion: 
-      separated_conversation_notice: "Siden dette er en gruppediskusjon vil hver gruppe ha sin egen samtale om temaet. Her er de du har tilgang til:"
+      separated_conversation_notice: "Siden dette er en gruppediskusjon, vil hver gruppe ha sin egen samtale om temaet. Her er de du har tilgang til:"
     group_discussion_locked: "Studenter har allerede lagt inn til denne diskusjonen, så gruppeinnstillinger kan ikke endres."
     group_discussion_title: Gruppediskusjon
     index: 
