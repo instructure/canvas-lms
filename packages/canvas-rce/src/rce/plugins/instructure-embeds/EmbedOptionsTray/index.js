@@ -27,6 +27,7 @@ import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
 
 import formatMessage from '../../../../format-message'
+import {getTrayHeight} from '../../shared/trayUtils'
 
 export default function EmbedOptionsTray(props) {
   const {content} = props
@@ -64,7 +65,7 @@ export default function EmbedOptionsTray(props) {
       shouldContainFocus
       shouldReturnFocus
     >
-      <Flex direction="column" height="100vh">
+      <Flex direction="column" height={getTrayHeight()}>
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
             <Flex.Item grow shrink>
