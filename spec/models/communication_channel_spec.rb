@@ -431,7 +431,7 @@ describe CommunicationChannel do
     end
 
     describe ".bounce_for_path" do
-      it "flags paths with too many bounces" do
+      it "flags paths with too many bounces and doesn't process subsequent bounces" do
         @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
         @cc2 = communication_channel_model(path: 'bouncy@example.edu')
 
@@ -450,7 +450,7 @@ describe CommunicationChannel do
         expect(@cc1.bouncing?).to be_falsey
 
         @cc2.reload
-        expect(@cc2.bounce_count).to eq 5
+        expect(@cc2.bounce_count).to eq 1
         expect(@cc2.bouncing?).to be_truthy
       end
 
@@ -530,6 +530,27 @@ describe CommunicationChannel do
         cc.reload
         expect(cc.last_bounce_details).to eq('some' => 'details', 'foo' => 'bar')
         expect(cc.last_transient_bounce_details).to be_nil
+      end
+
+      it 'accounts for current callbacks in bulk bouncer' do
+        # If you hit this spec failure, you changed the callbacks that have been
+        # checked in the communication_channel save. Make sure that it is not an
+        # action that would need to happen for the bounce_for_path method. If it
+        # does not need to happen, add it to the list below. If it does, handle
+        # that, then add it to the list here.
+        accounted_for_callbacks = %i(
+          after_save_collection_association
+          assert_path_type
+          autosave_associated_records_for_pseudonym
+          autosave_associated_records_for_user
+          before_save_collection_association
+          broadcast_notifications
+          clear_user_email_cache
+          consider_building_pseudonym
+          set_confirmation_code
+          set_root_account_ids
+        )
+        expect(CommunicationChannel._save_callbacks.collect(&:filter).select {|k| k.is_a? Symbol} - accounted_for_callbacks).to eq []
       end
 
       it "stores the details of the last soft bounce" do
@@ -631,6 +652,7 @@ describe CommunicationChannel do
 
       describe ".bounce_for_path" do
         it "flags paths with too many bounces" do
+          stub_const("CommunicationChannel::RETIRE_THRESHOLD", 3)
           @cc1 = communication_channel_model(path: 'not_as_bouncy@example.edu')
           @shard1.activate do
             @cc2 = communication_channel_model(path: 'bouncy@example.edu')
@@ -657,11 +679,11 @@ describe CommunicationChannel do
           expect(@cc1.bouncing?).to be_falsey
 
           @cc2.reload
-          expect(@cc2.bounce_count).to eq 5
+          expect(@cc2.bounce_count).to eq 3
           expect(@cc2.bouncing?).to be_truthy
 
           @cc3.reload
-          expect(@cc3.bounce_count).to eq 5
+          expect(@cc3.bounce_count).to eq 3
           expect(@cc3.bouncing?).to be_truthy
         end
       end
