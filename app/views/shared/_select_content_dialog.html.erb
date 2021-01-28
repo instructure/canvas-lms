@@ -255,7 +255,8 @@
           <% end %>
           <% if new_quizzes_modules_support_enabled %>
             <% @combined_active_quizzes.each do |id, title, type| %>
-              <option value="<%= type + '_' + id.to_s %>"><%= title %></option>
+              <% option_text = "#{title} #{t :classic_quiz_identifier, '(classic)' if @combined_active_quizzes_includes_both_types && type == 'quiz'}" %>
+              <option value="<%= type + '_' + id.to_s %>"><%= option_text %></option>
             <% end %>
           <% else %>
             <% @context.quizzes.active.reorder(Quizzes::Quiz.best_unicode_collation_key('title')).limit(400).pluck(:id, :title).each do |id, title| %>

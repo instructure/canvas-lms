@@ -114,10 +114,23 @@ describe "shared/_select_content_dialog" do
         [2, 'B', 'quiz'],
         [1, 'C', 'assignment']
       ])
+      assign(:combined_active_quizzes_includes_both_types, true)
       render partial: 'shared/select_content_dialog'
       page = Nokogiri(response.body)
       options = page.css('#quizs_select .module_item_select option').map(&:text)
-      expect(options).to eq(["[ Create Quiz ]", "A", "B", "C"])
+      expect(options).to eq(["[ Create Quiz ]", "A (classic)", "B (classic)", "C "])
+    end
+
+    it "does not render the (classic) identifier when there are only classic quizzes listed" do
+      assign(:combined_active_quizzes, [
+        [1, 'A', 'quiz'],
+        [2, 'B', 'quiz']
+      ])
+      assign(:combined_active_quizzes_includes_both_types, false)
+      render partial: 'shared/select_content_dialog'
+      page = Nokogiri(response.body)
+      options = page.css('#quizs_select .module_item_select option').map(&:text)
+      expect(options).to eq(["[ Create Quiz ]", "A ", "B "])
     end
 
     it "does not render New Quizzes as Assignments" do

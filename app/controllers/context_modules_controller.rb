@@ -131,6 +131,7 @@ class ContextModulesController < ApplicationController
         limit(400).
         pluck(:id, :title, Arel.sql("'assignment' AS type"))
 
+      @combined_active_quizzes_includes_both_types = !classic_quizzes.empty? && !lti_quizzes.empty?
       (classic_quizzes + lti_quizzes).sort_by{ |quiz_attrs| Canvas::ICU.collation_key(quiz_attrs[1] || CanvasSort::First) }.take(400)
     end
   end
