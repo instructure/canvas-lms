@@ -307,12 +307,10 @@ class CourseSection < ActiveRecord::Base
       old_course.delay_if_production.update_account_associations unless Course.skip_updating_account_associations?
     end
 
-    run_immediately = opts.include?(:run_jobs_immediately)
     DueDateCacher.recompute_users_for_course(
       user_ids,
       course,
       nil,
-      run_immediately: run_immediately,
       update_grades: true,
       executing_user: opts[:updating_user]
     )
