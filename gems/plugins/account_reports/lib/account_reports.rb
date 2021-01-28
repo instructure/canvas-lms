@@ -40,18 +40,40 @@ module AccountReports
       end
     end
 
+    def module_class
+      module_name.constantize
+    end
+
     def proc
       unless self[:proc]
-        self.proc = module_name.constantize.method(type)
+        self.proc = module_class.method(type)
       end
       self[:proc]
+    end
+
+    def parameters
+      self.parameters = :account_report_parameters if self[:parameters].nil?
+
+      begin
+        case (p = self[:parameters])
+        when Proc
+          self.parameters = instance_exec(&p)
+        when Symbol
+          self.parameters = module_class.send(p)
+        else
+          p
+        end
+      rescue => e
+        Rails.logger.error(e)
+        self.parameters = {}
+      end
     end
 
     def parallel_proc
       unless instance_variable_defined?(:@parallel_proc)
         @parallel_proc = self[:parallel_proc] ||
-          module_name.constantize.public_methods.include?(:"parallel_#{type}") &&
-          module_name.constantize.method(:"parallel_#{type}")
+          module_class.public_methods.include?(:"parallel_#{type}") &&
+          module_class.method(:"parallel_#{type}")
       end
       @parallel_proc
     end
