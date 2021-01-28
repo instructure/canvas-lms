@@ -60,7 +60,7 @@ module Types
 
     field :outcomes, Types::ContentTagConnection, null: false
     def outcomes
-      object.child_outcome_links.active.order_by_outcome_title
+      learning_outcome_group_children_service.suboutcomes_by_group_id(object.id)
     end
 
     private

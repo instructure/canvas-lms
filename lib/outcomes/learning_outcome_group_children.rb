@@ -19,7 +19,7 @@
 #
 
 module Outcomes
-  class LearningOutcomeGroupChildren
+    class LearningOutcomeGroupChildren
     attr_reader :context
 
     def initialize(context = nil)
@@ -39,6 +39,18 @@ module Outcomes
         select(:content_id).
         distinct.
         count
+    end
+
+    def suboutcomes_by_group_id(learning_outcome_group_id)
+      ids = children_ids(learning_outcome_group_id) << learning_outcome_group_id
+
+      ContentTag.active.learning_outcome_links.
+        where(associated_asset_id: ids).
+        joins(:learning_outcome_content).
+        joins("INNER JOIN  #{LearningOutcomeGroup.quoted_table_name} AS logs
+              on logs.id = content_tags.associated_asset_id").
+        order(LearningOutcomeGroup.best_unicode_collation_key('logs.title'),
+              LearningOutcome.best_unicode_collation_key('short_description'))
     end
 
     private

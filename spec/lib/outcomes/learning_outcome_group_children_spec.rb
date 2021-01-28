@@ -26,28 +26,54 @@ describe Outcomes::LearningOutcomeGroupChildren do
   # rubocop:disable RSpec/LetSetup
   let!(:context) { Account.default }
   let!(:global_group) { LearningOutcomeGroup.create(title: 'global') }
-  let!(:global_outcome1) { outcome_model(outcome_group: global_group) }
-  let!(:global_outcome2) { outcome_model(outcome_group: global_group) }
+  let!(:global_outcome1) { outcome_model(outcome_group: global_group, title: 'G Outcome 1') }
+  let!(:global_outcome2) { outcome_model(outcome_group: global_group, title: 'G Outcome 2') }
   let!(:g0) { context.root_outcome_group }
-  let!(:g1) { outcome_group_model(context: context, outcome_group_id: g0) }
-  let!(:g2) { outcome_group_model(context: context, outcome_group_id: g0) }
-  let!(:g3) { outcome_group_model(context: context, outcome_group_id: g1) }
-  let!(:g4) { outcome_group_model(context: context, outcome_group_id: g1) }
-  let!(:g5) { outcome_group_model(context: context, outcome_group_id: g2) }
-  let!(:g6) { outcome_group_model(context: context, outcome_group_id: g3) }
-  let!(:o0) { outcome_model(context: context, outcome_group: g0) }
-  let!(:o1) { outcome_model(context: context, outcome_group: g1) }
-  let!(:o2) { outcome_model(context: context, outcome_group: g1) }
-  let!(:o3) { outcome_model(context: context, outcome_group: g2) }
-  let!(:o4) { outcome_model(context: context, outcome_group: g3) }
-  let!(:o5) { outcome_model(context: context, outcome_group: g3) }
-  let!(:o6) { outcome_model(context: context, outcome_group: g3) }
-  let!(:o7) { outcome_model(context: context, outcome_group: g4) }
-  let!(:o8) { outcome_model(context: context, outcome_group: g5) }
-  let!(:o9) { outcome_model(context: context, outcome_group: g6) }
-  let!(:o10) { outcome_model(context: context, outcome_group: g6) }
-  let!(:o11) { outcome_model(context: context, outcome_group: g6) }
+  let!(:g1) { outcome_group_model(context: context, outcome_group_id: g0, title: 'Group 1.1') }
+  let!(:g2) { outcome_group_model(context: context, outcome_group_id: g0, title: 'Group 1.2') }
+  let!(:g3) { outcome_group_model(context: context, outcome_group_id: g1, title: 'Group 2.1') }
+  let!(:g4) { outcome_group_model(context: context, outcome_group_id: g1, title: 'Group 2.2') }
+  let!(:g5) { outcome_group_model(context: context, outcome_group_id: g2, title: 'Group 3') }
+  let!(:g6) { outcome_group_model(context: context, outcome_group_id: g3, title: 'Group 4') }
+  let!(:o0) { outcome_model(context: context, outcome_group: g0, title:'Outcome 1', short_description: 'Outcome 1') }
+  let!(:o1) { outcome_model(context: context, outcome_group: g1, title:'Outcome 2.1', short_description: 'Outcome 2.1') }
+  let!(:o2) { outcome_model(context: context, outcome_group: g1, title:'Outcome 2.2', short_description: 'Outcome 2.2') }
+  let!(:o3) { outcome_model(context: context, outcome_group: g2, title:'Outcome 3', short_description: 'Outcome 3') }
+  let!(:o4) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.1', short_description: 'Outcome 4.1') }
+  let!(:o5) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.2', short_description: 'Outcome 4.2') }
+  let!(:o6) { outcome_model(context: context, outcome_group: g3, title:'Outcome 4.3', short_description: 'Outcome 4.3') }
+  let!(:o7) { outcome_model(context: context, outcome_group: g4, title:'Outcome 5', short_description: 'Outcome 5') }
+  let!(:o8) { outcome_model(context: context, outcome_group: g5, title:'Outcome 6', short_description: 'Outcome 6') }
+  let!(:o9) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.1', short_description: 'Outcome 7.1') }
+  let!(:o10) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.2', short_description: 'Outcome 7.2') }
+  let!(:o11) { outcome_model(context: context, outcome_group: g6, title:'Outcome 7.3', short_description: 'Outcome 7.3') }
   # rubocop:enable RSpec/LetSetup
+
+  # Outcome Structure for visual reference
+  # Global
+  # global_group: global
+  #   global_outcome1: G Outcome 1
+  #   global_outcome2: G Outcome 2
+  # Root
+  # g0: Root/Content Name
+  #   o0: Outcome 1
+  #   g1: Group 1.1
+  #      o1: Outcome 2.1
+  #      o2: Outcome 2.2
+  #      g3: Group 2.1
+  #         o4: Outcome 4.1
+  #         o5: Outcome 4.2
+  #         o6: outcome 4.3
+  #         g6: Group 4
+  #            o9:  Outcome 7.1
+  #            o10: Outcome 7.2
+  #            o11: Outcome 7.3
+  #      g4: Group 2.2
+  #         o7: Outcome 5
+  #   g2: Group 1.2
+  #      o3: Outcome 2
+  #      g5: Group 3
+  #         o8: Outcome 6
 
 
   before do
@@ -118,6 +144,78 @@ describe Outcomes::LearningOutcomeGroupChildren do
 
       it 'returns global outcomes' do
         expect(subject.total_outcomes(global_group.id)).to eq 2
+      end
+    end
+  end
+
+  describe '#suboutcomes_by_group_id' do
+    it 'returns the outcomes ordered by parent group title then outcome short_description' do
+      g_outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
+      expect(g_outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
+      r_outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
+      expect(r_outcomes).to match_array(
+        [
+          'Outcome 1', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 3', 'Outcome 4.1',
+          'Outcome 4.2', 'Outcome 4.3', 'Outcome 5', 'Outcome 6', 'Outcome 7.1',
+          'Outcome 7.2', 'Outcome 7.3'
+        ]
+      )
+    end
+
+    context 'when g2 title is updated with a letter that will proceed others' do
+      before {g2.update!(title: 'A Group 3')}
+
+      it 'should return the g2s outcome (o3) first' do
+        outcomes = subject.suboutcomes_by_group_id(g0.id).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to match_array(
+          [
+            'Outcome 3', 'Outcome 1', 'Outcome 2.1', 'Outcome 2.2', 'Outcome 4.1',
+            'Outcome 4.2', 'Outcome 4.3', 'Outcome 5', 'Outcome 6', 'Outcome 7.1',
+            'Outcome 7.2', 'Outcome 7.3'
+          ]
+        )
+      end
+    end
+
+    context 'when o5 short_description is updated with a letter that will proceed others' do
+      # NOTE: when you update the short_description of a LearningOutcome it does NOT update the
+      # content tag title.
+      before {o5.update!(short_description: 'A Outcome 4.2')}
+
+      it 'o5 should be returned before o4 but not o2 and o3' do
+        outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to match_array(
+          [
+            'Outcome 2.1', 'Outcome 2.2', 'A Outcome 4.2', 'Outcome 4.1', 'Outcome 4.3',
+            'Outcome 5', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3'
+          ]
+        )
+      end
+    end
+
+    context 'when g4 title and o6 short_description is updated with a letter that will proceed others' do
+      before {
+        g4.update!(title: 'A Group 2.2')
+        o6.update!(short_description: 'A Outcome 4.3')
+      }
+
+      it 'should return the g4s outcomes first and o6 should be first before other Outcomes 4.x' do
+        outcomes = subject.suboutcomes_by_group_id(g1.id).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to match_array(
+          [
+            'Outcome 5', 'Outcome 2.1', 'Outcome 2.2', 'A Outcome 4.3', 'Outcome 4.1',
+            'Outcome 4.2', 'Outcome 7.1', 'Outcome 7.2', 'Outcome 7.3'
+          ]
+        )
+      end
+    end
+
+    context 'when context is nil' do
+      subject { described_class.new(nil) }
+
+      it 'returns global outcomes' do
+        outcomes = subject.suboutcomes_by_group_id(global_group.id).map(&:learning_outcome_content).map(&:short_description)
+        expect(outcomes).to match_array(['G Outcome 1', 'G Outcome 2'])
       end
     end
   end
