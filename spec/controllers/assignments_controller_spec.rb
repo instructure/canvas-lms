@@ -792,6 +792,44 @@ describe AssignmentsController do
       expect(response).to be_successful
     end
 
+    describe 'assignments_2_student' do
+      before do
+        @course.enable_feature!(:assignments_2_student)
+        @course.save!
+        user_session(@student)
+      end
+
+      it "sets unlock date as a prerequisite for date locked assignment" do
+        @assignment.unlock_at = 1.week.from_now
+        @assignment.lock_at = 2.weeks.from_now
+        @assignment.due_at = 10.days.from_now
+        @assignment.submission_types = 'text_tool'
+        @assignment.save!
+
+        get 'show', params: {course_id: @course.id, id: @assignment.id}
+
+        expect(assigns[:js_env][:PREREQS][:unlock_at]).to eq(@assignment.unlock_at)
+      end
+
+      it "sets the previous assignment as a prerequisite for assignment in module with prerequisite requirement" do
+        @mod = @course.context_modules.create!(name: 'Module 1')
+        @mod2 = @course.context_modules.create!(name: 'Module 2')
+
+        @assignment2 = @course.assignments.create(title: "another assignment")
+
+        @tag = @mod.add_item(type: 'assignment', id: @assignment.id)
+        @mod2.add_item(type: 'assignment', id: @assignment2.id)
+        @mod.completion_requirements = {@tag.id => {type: 'must_mark_done'}}
+        @mod2.prerequisites = "module_#{@mod.id}"
+        @mod.save!
+        @mod2.save!
+
+        get 'show', params: {course_id: @course.id, id: @assignment2.id}
+
+        expect(assigns[:js_env][:PREREQS][:items].first[:prev][:title]).to eq(@assignment.title)
+      end
+    end
+
     it "should not show locked external tool assignments" do
       user_session(@student)
 

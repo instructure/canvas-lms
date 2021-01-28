@@ -37,6 +37,7 @@ function getAssignmentEnvVariables() {
     courseId: ENV.context_asset_string.split('_')[1],
     currentUser: ENV.current_user,
     enrollmentState: ENV.enrollment_state,
+    unlockDate: null,
     modulePrereq: null,
     moduleUrl: `${baseUrl}/modules`
   }
@@ -48,6 +49,8 @@ function getAssignmentEnvVariables() {
       link: prereq.html_url,
       __typename: 'modulePrereq'
     }
+  } else if (ENV.PREREQS?.unlock_at) {
+    env.unlockDate = ENV.PREREQS.unlock_at
   }
 
   return env

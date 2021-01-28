@@ -22,6 +22,7 @@ import ContentTabs from './ContentTabs'
 import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
 import MissingPrereqs from './MissingPrereqs'
+import DateLocked from './DateLocked'
 import React, {Suspense, lazy} from 'react'
 import PropTypes from 'prop-types'
 import {Spinner} from '@instructure/ui-spinner'
@@ -33,6 +34,8 @@ function renderContentBaseOnAvailability({assignment, submission}) {
   if (assignment.env.modulePrereq) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
+  } else if (assignment.env.unlockDate) {
+    return <DateLocked date={assignment.env.unlockDate} type="assignment" />
   } else if (submission === null) {
     // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (

@@ -109,12 +109,13 @@ class AssignmentsController < ApplicationController
       )
     end
 
-    assignment_prereqs =
-      if @locked && !@locked[:can_view]
-        context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
-      else
-        {}
-      end
+    assignment_prereqs = if @locked && @locked[:unlock_at]
+      @locked
+     elsif @locked && !@locked[:can_view]
+       context_module_sequence_items_by_asset_id(@assignment.id, "Assignment")
+     else
+       {}
+     end
 
     js_env({
       ASSIGNMENT_ID: params[:id],
