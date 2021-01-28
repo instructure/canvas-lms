@@ -721,6 +721,61 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "user_progress" do
+    before :once do
+      account_admin_user
+      @module = @course.context_modules.create!(:name => "teh module")
+      @assignment = @course.assignments.create!(:title => "teh assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+      @module.publish
+      @module.save!
+    end
+
+    it "allows a student to query 'self'" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/self/progress",
+                              { :course_id => @course.to_param, :user_id => 'self', :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "allows an administrator to query another user" do
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "returns 404 if querying a user who isn't in the course" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{other_user.id}/progress",
+                       { :course_id => @course.to_param, :user_id => other_user.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 404 })
+    end
+
+    it "returns 400 if querying a user who isn't a student" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 400 })
+    end
+
+    it "allows a teacher to query a student in the course" do
+      json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "verifies that a user has permission" do
+      api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 401 })
+    end
+
+
+  end
+
   it 'should paginate the course list' do
     json = api_call(:get, "/api/v1/courses.json?per_page=1",
             { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
