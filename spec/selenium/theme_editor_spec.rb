@@ -237,6 +237,11 @@ describe 'Theme Editor' do
       true
     end
     driver.switch_to.alert.accept
+
+    # wait for the popup
+    wait_for_ajaximations
+    run_jobs
+
     expect(fj('button:contains("Theme")').css_value('background-color')).to eq('rgba(102, 51, 153, 1)')
 
     # also make sure instUI stuff picks up the theme variables

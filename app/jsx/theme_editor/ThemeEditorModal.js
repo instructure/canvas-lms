@@ -24,15 +24,13 @@ import {Heading} from '@instructure/ui-elements'
 import ProgressBar from '../shared/ProgressBar'
 
 const messageToName = message =>
-  message.includes('Syncing for') ? message.replace('Syncing for ', '') : I18n.t('Unknown Account')
+  message.includes('Syncing for') ? message.replace('Syncing for ', '') : message
 
 function SubAccountProgressBar({message, completion}) {
   return (
     <li className="Theme-editor-progress-list-item">
       <div className="Theme-editor-progress-list-item__title">
-        {I18n.t('%{account_name}', {
-          account_name: messageToName(message)
-        })}
+        {messageToName(message)}
       </div>
       <div className="Theme-editor-progress-list-item__bar">
         <ProgressBar
