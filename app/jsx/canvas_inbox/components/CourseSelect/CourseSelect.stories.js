@@ -16,15 +16,26 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import React from 'react'
 import {CourseSelect} from './CourseSelect'
 
 export default {
   title: 'Examples/Canvas Inbox/Course Select',
-  component: CourseSelect
+  component: CourseSelect,
+  argTypes: {
+    onFailure: {action: 'failure_alert'},
+    onSuccess: {action: 'success_alert'}
+  }
 }
 
-const Template = args => <CourseSelect {...args} />
+const Template = args => (
+  <AlertManagerContext.Provider
+    value={{setOnFailure: args.onFailure, setOnSuccess: args.onSuccess}}
+  >
+    <CourseSelect {...args} />
+  </AlertManagerContext.Provider>
+)
 
 const options = {
   favoriteCourses: [

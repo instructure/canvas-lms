@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import MessageListActionContainer from '../MessageListActionContainer'
 import {createCache} from '../../../canvas-apollo'
 import {COURSES_QUERY} from '../../Queries'
@@ -57,9 +58,11 @@ const createGraphqlMocks = () => {
 const setup = async overrideProps => {
   const mocks = await createGraphqlMocks()
   return render(
-    <MockedProvider mocks={mocks} cache={createCache()}>
-      <MessageListActionContainer {...overrideProps} />
-    </MockedProvider>
+    <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <MockedProvider mocks={mocks} cache={createCache()}>
+        <MessageListActionContainer {...overrideProps} />
+      </MockedProvider>
+    </AlertManagerContext.Provider>
   )
 }
 

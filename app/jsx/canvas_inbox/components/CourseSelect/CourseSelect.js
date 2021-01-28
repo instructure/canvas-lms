@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 import I18n from 'i18n!conversations_2'
@@ -85,8 +85,7 @@ export class CourseSelect extends React.Component {
     options: this.props.options,
     filteredOptions: this.props.options,
     highlightedOptionId: null,
-    selectedOptionId: null,
-    announcement: null
+    selectedOptionId: null
   }
 
   getDefaultHighlightedOption = (newOptions = []) => {
@@ -134,11 +133,15 @@ export class CourseSelect extends React.Component {
     const option = this.getOptionById(id)
     if (!option) return // prevent highlighting of empty options
     this.getGroupChangedMessage(option)
-    this.setState(state => ({
-      highlightedOptionId: id,
-      inputValue: event.type === 'keydown' ? option.contextName : state.inputValue,
-      announcement: this.getGroupChangedMessage(option)
-    }))
+    this.setState(
+      state => ({
+        highlightedOptionId: id,
+        inputValue: event.type === 'keydown' ? option.contextName : state.inputValue
+      }),
+      () => {
+        this.context.setOnSuccess(this.getGroupChangedMessage(option))
+      }
+    )
   }
 
   handleSelectOption = (event, {id}) => {
@@ -146,13 +149,17 @@ export class CourseSelect extends React.Component {
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
     this.props.onCourseFilterSelect(id)
-    this.setState({
-      selectedOptionId: id,
-      inputValue: option.contextName,
-      isShowingOptions: false,
-      filteredOptions: this.props.options,
-      announcement: I18n.t('%{contextName} selected', {contextName})
-    })
+    this.setState(
+      {
+        selectedOptionId: id,
+        inputValue: option.contextName,
+        isShowingOptions: false,
+        filteredOptions: this.props.options
+      },
+      () => {
+        this.context.setOnSuccess(I18n.t('%{contextName} selected', {contextName}))
+      }
+    )
   }
 
   handleInputChange = event => {
@@ -216,37 +223,30 @@ export class CourseSelect extends React.Component {
   }
 
   render() {
-    const {inputValue, isShowingOptions, announcement} = this.state
+    const {inputValue, isShowingOptions} = this.state
     return (
-      <>
-        <Select
-          renderLabel={
-            <ScreenReaderContent>
-              {this.props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
-            </ScreenReaderContent>
-          }
-          assistiveText={I18n.t('Type or use arrow keys to navigate options')}
-          placeholder={this.props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
-          inputValue={inputValue}
-          isShowingOptions={isShowingOptions}
-          onBlur={this.handleBlur}
-          onInputChange={this.handleInputChange}
-          onRequestShowOptions={this.handleShowOptions}
-          onRequestHideOptions={this.handleHideOptions}
-          onRequestHighlightOption={this.handleHighlightOption}
-          onRequestSelectOption={this.handleSelectOption}
-          data-testid="courseSelect"
-        >
-          {this.renderGroups()}
-        </Select>
-        <Alert
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          liveRegionPoliteness="assertive"
-          screenReaderOnly
-        >
-          {announcement}
-        </Alert>
-      </>
+      <Select
+        renderLabel={
+          <ScreenReaderContent>
+            {this.props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
+          </ScreenReaderContent>
+        }
+        assistiveText={I18n.t('Type or use arrow keys to navigate options')}
+        placeholder={this.props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
+        inputValue={inputValue}
+        isShowingOptions={isShowingOptions}
+        onBlur={this.handleBlur}
+        onInputChange={this.handleInputChange}
+        onRequestShowOptions={this.handleShowOptions}
+        onRequestHideOptions={this.handleHideOptions}
+        onRequestHighlightOption={this.handleHighlightOption}
+        onRequestSelectOption={this.handleSelectOption}
+        data-testid="courseSelect"
+      >
+        {this.renderGroups()}
+      </Select>
     )
   }
 }
+
+CourseSelect.contextType = AlertManagerContext

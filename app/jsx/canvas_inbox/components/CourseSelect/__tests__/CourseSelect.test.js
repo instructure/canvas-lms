@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {CourseSelect} from '../CourseSelect'
@@ -59,13 +60,21 @@ beforeEach(() => {
 describe('CourseSelect', () => {
   it('renders the course select', () => {
     const props = createProps()
-    const {getByTestId} = render(<CourseSelect {...props} />)
+    const {getByTestId} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
     expect(getByTestId('courseSelect')).toBeInTheDocument()
   })
 
   it('opens the select and allows selecting an option', () => {
     const props = createProps()
-    const {getByTestId, getByText} = render(<CourseSelect {...props} />)
+    const {getByTestId, getByText} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
     const select = getByTestId('courseSelect')
     fireEvent.click(select)
     fireEvent.click(getByText('Potions'))
@@ -74,7 +83,11 @@ describe('CourseSelect', () => {
 
   it('filters the options when typing', () => {
     const props = createProps()
-    const {getByTestId, queryByText} = render(<CourseSelect {...props} />)
+    const {getByTestId, queryByText} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
     const select = getByTestId('courseSelect')
     fireEvent.click(select)
     fireEvent.change(select, {target: {value: 'Gryff'}})
