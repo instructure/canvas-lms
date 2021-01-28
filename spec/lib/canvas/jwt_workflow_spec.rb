@@ -69,9 +69,6 @@ module Canvas
           allow(@c).to receive(:respond_to?).with(:wiki).and_return(true)
           allow(@wiki).to receive(:grants_right?)
           allow(@g).to receive(:can_participate).and_return(true)
-
-          # ensure disabled by default
-          Account.default.root_account.disable_feature!(:granular_permissions_course_sections)
         end
 
         it 'sets can_upload_files to false' do
@@ -88,28 +85,6 @@ module Canvas
           ).and_return(true)
           state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
           expect(state[:can_upload_files]).to be true
-        end
-
-        context 'with granular permissions enabled' do
-          before :each do
-            Account.default.root_account.enable_feature!(:granular_permissions_course_sections)
-          end
-
-          it 'sets can_upload_files to false' do
-            expect(@c).to receive(:grants_any_right?).with(
-              @u, :manage_files, :manage_files_add
-            ).and_return(false)
-            state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
-            expect(state[:can_upload_files]).to be false
-          end
-
-          it 'sets can_upload_files to true' do
-            expect(@c).to receive(:grants_any_right?).with(
-              @u, :manage_files, :manage_files_add
-            ).and_return(true)
-            state = JWTWorkflow.state_for(%i[rich_content], @c, @u)
-            expect(state[:can_upload_files]).to be true
-          end
         end
 
         it 'sets usage_rights_required to false' do

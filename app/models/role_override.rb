@@ -871,27 +871,6 @@ class RoleOverride < ActiveRecord::Base
          'AccountAdmin'
        ]
     },
-    manage_sections: {
-      label: lambda do
-        t(
-          # Legacy bundled role override for managing course sections
-          'permissions.manage_sections',
-          'Manage (create / edit / delete) course sections'
-        )
-      end,
-      label_v2: -> { t('Course Sections - add / edit / delete') },
-      available_to: %w[
-        AccountAdmin
-        AccountMembership
-        TeacherEnrollment
-        TaEnrollment
-        DesignerEnrollment
-      ],
-      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-      account_allows: lambda do |a|
-        !a.root_account.feature_enabled?(:granular_permissions_course_sections)
-      end
-    },
     manage_sections_add: {
       label: -> { t('permissions.manage_sections_add', 'Add course sections') },
       label_v2: -> { t('Course Sections - add') },
@@ -904,10 +883,7 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
       ],
-      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_sections)
-      end
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
     },
     manage_sections_edit: {
       label: -> { t('permissions.manage_sections_edit', 'Edit course sections') },
@@ -921,10 +897,7 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
       ],
-      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_sections)
-      end
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
     },
     manage_sections_delete: {
       label: -> { t('permissions.manage_sections_delete', 'Delete course sections') },
@@ -938,10 +911,7 @@ class RoleOverride < ActiveRecord::Base
         TaEnrollment
         DesignerEnrollment
       ],
-      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment],
-      account_allows: lambda do |a|
-        a.root_account.feature_enabled?(:granular_permissions_course_sections)
-      end
+      true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
     },
     :manage_students => {
          :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },

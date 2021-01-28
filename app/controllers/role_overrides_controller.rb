@@ -283,7 +283,9 @@ class RoleOverridesController < ApplicationController
   #     manage_outcomes                  -- [sTaDo] Learning Outcomes - add / edit / delete
   #     manage_proficiency_calculations  -- [ t d ] Outcome Proficiency Calculations - add / edit / delete
   #     manage_proficiency_scales        -- [ t d ] Outcome Proficiency/Mastery Scales - add / edit / delete
-  #     manage_sections                  -- [ TaD ] Course Sections - add / edit / delete
+  #     manage_sections_add              -- [ TaD ] Course Sections - add
+  #     manage_sections_edit             -- [ TaD ] Course Sections - edit
+  #     manage_sections_delete           -- [ TaD ] Course Sections - delete
   #     manage_students                  -- [ TAD ] Users - add / remove students in courses
   #     manage_user_notes                -- [ TA  ] Faculty Journal - manage entries
   #     manage_rubrics                   -- [ TAD ] Rubrics - add / edit / delete
