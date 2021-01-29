@@ -310,14 +310,23 @@ module CustomSeleniumActions
   end
 
   def switch_editor_views(tiny_controlling_element)
-    if !tiny_controlling_element.is_a?(String)
-      tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+    if Account.default.feature_enabled?(:rce_enhancements)
+      switch_new_editor_views
+    else
+      if !tiny_controlling_element.is_a?(String)
+        tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+      end
+      selector = tiny_controlling_element.to_s.to_json
+      assert_can_switch_views!
+      driver.execute_script(%Q{
+        $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
+      })
     end
-    selector = tiny_controlling_element.to_s.to_json
-    assert_can_switch_views!
-    driver.execute_script(%Q{
-      $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
-    })
+  end
+
+  # Used for Enhanced RCE
+  def switch_new_editor_views
+    force_click('[data-btn-id="rce-edit-btn"]')
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id=nil)
@@ -346,7 +355,6 @@ module CustomSeleniumActions
     end
 
     iframe_id = driver.execute_script("return $(#{selector}).siblings('#{mce_class}').find('iframe')[0];")['id']
-
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
     if text.length > 100 || text.lines.size > 1
