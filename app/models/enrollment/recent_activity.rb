@@ -55,7 +55,7 @@ class Enrollment
       result = all_enrollments_scope.update_all(options)
       
       all_enrollments_scope.ids.each do |id|
-        PipelineService.publish(Enrollment.new(id: id))
+        PipelineService.publish_as_v2(Enrollment.new(id: id))
       end
 
       result
