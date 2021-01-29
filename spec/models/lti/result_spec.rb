@@ -150,6 +150,16 @@ RSpec.describe Lti::Result, type: :model do
 
         it { is_expected.to eq result.read_attribute(:result_score) }
       end
+
+      context 'when result_maximum is 0' do
+        before do
+          assignment.class.where(id: assignment.id).update_all(points_possible: 10)
+          result.update(result_maximum: 0, result_score: 5)
+          result.reload
+        end
+
+        it { is_expected.to eq result.read_attribute(:result_score) }
+      end
     end
 
     describe '#result_maximum' do
@@ -196,7 +206,34 @@ RSpec.describe Lti::Result, type: :model do
             result
           end.to raise_error(
             ActiveRecord::RecordInvalid,
-            "Validation failed: Result maximum must be greater than 0"
+            "Validation failed: Result maximum must be greater than or equal to 0"
+          )
+        end
+      end
+
+      context "with result_maximum 0 and the line item's score_maximum 0" do
+        it 'does not raise an error' do
+          expect do
+            lti_result_model(
+              line_item: line_item_model(
+                assignment: assignment_model(points_possible: 0)
+              ).tap{|li| li.update! score_maximum: 0},
+              result_maximum: 0,
+              result_score: 0.5
+            )
+          end.not_to raise_error
+        end
+      end
+
+      context "with result_maximum 0 and the line item's score_maximum not 0" do
+        let(:result_maximum) { 0 }
+
+        it 'raises an error' do
+          expect do
+            result
+          end.to raise_error(
+            ActiveRecord::RecordInvalid,
+            "Validation failed: Result maximum cannot be zero if line item's maximum is not zero"
           )
         end
       end

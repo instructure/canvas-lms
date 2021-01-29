@@ -70,7 +70,7 @@ module Lti::Ims
       :verify_user_in_context,
       :verify_required_params,
       :verify_valid_timestamp,
-      :verify_exclusive_key_pairs,
+      :verify_valid_score_maximum,
       :verify_valid_submitted_at,
     )
 
@@ -264,11 +264,12 @@ module Lti::Ims
       end
     end
 
-    def verify_exclusive_key_pairs
+    def verify_valid_score_maximum
       return if ignore_score?
       if params.key?(:scoreMaximum)
-        return if params[:scoreMaximum].to_f > 0
-        render_error('ScoreMaximum must be greater than 0', :unprocessable_entity)
+        return if params[:scoreMaximum].to_f >= 0
+
+        render_error('ScoreMaximum must be greater than or equal to 0', :unprocessable_entity)
       else
         render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
       end

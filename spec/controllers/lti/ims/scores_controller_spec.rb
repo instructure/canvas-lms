@@ -493,6 +493,30 @@ module Lti::Ims
         context 'with a ZERO score maximum' do
           let(:params_overrides) { super().merge(scoreGiven: 0, scoreMaximum: 0) }
 
+          context "when the line item's maximum is zero" do
+            it 'will tolerate a zero score' do
+              line_item.update score_maximum: 0
+              result
+              send_request
+              expect(response.status.to_i).to eq(200)
+              expect(result.reload.result_score).to eq(0)
+            end
+          end
+
+          context "when the line item's maximum is not zero" do
+            it 'will not tolerate a zero score' do
+              line_item.update score_maximum: 10
+              result
+              send_request
+              expect(response.status.to_i).to eq(422)
+              expect(response.body).to include("cannot be zero if line item's maximum is not zero")
+            end
+          end
+        end
+
+        context "with a NEGATIVE score maximum" do
+          let(:params_overrides) { super().merge(scoreGiven: 0, scoreMaximum: -1) }
+
           it 'will not tolerate invalid score max' do
             result
             send_request
