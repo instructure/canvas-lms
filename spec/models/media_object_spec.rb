@@ -30,6 +30,12 @@ describe MediaObject do
       expect(MediaObject.by_media_id('1_01234567').first).to eq mo
     end
 
+    it "should not find an arbitrary MediaObject when given a nil id" do
+      course_factory
+      mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
+      expect(MediaObject.by_media_id(nil).first).to be_nil
+    end
+
     it "should raise an error if someone tries to use find_by_media_id" do
       expect { MediaObject.find_by_media_id('fjdksl') }.to raise_error('Do not look up MediaObjects by media_id - use the scope by_media_id instead to support migrated content.')
     end
