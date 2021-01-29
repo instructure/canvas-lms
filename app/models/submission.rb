@@ -2439,7 +2439,7 @@ class Submission < ActiveRecord::Base
 
   def update_line_item_result
     return unless saved_change_to_score?
-    Lti::Result.where(submission: self).update_all(result_score: score)
+    Lti::Result.update_score_for_submission(self, score)
   end
 
   def delete_ignores

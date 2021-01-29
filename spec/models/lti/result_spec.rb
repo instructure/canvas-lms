@@ -79,31 +79,76 @@ RSpec.describe Lti::Result, type: :model do
       before { result.submission.update!(grader_id: tool_id * -1) }
 
       context 'when the score_given has not been manually changed' do
-        it { is_expected.to eq result.result_score }
+        it { is_expected.to eq result.read_attribute(:result_score) }
       end
 
       context 'when result_score is blank' do
         before { result.update!(result_score: 0) }
 
-        it { is_expected.to eq result.result_score }
+        it { is_expected.to eq result.read_attribute(:result_score) }
       end
 
       context 'when the submission is blank' do
         before { result.update!(submission: nil) }
 
-        it { is_expected.to eq result.result_score }
+        it { is_expected.to eq result.read_attribute(:result_score) }
       end
 
       context 'when the score_given was manually updated by a user' do
-        before { result.submission.update!(grader_id: 2, score: 4) }
+        before do
+          result.submission.update!(grader_id: 2, score: 4)
+          result.reload
+        end
 
-        it { is_expected.to eq 0.1 }
+        it { is_expected.to eq 0.8 }
 
         context 'when the assignment has 0 points_possible' do
           before { assignment.update!(points_possible: 0) }
 
-          it { is_expected.to eq result.result_score }
+          it { is_expected.to eq result.read_attribute(:result_score) }
         end
+      end
+
+      context 'when the result_score/result_maximum were originally null but the score was manually updated by a user' do
+        before do
+          result.update(result_maximum: nil, result_score: nil)
+          result.submission.update!(grader_id: 2, score: 4)
+          result.reload
+        end
+
+        it 'returns the raw score' do
+          expect(subject).to eq(4)
+        end
+      end
+
+      context 'when result_maximum is nil but result_score is not (possible through speedgrader)' do
+        # This happens when the original result has no result_maximum or result_score but grading
+        # the submission in speedgrader gives it a result_score. Tests the same
+        # as above but more of a unit test because it doesn't test the behavior
+        # of updating the submission.
+        # This should not be possible anymore (see update_score_for_submission)
+        # but there still may be old records in the database which have this
+        # issue
+        before do
+          result.submission.update!(grader_id: tool_id)
+          described_class.where(id: result.id).update_all(result_maximum: nil, result_score: 0.75)
+          result.reload
+        end
+
+        it 'returns the raw score' do
+          expect(subject).to eq(0.75)
+        end
+      end
+
+      context 'when the assignment points_possible is nil' do
+        # I don't know if this is possible but the old code implied it might be
+        before do
+          result.submission.update!(grader_id: tool_id)
+          assignment.class.where(id: assignment.id).update_all(points_possible: nil)
+          result.reload
+        end
+
+        it { is_expected.to eq result.read_attribute(:result_score) }
       end
     end
 
@@ -212,6 +257,31 @@ RSpec.describe Lti::Result, type: :model do
       submission.assignment.root_account_id = nil
       result = Lti::Result.create!(line_item: line_item_model, user: user_model, created_at: Time.zone.now, updated_at: Time.zone.now, submission: submission)
       expect(result.root_account_id).to eq result.line_item.root_account_id
+    end
+  end
+
+  describe '.update_score_for_submission' do
+    let(:result) { lti_result_model assignment: assignment }
+
+    context 'when result maximum is null' do
+      it "sets and result maxmium to the assignment's points_possible, and sets the score" do
+        expect(assignment.points_possible).to_not eq(nil)
+        expect(result.result_maximum).to eq(nil)
+        Lti::Result.update_score_for_submission(result.submission, 123)
+        result.reload
+        expect(result.result_maximum).to eq(assignment.points_possible)
+        expect(result.result_score).to eq(123)
+      end
+    end
+
+    context 'when result maximum is not null' do
+      it 'sets the score and leaves the score_maximum untouched' do
+        result.update!(result_score: 8, result_maximum: 88)
+        Lti::Result.update_score_for_submission(result.submission, 123)
+        result.reload
+        expect(result.result_maximum).to eq(88)
+        expect(result.result_score).to eq(123)
+      end
     end
   end
 end
