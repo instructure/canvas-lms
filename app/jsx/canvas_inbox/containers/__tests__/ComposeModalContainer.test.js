@@ -85,4 +85,14 @@ describe('ComposeModalContainer', () => {
       )
     })
   })
+
+  describe('Subject', () => {
+    it('allows setting the subject', async () => {
+      const {getByTestId} = setup()
+      const subjectInput = getByTestId('subject-input')
+      fireEvent.click(subjectInput)
+      fireEvent.change(subjectInput, {target: {value: 'Potato'}})
+      expect(subjectInput.value).toEqual('Potato')
+    })
+  })
 })

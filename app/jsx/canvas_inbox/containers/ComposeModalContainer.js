@@ -42,6 +42,7 @@ const ComposeModalContainer = props => {
 
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
+  const [subject, setSubject] = useState()
 
   const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
@@ -92,6 +93,10 @@ const ComposeModalContainer = props => {
     addAttachment(e)
   }
 
+  const onSubjectChange = value => {
+    setSubject(value.currentTarget.value)
+  }
+
   const renderModalHeader = () => (
     <Modal.Header>
       <CloseButton
@@ -137,7 +142,7 @@ const ComposeModalContainer = props => {
           shouldGrow={false}
         />
       </Flex.Item>
-      <SubjectInput onChange={() => {}} value="" />
+      <SubjectInput onChange={onSubjectChange} value={subject} />
       <Flex.Item>
         <ComposeInputWrapper
           shouldGrow
