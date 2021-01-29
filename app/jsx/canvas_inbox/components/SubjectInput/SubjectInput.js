@@ -16,23 +16,24 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import {ComposeInputWrapper} from '../ComposeInputWrapper/ComposeInputWrapper'
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
+import React from 'react'
+
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {TextInput} from '@instructure/ui-text-input'
-import {Flex} from '@instructure/ui-flex'
-import I18n from 'i18n!conversations_2'
 
 export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
   return (
-    <Flex width="100%">
-      <Flex.Item padding="xx-small">
+    <ComposeInputWrapper
+      title={
         <PresentationContent>
           <Text size="small">{I18n.t('Subject')}</Text>
         </PresentationContent>
-      </Flex.Item>
-      <Flex.Item shouldGrow padding="xx-small">
+      }
+      input={
         <TextInput
           renderLabel={<ScreenReaderContent>{I18n.t('Subject')}</ScreenReaderContent>}
           placeholder={I18n.t('No Subject')}
@@ -42,8 +43,9 @@ export const SubjectInput = ({value, onChange, onBlur, onFocus}) => {
           onBlur={onBlur}
           onFocus={onFocus}
         />
-      </Flex.Item>
-    </Flex>
+      }
+      shouldGrow
+    />
   )
 }
 

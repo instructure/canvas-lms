@@ -26,7 +26,7 @@ import I18n from 'i18n!conversations_2'
 
 export const ComposeActionButtons = ({...props}) => {
   return (
-    <Flex justifyItems="space-between">
+    <Flex justifyItems="space-between" width="100%">
       <Flex.Item>{renderUploadButtons(props)}</Flex.Item>
       <Flex.Item>{renderMessageButtons(props)}</Flex.Item>
     </Flex>

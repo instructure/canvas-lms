@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import ComposeModalContainer from './ComposeModalContainer'
 import {Flex} from '@instructure/ui-flex'
 import React, {useState} from 'react'
 import MessageListContainer from './MessageListContainer'
@@ -25,6 +26,7 @@ const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
   const [selectedIds, setSelectedIds] = useState([])
+  const [composeModal, setComposeModal] = useState(false)
 
   const toggleSelectedMessages = conversation => {
     const updatedSelectedIds = selectedIds
@@ -45,6 +47,7 @@ const CanvasInbox = () => {
             onSelectMailbox={setScope}
             onCourseFilterSelect={setCourseFilter}
             selectdIds={selectedIds}
+            onCompose={() => setComposeModal(true)}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
@@ -62,6 +65,7 @@ const CanvasInbox = () => {
           </Flex>
         </Flex.Item>
       </Flex>
+      <ComposeModalContainer open={composeModal} onDismiss={() => setComposeModal(false)} />
     </div>
   )
 }

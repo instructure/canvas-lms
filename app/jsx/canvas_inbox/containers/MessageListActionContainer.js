@@ -105,7 +105,7 @@ const MessageListActionContainer = props => {
         <Flex.Item>
           <MessageActionButtons
             archive={() => {}}
-            compose={() => {}}
+            compose={props.onCompose}
             delete={() => {}}
             forward={() => {}}
             markAsUnread={() => {}}
@@ -124,5 +124,6 @@ export default MessageListActionContainer
 MessageListActionContainer.propTypes = {
   activeMailbox: PropTypes.string,
   onCourseFilterSelect: PropTypes.func,
-  onSelectMailbox: PropTypes.func
+  onSelectMailbox: PropTypes.func,
+  onCompose: PropTypes.func
 }
