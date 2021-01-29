@@ -118,10 +118,19 @@ function start_dinghy_vm {
 }
 
 function start_docker_daemon {
-  service docker status &> /dev/null && return 0
+  if [ -x "$(command -v service)" ]; then
+    service docker status &> /dev/null && return 0
+  else
+    systemctl status docker &> /dev/null && return 0
+  fi
+
   prompt 'The docker daemon is not running. Start it? [y/n]' confirm
   [[ ${confirm:-n} == 'y' ]] || return 1
-  sudo service docker start
+  if [ -x "$(command -v service)" ]; then
+    sudo service docker start
+  else
+    sudo systemctl start docker
+  fi
   sleep 1 # wait for docker daemon to start
 }
 
@@ -174,8 +183,10 @@ function setup_docker_environment {
     message "It looks like you're using Linux. You'll need dory. Let's set that up."
     start_docker_daemon
     setup_docker_as_nonroot
-    install_dory
-    start_dory
+    if [[ $SKIP_DORY != 'true' ]]; then
+      install_dory
+      start_dory
+    fi
   fi
   if [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
