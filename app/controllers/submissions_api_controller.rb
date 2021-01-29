@@ -621,7 +621,8 @@ class SubmissionsApiController < ApplicationController
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
     if @assignment.allowed_extensions.any?
-      extension = infer_upload_filename(params).split('.').last&.downcase || File.mime_types[infer_upload_content_type(params)]
+      filename = infer_upload_filename(params)
+      extension = filename&.split('.')&.last&.downcase || File.mime_types[infer_upload_content_type(params)]
       reject!(t('unable to find extension')) unless extension
       reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
     end

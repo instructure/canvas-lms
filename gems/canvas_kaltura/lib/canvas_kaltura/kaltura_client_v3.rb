@@ -64,7 +64,7 @@ module CanvasKaltura
       # to make sure 500 mb files can be uploaded
       res['max_file_size_bytes'] = 510.megabytes unless res['max_file_size_bytes'].to_i > 0
 
-      res
+      res.with_indifferent_access
     end
 
     CONTENT_TYPES = {

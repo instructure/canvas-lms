@@ -263,7 +263,7 @@ export default class EditView extends ValidatedFormView
       deferSave: (usageRights) =>
         @attachment_model.set('usage_rights', usageRights)
         @renderUsageRights()
-      userCanManageFilesForContext: true # usage rights indicator wouldn't be rendered without manage_files permission
+      userCanEditFilesForContext: true # usage rights indicator wouldn't be rendered without manage_files_edit permission
       userCanRestrictFilesForContext: false # disable the publish section of the usage rights modal
       usageRightsRequiredForContext: true # usage rights indicator wouldn't be rendered without usage rights required for this context
       modalOptions:

@@ -15,23 +15,18 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag'
-import {shape, string} from 'prop-types'
 
-export const MediaTrack = {
-  fragment: gql`
-    fragment MediaTrack on MediaTrack {
-      _id
-      content
-      locale
-      kind
-    }
-  `,
+const MASQUERADE_SELECTOR = 'body.is-masquerading-or-student-view'
 
-  shape: shape({
-    _id: string,
-    content: string,
-    locale: string,
-    kind: string
-  })
+let trayHeight = null
+
+// Adjusts the height that slide-out trays should take up based on the presence
+// or absence of the masquerade bottom bar. Caches the result of this check
+// forever, since we always reload the bundle when you enter/leave masquerade.
+export const getTrayHeight = () => {
+  if (!trayHeight) {
+    const masqueradeBar = document.querySelector(MASQUERADE_SELECTOR)
+    trayHeight = masqueradeBar ? 'calc(100vh - 50px)' : '100vh'
+  }
+  return trayHeight
 }

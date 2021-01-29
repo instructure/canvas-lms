@@ -395,6 +395,7 @@ describe 'RCE Next toolbar features', ignore_js_errors: true do
 
     context 'math equations' do
       it 'renders math equation from math modal' do
+        skip 'LS-1839 (1/27/2021)'
         page_title = 'math_rendering'
         create_wiki_page_with_text(page_title)
         visit_existing_wiki_edit(@course, page_title)

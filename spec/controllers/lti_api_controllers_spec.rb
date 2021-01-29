@@ -121,7 +121,11 @@ describe LtiApiController, type: :request do
     end
 
     it "should require the correct shared secret" do
+      allow(Lti::Logging).to receive(:lti_1_api_signature_verification_failed)
       make_call('secret' => 'bad secret is bad')
+      expect(Lti::Logging).to have_received(:lti_1_api_signature_verification_failed) do |base_str|
+        expect(base_str).to start_with('POST&https%3A%2F%2Fwww.example.com%2F')
+      end
       check_error_response("Invalid authorization header", with_report: false)
       assert_status(401)
     end

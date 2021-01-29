@@ -54,16 +54,16 @@ describe('feature_flags:util', () => {
   describe('buildDescription', () => {
     it('generates the right things with allowsDefaults', () => {
       expect(util.buildDescription(sampleData.offFeature.feature_flag, true)).toEqual(
-        'Disabled (locked)'
+        'Disabled for all subaccounts/courses'
       )
       expect(util.buildDescription(sampleData.allowedFeature.feature_flag, true)).toEqual(
-        'Disabled (unlocked)'
+        'Allowed for subaccounts/courses, default off'
       )
       expect(util.buildDescription(sampleData.allowedOnFeature.feature_flag, true)).toEqual(
-        'Enabled (unlocked)'
+        'Allowed for subaccounts/courses, default on'
       )
       expect(util.buildDescription(sampleData.onFeature.feature_flag, true)).toEqual(
-        'Enabled (locked)'
+        'Enabled for all subaccounts/courses'
       )
     })
 

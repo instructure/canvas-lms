@@ -22,12 +22,10 @@ import TestUtils from 'react-dom/test-utils'
 import $ from 'jquery'
 import ItemCog from 'jsx/files/ItemCog'
 import Folder from 'compiled/models/Folder'
-import mockFilesENV from '../../../../coffeescripts/react_files/mockFilesENV'
 
 const {Simulate} = TestUtils
 
 let itemCog = null
-const fakeServer = null
 
 const readOnlyConfig = {
   download: true,
@@ -63,21 +61,23 @@ const buttonsEnabled = (itemCog, config) => {
   return valid
 }
 
-const sampleProps = (canManageFiles = false) => ({
+const sampleProps = (canAddFiles = false, canEditFiles = false, canDeleteFiles = false) => ({
   model: new Folder({id: 999}),
   modalOptions: {
     closeModal() {},
     openModal() {}
   },
   startEditingName() {},
-  userCanManageFilesForContext: canManageFiles,
+  userCanAddFilesForContext: canAddFiles,
+  userCanEditFilesForContext: canEditFiles,
+  userCanDeleteFilesForContext: canDeleteFiles,
   usageRightsRequiredForContext: true
 })
 
 QUnit.module('ItemCog', {
   setup() {
     itemCog = ReactDOM.render(
-      <ItemCog {...sampleProps(true)} />,
+      <ItemCog {...sampleProps(true, true, true)} />,
       $('<div>').appendTo('#fixtures')[0]
     )
   },
@@ -102,7 +102,7 @@ test('deletes model when delete link is pressed', () => {
 
 test('only shows download button for limited users', () => {
   const readOnlyItemCog = ReactDOM.render(
-    <ItemCog {...sampleProps(false)} />,
+    <ItemCog {...sampleProps()} />,
     $('<div>').appendTo('#fixtures')[0]
   )
   ok(buttonsEnabled(readOnlyItemCog, readOnlyConfig), 'only download button is shown')
@@ -110,6 +110,31 @@ test('only shows download button for limited users', () => {
 
 test('shows all buttons for users with manage_files permissions', () => {
   ok(buttonsEnabled(itemCog, manageFilesConfig), 'all buttons are shown')
+})
+
+test('does not render rename/move buttons for users without manage_files_edit permission', () => {
+  const itemCogNoEdit = ReactDOM.render(
+    <ItemCog {...sampleProps(true, false, true)} />,
+    $('<div>').appendTo('#fixtures')[0]
+  )
+  ok(
+    buttonsEnabled(itemCogNoEdit, {
+      ...manageFilesConfig,
+      ...{editName: false, move: false, usageRights: false}
+    }),
+    'rename/move buttons are not shown'
+  )
+})
+
+test('does not render delete button for users without manage_files_delete permission', () => {
+  const itemCogNoDelete = ReactDOM.render(
+    <ItemCog {...sampleProps(true, true, false)} />,
+    $('<div>').appendTo('#fixtures')[0]
+  )
+  ok(
+    buttonsEnabled(itemCogNoDelete, {...manageFilesConfig, ...{deleteLink: false}}),
+    'delete button is not shown'
+  )
 })
 
 test('downloading a file returns focus back to the item cog', () => {
@@ -122,7 +147,7 @@ test('downloading a file returns focus back to the item cog', () => {
 })
 
 test('deleting a file returns focus to the previous item cog when there are more items', () => {
-  const props = sampleProps(true)
+  const props = sampleProps(true, true, true)
   props.model.destroy = function() {
     return true
   }
@@ -153,7 +178,7 @@ test('deleting a file returns focus to the previous item cog when there are more
 
 test('deleting a file returns focus to the name column header when there are no items left', () => {
   $('#fixtures').empty()
-  const props = sampleProps(true)
+  const props = sampleProps(true, true, true)
   props.model.destroy = function() {
     return true
   }

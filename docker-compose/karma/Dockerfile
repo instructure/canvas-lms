@@ -1,4 +1,4 @@
-FROM instructure/node:12
+FROM instructure/node:14
 
 ENV APP_HOME /usr/src/app/
 ENV NODE_ENV test

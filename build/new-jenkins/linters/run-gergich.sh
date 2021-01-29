@@ -18,6 +18,11 @@ inputs+=("--env GERRIT_PATCHSET_REVISION=$GERRIT_PATCHSET_REVISION")
 inputs+=("--env GERRIT_CHANGE_ID=$GERRIT_CHANGE_ID")
 inputs+=("--env GERRIT_CHANGE_NUMBER=$GERRIT_CHANGE_NUMBER")
 
+if [ "$GERRIT_PROJECT" != "canvas-lms" ]; then
+  inputs+=("--volume $(pwd)/gems/plugins/$GERRIT_PROJECT/.git:/usr/src/app/gems/plugins/$GERRIT_PROJECT/.git")
+  inputs+=("--env GERGICH_GIT_PATH=/usr/src/app/gems/plugins/$GERRIT_PROJECT")
+fi
+
 # the GERRIT_REFSPEC is required for the commit message to actually
 # send things to gergich
 inputs+=("--env GERRIT_REFSPEC=$GERRIT_REFSPEC")
@@ -132,9 +137,6 @@ export GERGICH_REVIEW_LABEL="Lint-Review"
 gergich status
 
 if [[ "\$GERGICH_PUBLISH" == "1" ]]; then
-  # we need to do this because it forces gergich to not use git (because no git repo is there).
-  # and being that we rebased, the commit hash changes, so this will make it use the variables passed in
-  export GERGICH_GIT_PATH=".."
-  gergich publish
+  GERGICH_GIT_PATH=".." gergich publish
 fi
 EOF

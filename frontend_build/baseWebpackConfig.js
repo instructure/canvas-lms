@@ -135,7 +135,7 @@ module.exports = {
 
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' || process.env.COVERAGE || process.env.SENTRY_DSN
+    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1' || process.env.SENTRY_DSN
     ? 'source-map'
     : 'eval',
 

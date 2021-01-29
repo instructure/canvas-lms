@@ -2820,7 +2820,7 @@ class UsersController < ApplicationController
     @invalid_observee_creds = nil
     @invalid_observee_code = nil
     if @user.initial_enrollment_type == 'observer'
-      @pairing_code = find_observer_pairing_code(params[:pairing_code][:code])
+      @pairing_code = find_observer_pairing_code(params[:pairing_code]&.[](:code))
       if !@pairing_code.nil?
         @observee = @pairing_code.user
         # If the user is using a valid pairing code, we don't need recaptcha

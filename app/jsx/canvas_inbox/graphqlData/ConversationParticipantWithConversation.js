@@ -16,41 +16,38 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import gql from 'graphql-tag'
-import {shape, string, bool} from 'prop-types'
-import {MediaSource} from './MediaSource'
-import {MediaTrack} from './MediaTrack'
+import {shape, string} from 'prop-types'
+import {Conversation} from './Conversation'
+import {ConversationParticipant} from './ConversationParticipant'
+import {User} from './User'
 
-export const MediaComment = {
+export const ConversationParticipantWithConversation = {
   fragment: gql`
-    fragment MediaComment on MediaObject {
-      _id
-      id
-      title
-      canAddCaptions
-      mediaSources {
-        ...MediaSource
-      }
-      mediaTracks {
-        ...MediaTrack
+    fragment ConversationParticipantWithConversation on ConversationParticipant {
+      ...ConversationParticipant
+      conversation {
+        ...Conversation
       }
     }
-    ${MediaSource.fragment}
-    ${MediaTrack.fragment}
+    ${ConversationParticipant.fragment}
+    ${Conversation.fragment}
   `,
 
   shape: shape({
     _id: string,
     id: string,
-    title: string,
-    canAddCaptions: bool,
-    mediaSources: MediaSource.shape,
-    mediaTracks: MediaTrack.shape
+    label: string,
+    conversation: Conversation.shape,
+    user: User.shape
   })
 }
 
 export const DefaultMocks = {
-  MediaComment: () => ({
-    title: 'Test Media Comment Video',
-    canAddCaptions: true
+  ConversationParticipant: () => ({
+    _id: 'mock_id',
+    id: 'mockId',
+    label: 'someLabel',
+    conversation: {},
+    user: {}
   })
 }

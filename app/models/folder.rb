@@ -58,7 +58,10 @@ class Folder < ActiveRecord::Base
   validate :restrict_submission_folder_context
 
   def file_attachments_visible_to(user)
-    if self.context.grants_right?(user, :manage_files)
+    if context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+        self.context.grants_any_right?(user, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+      self.active_file_attachments
+    elsif self.context.grants_right?(user, :manage_files)
       self.active_file_attachments
     else
       self.visible_file_attachments.not_locked
@@ -73,6 +76,19 @@ class Folder < ActiveRecord::Base
     else
       self.root_account_id = self.context.root_account_id
     end
+  end
+
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
   end
 
   def protect_root_folder_name
@@ -429,6 +445,7 @@ class Folder < ActiveRecord::Base
 
   def get_folders_by_component(components, include_hidden_and_locked)
     return [self] if components.empty?
+
     components = components.dup
     subfolder_name = components.shift
     # search all subfolders with the given name (yes, there can be duplicates)
@@ -442,7 +459,16 @@ class Folder < ActiveRecord::Base
   end
 
   def self.resolve_path(context, path, include_hidden_and_locked = true)
-    path_components = path ? (path.is_a?(Array) ? path : path.split('/')) : []
+    path_components =
+      case path
+      when Array
+        path
+      when String
+        path.split('/')
+      else
+        []
+      end
+
     Folder.root_folders(context).each do |root_folder|
       folders = root_folder.get_folders_by_component(path_components, include_hidden_and_locked)
       return folders if folders
@@ -452,10 +478,11 @@ class Folder < ActiveRecord::Base
 
   def locked?
     return @locked if defined?(@locked)
+
     @locked = self.locked ||
-      (self.lock_at && Time.now > self.lock_at) ||
-      (self.unlock_at && Time.now < self.unlock_at) ||
-      (self.parent_folder && self.parent_folder.locked?)
+      (self.lock_at && Time.zone.now > self.lock_at) ||
+      (self.unlock_at && Time.zone.now < self.unlock_at) ||
+      self.parent_folder&.locked?
   end
 
   def for_submissions?
@@ -468,13 +495,33 @@ class Folder < ActiveRecord::Base
   alias currently_locked? currently_locked
 
   set_policy do
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
+    can :read and can :read_contents
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
+    can :create and can :update and can :delete and can :manage_contents
+
+    ##################### End legacy permission block ##########################
+
     given { |user, session| self.visible? && self.context.grants_right?(user, session, :read) }
     can :read
 
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :read_as_admin, :read_contents, :read_contents_for_export
 
-    given { |user, session| self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) && !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES)) }
+    given do |user, session|
+      self.visible? && !self.locked? && self.context.grants_right?(user, session, :read) &&
+        !(self.context.is_a?(Course) && self.context.tab_hidden?(Course::TAB_FILES))
+    end
     can :read_contents, :read_contents_for_export
 
     given do |user, session|
@@ -482,11 +529,32 @@ class Folder < ActiveRecord::Base
     end
     can :read_contents_for_export
 
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_any_right?(user, session, :manage_files_add, :manage_files_delete, :manage_files_edit)
+    end
     can :read and can :read_contents
 
-    given { |user, session| !self.for_submissions? && self.context.grants_right?(user, session, :manage_files) }
-    can :update and can :delete and can :create and can :manage_contents
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_add)
+    end
+    can :create and can :manage_contents
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_edit)
+    end
+    can :update and can :manage_contents
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      !self.for_submissions? &&
+      self.context.grants_right?(user, session, :manage_files_delete)
+    end
+    can :delete and can :manage_contents
   end
 
   # find all unlocked/visible folders that can be reached by following unlocked/visible folders from the root

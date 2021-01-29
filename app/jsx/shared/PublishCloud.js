@@ -55,7 +55,7 @@ PublishCloud.openRestrictedDialog = function() {
 
 PublishCloud.render = function() {
   const fileName = (this.props.model && this.props.model.displayName()) || I18n.t('This file')
-  if (this.props.userCanManageFilesForContext) {
+  if (this.props.userCanEditFilesForContext) {
     if (this.state.published && this.state.restricted) {
       return (
         <button

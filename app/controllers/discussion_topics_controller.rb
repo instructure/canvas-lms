@@ -568,7 +568,13 @@ class DiscussionTopicsController < ApplicationController
       CREATE_ANNOUNCEMENTS_UNLOCKED: @current_user.create_announcements_unlocked?,
       USAGE_RIGHTS_REQUIRED: usage_rights_required,
       PERMISSIONS: {
-        manage_files: @context.grants_right?(@current_user, session, :manage_files)
+        manage_files:
+          @context.grants_any_right?(
+            @current_user,
+            session,
+            :manage_files,
+            *RoleOverride::GRANULAR_FILE_PERMISSIONS
+          )
       }
     }
 
@@ -1476,7 +1482,12 @@ class DiscussionTopicsController < ApplicationController
   def set_default_usage_rights(attachment)
     return unless @context.root_account.feature_enabled?(:usage_rights_discussion_topics)
     return unless @context.try(:usage_rights_required?)
-    return if @context.grants_right?(@current_user, session, :manage_files)
+    return if @context.grants_any_right?(
+      @current_user,
+      session,
+      :manage_files,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    )
 
     attachment.usage_rights = @context.usage_rights.find_or_create_by(
       use_justification:'own_copyright',

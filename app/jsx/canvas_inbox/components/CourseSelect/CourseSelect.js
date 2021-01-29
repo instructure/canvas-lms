@@ -24,64 +24,74 @@ import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
 import I18n from 'i18n!conversations_2'
 
+const filterOptions = (value, options) => {
+  const filteredOptions = {}
+  Object.keys(options).forEach(key => {
+    filteredOptions[key] = options[key].filter(option =>
+      option.contextName.toLowerCase().startsWith(value.toLowerCase())
+    )
+  })
+  return filteredOptions
+}
+
 export class CourseSelect extends React.Component {
   static propTypes = {
     mainPage: PropTypes.bool.isRequired,
     options: PropTypes.shape({
       favoriteCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       moreCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       concludedCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       groups: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       )
     }).isRequired,
     onCourseFilterSelect: PropTypes.func
   }
 
+  static getDerivedStateFromProps(props, state) {
+    if (props.options !== state.options) {
+      return {
+        filteredOptions: filterOptions(state.inputValue, props.options)
+      }
+    }
+    return null
+  }
+
   state = {
     inputValue: '',
     isShowingOptions: false,
+    options: this.props.options,
     filteredOptions: this.props.options,
     highlightedOptionId: null,
     selectedOptionId: null,
     announcement: null
   }
 
-  filterOptions = value => {
-    const filteredOptions = {}
-    Object.keys(this.props.options).forEach(key => {
-      filteredOptions[key] = this.props.options[key].filter(option =>
-        option.contextName.toLowerCase().startsWith(value.toLowerCase())
-      )
-    })
-    return filteredOptions
-  }
-
-  getDefaultHighlightedOption = newOptions => {
+  getDefaultHighlightedOption = (newOptions = []) => {
     const options = Object.values(newOptions).flat()
-    return options.length > 0 ? options[0].contextId : null
+    return options.length > 0 ? options[0].assetString : null
   }
 
   getGroupChangedMessage = newOption => {
@@ -104,7 +114,7 @@ export class CourseSelect extends React.Component {
     if (!option) return
     return this.getGroupLabel(
       Object.keys(this.props.options).find(key =>
-        this.props.options[key].find(({contextId}) => contextId === option.contextId)
+        this.props.options[key].find(({assetString}) => assetString === option.assetString)
       )
     )
   }
@@ -112,7 +122,7 @@ export class CourseSelect extends React.Component {
   getOptionById = id => {
     return Object.values(this.props.options)
       .flat()
-      .find(({contextId}) => id === contextId)
+      .find(({assetString}) => id === assetString)
   }
 
   handleBlur = () => {
@@ -147,7 +157,7 @@ export class CourseSelect extends React.Component {
 
   handleInputChange = event => {
     const value = event.target.value
-    const newOptions = this.filterOptions(value)
+    const newOptions = filterOptions(value, this.props.options)
     this.setState(state => ({
       inputValue: value,
       filteredOptions: newOptions,
@@ -188,14 +198,14 @@ export class CourseSelect extends React.Component {
     const {highlightedOptionId, selectedOptionId} = this.state
 
     return Object.keys(options).map(key => {
-      return options[key].length > 0 ? (
+      return options[key]?.length > 0 ? (
         <Select.Group key={key} renderLabel={this.getGroupLabel(key)}>
           {options[key].map(option => (
             <Select.Option
-              id={option.contextId}
-              key={option.contextId}
-              isHighlighted={option.contextId === highlightedOptionId}
-              isSelected={option.contextId === selectedOptionId}
+              id={option.assetString}
+              key={option.assetString}
+              isHighlighted={option.assetString === highlightedOptionId}
+              isSelected={option.assetString === selectedOptionId}
             >
               {option.contextName}
             </Select.Option>

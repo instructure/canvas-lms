@@ -18,9 +18,7 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-# Filters added to this controller apply to all controllers in the application.
-# Likewise, all the methods added will be available for all controllers.
-
+# Utility for logging LTI-related messages
 module Lti::Logging
   PREFIX_MAP = {
     lti_1: "LTI 1.1",
@@ -29,6 +27,10 @@ module Lti::Logging
 
   def self.lti_1_launch_generated(base_string)
     log("Generated launch with base string #{base_string}")
+  end
+
+  def self.lti_1_api_signature_verification_failed(base_string)
+    log("API request signature verification failed, expected base string #{base_string}")
   end
 
   def self.log(message, version: :lti_1, level: :info)

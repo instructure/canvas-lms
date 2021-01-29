@@ -29,6 +29,7 @@ import Bridge from '../../../bridge/Bridge'
 import formatMessage from '../../../format-message'
 import Filter, {useFilterSettings} from './Filter'
 import {StoreProvider} from './StoreContext'
+import {getTrayHeight} from './trayUtils'
 
 /**
  * Returns the translated tray label
@@ -369,7 +370,7 @@ export default function CanvasContentTray(props) {
             <Flex
               direction="column"
               as="div"
-              height="100vh"
+              height={getTrayHeight()}
               overflowY="hidden"
               tabIndex="-1"
               data-canvascontenttray-content

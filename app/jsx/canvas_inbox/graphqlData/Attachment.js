@@ -15,42 +15,34 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-
 import gql from 'graphql-tag'
 import {shape, string} from 'prop-types'
-import {Attachment} from './Attachment'
-import {User} from './User'
-import {MediaComment} from './MediaComment'
 
-export const ConversationMessage = {
+export const Attachment = {
   fragment: gql`
-    fragment ConversationMessage on ConversationMessage {
+    fragment Attachment on File {
       _id
-      createdAt
-      body
-      attachmentsConnection {
-        nodes {
-          ...Attachment
-        }
-      }
-      author {
-        ...User
-      }
-      mediaComment {
-        ...MediaComment
-      }
+      displayName
+      id
+      mimeClass
+      url
+      thumbnailUrl
     }
-    ${Attachment.fragment}
-    ${User.fragment}
-    ${MediaComment.fragment}
   `,
 
   shape: shape({
     _id: string,
-    createdAt: string,
-    body: string,
-    attachmentsConnection: Attachment.shape,
-    author: User.shape,
-    mediaComment: MediaComment.shape
+    displayName: string,
+    id: string,
+    mimeClass: string,
+    url: string,
+    thumbnailUrl: string
+  })
+}
+
+export const DefaultMocks = {
+  File: () => ({
+    displayName: 'testing.csv',
+    mimeClass: 'file'
   })
 }

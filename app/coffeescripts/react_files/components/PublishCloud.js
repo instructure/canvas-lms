@@ -29,7 +29,7 @@ export default {
   propTypes: {
     togglePublishClassOn: PropTypes.object,
     model: customPropTypes.filesystemObject,
-    userCanManageFilesForContext: PropTypes.bool.isRequired,
+    userCanEditFilesForContext: PropTypes.bool.isRequired,
     fileName: PropTypes.string
   },
 

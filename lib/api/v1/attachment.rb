@@ -18,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'uri'
+
 module Api::V1::Attachment
   include Api::V1::Json
   include Api::V1::Locked
@@ -26,7 +28,14 @@ module Api::V1::Attachment
   include Api::V1::UsageRights
 
   def can_view_hidden_files?(context=@context, user=@current_user, session=nil)
-    context.grants_any_right?(user, session, :manage_files, :read_as_admin, :manage_contents)
+    context.grants_any_right?(
+      user,
+      session,
+      :read_as_admin,
+      :manage_contents,
+      :manage_files,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    )
   end
 
   def attachments_json(files, user, url_options = {}, options = {})
@@ -165,8 +174,20 @@ module Api::V1::Attachment
     hash
   end
 
+  def infer_filename_from_url(url)
+    return url if url.blank?
+
+    uri = URI.parse(url)
+
+    File.basename(uri.path)
+  rescue URI::InvalidURIError
+    nil
+  end
+
   def infer_upload_filename(params)
-    params[:name] || params[:filename]
+    return nil unless params
+
+    params[:name] || params[:filename] || infer_filename_from_url(params[:url])
   end
 
   def infer_upload_content_type(params, default_mimetype = nil)

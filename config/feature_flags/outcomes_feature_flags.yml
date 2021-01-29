@@ -8,12 +8,6 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-outcome_guid_course_exports:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Reduce outcome duplication on course import"
-  description: "Ensures that outcomes that have already been imported
-    into a course are not duplicated if they are imported again"
 selectable_outcomes_in_course_copy:
   state: hidden
   applies_to: RootAccount

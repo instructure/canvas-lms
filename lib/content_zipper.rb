@@ -253,11 +253,17 @@ class ContentZipper
     # not logged in - OR -
     # 2. we're doing this inside a course context export, and are bypassing
     # the user check (@check_user == false)
-    attachments = if !@check_user || folder.context.grants_right?(@user, :manage_files)
-                    folder.active_file_attachments
-                  else
-                    folder.visible_file_attachments
-                  end
+    attachments =
+      if !@check_user ||
+           folder.context.grants_any_right?(
+             @user,
+             :manage_files,
+             *RoleOverride::GRANULAR_FILE_PERMISSIONS
+           )
+        folder.active_file_attachments
+      else
+        folder.visible_file_attachments
+      end
 
     attachments = attachments.select{|a| opts[:exporter].export_object?(a)} if opts[:exporter]
     attachments.select{|a| !@check_user || a.grants_right?(@user, :download)}.each do |attachment|

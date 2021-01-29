@@ -109,7 +109,7 @@ class GroupAndMembershipImporter < ActiveRecord::Base
     user_sis_id = row['user_id']
     login_id = row['login_id']
     user = nil
-    user_scope = User.where(id: group_category.context.participating_students_by_date.where.not(enrollments: { type: 'StudentViewEnrollment' }))
+    user_scope = User.where(id: group_category.context.participating_students.where.not(enrollments: { type: 'StudentViewEnrollment' }))
     user = user_scope.where(id: user_id).take if user_id
     pseudonym_scope = Pseudonym.active.where(account_id: group_category.root_account_id)
     user ||= user_scope.where(id: pseudonym_scope.where(sis_user_id: user_sis_id).limit(1).select(:user_id)).take if user_sis_id

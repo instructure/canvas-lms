@@ -17,24 +17,47 @@
  */
 
 import {Flex} from '@instructure/ui-flex'
-import React from 'react'
+import React, {useState} from 'react'
 import MessageListContainer from './MessageListContainer'
 import MessageListActionContainer from './MessageListActionContainer'
 
 const CanvasInbox = () => {
+  const [scope, setScope] = useState('inbox')
+  const [courseFilter, setCourseFilter] = useState()
+  const [selectedIds, setSelectedIds] = useState([])
+
+  const toggleSelectedMessages = conversation => {
+    const updatedSelectedIds = selectedIds
+    if (updatedSelectedIds.includes(conversation._id)) {
+      const index = updatedSelectedIds.indexOf(conversation._id)
+      updatedSelectedIds.splice(index, 1)
+    } else {
+      updatedSelectedIds.push(conversation._id)
+    }
+    setSelectedIds(updatedSelectedIds)
+  }
+
   return (
     <div className="canvas-inbox-container">
       <Flex height="100vh" width="100%" as="div" direction="column">
         <Flex.Item>
-          <MessageListActionContainer />
+          <MessageListActionContainer
+            onSelectMailbox={setScope}
+            onCourseFilterSelect={setCourseFilter}
+            selectdIds={selectedIds}
+          />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
           <Flex height="100%" as="div" align="center" justifyItems="center">
             <Flex.Item width="400px" height="100%">
-              <MessageListContainer />
+              <MessageListContainer
+                course={courseFilter}
+                scope={scope}
+                onSelectMessage={toggleSelectedMessages}
+              />
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%">
-              {/* Message Content Goes Here */}
+              <div className="testing-class-name-canvas-inbox">Message Content Goes Here</div>
             </Flex.Item>
           </Flex>
         </Flex.Item>

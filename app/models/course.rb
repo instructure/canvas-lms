@@ -2940,11 +2940,16 @@ class Course < ActiveRecord::Base
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
         delete_unless.call([TAB_PEOPLE], :read_roster, :manage_students, :manage_admin_users)
-        delete_unless.call([TAB_FILES], :read, :manage_files)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
         delete_unless.call([TAB_RUBRICS], :read_rubrics, :manage_rubrics)
+
+        if self.root_account.feature_enabled?(:granular_permissions_course_files)
+          delete_unless.call([TAB_FILES], :read, *RoleOverride::GRANULAR_FILE_PERMISSIONS)
+        else
+          delete_unless.call([TAB_FILES], :read, :manage_files)
+        end
 
         # remove outcomes tab for logged-out users or non-students
         outcome_tab = tabs.detect { |t| t[:id] == TAB_OUTCOMES }
@@ -2960,6 +2965,11 @@ class Course < ActiveRecord::Base
           TAB_FILES => [:manage_files],
           TAB_DISCUSSIONS => [:moderate_forum]
         }
+
+        if self.root_account.feature_enabled?(:granular_permissions_course_files)
+          additional_checks[TAB_FILES] = RoleOverride::GRANULAR_FILE_PERMISSIONS
+        end
+
         tabs.reject! do |t|
           # tab shouldn't be shown to non-admins
           (t[:hidden] || t[:hidden_unused]) &&

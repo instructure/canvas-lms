@@ -428,6 +428,11 @@ describe UsersController do
           expect(oe.associated_user).to eq @user
         end
 
+        it "should not 500 when paring code is not in request" do
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com' }, user: { name: 'Jane Observer', terms_of_use: '1', initial_enrollment_type: 'observer' } }, format: 'json'
+          assert_status(400)
+        end
+
         it "should allow observers to self register with a pairing code" do
           course_with_student
           @domain_root_account = @course.account

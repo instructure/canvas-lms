@@ -24,23 +24,37 @@
 
   <% if use_responsive_layout? %>
     <header id="mobile-header" class="no-print">
-      <button type="button" class="Button Button--icon-action-rev Button--large  mobile-header-hamburger">
+      <button type="button" class="Button Button--icon-action-rev Button--large mobile-header-hamburger">
         <i class="icon-solid icon-hamburger"></i>
         <span id="mobileHeaderInboxUnreadBadge" class="menu-item__badge" style="min-width: 0; top: 12px; height: 12px; right: 6px; display:none;"></span>
         <span class="screenreader-only"><%= t 'links.dashboard', "Dashboard" %></span>
       </button>
+      <div class="mobile-header-space"></div>
       <% context_crumb = crumbs.length > 1 && crumbs[1] %>
       <% if context_crumb %>
-        <a class="mobile-header-title <%= 'expandable' if context_crumb %>" href="<%= context_crumb[1] %>" role="button" aria-controls="mobileContextNavContainer">
-          <i style="float: right; margin-top: 2px; padding-right: inherit" id="mobileHeaderArrowIcon" class="icon-arrow-open-down"></i>
+        <a class="mobile-header-title expandable" href="<%= context_crumb[1] %>" role="button" aria-controls="mobileContextNavContainer">
           <div><%= context_crumb[0] %></div>
-        <% if crumbs.length > 2 %>
-          <% sub_context_crumb = crumbs.last %>
-          <div style="padding-right: 30px"><%= sub_context_crumb[0] %></div>
-        <% end %>
+          <% if crumbs.length > 2 %>
+            <% sub_context_crumb = crumbs.last %>
+            <div><%= sub_context_crumb[0] %></div>
+          <% end %>
         </a>
       <% else %>
         <span class="mobile-header-title"><%= (yield :page_title).presence || @page_title || t('default_page_title', "Canvas LMS") %></span>
+      <% end %>
+      <% if show_student_view_button? %>
+        <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "Button Button--icon-action-rev Button--large mobile-header-student-view", :id => "mobile-student-view", :"aria-label" => t('Student View'), :role => "button", :method => :post do %>
+          <i class="icon-student-view"></i>
+        <% end %>
+      <% else %>
+        <div class="mobile-header-space"></div>
+    <% end %>
+      <% if context_crumb %>
+        <button type="button" class="Button Button--icon-action-rev Button--large mobile-header-arrow" aria-label="<%= t "Navigation Menu" %>">
+          <i class="icon-arrow-open-down" id="mobileHeaderArrowIcon"></i>
+        </button>
+      <% else %>
+        <div class="mobile-header-space"></div>
       <% end %>
     </header>
     <nav id="mobileContextNavContainer"></nav>

@@ -78,6 +78,9 @@ class RoleOverride < ActiveRecord::Base
     ENROLLMENT_TYPE_LABELS
   end
 
+  # Common set of granular permissions for checking rights against
+  GRANULAR_FILE_PERMISSIONS = [:manage_files_add, :manage_files_edit, :manage_files_delete].freeze
+
   # immediately register stock canvas-lms permissions
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
   # for legacy reasons
@@ -702,25 +705,84 @@ class RoleOverride < ActiveRecord::Base
         'AccountAdmin'
       ]
     },
-    :manage_files => {
-     :label => lambda { t('permissions.manage_files', "Manage (add / edit / delete) course files") },
-     :label_v2 => lambda { t("Course Files - add / edit / delete") },
-     :available_to => [
-       'TaEnrollment',
-       'DesignerEnrollment',
-       'TeacherEnrollment',
-       'TeacherlessStudentEnrollment',
-       'ObserverEnrollment',
-       'AccountAdmin',
-       'AccountMembership'
-     ],
-     :true_for => [
-       'TaEnrollment',
-       'DesignerEnrollment',
-       'TeacherEnrollment',
-       'AccountAdmin'
-     ],
-     :acts_as_access_token_scope => true
+    # legacy :manage_files permission bundle
+    manage_files: {
+      label: -> { t('Manage (add / edit / delete) course files') },
+      label_v2: -> { t('Course Files - add / edit / delete') },
+      available_to: %w[
+        TaEnrollment
+        DesignerEnrollment
+        TeacherEnrollment
+        TeacherlessStudentEnrollment
+        ObserverEnrollment
+        AccountAdmin
+        AccountMembership
+      ],
+      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+      acts_as_access_token_scope: true,
+      account_allows: lambda do |a|
+        !a.root_account.feature_enabled?(:granular_permissions_course_files)
+      end
+    },
+    manage_files_add: {
+      label: -> { t('Add course files') },
+      label_v2: -> { t('Course Files - add') },
+      group: "manage_files",
+      group_label: lambda { t("Manage Course Files") },
+      available_to: %w[
+        TaEnrollment
+        DesignerEnrollment
+        TeacherEnrollment
+        TeacherlessStudentEnrollment
+        ObserverEnrollment
+        AccountAdmin
+        AccountMembership
+      ],
+      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+      acts_as_access_token_scope: true,
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_files)
+      end
+    },
+    manage_files_edit: {
+      label: -> { t('Edit course files') },
+      label_v2: -> { t('Course Files - edit') },
+      group: "manage_files",
+      group_label: lambda { t("Manage Course Files") },
+      available_to: %w[
+        TaEnrollment
+        DesignerEnrollment
+        TeacherEnrollment
+        TeacherlessStudentEnrollment
+        ObserverEnrollment
+        AccountAdmin
+        AccountMembership
+      ],
+      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+      acts_as_access_token_scope: true,
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_files)
+      end
+    },
+    manage_files_delete: {
+      label: -> { t('Delete course files') },
+      label_v2: -> { t('Course Files - delete') },
+      group: "manage_files",
+      group_label: lambda { t("Manage Course Files") },
+      available_to: %w[
+        TaEnrollment
+        DesignerEnrollment
+        TeacherEnrollment
+        TeacherlessStudentEnrollment
+        ObserverEnrollment
+        AccountAdmin
+        AccountMembership
+      ],
+      true_for: %w[TaEnrollment DesignerEnrollment TeacherEnrollment AccountAdmin],
+      acts_as_access_token_scope: true,
+      account_allows: lambda do |a|
+        a.root_account.feature_enabled?(:granular_permissions_course_files)
+      end
     },
     :manage_grades => {
       :label => lambda { t('permissions.manage_grades', "Edit grades") },

@@ -396,6 +396,8 @@ body.primary-nav-expanded {
 }
 
 #mobile-header {
+  display: flex;
+  align-items: center;
   z-index: 100;
   background-color: var(--ic-brand-global-nav-bgd);
   * {
@@ -420,16 +422,23 @@ body.primary-nav-expanded {
     display: none;
   }
 }
-.mobile-header-hamburger {
-  float: direction(left);
-}
 .mobile-header-title {
   text-align: center;
   display: block;
+  flex-grow: 1;
 }
 .mobile-header-hamburger,
-.mobile-header-title {
+.mobile-header-student-view,
+.mobile-header-arrow,
+.mobile-header-title,
+.mobile-header-space{
   padding: $ic-sp * 1.3;
+}
+.mobile-header-student-view {
+  padding-#{direction('right')}: $ic-sp * 0.65;
+}
+.mobile-header-arrow {
+  padding-#{direction('left')}: $ic-sp * 0.65;
 }
 .ic-brand-mobile-global-nav-logo {
   height: 48px;

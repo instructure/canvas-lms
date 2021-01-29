@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
-import filesEnv from 'compiled/react_files/modules/filesEnv'
 import UsageRightsDialog from './UsageRightsDialog'
 
 export default class UsageRightsIndicator extends React.Component {
@@ -30,7 +29,7 @@ export default class UsageRightsIndicator extends React.Component {
 
   static propTypes = {
     model: customPropTypes.filesystemObject.isRequired,
-    userCanManageFilesForContext: PropTypes.bool.isRequired,
+    userCanEditFilesForContext: PropTypes.bool.isRequired,
     userCanRestrictFilesForContext: PropTypes.bool.isRequired,
     usageRightsRequiredForContext: PropTypes.bool.isRequired,
     modalOptions: PropTypes.object.isRequired,
@@ -82,7 +81,7 @@ export default class UsageRightsIndicator extends React.Component {
     ) {
       return null
     } else if (this.props.usageRightsRequiredForContext && !this.props.model.get('usage_rights')) {
-      if (this.props.userCanManageFilesForContext) {
+      if (this.props.userCanEditFilesForContext) {
         return (
           <button
             className="UsageRightsIndicator__openModal btn-link"
@@ -107,7 +106,7 @@ export default class UsageRightsIndicator extends React.Component {
         <button
           className="UsageRightsIndicator__openModal btn-link"
           onClick={this.handleClick}
-          disabled={!this.props.userCanManageFilesForContext}
+          disabled={!this.props.userCanEditFilesForContext}
           title={this.props.model.get('usage_rights').license_name}
           data-tooltip="top"
         >
