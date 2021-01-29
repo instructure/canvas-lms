@@ -174,6 +174,15 @@ module Api::V1::Attachment
     hash
   end
 
+  def infer_file_extension(params)
+    mime_type = infer_upload_content_type(params)
+
+    return File.mime_types[mime_type] if mime_type
+
+    filenames_with_extension = filenames(params).select{ |item| item.include?('.') }
+    filenames_with_extension&.first&.split('.')&.last&.downcase
+  end
+
   def infer_filename_from_url(url)
     return url if url.blank?
 
@@ -191,8 +200,11 @@ module Api::V1::Attachment
   end
 
   def infer_upload_content_type(params, default_mimetype = nil)
-    mime_type = params[:content_type].presence || Attachment.mimetype(infer_upload_filename(params))
-    mime_type && mime_type != 'unknown/unknown' ? mime_type : default_mimetype
+    mime_type = params[:content_type].presence
+    return mime_type if valid_mime_type?(mime_type)
+
+    mime_types = valid_mime_types(params)
+    mime_types&.first || default_mimetype
   end
 
   def infer_upload_folder(context, params)
@@ -203,6 +215,21 @@ module Api::V1::Attachment
     elsif params[:parent_folder_path].is_a?(String)
       Folder.assert_path(params[:parent_folder_path], context)
     end
+  end
+
+  def filenames(params)
+    [:name, :filename, :url].map { |param| params[param] }.compact
+  end
+
+  def valid_mime_type?(mime_type)
+    mime_type.present? && mime_type != 'unknown/unknown'
+  end
+
+  def valid_mime_types(params)
+    filenames(params).map do |filename|
+      mime_type = Attachment.mimetype(filename)
+      mime_type if valid_mime_type?(mime_type)
+    end.compact
   end
 
   def validate_on_duplicate(params)
@@ -294,7 +321,7 @@ module Api::V1::Attachment
         access_token: @access_token,
         folder: folder,
         filename: infer_upload_filename(params),
-        content_type: infer_upload_content_type(params),
+        content_type: infer_upload_content_type(params, 'unknown/unknown'),
         on_duplicate: infer_on_duplicate(params),
         quota_exempt: !opts[:check_quota],
         capture_url: api_v1_files_capture_url,

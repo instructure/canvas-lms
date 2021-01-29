@@ -65,19 +65,22 @@ describe Api::V1::Attachment do
     it { expect(infer_upload_filename({})).to be_nil }
 
     it 'return the name when it is given' do
-      params = { name: 'filename', filename: 'filename.jpg' }
+      params = ActionController::Parameters.new(
+        name: 'filename',
+        filename: 'filename.jpg'
+      )
 
       expect(infer_upload_filename(params)).to eq 'filename'
     end
 
     it 'return the filename when it is given' do
-      params = { filename: 'filename.png' }
+      params = ActionController::Parameters.new(filename: 'filename.png')
 
       expect(infer_upload_filename(params)).to eq 'filename.png'
     end
 
     it 'return the filename inferred from the url when it is given' do
-      params = { url: 'http://www.example.com/foo/bar/filename.jpg' }
+      params = ActionController::Parameters.new(url: 'http://www.example.com/foo/bar/filename.jpg')
 
       expect(infer_upload_filename(params)).to eq 'filename.jpg'
     end
@@ -117,5 +120,97 @@ describe Api::V1::Attachment do
 
       expect(infer_filename_from_url(url)).to be_empty
     end
+  end
+
+  describe '#infer_file_extension' do
+    it 'return the extension from name attribute when it is given' do
+      params = ActionController::Parameters.new(name: 'name.jpg')
+
+      expect(infer_file_extension(params)).to eq 'jpg'
+    end
+
+    it 'return the extension from url attribute even it is an unknown type' do
+      params = ActionController::Parameters.new(
+        name: 'name',
+        url: 'https://dummyimage.com/300/09f/image.xpto'
+      )
+
+      expect(infer_file_extension(params)).to eq 'xpto'
+    end
+
+    it 'return the extension from filename attribute when it is given' do
+      params = ActionController::Parameters.new(name: 'name', filename: 'filename.png')
+
+      expect(infer_file_extension(params)).to eq 'png'
+    end
+
+    it 'return the extension from url attribute when it is given' do
+      params = ActionController::Parameters.new(
+        name: 'name',
+        filename: 'filename',
+        url: 'http://www.example.com/foo/bar/filename.gif'
+      )
+
+      expect(infer_file_extension(params)).to eq 'gif'
+    end
+
+    it 'return `nil` when can not infer the extension' do
+      params = ActionController::Parameters.new(name: 'name')
+
+      expect(infer_file_extension(params)).to be_nil
+    end
+  end
+
+  describe '#infer_upload_content_type' do
+    it 'return the content_type from content_type attribute when it is given' do
+      params = ActionController::Parameters.new(content_type: 'image/png')
+
+      expect(infer_upload_content_type(params)).to eq 'image/png'
+    end
+
+    it 'return the content_type from name attribute when it is given' do
+      params = ActionController::Parameters.new(name: 'name.jpeg')
+
+      expect(infer_upload_content_type(params)).to eq 'image/jpeg'
+    end
+
+    it 'return the content_type from filename attribute when it is given' do
+      params = ActionController::Parameters.new(name: 'name', filename: 'filename.png')
+
+      expect(infer_upload_content_type(params)).to eq 'image/png'
+    end
+
+    it 'return the content_type from url attribute when it is given' do
+      params = ActionController::Parameters.new(
+        name: 'name',
+        filename: 'filename',
+        url: 'http://www.example.com/foo/bar/filename.pdf'
+      )
+
+      expect(infer_upload_content_type(params)).to eq 'application/pdf'
+    end
+
+    it 'return `nil` when can not infer the extension' do
+      params = ActionController::Parameters.new
+
+      expect(infer_upload_content_type(params)).to be_nil
+    end
+
+    it 'return `unknown/unknown` when can not infer the extension and a default mime type is given' do
+      params = ActionController::Parameters.new
+      default_mimetype = 'unknown/unknown'
+
+      expect(infer_upload_content_type(params, default_mimetype)).to eq default_mimetype
+    end
+  end
+
+  describe '#valid_mime_type?' do
+    it { expect(valid_mime_type?(nil)).to be false }
+
+    it { expect(valid_mime_type?('')).to be false }
+
+    it { expect(valid_mime_type?('unknown/unknown')).to be false }
+
+    it { expect(valid_mime_type?('application/pdf')).to be true }
   end
 end

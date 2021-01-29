@@ -4399,6 +4399,12 @@ describe 'Submissions API', type: :request do
         assert_status(200)
       end
 
+      it "rejects uploading files when file extension is not given" do
+        @assignment.update(allowed_extensions: ['jpg'])
+        preflight(name: 'name', size: 12345)
+        assert_status(400)
+      end
+
       it "rejects uploading files when filetype is not allowed" do
         @assignment.update(:allowed_extensions => ['doc'])
         preflight(name: 'test.txt', size: 12345, content_type: 'text/plain')
@@ -4457,7 +4463,7 @@ describe 'Submissions API', type: :request do
         it "returns upload_params infering the filename from the URL" do
           upload_json = {
             "filename" => "test",
-            "content_type" => nil,
+            "content_type" => "unknown/unknown",
             "target_url" => "http://example.com/test"
           }
           expect(json_response['upload_params']).to eq upload_json
