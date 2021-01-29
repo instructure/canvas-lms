@@ -82,10 +82,10 @@ describe "account admin outcomes" do
     end
 
     context "outcome groups" do
-      let(:ten) { 10 }
+      let(:one) { 1 }
 
       before(:each) do
-        setup_fake_state_data(ten)
+        setup_fake_state_data(one)
         open_outcomes_find
         click_on_state_standards
       end
@@ -95,10 +95,10 @@ describe "account admin outcomes" do
         import_state_standart_into_account
 
         back_button = f(".go_back")
-        expand_child_folders(ten, back_button)
+        expand_child_folders(one, back_button)
 
         # collapse back to the root folder by repeatedly clicking on |Back| (upper left)
-        ten.downto(1) do |i|
+        one.downto(1) do |i|
           outcome_group = ffj(".outcome-level:visible .outcome-group .ellipsis")[i - 1]
           expect(outcome_group.text).to eq "Level #{i}"
           back_button.click
@@ -129,7 +129,6 @@ describe "account admin outcomes" do
       1.upto(counter) do |og|
         root_group = root_group.child_outcome_groups.create!(:title => "Level #{og}")
       end
-      Shard.current.settings[:common_core_outcome_group_id] = root_group.id
     end
 
     def open_outcomes_find

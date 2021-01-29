@@ -1,5 +1,7 @@
+# frozen_string_literal: true
+
 #
-# Copyright (C) 2012 - present Instructure, Inc.
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -16,10 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-import _ from 'underscore'
-import PaginatedCollection from './PaginatedCollection'
-import OutcomeGroup from '../models/OutcomeGroup'
+class RemoveCommonCoreShardSetting < ActiveRecord::Migration[5.2]
+  tag :predeploy
 
-export default class OutcomeGroupCollection extends PaginatedCollection
-  model: OutcomeGroup
+  def up
+    return unless Shard.current == Shard.default
 
+    Shard.where.not(settings: nil).find_each do |shard|
+      shard.settings.delete(:common_core_outcome_group_id)
+      shard.save! if shard.changed?
+    end
+  end
+end

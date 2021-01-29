@@ -110,7 +110,6 @@ describe "account admin outcomes" do
         fake_cc = root_group.child_outcome_groups.create!(:title => "Fake Common Core")
         11.times { root_group.child_outcome_groups.create!(:title => "G is after F") }
         last_group = root_group.child_outcome_groups.create!(:title => "Z is last")
-        allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: fake_cc.id })
 
         # go to the find panel
         get outcome_url
@@ -120,7 +119,7 @@ describe "account admin outcomes" do
 
         # click on state standards
         top_level_groups = ff(".outcome-level .outcome-group")
-        expect(top_level_groups.count).to eq 3
+        expect(top_level_groups.count).to eq 2
         top_level_groups[1].click
         wait_for_ajaximations
 

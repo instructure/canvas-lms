@@ -30,9 +30,6 @@ class OutcomesController < ApplicationController
     log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if (common_core_group_id = Shard.current.settings[:common_core_outcome_group_id])
-      common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
-    end
 
     js_env(:ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
            :CONTEXT_URL_ROOT => polymorphic_path([@context]),
@@ -40,8 +37,6 @@ class OutcomesController < ApplicationController
            # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
            :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
            :GLOBAL_ROOT_OUTCOME_GROUP_ID => @context.is_a?(Course) ? nil : LearningOutcomeGroup.global_root_outcome_group.id,
-           :COMMON_CORE_GROUP_ID => common_core_group_id,
-           :COMMON_CORE_GROUP_URL => common_core_group_url,
            :PERMISSIONS => {
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),

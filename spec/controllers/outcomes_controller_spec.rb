@@ -68,12 +68,12 @@ describe OutcomesController do
       get 'index', params: {:account_id => @account.id}
     end
 
-    it "should find a common core group from settings" do
+    it "should not find a common core group from settings" do
       user_session(@admin)
       account_outcome
       allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: @outcome_group.id })
       get 'index', params: {:account_id => @account.id}
-      expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
+      expect(assigns[:js_env]).not_to have_key(:COMMON_CORE_GROUP_ID)
     end
 
     it "should pass along permissions" do
