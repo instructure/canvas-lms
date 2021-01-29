@@ -343,6 +343,7 @@ class ContextModuleProgression < ActiveRecord::Base
   end
 
   def prerequisites_satisfied?
+    return true unless sequence_control_on?
     ContextModuleProgression.prerequisites_satisfied?(user, context_module)
   end
 
