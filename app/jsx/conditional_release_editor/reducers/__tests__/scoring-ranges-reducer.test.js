@@ -117,6 +117,20 @@ describe('scoringRangeReducer', () => {
     )
   })
 
+  it('allows setting bound to 0 on the middle range', () => {
+    let newState = reduce(initialState(), actions.SET_SCORE_AT_INDEX, {index: 1, score: '0'})
+    newState = newState.map(range =>
+      Map({lower_bound: range.get('lower_bound'), upper_bound: range.get('upper_bound')})
+    )
+    expect(newState).toEqual(
+      Immutable.fromJS([
+        {lower_bound: '0.8484', upper_bound: '1.00'},
+        {lower_bound: '0', upper_bound: '0.8484'},
+        {lower_bound: '0', upper_bound: '0'}
+      ])
+    )
+  })
+
   it('sets errors if present', () => {
     const newState = reduce(initialState(), actions.SET_ERROR_AT_SCORE_INDEX, {
       index: 0,

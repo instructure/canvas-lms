@@ -30,7 +30,7 @@ const DEFAULT_SCORING_RANGES = Immutable.fromJS([
 
 const emptyAssignmentSet = () => Map({assignment_set_associations: List()})
 
-const identity = (dflt = '') => (s, _a) => s || dflt
+const identity = (dflt = '') => (s, _a) => (s == null ? dflt : s)
 
 const scoringRangesReducer = (state, action) => {
   if (state === undefined) return List()

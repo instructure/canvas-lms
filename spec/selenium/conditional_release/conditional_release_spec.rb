@@ -194,6 +194,19 @@ describe 'native canvas conditional release' do
       replace_content(ConditionalReleaseObjects.division_cutoff1, "35")
       expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to eq(true)
     end
+
+    it 'should not show error setting middle range to 0' do
+      assignment = assignment_model(course: @course, points_possible: 4)
+      get "/courses/#{@course.id}/assignments/#{assignment.id}/edit"
+      ConditionalReleaseObjects.conditional_release_link.click
+      replace_content(ConditionalReleaseObjects.division_cutoff1, "2")
+      replace_content(ConditionalReleaseObjects.division_cutoff2, "0")
+
+      expect(ConditionalReleaseObjects.must_not_be_empty_exists?).to eq(false)
+      expect(ConditionalReleaseObjects.these_scores_are_out_of_order_exists?).to eq(false)
+      expect(ConditionalReleaseObjects.must_be_a_number_exists?).to eq(false)
+      expect(ConditionalReleaseObjects.number_is_too_small_exists?).to eq(false)
+    end
   end
 
   context 'Mastery Path Breakdowns' do
