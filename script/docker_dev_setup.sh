@@ -42,13 +42,15 @@ function installed {
 
 if [[ $OS == 'Darwin' ]]; then
   install='brew install'
-  dependencies='docker docker-machine dinghy'#docker-compose is checked separately
+  #docker-compose is checked separately
+  dependencies='docker docker-machine dinghy'
 elif [[ $OS == 'Linux' ]] && ! installed apt-get; then
   echo 'This script only supports Debian-based Linux'
   exit 1
 elif [[ $OS == 'Linux' ]]; then
   #when more dependencies get added, modify Linux install output below
-  dependencies='dory'#docker-compose is checked separately
+  #docker-compose is checked separately
+  dependencies='dory'
 else
   echo 'This script only supports MacOS and Linux :('
   exit 1
