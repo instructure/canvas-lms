@@ -57,13 +57,15 @@ else
 fi
 
 function check_dependencies {
+  local packages=()
   #check for proper docker-compose version
   if ! check_docker_compose_version; then
     message "docker-compose $DOCKER_COMPOSE_MIN_VERSION or higher is required."
     printf "\tPlease see %s for installation instructions.\n" "https://docs.docker.com/compose/install/"
+    packages+=("docker-compose")
+    docker_missing=1
   fi
   #check for required packages installed
-  local packages=()
   for package in $dependencies; do
     if ! installed "$package"; then
       packages+=("$package")
@@ -71,15 +73,21 @@ function check_dependencies {
   done
   #if missing packages, print missing packages with install assistance.
   if [[ ${#packages[@]} -gt 0 ]]; then
-    message "Some additional dependencies need to be installed for your OS."
-    printf -v joined '%s,' "${packages[@]}"
-    echo "Please install ${joined%,}."
     #when more dependencies get added, modify this output to include them.
     if [[ $OS == 'Linux' ]];then
       if [[ "${packages[*]}" =~ "dory" ]];then
-        printf "\tTry: gem install dory\n"
+        message "Some additional dependencies need to be installed for your OS."
+        printf "\tCanvas recommends using dory for a reverse proxy allowing you to
+\taccess canvas at http://canvas.docker. Detailed instructions
+\tare available at https://github.com/FreedomBen/dory.
+\tIf you want to install it, run 'gem install dory' then rerun this script.\n"
+        [[ ${docker_missing:-0} == 1 ]] || prompt 'Would you like to skip dory? [y/n]' skip_dory
+        [[ ${skip_dory:-n} != 'y' ]] || return 0
       fi
     elif [[ $OS == 'Darwin' ]];then
+      message "Some additional dependencies need to be installed for your OS."
+      printf -v joined '%s,' "${packages[@]}"
+      echo "Please install ${joined%,}."
       printf "\tTry: %s %s\n" "$install" "${packages[*]}"
     else
       echo 'This script only supports MacOS and Linux :('
@@ -146,10 +154,18 @@ function start_dinghy_vm {
 }
 
 function start_docker_daemon {
-  service docker status &> /dev/null && return 0
+  if installed "service"; then
+    service docker status &> /dev/null && return 0
+  else
+    systemctl status docker &> /dev/null && return 0
+  fi
   prompt 'The docker daemon is not running. Start it? [y/n]' confirm
   [[ ${confirm:-n} == 'y' ]] || return 1
-  sudo service docker start
+  if installed "service"; then
+    sudo service docker start
+  else
+    sudo systemctl start docker
+  fi
   sleep 1 # wait for docker daemon to start
 }
 
@@ -182,10 +198,9 @@ function setup_docker_environment {
     create_dinghy_vm
     start_dinghy_vm
   elif [[ $OS == 'Linux' ]]; then
-    message "It looks like you're using Linux. You'll need dory. Let's set that up."
     start_docker_daemon
     setup_docker_as_nonroot
-    start_dory
+    [[ ${skip_dory:-n} != 'y' ]] && start_dory
   fi
   if [ -f "docker-compose.override.yml" ]; then
     message "docker-compose.override.yml exists, skipping copy of default configuration"
