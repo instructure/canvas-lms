@@ -16,19 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {getFileThumbnail} from 'jsx/shared/helpers/fileHelper'
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {IconPaperclipLine} from '@instructure/ui-icons'
+import {RemovableItem} from '../RemovableItem/RemovableItem'
+
 import {Flex} from '@instructure/ui-flex'
+import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
 import {TruncateText} from '@instructure/ui-truncate-text'
-import {RemovableItem} from '../RemovableItem/RemovableItem'
-import I18n from 'i18n!conversations_2'
 
 export const Attachment = ({...props}) => {
+  if (props.attachment.isLoading) {
+    return <Spinner renderTitle={I18n.t('Loading')} size="medium" />
+  }
+
   let attachmentInput = null
   const handleAttachment = () => attachmentInput?.click()
-  const attachmentDisplayName = props.attachment.displayName
+  const attachmentDisplayName = props.attachment.display_name
   return (
     <RemovableItem
       onRemove={props.onDelete}
@@ -43,19 +49,11 @@ export const Attachment = ({...props}) => {
         data-testid="attachment"
       >
         <Flex.Item margin="none xx-small xxx-small xx-small" align="center">
-          {props.attachment.thumbnailUrl ? (
-            <img
-              src={props.attachment.thumbnailUrl}
-              alt={props.attachment.displayName}
-              style={{maxWidth: '48px', maxHeight: '48px', borderRadius: '2px'}}
-            />
-          ) : (
-            <IconPaperclipLine size="medium" data-testid="paperclip" />
-          )}
+          {getFileThumbnail(props.attachment, 'medium')}
         </Flex.Item>
         <Flex.Item>
           <TruncateText position="middle" maxLines={3}>
-            <Text size="small">{props.attachment.displayName}</Text>
+            <Text size="small">{props.attachment.display_name}</Text>
           </TruncateText>
         </Flex.Item>
       </Flex>
@@ -72,9 +70,10 @@ export const Attachment = ({...props}) => {
 }
 
 export const attachmentProp = PropTypes.shape({
-  id: PropTypes.string.isRequired,
-  displayName: PropTypes.string.isRequired,
-  thumbnailUrl: PropTypes.string
+  id: PropTypes.string,
+  display_name: PropTypes.string,
+  thumbnail_url: PropTypes.string,
+  mime_class: PropTypes.string
 })
 
 Attachment.propTypes = {

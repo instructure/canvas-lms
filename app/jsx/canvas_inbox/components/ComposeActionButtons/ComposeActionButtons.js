@@ -16,13 +16,14 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
+
 import {Button, IconButton} from '@instructure/ui-buttons'
+import {Flex} from '@instructure/ui-flex'
 import {IconAttachMediaLine, IconPaperclipLine} from '@instructure/ui-icons'
 import {Tooltip} from '@instructure/ui-tooltip'
-import {Flex} from '@instructure/ui-flex'
-import I18n from 'i18n!conversations_2'
 
 export const ComposeActionButtons = ({...props}) => {
   return (
@@ -55,6 +56,7 @@ const renderUploadButtons = props => {
         style={{display: 'none'}}
         aria-hidden
         onChange={props.onAttachmentUpload}
+        multiple
       />
       {props.onMediaUpload && (
         <Tooltip renderTip={I18n.t('Record an audio or video comment')} placement="top">
