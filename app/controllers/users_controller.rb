@@ -474,7 +474,7 @@ class UsersController < ApplicationController
     clear_crumbs
 
     @show_footer = true
-    @k5_mode = @context.account.feature_enabled?(:canvas_for_elementary)
+    @k5_mode = @current_user.account.feature_enabled?(:canvas_for_elementary)
 
     if request.path =~ %r{\A/dashboard\z}
       return redirect_to(dashboard_url, :status => :moved_permanently)
@@ -483,7 +483,6 @@ class UsersController < ApplicationController
 
     js_env({
       :DASHBOARD_SIDEBAR_URL => dashboard_sidebar_url,
-      :K5_MODE => @k5_mode,
       :PREFERENCES => {
         :dashboard_view => @current_user.dashboard_view(@domain_root_account),
         :hide_dashcard_color_overlays => @current_user.preferences[:hide_dashcard_color_overlays],

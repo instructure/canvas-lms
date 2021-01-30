@@ -226,7 +226,8 @@ class ApplicationController < ActionController::Base
     :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
     :usage_rights_discussion_topics, :inline_math_everywhere, :granular_permissions_manage_admin_users
   ].freeze
-  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
+  JS_ENV_ACCOUNT_FEATURES = [:canvas_for_elementary].freeze
+  JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES + JS_ENV_ACCOUNT_FEATURES].sort.join(",")).freeze
   def cached_js_env_account_features
     # can be invalidated by a flag change on either site admin or the domain root account
     MultiCache.fetch(["js_env_account_features", JS_ENV_FEATURES_HASH,
@@ -237,6 +238,9 @@ class ApplicationController < ActionController::Base
       end
       JS_ENV_ROOT_ACCOUNT_FEATURES.each do |f|
         results[f] = !!@domain_root_account&.feature_enabled?(f)
+      end
+      JS_ENV_ACCOUNT_FEATURES.each do |f|
+        results[f] = !!@current_user&.account&.feature_enabled?(f)
       end
       results
     end

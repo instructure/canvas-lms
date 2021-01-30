@@ -2427,11 +2427,11 @@ describe UsersController do
       end
 
       context "disabled" do
-        it "sets ENV.K5_MODE to false" do
+        it "sets ENV.FEATURES.canvas_for_elementary to false" do
           course_with_student_logged_in(active_all: true)
           @current_user = @user
           get 'user_dashboard'
-          expect(assigns[:js_env][:K5_MODE]).to be_falsy
+          expect(assigns[:js_env][:FEATURES][:canvas_for_elementary]).to be_falsy
         end
 
         it "only returns classic dashboard bundles" do
@@ -2450,11 +2450,11 @@ describe UsersController do
           @account.enable_feature!(:canvas_for_elementary)
         end
 
-        it "sets ENV.K5_MODE to true when canvas_for_elementary flag is enabled" do
+        it "sets ENV.FEATURES.canvas_for_elementary to true when canvas_for_elementary flag is enabled" do
           course_with_student_logged_in(active_all: true)
           @current_user = @user
           get 'user_dashboard'
-          expect(assigns[:js_env][:K5_MODE]).to be_truthy
+          expect(assigns[:js_env][:FEATURES][:canvas_for_elementary]).to be_truthy
         end
 
         it "returns K-5 dashboard bundles" do

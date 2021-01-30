@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,8 +18,8 @@
 
 import React from 'react'
 import moxios from 'moxios'
-import {render, waitForElement, within} from '@testing-library/react'
-import K5Dashboard from '../K5Dashboard'
+import {act, render, waitForElement, within} from '@testing-library/react'
+import {K5Dashboard} from '../K5Dashboard'
 import fetchMock from 'fetch-mock'
 
 const currentUser = {
@@ -40,12 +40,23 @@ const dashboardCards = [
     href: '/courses/1',
     shortName: 'Econ 101',
     originalName: 'Economics 101',
-    courseCode: 'ECON-001'
+    courseCode: 'ECON-001',
+    isHomeroom: false
+  },
+  {
+    id: 'homeroom',
+    assetString: 'course_2',
+    href: '/courses/2',
+    shortName: 'Homeroom',
+    originalName: 'Home Room',
+    courseCode: 'HOME-001',
+    isHomeroom: true
   }
 ]
 const defaultEnv = {
   current_user: currentUser,
   FEATURES: {
+    canvas_for_elementary: true,
     unpublished_courses: true
   },
   PREFERENCES: {
@@ -76,7 +87,13 @@ const expectSelectedTabText = (wrapper, text) => {
 // passed to the card components (e.g. window.ENV). This causes the test to fail
 // with undefined errors even if the actual test really succeeds.
 const waitForCardsToLoad = async wrapper => {
-  await waitForElement(() => wrapper.getByText('My Subjects'))
+  await waitForElement(() => wrapper.getByTestId('k5-dashboard-card'))
+}
+
+const renderDashboardHomeroomPage = async (props = defaultProps) => {
+  const wrapper = render(<K5Dashboard {...props} />)
+  await waitForCardsToLoad(wrapper)
+  return wrapper
 }
 
 beforeAll(() => {
@@ -93,6 +110,11 @@ beforeAll(() => {
     }
   })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
+  fetchMock.get(
+    '/api/v1/courses/homeroom/discussion_topics?only_announcements=true&per_page=1',
+    '[]'
+  )
+  fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
 })
 
 afterAll(() => {
@@ -102,40 +124,30 @@ afterAll(() => {
 
 beforeEach(() => {
   jest.resetModules()
-  window.ENV = defaultEnv
+  global.ENV = defaultEnv
 })
 
 afterEach(() => {
-  window.ENV = {}
+  global.ENV = {}
 })
 
 describe('K-5 Dashboard', () => {
-  jest.spyOn(window, 'fetch').mockImplementation(() =>
-    Promise.resolve().then(() => ({
-      status: 200,
-      json: () => Promise.resolve().then(() => [])
-    }))
-  )
-
   it('displays a welcome message to the logged-in user', async () => {
-    const wrapper = render(<K5Dashboard {...defaultProps} />)
-    await waitForCardsToLoad(wrapper)
+    const wrapper = await renderDashboardHomeroomPage()
 
     expect(wrapper.getByText('Welcome, Geoffrey Jellineck!')).toBeInTheDocument()
   })
 
   describe('Tabs', () => {
     it('show Homeroom, Schedule, Grades, and Resources options', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} />)
-      await waitForCardsToLoad(wrapper)
+      const wrapper = await renderDashboardHomeroomPage()
       ;['Homeroom', 'Schedule', 'Grades', 'Resources'].forEach(label => {
         expect(wrapper.getByText(label)).toBeInTheDocument()
       })
     })
 
     it('default to the Homeroom tab', async () => {
-      const wrapper = render(<K5Dashboard {...defaultProps} />)
-      await waitForCardsToLoad(wrapper)
+      const wrapper = await renderDashboardHomeroomPage()
 
       expectSelectedTabText(wrapper, 'Homeroom')
     })
@@ -145,34 +157,31 @@ describe('K-5 Dashboard', () => {
         window.location.hash = ''
       })
 
-      it('and start at that tab if it is valid', () => {
+      it('and start at that tab if it is valid', async () => {
         window.location.hash = '#grades'
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
+        let wrapper = null
+        await act(async () => {
+          wrapper = await render(<K5Dashboard {...defaultProps} />)
+        })
 
         expectSelectedTabText(wrapper, 'Grades')
       })
 
       it('and start at the default tab if it is invalid', async () => {
         window.location.hash = 'tab-not-a-real-tab'
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
-        await waitForElement(() => wrapper.getByText('My Subjects'))
+        const wrapper = await renderDashboardHomeroomPage()
 
         expectSelectedTabText(wrapper, 'Homeroom')
       })
 
       it('and update the current tab as tabs are changed', async () => {
-        const wrapper = render(<K5Dashboard {...defaultProps} />)
-        await waitForCardsToLoad(wrapper)
+        const wrapper = await renderDashboardHomeroomPage()
 
-        within(wrapper.getByRole('tablist'))
-          .getByText('Grades')
-          .click()
+        await act(async () => within(wrapper.getByRole('tablist')).getByText('Grades').click())
         expect(window.location.hash).toBe('#grades')
         expectSelectedTabText(wrapper, 'Grades')
 
-        within(wrapper.getByRole('tablist'))
-          .getByText('Resources')
-          .click()
+        await act(async () => within(wrapper.getByRole('tablist')).getByText('Resources').click())
         expect(window.location.hash).toBe('#resources')
         expectSelectedTabText(wrapper, 'Resources')
       })
@@ -181,13 +190,14 @@ describe('K-5 Dashboard', () => {
 
   describe('Homeroom Section', () => {
     it('displays "My Subjects" heading', async () => {
-      const {getByText} = render(<K5Dashboard {...defaultProps} />)
-      await waitForElement(() => getByText('My Subjects'))
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('My Subjects')).toBeInTheDocument()
     })
 
-    it('shows course cards', async () => {
-      const {getByText} = render(<K5Dashboard {...defaultProps} />)
-      await waitForElement(() => getByText('Econ 101'))
+    it('shows course cards, excluding homerooms', async () => {
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('Economics 101')).toBeInTheDocument()
+      expect(wrapper.queryByText('Home Room')).toBeNull()
     })
   })
 

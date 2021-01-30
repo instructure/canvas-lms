@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2014 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -26,45 +26,13 @@
   margin-top: 0;
 }
 
-.ic-Dashboard-header__layout {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  box-sizing: border-box;
-  height: $ic-breadcrumbs-height;
-  &.small {
-    padding-bottom: .5rem;
-
-    .ic-Dashboard-header__actions {
-      display: flex;
-      flex-wrap: wrap;
-    }
-  }
-}
-
-h1.ic-Dashboard-header__title {
-  margin-top: 12px;
-  margin-bottom: 0;
-}
-
-.ic-Dashboard-header__actions {
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-}
-
 // These overrides are only here because the Dashboard cards don't fully use InstUI.
 // Once they are on InstUI they can be removed
-.ic-DashboardCard {
+.ic-DashboardCard__box {
   font-family: "Balsamiq Sans", "Lato Extended", "Lato", "Helvetica Neue", Helvetica, Arial, sans-serif;
 
   & h1, h2, h3, h4, h5, h6 {
     font-family: inherit;
-  }
-
-  & h3.ic-DashboardCard__header-title {
-    font-size: 1rem;
   }
 }
 

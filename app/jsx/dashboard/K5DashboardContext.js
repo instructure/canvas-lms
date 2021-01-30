@@ -16,33 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import PropTypes from 'prop-types'
+import {createContext} from 'react'
 
-import {createPlannerApp} from '@instructure/canvas-planner'
-
-const SchedulePage = ({visible = false}) => {
-  const [isPlannerCreated, setPlannerCreated] = useState(false)
-  const plannerApp = useRef()
-
-  useEffect(() => {
-    plannerApp.current = createPlannerApp()
-    setPlannerCreated(true)
-  }, [])
-
-  return (
-    <section
-      id="dashboard_page_schedule"
-      style={{display: visible ? 'block' : 'none'}}
-      aria-hidden={!visible}
-    >
-      {isPlannerCreated && plannerApp.current}
-    </section>
-  )
+const DEFAULT_CONTEXT = {
+  responsiveSize: 'large'
 }
 
-SchedulePage.propTypes = {
-  visible: PropTypes.bool
-}
-
-export default SchedulePage
+const K5DashboardContext = createContext(DEFAULT_CONTEXT)
+export default K5DashboardContext

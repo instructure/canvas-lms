@@ -16,33 +16,17 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {useEffect, useRef, useState} from 'react'
-import PropTypes from 'prop-types'
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
-import {createPlannerApp} from '@instructure/canvas-planner'
-
-const SchedulePage = ({visible = false}) => {
-  const [isPlannerCreated, setPlannerCreated] = useState(false)
-  const plannerApp = useRef()
-
-  useEffect(() => {
-    plannerApp.current = createPlannerApp()
-    setPlannerCreated(true)
-  }, [])
-
-  return (
-    <section
-      id="dashboard_page_schedule"
-      style={{display: visible ? 'block' : 'none'}}
-      aria-hidden={!visible}
-    >
-      {isPlannerCreated && plannerApp.current}
-    </section>
-  )
-}
-
-SchedulePage.propTypes = {
-  visible: PropTypes.bool
-}
-
-export default SchedulePage
+export const fetchLatestAnnouncement = courseId =>
+  asJson(
+    window.fetch(
+      `/api/v1/courses/${courseId}/discussion_topics?only_announcements=true&per_page=1`,
+      defaultFetchOptions
+    )
+  ).then(data => {
+    if (data?.length > 0) {
+      return data[0]
+    }
+    return null
+  })

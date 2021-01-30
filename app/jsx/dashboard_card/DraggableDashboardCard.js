@@ -16,10 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React from 'react'
 import {DropTarget, DragSource} from 'react-dnd'
 import compose from '../shared/helpers/compose'
 import ItemTypes from './Types'
-import DashboardCard from './DashboardCard'
 
 const cardSource = {
   beginDrag(props) {
@@ -73,4 +73,4 @@ export default compose(
     connectDragSource: connect.dragSource(),
     isDragging: monitor.isDragging()
   }))
-)(DashboardCard)
+)(({cardComponent: Card, ...rest}) => <Card {...rest} />)
