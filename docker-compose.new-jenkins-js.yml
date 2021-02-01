@@ -3,11 +3,5 @@ services:
   canvas:
     environment:
       - JSPEC_GROUP
-    image: local/js-runner
-    build:
-      context: .
-      dockerfile: ./build/new-jenkins/js/Dockerfile
-      args:
-        PATCHSET_TAG: $PATCHSET_TAG
-        WEBPACK_BUILDER_TAG: $WEBPACK_BUILDER_TAG
+    image: $KARMA_RUNNER_IMAGE
     init: true

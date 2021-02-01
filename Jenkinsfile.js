@@ -93,8 +93,6 @@ pipeline {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
-
-                sh 'docker-compose build'
               }
             }
 
@@ -103,12 +101,7 @@ pipeline {
                 script {
                   def tests = [:]
 
-                  if(env.TEST_SUITE == 'upload') {
-                    sh """
-                      docker tag local/js-runner $JS_DEBUG_IMAGE_TAG
-                      docker push $JS_DEBUG_IMAGE_TAG
-                    """
-                  } else if(env.TEST_SUITE == 'jest') {
+                  if(env.TEST_SUITE == 'jest') {
                     tests['Jest'] = {
                       withEnv(['CONTAINER_NAME=tests-jest']) {
                         try {
