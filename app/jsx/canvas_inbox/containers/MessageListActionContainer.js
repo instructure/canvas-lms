@@ -26,6 +26,7 @@ import {MessageActionButtons} from '../components/MessageActionButtons/MessageAc
 import PropTypes from 'prop-types'
 import {useQuery} from 'react-apollo'
 import React, {useContext} from 'react'
+import {reduceDuplicateCourses} from '../helpers/courses_helper'
 import {View} from '@instructure/ui-view'
 
 const MessageListActionContainer = props => {
@@ -35,30 +36,6 @@ const MessageListActionContainer = props => {
   const {loading, error, data} = useQuery(COURSES_QUERY, {
     variables: {userID}
   })
-
-  const reduceDuplicateCourses = (enrollments, favoriteCourses) => {
-    if (!enrollments || !favoriteCourses) {
-      return []
-    }
-    return enrollments
-      .map(c => {
-        return {
-          id: c.course.id,
-          contextName: c.course.contextName,
-          assetString: c.course.assetString
-        }
-      })
-      .filter(c => {
-        let isMatch
-        for (let i = 0; i < favoriteCourses.length; i++) {
-          isMatch = favoriteCourses[i].assetString === c.assetString
-          if (isMatch === true) {
-            break
-          }
-        }
-        return !isMatch
-      })
-  }
 
   if (loading) {
     return <span />

@@ -19,22 +19,60 @@
 import * as uploadFileModule from 'jsx/shared/upload_file'
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import ComposeModalContainer from '../ComposeModalContainer'
+import {COURSES_QUERY} from '../../Queries'
+import {createCache} from '../../../canvas-apollo'
+import {MockedProvider} from '@apollo/react-testing'
+import {mockQuery} from '../../mocks'
 import React from 'react'
 import {fireEvent, render} from '@testing-library/react'
+import waitForApolloLoading from '../../helpers/waitForApolloLoading'
 
 beforeEach(() => {
   uploadFileModule.uploadFiles = jest.fn().mockResolvedValue([])
   window.ENV = {
+    current_user_id: '1',
     CONVERSATIONS: {
       ATTACHMENTS_FOLDER_ID: 1
     }
   }
 })
 
-const setup = () => {
+const createGraphqlMocks = () => {
+  const mocks = [
+    {
+      request: {
+        query: COURSES_QUERY,
+        variables: {
+          userID: '1'
+        },
+        overrides: {
+          Node: {
+            __typename: 'User'
+          }
+        }
+      }
+    }
+  ]
+
+  const mockResults = Promise.all(
+    mocks.map(async m => {
+      const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
+      return {
+        request: {query: m.request.query, variables: m.request.variables},
+        result
+      }
+    })
+  )
+  return mockResults
+}
+
+const setup = async () => {
+  const mocks = await createGraphqlMocks()
   return render(
     <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
-      <ComposeModalContainer open onDismiss={jest.fn()} />
+      <MockedProvider mocks={mocks} cache={createCache()}>
+        <ComposeModalContainer open onDismiss={jest.fn()} />
+      </MockedProvider>
     </AlertManagerContext.Provider>
   )
 }
@@ -49,8 +87,8 @@ describe('ComposeModalContainer', () => {
   }
 
   describe('rendering', () => {
-    it('should render', () => {
-      const component = setup()
+    it('should render', async () => {
+      const component = await setup()
       expect(component.container).toBeTruthy()
     })
   })
@@ -58,7 +96,7 @@ describe('ComposeModalContainer', () => {
   describe('Attachments', () => {
     it('attempts to upload a file', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([{id: '1', name: 'file1.jpg'}])
-      const {getByTestId} = setup()
+      const {getByTestId} = await setup()
       const fileInput = getByTestId('attachment-input')
       const file = new File(['foo'], 'file.pdf', {type: 'application/pdf'})
 
@@ -72,7 +110,7 @@ describe('ComposeModalContainer', () => {
         {id: '1', name: 'file1.jpg'},
         {id: '2', name: 'file2.jpg'}
       ])
-      const {getByTestId} = setup()
+      const {getByTestId} = await setup()
       const fileInput = getByTestId('attachment-input')
       const file1 = new File(['foo'], 'file1.pdf', {type: 'application/pdf'})
       const file2 = new File(['foo'], 'file2.pdf', {type: 'application/pdf'})
@@ -88,7 +126,7 @@ describe('ComposeModalContainer', () => {
 
   describe('Subject', () => {
     it('allows setting the subject', async () => {
-      const {getByTestId} = setup()
+      const {getByTestId} = await setup()
       const subjectInput = getByTestId('subject-input')
       fireEvent.click(subjectInput)
       fireEvent.change(subjectInput, {target: {value: 'Potato'}})
@@ -97,8 +135,8 @@ describe('ComposeModalContainer', () => {
   })
 
   describe('Body', () => {
-    it('allows setting the body', () => {
-      const {getByTestId} = setup()
+    it('allows setting the body', async () => {
+      const {getByTestId} = await setup()
       const bodyInput = getByTestId('message-body')
       fireEvent.change(bodyInput, {target: {value: 'Potato'}})
       expect(bodyInput.value).toEqual('Potato')
@@ -106,8 +144,8 @@ describe('ComposeModalContainer', () => {
   })
 
   describe('Send individual messages', () => {
-    it('allows toggling the setting', () => {
-      const {getByTestId} = setup()
+    it('allows toggling the setting', async () => {
+      const {getByTestId} = await setup()
       const checkbox = getByTestId('individual-message-checkbox')
       expect(checkbox.checked).toBe(false)
 
@@ -116,6 +154,21 @@ describe('ComposeModalContainer', () => {
 
       fireEvent.click(checkbox)
       expect(checkbox.checked).toBe(false)
+    })
+  })
+
+  describe('Course Select', () => {
+    it('queries graphql for courses', async () => {
+      const component = await setup()
+
+      await waitForApolloLoading()
+
+      const select = await component.findByTestId('course-select')
+      fireEvent.click(select)
+
+      // Hello World is default value for string fields in our gql mocks
+      const selectOptions = await component.findAllByText('Hello World')
+      expect(selectOptions.length).toBeGreaterThan(0)
     })
   })
 })

@@ -21,13 +21,16 @@ import {AttachmentDisplay} from '../components/AttachmentDisplay/AttachmentDispl
 import {ComposeActionButtons} from 'jsx/canvas_inbox/components/ComposeActionButtons/ComposeActionButtons'
 import {ComposeInputWrapper} from 'jsx/canvas_inbox/components/ComposeInputWrapper/ComposeInputWrapper'
 import {CourseSelect} from 'jsx/canvas_inbox/components/CourseSelect/CourseSelect'
+import {COURSES_QUERY} from '../Queries'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from 'jsx/canvas_inbox/components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {MessageBody} from 'jsx/canvas_inbox/components/MessageBody/MessageBody'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
+import {reduceDuplicateCourses} from '../helpers/courses_helper'
 import {SubjectInput} from 'jsx/canvas_inbox/components/SubjectInput/SubjectInput'
 import {uploadFiles} from 'jsx/shared/upload_file'
+import {useQuery} from 'react-apollo'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -46,6 +49,13 @@ const ComposeModalContainer = props => {
   const [body, setBody] = useState()
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
+  const [selectedContext, setSelectedContext] = useState()
+
+  const coursesQuery = useQuery(COURSES_QUERY, {
+    variables: {
+      userID: ENV.current_user_id?.toString()
+    }
+  })
 
   const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
@@ -109,6 +119,10 @@ const ComposeModalContainer = props => {
 
   const onSendIndividualMessagesChange = () => {
     setSendIndividualMessages(prev => !prev)
+  }
+
+  const onContextSelect = id => {
+    setSelectedContext(id)
   }
 
   const validMessageFields = () => {
@@ -180,18 +194,32 @@ const ComposeModalContainer = props => {
     </Flex>
   )
 
-  const renderCourseSelect = () => (
-    <CourseSelect
-      mainPage={false}
-      options={{
-        favoriteCourses: [],
-        moreCourses: [],
-        concludedCourses: [],
-        groups: []
-      }}
-      onCourseFilterSelect={() => {}}
-    />
-  )
+  const renderCourseSelect = () => {
+    if (coursesQuery.error) {
+      setOnFailure(I18n.t('Unable to query for courses at this time, please try again later'))
+      props.onDismiss()
+      return
+    }
+
+    const moreCourses = reduceDuplicateCourses(
+      coursesQuery?.data?.legacyNode?.enrollments,
+      coursesQuery?.data?.legacyNode?.favoriteCoursesConnection?.nodes
+    )
+
+    return (
+      <CourseSelect
+        mainPage={false}
+        options={{
+          favoriteCourses: coursesQuery?.data?.legacyNode?.favoriteCoursesConnection?.nodes,
+          moreCourses,
+          concludedCourses: [],
+          groups: coursesQuery?.data?.legacyNode?.favoriteGroupsConnection?.nodes
+        }}
+        loading={coursesQuery.loading}
+        onCourseFilterSelect={onContextSelect}
+      />
+    )
+  }
 
   const renderModalFooter = () => (
     <Modal.Footer>

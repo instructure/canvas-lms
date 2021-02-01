@@ -91,7 +91,7 @@ describe('MessageListActionContainer', () => {
 
       await waitForApolloLoading()
 
-      const courseDropdown = await component.getByTestId('courseSelect')
+      const courseDropdown = await component.getByTestId('course-select')
 
       fireEvent.click(courseDropdown)
       await waitForApolloLoading()

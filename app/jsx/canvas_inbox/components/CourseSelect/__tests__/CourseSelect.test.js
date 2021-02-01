@@ -65,7 +65,7 @@ describe('CourseSelect', () => {
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>
     )
-    expect(getByTestId('courseSelect')).toBeInTheDocument()
+    expect(getByTestId('course-select')).toBeInTheDocument()
   })
 
   it('opens the select and allows selecting an option', () => {
@@ -75,7 +75,7 @@ describe('CourseSelect', () => {
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>
     )
-    const select = getByTestId('courseSelect')
+    const select = getByTestId('course-select')
     fireEvent.click(select)
     fireEvent.click(getByText('Potions'))
     expect(select.value).toBe('Potions')
@@ -88,7 +88,7 @@ describe('CourseSelect', () => {
         <CourseSelect {...props} />
       </AlertManagerContext.Provider>
     )
-    const select = getByTestId('courseSelect')
+    const select = getByTestId('course-select')
     fireEvent.click(select)
     fireEvent.change(select, {target: {value: 'Gryff'}})
     expect(queryByText('Potions')).toBe(null)

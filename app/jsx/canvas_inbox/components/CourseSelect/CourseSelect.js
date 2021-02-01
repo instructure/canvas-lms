@@ -16,18 +16,20 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import PropTypes from 'prop-types'
 import React from 'react'
 
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
-import I18n from 'i18n!conversations_2'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
 
 const filterOptions = (value, options) => {
   const filteredOptions = {}
   Object.keys(options).forEach(key => {
-    filteredOptions[key] = options[key].filter(option =>
+    filteredOptions[key] = options[key]?.filter(option =>
       option.contextName.toLowerCase().startsWith(value.toLowerCase())
     )
   })
@@ -67,6 +69,7 @@ export class CourseSelect extends React.Component {
         })
       )
     }).isRequired,
+    loading: PropTypes.bool,
     onCourseFilterSelect: PropTypes.func
   }
 
@@ -222,6 +225,14 @@ export class CourseSelect extends React.Component {
     })
   }
 
+  renderSpinner = () => (
+    <Select.Option id="loading">
+      <View as="div" height="100%" width="100%" textAlign="center">
+        <Spinner renderTitle={I18n.t('Loading')} size="small" />
+      </View>
+    </Select.Option>
+  )
+
   render() {
     const {inputValue, isShowingOptions} = this.state
     return (
@@ -241,9 +252,9 @@ export class CourseSelect extends React.Component {
         onRequestHideOptions={this.handleHideOptions}
         onRequestHighlightOption={this.handleHighlightOption}
         onRequestSelectOption={this.handleSelectOption}
-        data-testid="courseSelect"
+        data-testid="course-select"
       >
-        {this.renderGroups()}
+        {this.props.loading ? this.renderSpinner() : this.renderGroups()}
       </Select>
     )
   }
