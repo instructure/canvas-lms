@@ -64,7 +64,7 @@ describe('OutcomeManagementPanel', () => {
     expect(getByText(/Outcome Groups/)).toBeInTheDocument()
     expect(getByText('Account folder 0')).toBeInTheDocument()
     expect(getByText('Account folder 1')).toBeInTheDocument()
-    expect(getAllByText('10 Groups | 2 Outcomes').length).toBe(2)
+    expect(getAllByText('2 Groups | 2 Outcomes').length).toBe(2)
   })
 
   it('loads outcome group data for Course', async () => {

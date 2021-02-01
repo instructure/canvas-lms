@@ -17,7 +17,7 @@
  */
 import {CHILD_GROUPS_QUERY} from '../api'
 
-export const accountMocks = ({childGroupsCount = 1, outcomesCount = 2, accountId = '1'} = {}) => [
+export const accountMocks = ({childGroupsCount = 10, outcomesCount = 2, accountId = '1'} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -42,8 +42,8 @@ export const accountMocks = ({childGroupsCount = 1, outcomesCount = 2, accountId
                 __typename: 'LearningOutcomeGroup',
                 description: `Account folder description ${i}`,
                 _id: 100 + i,
-                outcomesCount: 2,
-                childGroupsCount: 10,
+                outcomesCount,
+                childGroupsCount,
                 title: `Account folder ${i}`
               }))
             }
