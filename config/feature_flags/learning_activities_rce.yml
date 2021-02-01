@@ -21,3 +21,8 @@ rce_pretty_html_editor:
   display_name: RCE Pretty HTML Editor
   description: A much better HTML code editor for the RCE, though it suffers from being inaccessible to screenreader users.
   applies_to: SiteAdmin
+rce_better_file_downloading:
+  state: hidden
+  display_name: RCE Better File Downloading
+  description: Include a download link next to each file link in the RCE
+  applies_to: SiteAdmin
