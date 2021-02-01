@@ -1,0 +1,16 @@
+{
+  "files": [
+    {
+      "pattern": "*/{app/jsx,public/javascripts}/**/*.js",
+      "processor": "js"
+    },
+    {
+      "pattern": "*/app/coffeescripts/**/*.coffee",
+      "processor": "js"
+    },
+    {
+      "pattern": "*/app/views/jst/**/*.{handlebars,hbs}",
+      "processor": "hbs"
+    }
+  ]
+}

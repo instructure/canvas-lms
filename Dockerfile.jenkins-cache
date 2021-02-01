@@ -108,6 +108,7 @@ RUN --mount=target=/tmp/src \
     config/initializers/json.rb \
     config/initializers/revved_asset_urls.rb \
     db/migrate/*_regenerate_brand_files_based_on_new_defaults_*.rb \
+    gems/plugins/.i18n* \
     lib/brandable_css.rb \
     lib/canvas_logger.rb \
     lib/canvas_yaml.rb \

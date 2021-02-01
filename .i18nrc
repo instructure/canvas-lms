@@ -1,5 +1,22 @@
 {
   "plugins": [
     "@instructure/i18nliner-handlebars"
+  ],
+
+  "files": [
+    {
+      "pattern": "app/jsx/**/*.{coffee,js}",
+      "processor": "js"
+    },
+    {
+      "pattern": "app/views/jst/**/*.handlebars",
+      "processor": "hbs"
+    }
+  ],
+
+  "include": [
+    "app/coffeescripts",
+    "gems/plugins",
+    "public/javascripts"
   ]
 }

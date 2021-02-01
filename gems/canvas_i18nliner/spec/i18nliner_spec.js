@@ -16,28 +16,22 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-var I18nliner = require("../js/main").I18nliner;
-var mkdirp = require("mkdirp");
+const mkdirp = require("mkdirp");
+const { I18nliner } = require("../js/main");
+const scanner = require("../js/scanner");
 
-var subject = function(path) {
+var subject = function(dir) {
   var command = new I18nliner.Commands.Check({});
-  var origDir = process.cwd();
-  try {
-    process.chdir(path);
-    command.processors.forEach(function(processor) {
-      processor.directories.forEach(function(directory) {
-        mkdirp.sync(directory);
-      });
-    });
-    command.run();
-  }
-  finally {
-    process.chdir(origDir);
-  }
+  scanner.scanFilesFromI18nrc(scanner.loadConfigFromDirectory(dir))
+  command.run();
   return command.translations.masterHash.translations;
 }
 
 describe("I18nliner", function() {
+  afterEach(function() {
+    scanner.reset()
+  })
+
   describe("handlebars", function() {
     it("extracts default translations", function() {
       expect(subject("spec/fixtures/hbs")).toEqual({
