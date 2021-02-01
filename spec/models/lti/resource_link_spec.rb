@@ -48,8 +48,16 @@ RSpec.describe Lti::ResourceLink, type: :model do
       expect(resource_link.lookup_id).not_to be_blank
     end
 
+    it 'sets the "lookup_uuid" if it is not specified' do
+      expect(resource_link.lookup_uuid).not_to be_blank
+    end
+
     it 'sets the "resource_link_id" if it is not specified' do
       expect(resource_link.resource_link_id).not_to be_blank
+    end
+
+    it 'sets the "resource_link_uuid" if it is not specified' do
+      expect(resource_link.resource_link_uuid).not_to be_blank
     end
 
     it 'sets the "context_external_tool"' do
@@ -57,7 +65,7 @@ RSpec.describe Lti::ResourceLink, type: :model do
     end
 
     it '`lookup_id` should be unique' do
-      expect(resource_link).to validate_uniqueness_of(:lookup_id)
+      expect(resource_link).to validate_uniqueness_of(:lookup_id).ignoring_case_sensitivity
     end
   end
 
@@ -127,6 +135,28 @@ RSpec.describe Lti::ResourceLink, type: :model do
         expect(course.lti_resource_links.first).to eq resource_link_1
         expect(course.lti_resource_links.last).to eq resource_link_2
       end
+    end
+  end
+
+  describe '.create' do
+    it 'create resource link where lookup_id=lookup_uuid and resource_link_id=resource_link_uuid' do
+      resource_link = described_class.create!(context: course, context_external_tool: tool)
+
+      expect(resource_link.lookup_uuid).to eq resource_link.lookup_id
+      expect(resource_link.resource_link_uuid).to eq resource_link.resource_link_id
+
+      lookup_uuid = SecureRandom.uuid
+      resource_link_uuid = SecureRandom.uuid
+
+      resource_link = described_class.create!(
+        context: course,
+        context_external_tool: tool,
+        lookup_id: lookup_uuid,
+        resource_link_id: resource_link_uuid
+      )
+
+      expect(resource_link.lookup_uuid).to eq lookup_uuid
+      expect(resource_link.resource_link_uuid).to eq resource_link_uuid
     end
   end
 end
