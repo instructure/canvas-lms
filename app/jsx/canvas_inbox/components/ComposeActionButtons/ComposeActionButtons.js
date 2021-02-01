@@ -86,7 +86,6 @@ const renderMessageButtons = props => {
         {I18n.t('Cancel')}
       </Button>
       <Button
-        type="submit"
         color={props.isSending ? 'secondary' : 'primary'}
         margin="xx-small"
         onClick={props.onSend}

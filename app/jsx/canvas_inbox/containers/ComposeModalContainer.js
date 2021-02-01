@@ -43,6 +43,8 @@ const ComposeModalContainer = props => {
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
   const [subject, setSubject] = useState()
+  const [body, setBody] = useState()
+  const [bodyMessages, setBodyMessages] = useState([])
 
   const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
@@ -97,6 +99,22 @@ const ComposeModalContainer = props => {
     setSubject(value.currentTarget.value)
   }
 
+  const onBodyChange = value => {
+    setBody(value)
+    if (value) {
+      setBodyMessages([])
+    }
+  }
+
+  const validMessageFields = () => {
+    // TODO: validate recipients
+    if (!body) {
+      setBodyMessages([{text: I18n.t('Message body is required'), type: 'error'}])
+      return false
+    }
+    return true
+  }
+
   const renderModalHeader = () => (
     <Modal.Header>
       <CloseButton
@@ -114,7 +132,7 @@ const ComposeModalContainer = props => {
       <Flex direction="column" width="100%" height="100%">
         {renderHeaderInputs()}
         <View borderWidth="small none none none" padding="x-small">
-          <MessageBody onBodyChange={() => {}} />
+          <MessageBody onBodyChange={onBodyChange} messages={bodyMessages} />
         </View>
         {[...attachments, ...attachmentsToUpload].length > 0 && (
           <View borderWidth="small none none none" padding="small">
@@ -172,6 +190,9 @@ const ComposeModalContainer = props => {
         onMediaUpload={() => {}}
         onCancel={props.onDismiss}
         onSend={() => {
+          if (!validMessageFields()) {
+            return
+          }
           console.log('submitting...')
         }}
         isSending={false}
@@ -181,7 +202,6 @@ const ComposeModalContainer = props => {
 
   return (
     <Modal
-      as="form"
       open={props.open}
       onDismiss={props.onDismiss}
       size="medium"

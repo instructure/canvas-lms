@@ -95,4 +95,13 @@ describe('ComposeModalContainer', () => {
       expect(subjectInput.value).toEqual('Potato')
     })
   })
+
+  describe('Body', () => {
+    it('allows setting the body', () => {
+      const {getByTestId} = setup()
+      const bodyInput = getByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+      expect(bodyInput.value).toEqual('Potato')
+    })
+  })
 })
