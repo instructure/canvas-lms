@@ -171,8 +171,8 @@ be the user's typical LTI ID.
 
 Returns an empty string otherwise.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *com_instructure_user_observees*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_user_observees*  
 
 ```
  LTI 1.3: "a6e2e413-4afb-4b60-90d1-8b0344df3e91",
@@ -182,8 +182,8 @@ Returns an empty string otherwise.
 Returns an array of the section names that the user is enrolled in, if the
 context of the tool launch is within a course.
 
-**Availability**: *when launched from a course*
-**Launch Parameter**: *com_instructure_user_section_names*
+**Availability**: *when launched from a course*  
+**Launch Parameter**: *com_instructure_user_section_names*  
 
 ```
 [ "Section 1", "Section 5", "TA Section"]
@@ -191,8 +191,8 @@ context of the tool launch is within a course.
 ## com.instructure.Observee.sisIds
 returns all observee ids linked to this observer as an String separated by `,`.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *com_instructure_observee_sis_ids*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_observee_sis_ids*  
 
 ```
 "A123,B456,..."
@@ -200,8 +200,8 @@ returns all observee ids linked to this observer as an String separated by `,`.
 ## Context.title
 The title of the context.
 
-**Availability**: *always*
-**Launch Parameter**: *context_title*
+**Availability**: *always*  
+**Launch Parameter**: *context_title*  
 
 ```
 "Example Course"
@@ -209,8 +209,8 @@ The title of the context.
 ## com.instructure.Editor.contents
 The contents of the text editor associated with the content item launch.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_editor_contents*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_editor_contents*  
 
 ```
 "This text was in the editor"
@@ -219,8 +219,8 @@ The contents of the text editor associated with the content item launch.
 The contents the user has selected in the text editor associated
 with the content item launch.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_editor_selection*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_editor_selection*  
 
 ```
 "this text was selected by the user"
@@ -229,8 +229,8 @@ with the content item launch.
 A token that can be used for frontend communication between an LTI tool
 and Canvas via the Window.postMessage API.
 
-**Availability**: **
-**Launch Parameter**: *com_instructure_post_message_token*
+**Availability**: **  
+**Launch Parameter**: *com_instructure_post_message_token*  
 
 ```
 "9ae4170c-6b64-444d-9246-0b7dedd5f560"
@@ -239,8 +239,8 @@ and Canvas via the Window.postMessage API.
 The LTI assignment id of an assignment. This value corresponds with
 the `ext_lti_assignment_id` send in various launches and webhooks.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_assignment_lti_id*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_assignment_lti_id*  
 
 ```
 "9ae4170c-6b64-444d-9246-0b7dedd5f560"
@@ -249,8 +249,8 @@ the `ext_lti_assignment_id` send in various launches and webhooks.
 The Canvas id of the Originality Report associated
 with the launch.
 
-**Availability**: **
-**Launch Parameter**: *com_instructure_originality_report_id*
+**Availability**: **  
+**Launch Parameter**: *com_instructure_originality_report_id*  
 
 ```
 23
@@ -259,8 +259,8 @@ with the launch.
 The Canvas id of the submission associated with the
 launch.
 
-**Availability**: **
-**Launch Parameter**: *com_instructure_submission_id*
+**Availability**: **  
+**Launch Parameter**: *com_instructure_submission_id*  
 
 ```
 23
@@ -269,8 +269,8 @@ launch.
 The Canvas id of the file associated with the submission
 in the launch.
 
-**Availability**: **
-**Launch Parameter**: *com_instructure_file_id*
+**Availability**: **  
+**Launch Parameter**: *com_instructure_file_id*  
 
 ```
 23
@@ -278,8 +278,8 @@ in the launch.
 ## CourseOffering.sourcedId
 the LIS identifier for the course offering.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *lis_course_offering_sourcedid*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *lis_course_offering_sourcedid*  
 
 ```
 1234
@@ -287,8 +287,8 @@ the LIS identifier for the course offering.
 ## Context.id
 an opaque identifier that uniquely identifies the context of the tool launch.
 
-**Availability**: *always*
-**Launch Parameter**: *context_id*
+**Availability**: *always*  
+**Launch Parameter**: *context_id*  
 
 ```
 "cdca1fe2c392a208bd8a657f8865ddb9ca359534"
@@ -296,7 +296,7 @@ an opaque identifier that uniquely identifies the context of the tool launch.
 ## Context.sourcedId
 The sourced Id of the context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -308,7 +308,7 @@ courses in reverse chronological order from which content has been copied.
 Will show a limit of 1000 context ids.  When the number passes 1000,
 'truncated' will show at the end of the list.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -317,8 +317,8 @@ Will show a limit of 1000 context ids.  When the number passes 1000,
 ## Message.documentTarget
 communicates the kind of browser window/frame where the Canvas has launched a tool.
 
-**Availability**: *always*
-**Launch Parameter**: *launch_presentation_document_target*
+**Availability**: *always*  
+**Launch Parameter**: *launch_presentation_document_target*  
 
 ```
 "iframe"
@@ -326,8 +326,8 @@ communicates the kind of browser window/frame where the Canvas has launched a to
 ## Message.locale
 returns the current locale.
 
-**Availability**: *always*
-**Launch Parameter**: *launch_presentation_locale*
+**Availability**: *always*  
+**Launch Parameter**: *launch_presentation_locale*  
 
 ```
 "de"
@@ -335,8 +335,8 @@ returns the current locale.
 ## ToolConsumerInstance.guid
 returns a unique identifier for the Tool Consumer (Canvas).
 
-**Availability**: *always*
-**Launch Parameter**: *tool_consumer_instance_guid*
+**Availability**: *always*  
+**Launch Parameter**: *tool_consumer_instance_guid*  
 
 ```
 "0dWtgJjjFWRNT41WdQMvrleejGgv7AynCVm3lmZ2:canvas-lms"
@@ -344,7 +344,7 @@ returns a unique identifier for the Tool Consumer (Canvas).
 ## Canvas.api.domain
 returns the canvas domain for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -353,7 +353,7 @@ returns the canvas domain for the current context.
 ## Canvas.api.collaborationMembers.url
 returns the api url for the members of the collaboration.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -362,7 +362,7 @@ returns the api url for the members of the collaboration.
 ## Canvas.api.baseUrl
 returns the base URL for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -373,7 +373,7 @@ returns the URL for the membership service associated with the current context.
 
 This variable is for future use only. Complete support for the IMS Membership Service has not been added to Canvas. This will be updated when we fully support and certify the IMS Membership Service.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -382,7 +382,7 @@ This variable is for future use only. Complete support for the IMS Membership Se
 ## Canvas.account.id
 returns the account id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -391,7 +391,7 @@ returns the account id for the current context.
 ## Canvas.account.name
 returns the account name for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -400,7 +400,7 @@ returns the account name for the current context.
 ## Canvas.account.sisSourceId
 returns the account's sis source id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -409,7 +409,7 @@ returns the account's sis source id for the current context.
 ## Canvas.rootAccount.id
 returns the Root Account ID for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -418,7 +418,7 @@ returns the Root Account ID for the current context.
 ## Canvas.rootAccount.sisSourceId
 returns the root account's sis source id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -427,7 +427,7 @@ returns the root account's sis source id for the current context.
 ## Canvas.externalTool.url
 returns the URL for the external tool that was launched. Only available for LTI 1.
 
-**Availability**: *always and when in an LTI 1*
+**Availability**: *always and when in an LTI 1*  
 
 
 ```
@@ -436,7 +436,7 @@ returns the URL for the external tool that was launched. Only available for LTI 
 ## com.instructure.brandConfigJSON.url
 returns the URL to retrieve the brand config JSON for the launching context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -445,7 +445,7 @@ returns the URL to retrieve the brand config JSON for the launching context.
 ## com.instructure.brandConfigJSON
 returns the brand config JSON itself for the launching context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -457,7 +457,7 @@ This URL should be used as the src attribute for a script tag on the external to
 provider's web page. It is configured to be used with the [instructure-ui node module](https://github.com/instructure/instructure-ui).
 More information on on how to use instructure ui react components can be found [here](http://instructure.github.io/instructure-ui/).
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -466,7 +466,7 @@ More information on on how to use instructure ui react components can be found [
 ## Canvas.css.common
 returns the URL for the common css file.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -475,7 +475,7 @@ returns the URL for the common css file.
 ## Canvas.shard.id
 returns the shard id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -484,7 +484,7 @@ returns the shard id for the current context.
 ## Canvas.root_account.global_id [duplicates Canvas.user.globalId]
 returns the root account's global id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -493,7 +493,7 @@ returns the root account's global id for the current context.
 ## Canvas.root_account.id *[deprecated]*
 returns the root account id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -502,8 +502,8 @@ returns the root account id for the current context.
 ## vnd.Canvas.root_account.uuid
 returns the account uuid for the current context.
 
-**Availability**: *always*
-**Launch Parameter**: *vnd_canvas_root_account_uuid*
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_root_account_uuid*  
 
 ```
 "Ioe3sJPt0KZp9Pw6xAvcHuLCl0z4TvPKP0iIOLbo"
@@ -511,7 +511,7 @@ returns the account uuid for the current context.
 ## Canvas.root_account.sisSourceId *[deprecated]*
 returns the root account sis source id for the current context.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -520,7 +520,7 @@ returns the root account sis source id for the current context.
 ## Canvas.course.id
 returns the current course id.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -529,7 +529,7 @@ returns the current course id.
 ## vnd.instructure.Course.uuid
 returns the current course uuid.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -538,7 +538,7 @@ returns the current course uuid.
 ## Canvas.course.name
 returns the current course name.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -547,7 +547,7 @@ returns the current course name.
 ## Canvas.course.sisSourceId
 returns the current course sis source id.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -556,7 +556,7 @@ returns the current course sis source id.
 ## com.instructure.Course.integrationId
 returns the current course integration id.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -565,7 +565,7 @@ returns the current course integration id.
 ## Canvas.course.startAt
 returns the current course start date.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -574,7 +574,7 @@ returns the current course start date.
 ## Canvas.course.endAt
 returns the current course end date.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -584,7 +584,7 @@ returns the current course end date.
 returns the current course workflow state. Workflow states of "claimed" or "created"
 indicate an unpublished course.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -593,7 +593,7 @@ indicate an unpublished course.
 ## Canvas.term.startAt
 returns the current course's term start date.
 
-**Availability**: *when launched in a course that has a term with a start date*
+**Availability**: *when launched in a course that has a term with a start date*  
 
 
 ```
@@ -602,8 +602,8 @@ returns the current course's term start date.
 ## Canvas.term.name
 returns the current course's term name.
 
-**Availability**: **
-**Launch Parameter**: *canvas_term_name*
+**Availability**: **  
+**Launch Parameter**: *canvas_term_name*  
 
 ```
 "W1 2017"
@@ -612,8 +612,8 @@ returns the current course's term name.
 returns the current course sis source id
 to return the section source id use Canvas.course.sectionIds.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *lis_course_section_sourcedid*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *lis_course_section_sourcedid*  
 
 ```
 1234
@@ -621,7 +621,7 @@ to return the section source id use Canvas.course.sectionIds.
 ## Canvas.enrollment.enrollmentState
 returns the current course enrollment state.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -631,8 +631,8 @@ returns the current course enrollment state.
 returns true if the assignment has anonymous grading
 enabled.
 
-**Availability**: *when launched as an assignment*
-**Launch Parameter**: *com_instructure_assignment_anonymous_grading*
+**Availability**: *when launched as an assignment*  
+**Launch Parameter**: *com_instructure_assignment_anonymous_grading*  
 
 ```
 true
@@ -641,8 +641,8 @@ true
 returns the current course membership roles
 using the LIS v2 vocabulary.
 
-**Availability**: *when launched from a course or an account*
-**Launch Parameter**: *com_instructure_membership_roles*
+**Availability**: *when launched from a course or an account*  
+**Launch Parameter**: *com_instructure_membership_roles*  
 
 ```
 "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Student"
@@ -650,8 +650,8 @@ using the LIS v2 vocabulary.
 ## Canvas.membership.roles
 returns the current course membership roles.
 
-**Availability**: *when launched from a course or an account*
-**Launch Parameter**: *canvas_membership_roles*
+**Availability**: *when launched from a course or an account*  
+**Launch Parameter**: *canvas_membership_roles*  
 
 ```
 "StudentEnrollment"
@@ -659,7 +659,7 @@ returns the current course membership roles.
 ## Canvas.membership.concludedRoles
 This is a list of IMS LIS roles should have a different key.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -668,7 +668,7 @@ This is a list of IMS LIS roles should have a different key.
 ## Canvas.course.previousContextIds
 With respect to the current course, returns the context ids of the courses from which content has been copied (excludes cartridge imports).
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -678,7 +678,7 @@ With respect to the current course, returns the context ids of the courses from 
 With respect to the current course, recursively returns the context ids of the courses from which content has been copied (excludes cartridge imports).
 Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated' will show at the end of the list.
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -687,7 +687,7 @@ Will show a limit of 1000 context ids.  When the number passes 1000, 'truncated'
 ## Canvas.course.previousCourseIds
 With respect to the current course, returns the course ids of the courses from which content has been copied (excludes cartridge imports).
 
-**Availability**: *when launched in a course*
+**Availability**: *when launched in a course*  
 
 
 ```
@@ -696,8 +696,8 @@ With respect to the current course, returns the course ids of the courses from w
 ## Person.name.full
 Returns the full name of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *lis_person_name_full*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_full*  
 
 ```
 "John Doe"
@@ -705,8 +705,8 @@ Returns the full name of the launching user.
 ## Person.name.display
 Returns the display name of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *person_name_display*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *person_name_display*  
 
 ```
 "John Doe"
@@ -714,8 +714,8 @@ Returns the display name of the launching user.
 ## Person.name.family
 Returns the last name of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *lis_person_name_family*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_family*  
 
 ```
 "Doe"
@@ -723,8 +723,8 @@ Returns the last name of the launching user.
 ## Person.name.given
 Returns the first name of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *lis_person_name_given*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_name_given*  
 
 ```
 "John"
@@ -732,8 +732,8 @@ Returns the first name of the launching user.
 ## com.instructure.Person.name_sortable
 Returns the sortable name of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *com_instructure_person_name_sortable*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *com_instructure_person_name_sortable*  
 
 ```
 "Doe, John"
@@ -741,8 +741,8 @@ Returns the sortable name of the launching user.
 ## Person.email.primary
 Returns the primary email of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *lis_person_contact_email_primary*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *lis_person_contact_email_primary*  
 
 ```
 "john.doe@example.com"
@@ -750,8 +750,8 @@ Returns the primary email of the launching user.
 ## com.instructure.Person.pronouns
 Returns pronouns for the current user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *com_instructure_person_pronouns*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *com_instructure_person_pronouns*  
 
 ```
 "She/Her"
@@ -759,7 +759,7 @@ Returns pronouns for the current user.
 ## vnd.Canvas.Person.email.sis
 Returns the institution assigned email of the launching user.
 
-**Availability**: *when launched by a logged in user that was added via SIS*
+**Availability**: *when launched by a logged in user that was added via SIS*  
 
 
 ```
@@ -768,7 +768,7 @@ Returns the institution assigned email of the launching user.
 ## Person.address.timezone
 Returns the name of the timezone of the launching user.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -777,8 +777,8 @@ Returns the name of the timezone of the launching user.
 ## User.image
 Returns the profile picture URL of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *user_image*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *user_image*  
 
 ```
 "https://example.com/picture.jpg"
@@ -786,8 +786,8 @@ Returns the profile picture URL of the launching user.
 ## User.id [duplicates Canvas.user.id]
 Returns the Canvas user_id of the launching user.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *user_id*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *user_id*  
 
 ```
 420000000000042
@@ -795,7 +795,7 @@ Returns the Canvas user_id of the launching user.
 ## Canvas.user.id [duplicates User.id]
 Returns the Canvas user_id of the launching user.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -804,7 +804,7 @@ Returns the Canvas user_id of the launching user.
 ## vnd.instructure.User.uuid [duplicates User.uuid]
 Returns the Canvas user_uuid of the launching user for the context.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -813,7 +813,7 @@ Returns the Canvas user_uuid of the launching user for the context.
 ## vnd.instructure.User.current_uuid [duplicates User.uuid]
 Returns the current Canvas user_uuid of the launching user.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -822,7 +822,7 @@ Returns the current Canvas user_uuid of the launching user.
 ## Canvas.user.prefersHighContrast
 Returns the users preference for high contrast colors (an accessibility feature).
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -831,8 +831,8 @@ false
 ## com.instructure.Course.groupIds
 returns the Canvas ids of all active groups in the current course.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *com_instructure_course_groupids*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *com_instructure_course_groupids*  
 
 ```
 "23,24,..."
@@ -840,7 +840,7 @@ returns the Canvas ids of all active groups in the current course.
 ## Canvas.group.contextIds
 returns the context ids for the groups the user belongs to in the course.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -850,8 +850,8 @@ returns the context ids for the groups the user belongs to in the course.
 Returns the [IMS LTI membership service](https://www.imsglobal.org/specs/ltimemv1p0/specification-3) roles for filtering via query parameters.
 Or, for LTI 1.3 tools, returns the [IMS LTI Names and Role Provisioning Service](https://www.imsglobal.org/spec/lti-nrps/v2p0) roles for filtering via query parameters.
 
-**Availability**: *when launched by a logged in user*
-**Launch Parameter**: *roles*
+**Availability**: *when launched by a logged in user*  
+**Launch Parameter**: *roles*  
 
 ```
 "http://purl.imsglobal.org/vocab/lis/v2/institution/person#Administrator"
@@ -866,7 +866,7 @@ will include roles they have in other courses or at the account level. Note that
 Institution level. Instead Users with a TA enrollment will have an institution role of Instructor.
 System role urns start with "urn:lti:sysrole" and include roles for the entire system.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -875,7 +875,7 @@ System role urns start with "urn:lti:sysrole" and include roles for the entire s
 ## com.instructure.User.allRoles
 Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -886,7 +886,7 @@ Same as "Canvas.xuser.allRoles", but uses roles formatted for LTI Advantage.
 ## Canvas.user.globalId [duplicates Canvas.root_account.global_id]
 Returns the Canvas global user_id of the launching user.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -895,7 +895,7 @@ Returns the Canvas global user_id of the launching user.
 ## Canvas.user.isRootAccountAdmin
 Returns true for root account admins and false for all other roles.
 
-**Availability**: *when launched by a logged in user*
+**Availability**: *when launched by a logged in user*  
 
 
 ```
@@ -905,7 +905,7 @@ true
 Username/Login ID for the primary pseudonym for the user for the account.
 This may not be the pseudonym the user is actually logged in with.
 
-**Availability**: *when pseudonym is in use*
+**Availability**: *when pseudonym is in use*  
 
 
 ```
@@ -915,7 +915,7 @@ This may not be the pseudonym the user is actually logged in with.
 Username/Login ID for the primary pseudonym for the user for the account.
 This may not be the pseudonym the user is actually logged in with.
 
-**Availability**: *when pseudonym is in use*
+**Availability**: *when pseudonym is in use*  
 
 
 ```
@@ -925,7 +925,7 @@ This may not be the pseudonym the user is actually logged in with.
 Returns the sis source id for the primary pseudonym for the user for the account
 This may not be the pseudonym the user is actually logged in with.
 
-**Availability**: *when pseudonym is in use*
+**Availability**: *when pseudonym is in use*  
 
 
 ```
@@ -935,7 +935,7 @@ This may not be the pseudonym the user is actually logged in with.
 Returns the integration id for the primary pseudonym for the user for the account
 This may not be the pseudonym the user is actually logged in with.
 
-**Availability**: *when pseudonym is in use*
+**Availability**: *when pseudonym is in use*  
 
 
 ```
@@ -945,8 +945,8 @@ This may not be the pseudonym the user is actually logged in with.
 Returns the sis source id for the primary pseudonym for the user for the account
 This may not be the pseudonym the user is actually logged in with.
 
-**Availability**: *when pseudonym is in use*
-**Launch Parameter**: *lis_person_sourcedid*
+**Availability**: *when pseudonym is in use*  
+**Launch Parameter**: *lis_person_sourcedid*  
 
 ```
 "sis_user_42"
@@ -956,7 +956,7 @@ Returns the logout service url for the user.
 This is the pseudonym the user is actually logged in as.
 It may not hold all the sis info needed in other launch substitutions.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -967,7 +967,7 @@ Returns the Canvas user_id for the masquerading user.
 This is the pseudonym the user is actually logged in as.
 It may not hold all the sis info needed in other launch substitutions.
 
-**Availability**: *when the user is being masqueraded*
+**Availability**: *when the user is being masqueraded*  
 
 
 ```
@@ -978,7 +978,7 @@ Returns the 40 character opaque user_id for masquerading user.
 This is the pseudonym the user is actually logged in as.
 It may not hold all the sis info needed in other launch substitutions.
 
-**Availability**: *when the user is being masqueraded*
+**Availability**: *when the user is being masqueraded*  
 
 
 ```
@@ -987,7 +987,7 @@ It may not hold all the sis info needed in other launch substitutions.
 ## Canvas.xapi.url
 Returns the xapi url for the user.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -996,7 +996,7 @@ Returns the xapi url for the user.
 ## Caliper.url
 Returns the caliper url for the user.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1005,7 +1005,7 @@ Returns the caliper url for the user.
 ## Canvas.course.sectionIds
 Returns a comma separated list of section_id's that the user is enrolled in.
 
-**Availability**: *when launched from a course*
+**Availability**: *when launched from a course*  
 
 
 ```
@@ -1014,7 +1014,7 @@ Returns a comma separated list of section_id's that the user is enrolled in.
 ## Canvas.course.sectionRestricted
 Returns true if the user can only view and interact with users in their own sections.
 
-**Availability**: *when launched from a course*
+**Availability**: *when launched from a course*  
 
 
 ```
@@ -1023,7 +1023,7 @@ true
 ## Canvas.course.sectionSisSourceIds
 Returns a comma separated list of section sis_id's that the user is enrolled in.
 
-**Availability**: *when launched from a course*
+**Availability**: *when launched from a course*  
 
 
 ```
@@ -1032,8 +1032,8 @@ Returns a comma separated list of section sis_id's that the user is enrolled in.
 ## com.instructure.contextLabel
 Returns the course code.
 
-**Availability**: *when launched in a course*
-**Launch Parameter**: *context_label*
+**Availability**: *when launched in a course*  
+**Launch Parameter**: *context_label*  
 
 ```
 "CS 124"
@@ -1041,7 +1041,7 @@ Returns the course code.
 ## Canvas.module.id
 Returns the module_id that the module item was launched from.
 
-**Availability**: *when content tag is present*
+**Availability**: *when content tag is present*  
 
 
 ```
@@ -1050,7 +1050,7 @@ Returns the module_id that the module item was launched from.
 ## Canvas.moduleItem.id
 Returns the module_item_id of the module item that was launched.
 
-**Availability**: *when content tag is present*
+**Availability**: *when content tag is present*  
 
 
 ```
@@ -1059,7 +1059,7 @@ Returns the module_item_id of the module item that was launched.
 ## Canvas.assignment.id
 Returns the assignment_id of the assignment that was launched.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1069,8 +1069,8 @@ Returns the assignment_id of the assignment that was launched.
 Returns the Canvas id of the group the current user is in if launching
 from a group assignment.
 
-**Availability**: *when launched by a logged in user and when launched as an assignment*
-**Launch Parameter**: *vnd_canvas_group_id*
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_id*  
 
 ```
 481
@@ -1079,8 +1079,8 @@ from a group assignment.
 Returns the name of the group the current user is in if launching
 from a group assignment.
 
-**Availability**: *when launched by a logged in user and when launched as an assignment*
-**Launch Parameter**: *vnd_canvas_group_name*
+**Availability**: *when launched by a logged in user and when launched as an assignment*  
+**Launch Parameter**: *vnd_canvas_group_name*  
 
 ```
 "Group One"
@@ -1088,7 +1088,7 @@ from a group assignment.
 ## Canvas.assignment.title
 Returns the title of the assignment that was launched.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1097,7 +1097,7 @@ Returns the title of the assignment that was launched.
 ## Canvas.assignment.pointsPossible
 Returns the points possible of the assignment that was launched.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1106,21 +1106,21 @@ Returns the points possible of the assignment that was launched.
 ## Canvas.assignment.unlockAt *[deprecated]*
 deprecated in favor of ISO8601.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 
 ## Canvas.assignment.lockAt *[deprecated]*
 deprecated in favor of ISO8601.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 
 ## Canvas.assignment.dueAt *[deprecated]*
 deprecated in favor of ISO8601.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 
@@ -1128,7 +1128,7 @@ deprecated in favor of ISO8601.
 Returns the `unlock_at` date of the assignment that was launched.
 Only available when launched as an assignment with an `unlock_at` set.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1138,7 +1138,7 @@ Only available when launched as an assignment with an `unlock_at` set.
 Returns the `lock_at` date of the assignment that was launched.
 Only available when launched as an assignment with a `lock_at` set.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1148,7 +1148,7 @@ Only available when launched as an assignment with a `lock_at` set.
 Returns the `due_at` date of the assignment that was launched.
 Only available when launched as an assignment with a `due_at` set.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1158,7 +1158,7 @@ Only available when launched as an assignment with a `due_at` set.
 Returns true if the assignment that was launched is published.
 Only available when launched as an assignment.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1168,7 +1168,7 @@ true
 Returns true if the assignment is LDB enabled.
 Only available when launched as an assignment.
 
-**Availability**: *when launched as an assignment*
+**Availability**: *when launched as an assignment*  
 
 
 ```
@@ -1178,7 +1178,7 @@ true
 Returns the endpoint url for accessing link-level tool settings
 Only available for LTI 2.0.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1188,7 +1188,7 @@ Only available for LTI 2.0.
 Returns the endpoint url for accessing context-level tool settings
 Only available for LTI 2.0.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1198,7 +1198,7 @@ Only available for LTI 2.0.
 Returns the endpoint url for accessing system-wide tool settings
 Only available for LTI 2.0.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1208,7 +1208,7 @@ Only available for LTI 2.0.
 Returns the [Tool Consumer Profile](https://www.imsglobal.org/specs/ltiv2p0/implementation-guide#toc-46) url for the tool.
 Only available for LTI 2.0.
 
-**Availability**: *always*
+**Availability**: *always*  
 
 
 ```
@@ -1218,8 +1218,8 @@ Only available for LTI 2.0.
 ## vnd.Canvas.OriginalityReport.url
 The originality report LTI2 service endpoint.
 
-**Availability**: *always*
-**Launch Parameter**: *vnd_canvas_originality_report_url*
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_originality_report_url*  
 
 ```
 "api/lti/assignments/{assignment_id}/submissions/{submission_id}/originality_report"
@@ -1227,8 +1227,8 @@ The originality report LTI2 service endpoint.
 ## vnd.Canvas.submission.url
 The submission LTI2 service endpoint.
 
-**Availability**: *always*
-**Launch Parameter**: *vnd_canvas_submission_url*
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_submission_url*  
 
 ```
 "api/lti/assignments/{assignment_id}/submissions/{submission_id}"
@@ -1236,8 +1236,8 @@ The submission LTI2 service endpoint.
 ## vnd.Canvas.submission.history.url
 The submission history LTI2 service endpoint.
 
-**Availability**: *always*
-**Launch Parameter**: *vnd_canvas_submission_history_url*
+**Availability**: *always*  
+**Launch Parameter**: *vnd_canvas_submission_history_url*  
 
 ```
 "api/lti/assignments/{assignment_id}/submissions/{submission_id}/history"
@@ -1245,56 +1245,56 @@ The submission history LTI2 service endpoint.
 ## Canvas.file.media.id
 
 
-**Availability**: *when an attachment is present and it has either a media object or media entry id defined*
+**Availability**: *when an attachment is present and it has either a media object or media entry id defined*  
 
 
 
 ## Canvas.file.media.type
 
 
-**Availability**: *when an attachment is present and has a media object defined*
+**Availability**: *when an attachment is present and has a media object defined*  
 
 
 
 ## Canvas.file.media.duration
 
 
-**Availability**: *when an attachment is present and has a media object defined*
+**Availability**: *when an attachment is present and has a media object defined*  
 
 
 
 ## Canvas.file.media.size
 
 
-**Availability**: *when an attachment is present and has a media object defined*
+**Availability**: *when an attachment is present and has a media object defined*  
 
 
 
 ## Canvas.file.media.title
 
 
-**Availability**: *when an attachment is present and has a media object defined*
+**Availability**: *when an attachment is present and has a media object defined*  
 
 
 
 ## Canvas.file.usageRights.name
 
 
-**Availability**: *when an attachment is present and has usage rights defined*
+**Availability**: *when an attachment is present and has usage rights defined*  
 
 
 
 ## Canvas.file.usageRights.url
 
 
-**Availability**: *when an attachment is present and has usage rights defined*
+**Availability**: *when an attachment is present and has usage rights defined*  
 
 
 
 ## Canvas.file.usageRights.copyrightText
 
 
-**Availability**: *when an attachment is present and has usage rights defined*
+**Availability**: *when an attachment is present and has usage rights defined*  
 
 
 
@@ -1303,8 +1303,8 @@ Returns the types of resources that can be imported to the current page, forward
 Value is a comma-separated array of one or more values of: ["assignment", "assignment_group", "audio",
 "discussion_topic", "document", "image", "module", "quiz", "page", "video"].
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_accept_canvas_resource_types*  
 
 ```
 "page"
@@ -1319,8 +1319,8 @@ Value is the largest logical unit of the page. Possible values are: ["assignment
   on Modules -> 'module'
   and so on.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_canvas_resource_type*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_canvas_resource_type*  
 
 ```
 page
@@ -1329,8 +1329,8 @@ page
 Returns whether a content can be imported into a specific group on the page, forwarded from the request.
 True for Modules page and Assignment Groups page. False for other content index pages.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_allow_canvas_resource_selection*  
 
 ```
 true
@@ -1340,8 +1340,8 @@ Returns a JSON-encoded list of content groups which can be selected, providing I
 forwarded from the request.
 Empty value if com.instructure.Course.allow_canvas_resource_selection is false.
 
-**Availability**: *always*
-**Launch Parameter**: *com_instructure_course_available_canvas_resources*
+**Availability**: *always*  
+**Launch Parameter**: *com_instructure_course_available_canvas_resources*  
 
 ```
 [{"id":"3","name":"First Module"},{"id":"5","name":"Second Module"}]
