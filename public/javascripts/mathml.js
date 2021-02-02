@@ -40,6 +40,9 @@ const localConfig = {
 
 const mathml = {
   loadMathJax(configFile = 'TeX-MML-AM_HTMLorMML', cb = null) {
+    if (this.preventMathJax()) {
+      return
+    }
     if (!this.isMathJaxLoaded()) {
       const locale = ENV.LOCALE || 'en'
       // signal local config to mathjax as it loads
@@ -103,6 +106,10 @@ const mathml = {
       window.MathJax.Hub.Queue(['Typeset', window.MathJax.Hub])
       cb?.()
     }
+  },
+
+  preventMathJax() {
+    return /(?:rubrics|\/files)/.test(window.location.pathname)
   },
 
   isMathOnPage() {
