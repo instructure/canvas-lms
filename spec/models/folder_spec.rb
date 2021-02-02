@@ -19,6 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/../sharding_spec_helper.rb')
+require 'delayed/testing'
 
 describe Folder do
   before(:once) do
@@ -26,7 +27,7 @@ describe Folder do
   end
 
   it "should create a new instance given valid attributes" do
-    folder_model
+    expect(folder_model).to be_present
   end
 
   it "should infer its full name if it has a parent folder" do
@@ -445,6 +446,89 @@ describe Folder do
       dup = @user.folders.build(name: 'dup', parent_folder: @user.submissions_folder)
       dup.submission_context_code = @course.asset_string
       expect { dup.save! }.to raise_exception(ActiveRecord::RecordNotUnique)
+    end
+  end
+
+  describe 'permissions' do
+    before(:once) do
+      @course.offer!
+      student_in_course(active_all: true)
+    end
+
+    let_once(:folder) { @course.folders.create!(name: 'f') }
+    let_once(:file) { attachment_model context: @course, display_name: 'normal.txt', folder: folder }
+
+    context 'clears own permissions' do
+      def student_can_read_contents?
+        Folder.find(folder.id).grants_right? @student, :read_contents
+      end
+
+      it 'when unlock_at set' do
+        Timecop.freeze do
+          folder.update! unlock_at: 5.minutes.from_now
+          expect(student_can_read_contents?).to be false
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be true
+        end
+      end
+
+      it 'when lock_at set' do
+        Timecop.freeze do
+          folder.update! lock_at: 5.minutes.from_now
+          expect(student_can_read_contents?).to be true
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be false
+        end
+      end
+
+      it 'when lock_at and unlock_at set' do
+        Timecop.freeze do
+          folder.update! unlock_at: 5.minutes.from_now, lock_at: 15.minutes.from_now
+          expect(student_can_read_contents?).to be false
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be true
+          Timecop.travel(10.minutes)
+          Delayed::Testing.drain
+          expect(student_can_read_contents?).to be false
+        end
+      end
+    end
+
+    context 'clears file permissions' do
+      def student_can_download?
+        file.reload.grants_right? @student, :download
+      end
+
+      it 'when locked' do
+        expect(student_can_download?).to be true
+        folder.update! locked: true
+        expect(student_can_download?).to be false
+      end
+
+      it 'when unlocked' do
+        folder.update! locked: true
+        expect(student_can_download?).to be false
+        folder.update! locked: false
+        expect(student_can_download?).to be true
+      end
+
+      it 'when moved' do
+        expect(student_can_download?).to be true
+        parent_folder = @course.folders.create!(name: 'parent', locked: true)
+        folder.update! parent_folder: parent_folder
+        expect(student_can_download?).to be false
+      end
+
+      it 'in subfolders' do
+        parent_folder = @course.folders.create!(name: 'parent')
+        parent_folder.sub_folders << folder
+        expect(student_can_download?).to be true
+        parent_folder.reload.update! locked: true
+        expect(student_can_download?).to be false
+      end
     end
   end
 end
