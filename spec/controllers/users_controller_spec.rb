@@ -790,6 +790,19 @@ describe UsersController do
           expect(p.user).to be_pre_registered
         end
 
+        it "should reassign null values when passing empty strings for pseudonym[integration_id]" do
+          post 'create', params: {account_id: account.id,
+                                  pseudonym: { unique_id: 'jacob', sis_user_id: 'testsisid', integration_id: '', path: '' },
+                                  user: { name: 'Jacob Fugal' }}, format: 'json'
+          expect(response).to be_successful
+          p = Pseudonym.where(unique_id: 'jacob').first
+          expect(p.account_id).to eq account.id
+          expect(p).to be_active
+          expect(p.sis_user_id).to eq 'testsisid'
+          expect(p.integration_id).to be_nil
+          expect(p.user).to be_pre_registered
+        end
+
         it "should create users with non-email pseudonyms and an email" do
           post 'create', params: {account_id: account.id, pseudonym: { unique_id: 'testid', path: 'testemail@example.com' }, user: { name: 'test' }}, format: 'json'
           expect(response).to be_successful
