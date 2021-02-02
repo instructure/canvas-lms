@@ -1114,6 +1114,73 @@ describe AssignmentsController do
           expect(assigns[:js_env]).to have_key :MASTERY_SCALE
         end
       end
+
+      context "with the assignments_2_student flag enabled" do
+        let(:course) { @course }
+        let(:assignment) { @assignment }
+        let(:student) { @student }
+
+        before(:each) do
+          course.enable_feature!(:assignments_2_student)
+          assignment.update!(submission_types: "online_upload")
+          user_session(student)
+        end
+
+        describe "CONTEXT_MODULE_ITEM" do
+          context "when viewing an assignment with a 'mark as done' requirement" do
+            let(:module1) { course.context_modules.create!(name: "a module") }
+            let(:module1_assignment_item) { module1.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id) }
+
+            before(:each) do
+              module1.add_item(id: assignment.id, type: "assignment")
+              module1.completion_requirements = [{id: module1_assignment_item.id, type: "must_mark_done"}]
+              module1.save!
+
+              module1.context_module_progressions.create!(user: student)
+            end
+
+            it "sets 'id' to the module item ID" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module1_assignment_item.id
+            end
+
+            it "sets 'module_id' to the module ID" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:module_id]).to eq module1.id
+            end
+
+            it "sets 'done' to true if the user has completed the item" do
+              module1_assignment_item.context_module_action(student, :done)
+
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be true
+            end
+
+            it "sets 'done' to false if the user has not completed the item" do
+              get :show, params: {course_id: @course.id, id: @assignment.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:done]).to be false
+            end
+
+            it "uses the module item ID specified by the 'module_item_id' param if one is passed in" do
+              module2 = course.context_modules.create!(name: "another module")
+              module2.add_item(id: assignment.id, type: "assignment")
+
+              module2_assignment_item = module2.content_tags.find_by!(content_type: "Assignment", content_id: assignment.id)
+              module2.completion_requirements = [{id: module2_assignment_item.id, type: "must_mark_done"}]
+              module2.save!
+
+              get :show, params: {course_id: @course.id, id: @assignment.id, module_item_id: module2_assignment_item.id}
+              expect(assigns[:js_env][:CONTEXT_MODULE_ITEM][:id]).to eq module2_assignment_item.id
+            end
+          end
+
+          it "is not included when the assignment does not have a 'mark as done' requirement" do
+            get :show, params: {course_id: @course.id, id: @assignment.id}
+
+            expect(assigns[:js_env]).not_to have_key :CONTEXT_MODULE_ITEM
+          end
+        end
+      end
     end
   end
 

@@ -117,6 +117,17 @@ class AssignmentsController < ApplicationController
        {}
      end
 
+    mark_done_presenter = MarkDonePresenter.new(self, @context, params["module_item_id"], @current_user, @assignment)
+    if mark_done_presenter.has_requirement?
+      js_env({
+        CONTEXT_MODULE_ITEM: {
+          done: mark_done_presenter.checked?,
+          id: mark_done_presenter.item.id,
+          module_id: mark_done_presenter.module.id
+        }
+      })
+    end
+
     js_env({
       ASSIGNMENT_ID: params[:id],
       CONFETTI_ENABLED: @domain_root_account&.feature_enabled?(:confetti_for_assignments),
