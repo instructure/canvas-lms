@@ -608,61 +608,66 @@ pipeline {
                 })
 
                 echo 'adding Vendored Gems'
-                buildStage.makeFromJob('Vendored Gems', '/Canvas/test-suites/vendored-gems', stages, buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                  ]
-                )
+                timedStage('Vendored Gems', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
+                })
 
                 if(configuration.getBoolean('upload-js-debug-image', 'false')) {
                   echo 'adding Javascript (Debug Image Upload)'
-                  buildStage.makeFromJob('Javascript (Debug Image Upload)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                      string(name: 'JS_DEBUG_IMAGE_TAG', value: env.JS_DEBUG_IMAGE),
-                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                      string(name: 'TEST_SUITE', value: "upload"),
-                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                    ], true, "testReport"
-                  )
+                  timedStage('Javascript (Debug Image Upload)', stages, {
+                      failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                          string(name: 'JS_DEBUG_IMAGE_TAG', value: env.JS_DEBUG_IMAGE),
+                          string(name: 'TEST_SUITE', value: "upload"),
+                          string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                        ], true, "testReport"
+                      )
+                  })
                 }
 
                 echo 'adding Javascript (Jest)'
-                buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                    string(name: 'TEST_SUITE', value: "jest"),
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                  ], true, "testReport"
-                )
+                timedStage('Javascript (Jest)', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                      string(name: 'TEST_SUITE', value: "jest"),
+                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    ], true, "testReport")
+                })
 
                 echo 'adding Javascript (Coffeescript)'
-                buildStage.makeFromJob('Javascript (Coffeescript)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                    string(name: 'TEST_SUITE', value: "coffee"),
-                  ], true, "testReport"
-                )
+                timedStage('Javascript (Coffeescript)', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                      string(name: 'TEST_SUITE', value: "coffee"),
+                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    ], true, "testReport")
+                })
 
                 echo 'adding Javascript (Karma)'
-                buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                    string(name: 'TEST_SUITE', value: "karma"),
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                  ], true, "testReport"
-                )
+                timedStage('Javascript (Karma)', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                      string(name: 'TEST_SUITE', value: "karma"),
+                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                    ], true, "testReport")
+                })
 
                 echo 'adding Contract Tests'
-                buildStage.makeFromJob('Contract Tests', '/Canvas/test-suites/contract-tests', stages, buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                  ]
-                )
+                timedStage('Contract Tests', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
+                })
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
-                  buildStage.makeFromJob('CDC Schema Check', '../Canvas/cdc-event-transformer-master', stages, buildParameters + [
-                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
-                    ]
-                  )
+                  timedStage('CDC Schema Check', stages, {
+                      failureReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
+                        string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
+                      ])
+                  })
                 }
                 else {
                   echo 'no migrations added, skipping CDC Schema check'
@@ -676,17 +681,20 @@ pipeline {
                   )
                 ) {
                   echo 'adding Flakey Spec Catcher'
-                  buildStage.makeFromJob('Flakey Spec Catcher', '/Canvas/test-suites/flakey-spec-catcher', stages, buildParameters + [
-                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                    ], configuration.fscPropagate(), ""
-                  )
+                  timedStage('Flakey Spec Catcher', stages, {
+                      failureReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
+                        string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                        string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                        string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                      ], configuration.fscPropagate(), "")
+                  })
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
-                  buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
+                  timedStage('Local Docker Dev Build', stages, {
+                      failureReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters)
+                  })
                 }
 
                 if(configuration.isChangeMerged()) {
