@@ -1723,6 +1723,22 @@ describe AssignmentsController do
         let(:feature_flag) { :moderated_grading }
       end
     end
+
+    describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
+      it "should set FLAGS/annotated_document_submissions in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(true)
+      end
+
+      it "should set FLAGS/annotated_document_submissions in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do

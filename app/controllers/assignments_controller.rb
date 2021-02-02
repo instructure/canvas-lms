@@ -628,7 +628,9 @@ class AssignmentsController < ApplicationController
         ),
         POST_TO_SIS: post_to_sis,
         SIS_NAME: AssignmentUtil.post_to_sis_friendly_name(@context),
-        VALID_DATE_RANGE: CourseDateRange.new(@context)
+        VALID_DATE_RANGE: CourseDateRange.new(@context),
+        ANNOTATED_DOCUMENT_SUBMISSIONS:
+          Account.site_admin.feature_enabled?(:annotated_document_submissions)
       }
 
       add_crumb(@assignment.title, polymorphic_url([@context, @assignment])) unless @assignment.new_record?
