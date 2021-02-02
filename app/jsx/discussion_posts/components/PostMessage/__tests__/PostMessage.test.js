@@ -18,13 +18,13 @@
 
 import {render, fireEvent} from '@testing-library/react'
 import React from 'react'
-import {PostToolbar} from '../PostToolbar'
+import {PostMessage} from '../PostMessage'
 
 const setup = props => {
-  return render(<PostToolbar onReadAll={Function.prototype} {...props} />)
+  return render(<PostMessage onReadAll={Function.prototype} {...props} />)
 }
 
-describe('PostToolbar', () => {
+describe('PostMessage', () => {
   describe('publish button', () => {
     it('does not display if callback is not provided', () => {
       const {queryByText} = setup()

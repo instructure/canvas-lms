@@ -36,7 +36,7 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
 import {PublishButton} from './PublishButton'
 
-export function PostToolbar({...props}) {
+export function PostMessage({...props}) {
   return (
     <View display="block" padding="small" background="secondary">
       <Flex width="100%" justifyItems="end">
@@ -138,7 +138,7 @@ const renderMenuItem = ({selectionCallback, icon, labelCallback, key}) => {
   )
 }
 
-PostToolbar.propTypes = {
+PostMessage.propTypes = {
   /**
    * Behavior for marking the thread as read
    */
@@ -185,4 +185,4 @@ PostToolbar.propTypes = {
   publishState: PropTypes.oneOf(['published', 'publishing', 'unpublished', 'unpublishing'])
 }
 
-export default PostToolbar
+export default PostMessage
