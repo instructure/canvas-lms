@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -18,42 +18,51 @@
 
 import {gql} from 'jsx/canvas-apollo'
 
-const groupFragment = gql`
-  fragment GroupFragment on LearningOutcomeGroup {
-    _id
-    outcomesCount
-    childGroupsCount
-    childGroups {
+const parentAccountsFragment = gql`
+  fragment ParentAccountsFragment on Account {
+    parentAccountsConnection {
       nodes {
-        description
-        _id
-        outcomesCount
-        childGroupsCount
-        title
+        rootOutcomeGroup {
+          _id
+          outcomesCount
+          childGroupsCount
+          title
+        }
       }
     }
   }
 `
 
-export const CHILD_GROUPS_QUERY = gql`
-  query LearningOutcomesGroupQuery($id: ID!, $type: NodeType!) {
+export const FIND_GROUPS_QUERY = gql`
+  query LearningOutcomesGroupQuery(
+    $id: ID!
+    $type: NodeType!
+    $rootGroupId: ID!
+    $includeGlobalRootGroup: Boolean!
+  ) {
     context: legacyNode(type: $type, _id: $id) {
       ... on Account {
         _id
-        rootOutcomeGroup {
-          ...GroupFragment
-        }
+        ...ParentAccountsFragment
       }
       ... on Course {
         _id
-        rootOutcomeGroup {
-          ...GroupFragment
+        account {
+          rootOutcomeGroup {
+            _id
+            outcomesCount
+            childGroupsCount
+            title
+          }
+          ...ParentAccountsFragment
         }
       }
-      ... on LearningOutcomeGroup {
-        ...GroupFragment
-      }
+    }
+    globalRootGroup: learningOutcomeGroup(id: $rootGroupId) @include(if: $includeGlobalRootGroup) {
+      _id
+      outcomesCount
+      childGroupsCount
     }
   }
-  ${groupFragment}
+  ${parentAccountsFragment}
 `

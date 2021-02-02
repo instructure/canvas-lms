@@ -37,8 +37,9 @@ class OutcomesController < ApplicationController
     js_env(:ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
            :CONTEXT_URL_ROOT => polymorphic_path([@context]),
            :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
-           # Don't display state standards if in the context of a Course. Only at Account level.
+           # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
            :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
+           :GLOBAL_ROOT_OUTCOME_GROUP_ID => @context.is_a?(Course) ? nil : LearningOutcomeGroup.global_root_outcome_group.id,
            :COMMON_CORE_GROUP_ID => common_core_group_id,
            :COMMON_CORE_GROUP_URL => common_core_group_url,
            :PERMISSIONS => {

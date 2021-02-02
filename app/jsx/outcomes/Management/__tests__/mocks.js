@@ -91,7 +91,7 @@ export const courseMocks = ({childGroupsCount = 1, outcomesCount = 2, courseId =
   }
 ]
 
-export const groupMocks = ({groupId, childGroupsCount = 1} = {}) => [
+export const groupMocks = ({groupId, childGroupsCount = 1, outcomesCount = 2} = {}) => [
   {
     request: {
       query: CHILD_GROUPS_QUERY,
@@ -105,6 +105,8 @@ export const groupMocks = ({groupId, childGroupsCount = 1} = {}) => [
         context: {
           __typename: 'LearningOutcomeGroup',
           _id: groupId,
+          childGroupsCount,
+          outcomesCount,
           childGroups: {
             __typename: 'LearningOutcomeGroupConnection',
             nodes: new Array(childGroupsCount).fill(0).map((_v, i) => ({

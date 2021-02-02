@@ -16,60 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import React, {useState} from 'react'
 import {PresentationContent} from '@instructure/ui-a11y'
 import {Billboard} from '@instructure/ui-billboard'
 import {Flex} from '@instructure/ui-flex'
-import {IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
-import {TreeBrowser} from '@instructure/ui-tree-browser'
 import {View} from '@instructure/ui-view'
-import 'compiled/jquery.rails_flash_notifications'
 import I18n from 'i18n!OutcomeManagement'
-import $ from 'jquery'
-import React, {useEffect, useState} from 'react'
-import {useApolloClient} from 'react-apollo'
-import SVGWrapper from '../../shared/SVGWrapper'
-import {CHILD_GROUPS_QUERY} from './api'
+import SVGWrapper from 'jsx/shared/SVGWrapper'
 import ManageOutcomesView from './ManageOutcomesView'
 import ManageOutcomesFooter from './ManageOutcomesFooter'
-import useSearch from '../../shared/hooks/useSearch'
+import useSearch from 'jsx/shared/hooks/useSearch'
+import TreeBrowser from './TreeBrowser'
+import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
+import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
 
 // Mocked data for ManageOutcomesView QA
 // Remove after data is retrieved via GraphQL
 import {outcomeGroup} from './__tests__/mocks'
-
-const groupDescriptor = ({childGroupsCount, outcomesCount}) => {
-  return I18n.t('%{groups} Groups | %{outcomes} Outcomes', {
-    groups: childGroupsCount,
-    outcomes: outcomesCount
-  })
-}
-
-const mergeStateGroups = (group, collections, parentGroupId) => {
-  const groups = group?.childGroups?.nodes || []
-  const newCollections = groups.reduce((memo, g) => {
-    return {
-      ...memo,
-      [g._id]: {
-        id: g._id,
-        name: g.title,
-        descriptor: groupDescriptor(g),
-        collections: []
-      }
-    }
-  }, collections)
-
-  if (newCollections[parentGroupId]) {
-    newCollections[parentGroupId] = {
-      ...newCollections[parentGroupId],
-      loadInfo: 'loaded',
-      collections: [...newCollections[parentGroupId].collections, ...groups.map(g => g._id)]
-    }
-  }
-
-  return newCollections
-}
 
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
@@ -101,10 +66,8 @@ const NoOutcomesBillboard = ({contextType}) => {
   )
 }
 
-// TreeBrowser rootId prop needs to be a number
-const ROOT_ID = 0
-
-const OutcomeManagementPanel = ({contextType, contextId}) => {
+const OutcomeManagementPanel = () => {
+  const {contextType} = useCanvasContext()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
   const onSelectOutcomesHandler = id =>
@@ -115,79 +78,9 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
     })
   const [searchString, onSearchChangeHandler, onSearchClearHandler] = useSearch()
   const noop = () => {}
+  const {error, isLoading, collections, queryCollections, rootId} = useManageOutcomes()
 
-  const isCourse = contextType === 'Course'
-  const [initialLoading, setInitialLoading] = useState(true)
-  const [error, setError] = useState(null)
-  const client = useApolloClient()
-  const [collections, setCollections] = useState({
-    [ROOT_ID]: {
-      id: ROOT_ID,
-      collections: [],
-      outcomesCount: 0,
-      loadInfo: 'loading'
-    }
-  })
-
-  useEffect(() => {
-    client
-      .query({
-        query: CHILD_GROUPS_QUERY,
-        variables: {
-          id: contextId,
-          type: contextType
-        }
-      })
-      .then(({data}) => {
-        setCollections(mergeStateGroups(data?.context?.rootOutcomeGroup, collections, ROOT_ID))
-      })
-      .finally(() => {
-        setInitialLoading(false)
-      })
-      .catch(err => {
-        setError(err)
-      })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-
-  const onCollectionToggle = ({id}) => {
-    if (!['loaded', 'loading'].includes(collections[id].loadInfo)) {
-      const newCollections = {
-        ...collections,
-        [id]: {
-          ...collections[id],
-          loadInfo: 'loading'
-        }
-      }
-      setCollections(newCollections)
-
-      client
-        .query({
-          query: CHILD_GROUPS_QUERY,
-          variables: {
-            id,
-            type: 'LearningOutcomeGroup'
-          }
-        })
-        .then(({data}) => {
-          setCollections(mergeStateGroups(data?.context, collections, id))
-        })
-        .catch(err => {
-          setError(err)
-        })
-    }
-  }
-
-  useEffect(() => {
-    if (error) {
-      isCourse
-        ? $.flashError(I18n.t('An error occurred while loading course outcomes.'))
-        : $.flashError(I18n.t('An error occurred while loading account outcomes.'))
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [error])
-
-  if (initialLoading) {
+  if (isLoading) {
     return (
       <div style={{textAlign: 'center'}}>
         <Spinner renderTitle={I18n.t('Loading')} size="large" />
@@ -197,13 +90,11 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
 
   if (error) {
     return (
-      <div>
-        <Text color="danger">
-          {isCourse
-            ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
-            : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
-        </Text>
-      </div>
+      <Text color="danger">
+        {contextType === 'Course'
+          ? I18n.t('An error occurred while loading course outcomes: %{error}', {error})
+          : I18n.t('An error occurred while loading account outcomes: %{error}', {error})}
+      </Text>
     )
   }
 
@@ -230,26 +121,11 @@ const OutcomeManagementPanel = ({contextType, contextId}) => {
                 <Text size="large" weight="light" fontStyle="normal">
                   {I18n.t('Outcome Groups')}
                 </Text>
-                <div>
-                  <TreeBrowser
-                    margin="small 0 0"
-                    collections={collections}
-                    items={{}}
-                    onCollectionToggle={onCollectionToggle}
-                    collectionIcon={() => (
-                      <span style={{display: 'inline-block', marginRight: '0.8em'}}>
-                        <IconArrowOpenEndLine size="x-small" />
-                      </span>
-                    )}
-                    collectionIconExpanded={() => (
-                      <span style={{display: 'inline-block', marginRight: '0.8em'}}>
-                        <IconArrowOpenDownLine size="x-small" />
-                      </span>
-                    )}
-                    rootId={ROOT_ID}
-                    showRootCollection={false}
-                  />
-                </div>
+                <TreeBrowser
+                  onCollectionToggle={queryCollections}
+                  collections={collections}
+                  rootId={rootId}
+                />
               </View>
             </Flex.Item>
             <Flex.Item
