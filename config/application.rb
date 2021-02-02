@@ -133,6 +133,7 @@ module CanvasRails
           config = config.dup
           config[:prepared_statements] = false
         end
+        connection&.setnonblocking(true)
         super(connection, logger, connection_parameters, config)
       end
 
@@ -143,6 +144,7 @@ module CanvasRails
             connection_parameters = @connection_parameters.dup
             connection_parameters[:host] = host
             @connection = PG::Connection.connect(connection_parameters)
+            @connection.setnonblocking(true)
 
             configure_connection
 
