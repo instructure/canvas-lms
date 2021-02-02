@@ -37,22 +37,49 @@ import I18n from 'i18n!conversations_2'
 import {PublishButton} from './PublishButton'
 
 export function PostMessage({...props}) {
+  const addDebug = true
   return (
-    <View display="block" padding="small" background="secondary">
-      <Flex width="100%" justifyItems="end">
-        {props.onTogglePublish && (
-          <PublishButton
-            key={props.publishState}
-            initialState={props.publishState}
-            onClick={props.onTogglePublish}
-          />
-        )}
-        {props.onEdit && (
-          <Button renderIcon={IconEditLine} onClick={props.onEdit} margin="0 x-small 0 xxx-small">
-            {I18n.t('Edit')}
-          </Button>
-        )}
-        {renderMenu(props)}
+    <View display="block" padding="small">
+      <Flex withVisualDebug={addDebug}>
+        <Flex.Item shouldGrow={false}>
+          {/* TODO: add avatar display VICE-934 */}
+          AVATAR
+        </Flex.Item>
+        <Flex.Item shouldGrow>
+          <Flex direction="column" withVisualDebug={addDebug}>
+            <Flex.Item>
+              <Flex width="100%" justifyItems="space-between">
+                <Flex.Item>
+                  {/* TODO author info VICE-934 */}
+                  AUTHOR INFO
+                </Flex.Item>
+                <Flex.Item>
+                  {props.onTogglePublish && (
+                    <PublishButton
+                      key={props.publishState}
+                      initialState={props.publishState}
+                      onClick={props.onTogglePublish}
+                    />
+                  )}
+                  {props.onEdit && (
+                    <Button
+                      renderIcon={IconEditLine}
+                      onClick={props.onEdit}
+                      margin="0 x-small 0 xxx-small"
+                    >
+                      {I18n.t('Edit')}
+                    </Button>
+                  )}
+                  {renderMenu(props)}
+                </Flex.Item>
+              </Flex>
+            </Flex.Item>
+            <Flex.Item>
+              {/* TODO message VICE-932 */}
+              MESSAGE
+            </Flex.Item>
+          </Flex>
+        </Flex.Item>
       </Flex>
     </View>
   )
