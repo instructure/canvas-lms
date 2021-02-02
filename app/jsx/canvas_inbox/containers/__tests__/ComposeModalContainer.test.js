@@ -104,4 +104,18 @@ describe('ComposeModalContainer', () => {
       expect(bodyInput.value).toEqual('Potato')
     })
   })
+
+  describe('Send individual messages', () => {
+    it('allows toggling the setting', () => {
+      const {getByTestId} = setup()
+      const checkbox = getByTestId('individual-message-checkbox')
+      expect(checkbox.checked).toBe(false)
+
+      fireEvent.click(checkbox)
+      expect(checkbox.checked).toBe(true)
+
+      fireEvent.click(checkbox)
+      expect(checkbox.checked).toBe(false)
+    })
+  })
 })

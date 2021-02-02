@@ -45,6 +45,7 @@ const ComposeModalContainer = props => {
   const [subject, setSubject] = useState()
   const [body, setBody] = useState()
   const [bodyMessages, setBodyMessages] = useState([])
+  const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
 
   const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
@@ -106,6 +107,10 @@ const ComposeModalContainer = props => {
     }
   }
 
+  const onSendIndividualMessagesChange = () => {
+    setSendIndividualMessages(prev => !prev)
+  }
+
   const validMessageFields = () => {
     // TODO: validate recipients
     if (!body) {
@@ -164,7 +169,12 @@ const ComposeModalContainer = props => {
       <Flex.Item>
         <ComposeInputWrapper
           shouldGrow
-          input={<IndividualMessageCheckbox onChange={() => {}} checked={false} />}
+          input={
+            <IndividualMessageCheckbox
+              onChange={onSendIndividualMessagesChange}
+              checked={sendIndividualMessages}
+            />
+          }
         />
       </Flex.Item>
     </Flex>

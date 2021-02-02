@@ -24,6 +24,7 @@ import I18n from 'i18n!conversations_2'
 export const IndividualMessageCheckbox = props => {
   return (
     <Checkbox
+      data-testid="individual-message-checkbox"
       label={I18n.t('Send an individual message to each recipient')}
       size="small"
       {...props}
