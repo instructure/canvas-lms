@@ -35,7 +35,7 @@ export function createDashboardCards(dashboardCards) {
     <Box
       showSplitDashboardView={window.ENV?.FEATURES?.unpublished_courses && isTeacher}
       courseCards={dashboardCards}
-      hideColorOverlays={ENV.PREFERENCES.hide_dashcard_color_overlays}
+      hideColorOverlays={ENV && ENV.PREFERENCES && ENV.PREFERENCES.hide_dashcard_color_overlays}
     />
   )
 }
