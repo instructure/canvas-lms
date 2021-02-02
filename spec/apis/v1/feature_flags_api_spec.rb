@@ -482,6 +482,17 @@ describe "Feature Flags API", type: :request do
     end
   end
 
+  describe "environment" do
+    it "lists cached_js_env_account_features" do
+      expect_any_instance_of(ApplicationController).to receive(:cached_js_env_account_features).
+        and_return({telepathic_navigation: true})
+      json = api_call(:get, "/api/v1/features/environment",
+               { controller: 'feature_flags', action: 'environment', format: 'json' }, {}, {},
+               { expected_status: 200 })
+      expect(json).to eq({'telepathic_navigation' => true})
+    end
+  end
+
   describe "custom_transition_proc" do
     before do
       allow(Feature).to receive(:definitions).and_return({

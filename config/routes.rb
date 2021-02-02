@@ -2039,6 +2039,7 @@ CanvasRails::Application.routes.draw do
         put "#{prefix}/flags/:feature", action: :update
         delete "#{prefix}/flags/:feature", action: :delete
       end
+      get "features/environment", action: :environment
     end
 
     scope(controller: :conferences) do
