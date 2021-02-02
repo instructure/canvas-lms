@@ -187,6 +187,7 @@ de:
   a_locked_file_named_name_already_exists_please_ent_3b2e65a: "Es gibt bereits eine gesperrte Datei namens „%{name}“. Bitte geben Sie einen neuen Namen ein."
   a_locked_item_named_name_already_exists_in_this_lo_ab03ee39: "Ein gesperrtes Element mit dem Namen „%{name}“ ist hier bereits vorhanden. Geben Sie bitte einen anderen Namen ein."
   a_message_is_required_129e1814: "Eine Nachricht ist erforderlich."
+  a_much_better_html_code_editor_for_the_rce_though__ef48b3b3: "Ein viel besserer HTML-Code-Editor für den RCE, der allerdings für Screenreader-Benutzer unzugänglich ist."
   a_name_for_this_set_is_required_222bad23: "Für dieses Set ist ein Name erforderlich."
   a_name_is_required_b5df38a9: "Ein Name ist erforderlich."
   a_new_assignment_has_been_created_for_your_course__12b72639: "Eine neue Aufgabe wurde für Ihren Kurs %{course_name} erstellt."
@@ -197,6 +198,7 @@ de:
   a_public_privacy_level_will_send_the_launching_use_63bdbfaa: "Eine öffentliche Sicherheitsstufe sendet die persönlichen Identifikationsdaten des startenden Benutzers an den Tool-Anbieter. Eine Einstellung auf Privat kann nachteiligen Einfluss auf Tools haben, die von diesen Daten abhängen."
   a_redirect_uri_is_required_please_supply_one_471908db: "A redirect_uri ist erforderlich. Sorgen Sie bitte dafür."
   a_section_is_required_64103992: "Ein Abschnitt ist erforderlich."
+  a_simplified_canvas_interface_for_k_5_80b33391: "Eine vereinfachte Canvas-Schnittstelle für Vorschule bis Klasse 5"
   a_sis_integration_is_not_configured_and_the_enable_3c560d89: "Eine SIS-Integration ist nicht konfiguriert und die Funktion „Neue SIS-Integrationseinstellungen aktivieren“ ist nicht aktiviert."
   a_student_has_just_turned_in_a_late_submission_for_23f0ba9e: "Ein Teilnehmer hat soeben verspätet für %{assignment_name} im Kurs %{course_name} abgegeben."
   a_student_has_just_turned_in_a_re_submission_for_a_9e9a17: "Ein Teilnehmer hat soeben erneut die Aufgabe %{assignment_title} im Kurs %{course_name} eingereicht."
@@ -1806,12 +1808,15 @@ de:
   add_more_e1ffaa65: "Weitere hinzufügen"
   add_name_db699e72: "%{name} hinzufügen"
   add_new_announcement_ddacd624: "Neue Ankündigung hinzufügen"
+  add_new_caption_or_subtitle_59d2d044: "Neue Beschriftung oder Untertitel hinzufügen"
   add_new_domain_e097d4a0: "Neue Domäne hinzufügen"
   add_new_group_7ac49f31: "Neue Gruppe hinzufügen"
   add_new_set_of_due_dates_e8e240f: "Neue Reihe von Abgabeterminen hinzufügen"
   add_new_term_d2217c0d: "Neues Semester hinzufügen"
   add_observers_to_courses_6f494a29: "Beobachter zu Kursen hinzufügen"
   add_old_quiz_f4c546a: "Altes Quiz hinzufügen"
+  add_outcomes_to_account_4647776f: "Lernziele zum Konto hinzufügen"
+  add_outcomes_to_course_88ba09be: "Lernziele zum Kurs hinzufügen"
   add_override_da70f198: "Außerkraftsetzen hinzufügen"
   add_people_7948b7da: "Personen hinzufügen"
   add_people_7ee4b2ec: "Personen hinzufügen"
@@ -1855,6 +1860,7 @@ de:
   add_users_to_name_b8109bbb: "Benutzer zu %{name} hinzufügen"
   add_your_assignments_you_can_just_make_a_long_list_8a7862dd: "Fügen Sie Ihre Aufgaben hinzu. Sie können einfach eine lange Liste erstellen, oder die Aufgaben in Gruppen unterteilen. Sie können sogar Gewichtungen für die einzelnen Aufgabengruppen angeben."
   add_your_zendesk_instance_s_custom_field_id_for_ea_3aeb75f4: "Fügen Sie für jedes der folgenden Elemente -die benutzerdefinierte Feld-ID Ihrer Zendesk-Instanz hinzu (Felder ohne ID werden nicht protokolliert):"
+  added_caption_1895db92: "Beschriftung hinzugefügt"
   added_mastery_level_dd4792d1: "Leistungszielstufe hinzugefügt"
   added_new_proficiency_rating_e30cab8a: "Neue Kompetenzeinstufung hinzugefügt"
   adding_rss_feed_f1202567: "RSS-Feed hinzufügen"
@@ -2037,6 +2043,7 @@ de:
   allow_importing_of_qti_and_common_cartridge_into_q_81b657cd: "Import von QTI und Common Cartridge in Quizzes.Next zulassen."
   allow_importing_of_third_party_packages_into_new_q_f6b8b1c7: "Erlaubt das Importieren von Drittanbieterpaketen in Neue Quizze"
   allow_in_mastery_paths_5332c786: "In Leistungsziel-Pfaden erlauben"
+  allow_inactive_and_or_concluded_enrollments_to_be__3c9a65ab: "Ermöglicht die Anzeige von inaktiven und/oder abgeschlossenen Einschreibungen in LMGB"
   allow_include_parameters_bf3d3230: "Include-Parameter zulassen "
   allow_intra_group_peer_reviews_53f1e455: "Gegenseitige gruppeninterne Korrekturen zulassen"
   allow_live_event_subscription_to_be_set_to_be_deli_e11ce7fa: |-
@@ -2102,8 +2109,10 @@ de:
   allows_the_missing_policy_applicator_to_emit_submi_338a9bb7: "Ermöglicht es der Anwendung für Versäumnis-Richtlinien, submission_updated Live-Events für jede als fehlend markierte Abgabe zu senden."
   allows_the_scheduling_of_recurring_calendar_events_aac71007: "Erlaubt die Planung wiederkehrender Kalender-Veranstaltungen"
   allows_the_user_to_navigate_away_while_submission__276d73b7: "Ermöglicht es dem Benutzer, weiter zu navigieren, während die Abgabe erneut hochgeladen wird"
+  allows_uer_to_delete_a_submission_file_5302db48: "Erlaubt dem Benutzer, eine Einreichungsdatei zu löschen."
   allows_user_to_access_and_edit_the_admin_settings__b3390b66: "Erlaubt dem Benutzer, auf die Admin-Einstellungen in Commons zuzugreifen und sie zu bearbeiten. Erlaubt dem Benutzer, Gruppen zu erstellen und zu verwalten. Erlaubt dem Benutzer, gemeinsam genutzte Ressourcen im Konto zu verwalten."
   allows_user_to_access_speedgrader_from_an_assignme_3b908f7: "Erlaubt dem Benutzer, auf SpeedGrader von einer Aufgabe aus zuzugreifen."
+  allows_user_to_access_the_act_as_user_link_on_stud_c7391722: "Ermöglicht dem Benutzer den Zugriff auf den Link „Handeln als Benutzer“ auf den Kontextkarten der Schüler."
   allows_user_to_access_the_announcements_link_in_co_2783579a: "Erlaubt dem Benutzer den Zugriff auf den Ankündigungs-Link in der Kursnavigation. Erlaubt dem Benutzer, Kursankündigungen zu sehen. Erlaubt dem Benutzer, aktuelle Ankündigungen auf der Startseite des Kurses zu sehen."
   allows_user_to_access_the_announcements_link_in_co_b0ef1a10: |-
       Erlaubt dem Benutzer den Zugriff auf den Ankündigungs-Link in der Kursnavigation.
@@ -2114,6 +2123,7 @@ de:
   allows_user_to_access_the_chat_tool_48d5f5c4: "Erlaubt dem Benutzer den Zugriff auf das Chat-Tool."
   allows_user_to_access_the_files_tab_in_the_content_a5187929: "Erlaubt dem Benutzer den Zugriff auf die Registerkarte Dateien im Content-Wähler."
   allows_user_to_access_the_navigation_tab_in_course_9ae8a05b: "Erlaubt dem Benutzer den Zugriff auf die Registerkarte „Navigation“ in den Kurseinstellungen. Erlaubt dem Benutzer den Zugriff auf die Schaltflächen „Studentenansicht“ (Teststudent), „Diesen Kurs kopieren“, „Kursinhalte zurücksetzen“ und „Kurs endgültig löschen“. Erlaubt dem Benutzer „Kursbild“, „Name“, „Kurscode“, „Zeitzone“, „Unterkonto“, „Semester“ und andere Optionen auf der Registerkarte „Kursdetails“ zu ändern."
+  allows_user_to_access_the_people_link_in_account_n_d42a0fd4: "Erlaubt dem Benutzer den Zugriff auf den Teilnehmer-Link in der Kontonavigation."
   allows_user_to_access_the_restore_courses_tab_in_a_397d9178: "Erlaubt dem Benutzer den Zugriff auf die Registerkarte „Kurswiederherstellung“ in Admin-Tools."
   allows_user_to_access_the_restore_courses_tab_in_a_3ff3086c: "Erlaubt dem Benutzer den Zugriff auf die Registerkarte „Kurswiederherstellung“ in Admin-Tools."
   allows_user_to_access_the_student_progress_page_aca95197: "Erlaubt dem Benutzer den Zugriff auf die Seite „Studentenfortschritt“."
@@ -2121,11 +2131,20 @@ de:
   allows_user_to_access_the_users_link_in_account_na_d77e46de: "Erlaubt dem Benutzer den Zugriff auf den Benutzer-Link in der Kontonavigation."
   allows_user_to_access_the_view_notifications_tab_i_71995596: "Erlaubt dem Benutzer den Zugriff auf die Registerkarte „Benachrichtigungen anzeigen“ in Admin-Tools."
   allows_user_to_act_as_other_users_in_the_account_195628ae: "Erlaubt dem Benutzer, als anderer Benutzer im Konto zu handeln."
+  allows_user_to_act_as_other_users_in_the_account_t_56c81672: |-
+      Erlaubt dem Benutzer, als anderer Benutzer im Konto zu handeln. Diese Berechtigung sollte nur Benutzern zugewiesen werden, die von Ihrer Einrichtung autorisiert wurden, als andere Benutzer in Ihrem gesamten Canvas-Konto zu agieren.
+              Benutzer mit dieser Berechtigung können die Funktion „Handeln als“ verwenden, um Kontoeinstellungen zu verwalten, Noten anzuzeigen und anzupassen, auf Benutzerinformationen zuzugreifen usw.
+              Mit dieser Berechtigung können auch Administratoren, die einem Unterkonto zugewiesen sind, auf Einstellungen und Informationen außerhalb ihres Unterkontos zugreifen.
   allows_user_to_add_and_remove_other_account_admins_7834ea9a: "Erlaubt dem Benutzer, andere Konto-Administratoren hinzuzufügen oder zu entfernen."
   allows_user_to_add_and_remove_other_teachers_cours_b69ba1cd: "Erlaubt dem Benutzer, andere Lehrer, Kursdesigner oder TAs hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Kursbeobachter hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Lehrer, Designer und TAs einzusehen. Erlaubt dem Benutzer, die Benutzerdetails jedes beliebigen Benutzers einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Benutzers zu ändern."
   allows_user_to_add_and_remove_other_teachers_cours_bff27199: "Erlaubt dem Benutzer, andere Lehrer, Kursdesigner oder TAs hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Kursbeobachter hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Lehrer, Designer und TAs einzusehen. Erlaubt dem Benutzer, das Einstellungsmenü für Lehrer, Kursdesigner, TAs und Beobachter zu sehen. Erlaubt dem Benutzer, die Benutzerdetails für Lehrer, Kursdesigner und TAs einzusehen. Erlaubt dem Benutzer, Studenten darauf zu beschränken, nur Abschnittsmitglieder zu sehen."
   allows_user_to_add_and_remove_students_allows_user_6b31aafc: "Erlaubt dem Benutzer, Studenten hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Kursbeobachter hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Studenten einzusehen. Erlaubt dem Benutzer, frühere Anmeldungen einzusehen. Erlaubt dem Benutzer, auf das Einstellungsmenü und die Benutzerdetails eines Benutzers zuzugreifen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Studenten zu ändern. Erlaubt dem Benutzer, auf der Seite „Kurse und Teilnehmer“ Kurseinladungen erneut zu versenden."
   allows_user_to_add_and_remove_students_to_the_cour_bb69582a: "Erlaubt dem Benutzer, Studenten zum Kurs hinzuzufügen oder sie zu entfernen. Erlaubt dem Benutzer, Kursbeobachter hinzuzufügen oder zu entfernen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Studenten einzusehen. Erlaubt dem Benutzer, frühere Anmeldungen einzusehen. Erlaubt dem Benutzer, auf das Einstellungsmenü und die Benutzerdetails eines Benutzers zuzugreifen. Erlaubt dem Benutzer, Anmeldungen auf der Detailseite eines Studenten abzuschließen oder zu löschen. Erlaubt dem Benutzer, Kurseinladungen erneut zu senden."
+  allows_user_to_add_course_sections_in_course_setti_f8e4cabf: "Erlaubt dem Benutzer, Kursabschnitte in den Kurseinstellungen hinzuzufügen."
+  allows_user_to_add_designers_in_the_course_allows__ee166883: |-
+      Erlaubt dem Benutzer, Designer zum Kurs hinzuzufügen. Erlaubt dem Benutzer, die Anmelde-ID-Informationen für die Designer anzuzeigen.
+              Erlaubt dem Benutzer, die Benutzerdetails für die Designer anzuzeigen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Designers zu ändern.
+  allows_user_to_add_designers_to_the_course_from_th_ee349841: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Designer zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, Designer zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Designer einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Designer einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Designers zu ändern."
   allows_user_to_add_discussions_in_the_discussions__1b3d9a53: "Erlaubt dem Benutzer, Diskussionen auf der Diskussionsseite hinzuzufügen."
   allows_user_to_add_discussions_in_the_discussions__3cc51c31: "Erlaubt dem Benutzer, Diskussionen auf der Diskussionsseite hinzuzufügen. Erlaubt dem Benutzer, von anderen erstellte Diskussionsthemen für Kommentare zu schließen, zu verschieben, zu fixieren oder zu lösen, zu ändern und zu löschen."
   allows_user_to_add_discussions_in_the_discussions__f5479e2c: |-
@@ -2161,6 +2180,8 @@ de:
   allows_user_to_add_events_to_list_view_dashboard_v_2ad5de25: "Erlaubt dem Benutzer, Ereignisse zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
   allows_user_to_add_new_assignments_to_a_module_51ae198c: "Erlaubt dem Benutzer, neue Aufgaben zu einem Modul hinzuzufügen."
   allows_user_to_add_non_graded_discussions_to_list__65e44efe: "Erlaubt dem Benutzer, nicht benotete Diskussionen zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
+  allows_user_to_add_observers_in_the_course_allows__9c6bb78c: "Erlaubt dem Benutzer, Beobachter zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Beobachter einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Beobachter einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Beobachters zu ändern."
+  allows_user_to_add_observers_to_the_course_from_th_dd0ccafa: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Beobachter zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, Beobachter zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Beobachter einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Beobachter einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Beobachters zu ändern."
   allows_user_to_add_pages_to_list_view_dashboard_vi_a661a203: "Erlaubt dem Benutzer, Seiten zur Listenansicht „Dashboard“ per Kontrollkästchen „Zu Studentenaufgaben hinzufügen“ hinzuzufügen."
   allows_user_to_add_remove_other_teachers_course_de_702821d4: |-
       Erlaubt dem Benutzer, andere Lehrern, Kursdesigner oder TAs hinzuzufügen oder zu entfernen.
@@ -2185,7 +2206,11 @@ de:
       Erlaubt dem Benutzer, Anmeldungen auf der Detailseite eines Studenten abzuschließen oder zu löschen.
       Erlaubt dem Benutzer, Kurseinladungen erneut zu senden.
   allows_user_to_add_students_to_a_course_from_the_a_3b752dd2: "Erlaubt dem Benutzer, auf der Seite „Kontokurse“ Studenten zu einem Kurs hinzuzufügen."
+  allows_user_to_add_tas_in_the_course_allows_user_t_7d9841a6: "Erlaubt dem Benutzer, TAs zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für TAs einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für TAs einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines TAs zu ändern."
+  allows_user_to_add_tas_to_the_course_from_the_acco_254e4c5f: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos TAs zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, TAs zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für TAs einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für TAs einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines TAs zu ändern."
   allows_user_to_add_teachers_course_designers_or_ta_a7fdaceb: "Erlaubt dem Benutzer, auf der Seite „Kontokurse“ Lehrer, Kursdesigner oder TAs zu einem Kurs hinzuzufügen."
+  allows_user_to_add_teachers_in_the_course_allows_u_3f80b57d: "Erlaubt dem Benutzer, Lehrer zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Lehrer einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Lehrer einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Lehrers zu ändern."
+  allows_user_to_add_teachers_to_the_course_from_the_dc03e973: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Lehrer zu einem Kurs hinzuzufügen. Erlaubt dem Benutzer, Lehrer zum Kurs hinzuzufügen. Erlaubt dem Benutzer, Anmelde-ID-Informationen für Lehrer einzusehen. Erlaubt dem Benutzer, die Benutzerdetails für Lehrer einzusehen. Erlaubt dem Benutzer, den Abschnitt oder die Rolle eines Lehrers zu ändern."
   allows_user_to_configure_alerts_in_course_settings_38675b12: "Erlaubt dem Benutzer, Warnmeldungen in den Kurseinstellungen zu konfigurieren. Warnmeldungen sind eine selten benutzte Funktion, die dazu dient, aus beliebigen Gründen eine Benachrichtigung an Schüler, Lehrer oder Administratoren zu senden (z. B. Für 7 Tage keine Schüler-Lehrer-Interaktion). Sie werden jeden Tag abgefragt, und Schülern und/oder Lehrern werden Benachrichtigungen gesendet, bis das auslösende Problem gelöst ist."
   allows_user_to_configure_alerts_in_course_settings_40a81b1d: "Erlaubt dem Benutzer, Warnmeldungen in den Kurseinstellungen zu konfigurieren. Warnmeldungen sind eine selten benutzte Funktion, die dazu dient, aus irgendeinem Grund eine Benachrichtigung an Schüler, Lehrer oder Administratoren zu senden (z. B. Für 7 Tage keine Schüler-Lehrer-Interaktion). Sie werden jeden Tag abgefragt, und Schülern und/oder Lehrern werden Benachrichtigungen gesendet, bis das auslösende Problem gelöst ist."
   allows_user_to_configure_alerts_in_course_settings_806397b5: "Erlaubt dem Benutzer, Warnmeldungen in den Kurseinstellungen zu konfigurieren. Warnmeldungen sind eine selten benutzte Funktion, die dazu dient, aus irgendeinem Grund eine Benachrichtigung an Schüler, Lehrer oder Administratoren zu senden (z. B. Für 7 Tage keine Schüler-Lehrer-Interaktion). Sie werden jeden Tag abgefragt, und Schülern und/oder Lehrern werden Benachrichtigungen gesendet, bis das auslösende Problem gelöst ist."
@@ -2199,6 +2224,7 @@ de:
   allows_user_to_create_and_modify_grading_schemes_e4433a19: "Erlaubt dem Benutzer, Benotungssysteme zu erstellen und zu ändern."
   allows_user_to_create_collaborations_allows_user_t_96f8c3be: "Erlaubt dem Benutzer, Kooperationen einzurichten. Erlaubt dem Benutzer, von ihnen erstellte Konferenzen anzuzeigen, zu bearbeiten und zu löschen."
   allows_user_to_create_collaborations_allows_user_t_eff2a175: "Erlaubt dem Benutzer, Kooperationen einzurichten. Erlaubt dem Benutzer, von ihnen erstellte Kooperationen anzuzeigen, zu bearbeiten und zu löschen."
+  allows_user_to_create_course_pages_allows_user_to__2b7e4d48: "Erlaubt dem Benutzer, Kursseiten zu erstellen. Erlaubt dem Benutzer, die Mustersperreinstellungen für einzelne Seiten in einem Muster-Hauptkurs zu ändern."
   allows_user_to_create_developer_keys_for_accounts_76bedd2b: "Erlaubt dem Benutzer, Entwicklerschlüssel für Konten zu erstellen."
   allows_user_to_create_edit_and_delete_account_grou_abc8c12: "Erlaubt dem Benutzer, Kontogruppen zu erstellen, zu bearbeiten und zu löschen."
   allows_user_to_create_edit_and_delete_course_group_36097d72: "Erlaubt dem Benutzer, Kursgruppen zu erstellen, zu bearbeiten und zu löschen. Erlaubt dem Benutzer, von Studenten erstellte Kursgruppen anzuzeigen, zu bearbeiten und zu löschen."
@@ -2213,6 +2239,8 @@ de:
       zu bearbeiten und zu löschen.
   allows_user_to_create_import_edit_and_delete_outco_8eff991: "Erlaubt dem Benutzer, auf Kursebene Ergebnisse und Ergebnisgruppen zu erstellen, zu importieren, zu bearbeiten und zu löschen."
   allows_user_to_create_new_conferences_allows_user__89cebec2: "Erlaubt dem Benutzer, neue Konferenzen zu erstellen. Erlaubt dem Benutzer, von ihnen erstellte Konferenzen zu beginnen."
+  allows_user_to_delete_course_pages_allows_user_to__d6e4174d: "Erlaubt dem Benutzer, Kursseiten zu löschen. Erlaubt dem Benutzer, die Mustersperreinstellungen für einzelne Seiten in einem Muster-Hauptkurs zu ändern."
+  allows_user_to_delete_course_sections_allows_user__649d2d0d: "Erlaubt dem Benutzer, Kursabschnitte zu löschen. Erlaubt dem Benutzer, einen Benutzer aus einem Kursabschnitt zu löschen."
   allows_user_to_designate_a_course_as_a_blueprint_c_208ec223: "Erlaubt dem Benutzer, einen Kurs zum Musterkurs zu erklären. Erlaubt dem Benutzer, die Musterkurseinstellungen in den Kurseinstellungen zu verwalten. Erlaubt dem Benutzer, zugehörige Kurse hinzuzufügen."
   allows_user_to_designate_a_course_as_a_blueprint_c_bc5ff9bc: |-
       Erlaubt dem Benutzer, einen Kurs zum Musterkurs zu erklären.
@@ -2233,6 +2261,10 @@ de:
   allows_user_to_edit_blueprint_lock_settings_on_the_a2534937: "Erlaubt dem Benutzer, die Mustersperreinstellungen auf den Aufgaben- und Quiz-Indexseiten in einem Muster-Hauptkurs zu ändern."
   allows_user_to_edit_conferences_61eb62e0: "Erlaubt dem Benutzer, Konferenzen zu ändern."
   allows_user_to_edit_configurations_for_manually_ad_7e0f496c: "Erlaubt dem Benutzer, Konfigurationen für manuell hinzugefügte externe Apps zu bearbeiten."
+  allows_user_to_edit_course_pages_allows_user_to_de_abb54eb8: |-
+      Erlaubt dem Benutzer, Kursseiten zu bearbeiten. Erlaubt dem Benutzer, Benutzer zu definieren, die die Seite bearbeiten dürfen. Erlaubt dem Benutzer, die Seite zur Aufgabenliste der Studenten hinzuzufügen
+              Erlaubt dem Benutzer, Seiten zu veröffentlichen bzw. die Veröffentlichung aufzuheben. Erlaubt dem Benutzer, den Seitenverlauf zu betrachten und die Titelseite einzustellen.
+              Erlaubt dem Benutzer, die Muster-Sperreinstellungen auf der Indexseite „Seiten“ und für eine einzelne Seite in einem Muster-Masterkurs zu bearbeiten.
   allows_user_to_edit_grades_and_add_comments_in_spe_dc18e3c0: "Erlaubt dem Benutzer, Noten zu ändern und Kommentare in SpeedGrader hinzuzufügen."
   allows_user_to_edit_grades_in_the_gradebook_allows_432849ce: "Erlaubt dem Benutzer, Noten im Notenbuch zu ändern. Erlaubt dem Benutzer, auf den Notenbuchverlauf zuzugreifen. Ermöglicht dem Benutzer den Zugriff auf das Notenbuch der Lernleistungsziele (falls aktiviert)."
   allows_user_to_edit_grades_in_the_gradebook_allows_74c2723: |-
@@ -2276,6 +2308,15 @@ de:
   allows_user_to_moderate_a_quiz_and_view_the_quiz_s_59ce0eee: "Erlaubt dem Benutzer, ein Quiz zu moderieren und die Seite der Quizstatistiken anzusehen."
   allows_user_to_moderate_a_quiz_settings_allows_use_e454b94e: "Erlaubt dem Benutzer, ein Quiz zu moderieren. Einstellungen: Erlaubt dem Benutzer, Benotungssysteme zu ändern."
   allows_user_to_publish_conclude_and_delete_courses_336cf352: "Erlaubt dem Benutzer, Kurse zu veröffentlichen, zu schließen und zu löschen."
+  allows_user_to_remove_designers_to_the_course_from_1053d170: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Designer aus einem Kurs zu entfernen. Erlaubt dem Benutzer, Designer aus dem Kurs zu entfernen."
+  allows_user_to_remove_designers_to_the_course_from_f5a7225e: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Designer aus einem Kurs zu entfernen."
+  allows_user_to_remove_observers_from_the_course_2ad4c60c: "Erlaubt dem Benutzer, Beobachter aus dem Kurs zu entfernen."
+  allows_user_to_remove_observers_from_the_course_fr_6a3625ff: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Beobachter von einem Kurs zu entfernen. Erlaubt dem Benutzer, Beobachter aus dem Kurs zu entfernen."
+  allows_user_to_remove_tas_from_the_course_bd8ac630: "Erlaubt dem Benutzer, TAs aus dem Kurs zu entfernen."
+  allows_user_to_remove_tas_from_the_course_from_the_fe838c70: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos TAs von einem Kurs zu entfernen. Erlaubt dem Benutzer, TAs aus dem Kurs zu entfernen."
+  allows_user_to_remove_teachers_from_the_course_bf4b2d8: "Erlaubt dem Benutzer, Lehrer aus dem Kurs zu entfernen."
+  allows_user_to_remove_teachers_from_the_course_fro_75ffab61: "Erlaubt dem Benutzer, auf der Kurs-Seite des Kontos Lehrer von einem Kurs zu entfernen. Erlaubt dem Benutzer, Lehrer aus dem Kurs zu entfernen."
+  allows_user_to_rename_course_sections_allows_user__8e9e7bac: "Erlaubt dem Benutzer, Kursabschnitte umzubenennen. Erlaubt dem Benutzer, das Start- und Enddatum für Kursabschnitte zu ändern. Erlaubt dem Benutzer, Abschnitte neu zu kombinieren."
   allows_user_to_reply_to_a_discussion_post_83f43e19: "Erlaubt dem Benutzer, auf einen Diskussionsbeitrag zu antworten."
   allows_user_to_restore_a_course_32084c5c: "Erlaubt dem Benutzer, einen Kurs wiederherzustellen."
   allows_user_to_restore_a_course_not_available_at_t_3a749177: "Erlaubt dem Benutzer, einen Kurs wiederherzustellen. (Auf der Unterkontoebene nicht verfügbar.)"
@@ -2684,9 +2725,9 @@ de:
   answer_text_80_character_limit_2fce1113: "Antworttext (max. 80 Zeichen)"
   answer_text_909894d6: Antworttext
   answer_weight_43420dc5: Antwortgewichtung
-  answers_which_scored_in_the_bottom_27_74409483: "Antworten, deren Punktezahlen in den unteren 27 % lagen"
-  answers_which_scored_in_the_middle_46_46466ffd: "Antworten, deren Punktezahlen in den mittleren 46 % lagen"
-  answers_which_scored_in_the_top_27_a605232d: "Antworten, deren Punktezahlen in den oberen 27 % lagen"
+  answers_which_scored_in_the_bottom_27_74409483: "Antworten, deren Punktezahlen in den unteren 27% lagen"
+  answers_which_scored_in_the_middle_46_46466ffd: "Antworten, deren Punktezahlen in den mittleren 46% lagen"
+  answers_which_scored_in_the_top_27_a605232d: "Antworten, deren Punktezahlen in den oberen 27% lagen"
   answers_will_be_shown_after_your_last_attempt_d9db6b1d: "Die Antworten werden nach Ihrem letzten Versuch angezeigt"
   any_sub_account_ec7069f2: "Irgendein Unterkonto"
   any_term_d49af19f: "Irgendein Semester"
@@ -2823,6 +2864,7 @@ de:
   are_you_sure_you_want_to_display_grades_for_this_a_c1c618c6: "Möchten Sie den Studenten wirklich die Noten für diese Aufgabe zeigen?"
   are_you_sure_you_want_to_do_this_it_cannot_be_undo_3379a544: "Möchten Sie dies wirklich tun? Dieser Vorgang kann nicht rückgängig gemacht werden. Dadurch werden bestehende Benotungen im Notenheft überschrieben."
   are_you_sure_you_want_to_inactivate_this_user_they_ec265d25: "Möchten Sie dieses Benutzer wirklich desaktivieren? Er/sie kann, während er/sie inaktiv ist, dann nicht mehr an diesem Kurs teilnehmen."
+  are_you_sure_you_want_to_permanently_remove_the_us_e6b84ce0: "Möchten Sie diesen Benutzer wirklich permanent aus ALLEN Konten entfernen?"
   are_you_sure_you_want_to_post_grades_for_this_assi_bafe5753: "Möchten Sie den Studenten wirklich die Noten für diese Aufgabe zeigen?"
   are_you_sure_you_want_to_proceed_changes_you_made__2f87f0e7: "Sind Sie sicher, dass Sie fortfahren möchten? Vorgenommene Änderungen werden nicht gespeichert."
   are_you_sure_you_want_to_publish_this_comment_26989c2f: "Möchten Sie diesen Kommentar wirklich veröffentlichen?"
@@ -4870,6 +4912,7 @@ de:
   canvas_failed_to_complete_the_upload_864a4c0f: "Upload fehlgeschlagen"
   canvas_failed_to_initiate_the_upload_8e3824d5: "Initialisierung des Upload fehlgeschlagen"
   canvas_files_889a274f: Canvas-Dateien
+  canvas_for_elementary_e6f5a06f: "Canvas für den Primarbereich"
   canvas_group_category_id_38d8cfd7: canvas_group_category_id
   canvas_helps_you_leverage_collaborative_technology_a453f09f: |-
       Canvas hilft Ihnen dabei, kollaborative Technologien zu nutzen, damit mehrere
@@ -6412,6 +6455,8 @@ de:
   couldn_t_adjust_dates_on_assignment_name_id_id_eaf1c353: "Konnte Termine nicht an Aufgabe %{name} (ID %{id}) anpassen"
   couldn_t_find_an_authority_to_update_44d9407e: "Es wurde keine zu aktualisierende Berechtigung gefunden."
   couldn_t_find_canvas_csv_import_headers_487f1b6c: "DIe Canvas-CSV-Import-Header konnten nicht gefunden werden."
+  couldn_t_find_valid_settings_for_this_link_resourc_24bd1e7a: "Konnte keine gültigen Einstellungen für diesen Link finden: Ressourcen-Link nicht gefunden"
+  couldn_t_find_valid_settings_for_this_link_resourc_cab9f16a: "Konnte keine gültigen Einstellungen für diesen Link finden: Ressourcen-Link für Tool nicht gefunden"
   couldn_t_generate_diff_message_a0528b20: "Die Diff: %{message} konnte nicht erzeugt werden"
   couldn_t_update_standards_for_authority_auth_81206187: "Die Standards für die Berechtigung %{auth} konnten nicht aktualisiert werden."
   count_alignments_40fbc23c: 
@@ -6523,6 +6568,9 @@ de:
   count_recording_5ba8a655: "%{count} Aufzeichnung"
   count_recordings_9f8e4148: "%{count} Aufzeichnungen"
   count_replies_a685c742: "%{count} Antworten"
+  count_respondents_fc4c2da4: 
+    one: "1 Befragter"
+    other: "%{count} Befragte"
   count_results_9926447c: 
     one: "Ein Ergebnis"
     other: "%{count} Ergebnisse"
@@ -6549,8 +6597,8 @@ de:
     other: "%{count} Studenten"
     zero: "0 Studenten"
   count_students_in_percentile_percentile_d0adecfe: 
-    one: "1 Student im Perzentil %{percentile}"
-    other: "%{count} Studenten im Perzentil %{percentile}"
+    one: "1 Student im Perzentil %{percentile} "
+    other: "%{count} Studenten im Perzentil %{percentile} "
   count_students_will_get_num_points_c970fc01: 
     one: "1 Student erhält %{num} Punkte"
     other: "%{count} Studenten erhalten %{num} Punkte"
@@ -6675,6 +6723,7 @@ de:
   course_copy_not_allowed_error: "Sie dürfen den ursprüngliche Kurs nicht kopieren."
   course_course_d1c78210: "Kurs: %{course}"
   course_discussions_38c0b74f: Kursdiskussionen
+  course_end_date_4c797823: "Enddatum des Kurses"
   course_ends_at_e8b166df: "Kurs endet um"
   course_export_from_date_f4e2a3e4: "*Kursexport von %{date}*"
   course_export_from_date_file_not_available_8a775e53: "Kursexport vom %{date} (Datei nicht verfügbar)"
@@ -6838,6 +6887,9 @@ de:
   course_option_links_a79d263d: Kursoptions-Links
   course_outcomes_7dc1cbc7: Kursergebnisse
   course_pages_449f1dd4: Kursseiten
+  course_participation_and_access_settings_7a3d6297: "Einstellungen für die Kursteilnahme und den Zugriff"
+  course_participation_is_limited_to_course_start_an_7315866d: "Die Kursteilnahme ist auf den Beginn und das Ende des *Kurses* beschränkt. Alle im Kurs erstellten Abschnittsdaten können die Kursdaten überschreiben."
+  course_participation_is_limited_to_term_start_and__c8974314: "Die Kursteilnahme ist auf den Beginn und das Ende des *Semesters* beschränkt."
   course_people_3058c948: Kursteilnehmer
   course_quiz_extensions_4102f98f: Kursquizerweiterungen
   course_quizzes_c337653c: Kursquizze
@@ -6918,6 +6970,7 @@ de:
   course_sis_df8b379: Kurs-SIS
   course_sis_id_bbed1a60: "SIS-ID für Kurs"
   course_sis_id_sis_id_or_canvas_id_4d323f5c: "Kurs-SIS-ID (SIS_ID:####) Oder Canvas-ID: (###)"
+  course_start_date_daae16ae: "Startdatum des Kurses"
   course_starts_at_3a01f9da: "Kurs beginnt um"
   course_state_manage_2edd46dc: "Kursstatus – verwalten"
   course_statistics: 
@@ -7257,6 +7310,8 @@ de:
         hide_final_grades: "Gesamtnoten in der Zusammenfassung der Studentenbenotung ausblenden"
         hide_sections_on_course_users_page: "Ausblenden von Abschnitten auf der Teilnehmerseite vor Studenten"
         home_page_announcement_limit: "Anzahl der Ankündigungen auf der Homepage"
+        homeroom_course: "Aktivieren als Homeroom-Kurs"
+        homeroom_course_header: Homeroom-Kurs
         image: Bild
         indexed: "Diesen Kurs in das öffentliche Kursverzeichnis aufnehmen"
         is_public_to_auth_users: "Diesen Kurs für authentifizierte Benutzer sichtbar machen"
@@ -7570,6 +7625,7 @@ de:
   criterion_ratings_3eed22e2: Kriterienbewertungen
   criterion_updated_36c0b3dc: "Kriterium aktualisiert"
   croatian_d713d655: Kroatisch
+  cross_listing_course_sections_edit_2ad15f02: "Abschnitte neu kombinieren (Kursabschnitte - bearbeiten)"
   crumbs: 
     access_report: Zugriffsbericht
     announcements: Announcements
@@ -7689,6 +7745,7 @@ de:
   current_total_67bf5f72: "Aktuelle Gesamtsumme:"
   current_volume_level_c55ab825: "Aktuelle Lautstärke"
   currently_assigned_to_tokenname_click_to_remove_5a853a84: "Derzeit %{tokenName} zugewiesen. Zum Entfernen klicken Sie darauf."
+  currently_the_add_remove_students_permission_overr_fcd0f6bc: "Derzeit hat die Berechtigung „Teilnehmer hinzufügen/entfernen“ Vorrang vor dieser gruppenbezogenen Berechtigung. Die Verwaltung von Beobachtern über die Berechtigung für Studenten wird irgendwann entfernt werden."
   currently_visible_to_e2f85345: "Derzeit sichtbar für"
   curso_f0ee9b5: Curso
   curve_grades_b7a75443: "Noten anpassen"
@@ -7962,6 +8019,7 @@ de:
   delete_domain_domain_c5b68f5: "Domäne löschen %{domain}"
   delete_entry_title_5e59727b: "Eintrag löschen %{title}"
   delete_feedname_1ac9a4a4: "Löschen %{feedName}"
+  delete_from_all_accounts_a1c5e621: "Aus ALLEN Konten löschen"
   delete_grading_period_dba36e59: "Benotungszeitraum löschen"
   delete_grading_period_set_b35358dd: "Benotungszeitraum-Set löschen"
   delete_grading_scheme_6b308832: "Benotungssystem löschen"
@@ -8015,6 +8073,7 @@ de:
   delete_toolname_app_85f9d4ee: "%{toolName}-App löschen"
   delete_track_fc21128b: "Spur löschen"
   deleted_1be5ed1: Gelöscht
+  deleted_caption_b5c66807: "Beschriftung gelöscht"
   deleted_ce03674d: gelöscht
   deleted_content_exceptions_237e809d: "Gelöschte Content-Ausnahmen:"
   deleted_content_referenced_in_this_resource_e42d1998: "Content löschen, auf den diese Ressource Bezug nimmt:"
@@ -8116,8 +8175,8 @@ de:
   description_61f4296: "*-Beschreibung"
   description_for_mastery_level_position_description_cc17114b: "Beschreibung für die Leistungszielstufe %{position}: %{description}"
   description_for_proficiency_rating_position_descri_da7c3cbe: "Beschreibung für die Kompetenzeinstufung %{position}: %{description}"
-  designers_add_fe7e1ea9: "Designer – Hinzufügen"
-  designers_remove_3e590bff: "Designer – Entfernen"
+  designers_add_fe7e1ea9: "Designer – Hinzufügen"
+  designers_remove_3e590bff: "Designer – Entfernen"
   details_98a31b68: Details
   details_a6f427c3: "Details:"
   determines_visibility_and_management_of_outcomes_i_e3ab94dc: "Bestimmt die Sichtbarkeit und Verwaltung der Lernziele in der Kontonavigation. Erlaubt dem Benutzer, auf der Konto und der Kursebene, Lernziele und Lernzielgruppen zu erstellen, zu ändern und zu löschen."
@@ -8641,6 +8700,7 @@ de:
   display_as_percentage_3e755dc: "Anzeige in Prozent"
   display_as_points_63084235: "Als Punkte anzeigen"
   display_course_catalog: "Zeigen Sie eine durchsuchbare Kursliste in diesem Stammkonto mit aktivierter Kennzeichnung „Diesen Kurs in das öffentliche Kursverzeichnis aufnehmen“ an."
+  display_filter_options_34fb6be2: "Filteroptionen anzeigen"
   display_grades_as_points_percentages_complete_inco_fa848380: |-
       Zeigen Sie Noten als
             Punkte, Prozentsätze, vollständig/unvollständig oder mit jeder anderen Methode an,
@@ -9086,6 +9146,7 @@ de:
   encourage_class_participation_4e069479: "Unterrichtsbeteiligung fördern"
   encourage_student_discourse_7836b9f7: "Fördern Sie den studentischen Diskurs"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Verschlüsselte SourcedIDs für grundlegende Ergebnisse"
+  end_78c581cd: Beenden
   end_course_set_up_tutorial_dialog_5b812ec6: "Kurseinrichtungstutorial beenden"
   end_course_set_up_tutorial_f358b85d: "Kurseinrichtungstutorial beenden"
   end_date_cannot_be_before_start_date_eb62ed6d: "Enddatum darf nicht vor Beginndatum liegen."
@@ -9151,6 +9212,18 @@ de:
   enrollment_term_7bfe840: Einschreibungssemester
   enrollment_terms_8753ec11: Einschreibungsbedingungen
   enrollments_e250c9c3: Einschreibungen
+  enrollments_may_be_added_by_your_institution_stude_213d41a4: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Wenn die Einstellung „Konto mit offener Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Beobachter über die Seite „Kursteilnehmer“ per E-Mail-Adresse oder Anmelde-ID zu einem Kurs hinzufügen, auch wenn der Beobachter noch kein Canvas-Konto hat.
+              Um einen Beobachter mit einem Kursteilnehmer zu verknüpfen, müssen „Benutzer - Anmeldedaten verwalten“ und „Conversations - an einzelne Kursteilnehmer senden“ aktiviert sein.
+              Um einen Beobachter mit einem Kursteilnehmer zu verknüpfen, muss „Benutzer - Beobachter-Pairing-Code für Kursteilnehmer generieren“ aktiviert sein.
+              Um die Liste der Beobachter im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - lesen“ aktiviert sein. Um einen Beobachter per SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_40297562: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Um den Abschnitt eines Designers zu bearbeiten, muss außerdem „Conversations - Nachrichten an einzelne Kursteilnehmer senden“ aktiviert sein.
+              Um die Liste der Designer im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - lesen“ aktiviert sein. Um einen Designer über die SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
   enrollments_may_be_added_by_your_institution_stude_4a538c66: |-
       Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
               Für den Zugriff auf die Seite „Teilnehmer“ muss „Benutzer – Liste anzeigen“ aktiviert sein. Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten über die E-Mail-Adresse zu einem Kurs hinzufügen, auch wenn der Benutzer noch kein Canvas-Konto hat. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Studenten zu bearbeiten, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
@@ -9160,9 +9233,33 @@ de:
   enrollments_may_be_added_by_your_institution_stude_791fc9ad: |-
       Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
               Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Studenten und seine Kursrolle zu ändern, müssen die Optionen „Benutzer – Liste anzeigen“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um Benutzer auf der Detailseite abzumelden, müssen die Optionen „Die Kursliste anzeigen“ und „Die Benutzerliste sehen“ ebenfalls aktiviert sein. Erlaubt dem Benutzer, auf der Seite „Kurse und Teilnehmer“ Kurseinladungen erneut zu versenden. Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite „Kursteilnehmer“ Studenten über die E-Mail-Adressen zu einem Kurs hinzufügen, auch wenn der Benutzer noch kein Canvas-Konto hat. Um einen Beobachter mit einem Student zu verknüpfen, müssen „Benutzer – Anmeldedetails verwalten“ und „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_88111dff: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Wenn die Einstellung „Konto für offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite "Kursteilnehmer" über die E-Mail-Adresse oder die Anmelde-ID Designer zu einem Kurs hinzufügen, auch wenn der Beobachter noch kein Canvas-Konto hat.
+              Um den Abschnitt eines Designers zu bearbeiten, muss außerdem „Conversations - Nachrichten an einzelne Kursteilnehmer senden“ aktiviert sein.
+              Um die Liste der Designer im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - Lesen“ aktiviert sein. Um einen Designer über die SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_8e8fcd3d: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Wenn die Einstellung „Konto mit offener Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite „Kursteilnehmer“ über die E-Mail-Adresse oder die Anmelde-ID Lehrer zu einem Kurs hinzufügen, auch wenn der Lehrer noch kein Canvas-Konto hat.
+              Um den Abschnitt eines Lehrers zu bearbeiten, muss außerdem „Conversations - an einzelne Kursteilnehmer senden“ aktiviert sein.
+              Um die Liste der Lehrer im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - Lesen“ aktiviert sein. Um einen Lehrer über die SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_9e5d79eb: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Wenn die Einstellung „Konto mit offener Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite „Kursteilnehmer“ über die E-Mail-Adresse oder die Anmelde-ID Lehrer zu einem Kurs hinzufügen, auch wenn der Beobachter noch kein Canvas-Konto hat.
+              Um den Abschnitt eines Lehrers zu bearbeiten, muss außerdem „Conversations - an einzelne Kursteilnehmer senden“ aktiviert sein.
+              Um die Liste der Lehrer im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - Lesen“ aktiviert sein. Um einen Lehrer über die SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
   enrollments_may_be_added_by_your_institution_stude_cb313429: |-
       Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Falls eine Anmeldung per SIS erfolgt, können nur Administratoren die Anmeldung vom Kurs entfernen.
               Um die Liste der Benutzer im Kurs anzuzeigen, muss „Benutzer – Liste anzeigen“ aktiviert sein. Zum Anzeigen von SIS-IDs muss „SIS-Daten – lesen“ aktiviert sein. Um einen Benutzers zu einen Kurs über die SIS-ID hinzuzufügen, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um den Abschnitt eines Lehrers oder TAs zu ändern, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein. Um einen Beobachter mit einem Student zu verknüpfen, muss „Conversations – einzelnen Kursteilnehmern Mitteilungen senden“ ebenfalls aktiviert sein.
+  enrollments_may_be_added_by_your_institution_stude_f600bc5a: |-
+      Anmeldungen können vom Student Information System (SIS) Ihrer Institution hinzugefügt werden. Wenn eine Einschreibung über SIS erstellt wird, können nur Administratoren die Einschreibung aus dem Kurs entfernen.
+              Wenn die Einstellung „Konto mit offener Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung auf der Seite "Kursteilnehmer" über die E-Mail-Adresse oder die Anmelde-ID TAs zu einem Kurs hinzufügen, auch wenn der TA noch kein Canvas-Konto hat.
+              Um den Abschnitt eines TAs zu bearbeiten, muss außerdem „Conversations - an einzelne Kursteilnehmer senden“ auch aktiviert sein.
+              Um die Liste der TAs im Kurs anzuzeigen, muss „Benutzer - Liste anzeigen“ aktiviert sein.
+              Um SIS-IDs anzuzeigen, muss „SIS-Daten - Lesen“ aktiviert sein. Um einen TA über die SIS-ID zu einem Kurs hinzuzufügen, muss auch „SIS-Daten - verwalten“ aktiviert sein.
   enrollments_observers: Beobachter
   enrollments_students: Studenten
   enrollments_tas: Lehrassistenten
@@ -9485,6 +9582,7 @@ de:
   error_retrieving_assignment_configuration_tools_f7d75303: "Fehler beim Abrufen der Aufgabenkonfigurations-Tools"
   error_retrieving_assignment_external_tools_9102d343: "Fehler beim Abrufen aufgabenexterner-Tools"
   error_retrieving_content_c07ee76b: "Fehler beim Abrufen des Contents"
+  error_retrieving_content_from_tool_e65ef3b7: "Fehler beim Abrufen des Inhalts aus Tool"
   error_retrieving_similarity_detection_tools_d6d4f9e9: "Fehler beim Abrufen der Similarity-Detection-Tools"
   error_running_quizzes_2_export_cfecedba: "Fehler beim Export von Quizzes 2."
   error_saving_assignment_dates_2af5e800: "Fehler beim Speichern von Aufgabendaten: "
@@ -9823,6 +9921,7 @@ de:
   failed_to_perform_search_c918100f: "Suche schlug fehl."
   failed_to_pin_discussion_38a60900: "Anheften der Diskussion fehlgeschlagen"
   failed_to_publish_draft_comment_853761e9: "Kommentarentwurf konnte nicht veröffentlicht werden"
+  failed_to_remove_user_7ce5e427: "Die Entfernung des Benutzers ist fehlgeschlagen."
   failed_to_save_changes_errors_6920f334: "Änderungen wurden nicht gespeichert: %{errors}%"
   failed_to_save_dashboard_selection_32e71c72: "Fehler beim Speichern der Dashboard-Auswahl"
   failed_to_save_please_try_again_later_bb7070fb: "Konnte nicht gespeichert werden. Bitte versuchen Sie es später nochmal."
@@ -11659,6 +11758,7 @@ de:
                     Projekt arbeiten.
   groups_cannot_have_size_restrictions_to_assign_by__7d36fa32: "Gruppen dürfen für Zuweisungen nach Abschnitt keine Größeneinschränkungen haben."
   groups_course_c73e4c2c: "Gruppen (Kurs)"
+  groups_groups_outcomes_outcomes_72fb5317: "%{groups} Gruppen | %{outcomes} Lernziele"
   groups_must_be_empty_to_assign_by_section_a9fafa72: "Gruppen müssen für Zuweisungen nach Abschnitt leer sein."
   groups_navigation_menu_76b5acc6: Gruppen-Navigationsmenü
   groups_tray_ef3e2649: Gruppenfach
@@ -12093,6 +12193,10 @@ de:
   if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_66608ce5: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Falls „Statistik – anzeigen“ oder „Benutzer – Anmeldedetails verwalten“ aktiviert ist, kann ein Benutzer in Admin-Tools eine An- oder Abmeldeaktivität erzeugen. Um die Option „Anmelden- / Abmelden-Aktivität“ in Admin-Tools auszublenden, müssen beide Berechtigungen deaktiviert werden."
+  if_the_open_registration_account_setting_is_enable_1994a971: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung TAs über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der TA noch kein Canvas-Konto hat."
+  if_the_open_registration_account_setting_is_enable_43bfe76c: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Designer über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Designer noch kein Canvas-Konto hat."
+  if_the_open_registration_account_setting_is_enable_6aaf8ead: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Lehrer über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Lehrer noch kein Canvas-Konto hat."
+  if_the_open_registration_account_setting_is_enable_88d349f8: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Beobachter über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Beobachter noch kein Canvas-Konto hat."
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Falls die Kontoeinstellung „Offene Registrierung“ aktiviert ist, können Benutzer mit dieser Berechtigung Studenten oder Beobachter über die E-Mail-Adresse oder Login-ID zu einem Kurs hinzufügen, auch wenn der Student oder Beobachter noch kein Canvas-Konto hat."
   if_this_permission_is_disabled_and_courses_add_edi_5f31ce8f: "Falls diese Berechtigung deaktiviert ist und „Kurse – hinzufügen / ändern / löschen“ aktiviert ist, können Benutzer anhand der Schaltfläche „Neuen Kurs hinzufügen“ in den Kontoeinstellungen einen neuen Kurs hinzufügen."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
@@ -12227,6 +12331,7 @@ de:
   importing_outcomes_e62a0375: "Ergebnisse werden importiert"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Verbessern Sie die Bedienbarkeit des linken Menüs durch bessere Nutzung von Farbe sowie visuelle und Screenreader-Indikatoren für inaktive Menüelemente."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Verbesserung der Erkennbarkeit von Drag-and-Drop in Dateien"
+  improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Verbesserte Unterstützung für neue Quizze mit Modulen, einschließlich der Erstellung neuer Quizze aus Modulen"
   improved_outcomes_management_4692f886: "Verbesserte Lernzieleverwaltung"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Verbesserte visuelle Erinnerungen, um Kursleiter zur Veröffentlichung von Kurse zu ermutigen"
   in_a_few_seconds_538ddff3: "in wenigen Sekunden"
@@ -12512,6 +12617,10 @@ de:
   is_using_a_free_version_of_bigbluebutton_that_prov_3e2cb455: " verwendet eine kostenlose Version von BigBlueButton, die 10 gleichzeitige Videokonferenzen mit jeweils 1 Host und bis zu 24 Teilnehmern bereitstellt. Aufzeichnungen werden 7 Tage lang gespeichert."
   israel_681bc5a5: Israel
   israel_972_e671df75: "Israel (+972)"
+  it_divides_students_into_three_groups_based_on_the_1a107f5b: "\n\
+      \x20       Sie unterteilt die Teilnehmer basierend auf ihrer Punktzahl im gesamten\n\
+      \x20       Quiz in drei Gruppen, und zeigt diese Gruppen danach an, wer die Frage richtig beantwortet hat.\n\
+      \x20     "
   it_looks_like_you_have_an_invalid_email_address_ad_67dec734: "Wie es aussieht, haben Sie eine ungültige E-Mail-Adresse: „%{addr}“"
   it_looks_like_your_content_might_not_load_you_can__dfb85860: "Es scheint, dass Ihre Inhalte nicht geladen werden. Mit dieser Schaltfläche können Sie versuchen, sie auf einer neuen Registerkarte zu laden."
   it_s_not_allowed_to_redirect_to_html_files_that_ca_1dbdfb9d: "Es ist nicht erlaubt, auf HTML-Dateien umzuleiten, die nicht vertreten werden können, während eine Content-Security-Richtlinie erzwungen wird"
@@ -12755,6 +12864,7 @@ de:
   learn_how_to_use_microsoft_teams_in_canvas_8b79dde: "Erfahren Sie, wie Sie Microsoft Teams in Canvas verwenden können."
   learn_more_7a8d626: "Mehr erfahren"
   learn_more_about_collaborations_2978f66d: "Mehr über Collaborations erfahren"
+  learn_more_about_quiz_statistics_315a378: "Erfahren Sie mehr über Quizstatistiken."
   learn_more_about_the_differences_a1217479: "Weitere Informationen über die Unterschiede."
   learn_more_about_using_commons_and_blueprints_3df953f6: "Weitere Informationen zur Verwendung von Commons und Mustern"
   learn_more_about_video_conferencing_5f0e76e4: "Weitere Informationen über Videokonferenzen"
@@ -12898,6 +13008,7 @@ de:
   light_green_c1cd020d: Hellgrün
   light_pink_e1214d62: Hellrosa
   limit_assignment_names_lengths_max_255_5ee9ebb5: "Länge der Aufgabennamen begrenzen (max. 255)"
+  limit_course_participation_to_term_or_custom_cours_67797a86: "Die Kursteilnahme auf Semester oder benutzerdefinierte Kurstermine beschränken?"
   limit_each_time_slot_to_input_value_user_s_47461538: "Jedes Zeitfenster auf %{input_value} Benutzer(innen) begrenzen. "
   limit_each_time_slot_to_num_participants_groups_us_14ec4d65: "Jedes Zeitfenster auf %{num_participants} *Gruppen* begrenzen. **Benutzer.**"
   limit_file_size_limit_per_file_b336c0d8: "%{file_size_limit} Begrenzung pro Datei"
@@ -12962,6 +13073,7 @@ de:
   list_collapsed_5f19f5bb: "Liste reduziert"
   list_collapsed_9ac35920: "Liste ausgeblendet."
   list_collapsed_dde87718: "Liste ausgeblendet"
+  list_expanded_4857ff4c: "Liste eingeblendet."
   list_expanded_efec2d0: "Liste eingeblendet."
   list_of_the_currently_attainable_trophies_959b2518: "Liste der derzeit erreichbaren Trophäe"
   list_view_430aecce: Listenansicht
@@ -13295,6 +13407,7 @@ de:
   manual_8c2665de: Manuell
   manual_configuration_b586fe54: "Manuelle Konfiguration"
   manual_entry_e4a4f99a: "Manuelle Eingabe"
+  manual_posting_scores_hidden_from_instructors_9ccb197c: "%{manual_posting} (Noten für Lehrer verborgen)"
   manually_9de23e1f: Manuell
   manually_mark_posts_as_read_afa5d035: "Posts manuell als gelesen kennzeichnen"
   manually_post_grades_18248306: "Noten manuell veröffentlichen"
@@ -13454,6 +13567,7 @@ de:
     customize: Personalisieren
     managed_accounts: "Verwaltete Konten"
     my_courses: "Meine Kurse"
+  menu_39cb0e8e: Menü
   menu_of_options_for_this_permission_77f50c31: "Optionsmenü für diese Berechtigung"
   message: 
     default_subject: Canvas-Warnung
@@ -15833,6 +15947,7 @@ de:
   new_conference_8b483024: "Neue Konferenz"
   new_conferences_a020a8a9: "Neue Konferenzen"
   new_course_and_user_analytics_ffbc508c: "Neue Kurs- und Benutzeranalysen"
+  new_course_availability_ui_f7ee2047: "Neue Benutzeroberfläche für die Kursverfügbarkeit"
   new_course_role_6a7bb75f: "Neue Kursrolle"
   new_criterion_6054bc7f: "Neues Kriterium"
   new_criterion_canceled_d8c2a655: "Neues Kriterium storniert"
@@ -15865,6 +15980,7 @@ de:
   new_quizzes_migration_required_7854aa1a: "Neue-Quizze-Migration erforderlich"
   new_quizzes_on_the_quizzes_page_b21f338d: "Neue Quizzes auf der Quiz-Seite"
   new_quizzes_submission_history_d81b477b: "Neue Quizze – Abgabeverlauf"
+  new_quizzes_support_for_modules_7b81eee9: "Neue Quizzes-Unterstützung für Module"
   new_quizzes_third_party_importing_1e1b696d: "Drittanbieterimporte bei Neue Quizze"
   new_rating_canceled_eed3c4ff: "Neue Bewertung storniert"
   new_rating_created_54125331: "Neue Bewertung erstellt"
@@ -15941,6 +16057,7 @@ de:
   no_evidence_75853352: "Ohne Nachweis"
   no_existing_user_provided_for_login_with_sis_id_us_6bcde71f: "Es wurden keine existierenden Benutzer für die Anmeldung mit SIS-ID %{user_id} bereitgestellt"
   no_exports_to_display_7f1b630b: "Keine anzuzeigenden Exporte"
+  no_file_selected_92d2ac30: "Keine Datei gewählt"
   no_file_submitted_a879fa53: "Keine Datei abgegeben"
   no_final_grade_selected_3595c9c: "Keine Abschlussnote ausgewählt"
   no_grade_3fa326c: "ohne Note"
@@ -16081,6 +16198,7 @@ de:
   nothing_to_split_off_of_this_user_28ba9dd5: "Bei diesem Benutzer gibt es nichts zu abzutrennen."
   notice_concluded_student_6d416c4: "Hinweis: Fertiger Student"
   notice_inactive_student_bcc4248a: "Hinweis: Inaktiver Student"
+  notice_some_notifications_may_contain_confidential_5985f52a: "Hinweis: Einige Benachrichtigungen können vertrauliche Informationen enthalten. Wenn Sie auswählen, dass Sie Benachrichtigungen an eine andere als die von Ihrer Institution angegebene E-Mail-Adresse erhalten, kann dies dazu führen, dass vertrauliche Canvas-Kurs- und Gruppeninformationen außerhalb des institutionellen Systems gesendet werden."
   notice_the_grading_period_is_closed_for_this_stude_6c3ce0f9: "Hinweis: Die Benotungsphase für diesen Studenten ist abgeschlossen."
   notification: 
     account_notification_description: "Institutsweite Ankündigungen (auch auf Dashboard-Seiten)"
@@ -16466,9 +16584,9 @@ de:
     errors: 
       invalid: "Pairing-Code ungültig"
   observers_672971d: Beobachter
-  observers_add_ab95f683: "Beobachter – Hinzufügen"
+  observers_add_ab95f683: "Beobachter – Hinzufügen"
   observers_add_remove_b61eaaa5: "Beobachter – hinzufügen/entfernen"
-  observers_remove_aafc8a88: "Beobachter – Entfernen"
+  observers_remove_aafc8a88: "Beobachter – Entfernen"
   observing_f3c5e759: Beobachtet
   observing_observee_d31d5fa2: "Beobachten: %{observee}"
   occurrence_s_c12d1aad: Vorfall/Vorfälle
@@ -16572,6 +16690,7 @@ de:
   option_4_aec96b1f: "Option 4"
   option_index_6308524d: "Option %{index}"
   option_name_ba758e08: "%{option_name}"
+  option_selected_49a37af2: "{option} ausgewählt"
   option_selected_737b6f72: "Ausgewählte Option:"
   option_selected_list_collapsed_70a356b4: "%{option} ausgewählt. Liste ausgeblendet."
   optionally_include_a_byte_order_mark_in_compatible_f3d0d243: "Sie können eine Markierung der Byte-Reihenfolge (BOM) in kompatible Arbeitsblattexporte aufnehmen, sodass diese von Benutzern in einigen Gebietsschemata nach Excel importiert werden können."
@@ -16638,6 +16757,7 @@ de:
   outcome_details_ce254e89: Ergebnisdetails
   outcome_export_89229eb4: Ergebnisexport
   outcome_group_39fae76f: Ergebnisgruppe
+  outcome_group_menu_2fffeb71: "Menü Lernzielgruppe"
   outcome_group_with_canvas_id_id_not_found_5c2469cd: "Ergebnisgruppe mit Canvas-ID %{id} nicht gefunden"
   outcome_groups: 
     invalid_file: "Ungültige Lernzielgruppendatei"
@@ -16874,6 +16994,7 @@ de:
         user_agent: "User Agent"
   page_views_eb64cf53: Seitenaufrufe
   page_views_only_312b7577: "Nur Seitenaufrufe"
+  page_views_service_is_temporarily_unavailable_2eb4818: "Der Dienst Seitenansichten ist vorübergehend nicht verfügbar"
   pages: 
     cancel_button: Abbrechen
     cannot_unpublish_front_page: "Veröffentlichung der Startseite kann nicht rückgängig gemacht werden."
@@ -17714,6 +17835,7 @@ de:
   privacy_290109ea: Datenschutz
   privacy_level_f0ec09a3: Sicherheitsstufe
   private_3883d133: Privat
+  pro_tip_30e41fa3: PROFI-TIPP!
   proceed_f3d33864: Fortfahren
   process_multiple_content_items_from_course_modules_6de90fd8: "Verarbeitung mehrerer Content-Objekte auf der Kursmodulseite"
   processing_2fcc9739: "In Bearbeitung"
@@ -18361,7 +18483,7 @@ de:
       headers: 
         question: Frage
     links: 
-      log_accessibility_warning: "Achtung: Für eine bessere Verfügbarbarkeit bei der Nutzung von Testprotokollen, bleiben Sie bitte in der aktuellen Stream-Ansicht."
+      log_accessibility_warning: "Warnung: Für eine bessere Zugreifbarkeit bei der Nutzung von Testprotokollen, bleiben Sie bitte in der aktuellen Stream-Ansicht."
     loading: "Wird geladen ..."
     navigation: 
       links: 
@@ -18374,7 +18496,7 @@ de:
       essay: 
         view_html_answer: "HTML anzeigen"
         view_plain_answer: "Nur-Text anzeigen"
-    question_header: "Frage Nr. %{position}"
+    question_header: "Frage #%{position}"
     question_response_count: 
       one: "Diese Frage wurde einmal beantwortet."
       other: "Diese Frage wurde %{count}-mal beantwortet."
@@ -18418,13 +18540,13 @@ de:
     generatable: "Bericht wurde nie erstellt."
     generate_item_analysis_report: "Erstellen Sie den Elementanalysebericht."
     generate_student_analysis_report: "Erstellen Sie den Studentenanalysebericht."
-    generated_at: "Erstellt am: %{date}"
+    generated_at: "Erzeugt: %{date}"
     generating: "Bericht wird erstellt ..."
     generation_almost_done: "Fast fertig."
     generation_complete: "Bericht wurde erstellt."
     generation_halfway: "Mehr als die Hälfte ist schon geschafft."
     generation_started: "Bericht wird erstellt."
-    item_analysis: Elementanalyse
+    item_analysis: Objektanalyse
     non_generatable_report_notice: "Bericht kann nicht für Befragungsquizze erstellt werden."
     quiz_report_generator: 
       download_report_name: "%{report_name} herunterladen"
@@ -18468,7 +18590,7 @@ de:
       audible_bracket_aced: "Alle Studenten in diesem Bereich haben richtig geantwortet."
       audible_bracket_failed: "Kein einziger Student in diesem Bereich hat eine richtige Antwort gegeben."
       audible_chart_description: "In dieser Tabelle ist aufgeführt, wie die einzelnen Studentenbereiche in der Klasse auf diese Frage geantwortet haben. Die Studentenbereiche setzen sich anhand ihrer Punktzahl zusammen. Der obere Bereich besteht aus den besten 27 %, während der mittlere Bereich aus den mittleren 46 % und der untere Bereich aus den schlechtesten 27 % besteht."
-      audible_discrimination_index: "Unterscheidungsindex: %{number}."
+      audible_discrimination_index: "Unterscheidungsindex %{number}."
       audible_middle_bracket: "Mittlerer Bereich:"
       audible_response_ratio_distribution: "%{correct_ratio}% der Studenten in diesem Bereich haben richtig geantwortet."
       audible_top_bracket: "Oberer Bereich:"
@@ -18479,30 +18601,30 @@ de:
     download_submissions: "Alle Dateien herunterladen"
     duration_in_hours: 
       one: "1 Std."
-      other: "%{count} Stunden"
+      other: "%{count} Stunden"
     duration_in_hours_and_minutes: "%{hours} und %{minutes}"
     duration_in_minutes: 
       one: 1 Minute
-      other: "%{count} Minuten"
+      other: "%{count} Minuten"
     duration_in_minutes_and_seconds: "%{minutes} und %{seconds}"
     duration_in_seconds: 
       one: 1 Sekunde
       other: "%{count} Sekunden"
     empty_question_breakdown: "Es sind keine Fragestatistiken verfügbar."
     essay_score: "Punktzahl: %{score}"
-    loading_questions: "Fragestatistiken werden geladen. Bitte warten Sie einen Moment."
+    loading_questions: "Die Fragestatistik wird geladen. Bitte warten Sie eine Weile."
     no_answer: "Keine Antwort"
     question_breakdown: Fragenaufgliederung
     question_header: "Frage %{position}"
-    quiz-stats-noshow-warning: "Selbst Einzigartigkeit hat ihre Grenzen. Wir können keine Statistiken für dieses Quiz darstellen. Sie können jedoch die Berichte herunterladen."
+    quiz-stats-noshow-warning: "Auch Großartigkeit hat Grenzen. Wir können keine Statistiken für dieses Quiz anzeigen, aber Sie können die Berichte herunterladen."
     response_student_count: 
       one: "1 Student"
       other: "%{count} Studenten"
       zero: Niemand
     sad-panda-alttext: "Zu schade."
-    speedgrader: "In SpeedGrader anzeigen"
+    speedgrader: "In SpeedGrader ansehen"
     summary: 
-      audible_chart_description: "%{above_average} Studenten erreichten mehr Punkte als oder genauso viele wie der Durchschnitt und %{below_average} erreichten weniger Punkte."
+      audible_chart_description: "%{above_average} Studenten erreichten mehr Punkte als oder genauso viele wie der Durchschnitt und %{below_average} erreichten weniger Punkte. "
       avg_time: "Durchschnittliche Zeit"
       chart_brushing_tip: "Tipp: Sie können sich auf ein bestimmtes Segment des Diagramms konzentrieren, indem Sie mit dem Cursor eine Auswahl vornehmen."
       chart_title: Punktzahlperzentildiagramm
@@ -18521,7 +18643,7 @@ de:
         other: "%{count} Studenten haben zwischen %{start} und %{end}% Punkte erreicht."
         zero: "Kein Student hat zwischen %{start} und %{end}% Punkte erreicht."
       table_description: "Zusammenfassungsstatistik für alle eingegangenen Abgaben"
-    title: Quiz-Statistik
+    title: Quizstatistik
     unknown_answer: "Etwas anderes"
     user_names: Benutzernamen
   quiz_statistics_e57611c2: Quizstatistik
@@ -19713,8 +19835,10 @@ de:
   ratio_responded_correctly_6d890107: "%{ratio}% haben richtig geantwortet"
   raw_html_editor_e3993e41: Raw-HTML-Editor
   rce_auto_save_f004fba9: "Automatisches Speichern in RCE"
+  rce_edit_closed_captions_de3ad169: "RCE Untertitel bearbeiten"
   rce_enhancements_5701e06: RCE-Erweiterungen
   rce_initialization_fix_4f176bda: RCE-Initialisierungskorrektur
+  rce_pretty_html_editor_d8faf2bb: "RCE Pretty HTML Editor"
   re_activate_user_f7d77c9a: "Benutzer reaktivieren"
   re_reported_b9671073: "Erneut berichtet"
   re_send_notification_directly_to_users_when_announ_c421cea5: "Senden Sie eine Benachrichtigung erneut direkt an die Benutzer, wenn die Ankündigung beginnt"
@@ -19842,6 +19966,7 @@ de:
   reduce_outcome_duplication_on_course_import_26431b40: "Reduzierung der Lernzielduplikation beim Import von Kursen"
   reference_code_3e8355dd: Referenzcode
   reference_code_is_required_c32c757f: "Referenzcode ist erforderlich"
+  refreshes_the_section_of_the_ui_on_the_course_sett_a45af9bb: "Aktualisiert den Abschnitt der Benutzeroberfläche auf der Seite mit den Kurseinstellungen, der die Optionen für die Kursverfügbarkeit steuert."
   regardless_of_whether_this_permission_is_enabled_o_437ee269: "Unabhängig davon, ob diese Berechtigung aktiviert oder deaktiviert ist, kann der Benutzer immer noch Ereignisse auf seinem persönlichen Kalender verwalten."
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Unabhängig davon, ob diese Berechtigung aktiviert oder deaktiviert ist, können Benutzer immer noch Ereignisse auf Ihren persönlichen Kalendern verwalten."
   regenerate_3e4679f8: Regenerieren
@@ -19931,6 +20056,7 @@ de:
   remove_email_address_b1820820: "E-Mail-Adresse entfernen"
   remove_empty_attachment_b2aea632: "leeren Dateianhang entfernen"
   remove_f47dc62a: Entfernen
+  remove_file_cbf3f40f: "Datei entfernen"
   remove_filename_87f3781e: "%{filename} entfernen"
   remove_filename_dab5c02e: "%{filename} entfernen"
   remove_grading_scheme_title_d3942a08: "Benotungsschema %{title} entfernen"
@@ -20013,6 +20139,7 @@ de:
   reports_account_settings_78f5336a: "Berichte (Kontoeinstellungen)"
   reports_course_f09b7d9e: "Berichte (Kurs)"
   request_id_1499afb0: Anfrage-ID
+  request_that_docviewer_use_cloudfront_for_serving__b569aca9: "Beantragen, dass DocViewer CloudFront für die Bereitstellung von PDF-Assets.verwendet"
   request_values_89976f2c: "Werte anfordern"
   requested_bbdb5b26: Angefragt
   require_an_access_code_600e06e8: "Zugriffscode anfordern"
@@ -20079,6 +20206,10 @@ de:
   restrict_students_from_accessing_courses_after_end_7dd66bce: "Schüler am Zugang zu Kursen nach dem Enddatum hindern"
   restrict_students_from_accessing_courses_before_st_f7c22c00: "Schüler am Zugang zu Kursen vor dem Startdatum hindern"
   restrict_students_from_annotating_6c28ab9b: "Verhindern, dass Studenten Anmerkungen machen"
+  restrict_students_from_viewing_course_after_course_c6baf31: "Studenten dürfen den Kurs nicht nach dem Ende des Kurses sehen."
+  restrict_students_from_viewing_course_after_term_e_1f93ccb9: "Studenten dürfen den Kurs nicht nach dem Ende des Semesters sehen."
+  restrict_students_from_viewing_course_before_cours_cca659a4: "Studenten dürfen den Kurs nicht vor dem Beginn des Kurses sehen."
+  restrict_students_from_viewing_course_before_term__3c4924f0: "Studenten dürfen den Kurs nicht vor dem Beginn des Semesters sehen."
   restricted_access_d3e99a39: "Beschränkter Zugriff"
   restricted_view_for_teachers_in_lmgb_52c78a62: "Eingeschränkte Ansicht für Lehrer im LMGB"
   resubmit_to_the_associated_tool_for_plagiarism_ana_8d84d913: "Erneut zur Plagiatsanalyse an das zugehörige Tool senden."
@@ -20377,6 +20508,7 @@ de:
   save_theme_f706116e: "Design speichern"
   save_this_comment_for_reuse_5eda0b70: "Diesen Kommentar zur Wiederverwendung speichern"
   save_your_type_to_begin_specifying_conditional_con_9e4f536a: "Ihren %{type} speichern, um mit der Festlegung des vorläufigen Inhalts zu beginnen."
+  save_yourself_a_lot_of_time_by_only_adding_the_out_33293248: "Sparen Sie sich eine Menge Zeit, indem Sie nur die Lernziele hinzufügen, die für Ihren Kursinhalt spezifisch sind."
   saved_comments_2f6ba95: "Gespeicherte Kommentare"
   saved_discussion_settings_successfully_ebd46a57: "Diskussionseinstellungen erfolgreich gespeichert"
   saving_2521e616: "Wird gespeichert"
@@ -22106,6 +22238,7 @@ de:
   starred_no_subject_click_to_unstar_3191d64: "Markiert: „(Kein Betreff)“. Klicken, um Markierung zu entfernen"
   starred_no_subject_click_to_unstar_bff04bce: "Markiert: „(Kein Betreff)“. Klicken, um Markierung zu entfernen"
   starred_subject_click_to_unstar_6aafcddc: "Markiert: „%{subject}“. Klicken, um Markierung zu entfernen"
+  start_5a4cfcd6: Starten
   start_a_conversation_with_your_instructor_in_the_c_50c9b8d5: "Beginnen Sie ein Gespräch mit Ihrem Kursleiter im Canvas-Posteingang."
   start_date_c41cb23a: "Startdatum:"
   start_date_e937be8a: Startdatum
@@ -22187,6 +22320,7 @@ de:
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Studentenkontextkarten müssen von einem Admin für ein Konto aktiviert werden."
   student_details_49901ceb: Studentendetails
   student_extensions_d35a907: "Verlängerungen für Studenten"
+  student_filters_in_lmgb_13964502: "Schülerfilter in LMGB"
   student_grades_4cbc59a1: Studentennoten
   student_group_filter_185fb085: Studentengruppenfilter
   student_groups: Studentengruppen
@@ -22219,6 +22353,7 @@ de:
       bei den Kurslernergebnissen anzuzeigen. Die Ergebnisse werden in einem notenbuchähnlichen
       Format, und die Fortschritte werden als Punktzahl angezeigt und als „Erreicht“, „Fast
       erreicht“ und „Zu fördern“.
+  student_page_history_pages_update_ae55fa03: "Studenten-Seitenverlauf (Seiten - Aktualisieren)"
   student_planner_aee76000: Studentenplaner
   student_planner_date_4cc73abb: "Studentenplanungsdatum:"
   student_points_possible_points_196c7108: "{{student_points}}/{{possible_points}}"
@@ -22247,6 +22382,7 @@ de:
   students_are_not_allowed_to_access_test_installati_11b9078: "Die Studenten haben keinen Zugang zu Testinstallationen."
   students_being_observed_4de3e520: "Studenten, die beobachtet werden"
   students_can_edit_and_view_page_history_if_allowed_39a47edc: "Die Studenten können den Seitenverlauf ansehen und ändern, falls dies in den Optionen einzelner Seiten erlaubt ist."
+  students_can_edit_and_view_page_history_if_allowed_67f9b8da: "Die Studenten können den Seitenverlauf ansehen und bearbeiten, falls dies in den Optionen einzelner Seiten erlaubt ist."
   students_can_only_participate_in_the_course_betwee_6f8595aa: "Die Studenten können nur innerhalb dieses Zeitraums am Kurs teilnehmen."
   students_can_see_originality_score_797fe634: "Studenten können Originalitätspunktzahl sehen"
   students_cannot_view_quiz_responses_after_course_c_88e929ed: "Die Studenten dürfen die Quiz-Antworten nach Abschluss des Kurses nicht mehr sehen."
@@ -22315,6 +22451,7 @@ de:
   subject_1bc03dea: "Betreff:"
   subject_must_contain_fewer_than_255_characters_2e72cd02: "Betreff darf höchstens 255 Zeichen lang sein."
   subject_reply_to: "Re: %{subject}"
+  subject_subject_9e1057f7: "Betreff: %{subject}"
   submission: 
     atom_no_author: "Kein Autor"
     attached_files_comment: "Siehe Dateianhang"
@@ -22581,6 +22718,7 @@ de:
       support_desk_livechat: Supportdesk-Livechat
   support_favorite_lti_tools_in_the_rce_1680436d: "Unterstützung bevorzugter LTI-Tools im RCE"
   support_latex_math_equations_almost_everywhere_6ce8ca24: "Support für LaTex mathematische Gleichungen fast überall"
+  supported_file_types_vtt_srt_8cb75c13: "Unterstützte Dateitypen: .vtt, .srt"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Schweden
@@ -22678,16 +22816,18 @@ de:
   take_the_survey_again_24ce22c2: "Erneut an Befragung teilnehmen"
   target_link_uri_bbed67d1: "* Ziel-Link-URI"
   target_link_uri_d166858: Ziel-Link-URI
-  tas_add_f4a16393: "TAs – Hinzufügen"
+  tas_add_f4a16393: "TAs – Hinzufügen"
   tas_observers_designers_b705118a: "TAs / Beobachter / Designer"
-  tas_remove_11059e14: "TAs – Entfernen"
+  tas_remove_11059e14: "TAs – Entfernen"
   teacher_5a73b637: Dozent
   teacher_count_teachers_a92f7199: "%{teacher_count} Dozenten"
   teacher_s_fdefb2c: Dozent
   teacher_tour_26282921: Lehrertour
   teacher_view_b2047bc6: Lehreransicht
   teachers_52e2423f: Dozenten
+  teachers_add_ed68c8d3: "Lehrer – Hinzufügen"
   teachers_over_time_1905603b: "Lehrer im Laufe der Zeit"
+  teachers_remove_518eb1a6: "Lehrer – Entfernen"
   teal_f729a294: Blaugrün
   tell_us_how_and_when_you_would_like_to_be_notified_de3ed2bc: "Teilen Sie uns mit, wann und wie Sie über Ereignisse in Canvas benachrichtigt werden wollen."
   templates_4ca13d07: Vorlagen
@@ -23184,6 +23324,11 @@ de:
   this_message_includes_media_comments_to_listen_or__5fc98641: "Diese Nachricht enthält Medienkommentare. Um diese anzuhören oder darauf zu antworten, klicken Sie auf diesen Link: %{link}."
   this_message_includes_media_comments_to_listen_or__75ea03a1: "Diese Nachricht enthält Medienkommentare. Um sie zu hören oder darauf zu antworten, klicken Sie auf den Link:"
   this_message_includes_media_comments_to_listen_or__df72d662: "Diese Nachricht enthält Medienkommentare. Klicken Sie auf diesen Link, um sie zu hören oder darauf zu antworten: %{link}.  Falls Sie einen Anhang verwenden müssen und dies dürfen, melden Sie sich bitte bei Canvas an, und antworten Sie auf die Abgabe."
+  this_metric_provides_a_measure_of_how_well_a_singl_a9aa334e: "\n\
+      \x20       Diese Metrik liefert ein Maß dafür, wie gut eine einzelne Frage den Unterschied\n\
+      \x20       (oder die Unterscheidung) zwischen Schülern, die bei einer Prüfung gut abschneiden,\n\
+      \x20       und solchen, die es nicht tun, erkennen kann.\n\
+      \x20     "
   this_module_is_locked_until_completing_all_of_the__ddf06070: "Dieses Modul ist gesperrt bis alle Voraussetzungen für die folgenden Module erfüllt sind: %{prerequisites}"
   this_module_is_locked_until_datetime_b2486751: "Dieses Modul ist gesperrt bis %{datetime}."
   this_most_likely_happened_because_you_imported_cou_a78ea880: "Die Ursache hierfür liegt wahrscheinlich darin, dass Sie Kursinhalte ohne die damit assoziierten Dateien importiert haben."
@@ -23234,6 +23379,7 @@ de:
   this_report_shows_grading_period_grades_and_overal_a86346a: "Dieser Bericht zeigt die Noten eines Semesters (sowie die endgültigen Notenergebnisse des Kurses) eines jeden Studenten, der für einen gegebenen Kurs eingeschrieben ist. Die resultierende CSV-Datei erhält eine Zeile pro Einschreibung."
   this_sample_page_includes_common_ui_elements_in_ca_331f4ac4: "Diese Beispielseite enthält geläufige UI-Elemente in Canvas, um Ihnen beim Aufbau Ihres individuell angepassten Brandings zu helfen. Sobald Sie die Farbwerte und Bilder in der linken Seitenleiste verändern, erscheint eine Schaltfläche *Vorschau Ihrer Änderungen*. Klicken Sie darauf, um Ihre Seite zu aktualisieren, und sehen Sie sich die Änderungen an."
   this_sample_page_includes_common_ui_elements_in_ca_ef71449d: "Diese Beispielseite enthält häufige Elemente der Benutzeroberfläche in Canvas, die Ihnen helfen, ein eigenes benutzerdefiniertes Branding zu erstellen. Sobald Sie beginnen, Farbwerte und Bilder zu ändern, sehen Sie eine Schaltfläche *Vorschau Ihrer Änderungen*. Klicken Sie darauf, um diese Seite zu aktualisieren und zu schauen, wie Ihre Änderungen aussehen."
+  this_setting_only_affects_your_view_of_student_gra_8f58eb33: "Diese Einstellung wirkt sich nur auf Ihre Ansicht der Studentennoten aus und zeigt die Noten so an, als ob alle nicht benoteten Aufgaben mit null Punkten bewertet würden. Diese Einstellung ist nur eine visuelle Änderung und hat keine Auswirkungen auf die Noten für Studenten oder andere Benutzer dieses Notenbuchs. Wenn diese Einstellung aktiviert ist, fügt Canvas keine Nullen in das Bewertungsbuch für Studenteneinsendungen innerhalb einzelner Aufgaben ein. Nur in den Aufgabengruppen und den Gesamtspalten werden Nullen automatisch in die Gesamtprozentsätze für jeden Studenten einbezogen."
   this_student_s_enrollment_has_been_concluded_c03bfafe: "Die Einschreibung dieses Studenten wurde abgeschlossen."
   this_student_s_enrollment_has_been_concluded_f135b8e4: "Die Einschreibung dieses Studenten wurde abgeschlossen."
   this_student_s_responses_are_hidden_because_this_a_252e8335: "Die Antworten des Studenten werden verborgen, da diese Aufgabe anonym ist."
@@ -23253,6 +23399,7 @@ de:
   this_topic_is_closed_for_comments_3dd10c00: "Dieses Thema ist für Kommentare geschlossen."
   this_topic_is_closed_for_comments_5bacad6: "Dieses Thema ist für Kommentare geschlossen."
   this_topic_is_used_for_grading_efc6ca89: "Dieses Thema fließt in die Benotung ein."
+  this_user_has_been_deleted_77e6c04b: "Dieser Benutzer wurde gelöscht"
   this_user_has_multiple_roles_in_the_course_changin_8cbd82d4: "Dieser Benutzer hat im Kurs verschiedene Rollen. Durch Änderung der Rolle werden alle aktuellen Einschreibungen überschrieben."
   this_user_is_currently_not_able_to_access_the_cour_39cabed1: "Dieser Benutzer kann derzeit nicht auf den Kurs zugreifen."
   this_user_is_currently_not_able_to_access_the_cour_b17d5df1: "„Dieser Benutzer kann derzeit nicht auf den Kurs zugreifen.“"
@@ -23501,6 +23648,7 @@ de:
   title_is_too_long_b192a46a: "Titel ist zu lang"
   title_is_too_long_must_be_under_length_characters_ab694ae4: "Der Name muss kürzer als %{length} Zeichen sein."
   title_is_unlocked_click_to_lock_6a20cfcb: "%{title} ist entsperrt Zum Sperren klicken"
+  title_outcomes_7adbd9cc: "%{title} Lernziele"
   title_separator: ": "
   title_tray_ec9f7488: "%{title} Fach"
   titles: 
@@ -23620,7 +23768,9 @@ de:
   to_create_announcements_discussions_moderate_must__8a8278f2: "Zur Erstellung von Ankündigungen muss „Diskussionen – moderieren“ ebenfalls aktiviert sein."
   to_cross_list_a_section_course_sections_add_edit_d_160006f7: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um eine Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
   to_cross_list_a_section_course_sections_add_edit_d_20b5fd9d: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Um die Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
+  to_cross_list_a_section_manage_course_sections_edi_93a73729: "Um einen Abschnitt über Kreuz zu listen, muss „Kursabschnitte verwalten – ändern“ ebenfalls aktiviert sein. Um eine Kurs-SIS-ID zu ändern, muss „SIS-Daten – verwalten“ ebenfalls aktiviert sein. Um einem Benutzer auf Kontoebene zu erlauben, einen Kurs zu löschen, muss „Kursstatus – verwalten“ ebenfalls aktiviert sein."
   to_cross_list_sections_course_add_edit_delete_must_a024d5b9: "Um Abschnitte über Kreuz zu listen, muss „Kursabschnitte – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
+  to_cross_list_sections_course_sections_edit_must_b_4ffea833: "Um Abschnitte neu zu kombinieren, muss „Kursabschnitte - bearbeiten“ aktiviert sein. Der Benutzer muss außerdem als Kursleiter in den Kursen eingeschrieben sein, die neu kombiniert werden sollen."
   to_cross_list_sections_courses_add_edit_delete_mus_f395401f: "Um Abschnitte über Kreuz zu listen, muss „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   to_date_can_t_come_before_from_date_cf9e18aa: "Das „Bis-Datum“ darf nicht vor dem „Von-Datum“ liegen"
   to_date_cannot_come_before_from_date_3eeb2633: "Das „Bis-Datum“ darf nicht vor dem „Von-Datum“ liegen."
@@ -23655,6 +23805,7 @@ de:
   to_edit_blueprint_lock_settings_from_the_discussio_cf8c75a5: "Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen die Optionen „Kurse hinzufügen / ändern / löschen“ und „Diskussionen moderieren“ ebenfalls aktiviert sein. "
   to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "Um Mustersperreinstellungen auf der Diskussionen-Indexseite zu ändern, müssen „Kurs hinzufügen / ändern / löschen“ und „Diskussionen anzeigen“ ebenfalls aktiviert sein. Falls diese Berechtigung nicht aktiviert ist, und „Kurs hinzufügen / ändern / löschen“ und „Diskussionen anzeigen“ aktiviert sind, können Mustersperreinstellungen für einzelne Diskussionen geändert werden."
   to_edit_blueprint_lock_settings_on_the_pages_index_c5a9d588: "Um Mustersperreinstellungen auf der Seiten-Indexseite zu ändern, muss die Option „Kurs hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Falls diese Berechtigung nicht aktiviert ist, und „Kurs hinzufügen / ändern / löschen“ aktiviert ist, können Mustersperreinstellungen für einzelne Seiten geändert werden."
+  to_edit_blueprint_lock_settings_on_the_pages_index_f68745bf: "Um Mustersperreinstellungen auf der Seiten-Indexseite zu ändern, muss die Option „Kurs hinzufügen / ändern / löschen“ ebenfalls aktiviert sein. Wenn jedoch „Kurse - Hinzufügen/Bearbeiten/Löschen“, aber die Berechtigung „Seiten - Aktualisieren“ nicht aktiviert ist, kann der Benutzer trotzdem die Einstellungen für die Inhaltssperre auf einzelnen Seiten in einem Muster-Masterkurs anpassen."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "Um Kursbenotungsschema zu ändern, muss „Kurse – hinzufügen / ändern / löschen“ ebenfalls aktiviert sein."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "Um Kurseinstellungen zu ändern, muss die Option „Kurse – hinzufügen / ändern / löschen“ aktiviert sein."
   to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "Um Kurseinstellungen zu ändern, muss die Option „Kurse – hinzufügen / ändern / löschen“ aktiviert sein."
@@ -24036,6 +24187,7 @@ de:
   unable_to_toggle_placement_833db6ff: "Umschalten der Platzierung ncht möglich"
   unable_to_transmit_file_to_the_storage_service_the_2d80b29e: "Übertragung der Datei in den Speicher-Service ist fehlgeschlagen. Entweder ist der Service heruntergefahren oder Sie müssen sich erneut bei Canvas anmelden."
   unarchive_selected_e0c4bd3d: "Ausgewählte dearchivieren"
+  unassessed_students_3809ac5e: "Nicht bewertetet Studenten"
   unassigned_permissions_6a38ca95: "Nicht zugewiesene Berechtigungen"
   unassigned_roles_cb9e95ec: "Nicht zugewiesene Rollen"
   unauthorized: "nicht berechtigt"
@@ -24280,9 +24432,11 @@ de:
   use_a_or_new_line_between_for_adding_multiple_user_e7c43ba9: "Verwenden Sie ein \",\" oder einen Zeilenwechsel, Sie wenn mehrere Benutzer hinzufügen."
   use_arrow_keys_to_navigate_options_2021cc50: "Navigieren Sie mit den Pfeiltasten in den Optionen."
   use_arrow_keys_to_select_a_conference_provider_c5b456a6: "Pfeiltasten verwenden, um einen Konferenz-Anbieter auszuwählen"
+  use_arrows_a60b3330: "Pfeile verwenden"
   use_as_front_page_274a488b: "Als Frontseite verwenden"
   use_between_for_adding_multiple_users_26bff207: "Verwenden Sie beim Hinzufügen mehrerer Benutzer ein Komma als Trennzeichen."
   use_bookmarking_for_api_pagination_in_enrollments__52b9bc28: "Lesezeichen für API-Paginierung im Einschreibungsindex verwenden"
+  use_cloudfront_for_docviewer_f21b96db: "Verwendung von CloudFront für DocViewer"
   use_default_890939b7: "Standard verwenden"
   use_experimental_features_before_they_are_generall_3dfaddd1: "Nutzen Sie experimentelle Funktionen, bevor sie regulär für den Produktivbetrieb aktiviert werden."
   use_high_contrast_ui_a5917282: "Verwenden Sie hohen Kontrast für die Benutzeroberfläche"
@@ -24504,7 +24658,9 @@ de:
       notifications: Benachrichtigungen
       profile: Profil
       settings: Einstellungen
+  user_profile_d56261fc: Benutzerprofil
   user_profile_picture_46bffbc7: Benutzerprofilbild
+  user_removed_successfully_20a3889d: "Benutzer erfolgreich entfernt"
   user_results_updated_9ce38dce: "Benutzerergebnisse aktualisiert."
   user_s_settings_d65644b4: "%{user}s Einstellungen"
   user_search_panel_18f80511: Benutzersuchbereich
@@ -24904,6 +25060,7 @@ de:
   view_this_message_in_conversations_5a16bc9f: "Diese Nachricht in den Konversationen anzeigen"
   view_toolname_placements_4a5724d1: "%{toolName}-Platzierungen anzeigen"
   view_ungraded_as_0_1a9631a1: "Unbenotete als 0 anzeigen"
+  view_ungraded_as_zero_e19da657: "Nicht benotet als Null anzeigen"
   view_ungraded_as_zero_view_in_gradebook_1bfc0783: "Als unzensierte Nullansicht im Notenbuch anzeigen"
   view_uploads_status_4c836211: "Status der Uploads anzeigen"
   view_user_groups_538f22b4: "Nutzergruppen anzeigen"
