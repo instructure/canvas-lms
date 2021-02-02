@@ -15,8 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import gql from 'graphql-tag'
+
 import {ConversationParticipant} from './graphqlData/ConversationParticipant'
+import {ConversationParticipantWithConversation} from './graphqlData/ConversationParticipantWithConversation'
+import {Error} from './graphqlData/Error'
+import gql from 'graphql-tag'
 
 export const UPDATE_CONVERSATION_PARTICIPANTS = gql`
   mutation UpdateConversationParticipants(
@@ -53,4 +56,45 @@ export const DELETE_CONVERSATIONS = gql`
       }
     }
   }
+`
+
+export const CREATE_CONVERSATION = gql`
+  mutation CreateConversation(
+    $attachmentIds: [ID!]
+    $body: String!
+    $contextCode: String
+    $conversationId: ID
+    $groupConversation: Boolean
+    $mediaCommentId: ID
+    $mediaCommentType: String
+    $recipients: [String!]!
+    $subject: String
+    $tags: [String!]
+    $userNote: Boolean
+  ) {
+    createConversation(
+      input: {
+        attachmentIds: $attachmentIds
+        body: $body
+        contextCode: $contextCode
+        conversationId: $conversationId
+        groupConversation: $groupConversation
+        mediaCommentId: $mediaCommentId
+        mediaCommentType: $mediaCommentType
+        recipients: $recipients
+        subject: $subject
+        tags: $tags
+        userNote: $userNote
+      }
+    ) {
+      conversations {
+        ...ConversationParticipantWithConversation
+      }
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+  ${ConversationParticipantWithConversation.fragment}
 `

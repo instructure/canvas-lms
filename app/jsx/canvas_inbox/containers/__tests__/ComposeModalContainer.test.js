@@ -20,11 +20,12 @@ import * as uploadFileModule from 'jsx/shared/upload_file'
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import ComposeModalContainer from '../ComposeModalContainer'
 import {COURSES_QUERY} from '../../Queries'
+import {CREATE_CONVERSATION} from '../../Mutations'
 import {createCache} from '../../../canvas-apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, wait} from '@testing-library/react'
 import waitForApolloLoading from '../../helpers/waitForApolloLoading'
 
 beforeEach(() => {
@@ -51,6 +52,24 @@ const createGraphqlMocks = () => {
           }
         }
       }
+    },
+    {
+      request: {
+        query: CREATE_CONVERSATION,
+        variables: {
+          attachmentIds: [],
+          body: 'Potato',
+          contextCode: undefined,
+          recipients: ['5'], // TODO: change this when we have an address book component
+          subject: 'Potato Subject',
+          groupConversation: true
+        },
+        overrides: {
+          CreateConversationPayload: {
+            errors: null
+          }
+        }
+      }
     }
   ]
 
@@ -66,10 +85,10 @@ const createGraphqlMocks = () => {
   return mockResults
 }
 
-const setup = async () => {
+const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn()) => {
   const mocks = await createGraphqlMocks()
   return render(
-    <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+    <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
       <MockedProvider mocks={mocks} cache={createCache()}>
         <ComposeModalContainer open onDismiss={jest.fn()} />
       </MockedProvider>
@@ -169,6 +188,31 @@ describe('ComposeModalContainer', () => {
       // Hello World is default value for string fields in our gql mocks
       const selectOptions = await component.findAllByText('Hello World')
       expect(selectOptions.length).toBeGreaterThan(0)
+    })
+  })
+
+  describe('Create Conversation', () => {
+    it('allows creating conversations', async () => {
+      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+
+      const component = await setup(jest.fn(), mockedSetOnSuccess)
+
+      await waitForApolloLoading()
+
+      // Set subject
+      const subjectInput = component.getByTestId('subject-input')
+      fireEvent.change(subjectInput, {target: {value: 'Potato Subject'}})
+
+      // Set body
+      const bodyInput = component.getByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+      // Hit send
+      const button = component.getByTestId('send-button')
+      fireEvent.click(button)
+
+      await waitForApolloLoading()
+      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })
 })

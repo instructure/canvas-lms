@@ -21,7 +21,8 @@ import {AttachmentDisplay} from '../components/AttachmentDisplay/AttachmentDispl
 import {ComposeActionButtons} from 'jsx/canvas_inbox/components/ComposeActionButtons/ComposeActionButtons'
 import {ComposeInputWrapper} from 'jsx/canvas_inbox/components/ComposeInputWrapper/ComposeInputWrapper'
 import {CourseSelect} from 'jsx/canvas_inbox/components/CourseSelect/CourseSelect'
-import {COURSES_QUERY} from '../Queries'
+import {CONVERSATIONS_QUERY, COURSES_QUERY} from '../Queries'
+import {CREATE_CONVERSATION} from '../Mutations'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from 'jsx/canvas_inbox/components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {MessageBody} from 'jsx/canvas_inbox/components/MessageBody/MessageBody'
@@ -30,7 +31,7 @@ import React, {useContext, useState} from 'react'
 import {reduceDuplicateCourses} from '../helpers/courses_helper'
 import {SubjectInput} from 'jsx/canvas_inbox/components/SubjectInput/SubjectInput'
 import {uploadFiles} from 'jsx/shared/upload_file'
-import {useQuery} from 'react-apollo'
+import {useMutation, useQuery} from 'react-apollo'
 
 import {CloseButton} from '@instructure/ui-buttons'
 import {Flex} from '@instructure/ui-flex'
@@ -39,6 +40,7 @@ import {Modal} from '@instructure/ui-modal'
 import {PresentationContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
+import {Spinner} from '@instructure/ui-elements'
 
 const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
@@ -50,11 +52,68 @@ const ComposeModalContainer = props => {
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
+  const [sendingMessage, setSendingMessage] = useState(false)
 
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
       userID: ENV.current_user_id?.toString()
     }
+  })
+
+  const updateCache = (cache, result) => {
+    if (result.data.createConversation.errors) {
+      setOnFailure(I18n.t('Error occurred while creating conversation message'))
+      return
+    }
+
+    let legacyNode
+    try {
+      const queryResult = JSON.parse(
+        JSON.stringify(
+          cache.readQuery({
+            query: CONVERSATIONS_QUERY,
+            variables: {
+              scope: 'sent',
+              userID: ENV.current_user_id?.toString()
+            }
+          })
+        )
+      )
+      legacyNode = queryResult.legacyNode
+    } catch (e) {
+      // readQuery throws an exception if the query isn't already in the cache
+      // If its not in the cache we don't want to do anything
+      return
+    }
+
+    legacyNode.conversationsConnection.nodes.unshift(
+      ...result.data.createConversation.conversations
+    )
+
+    cache.writeQuery({
+      query: CONVERSATIONS_QUERY,
+      variables: {
+        scope: 'sent',
+        userID: ENV.current_user_id?.toString()
+      },
+      data: {legacyNode}
+    })
+  }
+
+  const onConversationCreateComplete = success => {
+    setSendingMessage(false)
+
+    if (success) {
+      setOnSuccess(I18n.t('Message sent successfully'))
+    } else {
+      setOnFailure(I18n.t('Error creating conversation'))
+    }
+  }
+
+  const [createConversation] = useMutation(CREATE_CONVERSATION, {
+    update: updateCache,
+    onCompleted: data => onConversationCreateComplete(!data.createConversation.errors),
+    onError: () => onConversationCreateComplete(false)
   })
 
   const fileUploadUrl = attachmentFolderId => {
@@ -132,6 +191,31 @@ const ComposeModalContainer = props => {
       return false
     }
     return true
+  }
+
+  const sendMessage = async () => {
+    await createConversation({
+      variables: {
+        attachmentIds: attachments.map(a => a.id),
+        body,
+        contextCode: selectedContext,
+        recipients: ['5'], // TODO: replace this with selected users
+        subject,
+        groupConversation: !sendIndividualMessages
+      }
+    })
+    props.onDismiss()
+  }
+
+  const resetState = () => {
+    setAttachments([])
+    setAttachmentsToUpload([])
+    setBody(null)
+    setBodyMessages([])
+    setSelectedContext(null)
+    setSendingMessage(false)
+    setSubject(null)
+    setSendIndividualMessages(false)
   }
 
   const renderModalHeader = () => (
@@ -231,6 +315,12 @@ const ComposeModalContainer = props => {
           if (!validMessageFields()) {
             return
           }
+
+          if (!attachmentsToUpload.length) {
+            sendMessage()
+          }
+          setSendingMessage(true)
+
           console.log('submitting...')
         }}
         isSending={false}
@@ -238,18 +328,55 @@ const ComposeModalContainer = props => {
     </Modal.Footer>
   )
 
-  return (
-    <Modal
-      open={props.open}
-      onDismiss={props.onDismiss}
-      size="medium"
-      label={I18n.t('Compose Message')}
-      shouldCloseOnDocumentClick={false}
-    >
-      {renderModalHeader()}
-      {renderModalBody()}
-      {renderModalFooter()}
+  const renderOverlay = (label, message, open, onExited) => (
+    <Modal open={open} label={label} shouldCloseOnDocumentClick={false} onExited={onExited}>
+      <Modal.Body>
+        <Flex direction="column" textAlign="center">
+          <Flex.Item>
+            <Spinner renderTitle={label} size="large" />
+          </Flex.Item>
+          <Flex.Item>
+            <Text>{message}</Text>
+          </Flex.Item>
+        </Flex>
+      </Modal.Body>
     </Modal>
+  )
+
+  const renderUploadingAttachmentsOverlay = () => {
+    return renderOverlay(
+      I18n.t('Uploading Files'),
+      I18n.t('Please wait while we upload attachments'),
+      sendingMessage && attachmentsToUpload.length,
+      () => sendMessage()
+    )
+  }
+
+  const renderSendMessageOverlay = () => {
+    return renderOverlay(
+      I18n.t('Sending Message'),
+      I18n.t('Sending message'),
+      sendingMessage && !attachmentsToUpload.length
+    )
+  }
+
+  return (
+    <>
+      <Modal
+        open={props.open}
+        onDismiss={props.onDismiss}
+        size="medium"
+        label={I18n.t('Compose Message')}
+        shouldCloseOnDocumentClick={false}
+        onExited={resetState}
+      >
+        {renderModalHeader()}
+        {renderModalBody()}
+        {renderModalFooter()}
+      </Modal>
+      {renderSendMessageOverlay()}
+      {renderUploadingAttachmentsOverlay()}
+    </>
   )
 }
 
