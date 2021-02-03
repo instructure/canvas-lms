@@ -193,6 +193,7 @@ tr:
         partner_id: "Partner ID"
         partner_key: "Partner Anahtarı"
   accept_2fdd362e: Onayla
+  acceptable_use_policy_29a28124: "Uygun Kullanım Koşulları"
   accepted_formats_hex_rgba_rgb_hsl_42a37ef7: "kabul edilebilir formatlar: hex, rgba, rgb, hsl"
   accepted_formats_svg_png_jpg_gif_f793e4bc: "kabul edilebilir formatlar: svg, png, jpg, gif"
   accepted_user_role_type_course_course_2ce91589: "Kabul edilen: %{user}, %{role_type}, course, %{course}"
@@ -7448,6 +7449,7 @@ tr:
       rte_help: "Zengin Metin Alanı. Yardım için ALT+F8 e basın"
   editor_button_6647db9c: "Düzenleyici Butonu"
   either_the_url_or_domain_should_be_set_c29cf8c1: "Web adresi ya da alan adından biri belirtilmeli."
+  either_you_re_a_new_user_or_the_terms_of_use_has_c_29797cc2: "Ya yeni bir kullanıcısınız ya da *Kabul Edilebilir Kullanım Politikası*, son kabul ettiğinizden sonra değişti. Devam etmeden önce lütfen *Kabul Edilebilir Kullanım Politikasını* kabul edin."
   either_you_re_a_new_user_or_the_terms_of_use_have__14f0d0d0: "Ya yeni bir kullanıcısınız ya da son kabul ettiğinizden sonra *kullanım koşulları* değişti. Devam etmeden önce lütfen *kullanım koşulları* ve *gizlilik politiası*nı kabul edin."
   either_you_re_a_new_user_or_the_terms_of_use_have__2bbebdef: "Ya yeni bir kullanıcısınız ya da son kabul ettiğinizden sonra *kullanım koşulları* değişti. Devam etmeden önce lütfen *kullanım koşulları*nı kabul edin."
   el_salvador_503_b0907d30: "El Salvador (+503)"
@@ -9668,6 +9670,7 @@ tr:
   html5_media_recorder_in_rce_bb59b78f: "Zengin Metin Editöründe HTML5 Medya Kaydedici"
   html_editor_fb2ab713: "HTML Düzenleyici"
   hungary_36_cd3e515b: "Macaristan (+36)"
+  i_agree_to_the_34aa16ce: "nı kabul ediyorum"
   i_agree_to_the_terms_of_use_18e16f0c: "*kullanım koşulları* nı kabul ediyorum."
   i_agree_to_the_terms_of_use_and_privacy_policy_f41760cc: "*Kullanım şartları* ve **gizlilik politikasını** Kabul Ediyorum."
   i_cb2f5130: i
