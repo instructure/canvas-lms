@@ -16,11 +16,8 @@
  */
 
 import {fromNow} from '../fromNowFuzzy'
-import {installIntlPolyfills} from 'jsx/shared/helpers/IntlPolyFills'
 
 describe('fromNowFuzzy::', () => {
-  beforeAll(installIntlPolyfills)
-
   let now
   beforeEach(() => {
     now = Date.now()

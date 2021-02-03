@@ -20,7 +20,6 @@ import MockDate from 'mockdate'
 import fetchMock from 'fetch-mock'
 import {render, act, fireEvent} from '@testing-library/react'
 import {QRMobileLogin} from '../QRMobileLogin'
-import {installIntlPolyfills} from 'jsx/shared/helpers/IntlPolyFills'
 
 const MINUTES = 1000 * 60
 
@@ -36,8 +35,6 @@ const route = '/canvas/login.png'
 const doNotRespond = Function.prototype
 
 describe('QRMobileLogin', () => {
-  beforeAll(installIntlPolyfills)
-
   describe('before the API call responds', () => {
     beforeEach(() => {
       fetchMock.post(route, doNotRespond, {overwriteRoutes: true})
