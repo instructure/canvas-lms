@@ -54,6 +54,7 @@ module SpecTimeLimit
     # find an appropriate timeout for this spec
     def timeout_for(example)
       if example.metadata[:custom_timeout]
+        raise "Custom timeouts cannot exceed #{ABSOLUTE_TIMEOUT} seconds!" if example.metadata[:custom_timeout].to_i > ABSOLUTE_TIMEOUT
         [:target, example.metadata[:custom_timeout].to_i]
       elsif ENV.fetch("SELENIUM_REMOTE_URL", "undefined remote url").include? "saucelabs"
         [:status_quo, SAUCELABS_ABSOLUTE_TIMEOUT]

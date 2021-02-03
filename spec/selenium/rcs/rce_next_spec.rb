@@ -519,7 +519,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should close links tray if open when opening link options', custom_timeout: 300 do
+      it 'should close links tray if open when opening link options' do
         skip('still flakey. Needs to be addressed in LS-1814')
         visit_front_page_edit(@course)
         wait_for_tiny(edit_wiki_css)

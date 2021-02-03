@@ -194,7 +194,7 @@ describe 'assignments' do
           expect(page_body.text).to include "Preview"
         end
 
-        it 'can be imported into concluded courses', custom_timeout: 120 do
+        it 'can be imported into concluded courses', custom_timeout: 30 do
           import_content_share.click
           course_search_dropdown.click
           wait_for_ajaximations
