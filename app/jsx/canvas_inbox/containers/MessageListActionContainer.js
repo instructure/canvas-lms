@@ -210,6 +210,29 @@ const MessageListActionContainer = props => {
     }
   }
 
+  const handleUnarchive = () => {
+    const unarchiveConfirmMsg = I18n.t(
+      {
+        one: 'Are you sure you want to unarchive your copy of this conversation?',
+        other: 'Are you sure you want to unarchive your copy of these conversations?'
+      },
+      {count: props.selectedConversations.length}
+    )
+
+    const confirmResult = window.confirm(unarchiveConfirmMsg) // eslint-disable-line no-alert
+    if (confirmResult) {
+      archiveConversationParticipants({
+        variables: {
+          conversationIds: props.selectedConversations.map(convo => convo._id),
+          workflowState: 'read'
+        }
+      })
+    } else {
+      // confirm message was cancelled by user
+      props.archiveToggler(false)
+    }
+  }
+
   return (
     <View
       as="div"
@@ -241,7 +264,8 @@ const MessageListActionContainer = props => {
         <Flex.Item shouldGrow shouldShrink />
         <Flex.Item>
           <MessageActionButtons
-            archive={handleArchive}
+            archive={props.displayUnarchiveButton ? undefined : handleArchive}
+            unarchive={props.displayUnarchiveButton ? handleUnarchive : undefined}
             archiveDisabled={props.archiveDisabled || props.activeMailbox === 'sent'}
             compose={props.onCompose}
             delete={handleDelete}
@@ -274,5 +298,6 @@ MessageListActionContainer.propTypes = {
   deleteDisabled: PropTypes.bool,
   archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,
-  onConversationRemove: PropTypes.func
+  onConversationRemove: PropTypes.func,
+  displayUnarchiveButton: PropTypes.bool
 }

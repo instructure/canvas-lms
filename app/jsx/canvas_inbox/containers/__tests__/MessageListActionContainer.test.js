@@ -19,7 +19,7 @@
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import MessageListActionContainer from '../MessageListActionContainer'
 import {createCache} from '../../../canvas-apollo'
-import {COURSES_QUERY, CONVERSATIONS_QUERY} from '../../Queries'
+import {COURSES_QUERY} from '../../Queries'
 import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
@@ -38,30 +38,6 @@ const createGraphqlMocks = () => {
           Node: {
             __typename: 'User'
           }
-        }
-      }
-    },
-    {
-      request: {
-        query: CONVERSATIONS_QUERY,
-        variables: {
-          userID: '1',
-          scope: 'inbox',
-          course: 'course_123'
-        },
-        overrides: {
-          Node: {
-            __typename: 'User'
-          },
-          Conversation: () => ({
-            _id: '1a',
-            contextType: 'context',
-            contextId: 2,
-            subject: 'Second Subject',
-            updateAt: new Date(),
-            conversationMessageConnections: [{}],
-            conversationParticipantsConnection: [{}]
-          })
         }
       }
     }
@@ -225,5 +201,40 @@ describe('MessageListActionContainer', () => {
     await waitForApolloLoading()
     const archBtn = await component.getByTestId('archive')
     expect(archBtn).toBeDisabled()
+  })
+
+  it('should show unarchive button when displayUnarchiveButton is true', async () => {
+    const component = await setup({
+      archiveDisabled: false,
+      displayUnarchiveButton: true
+    })
+    await waitForApolloLoading()
+    const unarchBtn = await component.getByTestId('unarchive')
+    expect(unarchBtn).toBeTruthy()
+  })
+
+  it('should trigger confirm when unarchiving', async () => {
+    window.confirm = jest.fn(() => true)
+    const component = await setup({
+      archiveDisabled: false,
+      displayUnarchiveButton: true,
+      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
+    })
+    await waitForApolloLoading()
+    const unarchBtn = await component.findByTestId('unarchive')
+    fireEvent.click(unarchBtn)
+    expect(window.confirm).toHaveBeenCalled()
+  })
+
+  it('should trigger confirm when deleting', async () => {
+    window.confirm = jest.fn(() => true)
+    const component = await setup({
+      deleteDisabled: false,
+      selectedConversations: [{test1: 'test1'}, {test2: 'test2'}]
+    })
+    await waitForApolloLoading()
+    const deleteBtn = await component.findByTestId('delete')
+    fireEvent.click(deleteBtn)
+    expect(window.confirm).toHaveBeenCalled()
   })
 })

@@ -18,7 +18,7 @@
 
 import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
 import {Flex} from '@instructure/ui-flex'
-import React, {useState} from 'react'
+import React, {useState, useEffect} from 'react'
 import MessageListContainer from './MessageListContainer'
 import MessageListActionContainer from './MessageListActionContainer'
 
@@ -31,9 +31,11 @@ const CanvasInbox = () => {
   const [archiveDisabled, setArchiveDisabled] = useState(true)
   const [isReply, setIsReply] = useState(false)
   const [isReplyAll, setIsReplyAll] = useState(false)
+  const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
+  const userID = ENV.current_user_id?.toString()
 
   const toggleSelectedConversations = conversation => {
-    const updatedSelectedConversations = selectedConversations
+    const updatedSelectedConversations = [...selectedConversations]
 
     const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
       return updatedSelectedConvo._id === conversation._id
@@ -44,8 +46,6 @@ const CanvasInbox = () => {
       updatedSelectedConversations.push(conversation)
     }
     setSelectedConversations(updatedSelectedConversations)
-    setDeleteDisabled(selectedConversations.length === 0)
-    setArchiveDisabled(selectedConversations.length === 0)
   }
 
   const removeFromSelectedConversations = conversations => {
@@ -57,6 +57,20 @@ const CanvasInbox = () => {
       return updated
     })
   }
+
+  useEffect(() => {
+    setDeleteDisabled(selectedConversations.length === 0)
+    setArchiveDisabled(selectedConversations.length === 0)
+    if (selectedConversations.length === 0) {
+      setDisplayUnarchiveButton(false)
+    } else {
+      setDisplayUnarchiveButton(
+        selectedConversations[0].conversationParticipantsConnection?.nodes?.some(cp => {
+          return cp.userId === userID && cp.workflowState === 'archived'
+        })
+      )
+    }
+  }, [selectedConversations, userID])
 
   return (
     <div className="canvas-inbox-container">
@@ -83,6 +97,7 @@ const CanvasInbox = () => {
             archiveDisabled={archiveDisabled}
             archiveToggler={setArchiveDisabled}
             onConversationRemove={removeFromSelectedConversations}
+            displayUnarchiveButton={displayUnarchiveButton}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
