@@ -31,18 +31,24 @@ import {View} from '@instructure/ui-view'
 import I18n from 'i18n!conversations_2'
 
 export const MessageListItem = ({...props}) => {
-  const [selected, setSelected] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
   const [isStarred, setIsStarred] = useState(props.isStarred)
 
-  const handleSelectionChange = () => {
-    setSelected(!selected)
-    props.onSelect(props.conversation)
-  }
-
   const handleMessageClick = e => {
     e.stopPropagation()
-    props.onOpen()
+
+    // Kind of a hack since our Checkbox doesn't support onChange or swallowing
+    // events with ease. Removing aria-hidden elemnts from sending click events
+    if (e.target.getAttribute('aria-hidden') === 'true') {
+      return
+    }
+
+    if (e.metaKey || e.ctrlKey || e.shiftKey) {
+      props.onSelect(e, props.id, props.conversation, true)
+    } else {
+      props.onSelect(e, props.id, props.conversation, false)
+      props.onOpen()
+    }
   }
 
   const handleMessageStarClick = e => {
@@ -80,7 +86,7 @@ export const MessageListItem = ({...props}) => {
       style={{
         // TODO: Move these styles to a stylesheet once we are moved to the app/ directory
         boxShadow: isHovering && 'inset -4px 0px 0px rgb(0, 142, 226)',
-        backgroundColor: selected && 'rgb(229,242,248)'
+        backgroundColor: props.isSelected && 'rgb(229,242,248)'
       }}
     >
       <View
@@ -90,6 +96,7 @@ export const MessageListItem = ({...props}) => {
         padding="small x-small"
       >
         <Grid
+          data-testid="messageListItem-Item"
           vAlign="middle"
           colSpacing="none"
           rowSpacing="none"
@@ -99,7 +106,7 @@ export const MessageListItem = ({...props}) => {
           onMouseLeave={() => {
             setIsHovering(false)
           }}
-          onClick={handleMessageClick}
+          onMouseDown={handleMessageClick}
         >
           <Grid.Row>
             <Grid.Col width="auto">
@@ -112,13 +119,18 @@ export const MessageListItem = ({...props}) => {
                 margin="0 small 0 0"
               >
                 <Checkbox
+                  data-testid="messageListItem-Checkbox"
                   label={
                     <ScreenReaderContent>
-                      {selected ? I18n.t('selected') : I18n.t('not selected')}
+                      {props.isSelected ? I18n.t('selected') : I18n.t('not selected')}
                     </ScreenReaderContent>
                   }
-                  checked={selected}
-                  onChange={handleSelectionChange}
+                  checked={props.isSelected}
+                  onChange={e => {
+                    e.preventDefault()
+                    e.stopPropagation()
+                    props.onSelect(e, props.id, props.conversation, true)
+                  }}
                 />
               </View>
             </Grid.Col>
@@ -248,6 +260,7 @@ const conversaionMessageProp = PropTypes.shape({
 })
 
 export const conversationProp = PropTypes.shape({
+  id: PropTypes.string,
   subject: PropTypes.string,
   participants: PropTypes.arrayOf(participantProp),
   conversationMessages: PropTypes.arrayOf(conversaionMessageProp)
@@ -255,6 +268,8 @@ export const conversationProp = PropTypes.shape({
 
 MessageListItem.propTypes = {
   conversation: conversationProp,
+  id: PropTypes.string,
+  isSelected: PropTypes.bool,
   isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,

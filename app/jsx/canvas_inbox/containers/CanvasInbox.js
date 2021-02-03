@@ -34,18 +34,10 @@ const CanvasInbox = () => {
   const [displayUnarchiveButton, setDisplayUnarchiveButton] = useState(false)
   const userID = ENV.current_user_id?.toString()
 
-  const toggleSelectedConversations = conversation => {
-    const updatedSelectedConversations = [...selectedConversations]
-
-    const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
-      return updatedSelectedConvo._id === conversation._id
-    })
-    if (index > -1) {
-      updatedSelectedConversations.splice(index, 1)
-    } else {
-      updatedSelectedConversations.push(conversation)
-    }
-    setSelectedConversations(updatedSelectedConversations)
+  const updateSelectedConversations = conversations => {
+    setSelectedConversations(conversations)
+    setDeleteDisabled(conversations.length === 0)
+    setArchiveDisabled(conversations.length === 0)
   }
 
   const removeFromSelectedConversations = conversations => {
@@ -106,7 +98,7 @@ const CanvasInbox = () => {
               <MessageListContainer
                 course={courseFilter}
                 scope={scope}
-                onSelectMessage={toggleSelectedConversations}
+                onSelectMessage={updateSelectedConversations}
               />
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%">
