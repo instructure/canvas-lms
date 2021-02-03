@@ -33,8 +33,8 @@ beforeEach(() => {
   window.ENV = {
     current_user_id: '1',
     CONVERSATIONS: {
-      ATTACHMENTS_FOLDER_ID: 1
-    }
+      ATTACHMENTS_FOLDER_ID: 1,
+    },
   }
 })
 
@@ -44,14 +44,14 @@ const createGraphqlMocks = () => {
       request: {
         query: COURSES_QUERY,
         variables: {
-          userID: '1'
+          userID: '1',
         },
         overrides: {
           Node: {
-            __typename: 'User'
-          }
-        }
-      }
+            __typename: 'User',
+          },
+        },
+      },
     },
     {
       request: {
@@ -62,35 +62,35 @@ const createGraphqlMocks = () => {
           contextCode: undefined,
           recipients: ['5'], // TODO: change this when we have an address book component
           subject: 'Potato Subject',
-          groupConversation: true
+          groupConversation: true,
         },
         overrides: {
           CreateConversationPayload: {
-            errors: null
-          }
-        }
-      }
-    }
+            errors: null,
+          },
+        },
+      },
+    },
   ]
 
   const mockResults = Promise.all(
-    mocks.map(async m => {
+    mocks.map(async (m) => {
       const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
       return {
         request: {query: m.request.query, variables: m.request.variables},
-        result
+        result,
       }
     })
   )
   return mockResults
 }
 
-const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn()) => {
+const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn(), isReply) => {
   const mocks = await createGraphqlMocks()
   return render(
     <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
       <MockedProvider mocks={mocks} cache={createCache()}>
-        <ComposeModalContainer open onDismiss={jest.fn()} />
+        <ComposeModalContainer open onDismiss={jest.fn()} isReply={isReply} />
       </MockedProvider>
     </AlertManagerContext.Provider>
   )
@@ -100,8 +100,8 @@ describe('ComposeModalContainer', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
-        files
-      }
+        files,
+      },
     })
   }
 
@@ -127,7 +127,7 @@ describe('ComposeModalContainer', () => {
     it('allows uploading multiple files', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([
         {id: '1', name: 'file1.jpg'},
-        {id: '2', name: 'file2.jpg'}
+        {id: '2', name: 'file2.jpg'},
       ])
       const {getByTestId} = await setup()
       const fileInput = getByTestId('attachment-input')
@@ -213,6 +213,32 @@ describe('ComposeModalContainer', () => {
 
       await waitForApolloLoading()
       await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+    })
+  })
+
+  describe('reply', () => {
+    it('does not allow changing the context', async () => {
+      const component = await setup(jest.fn(), jest.fn(), true)
+
+      await waitForApolloLoading()
+
+      expect(component.queryByTestId('course-select')).toBe(null)
+    })
+
+    it('does not allow changing the subject', async () => {
+      const component = await setup(jest.fn(), jest.fn(), true)
+
+      await waitForApolloLoading()
+
+      expect(component.queryByTestId('subject-input')).toBe(null)
+    })
+
+    it('should include past messages', async () => {
+      const component = await setup(jest.fn(), jest.fn(), true)
+
+      await waitForApolloLoading()
+
+      expect(component.queryByTestId('past-messages')).toBeInTheDocument()
     })
   })
 })

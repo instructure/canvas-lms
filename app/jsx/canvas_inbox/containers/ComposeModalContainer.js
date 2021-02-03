@@ -26,6 +26,7 @@ import {CREATE_CONVERSATION} from '../Mutations'
 import I18n from 'i18n!conversations_2'
 import {IndividualMessageCheckbox} from 'jsx/canvas_inbox/components/IndividualMessageCheckbox/IndividualMessageCheckbox'
 import {MessageBody} from 'jsx/canvas_inbox/components/MessageBody/MessageBody'
+import {PastMessages} from 'jsx/canvas_inbox/components/PastMessages/PastMessages'
 import PropTypes from 'prop-types'
 import React, {useContext, useState} from 'react'
 import {reduceDuplicateCourses} from '../helpers/courses_helper'
@@ -42,13 +43,34 @@ import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
 import {Spinner} from '@instructure/ui-elements'
 
-const ComposeModalContainer = props => {
+// This stubbed data is here temporarily and will be replaced
+// when we start querying for real data
+const stubbedPastConversationMessages = [
+  {
+    author: {
+      name: 'John Johnson',
+    },
+    body: 'Hello friendo',
+    createdAt: 'November 5, 2020 at 11:03am',
+  },
+  {
+    author: {
+      name: 'Douglas Dougson',
+    },
+    body: 'Hey pal',
+    createdAt: 'November 5, 2020 at 11:02am',
+  },
+]
+const stubbedPastContext = 'Friendship 101'
+const stubbedPastSubject = 'F is for friends who do stuff together'
+
+const ComposeModalContainer = (props) => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [attachments, setAttachments] = useState([])
   const [attachmentsToUpload, setAttachmentsToUpload] = useState([])
-  const [subject, setSubject] = useState()
-  const [body, setBody] = useState()
+  const [subject, setSubject] = useState('')
+  const [body, setBody] = useState('')
   const [bodyMessages, setBodyMessages] = useState([])
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
@@ -56,8 +78,8 @@ const ComposeModalContainer = props => {
 
   const coursesQuery = useQuery(COURSES_QUERY, {
     variables: {
-      userID: ENV.current_user_id?.toString()
-    }
+      userID: ENV.current_user_id?.toString(),
+    },
   })
 
   const updateCache = (cache, result) => {
@@ -74,8 +96,8 @@ const ComposeModalContainer = props => {
             query: CONVERSATIONS_QUERY,
             variables: {
               scope: 'sent',
-              userID: ENV.current_user_id?.toString()
-            }
+              userID: ENV.current_user_id?.toString(),
+            },
           })
         )
       )
@@ -94,13 +116,13 @@ const ComposeModalContainer = props => {
       query: CONVERSATIONS_QUERY,
       variables: {
         scope: 'sent',
-        userID: ENV.current_user_id?.toString()
+        userID: ENV.current_user_id?.toString(),
       },
-      data: {legacyNode}
+      data: {legacyNode},
     })
   }
 
-  const onConversationCreateComplete = success => {
+  const onConversationCreateComplete = (success) => {
     setSendingMessage(false)
 
     if (success) {
@@ -112,15 +134,15 @@ const ComposeModalContainer = props => {
 
   const [createConversation] = useMutation(CREATE_CONVERSATION, {
     update: updateCache,
-    onCompleted: data => onConversationCreateComplete(!data.createConversation.errors),
-    onError: () => onConversationCreateComplete(false)
+    onCompleted: (data) => onConversationCreateComplete(!data.createConversation.errors),
+    onError: () => onConversationCreateComplete(false),
   })
 
-  const fileUploadUrl = attachmentFolderId => {
+  const fileUploadUrl = (attachmentFolderId) => {
     return `/api/v1/folders/${attachmentFolderId}/files`
   }
 
-  const addAttachment = async e => {
+  const addAttachment = async (e) => {
     const files = Array.from(e.currentTarget?.files)
     if (!files.length) {
       setOnFailure(I18n.t('Error adding files to conversation message'))
@@ -131,7 +153,7 @@ const ComposeModalContainer = props => {
       return {isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}`}
     })
 
-    setAttachmentsToUpload(prev => prev.concat(newAttachmentsToUpload))
+    setAttachmentsToUpload((prev) => prev.concat(newAttachmentsToUpload))
     setOnSuccess(I18n.t('Uploading files'))
 
     try {
@@ -139,22 +161,22 @@ const ComposeModalContainer = props => {
         files,
         fileUploadUrl(ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
       )
-      setAttachments(prev => prev.concat(newFiles))
+      setAttachments((prev) => prev.concat(newFiles))
     } catch (err) {
       setOnFailure(I18n.t('Error uploading files'))
     } finally {
-      setAttachmentsToUpload(prev => {
+      setAttachmentsToUpload((prev) => {
         const attachmentsStillUploading = prev.filter(
-          file => !newAttachmentsToUpload.includes(file)
+          (file) => !newAttachmentsToUpload.includes(file)
         )
         return attachmentsStillUploading
       })
     }
   }
 
-  const removeAttachment = id => {
-    setAttachments(prev => {
-      const index = prev.findIndex(attachment => attachment.id === id)
+  const removeAttachment = (id) => {
+    setAttachments((prev) => {
+      const index = prev.findIndex((attachment) => attachment.id === id)
       prev.splice(index, 1)
       return [...prev]
     })
@@ -165,11 +187,11 @@ const ComposeModalContainer = props => {
     addAttachment(e)
   }
 
-  const onSubjectChange = value => {
+  const onSubjectChange = (value) => {
     setSubject(value.currentTarget.value)
   }
 
-  const onBodyChange = value => {
+  const onBodyChange = (value) => {
     setBody(value)
     if (value) {
       setBodyMessages([])
@@ -177,10 +199,10 @@ const ComposeModalContainer = props => {
   }
 
   const onSendIndividualMessagesChange = () => {
-    setSendIndividualMessages(prev => !prev)
+    setSendIndividualMessages((prev) => !prev)
   }
 
-  const onContextSelect = id => {
+  const onContextSelect = (id) => {
     setSelectedContext(id)
   }
 
@@ -196,13 +218,13 @@ const ComposeModalContainer = props => {
   const sendMessage = async () => {
     await createConversation({
       variables: {
-        attachmentIds: attachments.map(a => a.id),
+        attachmentIds: attachments.map((a) => a.id),
         body,
         contextCode: selectedContext,
         recipients: ['5'], // TODO: replace this with selected users
         subject,
-        groupConversation: !sendIndividualMessages
-      }
+        groupConversation: !sendIndividualMessages,
+      },
     })
     props.onDismiss()
   }
@@ -230,13 +252,14 @@ const ComposeModalContainer = props => {
     </Modal.Header>
   )
 
-  const renderModalBody = () => (
+  const renderModalBody = (isReply) => (
     <Modal.Body padding="none">
       <Flex direction="column" width="100%" height="100%">
-        {renderHeaderInputs()}
+        {renderHeaderInputs(isReply)}
         <View borderWidth="small none none none" padding="x-small">
           <MessageBody onBodyChange={onBodyChange} messages={bodyMessages} />
         </View>
+        {isReply && <PastMessages messages={stubbedPastConversationMessages} />}
         {[...attachments, ...attachmentsToUpload].length > 0 && (
           <View borderWidth="small none none none" padding="small">
             <AttachmentDisplay
@@ -250,7 +273,7 @@ const ComposeModalContainer = props => {
     </Modal.Body>
   )
 
-  const renderHeaderInputs = () => (
+  const renderHeaderInputs = (isReply) => (
     <Flex direction="column" width="100%" height="100%" padding="small">
       <Flex.Item>
         <ComposeInputWrapper
@@ -259,22 +282,35 @@ const ComposeModalContainer = props => {
               <Text size="small">{I18n.t('Course')}</Text>
             </PresentationContent>
           }
-          input={renderCourseSelect()}
+          input={isReply ? <Text size="small">{stubbedPastContext}</Text> : renderCourseSelect()}
           shouldGrow={false}
         />
       </Flex.Item>
-      <SubjectInput onChange={onSubjectChange} value={subject} />
-      <Flex.Item>
+      {isReply ? (
         <ComposeInputWrapper
-          shouldGrow
-          input={
-            <IndividualMessageCheckbox
-              onChange={onSendIndividualMessagesChange}
-              checked={sendIndividualMessages}
-            />
+          title={
+            <PresentationContent>
+              <Text size="small">{I18n.t('Subject')}</Text>
+            </PresentationContent>
           }
+          input={<Text size="small">{stubbedPastSubject}</Text>}
         />
-      </Flex.Item>
+      ) : (
+        <SubjectInput onChange={onSubjectChange} value={subject} />
+      )}
+      {!isReply && (
+        <Flex.Item>
+          <ComposeInputWrapper
+            shouldGrow
+            input={
+              <IndividualMessageCheckbox
+                onChange={onSendIndividualMessagesChange}
+                checked={sendIndividualMessages}
+              />
+            }
+          />
+        </Flex.Item>
+      )}
     </Flex>
   )
 
@@ -297,7 +333,7 @@ const ComposeModalContainer = props => {
           favoriteCourses: coursesQuery?.data?.legacyNode?.favoriteCoursesConnection?.nodes,
           moreCourses,
           concludedCourses: [],
-          groups: coursesQuery?.data?.legacyNode?.favoriteGroupsConnection?.nodes
+          groups: coursesQuery?.data?.legacyNode?.favoriteGroupsConnection?.nodes,
         }}
         loading={coursesQuery.loading}
         onCourseFilterSelect={onContextSelect}
@@ -320,8 +356,6 @@ const ComposeModalContainer = props => {
             sendMessage()
           }
           setSendingMessage(true)
-
-          console.log('submitting...')
         }}
         isSending={false}
       />
@@ -371,7 +405,7 @@ const ComposeModalContainer = props => {
         onExited={resetState}
       >
         {renderModalHeader()}
-        {renderModalBody()}
+        {renderModalBody(props.isReply)}
         {renderModalFooter()}
       </Modal>
       {renderSendMessageOverlay()}
@@ -384,5 +418,6 @@ export default ComposeModalContainer
 
 ComposeModalContainer.propTypes = {
   open: PropTypes.bool,
-  onDismiss: PropTypes.func
+  onDismiss: PropTypes.func,
+  isReply: PropTypes.bool,
 }

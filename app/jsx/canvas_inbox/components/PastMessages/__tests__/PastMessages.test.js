@@ -25,45 +25,57 @@ describe('PastMessages', () => {
     const props = {
       messages: [
         {
-          name: 'Gandalf',
-          messageBody: "No. No, it isn't",
-          date: 'TA 3019'
+          author: {
+            name: 'Gandalf',
+          },
+          body: "No. No, it isn't",
+          createdAt: 'TA 3019',
         },
         {
-          name: 'Pippin',
-          messageBody: "Well, that isn't so bad.",
-          date: 'TA 3019'
+          author: {
+            name: 'Pippin',
+          },
+          body: "Well, that isn't so bad.",
+          createdAt: 'TA 3019',
         },
         {
-          name: 'Gandalf',
-          messageBody: 'White shores, and beyond, a far green country under a swift sunrise.',
-          date: 'TA 3019'
+          author: {
+            name: 'Gandalf',
+          },
+          body: 'White shores, and beyond, a far green country under a swift sunrise.',
+          createdAt: 'TA 3019',
         },
         {
-          name: 'Pippin',
-          messageBody: 'What? Gandalf? See what?',
-          date: 'TA 3019'
+          author: {
+            name: 'Pippin',
+          },
+          body: 'What? Gandalf? See what?',
+          createdAt: 'TA 3019',
         },
         {
-          name: 'Gandalf',
-          messageBody:
+          author: {
+            name: 'Gandalf',
+          },
+          body:
             "End? No, the journey doesn't end here. Death is just another path, one that we all must take. The grey rain-curtain of this world rolls back, and all turns to silver glass, and then you see it.",
-          date: 'TA 3019'
+          createdAt: 'TA 3019',
         },
         {
-          name: 'Pippin',
-          messageBody: 'I did not think it would end this way.',
-          date: 'TA 3019'
-        }
-      ]
+          author: {
+            name: 'Pippin',
+          },
+          body: "I didn't think it would end this way.",
+          createdAt: 'TA 3019',
+        },
+      ],
     }
 
     const {getAllByText, getByText} = render(<PastMessages {...props} />)
 
-    props.messages.forEach(message => {
-      expect(getAllByText(message.name).length > 0).toBe(true)
-      expect(getByText(message.messageBody)).toBeInTheDocument()
-      expect(getAllByText(message.date).length > 0).toBe(true)
+    props.messages.forEach((message) => {
+      expect(getAllByText(message.author.name).length > 0).toBe(true)
+      expect(getByText(message.body)).toBeInTheDocument()
+      expect(getAllByText(message.createdAt).length > 0).toBe(true)
     })
   })
 })

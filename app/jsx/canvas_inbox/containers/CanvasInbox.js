@@ -29,11 +29,12 @@ const CanvasInbox = () => {
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
+  const [isReply, setIsReply] = useState(false)
 
-  const toggleSelectedConversations = conversation => {
+  const toggleSelectedConversations = (conversation) => {
     const updatedSelectedConversations = selectedConversations
 
-    const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
+    const index = updatedSelectedConversations.findIndex((updatedSelectedConvo) => {
       return updatedSelectedConvo._id === conversation._id
     })
     if (index > -1) {
@@ -46,10 +47,10 @@ const CanvasInbox = () => {
     setArchiveDisabled(selectedConversations.length === 0)
   }
 
-  const removeFromSelectedConversations = conversations => {
-    const conversationIds = conversations.map(convo => convo._id)
-    setSelectedConversations(prev => {
-      const updated = prev.filter(selectedConvo => !conversationIds.includes(selectedConvo._id))
+  const removeFromSelectedConversations = (conversations) => {
+    const conversationIds = conversations.map((convo) => convo._id)
+    setSelectedConversations((prev) => {
+      const updated = prev.filter((selectedConvo) => !conversationIds.includes(selectedConvo._id))
       setDeleteDisabled(updated.length === 0)
       setArchiveDisabled(updated.length === 0)
       return updated
@@ -68,6 +69,10 @@ const CanvasInbox = () => {
             onCourseFilterSelect={setCourseFilter}
             selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
+            onReply={() => {
+              setIsReply(true)
+              setComposeModal(true)
+            }}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
             archiveDisabled={archiveDisabled}
@@ -90,7 +95,14 @@ const CanvasInbox = () => {
           </Flex>
         </Flex.Item>
       </Flex>
-      <ComposeModalContainer open={composeModal} onDismiss={() => setComposeModal(false)} />
+      <ComposeModalContainer
+        open={composeModal}
+        onDismiss={() => {
+          setComposeModal(false)
+          setIsReply(false)
+        }}
+        isReply={isReply}
+      />
     </div>
   )
 }

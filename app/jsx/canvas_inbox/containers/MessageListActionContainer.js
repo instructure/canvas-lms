@@ -178,7 +178,6 @@ const MessageListActionContainer = (props) => {
       },
       {count: props.selectedConversations.length}
     )
-
     const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
     if (confirmResult) {
       deleteConversations({variables: {ids: props.selectedConversations.map((convo) => convo._id)}})
@@ -249,8 +248,8 @@ const MessageListActionContainer = (props) => {
             deleteDisabled={props.deleteDisabled}
             forward={() => {}}
             markAsUnread={() => {}}
-            reply={() => {}}
-            replyAll={() => {}}
+            reply={props.onReply}
+            replyAll={props.onReply}
             star={() => {}}
           />
         </Flex.Item>
@@ -269,6 +268,7 @@ MessageListActionContainer.propTypes = {
   onSelectMailbox: PropTypes.func,
   onCompose: PropTypes.func,
   selectedConversations: PropTypes.array,
+  onReply: PropTypes.func,
   deleteToggler: PropTypes.func,
   deleteDisabled: PropTypes.bool,
   archiveToggler: PropTypes.func,
