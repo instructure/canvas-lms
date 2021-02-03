@@ -82,16 +82,14 @@ class Header extends React.Component {
     )
   }
 
-  /* eslint-disable jsx-a11y/anchor-is-valid */
   renderFakeMostRecent = () => {
     return (
       <Flex.Item as="div" align="end" textAlign="end">
         {I18n.t('Calculated by: ')}
-        <a>{I18n.t('Most Recent')}</a>
+        <div>{I18n.t('Most Recent')}</div>
       </Flex.Item>
     )
   }
-  /* eslint-enable jsx-a11y/anchor-is-valid */
 
   renderLatestGrade = () => (
     <StudentViewContext.Consumer>
