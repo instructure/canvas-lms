@@ -189,25 +189,41 @@ describe('MessageListActionContainer', () => {
     })
   })
 
-  it('should have delete button disabled on load', async () => {
+  it('should have buttons disabled when their disabled states are true', async () => {
     const component = await setup({
-      deleteDisabled: true
+      deleteDisabled: true,
+      archiveDisabled: true
     })
 
     await waitForApolloLoading()
 
-    const button = await component.getByTestId('delete')
-    expect(button).toBeDisabled()
+    const delBtn = await component.getByTestId('delete')
+    const archBtn = await component.getByTestId('archive')
+    expect(delBtn).toBeDisabled()
+    expect(archBtn).toBeDisabled()
   })
 
-  it('should have delete button enabled when there are deleteDisabled = false', async () => {
+  it('should have buttons enabled when their disabled states are false', async () => {
     const component = await setup({
-      deleteDisabled: false
+      deleteDisabled: false,
+      archiveDisabled: false
     })
 
     await waitForApolloLoading()
 
-    const button = await component.getByTestId('delete')
-    expect(button).not.toBeDisabled()
+    const delBtn = await component.getByTestId('delete')
+    const archBtn = await component.getByTestId('archive')
+    expect(delBtn).not.toBeDisabled()
+    expect(archBtn).not.toBeDisabled()
+  })
+
+  it('should have archive disabled when activeMailbox is sent', async () => {
+    const component = await setup({
+      archiveDisabled: false,
+      activeMailbox: 'sent'
+    })
+    await waitForApolloLoading()
+    const archBtn = await component.getByTestId('archive')
+    expect(archBtn).toBeDisabled()
   })
 })

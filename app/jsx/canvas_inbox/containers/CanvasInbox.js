@@ -28,6 +28,7 @@ const CanvasInbox = () => {
   const [selectedConversations, setSelectedConversations] = useState([])
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
+  const [archiveDisabled, setArchiveDisabled] = useState(true)
 
   const toggleSelectedConversations = conversation => {
     const updatedSelectedConversations = selectedConversations
@@ -35,7 +36,6 @@ const CanvasInbox = () => {
     const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
       return updatedSelectedConvo._id === conversation._id
     })
-
     if (index > -1) {
       updatedSelectedConversations.splice(index, 1)
     } else {
@@ -43,6 +43,17 @@ const CanvasInbox = () => {
     }
     setSelectedConversations(updatedSelectedConversations)
     setDeleteDisabled(selectedConversations.length === 0)
+    setArchiveDisabled(selectedConversations.length === 0)
+  }
+
+  const removeFromSelectedConversations = conversations => {
+    const conversationIds = conversations.map(convo => convo._id)
+    setSelectedConversations(prev => {
+      const updated = prev.filter(selectedConvo => !conversationIds.includes(selectedConvo._id))
+      setDeleteDisabled(updated.length === 0)
+      setArchiveDisabled(updated.length === 0)
+      return updated
+    })
   }
 
   return (
@@ -59,6 +70,9 @@ const CanvasInbox = () => {
             onCompose={() => setComposeModal(true)}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
+            archiveDisabled={archiveDisabled}
+            archiveToggler={setArchiveDisabled}
+            onConversationRemove={removeFromSelectedConversations}
           />
         </Flex.Item>
         <Flex.Item shouldGrow shouldShrink>
