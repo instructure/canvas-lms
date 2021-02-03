@@ -300,22 +300,6 @@ RSpec.describe ApplicationController do
         end
       end
 
-      context "bulk_delete_pages" do
-        before(:each) do
-          controller.instance_variable_set(:@domain_root_account, Account.default)
-        end
-
-        it 'is false if the feature flag is off' do
-          Account.default.disable_feature!(:bulk_delete_pages)
-          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_falsey
-        end
-
-        it 'is true if the feature flag is on' do
-          Account.default.enable_feature!(:bulk_delete_pages)
-          expect(controller.js_env[:FEATURES][:bulk_delete_pages]).to be_truthy
-        end
-      end
-
       context "usage_rights_discussion_topics" do
         before(:each) do
           controller.instance_variable_set(:@domain_root_account, Account.default)
