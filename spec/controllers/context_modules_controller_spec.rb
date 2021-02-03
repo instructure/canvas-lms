@@ -46,6 +46,20 @@ describe ContextModulesController do
       expect(response).to be_successful
     end
 
+    it "@combined_active_quizzes should return id, title, type for all classic and lti quizzes sorted by title" do
+      user_session(@teacher)
+      q1 = @course.quizzes.create!(title: 'A')
+      q2 = @course.quizzes.create!(title: 'C')
+      a1 = new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes = controller.instance_variable_get(:@combined_active_quizzes)
+      expect(combined_active_quizzes).to eq [
+        [q1.id, 'A', 'quiz'],
+        [a1.id, 'B', 'assignment'],
+        [q2.id, 'C', 'quiz']
+      ]
+    end
+
     it "should touch modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do

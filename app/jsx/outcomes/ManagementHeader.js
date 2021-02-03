@@ -15,32 +15,36 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import React from 'react'
+import I18n from 'i18n!OutcomeManagement'
+import {View} from '@instructure/ui-layout'
 import {Button} from '@instructure/ui-buttons'
 import {IconImportLine, IconPlusSolid, IconSearchLine} from '@instructure/ui-icons'
-import I18n from 'i18n!OutcomeManagement'
-import React from 'react'
 import {showImportOutcomesModal} from './ImportOutcomesModal'
+import FindOutcomesModal from './FindOutcomesModal'
+import useModal from '../shared/hooks/useModal'
 
 const ManagementHeader = () => {
+  const [showFindModal, onOpenFindModalHandler, onCloseFindModalHandler] = useModal()
   const noop = () => {}
 
   return (
     <div className="management-header" data-testid="managementHeader">
-      <div>
+      <View as="div">
         <h2 className="title">{I18n.t('Outcomes')}</h2>
-      </div>
-
-      <div>
+      </View>
+      <View as="div">
         <Button onClick={showImportOutcomesModal} renderIcon={IconImportLine} margin="x-small">
           {I18n.t('Import')}
         </Button>
         <Button onClick={noop} renderIcon={IconPlusSolid} margin="x-small">
           {I18n.t('Create')}
         </Button>
-        <Button onClick={noop} renderIcon={IconSearchLine} margin="x-small">
+        <Button onClick={onOpenFindModalHandler} renderIcon={IconSearchLine} margin="x-small">
           {I18n.t('Find')}
         </Button>
-      </div>
+      </View>
+      <FindOutcomesModal open={showFindModal} onCloseHandler={onCloseFindModalHandler} />
     </div>
   )
 }

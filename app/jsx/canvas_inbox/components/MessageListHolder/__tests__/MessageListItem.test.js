@@ -25,21 +25,41 @@ describe('MessageListItem', () => {
     return {
       conversation: {
         subject: 'This is the subject line',
-        participants: [{name: 'Bob Barker'}, {name: 'Sally Ford'}, {name: 'Russel Franks'}],
-        conversationMessages: [
-          {
-            author: {name: 'Bob Barker'},
-            participants: [{name: 'Bob Barker'}, {name: 'Sally Ford'}, {name: 'Russel Franks'}],
-            created_at: 'November 5, 2020 at 2:25pm',
-            body: 'This is the body text for the message.'
-          },
-          {
-            author: {name: 'Sally Ford'},
-            participants: [{name: 'Sally Ford'}, {name: 'Bob Barker'}, {name: 'Russel Franks'}],
-            created_at: 'November 4, 2020 at 2:25pm',
-            body: 'This is the body text for the message.'
-          }
-        ]
+        conversationParticipantsConnection: {
+          nodes: [
+            {user: {name: 'Bob Barker'}},
+            {user: {name: 'Sally Ford'}},
+            {user: {name: 'Russel Franks'}}
+          ]
+        },
+        conversationMessagesConnection: {
+          nodes: [
+            {
+              author: {name: 'Bob Barker'},
+              conversationParticipantsConnection: {
+                nodes: [
+                  {user: {name: 'Bob Barker'}},
+                  {user: {name: 'Sally Ford'}},
+                  {user: {name: 'Russel Franks'}}
+                ]
+              },
+              createdAt: 'November 5, 2020 at 2:25pm',
+              body: 'This is the body text for the message.'
+            },
+            {
+              author: {name: 'Sally Ford'},
+              conversationParticipantsConnection: {
+                nodes: [
+                  {user: {name: 'Sally Ford'}},
+                  {user: {name: 'Bob Barker'}},
+                  {user: {name: 'Russel Franks'}}
+                ]
+              },
+              createdAt: 'November 4, 2020 at 2:25pm',
+              body: 'This is the body text for the message.'
+            }
+          ]
+        }
       },
       isUnread: false,
       onSelect: jest.fn(),
@@ -58,9 +78,11 @@ describe('MessageListItem', () => {
 
     const checkbox = getByRole('checkbox')
     fireEvent.click(checkbox)
-    expect(onSelectMock).toHaveBeenLastCalledWith(true)
+    expect(onSelectMock).toHaveBeenCalled()
+    expect(checkbox.checked).toBe(true)
     fireEvent.click(checkbox)
-    expect(onSelectMock).toHaveBeenLastCalledWith(false)
+    expect(onSelectMock).toHaveBeenCalled()
+    expect(checkbox.checked).toBe(false)
   })
 
   it('calls onOpen when the message is clicked', () => {

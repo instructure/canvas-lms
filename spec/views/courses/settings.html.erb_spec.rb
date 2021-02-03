@@ -35,10 +35,6 @@ describe "courses/settings.html.erb" do
   end
 
   describe "Hide sections on course users page checkbox" do
-    before :once do
-      @course.root_account.enable_feature!(:hide_course_sections_from_students)
-    end
-
     it "should not display checkbox for teacher when there is one section" do
       view_context(@course, @user)
       assign(:current_user, @user)

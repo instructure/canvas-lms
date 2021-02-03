@@ -103,4 +103,30 @@ RSpec.describe Lti::ResourceLink, type: :model do
       end
     end
   end
+
+  describe '.create_with' do
+    context 'without `context` and `tool`' do
+      it 'do not create a resource link' do
+        expect(described_class.create_with(nil, nil)).to be_nil
+      end
+    end
+
+    context 'with `context` and `tool`' do
+      let(:custom) do
+        {
+          referer_id: 123,
+          referer_name: 'Sample 123'
+        }
+      end
+
+      it 'create resource links' do
+        resource_link_1 = described_class.create_with(course, tool, custom)
+        resource_link_2 = described_class.create_with(course, tool, custom)
+
+        expect(course.lti_resource_links.count).to eq 2
+        expect(course.lti_resource_links.first).to eq resource_link_1
+        expect(course.lti_resource_links.last).to eq resource_link_2
+      end
+    end
+  end
 end

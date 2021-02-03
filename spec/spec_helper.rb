@@ -351,12 +351,13 @@ RSpec.configure do |config|
 
   # DOCKER_PROCESSES is only used on Jenkins and we only care to have RspecJunitFormatter on Jenkins.
   if ENV['DOCKER_PROCESSES']
+    file = "log/results/results-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.xml"
     # if file already exists this is a rerun of a failed spec, don't generate new xml.
-    config.add_formatter "RspecJunitFormatter", "log/results.xml" unless File.file?("log/results.xml")
+    config.add_formatter "RspecJunitFormatter", file unless File.file?(file)
   end
 
   if ENV['RSPEC_LOG']
-    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime_rspec_tests.log"
+    config.add_formatter "ParallelTests::RSpec::RuntimeLogger", "log/parallel_runtime/parallel_runtime_rspec_tests-#{ENV.fetch('PARALLEL_INDEX', '0').to_i}.log"
   end
 
   if ENV['RAILS_LOAD_ALL_LOCALES'] && RSpec.configuration.filter.rules[:i18n]
@@ -852,6 +853,8 @@ RSpec.configure do |config|
     skip("stubbing prepended class methods is broken in this version of ruby") if versions.include?(RUBY_VERSION) || RUBY_VERSION >= "2.6"
   end
 end
+
+require 'lazy_presumptuous_i18n_backend'
 
 class LazyPresumptuousI18nBackend
   def stub(translations)

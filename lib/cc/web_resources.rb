@@ -34,7 +34,7 @@ module CC
 
       course_folder = Folder.root_folders(@course).first
       files_with_metadata = { :folders => [], :files => [] }
-      @added_attachment_ids = Set.new
+      @added_attachments = {}
 
       zipper = ContentZipper.new
       zipper.user = @user
@@ -47,8 +47,8 @@ module CC
             next
           end
 
-          @added_attachment_ids << file.id
           path = File.join(folder_names, file.display_name)
+          @added_attachments[file.id] = path
           migration_id = create_key(file)
           if file_or_folder_restricted?(file) || file.usage_rights || file.display_name != file.unencoded_filename
             files_with_metadata[:files] << [file, migration_id]
@@ -205,7 +205,7 @@ module CC
       # check to make sure we don't export more than 4 gigabytes of media objects
       total_size = 0
       html_content_exporter.used_media_objects.each do |obj|
-        next if @added_attachment_ids&.include?(obj.attachment_id)
+        next if @added_attachments&.key?(obj.attachment_id)
 
         info = html_content_exporter.media_object_infos[obj.id]
         next unless info && info[:asset] && info[:asset][:size]
@@ -223,33 +223,35 @@ module CC
 
       tracks = {}
       html_content_exporter.used_media_objects.each do |obj|
-        next if @added_attachment_ids&.include?(obj.attachment_id)
         begin
           migration_id = create_key(obj)
           info = html_content_exporter.media_object_infos[obj.id]
           next unless info && info[:asset]
 
-          unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
-            url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
-            add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
-            next
-          end
+          path = File.join(CCHelper::WEB_RESOURCES_FOLDER, info[:path])
 
-          path = File.join(CCHelper::WEB_RESOURCES_FOLDER, CCHelper::MEDIA_OBJECTS_FOLDER, info[:filename])
-
-          CanvasHttp.get(url) do |http_response|
-            raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
-            @zip_file.get_output_stream(path) do |stream|
-              http_response.read_body(stream)
+          # download from kaltura if the file wasn't already exported here in add_course_files
+          if !@added_attachments || @added_attachments[obj.attachment_id] != path
+            unless CanvasKaltura::ClientV3::ASSET_STATUSES[info[:asset][:status]] == :READY &&
+              url = (client.flavorAssetGetPlaylistUrl(obj.media_id, info[:asset][:id]) || client.flavorAssetGetDownloadUrl(info[:asset][:id]))
+              add_error(I18n.t('course_exports.errors.media_file', "A media file failed to export"))
+              next
             end
-          end
 
-          @resources.resource(
-                  "type" => CCHelper::WEBCONTENT,
-                  :identifier => migration_id,
-                  :href => path
-          ) do |res|
-            res.file(:href => path)
+            CanvasHttp.get(url) do |http_response|
+              raise CanvasHttp::InvalidResponseCodeError.new(http_response.code.to_i) unless http_response.code.to_i == 200
+              @zip_file.get_output_stream(path) do |stream|
+                http_response.read_body(stream)
+              end
+            end
+
+            @resources.resource(
+                    "type" => CCHelper::WEBCONTENT,
+                    :identifier => migration_id,
+                    :href => path
+            ) do |res|
+              res.file(:href => path)
+            end
           end
 
           process_media_tracks(tracks, migration_id, obj, path)

@@ -31,12 +31,14 @@ describe CourseLinkValidator do
 
     bad_url = "http://www.notarealsitebutitdoesntmattercauseimstubbingitanwyay.com"
     bad_url2 = "/courses/#{@course.id}/file_contents/baaaad"
+    bad_media_object_url = "/media_objects_iframe/junk"
     html = %{
       <a href="#{bad_url}">Bad absolute link</a>
       <img src="#{bad_url2}">Bad file link</a>
       <img src="/courses/#{@course.id}/file_contents/#{CGI.escape(@attachment.full_display_path)}">Ok file link</a>
       <a href="/courses/#{@course.id}/quizzes">Ok other link</a>
       <a href="/courses/#{@course.id}/assignments/#{@ua.id}">Unpublished thing</a>
+      <iframe src="#{bad_media_object_url}">
     }
     @course.image_url = bad_url
     @course.syllabus_body = html
@@ -71,6 +73,7 @@ describe CourseLinkValidator do
         expect(issue[:invalid_links]).to include({:reason => :unreachable, :url => bad_url, :link_text => 'Bad absolute link'})
         expect(issue[:invalid_links]).to include({:reason => :unpublished_item, :url => "/courses/#{@course.id}/assignments/#{@ua.id}", :link_text => "Unpublished thing"})
         expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_url2, :image => true})
+        expect(issue[:invalid_links]).to include({:reason => :missing_item, :url => bad_media_object_url})
       end
     end
 
@@ -424,6 +427,10 @@ describe CourseLinkValidator do
 
     it "should return :missing_item if the link doesn't point to course content" do
       expect(@course_link_validator.check_object_status("/test_error")).to eq :missing_item
+    end
+
+    it "should return :missing_item if the referenced media_object doesn't exist" do
+      expect(@course_link_validator.check_object_status("/media_objects_iframe/junk")).to eq :missing_item
     end
 
     it 'should return :unpublished_item for unpublished content' do

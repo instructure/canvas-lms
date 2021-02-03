@@ -88,6 +88,25 @@ describe Quizzes::QuizOutcomeResultBuilder do
     it "shouldn't declare mastery" do
       expect(@quiz_result.mastery).to eql(false)
     end
+
+    context 'with long quiz titles' do
+      before :once do
+       @user.update!(name: 'a'*255)
+       @sub.update_scores({
+        'context_id' => @course.id,
+        'override_scores' => true,
+        'context_type' => 'Course',
+        'submission_version_number' => '1',
+        "question_score_#{@q2.id}" => '0'
+      })
+      end
+
+      it "truncates result.title and question_result.title to 250 characters" do
+        expect(@quiz_result.reload.title.length).to eq 250
+        @question_results.each { |result| expect(result.title.length).to eq 250 }
+      end
+    end
+
     context 'with two outcomes' do
       before :once do
         course_with_student(active_all: true)

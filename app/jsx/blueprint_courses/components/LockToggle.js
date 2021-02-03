@@ -80,7 +80,7 @@ class LockToggle extends Component {
 
   static setupRootNode(wrapperSelector, childIndex, cb) {
     const toggleNode = document.createElement('span')
-    toggleNode.style.display = 'inline-block'
+    toggleNode.className = 'bpc-lock-toggle-wrapper'
     // sometimes we have to wait for the DOM to settle down first
     const intId = setInterval(() => {
       const wrapperNode = document.querySelector(wrapperSelector)
@@ -95,11 +95,21 @@ class LockToggle extends Component {
   constructor(props) {
     super(props)
     this.state = {}
+    this.toggleBtnRef = null
 
     if (props.isToggleable) {
       this.state.mode = props.isLocked ? modes.ADMIN_LOCKED : modes.ADMIN_UNLOCKED
     } else {
       this.state.mode = props.isLocked ? modes.TEACH_LOCKED : modes.TEACH_UNLOCKED
+    }
+  }
+
+  componentDidMount() {
+    // Fixing the width of the Toggle button to the biggest possible label to avoid resizing the button
+    const biggestLabelLength = Math.max(...Object.values(modes).map(mode => mode.label.length))
+
+    if (this.toggleBtnRef) {
+      this.toggleBtnRef.style.width = biggestLabelLength * 0.845 + 'em'
     }
   }
 
@@ -135,6 +145,8 @@ class LockToggle extends Component {
         <Tooltip tip={tooltip} placement="top" variant="inverse" on={['hover', 'focus']}>
           {this.props.breakpoints.miniTablet ? (
             <Button
+              id="lock-toggle-btn"
+              elementRef={r => (this.toggleBtnRef = r)}
               variant={variant}
               onClick={this.props.onClick}
               onFocus={this.onEnter}

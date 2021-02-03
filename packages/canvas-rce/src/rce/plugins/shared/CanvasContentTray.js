@@ -223,6 +223,7 @@ export default function CanvasContentTray(props) {
   const [hidingTrayOnAction, setHidingTrayOnAction] = useState(true)
 
   const trayRef = useRef(null)
+  const scrollingAreaRef = useRef(null)
   const [filterSettings, setFilterSettings] = useFilterSettings()
 
   const {bridge, editor, onTrayClosing} = {...props}
@@ -262,6 +263,16 @@ export default function CanvasContentTray(props) {
     // it's OK the setFilterSettings is not a dependency
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editor.id, bridge, handleDismissTray, hidingTrayOnAction])
+
+  useEffect(() => {
+    if (
+      hasOpened &&
+      scrollingAreaRef.current &&
+      !scrollingAreaRef.current.style.overscrollBehaviorY
+    ) {
+      scrollingAreaRef.current.style.overscrollBehaviorY = 'contain'
+    }
+  }, [hasOpened])
 
   function handleOpenTray() {
     bridge.focusEditor(editor)
@@ -396,7 +407,12 @@ export default function CanvasContentTray(props) {
                 />
               </Flex.Item>
 
-              <Flex.Item grow shrink margin="xx-small xxx-small 0">
+              <Flex.Item
+                grow
+                shrink
+                margin="xx-small xxx-small 0"
+                elementRef={el => (scrollingAreaRef.current = el)}
+              >
                 <ErrorBoundary>
                   <DynamicPanel
                     contentType={filterSettings.contentType}

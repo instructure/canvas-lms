@@ -273,7 +273,75 @@ describe "outcome gradebook" do
           expect(means).to contain_exactly("2", "3")
         end
 
-       context 'with learning mastery scales enabled' do
+        context 'with inactive_concluded_lmgb_filters enabled' do
+          before(:once) do
+            Account.default.set_feature_flag!('inactive_concluded_lmgb_filters', 'on')
+          end
+
+          it 'correctly displays inactive enrollments when the filter option is selected' do
+            StudentEnrollment.find_by(user_id: @student_1.id).deactivate
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            active_students = [@student_2.name, @student_3.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students)
+
+            f('button[data-component="lmgb-student-filter-trigger"]').click
+            f('span[data-component="lmgb-student-filter-inactive-enrollments"]').click
+            wait_for_ajax_requests
+
+            active_students = [@student_1.name, @student_2.name, @student_3.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students)
+          end
+
+          it 'correctly displays concluded enrollments when the filter option is selected' do
+            StudentEnrollment.find_by(user_id: @student_1.id).conclude
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            active_students = [@student_2.name, @student_3.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students)
+
+            f('button[data-component="lmgb-student-filter-trigger"]').click
+            f('span[data-component="lmgb-student-filter-concluded-enrollments"]').click
+            wait_for_ajax_requests
+
+            active_students = [@student_1.name, @student_2.name, @student_3.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students)
+          end
+
+          it 'correctly displays unassessed students when the filter option is selected' do
+            student_4 = User.create!(:name => 'Unassessed Student')
+            student_4.register!
+            @course.enroll_student(student_4)
+
+            get "/courses/#{@course.id}/gradebook"
+            select_learning_mastery
+            wait_for_ajax_requests
+
+            active_students = [@student_1.name, @student_2.name, @student_3.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students)
+
+            f('button[data-component="lmgb-student-filter-trigger"]').click
+            f('span[data-component="lmgb-student-filter-unassessed-students"]').click
+            wait_for_ajax_requests
+
+            active_students = [@student_1.name, @student_2.name, @student_3.name, student_4.name]
+            student_names = ff('.outcome-student-cell-content').map {|cell| cell.text.split("\n")[0]}
+            expect(student_names.sort).to eq(active_students.sort)
+          end
+        end
+
+        context 'with learning mastery scales enabled' do
           before(:once) do
             @rating1 = OutcomeProficiencyRating.new(description: 'best', points: 10, mastery: true, color: '00ff00')
             @rating2 = OutcomeProficiencyRating.new(description: 'worst', points: 0, mastery: false, color: 'ff0000')

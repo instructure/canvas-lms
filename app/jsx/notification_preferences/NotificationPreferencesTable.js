@@ -90,10 +90,7 @@ const formatCategoryKey = category => {
 }
 
 const smsNotificationCategoryDeprecated = category => {
-  return (
-    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
-    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
-  )
+  return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
 }
 
 const pushNotificationCategoryRestricted = category => {

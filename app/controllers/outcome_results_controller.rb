@@ -347,8 +347,31 @@ class OutcomeResultsController < ApplicationController
 
   def user_rollups(opts = {})
     excludes = Api.value_to_array(params[:exclude]).uniq
+    filter_users_by_excludes
+
     @results = find_results(opts).preload(:user)
     outcome_results_rollups(results: @results, users: @users, excludes: excludes, context: @context)
+  end
+
+  def filter_users_by_excludes(aggregate = false)
+    excludes = Api.value_to_array(params[:exclude]).uniq
+    # exclude users with no results (if being requested) before we paginate,
+    # otherwise we end up with users in the pagination that may have no rollups,
+    # which will inflate the pagination total count
+    remove_users_with_no_results if excludes.include?('missing_user_rollups') && !aggregate
+
+    if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
+      exclude_concluded = excludes.include? 'concluded_enrollments'
+      exclude_inactive = excludes.include? 'inactive_enrollments'
+      return unless exclude_concluded || exclude_inactive
+
+      filters = []
+      filters << 'completed' if exclude_concluded
+      filters << 'inactive' if exclude_inactive
+
+      ActiveRecord::Associations::Preloader.new.preload(@users, :enrollments)
+      @users = @users.reject {|u| u.enrollments.all? {|e| filters.include? e.workflow_state}}
+    end
   end
 
   def remove_users_with_no_results
@@ -358,13 +381,9 @@ class OutcomeResultsController < ApplicationController
 
   def user_rollups_json
     return user_rollups_sorted_by_score_json if params[:sort_by] == 'outcome' && params[:sort_outcome_id]
-    excludes = Api.value_to_array(params[:exclude]).uniq
-    # exclude users with no results (if being requested) before we paginate,
-    # otherwise we end up with users in the pagination that may have no rollups,
-    # which will inflate the pagination total count
-    remove_users_with_no_results if excludes.include? 'missing_user_rollups'
-    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
+
     rollups = user_rollups
+    @users = Api.paginate(@users, self, api_v1_course_outcome_rollups_url(@context))
     rollups = @users.map {|u| rollups.find {|r| r.context.id == u.id }}.compact if params[:sort_by] == 'student'
     json = outcome_results_rollups_json(rollups)
     json[:meta] = Api.jsonapi_meta(@users, self, api_v1_course_outcome_rollups_url(@context))
@@ -397,7 +416,8 @@ class OutcomeResultsController < ApplicationController
   def aggregate_rollups_json
     # calculating averages for all users in the context and only returning one
     # rollup, so don't paginate users in this method.
-    @results = find_results.preload(:user)
+    filter_users_by_excludes(true)
+    @results = find_results(all_users: false).preload(:user)
     aggregate_rollups = [aggregate_outcome_results_rollup(@results, @context, params[:aggregate_stat])]
     json = aggregate_outcome_results_rollups_json(aggregate_rollups)
     # no pagination, so no meta field
@@ -572,7 +592,12 @@ class OutcomeResultsController < ApplicationController
     elsif params[:section_id]
       @section = @context.course_sections.where(id: params[:section_id].to_i).first
       reject! "invalid section id" unless @section
-      @users = apply_sort_order(@section.students).to_a
+      @users = if @context.root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
+        # include all enrollment types which will be filtered later
+        apply_sort_order(@section.users).to_a
+      else
+        apply_sort_order(@section.students).to_a
+      end
     end
     @users ||= users_for_outcome_context.to_a
     @users.sort! {|a,b| a.id <=> b.id} unless params[:sort_by]

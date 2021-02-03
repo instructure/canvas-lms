@@ -3741,46 +3741,73 @@ describe 'Submissions API', type: :request do
     expect(json['grade']).to eq grade
   end
 
-  it "allows posting a rubric assessment" do
-    student = user_factory(active_all: true)
-    course_with_teacher(:active_all => true)
-    @course.enroll_student(student).accept!
-    a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
-    rubric = rubric_model(:user => @user, :context => @course,
-                          :data => larger_rubric_data)
-    a1.create_rubric_association(:rubric => rubric, :purpose => 'grading', :use_for_grading => true, :context => @course)
+  context "posting rubric assessments" do
+    before(:once) do
+      @student = user_factory(active_all: true)
+      course_with_teacher(:active_all => true)
+      @course.enroll_student(@student).accept!
+      @a1 = @course.assignments.create!(:title => 'assignment1', :grading_type => 'points', :points_possible => 12)
+      rubric = rubric_model(:user => @user, :context => @course, :data => larger_rubric_data)
+      @rubric_association = @a1.create_rubric_association(
+        :rubric => rubric,
+        :purpose => 'grading',
+        :use_for_grading => true,
+        :context => @course
+      )
+    end
 
-    api_call(:put,
-          "/api/v1/courses/#{@course.id}/assignments/#{a1.id}/submissions/#{student.id}.json",
-          { :controller => 'submissions_api', :action => 'update',
-            :format => 'json', :course_id => @course.id.to_s,
-            :assignment_id => a1.id.to_s, :user_id => student.id.to_s },
-          { :rubric_assessment =>
-             { :crit1 => { :points => 7 },
-               :crit2 => { :points => 2, :comments => 'Rock on' } } })
+    it "allows posting a rubric assessment" do
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+        { :controller => 'submissions_api', :action => 'update',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s },
+        { :rubric_assessment =>
+           { :crit1 => { :points => 7 },
+             :crit2 => { :points => 2, :comments => 'Rock on' } } }
+      )
 
-    expect(Submission.count).to eq 1
-    @submission = Submission.first
-    expect(@submission.user_id).to eq student.id
-    expect(@submission.score).to eq 9
-    expect(@submission.rubric_assessment).not_to be_nil
-    expect(@submission.rubric_assessment.data).to eq(
-      [{:description=>"B",
-        :criterion_id=>"crit1",
-        :comments_enabled=>true,
-        :points=>7,
-        :learning_outcome_id=>nil,
-        :id=>"rat2",
-        :comments=>nil},
-      {:description=>"Pass",
-        :criterion_id=>"crit2",
-        :comments_enabled=>true,
-        :points=>2,
-        :learning_outcome_id=>nil,
-        :id=>"rat1",
-        :comments=>"Rock on",
-        :comments_html=>"Rock on"}]
-    )
+      expect(Submission.count).to eq 1
+      @submission = Submission.first
+      expect(@submission.user_id).to eq @student.id
+      expect(@submission.score).to eq 9
+      expect(@submission.rubric_assessment).not_to be_nil
+      expect(@submission.rubric_assessment.data).to eq(
+        [{:description=>"B",
+          :criterion_id=>"crit1",
+          :comments_enabled=>true,
+          :points=>7,
+          :learning_outcome_id=>nil,
+          :id=>"rat2",
+          :comments=>nil},
+        {:description=>"Pass",
+          :criterion_id=>"crit2",
+          :comments_enabled=>true,
+          :points=>2,
+          :learning_outcome_id=>nil,
+          :id=>"rat1",
+          :comments=>"Rock on",
+          :comments_html=>"Rock on"}]
+      )
+    end
+
+    it "does not allow posting a rubric assessment when the rubric association is soft-deleted" do
+      @rubric_association.destroy
+      api_call(
+        :put,
+        "/api/v1/courses/#{@course.id}/assignments/#{@a1.id}/submissions/#{@student.id}.json",
+        { :controller => 'submissions_api', :action => 'update',
+          :format => 'json', :course_id => @course.id.to_s,
+          :assignment_id => @a1.id.to_s, :user_id => @student.id.to_s },
+        { :rubric_assessment =>
+           { :crit1 => { :points => 7 },
+             :crit2 => { :points => 2, :comments => 'Rock on' } } }
+      )
+
+      @submission = Submission.first
+      expect(@submission.rubric_assessment).to be_nil
+    end
   end
 
   it "validates the rubric assessment" do

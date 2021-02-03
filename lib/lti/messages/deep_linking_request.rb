@@ -18,59 +18,77 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Lti::Messages
+  # A "factory" class that builds an ID Token (JWT) to be used in LTI Advantage
+  # LTI Deep Linking Requests. These requests indicate to the launched
+  # tool that Canvas expects it to return data via deep linking.
+  #
+  # This class relies on a another class (LtiAdvantage::Messages::DeepLinkingRequest)
+  # to model the data in the JWT body and produce a signature.
+  #
+  # For details on the data included in the ID token please refer
+  # to http://www.imsglobal.org/spec/lti-dl/v2p0.
+  #
+  # For implementation details on LTI Advantage launches in
+  # Canvas, please see the inline documentation of
+  # app/models/lti/lti_advantage_adapter.rb.
   class DeepLinkingRequest < JwtMessage
-    ACCEPT_TYPES = {
-      'migration_selection' => %w(file).freeze,
-      'editor_button' => %w(link file html ltiResourceLink image).freeze,
-      'assignment_selection' => %w(ltiResourceLink).freeze,
-      'homework_submission' => %w(file ltiResourceLink).freeze,
-      'link_selection' => %w(ltiResourceLink).freeze,
-      'conference_selection' => %w(link html).freeze,
-      'submission_type_selection' => %w(ltiResourceLink).freeze
-    }.freeze
-
-    DOCUMENT_TARGETS = {
-      'migration_selection' => %w(iframe).freeze,
-      'editor_button' => %w(embed iframe window).freeze,
-      'assignment_selection' => %w(iframe window).freeze,
-      'homework_submission' => %w(iframe).freeze,
-      'link_selection' => %w(iframe window).freeze,
-      'conference_selection' => %w(iframe window).freeze,
-      'submission_type_selection' => %w(iframe window).freeze
-    }.freeze
-
-    MEDIA_TYPES = {
-      'migration_selection' => %w(
-        application/vnd.ims.imsccv1p1
-        application/vnd.ims.imsccv1p2
-        application/vnd.ims.imsccv1p3
-        application/zip
-        application/xml
-      ).freeze,
-      'editor_button' => %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze,
-      'assignment_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
-      'homework_submission' => %w(*/*).freeze,
-      'link_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
-      'conference_selection' => %w(text/html */*).freeze,
-      'submission_type_selection' => %w(application/vnd.ims.lti.v1.ltilink).freeze,
-    }.freeze
-
-    AUTO_CREATE = {
-      'migration_selection' => false,
-      'editor_button' => false,
-      'assignment_selection' => false,
-      'homework_submission' => false,
-      'link_selection' => false,
-      'conference_selection' => true
-    }.freeze
-
-    ACCEPT_MULTIPLE = {
-      'migration_selection' => false,
-      'editor_button' => true,
-      'assignment_selection' => false,
-      'homework_submission' => false,
-      'link_selection' => true,
-      'conference_selection' => false
+    DEEP_LINKING_DETAILS = {
+      'assignment_selection' => {
+        accept_multiple: false,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: false,
+        document_targets: %w(iframe window).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze,
+      'collaboration' => {
+        accept_multiple: false,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: true,
+        document_targets: %w(iframe).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze,
+      'conference_selection' => {
+        accept_multiple: false,
+        accept_types: %w(link html).freeze,
+        auto_create: true,
+        document_targets: %w(iframe window).freeze,
+        media_types: %w(text/html */*).freeze
+      }.freeze,
+      'editor_button' => {
+        accept_multiple: true,
+        accept_types: %w(link file html ltiResourceLink image).freeze,
+        auto_create: false,
+        document_targets: %w(embed iframe window).freeze,
+        media_types: %w(image/* text/html application/vnd.ims.lti.v1.ltilink */*).freeze
+      }.freeze,
+      'homework_submission' => {
+        accept_multiple: false,
+        accept_types: %w(file ltiResourceLink).freeze,
+        auto_create: false,
+        document_targets: %w(iframe).freeze,
+        media_types: %w(*/*).freeze
+      }.freeze,
+      'link_selection' => {
+        accept_multiple: true,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: false,
+        document_targets: %w(iframe window).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze,
+      'migration_selection' => {
+        accept_multiple: false,
+        accept_types: %w(file).freeze,
+        auto_create: false,
+        document_targets: %w(iframe).freeze,
+        media_types: %w(application/vnd.ims.imsccv1p1 application/vnd.ims.imsccv1p2 application/vnd.ims.imsccv1p3 application/zip application/xml).freeze
+      }.freeze,
+      'submission_type_selection' => {
+        accept_multiple: false,
+        accept_types: %w(ltiResourceLink).freeze,
+        auto_create: false,
+        document_targets: %w(iframe window).freeze,
+        media_types: %w(application/vnd.ims.lti.v1.ltilink).freeze
+      }.freeze
     }.freeze
 
     MODAL_PLACEMENTS = %w(editor_button assignment_selection link_selection migration_selection).freeze
@@ -87,19 +105,13 @@ module Lti::Messages
 
     private
 
-    def accept_multiple_overrides
-      {
-        'link_selection' => Account.site_admin.feature_enabled?(:process_multiple_content_items_modules_index)
-      }
-    end
-
     def add_deep_linking_request_claims!
       @message.deep_linking_settings.deep_link_return_url = return_url
-      @message.deep_linking_settings.accept_types = ACCEPT_TYPES[placement]
-      @message.deep_linking_settings.accept_presentation_document_targets = DOCUMENT_TARGETS[placement]
-      @message.deep_linking_settings.accept_media_types = MEDIA_TYPES[placement].join(',')
-      @message.deep_linking_settings.accept_multiple = ACCEPT_MULTIPLE.merge(accept_multiple_overrides)[placement]
-      @message.deep_linking_settings.auto_create = AUTO_CREATE[placement]
+      @message.deep_linking_settings.accept_types = DEEP_LINKING_DETAILS.dig(placement, :accept_types)
+      @message.deep_linking_settings.accept_presentation_document_targets = DEEP_LINKING_DETAILS.dig(placement, :document_targets)
+      @message.deep_linking_settings.accept_media_types = DEEP_LINKING_DETAILS.dig(placement, :media_types).join(',')
+      @message.deep_linking_settings.auto_create = DEEP_LINKING_DETAILS.dig(placement, :auto_create)
+      @message.deep_linking_settings.accept_multiple = DEEP_LINKING_DETAILS.dig(placement, :accept_multiple)
     end
 
     def placement

@@ -2439,7 +2439,8 @@ class Course < ActiveRecord::Base
       :allow_student_discussion_topics, :allow_student_discussion_editing, :lock_all_announcements,
       :organize_epub_by_content_type, :show_announcements_on_home_page,
       :home_page_announcement_limit, :enable_offline_web_export, :usage_rights_required,
-      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates
+      :restrict_student_future_view, :restrict_student_past_view, :restrict_enrollments_to_course_dates,
+      :homeroom_course
     ]
   end
 
@@ -3085,6 +3086,8 @@ class Course < ActiveRecord::Base
 
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
+  add_setting :homeroom_course, :boolean => true, :default => false
+
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
     return true if user_is_instructor?(user)
@@ -3590,14 +3593,10 @@ class Course < ActiveRecord::Base
   end
 
   def sections_hidden_on_roster_page?(current_user:)
-    if root_account.feature_enabled?('hide_course_sections_from_students')
-      course_sections.active.many? &&
-          hide_sections_on_course_users_page? &&
-          !current_user.enrollments.active.where(course: self).empty? &&
-          current_user.enrollments.active.where(course: self).all?(&:student?)
-    else
-      false
-    end
+    course_sections.active.many? &&
+      hide_sections_on_course_users_page? &&
+      !current_user.enrollments.active.where(course: self).empty? &&
+      current_user.enrollments.active.where(course: self).all?(&:student?)
   end
 
   def resolved_outcome_proficiency

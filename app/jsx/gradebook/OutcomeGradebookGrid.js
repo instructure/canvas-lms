@@ -20,9 +20,13 @@ import I18n from 'i18n!gradebookOutcomeGradebookGrid'
 import $ from 'jquery'
 import _ from 'underscore'
 import HeaderFilterView from 'jsx/gradebook/views/HeaderFilterView'
+import OutcomeFilterView from 'jsx/gradebook/views/OutcomeFilterView'
 import OutcomeColumnView from 'compiled/views/gradebook/OutcomeColumnView'
 import cellTemplate from 'jst/gradebook/outcome_gradebook_cell'
 import studentCellTemplate from 'jst/gradebook/outcome_gradebook_student_cell'
+
+import React from 'react'
+import ReactDOM from 'react-dom'
 
 /*
 xsslint safeString.method cellHtml
@@ -35,6 +39,7 @@ const Grid = {
   section: undefined,
   dataSource: {},
   outcomes: [],
+  gridRef: null,
   options: {
     headerRowHeight: 42,
     rowHeight: 42,
@@ -348,6 +353,7 @@ const Grid = {
         })
       }
     },
+    // This only renders student rows, not column headers
     studentCell(_row, _cell, value, _columnDef, _dataContext) {
       return studentCellTemplate(
         _.extend(value, {
@@ -403,10 +409,6 @@ const Grid = {
       if (column.field === 'student') {
         return Grid.View.studentHeaderRowCell(node, column, grid)
       }
-      const results = Grid.View.getColumnResults(grid.getData(), column)
-      if (!results.length) {
-        return $(node).empty()
-      }
       return $(node)
         .empty()
         .append(Grid.View.cellHtml(score?.score, score?.hide_points, column, false))
@@ -414,7 +416,10 @@ const Grid = {
     _aggregateUrl(stat) {
       const course = ENV.context_asset_string.split('_')[1]
       const sectionParam = Grid.section && Grid.section !== '0' ? `&section_id=${Grid.section}` : ''
-      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}${sectionParam}`
+      const filters = Grid.gridRef._getOutcomeFiltersParams()
+        ? `${Grid.gridRef._getOutcomeFiltersParams()}`
+        : ''
+      return `/api/v1/courses/${course}/outcome_rollups?aggregate=course&aggregate_stat=${stat}${sectionParam}${filters}`
     },
     redrawHeader(grid, fn = Grid.averageFn) {
       Grid.averageFn = fn
@@ -442,6 +447,22 @@ const Grid = {
         })
       })
     },
+    addEnrollmentFilters(node) {
+      const existingExclusions = Grid.gridRef._getOutcomeFilters()
+      const menu = React.createElement(
+        OutcomeFilterView,
+        {
+          showInactiveEnrollments: !existingExclusions.includes('inactive_enrollments'),
+          showConcludedEnrollments: !existingExclusions.includes('concluded_enrollments'),
+          showUnassessedStudents: !existingExclusions.includes('missing_user_rollups'),
+          toggleInactiveEnrollments: Grid.gridRef._toggleStudentsWithInactiveEnrollments,
+          toggleConcludedEnrollments: Grid.gridRef._toggleStudentsWithConcludedEnrollments,
+          toggleUnassessedStudents: Grid.gridRef._toggleStudentsWithNoResults
+        },
+        null
+      )
+      ReactDOM.render(menu, node)
+    },
     studentHeaderRowCell(node, _column, grid) {
       $(node).addClass('average-filter')
       const view = new HeaderFilterView({
@@ -453,6 +474,10 @@ const Grid = {
     },
     headerCell({node, column, grid}, _fn = Grid.averageFn) {
       if (column.field === 'student') {
+        if (ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters) {
+          $(node).empty()
+          this.addEnrollmentFilters(node)
+        }
         return
       }
       const totalsFn = _.partial(Grid.View.calculateRatingsTotals, grid, column)

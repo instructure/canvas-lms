@@ -279,6 +279,12 @@ describe GradebookExporter do
           expect(manual_posting_row[manual_header]).to eq "Manual Posting"
         end
 
+        it "has a special designation for anonymous unposted assignments" do
+          course_with_student(course: @course, active_all: true)
+          manual_assignment.update!(anonymous_grading: true)
+          expect(manual_posting_row[manual_header]).to eq "Manual Posting (scores hidden from instructors)"
+        end
+
         it "emits an empty value for auto-posted assignments" do
           expect(manual_posting_row[auto_header]).to be nil
         end
@@ -652,6 +658,31 @@ describe GradebookExporter do
       rows = CSV.parse(csv, headers: true)
 
       expect(rows[1][0]).to eql('="=sum(A)"')
+    end
+  end
+
+  context "when a course has anonymous assignments" do
+    before(:each) do
+      @student = User.create!
+      student_in_course(user: @student, course: @course, active_all: true)
+      @assignment = @course.assignments.create!(title: "Anon Assignment", points_possible: 10, anonymous_grading: true)
+      @assignment.ensure_post_policy(post_manually: true)
+      @assignment.grade_student(@student, grade: 8, grader: @teacher)
+    end
+
+    let(:submission_score) do
+      csv = GradebookExporter.new(@course, @teacher, {}).to_csv
+      rows = CSV.parse(csv, headers: true)
+      rows[2]["Anon Assignment (#{@assignment.id})"]
+    end
+
+    it "shows 'N/A' for submission scores in the export when the assignment is unposted" do
+      expect(submission_score).to eq "N/A"
+    end
+
+    it "shows actual submission scores in the export when the assignment is posted" do
+      @assignment.post_submissions
+      expect(submission_score).to eq "8.00"
     end
   end
 

@@ -280,11 +280,6 @@ module SeleniumDriverSetup
       # otherwise this will use the default version matching what is used in docker.
       Webdrivers::Chromedriver.required_version = CONFIG[:chromedriver_version]
       chrome_options = Selenium::WebDriver::Chrome::Options.new
-      # put `auto_open_devtools: true` in your selenium.yml if you want to have
-      # the chrome dev tools open by default by selenium
-      if CONFIG[:auto_open_devtools]
-        chrome_options.add_argument('--auto-open-devtools-for-tabs')
-      end
 
       Selenium::WebDriver.for :chrome, desired_capabilities: desired_capabilities, options: chrome_options
     end
@@ -323,6 +318,19 @@ module SeleniumDriverSetup
         caps['goog:loggingPrefs'] = {
           browser: 'ALL'
         }
+        # put `auto_open_devtools: true` in your selenium.yml if you want to have
+        # the chrome dev tools open by default by selenium
+        if CONFIG[:auto_open_devtools]
+          caps['goog:chromeOptions'][:args].append('auto-open-devtools-for-tabs')
+        end
+        # put `headless: true` and `window_size: "<x>,<y>"` in your selenium.yml
+        # if you want to run against headless chrome
+        if CONFIG[:headless]
+          caps['goog:chromeOptions'][:args].append('headless')
+        end
+        if CONFIG[:window_size].present?
+          caps['goog:chromeOptions'][:args].append("window-size=#{CONFIG[:window_size]}")
+        end
       when :edge
         # TODO: options for edge driver
       when :safari

@@ -43,6 +43,16 @@ describe Api::V1::Group do
       expect(user_json["name"]).to eq(@user.name)
     end
 
+    it "caps the numer of users that will be returned" do
+      other_user = user_model
+      @group.add_user(other_user)
+      json = group_json(@group, @user, nil, :include_inactive_users => true, :include => ['users'])
+      expect(json["users"].length).to eq 2
+      Setting.set("group_json_user_cap", "1")
+      json = group_json(@group, @user, nil, :include_inactive_users => true, :include => ['users'])
+      expect(json["users"].length).to eq 1
+    end
+
     it "filter inactive users but do include users" do
       json = group_json(@group, @user, nil, :include => ['users'])
       expect(json["id"]).to eq @group.id

@@ -664,7 +664,7 @@ class Message < ActiveRecord::Base
     end
 
     check_acct = root_account || user&.account || Account.site_admin
-    if path_type == 'sms' && !check_acct.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms)
+    if path_type == 'sms'
       if Notification.types_to_send_in_sms(check_acct).exclude?(notification_name)
         InstStatsd::Statsd.increment("message.skip.#{path_type}.#{notification_name}",
                                      short_stat: 'message.skip',

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -27,9 +29,14 @@ module Lti
 
       before_action :require_context
       before_action :validate_jwt
+      before_action :add_module_items # renders if unauthorized
 
       def deep_linking_response
-        add_module_items
+        # Adding one module item creates the resource link
+        # in ContextModule#add_item, adding multiple creates links in
+        # add_module_items before action
+        create_lti_resource_links unless adding_module_item?
+
         # Set content items and messaging values in JS env
         js_env({
           content_items: content_items,
@@ -43,7 +50,6 @@ module Lti
 
         render layout: 'bare'
       end
-
     end
   end
 end

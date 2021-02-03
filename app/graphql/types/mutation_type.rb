@@ -71,7 +71,7 @@ class Types::MutationType < Types::ApplicationObjectType
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
   field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
   field :delete_conversations, mutation: Mutations::DeleteConversations
-  field :update_conversation_participant, mutation: Mutations::UpdateConversationParticipant
+  field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

@@ -13,6 +13,9 @@
           },
           {
             "name": "AdhocStudents"
+          },
+          {
+            "name": "Noop"
           }
         ]
       },
@@ -29,17 +32,20 @@
         ]
       },
       {
+        "kind": "UNION",
+        "name": "ContentTagContent",
+        "possibleTypes": [
+          {
+            "name": "LearningOutcome"
+          }
+        ]
+      },
+      {
         "kind": "INTERFACE",
         "name": "LegacyIDInterface",
         "possibleTypes": [
           {
             "name": "Account"
-          },
-          {
-            "name": "AccountDomain"
-          },
-          {
-            "name": "AccountDomainLookup"
           },
           {
             "name": "Assignment"
@@ -52,6 +58,9 @@
           },
           {
             "name": "CommunicationChannel"
+          },
+          {
+            "name": "ContentTag"
           },
           {
             "name": "Course"
@@ -84,6 +93,12 @@
             "name": "GroupSet"
           },
           {
+            "name": "LearningOutcome"
+          },
+          {
+            "name": "LearningOutcomeGroup"
+          },
+          {
             "name": "MediaTrack"
           },
           {
@@ -102,7 +117,10 @@
             "name": "NotificationPolicy"
           },
           {
-            "name": "Outcome"
+            "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeProficiency"
           },
           {
             "name": "Page"
@@ -231,6 +249,12 @@
             "name": "CommunicationChannel"
           },
           {
+            "name": "ContentTag"
+          },
+          {
+            "name": "Conversation"
+          },
+          {
             "name": "Course"
           },
           {
@@ -252,7 +276,19 @@
             "name": "GroupSet"
           },
           {
+            "name": "LearningOutcome"
+          },
+          {
+            "name": "LearningOutcomeGroup"
+          },
+          {
             "name": "MediaObject"
+          },
+          {
+            "name": "MessageableContext"
+          },
+          {
+            "name": "MessageableUser"
           },
           {
             "name": "Module"
@@ -265,6 +301,12 @@
           },
           {
             "name": "NotificationPolicy"
+          },
+          {
+            "name": "OutcomeCalculationMethod"
+          },
+          {
+            "name": "OutcomeProficiency"
           },
           {
             "name": "Page"
@@ -336,12 +378,6 @@
         "name": "Timestamped",
         "possibleTypes": [
           {
-            "name": "AccountDomain"
-          },
-          {
-            "name": "AccountDomainLookup"
-          },
-          {
             "name": "Assignment"
           },
           {
@@ -352,6 +388,18 @@
           },
           {
             "name": "CommunicationChannel"
+          },
+          {
+            "name": "ContentTag"
+          },
+          {
+            "name": "Conversation"
+          },
+          {
+            "name": "ConversationMessage"
+          },
+          {
+            "name": "ConversationParticipant"
           },
           {
             "name": "Course"
@@ -379,6 +427,9 @@
           },
           {
             "name": "GroupMembership"
+          },
+          {
+            "name": "LearningOutcome"
           },
           {
             "name": "Module"

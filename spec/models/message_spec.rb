@@ -397,59 +397,32 @@ describe Message do
         allow(Canvas::Twilio).to receive(:enabled?).and_return(true)
       end
 
-      context 'with the deprecate_sms feature enabled' do
-        before :each do
-         Account.site_admin.enable_feature!(:deprecate_sms)
-        end
+      it "allows whitelisted notification types" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          notification_name: 'Assignment Graded',
+          user: @user
+        )
+        expect(@message).to receive(:deliver_via_sms)
+        @message.deliver
+      end
 
-        after :each do
-          Account.site_admin.disable_feature!(:deprecate_sms)
-        end
-
-        it "allows whitelisted notification types" do
-          message_model(
-            dispatch_at: Time.now,
-            workflow_state: 'staged',
-            to: '+18015550100',
-            updated_at: Time.now.utc - 11.minutes,
-            path_type: 'sms',
-            notification_name: 'Assignment Graded',
-            user: @user
-          )
-          expect(@message).to receive(:deliver_via_sms)
-          @message.deliver
-        end
-
-        it "does not deliver notification types not on the whitelist" do
-          message_model(
-            dispatch_at: Time.now,
-            workflow_state: 'staged',
-            to: '+18015550100',
-            updated_at: Time.now.utc - 11.minutes,
-            path_type: 'sms',
-            notification_name: 'Conversation Message',
-            user: @user
-          )
-          expect(@message).to receive(:deliver_via_sms).never
-          @message.deliver
-        end
-
-        it "delivers all sms when the sms_allowed override is set" do
-          @user.account.settings[:sms_allowed] = true
-          message_model(
-            dispatch_at: Time.now,
-            workflow_state: 'staged',
-            to: '+18015550100',
-            updated_at: Time.now.utc - 11.minutes,
-            path_type: 'sms',
-            notification_name: 'Conversation Message',
-            user: @user
-          )
-          expect(@message).to receive(:deliver_via_sms)
-          @message.deliver
-          @user.account.settings[:sms_allowed] = nil
-        end
-
+      it "does not deliver notification types not on the whitelist" do
+        message_model(
+          dispatch_at: Time.now,
+          workflow_state: 'staged',
+          to: '+18015550100',
+          updated_at: Time.now.utc - 11.minutes,
+          path_type: 'sms',
+          notification_name: 'Conversation Message',
+          user: @user
+        )
+        expect(@message).to receive(:deliver_via_sms).never
+        @message.deliver
       end
 
       it "uses Twilio for E.164 paths" do
@@ -461,6 +434,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', @message.body, from_recipient_country: true)
         expect(@message).to receive(:deliver_via_email).never
         @message.deliver
@@ -475,6 +449,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(@message).to receive(:deliver_via_email)
         expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
@@ -489,6 +464,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(@message).to receive(:deliver_via_email)
         expect(Canvas::Twilio).to receive(:deliver).never
         @message.deliver
@@ -503,6 +479,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver)
         @message.deliver
         @message.reload
@@ -518,6 +495,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).and_raise('some error')
         @message.deliver
         @message.reload
@@ -533,6 +511,7 @@ describe Message do
           path_type: 'sms',
           user: @user
         )
+        allow(Notification).to receive(:types_to_send_in_sms).and_return([@message.notification_name])
         expect(Canvas::Twilio).to receive(:deliver).with('+18015550100', anything, from_recipient_country: true)
         @message.deliver
         @message.reload

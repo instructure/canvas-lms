@@ -608,7 +608,8 @@ class GradebooksController < ApplicationController
 
   def set_learning_mastery_env
     set_student_context_cards_js_env
-    visible_sections = if @context.root_account.feature_enabled?(:limit_section_visibility_in_lmgb)
+    root_account = @context.root_account
+    visible_sections = if root_account.feature_enabled?(:limit_section_visibility_in_lmgb)
       @context.sections_visible_to(@current_user)
     else
       @context.active_course_sections
@@ -618,11 +619,12 @@ class GradebooksController < ApplicationController
       GRADEBOOK_OPTIONS: {
         context_id: @context.id.to_s,
         context_url: named_context_url(@context, :context_url),
-        ACCOUNT_LEVEL_MASTERY_SCALES:  @context.root_account.feature_enabled?(:account_level_mastery_scales),
+        ACCOUNT_LEVEL_MASTERY_SCALES: root_account.feature_enabled?(:account_level_mastery_scales),
         outcome_proficiency: outcome_proficiency,
         sections: sections_json(visible_sections, @current_user, session, [], allow_sis_ids: true),
         settings: gradebook_settings(@context.global_id),
-        settings_update_url: api_v1_course_gradebook_settings_update_url(@context)
+        settings_update_url: api_v1_course_gradebook_settings_update_url(@context),
+        inactive_concluded_lmgb_filters: root_account.feature_enabled?(:inactive_concluded_lmgb_filters)
       }
     })
   end
@@ -956,7 +958,7 @@ class GradebooksController < ApplicationController
           env[:student_group_reason_for_change] = updated_group_info.reason_for_change if updated_group_info.reason_for_change.present?
         end
 
-        if @assignment.rubric_association
+        if @assignment.active_rubric_association?
           env[:update_rubric_assessment_url] = context_url(
             @context,
             :context_rubric_association_rubric_assessments_url,

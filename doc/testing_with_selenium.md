@@ -84,6 +84,21 @@ or run a specific Selenium test:
 bundle exec rspec spec/selenium/accounts_spec.rb:36
 ```
 
+### Running Tests against Headless Chrome
+
+Selenium tests can be run against headless Chrome by changing a few properties in
+`config/selenium.yml`. Specifically, you'll need to set `headless` to `true` and
+`window_size` to something that makes sense, like so:
+
+```yaml
+  headless: true
+  window_size: "1237,974"
+```
+
+This can be useful when you don't need to see what your test is doing, since it
+can run in the background without stealing focus or interrupting other work. It's
+especially useful when running specs many times to check for flakiness.
+
 ## Running Selenium Tests in Docker
 
 See the [Selenium section](https://github.com/instructure/canvas-lms/blob/master/doc/docker/developing_with_docker.md#selenium)

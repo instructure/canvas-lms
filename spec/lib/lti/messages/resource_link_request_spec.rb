@@ -42,6 +42,30 @@ describe Lti::Messages::ResourceLinkRequest do
       expect_course_resource_link_id(jws)
     end
 
+    describe 'custom parameters' do
+      let(:link_for_params) {
+        Lti::ResourceLink.new(
+          context_external_tool: tool_override || tool,
+          context: course,
+          custom: {
+            link_has_expansion2: "$Canvas.assignment.id",
+            no_expansion: "overrides tool param!"
+          }
+        )
+      }
+      let(:opts) { super().merge(resource_link_for_custom_params: link_for_params) }
+
+      context 'when link-level custom params are given in resource_link_for_custom_params' do
+        it 'merges them in with tool/placement parameters' do
+          expect(jws['https://purl.imsglobal.org/spec/lti/claim/custom']).to eq(
+            'link_has_expansion2' => assignment.id,
+            'has_expansion' => user.id,
+            'no_expansion' => 'overrides tool param!'
+          )
+        end
+      end
+    end
+
     it_behaves_like 'disabled rlid claim group check'
 
     it_behaves_like 'lti 1.3 message initialization'

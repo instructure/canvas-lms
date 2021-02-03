@@ -28,7 +28,7 @@ export default createStore({
   normalizeParams(originalParams) {
     const params = {
       ...originalParams,
-      include: ['total_students', 'teachers', 'subaccount', 'term', 'concluded'],
+      include: ['total_students', 'active_teachers', 'subaccount', 'term', 'concluded'],
       teacher_limit: 25,
       per_page: COURSES_TO_FETCH_PER_PAGE,
       no_avatar_fallback: '1'

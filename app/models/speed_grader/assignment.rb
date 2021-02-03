@@ -58,6 +58,7 @@ module SpeedGrader
         ],
         :include_root => false
       )
+
       res['context']['concluded'] = assignment.context.concluded?
       res['anonymize_students'] = assignment.anonymize_students?
       res['anonymize_graders'] = !assignment.can_view_other_grader_identities?(current_user)

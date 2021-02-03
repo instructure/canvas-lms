@@ -632,6 +632,7 @@ describe RubricsController do
       delete 'destroy', params: {:course_id => @course.id, :id => @rubric.id}
       assert_unauthorized
     end
+
     it "should delete the rubric" do
       course_with_teacher_logged_in(:active_all => true)
       rubric_association_model(:user => @user, :context => @course)
@@ -639,6 +640,17 @@ describe RubricsController do
       expect(response).to be_successful
       expect(assigns[:rubric]).to be_deleted
     end
+
+    # This should probably be fixed, but I want to document how this currently behaves.
+    it "returns a 500 if the rubric cannot be found" do
+      course_with_teacher_logged_in(active_all: true)
+      association = rubric_association_model(user: @user, context: @course)
+      association.destroy
+      delete 'destroy', params: { course_id: @course.id, id: @rubric.id }
+
+      expect(response.status).to eq 500
+    end
+
     it "should delete the rubric if the rubric is only associated with a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)
@@ -654,6 +666,7 @@ describe RubricsController do
       @rubric.reload
       expect(@rubric.deleted?).to be_truthy
     end
+
     it "should delete the rubric association even if the rubric doesn't belong to a course" do
       course_with_teacher_logged_in :active_all => true
       Account.site_admin.account_users.create!(user: @user)

@@ -19,6 +19,8 @@ module Lti
   module Ims
     class InvalidLaunch < StandardError; end
 
+    # Contains actions to handle the second step of an LTI 1.3
+    # Launch: The authentication request
     class AuthenticationController < ApplicationController
       include Lti::RedisMessageClient
 
@@ -41,10 +43,31 @@ module Lti
 
       # Redirect the "authorize" action for the domain specified
       # in the lti_message_hint
+      #
+      # This means that tools can simply use the canvas.instructure.com
+      # domain in the authentication requests rather than keeping
+      # track of institution-specific domain.
       def authorize_redirect
         redirect_to authorize_redirect_url
       end
 
+      # Handles the authentication response from an LTI tool. This
+      # is the second step in an LTI 1.3 launch.
+      #
+      # Please refer to the following specification sections:
+      # - https://www.imsglobal.org/spec/security/v1p0#step-2-authentication-request
+      # - http://www.imsglobal.org/spec/lti/v1p3/
+      #
+      # If the authentication validations described in the specifications
+      # succeed, this action uses the "lti_message_hint" parameter
+      # to retrieve a cached ID token (LTI launch) and sends it to the
+      # tool.
+      #
+      # The cached ID Token is generated at the time Canvas makes
+      # the login request to the tool.
+      #
+      # For more details on how the cached ID token is generated,
+      # please refer to the inline documentation of "app/models/lti/lti_advantage_adapter.rb"
       def authorize
         validate_oidc_params!
         validate_current_user!

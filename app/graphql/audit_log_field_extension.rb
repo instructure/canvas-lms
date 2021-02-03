@@ -142,7 +142,7 @@ class AuditLogFieldExtension < GraphQL::Schema::FieldExtension
       next if mutation == Mutations::DeleteConversationMessages
       next if mutation == Mutations::DeleteConversations
       next if mutation == Mutations::AddConversationMessage
-      next if mutation == Mutations::UpdateConversationParticipant
+      next if mutation == Mutations::UpdateConversationParticipants
 
       logger = Logger.new(mutation, context, arguments)
 

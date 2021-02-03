@@ -68,7 +68,6 @@ test('policyCellProps with twitter', () => {
 test('policyCellProps with sms_deprecation', () => {
   fakeENV.setup()
   ENV.NOTIFICATION_PREFERENCES_OPTIONS = {
-    deprecate_sms_enabled: true,
     allowed_sms_categories: ['announcement', 'grading']
   }
 

@@ -1,0 +1,90 @@
+#!/usr/bin/env groovy
+
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
+ *
+ * This file is part of Canvas.
+ *
+ * Canvas is free software: you can redistribute it and/or modify it under
+ * the terms of the GNU Affero General Public License as published by the Free
+ * Software Foundation, version 3 of the License.
+ *
+ * Canvas is distributed in the hope that it will be useful, but WITHOUT ANY
+ * WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+ * A PARTICULAR PURPOSE. See the GNU Affero General Public License for more
+ * details.
+ *
+ * You should have received a copy of the GNU Affero General Public License along
+ * with this program. If not, see <http://www.gnu.org/licenses/>.
+ */
+
+def SYNC_IMAGES = [
+  'instructure/ruby-passenger:2.6': [
+    job: '/Canvas/main-canvas-postgres-12-ruby-2.6-postmerge',
+    target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.6',
+  ],
+  'instructure/ruby-passenger:2.7-bionic': [
+    job: null,
+    target: 'starlord.inscloudgate.net/jenkins/ruby-passenger:2.7-bionic',
+  ],
+]
+
+pipeline {
+  agent { label 'canvas-docker' }
+
+  options {
+    ansiColor('xterm')
+    timestamps()
+  }
+
+  stages {
+    stage('Calculate Changed Images') {
+      steps {
+        script {
+          SYNC_IMAGES.each { srcTag, config ->
+            def dstJob = config['job']
+            def dstTag = config['target']
+
+            echo "ITERATE ${srcTag} AND ${dstTag}"
+
+            sh """
+              docker pull $srcTag
+              docker pull $dstTag || true
+            """
+
+            def srcImageId = sh(script: "docker images --filter=reference=$srcTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
+            def dstImageId = sh(script: "docker images --filter=reference=$dstTag --format '{{.ID}}'", returnStdout: true).trim() ?: 'unknown'
+
+            if(srcImageId == dstImageId) {
+              slackSend(
+                channel: '#devx-alerts',
+                color: 'good',
+                message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), no changes found"
+              )
+            } else {
+              sh """
+                docker tag $srcTag $dstTag
+                docker push $dstTag
+              """
+
+              if(dstJob) {
+                def buildResult = build(job: dstJob, parameters: [
+                  string(name: 'GERRIT_REFSPEC', value: "${env.GERRIT_REFSPEC}"),
+                ], propagate: false, wait: false)
+              }
+
+              slackSend(
+                channel: '#devx-alerts',
+                color: 'warning',
+                message: "syncing image ${srcTag} (${srcImageId}) to ${dstTag} (${dstImageId}), changes found"
+              )
+            }
+
+            echo "SRC ID $srcImageId"
+            echo "DST ID $dstImageId"
+          }
+        }
+      }
+    }
+  }
+}

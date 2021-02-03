@@ -131,7 +131,7 @@ describe OutcomeResultsController do
     outcome_course.assignments.create!(
       title: "outcome assignment",
       description: "this is an outcome assignment",
-      points_possible: outcome_rubric.points_possible,
+      points_possible: outcome_rubric.points_possible
     )
   end
 
@@ -184,9 +184,9 @@ describe OutcomeResultsController do
       expect(response).not_to be_successful
     end
 
-    context 'with muted assignment' do
+    context 'with manual post policy assignment' do
       before do
-        outcome_assignment.mute!
+        outcome_assignment.ensure_post_policy(post_manually: true)
       end
 
       it 'teacher should see result' do
@@ -211,6 +211,36 @@ describe OutcomeResultsController do
                         format: "json"
         json = parse_response(response)
         expect(json['outcome_results'].length).to eq 0
+      end
+    end
+
+    context 'with auto post policy (default) assignment' do
+      before do
+        outcome_assignment.ensure_post_policy(post_manually: false)
+      end
+
+      it 'teacher should see result' do
+        user_session(@teacher)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = JSON.parse(response.body.gsub("while(1);", ""))
+        expect(json['outcome_results'].length).to eq 1
+      end
+
+      it 'student should see result' do
+        user_session(@student)
+        get 'index', params: {:context_id => @course.id,
+                        :course_id => @course.id,
+                        :context_type => "Course",
+                        :user_ids => [@student.id],
+                        :outcome_ids => [@outcome.id]},
+                        format: "json"
+        json = parse_response(response)
+        expect(json['outcome_results'].length).to eq 1
       end
     end
 
@@ -307,6 +337,106 @@ describe OutcomeResultsController do
           res = create_result(@student.id, @outcome, outcome_assignment, 2, {:possible => 5})
           json = parse_response(get_rollups(sort_by: 'student', sort_order: 'desc', per_page: 1, page: 1))
           expect(json['rollups'][0]['scores'][0]['score']).to eq 1.2 # ( score of 2 / possible 5) * outcome.points_possible
+        end
+      end
+    end
+
+    context 'with the inactive_concluded_lmgb_filters FF' do
+      context 'enabled' do
+        before do
+          @course.account.enable_feature!(:inactive_concluded_lmgb_filters)
+        end
+
+        it 'displays rollups for concluded enrollments when they are included' do
+          StudentEnrollment.find_by(user_id: @student2.id).conclude
+          json = parse_response(get_rollups({}))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(1)
+          expect(rollups.first['scores'][0]['score']).to eq 1.0
+        end
+
+        it 'does not display rollups for concluded enrollments when they are not included' do
+          StudentEnrollment.find_by(user_id: @student2.id).conclude
+          json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
+          expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+        end
+
+        it 'displays rollups for a student who has an active and a concluded enrolllment regardless of filter' do
+          section1 = add_section 's1', course: outcome_course
+          student_in_section section1, user: @student2, allow_multiple_enrollments: true
+          StudentEnrollment.find_by(course_section_id: section1.id).conclude
+          json = parse_response(get_rollups(exclude: 'concluded_enrollments'))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(2)
+          expect(rollups.first['scores'][0]['score']).to eq 1.0
+          expect(rollups.second['scores'][0]['score']).to eq 1.0
+        end
+
+        it 'displays rollups for inactive enrollments when they are included' do
+          StudentEnrollment.find_by(user_id: @student2.id).deactivate
+          json = parse_response(get_rollups({}))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(1)
+          expect(rollups.first['scores'][0]['score']).to eq 1.0
+        end
+
+        it 'does not display rollups for inactive enrollments when they are not included' do
+          StudentEnrollment.find_by(user_id: @student2.id).deactivate
+          json = parse_response(get_rollups(exclude: 'inactive_enrollments'))
+          expect(json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}.count).to eq(0)
+        end
+
+        context 'users with enrollments of different enrollment states' do
+          before do
+            StudentEnrollment.find_by(user_id: @student2.id).deactivate
+            @section1 = add_section 's1', course: outcome_course
+            student_in_section @section1, user: @student2, allow_multiple_enrollments: true
+            StudentEnrollment.find_by(course_section_id: @section1.id).conclude
+          end
+
+          it 'users whose enrollments are all excluded are not included' do
+            json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
+            rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+            expect(rollups.count).to eq(0)
+          end
+
+          it 'users whose enrollments are all excluded are not included in a specified section' do
+            json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments'],
+                                              section_id: @section1.id))
+            rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+            expect(rollups.count).to eq(0)
+          end
+
+          it 'users who contain an active enrollment are always included' do
+            section3 = add_section 's3', course: outcome_course
+            student_in_section section3, user: @student2, allow_multiple_enrollments: true
+            json = parse_response(get_rollups(exclude: ['concluded_enrollments', 'inactive_enrollments']))
+            rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+            expect(rollups.count).to eq(3)
+            expect(rollups.first['scores'][0]['score']).to eq 1.0
+            expect(rollups.second['scores'][0]['score']).to eq 1.0
+            expect(rollups.third['scores'][0]['score']).to eq 1.0
+          end
+        end
+      end
+
+      context 'disabled' do
+        before do
+          @course.account.disable_feature!(:inactive_concluded_lmgb_filters)
+        end
+
+        it 'does not display rollups for concluded enrollments when they are included' do
+          StudentEnrollment.find_by(user_id: @student2.id).conclude
+          json = parse_response(get_rollups({}))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(0)
+        end
+
+        it 'does not display for inactive enrollments when they are included' do
+          StudentEnrollment.find_by(user_id: @student2.id).deactivate
+          json = parse_response(get_rollups({}))
+          rollups = json['rollups'].select{|r| r['links']['user'] == @student2.id.to_s}
+          expect(rollups.count).to eq(0)
         end
       end
     end

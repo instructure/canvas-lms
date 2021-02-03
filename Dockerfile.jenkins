@@ -4,7 +4,7 @@
 
 ARG RUBY=2.6-p6.0.4
 
-FROM instructure/ruby-passenger:$RUBY
+FROM starlord.inscloudgate.net/jenkins/ruby-passenger:$RUBY
 LABEL maintainer="Instructure"
 
 ARG POSTGRES_CLIENT=12

@@ -32,6 +32,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
   let network
   let performanceControls
   let loadAssignmentsByGradingPeriod
+  let requestCharacterLimit
 
   suiteHooks.beforeEach(() => {
     const assignments = [
@@ -83,6 +84,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
       dispatch = new RequestDispatch()
       performanceControls = new PerformanceControls()
       loadAssignmentsByGradingPeriod = true
+      requestCharacterLimit = 8000
 
       gradebook = createGradebook({
         context_id: '1201'
@@ -99,7 +101,8 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         dispatch,
         gradebook,
         performanceControls,
-        loadAssignmentsByGradingPeriod
+        loadAssignmentsByGradingPeriod,
+        requestCharacterLimit
       })
 
       return dataLoader.loadAssignmentGroups()
@@ -145,7 +148,8 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
           grading_period_assignments: {
             3: ['1', '8', '12'],
             19: ['4', '77', '99'],
-            66: ['3']
+            66: ['3'],
+            68: []
           }
         })
       })
@@ -158,14 +162,30 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         strictEqual(requests.length, 1)
       })
 
-      test('makes two requests if a specific grading period is selected and release flag is enabled', async () => {
+      test('makes two requests if a grading period is selected and release flag is enabled', async () => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const requests = getRequests()
         strictEqual(requests.length, 2)
       })
 
-      test('makes one request if a specific grading period is selected and release flag is disabled', async () => {
+      test('makes one request if a grading period is selected and too many assignments are being requested', async () => {
+        requestCharacterLimit = 5
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const requests = getRequests()
+        strictEqual(requests.length, 1)
+      })
+
+      test('makes one request if a grading period is selected that has no assignments in it', async () => {
+        gradebook.gradingPeriodId = '68'
+        loadAssignmentGroups()
+        await network.allRequestsReady()
+        const requests = getRequests()
+        strictEqual(requests.length, 1)
+      })
+
+      test('makes one request if a grading period is selected and release flag is disabled', async () => {
         loadAssignmentsByGradingPeriod = false
         loadAssignmentGroups()
         await network.allRequestsReady()
@@ -177,14 +197,14 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const {params} = getRequests()[0]
-        deepEqual(params.assignment_ids, ['1', '8', '12'])
+        strictEqual(params.assignment_ids, '1,8,12')
       })
 
       test('makes another request to get assignments for all other grading periods', async () => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const {params} = getRequests()[1]
-        deepEqual(params.assignment_ids, ['4', '77', '99', '3'])
+        strictEqual(params.assignment_ids, '4,77,99,3')
       })
 
       test('excludes assignments in the second request that were present in the first', async () => {
@@ -197,7 +217,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const {params} = getRequests()[1]
-        deepEqual(params.assignment_ids, ['3'])
+        strictEqual(params.assignment_ids, '3')
       })
 
       test('does not include duplicates in requested assignment ids', async () => {
@@ -212,7 +232,7 @@ QUnit.module('Gradebook > DataLoader > AssignmentGroupsLoader', suiteHooks => {
         loadAssignmentGroups()
         await network.allRequestsReady()
         const {params} = getRequests()[1]
-        deepEqual(params.assignment_ids, ['3', '4', '5', '6', '7'])
+        strictEqual(params.assignment_ids, '3,4,5,6,7')
       })
     })
 

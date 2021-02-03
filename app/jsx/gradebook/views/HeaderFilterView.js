@@ -22,6 +22,12 @@ import 'compiled/jquery.kylemenu'
 import template from 'jst/gradebook/header_filter'
 
 class HeaderFilterView extends View {
+  toJSON() {
+    return {
+      inactive_concluded_lmgb_filters: ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
+    }
+  }
+
   onClick(e) {
     e.preventDefault()
     e.stopPropagation()

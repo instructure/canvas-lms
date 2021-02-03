@@ -721,6 +721,61 @@ describe CoursesController, type: :request do
     end
   end
 
+  describe "user_progress" do
+    before :once do
+      account_admin_user
+      @module = @course.context_modules.create!(:name => "teh module")
+      @assignment = @course.assignments.create!(:title => "teh assignment")
+      @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'})
+      @module.completion_requirements = {@tag.id => {:type => 'must_submit'}}
+      @module.publish
+      @module.save!
+    end
+
+    it "allows a student to query 'self'" do
+      json = api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/self/progress",
+                              { :course_id => @course.to_param, :user_id => 'self', :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "allows an administrator to query another user" do
+      json = api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "returns 404 if querying a user who isn't in the course" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{other_user.id}/progress",
+                       { :course_id => @course.to_param, :user_id => other_user.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 404 })
+    end
+
+    it "returns 400 if querying a user who isn't a student" do
+      other_user = user_factory
+      api_call_as_user(@admin, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 400 })
+    end
+
+    it "allows a teacher to query a student in the course" do
+      json = api_call_as_user(@teacher, :get, "/api/v1/courses/#{@course.id}/users/#{@student.id}/progress",
+                              { :course_id => @course.to_param, :user_id => @student.to_param, :controller => 'courses',
+                                :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 200 })
+      expect(json).to eq({"requirement_count"=>1, "requirement_completed_count"=>0, "next_requirement_url"=>nil, "completed_at"=>nil})
+    end
+
+    it "verifies that a user has permission" do
+      api_call_as_user(@student, :get, "/api/v1/courses/#{@course.id}/users/#{@teacher.id}/progress",
+                       { :course_id => @course.to_param, :user_id => @teacher.to_param, :controller => 'courses',
+                         :action => 'user_progress', :format => 'json' }, {}, {}, { expected_status: 401 })
+    end
+
+
+  end
+
   it 'should paginate the course list' do
     json = api_call(:get, "/api/v1/courses.json?per_page=1",
             { :controller => 'courses', :action => 'index', :format => 'json', :per_page => '1' })
@@ -796,7 +851,8 @@ describe CoursesController, type: :request do
           'sis_import_id' => nil,
           'workflow_state' => 'available',
           'default_view' => 'modules',
-          'storage_quota_mb' => @account.default_storage_quota_mb
+          'storage_quota_mb' => @account.default_storage_quota_mb,
+          'homeroom_course' => false
         })
         expect(Auditors::Course).to receive(:record_created).once
         json = api_call(:post, @resource_path, @resource_params, post_params)
@@ -876,7 +932,8 @@ describe CoursesController, type: :request do
           'created_at' => new_course.created_at.as_json,
           'calendar' => { 'ics' => "http://www.example.com/feeds/calendars/course_#{new_course.uuid}.ics" },
           'uuid' => new_course.uuid,
-          'blueprint' => false
+          'blueprint' => false,
+          'homeroom_course' => false
         )
         expect(json).to eql course_response
       end
@@ -3448,6 +3505,7 @@ describe CoursesController, type: :request do
         'enrollment_term_id' => @course.enrollment_term_id,
         'restrict_enrollments_to_course_dates' => false,
         'time_zone' => 'America/Los_Angeles',
+        'homeroom_course' => false,
         'uuid' => @course1.uuid,
         'blueprint' => false,
         'license' => nil
@@ -3728,6 +3786,7 @@ describe CoursesController, type: :request do
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => true,
+          'homeroom_course' => false,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3761,7 +3820,8 @@ describe CoursesController, type: :request do
           :restrict_student_future_view => true,
           :show_announcements_on_home_page => false,
           :syllabus_course_summary => false,
-          :home_page_announcement_limit => nil
+          :home_page_announcement_limit => nil,
+          :homeroom_course => true
         })
         expect(json).to eq({
           'allow_final_grade_override' => true,
@@ -3783,6 +3843,7 @@ describe CoursesController, type: :request do
           'show_announcements_on_home_page' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => false,
+          'homeroom_course' => true,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil
@@ -3801,6 +3862,7 @@ describe CoursesController, type: :request do
         expect(@course.show_announcements_on_home_page).to eq false
         expect(@course.syllabus_course_summary?).to eq false
         expect(@course.home_page_announcement_limit).to be nil
+        expect(@course.homeroom_course?).to eq true
       end
     end
 
@@ -3836,6 +3898,7 @@ describe CoursesController, type: :request do
           'usage_rights_required' => false,
           'home_page_announcement_limit' => nil,
           'syllabus_course_summary' => true,
+          'homeroom_course' => false,
           'image_url' => nil,
           'image_id' => nil,
           'image' => nil

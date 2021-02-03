@@ -37,6 +37,7 @@ def runSeleniumSuite(total, index) {
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
+      '1',
       '3',
       config.force_failure,
       config.patchsetTag
@@ -64,6 +65,7 @@ def runRSpecSuite(total, index) {
       config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
       '.*/(selenium|contracts)',
+      '1',
       '4',
       config.force_failure,
       config.patchsetTag
@@ -80,6 +82,7 @@ def _runRspecTestSuite(
     test_file_pattern,
     exclude_regex,
     docker_processes,
+    rspec_processes,
     force_failure,
     patchsetTag
 ) {
@@ -92,6 +95,7 @@ def _runRspecTestSuite(
       "EXCLUDE_TESTS=$exclude_regex",
       "CI_NODE_TOTAL=$total",
       "DOCKER_PROCESSES=$docker_processes",
+      "RSPEC_PROCESSES=$rspec_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
       "SELENIUM_VERSION=3.141.59-20201119",
@@ -112,7 +116,12 @@ def _runRspecTestSuite(
     } finally {
       // copy spec failures to local
       sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
+
+      if(configuration.getBoolean('upload-docker-logs', 'false')) {
+        sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${index}.log"
+        archiveArtifacts(artifacts: "tmp/docker-${prefix}-${index}.log")
+      }
 
       archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
       findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
@@ -137,12 +146,12 @@ def _runRspecTestSuite(
       }
 
       if (env.RSPEC_LOG == '1') {
-        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime_rspec_tests.log ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
         archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
       }
 
       sh 'rm -rf ./tmp'
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }

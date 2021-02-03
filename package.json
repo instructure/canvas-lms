@@ -11,13 +11,11 @@
     "packages": [
       "gems/canvas_i18nliner",
       "gems/plugins/*",
-      "packages/*",
-      "client_apps/*"
+      "packages/*"
     ],
     "nohoist": [
-      "canvas_quizzes/grunt*",
-      "canvas_quizzes/jasmine*",
-      "**/tinymce","**/tinymce/**"
+      "**/tinymce",
+      "**/tinymce/**"
     ]
   },
   "dependencies": {
@@ -145,6 +143,7 @@
     "react-lazy-load": "^3.0.13",
     "react-modal": "^3",
     "react-redux": "^5.1.1",
+    "react-router-dom": "^5.2.0",
     "react-tokeninput": "^2.5.0",
     "react-transition-group": "^1",
     "redux": "^4.0.1",
@@ -188,6 +187,7 @@
     "babel-plugin-dynamic-import-node": "^2.2.0",
     "babel-plugin-transform-amd-to-commonjs": "^1.4.0",
     "babel-plugin-transform-react-remove-prop-types": "^0.4",
+    "chai-assert-change": "^2.0.0",
     "clean-webpack-plugin": "^3",
     "coffee-loader": "~0.7.2",
     "coffee-script": "^1",
@@ -216,6 +216,7 @@
     "eslint-plugin-react-hooks": "^1",
     "exports-loader": "^0.7",
     "expose-loader": "^0.7",
+    "fast-glob": "^3.2.4",
     "fetch-mock": "^7",
     "file-loader": "^4",
     "gglobby": "0.0.3",
@@ -244,7 +245,6 @@
     "jest-moxios-utils": "^1",
     "jest-raw-loader": "^1",
     "json-loader": "^0.5.7",
-    "jsx-loader": "0.11.2",
     "karma": "^3",
     "karma-chrome-launcher": "^2",
     "karma-coverage-istanbul-reporter": "^2",
@@ -254,9 +254,11 @@
     "karma-sourcemap-loader": "^0.3",
     "karma-spec-reporter": "^0.0.32",
     "karma-verbose-reporter": "^0.0.6",
-    "karma-webpack": "^3",
+    "karma-webpack": "necessary until https://github.com/ryanclark/karma-webpack/pull/449 is merged",
+    "karma-webpack": "instructure/karma-webpack#patch1",
     "lint-staged": "^9",
     "merge-stream": "^2",
+    "mkdirp": "^1.0.4",
     "mockdate": "^2.0.2",
     "moment-timezone-data-webpack-plugin": "^1.0.3",
     "moxios": "^0.4",
@@ -326,11 +328,11 @@
     "lint:js:packages": "eslint ./packages/**/*.js",
     "lint:style": "stylelint  './app/**/*.{css,scss}' './packages/**/*.{css,scss}'",
     "lint:xss": "node ./script/xsslint.js",
-    "postinstall": "test -n \"$DISABLE_POSTINSTALL\" || (yarn build:packages && ./script/install_hooks && ./script/fix_inst_esm.sh)",
+    "postinstall": "yarn dedupe-yarn; test -n \"$DISABLE_POSTINSTALL\" || (yarn build:packages && ./script/install_hooks && ./script/fix_inst_esm.js)",
     "webpack:analyze": "echo 'if you get any errors here, make sure you have ran `rake canvas:compile_assets` first' && NODE_ENV=production SKIP_SOURCEMAPS=1 node --max_old_space_size=8096 $(yarn bin)/webpack --json > stats-prod.json && NODE_OPTIONS=\"--max_old_space_size=8192\" npx webpack-bundle-analyzer stats-prod.json public/dist/webpack-production",
     "webpack": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --progress --color --watch",
-    "webpack-development": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color && yarn lint:browser-code",
-    "webpack-production": "NODE_ENV=production gulp rev && NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color && yarn lint:browser-code",
+    "webpack-development": "gulp rev 1> /dev/null & NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
+    "webpack-production": "NODE_ENV=production gulp rev && NODE_ENV=production NODE_OPTIONS=\"--max_old_space_size=8192\" webpack --color",
     "workspace-run": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report -c $@; exit $?; } && r",
     "workspace-run-serial": "r() { wsrun --fast-exit --exclude-missing --collect-logs --report --serial -c $@; exit $?; } && r",
     "jspec": "./spec/jspec.sh",
@@ -345,6 +347,8 @@
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
     "graphael": "this is just here so yarn.lock looks the same whether the analytics plugin is checked out or not",
-    "graphael": "https://github.com/instructure/graphael.git"
+    "graphael": "https://github.com/instructure/graphael.git",
+    "babel-plugin-dynamic-import-node": "if we let this upgrade to recent versions, we hit https://github.com/babel/babel/issues/11607",
+    "babel-plugin-dynamic-import-node": "2.3.0"
   }
 }

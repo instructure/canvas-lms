@@ -140,5 +140,19 @@ describe StudentEnrollment do
       enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: false)
       expect(grade_change_event).to be nil
     end
+
+    it "does not record a grade change if the override score did not actually change" do
+      enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
+
+      expect {
+        enrollment.update_override_score(override_score: 90.0, updating_user: teacher, record_grade_change: true)
+      }.not_to change {
+        Auditors::ActiveRecord::GradeChangeRecord.where(
+          context_id: course.id,
+          student_id: student.id,
+          assignment_id: nil
+        ).count
+      }
+    end
   end
 end

@@ -47,7 +47,7 @@
 <% js_bundle 'legacy/assignments_peer_reviews' %>
 
 <h1><%= t :title, "%{assignment} Peer Reviews", :assignment => @assignment.title %></h1>
-  <% if @assignment.rubric_association %>
+  <% if @assignment.active_rubric_association? %>
     <%= t :overview_with_rubric, "Student peer reviews will be considered complete when students have commented
       at least once on the page and filled out the rubric form for the assignment." %>
   <% else %>

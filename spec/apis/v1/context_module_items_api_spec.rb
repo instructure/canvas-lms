@@ -122,7 +122,8 @@ describe "Module Items API", type: :request do
               "indent" => 0,
               "completion_requirement" => { "type" => "must_submit" },
               "published" => false,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "quiz_lti" => false
           },
           {
               "type" => "Quiz",
@@ -135,7 +136,8 @@ describe "Module Items API", type: :request do
               "indent" => 0,
               "completion_requirement" => { "type" => "min_score", "min_score" => 10.0 },
               "published" => true,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "quiz_lti" => false
           },
           {
               "type" => "Discussion",
@@ -148,7 +150,8 @@ describe "Module Items API", type: :request do
               "indent" => 0,
               "completion_requirement" => { "type" => "must_contribute" },
               "published" => true,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "quiz_lti" => false
           },
           {
               "type" => "SubHeader",
@@ -157,7 +160,8 @@ describe "Module Items API", type: :request do
               "title" => @subheader_tag.title,
               "indent" => 0,
               "published" => true,
-              "module_id" => @module1.id
+              "module_id" => @module1.id,
+              "quiz_lti" => false
           },
           {
               "type" => "ExternalUrl",
@@ -170,7 +174,8 @@ describe "Module Items API", type: :request do
               "completion_requirement" => { "type" => "must_view" },
               "published" => true,
               "module_id" => @module1.id,
-              "new_tab" => nil
+              "new_tab" => nil,
+              "quiz_lti" => false
           }
       ]
       expect(json).to eq expected
@@ -266,7 +271,8 @@ describe "Module Items API", type: :request do
           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/pages/#{@wiki_page.url}",
           "page_url" => @wiki_page.url,
           "published" => true,
-          "module_id" => @module2.id
+          "module_id" => @module2.id,
+          "quiz_lti" => false
       })
 
       @attachment_tag.unpublish
@@ -284,7 +290,8 @@ describe "Module Items API", type: :request do
           "indent" => 0,
           "url" => "http://www.example.com/api/v1/courses/#{@course.id}/files/#{@attachment.id}",
           "published" => false,
-          "module_id" => @module2.id
+          "module_id" => @module2.id,
+          "quiz_lti" => false
       })
     end
 

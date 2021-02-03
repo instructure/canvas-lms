@@ -519,7 +519,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         end
       end
 
-      it 'should close links tray if open when opening link options' do
+      it 'should close links tray if open when opening link options', custom_timeout: 300 do
         visit_front_page_edit(@course)
         wait_for_tiny(edit_wiki_css)
 
@@ -531,6 +531,7 @@ describe 'RCE next tests', ignore_js_errors: true do
         def switch_trays
           click_links_toolbar_menu_button
           click_course_links
+          wait_for_ajaximations
           expect(course_links_tray).to be_displayed
 
           click_link_for_options
@@ -544,9 +545,9 @@ describe 'RCE next tests', ignore_js_errors: true do
           driver.switch_to.default_content
         end
 
-        # Duplicate trays only appear sporadically, so repeate this several times to make sure
+        # Duplicate trays only appear sporadically, so repeat this several times to make sure
         # we aren't getting multiple trays open at once.
-        5.times { switch_trays }
+        3.times { switch_trays }
       end
 
       it 'should display assignment publish status in links accordion' do

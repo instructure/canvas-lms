@@ -433,8 +433,16 @@ module ActiveRecord
         expect { User.connection.remove_foreign_key(:discussion_topics, :conversations, if_exists: true) }.not_to raise_exception
       end
 
+      it "remove_foreign_key allows column and if_exists" do
+        expect { User.connection.remove_foreign_key(:enrollments, column: :associated_user_id, if_exists: true) }.not_to raise_exception
+      end
+
       it "foreign_key_for prefers a 'bare' FK first" do
-        expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+        if CANVAS_RAILS5_2
+          expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+        else
+          expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
+        end
       end
 
       it "remove_index allows if_exists" do

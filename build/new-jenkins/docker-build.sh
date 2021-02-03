@@ -35,6 +35,8 @@ WORKSPACE=${WORKSPACE:-$(pwd)}
 # $WEBPACK_BUILDER_TAG: additional tag for the webpack-builder image
 #   - set to patchset unique ID for builds to reference without knowing about the hash ID
 
+export CACHE_VERSION="2020-12-15.1"
+
 source ./build/new-jenkins/docker-build-helpers.sh
 
 DOCKER_BUILDKIT=1 docker build --file Dockerfile.jenkins-cache --tag "local/cache-helper-collect-gems" --target cache-helper-collect-gems "$WORKSPACE"
@@ -137,7 +139,6 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
       --label "RUBY_RUNNER_SELECTED_TAG=$RUBY_RUNNER_SELECTED_TAG" \
       --label "YARN_RUNNER_SELECTED_TAG=$YARN_RUNNER_SELECTED_TAG" \
       --tag "${WEBPACK_BUILDER_TAGS[SAVE_TAG]}" \
-      ${WEBPACK_BUILDER_TAG:+ --tag "$WEBPACK_BUILDER_TAG"} \
       - < Dockerfile.jenkins.webpack-builder
 
     WEBPACK_BUILDER_SELECTED_TAG=${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
@@ -156,7 +157,7 @@ if [ -z "${WEBPACK_CACHE_SELECTED_TAG}" ]; then
     tag_many $RUBY_RUNNER_SELECTED_TAG local/ruby-runner ${RUBY_RUNNER_TAGS[SAVE_TAG]}
   fi
 
-  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
+  tag_many $WEBPACK_BUILDER_SELECTED_TAG local/webpack-builder ${WEBPACK_BUILDER_TAGS[SAVE_TAG]} ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]-}
 
   # Using a multi-stage build is safe for the below image because
   # there is no expectation that we will need to use docker's
@@ -177,6 +178,12 @@ else
   RUBY_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.RUBY_RUNNER_SELECTED_TAG }}')
   YARN_RUNNER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.YARN_RUNNER_SELECTED_TAG }}')
   WEBPACK_BUILDER_SELECTED_TAG=$(docker inspect $WEBPACK_CACHE_SELECTED_TAG --format '{{ .Config.Labels.WEBPACK_BUILDER_SELECTED_TAG }}')
+
+  [ "$RUBY_RUNNER_SELECTED_TAG" != "${RUBY_RUNNER_TAGS[SAVE_TAG]}" ] && tag_remote_async "RUBY_RUNNER_TAG_REMOTE_SAVE_PID" $RUBY_RUNNER_SELECTED_TAG ${RUBY_RUNNER_TAGS[SAVE_TAG]}
+  [ "$YARN_RUNNER_SELECTED_TAG" != "${YARN_RUNNER_TAGS[SAVE_TAG]}" ] && tag_remote_async "YARN_RUNNER_TAG_REMOTE_SAVE_PID" $YARN_RUNNER_SELECTED_TAG ${YARN_RUNNER_TAGS[SAVE_TAG]}
+  [ "$WEBPACK_BUILDER_SELECTED_TAG" != "${WEBPACK_BUILDER_TAGS[SAVE_TAG]}" ] && tag_remote_async "WEBPACK_BUILDER_TAG_REMOTE_SAVE_PID" $WEBPACK_BUILDER_SELECTED_TAG ${WEBPACK_BUILDER_TAGS[SAVE_TAG]}
+
+  [ ! -z "${CACHE_UNIQUE_SCOPE-}" ] && tag_remote_async "WEBPACK_BUILDER_TAG_REMOTE_UNIQUE_PID" $WEBPACK_BUILDER_SELECTED_TAG ${WEBPACK_BUILDER_TAGS[UNIQUE_TAG]}
 fi
 
 tag_many $WEBPACK_CACHE_SELECTED_TAG local/webpack-cache ${WEBPACK_CACHE_TAGS[SAVE_TAG]}

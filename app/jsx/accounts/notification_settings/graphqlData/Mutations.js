@@ -25,6 +25,7 @@ export const UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES = gql`
     $frequency: NotificationFrequencyType
     $sendScoresInEmails: Boolean
     $sendObservedNamesInNotifications: Boolean
+    $hasReadPrivacyNotice: Boolean
   ) {
     updateNotificationPreferences(
       input: {
@@ -35,6 +36,7 @@ export const UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES = gql`
         frequency: $frequency
         sendScoresInEmails: $sendScoresInEmails
         sendObservedNamesInNotifications: $sendObservedNamesInNotifications
+        hasReadPrivacyNotice: $hasReadPrivacyNotice
       }
     ) {
       user {
@@ -42,6 +44,7 @@ export const UPDATE_ACCOUNT_NOTIFICATION_PREFERENCES = gql`
         notificationPreferences {
           sendScoresInEmails
           sendObservedNamesInNotifications
+          readPrivacyNoticeDate
           channels(channelId: $channelId) {
             _id
             path

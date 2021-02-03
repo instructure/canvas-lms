@@ -142,7 +142,7 @@ describe 'account authentication' do
         expect(config.log_out_url).to eq 'logout.example'
         expect(config.certificate_fingerprint).to eq 'abc123'
         expect(config.login_attribute).to eq 'NameID'
-        expect(config.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        expect(config.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
         expect(config.requested_authn_context).to eq nil
         expect(config.parent_registration).to be_falsey
       end
@@ -166,7 +166,7 @@ describe 'account authentication' do
         expect(config.log_out_url).to eq ''
         expect(config.certificate_fingerprint).to eq ''
         expect(config.login_attribute).to eq 'NameID'
-        expect(config.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:emailAddress'
+        expect(config.identifier_format).to eq 'urn:oasis:names:tc:SAML:1.1:nameid-format:unspecified'
         expect(config.requested_authn_context).to eq nil
         expect(config.parent_registration).to be_falsey
       end

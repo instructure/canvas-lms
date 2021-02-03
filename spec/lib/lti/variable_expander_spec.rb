@@ -931,6 +931,13 @@ module Lti
           expect(exp_hash[:test]).to eq 'course1'
         end
 
+        it 'has substitution for $com.instructure.Course.integrationId' do
+          course.integration_id = 'integration1'
+          exp_hash = {test: '$com.instructure.Course.integrationId'}
+          variable_expander.expand_variables!(exp_hash)
+          expect(exp_hash[:test]).to eq 'integration1'
+        end
+
         it 'has substitution for $Canvas.enrollment.enrollmentState' do
           allow(Lti::SubstitutionsHelper).to receive(:new).and_return(substitution_helper)
           allow(substitution_helper).to receive(:enrollment_state).and_return('active')

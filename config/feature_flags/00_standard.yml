@@ -438,3 +438,8 @@ easy_student_view:
   display_name: Easy Toggle Student View
   description: Places a button in the top-right corner of course pages allowing teachers to quickly switch to Student
     View.
+new_course_availability_ui:
+  state: hidden
+  applies_to: SiteAdmin
+  display_name: New Course Availability UI
+  description: Refreshes the section of the UI on the course settings page controlling course availability options.

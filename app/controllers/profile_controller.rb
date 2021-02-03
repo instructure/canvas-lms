@@ -235,11 +235,12 @@ class ProfileController < ApplicationController
       add_crumb(@current_user.short_name, profile_path)
       add_crumb(t("Account Notification Settings"))
       js_env NOTIFICATION_PREFERENCES_OPTIONS: {
-        deprecate_sms_enabled: !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
         reduce_push_enabled: Account.site_admin.feature_enabled?(:reduce_push_notifications),
         allowed_sms_categories: Notification.categories_to_send_in_sms(@domain_root_account),
         allowed_push_categories: Notification.categories_to_send_in_push,
-        send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account)
+        send_scores_in_emails_text: Notification.where(category: 'Grading').first.related_user_setting(@user, @domain_root_account),
+        read_privacy_info: @user.preferences[:read_notification_privacy_info],
+        account_privacy_notice: @domain_root_account.settings[:external_notification_warning]
       }
       js_bundle :account_notification_settings_show
       render html: '', layout: true
@@ -262,7 +263,6 @@ class ProfileController < ApplicationController
       :channels => @user.communication_channels.all_ordered_for_display(@user).map { |c| communication_channel_json(c, @user, session) },
       :policies => NotificationPolicy.setup_with_default_policies(@user, full_category_list).map { |p| notification_policy_json(p, @user, session).tap { |json| json[:communication_channel_id] = p.communication_channel_id } },
       :categories => categories,
-      :deprecate_sms_enabled => !@domain_root_account.settings[:sms_allowed] && Account.site_admin.feature_enabled?(:deprecate_sms),
       :allowed_sms_categories => Notification.categories_to_send_in_sms(@domain_root_account),
       :update_url => communication_update_profile_path,
       :show_observed_names => @user.observer_enrollments.any? || @user.as_observer_observation_links.any? ? @user.send_observed_names_in_notifications? : nil

@@ -838,7 +838,7 @@ class SubmissionsApiController < ApplicationController
       end
 
       assessment = params[:rubric_assessment]
-      if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
+      if assessment.is_a?(ActionController::Parameters) && @assignment.active_rubric_association?
         if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map{|c| c.id.to_s}).empty?
           return render :json => {:message => "invalid rubric_assessment"}, :status => :bad_request
         end

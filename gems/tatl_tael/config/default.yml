@@ -20,14 +20,12 @@ CopyrightLinter:
       - "**/mediaelement/**"
       - "**/shims/**"
       - "**/vendor/**"
-      - "**/symlink_to_node_modules/**"
       - "gems/tatl_tael/spec/lib/tatl_tael/linters/fixtures/**"
   Regexes:
     FirstLineExceptions:
       - !ruby/regexp '/^#!/' # e.g. "#!/usr/bin/env ruby"
       - !ruby/regexp '/coding:/' # encodings
       - !ruby/regexp '/frozen_string_literal:/'
-      - !ruby/regexp '/@jsx React\.DOM/' # jsx header (see client_apps/quizzes)
     CommentPrefixRegex: !ruby/regexp '/^( *)?(#|\/\/|\/?\*+|<%|\{\{\!)( *)?/'
   CopyrightYearPlaceholder: "CURRENT_YEAR"
   Copyright: |-
@@ -136,7 +134,6 @@ SeleniumSpecsLinter:
       - "**/mediaelement/**"
       - "**/shims/**"
       - "**/vendor/**"
-      - "**/symlink_to_node_modules/**"
     PublicJsSpec:
       - "spec/coffeescripts/**"
       - "spec/javascripts/**"
@@ -201,7 +198,6 @@ Simple/PublicJsSpecsLinter:
     - "**/bower/**"
     - "**/mediaelement/**"
     - "**/vendor/**"
-    - "**/symlink_to_node_modules/**"
   Requirement:
     Include:
     - "app/jsx/**/__tests__/**"

@@ -1,6 +1,0 @@
-{
-  "lodash": "underscore",
-  "node_modules-version-of-backbone": "symlink_to_node_modules/backbone/backbone",
-  "backbone": "Backbone",
-  "jquery/instructure_date_and_time": "jquery.instructure_date_and_time"
-}

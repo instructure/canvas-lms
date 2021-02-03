@@ -42,7 +42,8 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
     user_id: nil,
     send_scores_in_emails: nil,
     send_observed_names_in_notifications: nil,
-    is_policy_override: nil
+    is_policy_override: nil,
+    has_read_privacy_notice: nil
   )
     <<~GQL
       mutation {
@@ -57,6 +58,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
           #{"sendScoresInEmails: #{send_scores_in_emails}" unless send_scores_in_emails.nil?}
           #{"sendObservedNamesInNotifications: #{send_observed_names_in_notifications}" unless send_observed_names_in_notifications.nil?}
           #{"isPolicyOverride: #{is_policy_override}" unless is_policy_override.nil?}
+          #{"hasReadPrivacyNotice: #{has_read_privacy_notice}" if has_read_privacy_notice}
         }) {
           user {
             #{notification_preferences_str(
@@ -89,6 +91,7 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
       notificationPreferences {
         sendScoresInEmails(courseId: #{course_id})
         sendObservedNamesInNotifications
+        readPrivacyNoticeDate
         channels {
           #{"notificationPolicyOverrides(
             contextType: #{context_type},
@@ -118,6 +121,21 @@ RSpec.describe Mutations::UpdateNotificationPreferences do
   def run_mutation(opts = {}, current_user = @teacher)
     result = CanvasSchema.execute(mutation_str(opts), context: {current_user: current_user, request: ActionDispatch::TestRequest.create})
     result.to_h.with_indifferent_access
+  end
+
+  context 'privacy notice' do
+    it 'sets the user preference' do
+      result = run_mutation(
+        user_id: @teacher.id,
+        account_id: @account.id,
+        context_type: 'Account',
+        has_read_privacy_notice: true
+      )
+      expect(result.dig(:data, :updateNotificationPreferences, :errors)).to be nil
+      expect(result.dig(
+        :data, :updateNotificationPreferences, :user, :notificationPreferences, :readPrivacyNoticeDate
+      )).to eq @teacher.preferences[:read_notification_privacy_info]
+    end
   end
 
   context 'send observed names in notifications' do

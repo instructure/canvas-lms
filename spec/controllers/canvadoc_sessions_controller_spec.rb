@@ -365,6 +365,19 @@ describe CanvadocSessionsController do
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end
 
+      it "passes use_cloudfront as true when feature flag is set to true" do
+        Account.site_admin.enable_feature!(:use_cloudfront_for_docviewer)
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes use_cloudfront as false when feature flag is not set to true" do
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: false))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
       it "passes user information based on the submission (if past submission / missing attachment assocation)" do
         @submission.attachment_associations.destroy_all
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(user_id: @student.global_id.to_s))

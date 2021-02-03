@@ -33,11 +33,11 @@ import I18n from 'i18n!conversations_2'
 export const MessageListItem = ({...props}) => {
   const [selected, setSelected] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
-  const [isStarred, setIsStarred] = useState(props.conversation.starred)
+  const [isStarred, setIsStarred] = useState(props.isStarred)
 
   const handleSelectionChange = () => {
-    props.onSelect(!selected)
     setSelected(!selected)
+    props.onSelect(props.conversation)
   }
 
   const handleMessageClick = e => {
@@ -52,20 +52,27 @@ export const MessageListItem = ({...props}) => {
   }
 
   const formatParticipants = () => {
-    const participantsStr = props.conversation.participants
-      .filter(p => p.name !== props.conversation.conversationMessages[0].author.name)
+    const participantsStr = props.conversation.conversationParticipantsConnection.nodes
+      .filter(
+        p => p.user.name !== props.conversation.conversationMessagesConnection.nodes[0].author.name
+      )
       .reduce((prev, curr) => {
-        return prev + ', ' + curr.name
+        return prev + ', ' + curr.user.name
       }, '')
 
     return (
       <Text>
         <TruncateText>
-          <b>{props.conversation.conversationMessages[0].author.name}</b>
+          <b>{props.conversation.conversationMessagesConnection.nodes[0].author.name}</b>
           {participantsStr}
         </TruncateText>
       </Text>
     )
+  }
+
+  const formatDate = rawDate => {
+    const date = new Date(rawDate)
+    return date.toDateString()
   }
 
   return (
@@ -116,11 +123,13 @@ export const MessageListItem = ({...props}) => {
               </View>
             </Grid.Col>
             <Grid.Col>
-              <Text color="brand">{props.conversation.conversationMessages[0].created_at}</Text>
+              <Text color="brand">
+                {formatDate(props.conversation.conversationMessagesConnection.nodes[0]?.createdAt)}
+              </Text>
             </Grid.Col>
             <Grid.Col width="auto">
               <Badge
-                count={props.conversation.conversationMessages.length}
+                count={props.conversation.conversationMessagesConnection.nodes?.length}
                 countUntil={99}
                 standalone
               />
@@ -159,7 +168,9 @@ export const MessageListItem = ({...props}) => {
             </Grid.Col>
             <Grid.Col>
               <Text color="secondary">
-                <TruncateText>{props.conversation.conversationMessages[0].body}</TruncateText>
+                <TruncateText>
+                  {props.conversation.conversationMessagesConnection.nodes[0]?.body}
+                </TruncateText>
               </Text>
             </Grid.Col>
             <Grid.Col width="auto">
@@ -244,6 +255,7 @@ export const conversationProp = PropTypes.shape({
 
 MessageListItem.propTypes = {
   conversation: conversationProp,
+  isStarred: PropTypes.bool,
   isUnread: PropTypes.bool,
   onOpen: PropTypes.func,
   onSelect: PropTypes.func,
