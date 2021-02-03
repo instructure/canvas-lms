@@ -348,7 +348,7 @@
       <% end %>
     </div>
 
-    <%= preview_mode = can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
+    <% preview_mode = can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
 
     <% if preview_mode %>
       <div class="preview_quiz_button">
