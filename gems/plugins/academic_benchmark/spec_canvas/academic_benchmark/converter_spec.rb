@@ -192,7 +192,7 @@ describe AcademicBenchmark::Converter do
         expect(publication["outcomes"].count).to eq 1
         group1 = publication["outcomes"].first
         expect(group1['type']).to eql "learning_outcome_group"
-        expect(group1['title']).to eql "Social Studies"
+        expect(group1['title']).to eql "Social Studies (2010)"
         expect(group1["outcomes"].count).to eq 1
         group11 = group1["outcomes"].first
         expect(group11['type']).to eql "learning_outcome_group"
@@ -210,26 +210,27 @@ describe AcademicBenchmark::Converter do
         expect(outcome['ratings'].length).to eql 2
       end
 
-      context 'different documents with the same name' do
-        # Remove parent association with standard_instance
-        # and place under a different document
-        let(:standard_instance2) do
-          dup_hash = raw_standard2.dup
-          dup_hash['relationships']['parent'] = {"data" => {}}
-          dup_hash['attributes']['document']['adopt_year'] = "2025"
-          dup_hash['attributes']['document']['guid'] = 'future_guid'
+      context 'document without adoption year' do
+        let(:standard_instance) do
+          dup_hash = raw_standard.dup
+          dup_hash['attributes']['document']['adopt_year'] = ""
           AcademicBenchmarks::Standards::Standard.new(dup_hash)
         end
 
-        it 'appends adoption year' do
+        let(:standard_instance2) do
+          dup_hash = raw_standard2.dup
+          dup_hash['attributes']['document']['adopt_year'] = ""
+          AcademicBenchmarks::Standards::Standard.new(dup_hash)
+        end
+
+        it 'does not append adoption year' do
           expect(course = converter.export).to be_truthy
           expect(course["learning_outcomes"].count).to eql 1
           authority = course["learning_outcomes"].first
           expect(authority["outcomes"].count).to eql 1
           publication = authority["outcomes"][0]
-          expect(publication["outcomes"].count).to eql 2
-          expect(publication["outcomes"][0]['title']).to eq 'Social Studies (2010)'
-          expect(publication["outcomes"][1]['title']).to eq 'Social Studies (2025)'
+          expect(publication["outcomes"].count).to eq 1
+          expect(publication["outcomes"][0]['title']).to eq 'Social Studies'
         end
       end
     end
