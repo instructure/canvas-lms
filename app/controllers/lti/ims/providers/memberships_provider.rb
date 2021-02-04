@@ -91,7 +91,7 @@ module Lti::Ims::Providers
     def resource_link
       return nil unless rlid?
       @resource_link ||= begin
-        rl = Lti::ResourceLink.find_by(resource_link_id: rlid)
+        rl = Lti::ResourceLink.find_by(resource_link_uuid: rlid)
         # context here is a decorated context, we want the original
         if rl.present? && rl.current_external_tool(Lti::Ims::Providers::MembershipsProvider.unwrap(context))&.id != tool.id
           raise Lti::Ims::AdvantageErrors::InvalidResourceLinkIdFilter.new(

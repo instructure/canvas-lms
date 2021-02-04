@@ -53,7 +53,7 @@ module Factories
     base_line_item_params(assignment).merge(resource_link: overrides.fetch(
       :resource_link,
       overrides[:with_resource_link] ?
-        resource_link_model(overrides: overrides.merge(resource_link_id:  assignment.lti_context_id)) :
+        resource_link_model(overrides: overrides.merge(resource_link_uuid: assignment.lti_context_id)) :
         nil
     ))
   end

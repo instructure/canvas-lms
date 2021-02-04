@@ -32,7 +32,16 @@ export default class LinkContentItem extends ContentItem {
   }
 
   get properties() {
-    return Object.freeze(['url', 'title', 'text', 'icon', 'thumbnail', 'iframe', 'custom', 'lookup_id'])
+    return Object.freeze([
+      'url',
+      'title',
+      'text',
+      'icon',
+      'thumbnail',
+      'iframe',
+      'custom',
+      'lookup_uuid',
+    ])
   }
 
   toHtmlString() {

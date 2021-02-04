@@ -8971,7 +8971,8 @@ describe Assignment do
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
           expect(assignment.line_items.first.coupled).to eq true
           expect(assignment.line_items.first.resource_link).not_to be_nil
-          expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id
+          expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id # we'll remove this on part 4 commit
+          expect(assignment.line_items.first.resource_link.resource_link_uuid).to eq assignment.lti_context_id
           expect(assignment.line_items.first.resource_link.context_id).to eq assignment.id
           expect(assignment.line_items.first.resource_link.context_type).to eq 'Assignment'
           expect(assignment.line_items.first.resource_link.custom).to eq custom_params.with_indifferent_access
@@ -9086,7 +9087,7 @@ describe Assignment do
                 assignment.line_items.destroy_all
 
                 Lti::ResourceLink.where(
-                  resource_link_id: assignment.lti_context_id
+                  resource_link_uuid: assignment.lti_context_id
                 ).destroy_all
 
                 assignment.update!(lti_context_id: SecureRandom.uuid)
@@ -9101,7 +9102,7 @@ describe Assignment do
               it 'creates the LTI resource link' do
                 expect(
                   Lti::ResourceLink.where(
-                    resource_link_id: subject.lti_context_id
+                    resource_link_uuid: subject.lti_context_id
                   )
                 ).to be_present
               end
@@ -9118,7 +9119,7 @@ describe Assignment do
                 expect {
                   assignment.prepare_for_ags_if_needed!(tool)
                 }.not_to change {
-                  Lti::ResourceLink.where(resource_link_id: subject.lti_context_id).
+                  Lti::ResourceLink.where(resource_link_uuid: subject.lti_context_id).
                     first.
                     id
                 }
