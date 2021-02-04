@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -26,45 +26,23 @@ import {IconButton} from '@instructure/ui-buttons'
 import {IconArrowOpenEndLine, IconArrowOpenDownLine} from '@instructure/ui-icons'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import I18n from 'i18n!OutcomeManagement'
-import OutcomeKebabMenu from './OutcomeKebabMenu'
-import OutcomeDescription from './OutcomeDescription'
-import {addZeroWidthSpace} from '../../shared/helpers/addZeroWidthSpace'
+import OutcomeDescription from './Management/OutcomeDescription'
+import {addZeroWidthSpace} from '../shared/helpers/addZeroWidthSpace'
 
-const ManageOutcomeItem = ({
-  id,
-  title,
-  description,
-  isFirst,
-  isChecked,
-  onMenuHandler,
-  onCheckboxHandler
-}) => {
+const FindOutcomeItem = ({id, title, description, isChecked, onCheckboxHandler}) => {
   const [truncate, setTruncate] = useState(true)
-  const onClickHandler = () => setTruncate(prevState => !prevState)
+  const onClickHandler = () => description && setTruncate(prevState => !prevState)
   const onChangeHandler = () => onCheckboxHandler(id)
 
   if (!title) return null
 
   return (
-    <View
-      as="div"
-      padding="x-small 0"
-      borderWidth={isFirst ? 'small 0' : '0 0 small'}
-      data-testid={isFirst ? 'outcome-with-top-bottom-border' : 'outcome-with-bottom-border'}
-    >
+    <View as="div" padding="small 0" borderWidth="0 0 small">
       <Flex as="div" alignItems="start">
-        <Flex.Item as="div" size="4.125rem">
-          <div style={{padding: '0.3125rem 0'}}>
-            <Flex alignItems="center">
-              <Flex.Item>
-                <Checkbox
-                  label={<ScreenReaderContent>{I18n.t('Select outcome')}</ScreenReaderContent>}
-                  value="medium"
-                  checked={isChecked}
-                  onChange={onChangeHandler}
-                />
-              </Flex.Item>
-              <Flex.Item as="div" padding="0 x-small 0 0">
+        <Flex.Item as="div" size="3rem">
+          <Flex as="div" alignItems="start" justifyItems="center">
+            <Flex.Item>
+              <div style={{padding: '0.3125rem 0'}}>
                 <IconButton
                   size="small"
                   screenReaderLabel={
@@ -85,52 +63,50 @@ const ManageOutcomeItem = ({
                     )}
                   </div>
                 </IconButton>
-              </Flex.Item>
-            </Flex>
-          </div>
+              </div>
+            </Flex.Item>
+          </Flex>
         </Flex.Item>
-        <Flex.Item align="start" size="50%" shouldGrow>
+        <Flex.Item size="50%" shouldGrow>
           <div style={{padding: '0.625rem 0'}}>
             <Heading level="h4">
               <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(title)}</div>
             </Heading>
           </div>
-        </Flex.Item>
-        <Flex.Item>
-          <OutcomeKebabMenu menuTitle={I18n.t('Outcome Menu')} onMenuHandler={onMenuHandler} />
-        </Flex.Item>
-      </Flex>
-      <Flex as="div" alignItems="start">
-        <Flex.Item size="4.125rem" />
-        <Flex.Item size="50%" shouldGrow>
           {description && (
-            <View as="div" padding="0 0 x-small">
+            <div style={{paddingBottom: '0.75rem'}}>
               <OutcomeDescription
                 withExternalControl
                 description={description}
                 truncate={truncate}
                 onClickHandler={onClickHandler}
               />
-            </View>
+            </div>
           )}
+        </Flex.Item>
+        <Flex.Item size="5rem" alignSelf="end">
+          <div style={{padding: description ? '1.2815rem 0 0 1rem' : '0.313rem 0 0 1rem'}}>
+            <Checkbox
+              label={<ScreenReaderContent>{I18n.t('Add outcome')}</ScreenReaderContent>}
+              value="medium"
+              variant="toggle"
+              size="small"
+              checked={isChecked}
+              onChange={onChangeHandler}
+            />
+          </div>
         </Flex.Item>
       </Flex>
     </View>
   )
 }
 
-ManageOutcomeItem.defaultProps = {
-  isFirst: false
-}
-
-ManageOutcomeItem.propTypes = {
+FindOutcomeItem.propTypes = {
   id: PropTypes.string.isRequired,
   title: PropTypes.string.isRequired,
   description: PropTypes.string,
-  isFirst: PropTypes.bool,
   isChecked: PropTypes.bool.isRequired,
-  onMenuHandler: PropTypes.func.isRequired,
   onCheckboxHandler: PropTypes.func.isRequired
 }
 
-export default ManageOutcomeItem
+export default FindOutcomeItem

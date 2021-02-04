@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
 import {Flex} from '@instructure/ui-flex'
@@ -24,8 +24,13 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
 import I18n from 'i18n!OutcomeManagement'
+import FindOutcomeItem from './FindOutcomeItem'
 import OutcomeSearchBar from './Management/OutcomeSearchBar'
 import {addZeroWidthSpace} from '../shared/helpers/addZeroWidthSpace'
+
+// Mocked data to display list of outcomes
+// Remove after integration with GraphQL data
+import {findOutcomeGroupMockData} from './__tests__/mocks'
 
 const FindOutcomesView = ({
   collection,
@@ -37,66 +42,107 @@ const FindOutcomesView = ({
   const {name: groupTitle, outcomesCount} = collection
   const enabled = !!outcomesCount && outcomesCount > 0
 
+  // The code section below works with mocked data only
+  // Modify as needed to integrate with GraphQL data
+  const [selectedOutcomes, setSelectedOutcomes] = useState({})
+  const onSelectOutcomesHandler = id =>
+    setSelectedOutcomes(prevState => {
+      const updatedState = {...prevState}
+      prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
+      return updatedState
+    })
+  const {children} = findOutcomeGroupMockData
+  const outcomeList = children?.map(({id, title, description}) => (
+    <FindOutcomeItem
+      key={id}
+      id={id}
+      title={title}
+      description={description}
+      isChecked={!!selectedOutcomes[id]}
+      onCheckboxHandler={onSelectOutcomesHandler}
+    />
+  ))
+
   return (
     <View
       as="div"
+      height="100%"
       minWidth="300px"
       padding="0 x-large 0 medium"
       data-testid="find-outcome-container"
     >
-      <View as="div" padding="small 0 0">
-        <Heading level="h2" as="h3">
-          <div style={{overflowWrap: 'break-word'}}>{addZeroWidthSpace(groupTitle)}</div>
-        </Heading>
-      </View>
-      <View as="div" padding="large 0 medium">
-        <OutcomeSearchBar
-          enabled={enabled}
-          placeholder={I18n.t('Search within %{groupTitle}', {groupTitle})}
-          searchString={searchString}
-          onChangeHandler={onChangeHandler}
-          onClearHandler={onClearHandler}
-        />
-      </View>
-      <View as="div" padding="0 0 small">
-        <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
-          <Flex.Item size="50%" shouldGrow>
-            <Heading level="h4">
+      <div style={{height: '100%', display: 'flex', flexDirection: 'column'}}>
+        <View as="div" padding="0 0 x-small" borderWidth="0 0 small">
+          <View as="div" padding="small 0 0">
+            <Heading level="h2" as="h3">
               <div style={{overflowWrap: 'break-word'}}>
-                {I18n.t('All %{groupTitle} Outcomes', {
-                  groupTitle: addZeroWidthSpace(groupTitle)
-                })}
+                {groupTitle ? addZeroWidthSpace(groupTitle) : I18n.t('Outcome Group')}
               </div>
             </Heading>
-          </Flex.Item>
-          <Flex.Item>
-            <Flex as="div" alignItems="center" wrap="no-wrap">
-              <Flex.Item as="div" padding="0 medium 0 0">
-                <Text size="medium">
-                  {I18n.t(
-                    {
-                      one: '1 Outcome',
-                      other: '%{count} Outcomes'
-                    },
-                    {
-                      count: outcomesCount || 0
-                    }
-                  )}
-                </Text>
+          </View>
+          <View as="div" padding="large 0 medium">
+            <OutcomeSearchBar
+              enabled={enabled}
+              placeholder={
+                groupTitle
+                  ? I18n.t('Search within %{groupTitle}', {groupTitle})
+                  : I18n.t('Search within outcome group')
+              }
+              searchString={searchString}
+              onChangeHandler={onChangeHandler}
+              onClearHandler={onClearHandler}
+            />
+          </View>
+          <View as="div" position="relative" padding="0 0 small">
+            <Flex as="div" alignItems="center" justifyItems="space-between" wrap="wrap">
+              <Flex.Item size="50%" padding="0 small 0 0" shouldGrow>
+                <Heading level="h4">
+                  <div style={{overflowWrap: 'break-word'}}>
+                    {groupTitle
+                      ? I18n.t('All %{groupTitle} Outcomes', {
+                          groupTitle: addZeroWidthSpace(groupTitle)
+                        })
+                      : I18n.t('All Group Outcomes')}
+                  </div>
+                </Heading>
               </Flex.Item>
               <Flex.Item>
-                <Button
-                  margin="x-small 0"
-                  interaction={enabled ? 'enabled' : 'disabled'}
-                  onClick={onAddAllHandler}
-                >
-                  {I18n.t('Add All Outcomes')}
-                </Button>
+                <Flex as="div" alignItems="center" wrap="wrap">
+                  <Flex.Item as="div" padding="x-small medium x-small 0">
+                    <Text size="medium">
+                      {I18n.t(
+                        {
+                          one: '%{count} Outcome',
+                          other: '%{count} Outcomes'
+                        },
+                        {
+                          count: outcomesCount || 0
+                        }
+                      )}
+                    </Text>
+                  </Flex.Item>
+                  <Flex.Item>
+                    <Button
+                      margin="x-small 0"
+                      interaction={enabled ? 'enabled' : 'disabled'}
+                      onClick={onAddAllHandler}
+                    >
+                      {I18n.t('Add All Outcomes')}
+                    </Button>
+                  </Flex.Item>
+                </Flex>
               </Flex.Item>
             </Flex>
-          </Flex.Item>
-        </Flex>
-      </View>
+          </View>
+        </View>
+        <div style={{flex: '1 0 24rem', overflow: 'auto', position: 'relative'}}>
+          {outcomeList && (
+            <View as="div" data-testid="find-outcome-items-list">
+              {outcomeList}
+            </View>
+          )}
+        </div>
+      </div>
     </View>
   )
 }

@@ -24,32 +24,53 @@ import {View} from '@instructure/ui-view'
 import {Billboard} from '@instructure/ui-billboard'
 import {PresentationContent} from '@instructure/ui-a11y'
 import SVGWrapper from '../shared/SVGWrapper'
+import {useCanvasContext} from './shared/hooks'
 
-const FindOutcomesBillboard = () => (
-  <Flex as="div" height="100%">
-    <Flex.Item margin="auto">
-      <Billboard
-        size="small"
-        heading={I18n.t('PRO TIP!')}
-        headingLevel="h3"
-        headingAs="h3"
-        hero={
-          <PresentationContent>
-            <SVGWrapper url="/images/outcomes/clipboard_checklist.svg" />
-          </PresentationContent>
-        }
-        message={
-          <View as="div" padding="small 0 xx-large" margin="0 auto" width="60%">
-            <Text size="large" color="primary">
-              {I18n.t(
-                'Save yourself a lot of time by only adding the outcomes that are specific to your course content.'
+const FindOutcomesBillboard = () => {
+  const {contextType} = useCanvasContext()
+  const courseContext = contextType === 'Course'
+
+  return (
+    <Flex as="div" height="100%">
+      <Flex.Item margin="auto">
+        <Billboard
+          size="small"
+          heading={courseContext ? I18n.t('PRO TIP!') : ''}
+          headingLevel="h3"
+          headingAs="h3"
+          hero={
+            <PresentationContent>
+              {courseContext ? (
+                <div data-testid="clipboard-checklist-icon">
+                  <SVGWrapper url="/images/outcomes/clipboard_checklist.svg" />
+                </div>
+              ) : (
+                <div style={{transform: 'scale(1.7)'}} data-testid="outcomes-icon">
+                  <SVGWrapper url="/images/outcomes/outcomes.svg" />
+                </div>
               )}
-            </Text>
-          </View>
-        }
-      />
-    </Flex.Item>
-  </Flex>
-)
+            </PresentationContent>
+          }
+          message={
+            <View
+              as="div"
+              padding="small 0 xx-large"
+              margin="0 auto"
+              width={courseContext ? '60%' : '100%'}
+            >
+              <Text size="large" color="primary">
+                {courseContext
+                  ? I18n.t(
+                      'Save yourself a lot of time by only adding the outcomes that are specific to your course content.'
+                    )
+                  : I18n.t('Select a group to reveal outcomes here.')}
+              </Text>
+            </View>
+          }
+        />
+      </Flex.Item>
+    </Flex>
+  )
+}
 
 export default FindOutcomesBillboard

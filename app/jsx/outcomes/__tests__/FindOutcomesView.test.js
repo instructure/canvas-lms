@@ -47,9 +47,25 @@ describe('FindOutcomesView', () => {
     jest.clearAllMocks()
   })
 
-  it('renders component with the title passed within collections prop', () => {
-    const {getByText} = render(<FindOutcomesView {...defaultProps()} />)
+  it('renders component with the correct group name and search bar placeholder', () => {
+    const {getByText, getByPlaceholderText} = render(<FindOutcomesView {...defaultProps()} />)
     expect(getByText('State Standards')).toBeInTheDocument()
+    expect(getByPlaceholderText('Search within State Standards')).toBeInTheDocument()
+  })
+
+  it('renders component with default group name and search bar placeholder if name is missing in props', () => {
+    const {getByText, getByPlaceholderText} = render(
+      <FindOutcomesView
+        {...defaultProps({
+          collection: {
+            ...defaultProps().collection,
+            name: null
+          }
+        })}
+      />
+    )
+    expect(getByText('Outcome Group')).toBeInTheDocument()
+    expect(getByPlaceholderText('Search within outcome group')).toBeInTheDocument()
   })
 
   it('renders component with correct number of outcomes', () => {
@@ -90,6 +106,21 @@ describe('FindOutcomesView', () => {
     const btn = getByText('Add All Outcomes')
     fireEvent.click(btn)
     expect(onAddAllHandlerMock).toHaveBeenCalled()
+  })
+
+  it('marks outcome as added when toggle is turned on', () => {
+    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
+    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
+    fireEvent.click(toggle)
+    expect(toggle).toBeChecked()
+  })
+
+  it('marks outcome as removed when toggle is turned off', () => {
+    const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
+    const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
+    fireEvent.click(toggle)
+    fireEvent.click(toggle)
+    expect(toggle).not.toBeChecked()
   })
 
   it('disables "Add All Outcomes" button if number of outcomes eq 0', () => {

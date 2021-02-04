@@ -17,12 +17,30 @@
  */
 
 import React from 'react'
-import {render} from '@testing-library/react'
+import {render as realRender} from '@testing-library/react'
+import OutcomesContext from '../contexts/OutcomesContext'
 import FindOutcomesBillboard from '../FindOutcomesBillboard'
 
 describe('FindOutcomesBillboard', () => {
-  it('renders component with proper message', () => {
-    const {getByText} = render(<FindOutcomesBillboard />)
+  const render = (children, {contextType = 'Course', contextId = '1'} = {}) => {
+    return realRender(
+      <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
+        {children}
+      </OutcomesContext.Provider>
+    )
+  }
+
+  it('renders correct message and icon when context is Course', () => {
+    const {getByText, queryByTestId} = render(<FindOutcomesBillboard />)
     expect(getByText(/Save yourself a lot of time by only/)).toBeInTheDocument()
+    expect(queryByTestId('clipboard-checklist-icon')).toBeInTheDocument()
+  })
+
+  it('renders correct message and icon when context is Account', () => {
+    const {getByText, queryByTestId} = render(<FindOutcomesBillboard />, {
+      contextType: 'Account'
+    })
+    expect(getByText(/Select a group to reveal outcomes here/)).toBeInTheDocument()
+    expect(queryByTestId('outcomes-icon')).toBeInTheDocument()
   })
 })

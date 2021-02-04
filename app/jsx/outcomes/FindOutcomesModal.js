@@ -1,5 +1,4 @@
 /*
-/*
  * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
