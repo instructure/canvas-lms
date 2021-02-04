@@ -21,11 +21,11 @@ import ResourceLinkContentItem from '../ResourceLinkContentItem'
 const url = 'https://www.test.com/launch'
 const endpoint = 'http://test.canvas.com/accounts/1/external_tools/retrieve'
 const title = 'Tool Title'
-const lookup_id = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+const lookup_uuid = '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
 const json = {
   url,
   title,
-  lookup_id
+  lookup_uuid,
 }
 
 const resourceLinkContentItem = (overrides, launchEndpoint) => {
