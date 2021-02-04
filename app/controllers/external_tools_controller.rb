@@ -512,8 +512,9 @@ class ExternalToolsController < ApplicationController
   # determine resource_link_id to send to tool.
   def lookup_resource_link(tool)
     return nil unless params[:resource_link_lookup_id]
+    return nil unless params[:url]
 
-    Lti::ResourceLink.where(
+    resource_link = Lti::ResourceLink.where(
       lookup_id: params[:resource_link_lookup_id],
       context: @context,
       root_account_id: tool.root_account_id
@@ -522,13 +523,13 @@ class ExternalToolsController < ApplicationController
         raise InvalidSettingsError, t(
           "Couldn't find valid settings for this link: Resource link not found"
         )
-      elsif tool.global_developer_key_id !=
-          resource_link&.current_external_tool(@context)&.global_developer_key_id
-        raise InvalidSettingsError, t(
-          "Couldn't find valid settings for this link: Resource link not valid for tool"
-        )
       end
     end
+
+    # Verify the resource link was intended for the domain it's being
+    # launched from
+    resource_link if resource_link&.current_external_tool(@context)&.
+      matches_host?(params[:url])
   end
 
   def basic_lti_launch_request(tool, selection_type = nil, opts = {})
