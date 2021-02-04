@@ -574,6 +574,7 @@ module Api::V1::Assignment
     "media_recording",
     "not_graded",
     "wiki_page",
+    "annotated_document",
     ""
   ].freeze
 
