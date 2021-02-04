@@ -476,6 +476,7 @@ pipeline {
                       "CACHE_UNIQUE_SCOPE=${env.IMAGE_CACHE_UNIQUE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=${configuration.isChangeMerged() ? 1 : 0}",
                       "JS_BUILD_NO_UGLIFY=${configuration.isChangeMerged() ? 0 : 1}",
+                      "RAILS_LOAD_ALL_LOCALES=${configuration.isChangeMerged() ? 1 : 0}",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
@@ -564,6 +565,7 @@ pipeline {
                       "CACHE_SAVE_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
                       "COMPILE_ADDITIONAL_ASSETS=0",
                       "JS_BUILD_NO_UGLIFY=1",
+                      "RAILS_LOAD_ALL_LOCALES=0",
                       "RUBY_RUNNER_PREFIX=${env.RUBY_RUNNER_PREFIX}",
                       "WEBPACK_BUILDER_PREFIX=${env.WEBPACK_BUILDER_PREFIX}",
                       "WEBPACK_CACHE_PREFIX=${env.WEBPACK_CACHE_PREFIX}",
@@ -630,6 +632,7 @@ pipeline {
                       "CACHE_SAVE_SCOPE=${cacheScope}",
                       "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
                       "PATCHSET_TAG=${env.PATCHSET_TAG}",
+                      "RAILS_LOAD_ALL_LOCALES=${configuration.isChangeMerged() ? 1 : 0}",
                       "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
                     ]) {
                       sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
