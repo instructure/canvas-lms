@@ -28,6 +28,7 @@ import $ from 'jquery'
 import GradingPeriodsAPI from '../../api/gradingPeriodsApi'
 import SisValidationHelper from '../../util/SisValidationHelper'
 import 'jquery.instructure_date_and_time'
+import tz from 'timezone'
 
 export default class CreateAssignmentView extends DialogFormView
   defaults:
@@ -156,7 +157,16 @@ export default class CreateAssignmentView extends DialogFormView
         tooltipClass: 'center bottom vertical',
         content: -> $($(@).data('tooltipSelector')).html()
     else
-      timeField.datetime_field() unless timeField.hasClass("hasDatepicker")
+      unless timeField.hasClass("hasDatepicker")
+        timeField.datetime_field()
+        timeField.change (e) ->
+          trimmedInput = $.trim(e.target.value)
+          newDate = timeField.data('unfudged-date')
+          newDate = if trimmedInput == '' then null else newDate
+          newDate = tz.changeToTheSecondBeforeMidnight(newDate) if tz.isMidnight(newDate)
+          dateStr = $.dateString(newDate)
+          timeStr = $.timeString(newDate)
+          e.target.value = "#{dateStr} #{timeStr}"
 
   newAssignmentUrl: ->
     ENV.URLS.new_assignment_url
