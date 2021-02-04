@@ -52,7 +52,7 @@ describe('PastMessages', () => {
         },
         {
           name: 'Pippin',
-          messageBody: "I didn't think it would end this way.",
+          messageBody: 'I did not think it would end this way.',
           date: 'TA 3019'
         }
       ]
