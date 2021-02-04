@@ -25,20 +25,24 @@ import MessageListActionContainer from './MessageListActionContainer'
 const CanvasInbox = () => {
   const [scope, setScope] = useState('inbox')
   const [courseFilter, setCourseFilter] = useState()
-  const [selectedIds, setSelectedIds] = useState([])
+  const [selectedConversations, setSelectedConversations] = useState([])
   const [composeModal, setComposeModal] = useState(false)
   const [deleteDisabled, setDeleteDisabled] = useState(true)
 
-  const toggleSelectedMessages = conversation => {
-    const updatedSelectedIds = selectedIds
-    if (updatedSelectedIds.includes(conversation._id)) {
-      const index = updatedSelectedIds.indexOf(conversation._id)
-      updatedSelectedIds.splice(index, 1)
+  const toggleSelectedConversations = conversation => {
+    const updatedSelectedConversations = selectedConversations
+
+    const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
+      return updatedSelectedConvo._id === conversation._id
+    })
+
+    if (index > -1) {
+      updatedSelectedConversations.splice(index, 1)
     } else {
-      updatedSelectedIds.push(conversation._id)
+      updatedSelectedConversations.push(conversation)
     }
-    setSelectedIds(updatedSelectedIds)
-    setDeleteDisabled(selectedIds.length === 0)
+    setSelectedConversations(updatedSelectedConversations)
+    setDeleteDisabled(selectedConversations.length === 0)
   }
 
   return (
@@ -51,7 +55,7 @@ const CanvasInbox = () => {
             scope={scope}
             onSelectMailbox={setScope}
             onCourseFilterSelect={setCourseFilter}
-            selectdIds={selectedIds}
+            selectedConversations={selectedConversations}
             onCompose={() => setComposeModal(true)}
             deleteDisabled={deleteDisabled}
             deleteToggler={setDeleteDisabled}
@@ -63,7 +67,7 @@ const CanvasInbox = () => {
               <MessageListContainer
                 course={courseFilter}
                 scope={scope}
-                onSelectMessage={toggleSelectedMessages}
+                onSelectMessage={toggleSelectedConversations}
               />
             </Flex.Item>
             <Flex.Item shouldGrow shouldShrink height="100%">

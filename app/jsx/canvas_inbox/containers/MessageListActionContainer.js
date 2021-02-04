@@ -67,7 +67,7 @@ const MessageListActionContainer = props => {
         one: 'Message Deleted!',
         other: 'Messages Deleted!'
       },
-      {count: props.selectdIds.length}
+      {count: props.selectedConversations.length}
     )
 
     if (data.deleteConversations.errors) {
@@ -115,12 +115,14 @@ const MessageListActionContainer = props => {
         other:
           'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
       },
-      {count: props.selectdIds.length}
+      {count: props.selectedConversations.length}
     )
-
+    const selectedIds = props.selectedConversations.map(convo => {
+      return convo._id
+    })
     const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
     if (confirmResult) {
-      deleteConversations({variables: {ids: props.selectdIds}})
+      deleteConversations({variables: {ids: selectedIds}})
     } else {
       // confirm message was cancelled by user
       props.deleteToggler(false)
@@ -185,7 +187,7 @@ MessageListActionContainer.propTypes = {
   onCourseFilterSelect: PropTypes.func,
   onSelectMailbox: PropTypes.func,
   onCompose: PropTypes.func,
-  selectdIds: PropTypes.array,
+  selectedConversations: PropTypes.array,
   deleteToggler: PropTypes.func,
   deleteDisabled: PropTypes.bool
 }
