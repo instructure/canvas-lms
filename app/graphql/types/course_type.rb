@@ -290,7 +290,7 @@ module Types
     def image_url
       return nil unless course.feature_enabled?('course_card_images')
 
-      if course.image_url
+      if course.image_url.present?
         course.image_url
       elsif course.image_id.present?
         Loaders::IDLoader.for(Attachment.active).load(
