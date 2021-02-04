@@ -78,4 +78,17 @@ describe('feature_flags:util', () => {
       expect(util.buildDescription(sampleData.onFeature.feature_flag, false)).toEqual('Enabled')
     })
   })
+
+  describe('doesAllowDefaults', () => {
+    it('correctly determines whether allowed states are available', () => {
+      expect(util.doesAllowDefaults(sampleData.offFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.onFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedOnFeature.feature_flag)).toBe(true)
+      expect(util.doesAllowDefaults(sampleData.allowedOnRootAccountFeature.feature_flag)).toBe(
+        false
+      )
+      expect(util.doesAllowDefaults(sampleData.allowedOnCourseFeature.feature_flag)).toBe(false)
+    })
+  })
 })

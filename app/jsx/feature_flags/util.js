@@ -101,10 +101,10 @@ export function shouldDelete(flag, allowsDefaults, state) {
 
 export function doesAllowDefaults(flag, disableDefaults) {
   let allowsDefaults = false
-  if (!flag.transitions.allowed?.locked || flag.state === 'allowed') {
+  if (flag.transitions.allowed && !flag.transitions.allowed.locked) {
     allowsDefaults = true
   }
-  if (!flag.transitions.allowed_on?.locked || flag.state === 'allowed_on') {
+  if (flag.transitions.allowed_on && !flag.transitions.allowed_on.locked) {
     allowsDefaults = true
   }
   if (disableDefaults) {
