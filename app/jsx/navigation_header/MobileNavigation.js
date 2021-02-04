@@ -49,7 +49,7 @@ export default class MobileNavigation extends React.Component {
 
     const arrowIcon = document.getElementById('mobileHeaderArrowIcon')
     const mobileContextNavContainer = document.getElementById('mobileContextNavContainer')
-    $('.mobile-header-title.expandable').on(
+    $('.mobile-header-title.expandable, .mobile-header-arrow').on(
       'touchstart click',
       preventDefault(() => {
         this.setState(state => {

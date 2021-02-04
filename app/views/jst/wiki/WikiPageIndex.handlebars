@@ -4,12 +4,10 @@
   <div class="sticky-toolbar-with-right-side" data-sticky>
     <div class="header-bar">
       <div class="header-bar-right">
-        {{#if BULK_DELETE_ENABLED}}
-          {{#if CAN.MANAGE}}
-            <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
-              <i class="icon-trash" role="presentation" />
-            </button>
-          {{/if}}
+        {{#if CAN.MANAGE}}
+          <button class="btn delete_pages" tabindex="0" aria-label="{{#t}}Delete selected pages{{/t}}" disabled>
+            <i class="icon-trash" role="presentation" />
+          </button>
         {{/if}}
         {{#if CAN.CREATE}}
           <a class="btn btn-primary icon-plus new_page" role="button" tabindex="0" aria-label="{{#t 'buttons.new_page_label'}}Add a page{{/t}}">{{#t 'buttons.new_page'}}Page{{/t}}</a>
@@ -79,12 +77,10 @@
         <table class="ic-Table ic-Table--condensed ic-Table--striped ic-Table--hover-row wiki-page-table" role="grid">
           <thead>
             <tr class="header-row" role="row">
-              {{#if BULK_DELETE_ENABLED}}
-                {{#if CAN.DELETE}}
-                  <th width="2%" role="columnheader">
-                    <span class="screenreader-only">{{#t}}Select page{{/t}}</span>
-                  </th>
-                  {{/if}}
+              {{#if CAN.DELETE}}
+                <th width="2%" role="columnheader">
+                  <span class="screenreader-only">{{#t}}Select page{{/t}}</span>
+                </th>
               {{/if}}
               <th scope="col" width="{{#if CAN.MANAGE}}{{#if CAN.PUBLISH}}42%{{else}}46%{{/if}}{{else}}60%{{/if}}" role="columnheader">
                 <span class="mobile-screenreader-only">

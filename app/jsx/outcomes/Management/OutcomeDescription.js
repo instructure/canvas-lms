@@ -19,6 +19,7 @@
 import React, {useState} from 'react'
 import PropTypes from 'prop-types'
 import {View} from '@instructure/ui-view'
+import {Button} from '@instructure/ui-buttons'
 import {TruncateText} from '@instructure/ui-truncate-text'
 import {PresentationContent, ScreenReaderContent} from '@instructure/ui-a11y'
 import {stripHtmlTags} from '../../shared/helpers/stripHtmlTags'
@@ -29,23 +30,27 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
   const textDescription = description ? stripHtmlTags(description) : ''
   const onToggleHandler = () =>
     withExternalControl ? onClickHandler() : setTruncateInternal(prevState => !prevState)
-  const onKeyDownHandler = event => [13, 32].includes(event.keyCode) && onToggleHandler()
 
   if (!description) return null
 
   return (
-    <>
+    <Button
+      size="medium"
+      display="block"
+      textAlign="start"
+      withBackground={false}
+      onClick={onToggleHandler}
+      theme={{
+        borderWidth: '0',
+        mediumPaddingHorizontal: '0',
+        mediumPaddingTop: '0',
+        mediumPaddingBottom: '0',
+        primaryGhostHoverBackground: 'transparent',
+        secondaryGhostHoverBackground: 'transparent'
+      }}
+    >
       {truncated && textDescription && (
-        <View
-          as="div"
-          tabIndex="0"
-          padding="small xx-small 0 0"
-          cursor="pointer"
-          role="button"
-          data-testid="description-truncated"
-          onClick={onToggleHandler}
-          onKeyDown={onKeyDownHandler}
-        >
+        <View as="div" padding="0 small 0 0" data-testid="description-truncated">
           <PresentationContent>
             <TruncateText>{textDescription}</TruncateText>
           </PresentationContent>
@@ -55,17 +60,12 @@ const OutcomeDescription = ({description, withExternalControl, truncate, onClick
       {!truncated && description && (
         <View
           as="div"
-          tabIndex="0"
-          padding="0"
-          cursor="pointer"
-          role="button"
+          padding="0 small 0 0"
           data-testid="description-expanded"
           dangerouslySetInnerHTML={{__html: description}}
-          onClick={onToggleHandler}
-          onKeyDown={onKeyDownHandler}
         />
       )}
-    </>
+    </Button>
   )
 }
 

@@ -147,29 +147,19 @@ class CourseSection < ActiveRecord::Base
 
   set_policy do
     given do |user, session|
-      self.course.root_account.feature_enabled?(:granular_permissions_course_sections) &&
       self.course.grants_right?(user, session, :manage_sections_add)
     end
     can :read and can :create
 
     given do |user, session|
-      self.course.root_account.feature_enabled?(:granular_permissions_course_sections) &&
       self.course.grants_right?(user, session, :manage_sections_edit)
     end
     can :read and can :update
 
     given do |user, session|
-      self.course.root_account.feature_enabled?(:granular_permissions_course_sections) &&
       self.course.grants_right?(user, session, :manage_sections_delete)
     end
     can :read and can :delete
-
-    # Bundled legacy role override for managing course sections
-    given do |user, session|
-      !self.course.root_account.feature_enabled?(:granular_permissions_course_sections) &&
-      self.course.grants_right?(user, session, :manage_sections)
-    end
-    can :read and can :create and can :update and can :delete
 
     given { |user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
     can :read

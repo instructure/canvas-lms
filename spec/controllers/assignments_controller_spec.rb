@@ -241,6 +241,20 @@ describe AssignmentsController do
       expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
     end
 
+    it "should set FLAGS/new_quizzes_modules_support in js_env as true if enabled" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(true)
+    end
+
+    it "should set FLAGS/new_quizzes_modules_support in js_env as false if disabled" do
+      user_session(@teacher)
+      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(false)
+    end
+
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
       user_session(@teacher)
       allow(AssignmentUtil).to receive(:name_length_required_for_account?).and_return(true)

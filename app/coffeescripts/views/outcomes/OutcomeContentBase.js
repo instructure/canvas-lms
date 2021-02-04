@@ -97,7 +97,9 @@ export default class OutcomeContentBase extends ValidatedFormView {
   }
 
   _cleanUpTiny() {
-    return RichContentEditor.destroyRCE(this.$el.find('[name="description"]'))
+    const rceElem = this.$el.find('[name="description"]')
+    RichContentEditor.closeRCE(rceElem)
+    return RichContentEditor.destroyRCE(rceElem)
   }
 
   submit(e) {

@@ -46,6 +46,7 @@ exports[`renders the base component correctly 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />
@@ -155,6 +156,7 @@ exports[`renders the base component correctly with 0 points 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />
@@ -264,6 +266,7 @@ exports[`renders the base component correctly without points 1`] = `
       className="Opportunity-styles__status"
     >
       <Pill
+        color="primary"
         text="Missing"
         variant="danger"
       />

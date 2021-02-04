@@ -26,13 +26,7 @@ describe "Services API", type: :request do
   end
 
   before :each do
-    @kal = double('CanvasKaltura::ClientV3')
-    allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
-      'domain' => 'kaltura.fake.local',
-      'resource_domain' => 'cdn.kaltura.fake.local',
-      'rtmp_domain' => 'rtmp-kaltura.fake.local',
-      'partner_id' => '420',
-    })
+    stub_kaltura
   end
 
   it "should check for auth" do
@@ -51,10 +45,10 @@ describe "Services API", type: :request do
               :controller => "services_api", :action => "show_kaltura_config", :format => "json")
     expect(json).to eq({
       'enabled' => true,
-      'domain' => 'kaltura.fake.local',
-      'resource_domain' => 'cdn.kaltura.fake.local',
-      'rtmp_domain' => 'rtmp-kaltura.fake.local',
-      'partner_id' => '420',
+      'domain' => 'kaltura.example.com',
+      'resource_domain' => 'cdn.kaltura.example.com',
+      'rtmp_domain' => 'rtmp.kaltura.example.com',
+      'partner_id' => '100',
     })
   end
 
@@ -68,7 +62,6 @@ describe "Services API", type: :request do
   end
 
   it "should return a new kaltura session" do
-    stub_kaltura
     kal = double('CanvasKaltura::ClientV3')
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
@@ -83,7 +76,6 @@ describe "Services API", type: :request do
   end
 
   it "should return a new kaltura session with upload config if param provided" do
-    stub_kaltura
     kal = double('CanvasKaltura::ClientV3')
     expect(kal).to receive(:startSession).and_return "new_session_id_here"
     allow(CanvasKaltura::ClientV3).to receive(:new).and_return(kal)
@@ -98,14 +90,16 @@ describe "Services API", type: :request do
       'kaltura_setting' => {
         'domain'=>'kaltura.example.com',
         'kcw_ui_conf'=>'1',
+        "max_file_size_bytes"=>534773760,
         'partner_id'=>'100',
         'player_ui_conf'=>'1',
-        'resource_domain'=>'kaltura.example.com',
+        'resource_domain'=>'cdn.kaltura.example.com',
+        'rtmp_domain'=>'rtmp.kaltura.example.com',
         'subpartner_id'=>'10000',
         'upload_ui_conf'=>'1',
-        'entryUrl' => 'http:///index.php/partnerservices2/addEntry',
-        'uiconfUrl' => 'http:///index.php/partnerservices2/getuiconf',
-        'uploadUrl' => 'http:///index.php/partnerservices2/upload',
+        'entryUrl' => 'http://kaltura.example.com/index.php/partnerservices2/addEntry',
+        'uiconfUrl' => 'http://kaltura.example.com/index.php/partnerservices2/getuiconf',
+        'uploadUrl' => 'http://kaltura.example.com/index.php/partnerservices2/upload',
         'partner_data' => {
           'root_account_id'=>@user.account.root_account.id,
           'sis_source_id'=>nil,

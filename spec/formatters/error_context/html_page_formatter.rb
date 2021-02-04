@@ -50,7 +50,13 @@ module ErrorContext
     def error_page_content
       return if summary.discard?
 
-      output_buffer = nil
+      # these seemingly unused local and instance vars are necessary preambles
+      # to the `error_template.src` that gets eval'd below
+      if CANVAS_RAILS5_2
+        output_buffer = nil
+      else
+        @output_buffer = ActionView::OutputBuffer.new
+      end
       example = summary.example
       formatted_exception = ::RSpec::Core::Formatters::ExceptionPresenter.new(example.exception, example).fully_formatted(nil)
       eval(error_template.src, binding, error_template_path)

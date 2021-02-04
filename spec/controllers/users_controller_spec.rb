@@ -428,6 +428,11 @@ describe UsersController do
           expect(oe.associated_user).to eq @user
         end
 
+        it "should not 500 when paring code is not in request" do
+          post 'create', params: { pseudonym: { unique_id: 'jane@example.com' }, user: { name: 'Jane Observer', terms_of_use: '1', initial_enrollment_type: 'observer' } }, format: 'json'
+          assert_status(400)
+        end
+
         it "should allow observers to self register with a pairing code" do
           course_with_student
           @domain_root_account = @course.account
@@ -2401,6 +2406,55 @@ describe UsersController do
           expect(course_data.detect{|h| h[:id] == @course1.id}[:shortName]).to eq "worst class"
         end
       end
+    end
+
+    context "with canvas for elementary feature flag" do
+      before(:once) do
+        @account = Account.default
+      end
+
+      context "disabled" do
+        it "sets ENV.K5_MODE to false" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_env][:K5_MODE]).to be_falsy
+        end
+
+        it "only returns classic dashboard bundles" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).to include :dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :k5_dashboard
+        end
+      end
+
+      context "enabled" do
+        before(:once) do
+          @account.enable_feature!(:canvas_for_elementary)
+        end
+
+        it "sets ENV.K5_MODE to true when canvas_for_elementary flag is enabled" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_env][:K5_MODE]).to be_truthy
+        end
+
+        it "returns K-5 dashboard bundles" do
+          course_with_student_logged_in(active_all: true)
+          @current_user = @user
+          get 'user_dashboard'
+          expect(assigns[:js_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:js_bundles].flatten).not_to include :dashboard
+          expect(assigns[:css_bundles].flatten).to include :k5_dashboard
+          expect(assigns[:css_bundles].flatten).not_to include :dashboard
+        end
+      end
+
     end
   end
 

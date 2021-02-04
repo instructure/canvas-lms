@@ -14,5 +14,5 @@ Gem::Specification.new do |spec|
   spec.test_files = Dir["spec_canvas/**/*"]
 
   spec.add_dependency "rails", ">= 3.2"
-  spec.add_dependency "academic_benchmarks", "~> 0.0"
+  spec.add_dependency "academic_benchmarks", "~> 1.0.1"
 end

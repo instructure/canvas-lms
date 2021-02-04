@@ -10,7 +10,7 @@ set -e
 #
 ###
 
-export COVERAGE=true
+export COVERAGE=1
 
 if [ "$RUN_TESTS_FIRST" ]; then
     echo '========== Running tests with coverage ==========='

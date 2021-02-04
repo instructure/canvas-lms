@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import {fireEvent, render} from '@testing-library/react'
 import React from 'react'
 import {CourseSelect} from '../CourseSelect'
@@ -25,23 +26,23 @@ const createProps = overrides => {
     mainPage: true,
     options: {
       favoriteCourses: [
-        {id: 1, contextName: 'Charms', contextId: 'course_1'},
-        {id: 2, contextName: 'Transfiguration', contextId: 'course_2'}
+        {_id: 1, contextName: 'Charms', assetString: 'course_1'},
+        {_id: 2, contextName: 'Transfiguration', assetString: 'course_2'}
       ],
       moreCourses: [
-        {id: 3, contextName: 'Potions', contextId: 'course_3'},
-        {id: 4, contextName: 'History of Magic', contextId: 'course_4'},
-        {id: 5, contextName: 'Herbology', contextId: 'course_5'},
-        {id: 6, contextName: 'Defense Against the Dark Arts', contextId: 'course_6'}
+        {_id: 3, contextName: 'Potions', assetString: 'course_3'},
+        {_id: 4, contextName: 'History of Magic', assetString: 'course_4'},
+        {_id: 5, contextName: 'Herbology', assetString: 'course_5'},
+        {_id: 6, contextName: 'Defense Against the Dark Arts', assetString: 'course_6'}
       ],
       concludedCourses: [
-        {id: 7, contextName: 'Muggle Studies', contextId: 'course_7'},
-        {id: 8, contextName: 'Astronomy', contextId: 'course_8'}
+        {_id: 7, contextName: 'Muggle Studies', assetString: 'course_7'},
+        {_id: 8, contextName: 'Astronomy', assetString: 'course_8'}
       ],
       groups: [
-        {id: 1, contextName: 'Gryffindor Bros', contextId: 'group_1'},
-        {id: 2, contextName: 'Quidditch', contextId: 'group_2'},
-        {id: 3, contextName: "Dumbledore's Army", contextId: 'group_3'}
+        {_id: 1, contextName: 'Gryffindor Bros', assetString: 'group_1'},
+        {_id: 2, contextName: 'Quidditch', assetString: 'group_2'},
+        {_id: 3, contextName: "Dumbledore's Army", assetString: 'group_3'}
       ]
     },
     onCourseFilterSelect: () => {},
@@ -59,14 +60,22 @@ beforeEach(() => {
 describe('CourseSelect', () => {
   it('renders the course select', () => {
     const props = createProps()
-    const {getByTestId} = render(<CourseSelect {...props} />)
-    expect(getByTestId('courseSelect')).toBeInTheDocument()
+    const {getByTestId} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
+    expect(getByTestId('course-select')).toBeInTheDocument()
   })
 
   it('opens the select and allows selecting an option', () => {
     const props = createProps()
-    const {getByTestId, getByText} = render(<CourseSelect {...props} />)
-    const select = getByTestId('courseSelect')
+    const {getByTestId, getByText} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
+    const select = getByTestId('course-select')
     fireEvent.click(select)
     fireEvent.click(getByText('Potions'))
     expect(select.value).toBe('Potions')
@@ -74,8 +83,12 @@ describe('CourseSelect', () => {
 
   it('filters the options when typing', () => {
     const props = createProps()
-    const {getByTestId, queryByText} = render(<CourseSelect {...props} />)
-    const select = getByTestId('courseSelect')
+    const {getByTestId, queryByText} = render(
+      <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+        <CourseSelect {...props} />
+      </AlertManagerContext.Provider>
+    )
+    const select = getByTestId('course-select')
     fireEvent.click(select)
     fireEvent.change(select, {target: {value: 'Gryff'}})
     expect(queryByText('Potions')).toBe(null)

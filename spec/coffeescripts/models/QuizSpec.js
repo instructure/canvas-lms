@@ -21,6 +21,7 @@ import Quiz from 'compiled/models/Quiz'
 import Assignment from 'compiled/models/Assignment'
 import DateGroup from 'compiled/models/DateGroup'
 import AssignmentOverrideCollection from 'compiled/collections/AssignmentOverrideCollection'
+import fakeENV from 'helpers/fakeENV'
 import 'jquery.ajaxJSON'
 
 QUnit.module('Quiz', {
@@ -216,6 +217,29 @@ test('#initialize should set unpublish_url from html url', function() {
     this.quiz.get('unpublish_url'),
     'http://localhost:3000/courses/1/assignments/unpublish/quiz'
   )
+})
+
+QUnit.module('Quiz.Next with manage and new_quizzes_modules_support enabled', {
+  setup() {
+    fakeENV.setup({
+      PERMISSIONS: {manage: true},
+      FLAGS: {new_quizzes_modules_support: true}
+    })
+    this.quiz = new Quiz({
+      id: 7,
+      html_url: 'http://localhost:3000/courses/1/assignments/7',
+      assignment_id: 7,
+      quiz_type: 'quizzes.next'
+    })
+    this.ajaxStub = sandbox.stub($, 'ajaxJSON')
+  },
+  teardown() {
+    fakeENV.teardown()
+  }
+})
+
+test('#initialize should set url as edit_url', function() {
+  equal(this.quiz.get('url'), 'http://localhost:3000/courses/1/assignments/7/edit?quiz_lti')
 })
 
 QUnit.module('Quiz#allDates')

@@ -340,11 +340,12 @@ module CustomSeleniumActions
 
   def type_in_tiny(tiny_controlling_element, text, clear: false)
     selector = tiny_controlling_element.to_s.to_json
+    mce_class = Account.default.feature_enabled?(:rce_enhancements) ? ".tox-tinymce" : ".mce-tinymce"
     keep_trying_until do
-      driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').length > 0;")
+      driver.execute_script("return $(#{selector}).siblings('#{mce_class}').length > 0;")
     end
 
-    iframe_id = driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').find('iframe')[0];")['id']
+    iframe_id = driver.execute_script("return $(#{selector}).siblings('#{mce_class}').find('iframe')[0];")['id']
 
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
@@ -417,8 +418,12 @@ module CustomSeleniumActions
 
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
-    select = Selenium::WebDriver::Support::Select.new(element)
-    select.select_by(select_by, option_text)
+    if element.tag_name == 'input'
+      click_INSTUI_Select_option(element, option_text, select_by)
+    else
+      select = Selenium::WebDriver::Support::Select.new(element)
+      select.select_by(select_by, option_text)
+    end
   end
 
   def INSTUI_select(elem_or_css)
@@ -426,11 +431,16 @@ module CustomSeleniumActions
   end
 
   # implementation of click_option for use with INSTU's Select
-  # (tested with the CanvasSelect wrapper, untested with a raw instui Select)
+  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
+  # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
     cselect = INSTUI_select(select)
-    cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
+    if option_list_id.blank?
+      cselect.click
+      option_list_id = cselect.attribute('aria-controls')
+    end
+    
     if select_by == :text
       fj("##{option_list_id} [role='option']:contains(#{option_text})").click
     else

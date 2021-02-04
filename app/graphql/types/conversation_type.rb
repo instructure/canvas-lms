@@ -31,13 +31,17 @@ module Types
     field :subject, String, null: true
     field :updated_at, Types::DateTimeType, null: true
 
-    field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true
-    def conversation_messages_connection
+    field :conversation_messages_connection, Types::ConversationMessageType.connection_type, null: true do
+      argument :participants, [ID], required: false, prepare: GraphQLHelpers.relay_or_legacy_ids_prepare_func('User')
+    end
+    def conversation_messages_connection(participants: nil)
       load_association(:conversation_messages).then do |messages|
-        Promise.all(
-          messages.map {|message| Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load(message)}
-        ).then do
-          messages.select {|message| message.conversation_message_participants.pluck(:user_id).include?(current_user.id)}
+        Loaders::AssociationLoader.for(ConversationMessage, :conversation_message_participants).load_many(messages).then do
+          messages = messages.select { |message| message.conversation_message_participants.pluck(:user_id).include?(current_user.id) }
+          if participants
+            messages = messages.select { |message| (participants - message.conversation_message_participants.pluck(:user_id).map(&:to_s)).empty? }
+          end
+          messages
         end
       end
     end

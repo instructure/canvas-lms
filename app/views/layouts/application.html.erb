@@ -114,8 +114,8 @@
           <div class="TutorialToggleHolder"></div>
         <% end %>
         <% if show_student_view_button? %>
-          <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :"data-tooltip" => "", :title => t('Student View'), :"aria-label" => t('Student View'), :method => :post do %>
-            <i class="icon-student-view"></i>
+          <%= link_to course_student_view_path(course_id: @context, redirect_to_referer: 1), :class => "btn", :id => "easy_student_view", :method => :post do %>
+            <i class="icon-student-view"></i> <%= t('Student View') %>
           <% end %>
         <% end %>
       </div>

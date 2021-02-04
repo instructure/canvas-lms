@@ -8,12 +8,6 @@ outcome_alignment_non_scoring_content:
   environments:
     production:
       state: disabled
-outcome_guid_course_exports:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Reduce outcome duplication on course import"
-  description: "Ensures that outcomes that have already been imported
-    into a course are not duplicated if they are imported again"
 selectable_outcomes_in_course_copy:
   state: hidden
   applies_to: RootAccount
@@ -31,11 +25,6 @@ outcome_alignments_course_migration:
   display_name: Outcomes Service Alignment Migration
   description: Includes Outcomes Service alignments when exporting and importing
     course content
-bulk_delete_pages:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Page Bulk Deleting
-  description: Allow pages to be deleted in bulk
 account_level_mastery_scales:
   state: hidden
   display_name: Account and Course Level Outcome Mastery Scales
@@ -60,3 +49,8 @@ inactive_concluded_lmgb_filters:
   applies_to: RootAccount
   display_name: Student filters in LMGB
   description: Allow inactive and/or concluded enrollments to be displayed in LMGB
+enable_webcam_submission:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Enable Webcam on Submissions
+  description: Allow students to submit photo using their webcam.

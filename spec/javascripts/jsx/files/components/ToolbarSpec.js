@@ -27,7 +27,7 @@ let courseFolder = null
 let userFolder = null
 
 const buttonEnabled = button => {
-  if (button.length == 1) {
+  if (button.length === 1) {
     const el = button.instance()
     if (el.nodeName === 'A') {
       return !el.disabled && el.tabIndex !== -1
@@ -74,7 +74,10 @@ test('renders only view and download buttons for limited users', () => {
       currentFolder={userFolder}
       contextId="2"
       contextType="users"
-      userCanManageFilesForContext={false}
+      userCanAddFilesForContext={false}
+      userCanEditFilesForContext={false}
+      userCanDeleteFilesForContext={false}
+      userCanRestrictFilesForContext={false}
     />
   )
   const config = {
@@ -98,11 +101,12 @@ test('renders all buttons for users with manage_files permissions', () => {
       currentFolder={courseFolder}
       contextId="1"
       contextType="courses"
-      userCanManageFilesForContext
+      userCanAddFilesForContext
+      userCanEditFilesForContext
+      userCanDeleteFilesForContext
       userCanRestrictFilesForContext
     />
   )
-
   const config = {
     '.btn-view': true,
     '.btn-download': true,
@@ -118,6 +122,83 @@ test('renders all buttons for users with manage_files permissions', () => {
   )
 })
 
+test('does not render add/upload button for users without manage_files_add permission', () => {
+  const toolbar = mount(
+    <Toolbar
+      params="foo"
+      query=""
+      selectedItems={[file]}
+      currentFolder={courseFolder}
+      contextId="1"
+      contextType="courses"
+      userCanEditFilesForContext
+      userCanDeleteFilesForContext
+      userCanRestrictFilesForContext
+    />
+  )
+  const config = {
+    '.btn-view': true,
+    '.btn-download': true,
+    '.btn-move': true,
+    '.btn-restrict': true,
+    '.btn-delete': true,
+    '.btn-add-folder': false,
+    '.btn-upload': false
+  }
+  ok(buttonsEnabled(toolbar, config))
+})
+
+test('does not render move/restrict button for users without manage_files_edit permission', () => {
+  const toolbar = mount(
+    <Toolbar
+      params="foo"
+      query=""
+      selectedItems={[file]}
+      currentFolder={courseFolder}
+      contextId="1"
+      contextType="courses"
+      userCanAddFilesForContext
+      userCanDeleteFilesForContext
+    />
+  )
+  const config = {
+    '.btn-view': true,
+    '.btn-download': true,
+    '.btn-move': false,
+    '.btn-restrict': false,
+    '.btn-delete': true,
+    '.btn-add-folder': true,
+    '.btn-upload': true
+  }
+  ok(buttonsEnabled(toolbar, config))
+})
+
+test('does not render delete button for users without manage_files_delete permission', () => {
+  const toolbar = mount(
+    <Toolbar
+      params="foo"
+      query=""
+      selectedItems={[file]}
+      currentFolder={courseFolder}
+      contextId="1"
+      contextType="courses"
+      userCanAddFilesForContext
+      userCanEditFilesForContext
+      userCanRestrictFilesForContext
+    />
+  )
+  const config = {
+    '.btn-view': true,
+    '.btn-download': true,
+    '.btn-move': true,
+    '.btn-restrict': true,
+    '.btn-delete': false,
+    '.btn-add-folder': true,
+    '.btn-upload': true
+  }
+  ok(buttonsEnabled(toolbar, config))
+})
+
 test('disables preview button on folder', () => {
   const toolbar = mount(
     <Toolbar
@@ -127,7 +208,9 @@ test('disables preview button on folder', () => {
       currentFolder={courseFolder}
       contextId="1"
       contextType="courses"
-      userCanManageFilesForContext
+      userCanAddFilesForContext
+      userCanEditFilesForContext
+      userCanDeleteFilesForContext
       userCanRestrictFilesForContext
     />
   )

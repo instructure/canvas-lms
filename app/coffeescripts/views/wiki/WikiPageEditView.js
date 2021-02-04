@@ -338,7 +338,7 @@ export default class WikiPageEditView extends ValidatedFormView {
     }
     if (!this.hasUnsavedChanges() || confirm(this.unsavedWarning())) {
       this.checkUnsavedOnLeave = false
-      send($('textarea[data-rich_text]'), 'RCEClosed')
+      RichContentEditor.closeRCE(this.$wikiPageBody)
       return this.trigger('cancel')
     }
   }

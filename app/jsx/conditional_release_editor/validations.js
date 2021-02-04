@@ -22,7 +22,11 @@ import numberHelper from '../shared/helpers/numberHelper'
 
 // stack overflow suggests this implementation
 const isNumeric = n => {
-  n = numberHelper.parse(n)
+  try {
+    n = numberHelper.parse(n)
+  } catch (e) {
+    return false
+  }
   return !isNaN(n) && isFinite(n) // eslint-disable-line no-restricted-globals
 }
 

@@ -18,7 +18,6 @@ exports[`renders desert when completely empty 1`] = `
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
     >
       No Due Dates Assigned
@@ -33,13 +32,11 @@ exports[`renders desert when completely empty 1`] = `
       Looks like there isn't anything here
     </div>
     <Link
-      disabled={false}
+      color="link"
       iconPlacement="start"
       id="PlannerEmptyState_CardView"
       isWithinText={true}
-      linkRef={[Function]}
       onClick={[Function]}
-      variant="default"
     >
       Go to Card View Dashboard
     </Link>

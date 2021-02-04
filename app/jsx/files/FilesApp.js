@@ -61,11 +61,16 @@ FilesApp.render = function() {
     contextId = filesEnv.contextId
   }
 
-  const userCanManageFilesForContext = filesEnv.userHasPermission(
-    {contextType, contextId},
-    'manage_files'
-  )
-  const userCanRestrictFilesForContext = userCanManageFilesForContext && contextType !== 'groups'
+  const canManageFilesForContext = permission => {
+    return filesEnv.userHasPermission({contextType, contextId}, permission)
+  }
+
+  const userCanAddFilesForContext = canManageFilesForContext('manage_files_add')
+  const userCanEditFilesForContext = canManageFilesForContext('manage_files_edit')
+  const userCanDeleteFilesForContext = canManageFilesForContext('manage_files_delete')
+  const userCanManageFilesForContext =
+    userCanAddFilesForContext || userCanEditFilesForContext || userCanDeleteFilesForContext
+  const userCanRestrictFilesForContext = userCanEditFilesForContext && contextType !== 'groups'
   const usageRightsRequiredForContext = filesEnv.contextsDictionary[`${contextType}_${contextId}`]
     ? filesEnv.contextsDictionary[`${contextType}_${contextId}`].usage_rights_required
     : false
@@ -111,7 +116,9 @@ FilesApp.render = function() {
         onMove={this.onMove}
         contextType={contextType}
         contextId={contextId}
-        userCanManageFilesForContext={userCanManageFilesForContext}
+        userCanAddFilesForContext={userCanAddFilesForContext}
+        userCanEditFilesForContext={userCanEditFilesForContext}
+        userCanDeleteFilesForContext={userCanDeleteFilesForContext}
         usageRightsRequiredForContext={usageRightsRequiredForContext}
         userCanRestrictFilesForContext={userCanRestrictFilesForContext}
         indexExternalToolsForContext={indexExternalToolsForContext}
@@ -160,7 +167,9 @@ FilesApp.render = function() {
             toggleItemSelected: this.toggleItemSelected,
             toggleAllSelected: this.toggleAllSelected,
             areAllItemsSelected: this.areAllItemsSelected,
-            userCanManageFilesForContext,
+            userCanAddFilesForContext,
+            userCanEditFilesForContext,
+            userCanDeleteFilesForContext,
             userCanRestrictFilesForContext,
             usageRightsRequiredForContext,
             externalToolsForContext,

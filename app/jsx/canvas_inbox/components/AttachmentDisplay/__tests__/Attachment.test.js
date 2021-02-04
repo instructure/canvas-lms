@@ -23,7 +23,7 @@ import {Attachment} from '../Attachment'
 const setup = props => {
   return render(
     <Attachment
-      attachment={{id: '1', displayName: '1'}}
+      attachment={{id: '1', display_name: '1', mime_class: 'potato'}}
       onReplace={Function.prototype}
       onDelete={Function.prototype}
       {...props}
@@ -51,22 +51,99 @@ describe('Attachment', () => {
   })
 
   describe('attachment preview', () => {
-    it('renders a paperclip', () => {
-      const {getByTestId} = setup()
-      expect(getByTestId('paperclip')).toBeTruthy()
+    it('renders a paperclip if the mime class is not a standard file type', () => {
+      const {container} = setup()
+      expect(container.querySelector('svg').getAttribute('name')).toEqual('IconPaperclip')
+    })
+
+    it('renders the appropriate icon for the file type', () => {
+      const supportedFileIcons = [
+        {
+          mime_class: 'audio',
+          name: 'IconAttachMedia'
+        },
+        {
+          mime_class: 'code',
+          name: 'IconCode'
+        },
+        {
+          mime_class: 'doc',
+          name: 'IconDocument'
+        },
+        {
+          mime_class: 'file',
+          name: 'IconPaperclip'
+        },
+        {
+          mime_class: 'flash',
+          name: 'IconPaperclip'
+        },
+        {
+          mime_class: 'folder',
+          name: 'IconFolder'
+        },
+        {
+          mime_class: 'folder-locked',
+          name: 'IconFolderLocked'
+        },
+        {
+          mime_class: 'html',
+          name: 'IconCode'
+        },
+        {
+          mime_class: 'image',
+          name: 'IconImage'
+        },
+        {
+          mime_class: 'pdf',
+          name: 'IconPdf'
+        },
+        {
+          mime_class: 'ppt',
+          name: 'IconMsPpt'
+        },
+        {
+          mime_class: 'text',
+          name: 'IconDocument'
+        },
+        {
+          mime_class: 'video',
+          name: 'IconAttachMedia'
+        },
+        {
+          mime_class: 'xls',
+          name: 'IconMsExcel'
+        },
+        {
+          mime_class: 'zip',
+          name: 'IconZipped'
+        }
+      ]
+
+      supportedFileIcons.forEach(fileType => {
+        const {container} = setup({
+          attachment: {
+            id: '1',
+            display_name: `${fileType.mime_class} file`,
+            mime_class: fileType.mime_class
+          }
+        })
+        expect(container.querySelector('svg').getAttribute('name')).toEqual(fileType.name)
+      })
     })
 
     describe('a thumbnail url is provided', () => {
-      it('replaces the paperclip with the thumbnail', () => {
-        const {getByAltText, queryByTestId} = setup({
+      it('uses a thumbnail image rather than an icon', () => {
+        const {container, getByAltText} = setup({
           attachment: {
             id: '1',
-            displayName: 'has thumbnail',
-            thumbnailUrl: 'foo.bar/thumbnail'
+            display_name: 'has thumbnail',
+            thumbnail_url: 'foo.bar/thumbnail',
+            mime_class: 'image'
           }
         })
-        expect(queryByTestId('paperclip')).toBeFalsy()
-        expect(getByAltText('has thumbnail')).toBeTruthy()
+        expect(container.querySelector('svg')).toBe(null)
+        expect(getByAltText('has thumbnail preview')).toBeTruthy()
       })
     })
   })

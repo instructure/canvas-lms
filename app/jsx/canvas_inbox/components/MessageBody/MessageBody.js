@@ -35,7 +35,6 @@ export const MessageBody = props => {
     <TextArea
       label={<ScreenReaderContent>{I18n.t('Message Body')}</ScreenReaderContent>}
       messages={props.messages}
-      required
       autoGrow={false}
       height="200px"
       maxHeight="200px"

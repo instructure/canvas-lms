@@ -18,6 +18,7 @@
 
 import React from 'react'
 import TestUtils from 'react-dom/test-utils'
+import {DragDropContext} from 'react-dnd'
 import ReactDndTestBackend from 'react-dnd-test-backend'
 import DraggableDashboardCard from 'jsx/dashboard_card/DraggableDashboardCard'
 import getDroppableDashboardCardBox from 'jsx/dashboard_card/getDroppableDashboardCardBox'
@@ -79,7 +80,7 @@ test('cards have opacity of 0 while moving', () => {
 })
 
 test('moving a card adjusts the position property', () => {
-  const Box = getDroppableDashboardCardBox(ReactDndTestBackend)
+  const Box = getDroppableDashboardCardBox(DragDropContext(ReactDndTestBackend))
   const root = TestUtils.renderIntoDocument(
     <Box courseCards={cards} connectDropTarget={el => el} />
   )

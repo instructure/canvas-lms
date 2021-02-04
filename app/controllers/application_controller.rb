@@ -221,7 +221,7 @@ class ApplicationController < ActionController::Base
   JS_ENV_SITE_ADMIN_FEATURES = [:cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :rce_pretty_html_editor].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,
-    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses, :bulk_delete_pages,
+    :responsive_misc, :product_tours, :module_dnd, :files_dnd, :unpublished_courses,
     :usage_rights_discussion_topics, :inline_math_everywhere
   ].freeze
   JS_ENV_FEATURES_HASH = Digest::MD5.hexdigest([JS_ENV_SITE_ADMIN_FEATURES + JS_ENV_ROOT_ACCOUNT_FEATURES].sort.join(",")).freeze
@@ -1729,7 +1729,9 @@ class ApplicationController < ActionController::Base
   def content_tag_redirect(context, tag, error_redirect_symbol, tag_type=nil)
     url_params = tag.tag_type == 'context_module' ? { :module_item_id => tag.id } : {}
     if tag.content_type == 'Assignment'
-      redirect_to named_context_url(context, :context_assignment_url, tag.content_id, url_params)
+      use_edit_url = Account.site_admin.feature_enabled?(:new_quizzes_modules_support) && @context.grants_right?(@current_user, :manage) && tag.quiz_lti
+      redirect_symbol = use_edit_url ? :edit_context_assignment_url : :context_assignment_url
+      redirect_to named_context_url(context, redirect_symbol, tag.content_id, url_params)
     elsif tag.content_type == 'WikiPage'
       redirect_to polymorphic_url([context, tag.content], url_params)
     elsif tag.content_type == 'Attachment'

@@ -689,6 +689,27 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate assignnment
+  #
+  # Duplicate an assignment and return a json based on result_type argument.
+  #
+  # @argument result_type [String, "Quiz"]
+  #   Optional information:
+  #   When the root account has the feature `newquizzes_on_quiz_page` enabled
+  #   and this argument is set to "Quiz" the response will be serialized into a
+  #   quiz format({file:doc/api/quizzes.html#Quiz});
+  #   When this argument isn't specified the response will be serialized into an
+  #   assignment format;
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate?result_type=Quiz
+  #
+  # @returns Assignment
   def duplicate
     # see private methods for definitions
     old_assignment = old_assignment_for_duplicate

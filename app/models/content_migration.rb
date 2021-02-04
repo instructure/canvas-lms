@@ -48,7 +48,7 @@ class ContentMigration < ActiveRecord::Base
   workflow do
     state :created
     state :queued
-    #The pre_process states can be used by individual plugins as needed
+    # The pre_process states can be used by individual plugins as needed
     state :pre_processing
     state :pre_processed
     state :pre_process_error
@@ -64,9 +64,47 @@ class ContentMigration < ActiveRecord::Base
     exclude_hidden ? plugins.select{|p|!p.meta[:hide_from_users]} : plugins
   end
 
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
+  end
+
   set_policy do
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) }
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files)
+    end
     can :manage_files and can :read
+
+    ##################### End legacy permission block ##########################
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_add)
+    end
+    can :read and can :manage_files_add
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_edit)
+    end
+    can :read and can :manage_files_edit
+
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files_delete)
+    end
+    can :read and can :manage_files_delete
   end
 
   def trigger_live_events!
@@ -536,6 +574,13 @@ class ContentMigration < ActiveRecord::Base
         self.master_course_subscription.load_tags! # load child content tags
         self.master_course_subscription.master_template.preload_restrictions!
 
+        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
+        data = prepare_data(data)
+
+        # handle deletions before files are copied
+        deletions = data['deletions'].presence
+        process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
         # copy the attachments
         source_export = ContentExport.find(self.migration_settings[:master_course_export_id])
         if source_export.selective_export?
@@ -553,9 +598,6 @@ class ContentMigration < ActiveRecord::Base
         MasterCourses::FolderHelper.update_folder_names_and_states(self.context, source_export)
         self.context.copy_attachments_from_course(source_export.context, :content_export => source_export, :content_migration => self)
         MasterCourses::FolderHelper.recalculate_locked_folders(self.context)
-
-        data = JSON.parse(self.exported_attachment.open, :max_nesting => 50)
-        data = prepare_data(data)
       else
         @exported_data_zip = download_exported_data
         @zip_file = Zip::File.open(@exported_data_zip.path)
@@ -575,11 +617,11 @@ class ContentMigration < ActiveRecord::Base
       end
 
       migration_settings[:migration_ids_to_import] ||= {:copy=>{}}
-      deletions = self.for_master_course_import? && data['deletions'].presence
-      process_master_deletions(deletions.except('AssignmentGroup')) if deletions # wait until after the import to do AssignmentGroups
+
       import!(data)
 
       process_master_deletions(deletions.slice('AssignmentGroup')) if deletions
+
       if !self.import_immediately?
         update_import_progress(100)
       end

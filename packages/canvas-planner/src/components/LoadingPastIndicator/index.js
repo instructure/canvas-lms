@@ -17,8 +17,8 @@
  */
 import React, {Component} from 'react'
 import PropTypes from 'prop-types'
-import {View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 import {Spinner} from '@instructure/ui-spinner'
 
 import ErrorAlert from '../ErrorAlert'

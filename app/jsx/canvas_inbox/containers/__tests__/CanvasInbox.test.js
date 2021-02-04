@@ -16,15 +16,71 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import CanvasInbox from '../CanvasInbox'
+import {createCache} from '../../../canvas-apollo'
+import {CONVERSATIONS_QUERY} from '../../Queries'
+import {MockedProvider} from '@apollo/react-testing'
 import React from 'react'
 import {render} from '@testing-library/react'
+import {mockQuery} from '../../mocks'
+import waitForApolloLoading from '../../helpers/waitForApolloLoading'
+
+const createGraphqlMocks = () => {
+  const mocks = [
+    {
+      request: {
+        query: CONVERSATIONS_QUERY,
+        variables: {
+          userID: '1',
+          scope: 'inbox'
+        },
+        overrides: {
+          Node: {
+            __typename: 'User'
+          }
+        }
+      }
+    }
+  ]
+
+  const mockResults = Promise.all(
+    mocks.map(async m => {
+      const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
+      return {
+        request: {query: m.request.query, variables: m.request.variables},
+        result
+      }
+    })
+  )
+  return mockResults
+}
+
+const setup = async () => {
+  const mocks = await createGraphqlMocks()
+  return render(
+    <AlertManagerContext.Provider value={{setOnFailure: jest.fn(), setOnSuccess: jest.fn()}}>
+      <MockedProvider mocks={mocks} cache={createCache()}>
+        <CanvasInbox />
+      </MockedProvider>
+    </AlertManagerContext.Provider>
+  )
+}
 
 describe('CanvasInbox App Container', () => {
+  beforeEach(() => {
+    window.ENV = {
+      current_user_id: 1
+    }
+  })
+
   describe('rendering', () => {
-    it('should render', () => {
-      const component = render(<CanvasInbox />)
-      expect(component).toBeTruthy()
+    it('should render <CanvasInbox />', async () => {
+      const component = await setup()
+
+      await waitForApolloLoading()
+
+      expect(await component).toBeTruthy()
     })
   })
 })

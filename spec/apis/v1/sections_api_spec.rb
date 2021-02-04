@@ -26,10 +26,6 @@ describe SectionsController, type: :request do
 
     before :once do
       course_with_teacher(:active_all => true, :user => user_with_pseudonym(:name => 'UWP'))
-
-      # granular permissions disabled by default
-      @course.root_account.disable_feature!(:granular_permissions_course_sections)
-
       @me = @user
       @course1 = @course
       course_with_student(:user => @user, :active_all => true)
@@ -151,38 +147,12 @@ describe SectionsController, type: :request do
       json = api_call(:get, endpoint, params, {})
       expect(json.size).to eq @course2.course_sections.count
     end
-
-    context 'with granular permissions enabled' do
-      before :once do
-        @course.root_account.enable_feature!(:granular_permissions_course_sections)
-      end
-
-      it "should return the list of sections for a course" do
-        user1 = @user
-        user2 = User.create!(:name => 'Zombo')
-        section1 = @course2.default_section
-        section2 = @course2.course_sections.create!(:name => 'Section B')
-        section2.update_attribute :sis_source_id, 'sis-section'
-        @course2.enroll_user(user2, 'StudentEnrollment', :section => section2).accept!
-        RoleOverride.create!(:context => Account.default, :permission => 'read_sis', :role => teacher_role, :enabled => false)
-
-        @user = @me
-        json = api_call(:get, "/api/v1/courses/#{@course2.id}/sections.json",
-                        { :controller => 'sections', :action => 'index', :course_id => @course2.to_param, :format => 'json' }, { :include => ['students'] })
-        expect(json.size).to eq 2
-        expect(json.find { |s| s['name'] == section1.name }['students']).to eq api_json_response([user1], :only => user_api_fields)
-        expect(json.find { |s| s['name'] == section2.name }['students']).to eq api_json_response([user2], :only => user_api_fields)
-      end
-    end
   end
 
   describe "#show" do
     before :once do
       course_with_teacher
       @section = @course.default_section
-
-      # granular permissions disabled by default
-      @course.root_account.disable_feature!(:granular_permissions_course_sections)
     end
 
     context "scoped by course" do
@@ -250,29 +220,6 @@ describe SectionsController, type: :request do
         site_admin_user
         api_call(:get, "#{@path_prefix}/#{@other_section.id}", @path_params.merge({ :id => @other_section.to_param }), {}, {}, :expected_status => 404)
       end
-
-      context 'with granular permissions enabled' do
-        before :once do
-          @course.root_account.enable_feature!(:granular_permissions_course_sections)
-        end
-
-        it "should be accessible from the course" do
-          json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
-          expect(json).to eq({
-            'id' => @section.id,
-            'name' => @section.name,
-            'course_id' => @course.id,
-            'nonxlist_course_id' => nil,
-            'start_at' => nil,
-            'end_at' => nil,
-            'restrict_enrollments_to_section_dates' => nil,
-            'integration_id' => nil,
-            'sis_course_id' => nil,
-            'sis_section_id' => nil,
-            'created_at' => @section.created_at.iso8601
-          })
-        end
-      end
     end
 
     context "unscoped" do
@@ -338,29 +285,6 @@ describe SectionsController, type: :request do
         @course.destroy
         json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }), {}, {}, :expected_status => 404)
       end
-
-      context 'with granular permissions enabled' do
-        before :once do
-          @course.root_account.enable_feature!(:granular_permissions_course_sections)
-        end
-
-        it "should be accessible without a course context" do
-          json = api_call(:get, "#{@path_prefix}/#{@section.id}", @path_params.merge({ :id => @section.to_param }))
-          expect(json).to eq({
-            'id' => @section.id,
-            'name' => @section.name,
-            'course_id' => @course.id,
-            'nonxlist_course_id' => nil,
-            'start_at' => nil,
-            'end_at' => nil,
-            'restrict_enrollments_to_section_dates' => nil,
-            'integration_id' => nil,
-            'sis_course_id' => nil,
-            'sis_section_id' => nil,
-            'created_at' => @section.created_at.iso8601
-          })
-        end
-      end
     end
 
     context "as an admin" do
@@ -396,9 +320,6 @@ describe SectionsController, type: :request do
       course_factory
       @path_prefix = "/api/v1/courses/#{@course.id}/sections"
       @path_params = { :controller => 'sections', :action => 'create', :course_id => @course.to_param, :format => 'json' }
-
-      # granular permissions disabled by default
-      @course.root_account.disable_feature!(:granular_permissions_course_sections)
     end
 
     context "as teacher" do
@@ -520,59 +441,43 @@ describe SectionsController, type: :request do
       end
     end
 
-    context 'with granular permissions enabled' do
-      before :once do
-        @course.root_account.enable_feature!(:granular_permissions_course_sections)
+    context "as teacher having manage_sections_add permission" do
+      before do
+        course_with_teacher :course => @course
       end
 
-      context "as teacher having manage_sections_add permission" do
-        before do
-          course_with_teacher :course => @course
-        end
-
-        it "should create a section with default parameters" do
-          json = api_call(:post, @path_prefix, @path_params)
-          @course.reload
-          expect(@course.active_course_sections.where(id: json['id'].to_i)).to be_exists
-        end
-
-        it "should create a section with custom parameters" do
-          json = api_call(:post, @path_prefix, @path_params, { :course_section =>
-            { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z' }})
-          @course.reload
-          section = @course.active_course_sections.find(json['id'].to_i)
-          expect(section.name).to eq 'Name'
-          expect(section.sis_source_id).to be_nil
-          expect(section.start_at).to eq Time.parse('2011-01-01T01:00Z')
-          expect(section.end_at).to eq Time.parse('2011-07-01T01:00Z')
-        end
+      it "should create a section with default parameters" do
+        json = api_call(:post, @path_prefix, @path_params)
+        @course.reload
+        expect(@course.active_course_sections.where(id: json['id'].to_i)).to be_exists
       end
 
-      context "as teacher without manage_sections_add permission" do
-        before do
-          course_with_teacher :course => @course
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-              RoleOverride.create!(
-                permission: 'manage_sections_add',
-                enabled: false,
-                role: teacher_role,
-                account: @course.root_account
-              )
-        end
+      it "should create a section with custom parameters" do
+        json = api_call(:post, @path_prefix, @path_params, { :course_section =>
+          { :name => 'Name', :start_at => '2011-01-01T01:00Z', :end_at => '2011-07-01T01:00Z' }})
+        @course.reload
+        section = @course.active_course_sections.find(json['id'].to_i)
+        expect(section.name).to eq 'Name'
+        expect(section.sis_source_id).to be_nil
+        expect(section.start_at).to eq Time.parse('2011-01-01T01:00Z')
+        expect(section.end_at).to eq Time.parse('2011-07-01T01:00Z')
+      end
+    end
 
-        it "should disallow creating a section" do
-          api_call(:post, @path_prefix, @path_params, {}, {}, :expected_status => 401)
-        end
+    context "as teacher without manage_sections_add permission" do
+      before do
+        course_with_teacher :course => @course
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+            RoleOverride.create!(
+              permission: 'manage_sections_add',
+              enabled: false,
+              role: teacher_role,
+              account: @course.root_account
+            )
       end
 
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should disallow creating a section" do
-          api_call(:post, @path_prefix, @path_params, {}, {}, :expected_status => 401)
-        end
+      it "should disallow creating a section" do
+        api_call(:post, @path_prefix, @path_params, {}, {}, :expected_status => 401)
       end
     end
   end
@@ -686,67 +591,50 @@ describe SectionsController, type: :request do
       end
     end
 
-    context 'with granular permissions enabled' do
-      before :once do
-        @course.root_account.enable_feature!(:granular_permissions_course_sections)
+    context "as teacher having manage_sections_edit permission" do
+      before do
+        course_with_teacher :course => @course
       end
 
-      context "as teacher having manage_sections_edit permission" do
-        before do
-          course_with_teacher :course => @course
-        end
-
-        it "should modify section data by id" do
-          json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
-            { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :restrict_enrollments_to_section_dates => '1' }})
-          expect(json['id']).to eq @section.id
-          @section.reload
-          expect(@section.name).to eq 'New Name'
-          expect(@section.sis_source_id).to eq 'SISsy'
-          expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
-          expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
-          expect(@section.restrict_enrollments_to_section_dates).to be_truthy
-        end
-
-        it "should modify section data by sis id" do
-          json = api_call(:put, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"), { :course_section =>
-            { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
-          expect(json['id']).to eq @section.id
-          @section.reload
-          expect(@section.name).to eq 'New Name'
-          expect(@section.sis_source_id).to eq 'SISsy'
-          expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
-          expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
-        end
+      it "should modify section data by id" do
+        json = api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), { :course_section =>
+          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z', :restrict_enrollments_to_section_dates => '1' }})
+        expect(json['id']).to eq @section.id
+        @section.reload
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'SISsy'
+        expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
+        expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
+        expect(@section.restrict_enrollments_to_section_dates).to be_truthy
       end
 
-      context "as teacher without manage_sections_edit permission" do
-        before do
-          course_with_teacher :course => @course
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-              RoleOverride.create!(
-                permission: 'manage_sections_edit',
-                enabled: false,
-                role: teacher_role,
-                account: @course.root_account
-              )
-        end
+      it "should modify section data by sis id" do
+        json = api_call(:put, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"), { :course_section =>
+          { :name => 'New Name', :start_at => '2012-01-01T01:00Z', :end_at => '2012-07-01T01:00Z' }})
+        expect(json['id']).to eq @section.id
+        @section.reload
+        expect(@section.name).to eq 'New Name'
+        expect(@section.sis_source_id).to eq 'SISsy'
+        expect(@section.start_at).to eq Time.parse('2012-01-01T01:00Z')
+        expect(@section.end_at).to eq Time.parse('2012-07-01T01:00Z')
+      end
+    end
 
-        it "should disallow modifying a section" do
-          api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
-                   { :course_section => { :name => 'New Name' } }, {}, :expected_status => 401)
-        end
+    context "as teacher without manage_sections_edit permission" do
+      before do
+        course_with_teacher :course => @course
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+            RoleOverride.create!(
+              permission: 'manage_sections_edit',
+              enabled: false,
+              role: teacher_role,
+              account: @course.root_account
+            )
       end
 
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should disallow modifying a section" do
-          api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
-                   { :course_section => { :name => 'New Name' } }, {}, :expected_status => 401)
-        end
+      it "should disallow modifying a section" do
+        api_call(:put, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param),
+                 { :course_section => { :name => 'New Name' } }, {}, :expected_status => 401)
       end
     end
   end
@@ -804,54 +692,38 @@ describe SectionsController, type: :request do
       end
     end
 
-    context 'with granular permissions enabled' do
-      before :once do
-        @course.root_account.enable_feature!(:granular_permissions_course_sections)
+    context "as teacher having manage_sections_edit permission" do
+      before do
+        course_with_teacher :course => @course
       end
 
-      context "as teacher having manage_sections_edit permission" do
-        before do
-          course_with_teacher :course => @course
-        end
-
-        it "should delete a section by id" do
-          json = api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param))
-          expect(json['id']).to eq @section.id
-          expect(@section.reload).to be_deleted
-        end
-
-        it "should delete a section by sis id" do
-          json = api_call(:delete, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"))
-          expect(json['id']).to eq @section.id
-          expect(@section.reload).to be_deleted
-        end
+      it "should delete a section by id" do
+        json = api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param))
+        expect(json['id']).to eq @section.id
+        expect(@section.reload).to be_deleted
       end
 
-      context "as teacher without manage_sections_delete permission" do
-        before do
-          course_with_teacher :course => @course
-          teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
-              RoleOverride.create!(
-                permission: 'manage_sections_delete',
-                enabled: false,
-                role: teacher_role,
-                account: @course.root_account
-              )
-        end
+      it "should delete a section by sis id" do
+        json = api_call(:delete, "#{@path_prefix}/sis_section_id:SISsy", @path_params.merge(:id => "sis_section_id:SISsy"))
+        expect(json['id']).to eq @section.id
+        expect(@section.reload).to be_deleted
+      end
+    end
 
-        it "should disallow deleting a section" do
-          api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
-        end
+    context "as teacher without manage_sections_delete permission" do
+      before do
+        course_with_teacher :course => @course
+        teacher_role = Role.get_built_in_role('TeacherEnrollment', root_account_id: @course.root_account.id)
+            RoleOverride.create!(
+              permission: 'manage_sections_delete',
+              enabled: false,
+              role: teacher_role,
+              account: @course.root_account
+            )
       end
 
-      context "as student" do
-        before do
-          course_with_student_logged_in(:course => @course)
-        end
-
-        it "should disallow deleting a section" do
-          api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
-        end
+      it "should disallow deleting a section" do
+        api_call(:delete, "#{@path_prefix}/#{@section.id}", @path_params.merge(:id => @section.to_param), {}, {}, :expected_status => 401)
       end
     end
   end

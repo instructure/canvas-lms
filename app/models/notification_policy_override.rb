@@ -54,17 +54,20 @@ class NotificationPolicyOverride < ActiveRecord::Base
         ]
         "(#{vals.join(',')})"
       end
-
-      connection.execute(<<~SQL)
-        INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
-          (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
-          VALUES #{values.join(",")}
-          ON CONFLICT (context_id, context_type, communication_channel_id) WHERE notification_id IS NULL
-          DO UPDATE SET
-            workflow_state = excluded.workflow_state,
-            updated_at = excluded.updated_at
-          WHERE notification_policy_overrides.workflow_state<>excluded.workflow_state;
-      SQL
+      if values.size > 0
+        # if the user has no communication channels, there really isn't anything
+        # to do here for them.
+        connection.execute(<<~SQL)
+          INSERT INTO #{NotificationPolicyOverride.quoted_table_name}
+            (context_id, context_type, communication_channel_id, workflow_state, created_at, updated_at)
+            VALUES #{sanitize_sql(values.join(","))}
+            ON CONFLICT (context_id, context_type, communication_channel_id) WHERE notification_id IS NULL
+            DO UPDATE SET
+              workflow_state = excluded.workflow_state,
+              updated_at = excluded.updated_at
+            WHERE notification_policy_overrides.workflow_state<>excluded.workflow_state;
+        SQL
+      end
     end
   end
 

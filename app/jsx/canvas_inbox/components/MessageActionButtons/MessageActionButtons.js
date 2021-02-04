@@ -67,7 +67,7 @@ const ActionButton = props => (
       renderIcon={props.icon}
       onClick={props.onClick}
       margin="0 x-small 0 0"
-      disabled={props.disabled}
+      interaction={props.disabled ? 'disabled' : 'enabled'}
       data-testid={props.testid}
     />
   </Tooltip>

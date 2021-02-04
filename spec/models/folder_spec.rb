@@ -328,6 +328,11 @@ describe Folder do
       teacher_in_course(:course => @course, :active_all => true)
     end
 
+    before(:each) do
+      # granular permissions disabled by default
+      @course.root_account.disable_feature!(:granular_permissions_course_files)
+    end
+
     it "should grant right to students and teachers" do
       expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
       expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
@@ -349,6 +354,38 @@ describe Folder do
         @teacher.enrollments.where(:course_id => @course).first.complete!
         expect(@course.grants_right?(@teacher, :manage_files)).to be_falsey
         expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+    end
+
+    context 'with granular permissions enabled' do
+      before :each do
+        @course.root_account.enable_feature!(:granular_permissions_course_files)
+      end
+
+      it "should grant right to students and teachers" do
+        expect(@root_folder.grants_right?(@student, :read_contents)).to be_truthy
+        expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+      end
+
+      context "with files tab hidden to students" do
+        before :once do
+          @course.tab_configuration = [{"id" => Course::TAB_FILES, "hidden" => true}]
+          @course.save!
+          @root_folder.reload
+        end
+
+        it "should grant right to teachers but not students" do
+          expect(@root_folder.grants_right?(@student, :read_contents)).to be_falsey
+          expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+        end
+
+        it "should still grant rights to teachers even if the teacher enrollment is concluded" do
+          @teacher.enrollments.where(:course_id => @course).first.complete!
+          expect(@course.grants_right?(@teacher, :manage_files_add)).to be_falsey
+          expect(@course.grants_right?(@teacher, :manage_files_edit)).to be_falsey
+          expect(@course.grants_right?(@teacher, :manage_files_delete)).to be_falsey
+          expect(@root_folder.grants_right?(@teacher, :read_contents)).to be_truthy
+        end
       end
     end
   end

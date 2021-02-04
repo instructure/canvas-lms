@@ -1802,3 +1802,65 @@ module PreserveShardAfterTransaction
   end
 end
 ActiveRecord::ConnectionAdapters::Transaction.prepend(PreserveShardAfterTransaction)
+
+module ConnectionWithMaxRuntime
+  def initialize(*)
+    super
+    @created_at = Concurrent.monotonic_time
+  end
+
+  def runtime
+    Concurrent.monotonic_time - @created_at
+  end
+end
+ActiveRecord::ConnectionAdapters::AbstractAdapter.prepend(ConnectionWithMaxRuntime)
+
+module MaxRuntimeConnectionPool
+  def max_runtime
+    # TODO: Rails 6.1 uses a PoolConfig object instead
+    @spec.config[:max_runtime]
+  end
+
+  def acquire_connection(*)
+    loop do
+      conn = super
+      return conn unless max_runtime && conn.runtime >= max_runtime
+
+      @connections.delete(conn)
+      conn.disconnect!
+    end
+  end
+
+  def checkin(conn)
+    return super unless max_runtime && conn.runtime >= max_runtime
+
+    conn.lock.synchronize do
+      synchronize do
+        remove_connection_from_thread_cache conn
+
+        @connections.delete(conn)
+        conn.disconnect!
+      end
+    end
+  end
+
+  def flush(*)
+    super
+    return unless max_runtime
+
+    old_connections = synchronize do
+      # TODO: Rails 6.1 adds a `discarded?` method instead of checking this directly
+      return unless @connections
+      @connections.select do |conn|
+        !conn.in_use? && conn.runtime >= max_runtime
+      end.each do |conn|
+        conn.lease
+        @available.delete conn
+        @connections.delete conn
+      end
+    end
+
+    old_connections.each(&:disconnect!)
+  end
+end
+ActiveRecord::ConnectionAdapters::ConnectionPool.prepend(MaxRuntimeConnectionPool)

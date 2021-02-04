@@ -339,14 +339,3 @@ testRights('CAN (read)', {
     PUBLISH: false
   }
 })
-
-test('includes bulk_delete_pages feature flag', () => {
-  ENV.FEATURES = {bulk_delete_pages: true}
-  const model = new WikiPage({page_id: '42'})
-  const collection = new WikiPageCollection([model])
-  const view = new WikiPageIndexView({
-    collection,
-    WIKI_RIGHTS: {}
-  })
-  strictEqual(view.toJSON().BULK_DELETE_ENABLED, true)
-})

@@ -58,6 +58,7 @@ export default class AssignmentGroupSelector extends Backbone.View
     assignmentGroupId: @parentModel.assignmentGroupId()
     frozenAttributes: @parentModel.frozenAttributes()
     nested: @nested
+    new_quizzes_modules_support: ENV?.new_quizzes_modules_support
     inClosedGradingPeriod: @parentModel.inClosedGradingPeriod()
 
   fieldSelectors:

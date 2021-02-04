@@ -139,7 +139,7 @@ export const DELETE_RULE = 'DELETE_RULE'
 export const deleteRule = createAction(DELETE_RULE, state => CyoeApi.deleteRule(state))
 
 // @payload: index: scoring range index to remove assignment from
-//           assignmentSetIndex: index of assignmnet set to remove assignment from
+//           assignmentSetIndex: index of assignment set to remove assignment from
 //           assignment: canvas id of assignment to remove
 export const REMOVE_ASSIGNMENT = 'REMOVE_ASSIGNMENT'
 export const removeAssignment = createAction(REMOVE_ASSIGNMENT)

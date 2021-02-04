@@ -28,6 +28,7 @@ describe Types::LearningOutcomeGroupType do
     @account_user = Account.default.account_users.first
     @parent_group = outcome_group_model(context: Account.default)
     @child_group = outcome_group_model(context: Account.default)
+    @child_group3 = outcome_group_model(context: Account.default)
     @child_group2 = outcome_group_model(context: Account.default, workflow_state: 'deleted')
     outcome_group_model(context: Account.default, vendor_guid: "vendor_guid")
     @outcome_group.learning_outcome_group = @parent_group
@@ -36,6 +37,8 @@ describe Types::LearningOutcomeGroupType do
     @child_group.save!
     @child_group2.learning_outcome_group = @outcome_group
     @child_group2.save
+    @child_group3.learning_outcome_group = @outcome_group
+    @child_group3.save!
     @user = @admin
     @outcome1 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "BBBB")
     @outcome2 = outcome_model(context: Account.default, outcome_group: @outcome_group, short_description: "AAAA")
@@ -54,7 +57,8 @@ describe Types::LearningOutcomeGroupType do
     expect(outcome_group_type.resolve("outcomesCount")).to be_a Integer
     expect(outcome_group_type.resolve("parentOutcomeGroup { _id }")).to eq @parent_group.id.to_s
     expect(outcome_group_type.resolve("canEdit")).to eq true
-    expect(outcome_group_type.resolve("childGroups { nodes { _id } }")).to match_array([@child_group.id.to_s])
+    expect(outcome_group_type.resolve("childGroups { nodes { _id } }")).
+      to match_array([@child_group.id.to_s, @child_group3.id.to_s])
   end
 
   it "gets outcomes ordered by title" do
@@ -103,6 +107,18 @@ describe Types::LearningOutcomeGroupType do
       it "returns nil" do
         expect(outcome_group_type.resolve("_id")).to be_nil
       end
+    end
+  end
+
+  describe '#child_groups_count' do
+    it 'returns the total nested outcome groups' do
+      expect(outcome_group_type.resolve("childGroupsCount")).to eq 2
+    end
+  end
+
+  describe '#outcomes_count' do
+    it 'returns the total outcomes at the nested outcome groups' do
+      expect(outcome_group_type.resolve("outcomesCount")).to eq 2
     end
   end
 end

@@ -330,11 +330,12 @@ pipeline {
     RUBY = configuration.ruby() // RUBY_VERSION is a reserved keyword for ruby installs
     RSPEC_PROCESSES = 4
 
-    JS_DEBUG_IMAGE = "${configuration.buildRegistryPath("js-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
     LINTER_DEBUG_IMAGE = "${configuration.buildRegistryPath("linter-debug")}:${imageTagVersion()}-$TAG_SUFFIX"
 
     CASSANDRA_PREFIX = configuration.buildRegistryPath('cassandra-migrations')
     DYNAMODB_PREFIX = configuration.buildRegistryPath('dynamodb-migrations')
+    KARMA_BUILDER_PREFIX = configuration.buildRegistryPath("karma-builder")
+    KARMA_RUNNER_PREFIX = configuration.buildRegistryPath("karma-runner")
     POSTGRES_PREFIX = configuration.buildRegistryPath('postgres-migrations')
     RUBY_RUNNER_PREFIX = configuration.buildRegistryPath("ruby-runner")
     YARN_RUNNER_PREFIX = configuration.buildRegistryPath("yarn-runner")
@@ -352,6 +353,7 @@ pipeline {
 
     CASSANDRA_MERGE_IMAGE = "$CASSANDRA_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
     DYNAMODB_MERGE_IMAGE = "$DYNAMODB_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
+    KARMA_RUNNER_IMAGE = "$KARMA_RUNNER_PREFIX:$IMAGE_CACHE_UNIQUE_SCOPE"
     POSTGRES_MERGE_IMAGE = "$POSTGRES_PREFIX:$IMAGE_CACHE_MERGE_SCOPE-$RSPEC_PROCESSES"
 
     // This is primarily for the plugin build
@@ -583,7 +585,7 @@ pipeline {
                   }
                 }
 
-                if (!configuration.isChangeMerged() && env.GERRIT_PROJECT == 'canvas-lms') {
+                if (!configuration.isChangeMerged()) {
                   echo 'adding Linters'
                   timedStage('Linters', stages, {
                     credentials.withGerritCredentials {
@@ -608,61 +610,102 @@ pipeline {
                 })
 
                 echo 'adding Vendored Gems'
-                buildStage.makeFromJob('Vendored Gems', '/Canvas/test-suites/vendored-gems', stages, buildParameters + [
-                    string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
-                    string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                  ]
-                )
+                timedStage('Vendored Gems', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/vendored-gems', buildParameters + [
+                      string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
+                      string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ])
+                })
 
-                if(configuration.getBoolean('upload-js-debug-image', 'false')) {
-                  echo 'adding Javascript (Debug Image Upload)'
-                  buildStage.makeFromJob('Javascript (Debug Image Upload)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                      string(name: 'JS_DEBUG_IMAGE_TAG', value: env.JS_DEBUG_IMAGE),
-                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                      string(name: 'TEST_SUITE', value: "upload"),
-                      string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                    ], true, "testReport"
-                  )
-                }
+                def jsReady = null
+
+                timedStage('Javascript (Build Image)', stages, {
+                  try {
+                    def cacheScope = configuration.isChangeMerged() ? env.IMAGE_CACHE_MERGE_SCOPE : env.IMAGE_CACHE_BUILD_SCOPE
+
+                    withEnv([
+                      "CACHE_LOAD_SCOPE=${env.IMAGE_CACHE_MERGE_SCOPE}",
+                      "CACHE_LOAD_FALLBACK_SCOPE=${env.IMAGE_CACHE_BUILD_SCOPE}",
+                      "CACHE_SAVE_SCOPE=${cacheScope}",
+                      "KARMA_BUILDER_PREFIX=${env.KARMA_BUILDER_PREFIX}",
+                      "PATCHSET_TAG=${env.PATCHSET_TAG}",
+                      "WEBPACK_BUILDER_IMAGE=${env.WEBPACK_BUILDER_IMAGE}",
+                    ]) {
+                      sh "./build/new-jenkins/js/docker-build.sh $KARMA_RUNNER_IMAGE"
+                    }
+
+                    sh """
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE
+                      ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_BUILDER_PREFIX
+                    """
+
+                    jsReady = true
+                  } catch(e) {
+                    jsReady = false
+
+                    throw e
+                  }
+                })
 
                 echo 'adding Javascript (Jest)'
-                buildStage.makeFromJob('Javascript (Jest)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                timedStage('Javascript (Jest)', stages, {
+                  waitUntil { jsReady != null }
+
+                  if(!jsReady) {
+                    error "image dependency failed to build"
+                  }
+
+                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "jest"),
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                  ], true, "testReport"
-                )
+                  ], true, "testReport")
+                })
 
                 echo 'adding Javascript (Coffeescript)'
-                buildStage.makeFromJob('Javascript (Coffeescript)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                timedStage('Javascript (Coffeescript)', stages, {
+                  waitUntil { jsReady != null }
+
+                  if(!jsReady) {
+                    error "image dependency failed to build"
+                  }
+
+                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "coffee"),
-                  ], true, "testReport"
-                )
+                  ], true, "testReport")
+                })
 
                 echo 'adding Javascript (Karma)'
-                buildStage.makeFromJob('Javascript (Karma)', '/Canvas/test-suites/JS', stages, buildParameters + [
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
+                timedStage('Javascript (Karma)', stages, {
+                  waitUntil { jsReady != null }
+
+                  if(!jsReady) {
+                    error "image dependency failed to build"
+                  }
+
+                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/JS', buildParameters + [
+                    string(name: 'KARMA_RUNNER_IMAGE', value: env.KARMA_RUNNER_IMAGE),
                     string(name: 'TEST_SUITE', value: "karma"),
-                    string(name: 'WEBPACK_BUILDER_TAG', value: env.WEBPACK_BUILDER_IMAGE),
-                  ], true, "testReport"
-                )
+                  ], true, "testReport")
+                })
 
                 echo 'adding Contract Tests'
-                buildStage.makeFromJob('Contract Tests', '/Canvas/test-suites/contract-tests', stages, buildParameters + [
+                timedStage('Contract Tests', stages, {
+                  failureReport.buildAndReportIfFailure('/Canvas/test-suites/contract-tests', buildParameters + [
                     string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                     string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                  ]
-                )
+                    string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                  ])
+                })
 
                 if (sh(script: 'build/new-jenkins/check-for-migrations.sh', returnStatus: true) == 0) {
                   echo 'adding CDC Schema check'
-                  buildStage.makeFromJob('CDC Schema Check', '../Canvas/cdc-event-transformer-master', stages, buildParameters + [
-                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}")
-                    ]
-                  )
+                  timedStage('CDC Schema Check', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/cdc-event-transformer-master', buildParameters + [
+                      string(name: 'CANVAS_LMS_IMAGE_PATH', value: "${env.PATCHSET_TAG}"),
+                    ])
+                  })
                 }
                 else {
                   echo 'no migrations added, skipping CDC Schema check'
@@ -676,17 +719,20 @@ pipeline {
                   )
                 ) {
                   echo 'adding Flakey Spec Catcher'
-                  buildStage.makeFromJob('Flakey Spec Catcher', '/Canvas/test-suites/flakey-spec-catcher', stages, buildParameters + [
+                  timedStage('Flakey Spec Catcher', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/flakey-spec-catcher', buildParameters + [
                       string(name: 'CASSANDRA_IMAGE_TAG', value: "${env.CASSANDRA_IMAGE_TAG}"),
                       string(name: 'DYNAMODB_IMAGE_TAG', value: "${env.DYNAMODB_IMAGE_TAG}"),
-                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}")
-                    ], configuration.fscPropagate(), ""
-                  )
+                      string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
+                    ], configuration.fscPropagate(), "")
+                  })
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
                   echo 'adding Local Docker Dev Build'
-                  buildStage.makeFromJob('Local Docker Dev Build', '/Canvas/test-suites/local-docker-dev-smoke', stages, buildParameters)
+                  timedStage('Local Docker Dev Build', stages, {
+                    failureReport.buildAndReportIfFailure('/Canvas/test-suites/local-docker-dev-smoke', buildParameters)
+                  })
                 }
 
                 if(configuration.isChangeMerged()) {

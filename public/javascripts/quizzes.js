@@ -2250,6 +2250,7 @@ $(document).ready(function() {
     object_name: 'quiz',
 
     processData(data) {
+      RichContentEditor.closeRCE($('#quiz_description'))
       $(this).attr('method', 'PUT')
       const quiz_title = $("input[name='quiz[title]']").val()
       const postToSIS = data['quiz[post_to_sis]'] === '1'
@@ -2462,6 +2463,10 @@ $(document).ready(function() {
         $(this).formErrors(data)
       }
     }
+  })
+
+  $quiz_edit_wrapper.find('#cancel_button').click(_event => {
+    RichContentEditor.closeRCE($('#quiz_description'))
   })
 
   $quiz_edit_wrapper
@@ -2865,22 +2870,12 @@ $(document).ready(function() {
 
     // create toggler instance on the first click
     if (!toggler) {
-      const tinyOptions = {}
 
       const inputColumn = $comment.parents().find('.answer_type:visible')[0]
 
-      if (inputColumn) {
-        const rightMargin = parseInt($comment.css('marginRight')) || 0
-        const leftMargin = parseInt($comment.css('marginLeft')) || 0
-        const commentMargin = rightMargin + leftMargin
-
-        const rceWidth = inputColumn.offsetWidth - commentMargin
-        tinyOptions.width = rceWidth
-      }
 
       toggler = new EditorToggle($comment_html, {
-        editorBoxLabel: $link.title,
-        tinyOptions
+        editorBoxLabel: $link.title
       })
 
       toggler.editButton = $link

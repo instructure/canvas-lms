@@ -270,21 +270,46 @@ describe BasicLTI::QuizzesNextLtiResponse do
         end
       end
 
-      context 'when submissionDetails includes submitted_at and json includes reopened (true)' do
-        let(:text) { "{ \"reopened\" : true }" }
-        let(:timestamp) { 1.day.ago.iso8601(3) }
+      context 'when json passed includes graded_at' do
+        let(:graded_at_time) { 5.hours.ago.iso8601(3) }
+        let(:text) { "{ \"graded_at\" : \"#{graded_at_time}\" }" }
 
-        it "reads 'submitted_at' from submissionDetails" do
+        before do
+          submission = Submission.find_or_initialize_by(assignment: assignment, user: @user)
+          submission.grade = '0.67'
+          submission.score = 0.67
+          submission.graded_at = Time.zone.now
+          submission.grade_matches_current_submission = true
+          submission.grader_id = -1
+          submission.url = launch_url
+          submission.save!
+        end
+
+        it "reads 'graded_at' from resultData" do
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+          submission = assignment.submissions.where(user_id: @user.id).first
+          expect(submission.graded_at).to eq graded_at_time
+        end
+
+        it "doesn't revert submission history" do
+          expect(quiz_lti_submission).not_to receive(:revert_history)
+          BasicLTI::BasicOutcomes.process_request(tool, xml)
+        end
+      end
+
+      context 'when json passed includes graded_at and reopened (true)' do
+        let(:text) { "{ \"graded_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : true }" }
+
+        it "reads 'graded_at' from resultData" do
           expect(quiz_lti_submission).to receive(:revert_history).with(launch_url, -tool.id).and_call_original
           BasicLTI::BasicOutcomes.process_request(tool, xml)
         end
       end
 
-      context 'when json passed includes submitted_at and reopened (false)' do
-        let(:text) { "{ \"reopened\" : false }" }
-        let(:timestamp) { 1.day.ago.iso8601(3) }
+      context 'when json passed includes graded_at and reopened (false)' do
+        let(:text) { "{ \"submitted_at\" : \"#{1.day.ago.iso8601(3)}\", \"reopened\" : false }" }
 
-        it "reads 'submitted_at' from submissionDetails" do
+        it "reads 'graded_at' from submissionDetails" do
           expect(quiz_lti_submission).not_to receive(:revert_history)
           BasicLTI::BasicOutcomes.process_request(tool, xml)
         end

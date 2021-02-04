@@ -179,7 +179,7 @@ QUnit.module('Syllabus', {
 
     // Render and bind behaviors
     this.view = new SyllabusView({
-      el: '#syllabusContainer',
+      el: '#syllabusTableBody',
       collection: acollection
     })
   },
@@ -205,7 +205,7 @@ QUnit.module('Syllabus', {
   renderAssertions() {
     expect(24)
     // rendering
-    const syllabus = $('#syllabus')
+    const syllabus = $('#syllabusTableBody')
     ok(syllabus.length, 'syllabus - syllabus added to the dom')
     ok(syllabus.is(':visible'), 'syllabus - syllabus visible')
 

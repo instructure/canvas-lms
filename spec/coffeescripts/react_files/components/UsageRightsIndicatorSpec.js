@@ -19,7 +19,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import TestUtils from 'react-dom/test-utils'
-import $ from 'jquery'
 import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
 import Folder from 'compiled/models/Folder'
 import File from 'compiled/models/File'
@@ -33,7 +32,7 @@ test('returns null for folders', () => {
     modalOptions: {
       openModal() {}
     },
-    userCanManageFilesForContext: false
+    userCanEditFilesForContext: false
   }
   const uRI = TestUtils.renderIntoDocument(<UsageRightsIndicator {...props} />)
   equal(ReactDOM.findDOMNode(uRI), null, 'returns null')
@@ -43,7 +42,7 @@ test('returns null if no usageRightsRequiredForContext and the model has no usag
   const props = {
     model: new File({id: 4}),
     usageRightsRequiredForContext: true,
-    userCanManageFilesForContext: false,
+    userCanEditFilesForContext: false,
     modalOptions: {
       openModal() {}
     }
@@ -52,11 +51,11 @@ test('returns null if no usageRightsRequiredForContext and the model has no usag
   equal(ReactDOM.findDOMNode(uRI), null, 'returns null')
 })
 
-test('returns button if usageRightsRequiredForContext, userCanManageFilesForContext and the model has no usage_rights', () => {
+test('returns button if usageRightsRequiredForContext, userCanEditFilesForContext and the model has no usage_rights', () => {
   const props = {
     model: new File({id: 4}),
     usageRightsRequiredForContext: true,
-    userCanManageFilesForContext: true,
+    userCanEditFilesForContext: true,
     modalOptions: {
       openModal() {}
     }
@@ -72,7 +71,7 @@ test('handleClick opens a modal with UsageRightsDialog', () => {
   const props = {
     model: new File({id: 4}),
     usageRightsRequiredForContext: true,
-    userCanManageFilesForContext: true,
+    userCanEditFilesForContext: true,
     modalOptions: {
       openModal() {
         return (openedModal = true)
@@ -89,7 +88,7 @@ test('displays publish warning', () => {
   const props = {
     model: new File({id: 4}),
     usageRightsRequiredForContext: true,
-    userCanManageFilesForContext: true,
+    userCanEditFilesForContext: true,
     modalOptions: {
       openModal() {}
     },
@@ -113,7 +112,7 @@ test('suppresses publish warning', () => {
   const props = {
     model: new File({id: 4}),
     usageRightsRequiredForContext: true,
-    userCanManageFilesForContext: true,
+    userCanEditFilesForContext: true,
     modalOptions: {
       openModal() {}
     },
@@ -142,7 +141,7 @@ QUnit.module('UsageRightsIndicator: Icon Classess & Screenreader text', {
     const props = {
       model: new File({id: 4, usage_rights}),
       usageRightsRequiredForContext: false,
-      userCanManageFilesForContext: true,
+      userCanEditFilesForContext: true,
       modalOptions: {
         openModal() {}
       }

@@ -624,9 +624,10 @@ RSpec.configure do |config|
 
   def stub_kaltura
     # trick kaltura into being activated
-    allow(CanvasKaltura::ClientV3).to receive(:config).and_return({
+    allow(CanvasKaltura::plugin_settings).to receive(:settings).and_return({
                                                  'domain' => 'kaltura.example.com',
-                                                 'resource_domain' => 'kaltura.example.com',
+                                                 'resource_domain' => 'cdn.kaltura.example.com',
+                                                 'rtmp_domain' => 'rtmp.kaltura.example.com',
                                                  'partner_id' => '100',
                                                  'subpartner_id' => '10000',
                                                  'secret_key' => 'fenwl1n23k4123lk4hl321jh4kl321j4kl32j14kl321',

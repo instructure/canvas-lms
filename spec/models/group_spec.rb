@@ -258,7 +258,9 @@ describe Group do
     expect(group.grants_right?(teacher, :manage_wiki_create)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_update)).to be_truthy
     expect(group.grants_right?(teacher, :manage_wiki_delete)).to be_truthy
-    expect(group.grants_right?(teacher, :manage_files)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_add)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_edit)).to be_truthy
+    expect(group.grants_right?(teacher, :manage_files_delete)).to be_truthy
     expect(group.wiki.grants_right?(teacher, :update_page)).to be_truthy
     attachment = group.attachments.build
     expect(attachment.grants_right?(teacher, :create)).to be_truthy

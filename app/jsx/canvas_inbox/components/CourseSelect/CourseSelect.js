@@ -16,13 +16,25 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
+import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import PropTypes from 'prop-types'
 import React from 'react'
 
-import {Alert} from '@instructure/ui-alerts'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Select} from '@instructure/ui-select'
-import I18n from 'i18n!conversations_2'
+import {Spinner} from '@instructure/ui-elements'
+import {View} from '@instructure/ui-view'
+
+const filterOptions = (value, options) => {
+  const filteredOptions = {}
+  Object.keys(options).forEach(key => {
+    filteredOptions[key] = options[key]?.filter(option =>
+      option.contextName.toLowerCase().startsWith(value.toLowerCase())
+    )
+  })
+  return filteredOptions
+}
 
 export class CourseSelect extends React.Component {
   static propTypes = {
@@ -30,58 +42,58 @@ export class CourseSelect extends React.Component {
     options: PropTypes.shape({
       favoriteCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       moreCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       concludedCourses: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       ),
       groups: PropTypes.arrayOf(
         PropTypes.shape({
-          id: PropTypes.number,
+          _id: PropTypes.string,
           contextName: PropTypes.string,
-          contextId: PropTypes.string
+          assetString: PropTypes.string
         })
       )
     }).isRequired,
+    loading: PropTypes.bool,
     onCourseFilterSelect: PropTypes.func
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.options !== state.options) {
+      return {
+        filteredOptions: filterOptions(state.inputValue, props.options)
+      }
+    }
+    return null
   }
 
   state = {
     inputValue: '',
     isShowingOptions: false,
+    options: this.props.options,
     filteredOptions: this.props.options,
     highlightedOptionId: null,
-    selectedOptionId: null,
-    announcement: null
+    selectedOptionId: null
   }
 
-  filterOptions = value => {
-    const filteredOptions = {}
-    Object.keys(this.props.options).forEach(key => {
-      filteredOptions[key] = this.props.options[key].filter(option =>
-        option.contextName.toLowerCase().startsWith(value.toLowerCase())
-      )
-    })
-    return filteredOptions
-  }
-
-  getDefaultHighlightedOption = newOptions => {
+  getDefaultHighlightedOption = (newOptions = []) => {
     const options = Object.values(newOptions).flat()
-    return options.length > 0 ? options[0].contextId : null
+    return options.length > 0 ? options[0].assetString : null
   }
 
   getGroupChangedMessage = newOption => {
@@ -104,7 +116,7 @@ export class CourseSelect extends React.Component {
     if (!option) return
     return this.getGroupLabel(
       Object.keys(this.props.options).find(key =>
-        this.props.options[key].find(({contextId}) => contextId === option.contextId)
+        this.props.options[key].find(({assetString}) => assetString === option.assetString)
       )
     )
   }
@@ -112,7 +124,7 @@ export class CourseSelect extends React.Component {
   getOptionById = id => {
     return Object.values(this.props.options)
       .flat()
-      .find(({contextId}) => id === contextId)
+      .find(({assetString}) => id === assetString)
   }
 
   handleBlur = () => {
@@ -124,11 +136,15 @@ export class CourseSelect extends React.Component {
     const option = this.getOptionById(id)
     if (!option) return // prevent highlighting of empty options
     this.getGroupChangedMessage(option)
-    this.setState(state => ({
-      highlightedOptionId: id,
-      inputValue: event.type === 'keydown' ? option.contextName : state.inputValue,
-      announcement: this.getGroupChangedMessage(option)
-    }))
+    this.setState(
+      state => ({
+        highlightedOptionId: id,
+        inputValue: event.type === 'keydown' ? option.contextName : state.inputValue
+      }),
+      () => {
+        this.context.setOnSuccess(this.getGroupChangedMessage(option))
+      }
+    )
   }
 
   handleSelectOption = (event, {id}) => {
@@ -136,18 +152,22 @@ export class CourseSelect extends React.Component {
     const contextName = option.contextName
     if (!option) return // prevent selecting of empty options
     this.props.onCourseFilterSelect(id)
-    this.setState({
-      selectedOptionId: id,
-      inputValue: option.contextName,
-      isShowingOptions: false,
-      filteredOptions: this.props.options,
-      announcement: I18n.t('%{contextName} selected', {contextName})
-    })
+    this.setState(
+      {
+        selectedOptionId: id,
+        inputValue: option.contextName,
+        isShowingOptions: false,
+        filteredOptions: this.props.options
+      },
+      () => {
+        this.context.setOnSuccess(I18n.t('%{contextName} selected', {contextName}))
+      }
+    )
   }
 
   handleInputChange = event => {
     const value = event.target.value
-    const newOptions = this.filterOptions(value)
+    const newOptions = filterOptions(value, this.props.options)
     this.setState(state => ({
       inputValue: value,
       filteredOptions: newOptions,
@@ -188,14 +208,14 @@ export class CourseSelect extends React.Component {
     const {highlightedOptionId, selectedOptionId} = this.state
 
     return Object.keys(options).map(key => {
-      return options[key].length > 0 ? (
+      return options[key]?.length > 0 ? (
         <Select.Group key={key} renderLabel={this.getGroupLabel(key)}>
           {options[key].map(option => (
             <Select.Option
-              id={option.contextId}
-              key={option.contextId}
-              isHighlighted={option.contextId === highlightedOptionId}
-              isSelected={option.contextId === selectedOptionId}
+              id={option.assetString}
+              key={option.assetString}
+              isHighlighted={option.assetString === highlightedOptionId}
+              isSelected={option.assetString === selectedOptionId}
             >
               {option.contextName}
             </Select.Option>
@@ -205,38 +225,39 @@ export class CourseSelect extends React.Component {
     })
   }
 
+  renderSpinner = () => (
+    <Select.Option id="loading">
+      <View as="div" height="100%" width="100%" textAlign="center">
+        <Spinner renderTitle={I18n.t('Loading')} size="small" />
+      </View>
+    </Select.Option>
+  )
+
   render() {
-    const {inputValue, isShowingOptions, announcement} = this.state
+    const {inputValue, isShowingOptions} = this.state
     return (
-      <>
-        <Select
-          renderLabel={
-            <ScreenReaderContent>
-              {this.props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
-            </ScreenReaderContent>
-          }
-          assistiveText={I18n.t('Type or use arrow keys to navigate options')}
-          placeholder={this.props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
-          inputValue={inputValue}
-          isShowingOptions={isShowingOptions}
-          onBlur={this.handleBlur}
-          onInputChange={this.handleInputChange}
-          onRequestShowOptions={this.handleShowOptions}
-          onRequestHideOptions={this.handleHideOptions}
-          onRequestHighlightOption={this.handleHighlightOption}
-          onRequestSelectOption={this.handleSelectOption}
-          data-testid="courseSelect"
-        >
-          {this.renderGroups()}
-        </Select>
-        <Alert
-          liveRegion={() => document.getElementById('flash_screenreader_holder')}
-          liveRegionPoliteness="assertive"
-          screenReaderOnly
-        >
-          {announcement}
-        </Alert>
-      </>
+      <Select
+        renderLabel={
+          <ScreenReaderContent>
+            {this.props.mainPage ? I18n.t('Filter messages by course') : I18n.t('Select course')}
+          </ScreenReaderContent>
+        }
+        assistiveText={I18n.t('Type or use arrow keys to navigate options')}
+        placeholder={this.props.mainPage ? I18n.t('All Courses') : I18n.t('Select Course')}
+        inputValue={inputValue}
+        isShowingOptions={isShowingOptions}
+        onBlur={this.handleBlur}
+        onInputChange={this.handleInputChange}
+        onRequestShowOptions={this.handleShowOptions}
+        onRequestHideOptions={this.handleHideOptions}
+        onRequestHighlightOption={this.handleHighlightOption}
+        onRequestSelectOption={this.handleSelectOption}
+        data-testid="course-select"
+      >
+        {this.props.loading ? this.renderSpinner() : this.renderGroups()}
+      </Select>
     )
   }
 }
+
+CourseSelect.contextType = AlertManagerContext

@@ -22,7 +22,7 @@ require_relative 'helpers/public_courses_context.rb'
 describe "context modules" do
   include_context "in-process server selenium tests"
   include ContextModulesCommon
-  
+
   context "as a teacher through course home page (set to modules)", priority: "1" do
     before(:once) do
       course_with_teacher(name: 'teacher', active_all: true)

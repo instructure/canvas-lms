@@ -150,7 +150,7 @@ describe "courses" do
       expect(value).to eq 10.megabytes
     end
 
-    it "should redirect to the gradebook when switching courses when viewing a students grades" do
+    it "should redirect to the gradebook when switching courses when viewing a students grades", ignore_js_errors: true do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
 
@@ -165,9 +165,9 @@ describe "courses" do
       get "/courses/#{course1.id}/grades/#{student.id}"
 
       select = f('#course_select_menu')
-      options = select.find_elements(:css, 'option')
+      options = INSTUI_Select_options(select)
       expect(options.length).to eq 2
-      wait_for_ajaximations
+
       click_option('#course_select_menu', course2.name)
       expect_new_page_load { f('#apply_select_menus').click }
       expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)

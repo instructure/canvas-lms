@@ -60,23 +60,19 @@ shared_examples 'Arrange By dropdown' do |context|
   end
 
   it 'should contain Title', test_id: pick_test_id(context, student: "591852", teacher: "592111", admin: "592122", ta: "592133"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    f('#assignment_sort_order_select_menu').click
-    expect(f("#assignment_sort_order_select_menu option[value=\"title\"]")).to be_present
+    expect(option_values).to include 'title'
   end
 
   it 'should contain Due Date', test_id: pick_test_id(context, student: "591853", teacher: "592112", admin: "592123", ta: "592134"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    f('#assignment_sort_order_select_menu').click
-    expect(f("#assignment_sort_order_select_menu option[value=\"due_at\"]")).to be_present
+    expect(option_values).to include 'due_at'
   end
 
   it 'should contain Module', test_id: pick_test_id(context, student: "591854", teacher: "592113", admin: "592124", ta: "592135"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    f('#assignment_sort_order_select_menu').click
-    expect(f("#assignment_sort_order_select_menu option[value=\"module\"]")).to be_present
+    expect(option_values).to include 'module'
   end
 
   it 'should contain Assignment Group', test_id: pick_test_id(context, student: "591855", teacher: "592114", admin: "592125", ta: "592136"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
-    f('#assignment_sort_order_select_menu').click
-    expect(f("#assignment_sort_order_select_menu option[value=\"assignment_group\"]")).to be_present
+    expect(option_values).to include 'assignment_group'
   end
 
   it 'should sort by Title', test_id: pick_test_id(context, student: "591856", teacher: "592115", admin: "592126", ta: "592137"), priority: pick_priority(context, student: "1", teacher: "1", admin: "2", ta: "2") do
@@ -135,5 +131,9 @@ shared_examples 'Arrange By dropdown' do |context|
     else
       raise('Error: Invalid context')
     end
+  end
+
+  def option_values
+    INSTUI_Select_options('#assignment_sort_order_select_menu').map {|o| o.attribute('value')}
   end
 end

@@ -87,7 +87,7 @@ export default class Quiz extends Backbone.Model {
   initUrls() {
     if (this.get('html_url')) {
       this.set('base_url', this.get('html_url').replace(/(quizzes|assignments)\/\d+/, '$1'))
-      this.set('url', `${this.get('base_url')}/${this.get('id')}`)
+      this.set('url', this.url())
       this.set('edit_url', this.edit_url())
       this.set('publish_url', this.publish_url())
       this.set('unpublish_url', this.unpublish_url())
@@ -142,6 +142,13 @@ export default class Quiz extends Backbone.Model {
       return `${this.get('base_url')}/unpublish/quiz`
     }
     return `${this.get('base_url')}/unpublish`
+  }
+
+  url() {
+    if (this.isQuizzesNext() && ENV.PERMISSIONS?.manage && ENV.FLAGS?.new_quizzes_modules_support) {
+      return this.edit_url()
+    }
+    return `${this.get('base_url')}/${this.get('id')}`
   }
 
   edit_url() {

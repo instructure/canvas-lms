@@ -21,6 +21,8 @@ import {gql} from 'jsx/canvas-apollo'
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
     _id
+    outcomesCount
+    childGroupsCount
     childGroups {
       nodes {
         description
@@ -40,16 +42,12 @@ export const CHILD_GROUPS_QUERY = gql`
         _id
         rootOutcomeGroup {
           ...GroupFragment
-          outcomesCount
-          childGroupsCount
         }
       }
       ... on Course {
         _id
         rootOutcomeGroup {
           ...GroupFragment
-          outcomesCount
-          childGroupsCount
         }
       }
       ... on LearningOutcomeGroup {

@@ -73,7 +73,7 @@ profile page and print out a set of back-up codes, in case your normal multi-fac
             <% end %>
           </div>
           <div class="col-xs-4">
-            <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("Canvas") %>
+            <% provisioning_uri = ROTP::TOTP.new(session[:pending_otp_secret_key]).provisioning_uri("#{@domain_root_account.name} Canvas- #{@current_pseudonym.unique_id}") %>
             <% qr_code = Barby::QrCode.new(provisioning_uri) %>
             <div class="otp-qr-code">
               <img src="data:image/png;base64,<%= Base64.encode64(qr_code.to_png(:xdim => 4)).strip %>">

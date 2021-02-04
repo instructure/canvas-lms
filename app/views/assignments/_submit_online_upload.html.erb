@@ -24,17 +24,24 @@
       <tr>
         <td colspan="2">
           <%= t :upload_or_choose_file, "Upload a file, or choose a file you've already uploaded." %>
-            <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+          <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
         </td>
       </tr><tr>
-        <td><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></td>
-        <td>
+        <td colspan="2">
+          <span style="visibility: hidden"><%= blabel :attachment, :uploaded_data, :en => "File", id: 'attachmentLabel' %></span>
           <button class="Button Button--link add_another_file_link">
             <i class="icon-add" aria-hidden="true"></i>
             <%= t 'links.add_another_file', "Add Another File" %>
           </button>
-          <div id="submission_attachment_blank" class="submission_attachment" style="display: none;">
-            <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
+          <div id="submission_attachment_blank" class="submission_attachment" style="display: none; margin-bottom: 1em;">
+            <% if @domain_root_account.feature_enabled?(:enable_webcam_submission) && (
+              @assignment.allowed_extensions.blank? || @assignment.allowed_extensions.include?("png")
+            )
+            %>
+              <div class="attachment_wrapper" style="display: inline-block;"></div>
+            <% else %>
+              <input type="file" name="attachments[-1][uploaded_data]" class="input-file"/>
+            <% end %>
             <a href="#" class="remove_attachment_link no-hover" style="display: none;"><i class="icon-end" aria-hidden="true"></i><span class="screenreader-only"><%= t('remove empty attachment')%></span></a>
             <% if @assignment.allowed_extensions.present? -%>
               <div class='bad_ext_msg error_message' style="display: none">

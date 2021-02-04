@@ -28,13 +28,15 @@ export default class AlertManager extends React.Component {
   state = {
     alertStatus: null,
     alertMessage: null,
-    key: 0
+    key: 0,
+    successScreenReaderOnly: true
   }
 
   closeAlert = () => {
     this.setState({
       alertMessage: null,
-      alertStatus: null
+      alertStatus: null,
+      successScreenReaderOnly: true
     })
   }
 
@@ -46,11 +48,12 @@ export default class AlertManager extends React.Component {
     }))
   }
 
-  setOnSuccess = alertMessage => {
+  setOnSuccess = (alertMessage, successScreenReaderOnly = true) => {
     this.setState(prevState => ({
       alertMessage,
       alertStatus: 'success',
-      key: prevState.key + 1
+      key: prevState.key + 1,
+      successScreenReaderOnly
     }))
   }
 
@@ -59,9 +62,10 @@ export default class AlertManager extends React.Component {
     if (this.state.alertStatus === 'success') {
       return (
         <Alert
+          variant="success"
           liveRegion={() => document.getElementById('flash_screenreader_holder')}
           onDismiss={this.closeAlert}
-          screenReaderOnly
+          screenReaderOnly={this.state.successScreenReaderOnly}
           timeout={ALERT_TIMEOUT}
         >
           {this.state.alertMessage}

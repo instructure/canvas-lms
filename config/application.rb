@@ -299,6 +299,13 @@ module CanvasRails
       Switchman.cache = -> { MultiCache.cache }
     end
 
+    # Newer rails has this in rails proper
+    attr_writer :credentials
+
+    initializer "canvas.init_credentials", before: "active_record.initialize_database" do
+      self.credentials = Canvas::Credentials.new(credentials)
+    end
+
     # we don't know what middleware to make SessionsTimeout follow until after
     # we've loaded config/initializers/session_store.rb
     initializer("extend_middleware_stack", after: :load_config_initializers) do |app|

@@ -280,12 +280,6 @@ class ConversationsController < ApplicationController
       return redirect_to conversations_path(:scope => params[:redirect_scope]) if params[:redirect_scope]
       @current_user.reset_unread_conversations_counter
       @current_user.reload
-      if @domain_root_account.feature_enabled?(:react_inbox)
-        css_bundle :canvas_inbox
-        js_bundle :canvas_inbox
-        render html: '', layout: true
-        return
-      end
 
       hash = {
         :ATTACHMENTS_FOLDER_ID => @current_user.conversation_attachments_folder.id.to_s,
@@ -307,6 +301,13 @@ class ConversationsController < ApplicationController
         hash[:CAN_ADD_NOTES_FOR_COURSES] = course_note_permissions
       end
       js_env(CONVERSATIONS: hash)
+      if @domain_root_account.feature_enabled?(:react_inbox)
+        css_bundle :canvas_inbox
+        js_bundle :canvas_inbox
+        render html: '', layout: true
+        return
+      end
+
       return render :index_new
     end
   end

@@ -6,17 +6,16 @@ exports[`renders the item to update if provided 1`] = `
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <FormFieldGroup
       as="fieldset"
@@ -75,28 +74,46 @@ exports[`renders the item to update if provided 1`] = `
         timezone="Asia/Tokyo"
         value="2017-04-25T08:49:00.000Z"
       />
-      <CanvasSelect
+      <SimpleSelect
+        assistiveText="Use arrow keys to navigate options."
+        constrain="window"
         id="to-do-item-course-select"
-        label="Course"
-        noOptionsLabel="---"
+        inputRef={[Function]}
+        isInline={false}
+        isRequired={false}
+        listRef={[Function]}
+        onBlur={[Function]}
         onChange={[Function]}
+        onFocus={[Function]}
+        onHideOptions={[Function]}
+        onShowOptions={[Function]}
+        placeholder={null}
+        placement="bottom stretch"
+        renderAfterInput={null}
+        renderBeforeInput={null}
+        renderEmptyOption="---"
+        renderLabel="Course"
+        size="medium"
         value="1"
+        visibleOptionsCount={8}
       >
-        <CanvasSelectOption
+        <Option
           id="none"
+          isDisabled={false}
           key="none"
           value="none"
         >
           Optional: Add Course
-        </CanvasSelectOption>
-        <CanvasSelectOption
+        </Option>
+        <Option
           id="1"
+          isDisabled={false}
           key="1"
           value="1"
         >
           a course
-        </CanvasSelectOption>
-      </CanvasSelect>
+        </Option>
+      </SimpleSelect>
       <TextArea
         autoGrow={false}
         disabled={false}
@@ -116,18 +133,17 @@ exports[`renders the item to update if provided 1`] = `
     </FormFieldGroup>
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
       textAlign="end"
+      withVisualDebug={false}
     >
       <Button
         as="button"
@@ -171,17 +187,16 @@ exports[`updates state when new note is passed in 1`] = `
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <FormFieldGroup
       as="fieldset"
@@ -240,35 +255,54 @@ exports[`updates state when new note is passed in 1`] = `
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"
       />
-      <CanvasSelect
+      <SimpleSelect
+        assistiveText="Use arrow keys to navigate options."
+        constrain="window"
         id="to-do-item-course-select"
-        label="Course"
-        noOptionsLabel="---"
+        inputRef={[Function]}
+        isInline={false}
+        isRequired={false}
+        listRef={[Function]}
+        onBlur={[Function]}
         onChange={[Function]}
+        onFocus={[Function]}
+        onHideOptions={[Function]}
+        onShowOptions={[Function]}
+        placeholder={null}
+        placement="bottom stretch"
+        renderAfterInput={null}
+        renderBeforeInput={null}
+        renderEmptyOption="---"
+        renderLabel="Course"
+        size="medium"
         value="1"
+        visibleOptionsCount={8}
       >
-        <CanvasSelectOption
+        <Option
           id="none"
+          isDisabled={false}
           key="none"
           value="none"
         >
           Optional: Add Course
-        </CanvasSelectOption>
-        <CanvasSelectOption
+        </Option>
+        <Option
           id="1"
+          isDisabled={false}
           key="1"
           value="1"
         >
           first course
-        </CanvasSelectOption>
-        <CanvasSelectOption
+        </Option>
+        <Option
           id="2"
+          isDisabled={false}
           key="2"
           value="2"
         >
           second course
-        </CanvasSelectOption>
-      </CanvasSelect>
+        </Option>
+      </SimpleSelect>
       <TextArea
         autoGrow={false}
         disabled={false}
@@ -288,18 +322,17 @@ exports[`updates state when new note is passed in 1`] = `
     </FormFieldGroup>
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
       textAlign="end"
+      withVisualDebug={false}
     >
       <Button
         as="button"
@@ -343,17 +376,16 @@ exports[`updates state when new note is passed in 2`] = `
 >
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     padding="large medium medium"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <FormFieldGroup
       as="fieldset"
@@ -412,35 +444,54 @@ exports[`updates state when new note is passed in 2`] = `
         timezone="Asia/Tokyo"
         value="2017-04-28T11:00:00.000Z"
       />
-      <CanvasSelect
+      <SimpleSelect
+        assistiveText="Use arrow keys to navigate options."
+        constrain="window"
         id="to-do-item-course-select"
-        label="Course"
-        noOptionsLabel="---"
+        inputRef={[Function]}
+        isInline={false}
+        isRequired={false}
+        listRef={[Function]}
+        onBlur={[Function]}
         onChange={[Function]}
+        onFocus={[Function]}
+        onHideOptions={[Function]}
+        onShowOptions={[Function]}
+        placeholder={null}
+        placement="bottom stretch"
+        renderAfterInput={null}
+        renderBeforeInput={null}
+        renderEmptyOption="---"
+        renderLabel="Course"
+        size="medium"
         value="2"
+        visibleOptionsCount={8}
       >
-        <CanvasSelectOption
+        <Option
           id="none"
+          isDisabled={false}
           key="none"
           value="none"
         >
           Optional: Add Course
-        </CanvasSelectOption>
-        <CanvasSelectOption
+        </Option>
+        <Option
           id="1"
+          isDisabled={false}
           key="1"
           value="1"
         >
           first course
-        </CanvasSelectOption>
-        <CanvasSelectOption
+        </Option>
+        <Option
           id="2"
+          isDisabled={false}
           key="2"
           value="2"
         >
           second course
-        </CanvasSelectOption>
-      </CanvasSelect>
+        </Option>
+      </SimpleSelect>
       <TextArea
         autoGrow={false}
         disabled={false}
@@ -460,18 +511,17 @@ exports[`updates state when new note is passed in 2`] = `
     </FormFieldGroup>
     <View
       as="div"
-      borderColor="default"
-      debug={false}
+      borderColor="primary"
       display="auto"
       focusColor="info"
       focusPosition="offset"
-      focused={false}
       margin="small 0 0"
       overflowX="visible"
       overflowY="visible"
       position="static"
       shouldAnimateFocus={true}
       textAlign="end"
+      withVisualDebug={false}
     >
       <Button
         as="button"

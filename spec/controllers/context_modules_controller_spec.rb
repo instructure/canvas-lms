@@ -60,6 +60,33 @@ describe ContextModulesController do
       ]
     end
 
+    it "@combined_active_quizzes_includes_both_types should return true when classic and new quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq true
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only classic quizzes are included" do
+      user_session(@teacher)
+      @course.quizzes.create!(title: 'A')
+      @course.quizzes.create!(title: 'C')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
+    it "@combined_active_quizzes_includes_both_types should return false when only new quizzes are included" do
+      user_session(@teacher)
+      new_quizzes_assignment(:course => @course, :title => 'B')
+      get 'index', params: {:course_id => @course.id}
+      combined_active_quizzes_includes_both_types = controller.instance_variable_get(:@combined_active_quizzes_includes_both_types)
+      expect(combined_active_quizzes_includes_both_types).to eq false
+    end
+
     it "should touch modules if necessary" do
       time = 2.days.ago
       Timecop.freeze(time) do

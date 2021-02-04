@@ -347,6 +347,52 @@ describe "discussions" do
           get url
           expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to eq(true)
         end
+
+        context 'with granular permissions enabled' do
+          before do
+            course.root_account.enable_feature!(:granular_permissions_course_files)
+          end
+
+          it "should validate that usage rights are set" do
+            get url
+            _filename, fullpath, _data = get_file("testfile5.zip")
+            f('input[name=attachment]').send_keys(fullpath)
+            type_in_tiny('textarea[name=message]', 'file attachment discussion')
+            f('#edit_discussion_form_buttons .btn-primary[type=submit]').click
+            wait_for_ajaximations
+            error_box = f("div[role='alert'] .error_text")
+            expect(error_box.text).to eq 'You must set usage rights'
+          end
+
+          it "sets usage rights on file attachment" do
+            get url
+            _filename, fullpath, _data = get_file("testfile1.txt")
+            f('input[name=attachment]').send_keys(fullpath)
+            f('#usage_rights_control button').click
+            click_option(".UsageRightsSelectBox__container select", 'own_copyright', :value)
+            f(".UsageRightsDialog__Footer-Actions button[type='submit']").click
+            expect_new_page_load { f('.form-actions button[type=submit]').click }
+            expect(topic.reload.attachment.usage_rights).not_to be_nil
+          end
+
+          it "displays usage rights on file attachment" do
+            usage_rights = @course.usage_rights.create!(
+              legal_copyright: '(C) 2012 Initrode',
+              use_justification: 'own_copyright'
+            )
+            file = @course.attachments.create!(
+              display_name: 'hey.txt',
+              uploaded_data: default_uploaded_data,
+              usage_rights: usage_rights
+            )
+            file.usage_rights
+            topic.attachment = file
+            topic.save!
+
+            get url
+            expect(element_exists?("#usage_rights_control i.icon-files-copyright")).to eq(true)
+          end
+        end
       end
     end
   end

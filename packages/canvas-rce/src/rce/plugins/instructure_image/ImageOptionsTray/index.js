@@ -28,6 +28,7 @@ import {CUSTOM, MIN_HEIGHT, MIN_WIDTH, scaleToSize} from '../ImageEmbedOptions'
 import formatMessage from '../../../../format-message'
 import {useDimensionsState} from '../../shared/DimensionsInput'
 import ImageOptionsForm from '../../shared/ImageOptionsForm'
+import {getTrayHeight} from '../../shared/trayUtils'
 
 export default function ImageOptionsTray(props) {
   const {imageOptions, onEntered, onExited, onRequestClose, onSave, open} = props
@@ -113,7 +114,7 @@ export default function ImageOptionsTray(props) {
       shouldContainFocus
       shouldReturnFocus
     >
-      <Flex direction="column" height="100vh">
+      <Flex direction="column" height={getTrayHeight()}>
         <Flex.Item as="header" padding="medium">
           <Flex direction="row">
             <Flex.Item grow shrink>

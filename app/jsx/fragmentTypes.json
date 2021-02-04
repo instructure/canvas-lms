@@ -2,6 +2,21 @@
   "__schema": {
     "types": [
       {
+        "kind": "INTERFACE",
+        "name": "AssetString",
+        "possibleTypes": [
+          {
+            "name": "Course"
+          },
+          {
+            "name": "Enrollment"
+          },
+          {
+            "name": "Group"
+          }
+        ]
+      },
+      {
         "kind": "UNION",
         "name": "AssignmentOverrideSet",
         "possibleTypes": [
@@ -391,15 +406,6 @@
           },
           {
             "name": "ContentTag"
-          },
-          {
-            "name": "Conversation"
-          },
-          {
-            "name": "ConversationMessage"
-          },
-          {
-            "name": "ConversationParticipant"
           },
           {
             "name": "Course"

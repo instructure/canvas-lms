@@ -7016,6 +7016,42 @@ describe Assignment do
           it { is_expected.not_to be_in_closed_grading_period }
         end
       end
+
+      context "when the only submissions in a closed grading period belong to non-active students" do
+        let(:course) { assignment.course }
+        let(:active_enrollment) { @initial_student.student_enrollments.find_by(course: course) }
+        let(:completed_enrollment) { course.enroll_student(User.create!, workflow_state: "active") }
+        let(:inactive_enrollment) { course.enroll_student(User.create!, workflow_state: "active") }
+
+        before(:each) do
+          assignment.update!(due_at: 1.day.after(@current.start_date))
+          create_adhoc_override_for_assignment(
+            assignment,
+            completed_enrollment.user,
+            due_at: 1.day.after(@old.start_date)
+          )
+          completed_enrollment.conclude
+
+          create_adhoc_override_for_assignment(
+            assignment,
+            inactive_enrollment.user,
+            due_at: 1.day.after(@old.start_date)
+          )
+          inactive_enrollment.deactivate
+
+          DueDateCacher.recompute_course(course, run_immediately: true)
+        end
+
+        context "without preloaded submissions" do
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+
+        context "with preloaded submission" do
+          before { assignment.submissions.load }
+
+          it { is_expected.not_to be_in_closed_grading_period }
+        end
+      end
     end
   end
 

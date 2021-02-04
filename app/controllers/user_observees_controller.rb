@@ -195,7 +195,7 @@ class UserObserveesController < ApplicationController
   #
   # @returns User
   def show
-    raise ActiveRecord::RecordNotFound unless has_observation_link?
+    raise ActiveRecord::RecordNotFound unless observer&.observation_link?(student)
 
     render_student_json
   end
@@ -290,19 +290,14 @@ class UserObserveesController < ApplicationController
 
   def create_observation_links(root_accounts)
     updated = false
+    return if observer.blank?
     root_accounts.each do |root_account|
-      unless has_observation_link?(root_account)
+      unless observer.observation_link?(student, root_account)
         UserObservationLink.create_or_restore(student: student, observer: observer, root_account: root_account)
         updated = true
       end
     end
     observer.touch if updated
-  end
-
-  def has_observation_link?(root_account=nil)
-    scope = observer.as_observer_observation_links.where(student: student)
-    scope = scope.for_root_accounts(root_account) if root_account
-    scope.exists?
   end
 
   def self_or_admin_permission_check

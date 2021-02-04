@@ -23,6 +23,8 @@ require File.expand_path(File.dirname(__FILE__) + '/../../lti2_spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
 describe "/assignments/show" do
+  let(:eula_url) { 'https://www.test.com/eula' }
+
   it "should render" do
     course_with_teacher(active_all: true)
     view_context(@course, @user)
@@ -36,6 +38,25 @@ describe "/assignments/show" do
     allow(view).to receive(:show_moderation_link).and_return(true)
     render 'assignments/show'
     expect(response).not_to be_nil # have_tag()
+  end
+
+  it "should render webcam wrapper when enable_webcam_submission is enabled" do
+    course_with_student(active_all: true)
+    @course.root_account.enable_feature!(:enable_webcam_submission)
+    view_context(@course, @student)
+    g = @course.assignment_groups.create!(:name => "some group")
+    a = @course.assignments.create!(:title => "some assignment", :submission_types => "online_upload")
+    a.assignment_group_id = g.id
+    a.save!
+    assign(:assignment, a.overridden_for(@student))
+    assign(:assignment_groups, [g])
+    assign(:current_user_rubrics, [])
+    assign(:external_tools, [])
+    allow(view).to receive(:show_moderation_link).and_return(true)
+    allow(view).to receive(:eula_url) { eula_url }
+    allow(view).to receive(:show_confetti).and_return(false)
+    render 'assignments/show'
+    expect(response).to have_tag('.attachment_wrapper')
   end
 
   describe "moderation page link" do
@@ -67,7 +88,6 @@ describe "/assignments/show" do
   context 'plagiarism platform' do
     include_context 'lti2_spec_helper'
 
-    let(:eula_url) { 'https://www.test.com/eula' }
     let(:eula_service) do
       {
         "endpoint" => eula_url,

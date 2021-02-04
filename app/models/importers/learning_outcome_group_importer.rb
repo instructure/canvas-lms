@@ -47,7 +47,7 @@ module Importers
         item ||= LearningOutcomeGroup.where(context_id: context, context_type: context.class.to_s).
           where(migration_id: hash[:migration_id]).first if hash[:migration_id]
         item ||= LearningOutcomeGroup.find_by(vendor_guid: hash[:vendor_guid],
-          context: context, learning_outcome_group: parent_group) if check_for_duplicate_guids?(context, hash)
+          context: context, learning_outcome_group: parent_group) if hash[:vendor_guid].present?
         # Don't migrate if we already have a folder with the same name inside the parent_group
         item ||= LearningOutcomeGroup.active.where(
           context: context,
@@ -118,11 +118,6 @@ module Importers
           end
         end
       end
-    end
-
-    def self.check_for_duplicate_guids?(context, hash)
-      context.root_account.feature_enabled?(:outcome_guid_course_exports) &&
-      hash[:vendor_guid].present?
     end
   end
 end

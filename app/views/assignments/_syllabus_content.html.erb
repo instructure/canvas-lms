@@ -82,14 +82,15 @@ DOC
   <div id="syllabus_links">
   </div>
   <% css_bundle("syllabus") %>
-  <table id="syllabus" class="ic-Table--condensed">
+  <table id="syllabus" class="ic-Table ic-Table--condensed">
     <thead>
       <tr>
-        <th scope="col" style="width: 25%;"><%= t 'headers.date', "Date" %></th>
-        <th scope="col" style="width: 75%;"><%= t 'headers.details', "Details" %></th>
+        <th scope="col"><%= t 'headers.date', "Date" %></th>
+        <th scope="col"><%= t 'headers.details', "Details" %></th>
+        <th scope="col" class='due'><%= t 'headers.due', "Due" %></th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="syllabusTableBody">
       <tr>
         <td scope="row">
           <span id="loading_indicator"/>
