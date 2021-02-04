@@ -253,6 +253,7 @@ class MessageStudents extends React.Component {
           onDismiss={this.props.onRequestClose}
           size="medium"
           onExited={this.props.onExited}
+          shouldCloseOnDocumentClick={false}
         >
           <Modal.Body>
             {this.renderAlert(
