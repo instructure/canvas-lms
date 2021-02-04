@@ -19,22 +19,8 @@
 import PropTypes from 'prop-types'
 import React from 'react'
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
-import {
-  IconMoreLine,
-  IconMarkAsReadLine,
-  IconTrashLine,
-  IconLockLine,
-  IconUnlockLine,
-  IconUserLine,
-  IconDuplicateLine,
-  IconEditLine
-} from '@instructure/ui-icons'
-import {Button, IconButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import I18n from 'i18n!conversations_2'
-import {PublishButton} from './PublishButton'
+import {PostToolbar} from '../PostToolbar/PostToolbar'
 
 export function PostMessage({...props}) {
   const addDebug = true
@@ -53,25 +39,19 @@ export function PostMessage({...props}) {
                   {/* TODO author info VICE-934 */}
                   AUTHOR INFO
                 </Flex.Item>
-                <Flex.Item>
-                  {props.onTogglePublish && (
-                    <PublishButton
-                      key={props.publishState}
-                      initialState={props.publishState}
-                      onClick={props.onTogglePublish}
-                    />
-                  )}
-                  {props.onEdit && (
-                    <Button
-                      renderIcon={IconEditLine}
-                      onClick={props.onEdit}
-                      margin="0 x-small 0 xxx-small"
-                    >
-                      {I18n.t('Edit')}
-                    </Button>
-                  )}
-                  {renderMenu(props)}
-                </Flex.Item>
+                <PostToolbar
+                  onReadAll={props.onReadAll}
+                  onDelete={props.onDelete}
+                  onToggleComments={props.onToggleComments}
+                  commentsEnabled={props.commentsEnabled}
+                  onSend={props.onSend}
+                  onCopy={props.onCopy}
+                  onEdit={props.onEdit}
+                  onTogglePublish={props.onTogglePublish}
+                  isPublished={props.isPublished}
+                  onToggleSubscription={props.onToggleSubscription}
+                  isSubscribed={props.isSubscribed}
+                />
               </Flex>
             </Flex.Item>
             <Flex.Item>
@@ -82,86 +62,6 @@ export function PostMessage({...props}) {
         </Flex.Item>
       </Flex>
     </View>
-  )
-}
-
-const renderMenu = props => {
-  return (
-    <Menu
-      trigger={
-        <IconButton
-          screenReaderLabel={I18n.t('Manage Discussion')}
-          renderIcon={IconMoreLine}
-          data-testid="discussion-post-menu-trigger"
-        />
-      }
-    >
-      {getMenuConfigs(props).map(config => renderMenuItem({...config}))}
-    </Menu>
-  )
-}
-
-const getMenuConfigs = props => {
-  const options = [
-    {
-      key: 'read-all',
-      icon: <IconMarkAsReadLine />,
-      labelCallback: () => I18n.t('Mark All as Read'),
-      selectionCallback: props.onReadAll
-    }
-  ]
-  if (props.onDelete) {
-    options.push({
-      key: 'delete',
-      icon: <IconTrashLine />,
-      labelCallback: () => I18n.t('Delete'),
-      selectionCallback: props.onDelete
-    })
-  }
-  if (props.onToggleComments && props.commentsEnabled) {
-    options.push({
-      key: 'toggle-comments',
-      icon: <IconLockLine />,
-      labelCallback: () => I18n.t('Close for Comments'),
-      selectionCallback: props.onToggleComments
-    })
-  } else if (props.onToggleComments && !props.commentsEnabled) {
-    options.push({
-      key: 'toggle-comments',
-      icon: <IconUnlockLine />,
-      labelCallback: () => I18n.t('Open for Comments'),
-      selectionCallback: props.onToggleComments
-    })
-  }
-  if (props.onSend) {
-    options.push({
-      key: 'send',
-      icon: <IconUserLine />,
-      labelCallback: () => I18n.t('Send To...'),
-      selectionCallback: props.onSend
-    })
-  }
-  if (props.onCopy) {
-    options.push({
-      key: 'copy',
-      icon: <IconDuplicateLine />,
-      labelCallback: () => I18n.t('Copy To...'),
-      selectionCallback: props.onCopy
-    })
-  }
-  return options
-}
-
-const renderMenuItem = ({selectionCallback, icon, labelCallback, key}) => {
-  return (
-    <Menu.Item key={key} onSelect={selectionCallback}>
-      <Flex>
-        <Flex.Item>{icon}</Flex.Item>
-        <Flex.Item padding="0 0 0 xx-small">
-          <Text>{labelCallback.call()}</Text>
-        </Flex.Item>
-      </Flex>
-    </Menu.Item>
   )
 }
 
@@ -206,10 +106,20 @@ PostMessage.propTypes = {
    */
   onTogglePublish: PropTypes.func,
   /**
-   * Indicates whether the post is published, publishing, or unpublished.
+   * Indicates whether the post is published or unpublished.
    * Which state the publish button is in is dependent on this prop.
    */
-  publishState: PropTypes.oneOf(['published', 'publishing', 'unpublished', 'unpublishing'])
+  isPublished: PropTypes.bool,
+  /**
+   * Behavior for toggling the subscription state of the post.
+   * Providing this function will result in the button being rendered.
+   */
+  onToggleSubscription: PropTypes.func,
+  /**
+   * Indicates whether the user has subscribed to the post.
+   * Which state the subscription button is in is dependent on this prop.
+   */
+  isSubscribed: PropTypes.bool
 }
 
 export default PostMessage

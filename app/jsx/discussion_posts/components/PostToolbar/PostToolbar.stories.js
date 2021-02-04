@@ -18,11 +18,11 @@
 
 import React from 'react'
 
-import {PostMessage} from './PostMessage'
+import {PostToolbar} from './PostToolbar'
 
 export default {
-  title: 'Examples/Discussion Posts/PostMessage',
-  component: PostMessage,
+  title: 'Examples/Discussion Posts/PostToolbar',
+  component: PostToolbar,
   argTypes: {
     onReadAll: {action: 'Read All'},
     onDelete: {action: 'Delete'},
@@ -35,7 +35,7 @@ export default {
   }
 }
 
-const Template = args => <PostMessage {...args} />
+const Template = args => <PostToolbar {...args} />
 
 export const Default = Template.bind({})
 Default.args = {
