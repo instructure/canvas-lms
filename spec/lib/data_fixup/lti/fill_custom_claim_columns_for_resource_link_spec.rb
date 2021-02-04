@@ -28,7 +28,8 @@ RSpec.describe DataFixup::Lti::FillCustomClaimColumnsForResourceLink do
     Lti::ResourceLink.create!(context_external_tool: tool,
                              context_id: 999,
                              context_type: 'Account',
-                             resource_link_id: assignment.lti_context_id)
+                             resource_link_id: assignment.lti_context_id, # this should be removed in part 4
+                             resource_link_uuid: assignment.lti_context_id)
   end
 
   describe '.run' do

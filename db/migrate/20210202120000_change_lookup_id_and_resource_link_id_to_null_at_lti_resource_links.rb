@@ -1,5 +1,6 @@
-#
-# Copyright (C) 2018 - present Instructure, Inc.
+# frozen_string_literal: true
+
+# Copyright (C) 2021 - present Instructure, Inc.
 #
 # This file is part of Canvas.
 #
@@ -15,22 +16,13 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-module Lti::Ims
-  class LineItemsSerializer
-    def initialize(line_item, line_item_url)
-      @line_item = line_item
-      @line_item_url = line_item_url
-    end
+class ChangeLookupIdAndResourceLinkIdToNullAtLtiResourceLinks < ActiveRecord::Migration[5.2]
+  tag :postdeploy
 
-    def as_json
-      {
-        id: @line_item_url,
-        scoreMaximum: @line_item.score_maximum,
-        label: @line_item.label,
-        resourceId: @line_item.resource_id,
-        tag: @line_item.tag,
-        resourceLinkId: @line_item.resource_link&.resource_link_uuid
-      }.merge(@line_item.extensions).compact
-    end
+  disable_ddl_transaction!
+
+  def change
+    change_column_null :lti_resource_links, :lookup_id, true
+    change_column_null :lti_resource_links, :resource_link_id, true
   end
 end

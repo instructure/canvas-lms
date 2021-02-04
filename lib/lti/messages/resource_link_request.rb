@@ -65,7 +65,7 @@ module Lti::Messages
     def add_resource_link_request_claims!
       resource_link = assignment_resource_link
       assignment = line_item_for_assignment&.assignment
-      @message.resource_link.id = resource_link&.resource_link_id || context_resource_link_id
+      @message.resource_link.id = resource_link&.resource_link_uuid || context_resource_link_id
       @message.resource_link.description = resource_link && assignment&.description
       @message.resource_link.title = resource_link && assignment&.title
     end
