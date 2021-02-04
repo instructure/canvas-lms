@@ -50,5 +50,13 @@ module Types
     def conversation_participants_connection
       load_association(:conversation_participants)
     end
+
+    field :context_name, String, null: true
+    def context_name
+      # load_association(:context).then(&:name)
+      load_association(:context).then do |context|
+        context&.name
+      end
+    end
   end
 end

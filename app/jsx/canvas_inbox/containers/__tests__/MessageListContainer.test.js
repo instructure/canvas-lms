@@ -31,14 +31,14 @@ const createGraphqlMocks = () => {
         query: CONVERSATIONS_QUERY,
         variables: {
           userID: '1',
-          scope: 'inbox'
+          scope: 'inbox',
         },
         overrides: {
           Node: {
-            __typename: 'User'
-          }
-        }
-      }
+            __typename: 'User',
+          },
+        },
+      },
     },
     {
       request: {
@@ -46,62 +46,64 @@ const createGraphqlMocks = () => {
         variables: {
           userID: '1',
           scope: 'inbox',
-          course: 'course_123'
+          course: 'course_123',
         },
         overrides: {
           Node: {
-            __typename: 'User'
+            __typename: 'User',
           },
           Conversation: () => ({
             _id: '1a',
             contextType: 'context',
             contextId: 2,
+            contextName: 'Context Name',
             subject: 'Second Subject',
             updateAt: new Date(),
             conversationMessageConnections: [{}],
-            conversationParticipantsConnection: [{}]
-          })
-        }
-      }
+            conversationParticipantsConnection: [{}],
+          }),
+        },
+      },
     },
     {
       request: {
         query: CONVERSATIONS_QUERY,
         variables: {
           userID: '1',
-          scope: 'sent'
+          scope: 'sent',
         },
         overrides: {
           Node: {
-            __typename: 'User'
+            __typename: 'User',
           },
           Conversation: () => ({
             _id: '1a',
             contextType: 'context',
             contextId: 2,
+            contextName: 'Context Name',
             subject: 'Second Subject',
             updateAt: new Date(),
             conversationMessageConnections: [{}],
-            conversationParticipantsConnection: [{}]
-          })
-        }
-      }
-    }
+            conversationParticipantsConnection: [{}],
+          }),
+        },
+      },
+    },
   ]
 
   const mockResults = Promise.all(
-    mocks.map(async m => {
+    mocks.map(async (m) => {
       const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
       return {
         request: {query: m.request.query, variables: m.request.variables},
-        result
+        result,
       }
     })
   )
   return mockResults
 }
 
-const setup = async messageListContainerProps => {
+const setup = async (messageListContainerProps) => {
   const mocks = await createGraphqlMocks()
   return render(
     <MockedProvider mocks={mocks} cache={createCache()}>
@@ -113,7 +115,7 @@ const setup = async messageListContainerProps => {
 describe('MessageListContainer', () => {
   beforeEach(() => {
     window.ENV = {
-      current_user_id: 1
+      current_user_id: 1,
     }
   })
 
@@ -168,7 +170,7 @@ describe('MessageListContainer', () => {
     it('should track when messages are clicked', async () => {
       const mock = jest.fn()
       const messageList = await setup({
-        onSelectMessage: mock
+        onSelectMessage: mock,
       })
 
       await waitForApolloLoading()
@@ -179,7 +181,7 @@ describe('MessageListContainer', () => {
         checkboxes[0],
         new MouseEvent('click', {
           bubbles: true,
-          cancelable: true
+          cancelable: true,
         })
       )
 

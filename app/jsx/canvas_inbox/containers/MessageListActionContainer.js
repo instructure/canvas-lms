@@ -249,7 +249,7 @@ const MessageListActionContainer = (props) => {
             forward={() => {}}
             markAsUnread={() => {}}
             reply={props.onReply}
-            replyAll={props.onReply}
+            replyAll={() => {}}
             star={() => {}}
           />
         </Flex.Item>

@@ -67,3 +67,25 @@ export const COURSES_QUERY = gql`
   ${FavoriteCoursesConnection.fragment}
   ${FavoriteGroupsConnection.fragment}
 `
+
+export const REPLY_CONVERSATION_QUERY = gql`
+  query ReplyConversationQuery($conversationID: ID!, $participants: [ID!]) {
+    legacyNode(_id: $conversationID, type: Conversation) {
+      ... on Conversation {
+        _id
+        id
+        contextName
+        subject
+        conversationMessagesConnection(participants: $participants) {
+          nodes {
+            body
+            createdAt
+            author {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+`

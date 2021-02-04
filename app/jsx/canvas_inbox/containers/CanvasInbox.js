@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import ComposeModalContainer from './ComposeModalContainer'
+import ComposeModalManager from './ComposeModalContainer/ComposeModalManager'
 import {Flex} from '@instructure/ui-flex'
 import React, {useState} from 'react'
 import MessageListContainer from './MessageListContainer'
@@ -95,13 +95,14 @@ const CanvasInbox = () => {
           </Flex>
         </Flex.Item>
       </Flex>
-      <ComposeModalContainer
-        open={composeModal}
+      <ComposeModalManager
+        conversation={selectedConversations[0]}
+        isReply={isReply}
         onDismiss={() => {
           setComposeModal(false)
           setIsReply(false)
         }}
-        isReply={isReply}
+        open={composeModal}
       />
     </div>
   )
