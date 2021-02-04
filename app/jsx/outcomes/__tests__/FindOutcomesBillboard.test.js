@@ -16,12 +16,13 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import React from 'react'
+import {render} from '@testing-library/react'
+import FindOutcomesBillboard from '../FindOutcomesBillboard'
 
-export default function useModal() {
-  const [showModal, setShowModal] = useState(false)
-  const onOpenHandler = useCallback(() => setShowModal(true), [])
-  const onCloseHandler = useCallback(() => setShowModal(false), [])
-
-  return [showModal, onOpenHandler, onCloseHandler]
-}
+describe('FindOutcomesBillboard', () => {
+  it('renders component with proper message', () => {
+    const {getByText} = render(<FindOutcomesBillboard />)
+    expect(getByText(/Save yourself a lot of time by only/)).toBeInTheDocument()
+  })
+})

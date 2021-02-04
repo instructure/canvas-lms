@@ -68,7 +68,8 @@ const structFromGroup = g => ({
   id: g._id,
   name: g.title,
   descriptor: groupDescriptor(g),
-  collections: []
+  collections: [],
+  outcomesCount: g.outcomesCount
 })
 
 const getCounts = rootGroups => {
@@ -86,6 +87,13 @@ const useTreeBrowser = () => {
   const [collections, setCollections] = useState({[ROOT_ID]: defaultStruct(ROOT_ID)})
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [selectedCollection, setSelectedCollection] = useState(null)
+
+  const updateSelectedCollection = props => {
+    const {id} = props
+    setSelectedCollection(id)
+    queryCollections(props)
+  }
 
   const queryCollections = ({id}) => {
     if (['loaded', 'loading'].includes(collections[id]?.loadInfo)) {
@@ -129,6 +137,9 @@ const useTreeBrowser = () => {
     collections,
     setCollections,
     queryCollections,
+    selectedCollection,
+    setSelectedCollection,
+    updateSelectedCollection,
     error,
     setError,
     isLoading,
@@ -195,8 +206,15 @@ export const useFindOutcomeModal = open => {
     error,
     setError,
     isLoading,
-    setIsLoading
+    setIsLoading,
+    selectedCollection,
+    setSelectedCollection,
+    updateSelectedCollection
   } = useTreeBrowser()
+
+  useEffect(() => {
+    if (!open && selectedCollection !== null) setSelectedCollection(null)
+  }, [open, selectedCollection, setSelectedCollection])
 
   useEffect(() => {
     if (!isLoading || !open) {
@@ -269,6 +287,8 @@ export const useFindOutcomeModal = open => {
     isLoading,
     collections,
     queryCollections,
+    selectedCollection,
+    updateSelectedCollection,
     rootId: ROOT_ID
   }
 }

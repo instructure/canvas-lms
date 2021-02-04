@@ -1,5 +1,6 @@
 /*
- * Copyright (C) 2020 - present Instructure, Inc.
+/*
+ * Copyright (C) 2021 - present Instructure, Inc.
  *
  * This file is part of Canvas.
  *
@@ -24,26 +25,36 @@ import {Flex} from '@instructure/ui-flex'
 import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {Button} from '@instructure/ui-buttons'
-import {Billboard} from '@instructure/ui-billboard'
-import {PresentationContent} from '@instructure/ui-a11y'
-import 'compiled/jquery.rails_flash_notifications'
 import Modal from '../shared/components/InstuiModal'
-import SVGWrapper from '../shared/SVGWrapper'
 import TreeBrowser from './Management/TreeBrowser'
+import FindOutcomesBillboard from './FindOutcomesBillboard'
+import FindOutcomesView from './FindOutcomesView'
+import useSearch from '../shared/hooks/useSearch'
 import {useFindOutcomeModal} from './shared/treeBrowser'
 import {useCanvasContext} from './shared/hooks'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {contextType} = useCanvasContext()
-  const {isLoading, collections, queryCollections, rootId} = useFindOutcomeModal(open)
-  const isCourse = contextType === 'Course'
+  const {
+    isLoading,
+    collections,
+    selectedCollection,
+    updateSelectedCollection,
+    rootId
+  } = useFindOutcomeModal(open)
+  const [searchString, onChangeHandler, onClearHandler] = useSearch()
+
   return (
     <Modal
       open={open}
       onDismiss={onCloseHandler}
       shouldReturnFocus
       size="fullscreen"
-      label={isCourse ? I18n.t('Add Outcomes to Course') : I18n.t('Add Outcomes to Account')}
+      label={
+        contextType === 'Course'
+          ? I18n.t('Add Outcomes to Course')
+          : I18n.t('Add Outcomes to Account')
+      }
     >
       <Modal.Body padding="0 small small">
         <Flex>
@@ -68,7 +79,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                   </div>
                 ) : (
                   <TreeBrowser
-                    onCollectionToggle={queryCollections}
+                    onCollectionToggle={updateSelectedCollection}
                     collections={collections}
                     rootId={rootId}
                   />
@@ -92,33 +103,17 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             overflowY="visible"
             overflowX="auto"
           >
-            {/* space for outcome items display component */}
-            <Flex as="div" height="100%">
-              <Flex.Item margin="auto">
-                <Billboard
-                  size="small"
-                  heading={isCourse ? I18n.t('PRO TIP!') : ''}
-                  headingLevel="h3"
-                  headingAs="h3"
-                  hero={
-                    <PresentationContent>
-                      <SVGWrapper url="/images/outcomes/clipboard_checklist.svg" />
-                    </PresentationContent>
-                  }
-                  message={
-                    <View as="div" padding="small 0 xx-large" margin="0 auto" width="60%">
-                      <Text size="large" color="primary">
-                        {isCourse
-                          ? I18n.t(
-                              'Save yourself a lot of time by only adding the outcomes that are specific to your course content.'
-                            )
-                          : I18n.t('Select a group to reveal outcomes here.')}
-                      </Text>
-                    </View>
-                  }
-                />
-              </Flex.Item>
-            </Flex>
+            {selectedCollection !== null ? (
+              <FindOutcomesView
+                collection={collections[selectedCollection]}
+                searchString={searchString}
+                onChangeHandler={onChangeHandler}
+                onClearHandler={onClearHandler}
+                onAddAllHandler={() => {}}
+              />
+            ) : (
+              <FindOutcomesBillboard />
+            )}
           </Flex.Item>
         </Flex>
       </Modal.Body>
