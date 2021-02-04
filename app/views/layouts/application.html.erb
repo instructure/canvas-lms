@@ -72,7 +72,9 @@
   body_classes << 'is-masquerading-or-student-view' if @real_current_user && @real_current_user != @current_user
   body_classes << 'primary-nav-expanded' unless @collapse_global_nav
   body_classes << 'primary-nav-transitions' if @collapse_global_nav
-  body_classes << 'full-width'
+  # We probably want to consider doing this everywhere, all the time, but when I did
+  # for LS-1745, people complained a lot, so maybe not.
+  body_classes << 'full-width' if @domain_root_account.try(:feature_enabled?, :new_user_tutorial)
   body_classes << "context-#{@context.asset_string}" if @context
   body_classes << "responsive_awareness" if !!@domain_root_account&.feature_enabled?(:responsive_awareness)
   body_classes << "responsive_misc" if !!@domain_root_account&.feature_enabled?(:responsive_misc)
