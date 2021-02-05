@@ -174,10 +174,12 @@ ShowFolder.render = function() {
         )}
         {showNewFileUpload && hasLoadedAll && (
           <>
-            <FileUpload
-              currentFolder={this.props.currentFolder}
-              filesDirectoryRef={this.props.filesDirectoryRef}
-            />
+            {this.props.userCanAddFilesForContext && (
+              <FileUpload
+                currentFolder={this.props.currentFolder}
+                filesDirectoryRef={this.props.filesDirectoryRef}
+              />
+            )}
             <ColumnHeaders
               ref="columnHeaders"
               query={this.props.query}
