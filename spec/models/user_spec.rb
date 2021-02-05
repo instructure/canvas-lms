@@ -1423,8 +1423,8 @@ describe User do
       expect(User.avatar_fallback_url("http://somedomain/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
         "http://somedomain/path"
       )
-      expect(User.avatar_fallback_url('%{fallback}')).to eq(
-        '%{fallback}'
+      expect(User.avatar_fallback_url("http://localhost/path", OpenObject.new(:host => "bar", :protocol => "https://"))).to eq(
+        "https://bar/path"
       )
     end
 

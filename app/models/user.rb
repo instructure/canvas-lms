@@ -1501,14 +1501,20 @@ class User < ActiveRecord::Base
   end
 
   def self.avatar_fallback_url(fallback=nil, request=nil)
-    return fallback if fallback == '%{fallback}'
     if fallback and uri = URI.parse(fallback) rescue nil
+      # something got built without request context, so we want to inherit that
+      # context now that we have a request
+      if uri.host == 'localhost'
+        uri.scheme = request.scheme
+        uri.host = request.host
+        uri.port = request.port unless [80, 443].include?(request.port)
+      end
       uri.scheme ||= request ? request.protocol[0..-4] : HostUrl.protocol # -4 to chop off the ://
       if HostUrl.cdn_host
         uri.host = HostUrl.cdn_host
       elsif request && !uri.host
         uri.host = request.host
-        uri.port = request.port if ![80, 443].include?(request.port)
+        uri.port = request.port unless [80, 443].include?(request.port)
       elsif !uri.host
         uri.host, port = HostUrl.default_host.split(/:/)
         uri.port = Integer(port) if port

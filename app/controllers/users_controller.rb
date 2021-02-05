@@ -2151,32 +2151,25 @@ class UsersController < ApplicationController
 
   def avatar_image
     cancel_cache_buster
-    # TODO: remove support for specifying user ids by id, require using
-    # the encrypted version. We can't do it right away because there are
-    # a bunch of places that will have cached fragments using the old
-    # style.
-    return redirect_to(User.default_avatar_fallback) unless service_enabled?(:avatars)
-    user_id = params[:user_id].to_i
-    if params[:user_id].present? && params[:user_id].match(/-/)
-      user_id = User.user_id_from_avatar_key(params[:user_id])
-    end
-    account_avatar_setting = service_enabled?(:avatars) ? @domain_root_account.settings[:avatars] || 'enabled' : 'disabled'
+    user_id = User.user_id_from_avatar_key(params[:user_id])
+
+    return redirect_to(User.default_avatar_fallback) unless service_enabled?(:avatars) && user_id.present?
+
+    account_avatar_setting = @domain_root_account.settings[:avatars] || 'enabled'
     user_id = Shard.global_id_for(user_id)
     user_shard = Shard.shard_for(user_id)
     url = user_shard.activate do
       Rails.cache.fetch(Cacher.avatar_cache_key(user_id, account_avatar_setting)) do
-        user = User.where(id: user_id).first if user_id.present?
+        user = User.where(id: user_id).first
         if user
-          user.avatar_url(nil, account_avatar_setting, "%{fallback}")
+          user.avatar_url(nil, account_avatar_setting)
         else
-          '%{fallback}'
+          User.default_avatar_fallback
         end
       end
     end
-    fallback = User.avatar_fallback_url(nil, request)
-    redirect_to (url.blank? || url == "%{fallback}") ?
-      User.default_avatar_fallback :
-      url.sub(CGI.escape("%{fallback}"), CGI.escape(fallback))
+
+    redirect_to User.avatar_fallback_url(url, request)
   end
 
   # @API Merge user into another user
