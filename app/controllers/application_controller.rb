@@ -219,7 +219,7 @@ class ApplicationController < ActionController::Base
   # put feature checks on Account.site_admin and @domain_root_account that we're loading for every page in here
   # so altogether we can get them faster the vast majority of the time
   JS_ENV_SITE_ADMIN_FEATURES = [
-    :cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :rce_pretty_html_editor, :rce_better_file_downloading
+    :cc_in_rce_video_tray, :featured_help_links, :rce_lti_favorites, :rce_pretty_html_editor, :rce_better_file_downloading, :rce_better_file_previewing
   ].freeze
   JS_ENV_ROOT_ACCOUNT_FEATURES = [
     :direct_share, :assignment_bulk_edit, :responsive_awareness, :recent_history,

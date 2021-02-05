@@ -92,4 +92,29 @@ describe 'user_content post processing' do
       expect(f('body')).not_to contain_css('a.file_download_btn')
     end
   end
+
+  describe 'with rce_better_file_previewing flag on' do
+    before(:each) { Account.site_admin.enable_feature!(:rce_better_file_previewing) }
+
+    it 'previews files in the FilePreview overlay' do
+      root_folder = Folder.root_folders(@course).first
+      file =
+        root_folder.attachments.create!(
+          filename: 'afile.txt', context: @course, uploaded_data: StringIO.new('blah')
+        )
+
+      create_wiki_page_with_content(
+        'page',
+        "<a id='#{file.id}' class='instructure_file_link instructure_scribd_file'
+          href='/courses/#{@course.id}/files/#{file.id}?wrap=1'>file</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a.instructure_file_link')
+      expect(file_link.attribute('class')).to include('preview_in_overlay')
+
+      file_link.click
+      expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
+    end
+  end
 end

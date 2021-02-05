@@ -242,6 +242,11 @@ export function enhanceUserContent() {
         if ($link.hasClass('auto_open')) {
           $preview_link.click()
         }
+
+        // until the RCE UI is done
+        if (ENV.FEATURES?.rce_better_file_previewing) {
+          $link.addClass('preview_in_overlay')
+        }
       }
     })
   }
@@ -566,6 +571,22 @@ $(function() {
           'File previews have been disabled for this Canvas site'
         )
       )
+    })
+  }
+  if (ENV.FEATURES?.rce_better_file_previewing) {
+    $('a.preview_in_overlay').live('click', event => {
+      const matches = event.target.href.match(/\/files\/(\d+)/)
+      if (matches) {
+        event.preventDefault()
+        const file_id = matches[1]
+        import('jsx/shared/utils/showFilePreview')
+          .then(module => {
+            module.showFilePreview(file_id)
+          })
+          .catch(_err => {
+            $.flashError(I18n.t('Someting went wrong loading the file previewer.'))
+          })
+      }
     })
   }
   // publishing the 'userContent/change' will run enhanceUserContent at most once every 50ms
