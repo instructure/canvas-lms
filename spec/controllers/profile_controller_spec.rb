@@ -267,6 +267,16 @@ describe ProfileController do
         %w(http://foo.com Foo)
       ]
     end
+
+    it "should let you remove set pronouns" do
+      @user.update(pronouns: 'he_him')
+      expect {
+        put 'update_profile', params: {:pronouns => nil}, format: 'json'
+      }.to change {
+        @user.reload.pronouns
+      }.from('He/Him').to(nil)
+      expect(response).to be_successful
+    end
   end
 
   describe "content_shares" do
