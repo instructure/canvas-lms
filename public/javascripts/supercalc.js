@@ -135,10 +135,10 @@ $.fn.superCalc = function(options, more_options) {
         let res = null
         try {
           const val = calcCmd.computeValue(formula_text)
-          const rounder = Math.pow(10, parseInt(finds.round.val(), 10) || 0) || 1
+          const decimals = finds.round.val() || 0
           res =
             '= ' +
-            I18n.n(Math.round(val * rounder) / rounder, {
+            I18n.n(parseFloat(val.toFixed(decimals + 1)).toFixed(decimals), {
               precision: 5,
               strip_insignificant_zeros: true
             })
