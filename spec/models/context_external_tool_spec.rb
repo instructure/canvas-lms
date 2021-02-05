@@ -278,6 +278,79 @@ describe ContextExternalTool do
     end
   end
 
+  describe '#matches_host?' do
+    subject { tool.matches_host?(given_url) }
+
+    let(:tool) { external_tool_model }
+    let(:given_url) { 'https://www.given-url.com/test?foo=bar' }
+
+    context 'when the tool has a url and no domain' do
+      let(:url) { 'https://app.test.com/foo' }
+
+      before do
+        tool.update!(
+          domain: nil,
+          url: url
+        )
+      end
+
+      context 'and the tool url host does not match that of the given url host' do
+        it { is_expected.to eq false }
+      end
+
+      context 'and the tool url host matches that of the given url host' do
+        let(:url) { 'https://www.given-url.com/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool url host matches except for case' do
+        let(:url) { 'https://www.GiveN-url.cOm/foo?foo=bar' }
+
+        it { is_expected.to eq true }
+      end
+    end
+
+    context 'when the tool has a domain and no url' do
+      let(:domain) { 'app.test.com' }
+
+      before do
+        tool.update!(
+          url: nil,
+          domain: domain
+        )
+      end
+
+      context 'and the tool domain host does not match that of the given url host' do
+        it { is_expected.to eq false }
+
+        context 'and the tool url and given url are both nil' do
+          let(:given_url) { nil }
+
+          it { is_expected.to eq false }
+        end
+      end
+
+      context 'and the tool domain host matches that of the given url host' do
+        let(:domain) { 'www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain matches except for case' do
+        let(:domain) { 'www.gIvEn-URL.cOm' }
+
+        it { is_expected.to eq true }
+      end
+
+      context 'and the tool domain contains the protocol' do
+        let(:domain) { 'https://www.given-url.com' }
+
+        it { is_expected.to eq true }
+      end
+    end
+  end
+
   describe '#duplicated_in_context?' do
     shared_examples_for 'detects duplication in contexts' do
       subject { second_tool.duplicated_in_context? }

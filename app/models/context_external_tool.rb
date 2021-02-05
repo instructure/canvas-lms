@@ -594,6 +594,24 @@ class ContextExternalTool < ActiveRecord::Base
     @standard_url
   end
 
+  # Does the tool match the host of the given url?
+  # Checks for batches on both domain and url
+  #
+  # This method checks both the domain and url
+  # host when attempting to match host.
+  #
+  # This method was added becauase #matches_domain?
+  # cares about the presence or absence of a protocol
+  # in the domain. Rather than changing that method and
+  # risking breaking Canvas flows, we introduced this
+  # new method.
+  def matches_host?(url)
+    matches_tool_domain?(url) ||
+      (self.url.present? &&
+        Addressable::URI.parse(self.url)&.normalize&.host ==
+          Addressable::URI.parse(url).normalize.host)
+  end
+
   def matches_url?(url, match_queries_exactly=true)
     if match_queries_exactly
       url = ContextExternalTool.standardize_url(url)
@@ -615,7 +633,7 @@ class ContextExternalTool < ActiveRecord::Base
     return false if domain.blank?
     url = ContextExternalTool.standardize_url(url)
     host = Addressable::URI.parse(url).normalize.host rescue nil
-    d = domain.gsub(/http[s]?\:\/\//, '')
+    d = domain.downcase.gsub(/http[s]?\:\/\//, '')
     !!(host && ('.' + host).match(/\.#{d}\z/))
 end
 

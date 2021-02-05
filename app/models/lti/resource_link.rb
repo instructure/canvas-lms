@@ -58,7 +58,7 @@ class Lti::ResourceLink < ApplicationRecord
 
   def current_external_tool(context)
     ContextExternalTool.find_external_tool(
-      original_context_external_tool.url,
+      original_context_external_tool.url || original_context_external_tool.domain,
       context,
       original_context_external_tool.id
     )
