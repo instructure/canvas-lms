@@ -745,6 +745,17 @@ describe ExternalToolsController do
       end
 
       context 'when resource_link_lookup_id is passed' do
+        include Lti::RedisMessageClient
+        let(:launch_params) do
+          JSON.parse(
+            fetch_and_delete_launch(
+              @course,
+              JSON::JWT.decode(assigns[:lti_launch].params['lti_message_hint'], :skip_verification)['verifier']
+            )
+          )
+        end
+
+
         let(:rl) {
           Lti::ResourceLink.create!(
             context_external_tool: lti_1_3_tool,
@@ -793,7 +804,7 @@ describe ExternalToolsController do
           expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not found"
         end
 
-        it 'errors if the resource_link is for the wrong tool' do
+        it 'does not include custom params if the resource_link is for the wrong tool' do
           tool2 = @course.context_external_tools.create!(
             name: 'test', consumer_key: 'key', shared_secret: 'secret',
             url: 'http://www.example2.com/launch', use_1_3: true,
@@ -801,11 +812,10 @@ describe ExternalToolsController do
           )
           rl.update(context_external_tool: tool2)
           get_page
-          expect(response).to be_redirect
-          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not valid for tool"
+          expect(launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']).to be_blank
         end
 
-        it 'succeeds if the resource_link is for a tool with the same url and client ID' do
+        it 'succeeds if the resource_link is for a tool with the same host' do
           tool2 = @course.account.context_external_tools.create!(
             name: 'test', consumer_key: 'key', shared_secret: 'secret',
             url: 'http://www.example.com/launch', use_1_3: true,
@@ -813,8 +823,9 @@ describe ExternalToolsController do
           )
           rl.update(context_external_tool: tool2)
           get_page
-          expect(response).to be_redirect
-          expect(flash[:error]).to eq "Couldn't find valid settings for this link: Resource link not valid for tool"
+          expect(
+            launch_params['https://purl.imsglobal.org/spec/lti/claim/custom']
+          ).to eq({"abc" => "def", "expans" => @teacher.id})
         end
       end
 
