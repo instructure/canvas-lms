@@ -25,6 +25,13 @@ const setup = props => {
 }
 
 describe('PostToolbar', () => {
+  describe('info text', () => {
+    it('displays if provided', () => {
+      const {queryByText} = setup({infoText: 'info text'})
+      expect(queryByText('info text')).toBeTruthy()
+    })
+  })
+
   describe('publish button', () => {
     it('does not display if callback is not provided', () => {
       const {queryByText} = setup()

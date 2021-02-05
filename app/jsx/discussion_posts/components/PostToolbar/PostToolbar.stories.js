@@ -40,7 +40,8 @@ const Template = args => <PostToolbar {...args} />
 export const Default = Template.bind({})
 Default.args = {
   isPublished: true,
-  isSubscribed: true
+  isSubscribed: true,
+  infoText: '24 replies, 4 unread'
 }
 
 export const StudentView = Template.bind({})

@@ -23,33 +23,37 @@ import {PostMessage} from './PostMessage'
 export default {
   title: 'Examples/Discussion Posts/PostMessage',
   component: PostMessage,
-  argTypes: {
-    onReadAll: {action: 'Read All'},
-    onDelete: {action: 'Delete'},
-    onToggleComments: {action: 'Toggle Comments'},
-    onSend: {action: 'Send'},
-    onCopy: {action: 'Copy'},
-    onEdit: {action: 'Edit'},
-    onTogglePublish: {action: 'Toggle Publish'},
-    onToggleSubscription: {action: 'Toggle Subscription'}
-  }
+  argTypes: {}
 }
 
-const Template = args => <PostMessage {...args} />
+const Template = args => (
+  <PostMessage
+    authorName="Posty Postersen"
+    timingDisplay="Jan 25 1:00pm"
+    message="Posts are fun"
+    {...args}
+  />
+)
 
 export const Default = Template.bind({})
-Default.args = {
-  isPublished: true,
-  isSubscribed: true
+Default.args = {}
+
+export const AuthorPost = Template.bind({})
+AuthorPost.args = {
+  pillText: 'Author'
 }
 
-export const StudentView = Template.bind({})
-StudentView.args = {
-  onDelete: null,
-  onToggleComments: null,
-  onSend: null,
-  onCopy: null,
-  onEdit: null,
-  onTogglePublish: null,
-  onToggleSubscription: null
+export const LargePost = Template.bind({})
+LargePost.args = {
+  message: 'This is the post that never ends. It goes on and on my friends. '.repeat(10)
+}
+
+export const AvatarPost = Template.bind({})
+AvatarPost.args = {
+  avatarUrl: 'https://www.gravatar.com/avatar/'
+}
+
+export const UnreadPost = Template.bind({})
+UnreadPost.args = {
+  isUnread: true
 }

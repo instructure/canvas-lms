@@ -2015,6 +2015,19 @@
     keycode "^2"
     prop-types "^15"
 
+"@instructure/ui-byline@6":
+  version "6.27.0"
+  resolved "https://registry.yarnpkg.com/@instructure/ui-byline/-/ui-byline-6.27.0.tgz#c99e19525be474e55bce444ea57d541524f5e78a"
+  integrity sha512-QsDHcg6evq8eVtAURIoASaQkwlywNUABY6sERzQfNnfmcHpVlejLusPjMP7x6nnM7JD20bivymGq3pxrdfk7sQ==
+  dependencies:
+    "@babel/runtime" "^7.9.2"
+    "@instructure/ui-react-utils" "^6.27.0"
+    "@instructure/ui-testable" "^6.27.0"
+    "@instructure/ui-themeable" "^6.27.0"
+    "@instructure/ui-view" "^6.27.0"
+    classnames "^2"
+    prop-types "^15"
+
 "@instructure/ui-calendar@6", "@instructure/ui-calendar@^6.26.0":
   version "6.26.0"
   resolved "https://registry.yarnpkg.com/@instructure/ui-calendar/-/ui-calendar-6.26.0.tgz#5f51bea44b8f968a0f0a6f87841ba29baf10e94a"

@@ -16,110 +16,76 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
-import {Flex} from '@instructure/ui-flex'
+
+import {Avatar} from '@instructure/ui-avatar'
+import {Badge} from '@instructure/ui-badge'
+import {Byline} from '@instructure/ui-byline'
+import {Pill} from '@instructure/ui-pill'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import {PostToolbar} from '../PostToolbar/PostToolbar'
 
 export function PostMessage({...props}) {
-  const addDebug = true
   return (
-    <View display="block" padding="small">
-      <Flex withVisualDebug={addDebug}>
-        <Flex.Item shouldGrow={false}>
-          {/* TODO: add avatar display VICE-934 */}
-          AVATAR
-        </Flex.Item>
-        <Flex.Item shouldGrow>
-          <Flex direction="column" withVisualDebug={addDebug}>
-            <Flex.Item>
-              <Flex width="100%" justifyItems="space-between">
-                <Flex.Item>
-                  {/* TODO author info VICE-934 */}
-                  AUTHOR INFO
-                </Flex.Item>
-                <PostToolbar
-                  onReadAll={props.onReadAll}
-                  onDelete={props.onDelete}
-                  onToggleComments={props.onToggleComments}
-                  commentsEnabled={props.commentsEnabled}
-                  onSend={props.onSend}
-                  onCopy={props.onCopy}
-                  onEdit={props.onEdit}
-                  onTogglePublish={props.onTogglePublish}
-                  isPublished={props.isPublished}
-                  onToggleSubscription={props.onToggleSubscription}
-                  isSubscribed={props.isSubscribed}
-                />
-              </Flex>
-            </Flex.Item>
-            <Flex.Item>
-              {/* TODO message VICE-932 */}
-              MESSAGE
-            </Flex.Item>
-          </Flex>
-        </Flex.Item>
-      </Flex>
-    </View>
+    <Byline
+      title={
+        <>
+          <Text weight="bold">{props.authorName}</Text>
+          <View padding="0 small">
+            <Text color="secondary">{props.timingDisplay}</Text>
+          </View>
+          {props.pillText && <Pill data-testid="post-pill">{props.pillText}</Pill>}
+        </>
+      }
+      description={props.message}
+      alignContent="top"
+    >
+      {props.isUnread ? (
+        <Badge
+          type="notification"
+          placement="start center"
+          formatOutput={() => <ScreenReaderContent>{I18n.t('Unread post')}</ScreenReaderContent>}
+        >
+          <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
+        </Badge>
+      ) : (
+        <Avatar name={props.authorName} src={props.avatarUrl} margin="0 0 0 small" />
+      )}
+    </Byline>
   )
 }
 
 PostMessage.propTypes = {
   /**
-   * Behavior for marking the thread as read
+   * Display name for the author of the message
    */
-  onReadAll: PropTypes.func.isRequired,
+  authorName: PropTypes.string.isRequired,
   /**
-   * Behavior for deleting the discussion post.
-   * Providing this function will result in the menu option being rendered.
+   * Source url for the user's avatar
    */
-  onDelete: PropTypes.func,
+  avatarUrl: PropTypes.string,
   /**
-   * Behavior for toggling the ability to comment on the post.
-   * Providing this function will result in the menu option being rendered.
+   * Display text for the relative time information. This prop is expected
+   * to be provided as a string of the exact text to be displayed, not a
+   * timestamp to be formatted.
    */
-  onToggleComments: PropTypes.func,
+  timingDisplay: PropTypes.string.isRequired,
   /**
-   * Indicates whether comments have been enabled or not.
-   * Which toggling menu option is rendered is dependent on this prop.
+   * Display text for the post's message
    */
-  commentsEnabled: PropTypes.bool,
+  message: PropTypes.string.isRequired,
   /**
-   * Behavior for sending to a recipient.
-   * Providing this function will result in the menu option being rendered.
+   * Display text for the message pill.
+   * Providing this prop will result in the pill being displayed.
    */
-  onSend: PropTypes.func,
+  pillText: PropTypes.string,
   /**
-   * Behavior for copying a post.
-   * Providing this function will result in the menu option being rendered.
+   * Determines if the unread badge should be displayed
    */
-  onCopy: PropTypes.func,
-  /**
-   * Behavior for editing a post.
-   * Providing this function will result in the button being rendered.
-   */
-  onEdit: PropTypes.func,
-  /**
-   * Behavior for toggling the published state of the post.
-   * Providing this function will result in the button being rendered.
-   */
-  onTogglePublish: PropTypes.func,
-  /**
-   * Indicates whether the post is published or unpublished.
-   * Which state the publish button is in is dependent on this prop.
-   */
-  isPublished: PropTypes.bool,
-  /**
-   * Behavior for toggling the subscription state of the post.
-   * Providing this function will result in the button being rendered.
-   */
-  onToggleSubscription: PropTypes.func,
-  /**
-   * Indicates whether the user has subscribed to the post.
-   * Which state the subscription button is in is dependent on this prop.
-   */
-  isSubscribed: PropTypes.bool
+  isUnread: PropTypes.bool
 }
 
 export default PostMessage

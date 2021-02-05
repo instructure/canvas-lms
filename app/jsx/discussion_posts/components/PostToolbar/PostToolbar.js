@@ -16,32 +16,41 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import I18n from 'i18n!conversations_2'
 import PropTypes from 'prop-types'
 import React from 'react'
+import {ToggleButton} from './ToggleButton'
+
 import {Flex} from '@instructure/ui-flex'
-import {Menu} from '@instructure/ui-menu'
-import {IconButton} from '@instructure/ui-buttons'
-import {Text} from '@instructure/ui-text'
 import {
-  IconMoreLine,
-  IconMarkAsReadLine,
-  IconTrashLine,
-  IconLockLine,
-  IconUnlockLine,
-  IconUserLine,
-  IconDuplicateLine,
-  IconEditLine,
   IconBookmarkSolid,
   IconBookmarkLine,
   IconCompleteSolid,
-  IconNoSolid
+  IconDuplicateLine,
+  IconEditLine,
+  IconLockLine,
+  IconMarkAsReadLine,
+  IconMoreLine,
+  IconNoSolid,
+  IconTrashLine,
+  IconUnlockLine,
+  IconUserLine
 } from '@instructure/ui-icons'
-import I18n from 'i18n!conversations_2'
-import {ToggleButton} from './ToggleButton'
+import {IconButton} from '@instructure/ui-buttons'
+import {Menu} from '@instructure/ui-menu'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 
 export function PostToolbar({...props}) {
   return (
-    <Flex.Item>
+    <>
+      {props.infoText && (
+        <View padding="0 x-small 0 0">
+          <Text weight="light" size="small">
+            {props.infoText}
+          </Text>
+        </View>
+      )}
       {props.onTogglePublish && (
         <ToggleButton
           isEnabled={props.isPublished}
@@ -67,7 +76,7 @@ export function PostToolbar({...props}) {
         />
       )}
       {renderMenu(props)}
-    </Flex.Item>
+    </>
   )
 }
 
@@ -216,7 +225,11 @@ PostToolbar.propTypes = {
    * Indicates whether the user has subscribed to the post.
    * Which state the subscription button is in is dependent on this prop.
    */
-  isSubscribed: PropTypes.bool
+  isSubscribed: PropTypes.bool,
+  /**
+   * Text to be displayed with the toolbar
+   */
+  infoText: PropTypes.string
 }
 
 export default PostToolbar
