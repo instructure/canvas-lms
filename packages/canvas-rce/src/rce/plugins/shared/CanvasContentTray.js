@@ -353,10 +353,19 @@ export default function CanvasContentTray(props) {
           onOpen={handleOpenTray}
           onEntered={() => {
             const c = document.querySelector('[role="main"]')
-            const target_w = c ? c.offsetWidth - trayRef.current?.offsetWidth : 0
-            if (target_w >= 320) {
-              c.style.boxSizing = 'border-box'
-              c.style.width = `${target_w}px`
+            let target_w = 0
+            if (c) {
+              const margin =
+                window.getComputedStyle(c).direction === 'ltr'
+                  ? document.body.getBoundingClientRect().right - c.getBoundingClientRect().right
+                  : c.getBoundingClientRect().left
+
+              target_w = c.offsetWidth - trayRef.current?.offsetWidth + margin
+
+              if (target_w >= 320 && target_w < c.offsetWidth) {
+                c.style.boxSizing = 'border-box'
+                c.style.width = `${target_w}px`
+              }
             }
             setHidingTrayOnAction(target_w < 320)
           }}
