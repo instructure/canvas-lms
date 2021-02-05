@@ -134,8 +134,13 @@
   min-height: 5px;
   max-width: 100%;
   overflow-x: auto;
-  a:not(.btn):not(.Button) {
+  a:not(.btn):not(.Button):not([role='button']) {
     text-decoration: underline;
+  }
+  a.btn, a.Button, a[role='button'] {
+    &:hover, &:focus {
+      text-decoration: none;
+    }
   }
 
   table:not([cellpadding]) {
