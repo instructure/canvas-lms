@@ -286,10 +286,11 @@
     "yaml-loader": "^0.5"
   },
   "optionalDependencies": {
-    "@storybook/addon-actions": "^6.0.26",
-    "@storybook/addon-essentials": "^6.0.26",
-    "@storybook/addon-links": "^6.0.26",
-    "@storybook/react": "^6.0.26",
+    "@storybook/addon-actions": "^6.1.17",
+    "@storybook/addon-essentials": "^6.1.17",
+    "@storybook/addon-links": "^6.1.17",
+    "@storybook/addon-storyshots": "^6.1.17",
+    "@storybook/react": "^6.1.17",
     "inspect-process": "^0.5"
   },
   "browserslist": [
@@ -341,7 +342,8 @@
     "upgrade-instructure-ui": "script/upgrade-instructure-ui",
     "dedupe-yarn": "npx yarn-deduplicate",
     "clean": "yarn workspace-run-serial clean",
-    "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts"
+    "storybook": "start-storybook -p 6006 --no-dll =s ../public/javascripts",
+    "test-storybook": "yarn jest --roots .storybook --testMatch **/storybook.test.js"
   },
   "resolutions": {
     "jquery": "https://github.com/instructure/jquery.git#1.7.2-with-AMD-and-CommonJS",
