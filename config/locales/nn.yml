@@ -8093,6 +8093,7 @@ nn:
   enabled_links_be110215: "Aktiverte lenker"
   enabled_web_services_f620b2be: "Aktiverte nettenester"
   enables_display_of_plagiarism_reports_and_similari_3211dd8b: "Aktiverer vising av plagieringsrapportar for likskapsresultat i innleveringsmenyen til ny vurderingsoversikt."
+  enables_new_api_endpoints_for_the_course_and_user__2ba4afbf: "Aktiverer nye API-sluttpunkt for emne- og brukardata som kjem frå New Analytics."
   encourage_class_participation_4e069479: "Oppmod til deltaking"
   encrypted_sourcedids_for_basic_outcomes_87fa11ea: "Krypterte sourcedId-er for basislæringsmål"
   end_course_set_up_tutorial_dialog_5b812ec6: "Avslutt dialog med sett-opp-emne-rettleiing"
@@ -10603,6 +10604,8 @@ nn:
   if_rce_enhancements_are_also_enabled_the_rce_will__7bba3104: |-
       Dersom forbetringane av den nye teksteditoren òg er aktivert,
       vil editoren autolagre innhaldet ditt mens du arbeider
+  if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Dersom funksjonen er aktivert vil karakterutrekninga sjå vekk frå anonyme oppgåveinnleveringar som ikkje er posta når totalresultat reknast ut."
+  if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Dersom funksjonen er aktivert vil vurderingsoversikta porsjonere lasting av oppgåver ved å hente oppgåver frå valt karaktersetjingsperiode først. "
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Dersom denne er på, slår den av Post-til-SIS-funksjonalitet for oppgåver når karaktersetjingsperiode lukker, Gjeld kun når innstillingane for \"Aktiver ny SIS-integrasjon\" er aktivert. "
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøy. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av. "
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar eller observatørar til eit emne via e-postadresse eller innloggings-ID sjølv om studenten eller observatøren ikke har ein Canvaskonto frå før."
@@ -10647,6 +10650,7 @@ nn:
   ignore_name_55edc6fe: "Ignorer %{name}"
   ignore_these_3940f6f5: "Ignorer desse"
   ignore_this_assignment_b7a71f80: "Ignorer denne oppgåva"
+  ignore_unposted_anonymous_assignments_in_grade_cal_3f68c87f: "Sjå vekk frå anonyme oppgåveinnleveringar i karakterutrekninga som ikkje er posta"
   ignore_until_new_mark_935e00a2: "Sjå bort frå fram til ny karakter"
   ignore_until_new_submission_90ba19b7: "Sjå bort frå fram til ny innlevering"
   illegal_element_focus_request_b3cea847: "Førespurnad om ugyldig element i fokus"
@@ -13803,6 +13807,7 @@ nn:
   never_df100b49: Aldri
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontorolle"
+  new_analytics_api_access_7eec1ead: "New Analytics API-tilgang"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjering"
   new_announcement_title_30ba7c1b: "Ny kunngjering: %{title}"
@@ -17492,6 +17497,7 @@ nn:
         enabled: "Aktivert (må også aktivere QTI-konverteringsprogram)"
   responsive_global_nav_logo_99488e92: "Responsiv logo for global navigering"
   responsive_layout_54e4ca06: "Responsiv layout"
+  responsive_student_grades_page_324e9c8b: "Responsiv side for studentvurderingar"
   restart_link_validation_b61286fc: "Start lenkevalidator på nytt"
   restore_courses_182e162e: "Gjenopprett emne"
   restored_course_association_course_c9e16045: "Gjenopprett emneforbindelse %{course}"
@@ -18155,6 +18161,7 @@ nn:
   select_term_f8083fb0: "Vel semester"
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Vel fila du vil kople til, eller legg til ei fil ved å velje \"Ny fil\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Vel fila du vil knyte til denne *modulen*, eller legg til ei fil ved å velje \"Ny fil\"."
+  select_the_files_you_want_to_associate_with_this_m_82677c50: "Vel filene du vil legge til *modulen* eller legg til filer ved å velje \"Nye fil(er)\"."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Vel sida du vil knyte til, eller legg til ei ny side ved å velje \"Ny side\"."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Vel sida du vil knyte til denne *modulen*, eller legg til ei ny side ved å velje \"Ny side\"."
   select_type_of_prerequisite_8d6fa902: "Vel type føresetnad"
@@ -19036,6 +19043,7 @@ nn:
   show_name_of_observed_students_in_notifications_a56dd9e4: "Vis namn på studentar som er observerte i varslingar."
   show_navigation_menu_34e7f441: "Vis navigeringsmeny"
   show_new_analytics_for_course_and_user_data_18e92636: "Vis nye analysedata for emne og brukarar"
+  show_new_analytics_for_course_and_user_data_data_m_89526eb: "Vis New Analytics for emne- og brukardata. Det kan ta 24 timer før data er tilgjengeleg i New Analytics etter at funksjonen er satt til ON. "
   show_new_quizzes_on_the_quizzes_page_b2db14d8: "Vis New Quizzes i quizoversikta"
   show_notes_column_22d2b6c1: "Vis merknadskolonne"
   show_one_question_at_a_time_271e346d: "Vis eitt spørsmål om gongen"
