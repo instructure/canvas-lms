@@ -38,7 +38,7 @@ const ManageOutcomesView = ({
   onSearchChangeHandler,
   onSearchClearHandler,
   loading,
-  loadMore,
+  loadMore
 }) => {
   const groupTitle = outcomeGroup?.title
   const groupDescription = outcomeGroup?.description
@@ -84,11 +84,11 @@ const ManageOutcomesView = ({
               {I18n.t(
                 {
                   one: '1 "%{groupTitle}" Outcome',
-                  other: '%{count} "%{groupTitle}" Outcomes',
+                  other: '%{count} "%{groupTitle}" Outcomes'
                 },
                 {
                   count: numOutcomes,
-                  groupTitle: addZeroWidthSpace(groupTitle),
+                  groupTitle: addZeroWidthSpace(groupTitle)
                 }
               )}
             </div>
@@ -124,14 +124,14 @@ ManageOutcomesView.propTypes = {
         PropTypes.shape({
           _id: PropTypes.string.isRequired,
           title: PropTypes.string.isRequired,
-          description: PropTypes.string,
+          description: PropTypes.string
         })
       ),
       pageInfo: PropTypes.shape({
         endCursor: PropTypes.string,
-        hasNextPage: PropTypes.bool.isRequired,
-      }),
-    }).isRequired,
+        hasNextPage: PropTypes.bool.isRequired
+      })
+    }).isRequired
   }),
   loading: PropTypes.bool.isRequired,
   selectedOutcomes: PropTypes.object.isRequired,
@@ -141,7 +141,7 @@ ManageOutcomesView.propTypes = {
   onOutcomeMenuHandler: PropTypes.func.isRequired,
   onSearchChangeHandler: PropTypes.func.isRequired,
   onSearchClearHandler: PropTypes.func.isRequired,
-  loadMore: PropTypes.func.isRequired,
+  loadMore: PropTypes.func.isRequired
 }
 
 export default ManageOutcomesView

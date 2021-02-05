@@ -16,12 +16,30 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {useState, useCallback} from 'react'
+import React from 'react'
+import OutcomeMoveModal from './OutcomeMoveModal'
 
-export default function useModal() {
-  const [isModalOpen, setModalOpen] = useState(false)
-  const openModal = useCallback(() => setModalOpen(true), [])
-  const closeModal = useCallback(() => setModalOpen(false), [])
+export default {
+  title: 'Examples/Outcomes/OutcomeMoveModal',
+  component: OutcomeMoveModal,
+  args: {
+    isOpen: true,
+    onCloseHandler: () => {},
+    title: 'Storybook Group Title',
+    type: 'outcome'
+  }
+}
 
-  return [isModalOpen, openModal, closeModal]
+const Template = args => <OutcomeMoveModal {...args} />
+
+export const Default = Template.bind({})
+
+export const veryLongOutcomeTitle = Template.bind({})
+veryLongOutcomeTitle.args = {
+  title: 'This is a very long title.'.repeat(10)
+}
+
+export const showsMoveGroupHeader = Template.bind({})
+showsMoveGroupHeader.args = {
+  type: 'group'
 }

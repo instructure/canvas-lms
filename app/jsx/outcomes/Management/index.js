@@ -31,6 +31,8 @@ import useSearch from 'jsx/shared/hooks/useSearch'
 import TreeBrowser from './TreeBrowser'
 import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
 import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
+import useModal from '../../shared/hooks/useModal'
+import OutcomeMoveModal from './OutcomeMoveModal'
 
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
@@ -66,8 +68,8 @@ const OutcomeManagementPanel = () => {
   const {contextType} = useCanvasContext()
   const [selectedOutcomes, setSelectedOutcomes] = useState({})
   const selected = Object.keys(selectedOutcomes).length
-  const onSelectOutcomesHandler = (id) =>
-    setSelectedOutcomes((prevState) => {
+  const onSelectOutcomesHandler = id =>
+    setSelectedOutcomes(prevState => {
       const updatedState = {...prevState}
       prevState[id] ? delete updatedState[id] : (updatedState[id] = true)
       return updatedState
@@ -83,8 +85,13 @@ const OutcomeManagementPanel = () => {
     detailGroupIsLoading,
     detailGroup,
     detailGroupLoadMore,
-    selectedGroupId,
+    selectedGroupId
   } = useManageOutcomes()
+  const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
+  const onSelectOutcomeGroupMenuHandler = (_, value) => {
+    if (value === 'move') openMoveGroupModal()
+    else noop()
+  }
 
   if (isLoading) {
     return (
@@ -162,7 +169,7 @@ const OutcomeManagementPanel = () => {
                     selectedOutcomes={selectedOutcomes}
                     searchString={searchString}
                     onSelectOutcomesHandler={onSelectOutcomesHandler}
-                    onOutcomeGroupMenuHandler={noop}
+                    onOutcomeGroupMenuHandler={onSelectOutcomeGroupMenuHandler}
                     onOutcomeMenuHandler={noop}
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
@@ -176,6 +183,12 @@ const OutcomeManagementPanel = () => {
           {selectedGroupId && (
             <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
           )}
+          <OutcomeMoveModal
+            title={detailGroup ? detailGroup.title : ''}
+            type="group"
+            isOpen={isMoveGroupModalOpen}
+            onCloseHandler={closeMoveGroupModal}
+          />
         </>
       )}
     </div>

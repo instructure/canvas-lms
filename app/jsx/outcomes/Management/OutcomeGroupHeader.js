@@ -51,7 +51,9 @@ const OutcomeGroupHeader = ({title, description, minWidth, onMenuHandler}) => (
 )
 
 OutcomeGroupHeader.defaultProps = {
-  minWidth: 'auto'
+  minWidth: 'auto',
+  title: '',
+  description: ''
 }
 
 OutcomeGroupHeader.propTypes = {
