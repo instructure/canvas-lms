@@ -24,7 +24,7 @@
     <a href="<%= context_url(@context, :context_rubrics_url) %>" id="add_rubric_url" style="display: none;"></a>
   <% end %>
 
-  <div id="rubrics" style="margin-bottom: 10px;">
+  <div id="rubrics" class="mathjax_ignore" style="margin-bottom: 10px;">
     <% if @assignment.active_rubric_association? && @assignment.rubric_association.rubric %>
       <%= render :partial => "shared/rubric", :object => @assignment.rubric_association.rubric, :locals => {:association => @assignment, :rubric_association => @assignment.rubric_association, :editable => can_do(@assignment, @current_user, :update), :has_assessments => !@assignment.rubric_association.rubric_assessments.empty?, :edit_view => can_do(@assignment.rubric_association, @current_user, :update) } %>
     <% end %>
