@@ -161,6 +161,19 @@ module CC::Importer::Standard
       if meta_doc.at_css("post_policy")
         assignment[:post_policy] = {post_manually: get_bool_val(meta_doc, "post_policy post_manually") || false}
       end
+      if meta_doc.at_css("line_items")
+        assignment[:line_items] = meta_doc.css("line_items line_item").map do |li_node|
+          {
+            client_id: get_int_val(li_node, 'client_id'),
+            coupled: get_bool_val(li_node, 'coupled'),
+            extensions: get_node_val(li_node, 'extensions'),
+            label: get_node_val(li_node, 'label'),
+            resource_id: get_node_val(li_node, 'resource_id'),
+            score_maximum: get_float_val(li_node, 'score_maximum'),
+            tag: get_node_val(li_node, 'tag'),
+          }.compact
+        end
+      end
       assignment
     end
 

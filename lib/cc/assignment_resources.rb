@@ -294,7 +294,36 @@ module CC
       if assignment.post_policy.present?
         node.post_policy { |policy| policy.post_manually(assignment.post_policy.post_manually?) }
       end
+
+      if assignment.line_items.any?
+        node.line_items do |line_items_node|
+          assignment.line_items.find_each do |line_item|
+            add_line_item(line_items_node, line_item, assignment) if line_item.active?
+          end
+        end
+      end
     end
 
+    def self.add_line_item(line_items_node, line_item, assignment)
+      line_items_node.line_item do |li_node|
+        li_node.coupled line_item.coupled
+        li_node.tag line_item.tag if line_item.tag
+        li_node.resource_id line_item.resource_id if line_item.resource_id
+        li_node.extensions line_item.extensions.to_json if line_item.extensions.present?
+
+        # Include client ID if cannot be inferred from a tool tag (happens
+        # with AGS-created assignment with submission_types=none)
+        if line_item.client_id && !assignment.external_tool_tag
+          li_node.client_id line_item.client_id
+        end
+
+        # Include label & score_maximum if they are different from assignment's
+        # (should only happen in the case of multiple line items)
+        li_node.label line_item.label if line_item.label != assignment.name
+        if line_item.score_maximum != assignment.points_possible
+          li_node.score_maximum line_item.score_maximum
+        end
+      end
+    end
   end
 end

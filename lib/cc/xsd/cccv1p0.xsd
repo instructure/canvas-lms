@@ -240,6 +240,25 @@
         </xs:complexType>
       </xs:element>
       <xs:element name="post_policy" type="postPolicyType" minOccurs="0"/>
+      <xs:element name="line_items" minOccurs="0">
+        <xs:complexType>
+          <xs:sequence minOccurs="0" maxOccurs="unbounded">
+            <xs:element name="line_item">
+              <xs:complexType>
+                <xs:all>
+                  <xs:element name="coupled" type="xs:boolean" minOccurs="1"/>
+                  <xs:element name="tag" type="xs:string" minOccurs="0"/>
+                  <xs:element name="resource_id" type="xs:string" minOccurs="0"/>
+                  <xs:element name="extensions" type="xs:string" minOccurs="0"/>
+                  <xs:element name="client_id" type="xs:ID" minOccurs="0"/>
+                  <xs:element name="label" type="xs:string" minOccurs="0"/>
+                  <xs:element name="score_maximum" type="xs:float" minOccurs="0"/>
+                </xs:all>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+        </xs:complexType>
+      </xs:element>
     </xs:all>
     <xs:attribute name="identifier" type="xs:ID" use="required"/>
   </xs:complexType>
