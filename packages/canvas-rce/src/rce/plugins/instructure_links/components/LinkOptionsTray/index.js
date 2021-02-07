@@ -15,17 +15,19 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import React, {useCallback, useEffect, useState} from 'react'
-import {bool, func, object, oneOf, shape, string} from 'prop-types'
+import React, {useEffect, useState} from 'react'
+import {checkPropTypes, bool, func, object, oneOf, shape, string} from 'prop-types'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 
 import {Alert} from '@instructure/ui-alerts'
 import {Heading} from '@instructure/ui-heading'
 import {FormFieldGroup} from '@instructure/ui-form-field'
 import {Checkbox} from '@instructure/ui-checkbox'
+import {RadioInputGroup, RadioInput} from '@instructure/ui-radio-input'
 import {TextInput} from '@instructure/ui-text-input'
 import {Flex} from '@instructure/ui-flex'
 import {Tray} from '@instructure/ui-tray'
+import {View} from '@instructure/ui-view'
 import validateURL from '../../validateURL'
 import formatMessage from '../../../../../format-message'
 import {
@@ -47,6 +49,7 @@ export default function LinkOptionsTray(props) {
   const [disablePreview, setDisablePreview] = useState(
     content.displayAs === DISPLAY_AS_EMBED_DISABLED
   )
+  const [rce_better_file_previewing] = useState(!!window?.ENV?.FEATURES?.rce_better_file_previewing)
 
   useEffect(() => {
     try {
@@ -91,6 +94,71 @@ export default function LinkOptionsTray(props) {
   function handlePreviewChange(event) {
     setAutoOpenPreview(event.target.checked)
   }
+  function handlePreviewOptionChange(_event, value) {
+    setDisablePreview(value === 'overlay')
+  }
+
+  function renderDisplayOptions() {
+    if (rce_better_file_previewing) {
+      return (
+        <FormFieldGroup
+          description={formatMessage('Display Options')}
+          layout="stacked"
+          rowSpacing="small"
+        >
+          <RadioInputGroup
+            description=" " /* the FormFieldGroup is providing the label */
+            name="preview_option"
+            onChange={handlePreviewOptionChange}
+            value={disablePreview ? 'overlay' : 'inline'}
+          >
+            <RadioInput key="overlay" value="overlay" label={formatMessage('Preview in overlay')} />
+            <RadioInput key="inline" value="inline" label={formatMessage('Preview inline')} />
+          </RadioInputGroup>
+          {!disablePreview && (
+            <View as="div" margin="0 0 0 small">
+              <Checkbox
+                label={formatMessage('Expand preview by Default')}
+                name="auto-preview"
+                onChange={handlePreviewChange}
+                checked={autoOpenPreview}
+              />
+            </View>
+          )}
+        </FormFieldGroup>
+      )
+    } else {
+      return renderLegacyDisplayOptions()
+    }
+  }
+
+  function renderLegacyDisplayOptions() {
+    return (
+      <FormFieldGroup
+        description={formatMessage('Display Options')}
+        layout="stacked"
+        rowSpacing="small"
+      >
+        <Checkbox
+          label={formatMessage('Disable in-line preview.')}
+          name="disable-preview"
+          onChange={handleDisablePreviewChange}
+          checked={disablePreview}
+        />
+        {!disablePreview && (
+          <Checkbox
+            label={formatMessage(
+              'Automatically open an in-line preview. (Preview displays only after saving)'
+            )}
+            name="auto-preview"
+            onChange={handlePreviewChange}
+            checked={autoOpenPreview}
+          />
+        )}
+      </FormFieldGroup>
+    )
+  }
+
   return (
     <Tray
       data-testid="RCELinkOptionsTray"
@@ -150,24 +218,7 @@ export default function LinkOptionsTray(props) {
 
                 {content.isPreviewable && (
                   <Flex.Item margin="small none none none" padding="small">
-                    <FormFieldGroup description={formatMessage('Display Options')} layout="stacked">
-                      <Checkbox
-                        label={formatMessage('Disable in-line preview.')}
-                        name="disable-preview"
-                        onChange={handleDisablePreviewChange}
-                        checked={disablePreview}
-                      />
-                      {!disablePreview && (
-                        <Checkbox
-                          label={formatMessage(
-                            'Automatically open an in-line preview. (Preview displays only after saving)'
-                          )}
-                          name="auto-preview"
-                          onChange={handlePreviewChange}
-                          checked={autoOpenPreview}
-                        />
-                      )}
-                    </FormFieldGroup>
+                    {renderDisplayOptions()}
                   </Flex.Item>
                 )}
               </Flex>
@@ -194,13 +245,25 @@ export default function LinkOptionsTray(props) {
   )
 }
 LinkOptionsTray.propTypes = {
-  content: shape({
-    $element: object, // the DOM's HTMLElement
-    dispalyAs: oneOf([DISPLAY_AS_LINK, DISPLAY_AS_EMBED]),
-    isPreviewable: bool,
-    text: string,
-    url: string
-  }).isRequired,
+  // content is required only if the tray is open
+  content: (props, _propName, _componentName) => {
+    if (props.open) {
+      checkPropTypes(
+        {
+          content: shape({
+            $element: object, // the DOM's HTMLElement
+            dispalyAs: oneOf([DISPLAY_AS_LINK, DISPLAY_AS_EMBED]),
+            isPreviewable: bool,
+            text: string,
+            url: string
+          }).isRequired
+        },
+        props,
+        'content',
+        'LinkOptionsTray'
+      )
+    }
+  },
   onEntered: func,
   onExited: func,
   onRequestClose: func.isRequired,

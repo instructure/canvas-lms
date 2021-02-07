@@ -23,6 +23,7 @@ import I18n from 'i18n!standalone_file_preview'
 import {showFlashAlert} from 'jsx/shared/FlashAlert'
 import FilePreview from 'jsx/files/FilePreview'
 import File from 'compiled/models/File'
+import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
 // showFilePreview repurposes the file preview overlay from the Files
 // pages to show a single file in an arbitrary context. First use
@@ -35,19 +36,7 @@ export function showFilePreview(file_id) {
     document.body.appendChild(container)
   }
 
-  const headers = new Headers({
-    Accept: 'application/json, application/json+canvas-string-ids'
-  })
-  fetch(`/api/v1/files/${file_id}?include[]=enhanced_preview_url`, {
-    headers
-  })
-    .then(response => {
-      if (response.status >= 400) {
-        throw new Error(response.statusText)
-      }
-      return response
-    })
-    .then(response => response.json())
+  asJson(fetch(`/api/v1/files/${file_id}?include[]=enhanced_preview_url`, defaultFetchOptions))
     .then(file => {
       const backboneFile = new File(file)
       ReactDOM.render(<StandaloneFilePreview preview_file={backboneFile} />, container)
@@ -90,6 +79,6 @@ function StandaloneFilePreview({preview_file}) {
     )
   )
 }
-StandaloneFilePreview.PropTypes = {
+StandaloneFilePreview.propTypes = {
   preview_file: instanceOf(File)
 }

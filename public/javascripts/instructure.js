@@ -46,6 +46,11 @@ import 'jqueryui/sortable'
 import 'jqueryui/tabs'
 import 'compiled/behaviors/trackEvent'
 
+let preview_counter = 0
+function previewId() {
+  return `preview_${++preview_counter}`
+}
+
 function handleYoutubeLink() {
   const $link = $(this)
   const href = $link.attr('href')
@@ -64,7 +69,7 @@ function handleYoutubeLink() {
       </a>
     `)
     $after.click(
-      preventDefault(function() {
+      preventDefault(function () {
         const $video = $(`
         <span class='youtube_holder' style='display: block;'>
           <iframe
@@ -91,9 +96,7 @@ function handleYoutubeLink() {
             trackEvent('hide_embedded_content', 'hide_you_tube')
           })
         )
-        $(this)
-          .after($video)
-          .hide()
+        $(this).after($video).hide()
       })
     )
     trackEvent('show_embedded_content', 'show_you_tube')
@@ -110,7 +113,7 @@ export function enhanceUserContent() {
   const $content = $('#content')
   $('.user_content:not(.enhanced):visible').addClass('unenhanced')
   $('.user_content.unenhanced:visible')
-    .each(function() {
+    .each(function () {
       const $this = $(this)
       $this.find('img').each((i, img) => {
         const handleWidth = () => {
@@ -150,11 +153,11 @@ export function enhanceUserContent() {
         'Canvas is moving away from jQueryUI for our own widgets and this behavior ' +
         "will go away. Rather than relying on the internals of Canvas's JavaScript, " +
         'you should use your own custom JS file to do any such customizations.'
-      console.error(msg, $elements)
+      console.error(msg, $elements) // eslint-disable-line no-console
     })
     .end()
     .filter('.dialog')
-    .each(function() {
+    .each(function () {
       const $dialog = $(this)
       $dialog.hide()
       $dialog
@@ -176,13 +179,13 @@ export function enhanceUserContent() {
     .sortable()
     .end()
     .filter('.tabs')
-    .each(function() {
+    .each(function () {
       $(this).tabs()
     })
     .end()
     .end()
     .find('a:not(.not_external, .external):external')
-    .each(function() {
+    .each(function () {
       const externalLink = htmlEscape(I18n.t('titles.external_link', 'Links to an external site.'))
       $(this)
         .not(':has(img)')
@@ -199,30 +202,43 @@ export function enhanceUserContent() {
     })
     .end()
 
-  if ($.filePreviewsEnabled()) {
-    $('a.instructure_scribd_file').each(function() {
-      const $link = $(this)
-      if ($.trim($link.text())) {
-        let $download_btn, $preview_link
-        const $span = $("<span class='instructure_file_holder link_holder'/>")
-        if (ENV.FEATURES?.rce_better_file_downloading) {
-          const href = new URL($link[0].href)
-          const qs = href.searchParams
-          qs.delete('wrap')
-          qs.append('download_frd', '1')
-          const download_url = `${href.origin}${href.pathname}/download?${qs}`
-          $download_btn = $(
-            `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px;" href="${htmlEscape(
-              download_url
-            )}">
+  $('a.instructure_scribd_file').each(function () {
+    const $link = $(this)
+    let $download_btn, $preview_link, $preview_container
+    if ($.trim($link.text())) {
+      const $span = $("<span class='instructure_file_holder link_holder'/>")
+      // the preview's container
+      const preview_id = previewId()
+      $preview_container = $('<div role="region" />').attr('id', preview_id).css('display', 'none')
+      if (ENV.FEATURES?.rce_better_file_downloading) {
+        const href = new URL($link[0].href)
+        const qs = href.searchParams
+        qs.delete('wrap')
+        qs.append('download_frd', '1')
+        const download_url = `${href.origin}${href.pathname}/download?${qs}`
+        $download_btn = $(
+          `<a class="file_download_btn" role="button" download style="margin-inline-start: 5px;" href="${htmlEscape(
+            download_url
+          )}">
               <img style="width:16px; height:16px" src="/images/svg-icons/svg_icon_download.svg" alt="" role="presentation"/>
               <span class="screenreader-only">
                 ${htmlEscape(I18n.t('download'))}
               </span>
             </a>`
-          )
-        }
-        if (!$link.hasClass('inline_disabled')) {
+        )
+      }
+      if ($.filePreviewsEnabled()) {
+        if (ENV.FEATURES?.rce_better_file_previewing) {
+          if ($link.hasClass('inline_disabled')) {
+            // link opens in overlay
+            $link.addClass('preview_in_overlay')
+          } else {
+            // link opens inline preview
+            $link.addClass('file_preview_link')
+            $link.attr('aria-expanded', 'false')
+            $link.attr('aria-controls', preview_id)
+          }
+        } else if (!$link.hasClass('inline_disabled')) {
           $preview_link = $(
             "<a class='file_preview_link' aria-hidden='true' href='" +
               htmlEscape($link.attr('href')) +
@@ -233,30 +249,25 @@ export function enhanceUserContent() {
               "'/></a>"
           )
         }
-        $link
-          .removeClass('instructure_scribd_file')
-          .before($span)
-          .appendTo($span)
-        $span.append($preview_link)
-        $span.append($download_btn)
-        if ($link.hasClass('auto_open')) {
+      }
+      $link.removeClass('instructure_scribd_file').before($span).appendTo($span)
+      $span.append($preview_link)
+      $span.append($download_btn)
+      $span.append($preview_container)
+      if ($link.hasClass('auto_open')) {
+        if ($preview_link) {
           $preview_link.click()
-        }
-
-        // until the RCE UI is done
-        if (ENV.FEATURES?.rce_better_file_previewing) {
-          $link.addClass('preview_in_overlay')
+        } else if (ENV.FEATURES?.rce_better_file_previewing) {
+          $link.click()
         }
       }
-    })
-  }
+    }
+  })
 
   $('.user_content.unenhanced a,.user_content.unenhanced+div.answers a')
     .find('img.media_comment_thumbnail')
-    .each(function() {
-      $(this)
-        .closest('a')
-        .addClass('instructure_inline_media_comment')
+    .each(function () {
+      $(this).closest('a').addClass('instructure_inline_media_comment')
     })
     .end()
     .filter('.instructure_inline_media_comment')
@@ -268,13 +279,9 @@ export function enhanceUserContent() {
     .end()
     .not('.youtubed')
     .each(handleYoutubeLink)
-  $('.user_content.unenhanced')
-    .removeClass('unenhanced')
-    .addClass('enhanced')
+  $('.user_content.unenhanced').removeClass('unenhanced').addClass('enhanced')
   setTimeout(() => {
-    $('.user_content form.user_content_post_form:not(.submitted)')
-      .submit()
-      .addClass('submitted')
+    $('.user_content form.user_content_post_form:not(.submitted)').submit().addClass('submitted')
   }, 10)
   // Remove sandbox attribute from user content iframes to fix busted
   // third-party content, like Google Drive documents.
@@ -322,15 +329,15 @@ export function formatTimeAgoDate(date) {
   }
 }
 
-$(function() {
+$(function () {
   // handle all of the click events that were triggered before the dom was ready (and thus weren't handled by jquery listeners)
   if (window._earlyClick) {
     // unset the onclick handler we were using to capture the events
     document.removeEventListener('click', window._earlyClick)
     if (window._earlyClick.clicks) {
       // wait to fire the "click" events till after all of the event hanlders loaded at dom ready are initialized
-      setTimeout(function() {
-        $.each(_.uniq(window._earlyClick.clicks), function() {
+      setTimeout(function () {
+        $.each(_.uniq(window._earlyClick.clicks), function () {
           // cant use .triggerHandler because it will not bubble,
           // but we do want to preventDefault, so this is what we have to do
           const event = $.Event('click')
@@ -371,7 +378,7 @@ $(function() {
     // end breadcrumb ellipsis
   }
   KeyboardNavDialog.prototype.bindOpenKeys.call({$el: $('#keyboard_navigation')})
-  $('#switched_role_type').ifExists(function() {
+  $('#switched_role_type').ifExists(function () {
     const context_class = $(this).attr('class')
     const $img = $('<img/>')
     let switched_roles_message = null
@@ -412,29 +419,24 @@ $(function() {
           'You have switched roles temporarily for this course, and are now viewing the course as a student.  You can restore your role and permissions from the course home page.'
         )
     }
-    $img
-      .attr('src', '/images/warning.png')
-      .attr('title', switched_roles_message)
-      .css({
-        paddingRight: 2,
-        width: 12,
-        height: 12
-      })
+    $img.attr('src', '/images/warning.png').attr('title', switched_roles_message).css({
+      paddingRight: 2,
+      width: 12,
+      height: 12
+    })
     $('#crumb_' + context_class)
       .find('a')
       .prepend($img)
   })
-  $('a.show_quoted_text_link').live('click', function(event) {
-    const $text = $(this)
-      .parents('.quoted_text_holder')
-      .children('.quoted_text')
+  $('a.show_quoted_text_link').live('click', function (event) {
+    const $text = $(this).parents('.quoted_text_holder').children('.quoted_text')
     if ($text.length > 0) {
       event.preventDefault()
       $text.show()
       $(this).hide()
     }
   })
-  $('a.equella_content_link').live('click', function(event) {
+  $('a.equella_content_link').live('click', function (event) {
     event.preventDefault()
     let $dialog = $('#equella_preview_dialog')
     if (!$dialog.length) {
@@ -486,7 +488,7 @@ $(function() {
   // <a class="dialog_opener" aria-controls="my_dialog" data-dialog-opts="{resizable:false, width: 300}" role="button" href="#">
   // opens the .my_dialog dialog and passes the options {resizable:false, width: 300}
   // the :not clause is to not allow users access to this functionality in their content.
-  $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function(event) {
+  $('.dialog_opener[aria-controls]:not(.user_content *)').live('click', function (event) {
     const link = this
     $('#' + $(this).attr('aria-controls')).ifExists($dialog => {
       event.preventDefault()
@@ -507,11 +509,24 @@ $(function() {
     })
   })
   if ($.filePreviewsEnabled()) {
-    $('a.file_preview_link').live('click', function(event) {
+    $('a.file_preview_link').live('click', function (event) {
+      if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+        // if any modifier keys are pressed, do the browser default thing
+        return
+      }
       event.preventDefault()
       const $link = $(this)
-        .loadingImage({image_size: 'small'})
-        .hide()
+      if ($link.attr('aria-expanded') === 'true') {
+        // close the preview by clicking the "Minimize File Preview" link
+        $link.parent().find('.hide_file_preview_link').click()
+        return
+      }
+      $link.loadingImage({image_size: 'small', horizontal: 'right!'})
+      if (ENV.FEATURES?.rce_better_file_previewing) {
+        $link.attr('aria-expanded', 'true')
+      } else {
+        $link.hide()
+      }
       $.ajaxJSON(
         $link
           .attr('href')
@@ -527,25 +542,27 @@ $(function() {
             attachment &&
             ($.isPreviewable(attachment.content_type, 'google') || attachment.canvadoc_session_url)
           ) {
-            const $div = $('<div>')
-              .insertAfter($link.parents('.link_holder:last'))
-              .loadDocPreview({
-                canvadoc_session_url: attachment.canvadoc_session_url,
-                mimeType: attachment.content_type,
-                public_url: attachment.public_url,
-                attachment_preview_processing:
-                  attachment.workflow_state == 'pending_upload' ||
-                  attachment.workflow_state == 'processing'
-              })
+            const $div = window.ENV?.FEATURES.rce_better_file_previewing
+              ? $(`[id="${$link.attr('aria-controls')}"]`)
+              : $link.parent().find('[role="region"][id^="preview_"]')
+            $div.css('display', 'block').loadDocPreview({
+              canvadoc_session_url: attachment.canvadoc_session_url,
+              mimeType: attachment.content_type,
+              public_url: attachment.public_url,
+              attachment_preview_processing:
+                attachment.workflow_state === 'pending_upload' ||
+                attachment.workflow_state === 'processing'
+            })
             const $minimizeLink = $(
               '<a href="#" style="font-size: 0.8em;" class="hide_file_preview_link">' +
                 htmlEscape(I18n.t('links.minimize_file_preview', 'Minimize File Preview')) +
                 '</a>'
             ).click(event => {
               event.preventDefault()
+              $link.attr('aria-expanded', 'false')
               $link.show()
               $link.focus()
-              $div.remove()
+              $div.html('').css('display', 'none')
               trackEvent('hide_embedded_content', 'hide_file_preview')
             })
             $div.prepend($minimizeLink)
@@ -565,6 +582,7 @@ $(function() {
   } else {
     $('a.file_preview_link').live('click', event => {
       event.preventDefault()
+      // eslint-disable-next-line no-alert
       alert(
         I18n.t(
           'alerts.file_previews_disabled',
@@ -577,6 +595,10 @@ $(function() {
     $('a.preview_in_overlay').live('click', event => {
       const matches = event.target.href.match(/\/files\/(\d+)/)
       if (matches) {
+        if (event.ctrlKey || event.altKey || event.metaKey || event.shiftKey) {
+          // if any modifier keys are pressed, do the browser default thing
+          return
+        }
         event.preventDefault()
         const file_id = matches[1]
         import('jsx/shared/utils/showFilePreview')
@@ -600,7 +622,7 @@ $(function() {
     setInterval(enhanceUserContent, 15000)
     setTimeout(enhanceUserContent, 15)
   })
-  $('.zone_cached_datetime').each(function() {
+  $('.zone_cached_datetime').each(function () {
     if ($(this).attr('title')) {
       const datetime = tz.parse($(this).attr('title'))
       if (datetime) {
@@ -608,27 +630,20 @@ $(function() {
       }
     }
   })
-  $('.show_sub_messages_link').click(function(event) {
+  $('.show_sub_messages_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.subcontent')
       .find('.communication_sub_message.toggled_communication_sub_message')
       .removeClass('toggled_communication_sub_message')
-    $(this)
-      .parents('.communication_sub_message')
-      .remove()
+    $(this).parents('.communication_sub_message').remove()
   })
-  $('.show_comments_link').click(function(event) {
+  $('.show_comments_link').click(function (event) {
     event.preventDefault()
-    $(this)
-      .closest('ul')
-      .find('li')
-      .show()
-    $(this)
-      .closest('li')
-      .remove()
+    $(this).closest('ul').find('li').show()
+    $(this).closest('li').remove()
   })
-  $('.communication_message .message_short .read_more_link').click(function(event) {
+  $('.communication_message .message_short .read_more_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.communication_message')
@@ -638,20 +653,20 @@ $(function() {
       .find('.message')
       .show()
   })
-  $('.communication_message .close_notification_link').live('click', function(event) {
+  $('.communication_message .close_notification_link').live('click', function (event) {
     event.preventDefault()
     const $message = $(this).parents('.communication_message')
     $message.confirmDelete({
       url: $(this).attr('rel'),
       noMessage: true,
       success() {
-        $(this).slideUp(function() {
+        $(this).slideUp(function () {
           $(this).remove()
         })
       }
     })
   })
-  $('.communication_message .add_entry_link').click(function(event) {
+  $('.communication_message .add_entry_link').click(function (event) {
     event.preventDefault()
     const $message = $(this).parents('.communication_message')
     const $reply = $message.find('.reply_message').hide()
@@ -663,10 +678,7 @@ $(function() {
     const id = _.uniqueId('textarea_')
     $response.find('textarea.rich_text').attr('id', id)
     $(document).triggerHandler('richTextStart', $('#' + id))
-    $response
-      .find('textarea:first')
-      .focus()
-      .select()
+    $response.find('textarea:first').focus().select()
   })
   $(document)
     .bind('richTextStart', (event, $editor) => {
@@ -699,14 +711,11 @@ $(function() {
     })
   $(
     '.communication_message .content .links .show_users_link,.communication_message .header .show_users_link'
-  ).click(function(event) {
+  ).click(function (event) {
     event.preventDefault()
-    $(this)
-      .parents('.communication_message')
-      .find('.content .users_list')
-      .slideToggle()
+    $(this).parents('.communication_message').find('.content .users_list').slideToggle()
   })
-  $('.communication_message .delete_message_link').click(function(event) {
+  $('.communication_message .delete_message_link').click(function (event) {
     event.preventDefault()
     $(this)
       .parents('.communication_message')
@@ -720,12 +729,8 @@ $(function() {
   })
   $('.communication_sub_message .add_conversation_message_form').formSubmit({
     beforeSubmit(_data) {
-      $(this)
-        .find('button')
-        .attr('disabled', true)
-      $(this)
-        .find('.submit_button')
-        .text(I18n.t('status.posting_message', 'Posting Message...'))
+      $(this).find('button').attr('disabled', true)
+      $(this).find('.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
       $(this).loadingImage()
     },
     success(data) {
@@ -757,23 +762,15 @@ $(function() {
     },
     error(data) {
       $(this).loadingImage('remove')
-      $(this)
-        .find('button')
-        .attr('disabled', false)
-      $(this)
-        .find('.submit_button')
-        .text('Post Failed, Try Again')
+      $(this).find('button').attr('disabled', false)
+      $(this).find('.submit_button').text('Post Failed, Try Again')
       $(this).formErrors(data)
     }
   })
   $('.communication_sub_message .add_sub_message_form').formSubmit({
     beforeSubmit(_data) {
-      $(this)
-        .find('button')
-        .attr('disabled', true)
-      $(this)
-        .find('.submit_button')
-        .text(I18n.t('status.posting_message', 'Posting Message...'))
+      $(this).find('button').attr('disabled', true)
+      $(this).find('.submit_button').text(I18n.t('status.posting_message', 'Posting Message...'))
       $(this).loadingImage()
     },
     success(data) {
@@ -825,16 +822,14 @@ $(function() {
     },
     error(data) {
       $(this).loadingImage('remove')
-      $(this)
-        .find('button')
-        .attr('disabled', false)
+      $(this).find('button').attr('disabled', false)
       $(this)
         .find('.submit_button')
         .text(I18n.t('errors.posting_message_failed', 'Post Failed, Try Again'))
       $(this).formErrors(data)
     }
   })
-  $('.communication_sub_message form .cancel_button').click(function() {
+  $('.communication_sub_message form .cancel_button').click(function () {
     const $form = $(this).parents('.communication_sub_message')
     const $message = $(this).parents('.communication_message')
     $(document).triggerHandler('richTextEnd', $form.find('textarea.rich_text'))
@@ -842,13 +837,13 @@ $(function() {
     $message.find('.reply_message').show()
   })
   $('.communication_message,.communication_sub_message')
-    .bind('focusin mouseenter', function() {
+    .bind('focusin mouseenter', function () {
       $(this).addClass('communication_message_hover')
     })
-    .bind('focusout mouseleave', function() {
+    .bind('focusout mouseleave', function () {
       $(this).removeClass('communication_message_hover')
     })
-  $('.communication_sub_message .more_options_reply_link').click(function(event) {
+  $('.communication_sub_message .more_options_reply_link').click(function (event) {
     event.preventDefault()
     const $form = $(this).parents('form')
     let params = null
@@ -859,14 +854,11 @@ $(function() {
     }
     window.location.href = $(this).attr('href') + '?message=' + encodeURIComponent(params.message)
   })
-  $('.communication_message.new_activity_message').ifExists(function() {
-    this.find('.message_type img').click(function() {
+  $('.communication_message.new_activity_message').ifExists(function () {
+    this.find('.message_type img').click(function () {
       const $this = $(this),
         c = $.trim($this.attr('class'))
-      $this
-        .parents('.message_type')
-        .find('img')
-        .removeClass('selected')
+      $this.parents('.message_type').find('img').removeClass('selected')
       $this
         .addClass('selected')
         .parents('.new_activity_message')
@@ -885,7 +877,7 @@ $(function() {
         .change()
     })
     this.find('.context_select')
-      .change(function() {
+      .change(function () {
         const $this = $(this),
           thisVal = $this.val(),
           $message = $this.parents('.communication_message'),
@@ -897,20 +889,16 @@ $(function() {
           .find('.roster_list')
           .hide()
           .find(':checkbox')
-          .each(function() {
+          .each(function () {
             $(this).attr('checked', false)
           })
         $message.find('.' + thisVal + '_roster_list').show()
       })
       .triggerHandler('change')
-    this.find('.cancel_button').click(function(_event) {
-      $(this)
-        .parents('.communication_message')
-        .hide()
-        .prev('.new_activity_message')
-        .show()
+    this.find('.cancel_button').click(function (_event) {
+      $(this).parents('.communication_message').hide().prev('.new_activity_message').show()
     })
-    this.find('.new_activity_message_link').click(function(event) {
+    this.find('.new_activity_message_link').click(function (event) {
       event.preventDefault()
       $(this)
         .parents('.communication_message')
@@ -940,9 +928,7 @@ $(function() {
           topic.user_name = $('#identity .user_name').text()
           topic.post_date = $.datetimeString(topic.created_at)
           topic.topic_id = topic.id
-          const $template = $(this)
-            .parents('.communication_message')
-            .find('.template')
+          const $template = $(this).parents('.communication_message').find('.template')
           const $message = $template.find('.communication_message').clone(true)
           $message
             .find('.header .title,.behavior_content .less_important a')
@@ -973,17 +959,10 @@ $(function() {
             .find('.subcontent form')
             .attr('action', $template.find('.' + context_code + '_entries_url').attr('href'))
           $message.fillFormData(entry, {object_name: 'discussion_entry'})
-          $(this)
-            .parents('.communication_message')
-            .after($message.hide())
+          $(this).parents('.communication_message').after($message.hide())
           $message.slideDown()
-          $(this)
-            .parents('.communication_message')
-            .slideUp()
-          $(this)
-            .parents('.communication_message')
-            .prev('.new_activity_message')
-            .slideDown()
+          $(this).parents('.communication_message').slideUp()
+          $(this).parents('.communication_message').prev('.new_activity_message').slideDown()
         } else if ($(this).hasClass('announcement_form')) {
           // do nothing
         } else {
@@ -1001,7 +980,7 @@ $(function() {
   })
   $('#topic_list .show_all_messages_link')
     .show()
-    .click(function(event) {
+    .click(function (event) {
       event.preventDefault()
       $('#topic_list .topic_message').show()
       $(this).hide()
@@ -1034,9 +1013,7 @@ $(function() {
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^ END stuff for making pretty dates ^^^^^^^^^^^^^^^^^^^
   // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-  const sequence_url = $('#sequence_footer .sequence_details_url')
-    .filter(':last')
-    .attr('href')
+  const sequence_url = $('#sequence_footer .sequence_details_url').filter(':last').attr('href')
   if (sequence_url) {
     $.ajaxJSON(sequence_url, 'GET', {}, data => {
       const $sequence_footer = $('#sequence_footer')
@@ -1054,7 +1031,7 @@ $(function() {
                 tag.title += ' (' + I18n.t('draft', 'Draft') + ')'
               }
               tag.text =
-                label == 'previous'
+                label === 'previous'
                   ? I18n.t('buttons.previous_module', 'Previous Module')
                   : I18n.t('buttons.next_module', 'Next Module')
               $link.addClass('module_button')
@@ -1096,12 +1073,9 @@ $(function() {
   }
   // this is for things like the to-do, recent items and upcoming, it
   // happend a lot so rather than duplicating it everywhere I stuck it here
-  $('#right-side').delegate('.more_link', 'click', function(event) {
+  $('#right-side').delegate('.more_link', 'click', function (event) {
     const $this = $(this)
-    const $children = $this
-      .parents('ul')
-      .children(':hidden')
-      .show()
+    const $children = $this.parents('ul').children(':hidden').show()
     $this.closest('li').remove()
     // if they are using the keyboard to navigate (they hit enter on the link instead of actually
     // clicking it) then put focus on the first of the now-visible items--otherwise, since the
@@ -1109,21 +1083,14 @@ $(function() {
     // don't want to set focus if came from a mouse click because then you'd have 2 of the tooltip
     // bubbles staying visible, see #9211
     if (event.screenX === 0) {
-      $children
-        .first()
-        .find(':tabbable:first')
-        .focus()
+      $children.first().find(':tabbable:first').focus()
     }
     return false
   })
-  $('#right-side').on('click', '.disable-todo-item-link', function(event) {
+  $('#right-side').on('click', '.disable-todo-item-link', function (event) {
     event.preventDefault()
-    const $item = $(this)
-      .parents('li, div.topic_message')
-      .last()
-    const $prevItem = $(this)
-      .closest('.to-do-list > li')
-      .prev()
+    const $item = $(this).parents('li, div.topic_message').last()
+    const $prevItem = $(this).closest('.to-do-list > li').prev()
     const toFocus =
       ($prevItem.find('.disable-todo-item-link').length &&
         $prevItem.find('.disable-todo-item-link')) ||
@@ -1138,7 +1105,7 @@ $(function() {
           if (flashMessage) {
             $.flashMessage(flashMessage)
           }
-          $(this).slideUp(function() {
+          $(this).slideUp(function () {
             $(this).remove()
             toFocus.focus()
           })
@@ -1149,7 +1116,7 @@ $(function() {
   })
   // in 100ms (to give time for everything else to load), find all the external links and add give them
   // the external link look and behavior (force them to open in a new tab)
-  setTimeout(function() {
+  setTimeout(function () {
     const content = document.getElementById('content')
     if (!content) return
     const links = content.querySelectorAll(

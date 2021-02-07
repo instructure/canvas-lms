@@ -20,9 +20,19 @@
 require_relative '../common'
 
 describe 'user_content post processing' do
-  before(:each) { course_with_teacher_logged_in }
-
   include_context 'in-process server selenium tests'
+
+  before(:each) do
+    course_with_teacher_logged_in
+    @file =
+      @course.attachments.create!(
+        display_name: 'file',
+        context: @teacher,
+        uploaded_data: fixture_file_upload('files/a_file.txt', 'text/plain')
+      )
+    @file.save!
+    @file_url = "/users/#{@teacher.id}/files/#{@file.id}"
+  end
 
   def create_wiki_page_with_content(page_title, page_content)
     @root_folder = Folder.root_folders(@course).first
@@ -35,41 +45,49 @@ describe 'user_content post processing' do
     it 'adds a preview and download buttons' do
       create_wiki_page_with_content(
         'page',
-        '<a id="7" class="instructure_file_link instructure_scribd_file" href="/courses/1/files/7?wrap=1&verifier=xyzzy">file</a>'
+        "<a id='7' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
       )
       get "/courses/#{@course.id}/pages/page"
+
       # the file link
       file_link = f('a.instructure_file_link')
       expect(file_link).to be_displayed
-      expect(file_link.attribute('href')).to end_with '/courses/1/files/7?wrap=1&verifier=xyzzy'
+      expect(file_link.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
+
       # the file inline preview button
       expect(f('a.file_preview_link')).to be_displayed
+
       # the file download button
       download_btn = f('a.file_download_btn')
       expect(download_btn).to be_displayed
       expect(
         download_btn.attribute('href')
-      ).to end_with '/courses/1/files/7/download?verifier=xyzzy&download_frd=1'
+      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
     end
 
     it 'omits preview button is requested' do
       create_wiki_page_with_content(
         'page',
-        '<a id="7" class="instructure_file_link instructure_scribd_file inline_disabled" href="/courses/1/files/7?wrap=1&verifier=xyzzy">file</a>'
+        "<a id='7' class='instructure_file_link instructure_scribd_file inline_disabled'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
       )
       get "/courses/#{@course.id}/pages/page"
+
       # the file link
       file_link = f('a.instructure_file_link')
       expect(file_link).to be_displayed
-      expect(file_link.attribute('href')).to end_with '/courses/1/files/7?wrap=1&verifier=xyzzy'
+      expect(file_link.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
+
       # the file inline preview button
       expect(f('body')).not_to contain_css('a.file_preview_link')
+
       # the file download button
       download_btn = f('a.file_download_btn')
       expect(download_btn).to be_displayed
       expect(
         download_btn.attribute('href')
-      ).to end_with '/courses/1/files/7/download?verifier=xyzzy&download_frd=1'
+      ).to end_with "#{@file_url}/download?verifier=#{@file.uuid}&download_frd=1"
     end
   end
 
@@ -79,15 +97,19 @@ describe 'user_content post processing' do
     it 'adds a preview and download buttons' do
       create_wiki_page_with_content(
         'page',
-        '<a id="7" class="instructure_file_link instructure_scribd_file" href="/courses/1/files/7?wrap=1&verifier=xyzzy">file</a>'
+        "<a id='7' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
       )
       get "/courses/#{@course.id}/pages/page"
+
       # the file link
       file_link = f('a.instructure_file_link')
       expect(file_link).to be_displayed
-      expect(file_link.attribute('href')).to end_with '/courses/1/files/7?wrap=1&verifier=xyzzy'
+      expect(file_link.attribute('href')).to end_with "#{@file_url}?wrap=1&verifier=#{@file.uuid}"
+
       # the file inline preview button
       expect(f('a.file_preview_link')).to be_displayed
+
       # the file download button
       expect(f('body')).not_to contain_css('a.file_download_btn')
     end
@@ -97,16 +119,10 @@ describe 'user_content post processing' do
     before(:each) { Account.site_admin.enable_feature!(:rce_better_file_previewing) }
 
     it 'previews files in the FilePreview overlay' do
-      root_folder = Folder.root_folders(@course).first
-      file =
-        root_folder.attachments.create!(
-          filename: 'afile.txt', context: @course, uploaded_data: StringIO.new('blah')
-        )
-
       create_wiki_page_with_content(
         'page',
-        "<a id='#{file.id}' class='instructure_file_link instructure_scribd_file'
-          href='/courses/#{@course.id}/files/#{file.id}?wrap=1'>file</a>"
+        "<a id='7' class='instructure_file_link instructure_scribd_file inline_disabled'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
       )
       get "/courses/#{@course.id}/pages/page"
 
@@ -115,6 +131,75 @@ describe 'user_content post processing' do
 
       file_link.click
       expect(f('[aria-label="File Preview Overlay"]')).to be_displayed
+    end
+
+    it 'inline-able file link does not show the file preview icon' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='7' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      file_link = f('a.instructure_file_link')
+      expect(file_link.attribute('class')).to include('file_preview_link')
+      expect(f('.instructure_file_holder')).not_to contain_css('img[alt="Preview the document"]')
+
+      file_link.click
+      expect(f('.loading_image_holder')).to be_displayed
+      preview_container = f('#preview_1[role="region"]')
+      expect(f('.hide_file_preview_link', preview_container)).to be_displayed
+      expect(f('iframe', preview_container)).to be_displayed
+    end
+
+    it 'performs the browser default action if inline preview link is clicked with a modifier key pressed' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='7' class='instructure_file_link instructure_scribd_file'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      browser_tabs = driver.window_handles
+      expect(browser_tabs.length).to eq(1)
+
+      modifier_key = /mac/ =~ driver.capabilities.platform ? :meta : :control
+      file_link = f('a.instructure_file_link')
+      driver.action.key_down(modifier_key).click(file_link).key_up(modifier_key).perform
+
+      browser_tabs = driver.window_handles
+      expect(browser_tabs.length).to eq(2)
+
+      # if we don't close the new tab, flake_spec_catcher
+      # starts the next iteration with both tabs open
+      driver.switch_to.window(browser_tabs[1])
+      driver.close
+      driver.switch_to.window(browser_tabs[0])
+    end
+
+    it 'performs the browser default action if overlay view link is clicked with a modifier key pressed' do
+      create_wiki_page_with_content(
+        'page',
+        "<a id='7' class='instructure_file_link instructure_scribd_file inline_disabled'
+          href='#{@file_url}?wrap=1&verifier=#{@file.uuid}'>file</a>"
+      )
+      get "/courses/#{@course.id}/pages/page"
+
+      browser_tabs = driver.window_handles
+      expect(browser_tabs.length).to eq(1)
+
+      modifier_key = /mac/ =~ driver.capabilities.platform ? :meta : :control
+      file_link = f('a.instructure_file_link')
+      driver.action.key_down(modifier_key).click(file_link).key_up(modifier_key).perform
+
+      browser_tabs = driver.window_handles
+      expect(browser_tabs.length).to eq(2)
+
+      # if we don't close the new tab, flake_spec_catcher
+      # starts the next iteration with both tabs open
+      driver.switch_to.window(browser_tabs[1])
+      driver.close
+      driver.switch_to.window(browser_tabs[0])
     end
   end
 end
