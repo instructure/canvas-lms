@@ -402,7 +402,8 @@ pipeline {
                     checkoutRepo(GERRIT_PROJECT, env.GERRIT_REFSPEC, 2)
                   }
 
-                  // Plugin builds using the checkout above will create this @tmp file, we need to remove it
+                  // Plugin builds using the dir step above will create this @tmp file, we need to remove it
+                  // https://issues.jenkins.io/browse/JENKINS-52750
                   sh 'rm -vr gems/plugins/*@tmp'
                 }
 
@@ -729,6 +730,12 @@ pipeline {
                       string(name: 'POSTGRES_IMAGE_TAG', value: "${env.POSTGRES_IMAGE_TAG}"),
                     ], configuration.fscPropagate(), "")
                   })
+                }
+
+                // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
+                // https://issues.jenkins.io/browse/JENKINS-52750
+                if(env.GERRIT_PROJECT != "canvas-lms") {
+                  sh "rm -vr $LOCAL_WORKDIR@tmp"
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
