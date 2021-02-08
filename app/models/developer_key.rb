@@ -249,9 +249,13 @@ class DeveloperKey < ActiveRecord::Base
     return true if redirect_uris.include?(redirect_uri)
 
     # legacy deprecated
-    self_domain = URI.parse(self.redirect_uri).host
-    other_domain = URI.parse(redirect_uri).host
-    result = self_domain.present? && other_domain.present? && (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
+    self_uri = URI.parse(self.redirect_uri)
+    self_domain = self_uri.host
+    other_uri = URI.parse(redirect_uri)
+    other_domain = other_uri.host
+    result = self_domain.present? && other_domain.present? &&
+       self_uri.scheme == other_uri.scheme &&
+       (self_domain == other_domain || other_domain.end_with?(".#{self_domain}"))
     if result && redirect_uri != self.redirect_uri
       Rails.logger.info("Allowed lenient OAuth redirect uri #{redirect_uri} on developer key #{global_id}")
     end
