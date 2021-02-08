@@ -299,7 +299,7 @@
               <% if can_do(@context, @current_user, :moderate_forum) %>
                 <span class="screenreader-only" id="showDeletedAccessibleLabel"><%= t("Show deleted replies") %></span>
                 <input type="checkbox" id="showDeleted" aria-labelledby="showDeletedAccessibleLabel"/>
-                <label for="showDeleted" aria-hidden="true" title="Show deleted replies"><i class="icon-eye"></i></label>
+                <label for="showDeleted" aria-hidden="true" title="<%= t("Show deleted replies") %>"><i class="icon-eye"></i></label>
               <% end %>
 
               &nbsp; &nbsp;
