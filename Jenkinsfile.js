@@ -93,6 +93,8 @@ pipeline {
                 def refspecToCheckout = env.GERRIT_PROJECT == "canvas-lms" ? env.JENKINSFILE_REFSPEC : env.CANVAS_LMS_REFSPEC
 
                 checkoutRepo("canvas-lms", refspecToCheckout, 1)
+
+                sh "./build/new-jenkins/docker-with-flakey-network-protection.sh pull $KARMA_RUNNER_IMAGE"
               }
             }
 
