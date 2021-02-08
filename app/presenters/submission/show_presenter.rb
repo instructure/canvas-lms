@@ -68,6 +68,18 @@ class Submission::ShowPresenter
     context_url(@context, submission_route, @assignment.id, anonymizable_student_id, **additional_params)
   end
 
+  def submission_details_tool_launch_url
+    params = {
+      assignment_id: @assignment.id,
+      display: 'borderless',
+      url: @submission.external_tool_url
+    }
+
+    params[:resource_link_lookup_uuid] = resource_link_lookup_uuid if resource_link_lookup_uuid
+
+    retrieve_course_external_tools_url(@context.id, params)
+  end
+
   def submission_preview_frame_url
     submission_data_url(preview: 1, rand: rand(999999))
   end
@@ -85,11 +97,16 @@ class Submission::ShowPresenter
   end
 
   private
+
   def anonymizable_student_id
     anonymize_submission_owner? ? @submission.anonymous_id : @submission.user_id
   end
 
   def viewing_as_grader?
     !currently_peer_reviewing? && @context.grants_right?(@current_user, :manage_grades)
+  end
+
+  def resource_link_lookup_uuid
+    @submission.resource_link_lookup_uuid
   end
 end

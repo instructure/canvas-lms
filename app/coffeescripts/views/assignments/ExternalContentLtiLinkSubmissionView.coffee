@@ -26,6 +26,7 @@ export default class ExternalContentLtiLinkSubmissionView extends ExternalConten
   buildSubmission: ->
     submission_type: 'basic_lti_launch'
     url: @model.get('url')
+    resource_link_lookup_uuid: @model.get('lookup_uuid')
 
   extractComment: ->
     text_comment: @model.get('comment')

@@ -16,6 +16,14 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 %>
 
+<%
+  presenter = Submission::ShowPresenter.new(
+    submission: @submission,
+    current_user: @current_user,
+    assessment_request: @assessment_request
+  )
+%>
+
 <% css_bundle :submission %>
 
 <% user_name = params[:hide_student_name] ? t(:anonymous_username, "This Student") : submission_author_name_for(@assessment_request) %>
@@ -229,7 +237,7 @@
 
   <% js_bundle 'legacy/submissions_show_preview_media' %>
 <% elsif @submission.submission_type == 'basic_lti_launch' %>
-  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= retrieve_course_external_tools_url(@context.id, assignment_id: @assignment.id, display: 'borderless', url: @submission.external_tool_url) %>"/>
+  <meta HTTP-EQUIV="REFRESH" content="0; url=<%= presenter.submission_details_tool_launch_url %>"/>
 <% elsif @submission.has_submission? || @assignment.expects_external_submission? %>
   <div style="margin: 20px auto; width: 400px; height: 50px; font-size: 1.5em;  font-weight: bold;">
     <%= t('no_preview_available', 'No Preview Available') %>

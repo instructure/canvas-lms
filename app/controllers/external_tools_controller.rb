@@ -506,16 +506,25 @@ class ExternalToolsController < ApplicationController
   end
   protected :lti_launch
 
-  # Get resource link from `resource_link_lookup_id` query param, and
-  # ensure the tool matches the resource link.
+  # As `resource_link_lookup_id` was renamed to `resource_link_lookup_uuid` we
+  # have to support both names because, there are cases like RCE editor, that a
+  # resource link was previously-created and the genererated links couldn't stop
+  # working.
+  def resource_link_lookup_uuid
+    params[:resource_link_lookup_id] || params[:resource_link_lookup_uuid]
+  end
+  protected :resource_link_lookup_uuid
+
+  # Get resource link from `resource_link_lookup_id` or `resource_link_lookup_uuid`
+  # query param, and ensure the tool matches the resource link.
   # Used for link-level custom params, but may in the future be used to
   # determine resource_link_id to send to tool.
   def lookup_resource_link(tool)
-    return nil unless params[:resource_link_lookup_id]
+    return nil unless resource_link_lookup_uuid
     return nil unless params[:url]
 
     resource_link = Lti::ResourceLink.where(
-      lookup_uuid: params[:resource_link_lookup_id],
+      lookup_uuid: resource_link_lookup_uuid,
       context: @context,
       root_account_id: tool.root_account_id
     ).active.take.tap do |resource_link|

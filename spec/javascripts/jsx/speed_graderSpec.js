@@ -1080,11 +1080,16 @@ QUnit.module('SpeedGrader', rootHooks => {
   })
 
   test('contains iframe with the escaped student submission url', () => {
-    const retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
+    let retrieveUrl = '/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
     const url = 'www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
-    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
+    const submission = {
+      external_tool_url: url,
+      resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    }
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, submission)
     const [srcUrl] = buildIframeStub.firstCall.args
+    retrieveUrl += '&resource_link_lookup_uuid=0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
     ok(unescape(srcUrl).indexOf(retrieveUrl) > -1)
     ok(unescape(srcUrl).indexOf(encodeURIComponent(url)) > -1)
     buildIframeStub.restore()
@@ -1095,7 +1100,11 @@ QUnit.module('SpeedGrader', rootHooks => {
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
     const url = 'www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
-    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
+    const submission = {
+      url,
+      resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    }
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, submission)
     const [, {allowfullscreen}] = buildIframeStub.firstCall.args
     strictEqual(allowfullscreen, true)
     buildIframeStub.restore()
@@ -1106,7 +1115,11 @@ QUnit.module('SpeedGrader', rootHooks => {
       'canvas.com/course/1/external_tools/retrieve?display=borderless&assignment_id=22'
     const url = 'www.example.com/lti/launch/user/4'
     const buildIframeStub = sinon.stub(SpeedGraderHelpers, 'buildIframe')
-    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, url)
+    const submission = {
+      url,
+      resource_link_lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    }
+    SpeedGrader.EG.renderLtiLaunch($div, retrieveUrl, submission)
     const [, {allow}] = buildIframeStub.firstCall.args
     strictEqual(allow, ENV.LTI_LAUNCH_FRAME_ALLOWANCES.join('; '))
     buildIframeStub.restore()
@@ -1475,8 +1488,9 @@ QUnit.module('SpeedGrader', rootHooks => {
     test('should use submission history lti launch url', () => {
       finishSetup()
       const renderLtiLaunch = sinon.stub(SpeedGrader.EG, 'renderLtiLaunch')
+      const submission = SpeedGrader.EG.currentStudent.submission.submission_history[1].submission
       SpeedGrader.EG.handleSubmissionSelectionChange()
-      ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, 'bar'))
+      ok(renderLtiLaunch.calledWith(sinon.match.any, sinon.match.any, submission))
       renderLtiLaunch.restore()
     })
 

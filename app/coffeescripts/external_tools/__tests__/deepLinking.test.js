@@ -20,12 +20,6 @@ import {handleDeepLinkingError, handleContentItem} from '../deepLinking'
 import $ from 'jquery'
 
 describe('handleContentItem', () => {
-  const result = {
-    type: 'file',
-    text: 'text',
-    title: 'title',
-    icon: 'https://www.test.com/image.png'
-  }
   const contentView = {
     trigger: jest.fn()
   }
@@ -34,26 +28,73 @@ describe('handleContentItem', () => {
   beforeEach(() => {
     contentView.trigger.mockReset()
     callback.mockReset()
-    handleContentItem(result, contentView, callback)
   })
 
-  it('processes the content item', () => {
-    expect(contentView.trigger).toHaveBeenCalledWith('ready', {
-      contentItems: [
-        {
-          '@type': 'FileItem',
-          text: result.text,
-          title: result.title,
-          thumbnail: {
-            '@id': result.icon
+  describe('when the type is a `file`', () => {
+    const result = {
+      type: 'file',
+      text: 'text',
+      title: 'title',
+      icon: 'https://www.test.com/image.png'
+    }
+
+    beforeEach(() => {
+      handleContentItem(result, contentView, callback)
+    })
+
+    it('processes the content item', () => {
+      expect(contentView.trigger).toHaveBeenCalledWith('ready', {
+        contentItems: [
+          {
+            '@type': 'FileItem',
+            text: result.text,
+            title: result.title,
+            thumbnail: {
+              '@id': result.icon
+            }
           }
-        }
-      ]
+        ]
+      })
+    })
+
+    it('calls the callback', () => {
+      expect(callback).toHaveBeenCalledTimes(1)
     })
   })
 
-  it('calls the callback', () => {
-    expect(callback).toHaveBeenCalledTimes(1)
+  describe('when the type is a `ltiResourceLink`', () => {
+    const result = {
+      type: 'ltiResourceLink',
+      text: 'text',
+      title: 'title',
+      url: 'http://lti.example.com/content/launch/42',
+      lookup_uuid: '0b8fbc86-fdd7-4950-852d-ffa789b37ff2'
+    }
+
+    beforeEach(() => {
+      handleContentItem(result, contentView, callback)
+    })
+
+    it('processes the content item', () => {
+      expect(contentView.trigger).toHaveBeenCalledWith('ready', {
+        contentItems: [
+          {
+            '@type': 'LtiLinkItem',
+            text: result.text,
+            title: result.title,
+            url: result.url,
+            thumbnail: {
+              '@id': result.icon
+            },
+            lookup_uuid: result.lookup_uuid
+          }
+        ]
+      })
+    })
+
+    it('calls the callback', () => {
+      expect(callback).toHaveBeenCalledTimes(1)
+    })
   })
 })
 

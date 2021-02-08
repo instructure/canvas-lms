@@ -3160,6 +3160,17 @@ describe Assignment do
       submission = @a.submit_homework(@user)
       expect(submission.lti_user_id).to eq @user.lti_context_id
     end
+
+    it "sets the submission's `resource_link_lookup_uuid`" do
+      setup_assignment_without_submission
+      resource_link_lookup_uuid = SecureRandom.uuid
+
+      submission = @a.submit_homework(@user)
+      expect(submission.resource_link_lookup_uuid).to be_nil
+
+      submission = @a.submit_homework(@user, resource_link_lookup_uuid: resource_link_lookup_uuid)
+      expect(submission.resource_link_lookup_uuid).to eq resource_link_lookup_uuid
+    end
   end
 
   describe "muting" do

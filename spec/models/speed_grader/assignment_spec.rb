@@ -193,6 +193,21 @@ describe SpeedGrader::Assignment do
     expect(json[:submissions].first[:submission_comments]).to be_empty
   end
 
+  it "includes submission resource_link_lookup_uuid" do
+    params = {
+      submission_type: 'basic_lti_launch',
+      url: 'http://lti13testtool.docker/launch?deep_linking=true',
+      resource_link_lookup_uuid: '41b67e00-c2ae-44b1-8c8e-e9a782f39e30'
+    }
+
+    assignment_model(course: @course)
+    @assignment.submit_homework(@user, params)
+    @assignment.save!
+
+    json = SpeedGrader::Assignment.new(@assignment, @user).json
+    expect(json[:submissions].first[:resource_link_lookup_uuid]).to eq params[:resource_link_lookup_uuid]
+  end
+
   it "returns provisional grade ids to provisional grader" do
     final_grader = @course.enroll_teacher(User.create!, enrollment_state: 'active').user
     assignment = Assignment.create!(

@@ -249,10 +249,14 @@ class SubmissionsController < SubmissionsBaseController
       end
     end
 
+    # When the `resource_link_lookup_uuid` is given, we need to validate if it exists,
+    # in case not, we'll return an error and won't record the submission.
+    return unless valid_resource_link_lookup_uuid?
+
     submission_params = params[:submission].permit(
       :body, :url, :submission_type, :submitted_at, :comment, :group_comment,
       :media_comment_type, :media_comment_id, :eula_agreement_timestamp,
-      :attachment_ids => []
+      :resource_link_lookup_uuid, attachment_ids: []
     )
     submission_params[:group_comment] = value_to_boolean(submission_params[:group_comment])
     submission_params[:attachments] = Attachment.copy_attachments_to_submissions_folder(@context, params[:submission][:attachments].compact.uniq)
@@ -560,10 +564,35 @@ class SubmissionsController < SubmissionsBaseController
   end
 
   def always_permitted_create_params
-    always_permitted_params = [:eula_agreement_timestamp, :submitted_at].freeze
+    always_permitted_params = [:eula_agreement_timestamp, :submitted_at, :resource_link_lookup_uuid].freeze
     params.require(:submission).permit(always_permitted_params)
   end
   private :always_permitted_create_params
+
+  def valid_resource_link_lookup_uuid?
+    return true if params[:submission][:resource_link_lookup_uuid].nil?
+
+    resource_link = Lti::ResourceLink.find_by(
+      lookup_uuid: params[:submission][:resource_link_lookup_uuid],
+      context: @context
+    )
+
+    return true if resource_link
+
+    message = t('Resource link not found for given `resource_link_lookup_uuid`')
+
+    # Homework submission is done by API request, but I saw other parts of code
+    # that are handling HTML and JSON format. So, I kept the same logic here...
+    if api_request?
+      render(json: { message: message }, status: 400)
+    else
+      flash[:error] = message
+      redirect_to named_context_url(@context, :context_assignment_url, @assignment)
+    end
+
+    false
+  end
+  private :valid_resource_link_lookup_uuid?
 
   protected
 
