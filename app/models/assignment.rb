@@ -1091,28 +1091,30 @@ class Assignment < ActiveRecord::Base
     # currently bound Tool doesn't support LTI 1.3 or if the LineItem's ResourceLink doesn't agree with Assignment's
     # ContentTag on the currently bound tool. Presumably you always want correct data in the LineItem, regardless of
     # which Tool it's bound to.
-    if lti_1_3_external_tool_tag? && line_items.empty?
-      rl = Lti::ResourceLink.create!(
-        context: self,
-        custom: lti_resource_link_custom_params_as_hash,
-        resource_link_id: lti_context_id,
-        context_external_tool: ContextExternalTool.from_content_tag(
-          external_tool_tag,
-          context
+    GuardRail.activate(:primary) do
+      if lti_1_3_external_tool_tag? && line_items.empty?
+        rl = Lti::ResourceLink.create!(
+          context: self,
+          custom: lti_resource_link_custom_params_as_hash,
+          resource_link_id: lti_context_id,
+          context_external_tool: ContextExternalTool.from_content_tag(
+            external_tool_tag,
+            context
+          )
         )
-      )
 
-      line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
-    elsif saved_change_to_title? || saved_change_to_points_possible?
-      line_items.
-        find(&:assignment_line_item?)&.
-        update!(label: title, score_maximum: points_possible)
-    end
+        line_items.create!(label: title, score_maximum: points_possible, resource_link: rl, coupled: true)
+      elsif saved_change_to_title? || saved_change_to_points_possible?
+        line_items.
+          find(&:assignment_line_item?)&.
+          update!(label: title, score_maximum: points_possible)
+      end
 
-    if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
-      return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
+      if lti_1_3_external_tool_tag? && !lti_resource_links.empty?
+        return if primary_resource_link.custom == lti_resource_link_custom_params_as_hash
 
-      primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+        primary_resource_link.update!(custom: lti_resource_link_custom_params_as_hash)
+      end
     end
   end
   protected :update_line_items
