@@ -748,7 +748,7 @@ pipeline {
 
                 if(configuration.isChangeMerged()) {
                   timedStage('Dependency Check', stages, {
-                    snyk("canvas-lms:ruby", "Gemfile.lock", "$PATCHSET_TAG")
+                    snyk("canvas-lms:ruby", "Gemfile.lock.next", "$PATCHSET_TAG")
                   })
                 }
 
