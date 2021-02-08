@@ -804,138 +804,183 @@ describe "Users API", type: :request do
   describe "api_show" do
     before do
       @other_user = User.create!(name: "user name")
+
       email = "email@somewhere.org"
       @other_user.pseudonyms.create!(unique_id: email, account: Account.default) { |p| p.sis_user_id = email }
-      Account.default.tap { |a| a.disable_service(:avatars) }.save
     end
 
-    it "retrieves user details as an admin user" do
-      account_admin_user
-      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
-                      { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" })
+    context "avatars disabled" do
+      before do
+        Account.default.tap { |a| a.disable_service(:avatars) }.save
+      end
 
-      expect(json).to eq({
-                           "name" => @other_user.name,
-                           "sortable_name" => @other_user.sortable_name,
-                           "sis_import_id" => nil,
-                           "id" => @other_user.id,
-                           "created_at" => @other_user.created_at.iso8601,
-                           "short_name" => @other_user.short_name,
-                           "sis_user_id" => @other_user.pseudonym.sis_user_id,
-                           "integration_id" => nil,
-                           "login_id" => @other_user.pseudonym.unique_id,
-                           "locale" => nil,
-                           "permissions" => {
-                             "can_update_name" => true,
-                             "can_update_avatar" => false,
-                             "limit_parent_app_web_access" => false,
-                           },
-                           "email" => @other_user.email
-                         })
+      it "retrieves user details as an admin user" do
+        account_admin_user
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" })
+
+        expect(json).to eq({
+                             "name" => @other_user.name,
+                             "sortable_name" => @other_user.sortable_name,
+                             "sis_import_id" => nil,
+                             "id" => @other_user.id,
+                             "created_at" => @other_user.created_at.iso8601,
+                             "short_name" => @other_user.short_name,
+                             "sis_user_id" => @other_user.pseudonym.sis_user_id,
+                             "integration_id" => nil,
+                             "login_id" => @other_user.pseudonym.unique_id,
+                             "locale" => nil,
+                             "permissions" => {
+                               "can_update_name" => true,
+                               "can_update_avatar" => false,
+                               "limit_parent_app_web_access" => false,
+                             },
+                             "email" => @other_user.email
+                           })
+      end
+
+      it "retrieves limited user details as self" do
+        @user = @other_user
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json", include: "avatar_state" })
+        expect(json).to eq({
+                             "name" => @other_user.name,
+                             "sortable_name" => @other_user.sortable_name,
+                             "id" => @other_user.id,
+                             "created_at" => @other_user.created_at.iso8601,
+                             "short_name" => @other_user.short_name,
+                             "locale" => nil,
+                             "effective_locale" => "en",
+                             "permissions" => {
+                               "can_update_name" => true,
+                               "can_update_avatar" => false,
+                               "limit_parent_app_web_access" => false,
+                             },
+                           })
+      end
+
+      it "retrieves the right permissions" do
+        @user = @other_user
+        Account.default.tap { |a| a.settings[:users_can_edit_name] = false }.save
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]).to eq({
+                                            "can_update_name" => false,
+                                            "can_update_avatar" => false,
+                                            "limit_parent_app_web_access" => false,
+                                          })
+
+        Account.default.tap { |a| a.enable_service(:avatars) }.save
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]).to eq({
+                                            "can_update_name" => false,
+                                            "can_update_avatar" => true,
+                                            "limit_parent_app_web_access" => false,
+                                          })
+
+        Account.default.tap { |a| a.settings[:limit_parent_app_web_access] = true }.save
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]).to eq({
+                                            "can_update_name" => false,
+                                            "can_update_avatar" => true,
+                                            "limit_parent_app_web_access" => true,
+                                          })
+      end
+
+      it "retrieves the right avatar permissions" do
+        @user = @other_user
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]["can_update_avatar"]).to eq(false)
+
+        Account.default.tap { |a| a.enable_service(:avatars) }.save
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]["can_update_avatar"]).to eq(true)
+
+        @user.avatar_state = :locked
+        @user.save
+        json = api_call(:get, "/api/v1/users/self",
+                        { controller: "users", action: "api_show", id: "self", format: "json" })
+        expect(json["permissions"]["can_update_avatar"]).to eq(false)
+      end
+
+      it "requires :read_roster or :manage_user_logins permission from the account" do
+        account_admin_user_with_role_changes(role_changes: { read_roster: false, manage_user_logins: false })
+        api_call(:get, "/api/v1/users/#{@other_user.id}",
+                 { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                 {}, {}, { expected_status: 404 })
+      end
+
+      it "404s on a deleted user" do
+        @other_user.destroy
+        account_admin_user
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                        {}, expected_status: 404)
+        expect(json.keys).to eq ["errors"]
+      end
+
+      it "404s but still returns the user on a deleted user for a site admin" do
+        @other_user.destroy
+        account_admin_user(account: Account.site_admin)
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                        {}, expected_status: 404)
+        expect(json.keys).not_to be_include("errors")
+      end
+
+      it "404s but still returns the user on a deleted user, including merge info, for a site admin" do
+        u3 = User.create!
+        UserMerge.from(@other_user).into(u3)
+        account_admin_user(account: Account.site_admin)
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
+                        {}, expected_status: 404)
+        expect(json.keys).not_to be_include("errors")
+        expect(json["merged_into_user_id"]).to eq u3.id
+      end
     end
 
-    it "retrieves limited user details as self" do
-      @user = @other_user
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json).to eq({
-                           "name" => @other_user.name,
-                           "sortable_name" => @other_user.sortable_name,
-                           "id" => @other_user.id,
-                           "created_at" => @other_user.created_at.iso8601,
-                           "short_name" => @other_user.short_name,
-                           "locale" => nil,
-                           "effective_locale" => "en",
-                           "permissions" => {
-                             "can_update_name" => true,
-                             "can_update_avatar" => false,
-                             "limit_parent_app_web_access" => false,
-                           },
-                         })
-    end
+    context "avatars enabled" do
+      before do
+        Account.default.tap { |a| a.enable_service(:avatars) }.save
+        @user = Users
+      end
 
-    it "retrieves the right permissions" do
-      @user = @other_user
-      Account.default.tap { |a| a.settings[:users_can_edit_name] = false }.save
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]).to eq({
-                                          "can_update_name" => false,
-                                          "can_update_avatar" => false,
-                                          "limit_parent_app_web_access" => false,
-                                        })
+      it "does not include avatar_state by default" do
+        account_admin_user
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" })
 
-      Account.default.tap { |a| a.enable_service(:avatars) }.save
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]).to eq({
-                                          "can_update_name" => false,
-                                          "can_update_avatar" => true,
-                                          "limit_parent_app_web_access" => false,
-                                        })
+        expect(json).not_to have_key("avatar_state")
+      end
 
-      Account.default.tap { |a| a.settings[:limit_parent_app_web_access] = true }.save
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]).to eq({
-                                          "can_update_name" => false,
-                                          "can_update_avatar" => true,
-                                          "limit_parent_app_web_access" => true,
-                                        })
-    end
+      it "admin can request avatar_state" do
+        account_admin_user
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json", include: "avatar_state" })
 
-    it "retrieves the right avatar permissions" do
-      @user = @other_user
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]["can_update_avatar"]).to eq(false)
+        expect(json).to have_key("avatar_state")
+      end
 
-      Account.default.tap { |a| a.enable_service(:avatars) }.save
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]["can_update_avatar"]).to eq(true)
+      it "user cannot request others avatar_state" do
+        @user = User.create!
+        json = api_call(:get, "/api/v1/users/#{@other_user.id}",
+                        { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json", include: "avatar_state" })
 
-      @user.avatar_state = :locked
-      @user.save
-      json = api_call(:get, "/api/v1/users/self",
-                      { controller: "users", action: "api_show", id: "self", format: "json" })
-      expect(json["permissions"]["can_update_avatar"]).to eq(false)
-    end
+        expect(json).not_to have_key("avatar_state")
+      end
 
-    it "requires :read_roster or :manage_user_logins permission from the account" do
-      account_admin_user_with_role_changes(role_changes: { read_roster: false, manage_user_logins: false })
-      api_call(:get, "/api/v1/users/#{@other_user.id}",
-               { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
-               {}, {}, { expected_status: 404 })
-    end
+      it "user cannot request own avatar_state" do
+        @user = User.create!
+        json = api_call(:get, "/api/v1/users/#{@user.id}",
+                        { controller: "users", action: "api_show", id: @user.id.to_param, format: "json", include: "avatar_state" })
 
-    it "404s on a deleted user" do
-      @other_user.destroy
-      account_admin_user
-      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
-                      { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
-                      {}, expected_status: 404)
-      expect(json.keys).to eq ["errors"]
-    end
-
-    it "404s but still returns the user on a deleted user for a site admin" do
-      @other_user.destroy
-      account_admin_user(account: Account.site_admin)
-      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
-                      { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
-                      {}, expected_status: 404)
-      expect(json.keys).not_to be_include("errors")
-    end
-
-    it "404s but still returns the user on a deleted user, including merge info, for a site admin" do
-      u3 = User.create!
-      UserMerge.from(@other_user).into(u3)
-      account_admin_user(account: Account.site_admin)
-      json = api_call(:get, "/api/v1/users/#{@other_user.id}",
-                      { controller: "users", action: "api_show", id: @other_user.id.to_param, format: "json" },
-                      {}, expected_status: 404)
-      expect(json.keys).not_to be_include("errors")
-      expect(json["merged_into_user_id"]).to eq u3.id
+        expect(json).not_to have_key("avatar_state")
+      end
     end
   end
 
@@ -1699,6 +1744,7 @@ describe "Users API", type: :request do
         user = User.find(json["id"])
         json.delete("avatar_url")
         expect(json).to eq({
+                             "avatar_state" => "approved",
                              "name" => "Tobias Funke",
                              "sortable_name" => "Funke, Tobias",
                              "sis_user_id" => "sis-user-id",
@@ -1911,6 +1957,21 @@ describe "Users API", type: :request do
         expect(user.avatar_state).to eql :locked
       end
 
+      it "sets avatar state manually by an admin" do
+        @student.avatar_state = "approved"
+        @student.save!
+
+        json = api_call(:put, @path, @path_options, {
+                          user: {
+                            avatar: {
+                              state: "locked"
+                            }
+                          }
+                        })
+        user = User.find(json["id"])
+        expect(user.avatar_state).to eql :locked
+      end
+
       it "does not allow the user's avatar to be set to an external url" do
         url_to_set = "https://www.instructure.example.com/image.jpg"
         json = api_call(:put, @path, @path_options, {
@@ -2000,6 +2061,23 @@ describe "Users API", type: :request do
           api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id),
                    { user: { name: "Ovaltine Jenkins" } }, {}, { expected_status: 401 })
         end
+      end
+
+      it "cannot set avatar state" do
+        raw_api_call(:put, @path, @path_options, {
+                       user: {
+                         avatar: {
+                           state: "locked"
+                         }
+                       }
+                     })
+        expect(response.code).to eql "401"
+      end
+
+      it "cannot see avatar_state" do
+        raw_api_call(:put, "/api/v1/users/#{@user.id}", @path_options.merge(id: @user.id), { email: "test@example.com" })
+        expect(response.code).to eql "200"
+        expect(JSON.parse(response.body)).to_not have_key("avatar_state")
       end
     end
 
