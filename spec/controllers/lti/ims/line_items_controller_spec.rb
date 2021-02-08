@@ -307,7 +307,6 @@ module Lti
             it 'creates a line item with resource link, tag, and extensions' do
               send_request
               expect(item.resource_link).to_not be_blank
-              expect(item.resource_link.resource_link_id).to_not be_blank # we'll remove this on part 4 commit
               expect(item.resource_link.resource_link_uuid).to_not be_blank
               expect(item.tag).to_not be_blank
               expect(item.extensions).to_not be_blank
