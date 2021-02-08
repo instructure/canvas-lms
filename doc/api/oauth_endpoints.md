@@ -85,6 +85,17 @@ wrong person in, as <a href="http://homakov.blogspot.com/2012/07/saferweb-most-c
       <td>Set to the user's username to be populated in the login form in the event
       that the user must authenticate.</td>
     </tr>
+    <tr>
+      <td class="mono">prompt<span class="label optional"></span></td>
+      <td>If set to <code>none</code>, Canvas will immediately redirect to the
+      <code>redirect_uri</code>. If the caller has a valid session with a
+      &quot;remember me&quot; token or a token from a trusted Developer Key,
+      the redirect will contain a <code>code=XYZ</code> param. If the caller
+      has no session, the redirect will contain an
+      <code>error=login_required</code> param. If the caller has a session, but
+      no &quot;remember me&quot; or trusted token, the redirect will contain an
+      <code>error=interaction_required</code> param.</td>
+    </tr>
   </tbody>
 </table>
 </div>
