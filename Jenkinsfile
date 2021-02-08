@@ -734,8 +734,8 @@ pipeline {
 
                 // Flakey spec catcher using the dir step above will create this @tmp file, we need to remove it
                 // https://issues.jenkins.io/browse/JENKINS-52750
-                if(env.GERRIT_PROJECT != "canvas-lms") {
-                  sh "rm -vr $LOCAL_WORKDIR@tmp"
+                if(!configuration.isChangeMerged() && env.GERRIT_PROJECT != "canvas-lms") {
+                  sh "rm -vrf $LOCAL_WORKDIR@tmp"
                 }
 
                 if(env.GERRIT_PROJECT == 'canvas-lms' && git.changedFiles(dockerDevFiles, 'HEAD^')) {
