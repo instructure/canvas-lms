@@ -1096,7 +1096,6 @@ class Assignment < ActiveRecord::Base
         rl = Lti::ResourceLink.create!(
           context: self,
           custom: lti_resource_link_custom_params_as_hash,
-          resource_link_id: lti_context_id, # we'll remove this on part 4 commit
           resource_link_uuid: lti_context_id,
           context_external_tool: ContextExternalTool.from_content_tag(
             external_tool_tag,

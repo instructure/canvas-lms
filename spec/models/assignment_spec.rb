@@ -8995,7 +8995,6 @@ describe Assignment do
           expect(assignment.line_items.first.score_maximum).to eq assignment.points_possible
           expect(assignment.line_items.first.coupled).to eq true
           expect(assignment.line_items.first.resource_link).not_to be_nil
-          expect(assignment.line_items.first.resource_link.resource_link_id).to eq assignment.lti_context_id # we'll remove this on part 4 commit
           expect(assignment.line_items.first.resource_link.resource_link_uuid).to eq assignment.lti_context_id
           expect(assignment.line_items.first.resource_link.context_id).to eq assignment.id
           expect(assignment.line_items.first.resource_link.context_type).to eq 'Assignment'
