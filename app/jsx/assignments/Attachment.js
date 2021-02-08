@@ -18,11 +18,12 @@ import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Button} from '@instructure/ui-buttons'
 import {IconImageLine, IconTrashLine, IconUploadLine} from '@instructure/ui-icons'
 import PropTypes from 'prop-types'
-import React, {useEffect, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import WebcamModal from '../shared/components/WebcamModal'
 import {hasMediaFeature} from '../shared/utils/mediaUtils'
 import I18n from 'i18n!attachment'
 import {direction} from '../shared/helpers/rtlHelper'
+import Focus from '../shared/components/Focus'
 
 const LegacyFileUpload = ({index}) => {
   return (
@@ -46,6 +47,7 @@ const Attachment = ({index, setBlob}) => {
   const [openWebcamModal, setOpenWebcamModal] = useState(false)
   const [showFileInput, setShowFileInput] = useState(false)
   const [dataURL, setDataURL] = useState(null)
+  const useWebcamRef = useRef(null)
 
   useEffect(() => {
     return () => {
@@ -65,7 +67,12 @@ const Attachment = ({index, setBlob}) => {
             {I18n.t('Upload File')}
           </Button>
 
-          <Button icon={IconImageLine} onClick={() => setOpenWebcamModal(true)} margin="none small">
+          <Button
+            icon={IconImageLine}
+            onClick={() => setOpenWebcamModal(true)}
+            margin="none small"
+            ref={useWebcamRef}
+          >
             {I18n.t('Use Webcam')}
           </Button>
         </>
@@ -88,19 +95,26 @@ const Attachment = ({index, setBlob}) => {
               [direction('right')]: '0.4em'
             }}
           >
-            <Button
-              icon={IconTrashLine}
-              size="small"
-              variant="light"
-              onClick={() => {
-                setDataURL(null)
-                setBlob(null)
-              }}
-            >
-              <ScreenReaderContent>
-                {I18n.t('Remove webcam image %{count}', {count: index + 1})}
-              </ScreenReaderContent>
-            </Button>
+            <Focus timeout={500}>
+              <Button
+                icon={IconTrashLine}
+                size="small"
+                variant="light"
+                data-testid="removePhotoButton"
+                onClick={() => {
+                  setDataURL(null)
+                  setBlob(null)
+
+                  setTimeout(() => {
+                    useWebcamRef.current.focus()
+                  }, 100)
+                }}
+              >
+                <ScreenReaderContent>
+                  {I18n.t('Remove webcam image %{count}', {count: index + 1})}
+                </ScreenReaderContent>
+              </Button>
+            </Focus>
           </span>
         </div>
       )}

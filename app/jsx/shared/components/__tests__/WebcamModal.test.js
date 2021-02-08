@@ -21,10 +21,13 @@ import WebcamModal from '../WebcamModal'
 import {render, fireEvent, act} from '@testing-library/react'
 import * as mediaUtils from '../../utils/mediaUtils'
 
-mediaUtils.getUserMedia = jest.fn(() => Promise.resolve())
 jest.useFakeTimers()
 
 describe('WebcamModal', () => {
+  beforeEach(() => {
+    mediaUtils.getUserMedia = jest.fn(() => Promise.resolve())
+  })
+
   const getProps = (override = {}) => {
     return {
       onSelectImage: jest.fn(),
@@ -33,6 +36,18 @@ describe('WebcamModal', () => {
       ...override
     }
   }
+
+  it('focus Take Photo and Use This Photo when showed', async () => {
+    let result
+    await act(async () => {
+      result = render(<WebcamModal {...getProps({open: true})} />)
+    })
+    await act(async () => jest.runAllTimers())
+    expect(result.getByText('Take Photo').closest('button')).toHaveFocus()
+    fireEvent.click(result.getByText('Take Photo'))
+    await act(async () => jest.runAllTimers())
+    expect(result.getByText('Use This Photo').closest('button')).toHaveFocus()
+  })
 
   it('does not request webcam access if open false', () => {
     render(<WebcamModal {...getProps()} />)
