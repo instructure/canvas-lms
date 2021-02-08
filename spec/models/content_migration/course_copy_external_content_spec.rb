@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -165,7 +167,7 @@ describe ContentMigration do
       expect(TestExternalContentService).to receive(:export_completed?).exactly(6).times.and_return(false) # retries 5 times
 
       expect(Canvas::Errors).to receive(:capture_exception).with(:external_content_migration,
-        "External content migrations timed out for test_service")
+        "External content migrations timed out for test_service", :warn)
 
       run_course_copy
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -27,6 +29,7 @@ describe Types::MutationLogType do
   end
 
   before(:once) do
+    Canvas::DynamoDB::DevUtils.initialize_ddb_for_development!(:auditors, "graphql_mutations", recreate: true)
     student_in_course(active_all: true)
     @assignment = @course.assignments.create! name: "asdf"
     account_admin_user

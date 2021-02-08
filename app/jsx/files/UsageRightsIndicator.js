@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import ReactDOM from 'react-dom'
 import customPropTypes from 'compiled/react_files/modules/customPropTypes'
 import Folder from 'compiled/models/Folder'
-import filesEnv from 'compiled/react_files/modules/filesEnv'
 import UsageRightsDialog from './UsageRightsDialog'
 
 export default class UsageRightsIndicator extends React.Component {
@@ -30,10 +29,15 @@ export default class UsageRightsIndicator extends React.Component {
 
   static propTypes = {
     model: customPropTypes.filesystemObject.isRequired,
-    userCanManageFilesForContext: PropTypes.bool.isRequired,
+    userCanEditFilesForContext: PropTypes.bool.isRequired,
     userCanRestrictFilesForContext: PropTypes.bool.isRequired,
     usageRightsRequiredForContext: PropTypes.bool.isRequired,
-    modalOptions: PropTypes.object.isRequired
+    modalOptions: PropTypes.object.isRequired,
+    contextType: PropTypes.string,
+    contextId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    hidePreview: PropTypes.bool,
+    deferSave: PropTypes.func,
+    suppressWarning: PropTypes.bool
   }
 
   handleClick = event => {
@@ -44,6 +48,10 @@ export default class UsageRightsIndicator extends React.Component {
         closeModal={this.props.modalOptions.closeModal}
         itemsToManage={[this.props.model]}
         userCanRestrictFilesForContext={this.props.userCanRestrictFilesForContext}
+        contextType={this.props.contextType}
+        contextId={this.props.contextId}
+        hidePreview={this.props.hidePreview}
+        deferSave={this.props.deferSave}
       />
     )
     this.props.modalOptions.openModal(contents, () => {
@@ -73,15 +81,17 @@ export default class UsageRightsIndicator extends React.Component {
     ) {
       return null
     } else if (this.props.usageRightsRequiredForContext && !this.props.model.get('usage_rights')) {
-      if (this.props.userCanManageFilesForContext) {
+      if (this.props.userCanEditFilesForContext) {
         return (
           <button
             className="UsageRightsIndicator__openModal btn-link"
             onClick={this.handleClick}
-            title={this.warningMessage}
+            title={this.props.suppressWarning ? null : this.warningMessage}
             data-tooltip="top"
           >
-            <span className="screenreader-only">{this.warningMessage}</span>
+            {!this.props.suppressWarning && (
+              <span className="screenreader-only">{this.warningMessage}</span>
+            )}
             <i className="UsageRightsIndicator__warning icon-warning" />
           </button>
         )
@@ -96,7 +106,7 @@ export default class UsageRightsIndicator extends React.Component {
         <button
           className="UsageRightsIndicator__openModal btn-link"
           onClick={this.handleClick}
-          disabled={!this.props.userCanManageFilesForContext}
+          disabled={!this.props.userCanEditFilesForContext}
           title={this.props.model.get('usage_rights').license_name}
           data-tooltip="top"
         >

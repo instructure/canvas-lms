@@ -55,7 +55,8 @@ class RequestThrottle
     bucket = LeakyBucket.new(client_identifier(request))
 
     up_front_cost = bucket.get_up_front_cost_for_path(path)
-    cost = bucket.reserve_capacity(up_front_cost) do
+    pre_judged = (approved?(request) || blocked?(request))
+    cost = bucket.reserve_capacity(up_front_cost, request_prejudged: pre_judged) do
       status, headers, response = if !allowed?(request, bucket)
         throttled = true
         rate_limit_exceeded
@@ -78,31 +79,39 @@ class RequestThrottle
     if client_identifier(request) && !client_identifier(request).starts_with?('session')
       headers['X-Request-Cost'] = cost.to_s unless throttled
       headers['X-Rate-Limit-Remaining'] = bucket.remaining.to_s
-      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blacklisted?(request)
+      headers['X-Rate-Limit-Remaining'] = 0.0.to_s if blocked?(request)
     end
 
     [status, headers, response]
   end
 
   # currently we define cost as the amount of user cpu time plus the amount
-  # of time spent in db queries, plus any arbitrary cost the app assigns
+  # of time spent in db queries, plus any arbitrary cost the app assigns.
+  # The CPU and DB costs are weighted according to settings so they
+  # can be dialed up or down individually if we need to have them contribute more or
+  # less to overall throttling behaviour.  Overall throttling prevelency
+  # not related to any specific subcategory of time sinks should be controlled by tuning the
+  # "request_throttle.outflow" setting instead, which impacts how quickly
+  # the bucket leaks.
   def calculate_cost(user_time, db_time, env)
     extra_time = env.fetch("extra-request-cost", 0)
     extra_time = 0 unless extra_time.is_a?(Numeric) && extra_time >= 0
-    user_time + db_time + extra_time
+    cpu_cost = Setting.get("request_throttle.cpu_cost_weight", "1.0").to_f
+    db_cost = Setting.get("request_throttle.db_cost_weight", "1.0").to_f
+    (user_time * cpu_cost) + (db_time * db_cost) + extra_time
   end
 
   def subject_to_throttling?(request)
-    self.class.enabled? && Canvas.redis_enabled? && !whitelisted?(request) && !blacklisted?(request)
+    self.class.enabled? && Canvas.redis_enabled? && !approved?(request) && !blocked?(request)
   end
 
   def allowed?(request, bucket)
-    if whitelisted?(request)
+    if approved?(request)
       return true
-    elsif blacklisted?(request)
-      # blacklisting is useful even if throttling is disabled, this is left in intentionally
-      Rails.logger.info("blocking request due to blacklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
-      InstStatsd::Statsd.increment("request_throttling.blacklisted")
+    elsif blocked?(request)
+      # blocking is useful even if throttling is disabled, this is left in intentionally
+      Rails.logger.info("blocking request due to blocklist, client id: #{client_identifiers(request).inspect} ip: #{request.remote_ip}")
+      InstStatsd::Statsd.increment("request_throttling.blocked")
       return false
     else
       if bucket.full?
@@ -111,19 +120,19 @@ class RequestThrottle
           Rails.logger.info("blocking request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
           return false
         else
-          Rails.logger.info("WOULD HAVE blocked request due to throttling, client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
+          Rails.logger.info("WOULD HAVE throttled request (config disabled), client id: #{client_identifier(request)} bucket: #{bucket.to_json}")
         end
       end
       return true
     end
   end
 
-  def blacklisted?(request)
-    client_identifiers(request).any? { |id| self.class.blacklist.include?(id) }
+  def blocked?(request)
+    client_identifiers(request).any? { |id| self.class.blocklist.include?(id) }
   end
 
-  def whitelisted?(request)
-    client_identifiers(request).any? { |id| self.class.whitelist.include?(id) }
+  def approved?(request)
+    client_identifiers(request).any? { |id| self.class.approvelist.include?(id) }
   end
 
   def client_identifier(request)
@@ -162,16 +171,16 @@ class RequestThrottle
     request.env['rack.session.options'].try(:[], :id)
   end
 
-  def self.blacklist
-    @blacklist ||= list_from_setting('request_throttle.blacklist')
+  def self.blocklist
+    @blocklist ||= list_from_setting('request_throttle.blocklist')
   end
 
-  def self.whitelist
-    @whitelist ||= list_from_setting('request_throttle.whitelist')
+  def self.approvelist
+    @approvelist ||= list_from_setting('request_throttle.approvelist')
   end
 
   def self.reload!
-    @whitelist = @blacklist = @dynamic_settings = nil
+    @approvelist = @blocklist = @dynamic_settings = nil
     LeakyBucket.reload!
   end
 
@@ -180,7 +189,7 @@ class RequestThrottle
   end
 
   def self.list_from_setting(key)
-    Set.new(Setting.get(key, '').split(',').map(&:strip).reject(&:blank?))
+    Set.new(Setting.get(key, '').split(',').map { |i| i.gsub(/^\s+|\s*(?:;.+)?\s*$/, "") }.reject(&:blank?))
   end
 
   def self.dynamic_settings
@@ -307,13 +316,11 @@ class RequestThrottle
     # data out of redis at the same time. It then yields to the block,
     # expecting the block to return the final cost. It then increments again,
     # subtracting the initial up_front_cost from the final cost to erase it.
-    def reserve_capacity(up_front_cost = self.up_front_cost)
-      return (self.count = yield) unless RequestThrottle.enabled?
-
-      increment(0, up_front_cost)
+    def reserve_capacity(up_front_cost = self.up_front_cost, request_prejudged: false)
+      increment(0, up_front_cost) unless request_prejudged
       cost = yield
     ensure
-      increment(cost || 0, -up_front_cost) if RequestThrottle.enabled?
+      increment(cost || 0, -up_front_cost) unless request_prejudged
     end
 
     def full?
@@ -345,3 +352,5 @@ class RequestThrottle
     end
   end
 end
+
+Canvas::Reloader.on_reload { RequestThrottle.reload! }

@@ -183,6 +183,7 @@ export default class SyllabusView extends Backbone.View {
         start_at,
         end_at,
         due_at,
+        orig_date: orig_start_date,
         todo_at,
         same_day:
           (start_date != null ? start_date.getTime() : undefined) ===
@@ -197,6 +198,12 @@ export default class SyllabusView extends Backbone.View {
       }
 
       lastDate.events.push(lastEvent)
+
+      lastDate.events.forEach(event => {
+        event.eventCount = lastDate.events.length
+        event.date = lastDate.date
+        event.passed = lastDate.passed
+      })
 
       if (!(related_id in relatedEvents)) {
         relatedEvents[related_id] = []

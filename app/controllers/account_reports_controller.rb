@@ -240,12 +240,12 @@ class AccountReportsController < ApplicationController
         }
         parameters = {}
 
-        value[:parameters].each do |parameter_name, parameter|
+        value.parameters.each do |parameter_name, parameter|
           parameters[parameter_name] = {
             :required => parameter[:required] || false,
             :description => parameter[:description]
           }
-        end unless value[:parameters].nil?
+        end
 
         report[:parameters] = parameters unless parameters.length == 0
         results << report

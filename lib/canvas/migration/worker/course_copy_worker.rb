@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
         cm.content_export = ce
 
         source.shard.activate do
-          ce.export_without_send_later
+          ce.export(synchronous: true)
         end
 
         if ce.workflow_state == 'exported_for_course_copy'
@@ -77,6 +79,10 @@ class Canvas::Migration::Worker::CourseCopyWorker < Canvas::Migration::Worker::B
           cm.migration_settings[:last_error] = "ContentExport failed to export course."
           cm.save
         end
+      rescue InstFS::ServiceError, ActiveRecord::RecordInvalid => e
+        Canvas::Errors.capture_exception(:course_copy, e, :warn)
+        cm.fail_with_error!(e)
+        raise Delayed::RetriableError, e.message
       rescue => e
         cm.fail_with_error!(e)
         raise e

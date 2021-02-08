@@ -23,10 +23,12 @@ import NavigationView from 'compiled/views/course_settings/NavigationView'
 import FeatureFlagAdminView from 'compiled/views/feature_flags/FeatureFlagAdminView'
 import CourseImageSelector from '../course_settings/components/CourseImageSelector'
 import BlueprintLockOptions from '../blueprint_courses/components/BlueprintLockOptions'
+import CourseAvailabilityOptions from '../course_settings/components/CourseAvailabilityOptions'
 import configureStore from '../course_settings/store/configureStore'
 import initialState from '../course_settings/store/initialState'
 import 'course_settings'
 import 'grading_standards'
+import FeatureFlags from '../feature_flags/FeatureFlags'
 
 const blueprint = document.getElementById('blueprint_menu')
 if (blueprint) {
@@ -44,8 +46,12 @@ if (blueprint) {
 
 const navView = new NavigationView({el: $('#tab-navigation')})
 
-const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
-featureFlagView.collection.fetchAll()
+if (window.ENV.NEW_FEATURES_UI) {
+  ReactDOM.render(<FeatureFlags disableDefaults />, document.getElementById('tab-features'))
+} else {
+  const featureFlagView = new FeatureFlagAdminView({el: '#tab-features'})
+  featureFlagView.collection.fetchAll()
+}
 
 $(() => navView.render())
 
@@ -55,5 +61,17 @@ if (ENV.COURSE_IMAGES_ENABLED) {
   ReactDOM.render(
     <CourseImageSelector store={courseImageStore} name="course[image]" courseId={ENV.COURSE_ID} />,
     $('.CourseImageSelector__Container')[0]
+  )
+}
+
+const availabilityOptionsContainer = document.getElementById('availability_options_container')
+if (availabilityOptionsContainer) {
+  ReactDOM.render(
+    <CourseAvailabilityOptions
+      canManage={ENV.PERMISSIONS.manage}
+      viewPastLocked={ENV.RESTRICT_STUDENT_PAST_VIEW_LOCKED}
+      viewFutureLocked={ENV.RESTRICT_STUDENT_FUTURE_VIEW_LOCKED}
+    />,
+    availabilityOptionsContainer
   )
 }

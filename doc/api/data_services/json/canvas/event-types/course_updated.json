@@ -1,0 +1,39 @@
+{
+  "name": "course_updated",
+  "definition": "The event is emitted anytime a course is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when the course is renamed, deleted, or other properties (except for syllabus) of a course are modified.",
+  "schema": {
+    "account_id": "The Account id of the updated course.",
+    "course_id": "The Canvas id of the updated course.",
+    "created_at": "The time at which this course was created.",
+    "name": "The name the updated course.",
+    "updated_at": "The time at which this course was last modified in any way.",
+    "uuid": "The unique id of the course.",
+    "workflow_state": "The state of the course (available, claimed, completed, created, deleted)."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "event_name": "course_updated",
+          "event_time": "2019-11-05 07:38:00 -0800",
+          "job_id": "1020020528469291",
+          "job_tag": "SIS::CSV::ImportRefactored#run_parallel_importer",
+          "producer": "canvas",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs"
+        },
+        "body": {
+          "account_id": "12340000000012",
+          "course_id": "12340000000056",
+          "created_at": "2019-11-05T13:38:00.218Z",
+          "name": "Linear Algebra",
+          "updated_at": "2019-11-05 07:38:00 -0800",
+          "uuid": "a1b2c3c4z9x8a1s2q5w6p9o8i7u6y5t6a2s3d4f5",
+          "workflow_state": "available"
+        }
+      }
+    }
+  ]
+}

@@ -64,6 +64,7 @@ export default class LockCheckList extends React.Component {
             <input type="hidden" name={`course${this.props.formName}[${item}]`} value={false} />
             <Checkbox
               name={`course${this.props.formName}[${item}]`}
+              size="small"
               label={lockLabels[item]}
               value={(this.state.locks[item] || false).toString()}
               checked={this.state.locks[item]}

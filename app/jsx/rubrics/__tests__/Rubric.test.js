@@ -21,6 +21,13 @@ import Rubric from '../Rubric'
 import {rubric, assessments} from './fixtures'
 import sinon from 'sinon'
 import {shallow} from 'enzyme'
+import {Table} from '@instructure/ui-table'
+
+// Because we had to override the displayName of the <Criterion> component in
+// order to make InstUI's prop checking happy, finding them is a bit more involved.
+function findCriteria(shallowWrapper) {
+  return shallowWrapper.find('Row').filterWhere(c => c.type().name === 'Criterion')
+}
 
 describe('the Rubric component', () => {
   it('renders as expected', () => {
@@ -59,8 +66,9 @@ describe('the Rubric component', () => {
     const el = shallow(
       <Rubric rubric={rubric} rubricAssessment={peer} rubricAssociation={peer.rubric_association} />
     )
+    const criteria = findCriteria(el)
     const allow = c => c.prop('allowSavedComments')
-    expect(el.find('Criterion').map(allow)).toEqual([false, false])
+    expect(criteria.map(allow)).toEqual([false, false])
   })
 
   it('updates the total score when an individual criterion point assessment changes', () => {
@@ -77,8 +85,7 @@ describe('the Rubric component', () => {
 
     const el = renderAssessing(assessments.points)
     const updated = {...assessments.points.data[0], points: {valid: true, value: 2}}
-    el
-      .find('Criterion')
+    findCriteria(el)
       .first()
       .prop('onAssessmentChange')(updated)
 
@@ -109,10 +116,9 @@ describe('the Rubric component', () => {
           {...otherProps}
         />
       )
-      expect(el.find('th')).toHaveLength(expected ? 7 : 5)
+      expect(el.find(Table.ColHeader)).toHaveLength(expected ? 7 : 5)
       expect(
-        el
-          .find('Criterion')
+        findCriteria(el)
           .at(0)
           .prop('hasPointsColumn')
       ).toBe(expected)
@@ -162,8 +168,7 @@ describe('the Rubric component', () => {
     )
 
     const updated = {...assessment.data[1], points: 2}
-    el
-      .find('Criterion')
+    findCriteria(el)
       .at(1)
       .prop('onAssessmentChange')(updated)
 

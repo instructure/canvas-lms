@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -56,7 +58,15 @@ class SisPseudonym
 
   def find_on_enrollment_for_context
     if @context.is_a?(Course) || @context.is_a?(CourseSection)
-      @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      pseudonym = @context.enrollments.except(:preload).where(user_id: @user).where.not(sis_pseudonym_id: nil).preload(:sis_pseudonym).first&.sis_pseudonym
+      # if the sis user id isn't here, this pointer might
+      # no longer be good.  Let the fallback logic work
+      # through "find_in_home_account".  It may still return this one,
+      # but if the sis_user_id got moved to another pseudonym
+      # it will grab that one instead.
+      return nil if pseudonym&.sis_user_id.nil?
+      return nil if pseudonym&.workflow_state == 'deleted' && !@include_deleted
+      pseudonym
     end
   end
 
@@ -72,15 +82,29 @@ class SisPseudonym
       end
     end
 
-    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
-    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) }
-    if type == :trusted
-      # only search the shards with trusted accounts
-      shards &= trusted_account_ids.keys
+
+    trusted_account_ids = root_account.trusted_account_ids.group_by { |id| Shard.shard_for(id) } if type == :trusted
+
+    # try the user's home shard first if it's fast
+    # the default shard has a replica in every region, so is always fast
+    user_shard_is_in_region = user.shard.in_current_region? || user.shard.default?
+    if user_shard_is_in_region
+      if type != :trusted || (account_ids = trusted_account_ids[user.shard])
+        user.shard.activate do
+          result = find_in_trusted_accounts(account_ids)
+          return result if result
+        end
+      end
     end
+
+    shards = @in_region ? user.in_region_associated_shards : user.associated_shards
+    # only search the shards with trusted accounts
+    shards &= trusted_account_ids.keys if type == :trusted
+
     return nil if shards.empty?
 
     Shard.with_each_shard(shards.sort) do
+      next if Shard.current == user.shard && user_shard_is_in_region
       account_ids = trusted_account_ids[Shard.current] if type == :trusted
       result = find_in_trusted_accounts(account_ids)
       return result if result

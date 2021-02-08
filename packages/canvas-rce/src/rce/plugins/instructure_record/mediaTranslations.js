@@ -15,6 +15,11 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+// IMPORTANT!
+// Do not import this file directly, but get it via Bridge.uploadMediaTranslations
+// This is because the locale, which is lazy imported, has to be loaded and
+// format-message initialized before this file gets evaluated.
 import formatMessage from '../../../format-message'
 
 const uploadMediaTranslations = {
@@ -25,7 +30,7 @@ const uploadMediaTranslations = {
     CLOSED_CAPTIONS_CHOOSE_FILE: formatMessage('Choose caption file'),
     CLOSED_CAPTIONS_SELECT_LANGUAGE: formatMessage('Select Language'),
     COMPUTER_PANEL_TITLE: formatMessage('Computer'),
-    DRAG_DROP_CLICK_TO_BROWSE: formatMessage('Drop and drop, or click to browse your computer'),
+    DRAG_DROP_CLICK_TO_BROWSE: formatMessage('Drag and drop, or click to browse your computer'),
     DRAG_FILE_TEXT: formatMessage('Drag a file here'),
     EMBED_PANEL_TITLE: formatMessage('Embed'),
     EMBED_VIDEO_CODE_TEXT: formatMessage('Embed Code'),
@@ -35,7 +40,9 @@ const uploadMediaTranslations = {
     SUBMIT_TEXT: formatMessage('Submit'),
     UPLOADING_ERROR: formatMessage('An error occurred uploading your media.'),
     UPLOAD_MEDIA_LABEL: formatMessage('Upload Media'),
-    MEDIA_RECORD_NOT_AVAILABLE: formatMessage('Audio and Video recording is not available.'),
+    MEDIA_RECORD_NOT_AVAILABLE: formatMessage(
+      'Audio and video recording not supported; please use a different browser.'
+    ),
     SUPPORTED_FILE_TYPES: formatMessage('Supported file types: SRT or WebVTT'),
     NO_FILE_CHOSEN: formatMessage('No file chosen'),
     REMOVE_FILE: 'Remove {lang} closed captions',

@@ -1,5 +1,5 @@
 <div class="form-dialog-content pad-box form-horizontal group-category-create">
-  <fieldset class="pad-box{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
+  <fieldset class="pad-box no-top{{#if ENV.allow_self_signup}} dotted-separator{{/if}}">
     <label class="control-label" for="new_category_name">
       {{#t "group_set_name"}}Group Set Name{{/t}}
     </label>
@@ -35,6 +35,14 @@
         {{/t}}
       </label>
     </div>
+    <div class="controls" style="margin-top:-4px">
+      <label class="radio">
+        <input type="radio" id="num_students" name="split_groups" value="2" style="margin-top:8px">
+        {{#t "split_into_sized_groups"}}
+          Split students into groups with {{{num_members}}} students per group
+        {{/t}}
+      </label>
+    </div>
     <div class="controls group-by-section-controls">
       <label class="checkbox" for="group_by_section">
         {{checkbox "group_by_section"}}
@@ -44,8 +52,8 @@
     <div class="controls">
       <label class="radio">
         <input type="radio" name="split_groups" value="0" checked>
-        {{#t "create_groups_manually"}}
-          I'll create groups manually
+        {{#t "create_groups_later"}}
+          I'll create groups later
         {{/t}}
       </label>
     </div>

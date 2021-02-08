@@ -19,6 +19,7 @@
 import React from 'react'
 import {string, func, shape, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {Table} from '@instructure/ui-table'
 import {Tooltip} from '@instructure/ui-overlays'
 import {IconMasqueradeLine, IconMessageLine, IconEditLine} from '@instructure/ui-icons'
 import I18n from 'i18n!account_course_user_search'
@@ -28,8 +29,8 @@ import UserLink from './UserLink'
 
 export default function UsersListRow({accountId, user, permissions, handleSubmitEditUserForm}) {
   return (
-    <tr>
-      <th scope="row">
+    <Table.Row>
+      <Table.RowHeader>
         <UserLink
           href={`/accounts/${accountId}/users/${user.id}`}
           avatarName={user.short_name}
@@ -37,20 +38,26 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
           avatar_url={user.avatar_url}
           size="x-small"
         />
-      </th>
-      <td>{user.email}</td>
-      <td>{user.sis_user_id}</td>
-      <td>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</td>
-      <td style={{whiteSpace: 'nowrap'}}>
+      </Table.RowHeader>
+      <Table.Cell>{user.email}</Table.Cell>
+      <Table.Cell>{user.sis_user_id}</Table.Cell>
+      <Table.Cell>{user.last_login && <FriendlyDatetime dateTime={user.last_login} />}</Table.Cell>
+      <Table.Cell>
         {permissions.can_masquerade && (
-          <Tooltip tip={I18n.t('Act as %{name}', {name: user.name})}>
+          <Tooltip
+            data-testid="user-list-row-tooltip"
+            tip={I18n.t('Act as %{name}', {name: user.name})}
+          >
             <Button variant="icon" size="small" href={`/users/${user.id}/masquerade`}>
               <IconMasqueradeLine title={I18n.t('Act as %{name}', {name: user.name})} />
             </Button>
           </Tooltip>
         )}
         {permissions.can_message_users && (
-          <Tooltip tip={I18n.t('Send message to %{name}', {name: user.name})}>
+          <Tooltip
+            data-testid="user-list-row-tooltip"
+            tip={I18n.t('Send message to %{name}', {name: user.name})}
+          >
             <Button
               variant="icon"
               size="small"
@@ -68,7 +75,10 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
             afterSave={handleSubmitEditUserForm}
           >
             <span>
-              <Tooltip tip={I18n.t('Edit %{name}', {name: user.name})}>
+              <Tooltip
+                data-testid="user-list-row-tooltip"
+                tip={I18n.t('Edit %{name}', {name: user.name})}
+              >
                 <Button variant="icon" size="small">
                   <IconEditLine title={I18n.t('Edit %{name}', {name: user.name})} />
                 </Button>
@@ -76,8 +86,8 @@ export default function UsersListRow({accountId, user, permissions, handleSubmit
             </span>
           </CreateOrUpdateUserModal>
         )}
-      </td>
-    </tr>
+      </Table.Cell>
+    </Table.Row>
   )
 }
 
@@ -91,3 +101,5 @@ UsersListRow.propTypes = {
     can_edit_users: bool
   }).isRequired
 }
+
+UsersListRow.displayName = 'Row'

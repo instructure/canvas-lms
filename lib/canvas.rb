@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -14,8 +16,6 @@
 #
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
-
-require_dependency 'canvas/draft_state_validations'
 
 module Canvas
   # defines the behavior when a protected attribute is assigned to in mass
@@ -41,7 +41,7 @@ module Canvas
       Canvas::Redis.patch
       settings = ConfigFile.load('redis').dup
       settings['url'] = settings['servers'] if settings['servers']
-      ActiveSupport::Cache::RedisCacheStore.build_redis(settings.to_h.symbolize_keys)
+      ActiveSupport::Cache::RedisCacheStore.build_redis(**settings.to_h.symbolize_keys)
     end
   end
 
@@ -236,13 +236,14 @@ module Canvas
     else
       Timeout.timeout(timeout, &block)
     end
-  rescue TimeoutCutoff => e
-    Rails.logger.error("Skipping service call due to error count: #{service_name} #{e.error_count}")
-    raise if options[:raise_on_timeout]
-    return nil
-  rescue Timeout::Error => e
-    Rails.logger.error("Timeout during service call: #{service_name}")
-    Canvas::Errors.capture_exception(:service_timeout, e)
+  rescue TimeoutCutoff, Timeout::Error => e
+    log_message = if e.is_a?(TimeoutCutoff)
+      "Skipping service call due to error count: #{service_name} #{e.error_count}"
+    else
+      "Timeout during service call: #{service_name}"
+    end
+    Rails.logger.error(log_message)
+    Canvas::Errors.capture_exception(:service_timeout, e, :warn)
     raise if options[:raise_on_timeout]
     return nil
   end
@@ -330,5 +331,9 @@ module Canvas
 
   def self.cluster
     nil
+  end
+
+  def self.environment
+    Rails.env
   end
 end

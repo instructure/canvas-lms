@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -44,6 +46,7 @@ describe AssignmentGroupsController do
         student_override = assignment_with_override.assignment_overrides.new.tap do |override|
           override.title = 'feb override'
           override.due_at = Time.zone.local(2015, 2, 15)
+          override.due_at_overridden = true
         end
         student_override.save!
         student_override.assignment_override_students.create!(user: student)
@@ -52,6 +55,7 @@ describe AssignmentGroupsController do
       let(:student) do
         dora = User.create!(name: "Dora")
         course_with_student(course: course, user: dora, active_enrollment: true)
+        course_with_student(course: course, user: User.create!, active_enrollment: true)
         dora
       end
 
@@ -206,6 +210,57 @@ describe AssignmentGroupsController do
         }
         expect(assignments_ids).to include @vanilla_assignment.id
         expect(assignments_ids).not_to include @discussion_assignment.id
+      end
+    end
+
+    describe 'filtering assignments by ID' do
+      before(:once) do
+        course_with_teacher(active_all: true)
+        @first_assignment = @course.assignments.create!(name: "Assignment 1")
+        @second_assignment = @course.assignments.create!(name: "Assignment 2")
+      end
+
+      it 'optionally filters assignments by ID' do
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
+      end
+
+      it 'optionally filters assignments by ID when passed assignment_ids as a comma separated string' do
+        new_assignment = @course.assignments.create!(name: "Assignment 3")
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id, new_assignment.id].join(",")
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id, new_assignment.id]
+      end
+
+      it 'does not return assignments outside the scope of the original result set' do
+        new_course = Course.create!
+        new_assignment = new_course.assignments.create!(name: "New Assignment")
+
+        user_session(@teacher)
+        get :index, {
+          params: {
+            course_id: @course.id,
+            include: ['assignments'],
+            assignment_ids: [@second_assignment.id, new_assignment.id]
+          },
+          format: :json
+        }
+        expect(assignments_ids).to match_array [@second_assignment.id]
       end
     end
 

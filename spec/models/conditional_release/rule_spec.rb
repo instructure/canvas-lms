@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -17,7 +19,6 @@
 #
 
 require_relative '../../conditional_release_spec_helper'
-require_dependency "conditional_release/rule"
 
 module ConditionalRelease
   describe Rule, :type => :model do

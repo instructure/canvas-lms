@@ -27,7 +27,7 @@ module ConditionalRelease
     # GET /api/rules
     def index
       rules = get_rules
-      rules = rules.preload(Rule.all_includes) if include_param.include?('all')
+      rules = rules.preload(Rule.preload_associations) if include_param.include?('all')
       rules = rules.with_assignments if value_to_boolean(params[:active])
 
       render json: rules.as_json(include: json_includes, include_root: false, except: [:root_account_id, :deleted_at])
@@ -52,7 +52,7 @@ module ConditionalRelease
       rule = Rule.new(create_params)
 
       if rule.save
-        render json: rule.as_json(include: all_includes, include_root: false, except: [:root_account_id, :deleted_at])
+        render json: rule.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       else
         render json: rule.errors, status: :bad_request
       end
@@ -70,7 +70,7 @@ module ConditionalRelease
         :assignment_set_associations
       )
       if rule.update(update_params)
-        render json: rule.as_json(include: all_includes, include_root: false, except: [:root_account_id, :deleted_at])
+        render json: rule.as_json(include: Rule.includes_for_json, include_root: false, except: [:root_account_id, :deleted_at])
       else
         render json: rule.errors, status: :bad_request
       end
@@ -99,19 +99,8 @@ module ConditionalRelease
       Array.wrap(params[:include])
     end
 
-    def all_includes
-      { scoring_ranges: {
-        include: {
-          assignment_sets: {
-            include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}},
-            except: [:root_account_id, :deleted_at]
-          } },
-        except: [:root_account_id, :deleted_at]
-      } }
-    end
-
     def json_includes
-      return all_includes if include_param.include? 'all'
+      return Rule.includes_for_json if include_param.include? 'all'
     end
 
     def add_ordering_to(attrs)

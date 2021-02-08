@@ -19,7 +19,6 @@ import $ from 'jquery'
 import _ from 'underscore'
 import I18n from 'i18n!observees'
 import pairingCodeTemplate from 'jst/PairingCodeUserObservees'
-import extAuthTemplate from 'jst/ExternalAuthUserObservees'
 import itemView from './UserObserveeView'
 import PaginatedCollectionView from './PaginatedCollectionView'
 
@@ -28,11 +27,7 @@ export default class UserObserveesView extends PaginatedCollectionView
   itemView: itemView
   className: 'user-observees'
 
-  template: ->
-    if ENV.AUTH_TYPE == 'saml'
-      extAuthTemplate
-    else
-      pairingCodeTemplate
+  template: pairingCodeTemplate
 
   events:
     'submit .add-observee-form': 'addObservee'

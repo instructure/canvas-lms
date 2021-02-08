@@ -20,10 +20,11 @@ import {AlertManagerContext} from '../../../shared/components/AlertManager'
 import {Assignment} from '../graphqlData/Assignment'
 import AttemptTab from './AttemptTab'
 import {Button, CloseButton} from '@instructure/ui-buttons'
+import Confetti from '../../../confetti/components/Confetti'
 import {CREATE_SUBMISSION, CREATE_SUBMISSION_DRAFT} from '../graphqlData/Mutations'
 import {friendlyTypeName, multipleTypesDrafted} from '../helpers/SubmissionHelpers'
 import I18n from 'i18n!assignments_2_file_upload'
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import {Modal} from '@instructure/ui-overlays'
 import {Mutation} from 'react-apollo'
 import PropTypes from 'prop-types'
@@ -46,6 +47,7 @@ export default class SubmissionManager extends Component {
   state = {
     editingDraft: false,
     openSubmitModal: false,
+    showConfetti: false,
     submittingAssignment: false,
     uploadingFiles: false
   }
@@ -100,38 +102,6 @@ export default class SubmissionManager extends Component {
       query: STUDENT_VIEW_QUERY,
       variables: {assignmentLid: this.props.assignment._id, submissionID: this.props.submission.id},
       data: {assignment}
-    })
-  }
-
-  clearSubmissionHistoriesCache = (cache, result) => {
-    if (result.data.createSubmission.errors) {
-      return
-    }
-
-    // Clear the submission histories cache so that we don't lose the currently
-    // displayed submission when a new submission is created and the current
-    // submission gets transitioned over to a submission history.
-    //
-    // We can't set set the data back to null because apollo doesn't support that:
-    // https://github.com/apollographql/apollo-feature-requests/issues/4
-    // Instead, setting it to a `blank` state is as close as we can come.
-    const node = {
-      submissionHistoriesConnection: {
-        nodes: [],
-        pageInfo: {
-          startCursor: null,
-          hasPreviousPage: true,
-          __typename: 'PageInfo'
-        },
-        __typename: 'SubmissionHistoryConnection'
-      },
-      __typename: 'Submission'
-    }
-
-    cache.writeQuery({
-      query: SUBMISSION_HISTORIES_QUERY,
-      variables: {submissionID: this.props.submission.id},
-      data: {node}
     })
   }
 
@@ -223,7 +193,7 @@ export default class SubmissionManager extends Component {
       activeTypeMeetsCriteria &&
       !this.state.uploadingFiles &&
       !this.state.editingDraft &&
-      !context.nextButtonEnabled &&
+      context.isLatestAttempt &&
       !this.props.assignment.lockInfo.isLocked
     )
   }
@@ -249,6 +219,17 @@ export default class SubmissionManager extends Component {
     } else {
       this.handleSubmitConfirmation(submitMutation)
     }
+  }
+
+  handleSuccess() {
+    this.context.setOnSuccess(I18n.t('Submission sent'))
+    const onTime = Date.now() < Date.parse(this.props.assignment.dueAt)
+    this.setState({showConfetti: window.ENV.CONFETTI_ENABLED && onTime})
+    setTimeout(() => {
+      // Confetti is cleaned up after 3000.
+      // Need to reset state after that in case they submit another attempt.
+      this.setState({showConfetti: false})
+    }, 4000)
   }
 
   renderAttemptTab() {
@@ -328,10 +309,15 @@ export default class SubmissionManager extends Component {
           onCompleted={data =>
             data.createSubmission.errors
               ? this.context.setOnFailure(I18n.t('Error sending submission'))
-              : this.context.setOnSuccess(I18n.t('Submission sent'))
+              : this.handleSuccess()
           }
           onError={() => this.context.setOnFailure(I18n.t('Error sending submission'))}
-          update={this.clearSubmissionHistoriesCache}
+          // refetch submission histories so we don't lose the currently
+          // displayed submission when a new submission is created and the current
+          // submission gets transitioned over to a submission history.
+          refetchQueries={() => [
+            {query: SUBMISSION_HISTORIES_QUERY, variables: {submissionID: this.props.submission.id}}
+          ]}
         >
           {submitMutation => (
             <>
@@ -362,6 +348,7 @@ export default class SubmissionManager extends Component {
             return this.shouldRenderSubmit(context) ? this.renderSubmitButton() : null
           }}
         </StudentViewContext.Consumer>
+        {this.state.showConfetti ? <Confetti /> : null}
       </>
     )
   }

@@ -27,7 +27,8 @@ function createColumns() {
   return [1, 2, 3, 4].map(id => ({
     id: `column${id}`,
     field: `columnData${id}`,
-    name: `Column ${id}`
+    name: `Column ${id}`,
+    type: id === 4 ? 'custom_column' : null
   }))
 }
 
@@ -178,9 +179,14 @@ QUnit.module('GradebookGrid GridSupport State', suiteHooks => {
       deepEqual(grid.getActiveCell(), {row: 0, cell: 1})
     })
 
-    test('creates an editor for the cell', () => {
+    test('creates an editor for the cell if it is not part of a custom column', () => {
       gridSupport.state.setActiveLocation('body', {row: 0, cell: 1})
       ok(grid.getCellEditor(), 'an editor exists for the active cell')
+    })
+
+    test('does not create an editor for the cell if it is part of a custom column', () => {
+      gridSupport.state.setActiveLocation('body', {row: 0, cell: 3})
+      notOk(grid.getCellEditor(), 'no editor is created for an active custom column cell')
     })
   })
 

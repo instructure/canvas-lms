@@ -83,27 +83,46 @@ Rails.application.config.after_initialize do
 
     delegate :in_current_region?, to: :database_server
 
+    class << self
+      def non_existent_database_servers
+        @non_existent_database_servers ||= Shard.distinct.pluck(:database_server_id).compact - DatabaseServer.all.map(&:id)
+      end
+    end
+
     scope :in_region, ->(region) do
       next in_current_region if region.nil?
 
-      servers = DatabaseServer.all.select { |db| db.in_region?(region) }.map(&:id)
-      if servers.include?(Shard.default.database_server.id)
-        where("database_server_id IN (?) OR database_server_id IS NULL", servers)
+      dbs_by_region = DatabaseServer.all.group_by { |db| db.config[:region] }
+      db_count_in_this_region = dbs_by_region[region]&.length.to_i + dbs_by_region[nil]&.length.to_i
+      db_count_in_other_regions = DatabaseServer.all.length - db_count_in_this_region + non_existent_database_servers.length
+
+      dbs_in_this_region = dbs_by_region[region]&.map(&:id) || []
+      dbs_in_this_region += dbs_by_region[nil]&.map(&:id) || [] if Shard.default.database_server.in_region?(region)
+
+      if db_count_in_this_region <= db_count_in_other_regions
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id IN (?) OR database_server_id IS NULL", dbs_in_this_region)
+        else
+          where(database_server_id: dbs_in_this_region)
+        end
+      elsif db_count_in_other_regions == 0
+        all
       else
-        where(database_server_id: servers)
+        dbs_not_in_this_region = DatabaseServer.all.map(&:id) - dbs_in_this_region + non_existent_database_servers
+        if dbs_in_this_region.include?(Shard.default.database_server.id)
+          where("database_server_id NOT IN (?) OR database_server_id IS NULL", dbs_not_in_this_region)
+        else
+          where.not(database_server_id: dbs_not_in_this_region)
+        end
       end
     end
 
     scope :in_current_region, -> do
-      if !default.is_a?(Switchman::Shard)
-        # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
-        # either way there's only one shard, and we always want to see it
-        [default]
-      elsif !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
-        all
-      else
-        in_region(ApplicationController.region)
-      end
+      # sharding isn't set up? maybe we're in tests, or a somehow degraded environment
+      # either way there's only one shard, and we always want to see it
+      return [default] unless default.is_a?(Switchman::Shard)
+      return all if !ApplicationController.region || DatabaseServer.all.all? { |db| !db.config[:region] }
+      in_region(ApplicationController.region)
     end
   end
 
@@ -139,13 +158,13 @@ Rails.application.config.after_initialize do
         next if db.shards.empty?
         regions << db.config[:region]
         db.shards.first.activate do
-          klass.send_later_enqueue_args(method, enqueue_args, *args)
+          klass.delay(**enqueue_args).__send__(method, *args)
         end
       end
     end
 
     def self.send_in_region(region, klass, method, enqueue_args = {}, *args)
-      return klass.send_later_enqueue_args(method, enqueue_args, *args) if region.nil?
+      return klass.delay(**enqueue_args).__send__(method, *args) if region.nil?
 
       shard = nil
       all.find { |db| db.config[:region] == region && (shard = db.shards.first) }
@@ -153,17 +172,15 @@ Rails.application.config.after_initialize do
       # the app server knows what region it's in, but the database servers don't?
       # just send locally
       if shard.nil? && all.all? { |db| db.config[:region].nil? }
-        return klass.send_later_enqueue_args(method, enqueue_args, *args)
+        return klass.delay(**enqueue_args).__send__(method, *args)
       end
 
       raise "Could not find a shard in region #{region}" unless shard
       shard.activate do
-        klass.send_later_enqueue_args(method, enqueue_args, *args)
+        klass.delay(**enqueue_args).__send__(method, *args)
       end
     end
   end
-
-  Switchman.config[:on_fork_proc] = -> { Canvas.reconnect_redis }
 
   Object.send(:remove_const, :Shard) if defined?(::Shard)
   Object.send(:remove_const, :DatabaseServer) if defined?(::DatabaseServer)

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ module Canvas::Migration::ExternalContent
     class << self
 
       def registered_services
-        @@registered_services ||= {}
+        @registered_services ||= {}
       end
 
       def register_service(key, service)
@@ -73,8 +75,8 @@ module Canvas::Migration::ExternalContent
           retry_count += 1
         end
         if pending_keys.any?
-          Canvas::Errors.capture_exception(:external_content_migration,
-            "External content migrations timed out for #{pending_keys.join(', ')}")
+          message = "External content migrations timed out for #{pending_keys.join(', ')}"
+          Canvas::Errors.capture_exception(:external_content_migration, message, :warn)
         end
       end
 

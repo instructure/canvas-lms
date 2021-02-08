@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -50,6 +52,10 @@ describe LiveEvents::Client do
     def error(data)
       data
     end
+
+    def warn(data)
+      data
+    end
   end
 
   let(:test_stream_name) { 'my_stream' }
@@ -80,6 +86,29 @@ describe LiveEvents::Client do
       })
 
       expect(res[:endpoint]).to eq("http://example.com:6543/")
+      LiveEvents.worker.stop!
+    end
+
+    it "should ignore invalid endpoints" do
+      res = LiveEvents::Client.aws_config({
+        "aws_endpoint" => "example.com:6543/"
+      })
+
+      expect(res.key?(:endpoint)).to eq false
+      LiveEvents.worker.stop!
+    end
+
+    it "should load custom creds" do
+      LiveEvents.aws_credentials = -> (settings) {
+        settings['value_to_return']
+      }
+
+      res = LiveEvents::Client.aws_config({
+        'custom_aws_credentials' => 'true',
+        'value_to_return' => 'a_value'
+      })
+
+      expect(res[:credentials]).to eq('a_value')
       LiveEvents.worker.stop!
     end
   end

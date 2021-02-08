@@ -16,26 +16,18 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React, {Suspense, useEffect, useState} from 'react'
+import React, {useEffect, useState} from 'react'
 import ReactDOM from 'react-dom'
 import {arrayOf, func, object, oneOf, oneOfType, string} from 'prop-types'
-import {Modal} from '@instructure/ui-overlays'
-import {Button, CloseButton} from '@instructure/ui-buttons'
-import {Heading, Spinner} from '@instructure/ui-elements'
-import {Tabs} from '@instructure/ui-tabs'
 import {px} from '@instructure/ui-utils'
-import formatMessage from '../../../../format-message'
 import indicatorRegion from '../../../indicatorRegion'
 import {isImage, isAudioOrVideo} from '../fileTypeUtils'
 import indicate from '../../../../common/indicate'
 
 import {StoreProvider} from '../StoreContext'
-import RceApiSource from '../../../../sidebar/sources/api'
-import Bridge from '../../../../bridge'
 
-const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
-const UrlPanel = React.lazy(() => import('./UrlPanel'))
-const UnsplashPanel = React.lazy(() => import('./UnsplashPanel'))
+import Bridge from '../../../../bridge'
+import UploadFileModal from './UploadFileModal'
 
 /**
  * Handles uploading data based on what type of data is submitted.
@@ -50,6 +42,7 @@ export const handleSubmit = (
   afterInsert = () => {}
 ) => {
   Bridge.focusEditor(editor.rceWrapper) // necessary since it blurred when the modal opened
+  const {altText, isDecorativeImage, displayAs} = uploadData?.imageOptions || {}
   switch (selectedPanel) {
     case 'COMPUTER': {
       const {theFile} = uploadData
@@ -58,7 +51,12 @@ export const handleSubmit = (
         name: theFile.name,
         size: theFile.size,
         contentType: theFile.type,
-        domObject: theFile
+        domObject: theFile,
+        altText,
+        isDecorativeImage,
+        displayAs,
+        usageRights:
+          uploadData?.usageRights?.usageRight === 'choose' ? undefined : uploadData?.usageRights
       }
       let tabContext = 'documents'
       if (isImage(theFile.type)) {
@@ -72,18 +70,34 @@ export const handleSubmit = (
     case 'UNSPLASH': {
       const {unsplashData} = uploadData
       source.pingbackUnsplash(unsplashData.id)
-      editor.insertContent(
-        editor.dom.createHTML('img', {src: unsplashData.url, alt: unsplashData.alt})
-      )
+      let editorHtml
+      if (displayAs !== 'link' && /image/.test(accept)) {
+        editorHtml = editor.dom.createHTML('img', {
+          src: unsplashData.url,
+          alt: altText || unsplashData.alt,
+          role: isDecorativeImage ? 'presentation' : undefined
+        })
+      } else {
+        editorHtml = editor.dom.createHTML(
+          'a',
+          {href: unsplashData.url},
+          altText || unsplashData.url
+        )
+      }
+      editor.insertContent(editorHtml)
       break
     }
     case 'URL': {
       const {fileUrl} = uploadData
       let editorHtml
-      if (/image/.test(accept)) {
-        editorHtml = editor.dom.createHTML('img', {src: fileUrl})
+      if (displayAs !== 'link' && /image/.test(accept)) {
+        editorHtml = editor.dom.createHTML('img', {
+          src: fileUrl,
+          alt: altText,
+          role: isDecorativeImage ? 'presentation' : undefined
+        })
       } else {
-        editorHtml = editor.dom.createHTML('a', {href: fileUrl})
+        editorHtml = editor.dom.createHTML('a', {href: fileUrl}, altText || fileUrl)
       }
       editor.insertContent(editorHtml)
       break
@@ -96,22 +110,6 @@ export const handleSubmit = (
   afterInsert()
 }
 
-function shouldBeDisabled({fileUrl, theFile, unsplashData, error}, selectedPanel) {
-  if (error) {
-    return true
-  }
-  switch (selectedPanel) {
-    case 'COMPUTER':
-      return !theFile || theFile.error
-    case 'UNSPLASH':
-      return !unsplashData.id || !unsplashData.url
-    case 'URL':
-      return !fileUrl
-    default:
-      return false // When in doubt, don't disable (but we shouldn't get here either)
-  }
-}
-
 export function UploadFile({
   accept,
   editor,
@@ -121,24 +119,11 @@ export function UploadFile({
   trayProps,
   onSubmit = handleSubmit
 }) {
-  const [theFile, setFile] = useState(null)
-  const [error, setError] = useState(null)
-  const [fileUrl, setFileUrl] = useState('')
-  const [selectedPanel, setSelectedPanel] = useState(panels[0])
-  const [unsplashData, setUnsplashData] = useState({id: null, url: null})
   const [modalBodyWidth, setModalBodyWidth] = useState(undefined)
   const [modalBodyHeight, setModalBodyHeight] = useState(undefined)
-  const bodyRef = React.createRef()
+  const bodyRef = React.useRef()
 
   trayProps = trayProps || Bridge.trayProps.get(editor)
-
-  const source =
-    trayProps.source ||
-    new RceApiSource({
-      jwt: trayProps.jwt,
-      refreshToken: trayProps.refreshToken,
-      host: trayProps.host
-    })
 
   // the panels get rendered inside tab panels. it's difficult for them to
   // figure out how much space they have to work with, and I'd like the previews
@@ -153,126 +138,24 @@ export function UploadFile({
       setModalBodyWidth(sz.width)
       setModalBodyHeight(sz.height)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [bodyRef.current, modalBodyHeight, modalBodyWidth])
-
-  function renderLoading() {
-    return formatMessage('Loading')
-  }
-
-  function renderTabs() {
-    return panels.map(panel => {
-      switch (panel) {
-        case 'COMPUTER':
-          return (
-            <Tabs.Panel
-              key={panel}
-              renderTitle={function() {
-                return formatMessage('Computer')
-              }}
-              selected={selectedPanel === 'COMPUTER'}
-            >
-              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-                <ComputerPanel
-                  editor={editor}
-                  theFile={theFile}
-                  setFile={setFile}
-                  setError={setError}
-                  label={label}
-                  accept={accept}
-                  bounds={{width: modalBodyWidth, height: modalBodyHeight}}
-                />
-              </Suspense>
-            </Tabs.Panel>
-          )
-        case 'UNSPLASH':
-          return (
-            <Tabs.Panel
-              key={panel}
-              renderTitle={function() {
-                return 'Unsplash'
-              }}
-              selected={selectedPanel === 'UNSPLASH'}
-            >
-              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-                <UnsplashPanel
-                  editor={editor}
-                  setUnsplashData={setUnsplashData}
-                  source={source}
-                  brandColor={trayProps.brandColor}
-                  liveRegion={trayProps.liveRegion}
-                />
-              </Suspense>
-            </Tabs.Panel>
-          )
-        case 'URL':
-          return (
-            <Tabs.Panel
-              key={panel}
-              renderTitle={function() {
-                return formatMessage('URL')
-              }}
-              selected={selectedPanel === 'URL'}
-            >
-              <Suspense fallback={<Spinner renderTitle={renderLoading} size="large" />}>
-                <UrlPanel fileUrl={fileUrl} setFileUrl={setFileUrl} />
-              </Suspense>
-            </Tabs.Panel>
-          )
-      }
-      return null
-    })
-  }
-
-  const disabledSubmit = shouldBeDisabled({fileUrl, theFile, unsplashData, error}, selectedPanel)
+  }, [modalBodyHeight, modalBodyWidth])
 
   return (
     <StoreProvider {...trayProps}>
       {contentProps => (
-        <Modal
-          data-mce-component
-          as="form"
-          label={label}
-          size="large"
-          overflow="fit"
+        <UploadFileModal
+          ref={bodyRef}
+          editor={editor}
+          trayProps={trayProps}
+          contentProps={contentProps}
+          onSubmit={onSubmit}
           onDismiss={onDismiss}
-          onSubmit={e => {
-            e.preventDefault()
-            if (disabledSubmit) {
-              return false
-            }
-            onSubmit(
-              editor,
-              accept,
-              selectedPanel,
-              {fileUrl, theFile, unsplashData},
-              contentProps,
-              source,
-              onDismiss
-            )
-          }}
-          open
-          shouldCloseOnDocumentClick
-          liveRegion={trayProps.liveRegion}
-        >
-          <Modal.Header>
-            <CloseButton onClick={onDismiss} offset="small" placement="end">
-              {formatMessage('Close')}
-            </CloseButton>
-            <Heading>{label}</Heading>
-          </Modal.Header>
-          <Modal.Body ref={bodyRef}>
-            <Tabs onRequestTabChange={(event, {index}) => setSelectedPanel(panels[index])}>
-              {renderTabs()}
-            </Tabs>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button onClick={onDismiss}>{formatMessage('Close')}</Button>&nbsp;
-            <Button variant="primary" type="submit" disabled={disabledSubmit}>
-              {formatMessage('Submit')}
-            </Button>
-          </Modal.Footer>
-        </Modal>
+          panels={panels}
+          label={label}
+          accept={accept}
+          modalBodyWidth={modalBodyWidth}
+          modalBodyHeight={modalBodyHeight}
+        />
       )}
     </StoreProvider>
   )

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -18,9 +20,16 @@
 require File.expand_path(File.dirname(__FILE__) + '/common')
 require File.expand_path(File.dirname(__FILE__) + '/helpers/files_common')
 
+# We have the funky indenting here because we will remove this once the granular
+# permission stuff is released, and I don't want to complicate the git history
+RSpec.shared_examples "course_files" do
 describe "better_file_browsing" do
   include_context "in-process server selenium tests"
   include FilesCommon
+
+  before do
+    set_granular_permission
+  end
 
   context "as a student" do
     before :once do
@@ -111,21 +120,18 @@ describe "better_file_browsing" do
       end
 
       it "should not return files from hidden folders in search results", priority: "1", test_id: 171774 do
-        skip('LA-372')
         @folder.update_attribute :hidden, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
       it "should not return files from unpublished folders in search results", priority: "1", test_id: 171774 do
-        skip('LA-372')
         @folder.update_attribute :locked, true
         get "/courses/#{@course.id}/files"
         verify_hidden_item_not_searchable_as_student("example")
       end
 
       it "should let student access files in restricted folder hidden by link", priority: "1", test_id: 134750 do
-        skip('LA-372')
         @folder.update_attribute :hidden, true
 
         get "/courses/#{@course.id}/files/folder/restricted_folder?preview=#{@file.id}"
@@ -133,5 +139,18 @@ describe "better_file_browsing" do
         expect(f('.ef-file-preview-header')).to be_present
       end
     end
+  end
+end
+end # End shared_example block
+
+RSpec.describe 'With granular permission on' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.enable_feature!(:granular_permissions_course_files) }
+  end
+end
+
+RSpec.describe 'With granular permission off' do
+  it_behaves_like "course_files" do
+    let(:set_granular_permission) { Account.default.root_account.disable_feature!(:granular_permissions_course_files) }
   end
 end

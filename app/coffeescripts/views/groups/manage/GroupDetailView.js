@@ -15,10 +15,12 @@
 // You should have received a copy of the GNU Affero General Public License along
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
+import React from 'react'
+import ReactDOM from 'react-dom'
 import I18n from 'i18n!GroupDetailView'
 import $ from 'jquery'
 import {View} from 'Backbone'
-import GroupEditView from './GroupEditView'
+import GroupModal from 'jsx/groups/components/GroupModal'
 import GroupCategoryCloneView from './GroupCategoryCloneView'
 import template from 'jst/groups/manage/groupDetail'
 import groupHasSubmissions from '../../../util/groupHasSubmissions'
@@ -47,6 +49,12 @@ export default class GroupDetailView extends View {
     return this.model.on('change', this.render, this)
   }
 
+  refreshCollection() {
+    // fetch a new paginated set of models for this collection from the server
+    // helpul when bypassing Backbone lifecycle events
+    this.model.collection.fetch()
+  }
+
   summary() {
     const count = this.model.usersCount()
     if (this.model.theLimit()) {
@@ -62,19 +70,35 @@ export default class GroupDetailView extends View {
     }
   }
 
-  editGroup(e) {
-    e.preventDefault()
-    if (this.editView == null)
-      this.editView = new GroupEditView({
-        model: this.model,
-        groupCategory: this.model.collection.category
-      })
-    this.editView.setTrigger(this.$editGroupLink)
-    return this.editView.open()
+  editGroup(e, open = true) {
+    if (e) e.preventDefault()
+    ReactDOM.render(
+      <GroupModal
+        group={{
+          name: this.model.get('name'),
+          id: this.model.get('id'),
+          group_category_id: this.model.get('group_category_id'),
+          role: this.model.get('role'),
+          join_level: this.model.get('join_level'),
+          group_limit: this.model.get('max_membership'),
+          members_count: this.model.get('members_count')
+        }}
+        label={I18n.t('Edit Group')}
+        open={open}
+        requestMethod="PUT"
+        onSave={() => this.refreshCollection()}
+        onDismiss={() => {
+          this.editGroup(null, false)
+          this.$editGroupLink.focus()
+        }}
+      />,
+      document.getElementById('group-mount-point')
+    )
   }
 
   deleteGroup(e) {
     e.preventDefault()
+    // eslint-disable-next-line no-restricted-globals
     if (confirm(I18n.t('delete_confirm', 'Are you sure you want to remove this group?'))) {
       if (groupHasSubmissions(this.model)) {
         this.cloneCategoryView = new GroupCategoryCloneView({

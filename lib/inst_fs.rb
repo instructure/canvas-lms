@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -26,6 +28,10 @@ module InstFS
       rand < Canvas::Plugin.find('inst_fs').settings[:migration_rate].to_f / 100.0
     end
 
+    def service_worker_enabled?
+      Canvas::Plugin.value_to_boolean(Canvas::Plugin.find('inst_fs').settings[:service_worker])
+    end
+
     def migrate_attachment?(attachment)
       enabled? && !attachment.instfs_hosted? && Attachment.s3_storage? && check_migration_rate?
     end
@@ -44,7 +50,16 @@ module InstFS
       return unless user && enabled?
       CanvasHttp.delete(logout_url(user))
     rescue CanvasHttp::Error => e
-      Canvas::Errors.capture_exception(:page_view, e)
+      Canvas::Errors.capture_exception(:page_view, e, :warn)
+    end
+
+    def bearer_token(options)
+      expires_in = options[:expires_in] || Setting.get('instfs.session_token.expiration_minutes', '5').to_i.minutes
+      claims = {
+        iat: Time.now.utc.to_i,
+        user_id: options[:user]&.global_id&.to_s
+      }
+      Canvas::Security.create_jwt(claims, expires_in.from_now, self.jwt_secret, :HS512)
     end
 
     def authenticated_url(attachment, options={})
@@ -150,7 +165,11 @@ module InstFS
       data = {}
       data[file_name] = file_object
 
-      response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+      begin
+        response = CanvasHttp.post(url, form_data: data, multipart: true, streaming: true)
+      rescue Net::ReadTimeout, CanvasHttp::CircuitBreakerError
+        raise InstFS::ServiceError, "unable to communicate with instfs"
+      end
       if response.class == Net::HTTPCreated
         json_response = JSON.parse(response.body)
         return json_response["instfs_uuid"] if json_response.key?("instfs_uuid")
@@ -158,7 +177,13 @@ module InstFS
         raise InstFS::DirectUploadError, "upload succeeded, but response did not contain an \"instfs_uuid\" key"
       end
 
-      raise InstFS::DirectUploadError, "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+      err_message = "received code \"#{response.code}\" from service, with message \"#{response.body}\""
+      if response.code.to_i >= 500
+        raise InstFS::ServiceError, err_message
+      elsif response.code.to_i == 400
+        raise InstFS::BadRequestError, err_message
+      end
+      raise InstFS::DirectUploadError, err_message
     end
 
     def export_reference(attachment)
@@ -242,10 +267,41 @@ module InstFS
 
     private
     def setting(key)
-      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
+      unsafe_setting(key)
     rescue Imperium::TimeoutError => e
-      Canvas::Errors.capture_exception(:inst_fs, e)
-      nil
+      # capture this to make sure that we have SOME
+      # signal that the problem is continuing, even if our
+      # retries are all successful.
+      Canvas::Errors.capture_exception(:inst_fs, e, :warn)
+      Rails.logger.warn("[INST_FS] Consul timeout hit during settings #{e}, entering retry handling...")
+      retry_limit = Setting.get("inst_fs_config_retry_count", "5").to_i
+      retry_base = Setting.get("inst_fs_config_retry_base_interval", "1.4").to_i
+      retry_count = 1
+      return_value = nil
+      currently_in_job = Delayed::Worker.current_job.present?
+      while retry_count <= retry_limit
+        begin
+          return_value = unsafe_setting(key)
+          break
+        rescue Imperium::TimeoutError => e
+          retry_count += 1
+          # if we're not currently in a job, one retry is all you get,
+          # fail for the user and move on.
+          raise e if !currently_in_job || retry_count > retry_limit
+          backoff_interval = retry_base ** retry_count
+          Rails.logger.warn("[INST_FS] Consul timeout hit during settings, retrying in #{backoff_interval} seconds...")
+          sleep(backoff_interval)
+        end
+      end
+      return_value
+    end
+
+    # this is just to provide a convenient way to wrap
+    # accessing a setting in retries (see #setting),
+    # it should not be used by the rest of the code,
+    # inside this class or otherwise.
+    def unsafe_setting(key)
+      Canvas::DynamicSettings.find(service: "inst-fs", default_ttl: 5.minutes)[key]
     end
 
     def service_url(path, query_params=nil)
@@ -305,7 +361,6 @@ module InstFS
       whole, remainder = number.divmod(step)
       whole * step
     end
-
     # If we just say every token was created at Time.now, since that token
     # is included in the url, every time we make a url it will be a new url and no browser
     # will never be able to get it from their cache. Which means, for example: every time you
@@ -346,8 +401,11 @@ module InstFS
         iat: iat,
         user_id: options[:user]&.global_id&.to_s,
         resource: resource,
+        jti: SecureRandom.uuid,
         host: options[:oauth_host]
       }
+      original_url = parse_original_url(options[:original_url])
+      claims[:original_url] = original_url if original_url.present?
       if options[:acting_as] && options[:acting_as] != options[:user]
         claims[:acting_as_user_id] = options[:acting_as].global_id.to_s
       end
@@ -424,8 +482,26 @@ module InstFS
       }, expires_in)
     end
 
+    def parse_original_url(url)
+      if url
+        uri = Addressable::URI.parse(url)
+        query = (uri.query_values || {}).with_indifferent_access
+        # We only want to redirect once, if the redirect param is present then we already redirected.
+        # In which case we don't send the original_url param again
+        if !Canvas::Plugin.value_to_boolean(query[:redirect])
+          query[:redirect] = true
+          query[:no_cache] = true
+          uri.query_values = query
+          return uri.to_s
+        else
+          return nil
+        end
+      end
+    end
+
     def amend_claims_for_access_token(claims, access_token, root_account)
       return unless access_token
+
       if whitelisted_access_token?(access_token)
         # temporary workaround for legacy API consumers
         claims[:legacy_api_developer_key_id] = access_token.global_developer_key_id.to_s
@@ -449,6 +525,16 @@ module InstFS
   end
 
   class DirectUploadError < StandardError; end
+  class ServiceError < DirectUploadError
+    def response_status
+      502
+    end
+  end
+  class BadRequestError < DirectUploadError
+    def response_status
+      400
+    end
+  end
   class ExportReferenceError < StandardError; end
   class DuplicationError < StandardError; end
   class DeletionError < StandardError; end

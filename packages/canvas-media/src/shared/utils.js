@@ -18,6 +18,16 @@
 
 export const AUDIO_PLAYER_SIZE = {width: '320px', height: '14.25rem'}
 
+export const NON_PREVIEWABLE_TYPES = [
+  'audio/x-ms-wma',
+  'video/avi',
+  'video/x-msvideo',
+  'video/x-ms-wma',
+  'video/x-ms-wmv'
+]
+
+export const isPreviewable = type => !NON_PREVIEWABLE_TYPES.includes(type)
+
 export function isVideo(type) {
   return /^video/.test(type)
 }
@@ -28,6 +38,8 @@ export function isAudio(type) {
 
 // return the desired size of the video player in CSS units
 // constrained to the container's size
+// If the container is larger than the video, will stretch it to fill
+// the available space
 export function sizeMediaPlayer(player, type, container) {
   if (isAudio(type)) {
     return AUDIO_PLAYER_SIZE
@@ -37,17 +49,19 @@ export function sizeMediaPlayer(player, type, container) {
     width: player.videoWidth,
     height: player.videoHeight
   }
-  // scale the player so it fills the container,
-  // but does not overflow
-  const hscale = container.height / sz.height
-  sz.width *= hscale
-  sz.height *= hscale
-
-  if (sz.width > container.width) {
-    const wscale = container.width / sz.width
-    sz.width *= wscale
-    sz.height *= wscale
+  if (sz.width > sz.height) {
+    sz.width = container.width
+    sz.height = (player.videoHeight / player.videoWidth) * sz.width
+  } else {
+    sz.height = container.height
+    sz.width = (player.videoWidth / player.videoHeight) * sz.height
   }
+
+  if (sz.height > container.height) {
+    sz.width *= container.height / sz.height
+    sz.height = container.height
+  }
+
   sz.width = `${Math.round(sz.width)}px`
   sz.height = `${Math.round(sz.height)}px`
   return sz

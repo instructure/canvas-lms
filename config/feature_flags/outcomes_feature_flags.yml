@@ -5,31 +5,9 @@ outcome_alignment_non_scoring_content:
   display_name: Outcome alignment to non-scoring content
   description: |-
     Allows aligning outcomes to non-scoring content
-rubrics_in_course_navigation:
-  state: hidden
-  applies_to: RootAccount
-  display_name: Rubrics in course navigation
-  description: |-
-    Includes rubrics in the course sidebar navigation
-  touch_context: true
-decouple_rubrics:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Modify permissions for Account Rubrics"
-  description: "Change Rubrics visibility on Accounts to depend on the Rubrics permission
-    instead of the Learning Outcomes permission"
-import_outcomes_permission_fix:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Hide the Import Learning Outcomes button based on user permissions"
-  description: "Ensures that users without the Import Outcomes permission cannot see
-    the button within the Outcomes tab"
-outcome_guid_course_exports:
-  state: hidden
-  applies_to: RootAccount
-  display_name: "Reduce outcome duplication on course import"
-  description: "Ensures that outcomes that have already been imported
-    into a course are not duplicated if they are imported again"
+  environments:
+    production:
+      state: disabled
 selectable_outcomes_in_course_copy:
   state: hidden
   applies_to: RootAccount
@@ -47,3 +25,32 @@ outcome_alignments_course_migration:
   display_name: Outcomes Service Alignment Migration
   description: Includes Outcomes Service alignments when exporting and importing
     course content
+account_level_mastery_scales:
+  state: hidden
+  display_name: Account and Course Level Outcome Mastery Scales
+  description: Allows setting Account & Course Level mastery scales and calculation methods,
+    replacing per-outcome criterion ratings & calculation methods
+  after_state_change_proc: mastery_scales_after_change_hook
+  applies_to: RootAccount
+usage_rights_discussion_topics:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Usage Rights on Discussion Topics
+  description: On courses with usage rights enabled, enforces usage rights
+    selection on discussion topic file attachments
+improved_outcomes_management:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Improved Outcomes Management
+  description: Helps administrators and teachers make more meaningful decisions as they import,
+    organize, and edit outcomes in their account and courses.
+inactive_concluded_lmgb_filters:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Student filters in LMGB
+  description: Allow inactive and/or concluded enrollments to be displayed in LMGB
+enable_webcam_submission:
+  state: hidden
+  applies_to: RootAccount
+  display_name: Enable Webcam on Submissions
+  description: Allow students to submit photo using their webcam.

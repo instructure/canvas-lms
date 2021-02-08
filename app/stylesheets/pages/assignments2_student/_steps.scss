@@ -59,7 +59,9 @@
   padding: 0;
   min-width: 0.0625rem;
   flex: 1;
+}
 
+.step-expanded {
   &:last-of-type {
     flex: 0.5;
   }

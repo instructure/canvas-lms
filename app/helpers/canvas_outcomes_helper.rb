@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -18,6 +20,11 @@
 
 module CanvasOutcomesHelper
   def set_outcomes_alignment_js_env(artifact, context, props)
+    context =
+      case context
+      when Group then context.context
+      else context
+      end
     # don't show for contexts without alignmments
     return if context.learning_outcome_links.empty?
 

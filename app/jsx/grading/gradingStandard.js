@@ -410,44 +410,34 @@ class GradingStandard extends React.Component {
         >
           {this.renderStandardAlert()}
           <div>
-            <table>
-              <caption className="screenreader-only">
-                {I18n.t(
-                  'A table containing the name of the grading scheme and buttons for editing or deleting the scheme.'
-                )}
-              </caption>
-              <thead>
-                <tr>
-                  <th scope="col" className="insert_row_container" tabIndex="-1" />
-                  <th scope="col" colSpan="5" className="standard_title">
-                    {this.renderIconsAndTitle()}
-                  </th>
-                </tr>
-                <tr>
-                  <th scope="col" className="insert_row_container" />
-                  <th scope="col" className="name_header">
-                    {I18n.t('Name')}
-                  </th>
-                  <th scope="col" className="range_container" colSpan="2">
-                    <div className="range_label">{I18n.t('Range')}</div>
-                    <div className="clear" />
-                  </th>
-                </tr>
-              </thead>
-            </table>
             <table className="grading_standard_data">
               <caption className="screenreader-only">
                 {I18n.t(
-                  'A table that contains the grading scheme data. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
+                  'A table that contains the grading scheme data. First is a name of the grading scheme and buttons for editing and deleting the scheme. Each row contains a name, a maximum percentage, and a minimum percentage. In addition, each row contains a button to add a new row below, and a button to delete the current row.'
                 )}
               </caption>
-              <thead aria-hidden="true">
-                <tr>
-                  <td />
-                  <td />
-                  <td />
-                  <td />
-                  <td />
+              <thead>
+                <tr className="grading_standard_headers">
+                  <th scope="col" className="icon_row_cell" tabIndex="-1">
+                    <div className="screenreader-only">{I18n.t('Insert row in edit mode')}</div>
+                  </th>
+                  <th scope="col" colSpan="4" className="standard_title">
+                    {this.renderIconsAndTitle()}
+                  </th>
+                </tr>
+                <tr className="grading_standard_headers">
+                  <th scope="col" className="icon_row_cell">
+                    <div className="screenreader-only">{I18n.t('Insert row in edit mode')}</div>
+                  </th>
+                  <th scope="col" className="name_row_cell">
+                    {I18n.t('Name')}
+                  </th>
+                  <th scope="col" className="range_row_cell" colSpan="2">
+                    {I18n.t('Range')}
+                  </th>
+                  <th scope="col" className="icon_row_cell">
+                    <div className="screenreader-only">{I18n.t('Remove row in edit mode')}</div>
+                  </th>
                 </tr>
               </thead>
               <tbody>{this.renderDataRows()}</tbody>

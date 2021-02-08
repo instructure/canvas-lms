@@ -25,13 +25,6 @@ developer_key_support_includes:
   description: |-
     Provides a flag on the Devloper Key to support Include Parameters on API requests
   applies_to: SiteAdmin
-process_multiple_content_items_modules_index:
-  state: hidden
-  display_name: Process multiple content items from course modules page
-  description: |-
-    If enabled, Canvas will allow tools to return multiple content items
-    in a single request at the course modules page
-  applies_to: SiteAdmin
 site_admin_keys_only:
   state: hidden
   display_name: Only show site admin keys in the site admin UI
@@ -41,4 +34,19 @@ site_admin_keys_only:
     Canvas instances where root accounts are on the same shard
     as the site admin account. Behavior in other instances
     already behaved in this way.
+  applies_to: SiteAdmin
+use_oembed_token:
+  state: hidden
+  display_name: Require signed token for oEmbed
+  description: |-
+    If enabled, oEmbed endpoints will require a
+    tool-generated token to verify the origin
+    of an oEmbed resource request.
+  applies_to: SiteAdmin
+disable_graphql_authentication:
+  state: hidden
+  display_name: Disable authentication for GraphQL
+  description: |-
+    If enabled, GraphQL queries will not require
+    users to be signed in or use an access token.
   applies_to: SiteAdmin

@@ -109,7 +109,7 @@
                     can_manage_content: can_do(@context, @current_user, :manage_content),
                     can_manage_students: can_do(@context, @current_user, :manage_students),
                     can_manage_assignments: can_do(@context, @current_user, :manage_assignments),
-                    can_manage_files: can_do(@context, @current_user, :manage_files),
+                    can_manage_files: can_do(@context, @current_user, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS),
                     can_update: can_do(@context, @current_user, :update),
                     can_manage_calendar: can_do(@context, @current_user, :manage_calendar),
                     can_manage_admin_users: can_do(@context, @current_user, :manage_admin_users),
@@ -132,7 +132,7 @@
           </a>
         <% end %>
 
-        <% if can_do(@context, @current_user, :use_student_view) %>
+        <% if can_do(@context, @current_user, :use_student_view) && !@context.feature_enabled?(:easy_student_view) %>
           <%= link_to course_student_view_path(@context), :method => :post, :class => 'btn button-sidebar-wide' do %>
             <i class="icon-student-view"></i> <%= t('links.student_view', 'Student View') %>
           <% end %>
@@ -171,7 +171,7 @@
       </a>
     <% end %>
 
-    <% if @context_enrollment && @domain_root_account.try(:feature_enabled?, :mute_notifications_by_course) %>
+    <% if @context_enrollment %>
       <a class="btn button-sidebar-wide" href="<%= context_url(@context, :context_url, :view => 'notifications') %>">
         <i class="icon-<%= @course_notifications_enabled ? "unmuted" : "muted" %>"></i>
         <%= t('links.view_course_notification_settings', %{View Course Notifications}) %>

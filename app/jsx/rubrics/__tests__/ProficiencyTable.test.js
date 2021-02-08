@@ -15,6 +15,12 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+
+/*
+  TODO: Duplicated and modified within jsx/outcomes/MasteryScale for use there
+        Remove when feature flag account_level_mastery_scales is enabled
+*/
+
 import _ from 'lodash'
 import $ from 'jquery'
 import React from 'react'
@@ -25,6 +31,12 @@ import ProficiencyTable from '../ProficiencyTable'
 
 const defaultProps = {
   accountId: '1'
+}
+
+// Because we had to override the displayName of the <ProficiencyRating> component in
+// order to make InstUI's prop checking happy, finding them is a bit more involved.
+function findProficiencyRatings(shallowWrapper) {
+  return shallowWrapper.find('Row').filterWhere(c => c.type().name === 'ProficiencyRating')
 }
 
 let getSpy
@@ -60,7 +72,7 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(5)
+      expect(findProficiencyRatings(wrapper)).toHaveLength(5)
       done()
     }, 1)
   })
@@ -69,36 +81,12 @@ describe('default proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     setTimeout(() => {
       wrapper.instance().removeBillboard()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(0)
-          .prop('focusField')
-      ).toBe('mastery')
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(1)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(2)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(3)
-          .prop('focusField')
-      ).toBeNull()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .at(4)
-          .prop('focusField')
-      ).toBeNull()
+      const ratings = findProficiencyRatings(wrapper)
+      expect(ratings.at(0).prop('focusField')).toBe('mastery')
+      expect(ratings.at(1).prop('focusField')).toBeNull()
+      expect(ratings.at(2).prop('focusField')).toBeNull()
+      expect(ratings.at(3).prop('focusField')).toBeNull()
+      expect(ratings.at(4).prop('focusField')).toBeNull()
       done()
     }, 1)
   })
@@ -108,7 +96,7 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.findWhere(n => n.prop('variant') === 'circle-primary').simulate('click')
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(6)
+      expect(findProficiencyRatings(wrapper)).toHaveLength(6)
       done()
     }, 1)
   })
@@ -131,7 +119,7 @@ describe('default proficiency', () => {
     setTimeout(() => {
       wrapper.instance().removeBillboard()
       wrapper.instance().handleDelete(1)()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(4)
+      expect(findProficiencyRatings(wrapper)).toHaveLength(4)
       expect(flashMock).toHaveBeenCalledTimes(1)
       flashMock.mockRestore()
       done()
@@ -148,8 +136,7 @@ describe('default proficiency', () => {
         .last()
         .simulate('click')
       expect(
-        wrapper
-          .find('ProficiencyRating')
+        findProficiencyRatings(wrapper)
           .first()
           .prop('descriptionError')
       ).toBe('Missing required description')
@@ -167,8 +154,7 @@ describe('default proficiency', () => {
         .last()
         .simulate('click')
       expect(
-        wrapper
-          .find('ProficiencyRating')
+        findProficiencyRatings(wrapper)
           .first()
           .prop('pointsError')
       ).toBe('Invalid points')
@@ -186,8 +172,7 @@ describe('default proficiency', () => {
         .last()
         .simulate('click')
       expect(
-        wrapper
-          .find('ProficiencyRating')
+        findProficiencyRatings(wrapper)
           .first()
           .prop('pointsError')
       ).toBe('Invalid points')
@@ -205,8 +190,7 @@ describe('default proficiency', () => {
         .last()
         .simulate('click')
       expect(
-        wrapper
-          .find('ProficiencyRating')
+        findProficiencyRatings(wrapper)
           .first()
           .prop('pointsError')
       ).toBe('Negative points')
@@ -287,19 +271,11 @@ describe('custom proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     return promise.then(() => {
       spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(2)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeFalsy()
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .last()
-          .prop('disableDelete')
-      ).toBeFalsy()
+      const ratings = findProficiencyRatings(wrapper)
+      expect(ratings).toHaveLength(2)
+      ratings.forEach(r => {
+        expect(r.prop('disableDelete')).toBeFalsy()
+      })
     })
   })
 
@@ -321,13 +297,11 @@ describe('custom proficiency', () => {
     const wrapper = shallow(<ProficiencyTable {...defaultProps} />)
     return promise.then(() => {
       spy.mockRestore()
-      expect(wrapper.find('ProficiencyRating')).toHaveLength(1)
-      expect(
-        wrapper
-          .find('ProficiencyRating')
-          .first()
-          .prop('disableDelete')
-      ).toBeTruthy()
+      const ratings = findProficiencyRatings(wrapper)
+      expect(ratings).toHaveLength(1)
+      ratings.forEach(r => {
+        expect(r.prop('disableDelete')).toBeTruthy()
+      })
     })
   })
 })

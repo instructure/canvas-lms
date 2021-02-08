@@ -48,3 +48,29 @@ describe('isContentMessage', () => {
     expect(SelectContent.isContentMessage(undefined)).toBeFalsy()
   })
 })
+
+describe('errorForUrlItem', () => {
+  describe('when the item does not have a url', () => {
+    it('returns an error describing the absence of a URL', () => {
+      expect(SelectContent.errorForUrlItem({'@type': 'LtiLinkItem'})).toEqual(
+        'Error: The tool did not return a URL to Canvas'
+      )
+    })
+  })
+
+  describe('when the item does not have the expected type', () => {
+    it('returns an error describing the invalid message type', () => {
+      expect(
+        SelectContent.errorForUrlItem({'@type': 'InvalidType', url: 'http://www.test.com'})
+      ).toEqual('Error: The tool returned an invalid content type "InvalidType"')
+    })
+  })
+
+  describe('when the item does not have a recognized error', () => {
+    it('returns a generic error message', () => {
+      expect(
+        SelectContent.errorForUrlItem({'@type': 'LtiLinkItem', url: 'http://www.test.com'})
+      ).toEqual('Error embedding content from tool')
+    })
+  })
+})

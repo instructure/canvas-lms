@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -379,6 +381,34 @@ describe ContextModuleProgression do
 
       assignment.unmute!
       expect(progression.reload).to be_completed
+    end
+  end
+
+  describe "tweaking collapsed state" do
+    it "flips the state back and forth" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      progression.uncollapse!
+      expect(progression.collapsed?).to be_falsey
+    end
+
+    it "doesn't bother if the state is already in the right place" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      expect(progression).not_to receive(:save)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+    end
+
+    it "doesn't persist if you force it to skip" do
+      progression = @module.evaluate_for(@user)
+      progression.collapse!
+      expect(progression.collapsed?).to be_truthy
+      expect(progression).not_to receive(:save)
+      progression.uncollapse!(skip_save: true)
+      expect(progression.collapsed?).to be_falsey
     end
   end
 end

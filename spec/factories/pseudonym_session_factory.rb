@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -30,19 +32,27 @@ module Factories
         :login_count => 1,
         :global_account_id => '10000000000001',
         :sis_user_id => 'U001',
-        :shard => Shard.default
+        :shard => Shard.default,
+        :works_for_account? => true
       )
       # at least one thing cares about the id of the pseudonym... using the
       # object_id should make it unique (but obviously things will fail if
       # it tries to load it from the db.)
       allow(pseudonym).to receive(:id).and_return(pseudonym.object_id)
       allow(pseudonym).to receive(:unique_id).and_return('unique_id')
+      allow(pseudonym).to receive(:global_id).and_return(10000000000001)
     end
 
-    session = double('PseudonymSession', :record => pseudonym, :session_credentials => nil)
+    session = double('PseudonymSession',
+      :record => pseudonym
+    )
 
     @session_stubbed = true
     allow(PseudonymSession).to receive(:find).and_wrap_original do |original|
+      next original.call unless @session_stubbed
+      session
+    end
+    allow(PseudonymSession).to receive(:find_with_validation).and_wrap_original do |original|
       next original.call unless @session_stubbed
       session
     end

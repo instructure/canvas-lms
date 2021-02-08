@@ -9,7 +9,6 @@
 # * pretty much any dotfile not already covered (e.g. .rvmrc)
 #
 # That's what .git/info/exclude and core.excludesfile are for :)
-
 .bundle/
 .byebug_history
 .env
@@ -29,14 +28,18 @@ docker-compose.override.yml
 /exports/
 Gemfile.lock
 Gemfile.lock.next
-/log/
+/log/*
+!/log/.keep
+!/log/parallel-runtime-rspec.log
 mkmf.log
 /node_modules
 npm-debug.log
 /public/dist/
 /public/doc/api/
 /public/javascripts/translations/
-/tmp/
+/storybook-static/
+/tmp/*
+!/tmp/.keep
 /vendor/bundle
 yarn-error.log
 
@@ -48,9 +51,6 @@ yarn-error.log
 /public/plugins/
 /spec/coffeescripts/plugins/
 /spec/plugins/
-
-# generated client app stuff
-/public/javascripts/client_apps/
 
 # canvas-gems
 /gems/*/coverage
@@ -71,7 +71,7 @@ docker-compose.local.*
 /reports/
 /pacts/
 
-# generated scope names
+# generated scopes
 /lib/api_scope_mapper.rb
 
 # generated scopes markdown

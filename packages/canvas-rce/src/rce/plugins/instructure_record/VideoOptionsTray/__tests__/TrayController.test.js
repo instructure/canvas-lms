@@ -58,7 +58,7 @@ const mockVideoPlayers = [
 
 beforeAll(() => {
   contentSelection.asVideoElement = jest.fn(elem => {
-    const vid = elem.getAttribute('id')
+    const vid = elem.parentElement.getAttribute('id')
     return mockVideoPlayers.find(vp => vp.id === vid)
   })
 
@@ -196,16 +196,38 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
         appliedHeight: '101',
         appliedWidth: '321',
         titleText: 'new title',
+        media_object_id: 'm_somevideo',
         updateMediaObject
       })
       expect(getTray()).toBeNull() // the tray is closed
-      const videoContainer = trayController.$videoContainer
-      const videoIframe = videoContainer.firstElementChild
+      const videoIframe = trayController.$videoContainer
+      const videoContainer = videoIframe.parentElement
       expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
       expect(videoIframe.getAttribute('title')).toBe('new title')
       expect(videoContainer.style.height).toBe('101px')
       expect(videoContainer.style.width).toBe('321px')
       expect(updateMediaObject).toHaveBeenCalled()
+    })
+
+    it('does not updates the video w/o a media_object_id', () => {
+      const updateMediaObject = jest.fn().mockResolvedValue()
+      trayController.showTrayForEditor(editors[0])
+      trayController._applyVideoOptions({
+        displayAs: 'embed',
+        appliedHeight: '101',
+        appliedWidth: '321',
+        titleText: 'new title',
+        media_object_id: undefined,
+        updateMediaObject
+      })
+      expect(getTray()).toBeNull() // the tray is closed
+      const videoIframe = trayController.$videoContainer
+      const videoContainer = videoIframe.parentElement
+      expect(videoContainer.getAttribute('data-mce-p-title')).toBe('new title')
+      expect(videoIframe.getAttribute('title')).toBe('new title')
+      expect(videoContainer.style.height).toBe('101px')
+      expect(videoContainer.style.width).toBe('321px')
+      expect(updateMediaObject).not.toHaveBeenCalled()
     })
 
     it('replaces the video with a link', () => {
@@ -215,6 +237,7 @@ describe('RCE "Videos" Plugin > VideoOptionsTray > TrayController', () => {
       trayController._applyVideoOptions({
         displayAs: 'link',
         titleText: 'new <em>fancy</em> title',
+        media_object_id: 'm_somevideo',
         updateMediaObject
       })
       expect(getTray()).toBeNull() // the tray is closed

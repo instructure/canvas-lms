@@ -29,8 +29,6 @@ export default class FeatureFlagDialog extends DialogBaseView {
 
     this.optionProperty('hasCancelButton')
 
-    this.optionProperty('reloadOnConfirm')
-
     this.prototype.template = template
 
     this.prototype.labels = {
@@ -54,10 +52,6 @@ export default class FeatureFlagDialog extends DialogBaseView {
     return options
   }
 
-  onReload() {
-    window.location.reload()
-  }
-
   onOpen(_e) {
     this.okay = false
   }
@@ -75,9 +69,6 @@ export default class FeatureFlagDialog extends DialogBaseView {
   }
 
   onConfirm(_e) {
-    if (this.reloadOnConfirm) {
-      return this.onReload()
-    }
     this.okay = this.hasCancelButton
     this.close()
   }

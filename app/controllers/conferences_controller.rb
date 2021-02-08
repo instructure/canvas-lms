@@ -272,7 +272,7 @@ class ConferencesController < ApplicationController
     }
     log_asset_access([ "conferences", @context ], "conferences", "other")
 
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       @render_alternatives = WebConference.conference_types(@context).all? { |ct| ct[:replace_with_alternatives] }
       case @context
       when Course

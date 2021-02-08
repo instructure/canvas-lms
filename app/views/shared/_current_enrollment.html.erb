@@ -42,7 +42,7 @@
       <% past_course = enrollments_for_index(:past).include? current_enrollment %>
       <% favorite_past_course = past_course && favorite_course %>
       <% tooltip_message = t('nonfavorited_tooltip', "Click to add to the courses menu.") if !favorite_course %>
-      <% tooltip_message = t("This course cannot be added to the courses menu at this time.") if (!show_link || past_course) %>
+      <% tooltip_message = t("This course cannot be added to the courses menu unless the course is active.") if (!show_link || past_course) %>
       <% tooltip_message = t('favorited_tooltip', "Click to remove from the courses menu.") if favorite_course || favorite_past_course %>
         <span
           class="<%= "course-list-favorite-course" if favorite_course %> <%= "course-list-not-favoritable disabled" if (!show_link || favorite_past_course) %> <%= "course-list-favoritable" if show_link %>"

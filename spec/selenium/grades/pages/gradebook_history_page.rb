@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -51,7 +53,7 @@ class GradeBookHistory
     end
 
     def enter_assignment_name(assignment_name)
-      assignment_name_textfield.send_keys(assignment_name)
+      replace_content(assignment_name_textfield, assignment_name)
       wait_for_ajaximations
     end
 
@@ -96,6 +98,11 @@ class GradeBookHistory
       click_filter_button
     end
 
+    def search_final_grade_override_only
+      final_grade_override_checkbox.click
+      click_filter_button
+    end
+
     def search_with_all_data(type_ahead, student, grader, assignment)
       select_student_name(type_ahead, student)
       select_grader_name(grader)
@@ -123,6 +130,14 @@ class GradeBookHistory
         end
       end
       test_passed
+    end
+
+    def contains_final_grade_override_entries?
+      (1...results_table_rows.size + 1).any? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
+    end
+
+    def contains_only_final_grade_override_entries?
+      (1...results_table_rows.size + 1).all? { |idx| results_table_assignment_col(idx).text == "Final Grade Override" }
     end
 
     def check_table_for_grader_name(string_in_row)
@@ -165,6 +180,10 @@ class GradeBookHistory
 
     def assignment_name_textfield
       f('#assignments')
+    end
+
+    def final_grade_override_checkbox
+      f('div[data-testid="show-final-grade-overrides-only-checkbox"]')
     end
 
     def start_date_textfield

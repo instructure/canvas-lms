@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -90,8 +92,9 @@ module BasicLTI
 
     def save_submission!(launch_url, grade, score, grader_id)
       initialize_version
-      with_versioning(launch_url) do
-        submit_submission
+      with_versioning(launch_url) do |is_different_attempt|
+        # Don't "resubmit" the submission if this is just a regrade
+        submit_submission if is_different_attempt
         grade_submission(launch_url, grade, score, grader_id)
       end
     end
@@ -108,13 +111,15 @@ module BasicLTI
       is_different_attempt = submission.url != launch_url
       # create a new version if the open (last) version is another attempt
       #   and the open version is not a nil version (excluding the first padding)
+
       save_with_versioning if !is_updatable_nil_version && is_different_attempt
-      yield
+      yield is_different_attempt
     end
 
     def submit_submission
       submission.submission_type = params[:submission_type] || 'basic_lti_launch'
       submission.submitted_at = params[:submitted_at] || Time.zone.now
+      submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = false
       # this step is important, to send user notifications
       # see SubmissionPolicy
@@ -125,7 +130,7 @@ module BasicLTI
     def grade_submission(launch_url, grade, score, grader_id)
       submission.grade = grade
       submission.score = score
-      submission.graded_at = submission.submitted_at
+      submission.graded_at = params[:graded_at] || Time.zone.now
       submission.grade_matches_current_submission = true
       submission.grader_id = grader_id
       submission.posted_at = submission.submitted_at unless submission.posted? || @assignment.post_manually?

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -46,7 +48,7 @@ describe "Outcome Reports" do
       report.find { |row| match_outcome(object).matches?(row) }
     end
 
-    def have_n_ratings(n)
+    def n_ratings?(n)
       satisfy("have #{n} ratings") do |row|
         row.length - RATING_INDEX == 2 * n
       end
@@ -69,7 +71,7 @@ describe "Outcome Reports" do
       expect(report[0].headers).to eq AccountReports::OutcomeExport::OUTCOME_EXPORT_HEADERS
     end
 
-    it 'respects csv i18n settings only when enabled' do
+    it 'respects csv i18n settings' do
       preparsed_report_options = {
         parse_header: true,
         account: account,
@@ -80,15 +82,9 @@ describe "Outcome Reports" do
       expected_headers = ['vendor_guid', 'object_type', 'title']
       admin.enable_feature!(:use_semi_colon_field_separators_in_gradebook_exports)
 
-      account.disable_feature!(:enable_i18n_features_in_outcomes_exports)
-      preparsed_report_1 = run_report('outcome_export_csv', preparsed_report_options)
-      actual_headers_1 = parse_report(preparsed_report_1, preparsed_report_options.merge('col_sep': ','))[0].headers
-      expect(actual_headers_1[0..2]).to eq(expected_headers)
-
-      account.enable_feature!(:enable_i18n_features_in_outcomes_exports)
-      preparsed_report_2 = run_report('outcome_export_csv', preparsed_report_options)
-      actual_headers_2 = parse_report(preparsed_report_2, preparsed_report_options.merge('col_sep': ';'))[0].headers
-      expect(actual_headers_2[0..2]).to eq(expected_headers)
+      preparsed_report = run_report('outcome_export_csv', preparsed_report_options)
+      actual_headers = parse_report(preparsed_report, preparsed_report_options.merge('col_sep': ';'))[0].headers
+      expect(actual_headers[0..2]).to eq(expected_headers)
     end
 
     context 'with outcome groups' do
@@ -225,6 +221,18 @@ describe "Outcome Reports" do
         expect(other['calculation_int']).to eq '5'
       end
 
+      it 'ignores fields when account level mastery scales are enabled' do
+        @account.set_feature_flag!(:account_level_mastery_scales, 'on')
+        expect(report.length).to eq 4
+        report.each do |r|
+          expect(r).to_not have_key('mastery_points')
+          expect(r).to_not have_key('calculation_method')
+          expect(r).to_not have_key('calculation_int')
+          expect(r).to_not have_key('ratings')
+        end
+      end
+
+
       it 'does not include deleted outcomes' do
         @root_outcome_2.destroy!
         expect(report.length).to eq 3
@@ -281,7 +289,7 @@ describe "Outcome Reports" do
         let(:first_outcome) { find_object(@root_outcome_1) }
 
         it 'includes all ratings' do
-          expect(first_outcome).to have_n_ratings(2)
+          expect(first_outcome).to n_ratings?(2)
           expect(first_outcome[RATING_INDEX]).to eq '3.0'
           expect(first_outcome[RATING_INDEX + 1]).to eq 'Rockin'
           expect(first_outcome[RATING_INDEX + 2]).to eq '0.0'
@@ -300,7 +308,7 @@ describe "Outcome Reports" do
             ]
           }
           @root_outcome_1.save!
-          expect(first_outcome).to have_n_ratings(6)
+          expect(first_outcome).to n_ratings?(6)
           expect(first_outcome[RATING_INDEX]).to eq '10.0'
           expect(first_outcome[RATING_INDEX + 1]).to eq 'a fly'
           expect(first_outcome[RATING_INDEX + 10]).to eq '0.0'

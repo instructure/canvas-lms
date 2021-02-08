@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -79,12 +81,7 @@ module BroadcastPolicies
     end
 
     def quiz_posted?(quiz_submission)
-      quiz = quiz_submission.quiz
-      if quiz.assignment.context.post_policies_enabled?
-        quiz_submission.posted?
-      else
-        !quiz.muted?
-      end
+      quiz_submission.posted?
     end
   end
 end

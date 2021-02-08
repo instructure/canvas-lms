@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -265,15 +267,6 @@ describe Api::V1::SisAssignment do
       it "does not list student sis_ids when users are not preloaded" do
         assignments = Assignment.where(id: assignment_1.id).
           preload(active_assignment_overrides: [:assignment_override_students])
-
-        user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
-
-        expect(user_overrides.first['students'].first).not_to have_key('sis_user_id')
-      end
-
-      it "does not list student sis_ids when pseudonyms are not preloaded" do
-        assignments = Assignment.where(id: assignment_1.id).
-          preload(active_assignment_overrides: [assignment_override_students: [:user]])
 
         user_overrides = generator.sis_assignments_json(assignments, student_overrides: true)[0]['user_overrides']
 

@@ -241,6 +241,29 @@
 #       }
 #     }
 #
+# @model ScoreStatistic
+#     {
+#       "id": "ScoreStatistic",
+#       "description": "Used by Assignment model",
+#       "properties": {
+#         "min": {
+#           "description": "Min score",
+#           "example": 1,
+#           "type": "integer"
+#         },
+#         "max": {
+#           "description": "Max score",
+#           "example": 10,
+#           "type": "integer"
+#         },
+#         "mean": {
+#           "description": "Mean score",
+#           "example": 6,
+#           "type": "integer"
+#         }
+#       }
+#     }
+#
 # @model Assignment
 #     {
 #       "id": "Assignment",
@@ -418,14 +441,6 @@
 #           "example": {"5678": "0954"},
 #           "type" : "object",
 #           "description" : "(optional, Third Party integration data for assignment)"
-#         },
-#         "muted": {
-#           "deprecated": true,
-#           "deprecation_notice": "2020-02-26",
-#           "deprecation_effective": "2020-06-03",
-#           "deprecation_description": "A new attribute will be included in a future release to determine whether an assignment has feedback that has not been posted to students.",
-#           "description": "For courses using Old Gradebook, indicates whether the assignment is muted. For courses using New Gradebook, true if the assignment has any unposted submissions, otherwise false. To see the posted status of submissions, check the 'posted_attribute' on Submission.",
-#           "type": "boolean"
 #         },
 #         "points_possible": {
 #           "description": "the maximum points possible for the assignment",
@@ -613,6 +628,15 @@
 #           "description": "Whether the assignment has manual posting enabled. Only relevant for courses using New Gradebook.",
 #           "example": true,
 #           "type": "boolean"
+#         },
+#         "score_statistics": {
+#           "description": "(Optional) If 'score_statistics' and 'submission' are included in the 'include' parameter and statistics are available, includes the min, max, and mode for this assignment",
+#           "$ref": "ScoreStatistic"
+#         },
+#         "can_submit": {
+#           "description": "(Optional) If retrieving a single assignment and 'can_submit' is included in the 'include' parameter, flags whether user has the right to submit the assignment (i.e. checks enrollment dates, submission types, locked status, attempts remaining, etc...). Including 'can submit' automatically includes 'submission' in the include parameter.",
+#           "example": true,
+#           "type": "boolean"
 #         }
 #       }
 #     }
@@ -627,7 +651,7 @@ class AssignmentsApiController < ApplicationController
 
   # @API List assignments
   # Returns the paginated list of assignments for the current course or assignment group.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"|"can_edit"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"all_dates"|"overrides"|"observed_users"|"can_edit"|"score_statistics"]
   #   Optional information to include with each assignment:
   #   submission:: The current user's current +Submission+
   #   assignment_visibility:: An array of ids of students who can see the assignment
@@ -635,6 +659,7 @@ class AssignmentsApiController < ApplicationController
   #   overrides:: An array of +AssignmentOverride+ structures
   #   observed_users:: An array of submissions for observed users
   #   can_edit:: an extra Boolean value will be included with each +Assignment+ (and +AssignmentDate+ if +all_dates+ is supplied) to indicate whether the caller can edit the assignment or date. Moderated grading and closed grading periods may restrict a user's ability to edit an assignment.
+  #   score_statistics:: An object containing min, max, and mean score on this assignment. This will not be included for students if there are less than 5 graded assignments or if disabled by the instructor. Only valid if 'submission' is also included.
   # @argument search_term [String]
   #   The partial title of the assignments to match and return.
   # @argument override_assignment_dates [Boolean]
@@ -664,6 +689,27 @@ class AssignmentsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate assignnment
+  #
+  # Duplicate an assignment and return a json based on result_type argument.
+  #
+  # @argument result_type [String, "Quiz"]
+  #   Optional information:
+  #   When the root account has the feature `newquizzes_on_quiz_page` enabled
+  #   and this argument is set to "Quiz" the response will be serialized into a
+  #   quiz format({file:doc/api/quizzes.html#Quiz});
+  #   When this argument isn't specified the response will be serialized into an
+  #   assignment format;
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/assignments/123/duplicate?result_type=Quiz
+  #
+  # @returns Assignment
   def duplicate
     # see private methods for definitions
     old_assignment = old_assignment_for_duplicate
@@ -814,6 +860,10 @@ class AssignmentsApiController < ApplicationController
 
       preloaded_attachments = api_bulk_load_user_content_attachments(assignments.map(&:description), @context)
 
+      if include_params.include?('score_statistics')
+        ActiveRecord::Associations::Preloader.new.preload(assignments, :score_statistic)
+      end
+
       hashes = []
       hashes = assignments.map do |assignment|
 
@@ -832,8 +882,8 @@ class AssignmentsApiController < ApplicationController
                         bucket: params[:bucket],
                         include_overrides: include_override_objects,
                         preloaded_user_content_attachments: preloaded_attachments,
-                        include_can_edit: include_params.include?('can_edit')
-                        )
+                        include_can_edit: include_params.include?('can_edit'),
+                        include_score_statistics: include_params.include?('score_statistics'))
       end
       hashes
     end
@@ -841,10 +891,11 @@ class AssignmentsApiController < ApplicationController
 
   # @API Get a single assignment
   # Returns the assignment with the given id.
-  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"]
+  # @argument include[] [String, "submission"|"assignment_visibility"|"overrides"|"observed_users"|"can_edit"|"score_statistics"]
   #   Associations to include with the assignment. The "assignment_visibility" option
   #   requires that the Differentiated Assignments course feature be turned on. If
   #   "observed_users" is passed, submissions for observed users will also be included.
+  #   For "score_statistics" to be included, the "submission" option must also be set.
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides to the assignment, defaults to true.
   # @argument needs_grading_count_by_section [Boolean]
@@ -858,6 +909,10 @@ class AssignmentsApiController < ApplicationController
       return render_unauthorized_action unless @assignment.visible_to_user?(@current_user)
 
       included_params = Array(params[:include])
+      if included_params.include?('can_submit')
+        included_params.push 'submission'
+      end
+
       if included_params.include?('submission')
         submissions =
           submissions_hash(included_params, [@assignment])[@assignment.id]
@@ -874,6 +929,8 @@ class AssignmentsApiController < ApplicationController
       needs_grading_by_section_param = params[:needs_grading_count_by_section] || false
       needs_grading_count_by_section = value_to_boolean(needs_grading_by_section_param)
 
+      include_can_submit = included_params.include?('can_submit')
+
       locked = @assignment.locked_for?(@current_user, :check_policies => true)
       @assignment.context_module_action(@current_user, :read) unless locked && !locked[:can_view]
       log_api_asset_access(@assignment, "assignments", @assignment.assignment_group)
@@ -885,7 +942,9 @@ class AssignmentsApiController < ApplicationController
         needs_grading_count_by_section: needs_grading_count_by_section,
         include_all_dates: include_all_dates,
         include_overrides: include_override_objects,
-        include_can_edit: included_params.include?('can_edit')
+        include_can_edit: included_params.include?('can_edit'),
+        include_score_statistics: included_params.include?('score_statistics'),
+        include_can_submit: include_can_submit
       }
 
       result_json = if use_quiz_json?

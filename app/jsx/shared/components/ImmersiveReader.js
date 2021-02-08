@@ -18,11 +18,13 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import {Button} from '@instructure/ui-buttons'
+import {Button, IconButton} from '@instructure/ui-buttons'
 import {SVGIcon} from '@instructure/ui-svg-images'
 import I18n from 'i18n!ImmersiveReader'
 import {showFlashError} from '../FlashAlert'
 import {defaultFetchOptions} from '@instructure/js-utils'
+import {CookiePolicy} from '@microsoft/immersive-reader-sdk'
+import WithBreakpoints from '../WithBreakpoints'
 
 /**
  * This comes from https://github.com/microsoft/immersive-reader-sdk/blob/master/assets/icon.svg
@@ -53,7 +55,10 @@ function handleClick({title, content}, readerSDK) {
             title,
             chunks: [{content, mimeType: 'text/html'}]
           }
-          launchAsync(token, subdomain, requestContent)
+          const options = {
+            cookiePolicy: CookiePolicy.Disable
+          }
+          launchAsync(token, subdomain, requestContent, options)
         })
         .catch(e => {
           // eslint-disable-next-line no-console
@@ -68,14 +73,23 @@ function handleClick({title, content}, readerSDK) {
     })
 }
 
-export function ImmersiveReaderButton({content, readerSDK}) {
-  return (
+export function ImmersiveReaderButton({content, readerSDK, breakpoints}) {
+  return breakpoints?.miniTablet ? (
     <Button onClick={() => handleClick(content, readerSDK)} icon={<SVGIcon src={LOGO} />}>
       {I18n.t('Immersive Reader')}
     </Button>
+  ) : (
+    <IconButton
+      onClick={() => handleClick(content, readerSDK)}
+      screenReaderLabel={I18n.t('Immersive Reader')}
+    >
+      <SVGIcon src={LOGO} />
+    </IconButton>
   )
 }
 
+const ImmersiveReaderButtonWithBreakpoints = WithBreakpoints(ImmersiveReaderButton)
+
 export function initializeReaderButton(mountPoint, content) {
-  ReactDOM.render(<ImmersiveReaderButton content={content} />, mountPoint)
+  ReactDOM.render(<ImmersiveReaderButtonWithBreakpoints content={content} />, mountPoint)
 }

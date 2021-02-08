@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -289,9 +291,9 @@ class StreamItem < ActiveRecord::Base
             :context_id => l_context_id,
           }
         end
-        if object.is_a?(Submission) && object.assignment.muted?
-          # set the hidden flag if an assignment and muted (for the owner of the submission)
-          if owner_insert = inserts.detect{|i| i[:user_id] == object.user_id}
+        if object.is_a?(Submission) && !object.posted?
+          # set the hidden flag if this submission is not posted
+          if (owner_insert = inserts.detect{|i| i[:user_id] == object.user_id})
             owner_insert[:hidden] = true
           end
         end
@@ -391,8 +393,8 @@ class StreamItem < ActiveRecord::Base
       User.where(:id => user_ids.to_a).touch_all
     end
 
-    Shackles.activate(:deploy) do
-      Shard.current.database_server.unshackle do
+    GuardRail.activate(:deploy) do
+      Shard.current.database_server.unguard do
         StreamItem.vacuum
         StreamItemInstance.vacuum
         ActiveRecord::Base.connection_pool.current_pool.disconnect! unless Rails.env.test?
@@ -456,8 +458,8 @@ class StreamItem < ActiveRecord::Base
     self.stream_item_instances.shard(self).activate do |scope|
       user_ids = scope.pluck(:user_id)
       if !self.invalidate_immediately && user_ids.count > 100
-        StreamItemCache.send_later_if_production_enqueue_args(:invalidate_all_recent_stream_items,
-          { :priority => Delayed::LOW_PRIORITY }, user_ids, self.context_type, self.context_id)
+        StreamItemCache.delay_if_production(priority: Delayed::LOW_PRIORITY).
+          invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       else
         StreamItemCache.invalidate_all_recent_stream_items(user_ids, self.context_type, self.context_id)
       end

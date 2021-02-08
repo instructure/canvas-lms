@@ -17,20 +17,27 @@
  */
 
 import React from 'react'
-import {fireEvent, render} from '@testing-library/react'
+import {fireEvent, render, waitFor} from '@testing-library/react'
 
 import Filter, {useFilterSettings} from '../Filter'
 
 describe('RCE Plugins > Filter', () => {
   let currentFilterSettings
   let component
+  let default_filter_settings
 
   beforeEach(() => {
     currentFilterSettings = null
+    default_filter_settings = {
+      contentType: 'course_files',
+      contentSubtype: 'documents',
+      sortValue: 'date_added',
+      searchString: ''
+    }
   })
 
   function FilterWithHooks(props = {}) {
-    const [filterSettings, setFilterSettings] = useFilterSettings()
+    const [filterSettings, setFilterSettings] = useFilterSettings(default_filter_settings)
     currentFilterSettings = filterSettings
 
     return <Filter {...filterSettings} onChange={setFilterSettings} {...props} />
@@ -70,16 +77,16 @@ describe('RCE Plugins > Filter', () => {
     beforeEach(() => {
       renderComponent()
     })
-    it('sets content type to "links"', () => {
-      expect(currentFilterSettings.contentType).toEqual('links')
+    it('sets content type to default', () => {
+      expect(currentFilterSettings.contentType).toEqual(default_filter_settings.contentType)
     })
 
-    it('sets content subtype to "all"', () => {
-      expect(currentFilterSettings.contentSubtype).toEqual('all')
+    it('sets content subtype to defualt', () => {
+      expect(currentFilterSettings.contentSubtype).toEqual(default_filter_settings.contentSubtype)
     })
 
-    it('sets sort value to "date_added"', () => {
-      expect(currentFilterSettings.sortValue).toEqual('date_added')
+    it('sets sort value to default', () => {
+      expect(currentFilterSettings.sortValue).toEqual(default_filter_settings.sortValue)
     })
   })
 
@@ -128,6 +135,14 @@ describe('RCE Plugins > Filter', () => {
       expect(component.getByLabelText('Content Type').value).toEqual('Course Files')
     })
 
+    it('has "Group" options', () => {
+      renderComponent({userContextType: 'group'})
+
+      selectContentType('Group Files')
+      expect(currentFilterSettings.contentType).toEqual('group_files')
+      expect(component.getByLabelText('Content Type').value).toEqual('Group Files')
+    })
+
     it('has "User" options', () => {
       renderComponent({userContextType: 'course'})
 
@@ -150,6 +165,15 @@ describe('RCE Plugins > Filter', () => {
       const contentTypeField = component.queryByLabelText('Content Type')
       expect(contentTypeField).toBeNull() // we replaced the Select with a View
       expect(component.queryByText('Links')).toBeNull()
+      expect(component.getByText('User Files')).toBeInTheDocument()
+      expect(component.queryByText('Course Files')).toBeNull()
+    })
+
+    it('includes the Link and User options in group context', () => {
+      renderComponent({userContextType: 'group'})
+      const contentTypeField = component.getByLabelText('Content Type')
+      fireEvent.click(contentTypeField)
+      expect(component.getByText('Links')).toBeInTheDocument()
       expect(component.getByText('User Files')).toBeInTheDocument()
       expect(component.queryByText('Course Files')).toBeNull()
     })
@@ -208,6 +232,33 @@ describe('RCE Plugins > Filter', () => {
     })
   })
 
+  describe('deals with switching to and from Links', () => {
+    it('changes to "all" when type changes from "Links" to "Files"', () => {
+      renderComponent({userContextType: 'course'})
+
+      // our initial state
+      expect(currentFilterSettings.contentType).toEqual('course_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
+
+      // switch to Links, the subtype remains unchanged (though we don't care what it is)
+      selectContentType('Links')
+      expect(currentFilterSettings.contentType).toEqual('links')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
+
+      // the other content type is now just "Files", and it shows all files
+      // subtype is "all" so we can query for the media, which is only returned
+      // in the user context
+      selectContentType('Files')
+      expect(currentFilterSettings.contentType).toEqual('user_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('all')
+
+      // Switch from "All" to "Documents"
+      selectContentSubtype('Documents')
+      expect(currentFilterSettings.contentType).toEqual('user_files')
+      expect(currentFilterSettings.contentSubtype).toEqual('documents')
+    })
+  })
+
   describe('"Sort By" field', () => {
     beforeEach(() => {
       renderComponent({userContextType: 'course'})
@@ -244,6 +295,110 @@ describe('RCE Plugins > Filter', () => {
       selectContentSubtype('Media')
       selectSortBy('Alphabetical')
       expect(currentFilterSettings.contentSubtype).toEqual('media')
+    })
+  })
+
+  describe('"Search" field', () => {
+    it('is visible when the contentSubtype is documents', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is visible when the contentSubtype is images', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'images'
+      })
+      expect(component.getByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is visible when the contentSubtype is media', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'media'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is visible when the contentType is links', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'links'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('is visible when the contentSubtype is all', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'all'
+      })
+      expect(component.queryByPlaceholderText('Search')).toBeInTheDocument()
+    })
+
+    it('updates filter settings when the search string is > 3 chars long', async () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(currentFilterSettings.searchString).toBe('')
+      fireEvent.change(searchInput, {target: {value: 'abc'}})
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('abc')
+      })
+    })
+
+    it('clears search when clear button is clicked', async () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(currentFilterSettings.searchString).toBe('')
+      fireEvent.change(searchInput, {target: {value: 'abc'}})
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('abc')
+      })
+      fireEvent.click(component.getByText('Clear'))
+      await waitFor(() => {
+        expect(currentFilterSettings.searchString).toBe('')
+      })
+    })
+
+    it('is readonly while content is loading', () => {
+      renderComponent({
+        userContextType: 'course',
+        contentType: 'course_files',
+        contentSubtype: 'documents',
+        isContentLoading: true,
+        searchString: 'abc'
+      })
+      const searchInput = component.getByPlaceholderText('Search')
+      expect(searchInput.hasAttribute('readonly')).toBe(true)
+
+      const clearBtn = component.getByText('Clear').closest('button')
+      expect(clearBtn.hasAttribute('disabled')).toBe(true)
+    })
+
+    it('shows the search message when not loading', () => {
+      renderComponent()
+      expect(component.getByText('Enter at least 3 characters to search')).toBeInTheDocument()
+    })
+
+    it('shows the loading message when loading', () => {
+      renderComponent({isContentLoading: true})
+      // screenreader message + hint under the search input box
+      expect(component.getByText('Loading, please wait')).toBeInTheDocument()
     })
   })
 })

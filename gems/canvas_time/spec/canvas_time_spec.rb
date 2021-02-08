@@ -1,5 +1,5 @@
-# encoding: ASCII-8BIT
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2013 - present Instructure, Inc.
 #
 # This file is part of Canvas.

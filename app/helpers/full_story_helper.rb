@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -20,8 +22,9 @@ module FullStoryHelper
   # the feature determines if fullstory is turned on
   # then we enabled it only for every nth login
   def fullstory_init(account, session)
-    fullstory_enabled = account.feature_enabled?(:enable_fullstory) rescue false
+    fullstory_enabled = Account.site_admin.feature_enabled?(:enable_fullstory) rescue false
     return unless fullstory_enabled
+    return unless account.settings.fetch(:enable_fullstory, true)
 
     # this session is already hooked up
     return if session.key?(:fullstory_enabled)

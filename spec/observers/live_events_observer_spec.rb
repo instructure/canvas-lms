@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -234,6 +236,31 @@ describe LiveEventsObserver do
       submission_model
     end
 
+    it "does not post a create event when a submission is first created in an unsubmitted state" do
+      expect(Canvas::LiveEvents).to_not receive(:submission_created)
+      Submission.create!(assignment: assignment_model, user: user_model, workflow_state: 'unsubmitted', submitted_at: Time.zone.now)
+    end
+
+    it "posts a create event when a submission is first created in an submitted state" do
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      Submission.create!(
+        assignment: assignment_model, user: user_model, workflow_state: 'submitted',
+        submitted_at: Time.zone.now, submission_type: 'online_url'
+      )
+    end
+
+    it "posts a submission_created event when a unsubmitted submission is submitted" do
+      s = unsubmitted_submission_model
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      s.assignment.submit_homework(s.user, { url: "http://www.instructure.com/" })
+    end
+
+    it "posts a create event when a submitted submission is resubmitted" do
+      s = submission_model
+      expect(Canvas::LiveEvents).to receive(:submission_created).once
+      s.assignment.submit_homework(s.user, { url: "http://www.instructure.com/" })
+    end
+
     it "posts update events" do
       expect(Canvas::LiveEvents).to receive(:submission_updated).once
       s = submission_model
@@ -317,14 +344,14 @@ describe LiveEventsObserver do
         :selected_content => quiz.id,
         :user => user_model
       )
-      ce.export_without_send_later
+      ce.export(synchronous: true)
     end
 
     it "does not post for other ContentExport types" do
       expect(Canvas::LiveEvents).to receive(:quiz_export_complete).never
       course = Account.default.courses.create!
       ce = course.content_exports.create!
-      ce.export_without_send_later
+      ce.export(synchronous: true)
     end
 
     def enable_quizzes_next(course)
@@ -402,18 +429,18 @@ describe LiveEventsObserver do
       let(:context_module_progression) { context_module.context_module_progressions.create!(user_id: user_model.id) }
 
       it "posts update events if module and course are complete" do
-        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(true)
         context_module_progression.update_attribute(:workflow_state, 'completed')
       end
 
       it "does not post update events if module is not complete" do
-        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
         context_module_progression.update_attribute(:workflow_state, 'in_progress')
       end
 
       it "does not post update events if course is not complete" do
-        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).not_to receive(:course_completed).with(any_args)
         expect_any_instance_of(CourseProgress).to receive(:completed?).and_return(false)
         context_module_progression.update_attribute(:workflow_state, 'completed')
       end
@@ -424,13 +451,13 @@ describe LiveEventsObserver do
         context_module.completion_requirements = {tag.id => {:type => 'must_view'}}
         context_module.save!
 
-        expect(Canvas::LiveEvents).to receive(:course_completed).with(anything)
+        expect(Canvas::LiveEvents).to receive(:course_completed).with(any_args)
         ContextModuleProgression.transaction(requires_new: true) do
           # complete it
-          context_module_progression.update_attributes(:workflow_state => 'completed',
+          context_module_progression.update(:workflow_state => 'completed',
             :requirements_met => [{:id => tag.id, :type => 'must_view'}])
           # sneakily remove the requiremets met because terribleness
-          context_module_progression.update_attributes(:requirements_met => [])
+          context_module_progression.update(:requirements_met => [])
         end
         # event fires off now but it should ignore the missing requirements_met in the db and
         # use the ones that were present when the completion happened
@@ -506,6 +533,40 @@ describe LiveEventsObserver do
       link = group.add_outcome(outcome)
       expect(Canvas::LiveEvents).to receive(:learning_outcome_link_updated).with(link)
       link.destroy!
+    end
+  end
+
+  describe "outcome_proficiency" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_created).once
+      outcome_proficiency_model(account_model)
+    end
+
+    it "posts updated events when ratings are changed" do
+      proficiency = outcome_proficiency_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
+      rating = OutcomeProficiencyRating.new(description: 'new_rating', points: 5, mastery: true, color: 'ff0000')
+      proficiency.outcome_proficiency_ratings = [rating]
+      proficiency.save!
+    end
+
+    it "posts updated events when proficiencies are destroyed" do
+      proficiency = outcome_proficiency_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_proficiency_updated).once
+      proficiency.destroy
+    end
+  end
+
+  describe "calculation_method" do
+    it "posts create events" do
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_created).once
+      outcome_calculation_method_model(account_model)
+    end
+
+    it "posts updated events" do
+      calculation_method = outcome_calculation_method_model(account_model)
+      expect(Canvas::LiveEvents).to receive(:outcome_calculation_method_updated).once
+      calculation_method.destroy
     end
   end
 end

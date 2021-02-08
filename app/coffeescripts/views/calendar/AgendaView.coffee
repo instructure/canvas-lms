@@ -77,7 +77,7 @@ export default class AgendaView extends Backbone.View
   _fetch: (start, callback) ->
     end = fcUtil.clone(start).year(3000)
     @lastRequestID = $.guid++
-    @dataSource.getEvents start, end, @contexts, callback, undefined, {singlePage: true, requestID: @lastRequestID}
+    @dataSource.getEvents start, end, @contexts, callback, undefined, {singlePage: true, per_page: 100, requestID: @lastRequestID}
 
   refetch: =>
     return unless @startDate
@@ -216,7 +216,7 @@ export default class AgendaView extends Backbone.View
     meta:
       hasMore: !!@nextPageDate
       displayAppointmentEvents: @viewingGroup
-      better_scheduler: ENV.CALENDAR.BETTER_SCHEDULER
+      use_scheduler: ENV.CALENDAR.SHOW_SCHEDULER
 
   # Public: Creates the json for the template.
   #

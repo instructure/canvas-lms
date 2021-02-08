@@ -55,16 +55,23 @@ describe('fetchOutcomes', () => {
     rollupsResponse: {
       rollups: [
         {
-          scores: [{score: 3.0, links: {outcome: 1}}, {score: 1.0, links: {outcome: 2}}]
+          scores: [
+            {score: 3.0, links: {outcome: 1}},
+            {score: 1.0, links: {outcome: 2}}
+          ]
         }
       ]
     },
     resultsResponses: {
       1: {
         outcome_results: [
-          {id: 1, score: 3.0, links: {assignment: 'assignment_1'}},
-          {id: 2, score: 2.0, links: {assignment: 'assignment_2'}},
-          {id: 3, score: 2.0, links: {alignment: 'live_assessments/assessment_1'}}
+          {id: 1, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '1'}},
+          {id: 2, score: 2.0, links: {assignment: 'assignment_2', learning_outcome: '1'}},
+          {
+            id: 3,
+            score: 2.0,
+            links: {alignment: 'live_assessments/assessment_1', learning_outcome: '1'}
+          }
         ],
         linked: {
           assignments: [
@@ -75,7 +82,17 @@ describe('fetchOutcomes', () => {
         }
       },
       2: {
-        outcome_results: [{id: 3, score: 3.0, links: {assignment: 'assignment_1'}}],
+        outcome_results: [
+          {id: 3, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '2'}}
+        ],
+        linked: {
+          assignments: [{id: 'assignment_1', name: 'Assignment 1'}]
+        }
+      },
+      12: {
+        outcome_results: [
+          {id: 12, score: 3.0, links: {assignment: 'assignment_1', learning_outcome: '12'}}
+        ],
         linked: {
           assignments: [{id: 'assignment_1', name: 'Assignment 1'}]
         }
@@ -161,11 +178,20 @@ describe('fetchOutcomes', () => {
     )
     fetchMock.mock('/api/v1/courses/1/outcome_rollups?user_ids[]=2&per_page=100', rollupsResponse)
     fetchMock.mock('/api/v1/courses/1/outcome_alignments?student_id=2', alignmentsResponse)
-    Object.keys(resultsResponses).forEach(id => {
-      fetchMock.mock(
-        `/api/v1/courses/1/outcome_results?user_ids[]=2&outcome_ids[]=${id}&include[]=assignments&per_page=100`,
-        resultsResponses[id]
-      )
+    fetchMock.mock('begin:/api/v1/courses/1/outcome_results', url => {
+      const outcomeIdPattern = /outcome_ids\[\]=(\d+)/g
+      const ids = []
+      let match
+      while ((match = outcomeIdPattern.exec(url))) {
+        ids.push(match[1])
+      }
+      const results = {outcome_results: [], linked: {assignments: []}}
+      ids.forEach(id => {
+        const response = resultsResponses[id] || {outcome_results: [], linked: {assignments: []}}
+        results.outcome_results.push(...response.outcome_results)
+        results.linked.assignments.push(...response.linked.assignments)
+      })
+      return results
     })
   }
 
@@ -176,33 +202,48 @@ describe('fetchOutcomes', () => {
       .catch(() => done())
   })
 
-  it('handles complete request', done => {
+  it('handles complete request', () => {
     const responses = defaultResponses()
     mockAll(responses)
-    fetchOutcomes(1, 2).then(({outcomeGroups, outcomes}) => {
+    return fetchOutcomes(1, 2).then(({outcomeGroups, outcomes}) => {
       expect(outcomeGroups).toMatchObject(responses.groupsResponse)
       expect(outcomes).toMatchObject(expectedOutcomes)
-      done()
     })
   })
 
-  it('removes hidden results', done => {
+  it('removes hidden results', () => {
     const responses = defaultResponses()
     responses.resultsResponses['1'].outcome_results[1].hidden = true
     mockAll(responses)
-    fetchOutcomes(1, 2).then(({outcomes}) => {
+    return fetchOutcomes(1, 2).then(({outcomes}) => {
       expect(outcomes[0].results).toHaveLength(2)
-      done()
     })
   })
 
-  it('removes empty outcome groups', done => {
+  it('removes empty outcome groups', () => {
     const responses = defaultResponses()
     responses.linksResponse = responses.linksResponse.slice(0, 1)
     mockAll(responses)
-    fetchOutcomes(1, 2).then(({outcomeGroups}) => {
+    return fetchOutcomes(1, 2).then(({outcomeGroups}) => {
       expect(outcomeGroups).toHaveLength(1)
-      done()
+    })
+  })
+
+  it('handles multiple results requests', () => {
+    const responses = defaultResponses()
+    for (let i = 3; i <= 20; i++) {
+      responses.linksResponse.push({
+        outcome_group: {id: i},
+        outcome: {
+          id: i,
+          title: `Outcome ${i}`
+        }
+      })
+    }
+    mockAll(responses)
+    return fetchOutcomes(1, 2).then(({outcomes}) => {
+      expect(outcomes).toHaveLength(20)
+      expect(outcomes.find(o => o.id === 12).results).toHaveLength(1)
     })
   })
 

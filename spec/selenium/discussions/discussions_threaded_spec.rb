@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -231,7 +233,6 @@ describe "threaded discussions" do
   context "student tray" do
 
     before(:each) do
-      preload_graphql_schema
       @account = Account.default
       @account.enable_feature!(:student_context_cards)
     end

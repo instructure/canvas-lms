@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import moxios from 'moxios'
+import {findByTestId} from '@testing-library/react'
 import {initializePlanner, loadPlannerDashboard, resetPlanner, renderToDoSidebar} from '../index'
 import {initialize as alertInitialize} from '../utilities/alertUtils'
 
@@ -68,33 +69,37 @@ describe('with mock api', () => {
   describe('initializePlanner', () => {
     it('cannot be called twice', () => {
       initializePlanner(defaultPlannerOptions())
-      expect(() => initializePlanner(defaultPlannerOptions())).toThrow()
+      return expect(initializePlanner(defaultPlannerOptions())).rejects.toBeDefined()
     })
 
-    it('requires flash methods', () => {
-      ;['flashError', 'flashMessage', 'srFlashMessage'].forEach(flash => {
-        const options = defaultPlannerOptions()
-        options[flash] = null
-        expect(() => initializePlanner(options)).toThrow()
-      })
+    it('requires flash methods', async () => {
+      ;(
+        await Promise.allSettled(
+          ['flashError', 'flashMessage', 'srFlashMessage'].map(flash => {
+            const options = defaultPlannerOptions()
+            options[flash] = null
+            return initializePlanner(options)
+          })
+        )
+      ).forEach(({status}) => expect(status).toBe('rejected'))
     })
 
     it('requires convertApiUserContent', () => {
       const options = defaultPlannerOptions()
       options.convertApiUserContent = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires timezone', () => {
       const options = defaultPlannerOptions()
       options.env.TIMEZONE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
 
     it('requires locale', () => {
       const options = defaultPlannerOptions()
       options.env.MOMENT_LOCALE = null
-      expect(() => initializePlanner(options)).toThrow()
+      return expect(initializePlanner(options)).rejects.toBeDefined()
     })
   })
 
@@ -103,8 +108,10 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided divs', () => {
+    it('renders into provided divs', async () => {
       loadPlannerDashboard()
+      await findByTestId(document.body, 'PlannerApp')
+      await findByTestId(document.body, 'PlannerHeader')
       expect(document.querySelector('.PlannerApp')).toBeTruthy()
       expect(document.querySelector('.PlannerHeader')).toBeTruthy()
     })
@@ -115,8 +122,9 @@ describe('with mock api', () => {
       initializePlanner(defaultPlannerOptions())
     })
 
-    it('renders into provided element', () => {
+    it('renders into provided element', async () => {
       renderToDoSidebar(document.querySelector('#dashboard-sidebar'))
+      await findByTestId(document.body, 'ToDoSidebar')
       expect(document.querySelector('.todo-list-header')).toBeTruthy()
     })
   })

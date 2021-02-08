@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -28,10 +30,10 @@ class AssignmentOverride < ActiveRecord::Base
 
   attr_accessor :dont_touch_assignment, :preloaded_student_ids, :changed_student_ids
 
-  belongs_to :assignment
-  belongs_to :quiz, class_name: 'Quizzes::Quiz'
+  belongs_to :assignment, inverse_of: :assignment_overrides
+  belongs_to :quiz, class_name: 'Quizzes::Quiz', inverse_of: :assignment_overrides
   belongs_to :set, polymorphic: [:group, :course_section], exhaustive: false
-  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :dependent => :destroy, :validate => false
+  has_many :assignment_override_students, -> { where(workflow_state: 'active') }, :inverse_of => :assignment_override, :dependent => :destroy, :validate => false
   validates_presence_of :assignment_version, :if => :assignment
   validates_presence_of :title, :workflow_state
   validates :set_type, inclusion: ['CourseSection', 'Group', 'ADHOC', SET_TYPE_NOOP]
@@ -414,7 +416,12 @@ class AssignmentOverride < ActiveRecord::Base
     p.data { course_broadcast_data }
   end
 
+  def root_account_id
+    # Use the attribute if availible, otherwise fall back to getting it from a parent entity
+    super || assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
+  end
+
   def set_root_account_id
-    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id || quiz&.assignment&.root_account_id
+    self.write_attribute(:root_account_id, root_account_id) unless read_attribute(:root_account_id)
   end
 end

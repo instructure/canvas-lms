@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import Gradebook from 'compiled/gradebook/Gradebook'
+import Gradebook from 'jsx/gradebook/default_gradebook/Gradebook'
 
 export function createGradebook(options = {}) {
   const gradebook = new Gradebook({
@@ -70,6 +70,7 @@ export function createGradebook(options = {}) {
         title: 'Emoji Grades'
       }
     ],
+    has_modules: true,
     latePolicyStatusDisabled: false,
     locale: 'en',
     new_gradebook_development_enabled: true,
@@ -78,7 +79,6 @@ export function createGradebook(options = {}) {
       active_request_limit: 10
     },
     post_grades_ltis: [],
-    post_policies_enabled: true,
     publish_to_sis_enabled: false,
     sections: [],
 

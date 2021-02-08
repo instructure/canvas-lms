@@ -69,7 +69,8 @@ module Lti::Ims
       :verify_user_in_context,
       :verify_required_params,
       :verify_valid_timestamp,
-      :verify_exclusive_key_pairs
+      :verify_exclusive_key_pairs,
+      :verify_valid_submitted_at,
     )
 
     MIME_TYPE = 'application/vnd.ims.lis.v1.score+json'.freeze
@@ -91,7 +92,7 @@ module Lti::Ims
     #
     # @argument userId [Required, String]
     #   The lti_user_id or the Canvas user_id.
-    #   Returns a 412 if user not found in Canvas or is not a student.
+    #   Returns a 422 if user not found in Canvas or is not a student.
     #
     # @argument activityProgress [Required, String]
     #   Indicate to Canvas the status of the user towards the activity's completion.
@@ -121,9 +122,10 @@ module Lti::Ims
     #
     # @argument https://canvas.instructure.com/lti/submission [Optional, Object]
     #   (EXTENSION) Optional submission type and data.
-    #   new_submission [Boolean] flag to indicate that this is a new submission.  Defaults to true if submission_type is given.
-    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, or online_url
+    #   new_submission [Boolean] flag to indicate that this is a new submission. Defaults to true unless submission_type is none.
+    #   submission_type [String] permissible values are: none, basic_lti_launch, online_text_entry, external_tool, or online_url. Defaults to external_tool.
     #   submission_data [String] submission data (URL or body text)
+    #   submitted_at [String] Date and time that the submission was originally created. Should use subsecond precision. This should match the data and time that the original submission happened in Canvas.
     #
     # @returns resultUrl [String]
     #   The url to the result that was created.
@@ -140,7 +142,8 @@ module Lti::Ims
     #     "https://canvas.instructure.com/lti/submission": {
     #       "new_submission": true,
     #       "submission_type": "online_url",
-    #       "submission_data": "https://instructure.com"
+    #       "submission_data": "https://instructure.com",
+    #       "submitted_at": "2017-04-14T18:54:36.736+00:00"
     #     }
     #   }
     def create
@@ -152,7 +155,8 @@ module Lti::Ims
 
     REQUIRED_PARAMS = %i[userId activityProgress gradingProgress timestamp].freeze
     OPTIONAL_PARAMS = %i[scoreGiven scoreMaximum comment].freeze
-    SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url].freeze
+    SCORE_SUBMISSION_TYPES = %w[none basic_lti_launch online_text_entry online_url external_tool].freeze
+    DEFAULT_SUBMISSION_TYPE = 'external_tool'.freeze
 
     def scopes_matcher
       self.class.all_of(TokenScopes::LTI_AGS_SCORE_SCOPE)
@@ -161,7 +165,7 @@ module Lti::Ims
     def scores_params
       @_scores_params ||= begin
         update_params = params.permit(REQUIRED_PARAMS + OPTIONAL_PARAMS,
-          Lti::Result::AGS_EXT_SUBMISSION => [:new_submission, :submission_type, :submission_data]).transform_keys do |k|
+          Lti::Result::AGS_EXT_SUBMISSION => [:new_submission, :submission_type, :submission_data, :submitted_at]).transform_keys do |k|
             k.to_s.underscore
         end.except(:timestamp, :user_id, :score_given, :score_maximum).to_unsafe_h
         update_params[:extensions] = extract_extensions(update_params)
@@ -191,9 +195,26 @@ module Lti::Ims
       end
     end
 
+    def verify_valid_submitted_at
+      submitted_at = params.dig(Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at_date = submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil) : nil
+      future_buffer = Setting.get('ags_submitted_at_future_buffer', 1.minute.to_s).to_i.seconds
+
+      if submitted_at.present? && submitted_at_date.nil?
+        render_error "Provided submitted_at timestamp of #{submitted_at} not a valid timestamp", :bad_request
+      elsif submitted_at_date.present? && submitted_at_date > Time.zone.now + future_buffer
+        render_error "Provided submitted_at timestamp of #{submitted_at} in the future", :bad_request
+      end
+    end
+
     def verify_exclusive_key_pairs
-      return if ignore_score? || params.key?(:scoreMaximum)
-      render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
+      return if ignore_score?
+      if params.key?(:scoreMaximum)
+        return if params[:scoreMaximum].to_f > 0
+        render_error('ScoreMaximum must be greater than 0', :unprocessable_entity)
+      else
+        render_error('ScoreMaximum not supplied when ScoreGiven present.', :unprocessable_entity)
+      end
     end
 
     def score_submission
@@ -217,7 +238,7 @@ module Lti::Ims
       if !submission_type.nil? && SCORE_SUBMISSION_TYPES.include?(submission_type)
         submission.submission_type = submission_type
         case submission_type
-        when 'none'
+        when 'none', 'external_tool'
           submission.body = nil
           submission.url = nil
         when 'basic_lti_launch', 'online_url'
@@ -227,6 +248,12 @@ module Lti::Ims
           submission.url = nil
           submission.body = submission_data
         end
+      end
+
+      # change submission time without making it a "new" submission
+      if submitted_at.present?
+        submission.submitted_at = submitted_at
+        submission.attempt -= 1 if submission.attempt.try(:'>', 0)
       end
 
       submission.save!
@@ -250,6 +277,9 @@ module Lti::Ims
     end
 
     def line_item_score_maximum_scale
+      res_max = scores_params[:result_maximum].to_f
+      # if this doesn't make sense, just don't scale
+      return 1.0 if res_max.nan? || res_max == 0.0
       line_item.score_maximum / scores_params[:result_maximum].to_f
     end
 
@@ -262,7 +292,7 @@ module Lti::Ims
     end
 
     def timestamp
-      @_timestamp = Time.zone.parse(params[:timestamp])
+      @_timestamp = Time.zone.parse(params[:timestamp]) rescue nil
     end
 
     def result_url
@@ -270,16 +300,23 @@ module Lti::Ims
     end
 
     def submission_type
-      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type)
+      scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_type) || DEFAULT_SUBMISSION_TYPE
     end
 
     def submission_data
       scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submission_data)
     end
 
+    # all submissions should count as new (ie, module-progressing) unless explicitly otherwise,
+    # if new_submission flag is present and `false`, or submission_type flag is `none`
     def new_submission?
       new_flag = ActiveRecord::Type::Boolean.new.cast(scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :new_submission))
-      new_flag || (new_flag.nil? && !submission_type.nil? && submission_type != 'none')
+      (new_flag || new_flag.nil?) && submission_type != 'none'
+    end
+
+    def submitted_at
+      submitted_at = scores_params.dig(:extensions, Lti::Result::AGS_EXT_SUBMISSION, :submitted_at)
+      submitted_at.present? ? (Time.zone.parse(submitted_at) rescue nil): nil
     end
   end
 end

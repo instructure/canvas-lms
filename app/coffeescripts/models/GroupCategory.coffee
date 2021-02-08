@@ -129,8 +129,8 @@ export default class GroupCategory extends Backbone.Model
   present: ->
     data = Backbone.Model::toJSON.call(this)
     data.progress = @progressModel.toJSON()
-    data.randomlyAssignStudentsInProgress = data.progress.workflow_state is "queued" or
-                                            data.progress.workflow_state is "running"
+    data.groupCreationInProgress = data.progress.workflow_state is "queued" or
+                                   data.progress.workflow_state is "running"
     data
 
   toJSON: ->
@@ -140,7 +140,7 @@ export default class GroupCategory extends Backbone.Model
 
   sync: (method, model, options = {}) ->
     options.url = @urlFor(method)
-    if method is 'create' and model.get('split_groups') is '1'
+    if method is 'create' and (model.get('split_groups') is '1' or model.get('split_groups') is '2')
       model.set('assign_async', true) # if we don't specify this, it will auto-assign on creation, not asyncronously
       group_by_section = (model.get('group_by_section') == '1')
       success = options.success ? ->

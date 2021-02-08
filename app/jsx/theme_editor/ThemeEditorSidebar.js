@@ -58,7 +58,7 @@ export default function ThemeEditorSidebar(props) {
                       'Before implementing custom CSS or Javascript, please refer to *our documentation*.',
                       {
                         wrappers: [
-                          '<a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank">$1</a>'
+                          '<a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253" target="_blank">$1</a>'
                         ]
                       }
                     )

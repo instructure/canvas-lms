@@ -38,7 +38,8 @@ function makeDefaultProps() {
     permission,
     tab: 'account',
     open: true,
-    hideTray: () => {},
+    hideTray: Function.prototype,
+    modifyPermissions: Function.prototype,
     unassignedRoles: ROLES.filter(r => r.id === '2')
   }
 }

@@ -30,7 +30,8 @@ th {
 
 td {
   text-align: direction(left);
-  padding: 8px;
+  padding: 6px;
+  overflow-wrap: anywhere;
 
   .flagged_as_possible_spam {
     font-weight: bold;

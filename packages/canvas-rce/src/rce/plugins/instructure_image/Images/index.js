@@ -19,8 +19,9 @@
 import React, {useRef} from 'react'
 import {arrayOf, bool, func, objectOf, oneOf, shape, string} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
-import {Flex, View} from '@instructure/ui-layout'
-import {Text} from '@instructure/ui-elements'
+import {Flex} from '@instructure/ui-flex'
+import {View} from '@instructure/ui-view'
+import {Text} from '@instructure/ui-text'
 
 import {
   LoadMoreButton,
@@ -32,7 +33,7 @@ import ImageList from '../ImageList'
 import formatMessage from '../../../../format-message'
 
 export default function Images(props) {
-  const {fetchInitialImages, fetchNextImages, contextType, sortBy} = props
+  const {fetchInitialImages, fetchNextImages, contextType, sortBy, searchString} = props
   const images = props.images[contextType]
   const {hasMore, isLoading, error, files} = images
   const lastItemRef = useRef(null)
@@ -45,7 +46,8 @@ export default function Images(props) {
     onLoadMore: fetchNextImages,
     records: files,
     contextType,
-    sortBy
+    sortBy,
+    searchString
   })
 
   return (
@@ -96,5 +98,6 @@ Images.propTypes = {
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
     order: oneOf(['asc', 'desc']).isRequired
   }),
+  searchString: string,
   onImageEmbed: func.isRequired
 }

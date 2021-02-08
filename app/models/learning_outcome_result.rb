@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -46,7 +48,7 @@ class LearningOutcomeResult < ActiveRecord::Base
     scale_data = scale_params
     if needs_scale?(scale_data) && self.score && self.possible
       self.percent = calculate_by_scale(scale_data).round(4)
-    elsif self.score && self.possible
+    elsif self.score
       self.percent = percentage
     end
     self.percent = nil if self.percent && !self.percent.to_f.finite?
@@ -55,6 +57,8 @@ class LearningOutcomeResult < ActiveRecord::Base
   def percentage
     if self.possible.to_f > 0
       self.score.to_f / self.possible.to_f
+    elsif context&.root_account&.feature_enabled?(:account_level_mastery_scales) && outcome_proficiency.present? && outcome_proficiency.points_possible > 0
+      self.score.to_f / outcome_proficiency.points_possible.to_f
     elsif parent_has_mastery?
       # the parent should always have a mastery score, if it doesn't
       # it means something is broken with the outcome and it will need to
@@ -63,6 +67,11 @@ class LearningOutcomeResult < ActiveRecord::Base
       # the get_aggregates method in RollupScoreAggregatorHelper
       self.score.to_f / parent_outcome.mastery_points.to_f
     end
+  end
+
+  def outcome_proficiency
+    ## TODO: As part of OUT-3922, ensure a default is returned here
+    @outcome_proficiency ||= context.resolved_outcome_proficiency
   end
 
   def assignment
@@ -78,6 +87,7 @@ class LearningOutcomeResult < ActiveRecord::Base
   end
 
   def save_to_version(attempt)
+    InstStatsd::Statsd.increment('learning_outcome_result.create') if new_record?
     current_version = self.versions.current.try(:model)
     if current_version.try(:attempt) && attempt < current_version.attempt
       versions = self.versions.sort_by(&:created_at).reverse.select{|v| v.model.attempt == attempt}
@@ -129,16 +139,19 @@ class LearningOutcomeResult < ActiveRecord::Base
   # rubocop:disable Metrics/LineLength
   scope :exclude_muted_associations, -> {
     joins("LEFT JOIN #{RubricAssociation.quoted_table_name} rassoc ON rassoc.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'RubricAssociation'").
-      joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading'").
+      joins("LEFT JOIN #{Assignment.quoted_table_name} ra ON ra.id = rassoc.association_id AND rassoc.association_type = 'Assignment' AND rassoc.purpose = 'grading' AND rassoc.workflow_state = 'active'").
       joins("LEFT JOIN #{Quizzes::Quiz.quoted_table_name} ON quizzes.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Quizzes::Quiz'").
       joins("LEFT JOIN #{Assignment.quoted_table_name} qa ON qa.id = quizzes.assignment_id").
       joins("LEFT JOIN #{Assignment.quoted_table_name} sa ON sa.id = learning_outcome_results.association_id AND learning_outcome_results.association_type = 'Assignment'").
       joins("LEFT JOIN #{Submission.quoted_table_name} ON submissions.user_id = learning_outcome_results.user_id AND submissions.assignment_id in (ra.id, qa.id, sa.id)").
+      joins("LEFT JOIN #{PostPolicy.quoted_table_name} pc on pc.assignment_id  in (ra.id, qa.id, sa.id)").
       where('(ra.id IS NULL AND qa.id IS NULL AND sa.id IS NULL)'\
             ' OR submissions.posted_at IS NOT NULL'\
             ' OR ra.grading_type = \'not_graded\''\
             ' OR qa.grading_type = \'not_graded\''\
-            ' OR sa.grading_type = \'not_graded\'')
+            ' OR sa.grading_type = \'not_graded\''\
+            ' OR pc.id IS NULL'\
+            ' OR (pc.id IS NOT NULL AND pc.post_manually = False)')
   }
   # rubocop:enable Metrics/LineLength
 
@@ -203,7 +216,12 @@ class LearningOutcomeResult < ActiveRecord::Base
   def precise_mastery_percent
     # the outcome's mastery percent is rounded to 2 places. This is normally OK
     # but for scaling it's too imprecise and can lead to inaccurate calculations
-    return unless parent_has_mastery? && parent_outcome.points_possible > 0
-    parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
+    if context&.root_account&.feature_enabled?(:account_level_mastery_scales) && outcome_proficiency.present?
+      return unless outcome_proficiency.points_possible > 0 && outcome_proficiency.mastery_points > 0
+      outcome_proficiency.mastery_points.to_f / outcome_proficiency.points_possible.to_f
+    else
+      return unless parent_has_mastery? && parent_outcome.points_possible > 0
+      parent_outcome.mastery_points.to_f / parent_outcome.points_possible.to_f
+    end
   end
 end

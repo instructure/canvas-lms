@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,9 +23,9 @@ require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 describe ErrorReport do
   describe ".log_exception_from_canvas_errors" do
     it "should not fail with invalid UTF-8" do
-      message = "he"
-      message << 255.chr
-      message << "llo"
+      message = "he" +
+        255.chr +
+        "llo"
       data = { extra: { message: message } }
       expect { described_class.log_exception_from_canvas_errors('my error', data) }.
         to_not raise_error

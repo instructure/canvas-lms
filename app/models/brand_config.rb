@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -34,6 +36,8 @@ class BrandConfig < ActiveRecord::Base
           'save a new one and it will generate the new md5 for you'
   end
 
+  after_save :clear_cache
+
   belongs_to :parent, class_name: 'BrandConfig', foreign_key: 'parent_md5'
   has_many :accounts, foreign_key: 'brand_config_md5'
   has_many :shared_brand_configs, foreign_key: 'brand_config_md5'
@@ -56,6 +60,24 @@ class BrandConfig < ActiveRecord::Base
   MD5_OF_K12_CONFIG = 'a1f113321fa024e7a14cb0948597a2a4'
   def self.k12_config
     find(MD5_OF_K12_CONFIG)
+  end
+
+  def self.cache_key_for_md5(shard_id, md5)
+    ["brand_configs", shard_id, md5].cache_key
+  end
+
+  def self.find_cached_by_md5(md5)
+    MultiCache.fetch(cache_key_for_md5(Shard.current.id, md5)) do
+      BrandConfig.where(md5: md5).take
+    end
+  end
+
+  def clear_cache
+    self.shard.activate do
+      self.class.connection.after_transaction_commit do
+        MultiCache.delete(self.class.cache_key_for_md5(shard.id, md5))
+      end
+    end
   end
 
   def default?
@@ -180,6 +202,7 @@ class BrandConfig < ActiveRecord::Base
     account.brand_config_md5 = md5
     account.save!
     BrandConfig.destroy_if_unused(old_md5)
+    progress&.increment_completion!(1)
   end
 
   def sync_to_s3_and_save_to_shared_brand_config!(progress, shared_brand_config_id)
@@ -189,12 +212,12 @@ class BrandConfig < ActiveRecord::Base
     shared_brand_config.brand_config_md5 = md5
     shared_brand_config.save!
     BrandConfig.destroy_if_unused(old_md5)
+    progress&.increment_completion!(1)
   end
 
   def save_and_sync_to_s3!(progress=nil)
-    progress.update_completion!(5) if progress
     save_all_files!
-    progress.update_completion!(80) if progress
+    progress.increment_completion!(4) if progress&.total
   end
 
   def self.destroy_if_unused(md5)

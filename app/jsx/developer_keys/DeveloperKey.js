@@ -21,19 +21,22 @@ import 'jquery.instructure_date_and_time'
 import 'jqueryui/dialog'
 import I18n from 'i18n!react_developer_keys'
 import React from 'react'
-import PropTypes from 'prop-types'
+import {bool, func, number, shape, string} from 'prop-types'
 
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
 import {IconLtiLine} from '@instructure/ui-icons'
 import {Popover, Tooltip} from '@instructure/ui-overlays'
 import {Img, Link} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import DeveloperKeyActionButtons from './ActionButtons'
 import DeveloperKeyStateControl from './InheritanceStateControl'
 
 class DeveloperKey extends React.Component {
+  static displayName = 'Row'
+
   state = {showKey: false}
 
   get isSiteAdmin() {
@@ -115,7 +118,7 @@ class DeveloperKey extends React.Component {
   handleDelete = () => this.props.onDelete(this.props.developerKey.id)
 
   handleShowKey = () => {
-    this.setState({showKey: !this.state.showKey})
+    this.setState(state => ({showKey: !state.showKey}))
   }
 
   refActionButtons = link => {
@@ -130,21 +133,21 @@ class DeveloperKey extends React.Component {
     const {developerKey, inherited} = this.props
 
     return (
-      <tr>
-        <td>
+      <Table.Row>
+        <Table.Cell>
           <Flex>
             {this.makeImage(developerKey)}
             <Flex.Item shrink>{this.getToolName(developerKey)}</Flex.Item>
           </Flex>
-        </td>
+        </Table.Cell>
 
         {!inherited && (
-          <td style={{wordBreak: 'break-all'}} width="200px">
+          <Table.Cell style={{wordBreak: 'break-all'}}>
             {this.makeUserLink(developerKey)}
-          </td>
+          </Table.Cell>
         )}
 
-        <td>
+        <Table.Cell>
           <View maxWidth="200px" as="div">
             <div>{developerKey.id}</div>
             {!inherited && (
@@ -186,10 +189,10 @@ class DeveloperKey extends React.Component {
               <div style={{wordBreak: 'break-all'}}>{this.redirectURI(developerKey)}</div>
             )}
           </View>
-        </td>
+        </Table.Cell>
 
         {!inherited && (
-          <td>
+          <Table.Cell>
             <div>
               {I18n.t('Access Token Count: %{access_token_count}', {
                 access_token_count: developerKey.access_token_count
@@ -201,9 +204,9 @@ class DeveloperKey extends React.Component {
               })}
             </div>
             <div>{this.lastUsed(developerKey)}</div>
-          </td>
+          </Table.Cell>
         )}
-        <td>
+        <Table.Cell>
           {developerKey.is_lti_key ? (
             <Tooltip
               tip={I18n.t('Developer key is an external tool.')}
@@ -214,8 +217,8 @@ class DeveloperKey extends React.Component {
               </Button>
             </Tooltip>
           ) : null}
-        </td>
-        <td>
+        </Table.Cell>
+        <Table.Cell>
           <DeveloperKeyStateControl
             ref={this.refToggleGroup}
             developerKey={developerKey}
@@ -223,9 +226,9 @@ class DeveloperKey extends React.Component {
             actions={this.props.actions}
             ctx={this.props.ctx}
           />
-        </td>
+        </Table.Cell>
         {!inherited && (
-          <td>
+          <Table.Cell>
             <DeveloperKeyActionButtons
               ref={this.refActionButtons}
               dispatch={this.props.store.dispatch}
@@ -236,43 +239,44 @@ class DeveloperKey extends React.Component {
               onDelete={this.handleDelete}
               showVisibilityToggle={this.isSiteAdmin}
             />
-          </td>
+          </Table.Cell>
         )}
-      </tr>
+      </Table.Row>
     )
   }
 }
 
 DeveloperKey.propTypes = {
-  store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+  store: shape({
+    dispatch: func.isRequired
   }).isRequired,
-  actions: PropTypes.shape({
-    makeVisibleDeveloperKey: PropTypes.func.isRequired,
-    makeInvisibleDeveloperKey: PropTypes.func.isRequired,
-    activateDeveloperKey: PropTypes.func.isRequired,
-    deactivateDeveloperKey: PropTypes.func.isRequired,
-    deleteDeveloperKey: PropTypes.func.isRequired,
-    editDeveloperKey: PropTypes.func.isRequired,
-    developerKeysModalOpen: PropTypes.func.isRequired
+  actions: shape({
+    makeVisibleDeveloperKey: func.isRequired,
+    makeInvisibleDeveloperKey: func.isRequired,
+    activateDeveloperKey: func.isRequired,
+    deactivateDeveloperKey: func.isRequired,
+    deleteDeveloperKey: func.isRequired,
+    editDeveloperKey: func.isRequired,
+    developerKeysModalOpen: func.isRequired
   }).isRequired,
-  developerKey: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    api_key: PropTypes.string,
-    created_at: PropTypes.string.isRequired,
-    visible: PropTypes.bool,
-    name: PropTypes.string,
-    user_id: PropTypes.string,
-    workflow_state: PropTypes.string,
-    is_lti_key: PropTypes.bool
+  developerKey: shape({
+    id: string.isRequired,
+    access_token_count: number.isRequired,
+    api_key: string,
+    created_at: string.isRequired,
+    visible: bool,
+    name: string,
+    user_id: string,
+    workflow_state: string,
+    is_lti_key: bool
   }).isRequired,
-  ctx: PropTypes.shape({
-    params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
+  ctx: shape({
+    params: shape({
+      contextId: string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool,
-  onDelete: PropTypes.func.isRequired
+  inherited: bool,
+  onDelete: func.isRequired
 }
 
 DeveloperKey.defaultProps = {inherited: false}

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -226,7 +228,8 @@ describe OutcomesService::MigrationService do
           stub_post_content_import.to_return(status: 200, body: '{"id":123}')
           expect(described_class.send_imported_content(course, content_migration, imported_content)). to eq({
             import_id: 123,
-            course: course
+            course: course,
+            content_migration: content_migration
           })
         end
 
@@ -239,11 +242,17 @@ describe OutcomesService::MigrationService do
       end
 
       describe '.import_completed?' do
+        let(:content_migration) { ContentMigration.create!(context: course) }
         let(:import_data) do
           {
             course: course,
-            import_id: 1
+            import_id: 1,
+            content_migration: content_migration
           }
+        end
+
+        let!(:wiki_page) do
+          wiki_page_model({course: course})
         end
 
         def stub_get_content_import
@@ -259,19 +268,48 @@ describe OutcomesService::MigrationService do
           expect(described_class.import_completed?(import_data)).to eq true
         end
 
+        it 'sets the content migrations warnings' do
+          stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
+{\"artifact_type\": \"canvas.page\", \"artifact_id\": \"#{wiki_page.id}\"}]}")
+          expect(described_class.import_completed?(import_data)).to eq true
+          expect(content_migration.warnings).to eq ["Unable to align some outcomes to \"some page\""]
+        end
+
+        it 'fails to find the outcome, but still sets the content migrations warning' do
+          stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
+{\"artifact_type\": \"canvas.page\", \"artifact_id\": 1}]}")
+          expect(described_class.import_completed?(import_data)).to eq true
+          expect(content_migration.warnings).to eq ["Unable to align some outcomes to a page"]
+        end
+
+        it 'adds multiple content migration warnings' do
+          stub_get_content_import.to_return(status: 200, body: "{\"state\":\"completed\", \"missing_alignments\": [
+{\"artifact_type\": \"canvas.page\", \"artifact_id\": 1},
+{\"artifact_type\": \"canvas.page\", \"artifact_id\": #{wiki_page.id}}]}")
+          expect(described_class.import_completed?(import_data)).to eq true
+          expect(content_migration.warnings).to include('Unable to align some outcomes to a page')
+          expect(content_migration.warnings).to include('Unable to align some outcomes to "some page"')
+        end
+
         it 'returns false on pending' do
           stub_get_content_import.to_return(status: 200, body: '{"state":"in_progress"}')
           expect(described_class.import_completed?(import_data)).to eq false
         end
 
-        it 'raises error on failed' do
+        it 'raises error on failed and adds a content_import warning' do
+          failure_desc = 'Content Import for Outcomes Service failed'
           stub_get_content_import.to_return(status: 200, body: '{"state":"failed"}')
-          expect { described_class.import_completed?(import_data) }.to raise_error('Content Import for Outcomes Service failed')
+          expect { described_class.import_completed?(import_data) }.to raise_error(RuntimeError,
+            "#{failure_desc}: {\"state\"=>\"failed\"}")
+          expect(content_migration.warnings).to include('Content Import for Outcomes Service failed')
         end
 
-        it 'raises error on non 2xx response' do
-          stub_get_content_import.to_return(status: 401, body: '{"valid_jwt":false}')
-          expect { described_class.import_completed?(import_data) }.to raise_error('Error retrieving import state for Outcomes Service: {"valid_jwt":false}')
+        it 'raises error on non 2xx response and adds a content_import warning' do
+          outcomes_response = '{"valid_jwt":false}'
+          failure_desc = "Error retrieving import state for Outcomes Service: #{outcomes_response}"
+          stub_get_content_import.to_return(status: 401, body: outcomes_response)
+          expect { described_class.import_completed?(import_data) }.to raise_error(RuntimeError, failure_desc)
+          expect(content_migration.warnings).to include(failure_desc)
         end
       end
     end

@@ -44,7 +44,7 @@ let lastAnswerSelected = null
 let lastSuccessfulSubmissionData = null
 let showDeauthorizedDialog
 
-var quizSubmission = (function() {
+const quizSubmission = (function() {
   let timeMod = 0,
     endAt = $('.end_at'),
     endAtParsed = endAt.text() && new Date(endAt.text()),
@@ -100,10 +100,14 @@ var quizSubmission = (function() {
        * This is required to test updating questions via the API.
        */
       if (quizSubmission.backupsDisabled) {
+        console.log('[updateSubmission] Aborting because backups are disabled')
         return
       }
 
       if (quizSubmission.submitting && !repeat) {
+        console.log(
+          '[updateSubmission] Aborting because submission is in process and repeat is disabled'
+        )
         return
       }
       const now = new Date()
@@ -111,6 +115,7 @@ var quizSubmission = (function() {
         return
       }
       if (quizSubmission.currentlyBackingUp) {
+        console.log('[updateSubmission] Aborting because submission is currently being backed up')
         return
       }
 
@@ -206,6 +211,9 @@ var quizSubmission = (function() {
               if ($.inArray(ec, $.ajaxJSON.ignoredXHRs) === -1) {
                 $.ajaxJSON.ignoredXHRs.push(ec)
               }
+            } else if (ec.status === 403 || resp.status == 'forbidden') {
+              // Something has been malaligned and we now need ruby to figure out where we should be
+              window.location.reload()
             } else {
               // Connectivity lost?
               const current_user_id = window.ENV.current_user_id || 'none'
@@ -444,6 +452,20 @@ var quizSubmission = (function() {
       const hr = date.getUTCHours()
       const min = date.getUTCMinutes()
       const sec = date.getUTCSeconds()
+      // Only checking min and sec since those are the only two forced to always display.
+      // Plus, it's most likely either none of these will be NaN, or they all will be.
+      if (Number.isNaN(Number(min)) || Number.isNaN(Number(sec))) {
+        // display a helpful message instead of a NaN time
+        $('.time_header').hide()
+        $('.hide_time_link').hide()
+        $('.time_running').css('color', '#EA0611')
+        $timeRunningFunc().text(
+          I18n.t(
+            "Your browser connectivity may be slow or unstable. In spite of your browser's timer being disconnected, your answers will be recorded for an additional 5 minutes beyond the original time limit on this attempt."
+          )
+        )
+        return
+      }
       const times = []
       if (yr) {
         times.push(I18n.t('years_count', 'Year', {count: yr}))
@@ -704,7 +726,11 @@ $(function() {
       }
       if ($this.hasClass('precision_question_input')) {
         var val = numberHelper.parse($this.val())
-        $this.val(isNaN(val) ? '' : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true}))
+        $this.val(
+          isNaN(val)
+            ? ''
+            : I18n.n(val.toPrecision(16), {strip_insignificant_zeros: true, precision: 16})
+        )
       }
       if (update !== false) {
         quizSubmission.updateSubmission()

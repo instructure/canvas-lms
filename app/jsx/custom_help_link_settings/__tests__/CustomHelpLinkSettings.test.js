@@ -39,7 +39,7 @@ function makeProps(overrides = {}) {
       available_to: ['user', 'student', 'teacher', 'admin'],
       text: 'Search the Canvas Guides',
       subtext: 'Find answers to common questions',
-      url: 'http://community.canvaslms.com/community/answers/guides',
+      url: 'https://community.canvaslms.com/t5/Canvas/ct-p/canvas',
       type: 'default',
       is_featured: false,
       is_new: false,

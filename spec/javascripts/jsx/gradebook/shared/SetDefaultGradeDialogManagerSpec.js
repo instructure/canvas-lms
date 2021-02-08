@@ -25,14 +25,15 @@ import AsyncComponents from '../../../../../app/jsx/gradebook/default_gradebook/
 function createAssignmentProp() {
   return {
     id: '1',
-    htmlUrl: 'http://assignment_htmlUrl',
+    grades_published: true,
+    html_url: 'http://assignment_htmlUrl',
     invalid: false,
     muted: false,
     name: 'Assignment #1',
-    omitFromFinalGrade: false,
-    pointsPossible: 13,
-    submissionTypes: ['online_text_entry'],
-    courseId: '42'
+    omit_from_final_grade: false,
+    points_possible: 13,
+    submission_types: ['online_text_entry'],
+    course_id: '42'
   }
 }
 
@@ -96,10 +97,24 @@ test('returns false when submissions are not loaded', () => {
   notOk(manager.isDialogEnabled())
 })
 
+test('returns false when grades are not published', () => {
+  const manager = new SetDefaultGradeDialogManager(
+    {...createAssignmentProp(), grades_published: false},
+    createStudentsProp(),
+    'contextId',
+    'selectedSection',
+    false,
+    true
+  )
+
+  notOk(manager.isDialogEnabled())
+})
+
 QUnit.module('SetDefaultGradeDialogManager#showDialog', {
   setupDialogManager(opts) {
     const assignment = {
       ...createAssignmentProp(),
+      // Yes, some of the keys are snake-case, whereas others are camel-case ;(
       inClosedGradingPeriod: opts.inClosedGradingPeriod
     }
 

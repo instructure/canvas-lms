@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License along
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import {fireEvent, queryByLabelText} from '@testing-library/dom'
+import {fireEvent, queryByLabelText, queryByTestId} from '@testing-library/dom'
 
 export default class LinkOptionsDialogDriver {
   static find(op) {
@@ -47,6 +47,14 @@ export default class LinkOptionsDialogDriver {
     return [...this.$element.querySelectorAll('button,[role="button"]')].find(
       $button => $button.textContent.trim() === 'Done'
     )
+  }
+
+  get doneButtonIsDisabled() {
+    return this.$doneButton.getAttribute('disabled') !== null
+  }
+
+  get $errorMessage() {
+    return queryByTestId(this.$element, 'url-error')
   }
 
   get text() {

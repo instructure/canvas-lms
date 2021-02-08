@@ -20,7 +20,9 @@ import I18n from 'i18n!permission_button'
 import {func, bool, string} from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
-import {Text} from '@instructure/ui-elements'
+import {ApplyTheme} from '@instructure/ui-themeable'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import {
   IconPublishSolid,
   IconTroubleLine,
@@ -29,9 +31,19 @@ import {
 } from '@instructure/ui-icons'
 import {Menu} from '@instructure/ui-menu'
 import {IconButton} from '@instructure/ui-buttons'
+import {Spinner} from '@instructure/ui-spinner'
 
 import actions from '../actions'
 import propTypes, {ENABLED_FOR_NONE, ENABLED_FOR_ALL, ENABLED_FOR_PARTIAL} from '../propTypes'
+
+// let's cinch up that large margin around the IconButtons so that their
+// decorations snuggle up a little closer and are more obviously a part
+// of the button itself
+const themeOverrides = {
+  [IconButton.theme]: {
+    largeHeight: '1.75rem'
+  }
+}
 
 const MENU_ID_DEFAULT = 1
 const MENU_ID_ENABLED = 2
@@ -57,6 +69,7 @@ export default class PermissionButton extends Component {
     fixButtonFocus: func.isRequired,
     handleClick: func.isRequired,
     inTray: bool.isRequired,
+    apiBusy: bool.isRequired,
     permission: propTypes.rolePermission.isRequired,
     permissionName: string.isRequired,
     permissionLabel: string.isRequired,
@@ -129,7 +142,7 @@ export default class PermissionButton extends Component {
 
     const stateColor = enabled === ENABLED_FOR_NONE ? 'danger' : 'success'
 
-    return (
+    const button = (
       <IconButton
         elementRef={this.setupButtonRef}
         onClick={this.toggleMenu}
@@ -139,6 +152,7 @@ export default class PermissionButton extends Component {
         withBackground={false}
         withBorder={false}
         color={stateColor}
+        margin={this.props.inTray ? '0' : 'small 0 0 0'}
         screenReaderLabel={this.renderAllyScreenReaderTag({
           permission: this.props.permission,
           permissionLabel: this.props.permissionLabel,
@@ -148,6 +162,8 @@ export default class PermissionButton extends Component {
         {stateIcon()}
       </IconButton>
     )
+
+    return this.props.inTray ? button : <ApplyTheme theme={themeOverrides}>{button}</ApplyTheme>
   }
 
   renderAllyScreenReaderTag({permission, permissionLabel, roleLabel}) {
@@ -266,6 +282,28 @@ export default class PermissionButton extends Component {
     )
   }
 
+  renderLockOrSpinner() {
+    const {permission, apiBusy, inTray} = this.props
+    const {locked, explicit} = permission
+    const flexWidth = inTray ? '22px' : '18px'
+    return (
+      <Flex direction="column" margin="none none none xx-small" width={flexWidth}>
+        <Flex.Item size="24px">
+          {locked && explicit && (
+            <Text color="primary">
+              <IconLockSolid data-testid="permission-button-locked" />
+            </Text>
+          )}
+        </Flex.Item>
+        <Flex.Item size="24px">
+          {apiBusy && (
+            <Spinner size="x-small" renderTitle={I18n.t('Waiting for request to complete')} />
+          )}
+        </Flex.Item>
+      </Flex>
+    )
+  }
+
   render() {
     // Note: for performance, we do not initialize the menu button at all until
     //       the button is clicked, unless we are in a tray (which has significatnly
@@ -280,17 +318,7 @@ export default class PermissionButton extends Component {
         className="ic-permissions__permission-button-container"
       >
         <div>{this.props.inTray || this.state.showMenu ? this.renderMenu(button) : button}</div>
-        <div
-          className={
-            this.props.permission.locked && this.props.permission.explicit
-              ? null
-              : 'ic-hidden-button'
-          }
-        >
-          <Text color="primary">
-            <IconLockSolid />
-          </Text>
-        </div>
+        {this.renderLockOrSpinner()}
       </div>
     )
   }
@@ -303,10 +331,11 @@ function mapStateToProps(state, ownProps) {
   const targetFocusArea =
     (state.nextFocus.targetArea === 'tray' && ownProps.inTray) ||
     (state.nextFocus.targetArea === 'table' && !ownProps.inTray)
+  const apiBusy = state.apiBusy.some(
+    elt => elt.id === ownProps.roleId && elt.name === ownProps.permissionName
+  )
 
-  const stateProps = {
-    setFocus: targetFocusButton && targetFocusArea
-  }
+  const stateProps = {apiBusy, setFocus: targetFocusButton && targetFocusArea}
   return {...stateProps, ...ownProps}
 }
 

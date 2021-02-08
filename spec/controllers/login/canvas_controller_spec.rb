@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -57,6 +59,13 @@ describe Login::CanvasController do
       confirm_mobile_layout { post 'create' }
     end
 
+    it "should render a plain text error message on mobile, not the hash" do
+      controller.js_env.clear
+      request.env['HTTP_USER_AGENT'] = mobile_agents[0]
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
+      expect(flash[:error]).to be_a(String)
+    end
+
   end
 
   it "should show sso buttons on load" do
@@ -85,11 +94,12 @@ describe Login::CanvasController do
     expect(response).to render_template(:new)
   end
 
-  it "should re-render if no password given" do
+  it "should re-render if no password given and render a hash for the error" do
     post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => ''}}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/no password/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/no password/i)
   end
 
   it "password auth should work" do
@@ -125,7 +135,8 @@ describe Login::CanvasController do
     assert_status(400)
     expect(session[:sentinel]).to eq true
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should re-render if authenticity token is invalid and referer is trusted" do
@@ -134,7 +145,8 @@ describe Login::CanvasController do
          :authenticity_token => '42'}
     assert_status(400)
     expect(response).to render_template(:new)
-    expect(flash[:error]).to match(/invalid authenticity token/i)
+    expect(flash[:error]).to be_a(Hash)
+    expect(flash[:error][:html]).to match(/invalid authenticity token/i)
   end
 
   it "should login if authenticity token is invalid and referer is trusted" do
@@ -280,6 +292,33 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
+      expect(response).to redirect_to(dashboard_url(:login_success => 1))
+      expect(flash[:notice]).to be_present
+    end
+
+    it "should send users to their home domain if they have no associations with the current account" do
+      account = Account.create!
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
+      user_with_pseudonym(username: 'jt@instructure.com',
+                          active_all: 1,
+                          password: 'qwertyuiop',
+                          account: account)
+      allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
+      post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
+      expect(response).to redirect_to(dashboard_url(host: 'account2', cross_domain_login: 'test.host'))
+    end
+
+    it "doesn't send admins elsewhere" do
+      account = Account.create!
+      allow_any_instantiation_of(Account.default).to receive(:trusted_account_ids).and_return([account.id])
+      user_with_pseudonym(username: 'jt@instructure.com',
+                          active_all: 1,
+                          password: 'qwertyuiop',
+                          account: account)
+      Account.default.account_users.create!(user: @user)
+      allow(HostUrl).to receive(:context_host).with(account, 'test.host').and_return("account2")
       post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(flash[:notice]).to be_present
@@ -291,6 +330,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: account1)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
       @pseudonym = @user.pseudonyms.create!(account: Account.site_admin,
                                             unique_id: 'jt@instructure.com',
                                             password: 'qwertyuiop',
@@ -329,6 +369,7 @@ describe Login::CanvasController do
                           active_all: 1,
                           password: 'qwertyuiop',
                           account: Account.site_admin)
+      Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
       post 'create', params: {:pseudonym_session => { :unique_id => 'jt@instructure.com', :password => 'qwertyuiop'}}
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       # it should have preferred the site admin pseudonym
@@ -343,6 +384,7 @@ describe Login::CanvasController do
                             active_all: 1,
                             password: 'qwertyuiop',
                             account: Account.site_admin)
+        Account.default.pseudonyms.create!(user: @user, unique_id: 'someone')
         @shard1.activate do
           account = Account.create!
           allow(HostUrl).to receive(:default_domain_root_account).and_return(account)
@@ -356,7 +398,7 @@ describe Login::CanvasController do
 
   context "merging" do
     it "should redirect back to merge users" do
-      @cc = @user.communication_channels.create!(:path => 'jt+1@instructure.com')
+      communication_channel(@user, {username: 'jt+1@instructure.com'})
       session[:confirm] = @cc.confirmation_code
       session[:expected_user_id] = @user.id
       post 'create', params: {:pseudonym_session => { :unique_id => 'jtfrd@instructure.com', :password => 'qwertyuiop' }}

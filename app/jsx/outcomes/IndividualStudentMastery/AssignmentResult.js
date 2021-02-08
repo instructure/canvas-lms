@@ -34,6 +34,15 @@ const scoreFromPercent = (percent, outcome) => {
   }
 }
 
+const scaleScore = (score, possible, outcome) => {
+  if (!possible) return score
+  if (outcome.points_possible > 0) {
+    return +((score / possible) * outcome.points_possible).toFixed(2)
+  } else {
+    return +((score / possible) * outcome.mastery_points).toFixed(2)
+  }
+}
+
 const renderLinkedResult = (name, url, isQuiz) => (
   <Button
     variant="link"
@@ -62,7 +71,9 @@ const AssignmentResult = ({outcome, result, outcomeProficiency}) => {
   const {ratings} = outcome
   const {html_url: url, name, submission_types: types} = result.assignment
   const isQuiz = types && types.indexOf('online_quiz') >= 0
-  const score = result.percent ? scoreFromPercent(result.percent, outcome) : result.score
+  const score = result.percent
+    ? scoreFromPercent(result.percent, outcome)
+    : scaleScore(result.score, result.points_possible, outcome)
   return (
     <Flex padding="small" direction="column" alignItems="stretch">
       <Flex.Item>

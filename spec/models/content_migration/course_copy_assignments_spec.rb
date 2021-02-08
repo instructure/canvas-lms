@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -685,10 +687,11 @@ describe ContentMigration do
       end
 
       it "should copy only noop overrides" do
+        Account.default.enable_feature!(:conditional_release)
         assignment_override_model(assignment: @assignment, set_type: 'ADHOC')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop',
-          set_id: 1, title: 'Tag 1')
-        assignment_override_model(assignment: @assignment, set_type: 'Noop',
+        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS, title: 'Tag 1')
+        assignment_override_model(assignment: @assignment, set_type: AssignmentOverride::SET_TYPE_NOOP,
           set_id: nil, title: 'Tag 2')
         @assignment.only_visible_to_overrides = true
         @assignment.save!
@@ -700,7 +703,21 @@ describe ContentMigration do
         expect(to_assignment.assignment_overrides.detect{ |o| o.set_id.nil? }.title).to eq 'Tag 2'
       end
 
+      it "should ignore conditional release noop overrides if feature is not enabled in destination" do
+        assignment_override_model(assignment: @assignment,
+          set_type: AssignmentOverride::SET_TYPE_NOOP,
+          set_id: AssignmentOverride::NOOP_MASTERY_PATHS)
+        @assignment.only_visible_to_overrides = true
+        @assignment.save!
+
+        run_course_copy
+        to_assignment = @copy_to.assignments.first
+        expect(to_assignment.only_visible_to_overrides).to be_falsey
+        expect(to_assignment.assignment_overrides.length).to eq 0
+      end
+
       it "should copy dates" do
+        Account.default.enable_feature!(:conditional_release)
         due_at = 1.hour.from_now.round
         assignment_override_model(assignment: @assignment, set_type: 'Noop',
           set_id: 1, title: 'Tag 1', due_at: due_at)
@@ -713,6 +730,7 @@ describe ContentMigration do
       end
 
       it "preserves only_visible_to_overrides for page assignments" do
+        Account.default.enable_feature!(:conditional_release)
         a1 = assignment_model(context: @copy_from, title: 'a1', submission_types: 'wiki_page', only_visible_to_overrides: true)
         a1.build_wiki_page(title: a1.title, context: a1.context).save!
         a2 = assignment_model(context: @copy_from, title: 'a2', submission_types: 'wiki_page', only_visible_to_overrides: false)
@@ -723,6 +741,33 @@ describe ContentMigration do
         a2_to = @copy_to.assignments.where(migration_id: mig_id(a2)).take
         expect(a2_to.only_visible_to_overrides).to eq false
       end
+
+      it "ignores page assignments if mastery paths is not enabled in destination" do
+        a1 = assignment_model(context: @copy_from, title: 'a1', submission_types: 'wiki_page', only_visible_to_overrides: true)
+        a1.build_wiki_page(title: a1.title, context: a1.context).save!
+        run_course_copy
+        page_to = @copy_to.wiki_pages.where(migration_id: mig_id(a1.wiki_page)).take
+        expect(page_to.assignment).to eq nil
+        expect(@copy_to.assignments.where(migration_id: mig_id(a1)).exists?).to eq false
+      end
+    end
+
+    it "should copy the thing" do
+      @t1 = factory_with_protected_attributes(@copy_from.context_external_tools,
+        :url => "http://www.justanexamplenotarealwebsite.com/tool1", :shared_secret => 'test123',
+        :consumer_key => 'test123', :name => 'tool 1')
+      ext_data = {
+        'key' => "https://canvas.instructure.com/lti/mastery_connect_assessment"
+      }
+      a = assignment_model(
+        :course => @copy_from,
+        :title => "test1",
+        :submission_types => 'external_tool',
+        :external_tool_tag_attributes => {:content => @t1, :url => @t1.url, :external_data => ext_data.to_json}
+      )
+      run_course_copy
+      a_to = @copy_to.assignments.where(:migration_id => mig_id(a)).first
+      expect(a_to.external_tool_tag.external_data).to eq ext_data
     end
 
     context 'external tools' do
@@ -745,7 +790,6 @@ describe ContentMigration do
       end
 
       before do
-        allow_any_instance_of(Lti::AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
         allow(Lti::ToolProxy).to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) do
           Lti::ToolProxy.where(id: tool_proxy.id)
         end

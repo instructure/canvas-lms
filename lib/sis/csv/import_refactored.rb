@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -141,7 +143,7 @@ module SIS
 
       def count_rows(csv, importer, create_importers:)
         rows = 0
-        ::CSV.open(csv[:fullpath], "rb", CSVBaseImporter::PARSE_ARGS) do |faster_csv|
+        ::CSV.open(csv[:fullpath], "rb", **CSVBaseImporter::PARSE_ARGS) do |faster_csv|
           while faster_csv.shift
             unless @read_only
               if create_importers && rows % @rows_for_parallel == 0
@@ -165,8 +167,9 @@ module SIS
 
       def create_batch_attachment(path)
         return if File.stat(path).size == 0
+
         data = Rack::Test::UploadedFile.new(path, Attachment.mimetype(path))
-        SisBatch.create_data_attachment(@batch, data, File.basename(path))
+        Attachment.create_data_attachment(@batch, data, File.basename(path))
       end
 
       def process
@@ -221,24 +224,16 @@ module SIS
         end
         importer_type = parallel_importer.importer_type.to_sym
         importer_object = SIS::CSV.const_get(importer_type.to_s.camelcase + 'Importer').new(self)
-        csv ||= begin
-          att = parallel_importer.attachment
-          file = att.open
-          parallel_importer.start
-          {:fullpath => file.path, :file => att.display_name}
-        end
-        count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
-        parallel_importer.complete(rows_processed: count)
-        update_progress unless @run_immediately # just update progress on completion - the parallel jobs should be short enough
+        try_importing_segment(csv, parallel_importer, importer_object, skip_progress: @run_immediately)
       rescue => e
         if parallel_importer.workflow_state != 'retry'
           parallel_importer.write_attribute(:workflow_state, 'retry')
           run_parallel_importer(parallel_importer)
         end
         parallel_importer.fail
-        fail_with_error!(e, filename: parallel_importer.attachment.display_name)
+        csv ||= { file: parallel_importer.attachment.display_name }
+        fail_with_error!(e, csv: csv)
       ensure
-        file&.close
         unless @run_immediately
           if is_last_parallel_importer_of_type?(parallel_importer)
             queue_next_importer_set unless should_stop_import?
@@ -246,7 +241,38 @@ module SIS
         end
       end
 
-      def fail_with_error!(e, filename: nil)
+      def try_importing_segment(input_csv, parallel_importer, importer_object, skip_progress: false)
+        malformed_retries ||= 0
+        csv = input_csv || begin
+          att = parallel_importer.attachment
+          file = att.open
+          parallel_importer.start
+          {:fullpath => file.path, :file => att.display_name}
+        end
+        count = importer_object.process(csv, parallel_importer.index, parallel_importer.batch_size)
+        parallel_importer.complete(rows_processed: count)
+        # just update progress on completion - the parallel jobs should be short enough
+        update_progress unless skip_progress
+      rescue ::CSV::MalformedCSVError => csv_err
+        # sometimes the file we get from s3 is incomplete.
+        # it would be really hard to get a true malformed csv error because
+        # we parse the file in order to count the rows for splitting it up in the first place,
+        # so the file was valid csv at the time we parsed it.
+        # If the csv we got from s3 looks malformed, we'll try to redownload it once just to make
+        # sure it's not due to corruption during download.
+        #
+        # If we were actually handed a csv input, and we aren't
+        # pulling it from the importer attachment, then re-parsing
+        # won't help because we won't redownload, so we might as well go ahead and raise
+        raise if input_csv.present? || malformed_retries >= 1
+        file&.close
+        malformed_retries += 1
+        retry
+      ensure
+        file&.close
+      end
+
+      def fail_with_error!(e, csv: nil)
         return @batch if @batch.workflow_state == 'aborted'
         message = "Importing CSV for account: "\
             "#{@root_account.id} (#{@root_account.name}) sis_batch_id: #{@batch.id}: #{e}"
@@ -258,7 +284,7 @@ module SIS
         error_message = I18n.t("Error while importing CSV. Please contact support. "\
                                  "(Error report %{number})", number: err_id.to_s)
         @batch.shard.activate do
-          SisBatch.add_error(filename, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
+          SisBatch.add_error(csv, error_message, sis_batch: @batch, failure: true, backtrace: e.try(:backtrace))
           @batch.workflow_state = :failed_with_messages
           @batch.finish(false)
           @batch.save!
@@ -303,7 +329,7 @@ module SIS
           raise "state mismatch error queuing parallel import jobs"
         end
         importers_to_queue.each do |pi|
-          self.send_later_enqueue_args(:run_parallel_importer, enqueue_args, pi)
+          delay(**enqueue_args).run_parallel_importer(pi)
         end
       end
 
@@ -344,7 +370,7 @@ module SIS
             return
           end
           begin
-            ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
+            ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS.merge(:headers => false)) do |row|
               row.each {|header| header&.downcase!}
               importer = IMPORTERS.index do |type|
                 if SIS::CSV.const_get(type.to_s.camelcase + 'Importer').send(type.to_s + '_csv?', row)
@@ -379,7 +405,7 @@ module SIS
         Dir.mktmpdir do |tmp_dir|
           path = File.join(tmp_dir, File.basename(csv[:fullpath]).sub(/\.csv$/i, "_filtered.csv"))
           new_csv = ::CSV.open(path, 'wb', headers: headers - HEADERS_TO_EXCLUDE_FOR_DOWNLOAD, write_headers: true)
-          ::CSV.foreach(csv[:fullpath], CSVBaseImporter::PARSE_ARGS) do |row|
+          ::CSV.foreach(csv[:fullpath], **CSVBaseImporter::PARSE_ARGS) do |row|
             HEADERS_TO_EXCLUDE_FOR_DOWNLOAD.each do |header|
               row.delete(header)
             end

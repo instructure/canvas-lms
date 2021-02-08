@@ -17,12 +17,14 @@
  */
 
 import assert from 'assert'
+import moxios from 'moxios'
 import sinon from 'sinon'
 import * as actions from '../../../src/sidebar/actions/upload'
 import * as filesActions from '../../../src/sidebar/actions/files'
 import * as imagesActions from '../../../src/sidebar/actions/images'
 import {spiedStore} from './utils'
 import Bridge from '../../../src/bridge'
+import K5Uploader from '@instructure/k5uploader'
 
 const fakeFileReader = {
   readAsDataURL() {
@@ -33,7 +35,7 @@ const fakeFileReader = {
 
 describe('Upload data actions', () => {
   const results = {id: 47}
-  const file = {url: 'fileurl', thumbnail_url: 'thumbnailurl'}
+  const file = {url: 'http://canvas.test/files/17/download', thumbnail_url: 'thumbnailurl'}
   const successSource = {
     fetchFolders() {
       return Promise.resolve({
@@ -205,6 +207,7 @@ describe('Upload data actions', () => {
         type: 'image/png'
       }
     }
+
     it('dispatches a uploadPreflight with the proper parentFolderId set', () => {
       const baseState = setupState()
       const store = spiedStore(baseState)
@@ -213,6 +216,7 @@ describe('Upload data actions', () => {
           store.spy.calledWith({
             type: actions.START_FILE_UPLOAD,
             file: {
+              bookmark: undefined,
               parentFolderId: 24,
               name: 'foo.png',
               size: 3000,
@@ -240,11 +244,61 @@ describe('Upload data actions', () => {
     })
   })
 
+  describe('uploadToMediaFolder for media files', () => {
+    const fakeFileMetaData = {
+      parentFolderId: 'media',
+      name: 'foo.mov',
+      size: 3000,
+      contentType: 'video/mov',
+      domObject: {
+        name: 'foo.mov',
+        size: 3000,
+        type: 'video/mov'
+      }
+    }
+
+    beforeEach(() => {
+      moxios.install()
+    })
+    afterEach(() => {
+      moxios.uninstall()
+    })
+
+    it('uploads directly to notorious/kaltura', () => {
+      // I really just wanted to stub saveMediaRecording and assert that it's called,
+      // but sinon can't stub functions from es6 modules.
+      // The next best thing is to check that the K5Uploader is exercised
+      moxios.stubRequest('/api/v1/services/kaltura_session?include_upload_config=1', {
+        status: 200,
+        response: {
+          ks: 'averylongstring',
+          subp_id: '0',
+          partner_id: '9',
+          uid: '1234_567',
+          serverTime: 1234,
+          kaltura_setting: {
+            uploadUrl: 'url.url.url',
+            entryUrl: 'url.url.url',
+            uiconfUrl: 'url.url.url',
+            partnerData: 'data from our partners'
+          }
+        }
+      })
+      const k5uploaderstub = sinon.stub(K5Uploader.prototype, 'loadUiConf').callsFake(() => 'mock')
+
+      const baseState = setupState()
+      const store = spiedStore(baseState)
+      return store.dispatch(actions.uploadToMediaFolder('media', fakeFileMetaData)).then(() => {
+        sinon.assert.called(k5uploaderstub)
+      })
+    })
+  })
+
   describe('generateThumbnailUrl', () => {
     it('returns the results if the file is not an image', () => {
       const results = {'content-type': 'application/pdf'}
       return actions.generateThumbnailUrl(results).then(returnResults => {
-        assert.deepEqual(results, returnResults)
+        assert.deepStrictEqual(results, returnResults)
       })
     })
 
@@ -258,7 +312,7 @@ describe('Upload data actions', () => {
       return actions
         .generateThumbnailUrl(results, fakeFileDOMObject, fakeFileReader)
         .then(returnResults => {
-          assert.deepEqual(returnResults, {
+          assert.deepStrictEqual(returnResults, {
             'content-type': 'image/jpeg',
             thumbnail_url: 'fakeDataURL'
           })
@@ -487,6 +541,21 @@ describe('Upload data actions', () => {
   })
 
   describe('handleFailures', () => {
+    const R = global.Response
+    beforeEach(() => {
+      if (typeof Response !== 'function') {
+        global.Response = function(body, status) {
+          this.status = status
+          this.json = () => {
+            return Promise.resolve(JSON.parse(body))
+          }
+        }
+      }
+    })
+    afterEach(() => {
+      global.Response = R
+    })
+
     it('calls quota exceeded when the file size exceeds the quota', () => {
       const fakeDispatch = sinon.spy()
       const error = {
@@ -585,7 +654,7 @@ describe('Upload data actions', () => {
       const error = new Error('uh oh')
       const action = actions.failMediaUpload(error)
       sinon.assert.calledWith(showErrorSpy, error)
-      assert.deepEqual(action, {type: actions.FAIL_MEDIA_UPLOAD, error})
+      assert.deepStrictEqual(action, {type: actions.FAIL_MEDIA_UPLOAD, error})
     })
 
     it('handles failure', () => {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -55,7 +57,6 @@ describe PlannerOverridesController do
   context "as student" do
     before :each do
       user_session(@student)
-      @course.root_account.enable_feature!(:student_planner)
     end
 
     describe "GET #index" do
@@ -104,6 +105,17 @@ describe PlannerOverridesController do
         post :create, params: {plannable_type: 'announcement', plannable_id: @a.id, user_id: @student.id, marked_complete: true}
         json = json_parse(response.body)
         expect(json["plannable_type"]).to eq 'announcement'
+      end
+
+      it "gracefully handles duplicate request race condition" do
+        ovr = PlannerOverride.new
+        allow(PlannerOverride).to receive(:new).and_return(ovr)
+        expect(ovr).to receive(:save) do
+          raise ActiveRecord::RecordNotUnique, "PG::UniqueViolation: ERROR:  duplicate key value violates unique constraint..."
+        end
+        post :create, params: {plannable_type: "assignment", plannable_id: @assignment2.id, marked_complete: true}
+        expect(response).to have_http_status(:bad_request)
+        expect(PlannerOverride.where(user_id: @student.id).count).to be 1
       end
     end
 

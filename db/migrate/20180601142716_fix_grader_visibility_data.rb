@@ -19,12 +19,7 @@ class FixGraderVisibilityData < ActiveRecord::Migration[5.0]
   tag :postdeploy
 
   def self.up
-    DataFixup::FixGraderVisibilityData.send_later_if_production_enqueue_args(
-      :run,
-      {
-        priority: Delayed::LOW_PRIORITY,
-        n_strand: ["DataFixup::FixGraderVisibilityData", Shard.current.database_server.id]
-      }
-    )
+    DataFixup::FixGraderVisibilityData.delay_if_production(priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::FixGraderVisibilityData", Shard.current.database_server.id]).run
   end
 end

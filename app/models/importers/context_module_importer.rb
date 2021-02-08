@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -140,7 +142,7 @@ module Importers
       end
 
       item.require_sequential_progress = hash[:require_sequential_progress] if hash.has_key?(:require_sequential_progress)
-      item.requirement_count = hash[:requirement_count] if hash[:requirement_count]
+      item.requirement_count = hash[:requirement_count] if hash.has_key?(:requirement_count)
 
       if hash[:prerequisites]
         preqs = []
@@ -156,8 +158,7 @@ module Importers
       item.save!
 
       item_map = {}
-      item.item_migration_position ||= item.content_tags.not_deleted.pluck(:position).compact.max
-
+      item.item_migration_position ||= (item.content_tags.not_deleted.pluck(:position).compact + [item.content_tags.not_deleted.count]).max
       items = hash[:items] || []
       items = items.map{|item| self.flatten_item(item, 0)}.flatten
 

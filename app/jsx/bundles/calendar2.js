@@ -33,12 +33,11 @@ import 'compiled/jquery.kylemenu'
 
 const eventDataSource = new EventDataSource(ENV.CALENDAR.CONTEXTS)
 
-const schedulerStore = ENV.CALENDAR.BETTER_SCHEDULER ? configureSchedulerStore() : null
+const schedulerStore = ENV.CALENDAR.SHOW_SCHEDULER ? configureSchedulerStore() : null
 
 const header = new CalendarHeader({
   el: '#calendar_header',
-  calendar2Only: ENV.CALENDAR.CAL2_ONLY,
-  showScheduler: ENV.CALENDAR.SHOW_SCHEDULER && !ENV.CALENDAR.BETTER_SCHEDULER
+  calendar2Only: ENV.CALENDAR.CAL2_ONLY
 })
 
 const calendar = new Calendar(
@@ -54,7 +53,7 @@ const calendar = new Calendar(
     userId: ENV.current_user_id,
     schedulerStore,
     onLoadAppointmentGroups: agMap => {
-      if (ENV.CALENDAR.BETTER_SCHEDULER) {
+      if (ENV.CALENDAR.SHOW_SCHEDULER) {
         const courses = eventDataSource.contexts.filter(context =>
           agMap.hasOwnProperty(context.asset_string)
         )

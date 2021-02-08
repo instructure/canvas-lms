@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -267,6 +269,11 @@ describe PseudonymsController, type: :request do
             :unique_id => 'teacher@example.com'
           }
         })
+        expect(response.code).to eql '400'
+      end
+
+      it "returns 400 if no parameters" do
+        raw_api_call(:put, @path, @path_options, {})
         expect(response.code).to eql '400'
       end
 

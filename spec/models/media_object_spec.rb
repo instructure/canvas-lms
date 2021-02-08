@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,6 +28,12 @@ describe MediaObject do
 
       expect(MediaObject.by_media_id('0_abcdefgh').first).to eq mo
       expect(MediaObject.by_media_id('1_01234567').first).to eq mo
+    end
+
+    it "should not find an arbitrary MediaObject when given a nil id" do
+      course_factory
+      mo = factory_with_protected_attributes(MediaObject, :media_id => '0_abcdefgh', :context => @course)
+      expect(MediaObject.by_media_id(nil).first).to be_nil
     end
 
     it "should raise an error if someone tries to use find_by_media_id" do
@@ -120,7 +128,9 @@ describe MediaObject do
       Timecop.freeze do
         mo = MediaObject.create!(:context => user_factory, :media_id => "test")
         expect(mo).to receive(:retrieve_details)
-        expect(mo).to receive(:send_at).with(5.minutes.from_now, :retrieve_details_ensure_codecs, 2)
+        expect(mo).to receive(:delay).with(run_at: 5.minutes.from_now).and_return(mo)
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(1).and_call_original
+        expect(mo).to receive(:retrieve_details_ensure_codecs).ordered.with(2)
         mo.retrieve_details_ensure_codecs(1)
       end
     end
@@ -129,7 +139,7 @@ describe MediaObject do
       mo = MediaObject.create!(:context => user_factory, :media_id => "test")
       mo.data = { extensions: { mp4: { id: "t-yyy" } } }
       expect(mo).to receive(:retrieve_details)
-      expect(mo).to receive(:send_at).never
+      expect(mo).to receive(:delay).never
       mo.retrieve_details_ensure_codecs(1)
     end
   end
@@ -207,6 +217,23 @@ describe MediaObject do
       }
       @media_type = "video"
       @assets = []
+
+      course_factory
+      @media_object = MediaObject.create!(
+        context: @course,
+        title: "uploaded_video.mp4",
+        media_id: "m-somejunkhere",
+        media_type: "video"
+      )
+    end
+
+    before :each do
+      mock_kaltura = double('CanvasKaltura::ClientV3')
+      allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_kaltura)
+      allow(mock_kaltura).to receive(:media_sources).and_return(
+        [{:height => "240", :bitrate => "382", :isOriginal => "0", :width => "336", :content_type => "video/mp4",
+          :containerFormat => "isom", :url => "https://kaltura.example.com/some/url", :size =>"204", :fileExt=>"mp4"}]
+      )
     end
 
     before :each do
@@ -223,7 +250,7 @@ describe MediaObject do
     end
 
     it "keeps the current title if already set" do
-        mo = media_object
+        mo = @media_object
         mo.title = "Canvas Title"
         mo.save!
 
@@ -232,7 +259,7 @@ describe MediaObject do
     end
 
     it "uses the kaltura title if no current title" do
-        mo = media_object
+        mo = @media_object
         mo.title = ""
         mo.save!
 
@@ -259,6 +286,22 @@ describe MediaObject do
       mo.process_retrieved_details(@mock_entry, @media_type, @assets)
       att = Attachment.where(:media_entry_id => mo[:media_id])
       expect(att).to be_empty
+    end
+
+    it "creates the corresponding attachment if the feature is enabled" do
+      @course.root_account.enable_feature!(:autocreate_attachment_from_media_object)
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      att = Attachment.find(mo[:attachment_id])
+      expect(att).to be_hidden
+      expect(att.folder.name).to eq "Uploaded Media"
+      expect(att[:media_entry_id]).to eql mo[:media_id]
+    end
+
+    it "doesn't create the corresponding attachment if the feature is not enabled" do
+      mo = @media_object
+      mo.process_retrieved_details(@mock_entry, @media_type, @assets)
+      expect(mo.attachment_id).to be_nil
     end
   end
 

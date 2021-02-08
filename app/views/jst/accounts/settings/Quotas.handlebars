@@ -1,6 +1,6 @@
 <fieldset class="quota_settings">
   <legend>{{#t "default_account_quota_title"}}Default Account Quotas{{/t}}</legend>
-  <div class="control-group">
+  <div class="responsive-control-group">
     <label id="default_course_storage_mb_label" class="control-label" for="default_course_storage_mb">{{#t "default_course_storage_quota"}}Course Quota{{/t}}</label>
     <div class="controls">
       <div class="input-append">
@@ -10,7 +10,7 @@
     </div>
   </div>
   {{#if root_account}}
-    <div class="control-group">
+    <div class="responsive-control-group margin-t-m">
       <label id="default_user_storage_mb_label" class="control-label" for="default_user_storage_mb">{{#t "default_user_storage_quota"}}User Quota{{/t}}</label>
       <div class="controls">
         <div class="input-append">
@@ -20,7 +20,7 @@
       </div>
     </div>
   {{/if}}
-  <div class="control-group">
+  <div class="responsive-control-group margin-t-m">
       <label id="default_group_storage_mb_label" class="control-label" for="default_group_storage_mb">{{#t "default_group_storage_quota"}}Group Quota{{/t}}</label>
       <div class="controls">
         <div class="input-append">
@@ -30,9 +30,9 @@
       </div>
     </div>
 
-  <div class="button-container">
-    <div class="controls">
-      <button type="submit" class="btn">{{#t "update_button"}}Update{{/t}}</button>
-    </div>
+  <div class="responsive-button-container margin-t-m">
+    <button type="submit" class="btn responsive-control-button">
+      {{#t "update_button"}}Update{{/t}}
+    </button>
   </div>
 </fieldset>

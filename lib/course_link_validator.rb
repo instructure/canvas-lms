@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ class CourseLinkValidator
 
     progress ||= Progress.new(:tag => TAG, :context => course)
     progress.reset!
-    progress.process_job(self, :process)
+    progress.process_job(self, :process, {})
     progress
   end
 
@@ -255,6 +257,7 @@ class CourseLinkValidator
     object ||= Context.find_asset_by_url(url)
     unless object
       return :missing_item unless [nil, 'syllabus'].include?(url.match(/\/courses\/\d+\/\w+\/(.+)/)&.[](1))
+      return :missing_item if url =~ /\/media_objects_iframe\//
       return nil
     end
     if object.deleted?

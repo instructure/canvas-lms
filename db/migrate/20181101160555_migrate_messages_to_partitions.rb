@@ -19,10 +19,10 @@ class MigrateMessagesToPartitions < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def up
-    DataFixup::MigrateMessagesToPartitions.send_later_if_production_enqueue_args(:run,
-      priority: Delayed::LOWER_PRIORITY,
-      max_attempts: 1,
-      strand: "partition_messages:#{Shard.current.database_server.id}")
+    DataFixup::MigrateMessagesToPartitions.
+      delay_if_production(priority: Delayed::LOWER_PRIORITY,
+        strand: "partition_messages:#{Shard.current.database_server.id}").
+      run
   end
 
   def down

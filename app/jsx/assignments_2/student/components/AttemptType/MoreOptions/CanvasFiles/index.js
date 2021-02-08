@@ -23,7 +23,7 @@ import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import FileSelectTable from './FileSelectTable'
 import GenericErrorPage from '../../../../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_MoreOptions_CanvasFiles'
-import LoadingIndicator from '../../../../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import parseLinkHeader from '../../../../../../shared/parseLinkHeader'
 import React from 'react'
 

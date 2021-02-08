@@ -19,6 +19,7 @@
 import React from 'react'
 
 import {Text} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {View} from '@instructure/ui-layout'
 
 import {IconLock, IconUnlock} from './BlueprintLocks'
@@ -31,8 +32,8 @@ const UnsyncedChange = props => {
   const typeLabel = itemTypeLabels[asset_type] || asset_type
 
   return (
-    <tr className="bcs__unsynced-item">
-      <td>
+    <Table.Row data-testid="bcs__unsynced-item">
+      <Table.Cell>
         <div className="bcs__unsynced-item__name">
           <Text size="large" color="secondary">
             {locked ? <IconLock /> : <IconUnlock />}
@@ -43,23 +44,25 @@ const UnsyncedChange = props => {
             </Text>
           </View>
         </div>
-      </td>
-      <td>
+      </Table.Cell>
+      <Table.Cell>
         <Text size="small" weight="bold">
           {changeLabel}
         </Text>
-      </td>
-      <td>
+      </Table.Cell>
+      <Table.Cell>
         <Text size="small" weight="bold">
           {typeLabel}
         </Text>
-      </td>
-    </tr>
+      </Table.Cell>
+    </Table.Row>
   )
 }
 
 UnsyncedChange.propTypes = {
   change: propTypes.unsyncedChange.isRequired
 }
+
+UnsyncedChange.displayName = 'Row'
 
 export default UnsyncedChange

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,9 +38,7 @@ module Api::V1::WikiPage
     hash['hide_from_students'] = !hash['published'] # deprecated, but still here for now
     hash['front_page'] = wiki_page.is_front_page?
     hash['html_url'] = polymorphic_url([wiki_page.context, wiki_page])
-    if wiki_page.context.root_account.feature_enabled?(:student_planner)
-      hash['todo_date'] = wiki_page.todo_date
-    end
+    hash['todo_date'] = wiki_page.todo_date
 
     hash['updated_at'] = wiki_page.revised_at
     if opts[:include_assignment] && wiki_page.for_assignment?
@@ -51,7 +51,7 @@ module Api::V1::WikiPage
     locked_json(hash, wiki_page, current_user, 'page', :deep_check_if_needed => opts[:deep_check_if_needed])
     if include_body && !hash['locked_for_user'] && !hash['lock_info']
       hash['body'] = api_user_content(wiki_page.body, wiki_page.context)
-      wiki_page.increment_view_count(current_user, wiki_page.context)
+      wiki_page.context_module_action(current_user, wiki_page.context, :read)
     end
     if opts[:master_course_status]
       hash.merge!(wiki_page.master_course_api_restriction_data(opts[:master_course_status]))

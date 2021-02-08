@@ -21,89 +21,117 @@ import bridge from '../../../bridge'
 import formatMessage from '../../../format-message'
 import TrayController from './VideoOptionsTray/TrayController'
 import {isVideoElement} from '../shared/ContentSelection'
+import {isOKToLink} from '../../contentInsertionUtils'
 
 const trayController = new TrayController()
 
 const COURSE_PLUGIN_KEY = 'course_media'
 const USER_PLUGIN_KEY = 'user_media'
+const GROUP_PLUGIN_KEY = 'group_media'
+
+function getMenuItems(ed) {
+  const contextType = ed.settings.canvas_rce_user_context.type
+  const items = []
+  if (ed.getParam('show_media_upload')) {
+    // test if it's ok
+    items.push({
+      text: formatMessage('Upload/Record Media'),
+      value: 'instructure_upload_media'
+    })
+  }
+  if (contextType === 'course') {
+    items.push({
+      text: formatMessage('Course Media'),
+      value: 'instructure_course_media'
+    })
+  } else if (contextType === 'group') {
+    items.push({
+      text: formatMessage('Group Media'),
+      value: 'instructure_group_media'
+    })
+  }
+  items.push({
+    text: formatMessage('User Media'),
+    value: 'instructure_user_media'
+  })
+  return items
+}
+
+function doMenuItem(ed, value) {
+  switch (value) {
+    case 'instructure_upload_media':
+      ed.execCommand('instructureRecord')
+      break
+    case 'instructure_course_media':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
+      break
+    case 'instructure_group_media':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForMedia', false, GROUP_PLUGIN_KEY)
+      break
+    case 'instructure_user_media':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForMedia', false, USER_PLUGIN_KEY)
+      break
+  }
+}
 
 tinymce.create('tinymce.plugins.InstructureRecord', {
   init(ed) {
-    const contextType = ed.settings.canvas_rce_user_context.type
-
     ed.addCommand('instructureRecord', clickCallback.bind(this, ed, document))
     ed.addCommand('instructureTrayForMedia', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key)
+      bridge.showTrayForPlugin(plugin_key, ed.id)
     })
 
     // Register menu items
     ed.ui.registry.addNestedMenuItem('instructure_media', {
       text: formatMessage('Media'),
       icon: 'video',
-      getSubmenuItems: () => [
-        'instructure_upload_media',
-        'instructure_course_media',
-        'instructure_user_media'
-      ]
-    })
-    if (ed.getParam('show_media_upload')) {
-      ed.ui.registry.addMenuItem('instructure_upload_media', {
-        text: formatMessage('Record/Upload Media'),
-        onAction: () => ed.execCommand('instructureRecord')
-      })
-    }
-    if (contextType === 'course') {
-      ed.ui.registry.addMenuItem('instructure_course_media', {
-        text: formatMessage('Course Media'),
-        onAction: () => {
-          ed.focus(true)
-          ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
-        }
-      })
-    }
-    ed.ui.registry.addMenuItem('instructure_user_media', {
-      text: formatMessage('User Media'),
-      onAction: () => {
-        ed.focus(true)
-        ed.execCommand('instructureTrayForMedia', false, USER_PLUGIN_KEY)
-      }
+      getSubmenuItems: () =>
+        getMenuItems(ed).map(item => {
+          return {
+            type: 'menuitem',
+            text: item.text,
+            onAction: () => doMenuItem(ed, item.value),
+            onSetup: api => {
+              api.setDisabled(!isOKToLink(ed.selection.getContent()))
+              return () => {}
+            }
+          }
+        })
     })
 
-    ed.ui.registry.addMenuButton('instructure_record', {
+    // Register buttons
+    ed.ui.registry.addSplitButton('instructure_record', {
       tooltip: formatMessage('Record/Upload Media'),
       icon: 'video',
       fetch(callback) {
-        const items = [
-          {
-            type: 'menuitem',
-            text: formatMessage('User Media'),
-            onAction() {
-              ed.focus(true)
-              ed.execCommand('instructureTrayForMedia', false, USER_PLUGIN_KEY)
-            }
+        const items = getMenuItems(ed).map(item => {
+          return {
+            type: 'choiceitem',
+            text: item.text,
+            value: item.value
           }
-        ]
-
-        if (contextType === 'course') {
-          items.splice(0, 0, {
-            type: 'menuitem',
-            text: formatMessage('Course Media'),
-            onAction() {
-              ed.focus(true) // activate the editor without changing focus
-              ed.execCommand('instructureTrayForMedia', false, COURSE_PLUGIN_KEY)
-            }
-          })
-        }
-
-        if (ed.getParam('show_media_upload')) {
-          items.splice(0, 0, {
-            type: 'menuitem',
-            text: formatMessage('Upload/Record Media'),
-            onAction: () => ed.execCommand('instructureRecord')
-          })
-        }
-
+        })
         callback(items)
+      },
+      onAction(api) {
+        if (!api.isDisabled()) {
+          const first = getMenuItems(ed)[0].value
+          doMenuItem(ed, first)
+        }
+      },
+      onItemAction: (_splitButtonApi, value) => doMenuItem(ed, value),
+      onSetup(api) {
+        function handleNodeChange(_e) {
+          api.setDisabled(!isOKToLink(ed.selection.getContent()))
+        }
+        setTimeout(handleNodeChange)
+        ed.on('NodeChange', handleNodeChange)
+        return () => {
+          ed.off('NodeChange', handleNodeChange)
+        }
       }
     })
 
@@ -118,7 +146,7 @@ tinymce.create('tinymce.plugins.InstructureRecord', {
         trayController.showTrayForEditor(ed)
       },
 
-      text: formatMessage('Options'),
+      text: formatMessage('Video Options'),
       tooltip: buttonAriaLabel
     })
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -15,8 +17,6 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
-require 'iconv'
 
 class ErrorReport < ActiveRecord::Base
   belongs_to :user
@@ -96,7 +96,7 @@ class ErrorReport < ActiveRecord::Base
     end
 
     def create_error_report(opts)
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         begin
           report = ErrorReport.new
           report.assign_data(opts)

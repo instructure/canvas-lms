@@ -36,6 +36,7 @@ import StudentGroupFilter from '../shared/StudentGroupFilter'
 import SpeedGraderLink from '../shared/SpeedGraderLink'
 import DirectShareUserModal from 'jsx/shared/direct_share/DirectShareUserModal'
 import DirectShareCourseTray from 'jsx/shared/direct_share/DirectShareCourseTray'
+import {setupSubmitHandler} from 'jsx/shared/helpers/reuploadSubmissionsHelper'
 
 const lockManager = new LockManager()
 lockManager.init({itemType: 'assignment', page: 'show'})
@@ -204,19 +205,7 @@ $(() => {
     $('.upload_submissions_link').slideDown()
   })
 
-  $('#re_upload_submissions_form').submit(function(event) {
-    const data = $(this).getFormData()
-    if (!data.submissions_zip) {
-      event.preventDefault()
-      event.stopPropagation()
-    } else if (!data.submissions_zip.match(/\.zip$/)) {
-      event.preventDefault()
-      event.stopPropagation()
-      $(this).formErrors({
-        submissions_zip: I18n.t('Please upload files as a .zip')
-      })
-    }
-  })
+  setupSubmitHandler(ENV.USER_ASSET_STRING)
 
   $('#edit_assignment_form').bind('assignment_updated', (event, data) => {
     if (data.assignment && data.assignment.peer_reviews) {

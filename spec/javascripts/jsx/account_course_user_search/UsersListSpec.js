@@ -107,7 +107,7 @@ Object.entries({
       )
       const icons = wrapper.find(`IconMiniArrow${expectedArrow}Solid`)
       equal(icons.length, 1, `only one ${expectedArrow} arrow`)
-      const header = icons.closest('UsersListHeader')
+      const header = icons.closest('[data-testid="UsersListHeader"]')
       ok(
         header
           .find('Tooltip')
@@ -130,7 +130,7 @@ Object.entries({
         />
       )
       const header = wrapper
-        .find('UsersListHeader')
+        .find('[data-testid="UsersListHeader"]')
         .filterWhere(n => n.text().includes(label))
         .find('button')
       header.simulate('click')

@@ -1,0 +1,50 @@
+{
+  "name": "group_membership_created",
+  "definition": "The event is emitted anytime a new member is added to a course group by an end user or API request.",
+  "trigger": "Triggered when a new user is added to a group.",
+  "schema": {
+    "group_category_id": "The Canvas id of the group category.",
+    "group_category_name": "The name of the group category.",
+    "group_id": "The Canvas id of the group the user is assigned to.",
+    "group_membership_id": "The Canvas id of the group membership.",
+    "group_name": "The name of the group the user is being assigned to.",
+    "user_id": "The Canvas id of the user being assigned to a group.",
+    "workflow_state": "The state of the group membership."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "event_name": "group_membership_created",
+          "event_time": "2019-11-01T19:11:21.467Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/135519/groups",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/New_York",
+          "url": "https://oxana.instructure.com/group_categories/30575/clone_with_name",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "group_category_id": "21070000000049012",
+          "group_category_name": "Live_events_Group1",
+          "group_id": "21070000000000051",
+          "group_membership_id": "21070000000123460",
+          "group_name": "Group 1",
+          "user_id": "21070000000000047",
+          "workflow_state": "accepted"
+        }
+      }
+    }
+  ]
+}

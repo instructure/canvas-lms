@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -32,8 +34,7 @@ describe ConversationMessage do
       @last_student = @students.last
 
       [@teacher, *@students].each do |user|
-        channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-        channel.confirm
+        communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
       end
 
       @conversation = @teacher.initiate_conversation(@initial_students)

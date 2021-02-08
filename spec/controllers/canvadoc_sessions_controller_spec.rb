@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -359,6 +361,19 @@ describe CanvadocSessionsController do
 
       it "enables submission annotations when passed enable_annotations true" do
         expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(enable_annotations: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes use_cloudfront as true when feature flag is set to true" do
+        Account.site_admin.enable_feature!(:use_cloudfront_for_docviewer)
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: true))
+
+        get :show, params: {blob: blob.to_json, hmac: hmac}
+      end
+
+      it "passes use_cloudfront as false when feature flag is not set to true" do
+        expect(@attachment.canvadoc).to receive(:session_url).with(hash_including(use_cloudfront: false))
 
         get :show, params: {blob: blob.to_json, hmac: hmac}
       end

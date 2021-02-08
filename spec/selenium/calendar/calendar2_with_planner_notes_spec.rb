@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -23,7 +25,6 @@ describe "calendar2" do
   include Calendar2Common
 
   before(:once) do
-    Account.default.enable_feature!(:student_planner)
     course_with_teacher(active_all: true, new_user: true)
     @student1 = User.create!(name: 'Student 1')
     @course.enroll_student(@student1).accept!

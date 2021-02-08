@@ -24,7 +24,7 @@ import {collectionsShape} from './propTypes'
 import NavigationPanel from './NavigationPanel'
 import CollectionPanel from './CollectionPanel'
 
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {pickProps} from '@instructure/ui-react-utils'
 
 function LinksPanel(props) {
@@ -99,6 +99,7 @@ LinksPanel.propTypes = {
   onChangeAccordion: func,
   contextType: string.isRequired,
   contextId: string.isRequired,
+  searchString: string,
   collections: collectionsShape.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,

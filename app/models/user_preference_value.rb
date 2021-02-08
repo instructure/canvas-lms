@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -26,6 +28,8 @@ class UserPreferenceValue < ActiveRecord::Base
   serialize :value
   serialize :sub_key, JSON # i'm too lazy to force a distinction between integer and string/symbol keys
 
+  # this means that the preference value is no longer stored on the user object
+  # and is in it's own record in the db
   EXTERNAL = :external.freeze
 
   def self.add_user_preference(key, use_sub_keys: false)
@@ -46,6 +50,7 @@ class UserPreferenceValue < ActiveRecord::Base
   add_user_preference :gradebook_settings, use_sub_keys: true
   add_user_preference :new_user_tutorial_statuses
   add_user_preference :selected_calendar_contexts
+  add_user_preference :send_scores_in_emails_override, use_sub_keys: true
 
   def self.settings
     @preference_settings ||= {}

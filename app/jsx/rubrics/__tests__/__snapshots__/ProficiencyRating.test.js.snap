@@ -1,15 +1,9 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`renders the ProficiencyRating component 1`] = `
-<tr>
-  <td
-    style={
-      Object {
-        "padding": "1.1rem 0 0 0",
-        "textAlign": "center",
-        "verticalAlign": "top",
-      }
-    }
+<Row>
+  <Cell
+    textAlign="center"
   >
     <div
       style={
@@ -37,14 +31,9 @@ exports[`renders the ProficiencyRating component 1`] = `
         variant="simple"
       />
     </div>
-  </td>
-  <td
-    className="description"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
+  </Cell>
+  <Cell
+    textAlign="start"
   >
     <TextInput
       defaultValue="Stellar"
@@ -68,14 +57,9 @@ exports[`renders the ProficiencyRating component 1`] = `
       textAlign="start"
       type="text"
     />
-  </td>
-  <td
-    className="points"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
+  </Cell>
+  <Cell
+    textAlign="start"
   >
     <TextInput
       defaultValue="10"
@@ -100,189 +84,192 @@ exports[`renders the ProficiencyRating component 1`] = `
       type="text"
       width="4rem"
     />
-  </td>
-  <td
-    className="color"
-    style={
-      Object {
-        "verticalAlign": "top",
-      }
-    }
+  </Cell>
+  <Cell
+    textAlign="start"
   >
-    <Popover
-      alignArrow={false}
-      constrain="window"
-      contentRef={[Function]}
-      defaultFocusElement={null}
-      defaultShow={false}
-      insertAt="bottom"
-      label={null}
-      liveRegion={null}
-      mountNode={null}
-      offsetX={0}
-      offsetY={0}
-      on="click"
-      onBlur={[Function]}
-      onClick={[Function]}
-      onDismiss={[Function]}
-      onFocus={[Function]}
-      onMouseOut={[Function]}
-      onMouseOver={[Function]}
-      onPositionChanged={[Function]}
-      onPositioned={[Function]}
-      onShow={[Function]}
-      onToggle={[Function]}
-      placement="bottom center"
-      positionTarget={null}
-      shadow="resting"
-      shouldCloseOnDocumentClick={true}
-      shouldCloseOnEscape={true}
-      shouldContainFocus={false}
-      shouldFocusContentOnTriggerBlur={false}
-      shouldRenderOffscreen={false}
-      shouldReturnFocus={true}
-      show={false}
-      stacking="topmost"
-      trackPosition={true}
-      variant="default"
-      withArrow={true}
+    <span
+      style={
+        Object {
+          "whiteSpace": "nowrap",
+        }
+      }
     >
-      <PopoverTrigger>
+      <Popover
+        alignArrow={false}
+        constrain="window"
+        contentRef={[Function]}
+        defaultFocusElement={null}
+        defaultShow={false}
+        insertAt="bottom"
+        label={null}
+        liveRegion={null}
+        mountNode={null}
+        offsetX={0}
+        offsetY={0}
+        on="click"
+        onBlur={[Function]}
+        onClick={[Function]}
+        onDismiss={[Function]}
+        onFocus={[Function]}
+        onMouseOut={[Function]}
+        onMouseOver={[Function]}
+        onPositionChanged={[Function]}
+        onPositioned={[Function]}
+        onShow={[Function]}
+        onToggle={[Function]}
+        placement="bottom center"
+        positionTarget={null}
+        shadow="resting"
+        shouldCloseOnDocumentClick={true}
+        shouldCloseOnEscape={true}
+        shouldContainFocus={false}
+        shouldFocusContentOnTriggerBlur={false}
+        shouldRenderOffscreen={false}
+        shouldReturnFocus={true}
+        show={false}
+        stacking="topmost"
+        trackPosition={true}
+        variant="default"
+        withArrow={true}
+      >
+        <PopoverTrigger>
+          <Button
+            as="button"
+            cursor="pointer"
+            display="inline-block"
+            elementRef={[Function]}
+            margin="0"
+            size="medium"
+            textAlign="center"
+            type="button"
+            variant="link"
+            withBackground={true}
+          >
+            <div>
+              <span
+                className="colorPickerIcon"
+                style={
+                  Object {
+                    "background": "#00ff00",
+                  }
+                }
+              />
+              Change
+            </div>
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent>
+          <ColorPicker
+            afterClose={[Function]}
+            allowWhite={false}
+            colors={
+              Array [
+                Object {
+                  "hexcode": "#BD3C14",
+                  "name": "Brick",
+                },
+                Object {
+                  "hexcode": "#FF2717",
+                  "name": "Red",
+                },
+                Object {
+                  "hexcode": "#E71F63",
+                  "name": "Magenta",
+                },
+                Object {
+                  "hexcode": "#8F3E97",
+                  "name": "Purple",
+                },
+                Object {
+                  "hexcode": "#65499D",
+                  "name": "Deep Purple",
+                },
+                Object {
+                  "hexcode": "#4554A4",
+                  "name": "Indigo",
+                },
+                Object {
+                  "hexcode": "#1770AB",
+                  "name": "Blue",
+                },
+                Object {
+                  "hexcode": "#0B9BE3",
+                  "name": "Light Blue",
+                },
+                Object {
+                  "hexcode": "#06A3B7",
+                  "name": "Cyan",
+                },
+                Object {
+                  "hexcode": "#009688",
+                  "name": "Teal",
+                },
+                Object {
+                  "hexcode": "#009606",
+                  "name": "Green",
+                },
+                Object {
+                  "hexcode": "#8D9900",
+                  "name": "Olive",
+                },
+                Object {
+                  "hexcode": "#D97900",
+                  "name": "Pumpkin",
+                },
+                Object {
+                  "hexcode": "#FD5D10",
+                  "name": "Orange",
+                },
+                Object {
+                  "hexcode": "#F06291",
+                  "name": "Pink",
+                },
+              ]
+            }
+            currentColor="#00ff00"
+            focusOnMount={false}
+            hideOnScroll={false}
+            hidePrompt={true}
+            isOpen={true}
+            nonModal={true}
+            parentComponent="ProficiencyRating"
+            setStatusColor={[Function]}
+            withAnimation={false}
+            withArrow={false}
+            withBorder={false}
+            withBoxShadow={false}
+            withDarkCheck={false}
+          />
+        </PopoverContent>
+      </Popover>
+      <div
+        className="delete"
+      >
         <Button
           as="button"
+          buttonRef={[Function]}
           cursor="pointer"
+          disabled={false}
           display="inline-block"
           elementRef={[Function]}
+          icon={<IconTrashLine />}
           margin="0"
+          onClick={[Function]}
           size="medium"
           textAlign="center"
           type="button"
-          variant="link"
+          variant="icon"
           withBackground={true}
         >
-          <div>
-            <span
-              className="colorPickerIcon"
-              style={
-                Object {
-                  "background": "#00ff00",
-                }
-              }
-            />
-            Change
-          </div>
+          <ScreenReaderContent
+            as="span"
+          >
+            Delete proficiency rating
+          </ScreenReaderContent>
         </Button>
-      </PopoverTrigger>
-      <PopoverContent>
-        <ColorPicker
-          afterClose={[Function]}
-          allowWhite={false}
-          colors={
-            Array [
-              Object {
-                "hexcode": "#BD3C14",
-                "name": "Brick",
-              },
-              Object {
-                "hexcode": "#FF2717",
-                "name": "Red",
-              },
-              Object {
-                "hexcode": "#E71F63",
-                "name": "Magenta",
-              },
-              Object {
-                "hexcode": "#8F3E97",
-                "name": "Purple",
-              },
-              Object {
-                "hexcode": "#65499D",
-                "name": "Deep Purple",
-              },
-              Object {
-                "hexcode": "#4554A4",
-                "name": "Indigo",
-              },
-              Object {
-                "hexcode": "#1770AB",
-                "name": "Blue",
-              },
-              Object {
-                "hexcode": "#0B9BE3",
-                "name": "Light Blue",
-              },
-              Object {
-                "hexcode": "#06A3B7",
-                "name": "Cyan",
-              },
-              Object {
-                "hexcode": "#009688",
-                "name": "Teal",
-              },
-              Object {
-                "hexcode": "#009606",
-                "name": "Green",
-              },
-              Object {
-                "hexcode": "#8D9900",
-                "name": "Olive",
-              },
-              Object {
-                "hexcode": "#D97900",
-                "name": "Pumpkin",
-              },
-              Object {
-                "hexcode": "#FD5D10",
-                "name": "Orange",
-              },
-              Object {
-                "hexcode": "#F06291",
-                "name": "Pink",
-              },
-            ]
-          }
-          currentColor="#00ff00"
-          focusOnMount={false}
-          hideOnScroll={false}
-          hidePrompt={true}
-          isOpen={true}
-          nonModal={true}
-          parentComponent="ProficiencyRating"
-          setStatusColor={[Function]}
-          withAnimation={false}
-          withArrow={false}
-          withBorder={false}
-          withBoxShadow={false}
-          withDarkCheck={false}
-        />
-      </PopoverContent>
-    </Popover>
-    <div
-      className="delete"
-    >
-      <Button
-        as="button"
-        buttonRef={[Function]}
-        cursor="pointer"
-        disabled={false}
-        display="inline-block"
-        elementRef={[Function]}
-        icon={<IconTrashLine />}
-        margin="0"
-        onClick={[Function]}
-        size="medium"
-        textAlign="center"
-        type="button"
-        variant="icon"
-        withBackground={true}
-      >
-        <ScreenReaderContent
-          as="span"
-        >
-          Delete proficiency rating
-        </ScreenReaderContent>
-      </Button>
-    </div>
-  </td>
-</tr>
+      </div>
+    </span>
+  </Cell>
+</Row>
 `;

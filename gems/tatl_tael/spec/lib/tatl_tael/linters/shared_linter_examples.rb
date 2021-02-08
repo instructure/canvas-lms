@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 shared_examples "comments" do |raw_changes|
   let(:changes) { raw_changes.map { |c| double(c) } }
   let(:linter) { described_class.new(changes: changes, config: config) }

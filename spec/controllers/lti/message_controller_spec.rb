@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -120,7 +122,7 @@ module Lti
 
       it 'does not 500 if tool registration fails' do
         get 'registration_return', params: {course_id: course.id, status: 'failure'}
-        expect(response).to be_succes
+        expect(response).to be_successful
       end
     end
 
@@ -294,6 +296,40 @@ module Lti
           get 'basic_lti_launch_request', params: {course_id: course.id, message_handler_id: message_handler.id, assignment_id: assignment.id}
           expect(assigns[:lti_launch].params[:custom_anonymous_grading]).to eq true
         end
+
+        context 'when secure params are given' do
+          subject { get 'basic_lti_launch_request', params: params }
+
+          let(:due_at) { Time.zone.now }
+
+          let(:secure_params) do
+            Canvas::Security.create_jwt({lti_assignment_id: assignment.lti_context_id})
+          end
+
+          let(:params) do
+            {
+              course_id: course.id,
+              message_handler_id: message_handler.id,
+              secure_params: secure_params
+            }
+          end
+
+          before do
+            assignment.update!(due_at: due_at)
+
+            message_handler.update!(
+              parameters: [
+                { "name" => "due_date", "variable" => "Canvas.assignment.dueAt.iso8601" }
+              ]
+            )
+
+            subject
+          end
+
+          it 'expands assignment variables' do
+            expect(assigns[:lti_launch].params[:custom_due_date]).to eq due_at.utc.iso8601
+          end
+        end
       end
 
       context 'search account chain' do
@@ -462,7 +498,7 @@ module Lti
         it 'redirects to login page if there is no session' do
           tool_proxy.raw_data['enabled_capability'] += enabled_capability
           tool_proxy.save!
-          allow(PseudonymSession).to receive(:find).and_return(nil)
+          allow(PseudonymSession).to receive(:find_with_validation).and_return(nil)
           get 'basic_lti_launch_request', params: {account_id: account.id, message_handler_id: message_handler.id}
           expect(response).to redirect_to(login_url)
         end

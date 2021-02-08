@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -54,7 +56,7 @@ module AddressBook
   # filters the list of users to only those that are "available" (but not
   # necessarily known to any particular sender)
   def self.available(users)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       ::MessageableUser.available.where(id: users).to_a
     end
   end

@@ -205,16 +205,6 @@ QUnit.module('GradebookGrid AssignmentRowCell', suiteHooks => {
         strictEqual(wrapper.find('AssignmentGradeInput').prop('disabled'), true)
       })
 
-      test('renders end text', () => {
-        wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__GradeCell__EndText').length, 1)
-      })
-
-      test('renders nothing in the end text', () => {
-        wrapper = mountComponent()
-        strictEqual(wrapper.find('.Grid__GradeCell__EndText').text(), '')
-      })
-
       test('renders an InvalidGradeIndicator when the pending grade is invalid', () => {
         props.pendingGradeInfo = {excused: false, grade: null, valid: false}
         wrapper = mountComponent()

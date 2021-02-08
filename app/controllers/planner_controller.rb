@@ -25,7 +25,6 @@ class PlannerController < ApplicationController
 
   before_action :require_user, unless: :public_access?
   before_action :set_user
-  before_action :require_planner_enabled
   before_action :set_date_range
   before_action :set_params, only: [:index]
 
@@ -119,7 +118,7 @@ class PlannerController < ApplicationController
   #   }
   #  ]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       # fetch a meta key so we can invalidate just this info and not the whole of the user's cache
       planner_overrides_meta_key = get_planner_cache_id(@current_user)
 
@@ -218,7 +217,7 @@ class PlannerController < ApplicationController
     #
     # grading = @user.assignments_needing_grading(default_opts) if @domain_root_account.grants_right?(@user, :manage_grades)
     # moderation = @user.assignments_needing_moderation(default_opts)
-    viewing = @user.assignments_for_student('viewing', default_opts).
+    viewing = @user.assignments_for_student('viewing', **default_opts).
       preload(:quiz, :discussion_topic, :wiki_page)
     scopes = {viewing: viewing}
     # TODO: Add when ready (see above comment)
@@ -236,20 +235,20 @@ class PlannerController < ApplicationController
 
   def ungraded_quiz_collection
     item_collection('ungraded_quizzes',
-                    @user.ungraded_quizzes(default_opts),
+                    @user.ungraded_quizzes(**default_opts),
                     Quizzes::Quiz, [:user_due_date, :due_at, :created_at], :id)
   end
 
   def unread_discussion_topic_collection
     item_collection('unread_discussion_topics',
-                    @user.discussion_topics_needing_viewing(default_opts.except(:include_locked)).
+                    @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)).
                     unread_for(@user),
                     DiscussionTopic, [:todo_date, :posted_at, :delayed_post_at, :created_at], :id)
   end
 
   def unread_assignment_collection
     assign_scope = Assignment.active.where(:context_type => "Course", :context_id => @local_course_ids)
-    disc_assign_ids = DiscussionTopic.active.where(context_type: 'Course', context_id: @local_course_ids).
+    disc_assign_ids = DiscussionTopic.active.published.where(context_type: 'Course', context_id: @local_course_ids).
       where.not(assignment_id: nil).unread_for(@user).pluck(:assignment_id)
     scope = assign_scope.where("assignments.muted IS NULL OR NOT assignments.muted").
       # we can assume content participations because they're automatically created when comments
@@ -274,12 +273,12 @@ class PlannerController < ApplicationController
   end
 
   def page_collection
-    item_collection('pages', @user.wiki_pages_needing_viewing(default_opts.except(:include_locked)),
+    item_collection('pages', @user.wiki_pages_needing_viewing(**default_opts.except(:include_locked)),
       WikiPage, [:todo_date, :created_at], :id)
   end
 
   def ungraded_discussion_collection
-    item_collection('ungraded_discussions', @user.discussion_topics_needing_viewing(default_opts.except(:include_locked)),
+    item_collection('ungraded_discussions', @user.discussion_topics_needing_viewing(**default_opts.except(:include_locked)),
       DiscussionTopic, [:todo_date, :posted_at, :created_at], :id)
   end
 
@@ -292,7 +291,7 @@ class PlannerController < ApplicationController
 
   def peer_reviews_collection
     item_collection('peer_reviews',
-      @user.submissions_needing_peer_review(default_opts.except(:include_locked)),
+      @user.submissions_needing_peer_review(**default_opts.except(:include_locked)),
       AssessmentRequest, [{submission: {assignment: :peer_reviews_due_at}},
                           {assessor_asset: :cached_due_date}, :created_at], :id)
   end
@@ -334,8 +333,8 @@ class PlannerController < ApplicationController
       end
       @user_ids = @contexts.select{ |c| c.is_a? User }.map(&:id)
     else
-      @course_ids = @user.course_ids_for_todo_lists(:student, default_opts.slice(:course_ids, :include_concluded))
-      @group_ids = @user.group_ids_for_todo_lists(default_opts.slice(:group_ids))
+      @course_ids = @user.course_ids_for_todo_lists(:student, **default_opts.slice(:course_ids, :include_concluded))
+      @group_ids = @user.group_ids_for_todo_lists(**default_opts.slice(:group_ids))
       @user_ids = [@user.id]
     end
 

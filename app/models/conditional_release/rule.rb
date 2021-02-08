@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -31,6 +33,8 @@ module ConditionalRelease
     has_many :assignment_set_associations, -> { active.order(position: :asc) }, through: :scoring_ranges
     accepts_nested_attributes_for :scoring_ranges, allow_destroy: true
 
+    after_save :clear_caches
+
     before_create :set_root_account_id
     def set_root_account_id
       self.root_account_id ||= course.root_account_id
@@ -43,16 +47,46 @@ module ConditionalRelease
     end
 
     scope :with_assignments, -> do
-      having_assignments = joins(all_includes).group(Arel.sql("conditional_release_rules.id"))
-      preload(all_includes).where(id: having_assignments.pluck(:id))
+      having_assignments = joins(Rule.preload_associations).group(Arel.sql("conditional_release_rules.id"))
+      preload(Rule.preload_associations).where(id: having_assignments.pluck(:id))
     end
 
-    def self.all_includes
+    def self.preload_associations
       { scoring_ranges: { assignment_sets: :assignment_set_associations } }
     end
 
+    def self.includes_for_json
+      {
+        scoring_ranges: {
+          include: {
+            assignment_sets: {
+              include: {assignment_set_associations: {except: [:root_account_id, :deleted_at]}},
+              except: [:root_account_id, :deleted_at]
+            }
+          },
+          except: [:root_account_id, :deleted_at]
+        }
+      }
+    end
+
     def assignment_sets_for_score(score)
-      AssignmentSet.where(scoring_range: scoring_ranges.for_score(score)).preload(:assignment_set_associations)
+      AssignmentSet.active.where(scoring_range: scoring_ranges.for_score(score))
+    end
+
+    def clear_caches
+      self.class.connection.after_transaction_commit do
+        self.trigger_assignment.clear_cache_key(:conditional_release)
+        self.course.clear_cache_key(:conditional_release)
+      end
+    end
+
+    def self.is_trigger_assignment?(assignment)
+      # i'm only using the cache key currently for this one case but i figure it can be extended to handle caching around all rule data fetching
+      RequestCache.cache('conditional_release_is_trigger', assignment) do
+        Rails.cache.fetch_with_batched_keys('conditional_release_is_trigger', batch_object: assignment, batched_keys: :conditional_release) do
+          assignment.shard.activate { self.active.where(:trigger_assignment_id => assignment).exists? }
+        end
+      end
     end
   end
 end

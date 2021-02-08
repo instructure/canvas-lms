@@ -22,7 +22,8 @@ import PropTypes from 'prop-types'
 import React, {Component} from 'react'
 import {connect} from 'react-redux'
 
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {PresentationContent} from '@instructure/ui-a11y'
 
 import ChangeLogRow, {ChangeRow} from './ChangeLogRow'
@@ -91,7 +92,4 @@ const connectState = state => ({
   migration: state.selectedChangeLog && state.changeLogs[state.selectedChangeLog].data
 })
 const connectActions = () => ({})
-export const ConnectedChildChangeLog = connect(
-  connectState,
-  connectActions
-)(ChildChangeLog)
+export const ConnectedChildChangeLog = connect(connectState, connectActions)(ChildChangeLog)

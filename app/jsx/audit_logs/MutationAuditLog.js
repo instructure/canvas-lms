@@ -18,18 +18,26 @@
 import {ApolloProvider, Query, gql, createClient} from 'jsx/canvas-apollo'
 import React, {useState} from 'react'
 import I18n from 'i18n!mutationActivity'
+import tz from 'timezone'
 import {Button} from '@instructure/ui-buttons'
-import {DateInput, TextInput} from '@instructure/ui-forms'
-import {Heading, Spinner, Table} from '@instructure/ui-elements'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {TextInput} from '@instructure/ui-text-input'
+import CanvasDateInput from 'jsx/shared/components/CanvasDateInput'
+import {Heading} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
+import {Grid} from '@instructure/ui-grid'
+
+function formatDate(date) {
+  return tz.format(date, 'date.formats.medium_with_weekday')
+}
 
 const AuditLogForm = ({onSubmit}) => {
   const [assetString, setAssetString] = useState('')
   const [startDate, setStartDate] = useState(null)
   const [endDate, setEndDate] = useState(null)
-  const makeDateHandler = setter => (_e, isoDate, _raw, conversionFailed) => {
-    if (!conversionFailed) setter(isoDate)
+  const makeDateHandler = setter => value => {
+    if (value) setter(value)
   }
   const formDisabled = assetString.length === 0
 
@@ -51,29 +59,38 @@ const AuditLogForm = ({onSubmit}) => {
           }}
           required
         />
-        <br />
 
-        <DateInput
-          label={I18n.t('Start Date')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={makeDateHandler(setStartDate)}
-          dateValue={startDate}
-        />
-        <br />
+        <div style={{marginTop: '1.5em'}} />
 
-        <DateInput
-          label={I18n.t('End Date')}
-          previousLabel={I18n.t('Previous Month')}
-          nextLabel={I18n.t('Next Month')}
-          onDateChange={makeDateHandler(setEndDate)}
-          dateValue={endDate}
-        />
-        <br />
-
-        <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
-          {I18n.t('Find')}
-        </Button>
+        <Grid>
+          <Grid.Row>
+            <Grid.Col>
+              <CanvasDateInput
+                renderLabel={I18n.t('Start Date')}
+                onSelectedDateChange={makeDateHandler(setStartDate)}
+                formatDate={formatDate}
+                selectedDate={startDate}
+                placement="top center"
+                withRunningValue
+              />
+            </Grid.Col>
+            <Grid.Col>
+              <CanvasDateInput
+                renderLabel={I18n.t('End Date')}
+                onSelectedDateChange={makeDateHandler(setEndDate)}
+                formatDate={formatDate}
+                selectedDate={endDate}
+                placement="top center"
+                withRunningValue
+              />
+            </Grid.Col>
+            <Grid.Col vAlign="middle">
+              <Button variant="primary" type="submit" margin="small 0 0" disabled={formDisabled}>
+                {I18n.t('Find')}
+              </Button>
+            </Grid.Col>
+          </Grid.Row>
+        </Grid>
       </form>
     </View>
   )
@@ -124,44 +141,46 @@ const MUTATION_LOG_QUERY = gql`
   }
 `
 const LoadMoreButton = ({pageInfo: {hasNextPage}, onClick}) => (
-  <tr>
-    <td colSpan={4}>
+  <Table.Row>
+    <Table.Cell colSpan={4}>
       {hasNextPage ? (
         <Button onClick={onClick}>{I18n.t('Load more')}</Button>
       ) : (
         I18n.t('No more results')
       )}
-    </td>
-  </tr>
+    </Table.Cell>
+  </Table.Row>
 )
+LoadMoreButton.displayName = 'Row'
 
 const LogEntry = ({logEntry}) => {
   const [showingParams, setShowingParams] = useState(false)
 
   return (
     <>
-      <tr>
-        <td>{logEntry.timestamp}</td>
-        <td>{logEntry.mutationName}</td>
-        <td>
+      <Table.Row>
+        <Table.Cell>{logEntry.timestamp}</Table.Cell>
+        <Table.Cell>{logEntry.mutationName}</Table.Cell>
+        <Table.Cell>
           <User user={logEntry.user} realUser={logEntry.realUser} />
-        </td>
-        <td>
+        </Table.Cell>
+        <Table.Cell>
           <Button variant="link" onClick={() => setShowingParams(!showingParams)}>
             {showingParams ? I18n.t('Hide params') : I18n.t('Show params')}
           </Button>
-        </td>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
       {showingParams ? (
-        <tr>
-          <td colSpan={4}>
+        <Table.Row>
+          <Table.Cell colSpan={4}>
             <pre>{JSON.stringify(logEntry.params, null, 2)}</pre>
-          </td>
-        </tr>
+          </Table.Cell>
+        </Table.Row>
       ) : null}
     </>
   )
 }
+LogEntry.displayName = 'Row'
 
 const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
   if (!assetString) return null
@@ -176,29 +195,23 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
           return <p>{I18n.t('Something went wrong.')}</p>
         }
         if (loading || !data) {
-          return <Spinner renderTitle={I18n.t('Loading...')} />
+          return <Spinner renderTitle={I18n.t('Loading')} />
         }
 
         const {nodes: logEntries, pageInfo} = data.auditLogs.mutationLogs
 
         if (logEntries.length) {
           return (
-            <Table
-              caption={
-                <ScreenReaderContent>
-                  {I18n.t('mutations on %{search}', {search: assetString})}
-                </ScreenReaderContent>
-              }
-            >
-              <thead>
-                <tr>
-                  <th scope="col">{I18n.t('Timestamp')}</th>
-                  <th scope="col">{I18n.t('Mutation')}</th>
-                  <th scope="col">{I18n.t('Performed by')}</th>
-                  <th scope="col">{I18n.t('Parameters')}</th>
-                </tr>
-              </thead>
-              <tbody>
+            <Table caption={I18n.t('mutations on %{search}', {search: assetString})}>
+              <Table.Head>
+                <Table.Row>
+                  <Table.ColHeader id="mutations-timestamp">{I18n.t('Timestamp')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-mutation">{I18n.t('Mutation')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-by">{I18n.t('Performed by')}</Table.ColHeader>
+                  <Table.ColHeader id="mutations-parms">{I18n.t('Parameters')}</Table.ColHeader>
+                </Table.Row>
+              </Table.Head>
+              <Table.Body>
                 {logEntries.map(logEntry => (
                   <LogEntry key={logEntry.mutationId} logEntry={logEntry} />
                 ))}
@@ -231,7 +244,7 @@ const AuditLogResults = ({assetString, startDate, endDate, pageSize}) => {
                     })
                   }}
                 />
-              </tbody>
+              </Table.Body>
             </Table>
           )
         } else {
@@ -255,7 +268,7 @@ const AuditLogApp = () => {
         {I18n.t('GraphQL Mutation Activity')}
       </Heading>
 
-      <AuditLogForm onSubmit={auditParams => setAuditParams(auditParams)} />
+      <AuditLogForm onSubmit={setAuditParams} />
 
       <AuditLogResults {...auditParams} pageSize={250} />
     </ApolloProvider>

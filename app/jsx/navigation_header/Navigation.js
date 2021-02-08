@@ -23,7 +23,7 @@ import {func} from 'prop-types'
 import {Tray} from '@instructure/ui-overlays'
 import {CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-view'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import UnreadCounts from './UnreadCounts'
 import preventDefault from 'compiled/fn/preventDefault'
 import parseLinkHeader from 'compiled/fn/parseLinkHeader'
@@ -33,17 +33,20 @@ const CoursesTray = React.lazy(() => import('./trays/CoursesTray'))
 const GroupsTray = React.lazy(() => import('./trays/GroupsTray'))
 const AccountsTray = React.lazy(() => import('./trays/AccountsTray'))
 const ProfileTray = React.lazy(() => import('./trays/ProfileTray'))
+const HistoryTray = React.lazy(() => import('./trays/HistoryTray'))
 const HelpTray = React.lazy(() => import('./trays/HelpTray'))
 
 const EXTERNAL_TOOLS_REGEX = /^\/accounts\/[^\/]*\/(external_tools)/
-const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)/
+const ACTIVE_ROUTE_REGEX = /^\/(courses|groups|accounts|grades|calendar|conversations|profile)|^#history/
 const ACTIVE_CLASS = 'ic-app-header__menu-list-item--active'
 
 const TYPE_URL_MAP = {
-  courses: '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments',
+  courses:
+    '/api/v1/users/self/favorites/courses?include[]=term&exclude[]=enrollments&sort=nickname',
   groups: '/api/v1/users/self/groups?include[]=can_access',
   accounts: '/api/v1/accounts',
   profile: '/api/v1/users/self/tabs',
+  history: '/api/v1/users/self/history',
   help: '/help_links'
 }
 
@@ -98,7 +101,9 @@ export default class Navigation extends React.Component {
     helpLoading: false,
     helpAreLoaded: false,
     profileAreLoading: false,
-    profileAreLoaded: false
+    profileAreLoaded: false,
+    historyLoading: false,
+    historyAreLoaded: false
   }
 
   componentDidMount() {
@@ -298,6 +303,14 @@ export default class Navigation extends React.Component {
             counts={{unreadShares: this.state.unreadSharesCount}}
           />
         )
+      case 'history':
+        return (
+          <HistoryTray
+            history={this.state.history}
+            hasLoaded={this.state.historyAreLoaded}
+            closeTray={this.closeTray}
+          />
+        )
       case 'help':
         return (
           <HelpTray
@@ -324,6 +337,8 @@ export default class Navigation extends React.Component {
         return I18n.t('Profile tray')
       case 'help':
         return I18n.t('%{title} tray', {title: window.ENV.help_link_name})
+      case 'history':
+        return I18n.t('Recent History tray')
       default:
         return I18n.t('Global navigation tray')
     }
@@ -395,7 +410,7 @@ export default class Navigation extends React.Component {
                     <Spinner
                       size="large"
                       margin="large auto"
-                      renderTitle={() => I18n.t('...Loading')}
+                      renderTitle={() => I18n.t('Loading')}
                     />
                   </View>
                 }

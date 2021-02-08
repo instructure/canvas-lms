@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -29,6 +31,7 @@ module CdcFixtures
       context_id: 1,
       context_type: 'Course',
       user_id: 1,
+      root_account_id: 1,
     })
   end
 end

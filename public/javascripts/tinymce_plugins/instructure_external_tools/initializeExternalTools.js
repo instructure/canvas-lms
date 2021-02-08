@@ -84,14 +84,10 @@ const ExternalToolsPlugin = {
       }
     }
     if (ltiButtons.length && ENV.use_rce_enhancements) {
-      ed.ui.registry.addButton('lti_tool_dropdown', {
-        onAction: () => {
-          const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
-          document.dispatchEvent(ev)
-        },
-        icon: 'lti',
-        tooltip: 'Apps'
-      })
+      buildToolsButton(ed, ltiButtons)
+      buildFavoriteToolsButtons(ed, ltiButtons)
+      buildMRUMenuButton(ed, ltiButtons)
+      buildMenubarItem(ed, ltiButtons)
     }
     if (clumpedButtons.length) {
       const handleClick = function() {
@@ -122,6 +118,129 @@ const ExternalToolsPlugin = {
       }
     }
   }
+}
+
+function registerToolIcon(ed, button) {
+  if (!button.iconSVG && button.image) {
+    // Sanitize input against XSS
+    const svg = document.createElement('svg')
+    svg.setAttribute('viewBox', '0 0 16 16')
+    svg.setAttribute('version', '1.1')
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg')
+    const image = document.createElement('image')
+    image.setAttribute('xlink:href', button.image)
+    image.style.width = '100%'
+    image.style.height = '100%'
+    svg.appendChild(image)
+    button.iconSVG = svg.outerHTML
+    button.icon = `lti_tool_${button.id}`
+  }
+  if (button.iconSVG) {
+    ed.ui.registry.addIcon(button.icon, button.iconSVG)
+  }
+}
+
+// What I'd really like to do is start with a plain Apps button in the toolbar
+// and menubar's Tools menu, then replace it with a menu button/nested menu item
+// when there are MRU tools but I don't see a way to do that in tinymce.
+// What this does is:
+// for the toolbar: create both buttons and use CSS to show the one we want and hide the other
+// for the item in the menubar's Tools menu: always show a nexted menu. With no MRU tools,
+//    the submenu just shows "View All"
+
+// register the Apps menu item in the menubar's Tools menu
+function buildMenubarItem(ed, ltiButtons) {
+  if (ltiButtons.length) {
+    ed.ui.registry.addNestedMenuItem('lti_tools_menuitem', {
+      text: I18n.t('Apps'),
+      icon: 'lti',
+      getSubmenuItems: () => getLtiMRUItems(ed, ltiButtons)
+    })
+  }
+}
+
+// register the Apps toolbar button for when there are no MRU apps
+function buildToolsButton(ed, ltiButtons) {
+  const tooltip = I18n.t('Apps')
+  ed.ui.registry.addButton('lti_tool_dropdown', {
+    onAction: () => {
+      const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+      document.dispatchEvent(ev)
+    },
+    icon: 'lti',
+    tooltip,
+    onSetup(_api) {
+      // start off with the right button visible
+      ExternalToolsHelper.showHideButtons(ed)
+    }
+  })
+}
+
+// register the favorite lti tools toolbar buttons
+function buildFavoriteToolsButtons(ed, ltiButtons) {
+  ltiButtons.forEach(button => {
+    if (!button.favorite) return
+
+    registerToolIcon(ed, button)
+    ed.ui.registry.addButton(`instructure_external_button_${button.id}`, {
+      onAction: button.onAction,
+      tooltip: button.title,
+      icon: button.icon,
+      title: button.title
+    })
+  })
+}
+
+// register the Apps toolbar button for when there are MRU apps
+function buildMRUMenuButton(ed, ltiButtons) {
+  const tooltip = I18n.t('Apps')
+  ed.ui.registry.addMenuButton('lti_mru_button', {
+    tooltip,
+    icon: 'lti',
+    fetch(callback) {
+      callback(getLtiMRUItems(ed, ltiButtons))
+    },
+    onSetup(_api) {
+      ExternalToolsHelper.showHideButtons(ed)
+    }
+  })
+}
+
+// build the array of MRU app menu items
+function getLtiMRUItems(ed, ltiButtons) {
+  const mruMenuItems = []
+  try {
+    const mruIds = JSON.parse(window.localStorage.getItem('ltimru'))
+    if (mruIds && Array.isArray(mruIds) && mruIds.length) {
+      const mruButtons = ltiButtons.filter(b => mruIds.includes(b.id))
+      mruButtons.forEach(b => {
+        registerToolIcon(ed, b)
+        if (!b.menuItem) {
+          b.menuItem = {
+            type: 'menuitem',
+            text: b.title,
+            icon: b.icon,
+            onAction: b.onAction
+          }
+        }
+        mruMenuItems.push(b.menuItem)
+      })
+      mruMenuItems.sort((a, b) => a.text.localeCompare(b.text))
+    }
+  } catch (ex) {
+    // eslint-disable-next-line no-console
+    console.log('Failed building mru menu', ex.message)
+  } finally {
+    mruMenuItems.push({
+      type: 'menuitem',
+      text: I18n.t('View All'),
+      onAction: () => {
+        const ev = new CustomEvent('tinyRCE/onExternalTools', {detail: {ltiButtons}})
+        document.dispatchEvent(ev)
+      }
+    })
+  }
+  return mruMenuItems
 }
 
 export default ExternalToolsPlugin

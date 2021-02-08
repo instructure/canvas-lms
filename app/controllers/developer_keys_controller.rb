@@ -145,6 +145,7 @@ class DeveloperKeysController < ApplicationController
       :vendor_code,
       :visible,
       :test_cluster_only,
+      :client_credentials_audience,
       :require_scopes,
       :allow_includes,
       scopes: []

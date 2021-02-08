@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -35,7 +37,7 @@ class ContentTag < ActiveRecord::Base
   belongs_to :context, polymorphic:
       [:course, :learning_outcome_group, :assignment, :account,
        { quiz: 'Quizzes::Quiz' }]
-  belongs_to :associated_asset, polymorphic: [:learning_outcome_group],
+  belongs_to :associated_asset, polymorphic: [:learning_outcome_group, lti_resource_link: 'Lti::ResourceLink'],
              polymorphic_prefix: true
   belongs_to :context_module
   belongs_to :learning_outcome
@@ -167,9 +169,7 @@ class ContentTag < ActiveRecord::Base
       next unless klass < ActiveRecord::Base
       next if klass < Tableless
       if klass.new.respond_to?(:could_be_locked=)
-        klass.transaction do
-          klass.where(id: klass.where(id: ids).lock_in_order).update_all(could_be_locked: true)
-        end
+        klass.where(id: ids).update_all_locked_in_order(could_be_locked: true)
       end
     end
   end
@@ -199,6 +199,18 @@ class ContentTag < ActiveRecord::Base
     else
       false
     end
+  end
+
+  def direct_shareable?
+    content_id.to_i > 0 && direct_share_type
+  end
+
+  def direct_share_type
+    ContentShare::CLASS_NAME_TO_TYPE[content_type]
+  end
+
+  def direct_share_select_class
+    direct_share_type.pluralize
   end
 
   def content_type_class(is_student=false)
@@ -345,7 +357,8 @@ class ContentTag < ActiveRecord::Base
           alignment_conditions[:context_type] = self.context_type
         end
 
-        if ContentTag.learning_outcome_alignments.active.where(alignment_conditions).exists?
+        @active_alignment_tags = ContentTag.learning_outcome_alignments.active.where(alignment_conditions)
+        if @active_alignment_tags.exists?
           # then don't let them delete the link
           return false
         end
@@ -357,7 +370,8 @@ class ContentTag < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     unless can_destroy?
-      raise LastLinkToOutcomeNotDestroyed.new('Link is the last link to an aligned outcome. Remove the alignment and then try again')
+      aligned_outcome = @active_alignment_tags.map(&:learning_outcome).first.short_description
+      raise LastLinkToOutcomeNotDestroyed.new "Outcome '#{aligned_outcome}' cannot be deleted because it is aligned to content."
     end
 
     context_module.remove_completion_requirement(id) if context_module
@@ -453,7 +467,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def context_module_action(user, action, points=nil)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       self.context_module.update_for(user, action, self, points) if self.context_module
     end
   end
@@ -481,7 +495,7 @@ class ContentTag < ActiveRecord::Base
   end
 
   def has_rubric_association?
-    content.respond_to?(:rubric_association) && content.rubric_association
+    content.respond_to?(:rubric_association) && !!content.rubric_association&.active?
   end
 
   scope :for_tagged_url, lambda { |url, tag| where(:url => url, :tag => tag) }
@@ -652,4 +666,17 @@ class ContentTag < ActiveRecord::Base
       self.root_account_id = self.context&.root_account_id
     end
   end
+
+  def quiz_lti
+    @quiz_lti ||= has_attribute?(:content_type) && content_type == 'Assignment' ? content&.quiz_lti? : false
+  end
+
+  def to_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
+  def as_json(options={})
+    super({:methods => :quiz_lti}.merge(options))
+  end
+
 end

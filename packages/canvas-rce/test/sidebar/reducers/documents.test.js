@@ -18,7 +18,7 @@
 import assert from 'assert'
 import documentsReducer from '../../../src/sidebar/reducers/documents'
 import * as actions from '../../../src/sidebar/actions/documents'
-import {CHANGE_CONTEXT} from '../../../src/sidebar/actions/context'
+import {CHANGE_CONTEXT} from '../../../src/sidebar/actions/filter'
 
 describe('Documents reducer', () => {
   let state
@@ -59,7 +59,7 @@ describe('Documents reducer', () => {
     it('clears files', () => {
       state.course.files = ['one', 'two']
       const action = {type: actions.REQUEST_INITIAL_DOCS, payload: {contextType: 'course'}}
-      assert.equal(documentsReducer(state, action).course.files.length, 0)
+      assert.strictEqual(documentsReducer(state, action).course.files.length, 0)
     })
   })
 
@@ -72,7 +72,7 @@ describe('Documents reducer', () => {
           contextType: 'course'
         }
       }
-      assert.equal(documentsReducer(state, action).course.files.length, 2)
+      assert.strictEqual(documentsReducer(state, action).course.files.length, 2)
     })
 
     it("hasMore if there's a bookmark", () => {
@@ -96,7 +96,7 @@ describe('Documents reducer', () => {
           contextType: 'course'
         }
       }
-      assert.equal(documentsReducer(state, action).course.isLoading, false)
+      assert.strictEqual(documentsReducer(state, action).course.isLoading, false)
     })
   })
 
@@ -108,7 +108,7 @@ describe('Documents reducer', () => {
       }
       const newDocs = documentsReducer(state, action)
 
-      assert.deepEqual(newDocs.foobar, {
+      assert.deepStrictEqual(newDocs.foobar, {
         files: [],
         bookmark: null,
         hasMore: true,

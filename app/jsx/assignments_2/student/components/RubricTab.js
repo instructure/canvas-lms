@@ -58,7 +58,7 @@ function formatAssessor(assessor) {
     return I18n.t('Anonymous')
   }
 
-  const enrollment = ENROLLMENT_STRINGS[(assessor.enrollments?.[0]?.type)]
+  const enrollment = ENROLLMENT_STRINGS[assessor.enrollments?.[0]?.type]
   return enrollment ? `${assessor.name} (${enrollment})` : assessor.name
 }
 

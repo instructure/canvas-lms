@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -34,6 +36,7 @@ describe FeatureFlags do
       'course_feature' => Feature.new(feature: 'course_feature', applies_to: 'Course', state: 'allowed'),
       'user_feature' => Feature.new(feature: 'user_feature', applies_to: 'User', state: 'allowed'),
       'root_opt_in_feature' => Feature.new(feature: 'root_opt_in_feature', applies_to: 'Course', state: 'allowed', root_opt_in: true),
+      'default_on_feature' => Feature.new(feature: 'default_on_feature', applies_to: 'Account', state: 'allowed_on'),
       'hidden_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden'),
       'hidden_root_opt_in_feature' => Feature.new(feature: 'hidden_feature', applies_to: 'Course', state: 'hidden', root_opt_in: true),
       'hidden_user_feature' => Feature.new(feature: 'hidden_user_feature', applies_to: 'User', state: 'hidden'),
@@ -43,6 +46,7 @@ describe FeatureFlags do
 
   it "should report feature_enabled? correctly" do
     expect(t_sub_account.feature_enabled?(:course_feature)).to be_falsey
+    expect(t_sub_account.feature_enabled?(:default_on_feature)).to be_truthy
     expect(t_sub_account.feature_enabled?(:account_feature)).to be_truthy
   end
 
@@ -50,14 +54,9 @@ describe FeatureFlags do
     it "returns true if the feature is 'on' or 'allowed', and false otherwise" do
       expect(t_site_admin.feature_allowed?(:site_admin_feature)).to be_truthy
       expect(t_sub_account.feature_allowed?(:account_feature)).to be_truthy
+      expect(t_sub_account.feature_allowed?(:default_on_feature)).to be_truthy
       expect(t_root_account.feature_allowed?(:root_account_feature)).to be_falsey
       expect(t_course.feature_allowed?(:course_feature)).to be_truthy
-    end
-
-    it "returns true if the feature is 'allowed', and false otherwise when passed exclude_enabled: true" do
-      expect(t_sub_account.feature_allowed?(:account_feature, exclude_enabled: true)).to be_falsey
-      expect(t_root_account.feature_allowed?(:root_account_feature, exclude_enabled: true)).to be_falsey
-      expect(t_course.feature_allowed?(:course_feature, exclude_enabled: true)).to be_truthy
     end
   end
 
@@ -194,15 +193,21 @@ describe FeatureFlags do
       end
 
       context "with site admin feature flag" do
-        before do
-          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature'
-        end
-
         it "should not find the feature beneath the root account" do
+          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature'
+
           expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
           expect(t_root_account.lookup_feature_flag('root_opt_in_feature')).to be_new_record
           expect(t_sub_account.lookup_feature_flag('root_opt_in_feature')).to be_nil
           expect(t_course.lookup_feature_flag('root_opt_in_feature')).to be_nil
+        end
+
+        it "should find the default_on feature beneath the root account" do
+          t_site_admin.feature_flags.create! feature: 'root_opt_in_feature', state: Feature::STATE_DEFAULT_ON
+          expect(t_site_admin.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_root_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_sub_account.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
+          expect(t_course.lookup_feature_flag('root_opt_in_feature').context).to eql t_site_admin
         end
       end
 
@@ -322,7 +327,7 @@ describe FeatureFlags do
   describe "set_feature_flag!" do
     it "should create a feature flag" do
       t_root_account.set_feature_flag!(:course_feature, 'allowed')
-      expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_allowed
+      expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_can_override
     end
 
     it "should update a feature flag" do
@@ -340,7 +345,7 @@ describe FeatureFlags do
 
     it "should allow_feature!" do
       t_root_account.allow_feature! :course_feature
-      expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_allowed
+      expect(t_root_account.feature_flags.where(feature: 'course_feature').first).to be_can_override
     end
 
     it "should reset_feature!" do

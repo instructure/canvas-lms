@@ -783,14 +783,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       strictEqual(activeLocation.row, 0)
     })
 
-    test('does not prevent SlickGrid default behavior', () => {
+    test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('RightArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
     })
 
-    test('stops propagation of the event', () => {
+    test('does not stop propagation of the event', () => {
       simulateKeyDown('RightArrow')
-      equal(typeof bubbledEvent, 'undefined')
+      equal(bubbledEvent, triggeredEvent)
     })
   })
 
@@ -987,14 +987,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       strictEqual(activeLocation.row, 0)
     })
 
-    test('does not prevent SlickGrid default behavior', () => {
+    test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('LeftArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
     })
 
-    test('stops propagation of the event', () => {
+    test('does not stop propagation of the event', () => {
       simulateKeyDown('LeftArrow')
-      equal(typeof bubbledEvent, 'undefined')
+      equal(bubbledEvent, triggeredEvent)
     })
   })
 
@@ -1169,14 +1169,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       strictEqual(activeLocation.row, 0)
     })
 
-    test('does not prevent SlickGrid default behavior', () => {
+    test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('UpArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
     })
 
-    test('stops propagation of the event', () => {
+    test('does not stop propagation of the event', () => {
       simulateKeyDown('UpArrow')
-      equal(typeof bubbledEvent, 'undefined')
+      equal(bubbledEvent, triggeredEvent)
     })
   })
 
@@ -1251,14 +1251,14 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       strictEqual(activeLocation.row, 1)
     })
 
-    test('does not prevent SlickGrid default behavior', () => {
+    test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
     })
 
-    test('stops propagation of the event', () => {
+    test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(typeof bubbledEvent, 'undefined')
+      equal(bubbledEvent, triggeredEvent)
     })
   })
 
@@ -1276,14 +1276,39 @@ QUnit.module('GradebookGrid GridSupport Navigation', suiteHooks => {
       strictEqual(activeLocation.row, 0)
     })
 
-    test('does not prevent SlickGrid default behavior', () => {
+    test('prevents SlickGrid default behavior', () => {
       simulateKeyDown('DownArrow')
-      equal(typeof triggeredEvent.skipSlickGridDefaults, 'undefined')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
     })
 
-    test('stops propagation of the event', () => {
+    test('does not stop propagation of the event', () => {
       simulateKeyDown('DownArrow')
-      equal(typeof bubbledEvent, 'undefined')
+      equal(bubbledEvent, triggeredEvent)
+    })
+  })
+
+  QUnit.module('DownArrow on a cell in the last row of the last column', hooks => {
+    hooks.beforeEach(() => {
+      gridSupport.state.setActiveLocation('body', {row: 1, cell: 3})
+      $activeElement = gridSupport.state.getActiveNode()
+    })
+
+    test('keeps the current cell selected', () => {
+      simulateKeyDown('DownArrow')
+      const activeLocation = gridSupport.state.getActiveLocation()
+      equal(activeLocation.region, 'body')
+      strictEqual(activeLocation.cell, 3)
+      strictEqual(activeLocation.row, 1)
+    })
+
+    test('prevents SlickGrid default behavior', () => {
+      simulateKeyDown('DownArrow')
+      strictEqual(triggeredEvent.skipSlickGridDefaults, true)
+    })
+
+    test('does not stop propagation of the event', () => {
+      simulateKeyDown('DownArrow')
+      equal(bubbledEvent, triggeredEvent)
     })
   })
 

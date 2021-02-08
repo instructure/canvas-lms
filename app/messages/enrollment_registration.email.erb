@@ -6,10 +6,8 @@
   <%= t :subject, "Course Invitation" %>
 <% end %>
 
-<% website = HostUrl.context_host(asset.course) %>
-
-<%= t "You've been invited to participate in a class at %{website}.  The class is called %{course}. Course role: %{role_type}",
-    :website => website, :course => asset.course.name, :role_type => asset.readable_role_name %>
+<%= t "You've been invited to participate in a class at %{account}.  The class is called %{course}. Course role: %{role_type}",
+    :account => asset.course.account.name, :course => asset.course.name, :role_type => asset.readable_role_name %>
 
 <% email = asset.user.email; login = (asset.user.pseudonym.unique_id rescue "none") %>
 <%= before_label :name, "Name" %> <%= asset.user.name %>

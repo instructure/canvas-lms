@@ -26,7 +26,8 @@ import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 import 'compiled/jquery.rails_flash_notifications'
 
-import {Heading, Text, Spinner} from '@instructure/ui-elements'
+import {Heading, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Alert} from '@instructure/ui-alerts'
 import {PresentationContent} from '@instructure/ui-a11y'
 

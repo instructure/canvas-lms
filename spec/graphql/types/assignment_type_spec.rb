@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -41,7 +43,6 @@ describe Types::AssignmentType do
     expect(assignment_type.resolve("state")).to eq assignment.workflow_state
     expect(assignment_type.resolve("onlyVisibleToOverrides")).to eq assignment.only_visible_to_overrides
     expect(assignment_type.resolve("assignmentGroup { _id }")).to eq assignment.assignment_group.id.to_s
-    expect(assignment_type.resolve("muted")).to eq assignment.muted?
     expect(assignment_type.resolve("allowedExtensions")).to eq assignment.allowed_extensions
     expect(assignment_type.resolve("createdAt").to_datetime).to eq assignment.created_at.to_s.to_datetime
     expect(assignment_type.resolve("updatedAt").to_datetime).to eq assignment.updated_at.to_s.to_datetime
@@ -64,6 +65,36 @@ describe Types::AssignmentType do
       expect(
         CanvasSchema.execute(<<~GQL, context: {current_user: student}).dig("data", "assignment")
           query { assignment(id: "#{assignment.id.to_s}") { id } }
+        GQL
+      ).to be_nil
+    end
+  end
+
+  context "sis field" do
+    let_once(:sis_assignment) { assignment.update!(sis_source_id: "sisAssignment"); assignment }
+
+    let(:admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false})}
+
+    it "returns sis_id if you have read_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: teacher}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
+        GQL
+      ).to eq("sisAssignment")
+    end
+
+    it "returns sis_id if you have manage_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: admin}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
+        GQL
+      ).to eq("sisAssignment")
+    end
+
+    it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+      expect(
+        CanvasSchema.execute(<<~GQL, context: { current_user: student}).dig("data", "assignment", "sisId")
+          query { assignment(id: "#{sis_assignment.id}") { sisId } }
         GQL
       ).to be_nil
     end
@@ -516,6 +547,20 @@ describe Types::AssignmentType do
           } } } }
         GQL
       ).to eq [[student.id.to_s]]
+    end
+
+    it "works for Noop tags" do
+      course.root_account.enable_feature! 'conditional_release'
+      assignment.assignment_overrides.create!(set_type: 'Noop', set_id: 555)
+      expect(
+        assignment_type.resolve(<<~GQL, current_user: teacher)
+          assignmentOverrides { edges { node { set {
+            ... on Noop {
+              _id
+            }
+          } } } }
+        GQL
+      ).to eq ['555']
     end
   end
 

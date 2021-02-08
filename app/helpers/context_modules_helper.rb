@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -36,11 +38,11 @@ module ContextModulesHelper
   def cache_if_module(context_module, editable, is_student, can_view_unpublished, user, context, &block)
     if context_module
       visible_assignments = user ? user.assignment_and_quiz_visibilities(context) : []
-      cache_key_items = ['context_module_render_20_', context_module.cache_key, editable, is_student, can_view_unpublished,
+      cache_key_items = ['context_module_render_21_', context_module.cache_key, editable, is_student, can_view_unpublished,
         true, Time.zone, Digest::MD5.hexdigest([visible_assignments, @section_visibility].join("/"))]
       cache_key = cache_key_items.join('/')
       cache_key = add_menu_tools_to_cache_key(cache_key)
-      cache_key = add_mastery_paths_to_cache_key(cache_key, context, context_module, user)
+      cache_key = add_mastery_paths_to_cache_key(cache_key, context, user)
       cache(cache_key, {}, &block)
     else
       yield
@@ -55,13 +57,10 @@ module ContextModulesHelper
     cache_key
   end
 
-  def add_mastery_paths_to_cache_key(cache_key, context, module_or_modules, user)
+  def add_mastery_paths_to_cache_key(cache_key, context, user)
     if user && cyoe_enabled?(context)
       if context.user_is_student?(user)
-        items = Rails.cache.fetch("visible_content_tags_for/#{cache_key}") do
-          Array.wrap(module_or_modules).map{ |m| m.content_tags_visible_to(user, :is_teacher => false) }.flatten
-        end
-        rules = cyoe_rules(context, user, items, @session)
+        rules = cyoe_rules(context, user, @session)
       else
         rules = ConditionalRelease::Service.active_rules(context, user, @session)
       end
@@ -95,7 +94,8 @@ module ContextModulesHelper
   end
 
   def module_item_publishable?(item)
-    true
+    return true if item.nil? || !item.content || !item.content.respond_to?(:can_publish?)
+    item.content.can_publish?
   end
 
   def prerequisite_list(prerequisites)
@@ -120,7 +120,7 @@ module ContextModulesHelper
     }
 
     if cyoe_enabled?(@context)
-      rules = cyoe_rules(@context, current_user, module_data[:items], session) || []
+      rules = cyoe_rules(@context, current_user, session) || []
     end
 
     items_data = {}
@@ -152,10 +152,5 @@ module ContextModulesHelper
       return is_student ? I18n.t('Quiz') : I18n.t('New Quiz')
     end
     TRANSLATED_COMMENT_TYPE[item.content_type.to_sym] || I18n.t('Unknown Content Type')
-  end
-
-  def module_item_translated_quiz_type(item, is_student=false)
-    return I18n.t('Item type: New Quiz') if item&.content_type_class == 'lti-quiz' && !is_student
-    I18n.t('Item type: Quiz')
   end
 end

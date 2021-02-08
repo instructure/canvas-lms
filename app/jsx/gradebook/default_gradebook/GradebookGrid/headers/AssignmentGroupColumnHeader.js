@@ -27,22 +27,34 @@ import I18n from 'i18n!gradebook'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import ColumnHeader from './ColumnHeader'
 
-function AssignmentGroupDetail({assignmentGroup, weightedGroups}) {
-  if (weightedGroups) {
-    const weightValue = assignmentGroup.groupWeight || 0
-    const weightStr = I18n.n(weightValue, {
-      precision: 2,
-      percentage: true,
-      strip_insignificant_zeros: true
-    })
+function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGroups}) {
+  if (weightedGroups || viewUngradedAsZero) {
+    let secondaryLine
+
+    if (weightedGroups) {
+      const weightValue = assignmentGroup.groupWeight || 0
+      const weight = I18n.n(weightValue, {
+        precision: 2,
+        percentage: true,
+        strip_insignificant_zeros: true
+      })
+
+      secondaryLine = viewUngradedAsZero
+        ? I18n.t('%{weight} of grade/Ungraded as 0', {weight})
+        : I18n.t('%{weight} of grade', {weight})
+    } else {
+      secondaryLine = I18n.t('Ungraded as 0')
+    }
 
     return (
       <span className="Gradebook__ColumnHeaderDetail">
-        <span className="Gradebook__ColumnHeaderDetailLine">{assignmentGroup.name}</span>
+        <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
+          {assignmentGroup.name}
+        </span>
 
-        <span className="Gradebook__ColumnHeaderDetailLine">
+        <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
           <Text weight="normal" fontStyle="normal" size="x-small">
-            {I18n.t('%{weight} of grade', {weight: weightStr})}
+            {secondaryLine}
           </Text>
         </span>
       </span>
@@ -61,6 +73,7 @@ AssignmentGroupDetail.propTypes = {
     name: string.isRequired,
     groupWeight: number
   }).isRequired,
+  viewUngradedAsZero: bool.isRequired,
   weightedGroups: bool.isRequired
 }
 
@@ -86,6 +99,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
       onSortByGradeDescending: func.isRequired,
       settingKey: string.isRequired
     }).isRequired,
+    viewUngradedAsZero: bool.isRequired,
     weightedGroups: bool.isRequired,
     onMenuDismiss: Menu.propTypes.onDismiss.isRequired,
     ...ColumnHeader.propTypes
@@ -96,7 +110,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
   }
 
   render() {
-    const {assignmentGroup, sortBySetting, weightedGroups} = this.props
+    const {assignmentGroup, sortBySetting, viewUngradedAsZero, weightedGroups} = this.props
     const selectedSortSetting = sortBySetting.isSortColumn && sortBySetting.settingKey
     const classes = `Gradebook__ColumnHeaderAction ${this.state.menuShown ? 'menuShown' : ''}`
 
@@ -117,6 +131,7 @@ export default class AssignmentGroupColumnHeader extends ColumnHeader {
                 <AssignmentGroupDetail
                   assignmentGroup={assignmentGroup}
                   weightedGroups={weightedGroups}
+                  viewUngradedAsZero={viewUngradedAsZero}
                 />
               </Grid.Col>
 

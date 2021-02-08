@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,9 +27,7 @@ describe 'confirm_email_communication_channel' do
     @pseudonym = @user.pseudonyms.create!(unique_id: 'unique@example.com',
                                           password: 'password',
                                           password_confirmation: 'password')
-    @object = @user.communication_channels.create!(path_type: 'email',
-                                                   path: 'bob@example.com',
-                                                   user: @user)
+    @object = communication_channel(@user, {username: 'bob@example.com'})
   end
 
   let(:asset) { @object }

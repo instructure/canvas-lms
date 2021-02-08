@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -23,6 +25,7 @@ describe "quizzes assignments" do
 
   before(:each) do
     @domain_root_account = Account.default
+    Account.default.enable_feature!(:rce_enhancements)
     course_with_teacher_logged_in
   end
 

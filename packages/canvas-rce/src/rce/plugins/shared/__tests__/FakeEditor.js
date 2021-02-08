@@ -41,7 +41,12 @@ export default class FakeEditor {
 
       collapse: () => (this._collapsed = true),
       isCollapsed: () => this._collapsed,
-      select: node => (this._selectedNode = node)
+      select: node => (this._selectedNode = node),
+      getSel: () => {
+        return {
+          anchorNode: this._selectedNode
+        }
+      }
     }
 
     this.dom = {

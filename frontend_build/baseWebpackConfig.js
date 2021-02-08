@@ -26,14 +26,14 @@ if (!process.env.NODE_ENV) process.env.NODE_ENV = 'development'
 const TerserPlugin = require('terser-webpack-plugin')
 const MomentTimezoneDataPlugin = require('moment-timezone-data-webpack-plugin')
 const path = require('path')
+const glob = require('glob')
 const webpack = require('webpack')
 const {CleanWebpackPlugin} = require('clean-webpack-plugin')
 const StatsWriterPlugin = require('webpack-stats-plugin').StatsWriterPlugin
-const BundleExtensionsPlugin = require('./BundleExtensionsPlugin')
-const ClientAppsPlugin = require('./clientAppPlugin')
 const CompiledReferencePlugin = require('./CompiledReferencePlugin')
 const I18nPlugin = require('./i18nPlugin')
 const WebpackHooks = require('./webpackHooks')
+const SourceFileExtensionsPlugin = require('./SourceFileExtensionsPlugin')
 const webpackPublicPath = require('./webpackPublicPath')
 require('./bundles')
 
@@ -46,40 +46,45 @@ require('./bundles')
 // after-uglify size of things, but can skip making sourcemaps if you want it to
 // go faster. So this is to allow people to use either environment variable:
 // the technically more correct SKIP_SOURCEMAPS one or the historically used JS_BUILD_NO_UGLIFY one.
-const skipSourcemaps = Boolean(process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY)
+const skipSourcemaps = Boolean(
+  process.env.SKIP_SOURCEMAPS || process.env.JS_BUILD_NO_UGLIFY === '1'
+)
 
 const root = path.resolve(__dirname, '..')
 
 module.exports = {
   mode: process.env.NODE_ENV,
-  performance: {
-    // This just reflects how big the 'main' entry is at the time of writing. Every
-    // time we get it smaller we should change this to the new smaller number so it
-    // only goes down over time instead of growing bigger over time
-    maxEntrypointSize: 1200000,
-    // This is how big our biggest js bundles are at the time of writing. We should
-    // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
-    // tracking them too. Then, as we work to get all chunks smaller, we should change
-    // this number to the size of our biggest known asset and hopefully someday get
-    // to where they are all under the default value of 250000 and then remove this
-    maxAssetSize: 1200000,
-    assetFilter: assetFilename => {
-      const thingsWeKnowAreWayTooBig = [
-        'canvas-rce-async-chunk',
-        'canvas-rce-old-async-chunk',
-        'permissions_index',
-        'screenreader_gradebook',
-        // This bundle got pushed over the limit by translations being added and
-        // the simplest fix was to ignore it at the moment, to unblock selenium
-        // tests for everyone. CORE-3106 will resolve this.
-        'quizzes_bundle'
-      ]
-      return (
-        assetFilename.endsWith('.js') &&
-        !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
-      )
-    }
-  },
+  performance: skipSourcemaps
+    ? false
+    : {
+        // This just reflects how big the 'main' entry is at the time of writing. Every
+        // time we get it smaller we should change this to the new smaller number so it
+        // only goes down over time instead of growing bigger over time
+        maxEntrypointSize: 1200000,
+        // This is how big our biggest js bundles are at the time of writing. We should
+        // first work to attack the things in `thingsWeKnowAreWayTooBig` so we can start
+        // tracking them too. Then, as we work to get all chunks smaller, we should change
+        // this number to the size of our biggest known asset and hopefully someday get
+        // to where they are all under the default value of 250000 and then remove this
+        // TODO: decrease back to 1200000 LS-1222
+        maxAssetSize: 1400000,
+        assetFilter: assetFilename => {
+          const thingsWeKnowAreWayTooBig = [
+            'canvas-rce-async-chunk',
+            'canvas-rce-old-async-chunk',
+            'permissions_index',
+            'screenreader_gradebook',
+            // This bundle got pushed over the limit by translations being added and
+            // the simplest fix was to ignore it at the moment, to unblock selenium
+            // tests for everyone. CORE-3106 will resolve this.
+            'quizzes_bundle'
+          ]
+          return (
+            assetFilename.endsWith('.js') &&
+            !thingsWeKnowAreWayTooBig.some(t => assetFilename.includes(t))
+          )
+        }
+      },
   optimization: {
     // concatenateModules: false, // uncomment if you want to get more accurate stuff from `yarn webpack:analyze`
     moduleIds: 'hashed',
@@ -134,7 +139,7 @@ module.exports = {
 
   devtool: skipSourcemaps
     ? false
-    : process.env.NODE_ENV === 'production' || process.env.COVERAGE || process.env.SENTRY_DSN
+    : process.env.NODE_ENV === 'production' || process.env.COVERAGE === '1' || process.env.SENTRY_DSN
     ? 'source-map'
     : 'eval',
 
@@ -190,19 +195,10 @@ module.exports = {
       jst: path.resolve(__dirname, '../app/views/jst'),
       jqueryui: path.resolve(__dirname, '../public/javascripts/vendor/jqueryui'),
       coffeescripts: path.resolve(__dirname, '../app/coffeescripts'),
+      'lodash.underscore$': path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore.js'),
       jsx: path.resolve(__dirname, '../app/jsx'),
 
-      // stuff for canvas_quzzes client_apps
-      'canvas_quizzes/apps': path.resolve(__dirname, '../client_apps/canvas_quizzes/apps'),
-      qtip$: path.resolve(__dirname, '../client_apps/canvas_quizzes/vendor/js/jquery.qtip.js'),
-      old_version_of_react_used_by_canvas_quizzes_client_apps$: path.resolve(
-        __dirname,
-        '../client_apps/canvas_quizzes/vendor/js/old_version_of_react_used_by_canvas_quizzes_client_apps.js'
-      ),
-      'old_version_of_react-router_used_by_canvas_quizzes_client_apps$': path.resolve(
-        __dirname,
-        '../client_apps/canvas_quizzes/vendor/js/old_version_of_react-router_used_by_canvas_quizzes_client_apps.js'
-      )
+      'jquery.qtip$': path.resolve(__dirname, '../public/javascripts/vendor/jquery.qtip.js'),
     },
 
     modules: [
@@ -222,7 +218,7 @@ module.exports = {
       /node_modules\/jquery\//,
       /vendor\/md5/,
       /tinymce\/tinymce$/, // has 'require' and 'define' but they are from it's own internal closure
-      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
+      /i18nliner\/dist\/lib\/i18nliner/, // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ],
     rules: [
       {
@@ -238,7 +234,7 @@ module.exports = {
         exclude: [
           path.resolve(__dirname, '../public/javascripts/translations'),
           path.resolve(__dirname, '../public/javascripts/react-dnd-test-backend'),
-          path.resolve(__dirname, '../public/javascripts/lodash.underscore'),
+          path.resolve(__dirname, '../public/javascripts/vendor/lodash.underscore'),
           /bower\//
         ],
         use: {
@@ -247,11 +243,6 @@ module.exports = {
             cacheDirectory: process.env.NODE_ENV !== 'production'
           }
         }
-      },
-      {
-        test: /\.js$/,
-        include: [/client_apps\/canvas_quizzes\/apps\//],
-        loaders: ['jsx-loader']
       },
       {
         test: /\.coffee$/,
@@ -298,8 +289,8 @@ module.exports = {
           console.error(compilation.warnings)
           // If there's a bad import, webpack doesn't say where.
           // Only if we let the compilation complete do we get
-          // the callstack where the import happenes
-          // If you're having problems, comment out the throw
+          // the callstack where the import happens
+          // If you're having problems, comment out the following
           throw new Error('webpack build had warnings. Failing.')
         }
       })
@@ -325,15 +316,16 @@ module.exports = {
     // handles our custom i18n stuff
     new I18nPlugin(),
 
-    // handles the the quiz stats and quiz log auditing client_apps
-    new ClientAppsPlugin(),
-
     // tells webpack to look for 'compiled/foobar' at app/coffeescripts/foobar.coffee
     // instead of public/javascripts/compiled/foobar.js
     new CompiledReferencePlugin(),
 
-    // handle the way we hook into bundles from our rails plugins like analytics
-    new BundleExtensionsPlugin(),
+    // allow plugins to extend source files
+    new SourceFileExtensionsPlugin({
+      context: root,
+      include: glob.sync(path.join(root, 'gems/plugins/*/package.json'), { absolute: true }),
+      tmpDir: path.join(root, 'tmp/webpack-source-file-extensions'),
+    }),
 
     new WebpackHooks(),
 

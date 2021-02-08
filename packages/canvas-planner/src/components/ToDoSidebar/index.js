@@ -21,8 +21,10 @@ import {connect} from 'react-redux'
 import {func, arrayOf, object, bool, string} from 'prop-types'
 import moment from 'moment-timezone'
 
-import {List, Spinner, Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {List} from '@instructure/ui-list'
+import {Text} from '@instructure/ui-text'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 import {Button} from '@instructure/ui-buttons'
 import formatMessage from '../../format-message'
 
@@ -66,7 +68,7 @@ export class ToDoSidebar extends Component {
     )
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const visibleToDos = this.getVisibleItems(nextProps.items)
     this.setState({
       visibleToDos
@@ -143,7 +145,7 @@ export class ToDoSidebar extends Component {
   render() {
     if (!this.props.loaded) {
       return (
-        <div>
+        <div data-testid="ToDoSidebar">
           <h2 className="todo-list-header">{formatMessage('To Do')}</h2>
           <View as="div" textAlign="center">
             <Spinner renderTitle={() => formatMessage('To Do Items Loading')} size="small" />
@@ -153,7 +155,7 @@ export class ToDoSidebar extends Component {
     }
 
     return (
-      <div>
+      <div data-testid="ToDoSidebar">
         <h2 className="todo-list-header">
           <span
             tabIndex="-1"
@@ -177,7 +179,4 @@ const mapStateToProps = state => ({
 })
 const mapDispatchToProps = {sidebarLoadInitialItems, sidebarCompleteItem}
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(ToDoSidebar)
+export default connect(mapStateToProps, mapDispatchToProps)(ToDoSidebar)

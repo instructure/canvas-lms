@@ -20,9 +20,11 @@
 <head>
   <meta charset="utf-8">
   <link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin>
-  <link href="https://fonts.googleapis.com/css?family=Lato:300,400,400i,700&amp;subset=latin-ext&amp;display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Architects+Daughter&display=swap" rel="stylesheet">
-  <link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans&display=swap" rel="stylesheet">
+  <% if Setting.get('disable_lato_extended', false) == 'false' %>
+    <%= stylesheet_link_tag(css_url_for('lato_extended')) %>
+  <% else %>
+    <%= stylesheet_link_tag(css_url_for('lato')) %>
+  <% end %>
   <% unless params && (params[:controller]&.starts_with?('login/') || params[:controller]&.starts_with?('oauth'))  # some windows apps need to do the oauth login dance from an ie11 webview %>
     <script>if (navigator.userAgent.match(/(MSIE|Trident\/)/)) location.replace('/ie-is-not-supported.html')</script>
   <% end %>
@@ -65,8 +67,8 @@
   </script>
 
   <%= benchmark("include_head_js") { include_head_js } %>
-  <% @xhrs_to_prefetch_from_controller&.each do |args| %>
-    <%= prefetch_xhr(*args) %>
+  <% @xhrs_to_prefetch_from_controller&.each do |(args, kwargs)| %>
+    <%= prefetch_xhr(*args, **kwargs) %>
   <% end %>
   <% @content_for_head&.each do |string| %>
     <%= string %>

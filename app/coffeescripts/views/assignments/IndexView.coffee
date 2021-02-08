@@ -32,6 +32,7 @@ import IndexMenu from 'jsx/assignments/IndexMenu'
 import configureIndexMenuStore from 'jsx/assignments/store/indexMenuStore'
 import BulkEditIndex from 'jsx/assignments/bulk_edit/BulkEditIndex'
 import '../../jquery.rails_flash_notifications'
+import easy_student_view from 'easy_student_view'
 
 export default class IndexView extends Backbone.View
   @mixin AssignmentKeyBindingsMixin
@@ -129,12 +130,14 @@ export default class IndexView extends Backbone.View
 
     @ensureContentStyle()
 
-    @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
-    window.onkeydown = @focusOnAssignments
+    unless (ENV.disable_keyboard_shortcuts)
+      @kbDialog = new KeyboardNavDialog().render(keyboardNavTemplate({keyBindings:@keyBindings}))
+      window.onkeydown = @focusOnAssignments
 
     @selectGradingPeriod()
 
   requestBulkEdit: =>
+    easy_student_view.hide()
     @bulkEditMode = true
     @render()
 
@@ -142,6 +145,7 @@ export default class IndexView extends Backbone.View
     @bulkEditSaved = true
 
   cancelBulkEdit: =>
+    easy_student_view.show()
     if @bulkEditSaved
       location.reload()
     else

@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 #
 # Copyright (C) 2012 Instructure, Inc.
@@ -58,14 +59,23 @@ describe "Outcomes API", type: :request do
                                          presets[:has_updateable_rubrics]
                                        end
 
-    if %w[decaying_average n_mastery].include?(retval["calculation_method"])
+    if @account.feature_enabled?(:account_level_mastery_scales)
+      calculation_method = OutcomeCalculationMethod.find_or_create_default!(@account)
+      retval["calculation_method"] = presets[:calculation_method] || calculation_method.calculation_method
+      retval["calculation_int"] = presets.key?(:calculation_int) ? presets[:calculation_int] : calculation_method.calculation_int
+    elsif %w[decaying_average n_mastery].include?(retval["calculation_method"])
       retval["calculation_int"] = presets[:calculation_int] || outcome.calculation_int
     end
 
-    if criterion = outcome.data && outcome.data[:rubric_criterion]
+    if @account.feature_enabled?(:account_level_mastery_scales)
+      proficiency = OutcomeProficiency.find_or_create_default!(@account)
+      retval["points_possible"] = presets[:points_possible] || proficiency.points_possible
+      retval["mastery_points"]  = presets[:mastery_points]  || proficiency.mastery_points
+      retval["ratings"]         = presets[:ratings]         || proficiency.ratings_hash.map(&:stringify_keys)
+    elsif criterion = (outcome.data && outcome.data[:rubric_criterion])
       retval["points_possible"] = presets[:points_possible] || criterion[:points_possible].to_i
       retval["mastery_points"]  = presets[:mastery_points]  || criterion[:mastery_points].to_i
-      retval["ratings"]         = presets[:ratings]         || criterion[:ratings].map{ |d| d.stringify_keys }
+      retval["ratings"]         = presets[:ratings]         || criterion[:ratings].map(&:stringify_keys)
     end
 
     retval
@@ -311,6 +321,88 @@ describe "Outcomes API", type: :request do
                      :format => 'json')
         json = controller.outcome_json(@outcome, @account_user.user, session, {assessed_outcomes: [@outcome]})
         expect(json["assessed"]).to be true
+      end
+
+      describe "with the account_level_mastery_scales FF" do
+        describe "enabled" do
+          before :once do
+            @account.enable_feature!(:account_level_mastery_scales)
+          end
+
+          describe "within the account context" do
+            it "should return the account's mastery scale and calculation_method" do
+              proficiency = outcome_proficiency_model(@account)
+              method = outcome_calculation_method_model(@account)
+              raw_api_call(
+                :get,
+                "/api/v1/outcomes/#{@outcome.id}",
+                :controller => 'outcomes_api',
+                :action => 'show',
+                :id => @outcome.id.to_s,
+                :format => 'json'
+              )
+              json = controller.outcome_json(@outcome, @account_user.user, session, {context: @account})
+              expect(json).to eq(outcome_json(@outcome, {
+                :points_possible => proficiency.points_possible,
+                :mastery_points => proficiency.mastery_points,
+                :ratings => proficiency.ratings_hash.map(&:stringify_keys),
+                :calculation_method => method.calculation_method,
+                :calculation_int => method.calculation_int,
+              }))
+            end
+
+            it "should return the default outcome_proficiency and calculation_method if neither exists" do
+              raw_api_call(
+                :get,
+                "/api/v1/outcomes/#{@outcome.id}",
+                :controller => 'outcomes_api',
+                :action => 'show',
+                :id => @outcome.id.to_s,
+                :format => 'json'
+              )
+              json = controller.outcome_json(@outcome, @account_user.user, session, {context: @account})
+              proficiency = OutcomeProficiency.find_or_create_default!(@account)
+              method = OutcomeCalculationMethod.find_or_create_default!(@account)
+              expect(json).to eq(outcome_json(@outcome, {
+                :points_possible => proficiency.points_possible,
+                :mastery_points => proficiency.mastery_points,
+                :ratings => proficiency.ratings_hash.map(&:stringify_keys),
+                :calculation_method => method.calculation_method,
+                :calculation_int => method.calculation_int,
+              }))
+            end
+          end
+
+          describe "with no context provided" do
+            it "should not return mastery scale data" do
+              raw_api_call(
+                :get,
+                "/api/v1/outcomes/#{@outcome.id}",
+                :controller => 'outcomes_api',
+                :action => 'show',
+                :id => @outcome.id.to_s,
+                :format => 'json'
+              )
+              json = controller.outcome_json(@outcome, @account_user.user, session)
+              ["points_possible", "mastery_points", "ratings", "calculation_method", "calculation_int"].each do |key|
+                expect(json.key?(key)).to be false
+              end
+            end
+          end
+        end
+
+        describe "disabled" do
+          it "should ignore the outcome_proficiency and calculation_method values if one exists" do
+            outcome_calculation_method_model(@account)
+            outcome_proficiency_model(@account)
+            json = api_call(:get, "/api/v1/outcomes/#{@outcome.id}",
+                            :controller => 'outcomes_api',
+                            :action => 'show',
+                            :id => @outcome.id.to_s,
+                            :format => 'json')
+            expect(json).to eq(outcome_json(@outcome))
+          end
+        end
       end
     end
 
@@ -635,6 +727,50 @@ describe "Outcomes API", type: :request do
               end
             end
           end
+        end
+      end
+
+      context "with account_level_mastery_scales enabled" do
+        before do
+          @outcome.context.root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+        end
+
+        it "should fail when updating mastery points" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :mastery_points => 5 })
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome mastery points cannot be modified.'
+        end
+
+        it "should fail when updating ratings" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :ratings => [
+                     { :points => 10, :description => "Exceeds Expectations" },
+                     { :points => 5, :description => "Meets Expectations" },
+                     { :points => 0, :description => "Does Not Meet Expectations" }
+                   ]})
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome ratings cannot be modified.'
+        end
+
+        it "should fail when updating calculation values" do
+          api_call(:put, "/api/v1/outcomes/#{@outcome.id}",
+                   { :controller => 'outcomes_api',
+                     :action => 'update',
+                     :id => @outcome.id.to_s,
+                     :format => 'json' },
+                   { :calculation_method => 'decaying_average',
+                     :calculation_int => 65 })
+          assert_forbidden
+          expect(JSON.parse(response.body)['error']).to eq 'Individual outcome calculation values cannot be modified.'
         end
       end
     end

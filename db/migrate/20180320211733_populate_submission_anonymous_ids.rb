@@ -22,16 +22,9 @@ class PopulateSubmissionAnonymousIds < ActiveRecord::Migration[5.1]
 
   def up
     Course.active.find_ids_in_ranges do |start_at, end_at|
-      DataFixup::PopulateSubmissionAnonymousIds.send_later_if_production_enqueue_args(
-        :run,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          max_attempts: 1,
-          n_strand: ['DataFixup::PopulateSubmissionAnonymousIds', Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::PopulateSubmissionAnonymousIds.delay_if_production(priority: Delayed::LOW_PRIORITY,
+          n_strand: ['DataFixup::PopulateSubmissionAnonymousIds', Shard.current.database_server.id]).
+        run(start_at, end_at)
     end
   end
 end

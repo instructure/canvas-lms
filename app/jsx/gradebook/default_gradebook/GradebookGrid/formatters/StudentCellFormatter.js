@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import I18n from 'i18n!gradebook'
 import 'jquery.instructure_misc_helpers' // $.toSentence
+import htmlEscape from 'str/htmlEscape'
 
 function getSecondaryDisplayInfo(student, secondaryInfo, options) {
   if (options.shouldShowSections() && secondaryInfo === 'section') {
@@ -74,7 +75,7 @@ function render(options) {
         data-student_id="${options.studentId}"
         data-course_id="${options.courseId}"
         href="${options.url}"
-      >${options.displayName}</a>
+      >${htmlEscape(options.displayName)}</a>
       ${enrollmentStatus}
     </div>
     ${secondaryInfo}

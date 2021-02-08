@@ -70,7 +70,7 @@ export class AssignmentCardMenu extends React.Component {
     return this.props.ranges
       .map((range, i) => {
         return (
-          <Menu.Item key={range.get('id')} onSelect={this.createMoveSelectCallback(range, i)}>
+          <Menu.Item key={range.get('id') || i} onSelect={this.createMoveSelectCallback(range, i)}>
             <IconUpdownLine />
             <View margin="0 0 0 x-small">
               {I18n.t('Move to %{lower} - %{upper}', {

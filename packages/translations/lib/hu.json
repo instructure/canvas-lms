@@ -1,6 +1,6 @@
 {
     "accessibility_checker_b3af1f6c": {
-        "message": "Akadálymentesség ellenőrzése"
+        "message": "Akadálymentesség ellenőrző"
     },
     "add_8523c19b": {
         "message": "Hozzáadás"
@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Jobbra igazítás"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Igazítás és behúzás"
-    },
     "all_4321c3a1": {
         "message": "Összes"
     },
@@ -49,6 +46,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternatív szöveg"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Hiba történt a fájl olvasásakor"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Hiba történt, amikor megpróbálta elvetni a lehetőséget."
@@ -113,6 +113,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ title } című { assignmentType }, emlékeztető ekkor: { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Attribútumok"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Audio és videó rögzítés nem elérhető."
     },
@@ -131,6 +134,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "A Tennivaló Listád Elkezdése"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Naptár"
     },
@@ -143,14 +149,17 @@
     "canvas_planner_98ed106": {
         "message": "Canvas Tervező"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Pluginok"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "Feliratfájl választása"
     },
+    "choose_usage_rights_33683854": {
+        "message": "Válasszon a felhasználói jogokból..."
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "rendezetlen lista körökkel"
+    },
+    "clear_2084585f": {
+        "message": "Törlés"
     },
     "clear_selected_file_82388e50": {
         "message": "Kiválasztott fájl törlése"
@@ -188,6 +197,9 @@
     "computer_1d7dfa6f": {
         "message": "Számítógép"
     },
+    "content_1440204b": {
+        "message": "Tartalom"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "A tartalom feltöltése még folyamatban van. Ha folytatja, akkor nem lesz rendesen beágyazva."
     },
@@ -196,6 +208,9 @@
     },
     "content_type_2cf90d95": {
         "message": "Tartalom típusa "
+    },
+    "copyright_holder_66ee111": {
+        "message": "Jog tulajdonosa:"
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 szó}\n    one {1 szó}\n  other {# szó}\n}"
@@ -235,6 +250,9 @@
     },
     "course_to_do_bcbbab54": {
         "message": "Tennivalók { course } tantárgyból"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons licenc:"
     },
     "current_volume_level_c55ab825": {
         "message": "Aktuális hangerőszint"
@@ -290,9 +308,6 @@
     "dimensions_45ddb7b7": {
         "message": "Méretek"
     },
-    "directionality_ebcae6d0": {
-        "message": "irányítottság"
-    },
     "disable_in_line_preview_2a675175": {
         "message": "Letiltja a beágyazott előnézetet."
     },
@@ -344,9 +359,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Húzza a fogantyút. Átméretezéshez használja a fel és le nyilakat."
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Húzzon át ide elemeket, vagy kattintson a számítógépen való tallózáshoz."
-    },
     "due_5d7267be": {
         "message": "Határidő: "
     },
@@ -389,9 +401,6 @@
     "embed_video_a97a64af": {
         "message": "Videó beágyazása"
     },
-    "embed_video_code_703e10f2": {
-        "message": "Videó Kód beágyazása"
-    },
     "embedded_content_aaeb4d3d": {
         "message": "beágyazott tartalom"
     },
@@ -418,6 +427,9 @@
     },
     "external_links_3d9f074e": {
         "message": "Külső linkek"
+    },
+    "external_tools_6e77821": {
+        "message": "Külső eszközök"
     },
     "extra_large_b6cdf1ff": {
         "message": "Extra nagy"
@@ -473,6 +485,9 @@
     "folder_tree_fbab0726": {
         "message": "Könyvtárfa"
     },
+    "format_4247a9c5": {
+        "message": "Formátum"
+    },
     "formatting_5b143aa8": {
         "message": "Formázás"
     },
@@ -527,6 +542,12 @@
     "height_69b03e15": {
         "message": "Magasság"
     },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Szereztem jogosultságot ennek a fájlnak a használatához."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Megtartom a szerzői jogot"
+    },
     "image_8ad06": {
         "message": "Kép"
     },
@@ -560,6 +581,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Érvénytelen fájltípus"
     },
+    "invalid_url_cbde79f": {
+        "message": "Helytelen webcím"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } befejezve { items, plural,\n     =1 {elem}\n  other {elem}\n}"
     },
@@ -571,9 +595,6 @@
     },
     "late_2be42b88": {
         "message": "Késve"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "balról jobbra"
     },
     "link_7262adec": {
         "message": "Hivatkozás"
@@ -655,9 +676,6 @@
     },
     "mic_a7f3d311": {
         "message": "Mikrofon"
-    },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "MIndenféle és Appok"
     },
     "missing_1a256b3b": {
         "message": "Hiányzik"
@@ -863,9 +881,6 @@
     "rich_content_editor_2708ef21": {
         "message": "Vizuális szövegszerkesztő"
     },
-    "right_to_left_ec223c81": {
-        "message": "jobbról balra"
-    },
     "save_11a80ec3": {
         "message": "Mentés"
     },
@@ -1004,6 +1019,12 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Ekkorra kell megcsinálni ezt"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Az anyag a közkincs kategóriába tartozik"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Ezt az anyagot Creative Commons licenc alatt tették közzé."
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Ehhez az elemhez nincsenek pontok rendelve."
     },
@@ -1097,6 +1118,9 @@
     "url_22a5f3b8": {
         "message": "URL"
     },
+    "usage_right_ff96f3e2": {
+        "message": "Felhasználási jog:"
+    },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Használja a nyíl billentyűket az opció kiválasztására!"
     },
@@ -1136,6 +1160,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Videólejátszó ehhez: { title }"
     },
+    "view_ba339f93": {
+        "message": "Megtekintés"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "A gyors elérés billentyűkombinációk megtekintése"
     },
@@ -1165,6 +1192,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Önnek média visszajelzése van."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Nem tölthet fel egy üres fájlt."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Meg kell adni a dátumot és az időt"

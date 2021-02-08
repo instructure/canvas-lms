@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -121,7 +123,7 @@ describe SisBatch do
                                 c1,u1,student,deleted,}])
     expect(student_enrollment.reload.workflow_state).to eq 'deleted'
     UserObservationLink.create_or_restore(observer: observer, student: user, root_account: @account)
-    expect(course.observer_enrollments.where(:user_id => observer).take).to be_nil # doesn't make a new enrollment    
+    expect(course.observer_enrollments.where(:user_id => observer).take).to be_nil # doesn't make a new enrollment
     batch.restore_states_for_batch
     run_jobs
     expect(student_enrollment.reload.workflow_state).to eq 'active'
@@ -1172,7 +1174,7 @@ test_1,u1,student,active}
           expect(@c1.reload).to be_deleted
           expect(@c2.reload).to be_deleted
           expect(batch.roll_back_data.where(previous_workflow_state: 'created').count).to eq 2
-          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 6
+          expect(batch.roll_back_data.where(updated_workflow_state: 'deleted').count).to eq 4
           expect(batch.reload.workflow_state).to eq 'imported'
           # there will be no progress for this batch, but it should still work
           batch.restore_states_for_batch
@@ -1205,6 +1207,27 @@ test_1,u1,student,active}
         end
       end
 
+    end
+  end
+
+  describe 'remove_previous_imports' do
+    it 'refuses to do anything if the batch is already failed' do
+      term = Account.default.enrollment_terms.first
+      batch = create_csv_data([
+                                %{course_id,short_name,long_name,account_id,term_id,status},
+                                %{course_id,user_id,role,status},
+                              ]) do |batch|
+        batch.options = {}
+        batch.batch_mode = true
+        batch.options[:multi_term_batch_mode] = true
+        batch.batch_mode_term = term
+        batch.save!
+      end
+      ['failed', 'failed_with_messages', 'aborted' ].each do |status|
+        batch.workflow_state = status
+        batch.save!
+        expect(batch.remove_previous_imports).to be_falsey
+      end
     end
   end
 

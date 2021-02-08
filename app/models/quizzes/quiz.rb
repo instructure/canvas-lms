@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -18,6 +20,7 @@
 require 'canvas/draft_state_validations'
 
 class Quizzes::Quiz < ActiveRecord::Base
+  extend RootAccountResolver
   self.table_name = 'quizzes'
 
   include Workflow
@@ -67,7 +70,6 @@ class Quizzes::Quiz < ActiveRecord::Base
   before_save :generate_quiz_data_on_publish, :if => :workflow_state_changed?
   before_save :build_assignment
   before_save :set_defaults
-  before_save :set_root_account_id
   after_save :update_assignment
   before_save :check_if_needs_availability_cache_clear
   after_save :clear_availability_cache
@@ -88,6 +90,8 @@ class Quizzes::Quiz < ActiveRecord::Base
   # last version of the assignment, because the next callback would be a
   # simply_versioned callback updating the version.
   after_save :link_assignment_overrides, :if => :new_assignment_id?
+
+  resolves_root_account through: :context
 
   include MasterCourses::Restrictor
   restrict_columns :content, [:title, :description]
@@ -153,10 +157,6 @@ class Quizzes::Quiz < ActiveRecord::Base
       :only_visible_to_overrides, :one_time_results, :show_correct_answers_last_attempt
     ].each { |attr| self[attr] = false if self[attr].nil? }
     self[:show_correct_answers] = true if self[:show_correct_answers].nil?
-  end
-
-  def set_root_account_id
-    self.root_account_id ||= self.context&.root_account_id
   end
 
   # quizzes differ from other publishable objects in that they require we
@@ -419,7 +419,7 @@ class Quizzes::Quiz < ActiveRecord::Base
   attr_accessor :saved_by
 
   def update_assignment
-    send_later_if_production(:set_unpublished_question_count) if self.id
+    delay_if_production.set_unpublished_question_count if self.id
     if !self.assignment_id && @old_assignment_id
       self.context_module_tags.preload(:context_module => :content_tags).each { |tag| tag.confirm_valid_module_requirements }
     end
@@ -429,12 +429,12 @@ class Quizzes::Quiz < ActiveRecord::Base
         submission_types: 'online_quiz'
       ).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
       self.course.recompute_student_scores
-      send_later_if_production_enqueue_args(:destroy_related_submissions, priority: Delayed::HIGH_PRIORITY)
+      delay_if_production(priority: Delayed::HIGH_PRIORITY).destroy_related_submissions
       ::ContentTag.delete_for(::Assignment.find(@old_assignment_id)) if @old_assignment_id
       ::ContentTag.delete_for(::Assignment.find(self.last_assignment_id)) if self.last_assignment_id
     end
 
-    send_later_if_production(:update_existing_submissions) if @update_existing_submissions
+    delay_if_production.update_existing_submissions if @update_existing_submissions
     if (self.assignment || @assignment_to_set) && (@assignment_id_set || self.for_assignment?) && @saved_by != :assignment
       unless !self.graded? && @old_assignment_id
         Quizzes::Quiz.where("assignment_id=? AND id<>?", self.assignment_id, self).update_all(:workflow_state => 'deleted', :assignment_id => nil, :updated_at => Time.now.utc) if self.assignment_id
@@ -451,6 +451,9 @@ class Quizzes::Quiz < ActiveRecord::Base
         a.submission_types = "online_quiz"
         a.assignment_group_id = self.assignment_group_id
         a.saved_by = :quiz
+        if self.saved_by == :migration
+          a.needs_update_cached_due_dates = true if a.update_cached_due_dates?
+        end
         unless deleted?
           a.workflow_state = self.published? ? 'published' : 'unpublished'
         end
@@ -493,7 +496,7 @@ class Quizzes::Quiz < ActiveRecord::Base
     # 1. belong to this quiz;
     # 2. have been started; and
     # 3. won't lose time through this change.
-    where_clause = <<-END
+    where_clause = <<~END
       quiz_id = ? AND
       started_at IS NOT NULL AND
       finished_at IS NULL AND
@@ -1339,11 +1342,8 @@ class Quizzes::Quiz < ActiveRecord::Base
         version_number: self.version_number
       }
       if current_quiz_question_regrades.present?
-        Quizzes::QuizRegrader::Regrader.send_later_enqueue_args(
-          :regrade!,
-          { strand: "quiz:#{self.global_id}:regrading"},
-          options
-        )
+        Quizzes::QuizRegrader::Regrader.delay(strand: "quiz:#{self.global_id}:regrading").
+          regrade!(options)
       end
     end
     true
@@ -1456,10 +1456,18 @@ class Quizzes::Quiz < ActiveRecord::Base
   # Assignment#run_if_overrides_changed_later! uses its keyword arguments, but
   # this method does not
   def run_if_overrides_changed_later!(**)
-    self.send_later_if_production_enqueue_args(
-      :run_if_overrides_changed!,
-      {:singleton => "quiz_overrides_changed_#{self.global_id}"}
-    )
+    delay_if_production(singleton: "quiz_overrides_changed_#{self.global_id}").run_if_overrides_changed!
+  end
+
+  # returns visible students for differentiated assignments
+  def visible_students_with_da(context_students)
+    quiz_students = context_students.joins(:quiz_student_visibilities).
+      where('quiz_id = ?', self.id)
+
+    # empty quiz_students means the quiz is for everyone
+    return quiz_students if quiz_students.present?
+
+    context_students
   end
 
   # This alias exists to handle cases where a method that expects an

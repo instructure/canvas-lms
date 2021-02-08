@@ -1,5 +1,5 @@
-# encoding: utf-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -31,21 +31,6 @@ describe "account admin outcomes" do
       RoleOverride.create!(:context => account, :permission => 'manage_courses',
         :role => admin_role, :enabled => false) # should not manage_courses permission
       course_with_admin_logged_in
-    end
-
-    it "should be able to manage course rubrics" do
-      get "/courses/#{@course.id}/outcomes"
-      expect_new_page_load { f('.manage_rubrics').click }
-      # this was originally added in OUT-465. It will eventually be moved over
-      # into the below popover menu, so leaving the blow code in place for
-      # when that happens
-
-      # expect_new_page_load do
-      #   f('#popoverMenu button').click
-      #   f('[data-reactid*="manage-rubrics"]').click
-      # end
-
-      expect(f('.add_rubric_link')).to be_displayed
     end
 
     context "create/edit/delete outcomes" do
@@ -144,7 +129,7 @@ describe "account admin outcomes" do
       1.upto(counter) do |og|
         root_group = root_group.child_outcome_groups.create!(:title => "Level #{og}")
       end
-      Setting.set(AcademicBenchmark.common_core_setting_key, root_group.id.to_s)
+      Shard.current.settings[:common_core_outcome_group_id] = root_group.id
     end
 
     def open_outcomes_find

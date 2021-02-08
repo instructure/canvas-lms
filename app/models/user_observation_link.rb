@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -44,7 +46,7 @@ class UserObservationLink < ActiveRecord::Base
 
   MISSING_ROOT_ACCOUNT_ID = -1
 
-  # shadow_record param is private
+  # cross_shard_record param is private
   def self.create_or_restore(student: , observer: , root_account: , cross_shard_record: false)
     raise ArgumentError, 'student, observer and root_account are required' unless student && observer && root_account
     shard = cross_shard_record ? observer.shard : student.shard
@@ -81,7 +83,7 @@ class UserObservationLink < ActiveRecord::Base
   alias_method :destroy_permanently!, :destroy
   def destroy
     if !self.skip_destroy_other_record && (other = other_record)
-      other.skip_destroy_other_record = false
+      other.skip_destroy_other_record = true
       other.destroy
     end
     self.workflow_state = 'deleted'

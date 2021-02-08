@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -380,6 +382,30 @@ describe ModeratedGrading::ProvisionalGrade do
       expect(real_assessment.assessor).to eq scorer
       expect(real_assessment.rubric_association).to eq association
       expect(real_assessment.data).to eq provisional_assessment.data
+    end
+
+    it "does not publish rubric assessments when the rubric association is soft-deleted" do
+      outcome_with_rubric(course: course)
+      association = @rubric.associate_with(assignment, course, purpose: 'grading', use_for_grading: true)
+      association.destroy
+
+      submission = assignment.submit_homework(student, submission_type: 'online_text_entry', body: 'hallo')
+      provisional_grade = submission.find_or_create_provisional_grade!(scorer, score: 1)
+
+      association.assess(
+        user: student,
+        assessor: scorer,
+        artifact: provisional_grade,
+        assessment: {
+          assessment_type: 'grading',
+          :"criterion_#{@rubric.criteria_object.first.id}" => {
+            points: 3,
+            comments: "good 4 u"
+          }
+        }
+      )
+
+      expect(submission.rubric_assessments.first).to be_nil
     end
 
     it "does not error when a rubric has been deleted after an assessment took place" do

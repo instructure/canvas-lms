@@ -22,10 +22,46 @@ import 'jquery.ajaxJSON'
 import 'jquery.instructure_misc_helpers'
 import '../../jquery.rails_flash_notifications'
 
-function dataReady(data, service_id) {
+const ExternalContentSuccess = {}
+
+const {lti_response_messages} = ENV
+const {service_id} = ENV
+const data = ENV.retrieved_data
+const callback = ENV.service
+let parentWindow = window.parent
+
+ExternalContentSuccess.getIFrameSrc = function() {
+  let src = parentWindow
+    .$('[data-cid="Modal"]')
+    .find('iframe')
+    .attr('src')
+
+  if (src === undefined) {
+    src = parentWindow
+      .$('[data-cid="Tray"]')
+      .find('iframe')
+      .attr('src')
+  }
+
+  return src
+}
+
+ExternalContentSuccess.getLaunchType = function() {
+  const src = ExternalContentSuccess.getIFrameSrc()
+
+  if (src === undefined) {
+    return undefined
+  }
+
+  const params = new URLSearchParams(src.split('?')[1])
+  return params.get('launch_type')
+}
+
+ExternalContentSuccess.dataReady = function(data, service_id) {
   const e = $.Event('externalContentReady')
   e.contentItems = data
   e.service_id = service_id
+
   parentWindow.$(parentWindow).trigger('externalContentReady', e)
 
   if (parentWindow[callback] && parentWindow[callback].ready) {
@@ -51,7 +87,7 @@ function dataReady(data, service_id) {
 
 // Handles lti 1.0 responses for Assignments 2 which expects a
 // vanilla JS event from LTI tools in the following form.
-function a2DataReady(data) {
+ExternalContentSuccess.a2DataReady = function(data) {
   parentWindow.postMessage(
     {
       messageType: 'A2ExternalContentReady',
@@ -66,46 +102,55 @@ function a2DataReady(data) {
   )
 }
 
-const {lti_response_messages} = ENV
-const {service_id} = ENV
-const data = ENV.retrieved_data
-var callback = ENV.service
-var parentWindow = window.parent
-while (parentWindow && parentWindow.parent !== parentWindow && !parentWindow[callback]) {
-  parentWindow = parentWindow.parent
-}
+ExternalContentSuccess.start = function() {
+  while (parentWindow && parentWindow.parent !== parentWindow && !parentWindow[callback]) {
+    parentWindow = parentWindow.parent
+  }
 
-if (lti_response_messages.lti_errormsg) {
-  parentWindow.$.flashError(lti_response_messages.lti_errormsg)
-}
-if (lti_response_messages.lti_msg) {
-  parentWindow.$.flashMessage(lti_response_messages.lti_msg)
-}
+  if (parentWindow.$ === undefined) {
+    parentWindow.$ = $
+  }
 
-if (ENV.oembed) {
-  const url = $.replaceTags(
-    $.replaceTags(
-      $('#oembed_retrieve_url').attr('href'),
-      'endpoint',
-      encodeURIComponent(ENV.oembed.endpoint)
-    ),
-    'url',
-    encodeURIComponent(ENV.oembed.url)
-  )
-  $.ajaxJSON(
-    url,
-    'GET',
-    {},
-    data => dataReady(data),
-    () =>
-      $('#dialog_message').text(
-        I18n.t(
-          'oembed_failure',
-          'Content retrieval failed, please try again or notify your system administrator of the error.'
+  if (lti_response_messages && lti_response_messages.lti_errormsg) {
+    parentWindow.$.flashError(lti_response_messages.lti_errormsg)
+  }
+  if (lti_response_messages && lti_response_messages.lti_msg) {
+    parentWindow.$.flashMessage(lti_response_messages.lti_msg)
+  }
+
+  if (ENV.oembed) {
+    const url = $.replaceTags(
+      $.replaceTags(
+        $('#oembed_retrieve_url').attr('href'),
+        'endpoint',
+        encodeURIComponent(ENV.oembed.endpoint)
+      ),
+      'url',
+      encodeURIComponent(ENV.oembed.url)
+    )
+    $.ajaxJSON(
+      url,
+      'GET',
+      {},
+      data => ExternalContentSuccess.dataReady(data),
+      () =>
+        $('#dialog_message').text(
+          I18n.t(
+            'oembed_failure',
+            'Content retrieval failed, please try again or notify your system administrator of the error.'
+          )
         )
-      )
-  )
-} else {
-  dataReady(data, service_id)
-  a2DataReady(data)
+    )
+  } else if (ExternalContentSuccess.getLaunchType() === 'assignment_index_menu') {
+    parentWindow.location.reload()
+  } else {
+    ExternalContentSuccess.dataReady(data, service_id)
+    ExternalContentSuccess.a2DataReady(data)
+  }
 }
+
+$(document).ready(() => {
+  ExternalContentSuccess.start()
+})
+
+export default ExternalContentSuccess

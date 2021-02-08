@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ module Types
       start_time ||= 1.year.ago
       end_time ||= 1.year.from_now
 
-      DynamoQuery.new(dynamo, "graphql_mutations",
+      DynamoQuery.new(dynamo, AuditLogFieldExtension.ddb_table_name,
                       partition_key: "object_id",
                       value: "#{context[:domain_root_account].global_id}-#{asset_string}",
                       key_condition_expression: "mutation_id BETWEEN :start_time AND :end_time",

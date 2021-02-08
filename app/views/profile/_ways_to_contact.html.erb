@@ -209,7 +209,7 @@
 <%= form_tag communication_channels_url, {:id => "register_sms_number", :class => 'form-horizontal'} do %>
     <input type="hidden" name="communication_channel[type]" value="sms"/>
 
-    <% if Account.site_admin.feature_enabled?(:international_sms) %>
+    <% if @user.account.feature_enabled?(:international_sms) %>
       <div class="control-group">
         <label for="communication_channel_sms_country" class='control-label'><%=t('Country or Region') %></label>
         <div class="controls">

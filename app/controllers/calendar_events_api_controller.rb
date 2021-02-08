@@ -356,7 +356,7 @@ class CalendarEventsApiController < ApplicationController
   end
 
   def render_events_for_user(user, route_url)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope = if @type == :assignment
         assignment_scope(
           user,
@@ -698,7 +698,7 @@ class CalendarEventsApiController < ApplicationController
       @event.updating_user = @current_user
       @event.cancel_reason = params[:cancel_reason]
       if @event.destroy
-        if @event.appointment_group && @event.appointment_group.appointments.count == 0 && @event.appointment_group.context.root_account.feature_enabled?(:better_scheduler)
+        if @event.appointment_group && @event.appointment_group.appointments.count == 0
           @event.appointment_group.destroy(@current_user)
         end
         render :json => event_json(@event, @current_user, session)
@@ -722,7 +722,7 @@ class CalendarEventsApiController < ApplicationController
 
       get_options(nil)
 
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         @events.concat assignment_scope(@current_user).paginate(per_page: 1000, max: 1000)
         @events = apply_assignment_overrides(@events, @current_user)
         @events.concat calendar_event_scope(@current_user) { |relation| relation.events_without_child_events }.paginate(per_page: 1000, max: 1000)
@@ -763,7 +763,7 @@ class CalendarEventsApiController < ApplicationController
       # if the feed url doesn't give us the requesting user,
       # we have to just display the generic course feed
       get_all_pertinent_contexts
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         @contexts.each do |context|
           @assignments = context.assignments.active.to_a if context.respond_to?("assignments")
           # no overrides to apply without a current user
@@ -930,7 +930,7 @@ class CalendarEventsApiController < ApplicationController
         event_hashes = builder.generate_event_hashes(timetables)
         builder.process_and_validate_event_hashes(event_hashes)
         raise "error creating timetable events #{builder.errors.join(", ")}" if builder.errors.present?
-        builder.send_later(:create_or_update_events, event_hashes) # someday we may want to make this a trackable progress job /shrug
+        builder.delay.create_or_update_events(event_hashes) # someday we may want to make this a trackable progress job /shrug
       end
 
       # delete timetable events for sections missing here
@@ -984,6 +984,9 @@ class CalendarEventsApiController < ApplicationController
   #   A unique identifier that can be used to update the event at a later time
   #   If one is not specified, an identifier will be generated based on the start and end times
   #
+  # @argument events[][title] [Optional, String]
+  #   Title for the meeting. If not present, will default to the associated course's name
+  #
   def set_course_timetable_events
     get_context
     if authorized_action(@context, @current_user, :manage_calendar)
@@ -1001,7 +1004,7 @@ class CalendarEventsApiController < ApplicationController
         return render :json => {:errors => builder.errors}, :status => :bad_request
       end
 
-      builder.send_later(:create_or_update_events, event_hashes)
+      builder.delay.create_or_update_events(event_hashes)
       render json: {status: 'ok'}
     end
   end

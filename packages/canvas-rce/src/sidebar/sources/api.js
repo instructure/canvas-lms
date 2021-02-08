@@ -92,8 +92,9 @@ class RceApiSource {
     const headers = headerFor(this.jwt)
     const uri = this.baseUri('session')
     return this.apiReallyFetch(uri, headers)
-      .then(() => {
+      .then(data => {
         this.hasSession = true
+        return data
       })
       .catch(throwConnectionError)
   }
@@ -104,7 +105,9 @@ class RceApiSource {
     return {
       links: [],
       bookmark: this.uriFor(endpoint, props),
-      loading: false
+      isLoading: false,
+      hasMore: true,
+      searchString: props.searchString
     }
   }
 
@@ -172,6 +175,12 @@ class RceApiSource {
         files: files.map(normalizeFileData)
       }
     })
+  }
+
+  fetchLinks(key, props) {
+    const {collections} = props
+    const bookmark = collections[key].bookmark || this.uriFor(key, props)
+    return this.fetchPage(bookmark)
   }
 
   fetchRootFolder(props) {
@@ -246,8 +255,7 @@ class RceApiSource {
               reject(e)
             })
         })
-        .catch(e => {
-          console.error('reading a media track file failed', e)
+        .catch(_e => {
           this.alertFunc({
             text: formatMessage('Reading a media track file failed. Aborting.'),
             variant: 'error'
@@ -353,7 +361,7 @@ class RceApiSource {
       // it requires Canvas authentication. we also don't have an RCE API
       // endpoint to forward it through.
       const {pathname} = parse(uploadResults.location)
-      const matchData = pathname.match(/^\/api\/v1\/files\/(\d+)$/)
+      const matchData = pathname.match(/^\/api\/v1\/files\/((?:\d+~)?\d+)$/)
       if (!matchData) {
         const error = new Error('cannot determine file ID from location')
         error.location = uploadResults.location
@@ -417,7 +425,7 @@ class RceApiSource {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, {headers})
       .then(response => {
-        if (response.status == 401) {
+        if (response.status === 401) {
           // retry once with fresh token
           return this.buildRetryHeaders(headers).then(newHeaders => {
             return fetch(uri, {headers: newHeaders})
@@ -453,7 +461,7 @@ class RceApiSource {
     uri = this.normalizeUriProtocol(uri)
     return fetch(uri, fetchOptions)
       .then(response => {
-        if (response.status == 401) {
+        if (response.status === 401) {
           // retry once with fresh token
           return this.buildRetryHeaders(fetchOptions.headers).then(newHeaders => {
             const newOptions = {...fetchOptions, headers: newHeaders}
@@ -526,21 +534,34 @@ class RceApiSource {
   //   //rce.docker/api/wikiPages?context_type=course&context_id=42
   //
   uriFor(endpoint, props) {
-    const {host, contextType, contextId} = props
+    const {host, contextType, contextId, sortBy, searchString} = props
     let extra = ''
     switch (endpoint) {
       case 'images':
-        extra = `&content_types=image${getSortParams(props.sort, props.order)}`
+        extra = `&content_types=image${getSortParams(sortBy.sort, sortBy.dir)}${getSearchParam(
+          searchString
+        )}`
         break
       case 'media': // when requesting media files via the documents endpoint
-        extra = `&content_types=video,audio${getSortParams(props.sort, props.order)}`
+        extra = `&content_types=video,audio${getSortParams(
+          sortBy.sort,
+          sortBy.dir
+        )}${getSearchParam(searchString)}`
         break
       case 'documents':
-        extra = `&exclude_content_types=image,video,audio${getSortParams(props.sort, props.order)}`
+        extra = `&exclude_content_types=image,video,audio${getSortParams(
+          sortBy.sort,
+          sortBy.dir
+        )}${getSearchParam(searchString)}`
         break
       case 'media_objects': // when requesting media objects (this is the currently used branch)
-        extra = getSortParams(props.sort === 'alphabetical' ? 'title' : 'date', props.order)
+        extra = `${getSortParams(
+          sortBy.sort === 'alphabetical' ? 'title' : 'date',
+          sortBy.dir
+        )}${getSearchParam(searchString)}`
         break
+      default:
+        extra = getSearchParam(searchString)
     }
     return `${this.baseUri(
       endpoint,
@@ -549,14 +570,18 @@ class RceApiSource {
   }
 }
 
-function getSortParams(sort, order) {
+function getSortParams(sort, dir) {
   let sortBy = sort
   if (sortBy === 'date_added') {
     sortBy = 'created_at'
   } else if (sortBy === 'alphabetical') {
     sortBy = 'name'
   }
-  return `&sort=${sortBy}&order=${order}`
+  return `&sort=${sortBy}&order=${dir}`
+}
+
+export function getSearchParam(searchString) {
+  return searchString?.length >= 3 ? `&search_term=${encodeURIComponent(searchString)}` : ''
 }
 
 export default RceApiSource

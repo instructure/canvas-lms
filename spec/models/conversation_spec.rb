@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -450,8 +452,7 @@ describe Conversation do
       n2 = Notification.create(:name => "Conversation Created", :category => "TestImmediately")
 
       [sender].each do |user|
-        channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-        channel.confirm
+        channel = communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
 
         NotificationPolicy.create(:notification => n2, :communication_channel => channel, :frequency => "immediately")
       end
@@ -1023,6 +1024,47 @@ describe Conversation do
       new_course = course_factory
       conversation = Conversation.initiate([], false, context_type: 'Course', context_id: new_course.id)
       expect(conversation.root_account_ids).to eql [new_course.root_account_id]
+    end
+
+    it 'should update conversation participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation messages root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_messages.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
+    end
+
+    it 'should update conversation message participants root account ids when changed' do
+      a1 = Account.create!
+      a2 = Account.create!
+      users = create_users(2, return_type: :record)
+      conversation = Conversation.initiate(users, false)
+      conversation.add_message(users[0], 'howdy partner')
+
+      conversation.root_account_ids = [a1.id, a2.id]
+      conversation.save!
+      expect(
+        conversation.reload.conversation_message_participants.first.root_account_ids
+      ).to eq [a1.id, a2.id].sort
     end
 
     context "sharding" do

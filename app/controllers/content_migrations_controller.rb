@@ -569,7 +569,9 @@ class ContentMigrationsController < ApplicationController
         end
 
         if !params.has_key?(:do_not_run) || !Canvas::Plugin.value_to_boolean(params[:do_not_run])
-          @content_migration.queue_migration(@plugin)
+          @content_migration.shard.activate do
+            @content_migration.queue_migration(@plugin)
+          end
         end
       end
 
@@ -583,7 +585,7 @@ class ContentMigrationsController < ApplicationController
     if @current_user.adminable_accounts.any?
       false # assume that if they're an account admin they're probably managing so many courses it's not worth it to even try the count
     else
-      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses.count }.sum
+      course_count = Shard.with_each_shard(@current_user.in_region_associated_shards) { @current_user.manageable_courses(true).count }.sum
       course_count <= 100
     end
   end

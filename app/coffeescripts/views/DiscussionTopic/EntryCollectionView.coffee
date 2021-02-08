@@ -142,7 +142,10 @@ export default class EntryCollectionView extends View
     unshown = @collection.fullCollection.toJSON().slice start, end
     total = 0
     unread = 0
-    walk unshown, 'replies', (entry) ->
+    # No need to recursively traverse unshown here as
+    # the collection has already been flattened. Using
+    # undefined as the prop prevents the recursive walk
+    walk unshown, undefined, (entry) ->
       total++
       unread++ if entry.read_state is 'unread'
     {total, unread}

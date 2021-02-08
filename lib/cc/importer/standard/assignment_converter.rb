@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -111,7 +113,7 @@ module CC::Importer::Standard
         assignment[:similarity_detection_tool] = similarity_settings
       end
 
-      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "turnitin_settings"].each do |string_type|
+      ['title', "allowed_extensions", "grading_type", "submission_types", "external_tool_url", "external_tool_data_json", "turnitin_settings"].each do |string_type|
         val = get_node_val(meta_doc, string_type)
         assignment[string_type] = val unless val.nil?
       end

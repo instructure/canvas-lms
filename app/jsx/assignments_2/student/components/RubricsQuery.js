@@ -19,7 +19,7 @@ import {Assignment} from '../graphqlData/Assignment'
 import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2'
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import React from 'react'
 import RubricTab from './RubricTab'
 import {RUBRIC_QUERY} from '../graphqlData/Queries'
@@ -54,7 +54,9 @@ export default function RubricsQuery(props) {
     <RubricTab
       assessments={data.submission?.rubricAssessmentsConnection?.nodes}
       key={props.submission.attempt}
-      proficiencyRatings={data.course.account?.proficiencyRatingsConnection?.nodes}
+      proficiencyRatings={
+        data.course.account?.outcomeProficiency?.proficiencyRatingsConnection?.nodes
+      }
       rubric={data.assignment.rubric}
     />
   )

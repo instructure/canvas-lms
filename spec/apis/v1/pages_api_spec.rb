@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -175,12 +177,12 @@ describe "Pages API", type: :request do
         expect(urls).to eq new_pages.sort_by(&:id).collect(&:url)
       end
 
-      it "should return an error if the search term is fewer than 3 characters" do
-        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=aa",
-                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "aa"},
+      it "should return an error if the search term is fewer than 2 characters" do
+        json = api_call(:get, "/api/v1/courses/#{@course.id}/pages?search_term=a",
+                        {:controller=>'wiki_pages_api', :action=>'index', :format=>'json', :course_id=>@course.to_param, :search_term => "a"},
                         {}, {}, {:expected_status => 400})
         error = json["errors"].first
-        verify_json_error(error, "search_term", "invalid", "3 or more characters is required")
+        verify_json_error(error, "search_term", "invalid", "2 or more characters is required")
       end
 
       describe "sorting" do
@@ -214,8 +216,6 @@ describe "Pages API", type: :request do
         end
 
         context 'planner feature enabled' do
-          before(:once) { @course.root_account.enable_feature!(:student_planner) }
-
           it 'should create a page with a todo_date' do
             todo_date = Time.zone.local(2008, 9, 1, 12, 0, 0)
             json = api_call(:post, "/api/v1/courses/#{@course.id}/pages",
@@ -699,12 +699,11 @@ describe "Pages API", type: :request do
       end
 
       it 'should not crash updating front page if the wiki_page param is not available with student planner enabled' do
-        @course.root_account.enable_feature!(:student_planner)
-        response = api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
-                 { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param,
-                   :url => @hidden_page.url },
-                 {}, {},
-                 {:expected_status => 200})
+        api_call(:put, "/api/v1/courses/#{@course.id}/front_page",
+          { :controller => 'wiki_pages_api', :action => 'update_front_page', :format => 'json', :course_id => @course.to_param,
+            :url => @hidden_page.url },
+          {}, {},
+          {:expected_status => 200})
       end
 
       it "should set as front page", priority:"3", test_id: 126813 do

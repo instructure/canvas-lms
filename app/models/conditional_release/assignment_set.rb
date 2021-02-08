@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -25,6 +27,8 @@ module ConditionalRelease
     acts_as_list :scope => {:scoring_range => self, :deleted_at => nil}
     has_one :rule, through: :scoring_range
     belongs_to :root_account, :class_name => "Account"
+
+    attr_accessor :service_id # TODO: can remove after migration is complete
 
     before_create :set_root_account_id
     def set_root_account_id

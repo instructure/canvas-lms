@@ -21,22 +21,26 @@ def seleniumConfig() {
     node_total: configuration.getInteger('selenium-ci-node-total'),
     max_fail: configuration.getInteger('selenium-max-fail'),
     reruns_retry: configuration.getInteger('selenium-rerun-retry'),
-    force_failure: configuration.isForceFailureSelenium() ? "1" : ''
+    force_failure: configuration.isForceFailureSelenium() ? "1" : '',
+    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
 def runSeleniumSuite(total, index) {
+  def config = seleniumConfig()
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml:docker-compose.new-jenkins-selenium.yml',
+      'docker-compose.new-jenkins.yml:docker-compose.new-jenkins-selenium.yml',
       'selenium',
-      seleniumConfig().max_fail,
-      seleniumConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/selenium',
       '.*/performance',
+      '1',
       '3',
-      seleniumConfig().force_failure
+      config.force_failure,
+      config.patchsetTag
   )
 }
 
@@ -45,22 +49,26 @@ def rspecConfig() {
     node_total: configuration.getInteger('rspec-ci-node-total'),
     max_fail: configuration.getInteger('rspec-max-fail'),
     reruns_retry: configuration.getInteger('rspec-rerun-retry'),
-    force_failure: configuration.isForceFailureRSpec() ? "1" : ''
+    force_failure: configuration.isForceFailureRSpec() ? "1" : '',
+    patchsetTag: env.PATCHSET_TAG,
   ]
 }
 
 def runRSpecSuite(total, index) {
+  def config = rspecConfig()
   _runRspecTestSuite(
       total,
       index,
-      'docker-compose.new-jenkins.multiple-processes.yml',
+      'docker-compose.new-jenkins.yml',
       'rspec',
-      rspecConfig().max_fail,
-      rspecConfig().reruns_retry,
+      config.max_fail,
+      config.reruns_retry,
       '^./(spec|gems/plugins/.*/spec_canvas)/',
-      '.*/selenium',
+      '.*/(selenium|contracts)',
+      '1',
       '4',
-      rspecConfig().force_failure
+      config.force_failure,
+      config.patchsetTag
   )
 }
 
@@ -74,7 +82,10 @@ def _runRspecTestSuite(
     test_file_pattern,
     exclude_regex,
     docker_processes,
-    force_failure) {
+    rspec_processes,
+    force_failure,
+    patchsetTag
+) {
   withEnv([
       "CI_NODE_INDEX=$index",
       "COMPOSE_FILE=$compose",
@@ -84,89 +95,82 @@ def _runRspecTestSuite(
       "EXCLUDE_TESTS=$exclude_regex",
       "CI_NODE_TOTAL=$total",
       "DOCKER_PROCESSES=$docker_processes",
+      "RSPEC_PROCESSES=$rspec_processes",
       "FORCE_FAILURE=$force_failure",
       "POSTGRES_PASSWORD=sekret",
+      "SELENIUM_VERSION=3.141.59-20201119",
+      "PATCHSET_TAG=$patchsetTag",
   ]) {
     try {
       cleanAndSetup()
-      sh 'rm -rf ./tmp'
-      sh 'mkdir -p tmp'
-      timeout(time: 60) {
-        sh 'build/new-jenkins/docker-compose-pull.sh'
-        sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
-        sh 'build/new-jenkins/docker-compose-build-up.sh'
-        sh 'build/new-jenkins/docker-compose-setup-databases.sh'
-        sh 'build/new-jenkins/rspec_parallel_dockers.sh'
+      sh 'rm -rf ./tmp && mkdir -p tmp'
+      timeout(time: 15) {
+        sh(script: 'build/new-jenkins/docker-compose-pull.sh', label: 'Pull Images')
+        sh(script: 'build/new-jenkins/docker-compose-build-up.sh', label: 'Start Containers')
+        sh(script: 'build/new-jenkins/docker-compose-rspec-parallel.sh', label: 'Run Tests')
       }
-    }
-    finally {
+    } catch(Exception e) {
+      failureReport.addFailure(prefix, "${BUILD_URL}${prefix}-test-failures")
+
+      throw e
+    } finally {
       // copy spec failures to local
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures canvas_ --allow-error --clean-dir'
-      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results.xml tmp/rspec_results canvas_ --allow-error --clean-dir'
-      def reports = load 'build/new-jenkins/groovy/reports.groovy'
-      reports.stashSpecFailures(prefix, index)
-      reports.stashSpecResults(prefix, index)
+      sh "build/new-jenkins/docker-copy-files.sh /usr/src/app/log/spec_failures/ tmp/spec_failures/$prefix canvas_ --allow-error --clean-dir"
+      sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/results tmp/rspec_results canvas_ --allow-error --clean-dir'
+
+      if(configuration.getBoolean('upload-docker-logs', 'false')) {
+        sh "docker ps -aq | xargs -I{} -n1 -P1 docker logs --timestamps --details {} 2>&1 > tmp/docker-${prefix}-${index}.log"
+        archiveArtifacts(artifacts: "tmp/docker-${prefix}-${index}.log")
+      }
+
+      archiveArtifacts allowEmptyArchive: true, artifacts: "tmp/spec_failures/$prefix/**/*"
+      findFiles(glob: "tmp/spec_failures/$prefix/**/index.html").each { file ->
+        // node_18/spec_failures/canvas__9224fba6fc34/spec_failures/Initial/spec/selenium/force_failure_spec.rb:20/index
+        // split on the 5th to give us the rerun category (Initial, Rerun_1, Rerun_2...)
+        failureReport.addFailurePathByCategory(prefix, file.getPath(), file.getPath().split("/")[5])
+      }
+
+      // junit publishing will set build status to unstable if failed tests found, if so set it back to the original value
+      def preStatus = currentBuild.rawBuild.@result
+
+      junit allowEmptyResults: true, testResults: "tmp/rspec_results/**/*.xml"
+
+      if(currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
+        currentBuild.rawBuild.@result = preStatus
+      }
+
+
       if (env.COVERAGE == '1') {
         sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/coverage/ tmp/spec_coverage canvas_ --clean-dir'
-        reports.stashSpecCoverage(prefix, index)
+        archiveArtifacts(artifacts: 'tmp/spec_coverage/**/*')
       }
+
+      if (env.RSPEC_LOG == '1') {
+        sh 'build/new-jenkins/docker-copy-files.sh /usr/src/app/log/parallel_runtime/ ./tmp/parallel_runtime_rspec_tests canvas_ --allow-error --clean-dir'
+        archiveArtifacts(artifacts: 'tmp/parallel_runtime_rspec_tests/**/*.log')
+      }
+
       sh 'rm -rf ./tmp'
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
     }
   }
 }
 
-def uploadSeleniumCoverageIfSuccessful() {
-  _uploadCoverageIfSuccessful('selenium', seleniumConfig().node_total, 'canvas-lms-selenium')
+def uploadSeleniumCoverage() {
+  _uploadCoverage('selenium', 'canvas-lms-selenium')
 }
 
-def uploadRSpecCoverageIfSuccessful() {
-  _uploadCoverageIfSuccessful('rspec', rspecConfig().node_total, 'canvas-lms-rspec')
+def uploadRSpecCoverage() {
+  _uploadCoverage('rspec', 'canvas-lms-rspec')
 }
 
-def _uploadCoverageIfSuccessful(prefix, total, coverage_name) {
-  def successes = load 'build/new-jenkins/groovy/successes.groovy'
-  if (successes.hasSuccess(prefix, total)) {
-    def reports = load 'build/new-jenkins/groovy/reports.groovy'
-    reports.publishSpecCoverageToS3(prefix, total, coverage_name)
-  }
+def _uploadCoverage(prefix, coverage_name) {
+  reports.publishSpecCoverageToS3('tmp/spec_coverage/**/*', "$coverage_name/coverage")
 }
 
-def uploadSeleniumFailures() {
-  _uploadSpecFailures('selenium', seleniumConfig().node_total, 'Selenium Test Failures')
-}
-
-def uploadRSpecFailures() {
-  _uploadSpecFailures('rspec', rspecConfig().node_total, 'Rspec Test Failures')
-}
-
-def _uploadSpecFailures(prefix, total, test_name) {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  def report_url = reports.publishSpecFailuresAsHTML(prefix, total, test_name)
-  if (!load('build/new-jenkins/groovy/successes.groovy').hasSuccessOrBuildIsSuccessful(prefix, total)) {
-    reports.appendFailMessageReport("Spec Failure For $prefix", report_url)
-  }
-}
-
-def uploadSeleniumJunit() {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  reports.publishJunitReport('selenium', seleniumConfig().node_total)
-}
-
-def uploadRspecJunit() {
-  def reports = load('build/new-jenkins/groovy/reports.groovy')
-  reports.publishJunitReport('rspec', rspecConfig().node_total)
-}
-
-def uploadJunitReports() {
-  uploadSeleniumJunit()
-  uploadRspecJunit()
-  def preStatus = currentBuild.getResult()
-  junit allowEmptyResults: true, testResults: 'spec_results/**/*.xml'
-  // junit publishing will set build status to unstable if failed tests found, if so set it back to SUCCESS
-  if (currentBuild.getResult() == 'UNSTABLE' && preStatus != 'UNSTABLE') {
-    currentBuild.rawBuild.@result = hudson.model.Result.SUCCESS
-  }
+def uploadParallelLog() {
+  reports.copyParallelLogs('tmp/parallel_runtime_rspec_tests/**/*.log')
+  archiveArtifacts(artifacts: "parallel_logs/**")
 }
 
 return this

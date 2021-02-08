@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -25,7 +27,6 @@ describe 'as a student' do
     before(:once) do
       Account.default.enable_feature!(:assignments_2_student)
       course_with_student(course: @course, active_all: true)
-      preload_graphql_schema
     end
 
     context 'assignment details' do
@@ -153,7 +154,7 @@ describe 'as a student' do
       end
 
       it "shows the module sequence footer" do
-        expect(f('.module-sequence-footer-button--previous')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
+        expect(f('.module-sequence-footer-button--previous a')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_before.id}")
         expect(f('.module-sequence-footer-button--next a')).to have_attribute("href", "/courses/#{@course.id}/modules/items/#{@item_after.id}")
       end
     end
@@ -175,6 +176,7 @@ describe 'as a student' do
       end
 
       it "should be able to open the media modal" do
+        skip 'LS-1514 10/5/2020'
         StudentAssignmentPageV2.record_upload_button.click
         expect(StudentAssignmentPageV2.media_modal).to be_displayed
       end

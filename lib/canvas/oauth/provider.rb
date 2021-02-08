@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -56,7 +58,9 @@ module Canvas::Oauth
 
     def key
       return nil unless client_id_is_valid?
-      @key ||= DeveloperKey.where(id: @client_id).first
+      @key ||= DeveloperKey.find_cached(@client_id)
+    rescue ActiveRecord::RecordNotFound
+      nil
     end
 
     # Checks to see if a token has already been issued to this client and

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -115,7 +117,7 @@ module AddressBook
             # and then ignoring
             Canvas::Errors.capture(RuntimeError.new(
               "AddressBook::Service#search_users should not be paged with include_bookmark: true"
-            ))
+            ), {}, :warn)
           end
           service_options[:cursor] = pager.current_bookmark
         end

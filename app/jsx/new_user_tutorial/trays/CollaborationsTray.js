@@ -27,25 +27,28 @@ const CollaborationsTray = () => (
     image="/images/tutorial-tray-images/Panda_Collaborations.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-
-      canvas-instructor-guide-table-of-contents#jive_content_id_Collaborations`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('What are collaborations?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10722-67952720327'
+        href:
+          'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61'
       },
       {
         label: I18n.t('How do I use the Collaborations Index Page?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12842-4152708106'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Collaborations-Index-Page/ta-p/922'
       },
       {
         label: I18n.t('How do I create a Google Drive collaboration as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12799-4152719674'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Google-Drive-collaboration-as-an-instructor/ta-p/632'
       },
       {
         label: I18n.t('How do I create a Microsoft Office 365 collaboration as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12806-4152719676'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-Microsoft-Office-365-collaboration-as-an/ta-p/629'
       }
     ]}
   >

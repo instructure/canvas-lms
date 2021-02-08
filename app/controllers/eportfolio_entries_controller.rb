@@ -23,6 +23,9 @@ class EportfolioEntriesController < ApplicationController
   before_action :rce_js_env
   before_action :get_eportfolio
 
+  class EportfolioNotFound < StandardError; end
+  rescue_from EportfolioNotFound, with: :rescue_expected_error_type
+
   def create
     if authorized_action(@portfolio, @current_user, :update)
       @category = @portfolio.eportfolio_categories.find(params[:eportfolio_entry].delete(:eportfolio_category_id))
@@ -110,11 +113,15 @@ class EportfolioEntriesController < ApplicationController
       @entry = @portfolio.eportfolio_entries.find(params[:entry_id])
       @category = @entry.eportfolio_category
       @attachment = @portfolio.user.all_attachments.shard(@portfolio.user).where(uuid: params[:attachment_id]).first
+      unless @attachment.present?
+        return render json: { message: t('errors.not_found', "Not Found") }, status: :not_found
+      end
       # @entry.check_for_matching_attachment_id
       begin
         redirect_to file_download_url(@attachment, { :verifier => @attachment.uuid })
-      rescue
-        raise t('errors.not_found', "Not Found")
+      rescue StandardError => e
+        Canvas::Errors.capture_exception(:eportfolios, e, :warn)
+        raise EportfolioNotFound, t('errors.not_found', "Not Found")
       end
     end
   end

@@ -16,19 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {DragDropContext, DropTarget} from 'react-dnd'
-import ReactDnDHTML5Backend from 'react-dnd-html5-backend'
+import {DropTarget} from 'react-dnd'
 import compose from '../shared/helpers/compose'
 import ItemTypes from './Types'
 import DashboardCardBox from './DashboardCardBox'
+import DefaultDragDropContext from './DefaultDragDropContext'
 
 const cardTarget = {
   drop() {}
 }
 
-const getDroppableDashboardCardBox = (backend = ReactDnDHTML5Backend) =>
+const getDroppableDashboardCardBox = (withDragDropContext = DefaultDragDropContext) =>
   compose(
-    DragDropContext(backend),
+    withDragDropContext,
     DropTarget(ItemTypes.CARD, cardTarget, connect => ({
       connectDropTarget: connect.dropTarget()
     }))

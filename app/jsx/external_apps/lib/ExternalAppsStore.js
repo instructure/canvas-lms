@@ -85,6 +85,16 @@ store.fetchWithDetails = function(tool) {
   }
 }
 
+store.togglePlacement = function({tool, placement, onSuccess = () => {}, onError = () => {}}) {
+  $.ajax({
+    url: `/api/v1/${tool.context.toLowerCase()}s/${tool.context_id}/external_tools/${tool.app_id}`,
+    data: {[placement]: {enabled: tool[placement].enabled}},
+    type: 'PUT',
+    success: onSuccess.bind(this),
+    error: onError.bind(this)
+  })
+}
+
 store.save = function(configurationType, data, success, error) {
   configurationType = configurationType || 'manual'
 
@@ -105,6 +115,19 @@ store.save = function(configurationType, data, success, error) {
     url,
     contentType: 'application/json',
     data: JSON.stringify({external_tool: params}),
+    type: method,
+    success: success.bind(this),
+    error: error.bind(this)
+  })
+}
+
+store.setAsFavorite = function(tool, isFavorite, success, error) {
+  const url = '/api/v1' + ENV.CONTEXT_BASE_URL + '/external_tools/rce_favorites/' + tool.app_id
+  const method = isFavorite ? 'POST' : 'DELETE'
+
+  $.ajax({
+    url,
+    contentType: 'application/json',
     type: method,
     success: success.bind(this),
     error: error.bind(this)

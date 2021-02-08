@@ -23,6 +23,7 @@ import $ from 'jquery'
 import 'jquery.disableWhileLoading'
 import fakeENV from 'helpers/fakeENV'
 import {ltiState} from '../../../../public/javascripts/lti/post_message/handleLtiPostMessage'
+import * as ConfirmDeleteModal from 'jsx/wiki_pages/components/ConfirmDeleteModal'
 
 const indexMenuLtiTool = {
   id: '18',
@@ -32,6 +33,58 @@ const indexMenuLtiTool = {
   icon_url: 'http://localhost:3001/icon.png',
   canvas_icon_class: null
 }
+
+let prevHtml
+
+QUnit.module('WikiPageIndexView:confirmDeletePages not checked', {
+  setup() {
+    prevHtml = document.body.innerHTML
+    fakeENV.setup()
+    this.model = new WikiPage({page_id: '42'})
+    this.collection = new WikiPageCollection([this.model])
+    this.view = new WikiPageIndexView({
+      collection: this.collection
+    })
+  },
+
+  teardown() {
+    document.body.innerHTML = prevHtml
+    fakeENV.teardown()
+  }
+})
+
+test('does not call showConfirmDelete when no pages are checked', function() {
+  const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
+  this.view.confirmDeletePages(null)
+  notOk(showConfirmDelete.called)
+})
+
+QUnit.module('WikiPageIndexView:confirmDeletePages checked', {
+  setup() {
+    prevHtml = document.body.innerHTML
+    fakeENV.setup()
+    this.model = new WikiPage({page_id: '42', title: 'page 42'})
+    this.collection = new WikiPageCollection([this.model])
+    this.view = new WikiPageIndexView({
+      collection: this.collection,
+      selectedPages: {'42': this.model}
+    })
+  },
+
+  teardown() {
+    document.body.innerHTML = prevHtml
+    fakeENV.teardown()
+  }
+})
+test('calls showConfirmDelete when pages are checked', function() {
+  const showConfirmDelete = sandbox.spy(ConfirmDeleteModal, 'showConfirmDelete')
+  this.view.confirmDeletePages(null)
+  ok(
+    showConfirmDelete.firstCall.calledWithMatch({
+      pageTitles: ['page 42']
+    })
+  )
+})
 
 QUnit.module('WikiPageIndexView:direct_share', {
   setup() {

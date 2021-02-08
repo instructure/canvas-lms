@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,10 +18,27 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 class MasterCourses::MasterMigration < ActiveRecord::Base
+  # represents and handles a blueprint sync event
+  # a sync is considered successful when all associated courses have the same data
+  # (barring any "exceptions" i.e. modifications on the associated course that we'll leave alone)
+
+  # back in ye olden day this would have involved copying the entire course and re-importing it everywhere
+  # which obviously would (and did) take forever
+  # so our semi-clever solution is to tell the exporter to only export content from the blueprint (:selective export)
+  # that may have changed since the last sync
+
+  # of course that doesn't really help much if you just added a new associated course that wasn't around for the last sync
+  # so syncs will try to bring those up-to-date separately by exporting the entire course just for those new associations (:full exports)
+
+  # once the exports are generated, we'll queue a bunch of jobs to import the exported content into
+  # all the associated courses in parallel
+  # and eventually the last import job will mark the sync as complete or failed
+
   belongs_to :master_template, :class_name => "MasterCourses::MasterTemplate"
   belongs_to :root_account, :class_name => 'Account'
   belongs_to :user
 
+  # keeps track of the import status for all associated courses
   has_many :migration_results, :class_name => "MasterCourses::MigrationResult"
 
   before_create :set_root_account_id
@@ -49,10 +68,9 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
       master_template.lock!
       if master_template.active_migration_running?
         if opts[:retry_later]
-          self.send_later_enqueue_args(:start_new_migration!,
-            {:singleton => "retry_start_master_migration_#{master_template.global_id}",
-              :run_at => 10.minutes.from_now, :max_attempts => 1},
-            master_template, user, opts)
+          delay(singleton: "retry_start_master_migration_#{master_template.global_id}",
+              run_at: 10.minutes.from_now).
+              start_new_migration!(master_template, user, opts)
         else
           raise MigrationRunningError.new("cannot start new migration while another one is running")
         end
@@ -104,7 +122,7 @@ class MasterCourses::MasterMigration < ActiveRecord::Base
     }
 
     self.update_attribute(:workflow_state, 'queued')
-    self.send_later_enqueue_args(:perform_exports, queue_opts)
+    delay(**queue_opts).perform_exports
   end
 
   def fail_export_with_error!(exception_or_info)

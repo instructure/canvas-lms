@@ -23,6 +23,7 @@ const RichContentEditor = {
   initSidebar() {},
   callOnRCE(textarea, opName) {
     if (opName === 'get_code') return textarea.innerHTML
-  }
+  },
+  closeRCE() {}
 }
 export default RichContentEditor

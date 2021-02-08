@@ -1,0 +1,57 @@
+{
+  "name": "discussion_entry_submitted",
+  "definition": "The event is emitted anytime a user or system replies to a graded discussion topic.",
+  "trigger": "Triggered when a user replies to a graded discussion topic or discussion thread.",
+  "schema": {
+    "assignment_id": "The Canvas id of the assignment if the discussion topic is graded.",
+    "created_at": "The time at which this entry was created.",
+    "discussion_entry_id": "The Canvas id of the newly added entry.",
+    "discussion_topic_id": "The Canvas id of the topic the entry was added to.",
+    "parent_discussion_entry_id": "If this was a reply, the Canvas id of the parent entry.",
+    "submission_id": "The Canvas id of the submission if the discussion topic is graded.",
+    "text": "The text of the post. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "user_id": "The Canvas id of the user being that created the entry."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "StudentEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "event_name": "discussion_entry_submitted",
+          "event_time": "2019-11-01T19:11:04.081Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/8720/discussion_topics/189",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": null,
+          "url": "https://oxana.instructure.com/api/v1/courses/26612/discussion_topics/189/entries/59/replies",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000023481",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "assignment_id": "649",
+          "created_at": "2019-07-03T23:12:34Z",
+          "discussion_entry_id": "92",
+          "discussion_topic_id": "189",
+          "parent_discussion_entry_id": "59",
+          "submission_id": "567",
+          "text": "<p>test this discussion</p>",
+          "user_id": "23481"
+        }
+      }
+    }
+  ]
+}

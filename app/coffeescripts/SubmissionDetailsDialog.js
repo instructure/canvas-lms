@@ -21,7 +21,7 @@ import submissionDetailsDialog from 'jst/SubmissionDetailsDialog'
 import I18n from 'i18n!submission_details_dialog'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import originalityReportSubmissionKey from 'jsx/gradebook/shared/helpers/originalityReportSubmissionKey'
-import {extractDataForTurnitin} from './gradebook/Turnitin'
+import {extractDataForTurnitin} from 'jsx/gradebook/Turnitin'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import 'jst/_submission_detail' // a partial needed by the SubmissionDetailsDialog template
 import 'jst/_turnitinScore' // a partial needed by the submission_detail partial

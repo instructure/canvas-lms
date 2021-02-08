@@ -23,14 +23,14 @@ import * as actions from '../actions'
 import {onSuccessOnly} from '../reducer-helpers'
 
 const DEFAULT_SCORING_RANGES = Immutable.fromJS([
-  {upper_bound: null, lower_bound: '0.7', assignment_sets: [{assignment_set_associations: []}]},
-  {upper_bound: '0.7', lower_bound: '0.4', assignment_sets: [{assignment_set_associations: []}]},
-  {upper_bound: '0.4', lower_bound: null, assignment_sets: [{assignment_set_associations: []}]}
+  {upper_bound: null, lower_bound: 0.7, assignment_sets: [{assignment_set_associations: []}]},
+  {upper_bound: 0.7, lower_bound: 0.4, assignment_sets: [{assignment_set_associations: []}]},
+  {upper_bound: 0.4, lower_bound: null, assignment_sets: [{assignment_set_associations: []}]}
 ])
 
 const emptyAssignmentSet = () => Map({assignment_set_associations: List()})
 
-const identity = (dflt = '') => (s, _a) => s || dflt
+const identity = (dflt = '') => (s, _a) => (s == null ? dflt : s)
 
 const scoringRangesReducer = (state, action) => {
   if (state === undefined) return List()

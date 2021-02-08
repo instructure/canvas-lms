@@ -18,112 +18,115 @@
 # Note: Indented gems are meant to indicate transient dependencies of parent gems
 
 if CANVAS_RAILS5_2
-  gem 'rails', '5.2.4.3'
+  gem 'rails', '5.2.4.4'
     gem 'loofah', '2.3.0'
-    gem 'sprockets', '3.7.2' # 4.0 requires ruby 2.5
+    gem 'sprockets', '4.0.2'
 else
-  gem 'rails', '6.0.3.1'
+  gem 'rails', '6.0.3.4'
 end
 
-gem 'academic_benchmarks', '0.0.11', require: false
+gem 'academic_benchmarks', '1.0.1', require: false
 gem 'active_model-better_errors', '1.6.7', require: 'active_model/better_errors'
 gem 'active_model_serializers', '0.9.0alpha1',
   github: 'rails-api/active_model_serializers', ref: '61882e1e4127facfe92e49057aec71edbe981829'
 gem 'addressable', '2.7.0', require: false
-gem 'after_transaction_commit', '2.0.0'
-gem 'authlogic', '5.0.4'
+gem 'after_transaction_commit', '2.2.1'
+gem 'authlogic', '6.2.0'
   gem 'scrypt', '3.0.7'
-gem 'aws-sdk-core', '3.90.1', require: false
-  gem 'aws-partitions', '1.279.0', require: false
-gem 'aws-sdk-dynamodb', '1.44.0'
-gem 'aws-sdk-kinesis', '1.20.0', require: false
-gem 'aws-sdk-s3', '1.60.2', require: false
-gem 'aws-sdk-sns', '1.21.0', require: false
-gem 'aws-sdk-sqs', '1.23.1', require: false
-gem 'aws-sdk-kms', '1.29.0', require: false
-gem 'aws-sigv4', '1.1.1', require: false
+gem 'aws-sdk-core', '3.109.2', require: false
+  gem 'aws-partitions', '1.393.0', require: false
+gem 'aws-sdk-dynamodb', '1.57.0'
+gem 'aws-sdk-kinesis', '1.30.0', require: false
+gem 'aws-sdk-s3', '1.84.1', require: false
+gem 'aws-sdk-sns', '1.36.0', require: false
+gem 'aws-sdk-sqs', '1.34.0', require: false
+gem 'aws-sdk-kms', '1.39.0', require: false
+gem 'aws-sigv4', '1.2.2', require: false
 gem 'barby', '0.6.8', require: false
   gem 'rqrcode', '1.1.2', require: false
-  gem 'chunky_png', '1.3.11', require: false
-gem 'bcrypt', '3.1.13'
+  gem 'chunky_png', '1.3.14', require: false
+gem 'bcrypt', '3.1.16'
 gem 'brotli', '0.2.3', require: false
-gem 'browser', '4.0.0', require: false
+gem 'browser', '5.1.0', require: false
 gem 'builder', '3.2.4'
 gem 'canvas_connect', '0.3.11'
   gem 'adobe_connect', '1.0.8', require: false
 gem 'canvas_webex', '0.17'
 gem 'crocodoc-ruby', '0.0.1', require: false
-gem 'ddtrace', '0.33.1', require: false
+gem 'ddtrace', '0.42.0', require: false
 gem 'encrypted_cookie_store-instructure', '1.2.10', require: 'encrypted_cookie_store'
 gem 'folio-pagination', '0.0.12', require: 'folio/rails'
-gem 'ffi', '1.12.2', require: false
-gem 'gepub', '1.0.11'
+gem 'ffi', '1.13.1', require: false
+gem 'gepub', '1.0.11', github: 'skoji/gepub', ref: '04c8c2542f9fa3f8d99652f9058d77c8a23c1fd9'
 gem 'graphql', '1.9.17'
-gem 'graphql-batch', '0.4.2'
+gem 'graphql-batch', '0.4.3'
 gem 'hashery', '2.1.2', require: false
 gem 'highline', '2.0.3', require: false
-gem 'httparty', '0.18.0'
-gem 'i18n', '1.8.2'
+gem 'httparty', '0.18.1'
+gem 'i18n', '1.8.5'
 gem 'i18nliner', '0.1.2'
   gem 'ruby2ruby', '2.4.4', require: false
-  gem 'ruby_parser', '3.14.2', require: false
-gem 'icalendar', '2.6.1', require: false
+  gem 'ruby_parser', '3.15.0', require: false
+gem 'icalendar', '2.7.0', require: false
 gem 'imperium', '0.5.2', require: false
 gem 'ims-lti', '2.3.0', require: 'ims'
 gem 'inst_statsd', '2.1.6'
   gem 'statsd-ruby', '1.4.0', require: false
   gem 'aroi', '0.0.7', require: false
-  gem 'dogstatsd-ruby', '4.7.0'
-gem 'inst-jobs', '0.15.21'
-  gem 'fugit', '1.3.3', require: false
-    gem 'et-orbi', '1.2.2', require: false
-gem 'inst-jobs-autoscaling', '1.0.5'
-  gem 'aws-sdk-autoscaling', '1.32.0', require: false
-gem 'inst-jobs-statsd', '1.4.0'
-gem 'json', '2.3.0'
-gem 'json_schemer', '0.2.10'
-gem 'json-jwt', '1.11.0', require: false
+  gem 'dogstatsd-ruby', '4.8.2'
+gem 'inst-jobs', '2.2.0'
+  gem 'fugit', '1.4.0', require: false
+    gem 'et-orbi', '1.2.4', require: false
+gem 'inst-jobs-autoscaling', '2.1.0'
+  gem 'aws-sdk-autoscaling', '1.49.0', require: false
+gem 'inst-jobs-statsd', '2.1.0'
+# if updating json gem it will need to be hotfixed because if a newer version of
+# the json gem is installed, it will always use that one even before bundler
+# gets activated. Updating the gem in it's own commit will make this easier.
+gem 'json', '2.5.1'
+gem 'json_schemer', '0.2.16', github: 'robotdana/json_schemer', ref: '0d2ac359a87964f74c07a14cafeb98cfcae4e29f'
+gem 'json-jwt', '1.13.0', require: false
 gem 'link_header', '0.0.8'
 gem 'mail', '2.7.1', require: false
   gem 'mini_mime', '1.0.2', require: false
-gem 'marginalia', '1.8.0', require: false
+gem 'marginalia', '1.9.0', require: false
 gem 'mime-types', '3.3.1'
-gem 'mini_magick', '4.10.1'
-gem 'multi_json', '1.14.1'
-gem 'net-ldap', '0.16.2', require: false
-gem 'nokogiri', '1.10.9', require: false
+gem 'mini_magick', '4.11.0'
+gem 'multi_json', '1.15.0'
+gem 'net-ldap', '0.16.3', require: false
+gem 'nokogiri', '1.10.10', require: false
 gem 'oauth', '0.5.4', require: false
 gem 'oauth2', '1.4.4', require: false
-gem 'oj', '3.10.5'
-gem 'parallel', '1.19.1', require: false
+gem 'oj', '3.10.16'
+gem 'parallel', '1.20.0', require: false
   gem 'ruby-progressbar', '1.10.1', require: false # used to show progress of S3Uploader
 gem 'prawn-rails', '1.3.0'
 gem 'rack', '2.2.3'
+gem 'rack-brotli', '1.0.0'
 gem 'rack-test', '1.1.0'
 gem 'rake', '13.0.1'
 gem 'rails-observers', '0.1.5'
 gem 'ratom-nokogiri', '0.10.8', require: false
-gem 'rdiscount', '2.2.0.1', require: false
 gem 'redcarpet', '3.5.0', require: false
 gem 'retriable', '1.4.1'
 gem 'ritex', '1.0.1', require: false
-gem 'rotp', '5.1.0', require: false
+gem 'rotp', '6.2.0', require: false
 gem 'ruby-duration', '3.2.3', require: false
 gem 'rubycas-client', '2.3.9', require: false
-gem 'rubyzip', '2.2.0', require: 'zip'
+gem 'rubyzip', '2.3.0', require: 'zip'
 gem 'safe_yaml', '1.0.5', require: false
-gem 'saml2', '3.0.8'
-  gem 'nokogiri-xmlsec-instructure', '0.9.6', require: false
+gem 'saml2', '3.0.9'
+  gem 'nokogiri-xmlsec-instructure', '0.9.7', require: false
 gem 'sanitize', '2.1.1', require: false
 gem 'sentry-raven', '2.13.0', require: false
-gem 'shackles', '1.4.2'
+gem 'guardrail', '2.0.1'
 gem 'simple_oauth', '0.3.1', require: false
-gem 'switchman', '1.14.10'
+gem 'switchman', '2.0.3'
   gem 'open4', '1.3.4', require: false
-gem 'switchman-inst-jobs', '1.4.1'
+gem 'switchman-inst-jobs', '3.1.2'
 gem 'twilio-ruby', '5.36.0', require: false
-gem 'tzinfo', '1.2.5'
-gem 'vault', '0.13.0', require: false
+gem 'tzinfo', '1.2.7'
+gem 'vault', '0.15.0', require: false
 gem 'vericite_api', '1.5.3'
 gem 'will_paginate', '3.3.0', require: false # required for folio-pagination
 
@@ -153,7 +156,6 @@ path 'gems' do
   gem 'canvas_text_helper'
   gem 'canvas_time'
   gem 'canvas_unzip'
-  gem 'csv_diff'
   gem 'diigo'
   gem 'event_stream'
   gem 'google_drive'
@@ -171,3 +173,6 @@ path 'gems' do
   gem 'utf8_cleaner'
   gem 'workflow'
 end
+
+gem 'csv_diff', path: 'gems'
+  gem 'sqlite3', '1.4.2'

@@ -18,31 +18,28 @@
 
 import handler from '../requestFullWindowLaunch'
 
-const requestFullWindowLaunchMessage = {
-  messageType: 'requestFullWindowLaunch',
-  data: 'http://localhost/test'
-}
-
 describe('requestFullWindowLaunch', () => {
-  const origin = 'http://localhost'
   const {assign} = window.location
 
-  global.URL = jest.fn().mockImplementation(() => ({
-    searchParams: {append: jest.fn()}
-  }))
-
-  beforeAll(() => {
+  beforeEach(() => {
     delete window.location
-    window.location = {assign: jest.fn()}
+    window.location = {assign: jest.fn(), origin: 'http://localhost'}
   })
 
-  afterAll(() => {
+  afterEach(() => {
     window.location.assign = assign
   })
 
   it('opens new window on requestFullWindowLaunch', () => {
     ENV.context_asset_string = 'account_1'
-    handler(requestFullWindowLaunchMessage)
+    handler('http://localhost/test')
     expect(window.location.assign).toHaveBeenCalled()
+  })
+
+  it('pulls out client_id if provided', () => {
+    ENV.context_asset_string = 'account_1'
+    handler('http://localhost/test?client_id=hello')
+    const launch_url = new URL(window.location.assign.mock.calls[0][0])
+    expect(launch_url.searchParams.get('client_id')).toEqual('hello')
   })
 })

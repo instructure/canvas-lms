@@ -44,6 +44,7 @@ gulp.task('rev', () => {
     'rfc822.js',
     'synopsis.js',
     'zones.js',
+    'ca_ES.js',
     'de_DE.js',
     'fr_FR.js',
     'fr_CA.js',
@@ -74,7 +75,10 @@ gulp.task('rev', () => {
     })
   ).pipe(gulpPlugins.rev())
 
-  if (process.env.NODE_ENV === 'production' || process.env.RAILS_ENV === 'production') {
+  if (
+    process.env.JS_BUILD_NO_UGLIFY !== '1' &&
+    (process.env.NODE_ENV === 'production' || process.env.RAILS_ENV === 'production')
+  ) {
     const jsFilter = gulpPlugins.filter('**/*.js', {restore: true})
     stream = stream
       .pipe(jsFilter)
@@ -91,8 +95,6 @@ gulp.task('rev', () => {
 })
 
 gulp.task('watch', () => gulp.watch(STUFF_TO_REV, ['rev']))
-
-gulp.task('default', ['rev', 'watch'])
 
 function gulpTimezonePlugin() {
   const through = require('through2')

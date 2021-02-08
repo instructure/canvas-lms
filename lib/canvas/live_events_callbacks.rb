@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -49,7 +51,7 @@ module Canvas::LiveEventsCallbacks
     when AssignmentOverride
       Canvas::LiveEvents.assignment_override_created(obj)
     when Submission
-      Canvas::LiveEvents.submission_created(obj)
+      Canvas::LiveEvents.submission_created(obj) if obj.just_submitted?
     when SubmissionComment
       Canvas::LiveEvents.submission_comment_created(obj)
     when UserAccountAssociation
@@ -81,6 +83,10 @@ module Canvas::LiveEventsCallbacks
       Canvas::LiveEvents.learning_outcome_group_created(obj)
     when SisBatch
       Canvas::LiveEvents.sis_batch_created(obj)
+    when OutcomeProficiency
+      Canvas::LiveEvents.outcome_proficiency_created(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_created(obj)
     end
   end
 
@@ -155,7 +161,7 @@ module Canvas::LiveEventsCallbacks
         overridden_requirements_met = changes["requirements_met"] && {obj.id => changes["requirements_met"].last&.map(&:symbolize_keys)}
         if CourseProgress.new(obj.context_module.course, obj.user, read_only: true,
             overridden_requirements_met: overridden_requirements_met).completed?
-          Canvas::LiveEvents.course_completed(obj)
+          Canvas::LiveEvents.course_completed(obj, overridden_requirements_met: overridden_requirements_met)
         else
           Canvas::LiveEvents.course_progress(obj)
         end
@@ -177,6 +183,10 @@ module Canvas::LiveEventsCallbacks
       if changes[:workflow_state].present?
         Canvas::LiveEvents.sis_batch_updated(obj)
       end
+    when OutcomeProficiency
+      Canvas::LiveEvents.outcome_proficiency_updated(obj)
+    when OutcomeCalculationMethod
+      Canvas::LiveEvents.outcome_calculation_method_updated(obj)
     end
   end
 

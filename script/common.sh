@@ -90,12 +90,12 @@ function checkout_master_canvas {
 
 function rebase_canvas {
   echo_console_and_log "  Rebasing canvas-lms on HEAD ..."
-  git pull --rebase >>"$LOG" 2>&1
+  git pull --rebase origin master >>"$LOG" 2>&1
 }
 
 function bundle_install {
   echo_console_and_log "  Installing gems (bundle install) ..."
-  rm Gemfile.lock* >/dev/null 2>&1
+  rm -f Gemfile.lock* >/dev/null 2>&1
   bundle install >>"$LOG" 2>&1
 }
 

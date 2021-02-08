@@ -1,0 +1,28 @@
+<%= content[:page_title] %>
+==============
+<% for @payload in content[:event_payloads] %>
+<h2 id="<%= @payload.fetch('name') %>"><%= @payload.fetch('name') %></h2>
+
+**Definition:** <%= @payload.fetch("definition") %>
+
+<% if @payload.fetch("trigger", nil).present? %>**Trigger:** <%= @payload.fetch("trigger") %><% end %>
+
+<% for @example in @payload.fetch('examples', []) %>
+<% if @example.fetch('description', nil).present?  %>**Description:** <%= @example.fetch('description') %><% end %>
+### Payload Example:
+
+```json
+<%= JSON.pretty_generate(@example.fetch('payload')) %>
+```
+
+<% end %>
+
+<% unless @payload.fetch('schema').empty? %>
+### Event Body Schema
+
+| Field | Description |
+|-|-|
+<% for @event, @descriptions in @payload.fetch('schema') %><% for @field, @description in @descriptions %>| **<%= @event %>.<%= @field %>** | <%= @description.gsub("\n", " - ") %> |
+<% end %><% end %>
+<% end %>
+<% end %>

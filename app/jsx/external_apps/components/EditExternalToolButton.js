@@ -37,6 +37,7 @@ export default class EditExternalToolButton extends React.Component {
     tool: this.props.tool,
     modalIsOpen: false
   }
+  editButton = React.createRef()
 
   setContextExternalToolState = data => {
     const tool = Object.assign(data, this.props.tool)
@@ -75,7 +76,7 @@ export default class EditExternalToolButton extends React.Component {
       this.closeModal()
       // Unsure why this is necessary, but the focus is lost if not wrapped in a timeout
       setTimeout(() => {
-        this.refs.editButton.focus()
+        this.editButton.current.focus()
       }, 300)
 
       $.flashMessage(I18n.t('The app was updated successfully'))
@@ -155,7 +156,7 @@ export default class EditExternalToolButton extends React.Component {
         <li role="presentation" className="EditExternalToolButton">
           <a
             href="#"
-            ref="editButton"
+            ref={this.editButton}
             tabIndex="-1"
             role="menuitem"
             aria-label={editAriaLabel}

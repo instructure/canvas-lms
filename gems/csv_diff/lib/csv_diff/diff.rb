@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -34,16 +36,17 @@ module CsvDiff
       row_current = current_csv.shift
 
       check_headers(previous_csv, current_csv)
-      setup_output(current_csv.headers)
+      canonical_headers = current_csv.headers.compact
+      setup_output(canonical_headers)
 
       @db.transaction do
-        insert("previous", row_previous, previous_csv, current_csv.headers) if row_previous
-        insert("current", row_current, current_csv, nil) if row_current
+        insert("previous", row_previous, previous_csv, canonical_headers) if row_previous
+        insert("current", row_current, current_csv, canonical_headers) if row_current
       end
 
       find_updates
       if options[:deletes]
-        find_deletes(current_csv.headers, options[:deletes])
+        find_deletes(canonical_headers, options[:deletes])
       end
 
       @output.close
@@ -62,11 +65,7 @@ module CsvDiff
         # We need to turn this row into an array of known order, so that fields
         # are guaranteed to be in the same order from both csvs.
         key = Marshal.dump(row.fields(*@key_fields))
-        fields = if header_order
-          row.fields(*header_order)
-        else
-          row.fields
-        end
+        fields = row.fields(*header_order)
         data = Marshal.dump(fields)
         @db.execute("insert or replace into #{table} (key, data) values (?, ?)", [key, data])
       }
@@ -107,7 +106,7 @@ module CsvDiff
         raise(CsvDiff::Failure, "CSVs given must have headers enabled, pass :headers => true to CSV constructor")
       end
 
-      if a.headers.sort != b.headers.sort
+      if a.headers.compact.sort != b.headers.compact.sort
         raise(CsvDiff::Failure, "CSV headers do not match, cannot diff")
       end
 

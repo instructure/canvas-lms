@@ -36,8 +36,8 @@ QUnit.module('screenreader_gradebook', {
 })
 
 test('fetches enrollments', function() {
-  equal(this.controller.get('enrollments').objectAt(0).user.name, 'Bob')
-  equal(this.controller.get('enrollments').objectAt(1).user.name, 'Fred')
+  equal(this.controller.get('enrollments').objectAt(0).user.name, 'Bob Barnes')
+  equal(this.controller.get('enrollments').objectAt(1).user.name, 'Fred Flint')
 })
 
 test('fetches sections', function() {

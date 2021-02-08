@@ -59,7 +59,7 @@
   <ul>
   <% @rubric_associations.each do |association| %>
     <% rubric = association.rubric %>
-    <li>
+    <li class="hover-container">
       <a href="<%= context_url(@context, :context_rubric_url, association.rubric_id) %>" class="title"><%= rubric.title %></a>
       <span class="links">
         <% if can_do(rubric, @current_user, :update) %>

@@ -20,12 +20,13 @@ import {connect} from 'react-redux'
 import {themeable} from '@instructure/ui-themeable'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {ScreenReaderContent, AccessibleContent} from '@instructure/ui-a11y'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {Portal} from '@instructure/ui-portal'
 import {IconPlusLine, IconAlertsLine, IconGradebookLine} from '@instructure/ui-icons'
-import {Popover, Tray} from '@instructure/ui-overlays'
+import {Popover} from '@instructure/ui-popover'
+import {Tray} from '@instructure/ui-tray'
 import PropTypes from 'prop-types'
-import {Badge} from '@instructure/ui-elements'
+import {Badge} from '@instructure/ui-badge'
 import {momentObj} from 'react-moment-proptypes'
 import UpdateItemTray from '../UpdateItemTray'
 import Opportunities from '../Opportunities'
@@ -48,7 +49,7 @@ import {
 } from '../../actions'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 import formatMessage from '../../format-message'
 import {notifier} from '../../dynamic-ui'
 import {getFirstLoadedMoment} from '../../utilities/dateUtils'
@@ -138,7 +139,7 @@ export class PlannerHeader extends Component {
     this.props.getInitialOpportunities()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     const [newOpportunities, dismissedOpportunities] = this.segregateOpportunities(
       nextProps.opportunities
     )
@@ -153,7 +154,7 @@ export class PlannerHeader extends Component {
     this.setState({newOpportunities, dismissedOpportunities})
   }
 
-  componentWillUpdate() {
+  UNSAFE_componentWillUpdate() {
     this.props.preTriggerDynamicUiUpdates()
   }
 
@@ -378,7 +379,7 @@ export class PlannerHeader extends Component {
   }
 
   render() {
-    const verticalRoom = this.getPopupVerticalRoom()
+    let verticalRoom = this.getPopupVerticalRoom()
     let buttonMarginRight = 'medium'
     if (this.props.responsiveSize === 'medium') {
       buttonMarginRight = 'small'
@@ -387,8 +388,22 @@ export class PlannerHeader extends Component {
     }
     const buttonMargin = `0 ${buttonMarginRight} 0 0`
 
+    let withArrow = true
+    let positionTarget = null
+    let placement = 'bottom end'
+    let offsetY = 0
+    if (window.innerWidth < 400) {
+      // there's not enough room to position the popover with an arrow, so turn off the arrow,
+      // cover up the header, and center the popover in the window instead
+      withArrow = false
+      positionTarget = document.getElementById('dashboard_header_container')
+      placement = 'bottom center'
+      offsetY = -positionTarget.offsetHeight
+      verticalRoom += positionTarget.offsetHeight
+    }
+
     return (
-      <div className={`${styles.root} PlannerHeader`}>
+      <div className={`${styles.root} PlannerHeader`} data-testid="PlannerHeader">
         {this.renderToday(buttonMargin)}
         <Button
           variant="icon"
@@ -410,11 +425,14 @@ export class PlannerHeader extends Component {
           <ScreenReaderContent>{formatMessage('Show My Grades')}</ScreenReaderContent>
         </Button>
         <Popover
-          onDismiss={this.closeOpportunitiesDropdown}
-          show={this.state.opportunitiesOpen}
+          onHideContent={this.closeOpportunitiesDropdown}
+          isShowingContent={this.state.opportunitiesOpen}
           on="click"
+          withArrow={withArrow}
+          positionTarget={positionTarget}
           constrain="window"
-          placement="bottom end"
+          placement={placement}
+          offsetY={offsetY}
         >
           <Popover.Trigger>{this.renderOpportunitiesButton(buttonMargin)}</Popover.Trigger>
           <Popover.Content>
@@ -502,7 +520,4 @@ const mapDispatchToProps = {
   scrollToNewActivity
 }
 
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(NotifierPlannerHeader)
+export default connect(mapStateToProps, mapDispatchToProps)(NotifierPlannerHeader)

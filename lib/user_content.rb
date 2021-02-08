@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,11 @@ require 'ritex'
 require 'securerandom'
 
 module UserContent
-  def self.escape(str, current_host = nil)
+  def self.escape(
+    str,
+    current_host = nil,
+    use_updated_math_rendering = Account.site_admin.feature_enabled?(:new_math_equation_handling)
+  )
     html = Nokogiri::HTML::DocumentFragment.parse(str)
     find_user_content(html) do |obj, uc|
       uuid = SecureRandom.uuid
@@ -55,13 +61,23 @@ module UserContent
 
     find_equation_images(html) do |node|
       equation = node['data-equation-content'] || node['alt']
-      mathml = UserContent.latex_to_mathml(equation)
-      next if mathml.blank?
+      next if equation.blank?
 
-      mathml_span = Nokogiri::HTML::DocumentFragment.parse(
-        "<span class=\"hidden-readable\">#{mathml}</span>"
-      )
-      node.add_next_sibling(mathml_span)
+      # there are places in canvas (e.g. classic quizzes) that
+      # inadvertently saved the hidden-readable span, causing
+      # them to multiply everytime the entity is edited.
+      # Strip the ones that shouldn't be there before adding a new one
+      node.next_element.remove while node.next_element && node.next_element['class'] == 'hidden-readable'
+
+      if !use_updated_math_rendering
+        mathml = UserContent.latex_to_mathml(equation)
+        next if mathml.blank?
+        
+        mathml_span = Nokogiri::HTML::DocumentFragment.parse(
+          "<span class=\"hidden-readable\">#{mathml}</span>"
+        )
+        node.add_next_sibling(mathml_span)
+      end
     end
 
     html.to_s.html_safe

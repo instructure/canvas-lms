@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -57,7 +59,9 @@ module Outcomes
     #
     # Returns the resulting relation
     def order_results_for_rollup(relation)
-      relation.order(:user_id, :learning_outcome_id, :id)
+      relation.joins(:user).
+        order(User.sortable_name_order_by_clause).
+        order('users.id ASC, learning_outcome_results.learning_outcome_id ASC, learning_outcome_results.id ASC')
     end
 
     # Public: Generates a rollup of each outcome result for each user.
@@ -71,11 +75,14 @@ module Outcomes
     # excludes - (Optional) Specify additional values to exclude. "missing_user_rollups" excludes
     #            rollups for users without results.
     #
+    # context - (Optional) The current context making the function call which will be used in
+    #            determining the current_method chosen for calculating rollups.
+    #
     # Returns an Array of Rollup objects.
-    def outcome_results_rollups(results, users=[], excludes = [])
+    def outcome_results_rollups(results:, users: [], excludes: [], context: nil)
       ActiveRecord::Associations::Preloader.new.preload(results, :learning_outcome)
-      rollups = results.chunk(&:user_id).map do |_, user_results|
-        Rollup.new(user_results.first.user, rollup_user_results(user_results))
+      rollups = results.group_by(&:user_id).map do |_, user_results|
+        Rollup.new(user_results.first.user, rollup_user_results(user_results, context))
       end
       if excludes.include? 'missing_user_rollups'
         rollups
@@ -91,14 +98,15 @@ module Outcomes
     #
     # Returns a Rollup.
     def aggregate_outcome_results_rollup(results, context, stat = 'mean')
-      rollups = outcome_results_rollups(results)
+      rollups = outcome_results_rollups(results: results, context: context)
       rollup_scores = rollups.map(&:scores).flatten
       outcome_results = rollup_scores.group_by(&:outcome).values
       aggregate_results = outcome_results.map do |scores|
         scores.map{|score| Result.new(score.outcome, score.score, score.count, score.hide_points)}
       end
+      opts = {aggregate_score: true, aggregate_stat: stat, **mastery_scale_opts(context)}
       aggregate_rollups = aggregate_results.map do |result|
-        RollupScore.new(result, {aggregate_score: true, aggregate_stat: stat})
+        RollupScore.new(outcome_results: result, opts: opts)
       end
       Rollup.new(context, aggregate_rollups)
     end
@@ -110,10 +118,28 @@ module Outcomes
     #                sorted by outcome id.
     #
     # Returns an Array of RollupScore objects
-    def rollup_user_results(user_results)
+    def rollup_user_results(user_results, context = nil)
       filtered_results = user_results.select{|r| !r.score.nil?}
+      opts = mastery_scale_opts(context)
       filtered_results.group_by(&:learning_outcome_id).map do |_, outcome_results|
-        RollupScore.new(outcome_results)
+        RollupScore.new(outcome_results:outcome_results, opts: opts)
+      end
+    end
+
+    def mastery_scale_opts(context)
+      return {} unless context.is_a?(Course) && context.root_account.feature_enabled?(:account_level_mastery_scales)
+
+      @mastery_scale_opts ||= {}
+      @mastery_scale_opts[context.asset_string] ||= begin
+        method = context.resolved_outcome_calculation_method
+        mastery_scale = context.resolved_outcome_proficiency
+        {
+          calculation_method: method&.calculation_method,
+          calculation_int: method&.calculation_int,
+          points_possible: mastery_scale&.points_possible,
+          mastery_points: mastery_scale&.mastery_points,
+          ratings: mastery_scale&.ratings_hash
+        }
       end
     end
 
@@ -132,15 +158,21 @@ module Outcomes
     # Public: Gets rating percents for outcomes based on rollup
     #
     # Returns a hash of outcome id to array of rating percents
-    def rating_percents(rollups)
+    def rating_percents(rollups, context: nil)
       counts = {}
+      outcome_proficiency_ratings = if context&.root_account&.feature_enabled?(:account_level_mastery_scales)
+        context.resolved_outcome_proficiency.ratings_hash
+      end
       rollups.each do |rollup|
         rollup.scores.each do |score|
           next unless score.score
+
           outcome = score.outcome
           next unless outcome
-          ratings = outcome.rubric_criterion[:ratings]
+
+          ratings = outcome_proficiency_ratings || outcome.rubric_criterion[:ratings]
           next unless ratings
+
           counts[outcome.id] = Array.new(ratings.length, 0) unless counts[outcome.id]
           idx = ratings.find_index { |rating| rating[:points] <= score.score }
           counts[outcome.id][idx] = counts[outcome.id][idx] + 1 if idx
@@ -153,6 +185,7 @@ module Outcomes
     def to_percents(count_arr)
       total = count_arr.sum
       return count_arr if total.zero?
+
       count_arr.map {|v| (100.0 * v / total).round}
     end
 

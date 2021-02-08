@@ -21,7 +21,8 @@ import $ from 'jquery'
 import React from 'react'
 import classNames from 'classnames'
 import PropTypes from 'prop-types'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {Flex} from '@instructure/ui-flex'
 import I18n from 'i18n!edit_rubricRatings'
 
 import {ratingShape, tierShape} from './types'
@@ -56,8 +57,7 @@ export const Rating = props => {
     tierColor,
     hidePoints,
     isSummary,
-    selected,
-    width
+    selected
   } = props
 
   const shaderStyle = {backgroundColor: tierColor}
@@ -81,7 +81,6 @@ export const Rating = props => {
       onClick={assessing ? onClick : null}
       onKeyPress={e => (e.key === 'Enter' ? onClick() : null)}
       role={assessing ? 'button' : null}
-      style={{width}}
       // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
       tabIndex={assessing ? 0 : null}
     >
@@ -230,25 +229,27 @@ const Ratings = props => {
       const selected = selectedIndex === index
       const classes = classNames({
         'rating-tier': true,
-        selected
+        selected,
+        assessing
       })
 
       return (
-        <Rating
-          key={index}
-          assessing={assessing}
-          classes={classes}
-          endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
-          footer={isSummary ? footer : null}
-          onClick={() => handleClick(tier)}
-          shaderClass={getShaderClass(selected)}
-          tierColor={getTierColor(selected)}
-          hidePoints={isSummary || hidePoints}
-          isSummary={isSummary}
-          selected={selected}
-          width={`${100 / visible.length}%`}
-          {...tier}
-        />
+        <Flex.Item key={`tier-${index}`} width={`${100 / visible.length}%`}>
+          <Rating
+            key={index}
+            assessing={assessing}
+            classes={classes}
+            endOfRangePoints={useRange ? getRangePoints(tier.points, tiers[index + 1]) : null}
+            footer={isSummary ? footer : null}
+            onClick={() => handleClick(tier)}
+            shaderClass={getShaderClass(selected)}
+            tierColor={getTierColor(selected)}
+            hidePoints={isSummary || hidePoints}
+            isSummary={isSummary}
+            selected={selected}
+            {...tier}
+          />
+        </Flex.Item>
       )
     })
     .filter(v => v !== null)
@@ -270,10 +271,8 @@ const Ratings = props => {
     isSummary || _.isNil(footer) ? null : <div className="rating-all-footer">{footer}</div>
 
   return (
-    <div className="rating-all">
-      <div className={classNames('rating-tier-list', {'react-assessing': assessing})}>
-        {ratings.length > 0 || !isSummary ? ratings : defaultRating()}
-      </div>
+    <div>
+      <Flex>{ratings.length > 0 || !isSummary ? ratings : defaultRating()}</Flex>
       {fullFooter()}
     </div>
   )

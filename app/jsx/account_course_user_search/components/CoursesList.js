@@ -21,7 +21,7 @@ import {string, shape, arrayOf, func} from 'prop-types'
 import I18n from 'i18n!account_course_user_search'
 import CoursesListRow from './CoursesListRow'
 import CoursesListHeader from './CoursesListHeader'
-import {Table} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 export default function CoursesList(props) {
@@ -30,16 +30,13 @@ export default function CoursesList(props) {
   const showSISIds = !props.courses || props.courses.some(c => 'sis_course_id' in c)
 
   return (
-    <Table
-      margin="small 0"
-      caption={<ScreenReaderContent>{I18n.t('Courses')}</ScreenReaderContent>}
-    >
-      <thead>
-        <tr>
-          <th width="1" scope="col">
+    <Table margin="small 0" caption={I18n.t('Courses')}>
+      <Table.Head>
+        <Table.Row>
+          <Table.ColHeader id="header-published" width="1">
             {I18n.t('Published')}
-          </th>
-          <th>
+          </Table.ColHeader>
+          <Table.ColHeader id="header-course-name">
             <CoursesListHeader
               {...props}
               id="course_name"
@@ -47,9 +44,9 @@ export default function CoursesList(props) {
               tipDesc={I18n.t('Click to sort by name ascending')}
               tipAsc={I18n.t('Click to sort by name descending')}
             />
-          </th>
+          </Table.ColHeader>
           {showSISIds && (
-            <th style={{whiteSpace: 'nowrap'}} scope="col">
+            <Table.ColHeader id="header-sis-id">
               <CoursesListHeader
                 {...props}
                 id="sis_course_id"
@@ -57,9 +54,9 @@ export default function CoursesList(props) {
                 tipDesc={I18n.t('Click to sort by SIS ID ascending')}
                 tipAsc={I18n.t('Click to sort by SIS ID descending')}
               />
-            </th>
+            </Table.ColHeader>
           )}
-          <th scope="col">
+          <Table.ColHeader id="header-term">
             <CoursesListHeader
               {...props}
               id="term"
@@ -67,8 +64,8 @@ export default function CoursesList(props) {
               tipDesc={I18n.t('Click to sort by term ascending')}
               tipAsc={I18n.t('Click to sort by term descending')}
             />
-          </th>
-          <th scope="col">
+          </Table.ColHeader>
+          <Table.ColHeader id="header-teacher">
             <CoursesListHeader
               {...props}
               id="teacher"
@@ -76,8 +73,8 @@ export default function CoursesList(props) {
               tipDesc={I18n.t('Click to sort by teacher ascending')}
               tipAsc={I18n.t('Click to sort by teacher descending')}
             />
-          </th>
-          <th scope="col">
+          </Table.ColHeader>
+          <Table.ColHeader id="header-sub-account">
             <CoursesListHeader
               {...props}
               id="subaccount"
@@ -85,16 +82,16 @@ export default function CoursesList(props) {
               tipDesc={I18n.t('Click to sort by sub-account ascending')}
               tipAsc={I18n.t('Click to sort by sub-account descending')}
             />
-          </th>
-          <th width="1" scope="col">
+          </Table.ColHeader>
+          <Table.ColHeader id="header-students" width="1">
             {I18n.t('Students')}
-          </th>
-          <th width="1" scope="col">
+          </Table.ColHeader>
+          <Table.ColHeader id="header-option-links" width="1">
             <ScreenReaderContent>{I18n.t('Course option links')}</ScreenReaderContent>
-          </th>
-        </tr>
-      </thead>
-      <tbody data-automation="courses list">
+          </Table.ColHeader>
+        </Table.Row>
+      </Table.Head>
+      <Table.Body data-automation="courses list">
         {(props.courses || []).map(course => (
           <CoursesListRow
             key={course.id}
@@ -104,7 +101,7 @@ export default function CoursesList(props) {
             {...course}
           />
         ))}
-      </tbody>
+      </Table.Body>
     </Table>
   )
 }

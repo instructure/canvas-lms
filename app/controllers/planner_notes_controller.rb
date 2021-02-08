@@ -90,7 +90,6 @@ class PlannerNotesController < ApplicationController
   include Api::V1::PlannerNote
 
   before_action :require_user
-  before_action :require_planner_enabled
 
   # @API List planner notes
   #

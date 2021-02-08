@@ -24,7 +24,7 @@ function success(target) {
   const favorited_tooltip = I18n.t('favorited_tooltip', 'Click to remove from the courses menu.')
   const nonfavorite_tooltip = I18n.t('nonfavorited_tooltip', 'Click to add to the courses menu.')
   const notfavoritable_tooltip = I18n.t(
-    'This course cannot be added to the courses menu at this time.'
+    'This course cannot be added to the courses menu unless the course is active.'
   )
 
   if (target.hasClass('course-list-favorite-course')) {

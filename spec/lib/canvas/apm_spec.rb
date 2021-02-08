@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -87,26 +89,6 @@ describe Canvas::Apm do
     end
   end
 
-  describe "annotating with standard tags" do
-    it "adds shard and account tags to active span" do
-      Canvas::Apm.reset!
-      inject_apm_settings("sample_rate: 0.5\nhost_sample_rate: 1.0")
-      Canvas::Apm.hostname = "testbox"
-      Canvas::Apm.tracer.trace("TESTING") do |span|
-        shard = OpenStruct.new({id: 42})
-        account = OpenStruct.new({global_id: 420000042})
-        user = OpenStruct.new({global_id: 42100000421})
-        generate_request_id = "1234567890"
-        expect(Datadog.tracer.active_root_span).to eq(span)
-        Canvas::Apm.annotate_trace(shard, account, generate_request_id, user)
-        expect(span.get_tag('shard')).to eq('42')
-        expect(span.get_tag('root_account')).to eq('420000042')
-        expect(span.get_tag('request_context_id')).to eq('1234567890')
-        expect(span.get_tag('current_user')).to eq('42100000421')
-      end
-    end
-  end
-
   describe "sampling at the host level" do
     def generate_hostname
       hosttype = ["app","job"].sample
@@ -141,6 +123,10 @@ describe Canvas::Apm do
       def set_tag(key, val)
         @tags[key] = val
       end
+
+      def get_tag(key)
+        @tags[key]
+      end
     end
 
     class FakeTracer
@@ -152,6 +138,10 @@ describe Canvas::Apm do
       def trace(_name, opts = {})
         span.resource = opts.fetch(:resource, nil)
         yield span
+      end
+
+      def active_root_span
+        @span
       end
 
       def enabled
@@ -176,6 +166,22 @@ describe Canvas::Apm do
       example.run
       span.reset!
       Canvas::Apm.reset!
+    end
+
+    it "adds shard and account tags to active span" do
+      Canvas::Apm.hostname = "testbox"
+      Canvas::Apm.tracer.trace("TESTING") do |span|
+        shard = OpenStruct.new({id: 42})
+        account = OpenStruct.new({global_id: 420000042})
+        user = OpenStruct.new({global_id: 42100000421})
+        generate_request_id = "1234567890"
+        expect(tracer.active_root_span).to eq(span)
+        Canvas::Apm.annotate_trace(shard, account, generate_request_id, user)
+        expect(span.get_tag('shard')).to eq('42')
+        expect(span.get_tag('root_account')).to eq('420000042')
+        expect(span.get_tag('request_context_id')).to eq('1234567890')
+        expect(span.get_tag('current_user')).to eq('42100000421')
+      end
     end
 
     it "provides a hook to the dd tracer" do

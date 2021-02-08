@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -164,12 +166,27 @@ describe "AuthenticationProviders API", type: :request do
     end
 
     it "should error if empty post params sent" do
-      json = call_create({}, 422)
-      expect(json['errors'].first).to eq({
-        'field' => 'auth_type',
-        'message' => "invalid auth_type, must be one of #{AuthenticationProvider.valid_auth_types.join(',')}",
-        'error_code' => 'inclusion'
-      })
+      json = call_create({}, 400)
+      expect(json['errors'].first).to eq(
+        {
+          'message' =>
+            "invalid or missing auth_type '', must be one of #{
+              AuthenticationProvider.valid_auth_types.join(',')
+            }"
+        }
+      )
+    end
+
+    it 'should return bad request for invalid auth type' do
+      json = call_create({ auth_type: 'invalid' }, 400)
+      expect(json['errors'].first).to eq(
+        {
+          'message' =>
+            "invalid or missing auth_type 'invalid', must be one of #{
+              AuthenticationProvider.valid_auth_types.join(',')
+            }"
+        }
+      )
     end
 
     it "should return unauthorized error" do

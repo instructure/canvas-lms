@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -406,7 +408,7 @@ describe "security" do
 
     user_session(@student)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
-    expect(response).not_to be_success
+    expect(response).not_to be_successful
 
     user_session(@teacher)
     post "/courses/#{@course.id}/user_lists.json", params: {:user_list => "A1234567, A345678"}
@@ -1038,7 +1040,8 @@ describe "security" do
 
       it 'manage_sections' do
         course_with_teacher_logged_in(:active_all => 1)
-        remove_permission(:manage_sections, teacher_role)
+        remove_permission(:manage_sections_add, teacher_role)
+        remove_permission(:manage_sections_edit, teacher_role)
 
         get "/courses/#{@course.id}/settings"
         expect(response).to be_successful

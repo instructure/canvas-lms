@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -41,7 +43,7 @@ module OutcomesService
           body: data.to_json,
           content_type: 'application/json'
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           { export_id: json['id'], course: course }
         else
@@ -55,7 +57,7 @@ module OutcomesService
           content_export_url,
           headers_for(export_data[:course], 'content_migration.export', id: export_data[:export_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           case json['state']
           when 'completed'
@@ -76,7 +78,7 @@ module OutcomesService
           content_export_url,
           headers_for(export_data[:course], 'content_migration.export', id: export_data[:export_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
           json['data']
         else
@@ -103,9 +105,9 @@ module OutcomesService
           body: data.to_json,
           content_type: 'application/json'
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
-          { import_id: json['id'], course: course }
+          { import_id: json['id'], course: course, content_migration: content_migration }
         else
           raise "Error sending import for Outcomes Service: #{response.body}"
         end
@@ -117,22 +119,51 @@ module OutcomesService
           content_import_url,
           headers_for(import_data[:course], 'content_migration.import', id: import_data[:import_id])
         )
-        if response.code =~ /^2/
+        if response.code.to_s =~ /^2/
           json = JSON.parse(response.body)
+          json['missing_alignments']&.each do |missing_alignment|
+
+            page = lookup_artifact(missing_alignment["artifact_type"], missing_alignment["artifact_id"],
+                                   import_data[:course])
+            if page.nil?
+              import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to a page'))
+            else
+              import_data[:content_migration].add_warning(I18n.t('Unable to align some outcomes to "%{title}"',
+               { title: page.title}))
+            end
+          end
           case json['state']
           when 'completed'
             true
           when 'failed'
-            raise 'Content Import for Outcomes Service failed'
+            failure_desc = "Content Import for Outcomes Service failed"
+            add_failed_import_warning(import_data, failure_desc, json.to_s)
           else
             false
           end
         else
-          raise "Error retrieving import state for Outcomes Service: #{response.body}"
+          failure_desc = "Error retrieving import state for Outcomes Service: #{response.body}"
+          add_failed_import_warning(import_data, failure_desc)
         end
       end
 
       private
+
+      def add_failed_import_warning(data, description, additional_info = '')
+        data[:content_migration].add_warning(I18n.t('%{desc}', desc: description)) if data.key?(:content_migration)
+        if additional_info.present?
+          raise "#{description}: #{additional_info}"
+        else
+          raise description
+        end
+      end
+
+      def lookup_artifact(artifact_type, artifact_id, course)
+        case artifact_type
+        when 'canvas.page'
+          course.wiki_pages.where(id: artifact_id).first
+        end
+      end
 
       def headers_for(course, scope, overrides = {})
         {

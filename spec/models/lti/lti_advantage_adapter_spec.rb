@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -104,6 +106,14 @@ describe Lti::LtiAdvantageAdapter do
 
       it 'sets the target_link_uri in the id_token' do
         expect(params['https://purl.imsglobal.org/spec/lti/claim/target_link_uri']).to eq launch_url
+      end
+    end
+
+    context 'when the user is nil' do
+      let(:user) { nil }
+
+      it 'sets the "login_hint" to the public user ID' do
+        expect(login_message['login_hint']).to eq User.public_lti_id
       end
     end
 

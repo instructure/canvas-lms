@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -175,6 +177,13 @@ describe Api::V1::GradebookHistory do
       submission.reload
       harness.versions_json(course, versions, api_context)
       expect(versions.first.model.association(:originality_reports).loaded?).to eq true
+    end
+
+    it "handles versions without an associated 'versionable' object" do
+      version = Version.create!(versionable: submission, model: submission)
+      version.update_column(:versionable_id, nil)
+      submission.reload
+      expect { harness.versions_json(course, [version], api_context) }.not_to raise_error
     end
   end
 

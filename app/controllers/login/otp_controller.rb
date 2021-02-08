@@ -70,6 +70,12 @@ class Login::OtpController < ApplicationController
   end
 
   def create
+    # this action can be called to try to find a valid OTP by chance.  To prevent
+    # abuse, we'll make this look like an expensive operation so it would
+    # get quickly rate limited if hit repeatedly.  This should be about 1/4
+    # of a maxed out bucket.
+    increment_request_cost(150)
+
     verification_code = params[:otp_login][:verification_code]
     if Canvas.redis_enabled?
       key = "otp_used:#{@current_user.global_id}:#{verification_code}"

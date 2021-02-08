@@ -19,22 +19,24 @@ import {func} from 'prop-types'
 import I18n from 'i18n!notification_preferences'
 import NotificationPreferencesSetting from './NotificationPreferencesSetting'
 import NotificationPreferencesShape from './NotificationPreferencesShape'
-import React from 'react'
+import React, {useState} from 'react'
 
+import {Checkbox} from '@instructure/ui-checkbox'
 import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Table} from '@instructure/ui-table'
 import {Text} from '@instructure/ui-text'
 import {Tooltip} from '@instructure/ui-tooltip'
 import {TruncateText} from '@instructure/ui-truncate-text'
+import {View} from '@instructure/ui-view'
 
 const formattedCategoryNames = {
-  courseActivities: I18n.t('Course Activities'),
-  discussions: I18n.t('Discussions'),
-  conversations: I18n.t('Conversations'),
-  scheduling: I18n.t('Scheduling'),
-  groups: I18n.t('Groups'),
-  conferences: I18n.t('Conferences'),
-  alerts: I18n.t('Alerts')
+  courseActivities: () => I18n.t('Course Activities'),
+  discussions: () => I18n.t('Discussions'),
+  conversations: () => I18n.t('Conversations'),
+  scheduling: () => I18n.t('Scheduling'),
+  groups: () => I18n.t('Groups'),
+  conferences: () => I18n.t('Conferences'),
+  alerts: () => I18n.t('Alerts')
 }
 
 const notificationCategories = {
@@ -88,116 +90,170 @@ const formatCategoryKey = category => {
 }
 
 const smsNotificationCategoryDeprecated = category => {
+  return !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
+}
+
+const pushNotificationCategoryRestricted = category => {
   return (
-    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
-    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category)
+    ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.reduce_push_enabled &&
+    !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_push_categories.includes(category)
   )
+}
+
+const menuShouldBeDisabled = (category, pathType) => {
+  if (pathType === 'sms') return smsNotificationCategoryDeprecated(category)
+  else if (pathType === 'push') return pushNotificationCategoryRestricted(category)
+  else return false
 }
 
 const renderNotificationCategory = (
   notificationPreferences,
   notificationCategory,
   updatePreferenceCallback,
-  renderChannelHeader
+  renderChannelHeader,
+  sendScoresInEmails,
+  setSendScoresInEmails
 ) => (
-  <Table
-    caption={I18n.t('%{categoryName} notification preferences', {
-      categoryName: formattedCategoryNames[notificationCategory]
-    })}
-    margin="medium 0"
-    layout="fixed"
-    key={notificationCategory}
-  >
-    <Table.Head>
-      <Table.Row>
-        <Table.ColHeader id={notificationCategory} data-testid={notificationCategory} width="16rem">
-          <Text size="large">{formattedCategoryNames[notificationCategory]}</Text>
-        </Table.ColHeader>
-        {notificationPreferences.channels.map(channel => (
-          <Table.ColHeader
-            textAlign="center"
-            id={`${notificationCategory}-${channel.path}`}
-            key={`${notificationCategory}-${channel.path}`}
-            width="8rem"
-          >
-            {renderChannelHeader ? (
-              <>
-                <div style={{display: 'block'}}>
-                  <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
-                    {I18n.t('%{pathType}', {pathType: channel.pathType})}
-                  </Text>
-                </div>
-                <div style={{display: 'block'}}>
-                  <TruncateText>
-                    <Text weight="light">{channel.path}</Text>
-                  </TruncateText>
-                </div>
-              </>
-            ) : (
-              <ScreenReaderContent>
-                {I18n.t('%{pathType}', {pathType: channel.pathType})}
-                {channel.path}
-              </ScreenReaderContent>
-            )}
-          </Table.ColHeader>
-        ))}
-      </Table.Row>
-    </Table.Head>
-    <Table.Body>
-      {Object.keys(notificationPreferences.channels[0].categories[notificationCategory])
-        .filter(
-          category =>
-            notificationPreferences.channels[0].categories[notificationCategory][category]
-              .notification
-        )
-        .map(category => (
-          <Table.Row key={category} data-testid={formatCategoryKey(category)}>
-            <Table.Cell>
-              <Tooltip
-                renderTip={
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        notificationPreferences.channels[0].categories[notificationCategory][
-                          category
-                        ].notification.categoryDescription
-                    }}
-                    data-testid={`${formatCategoryKey(category)}_description`}
-                  />
-                }
-                placement="end"
-              >
-                {
-                  notificationPreferences.channels[0].categories[notificationCategory][category]
-                    .notification.categoryDisplayName
-                }
-              </Tooltip>
-            </Table.Cell>
+  <React.Fragment key={notificationCategory}>
+    {!(notificationCategory === 'conversations' && ENV.current_user_disabled_inbox) && (
+      <Table
+        caption={I18n.t('%{categoryName} notification preferences', {
+          categoryName: formattedCategoryNames[notificationCategory]()
+        })}
+        margin="medium 0"
+        layout="fixed"
+      >
+        <Table.Head>
+          <Table.Row>
+            <Table.ColHeader
+              id={notificationCategory}
+              data-testid={notificationCategory}
+              width="16rem"
+            >
+              <Text size="large">{formattedCategoryNames[notificationCategory]()}</Text>
+            </Table.ColHeader>
             {notificationPreferences.channels.map(channel => (
-              <Table.Cell textAlign="center" key={category + channel.path}>
-                <NotificationPreferencesSetting
-                  selectedPreference={
-                    channel.pathType === 'sms' &&
-                    smsNotificationCategoryDeprecated(formatCategoryKey(category))
-                      ? 'disabled'
-                      : channel.categories[notificationCategory][category].frequency
-                  }
-                  preferenceOptions={
-                    channel.pathType === 'sms'
-                      ? ['immediately', 'never']
-                      : ['immediately', 'daily', 'weekly', 'never']
-                  }
-                  updatePreference={frequency =>
-                    updatePreferenceCallback({channel, category, frequency})
-                  }
-                />
-              </Table.Cell>
+              <Table.ColHeader
+                textAlign="center"
+                id={`${notificationCategory}-${channel.path}`}
+                key={`${notificationCategory}-${channel.path}`}
+                width="8rem"
+              >
+                {renderChannelHeader ? (
+                  <>
+                    <div style={{display: 'block'}}>
+                      {channel.pathType === 'push' ? (
+                        <Text>{I18n.t('Push Notification')}</Text>
+                      ) : (
+                        <Text transform={channel.pathType === 'sms' ? 'uppercase' : 'capitalize'}>
+                          {channel.pathType}
+                        </Text>
+                      )}
+                    </div>
+                    <div style={{display: 'block'}}>
+                      <TruncateText>
+                        <Text weight="light">
+                          {channel.pathType === 'push' ? I18n.t('For All Devices') : channel.path}
+                        </Text>
+                      </TruncateText>
+                    </div>
+                  </>
+                ) : (
+                  <ScreenReaderContent>
+                    {channel.pathType}
+                    {channel.path}
+                  </ScreenReaderContent>
+                )}
+              </Table.ColHeader>
             ))}
           </Table.Row>
-        ))}
-    </Table.Body>
-  </Table>
+        </Table.Head>
+        <Table.Body>
+          {Object.keys(notificationPreferences.channels[0].categories[notificationCategory])
+            .filter(
+              category =>
+                notificationPreferences.channels[0].categories[notificationCategory][category]
+                  .notification
+            )
+            .map(category => (
+              <Table.Row key={category} data-testid={formatCategoryKey(category)}>
+                <Table.RowHeader>
+                  <Tooltip
+                    renderTip={
+                      <div
+                        dangerouslySetInnerHTML={{
+                          __html:
+                            notificationPreferences.channels[0].categories[notificationCategory][
+                              category
+                            ].notification.categoryDescription
+                        }}
+                        data-testid={`${formatCategoryKey(category)}_description`}
+                      />
+                    }
+                    placement="end"
+                  >
+                    {
+                      notificationPreferences.channels[0].categories[notificationCategory][category]
+                        .notification.categoryDisplayName
+                    }
+                  </Tooltip>
+                  {category === 'Grading' &&
+                    renderSendScoresInEmailsToggle(
+                      sendScoresInEmails,
+                      setSendScoresInEmails,
+                      updatePreferenceCallback
+                    )}
+                </Table.RowHeader>
+                {notificationPreferences.channels.map(channel => (
+                  <Table.Cell textAlign="center" key={category + channel.path}>
+                    <NotificationPreferencesSetting
+                      selectedPreference={
+                        menuShouldBeDisabled(formatCategoryKey(category), channel.pathType)
+                          ? 'disabled'
+                          : channel.categories[notificationCategory][category].frequency
+                      }
+                      preferenceOptions={
+                        channel.pathType === 'email'
+                          ? ['immediately', 'daily', 'weekly', 'never']
+                          : ['immediately', 'never']
+                      }
+                      updatePreference={frequency =>
+                        updatePreferenceCallback({channel, category, frequency})
+                      }
+                    />
+                  </Table.Cell>
+                ))}
+              </Table.Row>
+            ))}
+        </Table.Body>
+      </Table>
+    )}
+  </React.Fragment>
 )
+
+const renderSendScoresInEmailsToggle = (
+  sendScoresInEmails,
+  setSendScoresInEmails,
+  updatePreferenceCallback
+) => {
+  if (ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text !== null) {
+    return (
+      <View margin="x-small 0 0 small" display="block">
+        <Checkbox
+          data-testid="grading-send-score-in-email"
+          label={ENV.NOTIFICATION_PREFERENCES_OPTIONS.send_scores_in_emails_text.label}
+          size="small"
+          variant="toggle"
+          checked={sendScoresInEmails}
+          onChange={() => {
+            setSendScoresInEmails(!sendScoresInEmails)
+            updatePreferenceCallback({sendScoresInEmails: !sendScoresInEmails})
+          }}
+        />
+      </View>
+    )
+  }
+}
 
 const formatPreferencesData = preferences => {
   preferences.channels.forEach((channel, i) => {
@@ -237,6 +293,8 @@ const dropEmptyCategories = categories => {
 }
 
 const NotificationPreferencesTable = props => {
+  const [sendScoresInEmails, setSendScoresInEmails] = useState(props.preferences.sendScoresInEmails)
+
   if (props.preferences.channels?.length > 0) {
     formatPreferencesData(props.preferences)
     return (
@@ -246,12 +304,15 @@ const NotificationPreferencesTable = props => {
             props.preferences,
             notificationCategory,
             props.updatePreference,
-            i === 0
+            i === 0,
+            sendScoresInEmails,
+            setSendScoresInEmails
           )
         )}
       </>
     )
   }
+  return null
 }
 
 NotificationPreferencesTable.propTypes = {

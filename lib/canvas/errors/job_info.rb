@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -42,7 +44,10 @@ module Canvas
           attempts: @job.attempts,
           strand: @job.strand,
           priority: @job.priority,
-          worker_name: @worker.name,
+          # sometimes we might be reporting these in a context
+          # where there is no worker available, and we just
+          # pull the current job from the thread context
+          worker_name: @worker&.name,
           handler: @job.handler,
           run_at: @job.run_at,
           max_attempts: @job.max_attempts,

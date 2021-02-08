@@ -20,7 +20,8 @@ import React from 'react'
 import {arrayOf, bool, func, number, oneOf, shape, string} from 'prop-types'
 import I18n from 'i18n!gradebook'
 import {Alert} from '@instructure/ui-alerts'
-import {Avatar, Heading, Spinner, Text} from '@instructure/ui-elements'
+import {Avatar, Heading, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {View} from '@instructure/ui-layout'
 import {Tray} from '@instructure/ui-overlays'
@@ -92,7 +93,6 @@ export default class SubmissionTray extends React.Component {
       grade: string,
       valid: bool.isRequired
     }),
-    postPoliciesEnabled: bool.isRequired,
     requireStudentGroupForSpeedGrader: bool.isRequired,
     student: shape({
       id: string.isRequired,
@@ -383,7 +383,6 @@ export default class SubmissionTray extends React.Component {
                 isInClosedGradingPeriod={this.props.isInClosedGradingPeriod}
                 isInNoGradingPeriod={this.props.isInNoGradingPeriod}
                 isNotCountedForScore={this.props.isNotCountedForScore}
-                postPoliciesEnabled={this.props.postPoliciesEnabled}
                 submission={this.props.submission}
               />
 
@@ -413,6 +412,7 @@ export default class SubmissionTray extends React.Component {
 
               <View as="div" id="SubmissionTray__RadioInputGroup" margin="0 0 small 0">
                 <SubmissionTrayRadioInputGroup
+                  assignment={this.props.assignment}
                   colors={this.props.colors}
                   disabled={this.props.gradingDisabled}
                   locale={this.props.locale}

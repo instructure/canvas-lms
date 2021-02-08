@@ -29,6 +29,12 @@
     "assignments_1e02582c": {
         "message": "Εργασίες"
     },
+    "attributes_963ba262": {
+        "message": "Πεδία"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Ημερολόγιο:"
     },
@@ -38,8 +44,11 @@
     "cancel_caeb1e68": {
         "message": "Ακύρωση"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Προσθήκες του Canvas"
+    "choose_usage_rights_33683854": {
+        "message": "Επιλέξτε δικαιώματα χρήσης..."
+    },
+    "clear_2084585f": {
+        "message": "Καθαρισμός"
     },
     "click_to_embed_imagename_c41ea8df": {
         "message": "Κάντε κλικ για να ενσωματώσετε την εικόνα { imageName }"
@@ -53,8 +62,14 @@
     "collaborations_5c56c15f": {
         "message": "Συνεργασίες"
     },
+    "content_1440204b": {
+        "message": "Περιεχόμενο"
+    },
     "content_type_2cf90d95": {
         "message": "Τύπος Περιεχομένου"
+    },
+    "copyright_holder_66ee111": {
+        "message": "Κάτοχος Πνευματικών Δικαιωμάτων:"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -73,6 +88,9 @@
     },
     "course_navigation_dd035109": {
         "message": "Πλοήγηση στο μάθημα"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Άδεια Creative Commons:"
     },
     "date_ee500367": {
         "message": "Ημερομηνία"
@@ -119,11 +137,17 @@
     "excused_cf8792eb": {
         "message": "Δικαιολογημένος/η"
     },
+    "external_tools_6e77821": {
+        "message": "Εξωτερικά Εργαλεία"
+    },
     "files_c300e900": {
         "message": "Αρχεία"
     },
     "files_index_af7c662b": {
         "message": "Ευρετήριο Αρχείων"
+    },
+    "format_4247a9c5": {
+        "message": "Τύπος"
     },
     "generating_preview_45b53be0": {
         "message": "Δημιουργία προεπισκόπησης..."
@@ -139,6 +163,12 @@
     },
     "group_navigation_99f191a": {
         "message": "Πλοήγηση στην Ομάδα"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Πήρα άδεια για να χρησιμοποιήσω αυτό το αρχείο."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Έχω τα πνευματικά δικαιώματα"
     },
     "image_8ad06": {
         "message": "Εικόνα"
@@ -163,6 +193,9 @@
     },
     "invalid_file_type_881cc9b2": {
         "message": "Μη έγκυρος τύπος αρχείου"
+    },
+    "invalid_url_cbde79f": {
+        "message": "Μη έγκυρο URL"
     },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Συντομεύσεις πληκτρολογίου"
@@ -290,6 +323,12 @@
     "syllabus_f191f65b": {
         "message": "Αναλυτικό Πρόγραμμα"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Το υλικό βρίσκεται στο δημόσιο domain"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Το υλικό φέρει άδεια Creative Commons"
+    },
     "time_2b5aac58": {
         "message": "Χρόνος"
     },
@@ -317,8 +356,14 @@
     "url_22a5f3b8": {
         "message": "URL"
     },
+    "usage_right_ff96f3e2": {
+        "message": "Δικαίωμα Χρήσης:"
+    },
     "video_player_b371005": {
         "message": "Πρόγραμμα Αναπαραγωγής Βίντεο"
+    },
+    "view_ba339f93": {
+        "message": "Προβολή"
     },
     "wiki_home_9cd54d0": {
         "message": "Αρχική Σελίδα Wiki"

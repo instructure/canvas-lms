@@ -112,7 +112,7 @@ const defaultProps = () => ({
     {
       id: '6',
       role: 'DesignerEnrollment',
-      label: 'Course Designer',
+      label: 'Designer',
       base_role_type: 'DesignerEnrollment',
       workflow_state: 'built_in',
       permissions: {

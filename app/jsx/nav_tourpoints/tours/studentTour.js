@@ -21,6 +21,7 @@ import {Link} from '@instructure/ui-link'
 import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import handleOpenTray from '../handleOpenTray'
+import assetFactory from 'jsx/celebrations/assetFactory'
 
 export default [
   {
@@ -47,7 +48,7 @@ export default [
           <li>{I18n.t('How do I download the Student App?')}</li>
         </ol>
         <div className="tour-star-image" aria-hidden>
-          <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
+          <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
     )

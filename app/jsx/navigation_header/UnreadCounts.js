@@ -114,7 +114,7 @@ export default function UnreadCounts(props) {
             unreadCount
           })
           sessionStorage.setItem(storageKeyFor(dataUrl), savedState)
-        } catch {
+        } catch (_ex) {
           // error in setting storage, no biggie, ignore
         }
 

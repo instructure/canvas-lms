@@ -1,4 +1,6 @@
-<% if (google_analytics_key = Setting.get('google_analytics_key', nil)) %>
+<% if (google_analytics_key = Setting.get('google_analytics_key', nil)) &&
+      @domain_root_account&.settings&.fetch(:enable_google_analytics, true)
+%>
   <% dimensions = GoogleAnalyticsDimensions.calculate(
     domain_root_account: @domain_root_account,
     real_user: @real_current_user,

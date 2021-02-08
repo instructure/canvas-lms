@@ -27,10 +27,15 @@ import natcompare from 'compiled/util/natcompare'
 import TruncateWithTooltip from '../../shared/components/TruncateWithTooltip'
 import Outcome from './Outcome'
 import * as shapes from './shapes'
+import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
 
-const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
-  <Flex justifyItems="space-between">
-    <Flex.Item padding="0 x-small 0 0" size="0" grow>
+const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup, isVertical) => (
+  <Flex
+    padding="0 0 0 xxx-small"
+    justifyItems={isVertical ? null : 'space-between'}
+    direction={isVertical ? 'column' : 'row'}
+  >
+    <Flex.Item padding="0 x-small 0 0" size={isVertical ? undefined : '0'} grow>
       <Text size="large" weight="bold">
         <TruncateWithTooltip>{outcomeGroup.title}</TruncateWithTooltip>
       </Text>
@@ -41,18 +46,20 @@ const outcomeGroupHeader = (outcomeGroup, numMastered, numGroup) => (
   </Flex>
 )
 
-export default class OutcomeGroup extends React.Component {
+class OutcomeGroup extends React.Component {
   static propTypes = {
     outcomeGroup: shapes.outcomeGroupShape.isRequired,
     outcomes: PropTypes.arrayOf(shapes.outcomeShape).isRequired,
     expanded: PropTypes.bool.isRequired,
     expandedOutcomes: ImmutablePropTypes.set.isRequired,
     onExpansionChange: PropTypes.func.isRequired,
-    outcomeProficiency: shapes.outcomeProficiencyShape
+    outcomeProficiency: shapes.outcomeProficiencyShape,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
-    outcomeProficiency: null
+    outcomeProficiency: null,
+    breakpoints: {}
   }
 
   handleToggle = (_event, expanded) => {
@@ -66,15 +73,17 @@ export default class OutcomeGroup extends React.Component {
       expanded,
       expandedOutcomes,
       onExpansionChange,
-      outcomeProficiency
+      outcomeProficiency,
+      breakpoints
     } = this.props
     const numMastered = outcomes.filter(o => o.mastered).length
     const numGroup = outcomes.length
+    const isVertical = !breakpoints.tablet
 
     return (
       <View as="div" className="outcomeGroup">
         <ToggleGroup
-          summary={outcomeGroupHeader(outcomeGroup, numMastered, numGroup)}
+          summary={outcomeGroupHeader(outcomeGroup, numMastered, numGroup, isVertical)}
           toggleLabel={I18n.t('Toggle outcomes for %{title}', {title: outcomeGroup.title})}
           expanded={expanded}
           onToggle={this.handleToggle}
@@ -96,3 +105,5 @@ export default class OutcomeGroup extends React.Component {
     )
   }
 }
+
+export default WithBreakpoints(OutcomeGroup)

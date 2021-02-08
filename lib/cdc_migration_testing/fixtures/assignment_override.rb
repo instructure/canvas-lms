@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Canvas is Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -17,12 +19,18 @@
 #
 
 module CdcFixtures
+  class ForeignKeyNotSatisfied < StandardError
+  end
+
   def self.create_assignment_override
+    assignment = Assignment.first
+    raise CdcFixtures::ForeignKeyNotSatisfied unless assignment
+
     AssignmentOverride.new({
       workflow_state: 'default',
       title: 'default',
       set_id: 1,
-      assignment_id: 1
+      assignment_id: assignment.id
     })
   end
 end

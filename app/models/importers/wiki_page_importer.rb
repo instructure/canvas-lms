@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -240,7 +242,7 @@ module Importers
         allow_save = false
       end
       if allow_save && hash[:migration_id]
-        if hash[:assignment].present?
+        if hash[:assignment].present? && context.feature_enabled?(:conditional_release)
           hash[:assignment][:title] ||= item.title
           item.assignment = Importers::AssignmentImporter.import_from_migration(
             hash[:assignment], context, migration)

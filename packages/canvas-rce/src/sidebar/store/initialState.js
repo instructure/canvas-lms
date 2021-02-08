@@ -36,6 +36,7 @@ function normalizeContextType(contextType) {
   }
 }
 
+/* eslint-disable prefer-const */
 export default function(props = {}) {
   let {
     source,
@@ -52,12 +53,27 @@ export default function(props = {}) {
     documents,
     media,
     flickr,
-    newPageLinkExpanded
+    newPageLinkExpanded,
+    searchString,
+    sortBy,
+    all_files
   } = props
+  /* eslint-enable prefer-const */
 
   // normalize contextType (including in props)
   contextType = normalizeContextType(contextType)
   props = {...props, contextType}
+
+  if (searchString === undefined) {
+    searchString = ''
+  }
+
+  if (all_files === undefined) {
+    all_files = {isLoading: false}
+  }
+
+  if (!sortBy) sortBy = {}
+  sortBy = {sort: 'date_added', dir: 'desc', ...sortBy}
 
   // default to API source
   if (source == null) {
@@ -103,8 +119,21 @@ export default function(props = {}) {
   if (newPageLinkExpanded === undefined) {
     newPageLinkExpanded = false
   }
+  function getAccordionIndex() {
+    try {
+      return window.sessionStorage.getItem('canvas_rce_links_accordion_index')
+    } catch (err) {
+      // If there is an error accessing session storage, just ignore it.
+      // We are likely in a test environment
+      return undefined
+    }
+  }
+  const ui = {
+    selectedAccordionIndex: getAccordionIndex()
+  }
 
   return {
+    ui,
     source,
     jwt,
     host,
@@ -118,6 +147,9 @@ export default function(props = {}) {
     documents,
     media,
     flickr,
-    newPageLinkExpanded
+    newPageLinkExpanded,
+    searchString,
+    sortBy,
+    all_files
   }
 }

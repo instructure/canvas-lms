@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -88,7 +90,7 @@ class ContextModule < ActiveRecord::Base
       progression_scope = progression_scope.where(:user_id => student_ids) if student_ids
 
       if progression_scope.update_all(["workflow_state = 'locked', lock_version = lock_version + 1, current = ?", false]) > 0
-        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+        delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
 
       self.context.context_modules.each do |mod|
@@ -101,11 +103,11 @@ class ContextModule < ActiveRecord::Base
     self.class.connection.after_transaction_commit do
       if context_module_progressions.where(current: true).update_all(current: false) > 0
         # don't queue a job unless necessary
-        send_later_if_production_enqueue_args(:evaluate_all_progressions, {:strand => "module_reeval_#{self.global_context_id}"})
+        delay_if_production(strand: "module_reeval_#{self.global_context_id}").evaluate_all_progressions
       end
       if @discussion_topics_to_recalculate
         @discussion_topics_to_recalculate.each do |dt|
-          dt.send_later_if_production_enqueue_args(:recalculate_context_module_actions!, {:strand => "module_reeval_#{self.global_context_id}"})
+          dt.delay_if_production(strand: "module_reeval_#{self.global_context_id}").recalculate_context_module_actions!
         end
       end
     end
@@ -128,7 +130,7 @@ class ContextModule < ActiveRecord::Base
   end
 
   def check_for_stale_cache_after_unlocking!
-    Shackles.activate(:master) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
+    GuardRail.activate(:primary) {self.touch} if self.unlock_at && self.unlock_at < Time.now && self.updated_at < self.unlock_at
   end
 
   def is_prerequisite_for?(mod)
@@ -285,13 +287,29 @@ class ContextModule < ActiveRecord::Base
   def destroy
     self.workflow_state = 'deleted'
     self.deleted_at = Time.now.utc
-    ContentTag.where(:context_module_id => self).update_all(:workflow_state => 'deleted', :updated_at => Time.now.utc)
-    self.send_later_if_production_enqueue_args(:update_downstreams, { max_attempts: 1, n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY }, self.position)
+    ContentTag.where(:context_module_id => self).where.not(:workflow_state => 'deleted').update_all(:workflow_state => 'deleted', :updated_at => self.deleted_at)
+    delay_if_production(n_strand: "context_module_update_downstreams", priority: Delayed::LOW_PRIORITY).update_downstreams(self.position)
     save!
     true
   end
 
   def restore
+    if self.workflow_state == 'deleted' && self.deleted_at
+      # only restore tags deleted (approximately) when the module was deleted
+      # (tags are currently set to exactly deleted_at but older deleted modules used the current time on each tag)
+      tags_to_restore = self.content_tags.where(:workflow_state => 'deleted').
+        where('updated_at BETWEEN ? AND ?', self.deleted_at - 5.seconds, self.deleted_at + 5.seconds).
+        preload(:content)
+      tags_to_restore.each do |tag|
+        # don't restore the item if the asset has been deleted too
+        next if tag.asset_workflow_state == 'deleted'
+        # although the module will be restored unpublished, the items should match the asset's published state
+        tag.workflow_state = tag.content && tag.sync_workflow_state_to_asset? ? tag.asset_workflow_state : 'unpublished'
+        # deal with the possibility that the asset has been renamed after the module was deleted
+        tag.title = Context.asset_name(tag.content) if tag.content && tag.sync_title_to_asset_title?
+        tag.save
+      end
+    end
     self.workflow_state = 'unpublished'
     self.save
   end
@@ -618,6 +636,7 @@ class ContextModule < ActiveRecord::Base
       item = opts[:attachment] || self.context.attachments.not_deleted.find_by_id(params[:id])
     elsif params[:type] == "assignment"
       item = opts[:assignment] || self.context.assignments.active.where(id: params[:id]).first
+      item = item.submittable_object if item.respond_to?(:submittable_object) && item.submittable_object
     elsif params[:type] == "discussion_topic" || params[:type] == "discussion"
       item = opts[:discussion_topic] || self.context.discussion_topics.active.where(id: params[:id]).first
     elsif params[:type] == "quiz"
@@ -665,6 +684,14 @@ class ContextModule < ActiveRecord::Base
       added_item.indent = params[:indent] || 0
       added_item.workflow_state = 'unpublished' if added_item.new_record?
       added_item.link_settings = params[:link_settings]
+      if content.is_a?(ContextExternalTool) && content.use_1_3? && content.id != 0
+        # Note: using 'new' here instead of 'ResourceLink.create_with' so if validation
+        # of the added item fails, no orphaned resource link is created
+        added_item.associated_asset = context.lti_resource_links.new(
+          custom: Lti::DeepLinkingUtil.validate_custom_params(params[:custom_params]),
+          context_external_tool: content
+        )
+      end
       added_item.save
       added_item
     elsif params[:type] == 'context_module_sub_header' || params[:type] == 'sub_header'
@@ -705,19 +732,20 @@ class ContextModule < ActiveRecord::Base
   # specify a 1-based position to insert the items at; leave nil to append to the end of the module
   # ignores current module item positions in favor of an objective position
   def insert_items(items, start_pos = nil)
+    tags = content_tags.not_deleted.select(:id, :position, :content_type, :content_id).to_a
     if start_pos
       start_pos = 1 if start_pos < 1
       next_pos = start_pos
-      tags = content_tags.not_deleted.select(:id, :position).to_a
     else
       next_pos = (content_tags.maximum(:position) || 0) + 1
     end
-    
+
     new_tags = []
     items.each do |item|
       next unless item.is_a?(ActiveRecord::Base)
       next unless %w(Attachment Assignment WikiPage Quizzes::Quiz DiscussionTopic ContextExternalTool).include?(item.class_name)
       item = item.submittable_object if item.is_a?(Assignment) && item.submittable_object
+      next if tags.any? { |tag| tag.content_type == item.class_name && tag.content_id == item.id }
       state = item.respond_to?(:published?) && !item.published? ? 'unpublished' : 'active'
       new_tags << self.content_tags.create!(context: self.context, title: Context.asset_name(item), content: item,
                                             tag_type: 'context_module', indent: 0,
@@ -818,7 +846,7 @@ class ContextModule < ActiveRecord::Base
     return nil unless user
     progression = nil
     self.shard.activate do
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         progression = context_module_progressions.where(user_id: user).first
         if !progression && context.enrollments.except(:preload).where(user_id: user).exists? # check if we should even be creating a progression for this user
           self.class.unique_constraint_retry do |retry_count|

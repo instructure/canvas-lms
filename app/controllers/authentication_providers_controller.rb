@@ -657,6 +657,15 @@ class AuthenticationProvidersController < ApplicationController
   # @returns AuthenticationProvider
   def create
     aac_data = params.fetch(:authentication_provider, params)
+
+    unless AuthenticationProvider.valid_auth_types.include?(aac_data[:auth_type])
+      msg =
+        "invalid or missing auth_type '#{aac_data[:auth_type]}', must be one of #{
+          AuthenticationProvider.valid_auth_types.join(',')
+        }"
+      return render(status: 400, json: { errors: [{ message: msg }] })
+    end
+
     position = aac_data.delete(:position)
     data = filter_data(aac_data)
     deselect_parent_registration(data)

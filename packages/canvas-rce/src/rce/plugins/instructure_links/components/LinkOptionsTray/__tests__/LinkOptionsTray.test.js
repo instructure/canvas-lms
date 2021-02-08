@@ -29,7 +29,8 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
         displayAs: 'link',
         text: 'Syllabus.doc',
         url: 'http://example.instructure.com/files/3201/download',
-        isPreviewable: true
+        isPreviewable: true,
+        onlyTextSelected: true
       },
       onRequestClose: jest.fn(),
       onSave: jest.fn(),
@@ -59,11 +60,31 @@ describe('RCE "Links" Plugin > LinkOptionsTray', () => {
       renderComponent()
       expect(tray.text).toEqual(props.content.text)
     })
+
+    it('does not show the text field if something other than text was selected', () => {
+      props.content.onlyTextSelected = false
+      renderComponent()
+      expect(tray.$textField).toBe(null)
+    })
   })
   describe('"Link" field', () => {
     it('uses the value of .url in the given content', () => {
       renderComponent()
       expect(tray.link).toEqual(props.content.url)
+    })
+
+    it('shows an error message if the url is invalid', () => {
+      props.content.url = 'xxx://example.instructure.com/files/3201/download'
+      renderComponent()
+      expect(tray.link).toEqual(props.content.url)
+      expect(tray.$errorMessage).toBeInTheDocument()
+      expect(tray.doneButtonIsDisabled).toBe(true)
+
+      // correct the URL
+      tray.setLink('//example.instructure.com/files/3201/download')
+      expect(tray.link).toEqual('//example.instructure.com/files/3201/download')
+      expect(tray.$errorMessage).toBeNull()
+      expect(tray.doneButtonIsDisabled).toBe(false)
     })
   })
   describe('"Display Options" field', () => {

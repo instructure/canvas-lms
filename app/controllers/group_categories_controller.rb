@@ -16,6 +16,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
+require 'csv'
+
 # @API Group Categories
 #
 # Group Categories allow grouping of groups together in canvas. There are a few
@@ -91,9 +93,8 @@
 #     }
 #
 class GroupCategoriesController < ApplicationController
-  before_action :get_context
   before_action :require_context, :only => [:create, :index]
-  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members]
+  before_action :get_category_context, :only => [:show, :update, :destroy, :groups, :users, :assign_unassigned_members, :import, :export]
 
   include Api::V1::Attachment
   include Api::V1::GroupCategory
@@ -214,6 +215,67 @@ class GroupCategoriesController < ApplicationController
           render :json => [@group_category.as_json, @group_category.groups.map { |g| g.as_json(:include => :users) }]
         end
       end
+    end
+  end
+
+  # @API Import category groups
+  #
+  # Create Groups in a Group Category through a CSV import
+  #
+  # For more information on the format that's expected here, please see the
+  # "Group Category CSV" section in the API docs.
+  #
+  # @argument attachment
+  #   There are two ways to post group category import data - either via a
+  #   multipart/form-data form-field-style attachment, or via a non-multipart
+  #   raw post request.
+  #
+  #   'attachment' is required for multipart/form-data style posts. Assumed to
+  #   be outcome data from a file upload form field named 'attachment'.
+  #
+  #   Examples:
+  #     curl -F attachment=@<filename> -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories/<category_id>/import'
+  #
+  #   If you decide to do a raw post, you can skip the 'attachment' argument,
+  #   but you will then be required to provide a suitable Content-Type header.
+  #   You are encouraged to also provide the 'extension' argument.
+  #
+  #   Examples:
+  #     curl -H 'Content-Type: text/csv' --data-binary @<filename>.csv \
+  #         -H "Authorization: Bearer <token>" \
+  #         'https://<canvas>/api/v1/group_categories/<category_id>/import'
+  #
+  # @example_response
+  #    # Progress (default)
+  #    {
+  #        "completion": 0,
+  #        "context_id": 20,
+  #        "context_type": "GroupCategory",
+  #        "created_at": "2013-07-05T10:57:48-06:00",
+  #        "id": 2,
+  #        "message": null,
+  #        "tag": "course_group_import",
+  #        "updated_at": "2013-07-05T10:57:48-06:00",
+  #        "user_id": null,
+  #        "workflow_state": "running",
+  #        "url": "http://localhost:3000/api/v1/progress/2"
+  #    }
+  #
+  # @returns Progress
+  def import
+    if authorized_action(@context, @current_user, :manage_groups)
+      return render(:json => {'status' => 'unauthorized'}, :status => :unauthorized) if @group_category.protected?
+
+      file_obj = nil
+      if params.has_key?(:attachment)
+        file_obj = params[:attachment]
+      else
+        file_obj = body_file
+      end
+
+      progress = GroupAndMembershipImporter.create_import_with_attachment(@group_category, file_obj)
+      render(:json => progress_json(progress, @current_user, session))
     end
   end
 
@@ -339,6 +401,74 @@ class GroupCategoriesController < ApplicationController
     end
   end
 
+  # @API export groups in and users in category
+  # @beta
+  #
+  # Returns a csv file of users in format ready to import.
+  #
+  # @example_request
+  #     curl https://<canvas>/api/v1/group_categories/<group_category_id>/export \
+  #          -H 'Authorization: Bearer <token>'
+  def export
+    GuardRail.activate(:secondary) do
+      if authorized_action(@context, @current_user, :manage_groups)
+        include_sis_id = @context.grants_any_right?(@current_user, session, :read_sis, :manage_sis)
+        csv_string = CSV.generate do |csv|
+          section_names = @context.course_sections.select(:id, :name).index_by(&:id)
+          users = @context.participating_students.
+            select("users.id, users.sortable_name,
+                  -- we just want any that have an sis_pseudonym_id populated
+                  MAX (enrollments.sis_pseudonym_id) AS sis_pseudonym_id,
+                  -- grab all the section_ids to get the section names
+                  ARRAY_AGG (enrollments.course_section_id) AS course_section_ids").
+            where("enrollments.type='StudentEnrollment'").order("users.sortable_name").group(:id)
+          gms_by_user_id = GroupMembership.active.where(group_id: @group_category.groups.active.select(:id)).
+            joins(:group).select(:user_id, :name, :sis_source_id, :group_id).index_by(&:user_id)
+          csv << export_headers(include_sis_id, gms_by_user_id.any?)
+          users.preload(:pseudonyms).find_each { |u| csv << build_row(u, section_names, gms_by_user_id, include_sis_id) }
+        end
+      end
+      respond_to do |format|
+        format.csv { send_data csv_string, type: 'text/csv', filename: "#{@group_category.name}.csv", disposition: 'attachment' }
+      end
+    end
+  end
+
+  def build_row(user, section_names, gms_by_user_id, include_sis_id)
+    row = []
+    row << user.sortable_name
+    row << user.id
+    e = Enrollment.new(user_id: user.id,
+                       root_account_id: @context.root_account_id,
+                       sis_pseudonym_id: user.sis_pseudonym_id,
+                       course_id: @context.id)
+    p = SisPseudonym.for(user, e, type: :trusted, require_sis: false, root_account: @context.root_account)
+    row << p&.sis_user_id if include_sis_id
+    row << p&.unique_id
+    row << section_names.values_at(*user.course_section_ids).map(&:name).to_sentence
+    row << gms_by_user_id[user.id]&.name
+    if gms_by_user_id.any?
+      row << gms_by_user_id[user.id]&.group_id
+      row << gms_by_user_id[user.id]&.sis_source_id if include_sis_id
+    end
+    row
+  end
+
+  def export_headers(include_sis_id, groups_exist = true)
+    headers = []
+    headers << I18n.t("name")
+    headers << "canvas_user_id"
+    headers << "user_id" if include_sis_id
+    headers << "login_id"
+    headers << I18n.t("sections")
+    headers << "group_name"
+    if groups_exist
+      headers << "canvas_group_id"
+      headers << "group_id" if include_sis_id
+    end
+    headers
+  end
+
   include Api::V1::User
   # @API List users in group category
   #
@@ -381,6 +511,7 @@ class GroupCategoriesController < ApplicationController
     includes = Array(params[:include])
     users = Api.paginate(users, self, api_v1_group_category_users_url)
     UserPastLtiId.manual_preload_past_lti_ids(users, @group_category.groups) if ['uuid', 'lti_id'].any? { |id| includes.include? id }
+    user_json_preloads(users, false, {profile: true})
     json_users = users_json(users, @current_user, session, includes, @context, nil, Array(params[:exclude]))
 
     if includes.include?('group_submissions') && @group_category.context_type == "Course"
@@ -549,7 +680,45 @@ class GroupCategoriesController < ApplicationController
     rescue ActiveRecord::RecordNotFound
       return render(:json => {'status' => 'not found'}, :status => :not_found) unless @group_category
     end
-    @context ||= @group_category.context
+    @context = @group_category.context
   end
 
+  private
+  def body_file
+    file_obj = request.body
+
+    file_obj.instance_exec do
+      def set_file_attributes(filename, content_type)
+        @original_filename = filename
+        @content_type = content_type
+      end
+
+      def content_type
+        @content_type
+      end
+
+      def original_filename
+        @original_filename
+      end
+    end
+
+    if params[:extension]
+      file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
+                                   Attachment.mimetype("course_group_import.#{params[:extension]}"))
+    else
+      env = request.env.dup
+      env['CONTENT_TYPE'] = env["ORIGINAL_CONTENT_TYPE"]
+      # copy of request with original content type restored
+      request2 = Rack::Request.new(env)
+      charset = request2.media_type_params['charset']
+      if charset.present? && charset.casecmp('utf-8') != 0
+        raise InvalidContentType
+      end
+      params[:extension] ||= {"text/plain" => "csv",
+                              "text/csv" => "csv"}[request2.media_type] || "csv"
+      file_obj.set_file_attributes("course_group_import.#{params[:extension]}",
+                                   request2.media_type)
+      file_obj
+    end
+  end
 end

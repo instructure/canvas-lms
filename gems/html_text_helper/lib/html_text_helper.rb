@@ -1,5 +1,5 @@
-# encoding: UTF-8
-#
+# frozen_string_literal: true
+
 # Copyright (C) 2014 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -33,9 +33,8 @@
 
 require 'nokogiri'
 require 'cgi'
-require 'iconv'
-require 'active_support/core_ext/module/remove_method' # https://github.com/rails/rails/issues/28918
 require 'active_support'
+require 'time' # https://github.com/rails/rails/pull/40859
 require 'active_support/core_ext'
 require 'sanitize'
 require 'canvas_text_helper'

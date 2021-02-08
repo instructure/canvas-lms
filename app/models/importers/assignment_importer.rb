@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -66,18 +68,6 @@ module Importers
       end
 
       assignment_records.compact!
-
-      assignment_ids = assignment_records.map(&:id)
-      Submission.suspend_callbacks(:update_assignment, :touch_graders) do
-        # execute this query against the slave, so that it will use a cursor, and not
-        # attempt to order by submissions.id, because in very large dbs that can cause
-        # the postgres planner to prefer to search the submission_pkey index
-        Shackles.activate(:slave) do
-          Submission.where(assignment_id: assignment_ids).find_each do |sub|
-            Shackles.activate(:master) { sub.save! }
-          end
-        end
-      end
 
       context.clear_todo_list_cache(:admins) if context.is_a?(Course)
     end
@@ -170,11 +160,13 @@ module Importers
       elsif ['external_tool'].include?(hash[:submission_format])
         item.submission_types = "external_tool"
       end
-      if item.submission_types == "online_quiz"
+      case item.submission_types
+      when "online_quiz"
         item.saved_by = :quiz
-      end
-      if item.submission_types == "discussion_topic"
+      when "discussion_topic"
         item.saved_by = :discussion_topic
+      when "wiki_page"
+        item.saved_by = :wiki_page
       end
 
       if hash[:grading_type]
@@ -195,7 +187,7 @@ module Importers
         end
       end
       if hash[:assignment_group_migration_id]
-        item.assignment_group = context.assignment_groups.where(migration_id: hash[:assignment_group_migration_id]).first
+        item.assignment_group = context.assignment_groups.active.where(migration_id: hash[:assignment_group_migration_id]).first
       end
       item.assignment_group ||= context.assignment_groups.active.where(name: t(:imported_assignments_group, "Imported Assignments")).first_or_create
 
@@ -242,7 +234,11 @@ module Importers
       end
 
       if hash[:assignment_overrides]
+        added_overrides = false
         hash[:assignment_overrides].each do |o|
+          next if o[:set_id].to_i == AssignmentOverride::NOOP_MASTERY_PATHS &&
+            o[:set_type] == AssignmentOverride::SET_TYPE_NOOP &&
+            !context.feature_enabled?(:conditional_release)
           override = item.assignment_overrides.where(o.slice(:set_type, :set_id)).first
           override ||= item.assignment_overrides.build
           override.set_type = o[:set_type]
@@ -253,10 +249,12 @@ module Importers
             override.send "override_#{field}", Canvas::Migration::MigratorHelper.get_utc_time_from_timestamp(o[field])
           end
           override.save!
+          added_overrides = true
           migration.add_imported_item(override,
             key: [item.migration_id, override.set_type, override.set_id].join('/'))
         end
-        if hash.has_key?(:only_visible_to_overrides)
+        can_restrict = added_overrides || (item.submission_types == "wiki_page" && context.feature_enabled?(:conditional_release))
+        if hash.has_key?(:only_visible_to_overrides) && can_restrict
           item.only_visible_to_overrides = hash[:only_visible_to_overrides]
         end
       end
@@ -377,13 +375,32 @@ module Importers
           (hash[:external_tool_migration_id] && current_tag.content&.migration_id != hash[:external_tool_migration_id])
 
         if needs_new_tag
-          tag = item.create_external_tool_tag(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
+          tag = current_tag || item.build_external_tool_tag
+          tag.update(:url => hash[:external_tool_url], :new_tab => hash[:external_tool_new_tab])
           if hash[:external_tool_id] && migration && !migration.cross_institution?
             tool_id = hash[:external_tool_id].to_i
-            tag.content_id = tool_id if ContextExternalTool.all_tools_for(context).where(id: tool_id).exists?
+
+            # First check to see if there are any matching tools for the
+            # tool URL provided in the migration hash (giving preference
+            # to the tool ID provided in that same hash).
+            #
+            # In some cases the tool ID in the source context does not match the
+            # tool ID from the destination context. This check should help find
+            # a matching tool correctly.
+            tool = ContextExternalTool.find_external_tool(hash[:external_tool_url], context, tool_id)
+
+            # If no match is found in the first search, fall back on using the tool ID
+            # provided in the migration hash if a tool with that ID is present
+            # in the destination context.
+            tool ||= ContextExternalTool.all_tools_for(context).find_by(id: tool_id)
+
+            tag.content_id = tool&.id
           elsif hash[:external_tool_migration_id]
             tool = context.context_external_tools.where(migration_id: hash[:external_tool_migration_id]).first
             tag.content_id = tool.id if tool
+          end
+          if hash[:external_tool_data_json]
+            tag.external_data = JSON.parse(hash[:external_tool_data_json])
           end
           tag.content_type = 'ContextExternalTool'
           if !tag.save

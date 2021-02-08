@@ -23,7 +23,7 @@ class CreateDefaultShard < ActiveRecord::Migration[4.2]
     unless Switchman::Shard.default.is_a?(Switchman::Shard)
       Switchman::Shard.reset_column_information
       Switchman::Shard.create!(:default => true)
-      Switchman::Shard.default(true)
+      Switchman::Shard.default(reload: true)
     end
   end
 end

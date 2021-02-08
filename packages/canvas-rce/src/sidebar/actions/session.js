@@ -27,5 +27,5 @@ function receiveSession(data) {
 
 export function get(dispatch, getState) {
   const {source} = getState()
-  return source.getSession().then(data => dispatch(receiveSession(data)))
+  return source.getSession?.().then(data => dispatch(receiveSession(data)))
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -134,6 +136,17 @@ describe Quizzes::QuizGroup do
 
       Quizzes::QuizGroup.update_all_positions!([@group3, @group1, @group2])
       expect(group_positions(@quiz.reload)).to eq [@group3.id, @group1.id, @group2.id]
+    end
+  end
+
+  context 'root_account_id' do
+    before(:each) { quiz_with_graded_submission([]) }
+
+    it "uses root_account value from account" do
+      course_factory
+      quiz = @course.quizzes.create!(:title => "some quiz")
+      group1 = quiz.quiz_groups.create(:name => "question group 1")
+      expect(group1.root_account_id).to eq Account.default.id
     end
   end
 end

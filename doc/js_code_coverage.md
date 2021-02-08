@@ -8,7 +8,7 @@ If you run:
 
 ```bash
 
-COVERAGE=true yarn test
+COVERAGE=1 yarn test
 
 ```
 
@@ -40,7 +40,7 @@ RUN_TESTS_FIRST=true yarn run test:coverage
 
 ```
 
-which will call `COVERAGE=true yarn test` prior to doing the report.
+which will call `COVERAGE=1 yarn test` prior to doing the report.
 
 
 ## Canvas Jest Coverage
@@ -61,7 +61,7 @@ If you run:
 
 ```bash
 
-COVERAGE=true yarn run test:karma
+COVERAGE=1 yarn run test:karma
 
 ```
 
@@ -73,7 +73,7 @@ If you run:
 
 ```bash
 
-COVERAGE=true yarn run test:packages
+COVERAGE=1 yarn run test:packages
 
 ```
 

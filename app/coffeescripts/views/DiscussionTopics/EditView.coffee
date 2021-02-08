@@ -39,6 +39,9 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import DueDateCalendarPicker from 'jsx/due_dates/DueDateCalendarPicker'
 import SisValidationHelper from '../../util/SisValidationHelper'
 import AssignmentExternalTools from 'jsx/assignments/AssignmentExternalTools'
+import FilesystemObject from 'compiled/models/FilesystemObject'
+import UsageRightsIndicator from 'jsx/files/UsageRightsIndicator'
+import setUsageRights from '../../react_files/utils/setUsageRights'
 import * as returnToHelper from '../../../jsx/shared/helpers/returnToHelper'
 import 'jqueryui/tabs'
 
@@ -92,9 +95,29 @@ export default class EditView extends ValidatedFormView
     @assignment = @model.get("assignment")
     @initialPointsPossible = @assignment.pointsPossible()
     @dueDateOverrideView = options.views['js-assignment-overrides']
-    @on 'success', =>
-      @unwatchUnload()
-      @redirectAfterSave()
+    @on 'success', (xhr) =>
+      if xhr.attachments?.length == 1
+        usageRights = @attachment_model.get('usage_rights')
+        if usageRights and !_.isEqual(@initialUsageRights(), usageRights)
+          [contextType, contextId] = ENV.context_asset_string.split("_")
+          @attachment_model.set('id', xhr.attachments[0].id)
+          setUsageRights(
+            [@attachment_model]
+            usageRights
+            (_success, _data) => {}
+            contextId
+            "#{contextType}s"
+          ).always(() =>
+            @unwatchUnload()
+            @redirectAfterSave()
+          )
+        else
+          @unwatchUnload()
+          @redirectAfterSave()
+      else
+        @unwatchUnload()
+        @redirectAfterSave()
+    @attachment_model = new FilesystemObject()
     super
 
     @lockedItems = options.lockedItems || {}
@@ -133,8 +156,6 @@ export default class EditView extends ValidatedFormView
   canPublish: =>
     !@isAnnouncement() && !@model.get('published') && @permissions.CAN_MODERATE
 
-  isResponsive: => !!window.ENV?.FEATURES?.responsive_awareness
-
   toJSON: ->
     data = super
     json = _.extend data, @options,
@@ -144,7 +165,6 @@ export default class EditView extends ValidatedFormView
       isTopic: @isTopic()
       isAnnouncement: @isAnnouncement()
       canPublish: @canPublish()
-      isResponsive: @isResponsive()
       contextIsCourse: @options.contextType is 'courses'
       canAttach: @permissions.CAN_ATTACH
       canModerate: @permissions.CAN_MODERATE
@@ -161,6 +181,7 @@ export default class EditView extends ValidatedFormView
 
   handleCancel: (ev) =>
     ev.preventDefault()
+    RichContentEditor.closeRCE(@$textarea) unless @lockedItems.content
     @unwatchUnload()
     @redirectAfterCancel()
 
@@ -178,16 +199,16 @@ export default class EditView extends ValidatedFormView
 
   render: =>
     super
-    $textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).css('display', 'none')
+    @$textarea = @$('textarea[name=message]').attr('id', _.uniqueId('discussion-topic-message')).css('display', 'none')
 
     unless @lockedItems.content
       RichContentEditor.initSidebar()
       _.defer =>
-        @loadNewEditor($textarea)
+        @loadNewEditor(@$textarea)
         $('.rte_switch_views_link').click (event) ->
           event.preventDefault()
           event.stopPropagation()
-          RichContentEditor.callOnRCE($textarea, 'toggle')
+          RichContentEditor.callOnRCE(@$textarea, 'toggle')
           # hide the clicked link, and show the other toggle link.
           # todo: replace .andSelf with .addBack when JQuery is upgraded.
           $(event.currentTarget).siblings('.rte_switch_views_link').andSelf().toggle().focus()
@@ -210,8 +231,11 @@ export default class EditView extends ValidatedFormView
 
     this
 
+  shouldRenderUsageRights: =>
+    ENV.FEATURES.usage_rights_discussion_topics and ENV.USAGE_RIGHTS_REQUIRED and ENV.PERMISSIONS.manage_files and @permissions.CAN_ATTACH
+
   afterRender: =>
-    @renderStudentTodoAtDate() if ENV.STUDENT_PLANNER_ENABLED && @$todoDateInput.length
+    @renderStudentTodoAtDate() if @$todoDateInput.length
     [context, context_id] = ENV.context_asset_string.split("_")
     if context == 'course'
       @AssignmentExternalTools = AssignmentExternalTools.attach(
@@ -219,7 +243,37 @@ export default class EditView extends ValidatedFormView
         "assignment_edit",
         parseInt(context_id),
         parseInt(@assignment.id))
+    @renderUsageRights() if @shouldRenderUsageRights()
 
+  initialUsageRights: =>
+    if @model.get('attachments')
+      @model.get('attachments')[0]?.usage_rights
+
+  renderUsageRights: =>
+    [contextType, contextId] = ENV.context_asset_string.split("_")
+    usage_rights = @initialUsageRights()
+    if usage_rights and !@attachment_model.get('usage_rights')
+      @attachment_model.set('usage_rights', usage_rights)
+    props =
+      suppressWarning: true
+      hidePreview: true
+      contextType: "#{contextType}s"
+      contextId: contextId
+      model: @attachment_model
+      deferSave: (usageRights) =>
+        @attachment_model.set('usage_rights', usageRights)
+        @renderUsageRights()
+      userCanEditFilesForContext: true # usage rights indicator wouldn't be rendered without manage_files_edit permission
+      userCanRestrictFilesForContext: false # disable the publish section of the usage rights modal
+      usageRightsRequiredForContext: true # usage rights indicator wouldn't be rendered without usage rights required for this context
+      modalOptions:
+        isOpen: false
+        openModal: (contents, afterClose) =>
+          ReactDOM.render(contents, @$('#usage_rights_modal')[0])
+        closeModal: () =>
+          ReactDOM.unmountComponentAtNode(@$('#usage_rights_modal')[0])
+    component = React.createElement(UsageRightsIndicator, props, null)
+    ReactDOM.render(component, @$('#usage_rights_control')[0])
 
   attachKeyboardShortcuts: =>
     if !ENV.use_rce_enhancements
@@ -251,7 +305,6 @@ export default class EditView extends ValidatedFormView
       hideGradeIndividually: true
       sectionLabel: @messages.group_category_section_label
       fieldLabel: @messages.group_category_field_label
-      isResponsiveDiscussion: @isResponsive()
       lockedMessage: @messages.group_locked_message
       inClosedGradingPeriod: @assignment.inClosedGradingPeriod()
       renderSectionsAutocomplete: @renderSectionsAutocomplete
@@ -319,7 +372,7 @@ export default class EditView extends ValidatedFormView
     data.only_graders_can_rate = false unless data.allow_rating is '1'
     data.sort_by_rating = false unless data.allow_rating is '1'
     data.allow_todo_date = '0' if data.assignment?.set_assignment is '1'
-    data.todo_date = @studentTodoAtDateValue if ENV.STUDENT_PLANNER_ENABLED
+    data.todo_date = @studentTodoAtDateValue
     data.todo_date = null unless data.allow_todo_date is '1'
 
     if @groupCategorySelector && !ENV?.IS_LARGE_ROSTER
@@ -406,7 +459,9 @@ export default class EditView extends ValidatedFormView
     else
       super
 
-  fieldSelectors: _.extend({},
+  fieldSelectors: _.extend({
+      usage_rights_control: '#usage_rights_control button'
+    },
     AssignmentGroupSelector::fieldSelectors,
     GroupCategorySelector::fieldSelectors
   )
@@ -460,6 +515,9 @@ export default class EditView extends ValidatedFormView
     if @showConditionalRelease()
       crErrors = @conditionalReleaseEditor.validateBeforeSave()
       errors['conditional_release'] = crErrors if crErrors
+
+    if @shouldRenderUsageRights() and @$('#discussion_attachment_uploaded_data').val() != "" and !@attachment_model.get('usage_rights')
+      errors['usage_rights_control'] = [{message: I18n.t('You must set usage rights')}]
     errors
 
   _validateTitle: (data, errors) =>

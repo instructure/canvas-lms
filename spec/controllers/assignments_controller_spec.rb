@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -237,6 +239,20 @@ describe AssignmentsController do
       @course.root_account.disable_feature! :newquizzes_on_quiz_page
       get 'index', params: {course_id: @course.id}
       expect(assigns[:js_env][:FLAGS][:newquizzes_on_quiz_page]).to be_falsey
+    end
+
+    it "should set FLAGS/new_quizzes_modules_support in js_env as true if enabled" do
+      user_session(@teacher)
+      Account.site_admin.enable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(true)
+    end
+
+    it "should set FLAGS/new_quizzes_modules_support in js_env as false if disabled" do
+      user_session(@teacher)
+      Account.site_admin.disable_feature!(:new_quizzes_modules_support)
+      get 'index', params: {:course_id => @course.id}
+      expect(assigns[:js_env][:FLAGS][:new_quizzes_modules_support]).to eq(false)
     end
 
     it "js_env MAX_NAME_LENGTH_REQUIRED_FOR_ACCOUNT is true when AssignmentUtil.name_length_required_for_account? == true" do
@@ -538,11 +554,22 @@ describe AssignmentsController do
       assert_status(404)
     end
 
-    it "doesn't fail on a public course with a nil user" do
-      course = course_factory(:active_all => true, :is_public => true)
-      assignment = assignment_model(:course => course, :submission_types => "online_url")
-      get 'show', params: {:course_id => course.id, :id => assignment.id}
-      assert_status(200)
+    context "with public course" do
+      let(:course){ course_factory(:active_all => true, :is_public => true) }
+      let(:assignment){ assignment_model(:course => course, :submission_types => "online_url") }
+
+      it "doesn't fail on a public course with a nil user" do
+        get 'show', params: {:course_id => course.id, :id => assignment.id}
+        assert_status(200)
+      end
+
+      it "doesn't fail on a public course with a nil user EVEN IF filter_speed_grader_by_student_group is in play" do
+        course.root_account.enable_feature!(:filter_speed_grader_by_student_group)
+        course.update!(filter_speed_grader_by_student_group: true)
+        expect(course.reload.filter_speed_grader_by_student_group).to be_truthy
+        get 'show', params: {:course_id => course.id, :id => assignment.id}
+        assert_status(200)
+      end
     end
 
     it "should return unauthorized if not enrolled" do
@@ -588,10 +615,25 @@ describe AssignmentsController do
             url: launch_url
           )
         end
+
+        let(:key) do
+          DeveloperKey.create!(
+            scopes: [
+              TokenScopes::LTI_AGS_LINE_ITEM_SCOPE,
+              TokenScopes::LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_RESULT_READ_ONLY_SCOPE,
+              TokenScopes::LTI_AGS_SCORE_SCOPE
+            ]
+          )
+        end
+
         let(:external_tool) do
           tool = external_tool_model(
             context: assignment.course,
-            opts: { url: launch_url }
+            opts: {
+              url: launch_url,
+              developer_key: key
+            }
           )
           tool.settings[:use_1_3] = true
           tool.save!
@@ -608,8 +650,14 @@ describe AssignmentsController do
           external_tool
         end
 
-        it 'renders a helpful error to the user' do
-          expect(subject).to render_template 'shared/errors/error_with_details'
+        it { is_expected.to be_successful }
+
+        it 'creates the default line item' do
+          expect {
+            subject
+          }.to change {
+            Lti::LineItem.where(assignment: assignment).count
+          }.from(0).to(1)
         end
       end
     end
@@ -675,6 +723,13 @@ describe AssignmentsController do
       expect(response).to be_successful
       expect(assigns[:current_user_submission]).not_to be_nil
       expect(assigns[:assigned_assessments]).to eq []
+    end
+
+    it "doesn't explode when fielding a JSON request" do
+      user_session(@student)
+      get 'show', params: {:course_id => @course.id, :id => @assignment.id}, format: :json
+      expect(response.body).to include("endpoint does not support json")
+      expect(response.code.to_i).to eq(400)
     end
 
     it "should assign (active) peer review requests" do
@@ -1009,6 +1064,16 @@ describe AssignmentsController do
           @assignment.update!(submission_types: "external_tool", external_tool_tag: ContentTag.new)
           get :show, params: {course_id: @course.id, id: @assignment.id}
           expect(assigns[:js_env]).to have_key(:speed_grader_url)
+        end
+      end
+
+      describe "mastery_scales" do
+        it "should set mastery_scales env when account has mastery scales enabled" do
+          @course.root_account.enable_feature!(:account_level_mastery_scales)
+          outcome_proficiency_model(@course)
+          get :show, params: {course_id: @course.id, id: @assignment.id}
+          expect(assigns[:js_env]).to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+          expect(assigns[:js_env]).to have_key :MASTERY_SCALE
         end
       end
     end
@@ -1434,6 +1499,35 @@ describe AssignmentsController do
       expect(assigns[:js_env][:MODERATED_GRADING_MAX_GRADER_COUNT]).to eq @assignment.moderated_grading_max_grader_count
     end
 
+    it 'js_env SUBMISSION_TYPE_SELECTION_TOOLS is correctly set for submission type tools' do
+      @course.root_account.enable_feature! :submission_type_tool_placement
+      tool_settings = {
+        base_title: 'my title',
+        external_url: 'https://tool.launch.url',
+        selection_width: 750,
+        selection_height: 480,
+        icon_url: nil,
+      }
+      @tool = factory_with_protected_attributes(@course.context_external_tools,
+        :url => "http://www.justanexamplenotarealwebsite.com/tool1",
+        :shared_secret => 'test123',
+        :consumer_key => 'test123',
+        :name => tool_settings[:base_title],
+        :settings => {
+          :submission_type_selection => tool_settings
+        }
+      )
+      user_session(@teacher)
+
+      get :edit, params: { course_id: @course.id, id: @assignment.id }
+      expect(assigns[:js_env][:SUBMISSION_TYPE_SELECTION_TOOLS][0]).to include(
+        base_title: tool_settings[:base_title],
+        title: tool_settings[:base_title],
+        selection_width: tool_settings[:selection_width],
+        selection_height: tool_settings[:selection_height]
+      )
+    end
+
     context 'when the root account does not have a default tool url set' do
       let(:course) { @course }
       let(:root_account) { course.root_account }
@@ -1629,6 +1723,22 @@ describe AssignmentsController do
         let(:feature_flag) { :moderated_grading }
       end
     end
+
+    describe 'js_env ANNOTATED_DOCUMENT_SUBMISSIONS' do
+      it "should set FLAGS/annotated_document_submissions in js_env as true if enabled" do
+        user_session(@teacher)
+        Account.site_admin.enable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(true)
+      end
+
+      it "should set FLAGS/annotated_document_submissions in js_env as false if disabled" do
+        user_session(@teacher)
+        Account.site_admin.disable_feature!(:annotated_document_submissions)
+        get 'edit', params: { course_id: @course.id, id: @assignment.id }
+        expect(assigns[:js_env][:ANNOTATED_DOCUMENT_SUBMISSIONS]).to eq(false)
+      end
+    end
   end
 
   describe "DELETE 'destroy'" do
@@ -1682,16 +1792,27 @@ describe AssignmentsController do
   end
 
   describe "GET list_google_docs" do
-    it "passes errors through to Canvas::Errors" do
+    let(:connection){ double() }
+    let(:params){ {course_id: @course.id, id: @assignment.id} }
+
+    before(:each) do
       user_session(@teacher)
-      connection = double()
-      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       allow(controller).to receive(:google_drive_connection).and_return(connection)
       allow_any_instance_of(Assignment).to receive(:allow_google_docs_submission?).and_return(true)
+    end
+
+    it "passes errors through to Canvas::Errors" do
+      allow(connection).to receive(:list_with_extension_filter).and_raise(ArgumentError)
       expect(Canvas::Errors).to receive(:capture_exception)
-      params = {course_id: @course.id, id: @assignment.id}
       get 'list_google_docs', params: params, format: 'json'
       expect(response.code).to eq("200")
+    end
+
+    it "gives appropriate error code to connection errors" do
+      allow(connection).to receive(:list_with_extension_filter).and_raise(GoogleDrive::ConnectionException)
+      get 'list_google_docs', params: params, format: 'json'
+      expect(response.code).to eq("504")
+      expect(response.body).to include("Unable to connect to Google Drive")
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2016 Instructure, Inc.
 #
@@ -17,7 +19,7 @@
 #
 
 require File.expand_path(File.dirname(__FILE__) + '/lti2_api_spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require 'sharding_spec_helper'
 require_dependency "lti/ims/access_token_helper"
 
 module Lti
@@ -33,9 +35,6 @@ module Lti
       message_handler.update(message_type: 'basic-lti-launch-request')
       student_in_course active_all: true
       teacher_in_course active_all: true
-
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:create_subscription) { SecureRandom.uuid }
-      allow_any_instance_of(AssignmentSubscriptionsHelper).to receive(:destroy_subscription) { {} }
 
       @tool = @course.context_external_tools.create(name: "a",
                                                     domain: "google.com",
@@ -152,7 +151,7 @@ module Lti
 
       it "requires the plagiarism feature flag" do
         post @endpoints[:show]
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "verifies the specified attachment is in the course" do
@@ -242,7 +241,7 @@ module Lti
 
         it "requires the plagiarism feature flag" do
           post @endpoints[:alt_show]
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it "verifies the specified attachment is in the course" do
@@ -414,7 +413,7 @@ module Lti
       it "requires the plagiarism feature flag" do
 
         put @endpoints[:udpate], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "verifies the report is in the same context as the assignment" do
@@ -557,7 +556,7 @@ module Lti
 
         it "requires the plagiarism feature flag" do
           put @endpoints[:udpate], params: {originality_report: {originality_report_lti_url: "http://www.lti-test.com"}}, headers: request_headers
-          expect(response).not_to be_success
+          expect(response).not_to be_successful
         end
 
         it "verifies the report is in the same context as the assignment" do
@@ -680,12 +679,12 @@ module Lti
       it "checks that the specified assignment exists" do
         invalid_attach_url = "/api/lti/assignments/#{@assignment.id + 1}/submissions/#{@submission.id}/originality_report"
         post invalid_attach_url, params: {originality_report: {file_id: @attachment.id, originality_score: 0.4}}
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "checks that the specified file exists" do
         post @endpoints[:create], params: {originality_report: {file_id: @attachment.id + 1, originality_score: 0.4}}, headers: request_headers
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it "requires the tool proxy to be associated to the assignment" do

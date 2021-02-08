@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -41,6 +43,17 @@ describe DeveloperKey do
     )
   end
 
+  describe '#find_cached' do
+    it "raises error when not found, and caches that" do
+      enable_cache do
+        expect(DeveloperKey).to receive(:find_by).once.and_call_original
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+        # only calls the original once
+        expect { DeveloperKey.find_cached(0) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+    end
+  end
+
   describe 'site_admin' do
     subject { DeveloperKey.site_admin }
 
@@ -52,7 +65,7 @@ describe DeveloperKey do
 
   describe 'default values for is_lti_key' do
     let(:public_jwk) do
-      key_hash = Lti::RSAKeyPair.new.public_jwk.to_h
+      key_hash = Canvas::Security::RSAKeyPair.new.public_jwk.to_h
       key_hash['kty'] = key_hash['kty'].to_s
       key_hash
     end
@@ -75,8 +88,8 @@ describe DeveloperKey do
     specs_require_sharding
     include_context 'lti_1_3_spec_helper'
 
-    let(:developer_key) { @shard1.activate { DeveloperKey.create! } }
     let(:shard_1_account) { @shard1.activate { account_model } }
+    let(:developer_key) { @shard1.activate { DeveloperKey.create!(root_account: shard_1_account) } }
     let(:shard_1_tool) do
       tool = nil
       @shard1.activate do
@@ -666,6 +679,16 @@ describe DeveloperKey do
           end
         end
 
+        context 'when accout is site admin' do
+          subject { developer_key_not_saved.root_account }
+
+          let(:account) { nil }
+
+          before { developer_key_not_saved.update!(account: account) }
+
+          it { is_expected.to eq Account.site_admin }
+        end
+
         context 'when account is root account' do
           let(:account) { account_model }
 
@@ -937,11 +960,11 @@ describe DeveloperKey do
       before { subject.generate_rsa_keypair! }
 
       it 'populates the "public_jwk" column with a public key' do
-        expect(subject.public_jwk['kty']).to eq Lti::RSAKeyPair::KTY
+        expect(subject.public_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY
       end
 
       it 'populates the "private_jwk" attribute with a private key' do
-        expect(subject.private_jwk['kty']).to eq Lti::RSAKeyPair::KTY.to_sym
+        expect(subject.private_jwk['kty']).to eq Canvas::Security::RSAKeyPair::KTY.to_sym
       end
     end
   end
@@ -1051,5 +1074,41 @@ describe DeveloperKey do
   it "doesn't allow the default key to be deleted" do
     expect { DeveloperKey.default.destroy }.to raise_error "Please never delete the default developer key"
     expect { DeveloperKey.default.deactivate }.to raise_error "Please never delete the default developer key"
+  end
+
+  describe "issue_token" do
+    subject { DeveloperKey.create! }
+    let(:claims) { { "key" => "value" } }
+    let(:asymmetric_keypair) { Canvas::Security::RSAKeyPair.new.to_jwk }
+    let(:asymmetric_public_key) { asymmetric_keypair.to_key.public_key.to_jwk }
+
+    before {
+      # set up assymetric key
+      allow(Canvas::Oauth::KeyStorage).to receive(:present_key).and_return(asymmetric_keypair)
+    }
+
+
+    it "defaults to internal symmetric encryption with no audience set" do
+      expect(subject.client_credentials_audience).to be_nil
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to symmetric encryption with audience set to internal" do
+      subject.client_credentials_audience = "internal"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = Canvas::Security.decode_jwt(token)
+      expect(decoded).to eq claims
+    end
+
+    it "uses to asymmetric encryption with audience set to external" do
+      subject.client_credentials_audience = "external"
+      subject.save!
+      token = subject.issue_token(claims)
+      decoded = JSON::JWT.decode(token, asymmetric_public_key)
+      expect(decoded).to eq claims
+    end
   end
 end

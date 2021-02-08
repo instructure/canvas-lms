@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -22,37 +24,45 @@ require 'canvas_http/circuit_breaker'
 require 'logger'
 
 module CanvasHttp
-  class Error < ::StandardError; end
+  class Error < ::StandardError
+    attr_reader :body
+
+    def initialize(body = nil)
+      @body = body
+    end
+  end
+
   class TooManyRedirectsError < CanvasHttp::Error; end
   class InvalidResponseCodeError < CanvasHttp::Error
     attr_reader :code
-    def initialize(code)
-      super()
+    def initialize(code, body = nil)
+      super(body)
       @code = code
     end
   end
   class RelativeUriError < CanvasHttp::Error; end
   class InsecureUriError < CanvasHttp::Error; end
+  class UnresolvableUriError < CanvasHttp::Error; end
   class CircuitBreakerError < CanvasHttp::Error; end
 
-  def self.put(*args, &block)
-    CanvasHttp.request(Net::HTTP::Put, *args, &block)
+  def self.put(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Put, *args, **kwargs, &block)
   end
 
-  def self.delete(*args, &block)
-    CanvasHttp.request(Net::HTTP::Delete, *args, &block)
+  def self.delete(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Delete, *args, **kwargs, &block)
   end
 
-  def self.head(*args, &block)
-    CanvasHttp.request(Net::HTTP::Head, *args, &block)
+  def self.head(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Head, *args, **kwargs, &block)
   end
 
-  def self.get(*args, &block)
-    CanvasHttp.request(Net::HTTP::Get, *args, &block)
+  def self.get(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Get, *args, **kwargs, &block)
   end
 
-  def self.post(*args, &block)
-    CanvasHttp.request(Net::HTTP::Post, *args, &block)
+  def self.post(*args, **kwargs, &block)
+    CanvasHttp.request(Net::HTTP::Post, *args, **kwargs, &block)
   end
 
   # Use this helper method to do HTTP GET requests. It knows how to handle
@@ -72,7 +82,8 @@ module CanvasHttp
     last_scheme = nil
     last_host = nil
     current_host = nil
-
+    request_cost = 0
+    logger.info("CANVAS_HTTP START REQUEST CHAIN | method: #{request_class} | url: #{url_str}")
     loop do
       raise(TooManyRedirectsError) if redirect_limit <= 0
 
@@ -87,14 +98,21 @@ module CanvasHttp
       request.content_type = content_type if content_type
 
       http.verify_mode = OpenSSL::SSL::VERIFY_NONE
+      logger.info("CANVAS_HTTP INITIATE REQUEST | url: #{url_str}")
+      start_time = Time.now
       http.request(request) do |response|
+        end_time = Time.now
+        elapsed_time = (end_time - start_time) # seconds
+        request_cost += elapsed_time
         if response.is_a?(Net::HTTPRedirection) && !response.is_a?(Net::HTTPNotModified)
           redirect_spy.call(response) if redirect_spy.is_a?(Proc)
           last_host = uri.host
           last_scheme = uri.scheme
           url_str = response['Location']
+          logger.info("CANVAS_HTTP CONSUME REDIRECT | url: #{url_str} | elapsed: #{elapsed_time} s")
           redirect_limit -= 1
         else
+          logger.info("CANVAS_HTTP RESOLVE RESPONSE | url: #{url_str} | elapsed: #{elapsed_time} s")
           if block_given?
             yield response
           else
@@ -109,6 +127,8 @@ module CanvasHttp
   rescue Net::ReadTimeout, Net::OpenTimeout
     CircuitBreaker.trip_if_necessary(current_host)
     raise
+  ensure
+    increment_cost(request_cost)
   end
 
   def self.add_form_data(request, form_data, multipart:, streaming:)
@@ -163,13 +183,38 @@ module CanvasHttp
 
   def self.insecure_host?(host)
     return unless filters = self.blocked_ip_filters
-    addrs = Resolv.getaddresses(host).map { |ip| ::IPAddr.new(ip) rescue nil}.compact
-    return true unless addrs.any?
-
-    filters.any? do |filter|
-      addr_range = ::IPAddr.new(filter) rescue nil
-      addr_range && addrs.any?{|addr| addr_range.include?(addr)}
+    resolved_addrs = Resolv.getaddresses(host)
+    unless resolved_addrs.any?
+      # this is actually a different condition than the host being insecure,
+      # and having separate telemetry is helpful for understanding transient failures.
+      if host =~ /inst-fs/
+        resolution_output = `dig #{host}`
+        logger.warn("INST_FS_RESOLUTION_FAILURE: #{resolution_output}")
+      end
+      raise UnresolvableUriError, "#{host} cannot be resolved to any address"
     end
+    ip_addrs = resolved_addrs.map do |ip|
+      ::IPAddr.new(ip)
+    rescue IPAddr::InvalidAddressError
+      # this should never happen, Resolv should only be passing back IPs, but
+      # let's make sure we can see if the impossible occurs
+      logger.warn("CANVAS_HTTP WARNING | host: #{host} | invalid_ip: #{ip}")
+      nil
+    end.compact
+    unless ip_addrs.any?
+      raise UnresolvableUriError, "#{host} resolves to only unparseable IPs..."
+    end
+
+    filters.each do |filter|
+      addr_range = ::IPAddr.new(filter)
+      ip_addrs.any? do |addr|
+        if addr_range.include?(addr)
+          logger.warn("CANVAS_HTTP WARNING insecure address | host: #{host} | insecure_address: #{addr} | filter: #{filter}")
+          return true
+        end
+      end
+    end
+    false
   end
 
   # returns a Net::HTTP connection object for the given URI object
@@ -203,6 +248,16 @@ module CanvasHttp
 
   class << self
     attr_writer :open_timeout, :read_timeout, :blocked_ip_filters, :logger
+    attr_accessor :cost
+
+    def reset_cost!
+      self.cost = 0
+    end
+
+    def increment_cost(amount)
+      self.cost ||= 0
+      self.cost += amount
+    end
   end
 
   # returns a tempfile with a filename based on the uri (same extension, if

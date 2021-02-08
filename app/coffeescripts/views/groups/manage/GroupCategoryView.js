@@ -26,6 +26,9 @@ import AddUnassignedMenu from './AddUnassignedMenu'
 import template from 'jst/groups/manage/groupCategory'
 import '../../../jquery.rails_flash_notifications'
 import 'jquery.disableWhileLoading'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import GroupCategoryProgress from 'jsx/groups/components/GroupCategoryProgress'
 
 let _previousSearchTerm = ''
 export default class GroupCategoryView extends View {
@@ -136,8 +139,19 @@ export default class GroupCategoryView extends View {
   }
 
   afterRender() {
+    this.renderProgress()
     this.setUnassignedHeading()
     return this.setGroupsHeading()
+  }
+
+  renderProgress() {
+    const container = document.getElementById('group-category-progress')
+    if (container != null) {
+      ReactDOM.render(
+        <GroupCategoryProgress progressPercent={this.model.progressModel.attributes.completion} />,
+        container
+      )
+    }
   }
 
   setUnassignedHeading() {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -416,6 +418,7 @@ Canvas::Plugin.register('inst_fs', nil, {
   :version => '0.0.1',
   :settings => {
     :migration_rate => 0,
+    :service_worker => false,
   },
   :settings_partial => 'plugins/inst_fs_settings',
   :validator => 'InstFsValidator'
@@ -428,4 +431,15 @@ Canvas::Plugin.register('unsplash', nil, {
   version: '1.0.0',
   settings: { access_key: nil },
   settings_partial: 'plugins/unsplash_settings'
+})
+Canvas::Plugin.register('asset_user_access_logs', nil, {
+  name: lambda{ t :name, 'AUA Logger' },
+  description: lambda{ t :description, 'Minimize AUA write pressure' },
+  author: 'Instructure',
+  author_website: 'http://www.instructure.com',
+  version: '1.0.0',
+  settings: {
+    max_log_ids: [0,0,0,0,0,0,0], # one for each day of week (table "partition")
+    write_path: 'update' # member of { update, log }
+  }
 })

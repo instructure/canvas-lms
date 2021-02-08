@@ -240,6 +240,18 @@ class DiscussionTopicsApiController < ApplicationController
     end
   end
 
+  # @API Duplicate discussion topic
+  #
+  # Duplicate a discussion topic according to context (Course/Group)
+  #
+  # @example_request
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/courses/123/discussion_topics/123/duplicate
+  #
+  #     curl -X POST -H 'Authorization: Bearer <token>' \
+  #     https://<canvas>/api/v1/group/456/discussion_topics/456/duplicate
+  #
+  # @returns DiscussionTopic
   def duplicate
     return unless authorized_action(@topic, @current_user, :create)
     # Require topic hook forbids duplicating of child, nonexistent, and deleted topics

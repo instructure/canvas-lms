@@ -18,21 +18,16 @@
 
 export function fileEmbed(file) {
   const fileMimeClass = mimeClass(file)
-  const fileMediaEntryId = mediaEntryId(file)
 
   if (fileMimeClass === 'image') {
     return {type: 'image'}
   } else if (fileMimeClass === 'video' || fileMimeClass === 'audio') {
-    return {type: fileMimeClass, id: fileMediaEntryId}
+    return {type: fileMimeClass}
   } else if (file.preview_url) {
     return {type: 'scribd'}
   } else {
     return {type: 'file'}
   }
-}
-
-function mediaEntryId(file) {
-  return file.media_entry_id || 'maybe'
 }
 
 export function mimeClass(file) {
@@ -82,19 +77,24 @@ export function mimeClass(file) {
         'audio/x-aiff': 'audio',
         'audio/x-m4a': 'audio',
         'audio/x-mpegurl': 'audio',
+        'audio/x-ms-wma': 'audio',
         'audio/x-pn-realaudio': 'audio',
         'audio/x-wav': 'audio',
         'audio/mp4': 'audio',
+        'audio/wav': 'audio',
         'audio/webm': 'audio',
         'video/mpeg': 'video',
         'video/quicktime': 'video',
         'video/x-la-asf': 'video',
         'video/x-ms-asf': 'video',
+        'video/x-ms-wma': 'audio',
+        'video/x-ms-wmv': 'video',
         'video/x-msvideo': 'video',
         'video/x-sgi-movie': 'video',
         'video/3gpp': 'video',
         'video/mp4': 'video',
         'video/webm': 'video',
+        'video/avi': 'video',
         'application/x-shockwave-flash': 'flash'
       }[contentType] ||
       file.mime_class ||

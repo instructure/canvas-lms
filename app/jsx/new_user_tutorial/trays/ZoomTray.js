@@ -30,47 +30,57 @@ const ZoomTray = () => (
       {
         label: I18n.t('How do I add Zoom to a course?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_add_Zoom_to_a_Canvas_course'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1295024148'
       },
       {
         label: I18n.t('How do I schedule a Zoom video meeting?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_schedule_a_Zoom_video_meeting'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-447786187'
+      },
+      {
+        label: I18n.t('How do I invite others to join a meeting?'),
+        href:
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--361560439'
       },
       {
         label: I18n.t('How do I start a meeting?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_start_a_meeting'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1170907065'
       },
       {
         label: I18n.t('How do I record a meeting?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_record_a_meeting'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1980253691'
       },
       {
         label: I18n.t('How do I know if students have joined the meeting?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_know_if_students_have_joined_the_meeting'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--237443356'
       },
       {
         label: I18n.t('How do I mute and unmute all participants?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_mute_and_unmute_all_participants'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--810232164'
       },
       {
         label: I18n.t('How do I turn my camera on or off and use Zoom controls?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_turn_my_camera_on_and_off_and_use_the_Zoom_controls'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1619578790'
       },
       {
         label: I18n.t('How do I share my screen?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_share_my_screen'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-123231545'
       },
       {
         label: I18n.t('How do I manage and share the recording?'),
         href:
-          'https://community.canvaslms.com/docs/DOC-23893#jive_content_id_How_do_I_manage_and_share_the_recording'
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId-1866041880'
+      },
+      {
+        label: I18n.t('What storage options do I have in Zoom?'),
+        href:
+          'https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826#toc-hId--1387179659'
       }
     ]}
   >

@@ -20,7 +20,7 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import Bridge from '../../../bridge'
 import {StoreProvider} from '../shared/StoreContext'
-import uploadMediaTranslations from './mediaTranslations'
+import formatMessage from '../../../format-message'
 
 export default function(ed, document) {
   return import('@instructure/canvas-media').then(CanvasMedia => {
@@ -38,18 +38,40 @@ export default function(ed, document) {
       ed.focus(false)
     }
 
+    // We need to have a place to store the bookmark location
+    // while the upload happens.
+    let uploadBookmark = null
+
     // redux's activateMediaUpload action does the image placeholder,
     // but it also does the upload. We need to separate them if we
     // want to stay within the redux approach
     const handleStartUpload = fileProps => {
       Bridge.focusEditor(ed.rceWrapper)
+      const editorComponent = Bridge.activeEditor()
+      uploadBookmark = editorComponent?.editor?.selection.getBookmark(2, true)
       Bridge.insertImagePlaceholder(fileProps)
       handleDismiss()
     }
 
     const handleUpload = (error, uploadData, onUploadComplete) => {
-      const err_msg = error && uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      let err_msg = error && Bridge.uploadMediaTranslations.UploadMediaStrings.UPLOADING_ERROR
+      if (error?.file?.size > error?.maxFileSize * 1024 * 1024) {
+        err_msg = formatMessage(
+          'Size of {file} is greater than the maximum {max} MB allowed file size.',
+          {file: error.file.name, max: error.maxFileSize}
+        )
+      }
+
+      const editorComponent = Bridge.activeEditor()
+      let newBookmark
+      if (uploadBookmark) {
+        newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+        editorComponent.editor.selection.moveToBookmark(uploadBookmark)
+      }
       onUploadComplete(err_msg, uploadData)
+      if (newBookmark) {
+        editorComponent.editor.selection.moveToBookmark(newBookmark)
+      }
     }
 
     const trayProps = Bridge.trayProps.get(ed)
@@ -67,10 +89,9 @@ export default function(ed, document) {
             onUploadComplete={(err, data) =>
               handleUpload(err, data, contentProps.mediaUploadComplete)
             }
-            onEmbed={embedCode => Bridge.insertEmbedCode(embedCode)}
             onDismiss={handleDismiss}
-            tabs={{embed: true, record: true, upload: true}}
-            uploadMediaTranslations={uploadMediaTranslations}
+            tabs={{record: true, upload: true}}
+            uploadMediaTranslations={Bridge.uploadMediaTranslations}
           />
         )}
       </StoreProvider>,

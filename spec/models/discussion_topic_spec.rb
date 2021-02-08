@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -165,6 +167,28 @@ describe DiscussionTopic do
       )
 
       expect(values).to eq([true] * values.length)
+    end
+  end
+
+  describe 'default values' do
+    subject(:discussion_topic) { @course.discussion_topics.create!(title: title) }
+    
+    let(:default_title) { I18n.t('#discussion_topic.default_title', "No Title") }
+     
+    context 'when the title is an empty string' do
+      let(:title) { '' }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
+    end
+
+    context 'when the title is nil' do
+      let(:title) { nil }
+
+      it 'sets its default value' do
+        expect(discussion_topic.title).to eq(default_title)
+      end
     end
   end
 
@@ -504,6 +528,7 @@ describe DiscussionTopic do
           section2 = @course.course_sections.create!
           student1 = create_enrolled_user(@course, section1, :name => 'student 1', :enrollment_type => 'StudentEnrollment')
           student2 = create_enrolled_user(@course, section2, :name => 'student 2', :enrollment_type => 'StudentEnrollment')
+          @course.reload
           add_section_to_topic(topic, section2)
           topic.save!
           topic.publish!
@@ -1079,6 +1104,23 @@ describe DiscussionTopic do
       end
     end
 
+    it "should not send stream items to students if locked by a module" do
+      topic = @course.discussion_topics.create!(
+        title: "Ya Ya Ding Dong",
+        user: @teacher,
+        message: 'By Will Ferrell and My Marianne',
+        workflow_state: "unpublished"
+      )
+
+      context_module = @course.context_modules.create!(name: 'some module')
+      context_module.unlock_at = Time.now + 1.day
+      context_module.add_item(type: 'discussion_topic', id: topic.id)
+      context_module.save!
+      topic.publish!
+
+      expect(@student.stream_item_instances.count).to eq 0
+    end
+
     it "should not send stream items to students if course isn't published'" do
       @course.update_attribute(:workflow_state, "created")
       topic = @course.discussion_topics.create!(:title => "secret topic", :user => @teacher)
@@ -1124,6 +1166,20 @@ describe DiscussionTopic do
       announcement.delayed_post_at = 5.days.from_now
       announcement.workflow_state = 'post_delayed'
       announcement.save!
+
+      expect(@student.stream_item_instances.count).to eq 0
+    end
+
+    it "should remove stream items from users if locked by a module" do
+      topic = @course.discussion_topics.create!(title: "Ya Ya Ding Dong", user: @teacher, message: 'By Will Ferrell and My Marianne')
+
+      expect(@student.stream_item_instances.count).to eq 1
+
+      context_module = @course.context_modules.create!(name: 'some module')
+      context_module.unlock_at = Time.now + 1.day
+      context_module.add_item(type: 'discussion_topic', id: topic.id)
+      context_module.save!
+      topic.save!
 
       expect(@student.stream_item_instances.count).to eq 0
     end

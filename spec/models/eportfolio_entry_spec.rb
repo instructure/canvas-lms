@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -155,9 +157,8 @@ describe EportfolioEntry do
       let(:spam_status) { @eportfolio.reload.spam_status }
       let(:entry) { @eportfolio_entry }
 
-      context "when the setting has a value and the release flag is enabled" do
+      context "when the setting has a value" do
         before(:each) do
-          @user.account.root_account.enable_feature!(:eportfolio_moderation)
           Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
           Setting.set('eportfolio_content_spam_keywords', 'injurious,deleterious')
         end
@@ -203,14 +204,6 @@ describe EportfolioEntry do
       end
 
       it "does not attempt to mark as spam when the setting is empty" do
-        @user.account.root_account.enable_feature!(:eportfolio_moderation)
-        expect {
-          entry.update!(name: "actually a bad page")
-        }.not_to change { spam_status }
-      end
-
-      it "does not attempt to mark as spam when the release flag is not enabled" do
-        Setting.set('eportfolio_title_spam_keywords', 'bad, verybad, worse')
         expect {
           entry.update!(name: "actually a bad page")
         }.not_to change { spam_status }

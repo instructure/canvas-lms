@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -31,12 +33,12 @@ module CyoeHelper
     ConditionalRelease::Service.enabled_in_context?(context)
   end
 
-  def cyoe_rules(context, current_user, items, session)
-    ConditionalRelease::Service.rules_for(context, current_user, items, session)
+  def cyoe_rules(context, current_user, session)
+    ConditionalRelease::Service.rules_for(context, current_user, session)
   end
 
   def conditional_release_rule_for_module_item(content_tag, opts = {})
-    rules = opts[:conditional_release_rules] || cyoe_rules(opts[:context], opts[:user], [], opts[:session])
+    rules = opts[:conditional_release_rules] || cyoe_rules(opts[:context], opts[:user], opts[:session])
     assignment_id = content_tag.assignment.try(:id)
     path_data = conditional_release_assignment_set(rules, assignment_id) if rules.present? && assignment_id.present?
     if path_data.present? && opts[:is_student]
@@ -48,7 +50,7 @@ module CyoeHelper
   end
 
   def conditional_release_assignment_set(rules, id)
-    result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s }
+    result = rules.find { |rule| rule[:trigger_assignment].to_s == id.to_s || rule[:trigger_assignment_id] == id }
     return if result.blank?
     result.slice(:locked, :assignment_sets, :selected_set_id)
   end
@@ -57,8 +59,9 @@ module CyoeHelper
     result = conditional_release_rule_for_module_item(content_tag, opts)
     return if result.blank?
     result[:assignment_sets].each do |as|
-      next if as[:assignments].blank?
-      as[:assignments].each do |a|
+      associations = as[:assignment_set_associations]
+      next if associations.blank?
+      associations.each do |a|
         a[:model] = assignment_json(a[:model], user, nil) if a[:model]
       end
     end
@@ -76,9 +79,8 @@ module CyoeHelper
 
   def check_if_processing(data)
     if !data[:awaiting_choice] && data[:assignment_sets].length == 1
-      vis_assignments = AssignmentStudentVisibility.visible_assignment_ids_for_user(@current_user.id, @context.id) || []
-      selected_set_assignment_ids = data[:assignment_sets][0][:assignments].map{ |a| a[:assignment_id].to_i } || []
-      data[:still_processing] = (selected_set_assignment_ids - vis_assignments).present?
+      set = data[:assignment_sets][0]
+      data[:still_processing] = !ConditionalRelease::AssignmentSetAction.where(:assignment_set_id => set[:id], :student_id => @current_user.id).exists?
     end
   end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -205,7 +207,7 @@ module CC
       end
       node.workflow_state assignment.workflow_state
       if assignment.rubric
-        assoc = assignment.rubric_association
+        assoc = assignment.active_rubric_association? ? assignment.rubric_association : nil
         node.rubric_identifierref key_generator.create_key(assignment.rubric)
         if assignment.rubric && assignment.rubric.context != assignment.context
           node.rubric_external_identifier assignment.rubric.id
@@ -261,6 +263,7 @@ module CC
           end
         end
         node.external_tool_url assignment.external_tool_tag.url
+        node.external_tool_data_json assignment.external_tool_tag.external_data.to_json if assignment.external_tool_tag.external_data
         node.external_tool_new_tab assignment.external_tool_tag.new_tab
       end
 

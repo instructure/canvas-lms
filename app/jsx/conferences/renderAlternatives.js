@@ -41,9 +41,10 @@ const theme = {
 
 const visitZoomUrl = 'https://zoom.com/meeting/schedule'
 const visitMeetUrl = 'https://meet.google.com/_meet'
-const learnMeetUrl = 'https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet'
+const learnMeetUrl =
+  'https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649'
 const learnTeamsUrl =
-  'https://community.canvaslms.com/docs/DOC-18558-microsoft-teams-meetings-in-canvas'
+  'https://community.canvaslms.com/t5/Admin-Group/Microsoft-Teams-Meetings-in-Canvas/ba-p/256340'
 
 function ConferenceProvider({imageSource, title, text, responsiveSize}) {
   const skinny = responsiveSize === 'medium'

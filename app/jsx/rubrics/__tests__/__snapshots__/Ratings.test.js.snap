@@ -6,11 +6,6 @@ exports[`The Ratings component only renders the single selected Rating with a fo
   onClick={null}
   onKeyPress={[Function]}
   role={null}
-  style={
-    Object {
-      "width": "100%",
-    }
-  }
   tabIndex={null}
 >
   <div
@@ -70,11 +65,6 @@ exports[`The Ratings component renders a default rating if none of the ratings a
   onClick={null}
   onKeyPress={[Function]}
   role={null}
-  style={
-    Object {
-      "width": undefined,
-    }
-  }
   tabIndex={null}
 >
   <div
@@ -132,11 +122,6 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
   onClick={null}
   onKeyPress={[Function]}
   role={null}
-  style={
-    Object {
-      "width": "33.333333333333336%",
-    }
-  }
   tabIndex={null}
 >
   <div
@@ -203,11 +188,6 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
   onClick={null}
   onKeyPress={[Function]}
   role={null}
-  style={
-    Object {
-      "width": "33.333333333333336%",
-    }
-  }
   tabIndex={null}
 >
   <div
@@ -276,11 +256,6 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
   onClick={null}
   onKeyPress={[Function]}
   role={null}
-  style={
-    Object {
-      "width": "33.333333333333336%",
-    }
-  }
   tabIndex={null}
 >
   <div
@@ -342,64 +317,92 @@ exports[`The Ratings component renders the Rating sub-components as expected whe
 `;
 
 exports[`The Ratings component renders the root component as expected 1`] = `
-<div
-  className="rating-all"
->
-  <div
-    className="rating-tier-list"
+<div>
+  <Flex
+    as="span"
+    direction="row"
+    display="flex"
+    elementRef={[Function]}
+    justifyItems="start"
+    withVisualDebug={false}
+    wrap="no-wrap"
   >
-    <Rating
-      assessing={false}
-      classes="rating-tier"
-      description="Superb"
-      endOfRangePoints={null}
-      footer={null}
-      hidePoints={false}
-      id="1"
-      isSummary={false}
-      key="0"
-      onClick={[Function]}
-      points={10}
-      selected={false}
-      shaderClass={null}
-      tierColor="transparent"
+    <Item
+      as="span"
+      elementRef={[Function]}
+      key="tier-0"
+      shouldGrow={false}
+      shouldShrink={false}
       width="33.333333333333336%"
-    />
-    <Rating
-      assessing={false}
-      classes="rating-tier selected"
-      description="Meh"
-      endOfRangePoints={null}
-      footer={null}
-      hidePoints={false}
-      id="2"
-      isSummary={false}
-      key="1"
-      long_description="More Verbosity"
-      onClick={[Function]}
-      points={5}
-      selected={true}
-      shaderClass="nearMasteryShader"
-      tierColor={null}
+    >
+      <Rating
+        assessing={false}
+        classes="rating-tier"
+        description="Superb"
+        endOfRangePoints={null}
+        footer={null}
+        hidePoints={false}
+        id="1"
+        isSummary={false}
+        key="0"
+        onClick={[Function]}
+        points={10}
+        selected={false}
+        shaderClass={null}
+        tierColor="transparent"
+      />
+    </Item>
+    <Item
+      as="span"
+      elementRef={[Function]}
+      key="tier-1"
+      shouldGrow={false}
+      shouldShrink={false}
       width="33.333333333333336%"
-    />
-    <Rating
-      assessing={false}
-      classes="rating-tier"
-      description="Subpar"
-      endOfRangePoints={null}
-      footer={null}
-      hidePoints={false}
-      id="3"
-      isSummary={false}
-      key="2"
-      onClick={[Function]}
-      points={1}
-      selected={false}
-      shaderClass={null}
-      tierColor="transparent"
+    >
+      <Rating
+        assessing={false}
+        classes="rating-tier selected"
+        description="Meh"
+        endOfRangePoints={null}
+        footer={null}
+        hidePoints={false}
+        id="2"
+        isSummary={false}
+        key="1"
+        long_description="More Verbosity"
+        onClick={[Function]}
+        points={5}
+        selected={true}
+        shaderClass="nearMasteryShader"
+        tierColor={null}
+      />
+    </Item>
+    <Item
+      as="span"
+      elementRef={[Function]}
+      key="tier-2"
+      shouldGrow={false}
+      shouldShrink={false}
       width="33.333333333333336%"
-    />
-  </div>
+    >
+      <Rating
+        assessing={false}
+        classes="rating-tier"
+        description="Subpar"
+        endOfRangePoints={null}
+        footer={null}
+        hidePoints={false}
+        id="3"
+        isSummary={false}
+        key="2"
+        onClick={[Function]}
+        points={1}
+        selected={false}
+        shaderClass={null}
+        tierColor="transparent"
+      />
+    </Item>
+  </Flex>
 </div>
 `;

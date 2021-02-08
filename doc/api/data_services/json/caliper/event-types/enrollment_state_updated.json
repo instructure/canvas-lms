@@ -1,0 +1,100 @@
+{
+  "name": "enrollment_state_updated",
+  "definition": "The event is emitted anytime an enrollment record workflow state changes.",
+  "trigger": "Triggered when a course enrollment workflow_state changes.",
+  "schema": {
+    "data[0].group.extensions[\"com.instructure.canvas\"]": {
+      "context_type": "Canvas context type where the action took place e.g context_type = Course.",
+      "entity_id": "Canvas context ID"
+    },
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "access_is_current": "Indicates if the enrollment_state is up to date",
+      "entity_id": "Canvas global ID of the object affected by the event",
+      "restricted_access": "Indicates whether enrollment access is restricted, set to 'TRUE' if enrollment state is restricted",
+      "state_is_current": "Indicates if this enrollment_state is up to date",
+      "state": "The state of the enrollment",
+      "state_valid_until": "The time at which this enrollment is no longer valid"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T23:47:22.555Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:89c8b4b1-1caf-4af1-a391-c4d6da12eb09",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000012",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "applications.admin",
+                  "user_sis_id": "applications.admin",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000012"
+                }
+              }
+            },
+            "action": "Modified",
+            "object": {
+              "id": "urn:instructure:canvas:enrollment:21070000000001999",
+              "type": "Entity",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "access_is_current": true,
+                  "restricted_access": false,
+                  "state": "deleted",
+                  "state_is_current": true,
+                  "entity_id": "21070000000001999"
+                }
+              }
+            },
+            "eventTime": "2019-11-01T19:11:18.125Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "group": {
+              "id": "urn:instructure:canvas:course:21070000000000565",
+              "type": "CourseOffering",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "context_type": "Course",
+                  "entity_id": "21070000000000565"
+                }
+              }
+            },
+            "membership": {
+              "id": "urn:instructure:canvas:course:21070000000000565:user:21070000000000012",
+              "type": "Membership",
+              "member": {
+                "id": "urn:instructure:canvas:user:21070000000000012",
+                "type": "Person"
+              },
+              "organization": {
+                "id": "urn:instructure:canvas:course:21070000000000565",
+                "type": "CourseOffering"
+              }
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Somebot/12.0",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instrucvture.com/api/v1/courses/565/enrollments/1999?task=delete&access_token=1~fHJKsdaHK423KGHFJDAS32hkgfdaks342423jfKJKj33hjlklkgjkl2jkljlk34j",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

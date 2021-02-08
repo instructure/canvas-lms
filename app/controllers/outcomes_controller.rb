@@ -18,6 +18,7 @@
 
 class OutcomesController < ApplicationController
   include Api::V1::Outcome
+  include Api::V1::Role
   before_action :require_context, :except => [:build_outcomes]
   add_crumb(proc { t "#crumbs.outcomes", "Outcomes" }, :except => [:destroy, :build_outcomes]) { |c| c.send :named_context_url, c.instance_variable_get("@context"), :context_outcomes_path }
   before_action { |c| c.active_tab = "outcomes" }
@@ -29,28 +30,30 @@ class OutcomesController < ApplicationController
     log_asset_access([ "outcomes", @context ], "outcomes", "other")
 
     @root_outcome_group = @context.root_outcome_group
-    if (common_core_group_id = Setting.get(AcademicBenchmark.common_core_setting_key, nil))
-      common_core_group_id = common_core_group_id.to_i
+    if (common_core_group_id = Shard.current.settings[:common_core_outcome_group_id])
       common_core_group_url = polymorphic_path([:api_v1, :global, :outcome_group], :id => common_core_group_id)
     end
 
     js_env(:ROOT_OUTCOME_GROUP => outcome_group_json(@root_outcome_group, @current_user, session),
            :CONTEXT_URL_ROOT => polymorphic_path([@context]),
            :ACCOUNT_CHAIN_URL => polymorphic_path([:api_v1, @context, :account_chain]),
-           # Don't display state standards if in the context of a Course. Only at Account level.
+           # Don't display state standards, global outcomes if in the context of a Course. Only at Account level.
            :STATE_STANDARDS_URL => @context.is_a?(Course) ? nil : api_v1_global_redirect_path,
+           :GLOBAL_ROOT_OUTCOME_GROUP_ID => @context.is_a?(Course) ? nil : LearningOutcomeGroup.global_root_outcome_group.id,
            :COMMON_CORE_GROUP_ID => common_core_group_id,
            :COMMON_CORE_GROUP_URL => common_core_group_url,
-           :RUBRICS_IN_COURSE_NAV => @domain_root_account.feature_enabled?(:rubrics_in_course_navigation),
-           :IMPORT_OUTCOMES_PERMISSION_FIX => @domain_root_account.feature_enabled?(:import_outcomes_permission_fix),
            :PERMISSIONS => {
              :manage_outcomes => @context.grants_right?(@current_user, session, :manage_outcomes),
              :manage_rubrics => @context.grants_right?(@current_user, session, :manage_rubrics),
              :manage_courses => @context.grants_right?(@current_user, session, :manage_courses),
-             :import_outcomes => @context.grants_right?(@current_user, session, :import_outcomes)
+             :import_outcomes => @context.grants_right?(@current_user, session, :import_outcomes),
+             :manage_proficiency_scales => @context.grants_right?(@current_user, session, :manage_proficiency_scales),
+             :manage_proficiency_calculations => @context.grants_right?(@current_user, session, :manage_proficiency_calculations)
            })
 
     set_tutorial_js_env
+    mastery_scales_js_env
+    proficiency_roles_js_env
   end
 
   def show
@@ -311,5 +314,24 @@ class OutcomesController < ApplicationController
   protected
   def learning_outcome_params
     params.require(:learning_outcome).permit(:description, :short_description, :title, :display_name, :vendor_guid)
+  end
+
+  private
+
+  def proficiency_roles_js_env
+    if @context.is_a?(Account) && @context.root_account.feature_enabled?(:account_level_mastery_scales)
+      proficiency_calculation_roles = []
+      @context.roles_with_enabled_permission(:manage_proficiency_calculations).each do |role|
+        proficiency_calculation_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+      end if @context.grants_right? @current_user, :manage_proficiency_calculations
+      proficiency_scales_roles = []
+      @context.roles_with_enabled_permission(:manage_proficiency_scales).each do |role|
+        proficiency_scales_roles << role_json(@context, role, @current_user, session, skip_permissions: true)
+      end if @context.grants_right? @current_user, :manage_proficiency_scales
+      js_env(
+        PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES: proficiency_calculation_roles,
+        PROFICIENCY_SCALES_ENABLED_ROLES: proficiency_scales_roles
+      )
+    end
   end
 end

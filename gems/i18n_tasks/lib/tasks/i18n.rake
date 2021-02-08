@@ -45,7 +45,6 @@ namespace :i18n do
       locales
       crowdsourced
       custom
-      deprecated_for
       bigeasy_locale
       fullcalendar_locale
       moment_locale
@@ -95,13 +94,6 @@ namespace :i18n do
 
     locales = I18n.available_locales - [:en]
     all_translations = I18n.backend.send(:translations)
-
-    # copy "real" translations from deprecated locales
-    I18n.available_locales.each do |locale|
-      if (deprecated_for = I18n.backend.send(:lookup, locale.to_s, 'deprecated_for'))
-        all_translations[locale] = all_translations[deprecated_for.to_sym]
-      end
-    end
 
     flat_translations = all_translations.flatten_keys
 

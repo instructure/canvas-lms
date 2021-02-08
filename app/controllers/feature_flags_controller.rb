@@ -116,13 +116,14 @@
 #           "type": "string"
 #         },
 #         "state": {
-#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', or 'on'.",
+#           "description": "The policy for the feature at this context.  can be 'off', 'allowed', 'allowed_on', or 'on'.",
 #           "example": "allowed",
 #           "type": "string",
 #           "allowableValues": {
 #             "values": [
 #               "off",
 #               "allowed",
+#               "allowed_on",
 #               "on"
 #             ]
 #           }
@@ -147,7 +148,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns [Feature]
   def index
@@ -162,9 +163,13 @@ class FeatureFlagsController < ApplicationController
       flags = features.map { |fd|
         @context.lookup_feature_flag(fd.feature,
           override_hidden: Account.site_admin.grants_right?(@current_user, session, :read),
-          skip_cache: skip_cache
+          skip_cache: skip_cache,
+          # Hide flags that are forced ON at a higher level
+          # Undocumented flag for frontend use only
+          hide_inherited_enabled: params[:hide_inherited_enabled]
         )
       }.compact
+
       render json: flags.map { |flag| feature_with_flag_json(flag, @context, @current_user, session) }
     end
   end
@@ -177,7 +182,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features/enabled' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @example_response
   #
@@ -188,6 +193,25 @@ class FeatureFlagsController < ApplicationController
                    select { |ff| ff.enabled? }.map(&:feature)
       render json: features
     end
+  end
+
+  # @API List environment features
+  #
+  # Return a hash of global feature settings that pertain to the
+  # Canvas user interface. This is the same information supplied to the
+  # web interface as +ENV.FEATURES+.
+  #
+  # @example_request
+  #
+  #   curl 'http://<canvas>/api/v1/features/environment' \
+  #     -H "Authorization: Bearer <token>"
+  #
+  # @example_response
+  #
+  #   { "telepathic_navigation": true, "fancy_wickets": true, "automatic_essay_grading": false }
+  #
+  def environment
+    render json: cached_js_env_account_features
   end
 
   # @API Get feature flag
@@ -201,7 +225,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl 'http://<canvas>/api/v1/courses/1/features/flags/fancy_wickets' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns FeatureFlag
   def show
@@ -289,7 +313,7 @@ class FeatureFlagsController < ApplicationController
   # @example_request
   #
   #   curl -X DELETE 'http://<canvas>/api/v1/courses/1/features/flags/fancy_wickets' \
-  #     -H "Authorization: Bearer "
+  #     -H "Authorization: Bearer <token>"
   #
   # @returns FeatureFlag
   def delete

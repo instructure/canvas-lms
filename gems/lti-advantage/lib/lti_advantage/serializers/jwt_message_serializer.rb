@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -35,6 +37,7 @@ module LtiAdvantage::Serializers
       tool_platform
       version
       target_link_uri
+      lti11_legacy_user_id
     ).freeze
 
     DEEP_LINKING_CLAIMS = %w(

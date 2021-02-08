@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ describe "international sms" do
 
     before(:each) do
       course_with_student_logged_in
-      Account.site_admin.enable_feature!(:international_sms)
+      @user.account.enable_feature!(:international_sms)
     end
 
     it 'shows a disclaimer for international numbers', priority: "1", test_id: 443930 do

@@ -18,7 +18,7 @@
 
 import React from 'react'
 import {func, shape, string} from 'prop-types'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {NumberInput} from '@instructure/ui-number-input'
 
 export default function DimensionInput(props) {

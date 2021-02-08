@@ -27,7 +27,7 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
+        anonymizeStudents: false,
         postManually: false,
         published: true
       },
@@ -36,7 +36,6 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         assignmentId: '1',
         excused: false,
@@ -54,31 +53,16 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     wrapper.unmount()
   })
 
+  function getHiddenPills() {
+    return wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Hidden')
+  }
+
   function mountComponent() {
     return shallow(<SubmissionStatus {...props} />)
   }
-
-  test('shows the "Muted" pill when the assignment is muted and not postPoliciesEnabled', () => {
-    props.assignment.muted = true
-    wrapper = mountComponent()
-    const mutedPills = wrapper
-      .find('Pill')
-      .getElements()
-      .filter(node => node.props.text === 'Muted')
-
-    strictEqual(mutedPills.length, 1)
-  })
-
-  test('does not show the "Muted" pill when the assignment is not muted', () => {
-    props.assignment.muted = false
-    wrapper = mountComponent()
-    const pills = wrapper
-      .find('Pill')
-      .getElements()
-      .map(node => node.props.text)
-
-    strictEqual(pills.length, 0)
-  })
 
   test('shows the "Unpublished" pill when the assignment is unpublished', () => {
     props.assignment.published = false
@@ -113,6 +97,18 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     strictEqual(droppedPills.length, 1)
   })
 
+  test('does not show the "Dropped" pill when the submission is dropped and students are anonymous', () => {
+    props.submission.drop = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const droppedPills = wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Dropped')
+
+    strictEqual(droppedPills.length, 0)
+  })
+
   test('does not show the "Dropped" pill when the submission is not dropped', () => {
     props.submission.drop = false
     wrapper = mountComponent()
@@ -135,6 +131,18 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     strictEqual(excusedPills.length, 1)
   })
 
+  test('does not show the "Excused" pill when the submission is excused and students are anonymous', () => {
+    props.submission.excused = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const excusedPills = wrapper
+      .find('Pill')
+      .getElements()
+      .filter(node => node.props.text === 'Excused')
+
+    strictEqual(excusedPills.length, 0)
+  })
+
   test('does not show the "Excused" pill when the submission is not excused', () => {
     props.submission.excused = false
     wrapper = mountComponent()
@@ -146,63 +154,47 @@ QUnit.module('SubmissionStatus - Pills', hooks => {
     strictEqual(pills.length, 0)
   })
 
-  QUnit.module('Post Policies enabled', postPoliciesEnabledHooks => {
-    function getHiddenPills() {
-      return wrapper
-        .find('Pill')
-        .getElements()
-        .filter(node => node.props.text === 'Hidden')
-    }
+  test('shows the "Hidden" pill when the submission is graded and not posted', () => {
+    props.submission.score = 1
+    props.submission.workflowState = 'graded'
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 1)
+  })
 
-    postPoliciesEnabledHooks.beforeEach(() => {
-      props.postPoliciesEnabled = true
-    })
+  test('shows the "Hidden" pill when the submission has comments and not posted', () => {
+    props.submission.hasPostableComments = true
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 1)
+  })
 
-    test('does not show the "Muted" pill when the assignment is muted', () => {
-      props.assignment.muted = true
-      wrapper = mountComponent()
-      const mutedPills = wrapper
-        .find('Pill')
-        .getElements()
-        .filter(node => node.props.text === 'Muted')
+  test('does not show the "Hidden" pill when students are anonymized', () => {
+    props.submission.hasPostableComments = true
+    props.assignment.anonymizeStudents = true
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 0)
+  })
 
-      strictEqual(mutedPills.length, 0)
-    })
+  test('does not show the "Hidden" pill when the submission is not graded', () => {
+    props.submission.workflowState = 'unsubmitted'
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 0)
+  })
 
-    test('shows the "Hidden" pill when the submission is graded and not posted', () => {
-      props.submission.score = 1
-      props.submission.workflowState = 'graded'
-      wrapper = mountComponent()
-      const hiddenPills = getHiddenPills()
-      strictEqual(hiddenPills.length, 1)
-    })
+  test('does not show the "Hidden" pill when the submission is posted', () => {
+    props.submission.postedAt = new Date()
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 0)
+  })
 
-    test('shows the "Hidden" pill when the submission has comments and not posted', () => {
-      props.submission.hasPostableComments = true
-      wrapper = mountComponent()
-      const hiddenPills = getHiddenPills()
-      strictEqual(hiddenPills.length, 1)
-    })
-
-    test('does not show the "Hidden" pill when the submission is not graded', () => {
-      props.submission.workflowState = 'unsubmitted'
-      wrapper = mountComponent()
-      const hiddenPills = getHiddenPills()
-      strictEqual(hiddenPills.length, 0)
-    })
-
-    test('does not show the "Hidden" pill when the submission is posted', () => {
-      props.submission.postedAt = new Date()
-      wrapper = mountComponent()
-      const hiddenPills = getHiddenPills()
-      strictEqual(hiddenPills.length, 0)
-    })
-
-    test('does not show the "Hidden" pill when the submission is not graded nor posted', () => {
-      wrapper = mountComponent()
-      const hiddenPills = getHiddenPills()
-      strictEqual(hiddenPills.length, 0)
-    })
+  test('does not show the "Hidden" pill when the submission is not graded nor posted', () => {
+    wrapper = mountComponent()
+    const hiddenPills = getHiddenPills()
+    strictEqual(hiddenPills.length, 0)
   })
 })
 
@@ -214,7 +206,6 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
         postManually: false,
         published: true
       },
@@ -223,7 +214,6 @@ QUnit.module('SubmissionStatus - Grading Period not in any grading period warnin
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         excused: false,
         hasPostableComments: false,
@@ -275,7 +265,6 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
         postManually: false,
         published: true
       },
@@ -284,7 +273,6 @@ QUnit.module('SubmissionStatus - Grading Period is a closed warning', hooks => {
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         excused: false,
         hasPostableComments: false,
@@ -336,7 +324,6 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
         postManually: false,
         published: true
       },
@@ -345,7 +332,6 @@ QUnit.module('SubmissionStatus - Grading Period is in another period warning', h
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         excused: false,
         hasPostableComments: false,
@@ -397,7 +383,6 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
         postManually: false,
         published: true
       },
@@ -406,7 +391,6 @@ QUnit.module('SubmissionStatus - Concluded Enrollment Warning', hooks => {
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         excused: false,
         hasPostableComments: false,
@@ -458,7 +442,6 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
   hooks.beforeEach(() => {
     props = {
       assignment: {
-        muted: false,
         postManually: false,
         published: true
       },
@@ -467,7 +450,6 @@ QUnit.module('SubmissionStatus - Not calculated in final grade', hooks => {
       isInClosedGradingPeriod: false,
       isInNoGradingPeriod: false,
       isNotCountedForScore: false,
-      postPoliciesEnabled: false,
       submission: {
         excused: false,
         hasPostableComments: false,

@@ -32,8 +32,8 @@
     "align_right_9bad3ac1": {
         "message": "Wyrównaj do prawej"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Wyrównanie i wcięcie"
+    "alignment_and_lists_5cebcb69": {
+        "message": "Wyrównanie i listy"
     },
     "all_4321c3a1": {
         "message": "Wszystkie"
@@ -49,6 +49,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alternatywny tekst"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Wystąpił błąd podczas odczytywania pliku"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Podczas odrzucania okazji wystąpił błąd."
@@ -113,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, przypomnienie { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Właściwości"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Nagrania audio i wideo nie są dostępne."
     },
@@ -131,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "Początek historii listy zadań"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "Kalendarz:"
     },
@@ -143,14 +152,17 @@
     "canvas_planner_98ed106": {
         "message": "Planer Canvas"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Wtyczki systemu Canvas"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "Wybierz plik z napisami"
     },
+    "choose_usage_rights_33683854": {
+        "message": "Wybierz prawa użytkowania..."
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "oznacz nieuporządkowaną listę"
+    },
+    "clear_2084585f": {
+        "message": "Wyczyść"
     },
     "clear_selected_file_82388e50": {
         "message": "Usuń wybrany plik"
@@ -179,6 +191,9 @@
     "close_opportunity_center_popup_9907d981": {
         "message": "Zamknij wyskakujące okienko Opportunity Center"
     },
+    "closed_captions_subtitles_e6aaa016": {
+        "message": "Napisy / napisy dla niesłyszących"
+    },
     "collaborations_5c56c15f": {
         "message": "Współprace"
     },
@@ -188,6 +203,9 @@
     "computer_1d7dfa6f": {
         "message": "Komputer"
     },
+    "content_1440204b": {
+        "message": "Zawartość"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "Zawartość jest nadal przesyłana; w przypadku kontynuowania obraz nie zostanie prawidłowo osadzony."
     },
@@ -196,6 +214,9 @@
     },
     "content_type_2cf90d95": {
         "message": "Typ zawartości"
+    },
+    "copyright_holder_66ee111": {
+        "message": "Właściciel praw autorskich:"
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 słów}\n    one {1 słowo}\n  other {# słowa}\n}"
@@ -236,6 +257,9 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } LISTA ZADAŃ"
     },
+    "creative_commons_license_725584ae": {
+        "message": "Licencja Creative Commons:"
+    },
     "current_volume_level_c55ab825": {
         "message": "Bieżący poziom głośności"
     },
@@ -259,6 +283,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "Data i godzina:"
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "Obraz dekoracyjny"
     },
     "decrease_indent_de6343ab": {
         "message": "Zmniejsz wcięcie"
@@ -287,7 +314,7 @@
     "dimensions_45ddb7b7": {
         "message": "Wymiary"
     },
-    "directionality_ebcae6d0": {
+    "directionality_26ae9e08": {
         "message": "Kierunkowość"
     },
     "disable_in_line_preview_2a675175": {
@@ -341,9 +368,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "Przeciągnij uchwyt. Użyj strzałek w dół i w górę, aby zmienić rozmiar"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "Przeciągnij i upuść lub kliknij, aby przeglądać komputer"
-    },
     "due_5d7267be": {
         "message": "Termin:"
     },
@@ -358,6 +382,9 @@
     },
     "edit_c5fbea07": {
         "message": "Edytuj"
+    },
+    "edit_equation_f5279959": {
+        "message": "Edytuj równanie"
     },
     "edit_link_7f53bebb": {
         "message": "Edytuj łącze"
@@ -386,11 +413,11 @@
     "embed_video_a97a64af": {
         "message": "Osadź wideo"
     },
-    "embed_video_code_703e10f2": {
-        "message": "Osadź kod wideo"
-    },
     "embedded_content_aaeb4d3d": {
         "message": "osadzona zawartość"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "Wpisz co najmniej 3 znaki, aby wyszukać."
     },
     "equation_1c5ac93c": {
         "message": "Równanie"
@@ -415,6 +442,9 @@
     },
     "external_links_3d9f074e": {
         "message": "Łącza zewnętrzne"
+    },
+    "external_tools_6e77821": {
+        "message": "Narzędzia zewnętrzne"
     },
     "extra_large_b6cdf1ff": {
         "message": "Wyjątkowo duże"
@@ -464,8 +494,14 @@
     "finish_bc343002": {
         "message": "Zakończ"
     },
+    "focus_element_options_toolbar_18d993e": {
+        "message": "Pasek opcji koncentracji na elemencie"
+    },
     "folder_tree_fbab0726": {
         "message": "Drzewo folderów"
+    },
+    "format_4247a9c5": {
+        "message": "Format"
     },
     "formatting_5b143aa8": {
         "message": "Formatowanie"
@@ -475,6 +511,9 @@
     },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "Odnaleziono { count, plural,\n     =0 {# wyników}\n    one {# wynik}\n  other {# wyników}\n}"
+    },
+    "fullscreen_873bf53f": {
+        "message": "Pełny ekran"
     },
     "generating_preview_45b53be0": {
         "message": "Generowanie podglądu..."
@@ -500,11 +539,23 @@
     "grades_loaded_5056277c": {
         "message": "Wczytano oceny"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "Grupuj dokumenty"
+    },
     "group_files_4324f3df": {
         "message": "Pliki grupy"
     },
     "group_files_82e5dcdb": {
         "message": "Pliki grupy"
+    },
+    "group_images_98e0ac17": {
+        "message": "Grupuj zdjęcia"
+    },
+    "group_links_9493129e": {
+        "message": "Łącza grupowe"
+    },
+    "group_media_2f3d128a": {
+        "message": "Grupuj multimedia"
     },
     "group_navigation_99f191a": {
         "message": "Nawigowanie po grupach"
@@ -520,6 +571,15 @@
     },
     "height_69b03e15": {
         "message": "Wysokość"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Mam uprawnienie do korzystania z tego pliku."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Posiadam prawa autorskie"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "Jeśli nie wybierzesz teraz praw do korzystania, po przesłaniu plik nie zostanie opublikowany."
     },
     "image_8ad06": {
         "message": "Zdjęcie"
@@ -554,6 +614,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Nieprawidłowy typ pliku"
     },
+    "invalid_url_cbde79f": {
+        "message": "Nieprawidłowy adres URL"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items } ukończył(a) { items, plural,\n     =1 {element}\n  other {elementy}\n}"
     },
@@ -566,8 +629,8 @@
     "late_2be42b88": {
         "message": "Późno"
     },
-    "left_to_right_d6da6d7e": {
-        "message": "Od lewej do prawej"
+    "left_to_right_e9b4fd06": {
+        "message": "Lewa-prawa"
     },
     "link_7262adec": {
         "message": "Łącze"
@@ -632,6 +695,9 @@
     "loading_planner_items_947a813d": {
         "message": "Wczytywanie elementu planera"
     },
+    "loading_please_wait_d276220a": {
+        "message": "Ładowanie, proszę czekać"
+    },
     "location_3b6ff307": {
         "message": "Położenie:"
     },
@@ -650,8 +716,8 @@
     "mic_a7f3d311": {
         "message": "Mikrofon"
     },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "Różne i aplikacje"
+    "miscellaneous_e9818229": {
+        "message": "Różne"
     },
     "missing_1a256b3b": {
         "message": "Brak"
@@ -764,6 +830,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "Skróty do innych edytorów można znaleźć na"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } nie jest prawidłowym protokołem; wymagany jest  ftp, http, https, mailto, skype, tel lub można go pominąć"
+    },
     "page_50c4823d": {
         "message": "Strona"
     },
@@ -815,6 +884,9 @@
     "previous_page_928fc112": {
         "message": "Poprzednia strona"
     },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "Wymagany jest protokół ftp, http, https, mailto, skype, tel lub można go pominąć"
+    },
     "pts_699bd9aa": {
         "message": "pkt"
     },
@@ -829,6 +901,9 @@
     },
     "quizzes_7e598f57": {
         "message": "Testy"
+    },
+    "raw_html_editor_e3993e41": {
+        "message": "Edytor HTML bez formatowania"
     },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "Nie udało się odczytać pliku multimediów. Przerywanie..."
@@ -857,8 +932,8 @@
     "rich_content_editor_2708ef21": {
         "message": "Edytor wzbogaconej zawartości"
     },
-    "right_to_left_ec223c81": {
-        "message": "Od prawej do lewej"
+    "right_to_left_9cfb092a": {
+        "message": "Prawa-lewa"
     },
     "save_11a80ec3": {
         "message": "Zapisz"
@@ -904,6 +979,9 @@
     },
     "size_b30e1077": {
         "message": "Rozmiar"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "Rozmiar { file } przekracza maksymalną dozwoloną wielkość plików { max } MB."
     },
     "small_b070434a": {
         "message": "Mały"
@@ -998,6 +1076,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "Minęły już termin i godzina na wykonanie tego zadania"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Materiał znajduje się w domenie publicznej"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Materiał jest objęty licencją Creative Commons"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "Materiały są objęte wyjątkowymi zasadami, np. zasadami dozwolonego użytku, prawa do cytowania lub innymi obowiązującymi przepisami prawa autorskiego"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "Brak punktów powiązanych z tym elementem."
     },
@@ -1039,6 +1126,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "Jutro o godz. { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "Narzędzia"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "{ totalResults } wyników odnaleziono, { numDisplayed } wyników obecnie wyświetlanych"
@@ -1091,6 +1181,12 @@
     "url_22a5f3b8": {
         "message": "URL"
     },
+    "usage_right_ff96f3e2": {
+        "message": "Prawo użytkowania:"
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "Prawo użytkowania (wymagane)"
+    },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "Użyj klawiszy strzałek do nawigowania po opcjach."
     },
@@ -1130,6 +1226,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "Odtwarzacz wideo dla { title }"
     },
+    "view_ba339f93": {
+        "message": "Wyświetl"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Wyświetl skróty klawiszowe"
     },
@@ -1159,6 +1258,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "Masz informacje zwrotne dotyczące multimediów."
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "Nie można przesłać pustego pliku."
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "Wymagane są data i godzina."

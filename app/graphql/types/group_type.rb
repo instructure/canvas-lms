@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 Instructure, Inc.
 #
@@ -25,6 +27,7 @@ module Types
     implements GraphQL::Types::Relay::Node
     implements Interfaces::TimestampInterface
     implements Interfaces::LegacyIDInterface
+    implements Interfaces::AssetStringInterface
 
     global_id_field :id
 
@@ -46,6 +49,13 @@ module Types
       if group.grants_right?(current_user, :read_roster)
         Loaders::ForeignKeyLoader.for(members_scope, :user_id).load(user_id).
           then { |memberships| memberships.first }
+      end
+    end
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:root_account).then do |root_account|
+        group.sis_source_id if root_account.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
 

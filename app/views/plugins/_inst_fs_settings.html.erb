@@ -32,5 +32,11 @@
         <%= f.text_field :migration_rate %>
       </td>
     </tr>
+    <tr>
+      <td><%= f.blabel :service_worker, :en => "Use service worker to authenticate file accesses in Safari 13+" %></td>
+      <td>
+        <%= f.check_box :service_worker %>
+      </td>
+    </tr>
   </table>
 <% end %>

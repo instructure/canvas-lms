@@ -26,7 +26,8 @@ import {roleIsCourseBaseRole} from '../helper/utils'
 import {Button} from '@instructure/ui-buttons'
 import {Flex, View} from '@instructure/ui-layout'
 import {FormField} from '@instructure/ui-form-field'
-import {Heading, Spinner, Text} from '@instructure/ui-elements'
+import {Heading, Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {IconXSolid} from '@instructure/ui-icons'
 import {TextInput} from '@instructure/ui-forms'
 import {Tray} from '@instructure/ui-overlays'
@@ -34,7 +35,7 @@ import {Tray} from '@instructure/ui-overlays'
 export default class AddTray extends Component {
   static propTypes = {
     allBaseRoles: PropTypes.arrayOf(PropTypes.object).isRequired,
-    allLabels: PropTypes.arrayOf(PropTypes.string).isRequired,
+    allLabels: PropTypes.arrayOf(PropTypes.string),
     hideTray: PropTypes.func.isRequired,
     createNewRole: PropTypes.func.isRequired,
     open: PropTypes.bool.isRequired,
@@ -51,7 +52,7 @@ export default class AddTray extends Component {
     }
   }
 
-  componentWillReceiveProps(newProps) {
+  UNSAFE_componentWillReceiveProps(newProps) {
     if (!this.props.loading) {
       this.setState({
         selectedRoleName: '',
@@ -251,7 +252,4 @@ const mapDispatchToProps = {
   hideTray: actions.hideAllTrays
 }
 
-export const ConnectedAddTray = connect(
-  mapStateToProps,
-  mapDispatchToProps
-)(AddTray)
+export const ConnectedAddTray = connect(mapStateToProps, mapDispatchToProps)(AddTray)

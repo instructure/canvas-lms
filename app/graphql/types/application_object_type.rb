@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -33,6 +35,10 @@ module Types
 
     def session
       context[:session]
+    end
+
+    def request
+      context[:request]
     end
 
     def load_association(assoc)

@@ -1,6 +1,7 @@
 begin
   require 'yard'
   require 'yard-appendix'
+  require 'config/initializers/json'
 
 namespace :doc do
   DOC_DIR     = File.join(%w[public doc api])

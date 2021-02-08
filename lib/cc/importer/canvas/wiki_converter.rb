@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -52,6 +54,7 @@ module CC::Importer::Canvas
         wiki[:assignment] = {
           migration_id: asg_id,
           assignment_overrides: [],
+          submission_types: 'wiki_page',
           only_visible_to_overrides: meta['only_visible_to_overrides'] == 'true'
         }
       end

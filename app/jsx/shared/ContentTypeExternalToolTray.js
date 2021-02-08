@@ -85,7 +85,7 @@ export default function ContentTypeExternalToolTray({
       placement="end"
       size="regular"
       padding="0"
-      headerPadding="small"
+      headerPadding="medium"
     >
       <iframe
         style={{border: 'none', display: 'block', width: '100%', height: '100%'}}

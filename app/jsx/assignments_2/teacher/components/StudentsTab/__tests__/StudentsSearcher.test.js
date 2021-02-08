@@ -64,7 +64,7 @@ beforeEach(() => jest.useFakeTimers())
 describe('StudentsSearcher', () => {
   it('renders a spinner while loading', () => {
     const {getByText} = renderStudentsSearcher()
-    expect(getByText('Loading...')).toBeInTheDocument()
+    expect(getByText('Loading')).toBeInTheDocument()
   })
 
   it('shows action buttons when assignment is published', () => {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -206,7 +208,7 @@ describe ExternalToolsController do
           headers: {'CONTENT_TYPE' => 'application/json'}
         )
 
-        expect(response).not_to be_success
+        expect(response).not_to be_successful
       end
 
       it 'ignores non-required params' do

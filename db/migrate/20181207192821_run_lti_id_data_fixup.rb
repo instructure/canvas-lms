@@ -19,11 +19,7 @@ class RunLtiIdDataFixup < ActiveRecord::Migration[5.1]
   tag :postdeploy
 
   def change
-    DataFixup::AddLtiIdToUsers.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      max_attempts: 1,
-      n_strand: ['add_lti_id_datafixup', Shard.current.database_server.id]
-    )
+    DataFixup::AddLtiIdToUsers.delay_if_production(priority: Delayed::LOW_PRIORITY,
+      n_strand: ['add_lti_id_datafixup', Shard.current.database_server.id]).run
   end
 end

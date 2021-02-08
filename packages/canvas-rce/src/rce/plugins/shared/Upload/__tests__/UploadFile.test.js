@@ -241,6 +241,13 @@ describe('UploadFile', () => {
       handleSubmit(fakeEditor, 'images/*', 'URL', {fileUrl: 'http://fake/path'})
       expect(fakeEditor.content).toEqual('<img src="http://fake/path" />')
     })
+    it('inserts the image with url source and includes alt text', () => {
+      handleSubmit(fakeEditor, 'images/*', 'URL', {
+        fileUrl: 'http://fake/path',
+        imageOptions: {altText: '(╯°□°）╯︵ ┻━┻'}
+      })
+      expect(fakeEditor.content).toEqual('<img src="http://fake/path" alt="(╯°□°）╯︵ ┻━┻" />')
+    })
 
     describe('contentProps.startMediaUpload', () => {
       it('called for images when Computer panel is selected', () => {
@@ -285,6 +292,35 @@ describe('UploadFile', () => {
           name: 'foo.mov',
           size: 3000,
           contentType: 'video/mov',
+          domObject: fakeFile
+        })
+      })
+      it('called for images when Computer panel is selected and includes image options', () => {
+        const fakeMediaUpload = jest.fn()
+        const fakeFile = {
+          name: 'foo.png',
+          size: 3000,
+          type: 'image/png'
+        }
+        handleSubmit(
+          fakeEditor,
+          'images/*',
+          'COMPUTER',
+          {
+            theFile: fakeFile,
+            imageOptions: {altText: '(╯°□°）╯︵ ┻━┻', displayAs: 'embed', isDecorativeImage: true}
+          },
+          {startMediaUpload: fakeMediaUpload}
+        )
+        expect(fakeMediaUpload).toHaveBeenCalledWith('images', {
+          altText: '(╯°□°）╯︵ ┻━┻',
+          displayAs: 'embed',
+          isDecorativeImage: true,
+
+          parentFolderId: 'media',
+          name: 'foo.png',
+          size: 3000,
+          contentType: 'image/png',
           domObject: fakeFile
         })
       })

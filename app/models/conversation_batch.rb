@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -122,11 +124,8 @@ class ConversationBatch < ActiveRecord::Base
   end
 
   def queue_delivery
-    if mode == :async
-      send_later :deliver
-    else
-      deliver(false)
-    end
+    sync = (mode != :async)
+    delay(synchronous: sync).deliver(!sync)
   end
 
   workflow do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -52,14 +54,14 @@ class Quizzes::QuizSubmission::QuestionReferenceDataFixer
 
     modified = false
 
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       connection = quiz_submission.class.connection
       connection.transaction do
         Quizzes::QuizQuestion.transaction(requires_new: true) do
           if relink_or_create_questions(quiz_submission)
             modified = true
 
-            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<-SQL
+            Quizzes::QuizSubmission.where(id: quiz_submission).update_all <<~SQL
             quiz_data = '#{connection.quote_string(quiz_submission.quiz_data.to_yaml)}',
             submission_data = '#{connection.quote_string(quiz_submission.submission_data.to_yaml)}',
             question_references_fixed = TRUE

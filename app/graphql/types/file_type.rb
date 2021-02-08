@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -32,7 +34,7 @@ module Types
     # current user, we can overwrite this here since we don't have access to the OG
     # logged_in_user method.
     def logged_in_user
-      @current_user
+      @current_user || context[:current_user]
     end
 
     global_id_field :id
@@ -107,7 +109,7 @@ module Types
     def get_canvadoc_url(course, assignment, submission)
       opts = {
         anonymous_instructor_annotations: course.grants_right?(current_user, :manage_grade) && assignment.anonymous_instructor_annotations,
-        moderated_grading_whitelist: submission.moderated_grading_whitelist,
+        moderated_grading_allow_list: submission.moderated_grading_allow_list,
         submission_id: submission.id,
         enable_annotations: true,
         enrollment_type: CoursesHelper.user_type(course, current_user)

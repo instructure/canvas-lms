@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -30,7 +32,7 @@ class Enrollment < ActiveRecord::Base
 
   include Workflow
 
-  belongs_to :course, touch: true, inverse_of: :enrollments
+  belongs_to :course, inverse_of: :enrollments
   belongs_to :course_section, inverse_of: :enrollments
   belongs_to :root_account, class_name: 'Account', inverse_of: :enrollments
   belongs_to :user, inverse_of: :enrollments
@@ -121,14 +123,14 @@ class Enrollment < ActiveRecord::Base
     end
   end
 
-  def self.get_built_in_role_for_type(enrollment_type)
-    role = Role.get_built_in_role("StudentEnrollment") if enrollment_type == "StudentViewEnrollment"
-    role ||= Role.get_built_in_role(enrollment_type)
+  def self.get_built_in_role_for_type(enrollment_type, root_account_id:)
+    role = Role.get_built_in_role("StudentEnrollment", root_account_id: root_account_id) if enrollment_type == "StudentViewEnrollment"
+    role ||= Role.get_built_in_role(enrollment_type, root_account_id: root_account_id)
     role
   end
 
   def default_role
-    Enrollment.get_built_in_role_for_type(self.type)
+    Enrollment.get_built_in_role_for_type(self.type, root_account_id: self.course.root_account_id)
   end
 
   # see #active_student?
@@ -148,7 +150,7 @@ class Enrollment < ActiveRecord::Base
     active_student? != active_student?(:was)
   end
 
-  def touch_assignments
+  def clear_needs_grading_count_cache
     Assignment.
       where(context_id: course_id, context_type: 'Course').
       where("EXISTS (?) AND NOT EXISTS (?)",
@@ -161,12 +163,12 @@ class Enrollment < ActiveRecord::Base
         Enrollment.where(Enrollment.active_student_conditions).
           where(user_id: user_id, course_id: course_id).
           where("id<>?", self)).
-      update_all(["updated_at=?", Time.now.utc])
+      clear_cache_keys(:needs_grading)
   end
 
   def needs_grading_count_updated
     self.class.connection.after_transaction_commit do
-      touch_assignments
+      clear_needs_grading_count_cache
     end
   end
 
@@ -219,7 +221,7 @@ class Enrollment < ActiveRecord::Base
     if (self.just_created || self.saved_change_to_workflow_state? || @re_send_confirmation) && self.workflow_state == 'invited' && self.inactive? && self.available_at &&
         !self.self_enrolled && !(self.observer? && self.user.registered?)
       # this won't work if they invite them and then change the course/term/section dates _afterwards_ so hopefully people don't do that
-      self.send_later_enqueue_args(:re_send_confirmation_if_invited!, {:run_at => self.available_at, :singleton => "send_enrollment_invitations_#{global_id}"})
+      delay(run_at: self.available_at, singleton: "send_enrollment_invitations_#{global_id}").re_send_confirmation_if_invited!
     end
   end
 
@@ -637,7 +639,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   def accept(force = false)
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       return false unless force || invited?
       if update_attribute(:workflow_state, 'active')
         if self.type == 'StudentEnrollment'
@@ -657,7 +659,7 @@ class Enrollment < ActiveRecord::Base
   def add_to_favorites_later
     if self.saved_change_to_workflow_state? && self.workflow_state == 'active'
       self.class.connection.after_transaction_commit do
-        self.send_later_if_production_enqueue_args(:add_to_favorites, :priority => Delayed::LOW_PRIORITY)
+        delay_if_production(priority: Delayed::LOW_PRIORITY).add_to_favorites
       end
     end
   end
@@ -721,7 +723,7 @@ class Enrollment < ActiveRecord::Base
   def create_enrollment_state
     self.enrollment_state =
       self.shard.activate do
-        Shackles.activate(:master) do
+        GuardRail.activate(:primary) do
           EnrollmentState.unique_constraint_retry do
             EnrollmentState.where(:enrollment_id => self).first_or_create
           end
@@ -993,25 +995,18 @@ class Enrollment < ActiveRecord::Base
   # stale! And once you've added the call, add the condition to the comment
   # here for future enlightenment.
 
-  def self.recompute_final_score(*args)
-    GradeCalculator.recompute_final_score(*args)
+  def self.recompute_final_score(*args, **kwargs)
+    GradeCalculator.recompute_final_score(*args, **kwargs)
   end
 
   # This method is intended to not duplicate work for a single user.
-  def self.recompute_final_score_in_singleton(user_id, course_id, opts = {})
+  def self.recompute_final_score_in_singleton(user_id, course_id, **opts)
     # Guard against getting more than one user_id
     raise ArgumentError, "Cannot call with more than one user" if Array(user_id).size > 1
 
-    send_later_if_production_enqueue_args(
-      :recompute_final_score,
-      {
-        singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
-        max_attempts: 10
-      },
-      user_id,
-      course_id,
-      opts
-    )
+    delay_if_production(singleton: "Enrollment.recompute_final_score:#{user_id}:#{course_id}:#{opts[:grading_period_id]}",
+        max_attempts: 10).
+      recompute_final_score(user_id, course_id, **opts)
   end
 
   def self.recompute_due_dates_and_scores(user_id)
@@ -1120,7 +1115,7 @@ class Enrollment < ActiveRecord::Base
 
   def cached_score_or_grade(current_or_final, score_or_grade, posted_or_unposted, id_opts=nil)
     score = find_score(id_opts)
-    method = "#{current_or_final}_#{score_or_grade}"
+    method = +"#{current_or_final}_#{score_or_grade}"
     method.prepend("unposted_") if posted_or_unposted == :unposted
     score&.send(method)
   end
@@ -1480,14 +1475,9 @@ class Enrollment < ActiveRecord::Base
 
     # running in an n_strand to handle situations where a SIS import could
     # update a ton of enrollments from "deleted" to "completed".
-    send_later_if_production_enqueue_args(
-      :restore_submissions_and_scores_now,
-      {
-        n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
-        max_attempts: 1,
-        priority: Delayed::LOW_PRIORITY
-      }
-    )
+    delay_if_production(n_strand: "Enrollment#restore_submissions_and_scores#{root_account.global_id}",
+        priority: Delayed::LOW_PRIORITY).
+      restore_submissions_and_scores_now
   end
 
   def restore_submissions_and_scores_now

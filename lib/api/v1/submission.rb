@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -201,7 +203,7 @@ module Api::V1::Submission
           enable_annotations: true,
           enrollment_type: user_type(context, user),
           include: includes,
-          moderated_grading_whitelist: attempt.moderated_grading_whitelist(user),
+          moderated_grading_allow_list: attempt.moderated_grading_allow_list(user),
           skip_permission_checks: true,
           submission_id: attempt.id
         }
@@ -311,10 +313,7 @@ module Api::V1::Submission
       attachment.locked = anonymous
       attachment.save!
 
-      ContentZipper.send_later_enqueue_args(:process_attachment, {
-        priority: Delayed::LOW_PRIORITY,
-        max_attempts: 1
-      }, attachment)
+      ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(attachment)
     end
 
     attachment

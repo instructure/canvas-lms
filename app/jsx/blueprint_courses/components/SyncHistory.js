@@ -23,7 +23,8 @@ import {bindActionCreators} from 'redux'
 import I18n from 'i18n!blueprint_settingsSyncHistory'
 import select from '../../shared/select'
 
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import SyncHistoryItem from './SyncHistoryItem'
 
 import actions from '../actions'
@@ -128,7 +129,4 @@ const connectState = state => {
   )
 }
 const connectActions = dispatch => bindActionCreators(actions, dispatch)
-export const ConnectedSyncHistory = connect(
-  connectState,
-  connectActions
-)(SyncHistory)
+export const ConnectedSyncHistory = connect(connectState, connectActions)(SyncHistory)

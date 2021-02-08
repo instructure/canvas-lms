@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -69,6 +71,15 @@ module Canvas
         it 'includes the source, which has the request context id' do
           expect(hash[:extra][:source]).
             to match(/c5ec694d-1c0d-4744-a97a-cae44c477837/)
+        end
+      end
+
+      describe "edge cases" do
+        it "tolerates a nil worker" do
+          job_info = described_class.new(job, nil)
+          hash = job_info.to_h
+          expect(hash[:tags][:job_tag]).to eq("TAG")
+          expect(hash[:extra][:worker_name]).to be_nil
         end
       end
     end

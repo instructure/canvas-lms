@@ -429,9 +429,9 @@ class SubmissionsApiController < ApplicationController
       assignment_scope = assignment_scope.where(:id => requested_assignment_ids)
     end
 
-    assignments = Shackles.activate(:slave) do
+    assignments = GuardRail.activate(:secondary) do
       if params[:grading_period_id].present?
-        GradingPeriod.active.find(params[:grading_period_id]).assignments(assignment_scope)
+        GradingPeriod.active.find(params[:grading_period_id]).assignments(@context, assignment_scope)
       else
         assignment_scope.to_a
       end
@@ -470,9 +470,7 @@ class SubmissionsApiController < ApplicationController
     end
 
     if params[:grouped].present?
-      if @context.root_account.feature_enabled?(:allow_postable_submission_comments) && @context.post_policies_enabled?
-        includes << "has_postable_comments"
-      end
+      includes << "has_postable_comments"
 
       # student_ids is either a subscope returning students in context visible to the caller,
       # or an array whose contents have been verified to be a subset of these
@@ -493,7 +491,7 @@ class SubmissionsApiController < ApplicationController
       ActiveRecord::Associations::Preloader.new.preload(
         submissions,
         :submission_comments,
-        {select: [:hidden, :submission_id]}
+        SubmissionComment.select(:hidden, :submission_id)
       )
 
       bulk_load_attachments_and_previews(submissions)
@@ -622,8 +620,9 @@ class SubmissionsApiController < ApplicationController
   def create_file
     @assignment = api_find(@context.assignments.active, params[:assignment_id])
     @user = get_user_considering_section(params[:user_id])
+
     if @assignment.allowed_extensions.any?
-      extension = infer_upload_filename(params).split('.').last&.downcase || File.mime_types[infer_upload_content_type(params)]
+      extension = infer_file_extension(params)
       reject!(t('unable to find extension')) unless extension
       reject!(t('filetype not allowed')) unless @assignment.allowed_extensions.include?(extension)
     end
@@ -809,9 +808,11 @@ class SubmissionsApiController < ApplicationController
           submission[:url] = params[:submission][:url]
         end
       end
+
       if submission[:grade] || submission[:excuse]
         begin
           @submissions = @assignment.grade_student(@user, submission)
+          graded_just_now = true
         rescue Assignment::GradeError => e
           logger.info "GRADES: grade_student failed because '#{e.message}'"
           return render json: { error: e.to_s }, status: 400
@@ -835,12 +836,16 @@ class SubmissionsApiController < ApplicationController
           if sub.late_policy_status == "late" && submission[:seconds_late_override].present?
             sub.seconds_late_override = submission[:seconds_late_override]
           end
-          sub.save!
+          sub.grader = @current_user
+          # If we've called Assignment#grade_student, it has already created a
+          # new submission version on this request.
+          previously_graded = graded_just_now && (sub.grade.present? || sub.excused?)
+          previously_graded ? sub.save! : sub.with_versioning(explicit: true) { sub.save! }
         end
       end
 
       assessment = params[:rubric_assessment]
-      if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
+      if assessment.is_a?(ActionController::Parameters) && @assignment.active_rubric_association?
         if (assessment.keys & @assignment.rubric_association.rubric.criteria_object.map{|c| c.id.to_s}).empty?
           return render :json => {:message => "invalid rubric_assessment"}, :status => :bad_request
         end

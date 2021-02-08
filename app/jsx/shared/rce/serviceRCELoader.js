@@ -40,6 +40,10 @@ function getTrayProps() {
     contextType = 'user'
   } else {
     ;[contextType, contextId] = splitAssetString(ENV.context_asset_string, false)
+    if (contextType === 'account') {
+      contextType = 'user'
+      contextId = userId
+    }
   }
 
   return {
@@ -200,7 +204,7 @@ const RCELoader = {
    */
   createRCEProps(textarea, tinyMCEInitOptions) {
     const width = textarea.offsetWidth
-    const height = textarea.offsetHeight
+    const height = textarea.offsetHeight || 400
 
     if (height) {
       tinyMCEInitOptions.tinyOptions = {
@@ -244,7 +248,9 @@ const RCELoader = {
       textareaId: textarea.id,
       trayProps: getTrayProps(),
       languages,
-      autosave
+      autosave,
+      instRecordDisabled: ENV.RICH_CONTENT_INST_RECORD_TAB_DISABLED,
+      use_rce_pretty_html_editor: !!window.ENV?.FEATURES?.rce_pretty_html_editor
     }
   }
 }

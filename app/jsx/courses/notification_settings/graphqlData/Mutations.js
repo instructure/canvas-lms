@@ -24,6 +24,7 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
     $channelId: ID
     $category: NotificationCategoryType
     $frequency: NotificationFrequencyType
+    $sendScoresInEmails: Boolean
   ) {
     updateNotificationPreferences(
       input: {
@@ -33,12 +34,15 @@ export const UPDATE_COURSE_NOTIFICATION_PREFERENCES = gql`
         communicationChannelId: $channelId
         notificationCategory: $category
         frequency: $frequency
+        sendScoresInEmails: $sendScoresInEmails
+        isPolicyOverride: true
       }
     ) {
-      course {
+      user {
         _id
-        notificationPreferencesEnabled
+        notificationPreferencesEnabled(contextType: Course, courseId: $courseId)
         notificationPreferences {
+          sendScoresInEmails(courseId: $courseId)
           channels(channelId: $channelId) {
             _id
             path

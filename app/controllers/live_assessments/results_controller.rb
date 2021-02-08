@@ -128,7 +128,7 @@ module LiveAssessments
         end
       end
 
-      @assessment.send_later_if_production(:generate_submissions_for, @results.map(&:user).uniq)
+      @assessment.delay_if_production.generate_submissions_for(@results.map(&:user).uniq)
       render json: serialize_jsonapi(@results)
     end
 

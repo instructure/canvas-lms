@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -22,6 +24,9 @@ class GradingPeriod < ActiveRecord::Base
   belongs_to :grading_period_group, inverse_of: :grading_periods
   has_many :scores, -> { active }
   has_many :submissions, -> { active }
+  has_many :auditor_grade_change_records,
+    class_name: "Auditors::ActiveRecord::GradeChangeRecord",
+    inverse_of: :grading_period
 
   validates :title, :start_date, :end_date, :close_date, :grading_period_group_id, presence: true
   validates :weight, numericality: true, allow_nil: true
@@ -32,6 +37,7 @@ class GradingPeriod < ActiveRecord::Base
   before_validation :adjust_close_date_for_course_period
   before_validation :ensure_close_date
 
+  before_save :set_root_account_id
   after_save :recompute_scores, if: :dates_or_weight_or_workflow_state_changed?
   after_destroy :destroy_grading_period_set, if: :last_remaining_legacy_period?
   after_destroy :destroy_scores
@@ -97,19 +103,22 @@ class GradingPeriod < ActiveRecord::Base
     grading_period_group.course_id.present?
   end
 
-  def assignments_for_student(assignments, student)
-    Assignment::FilterWithOverridesByDueAtForStudent.new(
-      assignments: assignments,
-      grading_period: self,
-      student: student
-    ).filter_assignments
+  def assignments_for_student(course, assignments, student)
+    assignment_ids = GradebookGradingPeriodAssignments.new(course, student: student).to_h.fetch(id, [])
+    if assignment_ids.empty?
+      []
+    else
+      assignments.select { |assignment| assignment_ids.include?(assignment.id.to_s) }
+    end
   end
 
-  def assignments(assignments)
-    Assignment::FilterWithOverridesByDueAtForClass.new(
-      assignments: assignments,
-      grading_period: self
-    ).filter_assignments
+  def assignments(course, assignments)
+    assignment_ids = GradebookGradingPeriodAssignments.new(course).to_h.fetch(id, [])
+    if assignment_ids.empty?
+      []
+    else
+      assignments.select { |assignment| assignment_ids.include?(assignment.id.to_s) }
+    end
   end
 
   def current?
@@ -165,6 +174,10 @@ class GradingPeriod < ActiveRecord::Base
   end
 
   private
+
+  def set_root_account_id
+    self.root_account_id ||= grading_period_group&.root_account_id
+  end
 
   def date_for_comparison(date)
     comparison_date = date.is_a?(String) ? Time.zone.parse(date) : date

@@ -118,7 +118,9 @@ const mimeClasses = {
       'video/mpeg',
       'video/quicktime',
       'video/x-la-asf',
-      'video/3gpp'
+      'video/3gpp',
+      'video/webm',
+      'video/avi'
     ]
   },
   xls: {

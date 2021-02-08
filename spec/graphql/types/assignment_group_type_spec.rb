@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -72,6 +74,13 @@ describe Types::AssignmentGroupType do
         expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @teacher).size).to eq 2
       end
 
+      it "teacher may filter scores to individual enrollments" do
+        graphql_query = "gradesConnection(filter: {enrollmentIds: [#{@student_enrollment.id}]}) { nodes { enrollment { _id } } }"
+        results = @group_type.resolve(graphql_query, current_user: @teacher)
+        expect(results.size).to eq 1 
+        expect(results).to eq [@student_enrollment.id.to_s]
+      end
+
       it "student may only see their scores" do
         expect(@group_type.resolve("gradesConnection { nodes { finalScore } }", current_user: @student).size).to eq 1
       end
@@ -118,6 +127,39 @@ describe Types::AssignmentGroupType do
         expect(@group_type.resolve("rules { dropHighest }")).to eq 1
         expect(@group_type.resolve("rules { dropLowest }")).to eq 3
         expect(@group_type.resolve("rules { neverDrop { _id } }")).to eq [@assignment.id.to_s]
+      end
+    end
+
+    context "sis field" do
+      before(:once) do
+        @group.update!(sis_source_id: "sisGroup")
+      end
+
+      let(:manage_admin) { account_admin_user_with_role_changes(role_changes: { read_sis: false })}
+      let(:read_admin) { account_admin_user_with_role_changes(role_changes: { manage_sis: false })}
+
+      it "returns sis_id if you have read_sis permissions" do
+        expect(
+          CanvasSchema.execute(<<~GQL, context: { current_user: read_admin}).dig("data", "assignmentGroup", "sisId")
+            query { assignmentGroup(id: "#{@group.id}") { sisId } }
+          GQL
+        ).to eq("sisGroup")
+      end
+
+      it "returns sis_id if you have manage_sis permissions" do
+        expect(
+          CanvasSchema.execute(<<~GQL, context: { current_user: manage_admin}).dig("data", "assignmentGroup", "sisId")
+            query { assignmentGroup(id: "#{@group.id}") { sisId } }
+          GQL
+        ).to eq("sisGroup")
+      end
+
+      it "doesn't return sis_id if you don't have read_sis or management_sis permissions" do
+        expect(
+          CanvasSchema.execute(<<~GQL, context: { current_user: @student}).dig("data", "assignmentGroup", "sisId")
+            query { assignmentGroup(id: "#{@group.id}") { sisId } }
+          GQL
+        ).to be_nil
       end
     end
   end

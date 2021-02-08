@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -73,9 +75,7 @@ module BroadcastPolicies
     end
 
     def should_dispatch_submission_posted?
-      return false unless assignment.course.post_policies_enabled? &&
-        submission.grade_posting_in_progress &&
-        context_sendable?
+      return false unless submission.grade_posting_in_progress && context_sendable?
 
       submission.reload
       posted_recently?

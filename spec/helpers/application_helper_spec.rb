@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -253,13 +255,32 @@ describe ApplicationHelper do
           expect(output).to match %r{https://example.com/site_admin/account.css}
         end
 
-
         it "should not include anything if param is set to 0" do
           allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
           params[:global_includes] = '0'
 
           output = helper.include_account_css
           expect(output).to be_nil
+        end
+
+        context "with user that doesn't work for that account" do
+          before do
+            @current_pseudonym = pseudonym_model
+            allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          end
+
+          it "won't render only JS" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(css_overrides: 'https://example.com/path/to/overrides.css')
+            expect(helper.include_account_css).to be_nil
+          end
+
+          it "will not render if there's javacscript" do
+            allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(
+              css_overrides: 'https://example.com/root/account.css',
+              js_overrides: 'https://example.com/root/account.js'
+            )
+            expect(helper.include_account_css).to be_nil
+          end
         end
       end
 
@@ -359,6 +380,13 @@ describe ApplicationHelper do
 
           output = helper.include_account_js
           expect(output).to have_tag 'script', text: %r{https:\\/\\/example.com\\/site_admin\\/account.js}
+        end
+
+        it "will not render for user that doesn't work with that account" do
+          @current_pseudonym = pseudonym_model
+          allow(@current_pseudonym).to receive(:works_for_account?).and_return(false)
+          allow(helper).to receive(:active_brand_config).and_return BrandConfig.create!(js_overrides: 'https://example.com/path/to/overrides.js')
+          expect(helper.include_account_js).to be_nil
         end
 
         context "sub-accounts" do
@@ -562,7 +590,8 @@ describe ApplicationHelper do
         :width=>800,
         :height=>400,
         :use_tray => false,
-        :description => "<p>the description.</p>\n"
+        :description => "<p>the description.</p>\n",
+        :favorite => false
       }])
     end
 
@@ -583,7 +612,8 @@ describe ApplicationHelper do
         :width=>800,
         :height=>400,
         :use_tray => false,
-        :description => ""
+        :description => "",
+        :favorite => false
       }])
     end
 
@@ -692,7 +722,6 @@ describe ApplicationHelper do
     context "with planner enabled" do
       before(:each) do
         @account = Account.default
-        @account.enable_feature! :student_planner
       end
 
       it "returns the list of groups the user belongs to" do
@@ -740,10 +769,6 @@ describe ApplicationHelper do
     end
 
     context "with student_planner feature flag enabled" do
-      before(:each) do
-        @domain_root_account.enable_feature! :student_planner
-      end
-
       it "returns false when a user has no student enrollments" do
         course_with_teacher(:active_all => true)
         @current_user = @user
@@ -1130,6 +1155,7 @@ describe ApplicationHelper do
 
       allow(helper).to receive(:headers).and_return(headers)
       allow(helper).to receive(:js_env) { |env| js_env.merge!(env) }
+      response.content_type = 'text/html'
     end
 
     context "on root account" do
@@ -1143,6 +1169,14 @@ describe ApplicationHelper do
         expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
         expect(headers).to_not have_key('Content-Security-Policy')
         expect(js_env).not_to have_key(:csp)
+      end
+
+      it "doesn't set the CSP header for non-html requests" do
+        response.content_type = 'application/json'
+        account.enable_csp!
+        helper.add_csp_for_root
+        expect(headers).to_not have_key('Content-Security-Policy-Report-Only')
+        expect(headers).to_not have_key('Content-Security-Policy')
       end
 
       it "sets the CSP full header when active" do
@@ -1177,6 +1211,72 @@ describe ApplicationHelper do
         allow(Canvadocs).to receive(:config).and_return('base_url' => 'https://canvadocs.instructure.com/1')
         helper.add_csp_for_root
         expect(headers['Content-Security-Policy']).to eq "frame-src 'self' canvadocs.instructure.com localhost root_account.test root_account2.test"
+      end
+
+      it "includes inst_fs domain if enabled" do
+        account.enable_csp!
+
+        allow(InstFS).to receive(:enabled?).and_return(true)
+        allow(InstFS).to receive(:app_host).and_return('https://inst_fs.instructure.com')
+        helper.add_csp_for_root
+        expect(headers['Content-Security-Policy']).to eq "frame-src 'self' inst_fs.instructure.com localhost root_account.test root_account2.test"
+      end
+    end
+  end
+
+  describe 'mastery_scales_js_env' do
+    before(:once) do
+      course_model
+      @context = @course
+      @domain_root_account = @course.root_account
+      @proficiency = outcome_proficiency_model(@course.root_account)
+      @calculation_method = outcome_calculation_method_model(@course.root_account)
+    end
+
+    let(:js_env) {{}}
+
+    before do
+      allow(helper).to receive(:js_env) {|env| js_env.merge!(env)}
+    end
+
+    it 'does not include mastery scales FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+    end
+
+    it 'does not include improved outcomes management FF when account_level_mastery_scales disabled' do
+      helper.mastery_scales_js_env
+      expect(js_env).not_to have_key :IMPROVED_OUTCOMES_MANAGEMENT
+    end
+
+    context 'when account_level_mastery_scales enabled' do
+      before(:once) do
+        @course.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes mastery scales FF' do
+        helper.mastery_scales_js_env
+        expect(js_env).to have_key :ACCOUNT_LEVEL_MASTERY_SCALES
+      end
+
+      it 'includes appropriate mastery scale data' do
+        helper.mastery_scales_js_env
+        mastery_scale = js_env[:MASTERY_SCALE]
+        expect(mastery_scale[:outcome_proficiency]).to eq @proficiency.as_json
+        expect(mastery_scale[:outcome_calculation_method]).to eq @calculation_method.as_json
+      end
+
+      it 'includes improved outcomes management FF' do
+        helper.mastery_scales_js_env
+        expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(false)
+      end
+
+      context "when improved_outcomes_management enabled" do
+        it 'includes improved outcomes management FF' do
+          @course.root_account.enable_feature! :improved_outcomes_management
+          helper.mastery_scales_js_env
+          expect(js_env[:IMPROVED_OUTCOMES_MANAGEMENT]).to be(true)
+        end
       end
     end
   end

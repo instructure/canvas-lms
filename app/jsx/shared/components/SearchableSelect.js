@@ -148,16 +148,12 @@ function SearchableSelect(props) {
   }
 
   function onBlur(e) {
-    if (matchingOptions.length === 1) {
-      onRequestSelectOption(e, matchingOptions[0])
-    } else {
-      const resetValue = options.find(i => i.value === value)
-      if (resetValue) {
-        setInputValue(resetValue.name)
-        setMatcher(matcherFor(resetValue.name))
-      }
+    // set possible selection if narrowed to a single match or disregard as no op
+    const possibleSelection = matchingOptions.length === 1 ? matchingOptions[0] : false
+    if (possibleSelection) {
+      onRequestSelectOption(e, possibleSelection)
+      setSearchResultMessage(true)
     }
-    setSearchResultMessage(true)
   }
 
   function renderOptions(nodes) {

@@ -158,9 +158,9 @@ export default class EditCalendarEventView extends Backbone.View {
     const conferenceNode = document.getElementById('calendar_event_conference_selection')
     const activeConferenceTypes = this.getActiveConferenceTypes()
     if (!this.model.get('web_conference') && activeConferenceTypes.length === 0) {
-      conferenceNode.closest('tr').className = 'hide'
+      conferenceNode.closest('fieldset').className = 'hide'
     } else {
-      conferenceNode.closest('tr').className = ''
+      conferenceNode.closest('fieldset').className = ''
       ReactDOM.render(
         <CalendarConferenceWidget
           context={this.model.get('context_code')}
@@ -265,9 +265,8 @@ export default class EditCalendarEventView extends Backbone.View {
         },
         labelFn(input) {
           return $(input)
-            .parents('tr')
-            .prev()
-            .find('label')
+            .parents('.date_start_end_row')
+            .prev('label')
             .text()
         },
         success: $dialog => {
@@ -305,6 +304,8 @@ export default class EditCalendarEventView extends Backbone.View {
   }
 
   saveEvent(eventData) {
+    RichContentEditor.closeRCE(this.$('textarea'))
+
     return this.$el.disableWhileLoading(
       this.model.save(eventData, {
         success: () => this.redirectWithMessage(I18n.t('event_saved', 'Event Saved Successfully')),
@@ -381,6 +382,10 @@ export default class EditCalendarEventView extends Backbone.View {
   duplicateCheckboxChanged(jsEvent, _propagate) {
     return this.enableDuplicateFields(jsEvent.target.checked)
   }
+
+  cancel() {
+    RichContentEditor.closeRCE(this.$('textarea'))
+  }
 }
 
 EditCalendarEventView.prototype.el = $('#content')
@@ -390,6 +395,7 @@ EditCalendarEventView.prototype.events = {
   'change #use_section_dates': 'toggleUseSectionDates',
   'click .delete_link': 'destroyModel',
   'click .switch_event_description_view': 'toggleHtmlView',
-  'change "#duplicate_event': 'duplicateCheckboxChanged'
+  'change "#duplicate_event': 'duplicateCheckboxChanged',
+  'click .btn[role="button"]': 'cancel'
 }
 EditCalendarEventView.type = 'event'

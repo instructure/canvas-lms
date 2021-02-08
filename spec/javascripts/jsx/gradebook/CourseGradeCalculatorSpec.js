@@ -26,15 +26,21 @@ let gradingPeriodSet
 let gradingPeriods
 let effectiveDueDates
 
-function calculateWithoutGradingPeriods(weightingScheme) {
-  return CourseGradeCalculator.calculate(submissions, assignmentGroups, weightingScheme)
-}
-
-function calculateWithGradingPeriods(weightingScheme) {
+function calculateWithoutGradingPeriods(weightingScheme, ignoreUnpostedAnonymous = true) {
   return CourseGradeCalculator.calculate(
     submissions,
     assignmentGroups,
     weightingScheme,
+    ignoreUnpostedAnonymous
+  )
+}
+
+function calculateWithGradingPeriods(weightingScheme, ignoreUnpostedAnonymous = true) {
+  return CourseGradeCalculator.calculate(
+    submissions,
+    assignmentGroups,
+    weightingScheme,
+    ignoreUnpostedAnonymous,
     gradingPeriodSet,
     effectiveDueDates
   )
@@ -99,11 +105,11 @@ QUnit.module('CourseGradeCalculator.calculate with some assignments and submissi
       {assignment_id: 205, score: null}
     ]
     assignments = [
-      {id: 201, points_possible: 100, omit_from_final_grade: false},
-      {id: 202, points_possible: 91, omit_from_final_grade: false},
-      {id: 203, points_possible: 55, omit_from_final_grade: false},
-      {id: 204, points_possible: 38, omit_from_final_grade: false},
-      {id: 205, points_possible: 1000, omit_from_final_grade: false}
+      {id: 201, points_possible: 100, omit_from_final_grade: false, anonymize_students: false},
+      {id: 202, points_possible: 91, omit_from_final_grade: false, anonymize_students: false},
+      {id: 203, points_possible: 55, omit_from_final_grade: false, anonymize_students: false},
+      {id: 204, points_possible: 38, omit_from_final_grade: false, anonymize_students: false},
+      {id: 205, points_possible: 1000, omit_from_final_grade: false, anonymize_students: false}
     ]
     assignmentGroups = [
       {id: 301, rules: {}, group_weight: 50, assignments: assignments.slice(0, 2)},
@@ -121,10 +127,10 @@ test('avoids floating point errors in current and final score when assignment gr
   ]
 
   assignments = [
-    {id: 201, points_possible: 200},
-    {id: 202, points_possible: 100},
-    {id: 203, points_possible: 100},
-    {id: 204, points_possible: 100}
+    {id: 201, points_possible: 200, anonymize_students: false},
+    {id: 202, points_possible: 100, anonymize_students: false},
+    {id: 203, points_possible: 100, anonymize_students: false},
+    {id: 204, points_possible: 100, anonymize_students: false}
   ]
 
   assignmentGroups = [
@@ -141,9 +147,15 @@ test('avoids floating point errors in current and final score when assignment gr
 })
 
 test('avoids floating point errors in current and final score when assignment groups are not weighted', () => {
-  submissions = [{assignment_id: 201, score: 110.1}, {assignment_id: 202, score: 170.7}]
+  submissions = [
+    {assignment_id: 201, score: 110.1},
+    {assignment_id: 202, score: 170.7}
+  ]
 
-  assignments = [{id: 201, points_possible: 120}, {id: 202, points_possible: 180}]
+  assignments = [
+    {id: 201, points_possible: 120},
+    {id: 202, points_possible: 180}
+  ]
 
   assignmentGroups = [
     {id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1)},
@@ -157,9 +169,15 @@ test('avoids floating point errors in current and final score when assignment gr
 })
 
 test('avoids floating point errors in points possible when assignment groups are not weighted', () => {
-  submissions = [{assignment_id: 201, score: 100}, {assignment_id: 202, score: 150}]
+  submissions = [
+    {assignment_id: 201, score: 100},
+    {assignment_id: 202, score: 150}
+  ]
 
-  assignments = [{id: 201, points_possible: 110.1}, {id: 202, points_possible: 170.7}]
+  assignments = [
+    {id: 201, points_possible: 110.1},
+    {id: 202, points_possible: 170.7}
+  ]
 
   assignmentGroups = [
     {id: 301, rules: {}, group_weight: 10, assignments: assignments.slice(0, 1)},
@@ -173,8 +191,14 @@ test('avoids floating point errors in points possible when assignment groups are
 })
 
 test('avoids floating point errors in assignment group weights', () => {
-  submissions = [{assignment_id: 201, score: 124.46}, {assignment_id: 202, score: 144.53}]
-  assignments = [{id: 201, points_possible: 148}, {id: 202, points_possible: 148}]
+  submissions = [
+    {assignment_id: 201, score: 124.46},
+    {assignment_id: 202, score: 144.53}
+  ]
+  assignments = [
+    {id: 201, points_possible: 148},
+    {id: 202, points_possible: 148}
+  ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
     {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)}
@@ -189,8 +213,14 @@ test('avoids floating point errors in assignment group weights', () => {
 })
 
 test('avoids floating point errors when up-scaling assignment group weights', () => {
-  submissions = [{assignment_id: 201, score: 81.01}, {assignment_id: 202, score: 96.08}]
-  assignments = [{id: 201, points_possible: 100}, {id: 202, points_possible: 100}]
+  submissions = [
+    {assignment_id: 201, score: 81.01},
+    {assignment_id: 202, score: 96.08}
+  ]
+  assignments = [
+    {id: 201, points_possible: 100},
+    {id: 202, points_possible: 100}
+  ]
   assignmentGroups = [
     {id: 301, group_weight: 40, rules: {}, assignments: assignments.slice(0, 1)},
     {id: 302, group_weight: 40, rules: {}, assignments: assignments.slice(1, 2)}
@@ -218,6 +248,32 @@ test('includes assignment group grades', () => {
   equal(grades.assignmentGroups[302].current.possible, 93)
   equal(grades.assignmentGroups[302].final.possible, 1093)
 })
+
+test('excludes assignments that are anonymizing students in total calculations', () => {
+  assignments[0].anonymize_students = true
+  const grades = calculateWithoutGradingPeriods('points')
+  equal(grades.assignmentGroups[301].current.score, 42)
+  equal(grades.assignmentGroups[301].final.score, 42)
+  equal(grades.assignmentGroups[301].current.possible, 91)
+  equal(grades.assignmentGroups[301].final.possible, 91)
+})
+
+test(
+  'includes assignments that are anonymizing students in total calculations when' +
+    '"grade calc ignore unposted anonymous" flag is disabled',
+  () => {
+    assignments[0].anonymize_students = true
+    const grades = calculateWithoutGradingPeriods('points', false)
+    equal(grades.assignmentGroups[301].current.score, 142)
+    equal(grades.assignmentGroups[301].final.score, 142)
+    equal(grades.assignmentGroups[301].current.possible, 191)
+    equal(grades.assignmentGroups[301].final.possible, 191)
+    equal(grades.assignmentGroups[302].current.score, 17)
+    equal(grades.assignmentGroups[302].final.score, 17)
+    equal(grades.assignmentGroups[302].current.possible, 93)
+    equal(grades.assignmentGroups[302].final.possible, 1093)
+  }
+)
 
 test('includes all assignment group grades regardless of weight', () => {
   assignmentGroups[0].group_weight = 200
@@ -453,7 +509,10 @@ QUnit.module('CourseGradeCalculator.calculate with unweighted grading periods', 
       {id: 302, group_weight: 20, rules: {}, assignments: assignments.slice(2, 3)},
       {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)}
     ]
-    gradingPeriods = [{id: '701', weight: 50}, {id: '702', weight: 50}]
+    gradingPeriods = [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ]
     gradingPeriodSet = {gradingPeriods, weighted: false}
     effectiveDueDates = {
       201: {grading_period_id: '701'},
@@ -695,7 +754,10 @@ QUnit.module('CourseGradeCalculator.calculate with weighted grading periods', {
       {id: 302, group_weight: 20, rules: {}, assignments: assignments.slice(2, 3)},
       {id: 303, group_weight: 20, rules: {}, assignments: assignments.slice(3, 4)}
     ]
-    gradingPeriods = [{id: '701', weight: 50}, {id: '702', weight: 50}]
+    gradingPeriods = [
+      {id: '701', weight: 50},
+      {id: '702', weight: 50}
+    ]
     gradingPeriodSet = {gradingPeriods, weighted: true}
     effectiveDueDates = {
       201: {grading_period_id: '701'},
@@ -1032,8 +1094,14 @@ test('uses a score unit of "percentage" for grading period grades when weighting
 })
 
 test('avoids floating point errors in current and final score', () => {
-  submissions = [{assignment_id: 201, score: 45.9}, {assignment_id: 202, score: 38.25}]
-  assignments = [{id: 201, points_possible: 60}, {id: 202, points_possible: 40}]
+  submissions = [
+    {assignment_id: 201, score: 45.9},
+    {assignment_id: 202, score: 38.25}
+  ]
+  assignments = [
+    {id: 201, points_possible: 60},
+    {id: 202, points_possible: 40}
+  ]
   assignmentGroups = [
     {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 1)},
     {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(1, 2)}
@@ -1042,7 +1110,10 @@ test('avoids floating point errors in current and final score', () => {
     201: {grading_period_id: '701'},
     202: {grading_period_id: '702'}
   }
-  gradingPeriods = [{id: '701', weight: 40}, {id: '702', weight: 50}]
+  gradingPeriods = [
+    {id: '701', weight: 40},
+    {id: '702', weight: 50}
+  ]
   gradingPeriodSet = {gradingPeriods, weighted: true}
 
   //   45.9  / 60 * 0.4 (weight)
@@ -1078,7 +1149,10 @@ QUnit.module(
         {id: 301, group_weight: 50, rules: {}, assignments: assignments.slice(0, 2)},
         {id: 302, group_weight: 50, rules: {}, assignments: assignments.slice(2, 3)}
       ]
-      gradingPeriods = [{id: '701', weight: 50}, {id: '702', weight: 50}]
+      gradingPeriods = [
+        {id: '701', weight: 50},
+        {id: '702', weight: 50}
+      ]
       gradingPeriodSet = {gradingPeriods, weighted: true}
       effectiveDueDates = {
         201: {grading_period_id: '701'}, // in first assignment group and first grading period

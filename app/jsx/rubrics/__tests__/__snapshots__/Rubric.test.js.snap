@@ -10,84 +10,78 @@ exports[`the Rubric component hides the score total when needed 1`] = `
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -147,7 +141,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -211,7 +205,7 @@ exports[`the Rubric component hides the score total when needed 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-    </tbody>
+    </Body>
   </Table>
 </div>
 `;
@@ -226,84 +220,78 @@ exports[`the Rubric component points column does have a points column if points 
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -363,7 +351,7 @@ exports[`the Rubric component points column does have a points column if points 
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -427,7 +415,7 @@ exports[`the Rubric component points column does have a points column if points 
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-    </tbody>
+    </Body>
   </Table>
 </div>
 `;
@@ -442,70 +430,62 @@ exports[`the Rubric component points column does not have a points column if poi
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={2}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -565,7 +545,7 @@ exports[`the Rubric component points column does not have a points column if poi
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -629,7 +609,7 @@ exports[`the Rubric component points column does not have a points column if poi
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-    </tbody>
+    </Body>
   </Table>
 </div>
 `;
@@ -644,70 +624,62 @@ exports[`the Rubric component points column does not have a points column if poi
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={2}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -767,7 +739,7 @@ exports[`the Rubric component points column does not have a points column if poi
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -831,7 +803,7 @@ exports[`the Rubric component points column does not have a points column if poi
         onAssessmentChange={null}
         savedComments={Array []}
       />
-    </tbody>
+    </Body>
   </Table>
 </div>
 `;
@@ -842,70 +814,62 @@ exports[`the Rubric component points column does not have a points column in sum
   style={Object {}}
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={2}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -965,7 +929,7 @@ exports[`the Rubric component points column does not have a points column in sum
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1029,9 +993,10 @@ exports[`the Rubric component points column does not have a points column in sum
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <tr>
-        <td
+      <Row>
+        <Cell
           colSpan={2}
+          textAlign="start"
         >
           <Flex
             as="span"
@@ -1052,9 +1017,9 @@ exports[`the Rubric component points column does not have a points column in sum
               Total Points: 6 out of 11
             </FlexItem>
           </Flex>
-        </td>
-      </tr>
-    </tbody>
+        </Cell>
+      </Row>
+    </Body>
   </Table>
 </div>
 `;
@@ -1069,84 +1034,78 @@ exports[`the Rubric component points column has a points column if points visibl
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1206,7 +1165,7 @@ exports[`the Rubric component points column has a points column if points visibl
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1270,9 +1229,10 @@ exports[`the Rubric component points column has a points column if points visibl
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <tr>
-        <td
+      <Row>
+        <Cell
           colSpan={3}
+          textAlign="start"
         >
           <Flex
             as="span"
@@ -1293,9 +1253,9 @@ exports[`the Rubric component points column has a points column if points visibl
               Total Points: 6 out of 11
             </FlexItem>
           </Flex>
-        </td>
-      </tr>
-    </tbody>
+        </Cell>
+      </Row>
+    </Body>
   </Table>
 </div>
 `;
@@ -1310,84 +1270,78 @@ exports[`the Rubric component renders as expected 1`] = `
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1447,7 +1401,7 @@ exports[`the Rubric component renders as expected 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1511,9 +1465,10 @@ exports[`the Rubric component renders as expected 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <tr>
-        <td
+      <Row>
+        <Cell
           colSpan={3}
+          textAlign="start"
         >
           <Flex
             as="span"
@@ -1534,9 +1489,9 @@ exports[`the Rubric component renders as expected 1`] = `
               Total Points: 6
             </FlexItem>
           </Flex>
-        </td>
-      </tr>
-    </tbody>
+        </Cell>
+      </Row>
+    </Body>
   </Table>
 </div>
 `;
@@ -1551,84 +1506,78 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={null}
@@ -1673,7 +1622,7 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={null}
@@ -1721,9 +1670,10 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
         onAssessmentChange={null}
         savedComments={Array []}
       />
-      <tr>
-        <td
+      <Row>
+        <Cell
           colSpan={3}
+          textAlign="start"
         >
           <Flex
             as="span"
@@ -1744,9 +1694,9 @@ exports[`the Rubric component renders properly with no assessment 1`] = `
               Total Points: 11
             </FlexItem>
           </Flex>
-        </td>
-      </tr>
-    </tbody>
+        </Cell>
+      </Row>
+    </Body>
   </Table>
 </div>
 `;
@@ -1761,84 +1711,78 @@ exports[`the Rubric component updates the total score when an individual criteri
   }
 >
   <Table
-    caption={
-      <ScreenReaderContent
-        as="span"
-      >
-        Point Rubric
-      </ScreenReaderContent>
-    }
+    caption="Point Rubric"
     hover={false}
     layout="auto"
-    size="medium"
   >
-    <thead>
-      <tr
-        style={
-          Object {
-            "visibility": "collapse",
-          }
-        }
-      >
-        <th
-          className="rubric-criteria"
+    <Head>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-title"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
           colSpan={3}
-          scope="colgroup"
+          id="rubric-title"
+          sortDirection="none"
+          textAlign="start"
         >
           Point Rubric
-        </th>
-      </tr>
-      <tr>
-        <th
-          className="rubric-criteria"
+        </ColHeader>
+      </Row>
+      <Row>
+        <ColHeader
+          id="table-heading-criteria"
           key="TableHeadingCriteria"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Criteria
-        </th>
-        <th
-          className="ratings"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-ratings"
           key="TableHeadingRatings"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Ratings
-        </th>
-        <th
-          className="rubric-points"
+        </ColHeader>
+        <ColHeader
+          id="table-heading-points"
           key="TableHeadingPoints"
-          scope="col"
+          sortDirection="none"
+          textAlign="start"
         >
           Pts
-        </th>
-      </tr>
-    </thead>
-    <tbody
-      className="criterions"
+        </ColHeader>
+      </Row>
+    </Head>
+    <Body
+      data-testid="criterions"
     >
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1897,7 +1841,7 @@ exports[`the Rubric component updates the total score when an individual criteri
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <Criterion
+      <Row
         allowExtraCredit={false}
         allowSavedComments={true}
         assessment={
@@ -1961,9 +1905,10 @@ exports[`the Rubric component updates the total score when an individual criteri
         onAssessmentChange={[Function]}
         savedComments={Array []}
       />
-      <tr>
-        <td
+      <Row>
+        <Cell
           colSpan={3}
+          textAlign="start"
         >
           <Flex
             as="span"
@@ -1984,9 +1929,9 @@ exports[`the Rubric component updates the total score when an individual criteri
               Total Points: 5 out of 11
             </FlexItem>
           </Flex>
-        </td>
-      </tr>
-    </tbody>
+        </Cell>
+      </Row>
+    </Body>
   </Table>
 </div>
 `;

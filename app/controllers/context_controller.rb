@@ -38,7 +38,7 @@ class ContextController < ApplicationController
         @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255) if params[:user_entered_title] && !params[:user_entered_title].empty?
         @media_object.save
       end
-      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_url(@media_object.media_id))
+      render :json => @media_object.as_json.merge(:embedded_iframe_url => media_object_iframe_path(@media_object.media_id))
     end
   end
 
@@ -226,7 +226,7 @@ class ContextController < ApplicationController
   end
 
   def roster_user_usage
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       if authorized_action(@context, @current_user, :read_reports)
         @user = @context.users.find(params[:user_id])
         contexts = [@context] + @user.group_memberships_for(@context).to_a
@@ -338,21 +338,24 @@ class ContextController < ApplicationController
     end
   end
 
-  WORKFLOW_TYPES = [
-    :all_discussion_topics, :assignments, :assignment_groups,
-    :enrollments, :rubrics, :collaborations, :quizzes, :context_modules, :wiki_pages
-  ].freeze
-  ITEM_TYPES = WORKFLOW_TYPES + [:attachments].freeze
+  WORKFLOW_TYPES = [:all_discussion_topics, :assignment_groups, :assignments,
+                    :collaborations, :context_modules, :enrollments, :groups,
+                    :quizzes, :rubrics, :wiki_pages, :rubric_associations_with_deleted].freeze
+  ITEM_TYPES = WORKFLOW_TYPES + [:attachments, :all_group_categories].freeze
   def undelete_index
     if authorized_action(@context, @current_user, :manage_content)
-      @item_types = WORKFLOW_TYPES.select { |type| @context.class.reflections.key?(type.to_s) }.
-          map { |type| @context.association(type).reader }
+      @item_types = WORKFLOW_TYPES.each_with_object([]) do |workflow_type, item_types|
+        if @context.class.reflections.key?(workflow_type.to_s)
+          item_types << @context.association(workflow_type).reader
+        end
+      end
 
       @deleted_items = []
       @item_types.each do |scope|
         @deleted_items += scope.where(:workflow_state => 'deleted').limit(25).to_a
       end
       @deleted_items += @context.attachments.where(:file_state => 'deleted').limit(25).to_a
+      @deleted_items += @context.all_group_categories.where.not(deleted_at: nil).limit(25).to_a if @context.grants_right?(@current_user, :manage_groups)
       @deleted_items.sort_by{|item| item.read_attribute(:deleted_at) || item.created_at }.reverse
     end
   end
@@ -365,8 +368,14 @@ class ContextController < ApplicationController
       scope = @context
       scope = @context.wiki if type == 'wiki_page'
       type = 'all_discussion_topic' if type == 'discussion_topic'
+      type = 'all_group_category' if type == 'group_category'
+      if ['all_group_category', 'group'].include?(type)
+        return render_unauthorized_action unless @context.grants_right?(@current_user, :manage_groups)
+      end
       type = type.pluralize
+      type = 'rubric_associations_with_deleted' if type == 'rubric_associations'
       raise "invalid type" unless ITEM_TYPES.include?(type.to_sym) && scope.class.reflections.key?(type)
+
       @item = scope.association(type).reader.find(id)
       @item.restore
       render :json => @item

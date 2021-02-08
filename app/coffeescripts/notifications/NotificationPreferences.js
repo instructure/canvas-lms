@@ -104,7 +104,6 @@ export default class NotificationPreferences {
   getTooltipText = (category, channel) => {
     if (
       channel.type === 'sms' &&
-      ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.deprecate_sms_enabled &&
       !ENV?.NOTIFICATION_PREFERENCES_OPTIONS?.allowed_sms_categories.includes(category.category)
     ) {
       return 'This notification type is not supported in SMS'

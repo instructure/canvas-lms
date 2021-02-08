@@ -17,16 +17,15 @@
  */
 
 import classnames from 'classnames'
-import {
-  renderLink,
-  renderImage,
-  renderLinkedImage,
-  renderVideo,
-  renderAudio,
-  mediaIframeSrcFromFile
-} from './contentRendering'
+import {renderImage, renderLinkedImage, renderVideo, renderAudio} from './contentRendering'
 import scroll from '../common/scroll'
-import {cleanUrl} from './contentInsertionUtils'
+import {
+  cleanUrl,
+  getAnchorElement,
+  isOnlyTextSelected,
+  isImageFigure
+} from './contentInsertionUtils'
+import {mediaPlayerURLFromFile} from './plugins/shared/fileTypeUtils'
 
 /** * generic content insertion ** */
 
@@ -61,7 +60,11 @@ export function insertContent(editor, content) {
     // created nodes if there were multiple, unfortunately), because the cursor
     // itself stays just before the new content.
     scroll.scrollIntoViewWDelay(editor.iframeElement, {})
-    editor.insertContent(content)
+    // there's a bug in tinymce where insertContent calls execCommand('mceInsertContent'),
+    // but doesn't correctly forward the second "args" argument. Let's go right for
+    // execCommand
+    // editor.insertContent(content, {skip_focus: true})
+    editor.execCommand('mceInsertContent', false, content + ' ', {skip_focus: true})
     return editor.selection.getEnd()
   }
 }
@@ -156,24 +159,25 @@ function decorateLinkWithEmbed(link) {
   }
 }
 
-export function insertLink(editor, link, textOverride) {
+export function insertLink(editor, link) {
   const linkAttrs = {...link}
   if (linkAttrs.embed) {
     decorateLinkWithEmbed(linkAttrs)
     delete linkAttrs.embed
   }
-  return insertUndecoratedLink(editor, linkAttrs, textOverride)
+  return insertUndecoratedLink(editor, linkAttrs)
 }
 
 // link edit/create logic based on tinymce/plugins/link/plugin.js
-function insertUndecoratedLink(editor, linkProps, textOverride) {
+function insertUndecoratedLink(editor, linkProps) {
   const selectedElm = editor.selection.getNode()
   const anchorElm = getAnchorElement(editor, selectedElm)
-  const selectedHtml = editor.selection.getContent({format: 'text'})
-  const linkText =
-    (textOverride && editor.dom.encode(textOverride)) ||
-    selectedHtml ||
-    editor.dom.encode(linkProps.text)
+  const selectedContent = editor.selection.getContent()
+  const selectedPlainText = editor.selection.getContent({format: 'text'})
+  const onlyText = isOnlyTextSelected(selectedContent)
+
+  const linkText = onlyText && (linkProps.text || getAnchorText(editor.selection, anchorElm))
+
   // only keep the props we want as attributes on the <a>
   const linkAttrs = {
     id: linkProps.id,
@@ -188,40 +192,47 @@ function insertUndecoratedLink(editor, linkProps, textOverride) {
     linkAttrs.rel = 'noopener noreferrer'
   }
 
-  editor.focus()
-  if (anchorElm) {
-    anchorElm.innerText = linkText
-    editor.dom.setAttribs(anchorElm, linkAttrs)
-    editor.selection.select(anchorElm)
-    editor.undoManager.add()
+  if (anchorElm && !editor.selection.isCollapsed()) {
+    updateLink(editor, anchorElm, linkText, linkAttrs)
+  } else if (selectedContent) {
+    if (linkProps.userText && selectedPlainText !== linkText) {
+      createLink(editor, selectedElm, linkText, linkAttrs)
+    } else {
+      createLink(editor, selectedElm, undefined, linkAttrs)
+    }
   } else {
     createLink(editor, selectedElm, linkText, linkAttrs)
   }
   return editor.selection.getEnd() // this will be the newly created or updated content
 }
 
-function getAnchorElement(editor, selectedElm) {
-  selectedElm = selectedElm || editor.selection.getNode()
-  if (isImageFigure(selectedElm)) {
-    return editor.dom.select('a[href]', selectedElm)[0]
-  } else {
-    return editor.dom.getParent(selectedElm, 'a[href]')
-  }
+function getAnchorText(selection, anchorElm) {
+  return anchorElm ? anchorElm.innerText : selection.getContent({format: 'text'})
 }
 
-function isImageFigure(elm) {
-  return elm && elm.nodeName === 'FIGURE' && /\bimage\b/i.test(elm.className)
+function updateLink(editor, anchorElm, text, linkAttrs) {
+  if (text && anchorElm.innerText !== text) {
+    anchorElm.innerText = text
+  }
+  editor.dom.setAttribs(anchorElm, linkAttrs)
+  editor.selection.select(anchorElm)
+  editor.undoManager.add()
 }
 
 function createLink(editor, selectedElm, text, linkAttrs) {
   if (isImageFigure(selectedElm)) {
     linkImageFigure(editor, selectedElm, linkAttrs)
+  } else if (text) {
+    // create the whole wazoo
+    insertContent(editor, editor.dom.createHTML('a', linkAttrs, editor.dom.encode(text)))
   } else {
-    insertContent(editor, renderLink(linkAttrs, text))
+    // create a link on the selected content
+    editor.execCommand('mceInsertLink', false, linkAttrs)
   }
 }
+
 function linkImageFigure(editor, fig, attrs) {
-  const img = editor.dom.select('img', fig)[0]
+  const img = fig.tagName === 'IMG' ? fig : editor.dom.select('img', fig)[0]
   if (img) {
     const a = editor.dom.create('a', attrs)
     img.parentNode.insertBefore(a, img)
@@ -232,20 +243,44 @@ function linkImageFigure(editor, fig, attrs) {
 /* ** video insertion ** */
 
 export function insertVideo(editor, video) {
-  let result = insertContent(editor, renderVideo(video))
-  // for some reason, editor.selection.getEnd() returned from
-  // insertContent is parent paragraph when inserting the
-  // video iframe. Look for the iframe with the right
-  // src attribute. (Aside: tinymce strips the id or data-*
-  // attributes from the iframe, that's why we can't look for those)
-  const src = mediaIframeSrcFromFile(video)
-  result = result.querySelector(`iframe[src="${src}"]`)
-  return result
+  if (editor.selection.isCollapsed()) {
+    let result = insertContent(editor, renderVideo(video))
+    // for some reason, editor.selection.getEnd() returned from
+    // insertContent is parent paragraph when inserting the
+    // video iframe. Look for the iframe with the right
+    // src attribute. (Aside: tinymce strips the id or data-*
+    // attributes from the iframe, that's why we can't look for those)
+    const src = mediaPlayerURLFromFile(video)
+    result = result.querySelector(`iframe[src="${src}"]`)
+
+    // When the iframe is inserted, it doesn't allow the video to play
+    // because the wrapping span captures the click events. Setting
+    // contentEditable to false disables this behavior.
+    if (result?.parentElement) {
+      editor.dom.setAttrib(result.parentElement, 'contenteditable', false)
+    }
+
+    return result
+  } else {
+    return insertLink(editor, {...video, href: mediaPlayerURLFromFile(video)})
+  }
 }
 
 export function insertAudio(editor, audio) {
-  let result = insertContent(editor, renderAudio(audio))
-  const src = mediaIframeSrcFromFile(audio)
-  result = result.querySelector(`iframe[src="${src}"]`)
-  return result
+  if (editor.selection.isCollapsed()) {
+    let result = insertContent(editor, renderAudio(audio))
+    const src = mediaPlayerURLFromFile(audio)
+    result = result.querySelector(`iframe[src="${src}"]`)
+
+    // When the iframe is inserted, it doesn't allow the audio to play
+    // because the wrapping span captures the click events. Setting
+    // contentEditable to false disables this behavior.
+    if (result?.parentElement) {
+      editor.dom.setAttrib(result.parentElement, 'contenteditable', false)
+    }
+
+    return result
+  } else {
+    return insertLink(editor, {...audio, href: mediaPlayerURLFromFile(audio)})
+  }
 }

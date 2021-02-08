@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -74,6 +76,18 @@ module Canvas
         })
 
         expect(DynamicSettings.environment).to eq 'foobar'
+      end
+    end
+
+    describe ".on_fork!" do
+      it "clears any held imperium client" do
+        DynamicSettings.config = valid_config
+        cur_client = Imperium::KV.default_client
+        expect(DynamicSettings.kv_client.object_id).to eq(cur_client.object_id)
+        Imperium::KV.reset_default_client
+        DynamicSettings.on_fork!
+        expect(DynamicSettings.kv_client).to_not be_nil
+        expect(DynamicSettings.kv_client.object_id).to_not eq(cur_client.object_id)
       end
     end
 

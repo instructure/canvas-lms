@@ -51,7 +51,7 @@ const buildProps = options =>
       },
       wiki_page: {
         toggleWrapperSelector: {
-          show: '.header-bar .header-bar-right'
+          show: '.blueprint-label'
         }[options.page],
         itemIdPath: 'WIKI_PAGE.page_id'
       }

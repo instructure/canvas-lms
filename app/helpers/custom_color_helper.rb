@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -33,7 +35,7 @@ module CustomColorHelper
     if hex_to_normalize.start_with?('#')
       hex_to_normalize
     else
-      hex_to_normalize.prepend('#')
+      "#" + hex_to_normalize
     end
   end
 

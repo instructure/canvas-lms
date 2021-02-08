@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import I18n from 'i18n!grading_cell'
-import GRADEBOOK_TRANSLATIONS from '../../../gradebook/GradebookTranslations'
+import GRADEBOOK_TRANSLATIONS from 'jsx/gradebook/GradebookTranslations'
 import GradeFormatHelper from 'jsx/gradebook/shared/helpers/GradeFormatHelper'
 import OutlierScoreHelper from 'jsx/grading/helpers/OutlierScoreHelper'
 import Ember from 'ember'

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -243,6 +245,20 @@ describe DiscussionEntriesController do
       expect(rss.items.length).to eql(0)
     end
 
+    it "should include media comments generated with rce enhancements" do
+      topic_with_media_reply
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      @entry.update_attribute(:message, "<iframe data-media-id=\"#{@mo1.media_id}\"></iframe>")
+      get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(1)
+      expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
+      expect(rss.items.first.enclosure.url).to end_with(expected_url)
+    end
+
     it "should leave out media objects if the attachment is already included" do
       topic_with_media_reply
       @topic.update_attribute(:podcast_has_student_posts, true)
@@ -275,6 +291,49 @@ describe DiscussionEntriesController do
       expect(rss.items.length).to eql(1)
       expected_url = "courses/#{@course.id}/media_download.mp4?type=mp4&entryId=#{@mo1.media_id}&redirect=1"
       expect(rss.items.first.enclosure.url).to end_with(expected_url)
+      expect(assigns[:discussion_entries]).not_to be_empty
+      expect(assigns[:discussion_entries][0]).to eql(@entry)
+    end
+
+    it "should include student entries when media is from user context if enabled" do
+      @topic.update_attribute(:podcast_enabled, true)
+      @student_mo1 = @student.media_objects.build(:media_id => 'asdf', :title => 'asdf')
+      @student_mo1.data = {:extensions => {:mp4 => {:size => 100, :extension => 'mp4'}}}
+      @student_mo1.save!
+      @entry = @topic.discussion_entries.create!(:user => @student, :message => " media_comment_asdf ")
+      @entry.update_attribute(:message, "<iframe data-media-id=\"#{@student_mo1.media_id}\"></iframe>")
+      @topic.update_attribute(:podcast_has_student_posts, true)
+      get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(1)
+      expected_url = "users/#{@student.id}/media_download.mp4?type=mp4&entryId=#{@student_mo1.media_id}&redirect=1"
+      expect(rss.items.first.enclosure.url).to end_with(expected_url)
+      expect(assigns[:discussion_entries]).not_to be_empty
+      expect(assigns[:discussion_entries][0]).to eql(@entry)
+    end
+
+    it "should not include media objects from another course if enabled" do
+      @topic.update_attribute(:podcast_enabled, true)
+      @other_course = Course.create!
+      @other_mo = @other_course.media_objects.build(:media_id => 'asdf', :title => 'asdf')
+      @other_mo.data = {:extensions => {:mp4 => {:size => 100, :extension => 'mp4'}}}
+      @other_mo.save!
+      @entry = @topic.discussion_entries.create!(:user => @teacher, :message => " media_comment_asdf ")
+      @entry.update_attribute(:message, "<iframe data-media-id=\"#{@other_mo.media_id}\"></iframe>")
+
+      get 'public_feed', params: {:discussion_topic_id => @topic.id, :feed_code => @enrollment.feed_code}, :format => 'rss'
+      expect(assigns[:entries]).not_to be_nil
+      expect(assigns[:entries]).not_to be_empty
+      require 'rss/2.0'
+      rss = RSS::Parser.parse(response.body, false) rescue nil
+      expect(rss).not_to be_nil
+      expect(rss.channel.title).to eql("some topic Posts Podcast Feed")
+      expect(rss.items.length).to eql(0)
       expect(assigns[:discussion_entries]).not_to be_empty
       expect(assigns[:discussion_entries][0]).to eql(@entry)
     end
@@ -346,6 +405,7 @@ describe DiscussionEntriesController do
       allow(mock_client).to receive(:startSession)
       allow(mock_client).to receive(:mediaGet).and_return(nil)
       allow(mock_client).to receive(:flavorAssetGetByEntryId).and_return(nil)
+      allow(mock_client).to receive(:media_sources).and_return(nil)
       allow(CanvasKaltura::ClientV3).to receive(:new).and_return(mock_client)
 
       topic_with_media_reply

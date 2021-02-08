@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -111,6 +113,14 @@ describe "CanvasUnzip" do
       stupid_entry = Zip::Entry.new
       stupid_entry.name = "mol\x82"
       expect(CanvasUnzip::Entry.new(stupid_entry).name).to eq('molé')
+    end
+  end
+
+  describe '.compute_uncompressed_size' do
+    it "uses the sum of sizes inside the archive" do
+      filename =fixture_filename("bigcompression.zip")
+      uncompressed_size = CanvasUnzip.compute_uncompressed_size(filename)
+      expect(uncompressed_size > File.new(filename).size).to be_truthy
     end
   end
 

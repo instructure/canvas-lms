@@ -54,7 +54,7 @@ export default class CurveGradesDialog
             pre = "submissions[submission_" + idx + "]"
             data[pre + "[assignment_id]"] = data.assignment_id
             data[pre + "[user_id]"] = idx
-            if @assignment.grading_type == "gpa_scale"
+            if @assignment.grading_type == "gpa_scale" || @assignment.grading_type == "percent"
               percent = (curves[idx]/@assignment.points_possible)*100
               data[pre + "[grade]"] = "#{I18n.n percent, percentage: true}"
             else

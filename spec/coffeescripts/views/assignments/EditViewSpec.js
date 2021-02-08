@@ -19,6 +19,7 @@
 import $ from 'jquery'
 import React from 'react'
 import _ from 'underscore'
+import RCELoader from 'jsx/shared/rce/serviceRCELoader'
 import SectionCollection from 'compiled/collections/SectionCollection'
 import Assignment from 'compiled/models/Assignment'
 import DueDateList from 'compiled/models/DueDateList'
@@ -124,6 +125,10 @@ QUnit.module('EditView', {
     })
     this.server = sinon.fakeServer.create()
     sandbox.fetch.mock('path:/api/v1/courses/1/lti_apps/launch_definitions', 200)
+
+    RCELoader.RCE = null
+
+    return RCELoader.loadRCE()
   },
   teardown() {
     this.server.restore()
@@ -1070,7 +1075,7 @@ QUnit.module('EditView: Conditional Release', {
     fakeENV.setup({
       AVAILABLE_MODERATORS: [],
       current_user_roles: ['teacher'],
-      CONDITIONAL_RELEASE_ENV: {assignment: {id: 1}, jwt: 'foo'},
+      CONDITIONAL_RELEASE_ENV: {assignment: {id: 1}},
       CONDITIONAL_RELEASE_SERVICE_ENABLED: true,
       HAS_GRADED_SUBMISSIONS: false,
       LOCALE: 'en',
@@ -1595,7 +1600,10 @@ QUnit.module('EditView#validateGraderCount', hooks => {
 QUnit.module('EditView#renderModeratedGradingFormFieldGroup', suiteHooks => {
   let view
   let server
-  const availableModerators = [{name: 'John Doe', id: '21'}, {name: 'Jane Doe', id: '89'}]
+  const availableModerators = [
+    {name: 'John Doe', id: '21'},
+    {name: 'Jane Doe', id: '89'}
+  ]
 
   suiteHooks.beforeEach(() => {
     fixtures.innerHTML = `

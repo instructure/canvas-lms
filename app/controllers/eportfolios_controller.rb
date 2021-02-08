@@ -111,8 +111,7 @@ class EportfoliosController < ApplicationController
   def update
     update_params = if @portfolio.grants_right?(@current_user, session, :update)
       eportfolio_params
-    elsif @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) &&
-      @portfolio.grants_right?(@current_user, :moderate)
+    elsif @portfolio.grants_right?(@current_user, :moderate)
       eportfolio_moderation_params
     end
 
@@ -191,7 +190,7 @@ class EportfoliosController < ApplicationController
         @attachment.file_state = '0'
         @attachment.user = @current_user
         @attachment.save!
-        ContentZipper.send_later_enqueue_args(:process_attachment, { :priority => Delayed::LOW_PRIORITY, :max_attempts => 1 }, @attachment)
+        ContentZipper.delay(priority: Delayed::LOW_PRIORITY).process_attachment(@attachment)
         render :json => @attachment
       else
         respond_to do |format|

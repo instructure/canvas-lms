@@ -20,7 +20,7 @@ import React from 'react'
 import '@testing-library/jest-dom/extend-expect'
 import {render, fireEvent} from '@testing-library/react'
 import keycode from 'keycode'
-import StatusBar from '../StatusBar'
+import StatusBar, {WYSIWYG_VIEW, PRETTY_HTML_EDITOR_VIEW, RAW_HTML_EDITOR_VIEW} from '../StatusBar'
 
 function renderStatusBar(overrideProps) {
   return render(
@@ -28,7 +28,7 @@ function renderStatusBar(overrideProps) {
       onToggleHtml={() => {}}
       path={[]}
       wordCount={0}
-      isHtmlView={false}
+      editorView={WYSIWYG_VIEW}
       onResize={() => {}}
       onKBShortcutModalOpen={() => {}}
       onA11yChecker={() => {}}
@@ -46,36 +46,142 @@ describe('RCE StatusBar', () => {
     expect(onkbcallback).toHaveBeenCalled()
   })
 
-  it('cycles focus with right arrow keys', () => {
-    const {container} = renderStatusBar()
-    const buttons = container.querySelectorAll('button, *[tabindex]')
-    expect(buttons.length).toEqual(4)
+  describe('in WYSIWYG mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar()
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(5)
 
-    buttons[0].focus()
-    expect(document.activeElement === buttons[0])
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
 
-    // wraps to the right
-    for (let i = 0; i === buttons.length; ++i) {
-      fireEvent.keyDown(container, {keyCode: keycode.codes.right})
-      expect(document.activeElement === buttons[i % buttons.length])
-    }
-    expect(document.activeElement === buttons[0]) // back to the beginning
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar()
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('button, *[tabindex]')
+      expect(buttons.length).toEqual(5)
+
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let focusedButton = buttons.length - 1; focusedButton >= 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(focusedButton - 1 + buttons.length) % buttons.length]
+        )
+      }
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
   })
 
-  it('cycles focus with left arrow keys', () => {
-    const {container} = renderStatusBar()
-    const buttons = container.querySelectorAll('button, *[tabindex]')
-    expect(buttons.length).toEqual(4)
+  describe('in raw HTML mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('[tabindex]')
+      expect(buttons.length).toEqual(2)
 
-    buttons[3].focus()
-    expect(document.activeElement === buttons[3])
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
 
-    // wraps to the left
-    for (let i = 0; i < buttons.length; ++i) {
-      fireEvent.keyDown(container, {keyCode: keycode.codes.left})
-      expect(document.activeElement === buttons[(3 - i + buttons.length) % buttons.length])
-    }
-    expect(document.activeElement === buttons[3])
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar({editorView: RAW_HTML_EDITOR_VIEW})
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('[tabindex]')
+      expect(buttons.length).toEqual(2)
+
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let focusedButton = buttons.length - 1; focusedButton >= 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(focusedButton - 1 + buttons.length) % buttons.length]
+        )
+      }
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
+  })
+
+  describe('in pretty HTML mode', () => {
+    it('cycles focus with right arrow keys', () => {
+      const {container, getByTestId} = renderStatusBar({
+        editorView: PRETTY_HTML_EDITOR_VIEW,
+        use_rce_pretty_html_editor: true
+      })
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('[tabindex]')
+      expect(buttons.length).toEqual(4)
+
+      buttons[0].focus()
+      expect(document.activeElement).toBe(buttons[0])
+      // wraps to the right
+      for (let i = 1; i <= buttons.length; ++i) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.right})
+        expect(document.activeElement).toBe(buttons[i % buttons.length])
+      }
+      expect(document.activeElement).toBe(buttons[0]) // back to the beginning
+    })
+
+    it('cycles focus with left arrow keys', async () => {
+      const {container, getByTestId} = renderStatusBar({
+        editorView: PRETTY_HTML_EDITOR_VIEW,
+        use_rce_pretty_html_editor: true
+      })
+      const statusbar = getByTestId('RCEStatusBar')
+      const buttons = container.querySelectorAll('[tabindex]')
+      expect(buttons.length).toEqual(4)
+
+      buttons[buttons.length - 1].focus()
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+      // wraps to the left
+      for (let focusedButton = buttons.length - 1; focusedButton >= 0; --focusedButton) {
+        fireEvent.keyDown(statusbar, {keyCode: keycode.codes.left})
+        expect(document.activeElement).toBe(
+          buttons[(focusedButton - 1 + buttons.length) % buttons.length]
+        )
+      }
+      expect(document.activeElement).toBe(buttons[buttons.length - 1])
+    })
+  })
+
+  describe('default focus button', () => {
+    it('shifts button when entering edit mode', () => {
+      const {container, rerender} = renderStatusBar({editorView: WYSIWYG_VIEW})
+
+      const kbshortcutBtn = container.querySelector('[data-btn-id="rce-kbshortcut-btn"]')
+      expect(container.querySelector('[tabindex="0"]')).toBe(kbshortcutBtn)
+
+      rerender(
+        <StatusBar
+          onToggleHtml={() => {}}
+          path={[]}
+          wordCount={0}
+          editorView={RAW_HTML_EDITOR_VIEW}
+          onResize={() => {}}
+          onKBShortcutModalOpen={() => {}}
+          onA11yChecker={() => {}}
+        />
+      )
+
+      const editBtn = container.querySelector('[data-btn-id="rce-edit-btn"]')
+      expect(container.querySelector('[tabindex="0"]')).toBe(editBtn)
+    })
   })
 
   it('calls the callback when clicking the a11y checker button', () => {

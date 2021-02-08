@@ -18,10 +18,10 @@
 import React, {Children, Component} from 'react'
 import {themeable} from '@instructure/ui-themeable'
 import {Children as ChildrenPropType} from '@instructure/ui-prop-types'
-import {Pill} from '@instructure/ui-elements'
+import {Pill} from '@instructure/ui-pill'
 
 import styles from './styles.css'
-import theme from './theme.js'
+import theme from './theme'
 
 class BadgeList extends Component {
   static propTypes = {

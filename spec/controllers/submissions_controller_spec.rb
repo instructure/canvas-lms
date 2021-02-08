@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -481,6 +483,36 @@ describe SubmissionsController do
         SubmissionsController.new.store_google_doc_attachment(attachment, File.open("public/images/a.png"))
         expect(attachment.instfs_uuid).to eq uuid
       end
+
+      it "gracefully reports a gdrive timeout" do
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
+        expect(google_docs).to receive(:download).and_raise(GoogleDrive::ConnectionException, "fake conn timeout")
+        post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' }})
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq("Timed out while talking to google drive")
+      end
+
+      it "gracefully reports an invalid entry" do
+        mock_user_service = double()
+        allow(@user).to receive(:user_services).and_return(mock_user_service)
+        expect(mock_user_service).to receive(:where).with(service: "google_drive").
+          and_return(double(first: double(token: "token", secret: "secret")))
+        google_docs = double
+        expect(GoogleDrive::Connection).to receive(:new).and_return(google_docs)
+        expect(google_docs).to receive(:download).and_raise(GoogleDrive::WorkflowError, "fake bad entry")
+        post(:create, params: {course_id: @course.id, assignment_id: @assignment.id,
+             submission: { submission_type: 'google_doc' },
+             google_doc: { document_id: '12345' }})
+        expect(response).to be_redirect
+        expect(flash[:error]).to eq("Google Drive entry was unable to be downloaded")
+      end
     end
 
     describe "confetti celebrations" do
@@ -628,14 +660,13 @@ describe SubmissionsController do
       expect(a.user).to eq @teacher
       expect(a.workflow_state).to eq 'to_be_zipped'
       a.update_attribute('workflow_state', 'zipped')
-      allow(a).to receive('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
-      allow(a).to receive('content_type').and_return('test/file')
-      allow(Attachment).to receive(:instantiate).and_return(a)
+      allow_any_instantiation_of(a).to receive('full_filename').and_return(File.expand_path(__FILE__)) # just need a valid file
+      allow_any_instantiation_of(a).to receive('content_type').and_return('test/file')
 
       request.headers['HTTP_ACCEPT'] = '*/*'
       get 'index', params: { :course_id => @course.id, :assignment_id => @assignment.id, :zip => '1' }
       expect(response).to be_successful
-      expect(response.content_type).to eq 'test/file'
+      expect(response.media_type).to eq 'test/file'
     end
   end
 
@@ -658,6 +689,7 @@ describe SubmissionsController do
     it "renders show template" do
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       expect(response).to render_template(:show)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @teacher.asset_string
     end
 
     it "renders json with scores for teachers" do
@@ -751,6 +783,7 @@ describe SubmissionsController do
       @assignment.ensure_post_policy(post_manually: true)
       get :show, params: {course_id: @context.id, assignment_id: @assignment.id, id: @student.id}
       assert_status(200)
+      expect(assigns.dig(:js_env, :media_comment_asset_string)).to eq @student.asset_string
     end
 
     describe "peer reviewers" do
@@ -1283,44 +1316,6 @@ describe SubmissionsController do
         get :audit_events, params: quiz_audit_params, format: :json
         expect(returned_quizzes).to include(hash_including({ "id" => quiz.id, "role" => "grader" }))
       end
-    end
-  end
-
-  describe "copy_attachments_to_submissions_folder" do
-    before(:once) do
-      course_with_student
-      @course.account.enable_service(:avatars)
-      attachment_model(context: @student)
-    end
-
-    it "copies a user attachment into the user's submissions folder" do
-      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
-      expect(atts.length).to eq 1
-      expect(atts[0]).not_to eq @attachment
-      expect(atts[0].folder).to eq @student.submissions_folder(@course)
-    end
-
-    it "leaves files already in submissions folders alone" do
-      @attachment.folder = @student.submissions_folder(@course)
-      @attachment.save!
-      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
-      expect(atts).to eq [@attachment]
-    end
-
-    it "copies a group attachment into the group submission folder" do
-      group_model(context: @course)
-      attachment_model(context: @group)
-      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [@attachment])
-      expect(atts.length).to eq 1
-      expect(atts[0]).not_to eq @attachment
-      expect(atts[0].folder).to eq @group.submissions_folder
-    end
-
-    it "leaves files in non user/group context alone" do
-      assignment_model(context: @course)
-      weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
-      atts = SubmissionsController.copy_attachments_to_submissions_folder(@course, [weird_file])
-      expect(atts).to eq [weird_file]
     end
   end
 end

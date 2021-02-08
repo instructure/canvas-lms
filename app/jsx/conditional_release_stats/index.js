@@ -29,7 +29,7 @@ const CyoeStats = {
       ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED &&
       ENV.CONDITIONAL_RELEASE_ENV.rule != null
     ) {
-      const {assignment, jwt, stats_url} = ENV.CONDITIONAL_RELEASE_ENV
+      const {assignment, stats_url} = ENV.CONDITIONAL_RELEASE_ENV
 
       const detailsRoot = document.createElement('div')
       detailsRoot.setAttribute('id', 'crs-details')
@@ -40,7 +40,6 @@ const CyoeStats = {
         : [assignment.submission_types]
       const initState = {
         assignment,
-        jwt,
         apiUrl: stats_url
       }
 

@@ -20,7 +20,20 @@ require 'ims/lti'
 IMS::LTI::Models::ContentItems::ContentItem.add_attribute :canvas_url, json_key: 'canvasURL'
 
 class ExternalContentController < ApplicationController
+  include Lti::Concerns::Oembed
+
   protect_from_forgery :except => [:selection_test, :success], with: :exception
+
+  before_action :require_user, only: :oembed_retrieve, if: -> { require_oembed_token? }
+  before_action :validate_oembed_token!, only: :oembed_retrieve, if: -> { require_oembed_token? }
+
+  rescue_from Lti::Concerns::Oembed::OembedAuthorizationError do |error|
+    render json: { message: error.message }, status: :unauthorized
+  end
+
+  rescue_from JSON::JWT::InvalidFormat do
+    head :bad_request
+  end
 
   def success
     normalize_deprecated_data!
@@ -33,6 +46,7 @@ class ExternalContentController < ApplicationController
       end
     elsif params[:return_type] == 'oembed'
       js_env(oembed: {endpoint: params[:endpoint], url: params[:url]})
+      @oembed_token = params[:oembed_token]
     elsif params[:service] == 'external_tool_dialog'
       get_context
       @retrieved_data = content_items_for_canvas
@@ -66,10 +80,10 @@ class ExternalContentController < ApplicationController
       lti_response_messages: lti_response_messages,
       service: params[:service],
       service_id: params[:id],
-      message: params[:lti_msg],
-      log: params[:lti_log],
-      error_message: params[:lti_errormsg],
-      error_log: params[:lti_errorlog]
+      message: param_if_set(:lti_msg),
+      log: param_if_set(:lti_log),
+      error_message: param_if_set(:lti_errormsg),
+      error_log: param_if_set(:lti_errorlog)
     })
   end
 
@@ -82,11 +96,8 @@ class ExternalContentController < ApplicationController
   end
 
   def oembed_retrieve
-    endpoint = params[:endpoint]
-    url = params[:url]
-    uri = URI.parse(endpoint + (endpoint.match(/\?/) ? '&url=' : '?url=') + CGI.escape(url) + '&format=json')
     begin
-      res = CanvasHttp.get(uri.to_s)
+      res = CanvasHttp.get(oembed_object_uri.to_s)
       data = JSON.parse(res.body)
       content_item = Lti::ContentItemConverter.convert_oembed(data)
     rescue StandardError
@@ -162,6 +173,7 @@ class ExternalContentController < ApplicationController
 
   def param_if_set(param_key)
     param_value = params[param_key] && !params[param_key].empty? && params[param_key]
+    param_value = param_value.to_s if param_value
     if param_value && block_given?
       yield param_value
     end

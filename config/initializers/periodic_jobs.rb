@@ -27,32 +27,47 @@
 # passed to Delayed::Periodic.cron
 
 class PeriodicJobs
-  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil)
+  def self.compute_run_at(jitter:, local_offset:)
+    now = Time.zone.now
+    run_at = now
+
+    if local_offset
+      database_timzone_name = Shard.current.database_server.config[:timezone]
+      # If not set, assume it is the same on the database server as on the application server
+      database_timezone = (database_timzone_name ? ActiveSupport::TimeZone[database_timzone_name] : nil) || Time.zone
+      run_at = now + (Time.zone.utc_offset - database_timezone.utc_offset)
+      if run_at < now
+        run_at += 1.day
+      end
+    end
+
+    if jitter.present?
+      run_at = rand((run_at+10.seconds)..(run_at + jitter))
+    end
+    run_at
+  end
+
+  def self.with_each_shard_by_database_in_region(klass, method, *args, jitter: nil, local_offset: false)
     Shard.with_each_shard(Shard.in_current_region) do
       strand = "#{klass}.#{method}:#{Shard.current.database_server.id}"
       # TODO: allow this to work with redis jobs
       next if Delayed::Job == Delayed::Backend::ActiveRecord::Job && Delayed::Job.where(strand: strand, shard_id: Shard.current.id, locked_by: nil).exists?
       dj_params = {
         strand: strand,
-        max_attempts: 1,
         priority: 40
       }
-      if jitter.present?
-        now = Time.zone.now
-        dj_params[:run_at] = rand((now+10.seconds)..(now + jitter))
-      end
-      klass.send_later_enqueue_args(method, dj_params, *args)
+      dj_params[:run_at] = compute_run_at(jitter: jitter, local_offset: local_offset)
+      klass.delay(**dj_params).__send__(method, *args)
     end
   end
 end
 
-def with_each_shard_by_database(klass, method, *args, jitter: nil)
+def with_each_shard_by_database(klass, method, *args, jitter: nil, local_offset: false)
   DatabaseServer.send_in_each_region(PeriodicJobs,
                                      :with_each_shard_by_database_in_region,
                                      {
                                        singleton: "periodic:region: #{klass}.#{method}",
-                                       max_attempts: 1,
-                                     }, klass, method, *args, jitter: nil)
+                                     }, klass, method, *args, jitter: jitter, local_offset: local_offset)
 end
 
 Rails.configuration.after_initialize do
@@ -71,7 +86,7 @@ Rails.configuration.after_initialize do
   persistence_token_expire_after = (ConfigFile.load("session_store") || {})[:expire_remember_me_after]
   persistence_token_expire_after ||= 1.month
   Delayed::Periodic.cron 'SessionPersistenceToken.delete_all', '35 11 * * *' do
-    with_each_shard_by_database(SessionPersistenceToken, :delete_expired, persistence_token_expire_after)
+    with_each_shard_by_database(SessionPersistenceToken, :delete_expired, persistence_token_expire_after, local_offset: true)
   end
 
   Delayed::Periodic.cron 'ExternalFeedAggregator.process', '*/30 * * * *' do
@@ -120,8 +135,9 @@ Rails.configuration.after_initialize do
     end
   end
 
-  Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 11 * * *', priority: Delayed::LOW_PRIORITY do
-    with_each_shard_by_database(Alerts::DelayedAlertSender, :process)
+  # Process at 5:30 am local time
+  Delayed::Periodic.cron 'Alerts::DelayedAlertSender.process', '30 5 * * *', priority: Delayed::LOW_PRIORITY do
+    with_each_shard_by_database(Alerts::DelayedAlertSender, :process, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Attachment.do_notifications', '*/10 * * * *', priority: Delayed::LOW_PRIORITY do
@@ -129,15 +145,15 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Ignore.cleanup', '45 23 * * *' do
-    with_each_shard_by_database(Ignore, :cleanup)
+    with_each_shard_by_database(Ignore, :cleanup, local_offset: true)
   end
 
   Delayed::Periodic.cron 'DelayedMessageScrubber.scrub_all', '0 1 * * *' do
-    with_each_shard_by_database(DelayedMessageScrubber, :scrub)
+    with_each_shard_by_database(DelayedMessageScrubber, :scrub, local_offset: true)
   end
 
   Delayed::Periodic.cron 'ConversationBatchScrubber.scrub_all', '0 2 * * *' do
-    with_each_shard_by_database(ConversationBatchScrubber, :scrub)
+    with_each_shard_by_database(ConversationBatchScrubber, :scrub, local_offset: true)
   end
 
   Delayed::Periodic.cron 'BounceNotificationProcessor.process', '*/5 * * * *' do
@@ -159,25 +175,24 @@ Rails.configuration.after_initialize do
   end
 
   Delayed::Periodic.cron 'Auditors::ActiveRecord::Partitioner', '0 0 * * *' do
-    with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process, jitter: 6.hours)
+    with_each_shard_by_database(Auditors::ActiveRecord::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Quizzes::QuizSubmissionEventPartitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 6.hours)
+    with_each_shard_by_database(Quizzes::QuizSubmissionEventPartitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Version::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Version::Partitioner, :process, jitter: 6.hours)
+    with_each_shard_by_database(Version::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Messages::Partitioner.process', '0 0 * * *' do
-    with_each_shard_by_database(Messages::Partitioner, :process, jitter: 6.hours)
+    with_each_shard_by_database(Messages::Partitioner, :process, jitter: 30.minutes, local_offset: true)
   end
 
   if AuthenticationProvider::SAML.enabled?
     Delayed::Periodic.cron 'AuthenticationProvider::SAML::MetadataRefresher.refresh_providers', '15 0 * * *' do
-      with_each_shard_by_database(AuthenticationProvider::SAML::MetadataRefresher,
-                                  :refresh_providers)
+      with_each_shard_by_database(AuthenticationProvider::SAML::MetadataRefresher, :refresh_providers, local_offset: true)
     end
 
     AuthenticationProvider::SAML::Federation.descendants.each do |federation|
@@ -225,7 +240,7 @@ Rails.configuration.after_initialize do
     with_each_shard_by_database(ObserverAlert, :clean_up_old_alerts)
   end
 
-  Delayed::Periodic.cron 'ObserverAlert.create_assignment_missing_alerts', '*/5 * * * *', priority: Delayed::LOW_PRIORITY do
+  Delayed::Periodic.cron 'ObserverAlert.create_assignment_missing_alerts', '*/15 * * * *', priority: Delayed::LOW_PRIORITY do
     with_each_shard_by_database(ObserverAlert, :create_assignment_missing_alerts)
   end
 
@@ -233,12 +248,12 @@ Rails.configuration.after_initialize do
     Lti::KeyStorage.rotate_keys
   end
 
-  Delayed::Periodic.cron 'abandoned job cleanup', '*/10 * * * *' do
-    Delayed::Worker::HealthCheck.reschedule_abandoned_jobs
+  Delayed::Periodic.cron 'Canvas::Oauth::KeyStorage.rotate_keys', '0 0 1 * *', priority: Delayed::LOW_PRIORITY do
+    Canvas::Oauth::KeyStorage.rotate_keys
   end
 
   Delayed::Periodic.cron 'Purgatory.expire_old_purgatories', '0 0 * * *', priority: Delayed::LOWER_PRIORITY do
-    with_each_shard_by_database(Purgatory, :expire_old_purgatories)
+    with_each_shard_by_database(Purgatory, :expire_old_purgatories, local_offset: true)
   end
 
   Delayed::Periodic.cron 'Feature.remove_obsolete_flags', '0 8 * * 0', priority: Delayed::LOWER_PRIORITY do
@@ -251,5 +266,24 @@ Rails.configuration.after_initialize do
 
   Delayed::Periodic.cron 'ScheduledSmartAlert.queue_current_jobs', '5 * * * *' do
     with_each_shard_by_database(ScheduledSmartAlert, :queue_current_jobs)
+  end
+
+  # the default is hourly, and we picked a weird minute just to avoid
+  # synchronizing with other periodic jobs.
+  Delayed::Periodic.cron 'AssetUserAccessLog.compact', '42 * * * *' do
+    # using jitter should help spread out multiple shards on the same cluster doing these
+    # write-heavy updates so that they don't all hit at the same time and run immediately back to back.
+    with_each_shard_by_database(AssetUserAccessLog, :compact, jitter: 15.minutes)
+  end
+
+  if MultiCache.cache.is_a?(ActiveSupport::Cache::HaStore) && MultiCache.cache.options[:consul_event] && InstStatsd.settings.present?
+    Delayed::Periodic.cron 'HaStore.validate_consul_event', '5 * * * *' do
+      DatabaseServer.send_in_each_region(MultiCache, :validate_consul_event,
+          {
+            run_current_region_asynchronously: true,
+            singleton: 'HaStore.validate_consul_event'
+          }
+        )
+    end
   end
 end

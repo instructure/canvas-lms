@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -69,14 +71,14 @@ describe 'Screenreader Gradebook Student Information' do
         srgb_page.select_student(student)
 
         expect(f('span.text-error > i.icon-warning')).to be_displayed
-        expect(f('#student_information > div.row')).to include_text('Score does not include assignments from the group')
+        expect(f('#student_information > div.row-fluid')).to include_text('Score does not include assignments from the group')
       end
 
       it "with only an assignment is selected", priority: "2", test_id: 615691 do
         srgb_page.select_assignment(assignment_5)
 
         expect(f('a > i.icon-warning')).to be_displayed
-        expect(f('#assignment_information > div.row')).to include_text('Assignments in this group have no points')
+        expect(f('#assignment_information > div.row-fluid')).to include_text('Assignments in this group have no points')
       end
     end
   end

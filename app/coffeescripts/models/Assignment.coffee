@@ -45,6 +45,8 @@ export default class Assignment extends Model
   @mixin DefaultUrlMixin
   resourceName: 'assignments'
 
+  LTI_EXT_MASTERY_CONNECT = 'https://canvas.instructure.com/lti/mastery_connect_assessment'
+
   urlRoot: -> @_defaultUrl()
 
   defaults:
@@ -353,12 +355,35 @@ export default class Assignment extends Model
 
   externalToolData: =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
-    if !tagAttributes.external_data
-      return ''
-    data = tagAttributes.external_data
-    # we need to stringified version for the form input
-    data.stringify = JSON.stringify(data)
-    return data
+    return tagAttributes.external_data
+
+  externalToolDataStringified: =>
+    data = @externalToolData()
+    if (data)
+      return JSON.stringify(data)
+    return ''
+
+  externalToolCustomParams: (custom) =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    return tagAttributes.custom unless arguments.length > 0
+    tagAttributes.custom = custom
+    @set 'external_tool_tag_attributes', tagAttributes
+
+  externalToolCustomParamsStringified: =>
+    data = @externalToolCustomParams()
+    if (data)
+      return JSON.stringify(data)
+    return ''
+
+  isMasteryConnectTool: =>
+    tagAttributes = @get('external_tool_tag_attributes') || {}
+    return tagAttributes?.external_data?.key == LTI_EXT_MASTERY_CONNECT
+
+  externalToolDataStudentLabelText: =>
+    data = @externalToolData()
+    return '' if !data
+    return I18n.t('Student') if data.studentCount == 1
+    return I18n.t('Students')
 
   externalToolNewTab: (b) =>
     tagAttributes = @get('external_tool_tag_attributes') || {}
@@ -414,7 +439,10 @@ export default class Assignment extends Model
     return I18n.t('Assignment')
 
   htmlUrl: =>
-    @get 'html_url'
+    if @isQuizLTIAssignment() && canManage() && ENV.FLAGS && ENV.FLAGS.new_quizzes_modules_support
+      return @htmlEditUrl()
+    else
+      return @get 'html_url'
 
   htmlEditUrl: =>
     "#{@get 'html_url'}/edit"
@@ -529,30 +557,34 @@ export default class Assignment extends Model
 
   toView: =>
     fields = [
-      'name', 'dueAt', 'description', 'pointsPossible', 'lockAt', 'unlockAt',
-      'gradingType', 'notifyOfUpdate', 'peerReviews', 'automaticPeerReviews',
-      'peerReviewCount', 'peerReviewsAssignAt', 'anonymousPeerReviews',
-      'acceptsOnlineUpload', 'acceptsMediaRecording', 'submissionType',
-      'acceptsOnlineTextEntries', 'acceptsOnlineURL', 'allowedExtensions',
-      'restrictFileExtensions', 'isOnlineSubmission', 'isNotGraded',
-      'isExternalTool', 'externalToolUrl', 'externalToolNewTab',
-      'turnitinAvailable', 'turnitinEnabled', 'vericiteAvailable',
-      'vericiteEnabled', 'gradeGroupStudentsIndividually', 'groupCategoryId',
-      'frozen', 'frozenAttributes', 'freezeOnCopy', 'canFreeze', 'isSimple',
-      'gradingStandardId', 'isLetterGraded', 'isGpaScaled',
-      'assignmentGroupId', 'iconType', 'published', 'htmlUrl', 'htmlEditUrl',
-      'labelId', 'position', 'postToSIS', 'multipleDueDates', 'nonBaseDates',
-      'allDates', 'hasDueDate', 'hasPointsPossible', 'singleSectionDueDate',
-      'moderatedGrading', 'postToSISEnabled', 'isOnlyVisibleToOverrides',
-      'omitFromFinalGrade', 'isDuplicating', 'isMigrating', 'failedToDuplicate',
-      'originalAssignmentName', 'is_quiz_assignment', 'isQuizLTIAssignment',
-      'isImporting', 'failedToImport', 'failedToMigrate',
-      'secureParams', 'inClosedGradingPeriod', 'dueDateRequired',
-      'submissionTypesFrozen', 'anonymousInstructorAnnotations',
-      'anonymousGrading', 'gradersAnonymousToGraders', 'showGradersAnonymousToGradersCheckbox',
-      'defaultToolName', 'isDefaultTool', 'isGenericExternalTool', 'isNonPlacementExternalTool', 'defaultToNone',
-      'defaultToOnline', 'defaultToOnPaper', 'objectTypeDisplayName',
-      'selectedSubmissionTypeToolId', 'submissionTypeSelectionTools', 'externalToolData'
+      'acceptsMediaRecording', 'acceptsOnlineTextEntries', 'acceptsOnlineURL',
+      'acceptsOnlineUpload', 'allDates', 'allowedExtensions', 'anonymousGrading',
+      'anonymousInstructorAnnotations', 'anonymousPeerReviews', 'assignmentGroupId',
+      'automaticPeerReviews', 'canFreeze', 'defaultToNone', 'defaultToOnPaper',
+      'defaultToOnline', 'defaultToolName', 'description', 'dueAt',
+      'dueDateRequired', 'externalToolCustomParams',
+      'externalToolCustomParamsStringified', 'externalToolData',
+      'externalToolDataStringified', 'externalToolDataStudentLabelText',
+      'externalToolNewTab', 'externalToolUrl', 'failedToDuplicate',
+      'failedToImport', 'failedToMigrate', 'freezeOnCopy', 'frozen',
+      'frozenAttributes', 'gradeGroupStudentsIndividually',
+      'gradersAnonymousToGraders', 'gradingStandardId', 'gradingType',
+      'groupCategoryId', 'hasDueDate', 'hasPointsPossible', 'htmlEditUrl',
+      'htmlUrl', 'iconType', 'inClosedGradingPeriod', 'isDefaultTool',
+      'isDuplicating', 'isExternalTool', 'isGenericExternalTool', 'isGpaScaled',
+      'isImporting', 'isLetterGraded', 'isMasteryConnectTool', 'isMigrating',
+      'isNonPlacementExternalTool', 'isNotGraded', 'isOnlineSubmission',
+      'isOnlyVisibleToOverrides', 'isQuizLTIAssignment', 'isSimple',
+      'is_quiz_assignment', 'labelId', 'lockAt', 'moderatedGrading',
+      'multipleDueDates', 'name', 'nonBaseDates', 'notifyOfUpdate',
+      'objectTypeDisplayName', 'omitFromFinalGrade', 'originalAssignmentName',
+      'peerReviewCount', 'peerReviews', 'peerReviewsAssignAt', 'pointsPossible',
+      'position', 'postToSIS', 'postToSISEnabled', 'published',
+      'restrictFileExtensions', 'secureParams', 'selectedSubmissionTypeToolId',
+      'showGradersAnonymousToGradersCheckbox', 'singleSectionDueDate',
+      'submissionType', 'submissionTypeSelectionTools', 'submissionTypesFrozen',
+      'turnitinAvailable', 'turnitinEnabled', 'unlockAt', 'vericiteAvailable',
+      'vericiteEnabled'
     ]
 
     hash =

@@ -20,7 +20,6 @@
 class ContentImportsController < ApplicationController
   before_action :require_context
   before_action { |c| c.active_tab = "home" }
-  prepend_around_action :load_pseudonym_from_policy, :only => :migrate_content_upload
 
   include Api::V1::Course
   include ContentImportsHelper
@@ -41,9 +40,12 @@ class ContentImportsController < ApplicationController
 
   # current files UI uses this page for .zip uploads
   def files
-    authorized_action(@context, @current_user, [:manage_content, :manage_files])
-    js_env(return_or_context_url: return_or_context_url,
-           return_to: params[:return_to])
+    authorized_action(
+      @context,
+      @current_user,
+      [:manage_content, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    )
+    js_env(return_or_context_url: return_or_context_url, return_to: params[:return_to])
   end
 
   # @API Get course copy status

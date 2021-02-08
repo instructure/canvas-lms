@@ -219,7 +219,7 @@ class CollaborationsController < ApplicationController
           redirect_to named_context_url(@context, :context_collaborations_url)
         end
       rescue GoogleDrive::ConnectionException => drive_exception
-        Canvas::Errors.capture(drive_exception)
+        Canvas::Errors.capture(drive_exception, {}, :warn)
         flash[:error] = t 'errors.cannot_load_collaboration', "Cannot load collaboration"
         redirect_to named_context_url(@context, :context_collaborations_url)
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -47,6 +49,7 @@ class CanvasSchema < GraphQL::Schema
     when Course then Types::CourseType
     when Assignment then Types::AssignmentType
     when AssignmentGroup then Types::AssignmentGroupType
+    when Conversation then Types::ConversationType
     when CourseSection then Types::SectionType
     when User then Types::UserType
     when Enrollment then Types::EnrollmentType
@@ -63,9 +66,13 @@ class CanvasSchema < GraphQL::Schema
     when Attachment then Types::FileType
     when DiscussionTopic then Types::DiscussionType
     when Quizzes::Quiz then Types::QuizType
+    when OutcomeCalculationMethod then Types::OutcomeCalculationMethodType
+    when OutcomeProficiency then Types::OutcomeProficiencyType
     when Progress then Types::ProgressType
     when Rubric then Types::RubricType
     when MediaObject then Types::MediaObjectType
+    when LearningOutcomeGroup then Types::LearningOutcomeGroupType
+    when LearningOutcome then Types::LearningOutcomeType
     when ContentTag
       if type&.name == "ModuleItemInterface"
         case obj.content_type

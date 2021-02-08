@@ -26,7 +26,7 @@ describe('HelpTray', () => {
     {
       text: 'Search the Canvas Guides',
       subtext: 'Find answers to common questions',
-      url: 'http://community.canvaslms.com/community/answers/guides',
+      url: 'https://community.canvaslms.com/t5/Canvas/ct-p/canvas',
       type: 'default',
       id: 'search_the_canvas_guides'
     },

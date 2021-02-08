@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -47,11 +49,6 @@ class AccessToken < ActiveRecord::Base
     p.dispatch :manually_created_access_token_created
     p.to(&:user)
     p.whenever do |access_token|
-      # Rescuse here to get past places where unit tests have the Features
-      # mocked out but are still creating an access token to make api calls
-      # with which triggers this block. This whole line can be removed when
-      # we remove the release flag.
-      next false unless Account.site_admin.feature_enabled?(:notify_for_manually_created_access_tokens) rescue false
       access_token.crypted_token_previously_changed? && access_token.manually_created?
     end
   end
@@ -118,7 +115,7 @@ class AccessToken < ActiveRecord::Base
     # since you need a refresh token to
     # refresh expired tokens
 
-    if !developer_key_id || cached_developer_key.try(:usable?)
+    if !developer_key_id || developer_key&.usable?
       # we are a stand alone token, or a token with an active developer key
       # make sure we
       #   - have a user id
@@ -130,12 +127,12 @@ class AccessToken < ActiveRecord::Base
   end
 
   def app_name
-    cached_developer_key.try(:name) || "No App"
+    developer_key&.name || "No App"
   end
 
   def authorized_for_account?(target_account)
-    return true unless cached_developer_key
-    cached_developer_key.authorized_for_account?(target_account)
+    return true unless developer_key
+    developer_key.authorized_for_account?(target_account)
   end
 
   def record_last_used_threshold
@@ -150,7 +147,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def expired?
-    (slaved_developer_key == DeveloperKey.default || slaved_developer_key.try(:auto_expire_tokens)) && expires_at && expires_at < DateTime.now.utc
+    (manually_created? || developer_key&.auto_expire_tokens) && expires_at && expires_at < DateTime.now.utc
   end
 
   def token=(new_token)
@@ -168,9 +165,9 @@ class AccessToken < ActiveRecord::Base
       self.token = CanvasSlug.generate(nil, TOKEN_SIZE)
 
       # all reasons to _not_ expire the token
-      if slaved_developer_key == DeveloperKey.default ||
+      if manually_created? ||
         expires_at_changed? ||
-        !slaved_developer_key&.auto_expire_tokens ||
+        !developer_key&.auto_expire_tokens ||
         scopes == ['/auth/userinfo']
         # do nothing
       else
@@ -201,7 +198,7 @@ class AccessToken < ActiveRecord::Base
   end
 
   def protected_token?
-    slaved_developer_key != DeveloperKey.default
+    !manually_created?
   end
 
   def regenerate=(val)
@@ -270,21 +267,10 @@ class AccessToken < ActiveRecord::Base
   end
 
   def dev_key_account_id
-    cached_developer_key.account_id
+    developer_key.account_id
   end
 
   def manually_created?
-    cached_developer_key == DeveloperKey.default
-  end
-
-  private
-
-  def cached_developer_key
-    return nil unless developer_key_id
-    @developer_key ||= DeveloperKey.find_cached(developer_key_id)
-  end
-
-  def slaved_developer_key
-    Shackles.activate(:slave){ return developer_key }
+    developer_key_id == DeveloperKey.default.id
   end
 end

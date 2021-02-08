@@ -114,7 +114,7 @@ class EditorView extends React.Component {
       <div className="cr-editor__scoring-ranges">
         {ranges.map((range, i) => (
           <ScoringRange
-            key={range.get('id')}
+            key={range.get('id') || i}
             path={new Path(i)}
             range={range}
             isTop={i === 0}

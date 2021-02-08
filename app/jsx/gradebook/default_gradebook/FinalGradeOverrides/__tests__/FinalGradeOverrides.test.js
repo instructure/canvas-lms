@@ -45,7 +45,7 @@ describe('Gradebook FinalGradeOverrides', () => {
         id: '1201'
       },
 
-      getGradingPeriodToShow: sinon.stub().returns('1501'),
+      gradingPeriodId: '1501',
 
       gradebookGrid: {
         updateRowCell: sinon.stub()

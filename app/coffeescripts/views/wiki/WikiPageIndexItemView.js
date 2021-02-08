@@ -45,13 +45,15 @@ export default class WikiPageIndexItemView extends Backbone.View {
       'click .unset-as-front-page-menu-item': 'unsetAsFrontPage',
       'click .duplicate-wiki-page': 'duplicateWikiPage',
       'click .send-wiki-page-to': 'sendWikiPageTo',
-      'click .copy-wiki-page-to': 'copyWikiPageTo'
+      'click .copy-wiki-page-to': 'copyWikiPageTo',
+      'change .select-page-checkbox': 'changeSelectPageCheckbox'
     }
 
     this.optionProperty('indexView')
     this.optionProperty('collection')
     this.optionProperty('WIKI_RIGHTS')
     this.optionProperty('contextName')
+    this.optionProperty('selectedPages')
     this.optionProperty('collectionHasTodoDate')
   }
 
@@ -77,6 +79,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
 
     json.DIRECT_SHARE_ENABLED = ENV.DIRECT_SHARE_ENABLED
+    // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexView.js to match
+    json.CAN.OPEN_MANAGE_OPTIONS = json.CAN.MANAGE || json.DIRECT_SHARE_ENABLED
 
     if (json.is_master_course_child_content && json.restricted_by_master_course) {
       json.cannot_delete_by_master_course = true
@@ -87,6 +91,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     json.wiki_page_menu_tools.forEach(tool => {
       return (tool.url = tool.base_url + `&pages[]=${this.model.get('page_id')}`)
     })
+    json.isChecked = this.selectedPages.hasOwnProperty(this.model.get('page_id'))
     json.collectionHasTodoDate = this.collectionHasTodoDate()
     return json
   }
@@ -101,6 +106,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     }
 
     super.render(...arguments)
+    this.changeSelectPageCheckbox()
 
     // attach/re-attach the icons
     if (!this.publishIconView) {
@@ -131,7 +137,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
   }
 
   afterRender() {
-    return this.$el.find('td:first').redirectClickTo(this.$wikiPageLink)
+    return this.$el.find("td:not('.not_clickable'):first").redirectClickTo(this.$wikiPageLink)
   }
 
   settingsMenu(ev) {
@@ -155,7 +161,7 @@ export default class WikiPageIndexItemView extends Backbone.View {
     const {indexView} = this
     const {collection} = this
     return editDialog.on('success', function() {
-      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}.al-trigger`
+      indexView.focusAfterRenderSelector = `a#${this.model.get('page_id')}-menu.al-trigger`
       indexView.currentSortField = null
       indexView.renderSortHeaders()
 
@@ -191,7 +197,11 @@ export default class WikiPageIndexItemView extends Backbone.View {
     const deleteDialog = new WikiPageDeleteDialog({
       model: this.model,
       focusOnCancel: $curCog,
-      focusOnDelete: $focusOnDelete
+      onDelete: () => {
+        $focusOnDelete.focus()
+        delete this.selectedPages[this.model.id]
+        this.changeSelectPageCheckbox()
+      }
     })
     return deleteDialog.open()
   }
@@ -263,6 +273,8 @@ export default class WikiPageIndexItemView extends Backbone.View {
         const cogs = $('.collectionViewItems').find('.al-trigger')
         $(cogs[curIndex]).focus()
       }
+      delete this.selectedPages[this.model.id]
+      this.changeSelectPageCheckbox()
     })
   }
 
@@ -274,6 +286,20 @@ export default class WikiPageIndexItemView extends Backbone.View {
   copyWikiPageTo(ev) {
     ev.preventDefault()
     this.indexView.setCopyToItem(this.model, this.$settingsMenu)
+  }
+
+  changeSelectPageCheckbox(ev) {
+    if (ev) {
+      ev.preventDefault()
+      const {checked} = ev.target
+      const pageId = this.model.get('page_id')
+      if (checked) {
+        this.selectedPages[pageId] = this.model
+      } else {
+        delete this.selectedPages[pageId]
+      }
+    }
+    $('.delete_pages').attr('disabled', Object.keys(this.selectedPages).length === 0)
   }
 }
 WikiPageIndexItemView.initClass()

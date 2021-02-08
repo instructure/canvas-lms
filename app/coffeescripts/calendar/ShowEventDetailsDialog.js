@@ -349,7 +349,7 @@ export default class ShowEventDetailsDialog {
         .filter(context => context.length > 0)
     }
 
-    params.use_new_scheduler = ENV.CALENDAR.BETTER_SCHEDULER
+    params.use_new_scheduler = ENV.CALENDAR.SHOW_SCHEDULER
     params.is_appointment_group = !!this.event.isAppointmentGroupEvent() // this returns the actual url so make it boolean for clarity
     params.reserve_comments =
       this.event.object.reserve_comments != null

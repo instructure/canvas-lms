@@ -70,42 +70,44 @@
     <% end %>
 
     <% if @assignment.submission_types && @assignment.submission_types.match(/online_url/) %>
-    <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
-    <%= hidden_field :submission, :submission_type, :value => "online_url" %>
-    <table class="formtable" style="width: 100%;">
-      <tr>
-        <td colspan="2">
-          <%= t 'instructions.online_url', "Copy and paste the link to the web site you'd like to submit for this assignment." %>
-            <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
-          </td>
-      </tr><tr>
-        <td colspan="2">
-          <%= blabel :submission, :url, :en => "Website URL" %>
-          &nbsp;&nbsp;
-          <%= text_field :submission, :url, :style => "min-width: 250px;" %>
-        </td>
-      </tr><tr>
-        <td colspan="2" style="text-align: center;">
-          <div style="text-align: <%= direction('left') %>;">
-            <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
-          </div>
-        </td>
-      </tr>
-      <%= render :partial => "group_comment" %>
-      <% if @assignment.turnitin_enabled? %>
-        <%= render :partial => "turnitin" %>
+      <%= form_tag(context_url(@context, :controller => :submissions, :assignment_id => @assignment.id, :action => :create), {:id => "submit_online_url_form", :class => "submit_assignment_form"}) do %>
+        <%= hidden_field :submission, :submission_type, :value => "online_url" %>
+        <table class="formtable" style="width: 100%;">
+          <tr>
+            <td colspan="2">
+              <%= t 'instructions.online_url', "Copy and paste the link to the web site you'd like to submit for this assignment." %>
+                <%= render :partial => "assignments/group_submission_reminder" if @assignment.has_group_category? %>
+              </td>
+          </tr>
+          <tr>
+            <td colspan="2">
+              <%= blabel :submission, :url, :en => "Website URL" %>
+              &nbsp;&nbsp;
+              <%= text_field :submission, :url, :style => "min-width: 250px;" %>
+            </td>
+          </tr>
+          <tr>
+            <td colspan="2" style="text-align: center;">
+              <div style="text-align: <%= direction('left') %>;">
+                <%= text_area :submission, :comment, :class => 'submission_comment_textarea', :placeholder => t('comments_placeholder', 'Comments...'), :title => t('additional_comments', 'Additional comments') %>
+              </div>
+            </td>
+          </tr>
+          <%= render :partial => "group_comment" %>
+          <% if @assignment.turnitin_enabled? %>
+            <%= render :partial => "turnitin" %>
+          <% end %>
+          <% if @assignment.vericite_enabled? %>
+            <%= render :partial => "vericite" %>
+          <% end %>
+          <tr>
+            <td colspan="2" class='button-container'>
+              <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
+              <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
+            </td>
+          </tr>
+        </table>
       <% end %>
-      <% if @assignment.vericite_enabled? %>
-        <%= render :partial => "vericite" %>
-      <% end %>
-      <tr>
-        <td colspan="2" class='button-container'>
-          <button type="button" class='cancel_button btn'><%= t '#buttons.cancel', "Cancel" %></button>
-          <button type="submit" class="btn btn-primary"><%= t 'buttons.submit_assignment', "Submit Assignment" %></button>
-        </td>
-      </tr>
-    </table>
-    <% end %>
     <% end %>
 
     <style>

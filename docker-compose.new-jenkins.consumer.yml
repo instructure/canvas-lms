@@ -7,6 +7,7 @@ services:
       - redis
     environment:
       RAILS_ENV: development
+      USE_OPTIMIZED_JS: "true"
     ports:
       - "8181:80"
     init: true
@@ -22,7 +23,7 @@ services:
     init: true
 
   postgres:
-    image: starlord.inscloudgate.net/jenkins/postgis:$POSTGRES-2.5
+    image: $POSTGRES_IMAGE_TAG
     environment:
       POSTGRES_PASSWORD: sekret
     init: true

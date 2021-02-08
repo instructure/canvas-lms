@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -37,7 +39,11 @@ module EventStream::IndexStrategy
 
     def for_ar_scope(args, options={})
       ar_type = index.event_stream.active_record_type
-      index_scope = ar_type.where(index.ar_conditions_proc.call(*args))
+      index_scope = index.ar_scope_proc.call(*args)
+      self.class.for_ar_scope(ar_type, index_scope, options)
+    end
+
+    def self.for_ar_scope(ar_type, index_scope, options)
       index_scope = index_scope.where("created_at >= ?", options[:oldest]) if options[:oldest].present?
       index_scope = index_scope.where("created_at <= ?", options[:newest]) if options[:newest].present?
       index_scope = index_scope.select(:id, :created_at) if options[:just_ids] == true
@@ -50,7 +56,7 @@ module EventStream::IndexStrategy
       end
     end
 
-    def pager_to_records(index_scope, pager)
+    def self.pager_to_records(index_scope, pager)
       bookmark_scope = index_scope
       if bookmark = pager.current_bookmark
         bookmark_scope = bookmark_scope.where("created_at < ?", Time.zone.parse(bookmark))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,6 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Migration
+  class UnsupportedPackage < Error; end
+
   class PackageIdentifier
     include Canvas::Migration::XMLHelper
     attr_reader :type, :converter
@@ -116,7 +120,7 @@ module Canvas::Migration
         return plugin.settings[:provides][@type]
       end
 
-      raise Canvas::Migration::Error, I18n.t(:unsupported_package, "Unsupported content package")
+      raise Canvas::Migration::UnsupportedPackage, I18n.t(:unsupported_package, "Unsupported content package")
     end
   end
 end

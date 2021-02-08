@@ -17,8 +17,8 @@
  */
 
 import React from 'react'
-import {Spinner} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Spinner} from '@instructure/ui-spinner'
+import {View} from '@instructure/ui-view'
 
 import formatMessage from '../../format-message'
 

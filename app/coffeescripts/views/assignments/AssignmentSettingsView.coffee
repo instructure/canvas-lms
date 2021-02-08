@@ -20,7 +20,7 @@ import I18n from 'i18n!AssignmentSettingsView'
 import round from '../../util/round'
 import numberHelper from 'jsx/shared/helpers/numberHelper'
 import _ from 'underscore'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {getResponsiveWidth} from '../DialogFormView'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 import assignmentSettingsTemplate from 'jst/assignments/AssignmentSettings'
 
@@ -29,7 +29,7 @@ export default class AssignmentSettingsView extends DialogFormView
   wrapperTemplate: wrapper
 
   defaults:
-    width: 450
+    width: getResponsiveWidth(320, 450)
     height: 500
     collapsedHeight: 300
 

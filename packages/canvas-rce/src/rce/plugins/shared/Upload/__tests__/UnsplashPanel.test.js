@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {render, fireEvent, act, wait} from '@testing-library/react'
+import {render, act, waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import UnsplashPanel from '../UnsplashPanel'
 
@@ -251,7 +251,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.type(selectBox, 'kittens')
     })
     let resultsContainer
-    await wait(() => {
+    await waitFor(() => {
       resultsContainer = getByTestId('UnsplashResultsContainer')
     })
     expect(resultsContainer.children).toHaveLength(12)
@@ -269,7 +269,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.type(selectBox, 'kittens')
     })
     let nextPage
-    await wait(() => (nextPage = getAllByText('Next Page')[0]))
+    await waitFor(() => (nextPage = getAllByText('Next Page')[0]))
     expect(nextPage).toBeVisible()
   })
 
@@ -287,7 +287,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.type(selectBox, 'kittens')
     })
     let nextPage
-    await wait(() => (nextPage = queryByText('Next Page')))
+    await waitFor(() => (nextPage = queryByText('Next Page')))
     expect(nextPage).toBeNull()
   })
 
@@ -306,7 +306,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.type(selectBox, 'kittens')
     })
     let image
-    await wait(
+    await waitFor(
       () => (image = getByAltText('selective focus photography brown cat lying over black cat'))
     )
     act(() => {
@@ -338,7 +338,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.type(selectBox, 'kittens')
     })
     let text
-    await wait(() => (text = getByText('No results found for kittens.')))
+    await waitFor(() => (text = getByText('No results found for kittens.')))
 
     expect(text).toBeVisible()
   })
@@ -361,7 +361,7 @@ describe.skip('UnsplashPanel', () => {
       userEvent.click(selectBox)
       userEvent.type(selectBox, 'kittens')
     })
-    await wait(() => getAllByText('Next Page')[0])
+    await waitFor(() => getAllByText('Next Page')[0])
     expect(liveRegion.textContent.trim()).toBe('2321 results found, 12 results currently displayed')
   })
 
@@ -380,7 +380,7 @@ describe.skip('UnsplashPanel', () => {
         userEvent.type(selectBox, 'kittens')
       })
       let image
-      await wait(
+      await waitFor(
         () => (image = getByAltText('selective focus photography brown cat lying over black cat'))
       )
       act(() => {

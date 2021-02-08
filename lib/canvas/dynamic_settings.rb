@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -15,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require_dependency 'fallback_memory_cache'
+require_dependency 'local_cache'
 require_dependency 'canvas/dynamic_settings/fallback_proxy'
 require_dependency 'canvas/dynamic_settings/prefix_proxy'
 require 'imperium'
@@ -30,9 +32,11 @@ module Canvas
     KV_NAMESPACE = "config/canvas".freeze
     CACHE_KEY_PREFIX = "dynamic_settings/".freeze
 
+    Canvas::Reloader.on_reload { @root_fallback_proxy = nil }
+
     class << self
       attr_accessor :config, :environment
-      attr_reader :fallback_data
+      attr_reader :fallback_data, :kv_client
 
       def config=(conf_hash)
         @config = conf_hash
@@ -57,6 +61,12 @@ module Canvas
           @kv_client = nil
           @default_service = :canvas
         end
+      end
+
+      # if we don't clear out the kv_client we can end up
+      # with a shared file descriptor between processes
+      def on_fork!
+        @kv_client = Imperium::KV.default_client unless @kv_client.nil?
       end
 
       # Set the fallback data to use in leiu of Consul
@@ -108,7 +118,8 @@ module Canvas
             cluster: cluster,
             default_ttl: default_ttl,
             kv_client: kv_client,
-            data_center: @data_center
+            data_center: @data_center,
+            query_logging: @config.fetch('query_logging', true)
           )
         else
           proxy = root_fallback_proxy

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -148,7 +150,7 @@ describe "courses" do
       expect(value).to eq 10.megabytes
     end
 
-    it "should redirect to the gradebook when switching courses when viewing a students grades" do
+    it "should redirect to the gradebook when switching courses when viewing a students grades", ignore_js_errors: true do
       teacher = user_with_pseudonym(:username => 'teacher@example.com', :active_all => 1)
       student = user_with_pseudonym(:username => 'student@example.com', :active_all => 1)
 
@@ -163,9 +165,9 @@ describe "courses" do
       get "/courses/#{course1.id}/grades/#{student.id}"
 
       select = f('#course_select_menu')
-      options = select.find_elements(:css, 'option')
+      options = INSTUI_Select_options(select)
       expect(options.length).to eq 2
-      wait_for_ajaximations
+
       click_option('#course_select_menu', course2.name)
       expect_new_page_load { f('#apply_select_menus').click }
       expect(f('#breadcrumbs .home + li a')).to include_text(course2.name)
@@ -358,5 +360,53 @@ describe "courses" do
     expect(f('#announcements_on_home_page')).to be_displayed
     expect(f('#announcements_on_home_page')).to include_text(text)
     expect(f('#announcements_on_home_page')).to_not include_text(html)
+  end
+
+  it "should properly apply visible sections to announcement limit" do
+    course_with_teacher(active_course: true)
+    @course.show_announcements_on_home_page = true
+    @course.home_page_announcement_limit = 2
+    @course.save!
+
+    section1 = @course.course_sections.create!(name: 'Section 1')
+    section2 = @course.course_sections.create!(name: 'Section 2')
+
+    # first, create an announcement for the entire course
+    @course.announcements.create!(
+      user: @teacher,
+      message: 'hello, course!'
+    ).save!
+
+    # next, create 2 announcements outside student1's section
+    ['sec an 1', 'sec an 2'].each do |msg|
+      sec_an = @course.announcements.create!(
+        user: @teacher,
+        message: msg
+      )
+      sec_an.is_section_specific = true
+      sec_an.course_sections = [section2]
+      sec_an.save!
+    end
+
+    # last, create 1 announcement inside student1's section
+    a2 = @course.announcements.create!(
+      user: @teacher,
+      message: 'hello, section!'
+    )
+    a2.is_section_specific = true
+    a2.course_sections = [section1]
+    a2.save!
+
+    student1, _student2 = create_users(2, return_type: :record)
+    @course.enroll_student(student1, :enrollment_state => 'active')
+    student_in_section(section1, user: student1)
+    user_session student1
+    get "/courses/#{@course.id}"
+    wait_for(method: nil, timeout: 10) { ff('div.ic-announcement-row__content') }
+    contents = ff('div.ic-announcement-row__content')
+    # these expectations make sure pagination, scope filtration, and announcement ordering works
+    expect(contents.count).to eq 2
+    expect(contents[0].text).to eq 'hello, section!'
+    expect(contents[1].text).to eq 'hello, course!'
   end
 end

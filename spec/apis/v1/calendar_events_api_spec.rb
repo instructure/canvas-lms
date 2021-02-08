@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -21,6 +23,7 @@ require_relative '../../sharding_spec_helper'
 
 describe CalendarEventsApiController, type: :request do
   before :once do
+    Account.find_or_create_by!(id: 0).update_attributes(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
     course_with_teacher(:active_all => true, :user => user_with_pseudonym(:active_user => true))
     @me = @user
   end
@@ -1170,7 +1173,6 @@ describe CalendarEventsApiController, type: :request do
     end
 
     it 'should delete the appointment group if it has no appointments' do
-      @course.root_account.enable_feature!(:better_scheduler)
       time = Time.utc(Time.now.year, Time.now.month, Time.now.day, 4, 20)
       @appointment_group = AppointmentGroup.create!(
         :title => "appointment group", :participants_per_appointment => 4,

@@ -19,89 +19,117 @@
 import formatMessage from '../../../format-message'
 import bridge from '../../../bridge'
 import {isImageEmbed} from '../shared/ContentSelection'
+import {isOKToLink} from '../../contentInsertionUtils'
 import TrayController from './ImageOptionsTray/TrayController'
 import clickCallback from './clickCallback'
 
 const COURSE_PLUGIN_KEY = 'course_images'
 const USER_PLUGIN_KEY = 'user_images'
+const GROUP_PLUGIN_KEY = 'group_images'
 
 const trayController = new TrayController()
 
+function getMenuItems(ed) {
+  const contextType = ed.settings.canvas_rce_user_context.type
+  const items = [
+    {
+      text: formatMessage('Upload Image'),
+      value: 'instructure_upload_image'
+    }
+  ]
+  if (contextType === 'course') {
+    items.push({
+      text: formatMessage('Course Images'),
+      value: 'instructure_course_image'
+    })
+  } else if (contextType === 'group') {
+    items.push({
+      text: formatMessage('Group Images'),
+      value: 'instructure_group_image'
+    })
+  }
+  items.push({
+    text: formatMessage('User Images'),
+    value: 'instructure_user_image'
+  })
+  return items
+}
+
+function doMenuItem(ed, value) {
+  switch (value) {
+    case 'instructure_upload_image':
+      ed.execCommand('mceInstructureImage')
+      break
+    case 'instructure_course_image':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForImages', false, COURSE_PLUGIN_KEY)
+      break
+    case 'instructure_group_image':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForImages', false, GROUP_PLUGIN_KEY)
+      break
+    case 'instructure_user_image':
+      ed.focus(true)
+      ed.execCommand('instructureTrayForImages', false, USER_PLUGIN_KEY)
+      break
+  }
+}
+
 tinymce.create('tinymce.plugins.InstructureImagePlugin', {
   init(editor) {
-    const contextType = editor.settings.canvas_rce_user_context.type
-
     // Register commands
     editor.addCommand('mceInstructureImage', clickCallback.bind(this, editor, document))
     editor.addCommand('instructureTrayForImages', (ui, plugin_key) => {
-      bridge.showTrayForPlugin(plugin_key)
+      bridge.showTrayForPlugin(plugin_key, editor.id)
     })
 
     // Register menu items
     editor.ui.registry.addNestedMenuItem('instructure_image', {
       text: formatMessage('Image'),
       icon: 'image',
-      getSubmenuItems: () => [
-        'instructure_upload_image',
-        'instructure_course_image',
-        'instructure_user_image'
-      ]
-    })
-    editor.ui.registry.addMenuItem('instructure_upload_image', {
-      text: formatMessage('Upload Image'),
-      onAction: () => editor.execCommand('mceInstructureImage')
-    })
-    if (contextType === 'course') {
-      editor.ui.registry.addMenuItem('instructure_course_image', {
-        text: formatMessage('Course Images'),
-        onAction: () => {
-          editor.focus(true)
-          editor.execCommand('instructureTrayForImages', false, COURSE_PLUGIN_KEY)
-        }
-      })
-    }
-    editor.ui.registry.addMenuItem('instructure_user_image', {
-      text: formatMessage('User Images'),
-      onAction: () => {
-        editor.focus(true)
-        editor.execCommand('instructureTrayForImages', false, USER_PLUGIN_KEY)
-      }
+      getSubmenuItems: () =>
+        getMenuItems(editor).map(item => {
+          return {
+            type: 'menuitem',
+            text: item.text,
+            onAction: () => doMenuItem(editor, item.value),
+            onSetup: api => {
+              api.setDisabled(!isOKToLink(editor.selection.getContent()))
+              return () => {}
+            }
+          }
+        })
     })
 
     // Register buttons
-    editor.ui.registry.addMenuButton('instructure_image', {
+    editor.ui.registry.addSplitButton('instructure_image', {
       tooltip: formatMessage('Images'),
       icon: 'image',
-
       fetch(callback) {
-        const items = [
-          {
-            type: 'menuitem',
-            text: formatMessage('Upload Image'),
-            onAction: () => editor.execCommand('mceInstructureImage')
-          },
-          {
-            type: 'menuitem',
-            text: formatMessage('User Images'),
-            onAction() {
-              editor.focus(true)
-              editor.execCommand('instructureTrayForImages', false, USER_PLUGIN_KEY)
-            }
+        const items = getMenuItems(editor).map(item => {
+          return {
+            type: 'choiceitem',
+            text: item.text,
+            value: item.value
           }
-        ]
-
-        if (contextType === 'course') {
-          items.splice(1, 0, {
-            type: 'menuitem',
-            text: formatMessage('Course Images'),
-            onAction() {
-              editor.focus(true) // activate the editor without changing focus
-              editor.execCommand('instructureTrayForImages', false, COURSE_PLUGIN_KEY)
-            }
-          })
-        }
-
+        })
         callback(items)
+      },
+      onAction(api) {
+        if (!api.isDisabled()) {
+          doMenuItem(editor, 'instructure_upload_image')
+        }
+      },
+      onItemAction: (_splitButtonApi, value) => doMenuItem(editor, value),
+      onSetup(api) {
+        function handleNodeChange(_e) {
+          api.setDisabled(!isOKToLink(editor.selection.getContent()))
+        }
+        setTimeout(handleNodeChange)
+        editor.on('NodeChange', handleNodeChange)
+        return () => {
+          editor.off('NodeChange', handleNodeChange)
+        }
       }
     })
 
@@ -109,6 +137,10 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
      * Register the Image "Options" button that will open the Image Options
      * tray.
      */
+
+    function canUpdateImageProps(node) {
+      return !node.classList.contains('equation_image') && isImageEmbed(node)
+    }
     const buttonAriaLabel = formatMessage('Show image options')
     editor.ui.registry.addButton('instructure-image-options', {
       onAction(/* buttonApi */) {
@@ -116,14 +148,14 @@ tinymce.create('tinymce.plugins.InstructureImagePlugin', {
         trayController.showTrayForEditor(editor)
       },
 
-      text: formatMessage('Options'),
+      text: formatMessage('Image Options'),
       tooltip: buttonAriaLabel
     })
 
     editor.ui.registry.addContextToolbar('instructure-image-toolbar', {
       items: 'instructure-image-options',
       position: 'node',
-      predicate: isImageEmbed,
+      predicate: canUpdateImageProps,
       scope: 'node'
     })
   },

@@ -230,7 +230,7 @@ Object.assign(CommonEvent.prototype, {
       return type
     } else if (this.eventType === 'planner_note') {
       return 'note-light'
-    } else if (ENV.CALENDAR.BETTER_SCHEDULER) {
+    } else if (ENV.CALENDAR.SHOW_SCHEDULER) {
       if (
         this.isAppointmentGroupEvent() &&
         (this.isAppointmentGroupFilledEvent() || this.appointmentGroupEventStatus === 'Reserved')

@@ -101,6 +101,14 @@ function toggleRegion($region, showRegion, $trigger) {
     }
 
     if (showRegion) {
+      // shrink dialog to 320px if it's wider than that and doesn't fit in the window (and responsive option given)
+      if (!!window.ENV?.FEATURES?.responsive_misc && $region.dialog('option').responsive) {
+        const width = $region.dialog('option').width
+        if (width && width > 320 && !window.matchMedia(`(min-width: ${width}px)`).matches) {
+          $region.dialog('option', 'width', 320)
+          $region.removeClass('form-horizontal')
+        }
+      }
       $region.dialog('open')
 
       if ($region.data('read-on-open')) {

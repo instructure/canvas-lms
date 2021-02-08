@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -239,6 +241,14 @@ describe AssessmentQuestion do
       smallest_id_question = questions.sort_by(&:id).first
       qq = AssessmentQuestion.find_or_create_quiz_questions([assessment_question], quiz.id, nil).first
       expect(qq.id).to eq(smallest_id_question.id)
+    end
+  end
+
+  context 'root_account_id' do
+    it "uses root_account value from account" do
+      question = assessment_question_model(bank: AssessmentQuestionBank.create!(context: Course.create!))
+
+      expect(question.root_account_id).to eq Account.default.id
     end
   end
 end

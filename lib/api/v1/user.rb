@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -41,6 +43,9 @@ module Api::V1::User
     end
     if opts[:group_memberships]
       ActiveRecord::Associations::Preloader.new.preload(users, :group_memberships)
+    end
+    if opts[:profile]
+      ActiveRecord::Associations::Preloader.new.preload(users, :profile)
     end
   end
 

@@ -2,34 +2,31 @@
 
 exports[`does not render caveat if no courses have grading periods 1`] = `
 <View
-  borderColor="default"
-  debug={false}
+  borderColor="primary"
   display="auto"
   focusColor="info"
   focusPosition="offset"
-  focused={false}
   overflowX="visible"
   overflowY="visible"
   position="static"
   shouldAnimateFocus={true}
+  withVisualDebug={false}
 >
   <View
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
       margin="0 0 large 0"
     >
@@ -46,18 +43,17 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     key="1"
     margin="0 0 large 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <div
       className="GradesDisplay-styles__course"
@@ -113,34 +109,31 @@ exports[`does not render caveat if no courses have grading periods 1`] = `
 
 exports[`renders a loading spinner when loading 1`] = `
 <View
-  borderColor="default"
-  debug={false}
+  borderColor="primary"
   display="auto"
   focusColor="info"
   focusPosition="offset"
-  focused={false}
   overflowX="visible"
   overflowY="visible"
   position="static"
   shouldAnimateFocus={true}
+  withVisualDebug={false}
 >
   <View
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
       margin="0 0 large 0"
     >
@@ -157,18 +150,17 @@ exports[`renders a loading spinner when loading 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     margin="0 0 large 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Spinner
       as="div"
@@ -182,16 +174,15 @@ exports[`renders a loading spinner when loading 1`] = `
 
 exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
 <View
-  borderColor="default"
-  debug={false}
+  borderColor="primary"
   display="auto"
   focusColor="info"
   focusPosition="offset"
-  focused={false}
   overflowX="visible"
   overflowY="visible"
   position="static"
   shouldAnimateFocus={true}
+  withVisualDebug={false}
 >
   <ErrorAlert
     error="There was an error"
@@ -199,22 +190,20 @@ exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
     Error loading grades
   </ErrorAlert>
   <View
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
       margin="0 0 large 0"
     >
@@ -234,34 +223,31 @@ exports[`renders an ErrorAlert if there is an error loading grades 1`] = `
 
 exports[`renders some course grades 1`] = `
 <View
-  borderColor="default"
-  debug={false}
+  borderColor="primary"
   display="auto"
   focusColor="info"
   focusPosition="offset"
-  focused={false}
   overflowX="visible"
   overflowY="visible"
   position="static"
   shouldAnimateFocus={true}
+  withVisualDebug={false}
 >
   <View
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Heading
       border="none"
       color="inherit"
-      ellipsis={false}
       level="h2"
       margin="0 0 large 0"
     >
@@ -278,18 +264,17 @@ exports[`renders some course grades 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     key="1"
     margin="0 0 large 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <div
       className="GradesDisplay-styles__course"
@@ -342,18 +327,17 @@ exports[`renders some course grades 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     key="2"
     margin="0 0 large 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <div
       className="GradesDisplay-styles__course"
@@ -406,18 +390,17 @@ exports[`renders some course grades 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     key="3"
     margin="0 0 large 0"
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
+    withVisualDebug={false}
   >
     <div
       className="GradesDisplay-styles__course"
@@ -470,17 +453,16 @@ exports[`renders some course grades 1`] = `
   </View>
   <View
     as="div"
-    borderColor="default"
-    debug={false}
+    borderColor="primary"
     display="auto"
     focusColor="info"
     focusPosition="offset"
-    focused={false}
     overflowX="visible"
     overflowY="visible"
     position="static"
     shouldAnimateFocus={true}
     textAlign="center"
+    withVisualDebug={false}
   >
     <Text
       as="span"

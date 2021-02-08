@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ module Canvadocs
     def canvadocs_session_url(opts = {})
       user = opts.delete(:user)
       enable_annotations = opts.delete(:enable_annotations)
-      opts.merge! canvadoc_permissions_for_user(user, enable_annotations)
+      opts.reverse_merge! canvadoc_permissions_for_user(user, enable_annotations)
       opts[:url] = attachment.public_url(expires_in: 7.days)
       opts[:locale] = I18n.locale || I18n.default_locale
 

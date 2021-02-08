@@ -1,17 +1,10 @@
 ---
-caps_site_admin_test_feature:
-  state: allowed
-  applies_to: SiteAdmin
-  display_name: This is a SiteAdmin test Feature Flag
-  description: |-
-    This flag will not cause any change in behavior.
 assignments_2_student:
   state: hidden
   display_name: Assignment Enhancements - Student
   description: Use the new assignments student page
   applies_to: Course
   root_opt_in: true
-  beta: true
 assignments_2_teacher:
   state: hidden
   display_name: Assignments 2 Teacher View
@@ -62,3 +55,65 @@ enable_fullstory:
   description: |-
     Include FullStory recording of the user's session
   applies_to: SiteAdmin
+new_math_equation_handling:
+  state: hidden
+  display_name: "Math: Updated equation handling"
+  description: |-
+    Replaces the existing image of the math equation plus its hidden mathml
+    with a MathJax processed version. This change provides better accessibility
+    and many options for the reader to interact with the equation on the page.
+  applies_to: RootAccount
+autocreate_attachment_from_media_object:
+  state: hidden
+  display_name: Create Files After RCE Media Upload/Recording
+  description: |-
+    Creates file objects (initially hidden to students if in a Course) after
+    media is uploaded or recorded through the RCE.
+  applies_to: RootAccount
+enhanced_grade_change_query:
+  state: hidden
+  display_name: Enhanced grade change auditing
+  description: Allow searching grade change audit logs by multiple criteria
+  applies_to: SiteAdmin
+new_file_url_rewriting:
+  state: hidden
+  display_name: Update file links to prefer preview, not download
+  description: |-
+    Canvas rewrites file URLs in user generated content. In the process, it
+    often added "/download" where it was not wanted and inappropriate. This
+    setting updates how URL rewriting takes place to facilitate previewing
+    files within Canvas and not downloading.
+  applies_to: SiteAdmin
+  environments:
+    development:
+      state: on
+    ci:
+      state: on
+inline_math_everywhere:
+  state: hidden
+  display_name: "Math: Support LaTex math equations almost everywhere"
+  description: |-
+    With this feature, LaTex math equations entered into most
+    text entry fields in Canvas will be processed by MathJax.
+    LaTex delimited by \(...\) become inline equations, while
+    $$...$$ will be rendered as a block.  For example,
+    you could choose to title an Assignment \(\sqrt{x}\), or
+    enter $$ax^2 + by + c = 0$$ in a submission comment.
+    This feature requires that the "Math: Updated equation handling"
+    flag is also on.
+  applies_to: RootAccount
+bounced_emails_admin_tool:
+  state: hidden
+  display_name: Bounced Emails Admin Tool
+  description: |-
+    Adds a new Bounced Emails tab to Account Admin Tools, which
+    allows you to search email addresses where Canvas notifications
+    have bounced
+  applies_to: RootAccount
+canvas_for_elementary:
+  state: hidden
+  display_name: Canvas for Elementary
+  applies_to: Account
+  description: |-
+    A simplified Canvas interface for K-5
+

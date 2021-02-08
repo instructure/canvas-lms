@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -95,6 +97,20 @@ module CanvasPartman::Concerns
         self.partitioning_strategy = :by_date
         self.partitioning_field = on.to_s if on
         self.partitioning_interval = over.to_sym if over
+      end
+
+      # Convenience method for wrangling a group of attribute
+      # hashes for xome kind of bulk operation.  Example
+      # would be constructing a bulk insert statement
+      #
+      # @param [Array] attrs_list
+      #   each element is a hash that carries the attributes of a
+      #   potential record of the current class type
+      #
+      def attrs_in_partition_groups(attrs_list)
+        attrs_list.group_by{|a| infer_partition_table_name(a) }.each do |name, group|
+          yield name, group
+        end
       end
 
       # :nodoc:

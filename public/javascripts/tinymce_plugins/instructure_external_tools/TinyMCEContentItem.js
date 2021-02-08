@@ -17,7 +17,8 @@
  */
 
 import $ from 'jquery'
-import {monitorLtiMessages} from '../../../javascripts/lti/messages'
+import {monitorLtiMessages} from '../../lti/messages'
+import iframeAllowances from 'jsx/external_apps/lib/iframeAllowances'
 
 const LTI_MIME_TYPES = [
   'application/vnd.ims.lti.v1.ltilink',
@@ -74,7 +75,7 @@ const TinyMCEPayloadGenerators = {
           allowfullscreen: 'true',
           webkitallowfullscreen: 'true',
           mozallowfullscreen: 'true',
-          allow: 'autoplay *'
+          allow: iframeAllowances()
         })
           .css({
             width: tinyMCEContentItem.placementAdvice.displayWidth,
@@ -128,7 +129,7 @@ const TinyMCEPayloadGenerators = {
           alt: tinyMCEContentItem.text
         })
       )
-    } else if (window.tinyMCE.activeEditor.selection.getContent()) {
+    } else if (window.tinyMCE.activeEditor?.selection.getContent()) {
       $link[0].innerHTML = linkText(tinyMCEContentItem)
     } else {
       // don't inject tool provided content into the page HTML

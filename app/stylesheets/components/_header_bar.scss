@@ -51,9 +51,11 @@
   // helpers for alignment, use .row-fluid and .span classes to align where possible instead of these
   .header-bar-right {
     float: direction(right);
+    padding-bottom: 5px;
   }
   .header-bar-left {
     float: direction(left);
+    padding-bottom: 5px;
   }
   &.no-line {
     border: none;

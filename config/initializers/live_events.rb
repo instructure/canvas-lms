@@ -44,5 +44,15 @@ Rails.configuration.to_prepare do
       plugin_settings
     end
   }
+  LiveEvents.aws_credentials = -> (settings) {
+    if settings['vault_credential_path']
+      Canvas::Vault::AwsCredentialProvider.new(settings['vault_credential_path'])
+    else
+      nil
+    end
+  }
   LiveEvents.stream_client = StubbedClient if ENV['STUB_LIVE_EVENTS_KINESIS']
+  # sometimes this async worker thread grabs a connection on a Setting read or similar.
+  # We need it to be released or the main thread can have a real problem.
+  LiveEvents.on_work_unit_end = -> { ActiveRecord::Base.clear_active_connections! }
 end

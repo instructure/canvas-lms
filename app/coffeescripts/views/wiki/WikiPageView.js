@@ -120,7 +120,7 @@ export default class WikiPageView extends Backbone.View {
           })
         })
         .catch(e => {
-          console.log('Error loading immersive readers.', e)
+          console.log('Error loading immersive readers.', e) // eslint-disable-line no-console
         })
     }
 
@@ -130,8 +130,7 @@ export default class WikiPageView extends Backbone.View {
       this.$sequenceFooter.moduleSequenceFooter({
         courseID: this.course_id,
         assetType: 'Page',
-        assetID: this.model.get('url'),
-        location
+        assetID: this.model.get('url')
       })
     } else if (this.$sequenceFooter != null) {
       this.$sequenceFooter.msfAnimation(false)
@@ -154,7 +153,7 @@ export default class WikiPageView extends Backbone.View {
 
   afterRender() {
     super.afterRender(...arguments)
-    $('.header-bar-outer-container .header-bar-right').append($('#mark-as-done-checkbox'))
+    $('.page-toolbar .page-toolbar-end .buttons').append($('#mark-as-done-checkbox'))
     this.navigateToLinkAnchor()
     this.reloadView = new WikiPageReloadView({
       el: this.$pageChangedAlert,
@@ -192,7 +191,7 @@ export default class WikiPageView extends Backbone.View {
     }
 
     return this.model.unsetFrontPage(() =>
-      $('#wiki_page_show .header-bar-right .al-trigger').focus()
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
     )
   }
 
@@ -202,7 +201,9 @@ export default class WikiPageView extends Backbone.View {
     }
     if (!this.model.get('published')) return
 
-    return this.model.setFrontPage(() => $('#wiki_page_show .header-bar-right .al-trigger').focus())
+    return this.model.setFrontPage(() =>
+      $('#wiki_page_show .page-toolbar .buttons .al-trigger').focus()
+    )
   }
 
   openSendTo(ev, open = true) {
@@ -255,7 +256,7 @@ export default class WikiPageView extends Backbone.View {
       DELETE: !!this.PAGE_RIGHTS.delete && !this.course_home,
       READ_REVISIONS: !!this.PAGE_RIGHTS.read_revisions
     }
-    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED && json.CAN.UPDATE_CONTENT
+    json.CAN.DIRECT_SHARE = !!ENV.DIRECT_SHARE_ENABLED
     json.CAN.ACCESS_GEAR_MENU = json.CAN.DELETE || json.CAN.READ_REVISIONS || json.CAN.DIRECT_SHARE
     json.CAN.VIEW_TOOLBAR =
       json.CAN.VIEW_PAGES ||

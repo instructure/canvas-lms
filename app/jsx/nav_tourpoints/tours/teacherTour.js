@@ -23,6 +23,7 @@ import {View} from '@instructure/ui-view'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import handleOpenTray from '../handleOpenTray'
+import assetFactory from 'jsx/celebrations/assetFactory'
 
 export default [
   {
@@ -51,7 +52,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+              href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -61,7 +62,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+              href="https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -71,7 +72,7 @@ export default [
           <li>
             <Link
               as="a"
-              href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+              href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
               target="_blank"
               rel="noopener noreferrer"
             >
@@ -81,7 +82,7 @@ export default [
               <li>
                 <Link
                   as="a"
-                  href="https://community.canvaslms.com/docs/DOC-23893"
+                  href="https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -91,7 +92,7 @@ export default [
               <li>
                 <Link
                   as="a"
-                  href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                  href="https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
                   target="_blank"
                   rel="noopener noreferrer"
                 >
@@ -112,7 +113,7 @@ export default [
           </li>
         </ol>
         <div className="tour-star-image" aria-hidden>
-          <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
+          <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
     )
@@ -129,7 +130,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-13111-4152719738"
+            href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-set-my-Canvas-notification-preferences-as-an-instructor/ta-p/1222"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -163,7 +164,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-18584-set-up-your-canvas-course-in-30-minutes-or-less"
+            href="https://community.canvaslms.com/t5/Contingency-Planning/Set-Up-Your-Canvas-Course-in-30-minutes-or-Less/ba-p/258437"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -196,7 +197,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-23893"
+                href="https://community.canvaslms.com/t5/Admin-Group/Using-Zoom-with-Canvas-FAQ/ba-p/261826"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -206,7 +207,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-18570-google-hangouts-meet-lti"
+                href="https://community.canvaslms.com/t5/Admin-Group/Google-Hangouts-Meet-LTI/ba-p/257649"
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -226,7 +227,7 @@ export default [
             <li>
               <Link
                 as="a"
-                href="https://community.canvaslms.com/docs/DOC-12687-41524130"
+                href="https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-create-a-conference-in-a-course/ta-p/1156"
                 target="_blank"
                 rel="noopener noreferrer"
               >

@@ -24,6 +24,8 @@ import PaginatedCollectionView from '../PaginatedCollectionView'
 import WikiPageEditView from './WikiPageEditView'
 import itemView from './WikiPageIndexItemView'
 import template from 'jst/wiki/WikiPageIndex'
+import {deletePages} from 'jsx/wiki_pages/apiClient'
+import {showConfirmDelete} from 'jsx/wiki_pages/components/ConfirmDeleteModal'
 import StickyHeaderMixin from '../StickyHeaderMixin'
 import splitAssetString from '../../str/splitAssetString'
 import ContentTypeExternalToolTray from 'jsx/shared/ContentTypeExternalToolTray'
@@ -37,10 +39,12 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     this.mixin(StickyHeaderMixin)
     this.mixin({
       events: {
+        'click .delete_pages': 'confirmDeletePages',
         'click .new_page': 'createNewPage',
         'keyclick .new_page': 'createNewPage',
         'click .header-row a[data-sort-field]': 'sort',
-        'click .header-bar-right .menu_tool_link': 'openExternalTool'
+        'click .header-bar-right .menu_tool_link': 'openExternalTool',
+        'click .pages-mobile-header a[data-sort-mobile-field]': 'sortBySelect'
       },
 
       els: {
@@ -58,6 +62,7 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.optionProperty('default_editing_roles')
     this.optionProperty('WIKI_RIGHTS')
+    this.optionProperty('selectedPages')
 
     this.lastFocusField = null
   }
@@ -89,6 +94,9 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
 
     this.itemViewOptions.contextName = this.contextName
 
+    if (!this.selectedPages) this.selectedPages = {}
+    this.itemViewOptions.selectedPages = this.selectedPages
+
     this.collection.on('fetch', () => {
       if (!this.fetched) {
         this.fetched = true
@@ -114,6 +122,12 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
         $(this.focusAfterRenderSelector).focus()
       }, 1)
     }
+  }
+
+  sortBySelect(event) {
+    event.preventDefault()
+    const {sortMobileField, sortMobileKey} = event.target.dataset
+    return this.$el.disableWhileLoading(this.collection.sortByField(sortMobileField, sortMobileKey))
   }
 
   sort(event = {}) {
@@ -164,6 +178,35 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     if (this.lastFocusField) {
       $(`[data-sort-field='${this.lastFocusField}']`).focus()
     }
+  }
+
+  confirmDeletePages(ev) {
+    if (ev != null) {
+      ev.preventDefault()
+    }
+    const pages = Object.values(this.itemViewOptions.selectedPages)
+    if (pages.length > 0) {
+      const titles = pages.map(page => page.get('title'))
+      const urls = pages.map(page => page.get('url'))
+      showConfirmDelete({
+        pageTitles: titles,
+        onConfirm: () => deletePages(this.contextName, this.contextId, urls),
+        onHide: (confirmed, error) => this.onDeleteModalHide(confirmed, error)
+      })
+    }
+  }
+
+  onDeleteModalHide(confirmed, error) {
+    if (confirmed) {
+      if (error) {
+        $.flashError(I18n.t('Failed to delete selected pages'))
+      } else {
+        $.flashMessage(I18n.t('Selected pages have been deleted'))
+        this.itemViewOptions.selectedPages = {}
+        this.collection.fetch()
+      }
+    }
+    $('.delete_pages').focus()
   }
 
   createNewPage(ev) {
@@ -281,9 +324,6 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
   }
 
   collectionHasTodoDate() {
-    if (!ENV.STUDENT_PLANNER_ENABLED) {
-      return false
-    }
     return !!this.collection.find(m => m.has('todo_date'))
   }
 
@@ -292,9 +332,14 @@ export default class WikiPageIndexView extends PaginatedCollectionView {
     json.CAN = {
       CREATE: !!this.WIKI_RIGHTS.create_page,
       MANAGE: !!this.WIKI_RIGHTS.update || !!this.WIKI_RIGHTS.delete_page,
+      DELETE: !!this.WIKI_RIGHTS.delete_page,
       PUBLISH: !!this.WIKI_RIGHTS.publish_page
     }
     json.CAN.VIEW_TOOLBAR = json.CAN.CREATE
+    // NOTE: if permissions need to change for OPEN_MANAGE_OPTIONS, please update WikiPageIndexItemView.js to match
+    json.CAN.OPEN_MANAGE_OPTIONS =
+      json.CAN.MANAGE || json.CAN.CREATE || json.CAN.PUBLISH || ENV.DIRECT_SHARE_ENABLED
+
     json.fetched = !!this.fetched
     json.fetchedLast = !!this.fetchedLast
     json.collectionHasTodoDate = this.collectionHasTodoDate()

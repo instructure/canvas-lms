@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -323,7 +325,7 @@ class Quizzes::QuizStatistics::StudentAnalysis < Quizzes::QuizStatistics::Report
   private
 
   def submissions_for_statistics(param_options = {})
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       scope = quiz.quiz_submissions.for_students(quiz)
       logged_out = quiz.quiz_submissions.logged_out
 

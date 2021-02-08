@@ -29,7 +29,10 @@ class ObserverAlertsApiController < ApplicationController
       active.
       where(student: params[:student_id]).
       order(id: :desc).
-      select(&:users_are_still_linked?)
+      preload(:context)
+
+    # avoid n+1, all alerts are for the same student, we don't need to check each one.
+    all_alerts = [] unless all_alerts.first&.users_are_still_linked?
 
     alerts = Api.paginate(all_alerts, self, api_v1_observer_alerts_by_student_url)
 

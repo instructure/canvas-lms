@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2013 Instructure, Inc.
 #
@@ -48,8 +50,10 @@ describe ConversationsController, type: :request do
 
   def observer_in_course(options = {})
     section = options.delete(:section)
+    associated_user = options.delete(:associated_user)
     u = User.create(options)
     enrollment = @course.enroll_user(u, 'ObserverEnrollment', :section => section)
+    enrollment.associated_user = associated_user
     enrollment.workflow_state = 'active'
     enrollment.save
     u
@@ -1203,6 +1207,28 @@ describe ConversationsController, type: :request do
           randos.each{|r| expect(r.conversations).to be_empty}
           @other_students.each{|s| expect(s.conversations.last.conversation.shard).to eq @shard1 }
         end
+
+        it "should work cross-shard with local file" do
+          @shard1.activate do
+            @other_account = Account.create
+            course_factory(active_all: true, account: @other_account)
+            @other_course = @course
+            @other_student = user_with_pseudonym(active_all: true, account: @other_account)
+            @other_course.enroll_student(@other_student, enrollment_state: "active")
+            teacher_in_course(active_all: true, course: @other_course, user: @me)
+          end
+
+          attachment = attachment_model(context: @me, folder: @me.conversation_attachments_folder)
+          @user = @me
+
+          api_call(:post, "/api/v1/conversations",
+                   { controller: 'conversations', action: 'create', format: 'json' },
+                   { recipients: [@other_student.id], body: "yep", context_code: "course_#{@other_course.id}",
+                     course: "course_#{@other_course.id}",
+                     group_conversation: "1", bulk_message: "1", mode: "async", attachment_ids: [attachment.id] })
+          run_jobs
+          expect(@other_student.conversations.last.conversation.conversation_messages.last.attachment_ids).to eq [attachment.global_id]
+        end
       end
     end
   end
@@ -1314,6 +1340,43 @@ describe ConversationsController, type: :request do
         { :controller => 'conversations', :action => 'show', :id => conversation.conversation_id.to_s, :format => 'json' })
 
       expect(json["cannot_reply"]).to eq true
+    end
+
+    context "as an observer" do
+      before :once do
+        @bobs_mom = observer_in_course(:name => "bob's mom", :associated_user => @bob)
+        @user = @bobs_mom
+      end
+
+      it "should not set cannot_reply for observer observee relationship" do
+        conversation = conversation(@bobs_mom, :sender => @bob, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to be_nil
+      end
+
+      it "should set cannot_reply to true if non-observed student" do
+        conversation = conversation(@bobs_mom, :sender => @billy, :context_type => "Course", :context_id => @course.id)
+
+        json = api_call(
+          :get,
+          "/api/v1/conversations/#{conversation.conversation_id}",
+          { controller: 'conversations',
+            action: 'show',
+            id: conversation.conversation_id.to_s,
+            format: 'json' }
+        )
+
+        expect(json["cannot_reply"]).to eq true
+      end
     end
 
     it "should not explode on account group conversations" do

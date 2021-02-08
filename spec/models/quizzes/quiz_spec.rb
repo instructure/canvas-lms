@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -1542,18 +1544,14 @@ describe Quizzes::Quiz do
         quiz_question_id: q.id,
         regrade_option: 'current_correct_only'
       )
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).once.
-        with(
-          :regrade!,
-          { strand: "quiz:#{quiz.global_id}:regrading"},
-          quiz: quiz, version_number: quiz.version_number
-        )
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).with(strand: "quiz:#{quiz.global_id}:regrading").once.and_return(Quizzes::QuizRegrader::Regrader)
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:regrade!).with(quiz: quiz, version_number: quiz.version_number)
       quiz.save!
     end
 
     it "does not queue a job to regrade when no current question regrades" do
       course_with_teacher(course: @course, active_all: true)
-      expect(Quizzes::QuizRegrader::Regrader).to receive(:send_later_enqueue_args).never
+      expect(Quizzes::QuizRegrader::Regrader).to receive(:delay).never
       quiz = @course.quizzes.create!
       quiz.save!
     end
@@ -2564,6 +2562,13 @@ describe Quizzes::Quiz do
         quiz = @course.quizzes.create!(title: 'hello')
         expect(quiz.root_account).to be_nil
       end
+    end
+  end
+
+  context 'root_account_id' do
+    it "uses root_account value from account" do
+      quiz = @course.quizzes.create!(title: "hello")
+      expect(quiz.root_account_id).to eq Account.default.id
     end
   end
 end

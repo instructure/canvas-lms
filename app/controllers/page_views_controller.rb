@@ -177,7 +177,6 @@ class PageViewsController < ApplicationController
   # @returns [PageView]
   def index
     @user = api_find(User, params[:user_id])
-
     return unless authorized_action(@user, @current_user, :view_statistics)
 
     date_options = {}
@@ -191,18 +190,18 @@ class PageViewsController < ApplicationController
       url_options[:end_time] = params[:end_time]
     end
     date_options[:viewer] = @current_user
-    page_views = @user.page_views(date_options)
-    url = api_v1_user_page_views_url(url_options)
 
     respond_to do |format|
       format.json do
+        page_views = @user.page_views(date_options)
+        url = api_v1_user_page_views_url(url_options)
         @page_views = Api.paginate(page_views, self, url, :total_entries => nil)
         render :json => page_views_json(@page_views, @current_user, session)
       end
       format.csv do
         cancel_cache_buster
 
-        csv = PageView::CsvReport.new(@user, @current_user).generate
+        csv = PageView::CsvReport.new(@user, @current_user, date_options).generate
 
         options = {
           type: 'text/csv',

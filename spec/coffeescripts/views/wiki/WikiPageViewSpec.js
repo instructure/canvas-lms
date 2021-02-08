@@ -24,176 +24,184 @@ import 'helpers/jquery.simulate'
 import 'compiled/jquery/ModuleSequenceFooter'
 import fakeENV from 'helpers/fakeENV'
 
-QUnit.module('WikiPageView')
-
-test('display_show_all_pages makes it through constructor', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({
-    model,
-    display_show_all_pages: true
-  })
-  equal(true, view.display_show_all_pages)
-})
-
-test('model.view maintained by item view', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({model})
-  strictEqual(model.view, view, 'model.view is set to the item view')
-  view.render()
-  strictEqual(model.view, view, 'model.view is set to the item view')
-})
-
-test('detach/reattach the publish icon view', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({model})
-  view.render()
-  const $previousEl = view.$el.find('> *:first-child')
-  view.publishButtonView.$el.data('test-data', 'test-is-good')
-  view.render()
-  equal($previousEl.parent().length, 0, 'previous content removed')
-  equal(
-    view.publishButtonView.$el.data('test-data'),
-    'test-is-good',
-    'test data preserved (by detach)'
-  )
-})
-
-QUnit.module('WikiPageView:JSON')
-
-test('modules_path', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({
-    model,
-    modules_path: '/courses/73/modules'
-  })
-  strictEqual(
-    view.toJSON().modules_path,
-    '/courses/73/modules',
-    'modules_path represented in toJSON'
-  )
-})
-
-test('wiki_pages_path', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({
-    model,
-    wiki_pages_path: '/groups/73/pages'
-  })
-  strictEqual(
-    view.toJSON().wiki_pages_path,
-    '/groups/73/pages',
-    'wiki_pages_path represented in toJSON'
-  )
-})
-
-test('wiki_page_edit_path', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({
-    model,
-    wiki_page_edit_path: '/groups/73/pages/37'
-  })
-  strictEqual(
-    view.toJSON().wiki_page_edit_path,
-    '/groups/73/pages/37',
-    'wiki_page_edit_path represented in toJSON'
-  )
-})
-
-test('wiki_page_history_path', () => {
-  const model = new WikiPage()
-  const view = new WikiPageView({
-    model,
-    wiki_page_edit_path: '/groups/73/pages/37/revisions'
-  })
-  strictEqual(
-    view.toJSON().wiki_page_edit_path,
-    '/groups/73/pages/37/revisions',
-    'wiki_page_history_path represented in toJSON'
-  )
-})
-
-test('lock_info.unlock_at', () => {
-  const clock = sinon.useFakeTimers(new Date(2012, 0, 31).getTime())
-  const model = new WikiPage({
-    locked_for_user: true,
-    lock_info: {unlock_at: '2012-02-15T12:00:00Z'}
-  })
-  const view = new WikiPageView({model})
-  const lockInfo = view.toJSON().lock_info
-  ok(
-    !!(lockInfo && lockInfo.unlock_at.match('Feb')),
-    'lock_info.unlock_at reformatted and represented in toJSON'
-  )
-  clock.restore()
-})
-
-test('useAsFrontPage for published wiki_pages_path', () => {
-  const model = new WikiPage({
-    front_page: false,
-    published: true
-  })
-  const view = new WikiPageView({model})
-  const stub = sandbox.stub(model, 'setFrontPage')
-  view.useAsFrontPage()
-  ok(stub.calledOnce)
-})
-
-test('useAsFrontPage should not work on unpublished wiki_pages_path', () => {
-  const model = new WikiPage({
-    front_page: false,
-    published: false
-  })
-  const view = new WikiPageView({model})
-  const stub = sandbox.stub(model, 'setFrontPage')
-  view.useAsFrontPage()
-  notOk(stub.calledOnce)
-})
-
-QUnit.module('WikiPageView: direct share', hooks => {
+QUnit.module('WikiPageView', hooks => {
   hooks.beforeEach(() => {
-    $('<div id="direct-share-mount-point">').appendTo('#fixtures')
-    fakeENV.setup({DIRECT_SHARE_ENABLED: true})
-    sinon.stub(ReactDOM, 'render')
+    fakeENV.setup()
   })
 
   hooks.afterEach(() => {
-    ReactDOM.render.restore()
     fakeENV.teardown()
-    $('#direct-share-mount-point').remove()
   })
 
-  test('opens and closes user share modal', () => {
-    const model = new WikiPage({
-      page_id: '42',
-      url: 'foo'
+  test('display_show_all_pages makes it through constructor', () => {
+    const model = new WikiPage()
+    const view = new WikiPageView({
+      model,
+      display_show_all_pages: true
     })
-    const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
-    view.render()
-    view.$('.al-trigger').simulate('click')
-    view.$('.direct-share-send-to-menu-item').simulate('click')
-    const props = ReactDOM.render.firstCall.args[0].props
-    equal(props.open, true)
-    equal(props.sourceCourseId, '123')
-    deepEqual(props.contentShare, {content_type: 'page', content_id: '42'})
-    props.onDismiss()
-    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+    equal(view.display_show_all_pages, true)
   })
 
-  test('opens and closes copy to tray', () => {
-    const model = new WikiPage({
-      page_id: '42',
-      url: 'foo'
-    })
-    const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
+  test('model.view maintained by item view', () => {
+    const model = new WikiPage()
+    const view = new WikiPageView({model})
+    strictEqual(model.view, view, 'model.view is set to the item view')
     view.render()
-    view.$('.al-trigger').simulate('click')
-    view.$('.direct-share-copy-to-menu-item').simulate('click')
-    const props = ReactDOM.render.firstCall.args[0].props
-    equal(props.open, true)
-    equal(props.sourceCourseId, '123')
-    deepEqual(props.contentSelection, {pages: ['42']})
-    props.onDismiss()
-    equal(ReactDOM.render.lastCall.args[0].props.open, false)
+    strictEqual(model.view, view, 'model.view is set to the item view')
+  })
+
+  test('detach/reattach the publish icon view', () => {
+    const model = new WikiPage()
+    const view = new WikiPageView({model})
+    view.render()
+    const $previousEl = view.$el.find('> *:first-child')
+    view.publishButtonView.$el.data('test-data', 'test-is-good')
+    view.render()
+    equal($previousEl.parent().length, 0, 'previous content removed')
+    equal(
+      view.publishButtonView.$el.data('test-data'),
+      'test-is-good',
+      'test data preserved (by detach)'
+    )
+  })
+
+  QUnit.module('WikiPageView:JSON', _hooks => {
+    test('modules_path', () => {
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        modules_path: '/courses/73/modules'
+      })
+      strictEqual(
+        view.toJSON().modules_path,
+        '/courses/73/modules',
+        'modules_path represented in toJSON'
+      )
+    })
+
+    test('wiki_pages_path', () => {
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        wiki_pages_path: '/groups/73/pages'
+      })
+      strictEqual(
+        view.toJSON().wiki_pages_path,
+        '/groups/73/pages',
+        'wiki_pages_path represented in toJSON'
+      )
+    })
+
+    test('wiki_page_edit_path', () => {
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        wiki_page_edit_path: '/groups/73/pages/37'
+      })
+      strictEqual(
+        view.toJSON().wiki_page_edit_path,
+        '/groups/73/pages/37',
+        'wiki_page_edit_path represented in toJSON'
+      )
+    })
+
+    test('wiki_page_history_path', () => {
+      const model = new WikiPage()
+      const view = new WikiPageView({
+        model,
+        wiki_page_edit_path: '/groups/73/pages/37/revisions'
+      })
+      strictEqual(
+        view.toJSON().wiki_page_edit_path,
+        '/groups/73/pages/37/revisions',
+        'wiki_page_history_path represented in toJSON'
+      )
+    })
+
+    test('lock_info.unlock_at', () => {
+      const clock = sinon.useFakeTimers(new Date(2012, 0, 31).getTime())
+      const model = new WikiPage({
+        locked_for_user: true,
+        lock_info: {unlock_at: '2012-02-15T12:00:00Z'}
+      })
+      const view = new WikiPageView({model})
+      const lockInfo = view.toJSON().lock_info
+      ok(
+        !!(lockInfo && lockInfo.unlock_at.match('Feb')),
+        'lock_info.unlock_at reformatted and represented in toJSON'
+      )
+      clock.restore()
+    })
+
+    test('useAsFrontPage for published wiki_pages_path', () => {
+      const model = new WikiPage({
+        front_page: false,
+        published: true
+      })
+      const view = new WikiPageView({model})
+      const stub = sandbox.stub(model, 'setFrontPage')
+      view.useAsFrontPage()
+      ok(stub.calledOnce)
+    })
+
+    test('useAsFrontPage should not work on unpublished wiki_pages_path', () => {
+      const model = new WikiPage({
+        front_page: false,
+        published: false
+      })
+      const view = new WikiPageView({model})
+      const stub = sandbox.stub(model, 'setFrontPage')
+      view.useAsFrontPage()
+      notOk(stub.calledOnce)
+    })
+  })
+
+  QUnit.module('WikiPageView: direct share', hooks2 => {
+    hooks2.beforeEach(() => {
+      $('<div id="direct-share-mount-point">').appendTo('#fixtures')
+      fakeENV.setup({DIRECT_SHARE_ENABLED: true})
+      sinon.stub(ReactDOM, 'render')
+    })
+
+    hooks2.afterEach(() => {
+      ReactDOM.render.restore()
+      fakeENV.teardown()
+      $('#direct-share-mount-point').remove()
+    })
+
+    test('opens and closes user share modal', () => {
+      const model = new WikiPage({
+        page_id: '42',
+        url: 'foo'
+      })
+      const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
+      view.render()
+      view.$('.al-trigger').simulate('click')
+      view.$('.direct-share-send-to-menu-item').simulate('click')
+      const props = ReactDOM.render.firstCall.args[0].props
+      equal(props.open, true)
+      equal(props.sourceCourseId, '123')
+      deepEqual(props.contentShare, {content_type: 'page', content_id: '42'})
+      props.onDismiss()
+      equal(ReactDOM.render.lastCall.args[0].props.open, false)
+    })
+
+    test('opens and closes copy to tray', () => {
+      const model = new WikiPage({
+        page_id: '42',
+        url: 'foo'
+      })
+      const view = new WikiPageView({model, course_id: '123', PAGE_RIGHTS: {update_content: true}})
+      view.render()
+      view.$('.al-trigger').simulate('click')
+      view.$('.direct-share-copy-to-menu-item').simulate('click')
+      const props = ReactDOM.render.firstCall.args[0].props
+      equal(props.open, true)
+      equal(props.sourceCourseId, '123')
+      deepEqual(props.contentSelection, {pages: ['42']})
+      props.onDismiss()
+      equal(ReactDOM.render.lastCall.args[0].props.open, false)
+    })
   })
 })
 

@@ -36,7 +36,7 @@ async function makeMocks() {
     Assignment: {rubric: {}},
     Rubric: {criteria: [{}]},
     Submission: {rubricAssessmentsConnection: null},
-    Account: {proficiencyRatingsConnection: null}
+    Account: {outcomeProficiency: {proficiencyRatingsConnection: null}}
   }
 
   const result = await mockQuery(RUBRIC_QUERY, overrides, variables)

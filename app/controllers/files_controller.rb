@@ -144,7 +144,6 @@ class FilesController < ApplicationController
 
   before_action :open_limited_cors, only: [:show]
 
-  prepend_around_action :load_pseudonym_from_policy, only: :create
   skip_before_action :verify_authenticity_token, only: :api_create
   before_action :verify_api_id, only: [
     :api_show, :api_create_success, :api_file_status, :api_update, :destroy, :reset_verifier
@@ -162,9 +161,8 @@ class FilesController < ApplicationController
 
   def quota
     get_quota
-    if authorized_action(@context.attachments.temp_record, @current_user, :create)
-      h = ActionView::Base.new
-      h.extend ActionView::Helpers::NumberHelper
+    if authorized_action(@context.attachments.temp_record, @current_user, [:create, :update, :delete])
+      h = ActiveSupport::NumberHelper
       result = {
         :quota => h.number_to_human_size(@quota),
         :quota_used => h.number_to_human_size(@quota_used),
@@ -187,7 +185,7 @@ class FilesController < ApplicationController
   #  { "quota": 524288000, "quota_used": 402653184 }
   #
   def api_quota
-    if authorized_action(@context.attachments.build, @current_user, :create)
+    if authorized_action(@context.attachments.build, @current_user, [:create, :update, :delete])
       get_quota
       render json: {quota: @quota, quota_used: @quota_used}
     end
@@ -285,7 +283,7 @@ class FilesController < ApplicationController
   #
   # @returns [File]
   def api_index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       get_context
       verify_api_id unless @context.present?
       @folder = Folder.from_context_or_id(@context, params[:id])
@@ -349,8 +347,13 @@ class FilesController < ApplicationController
   def images
     if authorized_action(@context.attachments.temp_record, @current_user, :read)
       if Folder.root_folders(@context).first.grants_right?(@current_user, session, :read_contents)
-        if @context.grants_right?(@current_user, session, :manage_files)
-          @images = @context.active_images.paginate :page => params[:page]
+        if @context.grants_any_right?(
+          @current_user,
+          session,
+          :manage_files,
+          *RoleOverride::GRANULAR_FILE_PERMISSIONS
+        )
+          @images = @context.active_images.paginate page: params[:page]
         else
           @images = @context.active_images.not_hidden.not_locked.where(:folder_id => @context.active_folders.not_hidden.not_locked).paginate :page => params[:page]
         end
@@ -363,7 +366,14 @@ class FilesController < ApplicationController
   end
 
   def react_files
-    if authorized_action(@context, @current_user, [:read, :manage_files]) && tab_enabled?(@context.class::TAB_FILES)
+    if !request.format.html?
+      return render body: "endpoint does not support #{request.format.symbol}", status: :bad_request
+    end
+    if authorized_action(
+      @context,
+      @current_user,
+      [:read, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS]
+    ) && tab_enabled?(@context.class::TAB_FILES)
       @contexts = [@context]
       get_all_pertinent_contexts(include_groups: true, cross_shard: true) if @context == @current_user
       files_contexts = @contexts.map do |context|
@@ -387,7 +397,24 @@ class FilesController < ApplicationController
           name: context == @current_user ? t('my_files', 'My Files') : context.name,
           usage_rights_required: tool_context.respond_to?(:usage_rights_required?) && tool_context.usage_rights_required?,
           permissions: {
-            manage_files: context.grants_right?(@current_user, session, :manage_files),
+            manage_files_add: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_add
+            ),
+            manage_files_edit: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_edit
+            ),
+            manage_files_delete: context.grants_any_right?(
+              @current_user,
+              session,
+              :manage_files,
+              :manage_files_delete
+            ),
           },
           file_menu_tools: file_menu_tools,
           file_index_menu_tools: file_index_menu_tools
@@ -440,14 +467,17 @@ class FilesController < ApplicationController
   #
   def public_url
     @attachment = Attachment.find(params[:id])
+    verifier_checker = Attachments::Verification.new(@attachment)
+
     # if the attachment is part of a submisison, its 'context' will be the student that submmited the assignment.  so if  @current_user is a
     # teacher authorized_action(@attachment, @current_user, :download) will be false, we need to actually check if they have perms to see the
     # submission.
     @submission = Submission.active.find(params[:submission_id]) if params[:submission_id]
     # verify that the requested attachment belongs to the submission
     return render_unauthorized_action if @submission && !@submission.includes_attachment?(@attachment)
-    if @submission ? authorized_action(@submission, @current_user, :read) : authorized_action(@attachment, @current_user, :download)
-      render :json  => { :public_url => @attachment.public_url(:secure => request.ssl?) }
+    if ((@submission && authorized_action(@submission, @current_user, :read)) ||
+        ((params[:verifier] && verifier_checker.valid_verifier_for_permission?(params[:verifier], :download, session)) || authorized_action(@attachment, @current_user, :download)))
+      render :json => { :public_url => @attachment.public_url(:secure => request.ssl?) }
     end
   end
 
@@ -486,7 +516,7 @@ class FilesController < ApplicationController
   end
 
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       original_params = params.dup
       params[:id] ||= params[:file_id]
       get_context
@@ -561,7 +591,7 @@ class FilesController < ApplicationController
 
   def render_attachment(attachment)
     respond_to do |format|
-      if params[:preview] && attachment.mime_class == 'image'
+      if params[:download] && attachment.mime_class == 'image'
         format.html { redirect_to '/images/svg-icons/icon_lock.svg' }
       else
         if @files_domain
@@ -1024,6 +1054,7 @@ class FilesController < ApplicationController
     @attachment = @context.attachments.find(params[:id])
     @folder = @context.folders.active.find(params[:attachment][:folder_id]) rescue nil
     return unless authorized_action(@folder, @current_user, :manage_contents) if @folder
+
     @folder ||= @attachment.folder
     @folder ||= Folder.unfiled_folder(@context)
     if authorized_action(@attachment, @current_user, :update)
@@ -1105,7 +1136,7 @@ class FilesController < ApplicationController
   # @returns File
   def api_update
     @attachment = Attachment.find(params[:id])
-    if authorized_action(@attachment,@current_user,:update)
+    if authorized_action(@attachment, @current_user, :update)
       @context = @attachment.context
       if @context && params[:parent_folder_id]
         folder = @context.folders.active.find(params[:parent_folder_id])
@@ -1141,7 +1172,7 @@ class FilesController < ApplicationController
 
   def reorder
     @folder = @context.folders.active.find(params[:folder_id])
-    if authorized_action(@context, @current_user, :manage_files)
+    if authorized_action(@context, @current_user, [:manage_files, :manage_files_edit])
       @folders = @folder.active_sub_folders.by_position
       @folders.first && @folders.first.update_order((params[:folder_order] || "").split(","))
       @folder.file_attachments.by_position_then_display_name.first && @folder.file_attachments.first.update_order((params[:order] || "").split(","))
@@ -1149,7 +1180,6 @@ class FilesController < ApplicationController
       render :json => @folder.subcontent.map{ |f| f.as_json(methods: :readable_size, permissions: {user: @current_user, session: session}) }
     end
   end
-
 
   # @API Delete file
   # Remove the specified file. Unlike most other DELETE endpoints, using this
@@ -1184,6 +1214,7 @@ class FilesController < ApplicationController
     end
     if can_do(@attachment, @current_user, :delete)
       return render_unauthorized_action if editing_restricted?(@attachment)
+
       @attachment.destroy
       respond_to do |format|
         format.html {
@@ -1239,26 +1270,41 @@ class FilesController < ApplicationController
         else
           @context.respond_to?(:context) ? @context.context : @context
         end
-      permission_context.grants_right?(@current_user, nil, :manage_files) &&
-        @domain_root_account.grants_right?(@current_user, nil, :become_user)
+      permission_context.grants_any_right?(
+        @current_user,
+        nil,
+        :manage_files,
+        :manage_files_edit,
+        :manage_files_delete
+      ) && @domain_root_account.grants_right?(@current_user, nil, :become_user)
     end
   end
 
   def image_thumbnail
     cancel_cache_buster
+
+    no_cache = !!Canvas::Plugin.value_to_boolean(params[:no_cache])
+
     # include authenticator fingerprint so we don't redirect to an
     # authenticated thumbnail url for the wrong user
-    cache_key = ['thumbnail_url', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
-    url = Rails.cache.read(cache_key)
-    unless url
+    cache_key = ['thumbnail_url2', params[:uuid], params[:size], file_authenticator.fingerprint].cache_key
+    url, instfs = Rails.cache.read(cache_key)
+    if !url || no_cache
       attachment = Attachment.active.where(id: params[:id], uuid: params[:uuid]).first if params[:id].present?
       thumb_opts = params.slice(:size)
       url = authenticated_thumbnail_url(attachment, thumb_opts)
-      # only cache for half the time because of use_consistent_iat
-      Rails.cache.write(cache_key, url, :expires_in => (attachment.url_ttl / 2)) if url
+      if url
+        instfs = attachment.instfs_hosted?
+        # only cache for half the time because of use_consistent_iat
+        Rails.cache.write(cache_key, [url, instfs], :expires_in => (attachment.url_ttl / 2))
+      end
     end
-    url ||= '/images/no_pic.gif'
-    redirect_to url
+
+    if url && instfs && file_location_mode?
+      render_file_location(url)
+    else
+      redirect_to(url || '/images/no_pic.gif')
+    end
   end
 
   # when using local storage, the image_thumbnail action redirects here rather

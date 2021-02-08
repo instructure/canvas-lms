@@ -33,6 +33,7 @@ import {
   IconImageSolid,
   IconLinkSolid
 } from '@instructure/ui-icons'
+import sanitizeUrl from 'jsx/shared/helpers/sanitizeUrl'
 
 import I18n from 'i18n!link_validator'
 
@@ -100,7 +101,7 @@ export default function ValidatorResultsRow(props) {
         <List.Item key={error.url}>
           <IconClass color="success" />
           &ensp;
-          <Link href={error.url}>{link_text}</Link>
+          <Link href={sanitizeUrl(error.url)}>{link_text}</Link>
         </List.Item>
       )
       links.push(link)

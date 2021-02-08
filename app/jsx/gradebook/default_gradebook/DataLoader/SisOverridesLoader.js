@@ -28,7 +28,12 @@ export default class SisOverridesLoader {
 
     const params = {
       exclude_assignment_submission_types: ['wiki_page'],
-      exclude_response_fields: ['description', 'in_closed_grading_period', 'needs_grading_count'],
+      exclude_response_fields: [
+        'description',
+        'in_closed_grading_period',
+        'needs_grading_count',
+        'rubric'
+      ],
       include: ['assignments', 'grades_published', 'overrides'],
       override_assignment_dates: false
     }

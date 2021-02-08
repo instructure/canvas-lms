@@ -48,7 +48,7 @@ class DiscussionTopicPresenter
   end
 
   def can_direct_share?
-    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :manage_content) && topic.context.root_account.feature_enabled?(:direct_share)
+    topic.context.is_a?(Course) && topic.context.grants_right?(@user, :read_as_admin) && topic.context.root_account.feature_enabled?(:direct_share)
   end
 
   # Public: Determine if the given user has permissions to view peer reviews.
@@ -66,7 +66,7 @@ class DiscussionTopicPresenter
   end
 
   def peer_reviews_for(user)
-    reviews = user.assigned_submission_assessments.for_assignment(assignment.id).to_a
+    reviews = user.assigned_submission_assessments.shard(assignment.shard).for_assignment(assignment.id).to_a
     if reviews.any?
       valid_student_ids = assignment.context.participating_students.where(:id => reviews.map(&:user_id)).pluck(:id).to_set
       reviews = reviews.select{|r| valid_student_ids.include?(r.user_id)}

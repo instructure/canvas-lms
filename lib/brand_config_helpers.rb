@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -21,13 +23,17 @@ module BrandConfigHelpers
   end
 
   def effective_brand_config
-    first_config_in_chain(
-      brand_config_chain(include_self: true).select(&:branding_allowed?)
-    )
+    md5 = Rails.cache.fetch_with_batched_keys("effective_brand_config_md5", batch_object: self, batched_keys: [:account_chain, :brand_config]) do
+      brand_config_chain(include_self: true).select(&:branding_allowed?).find(&:brand_config_md5)&.brand_config_md5
+    end
+    # ensure the BrandConfig query hits the correct shard
+    shard.activate do
+      md5 && BrandConfig.find_cached_by_md5(md5)
+    end
   end
 
   def first_parent_brand_config
-    first_config_in_chain(brand_config_chain(include_self: false))
+    brand_config_chain(include_self: false).find(&:brand_config_md5).try(:brand_config)
   end
 
   def brand_config_chain(include_self:)
@@ -39,8 +45,4 @@ module BrandConfigHelpers
   end
   private :brand_config_chain
 
-  def first_config_in_chain(chain)
-    chain.find(&:brand_config_md5).try(:brand_config)
-  end
-  private :first_config_in_chain
 end

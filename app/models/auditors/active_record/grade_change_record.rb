@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -31,6 +33,7 @@ module Auditors::ActiveRecord
     belongs_to :submission, inverse_of: :auditor_grade_change_records
     belongs_to :course, -> { where(context_type: 'Course') }, class_name: "::Course", foreign_key: 'context_id', inverse_of: :auditor_grade_change_records
     belongs_to :assignment, inverse_of: :auditor_grade_change_records
+    belongs_to :grading_period, inverse_of: :auditor_grade_change_records
 
     attr_accessor :grade_current
 
@@ -44,13 +47,14 @@ module Auditors::ActiveRecord
         attrs_hash['uuid'] = record.id
         attrs_hash['account_id'] = Shard.relative_id_for(record.account_id, Shard.current, Shard.current)
         attrs_hash['root_account_id'] = (root_account_id || attrs_hash['account_id'])
-        attrs_hash['assignment_id'] = Shard.relative_id_for(record.assignment_id, Shard.current, Shard.current)
+        attrs_hash['assignment_id'] = resolve_id_or_placeholder(record.assignment_id)
         attrs_hash['context_id'] = Shard.relative_id_for(record.context_id, Shard.current, Shard.current)
         attrs_hash['grader_id'] = Shard.relative_id_for(record.grader_id, Shard.current, Shard.current)
         attrs_hash['graded_anonymously'] ||= false
         attrs_hash['student_id'] = Shard.relative_id_for(record.student_id, Shard.current, Shard.current)
-        attrs_hash['submission_id'] = Shard.relative_id_for(record.submission_id, Shard.current, Shard.current)
+        attrs_hash['submission_id'] = resolve_id_or_placeholder(record.submission_id)
         attrs_hash['submission_version_number'] = record.version_number
+        attrs_hash['grading_period_id'] = resolve_id_or_placeholder(record.grading_period_id)
         attrs_hash
       end
     end
@@ -63,5 +67,19 @@ module Auditors::ActiveRecord
     def version_number
       submission_version_number
     end
+
+    def override_grade?
+      submission_id.blank?
+    end
+
+    def in_grading_period?
+      grading_period_id.present?
+    end
+
+    def self.resolve_id_or_placeholder(id)
+      return nil if id == Auditors::GradeChange::NULL_PLACEHOLDER
+      Shard.relative_id_for(id, Shard.current, Shard.current)
+    end
+    private_class_method :resolve_id_or_placeholder
   end
 end

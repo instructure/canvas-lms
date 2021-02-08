@@ -20,7 +20,12 @@ import PaginatedCollection from '../collections/PaginatedCollection'
 
 export default class GradeChangeLoggingCollection extends PaginatedCollection {
   url() {
-    return `/api/v1/audit/grade_change/${this.options.params.type}/${this.options.params.id}`
+    // TODO remove this check after OSS instances have been given a path to migrate from cassandra auditors
+    if (ENV.enhanced_grade_change_query) {
+      return '/api/v1/audit/grade_change'
+    } else {
+      return `/api/v1/audit/grade_change/${this.options.params.type}/${this.options.params.id}`
+    }
   }
 }
 GradeChangeLoggingCollection.prototype.sideLoad = {

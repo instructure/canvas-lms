@@ -37,11 +37,14 @@ export default class OutcomeColumnView extends View
       mouseenter: 'mouseenter'
       mouseleave: 'mouseleave'
 
+    account_level_scales: ->
+      @_account_level_scales = ENV.GRADEBOOK_OPTIONS.ACCOUNT_LEVEL_MASTERY_SCALES
+
     createPopover: (e) ->
       @totalsFn()
-      @pickColors()
-      attributes = new Outcome(@attributes)
-      popover = new Popover(e, @popover_template(attributes.present()), verticalSide: 'bottom', invertOffset: true)
+      if !@account_level_scales() then @pickColors()
+      attributes = _.extend(new Outcome(@attributes).present(), {account_level_scales: @account_level_scales()})
+      popover = new Popover(e, @popover_template(attributes), verticalSide: 'bottom', invertOffset: true)
       popover.el.on('mouseenter', @mouseenter)
       popover.el.on('mouseleave', @mouseleave)
       @renderChart()
@@ -118,7 +121,7 @@ export default class OutcomeColumnView extends View
 
       @arc.outerRadius(initialRadius)
       @arcs.append("svg:path")
-        .attr("fill", (d, i) => @data[i].color )
+        .attr("fill", (d, i) => if @account_level_scales() then "##{@data[i].color}" else @data[i].color)
         .attr("d", @arc)
         .transition().duration(400).attrTween("d", radiusTween)
       @arc.outerRadius(@r)

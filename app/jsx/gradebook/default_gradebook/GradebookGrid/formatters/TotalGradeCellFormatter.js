@@ -17,10 +17,12 @@
  */
 
 import $ from 'jquery'
+import _ from 'underscore'
 import round from 'compiled/util/round'
 import I18n from 'i18n!gradebook'
 import {scoreToGrade} from '../../../GradingSchemeHelper'
 import {scoreToPercentage} from '../../../shared/helpers/GradeCalculationHelper'
+import htmlEscape from 'str/htmlEscape'
 import 'jquery.instructure_misc_helpers' // $.toSentence
 
 function getGradePercentage(score, pointsPossible) {
@@ -38,7 +40,7 @@ function buildHiddenAssignmentsWarning() {
 }
 
 function buildInvalidAssignmentGroupsWarning(invalidAssignmentGroups) {
-  const names = invalidAssignmentGroups.map(group => group.name)
+  const names = invalidAssignmentGroups.map(group => htmlEscape(group.name))
   const warningText = I18n.t(
     {
       one: 'Score does not include %{groups} because it has no points possible',
@@ -96,7 +98,10 @@ function render(options) {
   }
 
   if (options.letterGrade) {
-    letterGrade = `<span class="letter-grade-points">${options.letterGrade}</span>`
+    const escapedGrade = _.escape(options.letterGrade)
+
+    // xsslint safeString.identifier escapedGrade
+    letterGrade = `<span class="letter-grade-points">${escapedGrade}</span>`
   }
 
   // xsslint safeString.identifier tooltip warningIcon grade letterGrade

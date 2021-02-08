@@ -47,7 +47,7 @@ test('renders an avatar when needed', () => {
 test('renders all actions when all permissions are present', () => {
   const wrapper = shallow(<UsersListRow {...defaultProps()} />)
 
-  equal(wrapper.find('td Tooltip Button').length, 3)
+  equal(wrapper.find('[data-testid="user-list-row-tooltip"]').length, 3)
 })
 
 test('renders no actions if no permissions are present', () => {
@@ -60,5 +60,5 @@ test('renders no actions if no permissions are present', () => {
     }
   }
   const wrapper = shallow(<UsersListRow {...propsWithNoPermissions} />)
-  equal(wrapper.find('td Tooltip Button').length, 0)
+  equal(wrapper.find('[data-testid="user-list-row-tooltip"]').length, 0)
 })

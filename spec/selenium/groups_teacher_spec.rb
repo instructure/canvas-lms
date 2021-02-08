@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -48,7 +50,7 @@ describe "new groups" do
       f('.btn.add-group').click
       wait_for_ajaximations
       f('#group_name').send_keys("Test Group")
-      f('#groupEditSaveButton').click
+      submit_form("span[aria-label='Add Group']")
       wait_for_ajaximations
       expect(fj('.collectionViewItems.unstyled.groups-list>li:last-child')).to include_text("Test Group")
     end
@@ -192,6 +194,12 @@ describe "new groups" do
 
       expect(f('.group-summary')).to include_text("0 / 3 students")
       f('.al-trigger.btn').click
+
+      # the randomly assign members option doesn't appear immediately and can result
+      # in selenium clicking the wrong link. wait for it to appear before clicking
+      # edit category to work around the issue
+      wait_for(method: nil, timeout: 2) { f('.randomly-assign-members').displayed? }
+
       f('.icon-edit.edit-category').click
 
       manually_set_groupset_limit("2")
@@ -225,6 +233,12 @@ describe "new groups" do
       wait_for_ajaximations
       f(".group-user-actions[data-user-id=\"user_#{@students[0].id}\"]").click
       wait_for_ajaximations
+
+      # the remove as leader option doesn't appear immediately and can result
+      # in selenium clicking the wrong link. wait for it to appear before clicking
+      # "Move To" to work around the issue
+      wait_for(method: nil, timeout: 2) { f('.ui-menu-item .remove-as-leader').displayed? }
+
       f(".ui-menu-item .edit-group-assignment").click
       wait_for(method: nil, timeout: 2) { fxpath("//*[@data-cid='Tray']//*[@role='dialog']").displayed? }
       ff(".move-select .move-select__group option").last.click
@@ -709,7 +723,6 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group to a group with submission" do
-          skip('ADMIN-880')
           group_test_setup(2,1,2)
           # add second student to second test group
           add_user_to_group(@students.last,@testgroup.last)
@@ -730,7 +743,6 @@ describe "new groups" do
         end
 
         it "should clone group set when moving a student from a group with submission to a group" do
-          skip('ADMIN-880')
           group_test_setup(2,1,2)
           add_user_to_group(@students.last,@testgroup.last)
           create_and_submit_assignment_from_group(@students.last)
@@ -994,7 +1006,7 @@ describe "new groups" do
 
           select_change_groups_option
 
-          expect(f('.progressbar')).to be_displayed
+          expect(f('.progress-container')).to be_displayed
         end
 
         context "dragging and dropping a student" do

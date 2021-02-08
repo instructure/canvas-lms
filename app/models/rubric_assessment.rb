@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -30,6 +32,7 @@ class RubricAssessment < ActiveRecord::Base
   belongs_to :artifact, touch: true,
              polymorphic: [:submission, :assignment, { provisional_grade: 'ModeratedGrading::ProvisionalGrade' }]
   has_many :assessment_requests, :dependent => :destroy
+  has_many :learning_outcome_results, as: :artifact, :dependent => :destroy
   serialize :data
 
   simply_versioned
@@ -47,12 +50,13 @@ class RubricAssessment < ActiveRecord::Base
     peer_review = self.assessment_type == "peer_review"
     provisional_grade = self.artifact_type == "ModeratedGrading::ProvisionalGrade"
     update_outcomes = outcome_ids.present? && !peer_review && !provisional_grade
-    send_later_if_production(:update_outcomes_for_assessment, outcome_ids) if update_outcomes
+    delay_if_production.update_outcomes_for_assessment(outcome_ids) if update_outcomes
   end
 
   def update_outcomes_for_assessment(outcome_ids=[])
     return if outcome_ids.empty?
-    alignments = if self.rubric_association.present?
+
+    alignments = if active_rubric_association?
       self.rubric_association.association_object.learning_outcome_alignments.where({
         learning_outcome_id: outcome_ids
       })
@@ -107,7 +111,10 @@ class RubricAssessment < ActiveRecord::Base
     end
 
     # title
-    result.title = "#{user.name}, #{rubric_association.title}"
+    result.title = CanvasTextHelper.truncate_text(
+      "#{user.name}, #{rubric_association.title}",
+      {max_length: 250}
+    )
 
     # non-scoring rubrics
     result.hide_points = self.hide_points
@@ -137,7 +144,7 @@ class RubricAssessment < ActiveRecord::Base
 
   def update_assessment_requests
     requests = self.assessment_requests
-    if self.rubric_association.present?
+    if active_rubric_association?
       requests += self.rubric_association.assessment_requests.where({
         assessor_id: self.assessor_id,
         asset_id: self.artifact_id,
@@ -235,7 +242,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def score
-    self[:score]&.round(4)
+    self[:score]&.round(Rubric::POINTS_POSSIBLE_PRECISION)
   end
 
   def assessor_name
@@ -256,7 +263,8 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def considered_anonymous?
-    return false unless self.rubric_association.present?
+    return false unless active_rubric_association?
+
     self.rubric_association.association_type == 'Assignment' &&
     self.rubric_association.association_object.anonymous_peer_reviews?
   end
@@ -266,7 +274,7 @@ class RubricAssessment < ActiveRecord::Base
   end
 
   def related_group_submissions_and_assessments
-    if self.rubric_association && self.rubric_association.association_object.is_a?(Assignment) && !self.artifact.is_a?(ModeratedGrading::ProvisionalGrade) && !self.rubric_association.association_object.grade_group_students_individually
+    if active_rubric_association? && self.rubric_association.association_object.is_a?(Assignment) && !self.artifact.is_a?(ModeratedGrading::ProvisionalGrade) && !self.rubric_association.association_object.grade_group_students_individually
       students = self.rubric_association.association_object.group_students(self.user).last
       submissions = students.map do |student|
         submission = self.rubric_association.association_object.find_asset_for_assessment(self.rubric_association, student).first
@@ -279,5 +287,9 @@ class RubricAssessment < ActiveRecord::Base
 
   def set_root_account_id
     self.root_account_id ||= self.rubric&.root_account_id
+  end
+
+  def active_rubric_association?
+    !!self.rubric_association&.active?
   end
 end

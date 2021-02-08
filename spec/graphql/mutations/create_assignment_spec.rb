@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -49,7 +51,6 @@ describe Mutations::CreateAssignment do
             assignmentGroup { _id }
             groupSet { _id }
             allowedAttempts
-            muted
             onlyVisibleToOverrides
             submissionTypes
             gradeGroupStudentsIndividually
@@ -104,7 +105,6 @@ describe Mutations::CreateAssignment do
     ["gradingType", :grading_type, "points", "not_graded", "not_graded"],
     ["allowedExtensions", :allowed_extensions, [], '[ "docs", "blah" ]', [ "docs", "blah" ]],
     ["allowedAttempts", :allowed_attempts, nil, 10, 10],
-    ["muted", :muted?, false, true, true],
     ["onlyVisibleToOverrides", :only_visible_to_overrides, false, true, true],
     ["submissionTypes", :submission_types, "none", '[ discussion_topic, not_graded ]', [ "discussion_topic", "not_graded" ], "discussion_topic,not_graded"],
     ["gradeGroupStudentsIndividually", :grade_group_students_individually, false, true, true],
@@ -115,7 +115,7 @@ describe Mutations::CreateAssignment do
   ]
 
   it "creates an assignment with attributes" do
-    query = "courseId: #{@course.to_param}\n"
+    query = +"courseId: #{@course.to_param}\n"
     TEST_ATTRS.each do |graphql_name, assignment_name, initial_value, update_value, graphql_result, assignment_result = graphql_result|
       query << "#{graphql_name}: #{update_value}\n"
     end
@@ -165,7 +165,7 @@ describe Mutations::CreateAssignment do
   it "creates a peer review assignment" do
     result = execute_with_input <<~GQL
       courseId: "#{@course.to_param}"
-      name: "peer review test assignment" 
+      name: "peer review test assignment"
       moderatedGrading: {
         graderCount: 1
       }

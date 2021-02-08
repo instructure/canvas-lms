@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -187,7 +189,7 @@ class EffectiveDueDates
       if assignment_collection.empty?
         {}
       else
-        ActiveRecord::Base.connection.select_all(<<-SQL)
+        ActiveRecord::Base.connection.select_all(<<~SQL)
           -- fetch the assignment itself
           WITH models AS (
             SELECT *

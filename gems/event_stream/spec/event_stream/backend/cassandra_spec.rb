@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -49,6 +51,10 @@ describe EventStream::Backend::Cassandra do
       'test_db'
     end
 
+    def database.fingerprint
+      'fingerprint'
+    end
+
     database
   end
 
@@ -67,11 +73,20 @@ describe EventStream::Backend::Cassandra do
   end
 
   describe "executing operations" do
+    let(:backend){ EventStream::Backend::Cassandra.new(stream) }
+
     it "proxies calls through provided cassandra db" do
-      cass_backend = EventStream::Backend::Cassandra.new(stream)
-      cass_backend.execute(:insert, event_record)
+      backend.execute(:insert, event_record)
       expect(database.inserted.size).to eq(1)
       expect(database.inserted.first[1]['id']).to eq('big-uuid')
+    end
+
+    it "pulls db fingerprint" do
+      expect(backend.database_fingerprint).to eq('fingerprint')
+    end
+
+    it "uses keyspace for name" do
+      expect(backend.database_name).to eq('test_db')
     end
   end
 end

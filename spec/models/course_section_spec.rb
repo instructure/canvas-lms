@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -472,8 +474,8 @@ describe CourseSection, "moving to new course" do
   end
 
   context 'permissions' do
-    context ':read and section_visibilities' do
-      before :once do
+    context ":read and section_visibilities" do
+      before do
         RoleOverride.create!({
           :context => Account.default,
           :permission => 'manage_students',
@@ -489,7 +491,9 @@ describe CourseSection, "moving to new course" do
         @ta.reload
 
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_falsey
@@ -497,7 +501,9 @@ describe CourseSection, "moving to new course" do
 
       it "should work with section_limited false" do
         # make sure other ways to get :read are false
-        expect(@other_section.course.grants_right?(@ta, :manage_sections)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_add)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_edit)).to be_falsey
+        expect(@other_section.course.grants_right?(@ta, :manage_sections_delete)).to be_falsey
         expect(@other_section.course.grants_right?(@ta, :manage_students)).to be_falsey
 
         expect(@other_section.grants_right?(@ta, :read)).to be_truthy
@@ -550,5 +556,11 @@ describe CourseSection, "moving to new course" do
 
       expect(@enrollment.enrollment_state.reload.restricted_access?).to eq false
     end
+  end
+
+  it "delegates account to course" do
+    course = course_model(account_id: Account.default)
+    section = course.course_sections.create!
+    expect(section.account).to eq(Account.default)
   end
 end

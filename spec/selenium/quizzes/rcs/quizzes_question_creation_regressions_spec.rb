@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -28,6 +30,7 @@ describe 'quizzes question creation' do
 
   before(:each) do
     user_session(@teacher)
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 

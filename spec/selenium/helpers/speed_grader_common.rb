@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -68,7 +70,7 @@ module SpeedGraderCommon
     f('.toggle_full_rubric').click
     wait_for_ajaximations
 
-    rubric_inputs = ff('td.criterion_points input')
+    rubric_inputs = ff('td[data-testid="criterion-points"] input')
     rubric_inputs[0].send_keys(score1)
     rubric_inputs[1].send_keys(score2)
   end

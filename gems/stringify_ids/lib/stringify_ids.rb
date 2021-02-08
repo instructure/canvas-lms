@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -31,6 +33,7 @@ module StringifyIds
   def self.stringify_ids(value, opts = {})
     return unless value.is_a?(Hash)
     value.keys.each do |key|
+      next unless key.is_a?(String) || key.is_a?(Symbol)
       if key =~ /(^|_)id$/i
         # id, foo_id, etc.
         value[key] = stringify_id(value[key], opts)

@@ -102,6 +102,13 @@ QUnit.module('Gradebook > DataLoader > SisOverridesLoader', () => {
       strictEqual(requests.length, 1)
     })
 
+    test('excludes rubrics when requesting assignments', async () => {
+      loadOverrides()
+      await network.allRequestsReady()
+      const [{params}] = getRequests()
+      ok(params.exclude_response_fields.includes('rubric'))
+    })
+
     QUnit.module('when sending the initial request', () => {
       test('excludes "wiki_page" submission types', async () => {
         loadOverrides()

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -25,7 +27,6 @@ describe "scheduler" do
   context "find appointment mode as a student" do
     before :once do
       Account.default.tap do |a|
-        a.enable_feature!(:better_scheduler)
         a.settings[:show_scheduler]   = true
         a.settings[:agenda_view]      = true
         a.save!

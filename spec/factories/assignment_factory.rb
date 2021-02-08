@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -70,5 +72,19 @@ module Factories
       }.merge(fields)
     end
     create_records(Assignment, records)
+  end
+
+  def new_quizzes_assignment(opts = {})
+    assignment_model({:submission_types => "external_tool"}.merge(opts))
+    tool = @c.context_external_tools.create!(
+      :name => 'Quizzes.Next',
+      :consumer_key => 'test_key',
+      :shared_secret => 'test_secret',
+      :tool_id => 'Quizzes 2',
+      :url => 'http://example.com/launch'
+    )
+    @a.external_tool_tag_attributes = { :content => tool }
+    @a.save!
+    @a
   end
 end

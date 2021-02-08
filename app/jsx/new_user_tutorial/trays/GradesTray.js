@@ -28,33 +28,37 @@ const GradesTray = () => (
     imageWidth="8.5rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-
-      guide-table-of-contents#jive_content_id_Grades`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I use the Gradebook?'),
-        href: 'https://community.canvaslms.com/docs/DOC-16554-4152813659'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Gradebook/ta-p/701'
       },
       {
         label: I18n.t('How do I enter and edit grades in the Gradebook?'),
-        href: 'https://community.canvaslms.com/docs/DOC-16572-4152813671'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-enter-and-edit-grades-in-the-Gradebook/ta-p/724'
       },
       {
         label: I18n.t('How do I post grades for an assignment in the Gradebook?'),
-        href: 'https://community.canvaslms.com/docs/DOC-17330-41521116619'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-post-grades-for-an-assignment-in-the-Gradebook/ta-p/576'
       },
       {
         label: I18n.t('How do I view assignments or students individually in the Gradebook?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12875-4152212381'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-assignments-or-students-individually-in-the/ta-p/1247'
       },
       {
         label: I18n.t('How do I use SpeedGrader?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12774-415255021'
+        href: 'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-is-SpeedGrader/ta-p/13'
       },
       {
         label: I18n.t('How do I view the details of a submission for a student in SpeedGrader?'),
-        href: 'https://community.canvaslms.com/docs/DOC-13088-415255024'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-view-the-details-of-a-submission-for-a-student-in/ta-p/762'
       }
     ]}
   >

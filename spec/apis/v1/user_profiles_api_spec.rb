@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -153,7 +155,7 @@ describe "User Profile API", type: :request do
 
   it "respects :read_email_addresses permission" do
     RoleOverride.create!(:context => Account.default, :permission => 'read_email_addresses',
-                         :role => Role.get_built_in_role('AccountAdmin'), :enabled => false)
+                         :role => admin_role, :enabled => false)
     json = api_call(:get, "/api/v1/users/#{@student.id}/profile",
              :controller => "profile", :action => "settings", :user_id => @student.to_param, :format => 'json')
     expect(json['id']).to eq @student.id

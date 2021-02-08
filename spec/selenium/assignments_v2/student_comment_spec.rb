@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -31,7 +33,6 @@ describe 'assignments' do
         points_possible: 10,
         submission_types: 'online_upload'
       )
-      preload_graphql_schema
     end
 
     before(:each) do

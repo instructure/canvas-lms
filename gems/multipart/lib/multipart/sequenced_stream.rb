@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module Multipart
       @streams.map(&:size).sum
     end
 
-    def read(size=nil, outbuf="")
+    def read(size=nil, outbuf=+"")
       outbuf.replace("")
       if size.nil?
         # slurp up all remaining contents, even if that's just "" when eof at
@@ -40,7 +42,7 @@ module Multipart
         read_any = false
         remaining = size
         @streams.each do |stream|
-          readbuf = ""
+          readbuf = +""
           while remaining > 0 && stream.read(remaining, readbuf)
             read_any = true
             remaining -= readbuf.length

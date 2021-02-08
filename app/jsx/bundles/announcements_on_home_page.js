@@ -20,7 +20,8 @@ import I18n from 'i18n!announcements_on_home_page'
 import React from 'react'
 import ReactDOM from 'react-dom'
 import axios from 'axios'
-import {Spinner, Heading} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {View} from '@instructure/ui-layout'
 import AnnouncementRow from '../shared/components/AnnouncementRow'
 import ready from '@instructure/ready'
@@ -45,18 +46,26 @@ if (ENV.SHOW_ANNOUNCEMENTS) {
       include: ['sections', 'sections_user_count']
     }
 
-    axios.get(url, {params}).then(response => {
-      ReactDOM.render(
-        <View display="block" margin="0 0 medium">
-          <Heading level="h3" margin="0 0 small">
-            {I18n.t('Recent Announcements')}
-          </Heading>
-          {response.data.map(announcement => (
-            <AnnouncementRow key={announcement.id} announcement={announcement} />
-          ))}
-        </View>,
-        container
-      )
-    })
+    axios
+      .get(url, {params})
+      .then(response => {
+        ReactDOM.render(
+          <View display="block" margin="0 0 medium">
+            <Heading level="h3" margin="0 0 small">
+              {I18n.t('Recent Announcements')}
+            </Heading>
+            {response.data.map(announcement => (
+              <AnnouncementRow key={announcement.id} announcement={announcement} />
+            ))}
+          </View>,
+          container
+        )
+      })
+      .catch(error => {
+        /* eslint-disable no-console */
+        console.error('Error retrieving home page announcements')
+        console.error(error)
+        /* eslint-enable no-console */
+      })
   })
 }

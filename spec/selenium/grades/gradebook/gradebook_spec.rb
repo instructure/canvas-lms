@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -77,6 +79,63 @@ describe "Gradebook" do
       expect(f('.gradebook-cell', cell)).to include_text '10'
       cell.click
       expect(Gradebook::Cells.grading_cell_input(@student_1, @first_assignment)).not_to be_blank
+    end
+  end
+
+  context 'view ungraded as 0' do
+
+    before(:each) do
+      Account.site_admin.enable_feature!(:view_ungraded_as_zero)
+      Gradebook.visit(@course)
+    end
+
+    it 'persists its value when changed in the View menu' do
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+      Gradebook.select_view_dropdown
+
+      expect(Gradebook.view_ungraded_as_zero).to contain_css("svg[name='IconCheck']")
+
+      driver.navigate.refresh
+      Gradebook.select_view_dropdown
+
+      expect(Gradebook.view_ungraded_as_zero).to contain_css("svg[name='IconCheck']")
+    end
+
+    it 'toggles the presence of "Ungraded as 0" in the Total grade column header' do
+      expect(Gradebook.assignment_header_cell_element('Total').text).not_to include('Ungraded as 0')
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.assignment_header_cell_element('Total').text).to include('Ungraded as 0')
+    end
+
+    it 'toggles the presence of "Ungraded as 0" in assignment group grade column header' do
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).not_to include('Ungraded as 0')
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).to include('Ungraded as 0')
+    end
+
+    it 'toggles which version of the total grade is displayed for a student' do
+      expect(Gradebook::Cells.get_total_grade(@student_1)).to eq "100% A"
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook::Cells.get_total_grade(@student_1)).to eq "18.75% F"
+    end
+
+    it 'does not change the grades in the backend' do
+      expect(Gradebook.scores_api(@course).first[:score]).to eq 100.0
+
+      Gradebook.select_view_dropdown
+      Gradebook.select_view_ungraded_as_zero
+
+      expect(Gradebook.scores_api(@course).first[:score]).to eq 100.0
     end
   end
 

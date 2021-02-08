@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -23,6 +25,7 @@ class ConversationParticipant < ActiveRecord::Base
   include TextHelper
   include SimpleTags
   include ModelCache
+  include ConversationHelper
 
   belongs_to :conversation
   belongs_to :user
@@ -125,7 +128,7 @@ class ConversationParticipant < ActiveRecord::Base
       user_ids = users_by_conversation_shard[Shard.current]
 
       shard_conditions = if options[:mode] == :or || user_ids.size == 1
-        [<<-SQL, user_ids]
+        [<<~SQL, user_ids]
         EXISTS (
           SELECT *
           FROM #{ConversationParticipant.quoted_table_name} cp
@@ -134,7 +137,7 @@ class ConversationParticipant < ActiveRecord::Base
         )
         SQL
       else
-        [<<-SQL, user_ids, user_ids.size]
+        [<<~SQL, user_ids, user_ids.size]
         (
           SELECT COUNT(*)
           FROM #{ConversationParticipant.quoted_table_name} cp
@@ -188,6 +191,7 @@ class ConversationParticipant < ActiveRecord::Base
   delegate :context_name, :to => :conversation
   delegate :context_components, :to => :conversation
 
+  before_create :set_root_account_ids
   before_update :update_unread_count_for_update
   before_destroy :update_unread_count_for_destroy
 
@@ -249,6 +253,15 @@ class ConversationParticipant < ActiveRecord::Base
     end
 
     participants
+  end
+  
+  def clear_participants_cache
+    shard.activate do
+      key = [conversation, 'participants'].cache_key
+      Rails.cache.delete(key)
+      indirect_key = [conversation, user, 'indirect_participants'].cache_key
+      Rails.cache.delete(indirect_key)
+    end
   end
 
   def properties(latest = last_message)
@@ -355,7 +368,7 @@ class ConversationParticipant < ActiveRecord::Base
       save
     end
     # update the stream item data but leave the instances alone
-    StreamItem.send_later_if_production_enqueue_args(:generate_or_update, {:priority => 25}, self.conversation)
+    StreamItem.delay_if_production(priority: 25).generate_or_update(self.conversation)
   end
 
   def update(hash)
@@ -483,12 +496,14 @@ class ConversationParticipant < ActiveRecord::Base
         conversation.conversation_messages.where(:author_id => user_id).update_all(:author_id => new_user.id)
         if existing = conversation.conversation_participants.where(user_id: new_user).first
           existing.update_attribute(:workflow_state, workflow_state) if unread? || existing.archived?
+          existing.clear_participants_cache
           destroy
         else
           ConversationMessageParticipant.joins(:conversation_message).
               where(:conversation_messages => { :conversation_id => self.conversation_id }, :user_id => self.user_id).
               update_all(:user_id => new_user.id)
           update_attribute :user, new_user
+          clear_participants_cache
           existing = self
         end
         # replicate ConversationParticipant record to the new user's shard
@@ -579,9 +594,8 @@ class ConversationParticipant < ActiveRecord::Base
 
   def self.batch_update(user, conversation_ids, update_params)
     progress = user.progresses.create! :tag => "conversation_batch_update", :completion => 0.0
-    job = ConversationParticipant.send_later_enqueue_args(:do_batch_update,
-                                                          { no_delay: true },
-                                                          progress, user, conversation_ids, update_params)
+    job = ConversationParticipant.delay(ignore_transaction: true).
+      do_batch_update(progress, user, conversation_ids, update_params)
     progress.user_id = user.id
     progress.delayed_job_id = job.id
     progress.save!

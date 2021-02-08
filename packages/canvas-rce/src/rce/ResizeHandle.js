@@ -20,7 +20,7 @@ import React, {useState} from 'react'
 import {func, string} from 'prop-types'
 import {DraggableCore} from 'react-draggable'
 import keycode from 'keycode'
-import {View} from '@instructure/ui-layout'
+import {View} from '@instructure/ui-view'
 import {IconDragHandleLine} from '@instructure/ui-icons'
 import DraggingBlocker from './DraggingBlocker'
 import formatMessage from '../format-message'
@@ -40,12 +40,21 @@ export default function ResizeHandle(props) {
     }
   }
 
-  function handleFocus() {
+  function handleFocus(event) {
     setIsFocused(true)
+    props.onFocus?.(event)
   }
 
   function handleBlur() {
     setIsFocused(false)
+  }
+
+  function handleDragStart(e) {
+    setDragging(true)
+  }
+
+  function handleDragStop(e) {
+    setDragging(false)
   }
 
   const [dragging, setDragging] = useState(false)
@@ -56,6 +65,7 @@ export default function ResizeHandle(props) {
   return (
     <View
       aria-label={formatMessage('Drag handle. Use up and down arrows to resize')}
+      title={formatMessage('Resize')}
       as="span"
       borderRadius="medium"
       display="inline-block"
@@ -63,6 +73,7 @@ export default function ResizeHandle(props) {
       padding="0 0 0 xx-small"
       position="relative"
       role="button"
+      data-btn-id={props['data-btn-id']}
       tabIndex={props.tabIndex}
       onKeyDown={handleKey}
       onFocus={handleFocus}
@@ -71,8 +82,8 @@ export default function ResizeHandle(props) {
       <DraggableCore
         offsetParent={document.body}
         onDrag={props.onDrag}
-        onStart={() => setDragging(true)}
-        onStop={() => setDragging(false)}
+        onStart={handleDragStart}
+        onStop={handleDragStop}
       >
         <View cursor="ns-resize">
           <IconDragHandleLine />
@@ -85,7 +96,9 @@ export default function ResizeHandle(props) {
 
 ResizeHandle.propTypes = {
   onDrag: func,
-  tabIndex: string
+  onFocus: func,
+  tabIndex: string,
+  'data-btn-id': string
 }
 
 ResizeHandle.defaultProps = {

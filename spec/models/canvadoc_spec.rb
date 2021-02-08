@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -79,6 +81,11 @@ describe 'Canvadoc' do
     it "ignores annotatable if unavailable" do
       stub_upload.with(@doc.attachment.public_url, {})
       @doc.upload annotatable: true
+    end
+
+    it "uses targeted exception for timeouts" do
+      allow(Canvas).to receive(:timeout_protection).and_return(nil)
+      expect{ @doc.upload }.to raise_error(::Canvadoc::UploadTimeout)
     end
   end
 

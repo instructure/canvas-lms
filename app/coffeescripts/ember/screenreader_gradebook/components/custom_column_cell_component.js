@@ -16,7 +16,7 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import Ember from 'ember'
-import GradebookHelpers from '../../../gradebook/GradebookHelpers'
+import GradebookHelpers from 'jsx/gradebook/GradebookHelpers'
 import GradebookConstants from 'jsx/gradebook/shared/constants'
 
 const CustomColumnCellComponent = Ember.Component.extend({

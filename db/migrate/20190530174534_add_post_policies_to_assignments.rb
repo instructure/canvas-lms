@@ -23,27 +23,15 @@ class AddPostPoliciesToAssignments < ActiveRecord::Migration[5.1]
 
   def change
     Submission.find_ids_in_ranges(batch_size: 100_000, loose: true) do |start_at, end_at|
-      DataFixup::AddPostPoliciesToAssignments.send_later_if_production_enqueue_args(
-        :set_submission_posted_at_dates,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::AddPostPoliciesToAssignments", Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::AddPostPoliciesToAssignments.delay_if_production(priority: Delayed::LOW_PRIORITY,
+          n_strand: ["DataFixup::AddPostPoliciesToAssignments", Shard.current.database_server.id]).
+        set_submission_posted_at_dates(start_at, end_at)
     end
 
     Course.find_ids_in_ranges(loose: true) do |start_at, end_at|
-      DataFixup::AddPostPoliciesToAssignments.send_later_if_production_enqueue_args(
-        :create_post_policies,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::AddPostPoliciesToAssignments", Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::AddPostPoliciesToAssignments.delay_if_production(priority: Delayed::LOW_PRIORITY,
+          n_strand: ["DataFixup::AddPostPoliciesToAssignments", Shard.current.database_server.id]).
+        create_post_policies(start_at, end_at)
     end
   end
 end

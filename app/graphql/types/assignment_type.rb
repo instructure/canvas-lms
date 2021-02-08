@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -25,7 +27,7 @@ module Types
     implements Interfaces::ModuleItemInterface
     implements Interfaces::LegacyIDInterface
 
-    alias :assignment :object
+    alias assignment object
 
     class AssignmentStateType < Types::BaseEnum
       graphql_name "AssignmentState"
@@ -221,8 +223,6 @@ module Types
       "permitted uploaded file extensions (e.g. ['doc', 'xls', 'txt'])",
       null: true
 
-    field :muted, Boolean, method: :muted?, null: false
-
     field :state, AssignmentStateType, method: :workflow_state, null: false
 
     field :quiz, Types::QuizType, null: true
@@ -361,6 +361,13 @@ module Types
         if course.grants_right?(current_user, :manage_grades)
           load_association(:post_policy)
         end
+      end
+    end
+
+    field :sis_id, String, null: true
+    def sis_id
+      load_association(:context).then do |course|
+        assignment.sis_source_id if course.grants_any_right?(current_user, :read_sis, :manage_sis)
       end
     end
   end

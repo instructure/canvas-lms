@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,6 +30,7 @@
 # @see AssessmentQuestion#create_quiz_question()
 # @see AssessmentQuestionBank#select_for_submission()
 class Quizzes::QuizQuestion < ActiveRecord::Base
+  extend RootAccountResolver
   self.table_name = 'quiz_questions'
 
   include Workflow
@@ -50,6 +53,8 @@ class Quizzes::QuizQuestion < ActiveRecord::Base
   validates_presence_of :quiz_id
   serialize :question_data
   after_save :update_quiz
+
+  resolves_root_account through: :quiz
 
   include MasterCourses::CollectionRestrictor
   self.collection_owner_association = :quiz

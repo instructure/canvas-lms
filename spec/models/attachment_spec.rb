@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -159,21 +161,21 @@ describe Attachment do
       expect(@attachment).to be_crocodocable
     end
 
-    it "should include a whitelist of moderated_grading_whitelist in the url blob" do
+    it "should include an allow list of moderated_grading_allow_list in the url blob" do
       crocodocable_attachment_model
-      moderated_grading_whitelist = [user, student].map { |u| u.moderated_grading_ids(true) }
+      moderated_grading_allow_list = [user, student].map { |u| u.moderated_grading_ids(true) }
 
       @attachment.submit_to_crocodoc
       url_opts = {
-        moderated_grading_whitelist: moderated_grading_whitelist
+        moderated_grading_allow_list: moderated_grading_allow_list
       }
       url = Rack::Utils.parse_nested_query(@attachment.crocodoc_url(user, url_opts).sub(/^.*\?{1}/, ""))
       blob = extract_blob(url["hmac"], url["blob"],
                           "user_id" => user.id,
                           "type" => "crocodoc")
 
-      expect(blob["moderated_grading_whitelist"]).to include(user.moderated_grading_ids.as_json)
-      expect(blob["moderated_grading_whitelist"]).to include(student.moderated_grading_ids.as_json)
+      expect(blob["moderated_grading_allow_list"]).to include(user.moderated_grading_ids.as_json)
+      expect(blob["moderated_grading_allow_list"]).to include(student.moderated_grading_ids.as_json)
     end
 
     it "should always enable annotations when creating a crocodoc url" do
@@ -310,6 +312,23 @@ describe Attachment do
         canvadocable.submit_to_canvadocs 1, wants_annotation: true
         expect(canvadocable.canvadoc).not_to be_nil
         expect(canvadocable.crocodoc_document).to be_nil
+      end
+
+      it "downgrades Canvadoc upload timeouts to WARN" do
+        canvadocable = canvadocable_attachment_model content_type: "application/pdf"
+        cd_double = double()
+        allow(canvadocable).to receive(:canvadoc).and_return(cd_double)
+        expect(canvadocable.canvadoc).not_to be_nil
+        expect(canvadocable.canvadoc).to receive(:upload).and_raise(Canvadoc::UploadTimeout, "test timeout")
+        captured = false
+        allow(Canvas::Errors).to receive(:capture) do |e, error_data, error_level|
+          if e.is_a?(Canvadoc::UploadTimeout)
+            captured = true
+            expect(error_level).to eq(:warn)
+          end
+        end
+        canvadocable.submit_to_canvadocs 1
+        expect(captured).to be_truthy
       end
     end
   end
@@ -775,6 +794,24 @@ describe Attachment do
   end
 
   context "clone_for" do
+    context 'with S3 storage enabled' do
+      subject { attachment.clone_for(context, nil, {force_copy: true}) }
+
+      let(:bank) { AssessmentQuestionBank.create!(context: course_model) }
+      let(:context) { AssessmentQuestion.create!(assessment_question_bank: bank) }
+      let(:attachment) { attachment_model(:filename => "blech.ppt", context: bank.context) }
+
+      before { s3_storage! }
+
+      context 'and the context has a nil root account' do
+        before { context.update_columns(root_account_id: nil) }
+
+        it 'does not raise an error' do
+          expect { subject }.not_to raise_exception
+        end
+      end
+    end
+
     it "should clone to another context" do
       a = attachment_model(:filename => "blech.ppt")
       course_factory
@@ -1154,6 +1191,25 @@ describe Attachment do
           expect(deleted).to eq [ @a1 ]
         end
       end
+
+      it "can still rename when folder lives on a different shard" do
+        @shard1.activate do
+          shard_attachment_1 = attachment_with_context(@course, display_name: "old_name_1")
+          shard_attachment_2 = attachment_with_context(@course, display_name: "old_name_2")
+          folder = shard_attachment_1.folder
+          expect(folder.shard.id).to_not eq(shard_attachment_1.shard.id)
+          shard_attachment_1.display_name = "old_name_2"
+          deleted = shard_attachment_1.handle_duplicates(:rename)
+          expect(deleted).to be_empty
+          shard_attachment_1.reload
+          shard_attachment_2.reload
+          expect(shard_attachment_1.file_state).to eq 'available'
+          expect(shard_attachment_2.file_state).to eq 'available'
+          expect(shard_attachment_2.display_name).to_not eq(shard_attachment_1.display_name)
+          expect(shard_attachment_2.display_name).to eq 'old_name_2'
+          expect(shard_attachment_1.display_name).to eq 'old_name_2-2'
+        end
+      end
     end
   end
 
@@ -1280,6 +1336,7 @@ describe Attachment do
       expect(@a).to be_new_record
       expect(@a.read_attribute(:namespace)).to be_nil
       expect(@a.namespace).not_to be_nil
+      @a.set_root_account_id
       expect(@a.read_attribute(:namespace)).not_to be_nil
       expect(@a.root_account_id).to eq @account.id
     end
@@ -1303,6 +1360,7 @@ describe Attachment do
         Attachment.current_root_account = Account.default
         att = Attachment.new
         att.infer_namespace
+        att.set_root_account_id
         expect(att.namespace).to eq Account.default.asset_string
         expect(att.root_account_id).to eq Account.default.local_id
         @shard1.activate do
@@ -1318,6 +1376,7 @@ describe Attachment do
           Attachment.current_root_account = a
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq a.global_asset_string
           expect(att.root_account_id).to eq a.local_id
         end
@@ -1331,6 +1390,7 @@ describe Attachment do
           a = Account.create!
           att = Attachment.new
           att.namespace = a.asset_string
+          att.set_root_account_id
           expect(att.root_account_id).to eq a.local_id
         end
         expect(att.root_account_id).to eq a.global_id
@@ -1342,6 +1402,7 @@ describe Attachment do
         @shard1.activate do
           att = Attachment.new
           att.infer_namespace
+          att.set_root_account_id
           expect(att.namespace).to eq Account.default.global_asset_string
           expect(att.root_account_id).to eq Account.default.global_id
         end
@@ -1663,24 +1724,22 @@ describe Attachment do
       # create a student to receive notifications
       @student = user_model
       @student.register!
-      e = @course.enroll_student(@student).accept
-      @cc = @student.communication_channels.create(:path => "default@example.com")
-      @cc.confirm!
+      @course.enroll_student(@student).accept
+      cc = communication_channel(@student, {username: 'default@example.com', active_cc: true})
 
       @student_ended = user_model
       @student_ended.register!
       @section_ended = @course.course_sections.create!(end_at: Time.zone.now - 1.day)
       @course.enroll_student(@student_ended, :section => @section_ended).accept
-      @cc_ended = @student_ended.communication_channels.create(:path => "default2@example.com")
-      @cc_ended.confirm!
+      cc_ended = communication_channel(@student_ended, {username: 'default2@example.com', active_cc: true})
 
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => @cc, :frequency => "immediately")
-      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => @cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added'), :communication_channel => cc, :frequency => "immediately")
+      NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added'), :communication_channel => cc, :frequency => "immediately")
 
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New File Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
       NotificationPolicy.create(:notification => Notification.create!(:name => 'New Files Added - ended'),
-                                :communication_channel => @cc_ended, :frequency => "immediately")
+                                :communication_channel => cc_ended, :frequency => "immediately")
     end
 
     it "should send a single-file notification" do
@@ -1692,6 +1751,12 @@ describe Attachment do
       @attachment.reload
       expect(@attachment.need_notify).not_to be_truthy
       expect(Message.where(user_id: @student, notification_name: 'New File Added').first).not_to be_nil
+    end
+
+    it "should not send to student on hidden files" do
+      attachment_model(uploaded_data: stub_file_data('file.txt', nil, 'text/html'), content_type: 'text/html', file_state: 'hidden')
+      Timecop.freeze(10.minutes.from_now) { Attachment.do_notifications }
+      expect(Message.where(user_id: @student, notification_name: 'New File Added').first).to be_nil
     end
 
     it "should send a batch notification" do
@@ -1762,8 +1827,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is uploaded to a locked folder" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
@@ -1781,8 +1845,7 @@ describe Attachment do
 
     it "should not send notifications to students if the file is unpublished because of usage rights" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       @course.usage_rights_required = true
@@ -1801,8 +1864,7 @@ describe Attachment do
 
     it "should not send notifications to students if the files navigation is hidden from student view" do
       @teacher.register!
-      cc = @teacher.communication_channels.create!(:path => "default@example.com")
-      cc.confirm!
+      cc = communication_channel(@teacher, {username: 'default@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => Notification.where(name: 'New File Added').first, :communication_channel => cc, :frequency => "immediately")
 
       attachment_model(:uploaded_data => stub_file_data('file.txt', nil, 'text/html'), :content_type => 'text/html')
@@ -2105,12 +2167,6 @@ describe Attachment do
       expect { Attachment.clone_url_as_attachment("ftp://some/stuff") }.to raise_error(ArgumentError)
     end
 
-    it "should not raise on non-200 responses" do
-      url = "http://example.com/test.png"
-      expect(CanvasHttp).to receive(:get).with(url).and_yield(double('code' => '401'))
-      expect { Attachment.clone_url_as_attachment(url) }.to raise_error(CanvasHttp::InvalidResponseCodeError)
-    end
-
     it "should use an existing attachment if passed in" do
       url = "http://example.com/test.png"
       a = attachment_model
@@ -2140,6 +2196,109 @@ describe Attachment do
       att.context = Account.default
       att.save!
       expect(att.open.read).to eq 'this is a jpeg'
+    end
+
+    context 'with non-200 responses' do
+      subject { Attachment.clone_url_as_attachment(url) }
+
+      let(:url) { "http://example.com/test.png" }
+      let(:body) { "body content" }
+      let(:http_response) { FakeHttpResponse.new(401, body) }
+
+      before { allow(CanvasHttp).to receive(:get).with(url).and_yield(http_response) }
+
+      it "should raise on non-200 responses" do
+        expect { subject }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+      end
+
+      it "should include the body in the reaised error" do
+        expect { subject }.to raise_error(
+          an_instance_of(
+            CanvasHttp::InvalidResponseCodeError
+          ).and having_attributes(body: "#{body}...")
+        )
+      end
+
+      context 'and an error reading the response body' do
+        before { allow(http_response).to receive(:read_body).and_raise StandardError }
+
+        it 'raises the invalid response error' do
+          expect { subject }.to raise_error(CanvasHttp::InvalidResponseCodeError)
+        end
+      end
+    end
+  end
+
+  describe '.clone_url' do
+    subject { attachment.clone_url(url, handling, check_quota, opts) }
+
+    let(:attachment) { attachment_model }
+    let(:url) { 'https://www.test.com/file.jpg' }
+    let(:handling) { nil }
+    let(:check_quota) { nil }
+    let(:opts) { {} }
+
+
+    context 'when an error retrieving the file occurs' do
+      before { allow(Attachment).to receive(:clone_url_as_attachment).and_raise error }
+
+      context 'and the error was an invalid response code' do
+        let(:error) { CanvasHttp::InvalidResponseCodeError.new(code, body) }
+        let(:code) { 400 }
+        let(:body) { "response body" }
+
+        it 'captures the error' do
+          expect(Canvas::Errors).to receive(:capture).with(
+            error, attachment.clone_url_error_info(error, url)
+          )
+          subject
+        end
+      end
+
+      context 'and the error was unkown' do
+        let(:error) { StandardError }
+
+        it 'captures the error' do
+          expect(Canvas::Errors).to receive(:capture).with(
+            error, attachment.clone_url_error_info(error, url)
+          )
+          subject
+        end
+      end
+    end
+  end
+
+  describe '.clone_url_error_info' do
+    subject { attachment.clone_url_error_info(error, url) }
+
+    let(:attachment) { attachment_model }
+    let(:url) { 'https://www.test.com/file.jpg' }
+    let(:error) { StandardError.new }
+
+    it 'includes the proper type tag' do
+      expect(subject.dig(:tags, :type)).to eq Attachment::CLONING_ERROR_TYPE
+    end
+
+    it 'includes the url of the failed download' do
+      expect(subject.dig(:extra, :url)).to eq url
+    end
+
+    context 'when the exception includes a code' do
+      let(:error) { CanvasHttp::InvalidResponseCodeError.new(code, nil) }
+      let(:code) { 400 }
+
+      it 'includes the code from the error' do
+        expect(subject.dig(:extra, :http_status_code)).to eq code
+      end
+    end
+
+    context 'when the exception includes a body' do
+      let(:error) { CanvasHttp::InvalidResponseCodeError.new(nil, body) }
+      let(:body) { 'body content' }
+
+      it 'includes the code from the error' do
+        expect(subject.dig(:extra, :body)).to eq body
+      end
     end
   end
 
@@ -2210,7 +2369,7 @@ describe Attachment do
     it 'returns the attachment filename in the upload params' do
       attachment_model filename: 'test.txt'
       pseudonym @user
-      json = @attachment.ajax_upload_params(@user.pseudonym, '', '')
+      json = @attachment.ajax_upload_params('', '')
       expect(json[:upload_params]['Filename']).to eq 'test.txt'
     end
   end
@@ -2267,6 +2426,58 @@ describe Attachment do
     it 'handles specifically enumerated types' do
       attachment_model content_type: 'application/vnd.ms-powerpoint'
       expect(@attachment.mime_class).to eq 'ppt'
+    end
+  end
+
+  describe "copy_attachments_to_submissions_folder" do
+    before(:once) do
+      course_with_student
+      @course.account.enable_service(:avatars)
+      attachment_model(context: @student)
+    end
+
+    it "copies a user attachment into the user's submissions folder" do
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @student.submissions_folder(@course)
+    end
+
+    it "copies an attachment for a separate submission into the user's submission folder" do
+      submission_model(context: @course, user: @student)
+      @submission.attachment = @attachment
+      @submission.save!
+
+      @attachment.folder = @student.submissions_folder(@course)
+      @attachment.save!
+
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@submission.attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @student.submissions_folder(@course)
+    end
+
+    it "leaves files already in submissions folders alone" do
+      @attachment.folder = @student.submissions_folder(@course)
+      @attachment.save!
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts).to eq [@attachment]
+    end
+
+    it "copies a group attachment into the group submission folder" do
+      group_model(context: @course)
+      attachment_model(context: @group)
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [@attachment])
+      expect(atts.length).to eq 1
+      expect(atts[0]).not_to eq @attachment
+      expect(atts[0].folder).to eq @group.submissions_folder
+    end
+
+    it "leaves files in non user/group context alone" do
+      assignment_model(context: @course)
+      weird_file = @assignment.attachments.create! display_name: 'blah', uploaded_data: default_uploaded_data
+      atts = Attachment.copy_attachments_to_submissions_folder(@course, [weird_file])
+      expect(atts).to eq [weird_file]
     end
   end
 end

@@ -121,13 +121,18 @@ class LoginController < ApplicationController
     # render :logout_landing
   end
 
-  # POST /login/session_token
+  # GET /login/session_token
   def session_token
     # must be used from API
     return render_unauthorized_action unless @access_token
 
     # verify that we're sending them back to a host from the same instance
-    return_to = URI.parse(params[:return_to] || request.referer || root_url)
+    begin
+      return_to = URI.parse(params[:return_to] || request.referer || root_url)
+    rescue URI::InvalidURIError => e
+      Canvas::Errors.capture_exception(:login, e, :info)
+      return render json: { error: I18n.t('Invalid redirect URL') }, status: :bad_request
+    end
     return render_unauthorized_action unless return_to.absolute?
     host = return_to.host
     return render_unauthorized_action unless host == request.host

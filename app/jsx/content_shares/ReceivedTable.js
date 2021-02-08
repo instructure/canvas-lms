@@ -49,6 +49,24 @@ ReceivedTable.propTypes = {
 
 export default function ReceivedTable({shares, onPreview, onImport, onRemove, onUpdate}) {
   function renderActionMenu(share) {
+    const items = []
+    if (share.content_export?.workflow_state === 'exported') {
+      items.push(
+        <Menu.Item key="prv" data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
+          <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
+        </Menu.Item>
+      )
+      items.push(
+        <Menu.Item key="imp" data-testid="import-menu-action" onSelect={() => onImport(share)}>
+          <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
+        </Menu.Item>
+      )
+    }
+    items.push(
+      <Menu.Item key="rmv" data-testid="remove-menu-action" onSelect={() => onRemove(share)}>
+        <IconTrashLine /> <View margin="0 0 0 x-small">{I18n.t('Remove')}</View>
+      </Menu.Item>
+    )
     return (
       <Menu
         data-testid="action-menu"
@@ -60,15 +78,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
           </Button>
         }
       >
-        <Menu.Item data-testid="preview-menu-action" onSelect={() => onPreview(share)}>
-          <IconEyeLine /> <View margin="0 0 0 x-small">{I18n.t('Preview')}</View>
-        </Menu.Item>
-        <Menu.Item data-testid="import-menu-action" onSelect={() => onImport(share)}>
-          <IconImportLine /> <View margin="0 0 0 x-small">{I18n.t('Import')}</View>
-        </Menu.Item>
-        <Menu.Item data-testid="remove-menu-action" onSelect={() => onRemove(share)}>
-          <IconTrashLine /> <View margin="0 0 0 x-small">{I18n.t('Remove')}</View>
-        </Menu.Item>
+        {items}
       </Menu>
     )
   }
@@ -137,6 +147,28 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
     }
   }
 
+  function renderReceivedColumn(content_export) {
+    if (content_export && content_export.workflow_state === 'exported') {
+      return <FriendlyDatetime dateTime={content_export.created_at} />
+    } else if (
+      !content_export ||
+      content_export.workflow_state === 'failed' ||
+      content_export.workflow_state === 'deleted'
+    ) {
+      return (
+        <Text color="danger">
+          <em>{I18n.t('Failed')}</em>
+        </Text>
+      )
+    } else {
+      return (
+        <Text color="secondary">
+          <em>{I18n.t('Pending')}</em>
+        </Text>
+      )
+    }
+  }
+
   function renderRow(share) {
     return (
       <Table.Row key={share.id}>
@@ -155,9 +187,7 @@ export default function ReceivedTable({shares, onPreview, onImport, onRemove, on
           />{' '}
           {share.sender.display_name}
         </Table.Cell>
-        <Table.Cell>
-          <FriendlyDatetime dateTime={share.created_at} />
-        </Table.Cell>
+        <Table.Cell>{renderReceivedColumn(share.content_export)}</Table.Cell>
         <Table.Cell>{renderActionMenu(share)}</Table.Cell>
       </Table.Row>
     )

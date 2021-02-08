@@ -97,7 +97,9 @@ export default class OutcomeContentBase extends ValidatedFormView {
   }
 
   _cleanUpTiny() {
-    return RichContentEditor.destroyRCE(this.$el.find('[name="description"]'))
+    const rceElem = this.$el.find('[name="description"]')
+    RichContentEditor.closeRCE(rceElem)
+    return RichContentEditor.destroyRCE(rceElem)
   }
 
   submit(e) {
@@ -209,10 +211,27 @@ export default class OutcomeContentBase extends ValidatedFormView {
           this.remove()
           $('.add_outcome_link').focus()
         },
-        error: () =>
-          $.flashError(
-            I18n.t('flash.deleteError', 'Something went wrong. Unable to delete at this time.')
-          )
+        error: (_model, response) => {
+          if (
+            response.responseText.match(
+              /Outcome.*cannot be deleted because it is aligned to content/
+            )
+          ) {
+            $.flashError(
+              I18n.t(
+                'flash.userDeleteError',
+                'Outcome Group contains one or more Outcomes that are currently aligned to content.'
+              )
+            )
+          } else {
+            $.flashError(
+              I18n.t(
+                'flash.unexpectedDeleteError',
+                'Something went wrong. Unable to delete at this time.'
+              )
+            )
+          }
+        }
       })
     )
   }

@@ -32,9 +32,6 @@
     "align_right_9bad3ac1": {
         "message": "Sağa dayalı"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "Hizlama ve içerden başlatma"
-    },
     "all_4321c3a1": {
         "message": "Tümü"
     },
@@ -49,6 +46,9 @@
     },
     "alt_text_611fb322": {
         "message": "Etiket Metni"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "Dosya okunurken hata oluştu"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "Fırsatı gözardı etmeye çalışırken bir hata oluştu."
@@ -113,11 +113,20 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType } { title }, hatırlatıcı { datetime }."
     },
+    "attributes_963ba262": {
+        "message": "Özellikler"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "Ses ve Görüntü kaydı kullanılamaz."
     },
     "audio_player_for_title_20cc70d": {
         "message": "{ title } ses oynatıcı"
+    },
+    "available_folders_694d0436": {
+        "message": "Mevcut klasörler"
+    },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
     },
     "calendar_a8563bb2": {
         "message": "Takvim:"
@@ -131,14 +140,17 @@
     "canvas_planner_98ed106": {
         "message": "Canvas Planlayıcı"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas Eklentileri"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "Alt yazı dosyasını seçin"
     },
+    "choose_usage_rights_33683854": {
+        "message": "Kullanıcı haklarını seçin..."
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "sıralanmamış listeyi yuvarlak içine al"
+    },
+    "clear_2084585f": {
+        "message": "Temizle"
     },
     "clear_selected_file_82388e50": {
         "message": "Seçili dosyayı temizle"
@@ -164,11 +176,17 @@
     "computer_1d7dfa6f": {
         "message": "Bilgisayar"
     },
+    "content_1440204b": {
+        "message": "İçerik"
+    },
     "content_subtype_5ce35e88": {
         "message": "İçerik Alt Türü"
     },
     "content_type_2cf90d95": {
         "message": "İçerik Tipi"
+    },
+    "copyright_holder_66ee111": {
+        "message": "Telif Sahibi:"
     },
     "count_plural_one_item_loaded_other_items_loaded_857023b7": {
         "message": "{ count, plural,\n    one {}\n  other {}\n}"
@@ -199,6 +217,9 @@
     },
     "course_navigation_dd035109": {
         "message": "Ders Gezinme Menüsü"
+    },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons Lisansı:"
     },
     "current_volume_level_c55ab825": {
         "message": "Mevcut Ses Seviyesi"
@@ -281,14 +302,14 @@
     "embed_preview_2d741e1f": {
         "message": "Gömme Önizleme"
     },
-    "embed_video_code_703e10f2": {
-        "message": "Video Kodunu Göm"
-    },
     "excused_cf8792eb": {
         "message": "Mazeretli"
     },
     "external_links_3d9f074e": {
         "message": "Harici Bağlantılar"
+    },
+    "external_tools_6e77821": {
+        "message": "Harici Araçlar"
     },
     "extra_large_b6cdf1ff": {
         "message": "Ekstra Büyük"
@@ -323,6 +344,9 @@
     "finish_bc343002": {
         "message": "Tamamla"
     },
+    "format_4247a9c5": {
+        "message": "Format"
+    },
     "generating_preview_45b53be0": {
         "message": "Oluşturma önizlemesi..."
     },
@@ -349,6 +373,12 @@
     },
     "height_69b03e15": {
         "message": "Yükseklik"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "Bu dosyayı kullanmak için iznim var."
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "Telif hakkı bendedir"
     },
     "image_8ad06": {
         "message": "Görsel"
@@ -383,6 +413,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "Geçersiz dosya türü"
     },
+    "invalid_url_cbde79f": {
+        "message": "Geçersiz bağlantı"
+    },
     "keyboard_shortcuts_ed1844bd": {
         "message": "Klavye Kısayolları"
     },
@@ -391,9 +424,6 @@
     },
     "late_2be42b88": {
         "message": "Geç"
-    },
-    "left_to_right_d6da6d7e": {
-        "message": "soldan sağa"
     },
     "link_7262adec": {
         "message": "Bağlantı"
@@ -551,6 +581,12 @@
     "task_16b0ef38": {
         "message": "Görev"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "Bu malzeme genel kullanıma açık"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "Bu malzeme Creative Commons a göre lisanslı"
+    },
     "time_2b5aac58": {
         "message": "Süre"
     },
@@ -617,6 +653,9 @@
     "url_22a5f3b8": {
         "message": "URL"
     },
+    "usage_right_ff96f3e2": {
+        "message": "Kullanım Şartları:"
+    },
     "used_by_screen_readers_to_describe_the_content_of__b1e76d9e": {
         "message": "Ekran okuyucuları tarafından bir görselin içeriğini açıklamak için kullanılır"
     },
@@ -640,6 +679,9 @@
     },
     "video_player_b371005": {
         "message": "Video Oynatıcı"
+    },
+    "view_ba339f93": {
+        "message": "Göster"
     },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "Klavye Kısayollarını Göster"

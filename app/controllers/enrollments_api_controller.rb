@@ -416,14 +416,17 @@ class EnrollmentsApiController < ApplicationController
   #
   # @returns [Enrollment]
   def index
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       endpoint_scope = (@context.is_a?(Course) ? (@section.present? ? "section" : "course") : "user")
 
       return unless enrollments = @context.is_a?(Course) ?
                                     course_index_enrollments :
                                     user_index_enrollments
 
-      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index)
+      # a few specific developer keys temporarily need bookmarking disabled, see INTEROP-5326
+      pagination_override_key_list = Setting.get("pagination_override_key_list", "").split(',').map(&:to_i)
+      use_numeric_pagination_override = pagination_override_key_list.include?(@access_token&.global_developer_key_id)
+      use_bookmarking = @domain_root_account&.feature_enabled?(:bookmarking_for_enrollments_index) && !use_numeric_pagination_override
       enrollments = use_bookmarking ?
         enrollments.joins(:user).select("enrollments.*, users.sortable_name AS sortable_name") :
         enrollments.joins(:user).select("enrollments.*").
@@ -512,7 +515,7 @@ class EnrollmentsApiController < ApplicationController
   #  The ID of the enrollment object
   # @returns Enrollment
   def show
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       enrollment = @context.all_enrollments.find(params[:id])
       if enrollment.user_id == @current_user.id || authorized_action(@context, @current_user, :read_roster)
         render :json => enrollment_json(enrollment, @current_user, session)
@@ -623,7 +626,7 @@ class EnrollmentsApiController < ApplicationController
         role = @context.account.get_course_role_by_name(role_name)
       else
         type = "StudentEnrollment" if type.blank?
-        role = Role.get_built_in_role(type)
+        role = Role.get_built_in_role(type, root_account_id: @context.root_account_id)
         if role.nil? || !role.course_role?
           errors << @@errors[:bad_type]
         end
@@ -647,7 +650,6 @@ class EnrollmentsApiController < ApplicationController
     return render_create_errors(errors) if errors.present?
 
     # create enrollment
-
     params[:enrollment][:no_notify] = true unless value_to_boolean(params[:enrollment][:notify])
     unless @current_user.can_create_enrollment_for?(@context, session, type)
       render_unauthorized_action && return
@@ -660,7 +662,6 @@ class EnrollmentsApiController < ApplicationController
     api_user_id = params[:enrollment].delete(:user_id)
     user = api_find(User, api_user_id)
     raise(ActiveRecord::RecordNotFound, "Couldn't find User with API id '#{api_user_id}'") unless user.can_be_enrolled_in_course?(@context)
-
     if @context.concluded?
       # allow moving users already in the course to open sections
       unless @section && user.enrollments.shard(@context.shard).where(course_id: @context).exists? && !@section.concluded?
@@ -673,6 +674,9 @@ class EnrollmentsApiController < ApplicationController
 
     DueDateCacher.with_executing_user(@current_user) do
       @enrollment = @context.enroll_user(user, type, params[:enrollment].merge(:allow_multiple_enrollments => true))
+      if @enrollment.assigned_observer? && !user.observation_link?(@enrollment.associated_user, @context.root_account_id)
+        UserObservationLink.create_or_restore(student: @enrollment.associated_user, observer: user, root_account: @context.root_account)
+      end
     end
 
     @enrollment.valid? ?
@@ -962,12 +966,6 @@ class EnrollmentsApiController < ApplicationController
       role_ids = Array(role_ids).map(&:to_i)
       condition = 'enrollments.role_id IN (:role_ids)'
       replacements[:role_ids] = role_ids
-
-      built_in_roles = role_ids.map{|r_id| Role.built_in_roles_by_id[r_id]}.compact
-      if built_in_roles.present?
-        condition = "(#{condition} OR (enrollments.role_id IS NULL AND enrollments.type IN (:built_in_role_types)))"
-        replacements[:built_in_role_types] = built_in_roles.map(&:name)
-      end
       clauses << condition
     elsif type.present?
       clauses << 'enrollments.type IN (:type)'
@@ -995,7 +993,7 @@ class EnrollmentsApiController < ApplicationController
   def enrollment_states_for_state_param
     states = Array(params[:state]).uniq
     states.concat(%w(active invited)) if states.delete 'current_and_invited'
-    states.concat(%w(active invited creation_pending)) if states.delete 'current_and_future'
+    states.concat(%w(active invited creation_pending pending_active pending_invited)) if states.delete 'current_and_future'
     states.concat(%w(active completed)) if states.delete 'current_and_concluded'
     states.uniq
   end

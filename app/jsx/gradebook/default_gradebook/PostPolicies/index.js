@@ -114,6 +114,10 @@ export default class PostPolicies {
     const assignment = this._gradebook.getAssignment(assignmentId)
     const {anonymous_grading, grades_published, id, name} = assignment
     const sections = this._gradebook.getSections()
+    const studentsWithVisibility = Object.values(
+      this._gradebook.studentsThatCanSeeAssignment(assignment.id)
+    )
+    const submissions = studentsWithVisibility.map(student => getSubmission(student, assignment.id))
 
     const HideAssignmentGradesTray = await AsyncComponents.loadHideAssignmentGradesTray()
 
@@ -133,7 +137,8 @@ export default class PostPolicies {
       },
       onExited,
       onHidden: this._onGradesPostedOrHidden,
-      sections
+      sections,
+      submissions
     })
   }
 

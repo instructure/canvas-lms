@@ -44,22 +44,3 @@ test('onDateSubmit calls correct function', () => {
   const node = tree.find('Text')
   expect(node.text()).toBe('Last day attended')
 })
-
-test('onDateSubmit sets correct error for invalid date', () => {
-  const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  const instance = tree.instance()
-  instance.onDateSubmit({}, 'Invalid Date')
-  expect(tree.state('messages')[0].type).toBe('error')
-})
-
-test('checkDateValidations returns no messages for real date', () => {
-  const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  const instance = tree.instance()
-  expect(instance.checkDateValidations('2018-03-04T07:00:00.000Z')).toEqual([])
-})
-
-test('checkDateValidations returns error messages for invalid date', () => {
-  const tree = mount(<StudentLastAttended {...defaultProps()} />)
-  const instance = tree.instance()
-  expect(instance.checkDateValidations('Invalid Date')[0].type).toBe('error')
-})

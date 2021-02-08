@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -19,19 +21,18 @@
 class AppointmentGroup < ActiveRecord::Base
   include Workflow
   include TextHelper
-  include HtmlTextHelper
 
-  has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context }
+  has_many :appointments, -> { order(:start_at).preload(:child_events).where("calendar_events.workflow_state <> 'deleted'") }, **(opts = { class_name: 'CalendarEvent', as: :context, inverse_of: :context })
   # has_many :through on the same table does not alias columns in condition
   # strings, just hashes. we create this helper association to ensure
   # appointments_participants conditions have the correct table alias
-  has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, opts
+  has_many :_appointments, -> { order(:start_at).preload(:child_events).where("_appointments_appointments_participants.workflow_state <> 'deleted'") }, **opts
   has_many :appointments_participants, -> { where("calendar_events.workflow_state <> 'deleted'").order(:start_at) }, through: :_appointments, source: :child_events
   has_many :appointment_group_contexts
   has_many :appointment_group_sub_contexts, -> { preload(:sub_context) }
 
   def context
-    appointment_group_contexts.first.context
+    appointment_group_contexts.first&.context
   end
 
   def contexts
@@ -196,7 +197,7 @@ class AppointmentGroup < ActiveRecord::Base
               "ON appointment_groups.id = agc.appointment_group_id " \
               "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
-        where(<<-COND, codes[:primary], codes[:secondary])
+        where(<<~COND, codes[:primary], codes[:secondary])
         workflow_state = 'active'
         AND agc.context_code IN (?)
         AND (
@@ -220,7 +221,7 @@ class AppointmentGroup < ActiveRecord::Base
               "ON appointment_groups.id = agc.appointment_group_id " \
               "LEFT JOIN #{AppointmentGroupSubContext.quoted_table_name} sc " \
               "ON appointment_groups.id = sc.appointment_group_id").
-        where(<<-COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
+        where(<<~COND, codes[:full] + codes[:limited], codes[:full], codes[:secondary])
         workflow_state <> 'deleted'
         AND agc.context_code IN (?)
         AND (
@@ -260,21 +261,34 @@ class AppointmentGroup < ActiveRecord::Base
     can :read_appointment_participants
   end
 
+  def broadcast_data
+    data = {}
+    ids = appointment_group_contexts.where(context_type: 'Course').
+      joins("INNER JOIN #{Course.quoted_table_name} ON courses.id = context_id").pluck(:context_id, :root_account_id)
+    ids += appointment_group_contexts.where(context_type: 'CourseSection').
+      joins("INNER JOIN #{CourseSection.quoted_table_name} ON course_sections.id = context_id").pluck(:course_id, :root_account_id)
+    data[:root_account_id] = ids.map(&:last).first
+    data[:course_ids] = ids.map(&:first).sort
+    data
+  end
+
   has_a_broadcast_policy
 
   set_broadcast_policy do
     dispatch :appointment_group_published
     to       { possible_users }
     whenever { contexts.any?(&:available?) && active? && saved_change_to_workflow_state? }
+    data     { broadcast_data}
 
     dispatch :appointment_group_updated
     to       { possible_users }
     whenever { contexts.any?(&:available?) && active? && new_appointments && !saved_change_to_workflow_state? }
+    data     { broadcast_data}
 
     dispatch :appointment_group_deleted
     to       { possible_users }
     whenever { contexts.any?(&:available?) && changed_state(:deleted, :active) }
-    data     { {:cancel_reason => @cancel_reason} }
+    data     { broadcast_data.merge({:cancel_reason => @cancel_reason}) }
   end
 
   def possible_users
@@ -393,23 +407,18 @@ class AppointmentGroup < ActiveRecord::Base
     :location_address
   ]
 
-  def description_html
-    format_message(description).first if description
-  end
-
   def update_appointments
     changed = Hash[
       EVENT_ATTRIBUTES.select{ |attr| saved_change_to_attribute?(attr) }.
-      map{ |attr| [attr, attr == :description ? description_html : send(attr)] }
+      map{ |attr| [attr, send(attr)] }
     ]
 
     if @contexts_changed
+      changed[:root_account_id] = self.context&.root_account_id
       changed[:effective_context_code] = contexts.map(&:asset_string).join(",")
     end
 
-    return unless changed.present?
-
-    desc = changed.delete :description
+    return if changed.blank?
 
     if changed.present?
       appointments.update_all(changed)
@@ -417,12 +426,10 @@ class AppointmentGroup < ActiveRecord::Base
     end
 
     if changed.present?
-      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }).update_all(changed)
-    end
-
-    if desc
-      appointments.where(:description => description_before_last_save).update_all(:description => desc)
-      CalendarEvent.joins(:parent_event).where(workflow_state: ['active', 'locked'], parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }, description: description_before_last_save).update_all(:description => desc)
+      CalendarEvent.joins(:parent_event).where(
+          workflow_state: ['active', 'locked'],
+          parent_events_calendar_events: { context_id: self, context_type: 'AppointmentGroup' }
+      ).update_all(changed)
     end
 
     @new_appointments.each(&:reload) if @new_appointments.present?

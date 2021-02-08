@@ -64,10 +64,12 @@ const filterModel = new DiscussionFilterState()
 ready(() => {
   const discussionTopicToolbarView = new DiscussionTopicToolbarView({el: '#discussion-managebar'})
 
-  ReactDOM.render(
-    <DiscussionTopicKeyboardShortcutModal />,
-    document.getElementById('keyboard-shortcut-modal')
-  )
+  if (!window.ENV.disable_keyboard_shortcuts) {
+    ReactDOM.render(
+      <DiscussionTopicKeyboardShortcutModal />,
+      document.getElementById('keyboard-shortcut-modal')
+    )
+  }
 
   // Rendering of the section tooltip
   const container = document.querySelector('#section_tooltip_root')

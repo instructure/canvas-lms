@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 
 class MultiCache
   class << self
-    delegate :fetch, :delete, to: :cache
+    delegate :fetch, :delete, :validate_consul_event, to: :cache
 
     def cache
       unless defined?(@multi_cache)

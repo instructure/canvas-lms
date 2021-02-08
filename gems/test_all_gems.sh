@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -o xtrace
+
 result=0
 
 pushd "$(dirname $0)"

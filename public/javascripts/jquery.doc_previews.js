@@ -86,7 +86,13 @@ $.fn.loadDocPreview = function(options) {
     function tellAppIViewedThisInline(serviceUsed) {
       // if I have a url to ping back to the app that I viewed this file inline, ping it.
       if (opts.attachment_view_inline_ping_url) {
-        $.ajaxJSON(opts.attachment_view_inline_ping_url, 'POST', {}, () => {}, () => {})
+        $.ajaxJSON(
+          opts.attachment_view_inline_ping_url,
+          'POST',
+          {},
+          () => {},
+          () => {}
+        )
         trackEvent(
           'Doc Previews',
           serviceUsed,
@@ -171,9 +177,18 @@ $.fn.loadDocPreview = function(options) {
       if (opts.public_url) {
         loadGooglePreview()
       } else if (opts.attachment_id) {
-        let url = '/api/v1/files/' + opts.attachment_id + '/public_url.json'
+        let url = `/api/v1/files/${opts.attachment_id}/public_url.json`
         if (opts.submission_id) {
           url += '?' + $.param({submission_id: opts.submission_id})
+        }
+        if (opts.verifier) {
+          url += `${opts.submission_id ? '&' : '?'}verifier=${opts.verifier}`
+        } else {
+          const match = window.location.search.match(/verifier=([^&]+)(?:&|$)/)
+          const ver = match && match[1]
+          if (ver) {
+            url += `${opts.submission_id ? '&' : '?'}verifier=${ver}`
+          }
         }
         $this.loadingImage()
         $.ajaxJSON(url, 'GET', {}, data => {

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -24,8 +26,6 @@ describe Api::V1::PlannerOverride do
 
   before :once do
     course_factory active_all: true
-    @course.root_account.enable_feature!(:student_planner)
-
     student_in_course active_all: true
   end
 

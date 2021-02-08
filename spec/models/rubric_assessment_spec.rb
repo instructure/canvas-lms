@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -31,6 +33,39 @@ describe RubricAssessment do
     rubric_model
     @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
   end
+
+  describe "active_rubric_association?" do
+    before(:once) do
+      @assessment = @association.assess({
+        :user => @student,
+        :assessor => @teacher,
+        :artifact => @assignment.find_or_create_submission(@student),
+        :assessment => {
+          :assessment_type => 'grading',
+          :criterion_crit1 => {
+            :points => 5,
+            :comments => "comments",
+          }
+        }
+      })
+    end
+
+    it "returns false if there is no rubric association" do
+      @assessment.update!(rubric_association: nil)
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@assessment).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@assessment).to be_active_rubric_association
+    end
+  end
+
+  it { is_expected.to have_many(:learning_outcome_results).dependent(:destroy) }
 
   it "should htmlify the rating comments" do
     comment = "Hi, please see www.example.com.\n\nThanks."
@@ -215,6 +250,23 @@ describe RubricAssessment do
         @course.enroll_student(@student, enrollment_state: :active)
       end
 
+      it 'assessing a rubric with outcome criterion should increment datadog counter' do
+        expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome_result.create')
+        @outcome.update!(data: nil)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => '3'
+            }
+          }
+        })
+      end
+
       it 'should use default ratings for scoring' do
         @outcome.update!(data: nil)
         criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
@@ -285,6 +337,23 @@ describe RubricAssessment do
         })
         expect(assessment.hide_points).to be true
         expect(LearningOutcomeResult.last.hide_points).to be true
+      end
+
+      it "should truncate the learning outcome result title to 250 characters" do
+        @association.update!(title: 'a'*255)
+        criterion_id = "criterion_#{@rubric.data[0][:id]}".to_sym
+        @association.assess({
+          :user => @student,
+          :assessor => @teacher,
+          :artifact => @assignment.find_or_create_submission(@student),
+          :assessment => {
+            :assessment_type => 'grading',
+            criterion_id => {
+              :points => "5"
+            }
+          }
+        })
+        expect(LearningOutcomeResult.last.title.length).to eq 250
       end
 
       it "propagates hide_outcome_results value" do

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -302,8 +304,11 @@ describe ContextModule do
   end
 
   describe "add_item" do
-    it "should add an assignment" do
+    before :once do
       course_module
+    end
+
+    it "should add an assignment" do
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag = @module.add_item({:id => @assignment.id, :type => 'assignment'}) #@assignment)
 
@@ -312,13 +317,23 @@ describe ContextModule do
     end
 
     it "should not add an invalid assignment" do
-      course_module
       @tag = @module.add_item({:id => 21, :type => 'assignment'})
       expect(@tag).to be_nil
     end
 
+    it "prefers the linked discussion topic when a graded topic's assignment is added" do
+      topic = graded_discussion_topic(context: @course)
+      tag = @module.add_item({:id => topic.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql topic
+    end
+
+    it "prefers the linked quiz when a quiz's assignment is added" do
+      quiz = quiz_model(course: @course, quiz_type: :assignment)
+      tag = @module.add_item({:id => quiz.assignment.id, :type => 'assignment'})
+      expect(tag.content).to eql quiz
+    end
+
     it "should add a wiki page" do
-      course_module
       @page = @course.wiki_pages.create!(:title => "some page")
       @tag = @module.add_item({:id => @page.id, :type => 'wiki_page'}) #@page)
 
@@ -327,7 +342,6 @@ describe ContextModule do
     end
 
     it "should not add invalid wiki pages" do
-      course_module
       @course.wiki
       other_course = Account.default.courses.create!
       @page = other_course.wiki_pages.create!(:title => "new page")
@@ -336,7 +350,6 @@ describe ContextModule do
     end
 
     it "should add an attachment" do
-      course_module
       @file = @course.attachments.create!(:display_name => "some file", :uploaded_data => default_uploaded_data)
       @tag = @module.add_item({:id => @file.id, :type => 'attachment'}) #@file)
 
@@ -345,7 +358,6 @@ describe ContextModule do
     end
 
     it "should allow adding items more than once" do
-      course_module
       @assignment = @course.assignments.create!(:title => "some assignment")
       @tag1 = @module.add_item(:id => @assignment.id, :type => "assignment")
       @tag2 = @module.add_item(:id => @assignment.id, :type => "assignment")
@@ -361,13 +373,11 @@ describe ContextModule do
     end
 
     it "should add a header as unpublished" do
-      course_module
       tag = @module.add_item(type: 'context_module_sub_header', title: 'unpublished header')
       expect(tag.unpublished?).to be_truthy
     end
 
     it "should add an external url" do
-      course_module
       @tag = @module.add_item(
         :type => 'external_url',
         :url => "http://www.instructure.com",
@@ -379,6 +389,44 @@ describe ContextModule do
       @module.save!
 
       expect(@module.content_tags).to be_include(@tag)
+    end
+
+    describe 'when adding an LTI 1.3 external tool' do
+      let(:tool) {
+        @course.context_external_tools.create!(
+          name: 'tool', consumer_key: '1', shared_secret: '1',
+          url: 'http://example.com/', developer_key: DeveloperKey.create!,
+          settings: {use_1_3: true}
+        )
+      }
+
+      let(:args) {
+        {
+          type: 'context_external_tool',
+          id: tool.id,
+          title: 'The tool',
+          url: 'http://example.com/',
+          indent: 0,
+          position: 0,
+          tag_type: 'context_module',
+        }
+      }
+
+      it 'should add an external tool with resource link and custom params' do
+        @tag = @module.add_item(args.merge(custom_params: {'foo' => 'bar'}))
+        @module.workflow_state = 'published'
+        @module.save!
+
+        expect(@module.content_tags).to be_include(@tag)
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
+
+      it 'should add an external tool with custom params in a JSON string' do
+        @tag = @module.add_item(args.merge(custom_params: '{"foo":"bar"}'))
+        expect(@tag.associated_asset).to be_a(Lti::ResourceLink)
+        expect(@tag.associated_asset.custom).to eq('foo' => 'bar')
+      end
     end
   end
 
@@ -465,6 +513,14 @@ describe ContextModule do
       m.insert_items([@quiz.assignment.reload, @topic.assignment.reload])
       expect(m.content_tags.map(&:content_type)).to eq(%w(Quizzes::Quiz DiscussionTopic))
       expect(m.content_tags.map(&:content_id)).to eq([@quiz.id, @topic.id])
+    end
+
+    it "doesn't add duplicate items" do
+      @module.add_item(type: 'assignment', id: @assign.id)
+      @module.insert_items([@page, @assign, @quiz])
+      expect(@module.content_tags.pluck(:content_type)).to eq(
+        ['ContextModuleSubHeader', 'ContextModuleSubHeader', 'ContextModuleSubHeader',
+         'Assignment', 'WikiPage', 'Quizzes::Quiz'])
     end
   end
 
@@ -1450,6 +1506,46 @@ describe ContextModule do
       @module.destroy
       @module.restore
       expect(@module.reload).to be_unpublished
+    end
+
+    it "should restore module items that were deleted at the same time the module was" do
+      course_factory
+      @module = @course.context_modules.create!
+      @a0 = @course.assignments.create! :name => 'a0'
+      @a1 = @course.assignments.create! :name => 'a1', :workflow_state => 'unpublished'
+      @a2 = @course.assignments.create! :name => 'a2', :workflow_state => 'published'
+      @p1 = @course.wiki_pages.create! :title => 'p1', :workflow_state => 'unpublished'
+      @p2 = @course.wiki_pages.create! :title => 'p2', :workflow_state => 'active'
+      Timecop.travel(2.weeks.ago) do
+        @module.add_item :type => 'sub_header', :title => 'foo'
+        @doomed_header = @module.add_item :type => 'sub_header', :title => 'baz'
+        @doomed_assignment = @module.add_item :type => 'assignment', :id => @a0.id
+      end
+      Timecop.travel(1.week.ago) do
+        @module.add_item :type => 'assignment', :id => @a1.id
+        @module.add_item :type => 'assignment', :id => @a2.id
+        @module.add_item :type => 'wiki_page', :id => @p1.id
+        @module.add_item :type => 'wiki_page', :id => @p2.id
+      end
+      Timecop.travel(6.days.ago) do
+        # these should not be restored because they were deleted before the module was
+        @doomed_header.destroy
+        @doomed_assignment.destroy
+      end
+      Timecop.travel(5.days.ago) do
+        @module.destroy
+      end
+      Timecop.travel(3.days.ago) do
+        @p1.destroy # don't restore tag for deleted asset
+        @p2.title = 'p2-renamed' # test updating restored tag with current asset name
+        @p2.save!
+      end
+      @module.restore
+      tags = @module.content_tags.not_deleted.order(:position).to_a
+      expect(tags.size).to eq 4
+      expect(tags.map(&:content_id)).to eq([0, @a1.id, @a2.id, @p2.id])
+      expect(tags.map(&:title)).to eq(['foo', 'a1', 'a2', 'p2-renamed'])
+      expect(tags.map(&:workflow_state)).to eq(['unpublished', 'unpublished', 'active', 'active'])
     end
   end
 

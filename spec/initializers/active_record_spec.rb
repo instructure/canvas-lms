@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module ActiveRecord
 
       it 'escapes special characters in the query' do
         %w(% _).each do |char|
-          expect(Base.wildcard_pattern('some' << char << 'string')).to include('some\\' << char << 'string')
+          expect(Base.wildcard_pattern('some' + char + 'string')).to include('some\\' + char + 'string')
         end
       end
 
@@ -194,6 +196,27 @@ module ActiveRecord
         end
 
       end
+
+      describe "with id plucking" do
+        it "should iterate through all selected rows" do
+          users = Set.new
+          3.times { users << user_model }
+          found = Set.new
+          User.find_in_batches(strategy: :pluck_ids, batch_size: 1) do |u_batch|
+            u_batch.each{|u| found << u }
+          end
+          expect(found).to eq users
+        end
+
+        it "keeps the specified order" do
+          [ "user_F", "user_D", "user_A", "user_C", "user_B", "user_E"].map{ |name| user_model(name: name) }
+          names = []
+          User.order(:name).find_in_batches(strategy: :pluck_ids, batch_size: 3) do |u_batch|
+            names += u_batch.map(&:name)
+          end
+          expect(names).to eq(["user_A", "user_B", "user_C", "user_D", "user_E", "user_F"])
+        end
+      end
     end
 
     describe ".bulk_insert" do
@@ -210,6 +233,35 @@ module ActiveRecord
         expect do
           Auditors::ActiveRecord::AuthenticationRecord.bulk_insert([attrs])
         end.to raise_error(ActiveRecord::InvalidForeignKey)
+      end
+
+      it "writes to the correct partition" do
+        user = user_with_pseudonym(active_user: true)
+        pseud = @pseudonym
+        attrs_1 = {
+          'request_id' => 'abcde-12345',
+          'uuid' => 'edcba-54321',
+          'account_id' => Account.default.id,
+          'user_id' => user.id,
+          'pseudonym_id' => pseud.id,
+          'event_type' => 'login',
+          'created_at' => DateTime.now.utc
+        }
+        attrs_2 = attrs_1.merge({
+          'created_at' => 40.days.ago
+        })
+        ar_type = Auditors::ActiveRecord::AuthenticationRecord
+        expect { ar_type.bulk_insert([attrs_1, attrs_2]) }.to_not raise_error
+        conn = ar_type.connection
+        root_partition_count = conn.execute("select count(*) from only #{ar_type.quoted_table_name};")[0]["count"]
+        expect(root_partition_count).to eq(0)
+        expect(ar_type.count).to eq(2)
+        now_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_1))
+        now_partition_count = conn.execute("select count(*) from #{now_partition_name};")[0]["count"]
+        expect(now_partition_count).to eq(1)
+        prev_partition_name = conn.quote_table_name(ar_type.infer_partition_table_name(attrs_2))
+        prev_partition_count = conn.execute("select count(*) from #{prev_partition_name};")[0]["count"]
+        expect(prev_partition_count).to eq(1)
       end
     end
 
@@ -381,8 +433,16 @@ module ActiveRecord
         expect { User.connection.remove_foreign_key(:discussion_topics, :conversations, if_exists: true) }.not_to raise_exception
       end
 
+      it "remove_foreign_key allows column and if_exists" do
+        expect { User.connection.remove_foreign_key(:enrollments, column: :associated_user_id, if_exists: true) }.not_to raise_exception
+      end
+
       it "foreign_key_for prefers a 'bare' FK first" do
-        expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+        if CANVAS_RAILS5_2
+          expect(User.connection.foreign_key_for(:enrollments, :users).column).to eq 'user_id'
+        else
+          expect(User.connection.foreign_key_for(:enrollments, to_table: :users).column).to eq 'user_id'
+        end
       end
 
       it "remove_index allows if_exists" do

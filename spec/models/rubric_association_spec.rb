@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -436,6 +438,44 @@ describe RubricAssociation do
       sub_account = root_account.sub_accounts.create!
       rubric_association_model({context: sub_account})
       expect(@rubric_association.root_account_id).to eq sub_account.root_account_id
+    end
+  end
+
+  describe "workflow_state" do
+    before(:once) do
+      @course = Course.create!
+      @rubric = @course.rubrics.create!
+      @association = RubricAssociation.create!(
+        rubric: @rubric,
+        association_object: @course,
+        context: @course,
+        purpose: "bookmark"
+      )
+    end
+
+    it "is set to 'active' by default" do
+      expect(@association).to be_active
+    end
+
+    it "gets set to 'deleted' when soft-deleted" do
+      expect { @association.destroy }.to change {
+        @association.workflow_state
+      }.from("active").to("deleted")
+    end
+  end
+
+  describe "#restore" do
+    it "sets the workflow_state to 'active'" do
+      course = Course.create!
+      rubric = course.rubrics.create!
+      association = RubricAssociation.create!(
+        rubric: rubric,
+        association_object: course,
+        context: course,
+        purpose: "bookmark"
+      )
+      association.destroy
+      expect { association.restore }.to change { association.workflow_state }.from("deleted").to("active")
     end
   end
 end

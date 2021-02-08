@@ -71,8 +71,8 @@
 class MediaObjectsController < ApplicationController
   include Api::V1::MediaObject
 
-  before_action :load_media_object, :except => [:index, :update_media_object]
-  before_action :require_user, :except => [:show, :iframe_media_player]
+  before_action :load_media_object, except: %i[index update_media_object]
+  before_action :require_user, except: %i[show iframe_media_player]
 
   # @{not an}API Show Media Object Details
   # This isn't an API because it needs to work for non-logged in users (video in public course)
@@ -85,14 +85,14 @@ class MediaObjectsController < ApplicationController
   #
   # @returns MediaObject
   def show
-    render :json => media_object_api_json(@media_object, @current_user, session)
+    render json: media_object_api_json(@media_object, @current_user, session)
   end
 
   # @API List Media Objects
   #
-  # Returns Media Objects created by the user making the request. When
-  # using the second version, returns
-  # only those Media Objects associated with the given course.
+  # Returns media objects created by the user making the request. When
+  # using the second version, returns media objects associated with
+  # the given course.
   #
   # @argument sort [String, "title"|"created_at"]
   #   Field to sort on. Default is "title"
@@ -120,29 +120,43 @@ class MediaObjectsController < ApplicationController
   #
   # @returns [MediaObject]
   def index
-    scope = MediaObject.active.where(user: @current_user)
     if params[:course_id]
-      course = Course.find(params[:course_id])
-      root_folder = Folder.root_folders(course).first
+      context = Course.find(params[:course_id])
+      url = api_v1_course_media_objects_url
+    elsif params[:group_id]
+      context = Group.find(params[:group_id])
+      url = api_v1_group_media_objects_url
+    end
+    if context
+      root_folder = Folder.root_folders(context).first
+
       if root_folder.grants_right?(@current_user, :read_contents)
-        # return all media objects with one visible matching attachment in course
-        scope = scope.where(:context => course).
-          where("EXISTS (?)", Attachments::ScopedToUser.new(course, @current_user).scope.
-            where("attachments.media_entry_id=media_objects.media_id"))
+        # if the user has access to the context's root folder, let's
+        # assume they have access to the context's media, even if it's
+        # media not associated with an Attachment in there
+        scope = MediaObject.active.where(context: context)
       else
-        return render_unauthorized_action # not allowed to view files in the course
+        return render_unauthorized_action # not allowed to view files in the context
       end
+    else
+      scope = MediaObject.active.where(context: @current_user)
+      url = api_v1_media_objects_url
     end
 
-    order_dir = params[:order] == "desc" ? "desc" : "asc"
-    order_by = params[:sort] || "title"
-    order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)') if order_by == "title"
+    order_dir = params[:order] == 'desc' ? 'desc' : 'asc'
+    order_by = params[:sort] || 'title'
+    if order_by == 'title'
+      order_by = MediaObject.best_unicode_collation_key('COALESCE(user_entered_title, title)')
+    end
     scope = scope.order(order_by => order_dir)
+    scope = MediaObject.search_by_attribute(scope, :title, params[:search_term])
 
     exclude = params[:exclude] || []
-    media_objects = Api.paginate(scope, self, api_v1_media_objects_url).
-      map{ |mo| media_object_api_json(mo, @current_user, session, exclude)}
-    render :json => media_objects
+    media_objects =
+      Api.paginate(scope, self, url).map do |mo|
+        media_object_api_json(mo, @current_user, session, exclude)
+      end
+    render json: media_objects
   end
 
   # @API Update Media Object
@@ -150,20 +164,28 @@ class MediaObjectsController < ApplicationController
   # @argument user_entered_title [String] The new title.
   #
   def update_media_object
+    # media objects don't have any permissions associated with them,
+    # so we just check that this is the user's media
+
     if params[:media_object_id]
       @media_object = MediaObject.by_media_id(params[:media_object_id]).first
 
       return render_unauthorized_action unless @media_object
       return render_unauthorized_action unless @current_user&.id
-      # media objects don't have any permissions associated with them,
-      # so we just check that this is the user's media
+
       return render_unauthorized_action unless @media_object.user_id == @current_user.id
-      return render json: {message: "The user_entered_title parameter must have a value"}, status: :bad_request if params[:user_entered_title].blank?
+      if params[:user_entered_title].blank?
+        return(
+          render json: { message: 'The user_entered_title parameter must have a value' },
+                 status: :bad_request
+        )
+      end
 
       self.extend TextHelper
-      @media_object.user_entered_title = CanvasTextHelper.truncate_text(params[:user_entered_title], :max_length => 255)
+      @media_object.user_entered_title =
+        CanvasTextHelper.truncate_text(params[:user_entered_title], max_length: 255)
       @media_object.save!
-      render :json => media_object_api_json(@media_object, @current_user, session, ["sources", "tracks"])
+      render json: media_object_api_json(@media_object, @current_user, session, %w[sources tracks])
     end
   end
 
@@ -171,24 +193,25 @@ class MediaObjectsController < ApplicationController
     # Exclude all global includes from this page
     @exclude_account_js = true
 
-    js_env media_object: media_object_api_json(@media_object, @current_user, session)
+    js_env media_object: media_object_api_json(@media_object, @current_user, session) if @media_object
     js_bundle :media_player_iframe_content
     css_bundle :media_player
-    render html: "<div><div>#{I18n.t('Loading...')}</div></div>".html_safe, layout: 'layouts/bare'
+    render html: "<div id='player_container'>#{I18n.t('Loading...')}</div>".html_safe,
+           layout: 'layouts/bare'
   end
 
   private
 
   def load_media_object
+    return nil unless params[:media_object_id].present?
     @media_object = MediaObject.by_media_id(params[:media_object_id]).first
     unless @media_object
       # Unfortunately, we don't have media_object entities created for everything,
       # so we use this opportunity to create the object if it does not exist.
       @media_object = MediaObject.create_if_id_exists(params[:media_object_id])
-      @media_object.send_later_enqueue_args(:retrieve_details, {
-        :singleton => "retrieve_media_details:#{@media_object.media_id}"
-      })
-      increment_request_cost(Setting.get("missed_media_additional_request_cost", "200").to_i)
+      raise ActiveRecord::RecordNotFound, "invalid media_object_id" unless @media_object
+      @media_object.delay(singleton: "retrieve_media_details:#{@media_object.media_id}").retrieve_details
+      increment_request_cost(Setting.get('missed_media_additional_request_cost', '200').to_i)
     end
 
     @media_object.viewed!

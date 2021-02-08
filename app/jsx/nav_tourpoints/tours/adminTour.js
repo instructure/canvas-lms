@@ -22,6 +22,7 @@ import {Text} from '@instructure/ui-text'
 import {Heading} from '@instructure/ui-heading'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import handleOpenTray from '../handleOpenTray'
+import assetFactory from 'jsx/celebrations/assetFactory'
 
 export default [
   {
@@ -53,7 +54,7 @@ export default [
           <li>{I18n.t('Find Training Resources and More Help')}</li>
         </ol>
         <div className="tour-star-image" aria-hidden>
-          <img src={require('../../confetti/svg/Star.svg')} alt={I18n.t('star')} />
+          <img src={assetFactory('star')} alt={I18n.t('star')} />
         </div>
       </section>
     )
@@ -64,12 +65,12 @@ export default [
       <section>
         <Heading level="h3">{I18n.t('Add People and Courses to Canvas')}</Heading>
         <ScreenReaderContent>
-          {I18n.t('Click on the admin navigation button to access account settings.')}
+          {I18n.t('Click the admin navigation button to access account settings.')}
         </ScreenReaderContent>
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-10766-421455347"
+            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-a-course-in-an-account-as-an-admin/ta-p/158"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -79,7 +80,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-12632-421473704"
+            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-add-users-to-an-account/ta-p/90"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -89,7 +90,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-10840-4214527607"
+            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-import-SIS-data-to-a-Canvas-account/ta-p/98"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -112,7 +113,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-16697-blueprint-courses-and-canvas-commons-comparison-pdf"
+            href="https://community.canvaslms.com/t5/Resource-Documents/Blueprint-Courses-and-Canvas-Commons-Comparison-PDF/ta-p/387051"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -133,7 +134,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-18572-conferences-resources"
+            href="https://community.canvaslms.com/t5/Contingency-Planning/Web-Conferencing-Resources/ba-p/262674"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -156,7 +157,7 @@ export default [
         <Text as="p">
           <Link
             as="a"
-            href="https://community.canvaslms.com/docs/DOC-17985-how-do-i-use-the-training-services-portal-as-an-admin"
+            href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-use-the-Training-Services-Portal-as-an-admin/ta-p/198"
             target="_blank"
             rel="noopener noreferrer"
           >

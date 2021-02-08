@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -36,6 +38,8 @@ class Types::MutationType < Types::ApplicationObjectType
     super(*args, **kwargs, extensions: [PostgresTimeoutFieldExtension, AuditLogFieldExtension])
   end
 
+  field :add_conversation_message, mutation: Mutations::AddConversationMessage
+  field :create_conversation, mutation: Mutations::CreateConversation
   field :create_group_in_set, mutation: Mutations::CreateGroupInSet
   field :hide_assignment_grades, mutation: Mutations::HideAssignmentGrades
   field :hide_assignment_grades_for_sections, mutation: Mutations::HideAssignmentGradesForSections
@@ -52,6 +56,12 @@ class Types::MutationType < Types::ApplicationObjectType
     Sets the post policy for the course, with an option to override and delete
     existing assignment post policies.
   DESC
+  field :create_outcome_proficiency, mutation: Mutations::CreateOutcomeProficiency
+  field :update_outcome_proficiency, mutation: Mutations::UpdateOutcomeProficiency
+  field :delete_outcome_proficiency, mutation: Mutations::DeleteOutcomeProficiency
+  field :create_outcome_calculation_method, mutation: Mutations::CreateOutcomeCalculationMethod
+  field :update_outcome_calculation_method, mutation: Mutations::UpdateOutcomeCalculationMethod
+  field :delete_outcome_calculation_method, mutation: Mutations::DeleteOutcomeCalculationMethod
   field :create_assignment, mutation: Mutations::CreateAssignment
   field :update_assignment, mutation: Mutations::UpdateAssignment
   field :mark_submission_comments_read, mutation: Mutations::MarkSubmissionCommentsRead
@@ -59,6 +69,9 @@ class Types::MutationType < Types::ApplicationObjectType
   field :create_submission_draft, mutation: Mutations::CreateSubmissionDraft
   field :create_module, mutation: Mutations::CreateModule
   field :update_notification_preferences, mutation: Mutations::UpdateNotificationPreferences
+  field :delete_conversation_messages, mutation: Mutations::DeleteConversationMessages
+  field :delete_conversations, mutation: Mutations::DeleteConversations
+  field :update_conversation_participants, mutation: Mutations::UpdateConversationParticipants
 
   # TODO: Remove the in active development string from here once this is more
   #       finalized.

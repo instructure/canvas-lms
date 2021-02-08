@@ -26,12 +26,13 @@ const handler = data => {
   tool_launch_url.searchParams.append('full_win_launch_requested', '1')
   // xsslint safeString.property window.location
   tool_launch_url.searchParams.append('platform_redirect_url', window.location)
+  const client_id = tool_launch_url.searchParams.get('client_id')
 
   const launch_url = `${
     window.location.origin
   }/${context}/external_tools/retrieve?display=borderless&url=${encodeURIComponent(
     tool_launch_url.toString()
-  )}`
+  )}${client_id ? `&client_id=${client_id}` : ''}`
   window.location.assign(launch_url)
 }
 

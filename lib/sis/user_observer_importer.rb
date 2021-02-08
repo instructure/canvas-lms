@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -22,11 +24,9 @@ module SIS
     def process
       importer = Work.new(@batch, @root_account, @logger)
 
-      Enrollment.skip_touch_callbacks(:course) do
-        Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
-          User.skip_updating_account_associations do
-            yield importer
-          end
+      Enrollment.suspend_callbacks(:set_update_cached_due_dates) do
+        User.skip_updating_account_associations do
+          yield importer
         end
       end
 

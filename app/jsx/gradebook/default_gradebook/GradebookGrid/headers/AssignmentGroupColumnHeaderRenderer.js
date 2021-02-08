@@ -26,7 +26,7 @@ function getProps(column, gradebook, options) {
   const assignmentGroup = gradebook.getAssignmentGroup(column.assignmentGroupId)
 
   const gradeSortDataLoaded =
-    gradebook.contentLoadStates.assignmentsLoaded &&
+    gradebook.assignmentsLoadedForCurrentView() &&
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
@@ -60,6 +60,7 @@ function getProps(column, gradebook, options) {
       settingKey: sortRowsBySetting.settingKey
     },
 
+    viewUngradedAsZero: gradebook.viewUngradedAsZero(),
     weightedGroups: gradebook.weightedGroups()
   }
 }

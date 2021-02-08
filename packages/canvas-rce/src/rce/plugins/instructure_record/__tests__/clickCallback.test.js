@@ -62,7 +62,7 @@ describe('Instructure Media Plugin: clickCallback', () => {
     await clickCallback(fauxEditor, document, trayProps)
     expect(
       getAllByLabelText(document, 'Upload Media', {
-        selector: 'form'
+        selector: '[role="dialog"]'
       })[0]
     ).toBeVisible()
   })

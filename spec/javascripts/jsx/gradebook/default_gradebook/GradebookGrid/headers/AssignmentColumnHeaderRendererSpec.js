@@ -28,7 +28,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
   let assignment
   let column
   let component
-  let gradebookOptions
   let renderer
   let student
   let submission
@@ -49,11 +48,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
   suiteHooks.beforeEach(() => {
     $container = document.createElement('div')
     document.body.appendChild($container)
-
-    gradebookOptions = {
-      include_speed_grader_in_assignment_header_menu: false,
-      post_policies_enabled: true
-    }
   })
 
   suiteHooks.afterEach(() => {
@@ -61,7 +55,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
   })
 
   function buildGradebook() {
-    gradebook = createGradebook(gradebookOptions)
+    gradebook = createGradebook()
     sinon.stub(gradebook, 'saveSettings')
 
     assignment = {
@@ -339,94 +333,80 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       strictEqual(component.props.enterGradesAsSetting.showGradingSchemeOption, true)
     })
 
-    QUnit.module('"Post grades" action', () => {
-      QUnit.module('when Post Policies is enabled', contextHooks => {
-        let onSelectCallback
+    QUnit.module('"Post grades" action', hooks => {
+      let onSelectCallback
 
-        contextHooks.beforeEach(() => {
-          gradebookOptions.post_policies_enabled = true
-          onSelectCallback = sinon.spy()
-          buildGradebook()
+      hooks.beforeEach(() => {
+        onSelectCallback = sinon.spy()
+        buildGradebook()
 
-          sinon.stub(gradebook.postPolicies, 'showPostAssignmentGradesTray')
-        })
+        sinon.stub(gradebook.postPolicies, 'showPostAssignmentGradesTray')
+      })
 
-        test('sets featureEnabled to true', () => {
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.featureEnabled, true)
-        })
+      test('sets featureEnabled to true', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.featureEnabled, true)
+      })
 
-        test('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
-          submission.workflow_state = 'graded'
-          submission.score = 1
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, true)
-        })
+      test('sets hasGradesOrPostableComments to true if at least one submission is graded', () => {
+        submission.workflow_state = 'graded'
+        submission.score = 1
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, true)
+      })
 
-        test('sets hasGradesOrPostableComments to false if no submissions are graded', () => {
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, false)
-        })
+      test('sets hasGradesOrPostableComments to false if no submissions are graded', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.hasGradesOrPostableComments, false)
+      })
 
-        test('sets hasGradesOrCommentsToPost to true if at least one submission is graded and unposted', () => {
-          submission.workflow_state = 'graded'
-          submission.score = 1
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
-        })
+      test('sets hasGradesOrCommentsToPost to true if at least one submission is graded and unposted', () => {
+        submission.workflow_state = 'graded'
+        submission.score = 1
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
+      })
 
-        test('sets hasGradesOrCommentsToPost to true if at least one submission has a postable comment and unposted', () => {
-          submission.has_postable_comments = true
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
-        })
+      test('sets hasGradesOrCommentsToPost to true if at least one submission has a postable comment and unposted', () => {
+        submission.has_postable_comments = true
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, true)
+      })
 
-        test('sets hasGradesOrCommentsToPost to false if all submissions have a posted_at date', () => {
-          submission.posted_at = new Date('Wed Oct 1 1997')
+      test('sets hasGradesOrCommentsToPost to false if all submissions have a posted_at date', () => {
+        submission.posted_at = new Date('Wed Oct 1 1997')
 
-          gradebook.gotChunkOfStudents([student])
-          render()
-          strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, false)
-        })
+        gradebook.gotChunkOfStudents([student])
+        render()
+        strictEqual(component.props.postGradesAction.hasGradesOrCommentsToPost, false)
+      })
 
-        test('sets newIconsEnabled to true if Gradebook has new_post_policy_icons_enabled set to true', () => {
-          gradebook.options.new_post_policy_icons_enabled = true
-          render()
-          strictEqual(component.props.postGradesAction.newIconsEnabled, true)
-        })
+      test('includes a callback to show the "Post Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        component.props.postGradesAction.onSelect(onSelectCallback)
+        strictEqual(gradebook.postPolicies.showPostAssignmentGradesTray.callCount, 1)
+      })
 
-        test('sets newIconsEnabled to false if Gradebook does not have new_post_policy_icons_enabled set to true', () => {
-          render()
-          strictEqual(component.props.postGradesAction.newIconsEnabled, false)
-        })
+      test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        component.props.postGradesAction.onSelect(onSelectCallback)
+        const [{assignmentId}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
+        strictEqual(assignmentId, '2301')
+      })
 
-        test('includes a callback to show the "Post Assignment Grades" tray', () => {
-          gradebook.gotChunkOfStudents([student])
-          render()
-          component.props.postGradesAction.onSelect(onSelectCallback)
-          strictEqual(gradebook.postPolicies.showPostAssignmentGradesTray.callCount, 1)
-        })
-
-        test('includes the assignment id when showing the "Post Assignment Grades" tray', () => {
-          gradebook.gotChunkOfStudents([student])
-          render()
-          component.props.postGradesAction.onSelect(onSelectCallback)
-          const [{assignmentId}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
-          strictEqual(assignmentId, '2301')
-        })
-
-        test('includes the `onSelect` callback when showing the "Post Assignment Grades" tray', () => {
-          gradebook.gotChunkOfStudents([student])
-          render()
-          component.props.postGradesAction.onSelect(onSelectCallback)
-          const [{onExited}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
-          strictEqual(onExited, onSelectCallback)
-        })
+      test('includes the `onSelect` callback when showing the "Post Assignment Grades" tray', () => {
+        gradebook.gotChunkOfStudents([student])
+        render()
+        component.props.postGradesAction.onSelect(onSelectCallback)
+        const [{onExited}] = gradebook.postPolicies.showPostAssignmentGradesTray.lastCall.args
+        strictEqual(onExited, onSelectCallback)
       })
     })
 
@@ -434,7 +414,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       let onSelectCallback
 
       hooks.beforeEach(() => {
-        gradebookOptions.post_policies_enabled = true
         onSelectCallback = sinon.spy()
         buildGradebook()
         submission.posted_at = new Date('Wed Oct 1 1997')
@@ -504,7 +483,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       let onSelectCallback
 
       hooks.beforeEach(() => {
-        gradebookOptions.post_policies_enabled = true
         onSelectCallback = sinon.spy()
         buildGradebook()
         render()
@@ -576,7 +554,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       gradebook.gotChunkOfStudents([student])
       render()
       const studentProp = component.props.students.find(s => s.id === student.id)
-      strictEqual(studentProp.submission.score, 9)
+      strictEqual(studentProp.submission.score, '9')
     })
 
     test('"score" is null if the student does not have a submission', () => {
@@ -745,18 +723,21 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       equal(component.props.sortBySetting.direction, 'ascending')
     })
 
-    test('sets the "Sort by" disabled setting to true when assignments are not loaded', () => {
-      buildGradebook()
-      gradebook.setAssignmentsLoaded(false)
-      gradebook.setStudentsLoaded(true)
-      gradebook.setSubmissionsLoaded(true)
-      render()
-      strictEqual(component.props.sortBySetting.disabled, true)
-    })
+    QUnit.test(
+      'sets the "Sort by" disabled setting to true when assignments are not loaded',
+      () => {
+        buildGradebook()
+        gradebook.contentLoadStates.assignmentsLoaded.all = false
+        gradebook.setStudentsLoaded(true)
+        gradebook.setSubmissionsLoaded(true)
+        render()
+        strictEqual(component.props.sortBySetting.disabled, true)
+      }
+    )
 
     test('sets the "Sort by" disabled setting to true when anonymize_students is true', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       assignment.anonymize_students = true
@@ -766,7 +747,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to true when students are not loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(false)
       gradebook.setSubmissionsLoaded(true)
       render()
@@ -775,7 +756,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to true when submissions are not loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(false)
       render()
@@ -784,7 +765,7 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
 
     test('sets the "Sort by" disabled setting to false when necessary data are loaded', () => {
       buildGradebook()
-      gradebook.setAssignmentsLoaded(true)
+      gradebook.setAssignmentsLoaded()
       gradebook.setStudentsLoaded(true)
       gradebook.setSubmissionsLoaded(true)
       render()
@@ -855,21 +836,6 @@ QUnit.module('GradebookGrid AssignmentColumnHeaderRenderer', suiteHooks => {
       gradebook.setSortRowsBySetting('assignment_2301', 'grade', 'ascending')
       render()
       equal(component.props.sortBySetting.settingKey, 'grade')
-    })
-
-    QUnit.module('includeSpeedGraderMenuItem', () => {
-      test('is set to true if the option is enabled in gradebook', () => {
-        gradebookOptions.include_speed_grader_in_assignment_header_menu = true
-        buildGradebook()
-        render()
-        strictEqual(component.props.includeSpeedGraderMenuItem, true)
-      })
-
-      test('is set to false if the option is not enabled in gradebook', () => {
-        buildGradebook()
-        render()
-        strictEqual(component.props.includeSpeedGraderMenuItem, false)
-      })
     })
   })
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module Types
       !!object[:ignore_for_scoring]
     end
 
-    field :outcome, OutcomeType, null: true
+    field :outcome, LearningOutcomeType, null: true
     def outcome
       return nil unless object[:learning_outcome_id]
       Loaders::IDLoader.for(LearningOutcome).load(object[:learning_outcome_id])

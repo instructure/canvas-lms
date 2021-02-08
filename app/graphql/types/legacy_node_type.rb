@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,6 +24,7 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "Account"
   value "Assignment"
   value "AssignmentGroup"
+  value "Conversation"
   value "Course"
   value "Discussion"
   value "Enrollment"
@@ -29,9 +32,12 @@ class Types::LegacyNodeType < Types::BaseEnum
   value "GradingPeriod"
   value "Group"
   value "GroupSet"
+  value "LearningOutcomeGroup"
   value "MediaObject"
   value "Module"
   value "ModuleItem"
+  value "OutcomeCalculationMethod"
+  value "OutcomeProficiency"
   value "Page"
   value "PostPolicy"
   value "Progress"

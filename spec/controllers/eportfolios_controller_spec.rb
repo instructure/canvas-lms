@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -217,7 +219,6 @@ describe EportfoliosController do
 
     context "spam eportfolios" do
       before(:once) do
-        @portfolio.user.account.enable_feature!(:eportfolio_moderation)
         @portfolio.update!(public: true)
       end
 
@@ -244,15 +245,6 @@ describe EportfoliosController do
 
           assert_unauthorized
         end
-
-        it "renders the eportfolio when the eportfolio is spam and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: 'marked_as_spam')
-          user_session(@other_user)
-          get :show, params: { id: @portfolio.id }
-
-          expect(response.status).to eq(200)
-        end
       end
 
       context "when the user is an admin" do
@@ -277,17 +269,6 @@ describe EportfoliosController do
 
           assert_unauthorized
         end
-
-        it "renders the eportfolio when the eportfolio is spam and the admin does " \
-        "not have :moderate_user_content permissions and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: 'marked_as_spam')
-          Account.default.role_overrides.create!(role: admin_role, enabled: false, permission: :moderate_user_content)
-          user_session(@admin)
-          get :show, params: { id: @portfolio.id }
-
-          expect(response.status).to eq(200)
-        end
       end
     end
   end
@@ -308,10 +289,6 @@ describe EportfoliosController do
     end
 
     context "spam eportfolios" do
-      before(:once) do
-        @portfolio.user.account.enable_feature!(:eportfolio_moderation)
-      end
-
       context "when the user is the author" do
         it "can not make updates to the eportfolio if it has been flagged as possible spam" do
           @portfolio.update!(spam_status: "flagged_as_possible_spam")
@@ -320,27 +297,11 @@ describe EportfoliosController do
           expect(response.status).to eq(401)
         end
 
-        it "can make updates to the eportfolio if it has been flagged as possible spam and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: "flagged_as_possible_spam")
-          user_session(@user)
-          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
-          expect(assigns[:portfolio].name).to eq("not spam i promise ;)")
-        end
-
         it "can not make updates to the eportfolio if it has been marked as spam" do
           @portfolio.update!(spam_status: "marked_as_spam")
           user_session(@user)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
           expect(response.status).to eq(401)
-        end
-
-        it "can make updates to the eportfolio if it has been marked as spam and the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
-          @portfolio.update!(spam_status: "marked_as_spam")
-          user_session(@user)
-          put :update, params: { id: @portfolio.id, eportfolio: { name: "not spam i promise ;)" } }
-          expect(assigns[:portfolio].name).to eq("not spam i promise ;)")
         end
 
         it "can make updates to the eportfolio if it has been marked as safe" do
@@ -352,14 +313,6 @@ describe EportfoliosController do
         end
 
         it "cannot update the spam_status attribute" do
-          user_session(@user)
-          put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
-          expect(response).to be_redirect
-          expect(assigns[:portfolio].spam_status).to eq(nil)
-        end
-
-        it "cannot update the spam_status attribute when the release flag is disabled" do
-          @portfolio.user.account.disable_feature!(:eportfolio_moderation)
           user_session(@user)
           put :update, params: { id: @portfolio.id, eportfolio: { name: "new title", spam_status: "marked_as_safe" } }
           expect(response).to be_redirect

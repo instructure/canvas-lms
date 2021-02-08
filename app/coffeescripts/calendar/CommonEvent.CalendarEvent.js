@@ -55,7 +55,11 @@ Object.assign(CalendarEvent.prototype, {
     this.editable = true
     this.lockedTitle = this.object.parent_event_id != null
     this.description = data.description
-    this.addClass(`group_${this.contextCode()}`)
+    // in some rare cases, this.contextCode returns a comma separated list
+    const contexts = this.contextCode()?.split(',')
+    contexts?.forEach(c => {
+      this.addClass(`group_${c}`)
+    })
     if (this.isAppointmentGroupEvent()) {
       this.addClass('scheduler-event')
       if (this.object.reserved) {

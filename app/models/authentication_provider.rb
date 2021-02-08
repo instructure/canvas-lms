@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -102,6 +104,7 @@ class AuthenticationProvider < ActiveRecord::Base
 
   scope :active, ->{ where("workflow_state <> 'deleted'") }
   belongs_to :account
+  include Canvas::RootAccountCacher
   has_many :pseudonyms, foreign_key: :authentication_provider_id, inverse_of: :authentication_provider
   acts_as_list scope: { account: self, workflow_state: [nil, 'active'] }
 
@@ -150,7 +153,7 @@ class AuthenticationProvider < ActiveRecord::Base
     self.workflow_state = 'deleted'
     self.save!
     enable_canvas_authentication
-    send_later_if_production(:soft_delete_pseudonyms)
+    delay_if_production.soft_delete_pseudonyms
     true
   end
   alias destroy_permanently! destroy

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -30,7 +32,9 @@ class EventStream::Index
   attr_config :scrollback_limit, :type => Integer, :default => 52.weeks
   attr_config :entry_proc, :type => Proc
   attr_config :key_proc, :type => Proc, :default => nil
-  attr_config :ar_conditions_proc, type: Proc, default: nil
+  # it's expected that this proc will return an AR Scope from the
+  # associated AR type.  If it doesn't, there could be problems...
+  attr_config :ar_scope_proc, type: Proc, default: nil
 
   def initialize(event_stream, &blk)
     @event_stream = event_stream
@@ -57,34 +61,5 @@ class EventStream::Index
       raise "Unknown Indexing Strategy: #{strategy_name}"
     end
   end
-
-  # these methods are included to keep the interface with plugins
-  # until they can be updated or removed to no longer
-  # depend no a cassandra-specific implementation.
-  # --- start ---
-  def database
-    event_stream.database
-  end
-
-  def for_key(key, options={})
-    self.strategy_for(:cassandra).for_key(key, options)
-  end
-
-  def select_cql
-    self.strategy_for(:cassandra).select_cql
-  end
-
-  def insert_cql
-    self.strategy_for(:cassandra).insert_cql
-  end
-
-  def insert(record, key)
-    self.strategy_for(:cassandra).insert(record, key)
-  end
-
-  def bucket_for_time(time)
-    self.strategy_for(:cassandra).bucket_for_time(time)
-  end
-  # --- end ---
 
 end

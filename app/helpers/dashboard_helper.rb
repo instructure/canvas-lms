@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -20,7 +22,6 @@ module DashboardHelper
   def user_dashboard_view
     dashboard_view = @current_user&.dashboard_view
     dashboard_view = 'activity' if @current_user&.preferences&.dig(:recent_activity_dashboard) && !@current_user.preferences[:dashboard_view]
-    dashboard_view = 'cards' if dashboard_view == 'planner' && !@current_user.account.feature_enabled?(:student_planner)
     dashboard_view
   end
 
@@ -150,7 +151,7 @@ module DashboardHelper
   end
 
   def map_courses_for_menu(courses, opts={})
-    Course.preload_menu_data_for(courses, @current_user, preload_favorites: @domain_root_account.feature_enabled?(:unfavorite_course_from_dashboard))
+    Course.preload_menu_data_for(courses, @current_user, preload_favorites: true)
     mapped = courses.map do |course|
       presenter = CourseForMenuPresenter.new(course, @current_user, @domain_root_account, session, opts)
       presenter.to_h

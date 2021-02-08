@@ -75,7 +75,12 @@
   display: inline-block;
   color: $ic-color-icon-disabled;
   cursor: pointer;
-  &:focus { @include ic-focus-variant; }
+  border-radius: 3px;
+  outline: none;
+  padding: 2px 4px;
+  &:focus {
+    @include button-focus-light;
+  }
   &.publish-icon-unpublish { color: $ic-color-icon-disabled; }
   &.publish-icon-published { color: $ic-color-success; }
   .publish-text { display: none; }

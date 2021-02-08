@@ -18,7 +18,7 @@
 
 import OutlierScoreHelper, {isUnusuallyHigh} from 'jsx/grading/helpers/OutlierScoreHelper'
 
-import GRADEBOOK_TRANSLATIONS from 'compiled/gradebook/GradebookTranslations'
+import GRADEBOOK_TRANSLATIONS from 'jsx/gradebook/GradebookTranslations'
 
 QUnit.module('#hasWarning', () => {
   test('returns true for exacty 1.5 times points possible', () => {

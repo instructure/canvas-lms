@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -31,32 +33,32 @@ describe Types::ProficiencyRatingType do
 
   it 'works' do
     expect(
-      account_type.resolve('proficiencyRatingsConnection { nodes { _id } }').sort
+      account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { _id } } }').sort
     ).to eq @ratings.map { |r| r.id.to_s }.sort
   end
 
   describe 'works for the field' do
     it 'color' do
       expect(
-        account_type.resolve('proficiencyRatingsConnection { nodes { color } }').sort
+        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { color } } }').sort
       ).to eq @ratings.map(&:color).sort
     end
 
     it 'description' do
       expect(
-        account_type.resolve('proficiencyRatingsConnection { nodes { description } }').sort
+        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { description } } }').sort
       ).to eq @ratings.map(&:description).sort
     end
 
     it 'mastery' do
       expect(
-        account_type.resolve('proficiencyRatingsConnection { nodes { mastery } }')
+        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { mastery } } }')
       ).to eq @ratings.map(&:mastery)
     end
 
     it 'points' do
       expect(
-        account_type.resolve('proficiencyRatingsConnection { nodes { points } }').sort
+        account_type.resolve('outcomeProficiency { proficiencyRatingsConnection { nodes { points } } }').sort
       ).to eq @ratings.map(&:points).sort
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -136,9 +138,5 @@ module OtherHelperMethods
 
   def clear_local_storage
     driver.execute_script 'localStorage.clear();'
-  end
-
-  def preload_graphql_schema
-    CanvasSchema.execute("{}")
   end
 end

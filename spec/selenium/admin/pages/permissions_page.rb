@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -148,23 +150,13 @@ class PermissionsIndex
       end
     end
 
-    # -------- Granular Permissions (Feature Flag) --------
-    def granular_permissions_wiki_pages
-      @account ||= Account.default
-      @account.feature_enabled?(:granular_permissions_wiki_pages)
-    end
-
     def manage_wiki_button
-      if granular_permissions_wiki_pages
-        f("button[data-testid='expand_manage_wiki']")
-      end
+      f("button[data-testid='expand_manage_wiki']")
     end
 
     def expand_manage_wiki
-      if granular_permissions_wiki_pages
-        scroll_to_element(manage_wiki_button)
-        manage_wiki_button.click
-      end
+      scroll_to_element(manage_wiki_button)
+      manage_wiki_button.click
     end
 
     # ---------------------- Actions ----------------------

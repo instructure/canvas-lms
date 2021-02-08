@@ -21,6 +21,7 @@ import {render} from '@testing-library/react'
 
 import ImageOptionsTray from '..'
 import ImageOptionsTrayDriver from './ImageOptionsTrayDriver'
+import {CUSTOM} from '../../ImageEmbedOptions'
 
 describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   let props
@@ -32,6 +33,8 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
         altText: '',
         appliedHeight: 300,
         appliedWidth: 150,
+        imageSize: CUSTOM,
+        isLinked: false,
         isDecorativeImage: false,
         naturalHeight: 200,
         naturalWidth: 100,
@@ -113,6 +116,7 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
   describe('"Display Options" field', () => {
     it('is set to "embed" by default', () => {
       renderComponent()
+      expect(tray.isDisplayAsDisabled).toBe(false)
       expect(tray.displayAs).toEqual('embed')
     })
 
@@ -127,6 +131,12 @@ describe('RCE "Images" Plugin > ImageOptionsTray', () => {
       tray.setDisplayAs('link')
       tray.setDisplayAs('embed')
       expect(tray.displayAs).toEqual('embed')
+    })
+
+    it('is hidden when image is already linked', () => {
+      props.imageOptions.isLinked = true
+      renderComponent()
+      expect(tray.isDisplayAsDisabled).toBe(true)
     })
   })
 

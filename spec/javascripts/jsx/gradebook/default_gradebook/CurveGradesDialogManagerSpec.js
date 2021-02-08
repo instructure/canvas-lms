@@ -26,12 +26,13 @@ import 'compiled/jquery.rails_flash_notifications'
 const {createCurveGradesAction} = CurveGradesDialogManager
 
 QUnit.module('CurveGradesDialogManager.createCurveGradesAction.isDisabled', {
-  props({points_possible, grading_type, submissionsLoaded}) {
+  props({points_possible, grades_published, grading_type, submissionsLoaded}) {
     return [
       {
         // assignment
         points_possible,
-        grading_type
+        grading_type,
+        grades_published
       },
       [], // students
       {
@@ -49,6 +50,7 @@ test(
   function() {
     const props = this.props({
       points_possible: 10,
+      grades_published: true,
       grading_type: 'points',
       submissionsLoaded: true
     })
@@ -56,9 +58,20 @@ test(
   }
 )
 
+test('is disabled when grades are not published', function() {
+  const props = this.props({
+    points_possible: 10,
+    grades_published: false,
+    grading_type: 'points',
+    submissionsLoaded: true
+  })
+  ok(createCurveGradesAction(...props).isDisabled)
+})
+
 test('is disabled when submissions are not loaded', function() {
   const props = this.props({
     points_possible: 10,
+    grades_published: true,
     grading_type: 'points',
     submissionsLoaded: false
   })
@@ -68,6 +81,7 @@ test('is disabled when submissions are not loaded', function() {
 test('is disabled when grading type is pass/fail', function() {
   const props = this.props({
     points_possible: 10,
+    grades_published: true,
     grading_type: 'pass_fail',
     submissionsLoaded: true
   })
@@ -77,6 +91,7 @@ test('is disabled when grading type is pass/fail', function() {
 test('returns true when points_possible is null', function() {
   const props = this.props({
     points_possible: null,
+    grades_published: true,
     grading_type: 'points',
     submissionsLoaded: true
   })
@@ -84,7 +99,12 @@ test('returns true when points_possible is null', function() {
 })
 
 test('returns true when points_possible is 0', function() {
-  const props = this.props({points_possible: 0, grading_type: 'points', submissionsLoaded: true})
+  const props = this.props({
+    points_possible: 0,
+    grades_published: true,
+    grading_type: 'points',
+    submissionsLoaded: true
+  })
   ok(createCurveGradesAction(...props).isDisabled)
 })
 

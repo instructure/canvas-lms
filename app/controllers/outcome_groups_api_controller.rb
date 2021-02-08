@@ -196,6 +196,7 @@ class OutcomeGroupsApiController < ApplicationController
       # ret is now a list of outcomes that have been assessed
       outcome_params[:assessed_outcomes] = ret
     end
+    outcome_params[:context] = @context
 
     render json: outcome_links_json(links, @current_user, session, outcome_params)
   end
@@ -311,6 +312,8 @@ class OutcomeGroupsApiController < ApplicationController
       @outcome_group.destroy
       @context.try(:touch)
       render :json => outcome_group_json(@outcome_group, @current_user, session)
+    rescue ContentTag::LastLinkToOutcomeNotDestroyed => e
+      render :json => e.to_json, :status => :bad_request
     rescue ActiveRecord::RecordNotSaved
       render :json => 'error'.to_json, :status => :bad_request
     end
@@ -332,7 +335,7 @@ class OutcomeGroupsApiController < ApplicationController
     @outcome_group = context_outcome_groups.find(params[:id])
 
     # get and paginate links from group
-    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title
+    link_scope = @outcome_group.child_outcome_links.active.order_by_outcome_title.preload(:context, :associated_asset, :content)
     url = polymorphic_url [:api_v1, @context || :global, :outcome_group_outcomes], :id => @outcome_group.id
     @links = Api.paginate(link_scope, self, url)
 
@@ -344,6 +347,7 @@ class OutcomeGroupsApiController < ApplicationController
     end
 
     outcome_params = params.slice(:outcome_style)
+    outcome_params[:context] = @context
 
     # preload the links' outcomes' contexts.
     ActiveRecord::Associations::Preloader.new.preload(@links, :learning_outcome_content => :context)

@@ -40,6 +40,7 @@ import 'compiled/behaviors/instructure_inline_media_comment'
 import 'compiled/behaviors/ping'
 import 'compiled/behaviors/broken-images'
 import 'LtiThumbnailLauncher'
+import './css_overflow_sanitize'
 
 if (ENV.page_view_update_url) import('page_views')
 

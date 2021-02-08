@@ -1,4 +1,5 @@
 <%= InstFS.login_pixel(logged_in_user, session, request.host_with_port) if logged_in_user && !@files_domain %>
+<% js_bundle :inst_fs_service_worker if InstFS.service_worker_enabled? %>
 
 <% if @js_env_data_we_need_to_render_later %>
   <script>

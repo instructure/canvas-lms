@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -113,6 +115,7 @@ module Lti::Ims::NamesAndRolesMatchers
         'https://purl.imsglobal.org/spec/lti/claim/message_type' => 'LtiResourceLinkRequest',
         'locale' => (user.locale || I18n.default_locale.to_s),
         'https://purl.imsglobal.org/spec/lti/claim/custom' => {},
+        "https://purl.imsglobal.org/spec/lti/claim/lti11_legacy_user_id" => tool.opaque_identifier_for(user)
       }.merge!(opts[:message_matcher].presence || {}).compact
     ]
   end

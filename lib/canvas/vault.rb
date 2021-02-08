@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -17,35 +19,56 @@
 
 require 'vault'
 
-class Canvas::Vault
+module Canvas::Vault
+  CACHE_KEY_PREFIX = 'vault/'.freeze
+  class MissingVaultSecret < StandardError; end
+
   class << self
-    CACHE_KEY_PREFIX = 'vault/'.freeze
-
-    def read(path)
-      cached_val = LocalCache.fetch(CACHE_KEY_PREFIX + path)
-      return cached_val unless cached_val.nil?
-
-      begin
+    def read(path, required: true, cache: true)
+      Rails.logger.info("Reading #{path} from vault")
+      unless cache
         vault_resp = api_client.logical.read(path)
-        return nil if vault_resp.nil?
-
-        token_ttl = vault_resp.lease_duration || vault_resp.data[:ttl] || 10.minutes
-        cache_ttl = token_ttl / 2
-        LocalCache.write(CACHE_KEY_PREFIX + path, vault_resp.data, expires_in: cache_ttl)
-
-        return vault_resp.data
-      rescue => exception
-        Canvas::Errors.capture_exception(:vault, exception)
-        return LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
+        raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+        return vault_resp&.data
       end
+
+      # we're going to override this anyway, just want it to use the fetch path.
+      default_expiry = 30.minutes
+      default_race_condition_ttl = Setting.get("vault_cache_race_condition_ttl", 60).to_i.seconds
+      cache_key = CACHE_KEY_PREFIX + path
+      fetched_lease_value = nil
+      cached_data = LocalCache.fetch(cache_key, expires_in: default_expiry, race_condition_ttl: default_race_condition_ttl) do
+        vault_resp = api_client.logical.read(path)
+        raise(MissingVaultSecret, "nil credentials found for #{path}") if required && vault_resp.nil?
+        fetched_lease_value = vault_resp&.lease_duration
+        fetched_lease_value = vault_resp&.data&.[](:ttl) unless fetched_lease_value&.positive?
+        fetched_lease_value = 10.minutes unless fetched_lease_value&.positive?
+        vault_resp&.data
+      end
+      unless fetched_lease_value.nil?
+        # we actually talked to vault and got a new record, let's update the expiration information
+        # so actually be sensitive to the data in the lease
+        cache_ttl = fetched_lease_value / 2
+        LocalCache.write(cache_key, cached_data, expires_in: cache_ttl)
+      end
+      return cached_data
+    rescue => exception
+      Canvas::Errors.capture_exception(:vault, exception)
+      stale_value = LocalCache.fetch_without_expiration(CACHE_KEY_PREFIX + path)
+      return stale_value if stale_value.present?
+      # if we can't serve any stale value, we're better erroring than handing back nil
+      raise
     end
 
     def api_client
+      # Default to flat file if vault is unconfigured
+      return Canvas::Vault::FileClient.get_client if addr.nil? || addr == "file"
+
       Vault::Client.new(address: addr, token: token)
     end
 
     def kv_mount
-      config[:kv_mount]
+      config[:kv_mount] || 'app-canvas'
     end
 
     private

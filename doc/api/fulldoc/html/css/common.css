@@ -131,7 +131,8 @@ h3.beta {
 #sidebar {
   background-color: #efefef;
 }
-#sidebar nav > a, #sidebar nav > li > a, #sidebar nav > li > ul  > a, #sidebar h2 {
+#sidebar nav > a, #sidebar nav > li > a, #sidebar nav > li > ul > a, #sidebar h2,
+#sidebar nav > li > ul > li > a {
   display: block;
   font-size: 1.1em;
 }
@@ -145,19 +146,18 @@ h3.beta {
   margin:  0;
 }
 
-#sidebar nav > li, #sidebar nav > li > ul {  
+#sidebar nav > li, #sidebar nav > li > ul, #sidebar nav > li, #sidebar nav > li > ul > li {
   padding: 0px 0px 0px 20px;
   list-style-type: none;
 }
 
-
-#sidebar nav > li > h4, #sidebar nav > li > ul  > h4{
+#sidebar nav > li > h4, #sidebar nav > li > ul > h4,  #sidebar nav > li > ul > li > h4 {
   font-size: 14px;
   margin-top: 10px;
   margin-bottom: 0px;
 }
 
-#sidebar nav > a, #sidebar nav > li > a, #sidebar nav > li > ul  > a {
+#sidebar nav > a, #sidebar nav > li > a, #sidebar nav > li > ul  > a, #sidebar nav > li > ul > li > a {
   padding:8px 10px;
   color: #333;
   text-decoration: none;
@@ -175,12 +175,14 @@ h3.beta {
   text-decoration: none;
 }
 
-#sidebar nav > a:hover, #sidebar nav > a:focus, #sidebar nav > li > a:hover, #sidebar nav > li > a:focus, #sidebar nav > li > ul  > a:hover, #sidebar nav > li > ul  > a:focus {
+#sidebar nav > a:hover, #sidebar nav > a:focus, #sidebar nav > li > a:hover, #sidebar nav > li > a:focus,
+#sidebar nav > li > ul > a:hover, #sidebar nav > li > ul > a:focus,
+#sidebar nav > li > ul > li > a:hover, #sidebar nav > li > ul > li > a:focus {
   background-color: #DEE2E4;
   text-decoration: none;
 }
 
-#sidebar nav > a.current, #sidebar nav > li > a.current, #sidebar nav > li > ul > a.current {
+#sidebar nav > a.current, #sidebar nav > li > a.current, #sidebar nav > li > ul > a.current, #sidebar nav > li > ul > li > a.current {
   background-color: white;
 }
 

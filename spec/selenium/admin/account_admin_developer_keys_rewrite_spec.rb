@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -117,7 +119,8 @@ describe 'Developer Keys' do
       get "/accounts/#{Account.default.id}/developer_keys"
       fj("table[data-automation='devKeyAdminTable'] tbody tr button:has(svg[name='IconTrash'])").click
       accept_alert
-      expect(f("table[data-automation='devKeyAdminTable']")).not_to contain_css("tbody tr")
+      wait_for_ajaximations
+      expect(element_exists?("table[data-automation='devKeyAdminTable']")).to eq(false)
       expect(Account.default.developer_keys.nondeleted.count).to eq 0
     end
 
@@ -260,6 +263,35 @@ describe 'Developer Keys' do
     end
 
     context "scopes" do
+      before(:all) do
+        # if docs haven't been generated, use mock data
+        unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb'))
+          def api_scope_mapper_fallback
+            klass = Class.new(Object)
+            klass.class_eval do
+              def self.lookup_resource(controller, action)
+                controller == :assignment_groups_api ? :assignment_groups : controller
+              end
+
+              def self.name_for_resource(resource)
+                resource == :assignment_groups ? 'Assignment Groups' : resource.to_s
+              end
+            end
+            klass
+          end
+
+          Object.const_set("ApiScopeMapper", api_scope_mapper_fallback)
+          TokenScopes.reset!
+        end
+      end
+
+      after(:all) do
+        unless File.exist?(Rails.root.join('lib', 'api_scope_mapper.rb'))
+          Object.const_set("ApiScopeMapper", ApiScopeMapperLoader.api_scope_mapper_fallback)
+          TokenScopes.reset!
+        end
+      end
+
       let(:api_token_scopes) { ["url:GET|/api/v1/accounts/:account_id/scopes"] }
       let(:assignment_groups_scopes) do
         [
@@ -341,7 +373,7 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
+        expect(DeveloperKey.last.scopes).to match_array assignment_groups_scopes
       end
 
       it "adds scopes to backend developer key via UI in site admin" do
@@ -350,7 +382,7 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajaximations
-        expect(DeveloperKey.last.scopes).to eq assignment_groups_scopes
+        expect(DeveloperKey.last.scopes).to match_array assignment_groups_scopes
       end
 
       it "removes scopes from backend developer key through UI" do
@@ -361,7 +393,7 @@ describe 'Developer Keys' do
         click_scope_group_checkbox
         find_button("Save").click
         wait_for_ajax_requests
-        expect(developer_key_with_scopes.reload.scopes).to eq api_token_scopes
+        expect(developer_key_with_scopes.reload.scopes).to match_array api_token_scopes
       end
 
       it "keeps all endpoints read only checkbox checked after save" do

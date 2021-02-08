@@ -141,7 +141,7 @@ module Lti
           # Course
         }
       end
-      render_unauthorized_action unless codes && tool_proxy.matches?(codes)
+      render_unauthorized_action unless codes && tool_proxy.matches?(**codes)
     end
   end
 end

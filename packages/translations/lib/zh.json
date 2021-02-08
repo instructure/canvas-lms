@@ -32,8 +32,8 @@
     "align_right_9bad3ac1": {
         "message": "右对齐"
     },
-    "alignment_and_indentation_f7de34bf": {
-        "message": "校准和缩进"
+    "alignment_and_lists_5cebcb69": {
+        "message": "对齐和列表"
     },
     "all_4321c3a1": {
         "message": "全部"
@@ -49,6 +49,9 @@
     },
     "alt_text_611fb322": {
         "message": "Alt 文本"
+    },
+    "an_error_occured_reading_the_file_ff48558b": {
+        "message": "读取文件时发生错误"
     },
     "an_error_occurred_attempting_to_dismiss_the_opport_f86e0667": {
         "message": "尝试拒绝该机会时出现错误。"
@@ -113,6 +116,9 @@
     "assignmenttype_title_reminder_datetime_33fa66d5": {
         "message": "{ assignmentType }{ title }，提醒{ datetime }。"
     },
+    "attributes_963ba262": {
+        "message": "属性"
+    },
     "audio_and_video_recording_is_not_available_c7173efc": {
         "message": "音频和视频录制不可用。"
     },
@@ -131,6 +137,9 @@
     "beginning_of_your_to_do_history_61ef2dce": {
         "message": "您的待办事项历史记录的开始"
     },
+    "c_2001_acme_inc_283f7f80": {
+        "message": "(c) 2001 Acme Inc."
+    },
     "calendar_a8563bb2": {
         "message": "日历:"
     },
@@ -143,14 +152,17 @@
     "canvas_planner_98ed106": {
         "message": "Canvas 计划程序"
     },
-    "canvas_plugins_705a5016": {
-        "message": "Canvas 插件"
-    },
     "choose_caption_file_9c45bc4e": {
         "message": "选择标题文件"
     },
+    "choose_usage_rights_33683854": {
+        "message": "选择使用权限..."
+    },
     "circle_unordered_list_9e3a0763": {
         "message": "圆形无序列表"
+    },
+    "clear_2084585f": {
+        "message": "清除"
     },
     "clear_selected_file_82388e50": {
         "message": "清除所选文件"
@@ -179,6 +191,9 @@
     "close_opportunity_center_popup_9907d981": {
         "message": "关闭机会中心弹出窗口"
     },
+    "closed_captions_subtitles_e6aaa016": {
+        "message": "关闭了字幕/说明"
+    },
     "collaborations_5c56c15f": {
         "message": "协作"
     },
@@ -188,6 +203,9 @@
     "computer_1d7dfa6f": {
         "message": "计算机"
     },
+    "content_1440204b": {
+        "message": "内容"
+    },
     "content_is_still_being_uploaded_if_you_continue_it_8f06d0cb": {
         "message": "内容仍在上传中，如果您继续，该内容将不会正确嵌入。"
     },
@@ -196,6 +214,9 @@
     },
     "content_type_2cf90d95": {
         "message": "内容类型"
+    },
+    "copyright_holder_66ee111": {
+        "message": "版权持有者："
     },
     "count_plural_0_0_words_one_1_word_other_words_acf32eca": {
         "message": "{ count, plural,\n     =0 {0 个字}\n    one {1 个字}\n  other {# 个字}\n}"
@@ -236,6 +257,9 @@
     "course_to_do_bcbbab54": {
         "message": "{ course } 待办"
     },
+    "creative_commons_license_725584ae": {
+        "message": "Creative Commons 许可证："
+    },
     "current_volume_level_c55ab825": {
         "message": "当前音量"
     },
@@ -259,6 +283,9 @@
     },
     "date_time_d9fbf2d7": {
         "message": "日期和时间："
+    },
+    "decorative_image_3c28aa7d": {
+        "message": "装饰图"
     },
     "decrease_indent_de6343ab": {
         "message": "减少缩进"
@@ -287,8 +314,8 @@
     "dimensions_45ddb7b7": {
         "message": "尺寸"
     },
-    "directionality_ebcae6d0": {
-        "message": "方向性"
+    "directionality_26ae9e08": {
+        "message": "方向"
     },
     "disable_in_line_preview_2a675175": {
         "message": "禁用在线预览。"
@@ -341,9 +368,6 @@
     "drag_handle_use_up_and_down_arrows_to_resize_e29eae5c": {
         "message": "拖动手柄。使用上下箭头调整大小"
     },
-    "drop_and_drop_or_click_to_browse_your_computer_1acfa42d": {
-        "message": "拖放或点击以浏览您的计算机"
-    },
     "due_5d7267be": {
         "message": "到期："
     },
@@ -358,6 +382,9 @@
     },
     "edit_c5fbea07": {
         "message": "编辑"
+    },
+    "edit_equation_f5279959": {
+        "message": "编辑等式"
     },
     "edit_link_7f53bebb": {
         "message": "编辑链接"
@@ -386,11 +413,11 @@
     "embed_video_a97a64af": {
         "message": "嵌入视频"
     },
-    "embed_video_code_703e10f2": {
-        "message": "嵌入视频代码"
-    },
     "embedded_content_aaeb4d3d": {
         "message": "嵌入内容"
+    },
+    "enter_at_least_3_characters_to_search_4f037ee0": {
+        "message": "输入至少 3 个字符以进行搜索"
     },
     "equation_1c5ac93c": {
         "message": "等式"
@@ -415,6 +442,9 @@
     },
     "external_links_3d9f074e": {
         "message": "外部链接"
+    },
+    "external_tools_6e77821": {
+        "message": "外部工具"
     },
     "extra_large_b6cdf1ff": {
         "message": "超大"
@@ -464,8 +494,14 @@
     "finish_bc343002": {
         "message": "完成"
     },
+    "focus_element_options_toolbar_18d993e": {
+        "message": "焦点元素选项工具栏"
+    },
     "folder_tree_fbab0726": {
         "message": "文件夹树"
+    },
+    "format_4247a9c5": {
+        "message": "格式"
     },
     "formatting_5b143aa8": {
         "message": "格式化"
@@ -475,6 +511,9 @@
     },
     "found_count_plural_0_results_one_result_other_resu_46aeaa01": {
         "message": "查找 { count, plural,\n     =0 {# 结果}\n    one {# 结果}\n  other {# 结果}\n}"
+    },
+    "fullscreen_873bf53f": {
+        "message": "全屏"
     },
     "generating_preview_45b53be0": {
         "message": "生成预览..."
@@ -500,11 +539,23 @@
     "grades_loaded_5056277c": {
         "message": "已加载评分"
     },
+    "group_documents_8bfd6ae6": {
+        "message": "组文档"
+    },
     "group_files_4324f3df": {
         "message": "小组文件"
     },
     "group_files_82e5dcdb": {
         "message": "组文件"
+    },
+    "group_images_98e0ac17": {
+        "message": "组图像"
+    },
+    "group_links_9493129e": {
+        "message": "小组链接"
+    },
+    "group_media_2f3d128a": {
+        "message": "组媒体"
     },
     "group_navigation_99f191a": {
         "message": "小组导航"
@@ -520,6 +571,15 @@
     },
     "height_69b03e15": {
         "message": "高度"
+    },
+    "i_have_obtained_permission_to_use_this_file_6386f087": {
+        "message": "我已获得使用此文件的权限。"
+    },
+    "i_hold_the_copyright_71ee91b1": {
+        "message": "我持有版权"
+    },
+    "if_you_do_not_select_usage_rights_now_this_file_wi_14e07ab5": {
+        "message": "如果您现在不选择使用权限，该文件在上传后不会被发布。"
     },
     "image_8ad06": {
         "message": "图片"
@@ -554,6 +614,9 @@
     "invalid_file_type_881cc9b2": {
         "message": "无效的文件类型"
     },
+    "invalid_url_cbde79f": {
+        "message": "URL 无效"
+    },
     "items_completed_items_plural_1_item_other_items_717d579f": {
         "message": "{ items }已完成{ items, plural,\n     =1 {个项目}\n  other {个项目}\n}"
     },
@@ -566,7 +629,7 @@
     "late_2be42b88": {
         "message": "延迟"
     },
-    "left_to_right_d6da6d7e": {
+    "left_to_right_e9b4fd06": {
         "message": "从左至右"
     },
     "link_7262adec": {
@@ -632,6 +695,9 @@
     "loading_planner_items_947a813d": {
         "message": "加载计划程序项目"
     },
+    "loading_please_wait_d276220a": {
+        "message": "正在加载，请稍候"
+    },
     "location_3b6ff307": {
         "message": "位置："
     },
@@ -650,8 +716,8 @@
     "mic_a7f3d311": {
         "message": "麦克风"
     },
-    "miscellaneous_and_apps_f450a387": {
-        "message": "杂项和应用程序"
+    "miscellaneous_e9818229": {
+        "message": "其他"
     },
     "missing_1a256b3b": {
         "message": "缺失"
@@ -764,6 +830,9 @@
     "other_editor_shortcuts_may_be_found_at_404aba4a": {
         "message": "其他编辑器快捷方式可见于"
     },
+    "p_is_not_a_valid_protocol_which_must_be_ftp_http_h_adf13fc2": {
+        "message": "{ p } 不是有效的协议，必须是 ftp、http、https、mailto、skype、tel 或可以忽略"
+    },
     "page_50c4823d": {
         "message": "页面"
     },
@@ -815,6 +884,9 @@
     "previous_page_928fc112": {
         "message": "上一页"
     },
+    "protocol_must_be_ftp_http_https_mailto_skype_tel_o_73beb4f8": {
+        "message": "协议必须是 ftp、http、https、mailto、skype、tel 或可以忽略"
+    },
     "pts_699bd9aa": {
         "message": "分"
     },
@@ -829,6 +901,9 @@
     },
     "quizzes_7e598f57": {
         "message": "测验"
+    },
+    "raw_html_editor_e3993e41": {
+        "message": "原始 HTML 编辑器"
     },
     "reading_a_media_track_file_failed_aborting_be051b20": {
         "message": "读取媒体跟踪文件失败。正在中止。"
@@ -857,7 +932,7 @@
     "rich_content_editor_2708ef21": {
         "message": "富内容编辑器"
     },
-    "right_to_left_ec223c81": {
+    "right_to_left_9cfb092a": {
         "message": "从右至左"
     },
     "save_11a80ec3": {
@@ -904,6 +979,9 @@
     },
     "size_b30e1077": {
         "message": "大小"
+    },
+    "size_of_file_is_greater_than_the_maximum_max_mb_al_6eb3fa9a": {
+        "message": "{ file }大于{ max } MB最大所允许的文件容量。"
     },
     "small_b070434a": {
         "message": "小"
@@ -998,6 +1076,15 @@
     "the_date_and_time_this_to_do_is_due_74c823d4": {
         "message": "完成该事项的日期和时间已截止"
     },
+    "the_material_is_in_the_public_domain_279c39a3": {
+        "message": "材料在公开域中"
+    },
+    "the_material_is_licensed_under_creative_commons_3242cb5e": {
+        "message": "材料已根据 Creative Commons 许可"
+    },
+    "the_material_is_subject_to_an_exception_e_g_fair_u_a39c8ca2": {
+        "message": "材料有例外情况——例如，合理使用、引用权，或版权法规定的其他适用的情况"
+    },
     "there_are_no_points_associated_with_this_item_449c712a": {
         "message": "没有与此项目相关的分数"
     },
@@ -1039,6 +1126,9 @@
     },
     "tomorrow_at_date_b53f2cf1": {
         "message": "明天 { date }"
+    },
+    "tools_2fcf772e": {
+        "message": "工具"
     },
     "totalresults_results_found_numdisplayed_results_cu_a0a44975": {
         "message": "找到了{ totalResults }个结果，当前显示{ numDisplayed }个结果"
@@ -1091,6 +1181,12 @@
     "url_22a5f3b8": {
         "message": "URL"
     },
+    "usage_right_ff96f3e2": {
+        "message": "使用权限："
+    },
+    "usage_rights_required_5fe4dd68": {
+        "message": "使用权限（必填）"
+    },
     "use_arrow_keys_to_navigate_options_2021cc50": {
         "message": "使用方向键来导航各选项。"
     },
@@ -1130,6 +1226,9 @@
     "video_player_for_title_ffd9fbc4": {
         "message": "{ title }的视频播放器"
     },
+    "view_ba339f93": {
+        "message": "查看"
+    },
     "view_keyboard_shortcuts_34d1be0b": {
         "message": "查看键盘快捷键"
     },
@@ -1159,6 +1258,9 @@
     },
     "you_have_media_feedback_f5f9aba8": {
         "message": "您有媒体反馈。"
+    },
+    "you_may_not_upload_an_empty_file_11c31eb2": {
+        "message": "无法上传空文件。"
     },
     "you_must_provide_a_date_and_time_a86839d2": {
         "message": "须提供日期和时间。"

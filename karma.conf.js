@@ -115,7 +115,7 @@ const karmaConfig = {
 }
 
 // For faster local debugging in karma, only add istanbul cruft you've explicity set the "COVERAGE" environment variable
-if (process.env.COVERAGE) {
+if (process.env.COVERAGE === '1') {
   karmaConfig.reporters.push('coverage-istanbul')
   karmaConfig.coverageIstanbulReporter = {
     reports: ['html', 'json'],
@@ -129,7 +129,7 @@ if (process.env.COVERAGE) {
       options: {esModules: true, produceSourceMap: true}
     },
     enforce: 'post',
-    exclude: /(node_modules|spec|public\/javascripts\/(bower|client_apps|translations|vendor|custom_moment_locales|custom_timezone_locales))/
+    exclude: /(node_modules|spec|public\/javascripts\/(bower|canvas_quizzes|translations|vendor|custom_moment_locales|custom_timezone_locales))/
   })
 }
 

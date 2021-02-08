@@ -75,13 +75,15 @@ export default function SpeedGraderSettingsMenu(props) {
         </Menu.Item>
       )}
 
-      <Menu.Item
-        name="keyboardShortcuts"
-        onSelect={props.openKeyboardShortcutsModal}
-        value="keyboardShortcuts"
-      >
-        <Text>{I18n.t('Keyboard Shortcuts')}</Text>
-      </Menu.Item>
+      {props.showKeyboardShortcutsMenuItem && (
+        <Menu.Item
+          name="keyboardShortcuts"
+          onSelect={props.openKeyboardShortcutsModal}
+          value="keyboardShortcuts"
+        >
+          <Text>{I18n.t('Keyboard Shortcuts')}</Text>
+        </Menu.Item>
+      )}
 
       {props.showHelpMenuItem && (
         <Menu.Item name="help" onSelect={handleHelpSelect} value="help">
@@ -101,7 +103,8 @@ SpeedGraderSettingsMenu.propTypes = {
   openOptionsModal: func.isRequired,
   openKeyboardShortcutsModal: func.isRequired,
   showHelpMenuItem: bool.isRequired,
-  showModerationMenuItem: bool.isRequired
+  showModerationMenuItem: bool.isRequired,
+  showKeyboardShortcutsMenuItem: bool.isRequired
 }
 
 SpeedGraderSettingsMenu.defaultProps = {

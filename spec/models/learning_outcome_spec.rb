@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -87,6 +89,34 @@ describe LearningOutcome do
       })
       @result.reload
       @rubric.reload
+    end
+
+    it "adding outcomes to a rubric should increment datadog counter" do
+      expect(InstStatsd::Statsd).to receive(:increment).with('learning_outcome.align')
+      @rubric = Rubric.new(:context => @course)
+      @rubric.data = [
+        {
+          :points => 3,
+          :description => "Outcome row",
+          :id => 1,
+          :ratings => [
+            {
+              :points => 3,
+              :description => "Rockin'",
+              :criterion_id => 1,
+              :id => 2
+            },
+            {
+              :points => 0,
+              :description => "Lame",
+              :criterion_id => 1,
+              :id => 3
+            }
+          ],
+          :learning_outcome_id => @outcome.id
+        }
+      ]
+      @rubric.save!
     end
 
     it "should allow learning outcome rows in the rubric" do

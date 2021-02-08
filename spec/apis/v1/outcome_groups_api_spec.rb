@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -288,7 +290,7 @@ describe "Outcome Groups API", type: :request do
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome, can_edit) do
-          expect(outcome).to eq({
+          expect(outcome).to include({
             "id" => @outcome.id,
             "vendor_guid" => @outcome.vendor_guid,
             "context_type" => @account.class.to_s,
@@ -304,8 +306,8 @@ describe "Outcome Groups API", type: :request do
 
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_edit, can_unlink) do
-          expect(outcome_link).to eq({
-          "context_type" => context.class.to_s,
+          expect(outcome_link).to include({
+            "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
             "assessed" => assessed,
@@ -373,6 +375,33 @@ describe "Outcome Groups API", type: :request do
           false,
           false
         )
+      end
+    end
+
+    describe 'with the account_level_mastery_scales FF enabled' do
+      before do
+        proficiency = outcome_proficiency_model(@account)
+        @ratings_hash = proficiency.ratings_hash
+        @mastery_points = proficiency.mastery_points
+        @points_possible = proficiency.points_possible
+        @account.enable_feature!(:account_level_mastery_scales)
+      end
+
+      it 'should correctly serialize mastery scale data for each link' do
+        json = api_call(
+          :get,
+          "/api/v1/accounts/#{@account.id}/outcome_group_links",
+          controller: 'outcome_groups_api',
+          action: 'link_index',
+          account_id: @account.id,
+          :outcome_style => "full",
+          format: 'json'
+        )
+        json.each do |link|
+          expect(link['outcome']['ratings']).to eq @ratings_hash.map(&:stringify_keys)
+          expect(link['outcome']['mastery_points']).to eq @mastery_points
+          expect(link['outcome']['points_possible']).to eq @points_possible
+        end
       end
     end
   end
@@ -795,6 +824,7 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => outcome.id),
           "assessed" => false,
           "can_unlink" => true,
+          "quiz_lti" => false,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -893,7 +923,7 @@ describe "Outcome Groups API", type: :request do
     context "assessed trait on outcome link object" do
       let(:check_outcome) do
         ->(outcome) do
-          expect(outcome).to eq({
+          expect(outcome).to include({
             "id" => @outcome.id,
             "vendor_guid" => @outcome.vendor_guid,
             "context_type" => @account.class.to_s,
@@ -909,7 +939,7 @@ describe "Outcome Groups API", type: :request do
 
       let(:check_outcome_link) do
         ->(outcome_link, context, group, assessed, can_unlink) do
-          expect(outcome_link).to eq({
+          expect(outcome_link).to include({
           "context_type" => context.class.to_s,
             "context_id" => context.id,
             "url" => polymorphic_path([:api_v1, context, :outcome_link], :id => group.id, :outcome_id => @outcome.id),
@@ -1123,6 +1153,7 @@ describe "Outcome Groups API", type: :request do
           "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),
           "assessed" => false,
           "can_unlink" => true,
+          "quiz_lti" => false,
           "outcome_group" => {
             "id" => @group.id,
             "title" => @group.title,
@@ -1431,6 +1462,7 @@ describe "Outcome Groups API", type: :request do
 
     it "should fail (400) if this is the last link for an aligned outcome" do
       aqb = @account.assessment_question_banks.create!
+      exp_warning = /Outcome \'#{@outcome.short_description}\' cannot be deleted because it is aligned to content\./
       @outcome.align(aqb, @account, :mastery_type => "none")
       raw_api_call(:delete, "/api/v1/accounts/#{@account.id}/outcome_groups/#{@group.id}/outcomes/#{@outcome.id}",
                    :controller => 'outcome_groups_api',
@@ -1441,7 +1473,7 @@ describe "Outcome Groups API", type: :request do
                    :format => 'json')
       assert_status(400)
       parsed_body = JSON.parse( response.body )
-      expect(parsed_body[ 'message' ]).to match /link is the last link/i
+      expect(parsed_body[ 'message' ]).to match exp_warning
     end
 
     it "should unlink the outcome from the group" do
@@ -1464,7 +1496,7 @@ describe "Outcome Groups API", type: :request do
                    :id => @group.id.to_s,
                    :outcome_id => @outcome.id.to_s,
                    :format => 'json')
-      expect(json).to eq({
+      expect(json).to include({
         "context_type" => "Account",
         "context_id" => @account.id,
         "url" => polymorphic_path([:api_v1, @account, :outcome_link], :id => @group.id, :outcome_id => @outcome.id),

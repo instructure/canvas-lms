@@ -21,6 +21,7 @@ import signupDialog from 'compiled/registration/signupDialog'
 import ready from '@instructure/ready'
 
 const eventToBindTo = 'click'
+
 ready(() => {
   setupForgotPassword()
   setupParentSignup()
@@ -41,11 +42,14 @@ function setupParentSignup() {
 function setupForgotPassword() {
   const $front_back_container = document.querySelector('#f1_container')
   const $flip_to_back = document.querySelector('.flip-to-back')
+  const $forgot_password_form = document.querySelector('#forgot_password_form')
+  const uniqueIdInput = document.querySelector('#pseudonym_session_unique_id_forgot')
 
   if ($flip_to_back) {
     $flip_to_back.addEventListener(eventToBindTo, event => {
       event.preventDefault()
       addClass($front_back_container, 'flipped')
+      setFocus(uniqueIdInput)
     })
   }
 
@@ -54,14 +58,11 @@ function setupForgotPassword() {
     removeClass($front_back_container, 'flipped')
   })
 
-  const $forgot_password_form = document.querySelector('#forgot_password_form')
   $forgot_password_form.addEventListener('submit', event => {
     const $button = $forgot_password_form.querySelector('.request-password-button')
-    const originalText = $button.textContent
-    const uniqueId = $forgot_password_form
-      .querySelector('input[name="pseudonym_session[unique_id_forgot]"]')
-      .value.trim()
-    if (!uniqueId) return false
+    const uniqueIdValue = uniqueIdInput.value.trim()
+
+    if (!uniqueIdValue) return false
     $button.disabled = true
     $button.textContent = $button.getAttribute('data-text-while-loading')
     event.preventDefault()
@@ -71,18 +72,20 @@ function setupForgotPassword() {
       data: `authenticity_token=${encodeURIComponent(
         $forgot_password_form.querySelector('input[name=authenticity_token]').value
       )}
-            &pseudonym_session%5Bunique_id_forgot%5D=${encodeURIComponent(uniqueId)}`,
+            &pseudonym_session%5Bunique_id_forgot%5D=${encodeURIComponent(uniqueIdValue)}`,
       success() {
-        alert(ENV.RESET_SENT)
+        $button.disabled = false
+        $button.textContent = $button.getAttribute('data-text-when-loaded')
       },
       error() {
-        alert(ENV.RESET_ERROR)
-      },
-      complete() {
-        $button.textContent = originalText
+        $button.textContent = $button.getAttribute('data-text-on-error')
       }
     })
   })
+}
+
+function setFocus(element) {
+  element.focus()
 }
 
 function addClass(element, name) {

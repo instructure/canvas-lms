@@ -29,7 +29,7 @@ import StudentContentDataLoader from './StudentContentDataLoader'
 import StudentIdsLoader from './StudentIdsLoader'
 
 export default class DataLoader {
-  constructor({gradebook, performanceControls}) {
+  constructor({gradebook, performanceControls, loadAssignmentsByGradingPeriod}) {
     this._gradebook = gradebook
 
     const dispatch = new RequestDispatch({
@@ -37,11 +37,13 @@ export default class DataLoader {
     })
 
     const loaderConfig = {
+      requestCharacterLimit: 8000, // apache limit
       dispatch,
       gradebook,
-      performanceControls
+      performanceControls,
+      loadAssignmentsByGradingPeriod
     }
-
+    this.loadAssignmentsByGradingPeriod = loadAssignmentsByGradingPeriod
     this.assignmentGroupsLoader = new AssignmentGroupsLoader(loaderConfig)
     this.contextModulesLoader = new ContextModulesLoader(loaderConfig)
     this.customColumnsDataLoader = new CustomColumnsDataLoader(loaderConfig)
@@ -58,9 +60,8 @@ export default class DataLoader {
     this.__loadGradebookData({
       dataLoader: this,
       gradebook,
-
       getAssignmentGroups: true,
-      getContextModules: true,
+      getModules: gradebook.options.has_modules,
       getCustomColumns: true,
       getGradingPeriodAssignments: gradebook.gradingPeriodSet != null
     })
@@ -118,19 +119,31 @@ export default class DataLoader {
     // Begin loading Student IDs before any other data.
     const gotStudentIds = dataLoader.studentIdsLoader.loadStudentIds()
 
-    if (options.getAssignmentGroups) {
-      dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+    let gotGradingPeriodAssignments
+    if (options.getGradingPeriodAssignments) {
+      gotGradingPeriodAssignments = dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
     }
 
-    if (options.getGradingPeriodAssignments) {
-      dataLoader.gradingPeriodAssignmentsLoader.loadGradingPeriodAssignments()
+    if (options.getAssignmentGroups) {
+      if (
+        this.loadAssignmentsByGradingPeriod &&
+        gotGradingPeriodAssignments &&
+        gradebook.gradingPeriodId !== '0'
+      ) {
+        // eslint-disable-next-line promise/catch-or-return
+        gotGradingPeriodAssignments.then(() => {
+          dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+        })
+      } else {
+        dataLoader.assignmentGroupsLoader.loadAssignmentGroups()
+      }
     }
 
     if (options.getCustomColumns) {
       dataLoader.customColumnsLoader.loadCustomColumns()
     }
 
-    if (options.getContextModules) {
+    if (options.getModules) {
       dataLoader.contextModulesLoader.loadContextModules()
     }
 
@@ -142,10 +155,15 @@ export default class DataLoader {
     await dataLoader.studentContentDataLoader.load(studentIdsToLoad)
 
     /*
-     * Currently, custom columns data has the lowest priority for initial
-     * data loading, so it waits until all students and submissions are
-     * finished loading.
+     * Load custom column data if:
+     *   Custom columns are not done loading (we'll ask for the data now in case custom columns exist), OR
+     *   Custom columns are done loading, and at least one of them is being shown in the Gradebook.
      */
-    dataLoader.customColumnsDataLoader.loadCustomColumnsData()
+    if (
+      !gradebook.contentLoadStates.customColumnsLoaded ||
+      gradebook.listVisibleCustomColumns().length
+    ) {
+      dataLoader.customColumnsDataLoader.loadCustomColumnsData()
+    }
   }
 }

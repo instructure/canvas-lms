@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ module Canvas::Oauth
     let(:provider) { Provider.new('123') }
 
     def stub_dev_key(key)
-      allow(DeveloperKey).to receive(:where).and_return(double(first: key))
+      allow(DeveloperKey).to receive(:find_cached).and_return(key)
     end
 
     describe 'initialization' do

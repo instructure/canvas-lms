@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
 require File.expand_path(File.dirname(__FILE__) + '/../views_helper')
 
-describe "/shared/_user_lists" do
+describe "shared/_user_lists" do
   it "should render as a course" do
     assign(:context, course_factory)
     render :partial => "shared/user_lists"

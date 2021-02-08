@@ -5,7 +5,7 @@
 <div class="row-fluid message-info">
   <div class="span8 user-info">
 {{/if}}
-    {{>avatar author}}
+    <div id={{avatarContainerId}} class="fs-exclude avatar"></div>
     <div class="message-author-and-participants">
       <b class="username">{{author.name}}{{#if author.pronouns}} <i>({{author.pronouns}})</i> {{/if}}</b>{{#if participants.length}},{{/if}}
 

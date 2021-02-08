@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -38,7 +40,7 @@ module Types
     field :path_type, String, null: true
 
     field :notification_policies, [NotificationPolicyType], null: true do
-      argument :context_type, NotificationPreferencesContextType, required: true
+      argument :context_type, NotificationPreferencesContextType, required: false
     end
     def notification_policies(context_type: nil)
       NotificationPolicy.find_all_for(self.object, context_type: context_type)
@@ -51,7 +53,7 @@ module Types
     end
     def notification_policy_overrides(account_id: nil, course_id: nil, context_type: nil)
       overrides_for = ->(context) do
-        NotificationPolicyOverride.find_all_for(current_user, context, channel: object)
+        NotificationPolicyOverride.find_all_for(current_user, [context], channel: object)
       end
 
       case context_type

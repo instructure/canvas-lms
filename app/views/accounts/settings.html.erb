@@ -59,6 +59,9 @@
     <% if can_do(@context, @current_user, :manage_account_settings) %>
     <li><a href="#tab-settings" id="tab-settings-link"><%= t(:tab_settings, "Settings") %></a></li>
     <% end %>
+    <% if can_do(@account, @current_user, :manage_privacy_settings) %>
+    <li><a href="#tab-privacy" id="tab-privacy-link"><%= t(:tab_privacy, "Privacy") %></a></li>
+    <% end %>
     <% if can_do(@context, @current_user, :manage_storage_quotas) %>
     <li><a href="#tab-quotas" id="tab-quotas-link"><%= t(:tab_quotas, "Quotas") %></a></li>
     <% end %>
@@ -78,11 +81,7 @@
     <% end %>
     <% if can_do(@context, @current_user, :view_feature_flags) %>
       <li><a href="#tab-features" id="tab-features-link">
-        <% if @account.root_account.feature_enabled?(:new_features_ui) %>
-          <%= t(:feature_preview, "Feature Preview") %>
-        <% else %>
           <%= t(:feature_options, "Feature Options") %>
-        <% end %>
         </a>
       </li>
     <% end %>
@@ -311,6 +310,18 @@
                   <% end %>
                 <% end %>
 
+                <% if @account.feature_allowed?(:rce_enhancements) %>
+                  <%= settings.fields_for :disable_rce_media_uploads do |r| %>
+                    <% hash = @account.disable_rce_media_uploads %>
+                    <% disabled = hash[:locked] && hash[:inherited] %>
+                    <tr>
+                      <td colspan="2">
+                        <%= r.check_box :value, checked: hash[:value], disabled: disabled %>
+                        <%= r.label :value, t("Disable uploads to Canvas Media from the enhanced rich content editor") %>
+                      </td>
+                    </tr>
+                  <% end %>
+                <% end %>
               <% end %>
             <% end %>
           </table>
@@ -339,24 +350,10 @@
               <%= settings.check_box :can_add_pronouns, :checked => @account.settings[:can_add_pronouns], class: "element_toggler", "aria-controls": "personal_pronouns_options" %>
               <%= settings.label :can_add_pronouns, en: "Enable Personal Pronouns" %>
               <div id="personal_pronouns_options" <%= hidden(true) unless @account.settings[:can_add_pronouns] %>>
-                <table class="formtable">
-                  <tbody>
-                    <% ((@account.pronouns.presence || Pronouns.default_pronouns) + [nil]).each do |pronouns| %>
-                      <tr class="pronouns_row <%= raw ' blank" style="display: none;' if pronouns.nil? %>">
-                        <td> <input type="text" name="account[pronouns][]" value="<%= pronouns %>"/></td>
-                        <td> <a href="#" title="<%= t("Remove Pronouns %{pronoun}", :pronoun => pronouns) %>" role="button" class="close" data-remove=".pronouns_row"><i class="icon-end standalone-icon"></i></a> </td>
-                      </tr>
-                    <% end %>
-                  </tbody>
-                </table>
-                <button
-                  type="button"
-                  class="Button"
-                  onclick="$('.pronouns_row.blank').clone().removeClass('blank').show().insertBefore('.pronouns_row.blank').find('input').focus()"
-                >
-                  <i class='icon-add'></i>
-                  <%= t("Add pronouns option") %>
-                </button>
+                <%= settings.check_box :can_change_pronouns, :checked => @account.can_change_pronouns? %>
+                <%= settings.label :can_change_pronouns, en: "Allow users to change their pronouns in Canvas" %>
+                <% js_env(PRONOUNS_LIST: ((@account.pronouns.presence || Pronouns.default_pronouns)))
+                js_bundle :available_pronouns_list %>
               </div>
             <% end %>
           </fieldset>
@@ -424,16 +421,26 @@
                     <td> <label> <%= t("Name:") %></label> <input aria-label="<%= t("Name") %>" type="text" class="name" value="<%= name %>"/></td>
                     <td>
                       <label> <%= t("Filter:") %></label> <input aria-label="<%= t("Filter") %>" type="text" class="value" value="<%= filter %>" maxlength="255"/>
-                      <a href="#" title="<%= t(:quiz_ip_filters_delete, "Remove Filter") %>" class="delete_filter_link"><i class="icon-end standalone-icon"></i></a>
+                      <button
+                        type="button"
+                        class="Button Button--icon-action delete_filter_link"
+                        title="<%= t(:quiz_ip_filters_delete, "Remove Quiz IP Filter") %>"
+                      >
+                        <i class="icon-end standalone-icon"></i>
+                      </button>
                     </td>
                   </tr>
                 <% end %>
               </tbody>
             </table>
-            <a href="#" class="icon-add add_ip_filter_link">
+            <button
+              type="button"
+              class="Button add_ip_filter_link"
+              title="<%= t("Add Quiz IP Filter") %>"
+            >
+              <i class='icon-add'></i>
               <span aria-hidden="true"><%= t(:add_ip_filter_link, "Filter") %></span>
-              <span class="screenreader-only"><%= t("Add Quiz IP Filter") %></span>
-            </a>
+            </button>
           </fieldset>
         <% end %>
 
@@ -500,7 +507,7 @@
                     </p>
                     <p>
                       <%= t do %>
-                      Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/docs/DOC-3010" target="_blank"> our documentation</a>.
+                      Before implementing custom CSS or Javascript, please refer to <a href="https://community.canvaslms.com/t5/Admin-Guide/How-do-I-upload-custom-JavaScript-and-CSS-files-to-an-account/ta-p/253" target="_blank"> our documentation</a>.
                       <% end %>
                     </p>
                   </div>
@@ -547,7 +554,7 @@
                 </div>
               <% end %>
               <div>
-                <%= settings.check_box :users_can_edit_name, :checked => @account.settings[:users_can_edit_name] != false %>
+                <%= settings.check_box :users_can_edit_name, :checked => @account.users_can_edit_name? %>
                 <%= settings.label :users_can_edit_name, :en => "Users can edit their name" %>
               </div>
 
@@ -783,6 +790,35 @@ acknowledge that you have read and agreed to the
 
         <div class="button-container">
           <button type="submit" class="Button Button--primary"><%= t(:update_settings_button, "Update Settings") %></button>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if can_do(@account, @current_user, :manage_privacy_settings) %>
+    <div id="tab-privacy">
+      <h2 class="screenreader-only"><%= t('headings.privacy', "Privacy") %></h2>
+      <%= form_for(:account, url: account_url(@account), html: {
+            method: :put,
+            id: "account_privacy_settings"
+          }) do |f|
+      %>
+        <%= f.fields_for :settings do |settings| %>
+          <div>
+            <%= settings.check_box :enable_google_analytics, checked: @account.settings.fetch(:enable_google_analytics, true) %>
+            <%= settings.label :enable_google_analytics, en: "Allow tracking with Google Analytics" %>
+          </div>
+
+          <div>
+            <%= settings.check_box :enable_fullstory, checked: @account.settings.fetch(:enable_fullstory, true) %>
+            <%= settings.label :enable_fullstory, en: "Allow tracking with FullStory" %>
+          </div>
+        <% end %>
+
+        <div class="button-container">
+          <button type="submit" class="Button Button--primary">
+            <%= t(:update_settings_button, "Update Settings") %>
+          </button>
         </div>
       <% end %>
     </div>

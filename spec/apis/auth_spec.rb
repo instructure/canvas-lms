@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - 2014 Instructure, Inc.
 #
@@ -228,7 +230,7 @@ describe "API Authentication", type: :request do
           follow_redirect!
           expect(response).to redirect_to("/login/cas")
           follow_redirect!
-          expect(response).to redirect_to(controller.delegated_auth_redirect_uri(cas.add_service_to_login_url(url_for(controller: 'login/cas', action: :new))))
+          expect(response).to redirect_to(cas.add_service_to_login_url(url_for(controller: 'login/cas', action: :new)))
 
           get "/login/cas", params: {:ticket => 'ST-abcd'}
           expect(response).to be_redirect

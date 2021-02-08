@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -247,6 +249,19 @@ describe SectionTabHelper do
         it 'should include icon indicating it is not visible to students' do
           icon = html.xpath('i[contains(@class, "nav-icon")]')[0]
           expect(icon.attributes['class'].value).to include('icon-off')
+        end
+      end
+
+      context 'when tab is neither hidden nor unused' do
+        let(:string) do
+          SectionTabHelperSpec::SectionTabTag.new(
+            tab_assignments.merge(), course
+          ).a_tag
+        end
+        let(:html) { Nokogiri::HTML.fragment(string).children[0] }
+
+        it 'shouldn\'t have a title attribute' do
+          expect(html.attributes).not_to include('title')
         end
       end
     end

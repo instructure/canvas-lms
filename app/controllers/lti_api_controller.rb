@@ -24,6 +24,10 @@ class LtiApiController < ApplicationController
   skip_before_action :load_user
   skip_before_action :verify_authenticity_token
 
+  # these exceptions will happen on bad external requests,
+  # we don't need to tell sentry about every one of them
+  rescue_from BasicLTI::BasicOutcomes::Unauthorized, BasicLTI::BasicOutcomes::InvalidRequest, with: :rescue_expected_error_type
+
   # this API endpoint passes all the existing tests for the LTI v1.1 outcome service specification
   def grade_passback
     verify_oauth
@@ -136,13 +140,8 @@ class LtiApiController < ApplicationController
     assignment.update_attribute(:turnitin_enabled, false) if assignment.turnitin_enabled?
     request.body.rewind
     turnitin_processor = Turnitin::OutcomeResponseProcessor.new(@tool, assignment, user, JSON.parse(request.body.read))
-    turnitin_processor.send_later_enqueue_args(
-      :process,
-      {
-        max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
-        priority: Delayed::LOW_PRIORITY
-      }
-    )
+    turnitin_processor.delay(max_attempts: Turnitin::OutcomeResponseProcessor.max_attempts,
+        priority: Delayed::LOW_PRIORITY).process
     render json: {}, status: 200
   end
 
@@ -156,7 +155,10 @@ class LtiApiController < ApplicationController
     # verify the request oauth signature, timestamp and nonce
     begin
       @signature = OAuth::Signature.build(request, :consumer_secret => @tool.shared_secret)
-      @signature.verify() or raise OAuth::Unauthorized.new(request)
+      unless @signature.verify
+        Lti::Logging.lti_1_api_signature_verification_failed(@signature.signature_base_string)
+        raise OAuth::Unauthorized.new, request
+      end
 
     rescue OAuth::Signature::UnknownSignatureMethod, OAuth::Unauthorized => e
       Canvas::Errors::Reporter.raise_canvas_error(BasicLTI::BasicOutcomes::Unauthorized, "Invalid authorization header", oauth_error_info.merge({error_class: e.class.name}))

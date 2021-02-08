@@ -27,25 +27,28 @@ const AnnouncementsTray = () => (
     image="/images/tutorial-tray-images/Panda_Announcements.svg"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor
-      -guide-table-of-contents#jive_content_id_Announcements`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('What are announcements?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10736-67952724136'
+        href:
+          'https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Announcements/ta-p/39'
       },
       {
         label: I18n.t('How do I add an announcement in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10405-415250731'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-an-announcement-in-a-course/ta-p/1194'
       },
       {
         label: I18n.t('How do I edit an announcement in a course?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10407-415250732'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-edit-an-announcement-in-a-course/ta-p/1190'
       },
       {
         label: I18n.t('How do I use the Announcements Index Page?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10214-415276768'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-use-the-Announcements-Index-Page/ta-p/1113'
       }
     ]}
   >

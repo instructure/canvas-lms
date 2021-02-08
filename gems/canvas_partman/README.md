@@ -160,8 +160,10 @@ end
 
 ### Running Specs
 to get partman specs to run locally:
- - create a database named canvas_partman_test in an available postgres instance
+ - create a database named canvas_partman_test in an available postgres instance:
+     something like: `createdb -U postgres canvas_partman_test`
  - set your DATABASE_URL environment variable to: `postgresql://user:pass@dbhostname/canvas_partman_test"`
+     example: `export DATABASE_URL=postgresql://postgres:sekret@postgres/canvas_partman_test`
  - run `bundle exec rspec spec` from the gem root directory
 
 # TODO

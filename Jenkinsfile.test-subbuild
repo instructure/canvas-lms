@@ -18,6 +18,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+library "canvas-builds-library"
+
 pipeline {
   agent { label 'canvas-docker' }
   options {
@@ -29,7 +31,7 @@ pipeline {
     stage('Print Env Variables') {
       steps {
         timeout(time: 20, unit: 'SECONDS') {
-          sh 'build/new-jenkins/print-env-excluding-secrets.sh'
+          cleanAndSetup()
         }
       }
     }

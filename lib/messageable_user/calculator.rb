@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -226,30 +228,30 @@ class MessageableUser
       messageable_groups_by_shard.values.flatten
     end
 
-    def self.slave_module
-      @slave_module ||= Module.new.tap { |m| prepend(m) }
+    def self.secondary_module
+      @secondary_module ||= Module.new.tap { |m| prepend(m) }
     end
 
-    def self.slave(method)
-      slave_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
+    def self.secondary(method)
+      secondary_module.module_eval <<-RUBY, __FILE__, __LINE__ + 1
         def #{method}(*)
-          Shackles.activate(:slave) { super }
+          GuardRail.activate(:secondary) { super }
         end
       RUBY
     end
 
-    slave :load_messageable_users
-    slave :messageable_users_in_context
-    slave :messageable_users_in_course
-    slave :messageable_users_in_section
-    slave :messageable_users_in_group
-    slave :count_messageable_users_in_context
-    slave :count_messageable_users_in_course
-    slave :count_messageable_users_in_section
-    slave :count_messageable_users_in_group
-    slave :search_messageable_users
-    slave :messageable_sections
-    slave :messageable_groups
+    secondary :load_messageable_users
+    secondary :messageable_users_in_context
+    secondary :messageable_users_in_course
+    secondary :messageable_users_in_section
+    secondary :messageable_users_in_group
+    secondary :count_messageable_users_in_context
+    secondary :count_messageable_users_in_course
+    secondary :count_messageable_users_in_section
+    secondary :count_messageable_users_in_group
+    secondary :search_messageable_users
+    secondary :messageable_sections
+    secondary :messageable_groups
 
     # ==========================  end of public API  ==========================
     # |                                                                       |
@@ -472,6 +474,9 @@ class MessageableUser
 
       group.shard.activate do
         if options[:admin_context] || fully_visible_group_ids.include?(group.id)
+          # bail early if user doesn't have permission to message group members
+          return if group&.context&.is_a?(Course) && !group.context.grants_right?(@user, nil, :send_messages)
+
           group_user_scope.where('group_memberships.group_id' => group.id).merge(active_users_in_group_context.except(:joins))
         elsif section_visible_group_ids.include?(group.id)
           # group.context is guaranteed to be a course from
@@ -536,7 +541,7 @@ class MessageableUser
       ]
       if options[:include_concluded]
         clause = Enrollment::QueryBuilder.new(:completed, options.slice(:strict_checks)).conditions
-        clause << " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
+        clause += " AND enrollments.type IN ('TeacherEnrollment', 'TaEnrollment')" unless options[:include_concluded_students]
         state_clauses << clause
       end
       state_clauses.compact!
@@ -637,7 +642,7 @@ class MessageableUser
     # enrollment in a course is as a student, he can't see observers that
     # aren't observing him
     def observer_restriction_clause
-      clause = ["enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
+      clause = [+"enrollments.course_id NOT IN (?) OR enrollments.type != 'ObserverEnrollment'", student_courses.map(&:id)]
       if linked_observer_ids.present?
         clause.first << " OR enrollments.user_id IN (?)"
         clause << linked_observer_ids
@@ -788,7 +793,7 @@ class MessageableUser
         select("group_memberships.group_id AS group_id").
         distinct.
         joins(:user, :group).
-        joins(<<-SQL).
+        joins(<<~SQL).
           INNER JOIN #{Enrollment.quoted_table_name} ON
             enrollments.user_id=users.id AND
             enrollments.course_id=groups.context_id

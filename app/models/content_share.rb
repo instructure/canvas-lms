@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -17,20 +19,35 @@
 #
 
 class ContentShare < ActiveRecord::Base
+  TYPE_TO_CLASS = {
+    'assignment' => Assignment,
+    'discussion_topic' => DiscussionTopic,
+    'page' => WikiPage,
+    'quiz' => Quizzes::Quiz,
+    'module' => ContextModule,
+    'module_item' => ContentTag
+  }.freeze
+
+  CLASS_NAME_TO_TYPE = TYPE_TO_CLASS.transform_values(&:to_s).invert.freeze
 
   belongs_to :user
   belongs_to :content_export
+  has_one :course, through: :content_export, source: :context, source_type: 'Course'
+  has_one :group, through: :content_export, source: :context, source_type: 'Group'
+  has_one :context_user, through: :content_export, source: :context, source_type: 'User'
+
+  belongs_to :sender, class_name: "User"
+  belongs_to :root_account, class_name: "Account"
 
   validates :read_state, inclusion: { in: %w(read unread) }
 
   before_create :set_root_account_id
 
   scope :by_date, -> { order(created_at: :desc) }
-  scope :with_content, -> { joins(:content_export) }
 
   def clone_for(receiver)
-    receiver.received_content_shares.create!(sender_id: self.user_id,
-                                             content_export_id: self.content_export_id,
+    receiver.received_content_shares.create!(sender: self.user,
+                                             content_export: self.content_export,
                                              name: self.name,
                                              read_state: 'unread')
   end

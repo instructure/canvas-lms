@@ -35,7 +35,7 @@ class RequestContextGenerator
     # to a cookie in this middleware because the cookie header has already been
     # written by the time this app.call returns.
     session_id = ActionDispatch::Request.new(env).cookie_jar[:log_session_id]
-    meta_headers = ""
+    meta_headers = +""
     Thread.current[:context] = {
       request_id:   request_id,
       session_id:   session_id,

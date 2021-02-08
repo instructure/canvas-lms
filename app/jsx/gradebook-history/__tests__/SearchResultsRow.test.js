@@ -27,6 +27,7 @@ const item = {
     muted: false,
     name: 'Rustic Rubber Duck'
   },
+  courseOverrideGrade: false,
   date: '2017-05-30T23:16:59Z',
   displayAsPoints: true,
   grader: 'Ms. Lopez',
@@ -124,5 +125,23 @@ describe('SearchResultsRow', () => {
 
   it('displays only the history grade current if grade cannot be parsed as a number', () => {
     expect(renderAndGetRow(7, {gradeCurrent: 'B'})).toBe('B')
+  })
+
+  describe('Override grade changes', () => {
+    let overrideItem
+
+    beforeEach(() => {
+      overrideItem = {...item, assignment: undefined, courseOverrideGrade: true}
+    })
+
+    it('displays the assignment name as "Final Grade Override"', () => {
+      expect(renderAndGetRow(4, overrideItem)).toBe('Final Grade Override')
+    })
+
+    it('italicizes the assignment name', () => {
+      const {container} = render(<WrappedComponent {...overrideItem} />)
+      const textElement = container.querySelectorAll('td')[4].querySelector('span')
+      expect(window.getComputedStyle(textElement).fontStyle).toBe('italic')
+    })
   })
 })

@@ -16,9 +16,10 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {saveMediaRecording} from '@instructure/canvas-media'
 import * as files from './files'
 import * as images from './images'
-import Bridge from '../../bridge'
+import bridge from '../../bridge'
 import {fileEmbed} from '../../common/mimeClass'
 import {isPreviewable} from '../../rce/plugins/shared/Previewable'
 import {isImage, isAudioOrVideo} from '../../rce/plugins/shared/fileTypeUtils'
@@ -56,7 +57,7 @@ export function failFoldersLoad(error) {
 }
 
 export function failMediaUpload(error) {
-  Bridge.showError(error)
+  bridge.showError(error)
   return {type: FAIL_MEDIA_UPLOAD, error}
 }
 
@@ -99,14 +100,14 @@ export function stopMediaUploading() {
 export function activateMediaUpload(fileMetaProps) {
   return dispatch => {
     dispatch(startMediaUploading(fileMetaProps))
-    Bridge.insertImagePlaceholder(fileMetaProps)
+    bridge.insertImagePlaceholder(fileMetaProps)
   }
 }
 
 export function removePlaceholdersFor(name) {
   return dispatch => {
     dispatch(stopMediaUploading())
-    Bridge.removePlaceholders(name)
+    bridge.removePlaceholders(name)
   }
 }
 
@@ -130,31 +131,37 @@ export function allUploadCompleteActions(results, fileMetaProps, contextType) {
   return actions
 }
 
-function linkingExistingContent() {
-  return Bridge.existingContentToLink() || Bridge.existingContentToLinkIsImg()
-}
 export function embedUploadResult(results, selectedTabType) {
   const embedData = fileEmbed(results)
-
-  if (selectedTabType === 'images' && isImage(embedData.type) && !linkingExistingContent()) {
+  if (selectedTabType === 'images' && isImage(embedData.type) && results.displayAs !== 'link') {
+    // embed the image after any current selection rather than link to it or replace it
+    bridge
+      .activeEditor()
+      ?.mceInstance()
+      ?.selection.collapse()
     const file_props = {
       href: results.href || results.url,
       title: results.title,
       display_name: results.display_name || results.name || results.title || results.filename,
       alt_text: results.alt_text,
+      isDecorativeImage: results.isDecorativeImage,
       content_type: results['content-type'],
       contextType: results.contextType,
       contextId: results.contextId,
       uuid: results.uuid
     }
-    Bridge.insertImage(file_props)
-  } else if (
-    selectedTabType === 'media' &&
-    isAudioOrVideo(embedData.type) &&
-    !linkingExistingContent()
-  ) {
-    Bridge.embedMedia({
-      id: embedData.id,
+    bridge.insertImage(file_props)
+  } else if (selectedTabType === 'media' && isAudioOrVideo(embedData.type)) {
+    // embed media after any current selection rather than link to it or replace it
+    bridge
+      .activeEditor()
+      ?.mceInstance()
+      ?.selection.collapse()
+
+    // when we record audio, notorious thinks it's a video. use the content type we got
+    // from the recoreded file, not the returned media object.
+    bridge.embedMedia({
+      id: results.id,
       embedded_iframe_url: results.embedded_iframe_url,
       href: results.href || results.url,
       media_id: results.media_id,
@@ -165,11 +172,16 @@ export function embedUploadResult(results, selectedTabType) {
       uuid: results.uuid
     })
   } else {
-    Bridge.insertLink(
+    bridge.insertLink(
       {
         'data-canvas-previewable': isPreviewable(results['content-type']),
         href: results.href || results.url,
-        title: results.display_name || results.name || results.title || results.filename,
+        title:
+          results.alt_text ||
+          results.display_name ||
+          results.name ||
+          results.title ||
+          results.filename,
         content_type: results['content-type'],
         embed: embedData,
         target: '_blank',
@@ -232,9 +244,9 @@ export function mediaUploadComplete(error, uploadData) {
 export function createMediaServerSession() {
   return (dispatch, getState) => {
     const {source} = getState()
-    if (!Bridge.mediaServerSession) {
+    if (!bridge.mediaServerSession) {
       return source.mediaServerSession().then(data => {
-        Bridge.setMediaServerSession(data)
+        bridge.setMediaServerSession(data)
       })
     }
   }
@@ -242,8 +254,23 @@ export function createMediaServerSession() {
 
 export function uploadToMediaFolder(tabContext, fileMetaProps) {
   return (dispatch, getState) => {
+    const editorComponent = bridge.activeEditor()
+    const bookmark = editorComponent?.editor?.selection.getBookmark(2, true)
+
     dispatch(activateMediaUpload(fileMetaProps))
     const {source, jwt, host, contextId, contextType} = getState()
+
+    if (tabContext === 'media' && fileMetaProps.domObject) {
+      return saveMediaRecording(
+        fileMetaProps.domObject,
+        contextId,
+        contextType,
+        (err, uploadData) => {
+          dispatch(mediaUploadComplete(err, uploadData))
+        }
+      )
+    }
+
     return source
       .fetchMediaFolder({jwt, host, contextId, contextType})
       .then(({folders}) => {
@@ -251,7 +278,7 @@ export function uploadToMediaFolder(tabContext, fileMetaProps) {
         if (fileMetaProps.domObject) {
           delete fileMetaProps.domObject.preview // don't need this anymore
         }
-        dispatch(uploadPreflight(tabContext, fileMetaProps))
+        dispatch(uploadPreflight(tabContext, {...fileMetaProps, bookmark}))
       })
       .catch(e => {
         // Get rid of any placeholder that might be there.
@@ -358,12 +385,34 @@ export function uploadPreflight(tabContext, fileMetaProps) {
         return setAltText(fileMetaProps.altText, results)
       })
       .then(results => {
+        if (fileMetaProps.isDecorativeImage) {
+          results.isDecorativeImage = fileMetaProps.isDecorativeImage
+        }
+        if (fileMetaProps.displayAs) {
+          results.displayAs = fileMetaProps.displayAs
+        }
+        return results
+      })
+      .then(results => {
         // This may or may not be necessary depending on the upload
         dispatch(removePlaceholdersFor(fileMetaProps.name))
         return results
       })
       .then(results => {
-        return embedUploadResult({contextType, contextId, ...results}, tabContext)
+        let newBookmark
+        const editorComponent = bridge.activeEditor()
+        if (fileMetaProps.bookmark) {
+          newBookmark = editorComponent.editor.selection.getBookmark(2, true)
+          editorComponent.editor.selection.moveToBookmark(fileMetaProps.bookmark)
+        }
+
+        const uploadResult = embedUploadResult({contextType, contextId, ...results}, tabContext)
+
+        if (fileMetaProps.bookmark) {
+          editorComponent.editor.selection.moveToBookmark(newBookmark)
+        }
+
+        return uploadResult
       })
       .then(results => {
         dispatch(allUploadCompleteActions(results, fileMetaProps, contextType))

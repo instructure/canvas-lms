@@ -36,7 +36,6 @@ pipeline {
         cleanAndSetup()
         timeout(time: 10) {
           sh 'build/new-jenkins/docker-compose-pull.sh'
-          sh 'build/new-jenkins/docker-compose-pull-selenium.sh'
           sh 'build/new-jenkins/docker-compose-build-up.sh'
           sh 'build/new-jenkins/docker-compose-setup-databases.sh'
         }
@@ -75,8 +74,10 @@ pipeline {
     }
 
     cleanup {
-      sh 'rm -vrf ./tmp/spec_failures'
-      execute 'bash/docker-cleanup.sh --allow-failure'
+      script {
+        sh 'rm -vrf ./tmp/spec_failures'
+        libraryScript.execute 'bash/docker-cleanup.sh --allow-failure'
+      }
     }
   }
 }

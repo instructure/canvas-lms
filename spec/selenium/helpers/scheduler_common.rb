@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -141,11 +143,6 @@ module SchedulerCommon
   # This method closes the modal only when it is already opened. If not, it will open the modal
   def close_select_courses_modal
     f('#FindAppointmentButton').click
-  end
-
-  def click_scheduler_link
-    f('button#scheduler').click
-    wait_for_ajaximations
   end
 
   def click_appointment_link

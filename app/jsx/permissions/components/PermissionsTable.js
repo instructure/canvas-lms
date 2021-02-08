@@ -26,10 +26,7 @@ import {maxBy} from 'lodash'
 import 'compiled/jquery.rails_flash_notifications'
 
 import {Button, CondensedButton, IconButton} from '@instructure/ui-buttons'
-import {Checkbox} from '@instructure/ui-checkbox'
 import {IconArrowOpenEndSolid, IconArrowOpenDownSolid} from '@instructure/ui-icons'
-
-import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {Text} from '@instructure/ui-elements'
 import {Tooltip} from '@instructure/ui-overlays'
 import {View} from '@instructure/ui-layout'
@@ -37,14 +34,14 @@ import {View} from '@instructure/ui-layout'
 import actions from '../actions'
 import {GROUP_PERMISSION_DESCRIPTIONS} from '../templates'
 import {ConnectedPermissionButton} from './PermissionButton'
-import propTypes, {ENABLED_FOR_NONE} from '../propTypes'
+import {ConnectedGranularCheckbox} from './GranularCheckbox'
+import propTypes from '../propTypes'
 
 const GRANULAR_PERMISSION_TAG = 'ic-permissions__grp-tag'
 
 export default class PermissionsTable extends Component {
   static propTypes = {
     roles: arrayOf(propTypes.role).isRequired,
-    modifyPermissions: func.isRequired,
     permissions: arrayOf(propTypes.permission).isRequired,
     setAndOpenRoleTray: func.isRequired,
     setAndOpenPermissionTray: func.isRequired
@@ -241,32 +238,6 @@ export default class PermissionsTable extends Component {
     )
   }
 
-  renderGranularCheckbox(role, perm) {
-    const perms = role.permissions
-    const name = perm.permission_name
-
-    function toggle() {
-      const enabled = !perms[name].enabled
-      const id = role.id
-
-      this.props.modifyPermissions({enabled, explicit: true, id, name})
-    }
-
-    return (
-      <div className="ic-permissions__permission-button-container">
-        <Checkbox
-          inline
-          checked={perms[name].enabled !== ENABLED_FOR_NONE}
-          disabled={perms[name].readonly}
-          label={<ScreenReaderContent>{perm.label}</ScreenReaderContent>}
-          onFocus={this.fixHorizontalScroll}
-          onChange={toggle.bind(this)}
-          value={perm.label}
-        />
-      </div>
-    )
-  }
-
   renderExpandedRows(perm) {
     return perm.granular_permissions.map(permission => (
       <tr
@@ -276,9 +247,13 @@ export default class PermissionsTable extends Component {
         {this.renderLeftHeader(permission)}
         {this.props.roles.map(role => (
           <td key={role.id}>
-            <div className="ic-permissions__cell-content-checkbox">
-              {this.renderGranularCheckbox(role, permission)}
-            </div>
+            <ConnectedGranularCheckbox
+              permission={role.permissions[permission.permission_name]}
+              permissionName={permission.permission_name}
+              permissionLabel={permission.label}
+              roleId={role.id}
+              handleScroll={this.fixHorizontalScroll}
+            />
           </td>
         ))}
       </tr>
@@ -336,7 +311,6 @@ function mapStateToProps(state, ownProps) {
 }
 
 const mapDispatchToProps = {
-  modifyPermissions: actions.modifyPermissions,
   setAndOpenRoleTray: actions.setAndOpenRoleTray,
   setAndOpenPermissionTray: actions.setAndOpenPermissionTray
 }

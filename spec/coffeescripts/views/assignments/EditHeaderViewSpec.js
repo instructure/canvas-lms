@@ -111,8 +111,7 @@ QUnit.module('EditHeaderView - try deleting assignment', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1},
-      jwt: 'foo'
+      assignment: {id: 1}
     }
   },
   teardown() {
@@ -141,8 +140,7 @@ QUnit.module('EditHeaderView - ConditionalRelease', {
     fakeENV.setup()
     ENV.CONDITIONAL_RELEASE_SERVICE_ENABLED = true
     ENV.CONDITIONAL_RELEASE_ENV = {
-      assignment: {id: 1},
-      jwt: 'foo'
+      assignment: {id: 1}
     }
   },
   teardown() {

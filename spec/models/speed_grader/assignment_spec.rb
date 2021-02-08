@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -112,6 +114,8 @@ describe SpeedGrader::Assignment do
         subject { @comments }
 
         before do
+          skip("flaky specs - unskip in EVAL-1133")
+
           json = SpeedGrader::Assignment.new(assignment, teacher).json
           student_a_submission = json.fetch(:submissions).select { |s| s[:user_id] == first_student.id.to_s }.first
           @comments = student_a_submission.fetch(:submission_comments).map do |comment|
@@ -206,6 +210,31 @@ describe SpeedGrader::Assignment do
     ).to eq comment.provisional_grade_id.to_s
   end
 
+  context "rubric association" do
+    before(:once) do
+      @assignment = assignment_model(course: @course)
+    end
+
+    let(:json) { SpeedGrader::Assignment.new(@assignment, @user).json }
+
+    it "does not include rubric_association when one does not exist" do
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "does not include rubric_association when one exists but it is not active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      association.destroy
+      expect(json).not_to have_key "rubric_association"
+    end
+
+    it "includes a rubric_association when one exists and is active" do
+      rubric = rubric_model
+      association = rubric.associate_with(@assignment, @course, purpose: "grading", use_for_grading: true)
+      expect(json.dig("rubric_association", "id")).to eq association.id.to_s
+    end
+  end
+
   context "students and active course sections" do
     before(:once) do
       @course = course_factory(active_course: true)
@@ -282,17 +311,10 @@ describe SpeedGrader::Assignment do
 
     describe "has_postable_comments" do
       before(:each) do
-        @course.root_account.enable_feature!(:allow_postable_submission_comments)
         @assignment.ensure_post_policy(post_manually: true)
       end
 
-      it "is not included when allow_postable_submission_comments feature is not enabled" do
-        @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        expect(json[:submissions].first).not_to have_key "has_postable_comments"
-      end
-
-      it "is true when unposted, hidden comments exist, and postable comments feature is enabled" do
+      it "is true when submission is unposted and hidden comments exist" do
         student1_sub = @assignment.submissions.find_by!(user: @student_1)
         student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json
@@ -300,16 +322,7 @@ describe SpeedGrader::Assignment do
         expect(submission_json["has_postable_comments"]).to be true
       end
 
-      it "is not present when unposted, hidden comments exist, and postable comments feature is not enabled" do
-        @course.root_account.disable_feature!(:allow_postable_submission_comments)
-        student1_sub = @assignment.submissions.find_by!(user: @student_1)
-        student1_sub.add_comment(author: @teacher, comment: "good job!", hidden: true)
-        json = SpeedGrader::Assignment.new(@assignment, @teacher).json
-        submission_json = json[:submissions].find { |sub| sub["user_id"] == student1_sub.user_id.to_s }
-        expect(submission_json).not_to have_key "has_postable_comments"
-      end
-
-      it "is false when unposted and only non-hidden comments exist" do
+      it "is false when submission is unposted and only non-hidden comments exist" do
         student1_sub = @assignment.submissions.find_by!(user: @student_1)
         student1_sub.add_comment(author: @student1, comment: "good job!", hidden: false)
         json = SpeedGrader::Assignment.new(@assignment, @teacher).json

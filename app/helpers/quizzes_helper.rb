@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -409,7 +411,8 @@ module QuizzesHelper
     html = hash_get(hash, "#{field}_html".to_sym)
 
     if html
-      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE))
+      use_new_math = Account.site_admin.feature_enabled?(:new_math_equation_handling) && action_name != "edit"
+      UserContent.escape(Sanitize.clean(html, CanvasSanitize::SANITIZE), nil, use_new_math)
     else
       hash_get(hash, field)
     end
@@ -422,7 +425,7 @@ module QuizzesHelper
     question = hash_get(options, :question)
     answers  = hash_get(options, :answers).dup
     answer_list = hash_get(options, :answer_list, [])
-    res      = user_content hash_get(question, :question_text)
+    res      = user_content hash_get(question, :question_text).dup
     readonly_markup = hash_get(options, :editable) ? " />" : 'readonly="readonly" />'
     label_attr = "aria-label='#{I18n.t("Fill in the blank, read surrounding text")}'"
 

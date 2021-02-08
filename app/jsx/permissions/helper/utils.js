@@ -120,8 +120,12 @@ function groupPermissionEnabled(boolArray) {
 /*
  * Takes a role and creates a new permission for any groups of granular permissions
  * in that role, based on the permission group name.
+ *
+ * Mutates its argument (role)
  */
 export function groupGranularPermissionsInRole(role) {
+  if (!role?.permissions) return // some JS tests don't bother to fill this in
+
   const groups = {}
   Object.values(role.permissions).forEach(permission => {
     // Fix up boolean enabled values to the enabled state

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ module Auditors
         end
 
         stream.on_error do |operation, record, exception|
-          next unless Canvas::Cassandra::DatabaseBuilder.configured?(:auditors)
+          next unless Auditors.configured?
           Canvas::EventStreamLogger.error('AUDITOR', identifier, operation, record.to_json, exception.message.to_s)
         end
       end
@@ -48,6 +50,16 @@ module Auditors
       strategy_value = :cassandra
       strategy_value = :active_record if read_from_postgres?
       strategy_value
+    end
+
+    def configured?
+      strategy = backend_strategy
+      if strategy == :cassandra
+        return Canvas::Cassandra::DatabaseBuilder.configured?('auditors')
+      elsif strategy == :active_record
+        return Rails.configuration.database_configuration[Rails.env].present?
+      end
+      raise ArgumentError, "Unknown Auditors Backend Strategy: #{strategy}"
     end
 
     def write_to_cassandra?
@@ -72,7 +84,10 @@ module Auditors
 
     def write_paths
       paths = [config&.[]('write_paths')].flatten.compact
-      paths.empty? ? ['cassandra'] : paths
+      # default to both for now.
+      # after a year we will have hit our retention period
+      # and can safely de-comission all auditors cassandra code.
+      paths.empty? ? ['cassandra', 'active_record'] : paths
     end
 
     def config(shard=::Switchman::Shard.current)

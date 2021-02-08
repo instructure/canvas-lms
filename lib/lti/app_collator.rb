@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -68,7 +70,7 @@ module Lti
         lti_version: external_tool.use_1_3? ? '1.3' : '1.1',
         deployment_id: external_tool.deployment_id
       }
-      result[:is_rce_favorite] = external_tool.is_rce_favorite if external_tool.can_be_rce_favorite?
+      result[:is_rce_favorite] = external_tool.is_rce_favorite_in_context?(@context) if external_tool.can_be_rce_favorite?
       result
     end
 

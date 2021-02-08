@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -46,6 +48,7 @@ module Api::V1::Course
     settings[:show_announcements_on_home_page] = course.show_announcements_on_home_page?
     settings[:home_page_announcement_limit] = course.home_page_announcement_limit
     settings[:syllabus_course_summary] = course.syllabus_course_summary?
+    settings[:homeroom_course] = course.homeroom_course?
     settings[:image_url] = course.image_url
     settings[:image_id] = course.image_id
     settings[:image] = course.image
@@ -116,6 +119,15 @@ module Api::V1::Course
           hash['teacher_count'] = course.teacher_count
         else
           hash['teachers'] = course.teachers.distinct.map { |teacher| user_display_json(teacher) }
+        end
+      end
+      # undocumented; used in AccountCourseUserSearch
+      if includes.include?('active_teachers')
+        course.shard.activate do
+          scope =
+            TeacherEnrollment.where.not(workflow_state: %w[rejected completed deleted inactive]).where(course_id: course.id).distinct.select(:user_id)
+          hash['teachers'] =
+            User.where(id: scope).map { |teacher| user_display_json(teacher) }
         end
       end
       hash['tabs'] = tabs_available_json(course, user, session, ['external'], precalculated_permissions: precalculated_permissions) if includes.include?('tabs')

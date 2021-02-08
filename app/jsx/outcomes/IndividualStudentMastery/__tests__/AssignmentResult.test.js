@@ -73,11 +73,30 @@ it('does not show scores when points are hidden', () => {
   expect(wrapper.text()).not.toMatch('Your score: 1')
 })
 
-it('falls back to using raw score if percent is not available', () => {
-  const props = defaultProps()
-  props.result.percent = null
-  const wrapper = render(<AssignmentResult {...props} />)
-  expect(wrapper.text()).toMatch('Your score: 2')
+describe('with percent not available', () => {
+  it('can use the raw score, result.points_possible, and outcome.points_possible', () => {
+    const props = defaultProps()
+    props.result.percent = null
+    props.result.points_possible = 5
+    const wrapper = render(<AssignmentResult {...props} />)
+    expect(wrapper.text()).toMatch('Your score: 2')
+  })
+
+  it('can use the raw score, result.points_possible, and outcome.mastery_points if outcome.points_possible is 0', () => {
+    const props = defaultProps()
+    props.result.percent = null
+    props.result.points_possible = 5
+    props.outcome.points_possible = 0
+    const wrapper = render(<AssignmentResult {...props} />)
+    expect(wrapper.text()).toMatch('Your score: 1.2')
+  })
+
+  it('falls back to using raw score if percent and result.points_possible is not available', () => {
+    const props = defaultProps()
+    props.result.percent = null
+    const wrapper = render(<AssignmentResult {...props} />)
+    expect(wrapper.text()).toMatch('Your score: 2')
+  })
 })
 
 it('falls back to using mastery points if points possible is 0', () => {

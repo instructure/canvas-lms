@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -26,15 +28,10 @@ class ScoreStatisticsGenerator
     # term or all courses in a grading period at the same time.
     min = Setting.get("minimum_seconds_wait_for_grade_statistics", 10).to_i
     max = Setting.get("maximum_seconds_wait_for_grade_statistics", 130).to_i
-    send_later_if_production_enqueue_args(
-      :update_score_statistics,
-      {
-        singleton: "ScoreStatisticsGenerator:#{course_id}",
+    delay_if_production(singleton: "ScoreStatisticsGenerator:#{course_id}",
         run_at: rand(min..max).seconds.from_now,
-        on_conflict: :loose
-      },
-      course_id
-    )
+        on_conflict: :loose).
+      update_score_statistics(course_id)
   end
 
   def self.update_score_statistics(course_id)
@@ -48,9 +45,9 @@ class ScoreStatisticsGenerator
     # note: because a score is needed for max/min/ave we are not filtering
     # by assignment_student_visibilities, if a stat is added that doesn't
     # require score then add a filter when the DA feature is on
-    statistics = Shackles.activate(:slave) do
+    statistics = GuardRail.activate(:secondary) do
       connection = ScoreStatistic.connection
-      connection.select_all(<<-SQL)
+      connection.select_all(<<~SQL)
       WITH want_assignments AS (
         SELECT a.id, a.created_at
         FROM #{Assignment.quoted_table_name} a
@@ -120,7 +117,7 @@ SQL
   def self.update_course_score_statistic(course_id)
     current_scores = []
     enrollment_ids = []
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       StudentEnrollment.select(:id, :user_id).not_fake.where(course_id: course_id, workflow_state: [:active, :invited]).
         find_in_batches { |batch| enrollment_ids.concat(batch) }
       # The grade calculator ensures all enrollments for the same user have the same score, so we only need one
@@ -139,7 +136,7 @@ SQL
       return
     end
 
-    average = current_scores.map(&:to_d).sum / BigDecimal.new(score_count)
+    average = current_scores.map(&:to_d).sum / BigDecimal(score_count)
 
     # This is a safeguard to avoid blowing up due to database storage which is set to be a decimal with a precision of 8
     # and a scale of 2. And really, what are you even doing awarding 1,000,000% or over in a course?
@@ -167,7 +164,3 @@ SQL
     SQL
   end
 end
-
-# TODO: remove this a release after it hits prod. We're keeping there here now as the class in this file was renamed and
-# we don't want any pending Delayed Jobs to fail
-AssignmentScoreStatisticsGenerator = ScoreStatisticsGenerator

@@ -24,7 +24,8 @@ import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 
 import {Button} from '@instructure/ui-buttons'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-overlays'
 import {PresentationContent} from '@instructure/ui-a11y'
 

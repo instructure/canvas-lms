@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -52,6 +54,7 @@ class CalendarEvent < ActiveRecord::Base
   belongs_to :parent_event, :class_name => 'CalendarEvent', :foreign_key => :parent_calendar_event_id, :inverse_of => :child_events
   has_many :child_events, -> { where("calendar_events.workflow_state <> 'deleted'") }, class_name: 'CalendarEvent', foreign_key: :parent_calendar_event_id, inverse_of: :parent_event
   belongs_to :web_conference, autosave: true
+  belongs_to :root_account, class_name: 'Account'
 
   validates_presence_of :context, :workflow_state
   validates_associated :context, :if => lambda { |record| record.validate_context }
@@ -59,6 +62,7 @@ class CalendarEvent < ActiveRecord::Base
   validates_length_of :title, :maximum => maximum_string_length, :allow_nil => true, :allow_blank => true
   validates_length_of :comments, maximum: 255, allow_nil: true, allow_blank: true
   validate :validate_conference_visibility
+  before_create :set_root_account
   before_save :default_values
   after_save :touch_context
   after_save :replace_child_events
@@ -150,7 +154,7 @@ class CalendarEvent < ActiveRecord::Base
     }.join(" OR ")
     codes_conditions = self.connection.quote(false) if codes_conditions.blank?
 
-    where(<<-SQL, all_codes, codes, group_codes, effectively_courses_codes)
+    where(<<~SQL, all_codes, codes, group_codes, effectively_courses_codes)
       calendar_events.context_code IN (?)
       AND (
         ( -- explicit contexts (e.g. course_123)
@@ -216,15 +220,19 @@ class CalendarEvent < ActiveRecord::Base
   end
   protected :default_values
 
-  def root_account
-    if context.respond_to?(:root_account)
-      context.root_account # course, section, group
+  def set_root_account(ctx = self.context)
+    if ctx.respond_to?(:root_account)
+      self.root_account = ctx.root_account # course, section, group
     else
-      case context
+      case ctx
       when User
-        context.account
+        if self.effective_context.is_a?(User)
+          self.root_account_id = 0
+        else
+          self.set_root_account(self.effective_context)
+        end
       when AppointmentGroup
-        context.context&.root_account
+        self.root_account = context.context&.root_account
       end
     end
   end
@@ -242,7 +250,7 @@ class CalendarEvent < ActiveRecord::Base
   def populate_appointment_group_defaults
     self.effective_context_code = context.appointment_group_contexts.map(&:context_code).join(",")
     if new_record?
-      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", attr == :description ? context.description_html : context.send(attr)) }
+      AppointmentGroup::EVENT_ATTRIBUTES.each { |attr| send("#{attr}=", context.send(attr)) }
       if locked?
         self.start_at = start_at_was if !new_record? && start_at_changed?
         self.end_at   = end_at_was   if !new_record? && end_at_changed?
@@ -279,7 +287,7 @@ class CalendarEvent < ActiveRecord::Base
     if self.all_day_changed? && self.all_day?
       self.start_at = zoned_start_at.beginning_of_day rescue nil
       self.end_at = zoned_end_at.beginning_of_day rescue nil
-    elsif self.start_at_changed? || self.end_at_changed?
+    elsif self.start_at_changed? || self.end_at_changed? || Canvas::Plugin.value_to_boolean(self.remove_child_events)
       self.all_day = self.start_at && self.start_at == self.end_at && zoned_start_at.strftime("%H:%M") == '00:00'
     end
 
@@ -383,8 +391,8 @@ class CalendarEvent < ActiveRecord::Base
         appointment_group.clear_cached_available_slots!
         appointment_group.save!
       end
-      if parent_event && parent_event.locked? && parent_event.child_events.size == 0
-        parent_event.workflow_state = 'active'
+      if parent_event && parent_event.child_events.size == 0
+        parent_event.workflow_state = parent_event.locked? ? 'active' : 'deleted'
         parent_event.save!
       end
       true
@@ -398,6 +406,8 @@ class CalendarEvent < ActiveRecord::Base
   has_a_broadcast_policy
 
   def course_broadcast_data
+    return appointment_group.broadcast_data if appointment_group
+
     if context.respond_to?(:broadcast_data)
       context.broadcast_data
     else

@@ -17,10 +17,10 @@
  */
 
 import $ from 'jquery'
-import {Table} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import React from 'react'
-import PropTypes from 'prop-types'
+import {arrayOf, bool, func, shape, string} from 'prop-types'
 import I18n from 'i18n!react_developer_keys'
 
 import DeveloperKey from './DeveloperKey'
@@ -105,18 +105,24 @@ class DeveloperKeysTable extends React.Component {
           caption={<ScreenReaderContent>{srcontent}</ScreenReaderContent>}
           size="medium"
         >
-          <thead>
-            <tr>
-              <th scope="col">{I18n.t('Name')}</th>
-              {!inherited && <th scope="col">{I18n.t('Owner Email')}</th>}
-              <th scope="col">{I18n.t('Details')}</th>
-              {!inherited && <th scope="col">{I18n.t('Stats')}</th>}
-              <th scope="col">{I18n.t('Type')}</th>
-              <th scope="col">{I18n.t('State')}</th>
-              {!inherited && <th scope="col">{I18n.t('Actions')}</th>}
-            </tr>
-          </thead>
-          <tbody>
+          <Table.Head>
+            <Table.Row>
+              <Table.ColHeader id="keystable-name">{I18n.t('Name')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-owneremail">{I18n.t('Owner Email')}</Table.ColHeader>
+              )}
+              <Table.ColHeader id="keystable-details">{I18n.t('Details')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-stats">{I18n.t('Stats')}</Table.ColHeader>
+              )}
+              <Table.ColHeader id="keystable-type">{I18n.t('Type')}</Table.ColHeader>
+              <Table.ColHeader id="keystable-state">{I18n.t('State')}</Table.ColHeader>
+              {!inherited && (
+                <Table.ColHeader id="keystable-actions">{I18n.t('Actions')}</Table.ColHeader>
+              )}
+            </Table.Row>
+          </Table.Head>
+          <Table.Body>
             {this.props.developerKeysList.map(developerKey => (
               <DeveloperKey
                 ref={key => {
@@ -131,7 +137,7 @@ class DeveloperKeysTable extends React.Component {
                 onDelete={this.createSetFocusCallback}
               />
             ))}
-          </tbody>
+          </Table.Body>
         </Table>
       </div>
     )
@@ -139,18 +145,18 @@ class DeveloperKeysTable extends React.Component {
 }
 
 DeveloperKeysTable.propTypes = {
-  store: PropTypes.shape({
-    dispatch: PropTypes.func.isRequired
+  store: shape({
+    dispatch: func.isRequired
   }).isRequired,
-  actions: PropTypes.shape({}).isRequired,
-  developerKeysList: PropTypes.arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
-  ctx: PropTypes.shape({
-    params: PropTypes.shape({
-      contextId: PropTypes.string.isRequired
+  actions: shape({}).isRequired,
+  developerKeysList: arrayOf(DeveloperKey.propTypes.developerKey).isRequired,
+  ctx: shape({
+    params: shape({
+      contextId: string.isRequired
     })
   }).isRequired,
-  inherited: PropTypes.bool,
-  setFocus: PropTypes.func
+  inherited: bool,
+  setFocus: func
 }
 
 DeveloperKeysTable.defaultProps = {inherited: false, setFocus: () => {}}

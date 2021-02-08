@@ -21,9 +21,11 @@ import $ from 'jquery'
 
 export default class DiscussionTopicToolbarView extends Backbone.View {
   showKeyboardShortcutModalInfo(e) {
-    $(e.currentTarget)
-      .children('.accessibility-warning')
-      .show()
+    if (!window.ENV.disable_keyboard_shortcuts) {
+      $(e.currentTarget)
+        .children('.accessibility-warning')
+        .show()
+    }
   }
 
   hideKeyboardShortcutModalInfo(e) {

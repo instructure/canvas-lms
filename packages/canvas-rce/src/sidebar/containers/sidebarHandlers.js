@@ -33,18 +33,21 @@ import {toggle as toggleFolder} from '../actions/files'
 import {openOrCloseNewPageForm} from '../actions/links'
 import {fetchInitialDocs, fetchNextDocs} from '../actions/documents'
 import {fetchInitialMedia, fetchNextMedia, updateMediaObject} from '../actions/media'
-import {changeContext} from '../actions/context'
+import {changeContext, changeSearchString, changeSortBy} from '../actions/filter'
+import {allFilesLoading} from '../actions/all_files'
+import {get as getSession} from '../actions/session'
 
 export default function propsFromDispatch(dispatch) {
   return {
+    loadSession: () => dispatch(getSession),
     onChangeTab: index => dispatch(changeTab(index)),
     onChangeAccordion: index => dispatch(changeAccordion(index)),
     fetchInitialPage: key => dispatch(fetchInitialPage(key)),
     fetchNextPage: key => dispatch(fetchNextPage(key)),
     toggleFolder: id => dispatch(toggleFolder(id)),
     fetchFolders: () => dispatch(fetchFolders()),
-    fetchInitialImages: sortBy => dispatch(fetchInitialImages(sortBy)),
-    fetchNextImages: sortBy => dispatch(fetchNextImages(sortBy)),
+    fetchInitialImages: () => dispatch(fetchInitialImages()),
+    fetchNextImages: () => dispatch(fetchNextImages()),
     startUpload: (tabContext, fileMetaProps) =>
       dispatch(uploadPreflight(tabContext, fileMetaProps)),
     flickrSearch: term => dispatch(searchFlickr(term)),
@@ -56,11 +59,14 @@ export default function propsFromDispatch(dispatch) {
     createMediaServerSession: () => dispatch(createMediaServerSession()),
     // saveMediaRecording: (file, editor, dismiss) => dispatch(saveMediaRecording(file, editor, dismiss)),
     mediaUploadComplete: (error, uploadData) => dispatch(mediaUploadComplete(error, uploadData)),
-    fetchInitialDocs: sortBy => dispatch(fetchInitialDocs(sortBy)),
-    fetchNextDocs: sortBy => dispatch(fetchNextDocs(sortBy)),
-    fetchInitialMedia: sortBy => dispatch(fetchInitialMedia(sortBy)),
-    fetchNextMedia: sortBy => dispatch(fetchNextMedia(sortBy)),
+    fetchInitialDocs: () => dispatch(fetchInitialDocs()),
+    fetchNextDocs: () => dispatch(fetchNextDocs()),
+    fetchInitialMedia: () => dispatch(fetchInitialMedia()),
+    fetchNextMedia: () => dispatch(fetchNextMedia()),
     updateMediaObject: new_values => dispatch(updateMediaObject(new_values)),
-    onChangeContext: newContext => dispatch(changeContext(newContext))
+    onChangeContext: newContext => dispatch(changeContext(newContext)),
+    onChangeSearchString: searchString => dispatch(changeSearchString(searchString)),
+    onChangeSortBy: sortBy => dispatch(changeSortBy(sortBy)),
+    onAllFilesLoading: isLoading => dispatch(allFilesLoading(isLoading))
   }
 }

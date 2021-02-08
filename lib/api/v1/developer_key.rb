@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,7 @@ module Api::V1::DeveloperKey
   include Api::V1::Json
 
   DEVELOPER_KEY_JSON_ATTRS = %w(
-    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes
+    name created_at email user_id user_name icon_url notes workflow_state scopes require_scopes client_credentials_audience
   ).freeze
   INHERITED_DEVELOPER_KEY_JSON_ATTRS = %w[name created_at icon_url workflow_state].freeze
 

@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {whitelist} from './messageTypes'
+import {whitelist, ignorelist} from './messageTypes'
 
 // page-global storage for data relevant to LTI postMessage events
 const ltiState = {}
@@ -26,8 +26,11 @@ const handleLtiPostMessage = async e => {
   const {messageType, data} = e.data
   let handler
 
-  // Enforce messageType whitelist
-  if (!whitelist.includes(messageType)) {
+  if (ignorelist.includes(messageType)) {
+    // These messages are handled elsewhere
+    return false
+  } else if (!whitelist.includes(messageType)) {
+    // Enforce messageType whitelist -- unknown type
     console.error(`invalid messageType: ${messageType}`)
     return false
   }

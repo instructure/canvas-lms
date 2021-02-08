@@ -46,7 +46,7 @@ export function showImportOutcomesModal(props) {
 export default class ImportOutcomesModal extends Component {
   static propTypes = {
     parent: instanceOf(Element),
-    toolbar: instanceOf(Element).isRequired
+    toolbar: instanceOf(Element)
   }
 
   static defaultProps = {
@@ -63,9 +63,12 @@ export default class ImportOutcomesModal extends Component {
   }
 
   onSelection(accepted, rejected) {
+    const {toolbar} = this.props
     if (accepted.length > 0) {
       this.hide()
-      this.props.toolbar.trigger('start_sync', accepted[0])
+      if (toolbar) {
+        toolbar.trigger('start_sync', accepted[0])
+      }
     } else if (rejected.length > 0) {
       this.setState({messages: [{text: I18n.t('Invalid file type'), type: 'error'}]})
     }

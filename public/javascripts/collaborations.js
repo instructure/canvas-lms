@@ -24,6 +24,10 @@ import './jquery.instructure_misc_plugins' /* .dim, confirmDelete, fragmentChang
 import './jquery.templateData' /* getTemplateData */
 import './vendor/jquery.scrollTo'
 import 'compiled/jquery.rails_flash_notifications'
+import {
+  addDeepLinkingListener,
+  onExternalContentReady
+} from '../../app/jsx/deep_linking/collaborations'
 
 const CollaborationsPage = {}
 
@@ -52,14 +56,6 @@ CollaborationsPage.Util = {
         $collaboration.remove()
       })
     }
-  },
-
-  collaborationUrl(id) {
-    return window.location.toString() + '/' + id
-  },
-
-  openCollaboration(id) {
-    window.open(CollaborationsPage.Util.collaborationUrl(id))
   }
 }
 
@@ -73,9 +69,12 @@ CollaborationsPage.Events = {
       .change()
     if (document.body.classList.contains('responsive_misc')) {
       $('#collaboration_selection_row').css('display: block;')
-      $('#collaboration_selection_label').css(['white-space: nowrap; text-align: left; display: block;'])
+      $('#collaboration_selection_label').css([
+        'white-space: nowrap; text-align: left; display: block;'
+      ])
     }
-    $(window).on('externalContentReady', this.onExternalContentReady.bind(this))
+    addDeepLinkingListener()
+    $(window).on('externalContentReady', onExternalContentReady.bind(this))
     $('.before_external_content_info_alert, .after_external_content_info_alert')
       .on('focus', function(e) {
         $(this).removeClass('screenreader-only')
@@ -158,34 +157,6 @@ CollaborationsPage.Events = {
       $('.collaboration_authorization').hide()
       $('#collaborate_authorize_' + type).showIf($description.hasClass('unauthorized'))
     }
-  },
-
-  onExternalContentReady(e, data) {
-    const contentItem = {contentItems: JSON.stringify(data.contentItems)}
-    if (data.service_id) {
-      this.updateCollaboration(contentItem, data.service_id)
-    } else {
-      this.createCollaboration(contentItem)
-    }
-  },
-
-  updateCollaboration(contentItem, collab_id) {
-    const url = $('.collaboration_' + collab_id + ' a.title')[0].href
-    $.ajaxJSON(url, 'PUT', contentItem, this.collaborationSuccess, msg => {
-      $.screenReaderFlashMessage(I18n.t('Collaboration update failed'))
-    })
-  },
-
-  createCollaboration(contentItem) {
-    const url = $('#new_collaboration').attr('action')
-    $.ajaxJSON(url, 'POST', contentItem, this.collaborationSuccess, msg => {
-      $.screenReaderFlashMessage(I18n.t('Collaboration creation failed'))
-    })
-  },
-
-  collaborationSuccess(msg) {
-    CollaborationsPage.Util.openCollaboration(msg.collaboration.id)
-    window.location.reload()
   }
 }
 

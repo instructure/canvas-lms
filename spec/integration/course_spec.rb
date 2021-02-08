@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -83,8 +85,8 @@ describe "course" do
     doc = Nokogiri::HTML(response.body)
     course_rows = doc.css('#my_courses_table tr')
     expect(course_rows.size).to eq 3
-    expect(course_rows[1].to_s).to include 'A nickname or something'
-    expect(course_rows[2].to_s).to include 'Course 1'
+    expect(course_rows[1].to_s).to include 'Course 1'
+    expect(course_rows[2].to_s).to include 'A nickname or something'
   end
 
   it "should not show links to unpublished courses in course index" do

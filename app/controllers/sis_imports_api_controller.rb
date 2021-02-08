@@ -364,6 +364,7 @@ class SisImportsApiController < ApplicationController
   include Api::V1::SisImport
   include Api::V1::Progress
 
+
   def check_account
     return render json: {errors: ["SIS imports can only be executed on root accounts"]}, status: :bad_request unless @account.root_account?
     return render json: {errors: ["SIS imports are not enabled for this account"]}, status: :forbidden unless @account.allow_sis_import

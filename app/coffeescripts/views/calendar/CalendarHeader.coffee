@@ -38,7 +38,6 @@ export default class CalendarHeader extends Backbone.View
     'click #month'     : '_triggerMonth'
     'click #agenda'    : '_triggerAgenda'
     'click #use_agenda': '_selectAgenda'
-    'click #scheduler' : '_triggerScheduler'
     'click .scheduler_done_button': '_triggerDone'
     'click #create_new_event_link': '_triggerCreateNewEvent'
     'click #refresh_calendar_link': '_triggerRefreshCalendar'
@@ -150,9 +149,6 @@ export default class CalendarHeader extends Backbone.View
 
   _triggerAgenda: (event) ->
     @trigger('agenda')
-
-  _triggerScheduler: (event) ->
-    @trigger('scheduler')
 
   _triggerCreateNewEvent: (event) ->
     event.preventDefault()

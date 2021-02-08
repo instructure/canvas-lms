@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -65,7 +67,7 @@ module Api::V1::DiscussionTopics
       root_topics = get_root_topic_data(topics, opts[:root_topic_fields])
     end
     if opts[:include_sections_user_count] && context
-      opts[:context_user_count] = Shackles.activate(:slave) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      opts[:context_user_count] = GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
     ActiveRecord::Associations::Preloader.new.preload(topics, [:user, :attachment, :root_topic, :context])
     topics.inject([]) do |result, topic|
@@ -88,6 +90,7 @@ module Api::V1::DiscussionTopics
   #   include_all_dates: include all dates associated with the discussion topic (default: false)
   #   override_dates: if the topic is graded, use the overridden dates for the given user (default: true)
   #   root_topic_fields: fields to fill in from root topic (if any) if not already present.
+  #   include_usage_rights: Optionally include usage rights of the topic's file attachment, if any (default: false)
   # root_topics- if you alraedy have the root topics to get the root_topic_data from, pass
   #   them in.  Useful if this is to be called repeatedly and you don't want to make a
   #   db call each time.
@@ -122,7 +125,7 @@ module Api::V1::DiscussionTopics
     end
 
     if opts[:include_sections_user_count] && !topic.is_section_specific
-      json[:user_count] = opts[:context_user_count] || Shackles.activate(:slave) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
+      json[:user_count] = opts[:context_user_count] || GuardRail.activate(:secondary) { context.enrollments.not_fake.active_or_pending_by_date_ignoring_access.count }
     end
 
     if opts[:include_sections] && topic.is_section_specific
@@ -131,9 +134,7 @@ module Api::V1::DiscussionTopics
       json[:sections] = sections_json(topic.course_sections, user, session, section_includes)
     end
 
-    if topic.context.root_account.feature_enabled?(:student_planner)
-      json[:todo_date] = topic.todo_date
-    end
+    json[:todo_date] = topic.todo_date
 
     if opts[:root_topic_fields] && opts[:root_topic_fields].length > 0
       # If this is called from discussion_topics_api_json then we already
@@ -160,7 +161,9 @@ module Api::V1::DiscussionTopics
   #
   # Returns a hash.
   def serialize_additional_topic_fields(topic, context, user, opts={})
-    attachments = topic.attachment ? [attachment_json(topic.attachment, user)] : []
+    attachment_opts = {}
+    attachment_opts[:include] = ['usage_rights'] if opts[:include_usage_rights]
+    attachments = topic.attachment ? [attachment_json(topic.attachment, user, {}, attachment_opts)] : []
     html_url    = named_context_url(context, :context_discussion_topic_url,
                                     topic, include_host: true)
     url         = if topic.podcast_enabled?

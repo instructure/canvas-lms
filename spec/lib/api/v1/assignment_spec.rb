@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -47,6 +49,10 @@ class AssignmentApiHarness
   def strong_anything
     ArbitraryStrongishParams::ANYTHING
   end
+
+  def grading_periods?
+    false
+  end
 end
 
 describe "Api::V1::Assignment" do
@@ -73,7 +79,6 @@ describe "Api::V1::Assignment" do
     end
 
     it "includes an associated planner override when flag is passed" do
-      assignment.context.root_account.enable_feature!(:student_planner)
       po = planner_override_model(user: user, plannable: assignment)
       json = api.assignment_json(assignment, user, session,
                                  {include_planner_override: true})
@@ -479,6 +484,96 @@ describe "Api::V1::Assignment" do
         'lockdown_browser_monitor_data' => 'some monitor data cchanges',
         'access_code' => 'magggic coddddde'
       )
+    end
+  end
+
+  describe 'when submission type is an external tool' do
+    let(:user) { user_model }
+    let(:course) { course_factory }
+    let(:external_tool_tag_attributes) do
+      {
+        content_id: course.context_external_tools.last.id,
+        content_type: 'context_external_tool',
+        custom_params: custom_params.to_json,
+        external_data: '',
+        new_tab: '0',
+        url: 'http://lti13testtool.docker/launch'
+      }
+    end
+    let(:assignment_params) do
+      ActionController::Parameters.new(
+        submission_types: ['external_tool'],
+        external_tool_tag_attributes: external_tool_tag_attributes
+      )
+    end
+    let(:custom_params) do
+      {
+        'context_id' => '$Context.id'
+      }
+    end
+
+    before do
+      course.context_external_tools.create!(
+        name: 'LTI Test Tool',
+        consumer_key: 'key',
+        shared_secret: 'secret',
+        use_1_3: true,
+        developer_key: DeveloperKey.create!,
+        tool_id: 'LTI Test Tool',
+        url: 'http://lti13testtool.docker/launch'
+      )
+    end
+
+    it 'create the assignment and set `custom_params` to lti resource link properly' do
+      new_assignmet = course.assignments.build
+      response = api.create_api_assignment(new_assignmet, assignment_params, user)
+
+      expect(response).to eq :created
+
+      expect(new_assignmet.lti_resource_link_custom_params).to eq external_tool_tag_attributes[:custom_params]
+      expect(new_assignmet.lti_resource_links.size).to eq 1
+      expect(new_assignmet.lti_resource_links.first.custom).to eq custom_params
+    end
+
+    it 'update the assignment and set `custom_params` to lti resource link properly' do
+      response = api.update_api_assignment(assignment, assignment_params, user)
+
+      expect(response).to eq :ok
+
+      expect(assignment.lti_resource_link_custom_params).to eq external_tool_tag_attributes[:custom_params]
+      expect(assignment.lti_resource_links.size).to eq 1
+      expect(assignment.lti_resource_links.first.custom).to eq custom_params
+    end
+
+    context 'when Quizzes 2 tool is selected' do
+      let(:tool) do
+        @course.context_external_tools.create!(
+          :name => 'Quizzes.Next',
+          :consumer_key => 'test_key',
+          :shared_secret => 'test_secret',
+          :tool_id => 'Quizzes 2',
+          :url => 'http://example.com/launch'
+        )
+      end
+
+      let(:external_tool_tag_attributes) do
+        {
+          content_id: tool.id,
+          content_type: 'context_external_tool',
+          custom_params: custom_params.to_json,
+          external_data: '',
+          new_tab: '0',
+          url: 'http://example.com/launch'
+        }
+      end
+
+      it 'create the assignment and set `custom_params` to lti resource link properly' do
+        new_assignmet = assignment_model(course: course, peer_reviews: true)
+        response = api.create_api_assignment(new_assignmet, assignment_params, user)
+
+        expect(response).to eq :created
+        expect(new_assignmet.peer_reviews).to be_falsey
+      end
     end
   end
 end

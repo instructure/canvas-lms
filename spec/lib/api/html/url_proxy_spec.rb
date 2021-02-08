@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -40,6 +42,32 @@ module Api
 
         it "passes through polymorphic urls" do
           expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/1/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
+        it "has media redirect routes for discussion entries" do
+          course = course_model
+          topic = course.discussion_topics.create!
+          entry = DiscussionEntry.new
+          entry.id = 1
+          entry.discussion_topic = topic
+          proxy = UrlProxy.new(StubUrlHelper.new, entry, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
+        it "has media redirect for wiki pages" do
+          course = course_model
+          page = course.wiki_pages.create(:title => "some page")
+          proxy = UrlProxy.new(StubUrlHelper.new, page, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
+        end
+
+        it "can produce a redirect route for announcements" do
+          course = course_model
+          announcement = Announcement.new
+          announcement.id = 1
+          announcement.context = course
+          proxy = UrlProxy.new(StubUrlHelper.new, announcement, "example.com", "http")
+          expect(proxy.media_redirect_url("123", "video")).to eq("http://example.com/courses/#{course.id}/media_download?entryId=123&media_type=video&redirect=1")
         end
       end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -75,6 +77,7 @@ describe IncomingMail::ReplyToAddress do
         expect(message).to receive(:global_id).twice.and_return(@shard1.global_id_for(Shard::IDS_PER_SHARD-1))
         created_at = 50.years.from_now
         expect(message).to receive(:created_at).and_return(created_at)
+        IncomingMail::ReplyToAddress.address_pool = %w{canvas@example.com}
 
         expect(IncomingMail::ReplyToAddress.new(message).address.split('@').first.length < 64).to be_truthy
       end

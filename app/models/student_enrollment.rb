@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -38,5 +40,31 @@ class StudentEnrollment < Enrollment
       each do |prog|
         prog.mark_as_outdated!
       end
+  end
+
+  def update_override_score(override_score:, grading_period_id: nil, updating_user:, record_grade_change: true)
+    score_params = {grading_period_id: grading_period_id} if grading_period_id.present?
+    score = find_score(score_params)
+
+    raise ActiveRecord::RecordNotFound if score.blank?
+
+    old_score = score[:override_score]
+    old_grade = score.override_grade
+    score.update!(override_score: override_score)
+
+    return score unless score.saved_change_to_override_score?
+
+    Canvas::LiveEvents.grade_override(score, old_score, self, course)
+    if record_grade_change && updating_user.present?
+      override_grade_change = Auditors::GradeChange::OverrideGradeChange.new(
+        grader: updating_user,
+        old_grade: old_grade,
+        old_score: old_score,
+        score: score
+      )
+      Auditors::GradeChange.record(override_grade_change: override_grade_change)
+    end
+
+    score
   end
 end

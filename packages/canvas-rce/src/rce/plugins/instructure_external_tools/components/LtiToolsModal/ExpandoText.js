@@ -20,8 +20,8 @@ import React, {useState} from 'react'
 import {string} from 'prop-types'
 import {StyleSheet, css} from 'aphrodite'
 
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import {IconArrowOpenDownLine, IconArrowOpenEndLine} from '@instructure/ui-icons'
 
 export default function ExpandoText(props) {

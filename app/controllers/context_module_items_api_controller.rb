@@ -25,7 +25,7 @@
 #       "description": "",
 #       "properties": {
 #         "type": {
-#           "description": "one of 'must_view', 'must_submit', 'must_contribute', 'min_score'",
+#           "description": "one of 'must_view', 'must_submit', 'must_contribute', 'min_score', 'must_mark_done'",
 #           "example": "min_score",
 #           "type": "string",
 #           "allowableValues": {
@@ -33,7 +33,8 @@
 #               "must_view",
 #               "must_submit",
 #               "must_contribute",
-#               "min_score"
+#               "min_score",
+#               "must_mark_done"
 #             ]
 #           }
 #         },
@@ -276,7 +277,7 @@ class ContextModuleItemsApiController < ApplicationController
       # Get conditionally released objects if requested
       # TODO: Document in API when out of beta
       if includes.include?("mastery_paths")
-        opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, items, session)
+        opts[:conditional_release_rules] = ConditionalRelease::Service.rules_for(@context, @student, session)
       end
       render :json => items.map { |item| module_item_json(item, @student || @current_user, session, mod, prog, includes, opts) }
     end
@@ -357,11 +358,12 @@ class ContextModuleItemsApiController < ApplicationController
   #   Whether the external tool opens in a new tab. Only applies to
   #   'ExternalTool' type.
   #
-  # @argument module_item[completion_requirement][type] [String, "must_view"|"must_contribute"|"must_submit"]
+  # @argument module_item[completion_requirement][type] [String, "must_view"|"must_contribute"|"must_submit"|"must_mark_done"]
   #   Completion requirement for this module item.
   #   "must_view": Applies to all item types
   #   "must_contribute": Only applies to "Assignment", "Discussion", and "Page" types
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
+  #   "must_mark_done": Only applies to "Assignment" and "Page" types
   #   Inapplicable types will be ignored
   #
   # @argument module_item[completion_requirement][min_score] [Integer]
@@ -433,11 +435,12 @@ class ContextModuleItemsApiController < ApplicationController
   #   Whether the external tool opens in a new tab. Only applies to
   #   'ExternalTool' type.
   #
-  # @argument module_item[completion_requirement][type] [String, "must_view"|"must_contribute"|"must_submit"]
+  # @argument module_item[completion_requirement][type] [String, "must_view"|"must_contribute"|"must_submit"|"must_mark_done"]
   #   Completion requirement for this module item.
   #   "must_view": Applies to all item types
   #   "must_contribute": Only applies to "Assignment", "Discussion", and "Page" types
   #   "must_submit", "min_score": Only apply to "Assignment" and "Quiz" types
+  #   "must_mark_done": Only applies to "Assignment" and "Page" types
   #   Inapplicable types will be ignored
   #
   # @argument module_item[completion_requirement][min_score] [Integer]
@@ -488,7 +491,11 @@ class ContextModuleItemsApiController < ApplicationController
 
       if params[:module_item].has_key?(:published)
         if value_to_boolean(params[:module_item][:published])
-          @tag.publish
+          if module_item_publishable?(@tag)
+            @tag.publish
+          else
+            return render json: {message: "item can't be published"}, status: :unprocessable_entity
+          end
         else
           if module_item_unpublishable?(@tag)
             @tag.unpublish
@@ -541,37 +548,25 @@ class ContextModuleItemsApiController < ApplicationController
     get_module_item
     assignment = @item.assignment
     return render json: { message: 'requested item is not an assignment' }, status: :bad_request unless assignment
+    assignment_ids = ConditionalRelease::OverrideHandler.handle_assignment_set_selection(@student, assignment, params[:assignment_set_id])
 
-    response = ConditionalRelease::Service.select_mastery_path(
-      @context,
-      @current_user,
-      @student,
-      assignment,
-      params[:assignment_set_id],
-      session)
+    # assignment occurs in delayed job, may not be fully visible to user until job completes
+    assignments = @context.assignments.published.where(id: assignment_ids).
+      preload(Api::V1::Assignment::PRELOADS)
 
-    if response[:code] != '200'
-      render json: response[:body], status: response[:code]
-    else
-      assignment_ids = response[:body]['assignments'].map {|a| a['assignment_id'].try(&:to_i) }
-      # assignment occurs in delayed job, may not be fully visible to user until job completes
-      assignments = @context.assignments.published.where(id: assignment_ids).
-        preload(Api::V1::Assignment::PRELOADS)
+    Assignment.preload_context_module_tags(assignments)
 
-      Assignment.preload_context_module_tags(assignments)
+    # match cyoe order, omit unpublished or deleted assignments
+    assignments = assignments.index_by(&:id).values_at(*assignment_ids).compact
 
-      # match cyoe order, omit unpublished or deleted assignments
-      assignments = assignments.index_by(&:id).values_at(*assignment_ids).compact
+    # grab locally relevant module items
+    items = assignments.map(&:all_context_module_tags).flatten.select{|a| a.context_module_id == @module.id}
 
-      # grab locally relevant module items
-      items = assignments.map(&:all_context_module_tags).flatten.select{|a| a.context_module_id == @module.id}
-
-      render json: {
-        meta: { primaryCollection: 'assignments' },
-        items: items.map { |item| module_item_json(item, @student || @current_user, session, @module) },
-        assignments: assignments_json(assignments, @current_user, session)
-      }
-    end
+    render json: {
+      meta: { primaryCollection: 'assignments' },
+      items: items.map { |item| module_item_json(item, @student || @current_user, session, @module) },
+      assignments: assignments_json(assignments, @current_user, session)
+    }
   end
 
   # @API Delete module item
@@ -772,7 +767,7 @@ class ContextModuleItemsApiController < ApplicationController
 
     if params[:module_item][:completion_requirement].blank?
       reqs[@tag.id] = {}
-    elsif ["must_view", "must_submit", "must_contribute", "min_score"].include?(params[:module_item][:completion_requirement][:type])
+    elsif %w[must_view must_submit must_contribute min_score must_mark_done].include?(params[:module_item][:completion_requirement][:type])
       reqs[@tag.id] = params[:module_item][:completion_requirement].to_unsafe_h
     else
       @tag.errors.add(:completion_requirement, t(:invalid_requirement_type, "Invalid completion requirement type"))

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -42,6 +44,7 @@ describe "master courses - child courses - quiz locking" do
 
   before :each do
     user_session(@teacher)
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 

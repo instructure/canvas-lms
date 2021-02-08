@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -33,28 +35,18 @@ class LearningOutcome < ActiveRecord::Base
   before_save :infer_root_account_ids
   after_save :propagate_changes_to_rubrics
 
-  CALCULATION_METHODS = {
-    'decaying_average' => "Decaying Average",
-    'n_mastery'        => "n Number of Times",
-    'highest'          => "Highest Score",
-    'latest'           => "Most Recent Score",
-  }.freeze
-  VALID_CALCULATION_INTS = {
-    "decaying_average" => (1..99),
-    "n_mastery" => (1..5),
-    "highest" => [].freeze,
-    "latest" => [].freeze,
-  }.freeze
-
   validates :description, length: { maximum: maximum_text_length, allow_nil: true, allow_blank: true }
   validates :short_description, length: { maximum: maximum_string_length }
   validates :vendor_guid, length: { maximum: maximum_string_length, allow_nil: true }
   validates :display_name, length: { maximum: maximum_string_length, allow_nil: true, allow_blank: true }
-  validates :calculation_method, inclusion: { in: CALCULATION_METHODS.keys,
-    message: -> { t(
-      "calculation_method must be one of the following: %{calc_methods}",
-      :calc_methods => CALCULATION_METHODS.keys.to_s
-    ) }
+  validates :calculation_method, inclusion: {
+    in: OutcomeCalculationMethod::CALCULATION_METHODS,
+    message: -> {
+      t(
+        "calculation_method must be one of the following: %{calc_methods}",
+        :calc_methods => OutcomeCalculationMethod::CALCULATION_METHODS.to_s
+      )
+    }
   }
   validates :short_description, :workflow_state, presence: true
   sanitize_field :description, CanvasSanitize::SANITIZE
@@ -138,11 +130,11 @@ class LearningOutcome < ActiveRecord::Base
   end
 
   def self.valid_calculation_method?(method)
-    CALCULATION_METHODS.keys.include?(method)
+    OutcomeCalculationMethod::CALCULATION_METHODS.include?(method)
   end
 
   def self.valid_calculation_ints(method)
-    VALID_CALCULATION_INTS[method]
+    OutcomeCalculationMethod::VALID_CALCULATION_INTS[method]
   end
 
   def self.valid_calculation_int?(int, method)
@@ -399,7 +391,7 @@ class LearningOutcome < ActiveRecord::Base
       !self.saved_change_to_short_description? &&
       !self.saved_change_to_description?
 
-    self.send_later_if_production(:update_associated_rubrics)
+    delay_if_production.update_associated_rubrics
   end
 
   def update_associated_rubrics
@@ -411,17 +403,14 @@ class LearningOutcome < ActiveRecord::Base
   def updateable_rubrics
     conds = { learning_outcome_id: self.id, content_type: 'Rubric', workflow_state: 'active' }
     # Find all unassessed, active rubrics aligned to this outcome, referenced by no more than one assignment
-    Rubric.where(id:
-      Rubric.select('rubrics.id').
-        where.not(workflow_state: 'deleted').
+    Rubric.where(
+      id: Rubric.
+        active.
         joins(:learning_outcome_alignments).
         where(content_tags: conds).
-        joins("LEFT JOIN #{RubricAssociation.quoted_table_name} ra2 ON rubrics.id = ra2.rubric_id AND ra2.purpose = 'grading'").
-        group('rubrics.id').
-        having('COUNT(rubrics.id) < 2')).
-      joins("LEFT JOIN #{RubricAssociation.quoted_table_name} ra2 ON rubrics.id = ra2.rubric_id AND ra2.purpose = 'grading'" \
-            " LEFT JOIN #{RubricAssessment.quoted_table_name} ra3 ON ra2.id = ra3.rubric_association_id").
-      where('ra3.id IS NULL')
+        with_at_most_one_association.
+        select('rubrics.id')
+    ).unassessed
   end
 
   def updateable_rubrics?
@@ -445,7 +434,9 @@ class LearningOutcome < ActiveRecord::Base
       content: asset,
       tag_type: 'learning_outcome',
       context: context
-    )
+    ) do |_a|
+      InstStatsd::Statsd.increment('learning_outcome.align')
+    end
   end
 
   def determine_tag_type(mastery_type)

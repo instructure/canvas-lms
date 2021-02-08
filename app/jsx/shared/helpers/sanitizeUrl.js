@@ -21,10 +21,16 @@
  * @param {string} url
  */
 export default function sanitizeUrl(url) {
-  const parsedUrl = new URL(url, window.location.origin)
-  // eslint-disable-next-line no-script-url
-  if (parsedUrl.protocol === 'javascript:') {
-    return 'about:blank'
+  const defaultUrl = 'about:blank'
+  try {
+    const parsedUrl = new URL(url, window.location.origin)
+    // eslint-disable-next-line no-script-url
+    if (parsedUrl.protocol === 'javascript:') {
+      return defaultUrl
+    }
+    return url
+  } catch (e) {
+    // URL() throws TypeError if url is not a valid URL
+    return defaultUrl
   }
-  return url
 }

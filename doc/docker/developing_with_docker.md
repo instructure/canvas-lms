@@ -52,7 +52,7 @@ echo "COMPOSE_FILE=docker-compose.yml:docker-compose.override.yml:docker-compose
 Setup your user-specific docker-compose override file as an empty file using the following command:
 
 ```bash
-echo "version: '2'" > docker-compose.local.`whoami`.yml
+echo "version: '2.3'" > docker-compose.local.`whoami`.yml
 ```
 
 ## Getting Started
@@ -60,11 +60,12 @@ After you have [installed the dependencies](getting_docker.md). You'll need to c
 over the required configuration files.
 
 The `docker-compose/config` directory has some config files already set up to use
-the linked containers supplied by config. You can just copy them to
+the linked containers supplied by config. Only copy yamls, not the contents of new-jenkins folder. 
+You can just copy them to
 `config/`:
 
 ```
-$ cp docker-compose/config/* config/
+$ cp docker-compose/config/*.yml config/
 ```
 
 Now you're ready to build all of the containers. This will take a while as a lot is going on here.
@@ -74,20 +75,22 @@ Now you're ready to build all of the containers. This will take a while as a lot
 - Assets are compiled
 
 ```bash
-docker-compose run --rm web bundle install
-docker-compose run --rm web bundle exec rake db:create db:initial_setup canvas:compile_assets
+docker-compose build
+docker-compose run --rm web ./script/install_assets.sh
+docker-compose run --rm web bundle exec rake db:create db:initial_setup
+docker-compose run --rm web bundle exec rake db:migrate RAILS_ENV=test
 ```
 
 Now you should be able to start up and access canvas like you would any other container.
 ```bash
 docker-compose up
-open http://web.canvaslms.docker
+open http://canvas.docker/
 ```
 
 ## Normal Usage
 
 Normally you can just start everything with `docker-compose up`, and
-access Canvas at http://web.canvaslms.docker/.
+access Canvas at http://canvas.docker/
 
 After pulling new code, you'll want to update all your local gems, rebuild your
 docker images, pull plugin code, run migrations, and recompile assets. This can
@@ -95,13 +98,6 @@ all be done with one command:
 
 ```
 ./script/docker_dev_update.sh
-```
-
-Note that this command will pull `master` and all plugin code by default. If you
-want to update without switching from your local `HEAD`, run:
-
-```
-./script/docker_dev_update.sh -n code
 ```
 
 Changes you're making are not showing up? See the Caveats section below.
@@ -118,7 +114,7 @@ execution. To use it, you will need to enable `REMOTE_DEBUGGING_ENABLED` in your
 this file, you will need to create it and add the following:
 
 ```
-version: '2'
+version: '2.3'
 services:
   web:
     environment:
@@ -162,14 +158,56 @@ $ docker-compose run --rm web bundle exec rspec spec
 
 ## Running javascript tests
 
-To run tests in headless Chrome, add the `docker-compose/js-tests.override.yml`
-to the `COMPOSE_FILE` environment variable in your .env, and run:
+First off, there's some general JS testing info in
+[testing_javascript.md](https://github.com/instructure/canvas-lms/blob/master/doc/testing_javascript.md).
+That will guide you on running JS tests natively.  To run them in docker, read on.
+
+First add `docker-compose/js-tests.override.yml` to your `COMPOSE_FILE` var in
+`.env`. Then prepare that container with:
 
 ```
-$ docker-compose run --rm js-tests
+docker-compose run --rm js-tests yarn install
 ```
 
-### Selenium
+If you run into issues with that command, either during initial setup or after
+updating master, try to fix it with a `nuke_node`:
+
+```
+docker-compose run --rm js-tests ./script/nuke_node.sh
+docker-compose run --rm js-tests yarn install
+```
+
+### QUnit Karma Tests in Headless Chrome
+
+Run all QUnit tests in watch mode with:
+
+```
+docker-compose run --rm js-tests
+```
+
+Or, if you're iterating on something and want to just run a targeted test file
+in watch mode, set the `JSPEC_PATH` env var, e.g.:
+
+```
+docker-compose run --rm -e JSPEC_PATH=spec/coffeescripts/util/deparamSpec.js js-tests
+```
+
+### Jest Tests
+
+Run all Jest tests with:
+
+```
+docker-compose run --rm js-tests yarn test:jest
+```
+
+Or to run a targeted subset of tests in watch mode, use `test:jest:watch` and
+specify the paths to the test files as one or more arguments, e.g.:
+
+```
+docker-compose run --rm js-tests yarn test:jest:watch app/jsx/actAs/__tests__/ActAsModal.test.js
+```
+
+## Selenium
 
 To enable Selenium: Add `docker-compose/selenium.override.yml` to your `COMPOSE_FILE` var in `.env`.
 
@@ -194,6 +232,35 @@ Now just run your choice of selenium specs:
 docker-compose run --rm web bundle exec rspec spec/selenium/dashboard_spec.rb
 ```
 
+### Capturing Rails Logs and Screenshots
+
+When selenium specs fail, the root cause isn't always obvious from the
+stdout/stderr of `rspec`. E.g. you might just see an `Uncaught Error: Internal
+Server Error`. To see the actual stack trace that led to the 500 response, you
+have to look at the rails logs. One way to do that is to just view
+`/usr/src/app/log/test.log` after the fact, or `tail -f` it during the run.
+Note that the log directory is a non-synchronized volume mount, so you need to
+actually view it from inside the `web` container rather than just on your
+native host.
+
+But here's a hot tip -- you can capture the portion of the rails log that
+corresponds to each failed spec, plus a screenshot of the page at the time of
+the failure, by running your specs with the `spec/spec.opts` options like:
+
+```sh
+docker-compose run --rm web bundle exec rspec --options spec/spec.opts spec/selenium/dashboard_spec.rb
+```
+
+This will produce a `log/spec_failures` directory in the container, which you
+can then `docker cp` to your host to view in a browser:
+
+```sh
+docker cp "$(docker-compose ps -q web | head -1)":/usr/src/app/log/spec_failures .
+open -a "Google Chrome" file:///"$(pwd)"/spec_failures
+```
+
+That directory tree contains a web page per spec failure, each featuring a
+colorized rails log and a browser screenshot taken at the time of the failure.
 
 ## Extra Services
 

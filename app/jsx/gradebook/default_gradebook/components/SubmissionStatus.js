@@ -33,7 +33,7 @@ export default class SubmissionStatus extends React.Component {
 
   static propTypes = {
     assignment: shape({
-      muted: bool.isRequired,
+      anonymizeStudents: bool.isRequired,
       postManually: bool.isRequired,
       published: bool.isRequired
     }).isRequired,
@@ -42,7 +42,6 @@ export default class SubmissionStatus extends React.Component {
     isInNoGradingPeriod: bool.isRequired,
     isInOtherGradingPeriod: bool.isRequired,
     isNotCountedForScore: bool.isRequired,
-    postPoliciesEnabled: bool.isRequired,
     submission: shape({
       drop: bool,
       excused: bool,
@@ -54,30 +53,8 @@ export default class SubmissionStatus extends React.Component {
   }
 
   getStatusPills() {
-    const {assignment, postPoliciesEnabled, submission} = this.props
+    const {assignment, submission} = this.props
     const statusPillComponents = []
-
-    if (postPoliciesEnabled) {
-      if (isPostable(submission)) {
-        statusPillComponents.push(
-          <Pill
-            key="hidden-submission"
-            variant="warning"
-            text={I18n.t('Hidden')}
-            margin="0 0 x-small"
-          />
-        )
-      }
-    } else if (assignment.muted) {
-      statusPillComponents.push(
-        <Pill
-          key="muted-assignment"
-          variant="default"
-          text={I18n.t('Muted')}
-          margin="0 0 x-small"
-        />
-      )
-    }
 
     if (!assignment.published) {
       statusPillComponents.push(
@@ -85,6 +62,22 @@ export default class SubmissionStatus extends React.Component {
           key="unpublished-assignment"
           variant="danger"
           text={I18n.t('Unpublished')}
+          margin="0 0 x-small"
+        />
+      )
+    }
+
+    // If students are anonymized we don't want to leak any information about the submission
+    if (assignment.anonymizeStudents) {
+      return statusPillComponents
+    }
+
+    if (isPostable(submission)) {
+      statusPillComponents.push(
+        <Pill
+          key="hidden-submission"
+          variant="warning"
+          text={I18n.t('Hidden')}
           margin="0 0 x-small"
         />
       )

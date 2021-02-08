@@ -53,6 +53,12 @@ describe('Common file url utils', () => {
       url = downloadToWrap(testurl)
       strictEqual(url, testurl)
     })
+
+    it('strips "preview" too', () => {
+      const testurl = '/some/path/preview'
+      url = downloadToWrap(testurl)
+      strictEqual(url, '/some/path?wrap=1')
+    })
   })
 
   describe('fixupFileUrl', () => {
@@ -75,13 +81,13 @@ describe('Common file url utils', () => {
       it('transforms course file urls', () => {
         // removes download_frd and adds wrap
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.href, '/courses/2/files/17/download?wrap=1')
+        strictEqual(result.href, '/courses/2/files/17?wrap=1')
       })
 
       it('adds the verifier to user files', () => {
-        // while removing download_frd and does not add wrap
+        // while removing download_frd
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.href, '/users/2/files/17/download?verifier=xyzzy')
+        strictEqual(result.href, '/users/2/files/17?wrap=1&verifier=xyzzy')
       })
     })
 
@@ -102,13 +108,13 @@ describe('Common file url utils', () => {
       it('transforms course file urls', () => {
         // removes download_frd and adds wrap
         const result = fixupFileUrl('course', 2, fileInfo)
-        strictEqual(result.url, '/courses/2/files/17/download?wrap=1')
+        strictEqual(result.url, '/courses/2/files/17?wrap=1')
       })
 
       it('adds the verifier to user files', () => {
         // while removing download_frd and does not add wrap
         const result = fixupFileUrl('user', 2, fileInfo)
-        strictEqual(result.url, '/users/2/files/17/download?verifier=xyzzy')
+        strictEqual(result.url, '/users/2/files/17?wrap=1&verifier=xyzzy')
       })
     })
   })
@@ -130,9 +136,14 @@ describe('Common file url utils', () => {
       strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
     })
 
+    it('does not mess with a /preview URL', () => {
+      const url = '/users/2/files/17/preview'
+      strictEqual(prepEmbedSrc(url), '/users/2/files/17/preview')
+    })
+
     it('does not indescriminetly replace /preview in a url', () => {
-      const url = '/please/download/me'
-      strictEqual(prepEmbedSrc(url), url)
+      const url = '/please/preview/me'
+      strictEqual(prepEmbedSrc(url), '/please/preview/me/preview')
     })
   })
 
@@ -143,19 +154,14 @@ describe('Common file url utils', () => {
       strictEqual(url, result)
     })
 
-    it('replaces /preview?some_params with /download?some_params', () => {
+    it('removes /preview', () => {
       const url = '/users/2/files/17/preview?verifier=xyzzy'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download?verifier=xyzzy')
-    })
-
-    it('replaces /preview and no params with /download', () => {
-      const url = '/users/2/files/17/preview'
-      strictEqual(prepLinkedSrc(url), '/users/2/files/17/download')
+      strictEqual(prepLinkedSrc(url), '/users/2/files/17?verifier=xyzzy&wrap=1')
     })
 
     it('does not indescriminetly replace /download in a url', () => {
-      const url = '/please/preview/me'
-      strictEqual(prepLinkedSrc(url), url)
+      const url = '/please/download/me'
+      strictEqual(prepLinkedSrc(url), `${url}?wrap=1`)
     })
   })
 })

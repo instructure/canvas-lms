@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -29,7 +31,13 @@ module LiveEvents
 
     def self.config
       res = LiveEvents.settings
-      return true if res['stub_kinesis']
+      if res['stub_kinesis']
+        return true if !Rails.env.production?
+        
+        LiveEvents.logger.warn(
+          "LIVE_EVENTS: stub_kinesis was set in production with value #{res['stub_kinesis']}"
+        )
+      end
       return nil unless res && !res['kinesis_stream_name'].blank? &&
                                (!res['aws_region'].blank? || !res['aws_endpoint'].blank?)
 
@@ -55,10 +63,21 @@ module LiveEvents
         aws[:secret_access_key] = plugin_config['aws_secret_access_key_dec']
       end
 
+      if plugin_config['custom_aws_credentials']
+        aws[:credentials] = LiveEvents.aws_credentials(plugin_config)
+      end
+
       aws[:region] = plugin_config['aws_region'].presence || 'us-east-1'
 
       if plugin_config['aws_endpoint'].present?
-        aws[:endpoint] = plugin_config['aws_endpoint']
+        # to expose the strange error where this endpoint is present but not a real endpoint
+        # and to avoid breaking live events if that error occurs
+        endpoint = URI.parse(plugin_config['aws_endpoint'])
+        if URI::HTTPS === endpoint || URI::HTTP === endpoint
+          aws[:endpoint] = plugin_config['aws_endpoint']
+        else
+          LiveEvents.logger.warn("invalid endpoint value #{plugin_config['aws_endpoint']}")
+        end
       end
 
       aws

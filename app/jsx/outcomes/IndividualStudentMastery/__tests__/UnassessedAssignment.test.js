@@ -23,7 +23,7 @@ import UnassessedAssignment from '../UnassessedAssignment'
 it('properly renders the UnassessedAssignment component', () => {
   const props = {assignment: {id: 1, title: 'example', url: 'www.example.com'}}
   const wrapper = shallow(<UnassessedAssignment {...props} />)
-  expect(wrapper).toMatchSnapshot()
+  expect(wrapper.html()).toMatch(/example \(not yet assessed\)/i)
 })
 
 it('properly renders with a quiz icon when submission type is online quiz', () => {

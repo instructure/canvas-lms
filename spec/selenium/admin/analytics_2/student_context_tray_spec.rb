@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 
 # Copyright (C) 2019 - present Instructure, Inc.
 
@@ -103,6 +104,8 @@ describe "analytics in Canvas" do
 
         context "with A2 FF enabled and view_all_grades disabled" do
           before :each do
+            skip "Flakey spec. Fix via LA-849"
+
             @course.account.role_overrides.create!(:permission => :view_all_grades, :role => teacher_role, :enabled => false)
             @course.root_account.enable_feature!(:analytics_2)
             user_session(@teacher)

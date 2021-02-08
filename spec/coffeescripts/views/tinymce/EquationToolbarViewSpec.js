@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import * as mathml from 'mathml'
+import mathml from 'mathml'
 import EquationToolbarView from 'compiled/views/tinymce/EquationToolbarView'
 
 QUnit.module('EquationToolbarView MathJax', {
@@ -27,8 +27,8 @@ QUnit.module('EquationToolbarView MathJax', {
 test('mathjax is loaded properly', () => {
   const equationToolbarView = new EquationToolbarView()
   sandbox
-    .mock(mathml)
+    .mock(mathml, 'loadMathJax')
     .expects('loadMathJax')
-    .withArgs('TeX-AMS_HTML.js')
+    .withArgs(undefined)
   equationToolbarView.render()
 })

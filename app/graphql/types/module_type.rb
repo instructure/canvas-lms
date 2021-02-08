@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ class ModuleItemsVisibleLoader < GraphQL::Batch::Loader
   end
 
   def perform(context_modules)
-    Shackles.activate(:slave) do
+    GuardRail.activate(:secondary) do
       context_modules.each do |context_module|
         content_tags = context_module.content_tags_visible_to(@user)
         fulfill(context_module, content_tags)

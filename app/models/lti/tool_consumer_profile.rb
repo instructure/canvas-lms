@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -84,7 +86,7 @@ module Lti
     class << self
       def cached_find_by_developer_key(dev_key_id)
         MultiCache.fetch(cache_key(dev_key_id)) do
-          Shackles.activate(:slave) do
+          GuardRail.activate(:secondary) do
             dev_key = DeveloperKey.find_cached(dev_key_id)
             dev_key.present? && dev_key.tool_consumer_profile
           end

@@ -65,7 +65,7 @@ const Tools = props => {
       )}
       {props.tools.map((tool, i) => (
         <Tabs.Panel
-          isSelected={selectedIndex === i + 1}
+          isSelected={selectedIndex === (props.renderCanvasFiles ? i + 1 : i)}
           key={tool._id}
           padding="xx-small 0"
           renderTitle={tool.name}

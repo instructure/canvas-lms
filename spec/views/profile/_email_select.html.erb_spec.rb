@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ describe "/profile/_email_select" do
   it "should render" do
     course_with_student
     view_context
-    cc = @user.communication_channels.create!(:path => 'user@example.com')
+    cc = communication_channel(@user, {username: 'user@example.com'})
     assign(:email_channels, [cc])
 
     render :partial => "profile/email_select", :object => cc

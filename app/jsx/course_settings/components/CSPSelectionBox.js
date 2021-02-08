@@ -20,7 +20,7 @@ import React, {Component} from 'react'
 import I18n from 'i18n!course_settings'
 import {bool, func, shape, string} from 'prop-types'
 import {Checkbox} from '@instructure/ui-forms'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import {Tooltip} from '@instructure/ui-overlays'
 
 import {showFlashError} from '../../shared/FlashAlert'

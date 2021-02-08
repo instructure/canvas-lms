@@ -21,15 +21,8 @@ class BackfillPostedAtOnSubmissions < ActiveRecord::Migration[5.1]
 
   def up
     Submission.find_ids_in_ranges(:batch_size => 500_000) do |start_at, end_at|
-      DataFixup::BackfillPostedAtOnSubmissions.send_later_if_production_enqueue_args(
-        :run,
-        {
-          priority: Delayed::LOW_PRIORITY,
-          n_strand: ["DataFixup::BackfillPostedAtOnSubmissions", Shard.current.database_server.id]
-        },
-        start_at,
-        end_at
-      )
+      DataFixup::BackfillPostedAtOnSubmissions.delay_if_production(priority: Delayed::LOW_PRIORITY,
+        n_strand: ["DataFixup::BackfillPostedAtOnSubmissions", Shard.current.database_server.id]).run(start_at, end_at)
     end
   end
 end

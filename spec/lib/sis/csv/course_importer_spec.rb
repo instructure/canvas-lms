@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -25,12 +27,12 @@ describe SIS::CSV::CourseImporter do
   it 'should skip bad content' do
     before_count = Course.count
     importer = process_csv_data(
-      "course_id,short_name,long_name,account_id,term_id,status",
-      "C001,Hum101,Humanities,A001,T001,active",
-      ",Hum102,Humanities 2,A001,T001,active",
-      "C003,Hum102,Humanities 2,A001,T001,inactive",
-      "C004,,Humanities 2,A001,T001,active",
-      "C005,Hum102,,A001,T001,active"
+      "course_id,short_name,long_name,term_id,status",
+      "C001,Hum101,Humanities,T001,active",
+      ",Hum102,Humanities 2,T001,active",
+      "C003,Hum102,Humanities 2,T001,inactive",
+      "C004,,Humanities 2,T001,active",
+      "C005,Hum102,,T001,active"
     )
     expect(Course.count).to eq before_count + 1
 
@@ -50,6 +52,15 @@ describe SIS::CSV::CourseImporter do
     expect(course.course_code).to eql("TC 101")
     expect(course.name).to eql("Test Course 101")
     expect(course.associated_accounts.map(&:id).sort).to eq [@account.id]
+  end
+
+  it "should throw an error when account is not found" do
+    importer = process_csv_data(
+      "course_id,short_name,long_name,account_id,term_id,status",
+      "test_1,TC 101,Test Course 101,VERY_INVALID_ACCOUNT,,active"
+    )
+    errors = importer.errors.map { |r| r.last }
+    expect(errors).to eq ["Account not found \"VERY_INVALID_ACCOUNT\" for course test_1"]
   end
 
   it "should support term stickiness" do
@@ -642,13 +653,17 @@ describe SIS::CSV::CourseImporter do
   it 'should allow unpublished to be passed for active' do
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
-      "c1,TC 101,Test Course 1,A001,T001,unpublished"
+      "c1,TC 101,Test Course 1,,T001,unpublished"
     )
     expect(Course.active.where(sis_source_id: 'c1').take).to be_present
   end
 
   it 'should create rollback data' do
-    batch1 = @account.sis_batches.create! { |sb| sb.data = {} }
+    sis_user = user_model
+    batch1 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",
@@ -663,7 +678,10 @@ describe SIS::CSV::CourseImporter do
       "course_id,user_id,role,section_id,status,associated_user_id",
       "data_2,student_user,student,,active,"
     )
-    batch2 = @account.sis_batches.create! { |sb| sb.data = {} }
+    batch2 = @account.sis_batches.create! do |sb|
+      sb.data = {}
+      sb.user = sis_user
+    end
     process_csv_data_cleanly(
       "course_id,short_name,long_name,account_id,term_id,status",
       "data_1,TC 101,Test Course 101,,,active",

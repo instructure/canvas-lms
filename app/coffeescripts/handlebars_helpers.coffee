@@ -252,6 +252,13 @@ Handlebars.registerHelper name, fn for name, fn of {
     content = new Handlebars.SafeString content unless hash and hash.forEditing
     content
 
+  # Turns plaintext into HTML with links and newlines
+  # Not for use by text in an RCE
+  linkify: (text) ->
+    html = textHelper.formatMessage(text)
+    content = new Handlebars.SafeString html
+    content
+
   newlinesToBreak : (string) ->
     # Convert a null to an empty string so it doesn't blow up.
     string ||= ''

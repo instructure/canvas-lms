@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -17,20 +19,6 @@
 #
 
 module AuthenticationMethods
-  def load_pseudonym_from_policy
-    if (policy_encoded = params['Policy']) &&
-        (signature = params['Signature']) &&
-        signature == Base64.encode64(OpenSSL::HMAC.digest(OpenSSL::Digest.new('sha1'), Attachment.shared_secret, policy_encoded)).gsub(/\n/, '') &&
-        (policy = JSON.parse(Base64.decode64(policy_encoded)) rescue nil) &&
-        policy['conditions'] &&
-        (credential = policy['conditions'].detect{ |cond| cond.is_a?(Hash) && cond.has_key?("pseudonym_id") })
-      @policy_pseudonym_id = credential['pseudonym_id']
-      # so that we don't have to explicitly skip verify_authenticity_token
-      params[self.class.request_forgery_protection_token] ||= form_authenticity_token
-    end
-    yield if block_given?
-  end
-
   class AccessTokenError < Exception
   end
 
@@ -70,17 +58,18 @@ module AuthenticationMethods
         logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       end
       @authenticated_with_jwt = true
-    rescue JSON::JWT::InvalidFormat,             # definitely not a JWT
-           Canvas::Security::TokenExpired,       # it could be a JWT, but it's expired if so
-           Canvas::Security::InvalidToken       # Looks like garbage
+    rescue JSON::JWT::InvalidFormat,       # definitely not a JWT
+           Canvas::Security::TokenExpired, # it could be a JWT, but it's expired if so
+           Canvas::Security::InvalidToken  # not formatted like a JWT
       # these will happen for some configurations (no consul)
       # and for some normal use cases (old token, access token),
       # so we can return and move on
       return
-    rescue Imperium::TimeoutError => exception # Something went wrong in the Network
-      # these are indications of infrastructure of data problems
+    rescue Imperium::TimeoutError => exception
+      # Something went wrong in the Network
+      # these are indications of infrastructure or data problems
       # so we should log them for resolution, but recover gracefully
-      Canvas::Errors.capture_exception(:jwt_check, exception)
+      Canvas::Errors.capture_exception(:jwt_check, exception, :warn)
     end
   end
 
@@ -177,40 +166,43 @@ module AuthenticationMethods
     if !@current_pseudonym
       if @policy_pseudonym_id
         @current_pseudonym = Pseudonym.where(id: @policy_pseudonym_id).first
-      elsif (@pseudonym_session = PseudonymSession.with_scope(find_options: Pseudonym.eager_load(:user)) { PseudonymSession.find })
-        @current_pseudonym = @pseudonym_session.record
-        @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
+      else
+        @pseudonym_session = PseudonymSession.find_with_validation
+        if @pseudonym_session
+          @current_pseudonym = @pseudonym_session.record
+          @current_pseudonym.user.reload if @current_pseudonym.shard != @current_pseudonym.user.shard
 
-        # if the session was created before the last time the user explicitly
-        # logged out (of any session for any of their pseudonyms), invalidate
-        # this session
-        invalid_before = @current_pseudonym.user.last_logged_out
-        # they logged out in the future?!? something's busted; just ignore it -
-        # either my clock is off or whoever set this value's clock is off
-        invalid_before = nil if invalid_before && invalid_before > Time.now.utc
-        if invalid_before &&
-          (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
-          session_refreshed_at < invalid_before
+          # if the session was created before the last time the user explicitly
+          # logged out (of any session for any of their pseudonyms), invalidate
+          # this session
+          invalid_before = @current_pseudonym.user.last_logged_out
+          # they logged out in the future?!? something's busted; just ignore it -
+          # either my clock is off or whoever set this value's clock is off
+          invalid_before = nil if invalid_before && invalid_before > Time.now.utc
+          if invalid_before &&
+            (session_refreshed_at = request.env['encrypted_cookie_store.session_refreshed_at']) &&
+            session_refreshed_at < invalid_before
 
-          logger.info "Invalidating session: Session created before user logged out."
-          destroy_session
-          @current_pseudonym = nil
-          if api_request? || request.format.json?
-            raise LoggedOutError
+            logger.info "[AUTH] Invalidating session: Session created before user logged out."
+            destroy_session
+            @current_pseudonym = nil
+            if api_request? || request.format.json?
+              raise LoggedOutError
+            end
           end
-        end
 
-        if @current_pseudonym &&
-           session[:cas_session] &&
-           @current_pseudonym.cas_ticket_expired?(session[:cas_session])
+          if @current_pseudonym &&
+            session[:cas_session] &&
+            @current_pseudonym.cas_ticket_expired?(session[:cas_session])
 
-          logger.info "Invalidating session: CAS ticket expired - #{session[:cas_session]}."
-          destroy_session
-          @current_pseudonym = nil
+            logger.info "[AUTH] Invalidating session: CAS ticket expired - #{session[:cas_session]}."
+            destroy_session
+            @current_pseudonym = nil
 
-          raise LoggedOutError if api_request? || request.format.json?
+            raise LoggedOutError if api_request? || request.format.json?
 
-          redirect_to_login
+            redirect_to_login
+          end
         end
       end
 
@@ -222,7 +214,9 @@ module AuthenticationMethods
       @current_user = @current_pseudonym && @current_pseudonym.user
     end
 
+    logger.info "[AUTH] inital load: pseud -> #{@current_pseudonym&.id}, user -> #{@current_user&.id}"
     if @current_user && @current_user.unavailable?
+      logger.info "[AUTH] Invalid request: User is currently UNAVAILABLE"
       @current_pseudonym = nil
       @current_user = nil
     end
@@ -270,12 +264,21 @@ module AuthenticationMethods
         user = api_find(User, as_user_id)
       rescue ActiveRecord::RecordNotFound
       end
-      if user && user.can_masquerade?(@current_user, @domain_root_account)
+      if user && @real_current_user
+        if @current_user != user
+          # if we're already masquerading from an access token, and now try to
+          # masquerade as someone else
+          render :json => {:errors => "Cannot change masquerade"}, :status => :unauthorized
+          return false
+        # else: they do match, everything is already set
+        end
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url} via masquerade token"
+      elsif user && user.can_masquerade?(@current_user, @domain_root_account)
         @real_current_user = @current_user
         @current_user = user
         @real_current_pseudonym = @current_pseudonym
         @current_pseudonym = SisPseudonym.for(@current_user, @domain_root_account, type: :implicit, require_sis: false)
-        logger.warn "#{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
+        logger.warn "[AUTH] #{@real_current_user.name}(#{@real_current_user.id}) impersonating #{@current_user.name} on page #{request.url}"
       elsif api_request?
         # fail silently for UI, but not for API
         render :json => {:errors => "Invalid as_user_id"}, :status => :unauthorized
@@ -283,6 +286,7 @@ module AuthenticationMethods
       end
     end
 
+    logger.info "[AUTH] final user: #{@current_user&.id}"
     @current_user
   end
   private :load_user
@@ -323,8 +327,7 @@ module AuthenticationMethods
   protected :store_location
 
   def redirect_back_or_default(default)
-    redirect_to(session[:return_to] || default)
-    session.delete(:return_to)
+    session.delete(:return_to) || default
   end
   protected :redirect_back_or_default
 

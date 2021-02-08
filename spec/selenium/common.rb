@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -114,6 +116,12 @@ shared_context "in-process server selenium tests" do
   # set up so you can use rails urls helpers in your selenium tests
   include Rails.application.routes.url_helpers
 
+  prepend_before :all do
+    # building the schema is currently very slow.
+    # this ensures the schema is built before specs are run to avoid timeouts
+    CanvasSchema.graphql_definition
+  end
+
   prepend_before :each do
     resize_screen_to_standard
     SeleniumDriverSetup.allow_requests!
@@ -193,6 +201,22 @@ shared_context "in-process server selenium tests" do
       SeleniumDriverSetup.disallow_requests!
     end
 
+    # we don't want to combine this into the above block to avoid x-test pollution
+    # if a previous step fails
+    begin
+      clear_local_storage
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
+
+    # we don't want to combine this into the above block to avoid x-test pollution
+    # if a previous step fails
+    begin
+      driver.session_storage.clear
+    rescue Selenium::WebDriver::Error::WebDriverError
+      # we want to ignore selenium errors when attempting to wait here
+    end
+
     if SeleniumDriverSetup.saucelabs_test_run?
       job_id = driver.session_id
       job = SauceWhisk::Jobs.fetch job_id
@@ -236,6 +260,7 @@ shared_context "in-process server selenium tests" do
 
       # if you run into something that doesn't make sense t
       browser_errors_we_dont_care_about = [
+        "A theme registry has already been initialized.",
         "Blocked attempt to show a 'beforeunload' confirmation panel for a frame that never had a user gesture since its load",
         "Error: <path> attribute d: Expected number",
         "elements with non-unique id #",
@@ -264,6 +289,7 @@ shared_context "in-process server selenium tests" do
         "Uncaught Error: Not Found", # for canvas-rce when no backend is set up
         "Uncaught Error: Minified React error #188",
         "Uncaught Error: Minified React error #200", # this is coming from canvas-rce, but we should fix it
+        "Uncaught Error: Loading chunk", # probably happens when the test ends when the browser is still loading some JS
         "Access to Font at 'http://cdnjs.cloudflare.com/ajax/libs/mathjax/",
         "Access to XMLHttpRequest at 'http://www.example.com/' from origin",
         "The user aborted a request" # The server doesn't respond fast enough sometimes and requests can be aborted. For example: when a closing a dialog.

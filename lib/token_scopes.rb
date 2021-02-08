@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -21,6 +23,12 @@ class TokenScopes
     resource: :oauth2,
     verb: "GET",
     scope: "#{OAUTH2_SCOPE_NAMESPACE}userinfo"
+  }.freeze
+  # Allows interaction with Canvas Data service
+  CD2_SCOPE = {
+    resource: :peer_services,
+    verb: "GET",
+    scope: "cd2".freeze
   }.freeze
   LTI_AGS_LINE_ITEM_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem".freeze
   LTI_AGS_LINE_ITEM_READ_ONLY_SCOPE = "https://purl.imsglobal.org/spec/lti-ags/scope/lineitem.readonly".freeze
@@ -80,11 +88,11 @@ class TokenScopes
   end
 
   def self.all_scopes
-    @_all_scopes ||= [USER_INFO_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
+    @_all_scopes ||= [USER_INFO_SCOPE[:scope], CD2_SCOPE[:scope], *api_routes.map {|route| route[:scope]}, *LTI_SCOPES.keys, *LTI_HIDDEN_SCOPES.keys].freeze
   end
 
   def self.detailed_scopes
-    @_detailed_scopes ||= [USER_INFO_SCOPE, *api_routes].freeze
+    @_detailed_scopes ||= [USER_INFO_SCOPE, CD2_SCOPE, *api_routes].freeze
   end
   private_class_method :detailed_scopes
 
@@ -103,4 +111,10 @@ class TokenScopes
   end
   private_class_method :api_routes
 
+  def self.reset!
+    @_api_routes = nil
+    @_all_scopes = nil
+    @_detailed_scopes = nil
+    @_named_scopes = nil
+  end
 end

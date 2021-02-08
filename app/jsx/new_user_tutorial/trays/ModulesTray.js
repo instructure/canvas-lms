@@ -29,25 +29,27 @@ const ModulesTray = () => (
     imageWidth="9rem"
     seeAllLink={{
       label: I18n.t('See more in Canvas Guides'),
-      href: `https://community.canvaslms.com/docs/DOC-10460-canvas-instructor-guide-
-      table-of-contents#jive_content_id_Modules`
+      href: `https://community.canvaslms.com/t5/Instructor-Guide/tkb-p/Instructor`
     }}
     links={[
       {
         label: I18n.t('How do I add a module?'),
-        href: 'https://community.canvaslms.com/docs/DOC-13129-415241424'
+        href: 'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-a-module/ta-p/1151'
       },
       {
         label: I18n.t('How do I publish or unpublish a module as an instructor?'),
-        href: 'https://community.canvaslms.com/docs/DOC-10114-4152180497'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-publish-or-unpublish-a-module-as-an-instructor/ta-p/571'
       },
       {
         label: I18n.t('How do I add assignment types, pages, and files as module items?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12689-415241427'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-add-course-content-as-module-items/ta-p/1157'
       },
       {
         label: I18n.t('How do I move or reorder a module?'),
-        href: 'https://community.canvaslms.com/docs/DOC-12697-415241425'
+        href:
+          'https://community.canvaslms.com/t5/Instructor-Guide/How-do-I-move-or-reorder-a-module/ta-p/1150'
       }
     ]}
   >

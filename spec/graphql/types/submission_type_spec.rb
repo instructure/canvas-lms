@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -141,6 +143,49 @@ describe Types::SubmissionType do
         expect(submission_type.resolve("enteredGrade", current_user: @student)).to be_nil
         expect(submission_type.resolve("deductedPoints", current_user: @student)).to be_nil
       end
+    end
+  end
+
+  describe "body" do
+    before(:each) do
+      allow(GraphQLHelpers::UserContent).to receive(:process).and_return("bad")
+    end
+
+    context "for a quiz" do
+      let(:quiz) do
+        quiz_with_submission
+        @quiz
+      end
+      let(:assignment) { quiz.assignment }
+      let(:submission) { assignment.submission_for_student(@student) }
+
+      let(:submission_type_for_student) { GraphQLTypeTester.new(submission, current_user: @student) }
+      let(:submission_type_for_teacher) { GraphQLTypeTester.new(submission, current_user: @teacher) }
+
+      before(:each) do
+        assignment.hide_submissions
+      end
+
+      context "when the quiz is not posted" do
+        it "returns nil for users who cannot read the grade" do
+          expect(submission_type_for_student.resolve("body")).to be nil
+        end
+
+        it "returns a value for users who can read the grade" do
+          expect(submission_type_for_teacher.resolve("body")).to eq "bad"
+        end
+      end
+
+      it "returns the value of the body for a posted quiz" do
+        assignment.post_submissions
+        expect(submission_type_for_student.resolve("body")).to eq "bad"
+      end
+    end
+
+    it "returns the value of the body for a non-quiz assignment" do
+      @submission.update!(body: "bad")
+      submission_type = GraphQLTypeTester.new(@submission, current_user: @student)
+      expect(submission_type.resolve("body")).to eq "bad"
     end
   end
 

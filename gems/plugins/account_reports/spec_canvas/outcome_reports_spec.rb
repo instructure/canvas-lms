@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -51,7 +53,7 @@ describe "Outcome Reports" do
     @enrollment2 = @course1.enroll_user(@user2, "StudentEnrollment", :enrollment_state => 'active')
 
     @section = @course1.course_sections.first
-    assignment_model(:course => @course1, :title => 'Engrish Assignment')
+    assignment_model(:course => @course1, :title => 'English Assignment')
     outcome_group = @root_account.root_outcome_group
     @outcome = outcome_model(context: @root_account, :short_description => 'Spelling')
     @rubric = Rubric.create!(:context => @course1)
@@ -114,7 +116,7 @@ describe "Outcome Reports" do
   def verify(row, values, row_index: nil)
     user, assignment, outcome, outcome_result, course, section, submission, quiz, question, quiz_outcome_result, quiz_submission, pseudonym =
       values.values_at(:user, :assignment, :outcome, :outcome_result, :course, :section, :submission, :quiz, :question,
-      :quiz_outcome_result, :quiz_submission, :pseudonym)
+                       :quiz_outcome_result, :quiz_submission, :pseudonym)
     result = quiz.nil? ? outcome_result : quiz_outcome_result
     rating = if outcome.present? && result&.score&.present?
                outcome.rubric_criterion&.[](:ratings)&.select do |r|
@@ -168,11 +170,10 @@ describe "Outcome Reports" do
       "enrollment state" => user&.enrollments&.find_by(course: course, course_section: section)&.workflow_state
     }
     expect(row.headers).to eq row.headers & expectations.keys
-
     row.headers.each do |key|
       expect(row[key].to_s).to eq(expectations[key].to_s),
-        (row_index.present? ? "for row #{row_index}, " : '') +
-        "for column '#{key}': expected '#{expectations[key]}', received '#{row[key]}'"
+                               (row_index.present? ? "for row #{row_index}, " : '') +
+                               "for column '#{key}': expected '#{expectations[key]}', received '#{row[key]}'"
     end
   end
 
@@ -226,6 +227,7 @@ describe "Outcome Reports" do
           sis_source_id: 'fall12'
         )
       end
+
       let(:report_params) { { params: { 'enrollment_term' => @term1.id } } }
 
       it "should filter out courses not in term" do
@@ -243,6 +245,7 @@ describe "Outcome Reports" do
       before(:once) do
         @sub_account = Account.create(:parent_account => @root_account, :name => 'English')
       end
+
       let(:report_params) { { account: @sub_account } }
 
       it "should filter courses in a sub account" do
@@ -333,9 +336,8 @@ describe "Outcome Reports" do
       end
 
       it 'includes results for all subaccounts when run from the root account' do
-        combined_values = all_values + [user1_subaccount_values, user2_subaccount_values]
+        combined_values = all_values + [user2_subaccount_values, user1_subaccount_values]
         combined_values.sort_by! { |v| v[:user].sortable_name }
-
         verify_all(report, combined_values)
       end
 
@@ -459,6 +461,105 @@ describe "Outcome Reports" do
         expect(report[0]['assessment type']).to eq 'quiz'
         expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
       end
+
+      context 'With Account Level Mastery' do
+        before(:once) do
+          user1_values[:outcome_result]
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Account", context: @root_account,
+                                                        outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
+                                                          id: 1, points: 5, color: '3ADF00', description: "High Rating",
+                                                            mastery: false, outcome_proficiency: @outcome_proficiency
+                                                        ), OutcomeProficiencyRating.new(
+                                                          id: 2, points: 3, color: 'FFFF00', description: "Mastery Rating",
+                                                            mastery: true, outcome_proficiency: @outcome_proficiency
+                                                        ), OutcomeProficiencyRating.new(
+                                                          id: 3, points: 1, color: 'FF0000', description: "Low Rating",
+                                                            mastery: false, outcome_proficiency: @outcome_proficiency
+                                                        )])
+          @root_account.outcome_proficiency = @outcome_proficiency
+          @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+
+        end
+
+        it 'should operate as before when the feature flag is disabled' do
+          @root_account.set_feature_flag!(:account_level_mastery_scales, 'off')
+          expect(report[0]['assessment type']).to eq 'quiz'
+          expect(report[0]['learning outcome rating']).to eq 'Does Not Meet Expectations'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
+        end
+
+        it 'should run the report and use the outcome proficiencies' do
+          report[0]
+          expect(report[0]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[1]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[2]['learning outcome rating']).to eq 'Mastery Rating'
+        end
+
+        it 'should use the total percent to calculate the rating as opposed to score' do
+          @outcome_proficiency.outcome_proficiency_ratings[0].points = 2
+          @outcome_proficiency.outcome_proficiency_ratings[1].points = 1
+          @outcome_proficiency.outcome_proficiency_ratings[2].points = 0
+          @outcome_proficiency.save!
+          expect(report[0]['learning outcome rating']).to eq 'Low Rating'
+        end
+
+        it 'should use the score to create a ratio when calculating rating' do
+          @outcome.learning_outcome_results[0].score = 3.0
+          @outcome.learning_outcome_results[0].original_score = 3.0
+          @outcome.learning_outcome_results[0].percent = 1.0
+          @outcome.learning_outcome_results[0].save!
+          @outcome_proficiency.outcome_proficiency_ratings[0].points = 50
+          @outcome_proficiency.outcome_proficiency_ratings[1].points = 30
+          @outcome_proficiency.outcome_proficiency_ratings[2].points = 10
+          @outcome_proficiency.save!
+          expect(report[0]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[1]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[2]['learning outcome rating']).to eq 'High Rating'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
+          expect(report[2]['learning outcome points possible']).to eq '50.0'
+        end
+
+        it 'should have no rating if the score and total_percent are nil' do
+          @outcome.learning_outcome_results[0].score = nil
+          @outcome.learning_outcome_results[0].original_score = nil
+          @outcome.learning_outcome_results[0].percent = nil
+          @outcome.learning_outcome_results[0].save!
+          expect(report[0]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[1]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[2]['learning outcome rating']).to eq nil
+        end
+
+      end
+
+      context 'With Course Level Mastery' do
+        before(:once) do
+          @outcome_proficiency = OutcomeProficiency.new(id: 1,root_account_id: @root_account.id, context_type: "Course", context: @course1,
+                                                        outcome_proficiency_ratings: [OutcomeProficiencyRating.new(
+                                                          id: 1, points: 5, color: '3ADF00', description: "High Rating",
+                                                          mastery: false, outcome_proficiency: @outcome_proficiency
+                                                        ), OutcomeProficiencyRating.new(
+                                                          id: 2, points: 3, color: 'FFFF00', description: "Mastery Rating",
+                                                          mastery: true, outcome_proficiency: @outcome_proficiency
+                                                        ), OutcomeProficiencyRating.new(
+                                                          id: 3, points: 1, color: 'FF0000', description: "Low Rating",
+                                                          mastery: false, outcome_proficiency: @outcome_proficiency
+                                                        )])
+          @course1.outcome_proficiency = @outcome_proficiency
+          @root_account.set_feature_flag!(:account_level_mastery_scales, 'on')
+
+        end
+
+        it 'should run the report and use the course outcome proficiencies' do
+          report[0]
+          expect(report[0]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[1]['learning outcome rating']).to eq 'Low Rating'
+          expect(report[2]['learning outcome rating']).to eq 'Mastery Rating'
+          expect(report[0]['learning outcome points possible']).to eq '45.0'
+          expect(report[2]['learning outcome points possible']).to eq '5.0'
+        end
+
+      end
     end
+
   end
 end

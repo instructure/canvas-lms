@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -35,7 +37,7 @@ module Auditors::ActiveRecord
 
     def update_from_event_stream!(record)
       db_rec = find_by!(uuid: record.attributes['id'])
-      db_rec.update_attributes!(ar_attributes_from_event_stream(record))
+      db_rec.update!(ar_attributes_from_event_stream(record))
     end
   end
 end

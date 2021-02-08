@@ -25,7 +25,7 @@ const cyoeEnv = () => ({
   CONDITIONAL_RELEASE_ENV: {
     active_rules: [
       {
-        trigger_assignment: '1',
+        trigger_assignment_id: '1',
         trigger_assignment_model: {
           grading_type: 'percentage'
         },
@@ -33,7 +33,7 @@ const cyoeEnv = () => ({
           {
             upper_bound: 1,
             lower_bound: 0.7,
-            assignment_sets: [{assignments: [{assignment_id: '2'}]}]
+            assignment_sets: [{assignment_set_associations: [{assignment_id: '2'}]}]
           }
         ]
       }
@@ -138,7 +138,7 @@ QUnit.module('CYOE Helper', () => {
     let itemData = CyoeHelper.getItemData('1')
     ok(itemData.isTrigger)
 
-    env.CONDITIONAL_RELEASE_ENV.active_rules[0].trigger_assignment = '2'
+    env.CONDITIONAL_RELEASE_ENV.active_rules[0].trigger_assignment_id = '2'
     setEnv(env)
 
     itemData = CyoeHelper.getItemData('1')

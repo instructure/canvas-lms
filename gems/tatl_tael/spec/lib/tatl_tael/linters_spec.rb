@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe TatlTael::Linters do
@@ -48,7 +50,7 @@ describe TatlTael::Linters do
           let(:query) { {statuses: ["deleted"]} }
 
           it "returns deleted changes" do
-            expect(base_linter.changes_matching(query)).to match([deleted_change])
+            expect(base_linter.changes_matching(**query)).to match([deleted_change])
           end
         end
       end
@@ -69,12 +71,12 @@ describe TatlTael::Linters do
           let(:query) { {include: ["**/zoo", "**/foo", "**/bar"]} }
 
           it "returns the changes that match any of the includes" do
-            expect(base_linter.changes_matching(query)).to match([added_change])
+            expect(base_linter.changes_matching(**query)).to match([added_change])
           end
         end
       end
 
-      context "filtering by whitelist" do
+      context "filtering by allowlist" do
         let(:added_change_path) { "path/to/foo" }
         let(:added_change) { Change.new("added", added_change_path) }
         let(:modified_change_path) { "path/to/mod" }
@@ -87,10 +89,10 @@ describe TatlTael::Linters do
         end
 
         context "include_regexes exist" do
-          let(:query) { {whitelist: ["**/zoo", "**/foo", "**/bar"]} }
+          let(:query) { {allowlist: ["**/zoo", "**/foo", "**/bar"]} }
 
-          it "returns the changes that don't match any of the whitelists" do
-            expect(base_linter.changes_matching(query)).to match([modified_change])
+          it "returns the changes that don't match any of the allowlists" do
+            expect(base_linter.changes_matching(**query)).to match([modified_change])
           end
         end
       end

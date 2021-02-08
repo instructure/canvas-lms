@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -39,8 +41,16 @@ module RspecMockAnyInstantiation
       ar_obj
     end
 
-    def instantiate(*args)
-      if obj = @@any_instantiation[[base_class, args.first['id'].to_i]]
+    def instantiate(record, column_types = {}, &block)
+      if obj = @@any_instantiation[[base_class, record['id'].to_i]]
+        obj
+      else
+        super
+      end
+    end
+
+    def instantiate_instance_of(klass, record, column_types = {}, &block)
+      if obj = @@any_instantiation[[klass, record['id'].to_i]]
         obj
       else
         super

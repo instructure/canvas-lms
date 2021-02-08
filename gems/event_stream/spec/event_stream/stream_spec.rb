@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -149,6 +151,41 @@ describe EventStream::Stream do
 
       expect(stream.database).to be nil
       expect(stream.available?).to be false
+    end
+  end
+
+  describe ".database_name" do
+    it "returns backend db name from AR" do
+      # can't access spec ivars inside instance_exec
+      table = @table
+      id_column = double(:to_s => double('id_column'))
+      record_type = double('record_type')
+
+      ar_type = Class.new do
+        def self.connection
+          self
+        end\
+
+        def self.shard
+          self
+        end
+
+        def self.name
+          "active_record_db"
+        end
+      end
+
+      stream = EventStream::Stream.new do
+        self.backend_strategy -> { :active_record }
+        self.database -> { nil }
+        self.table table
+        self.id_column id_column
+        self.record_type record_type
+        self.read_consistency_level 'ALL'
+        self.active_record_type ar_type
+      end
+
+      expect(stream.database_name).to eq("active_record_db")
     end
   end
 
@@ -428,6 +465,11 @@ describe EventStream::Stream do
           @index.key_proc lambda{ |entry| entry.key }
           expect(@index_strategy).to receive(:insert).once.with(anything, @key)
           @stream.insert(@record)
+        end
+
+        it "does not index in cassandra if a backend override is supplied" do
+          expect(@index_strategy).to_not receive(:insert)
+          @stream.insert(@record, backend_strategy: :active_record)
         end
       end
 

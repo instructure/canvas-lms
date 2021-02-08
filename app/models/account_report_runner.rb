@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -40,7 +42,7 @@ class AccountReportRunner < ActiveRecord::Base
   def write_rows
     return unless rows
     return if rows.empty?
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       self.class.bulk_insert_objects(rows)
       @rows = []
     end
@@ -57,12 +59,10 @@ class AccountReportRunner < ActiveRecord::Base
   end
 
   def abort
-    write_rows
     self.update!(workflow_state: 'aborted', ended_at: Time.now.utc)
   end
 
   def fail
-    write_rows
     self.update!(workflow_state: 'error', ended_at: Time.now.utc)
   end
 

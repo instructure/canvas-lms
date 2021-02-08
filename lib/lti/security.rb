@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -35,7 +37,11 @@ module Lti
     def self.signed_post_params_frd(params, url, key, secret)
       message = IMS::LTI::Models::Messages::Message.generate(params.merge({oauth_consumer_key: key}))
       message.launch_url = url
-      message.signed_post_params(secret).stringify_keys
+      signed_parameters = message.signed_post_params(secret).stringify_keys
+
+      Lti::Logging.lti_1_launch_generated(message.message_authenticator.base_string)
+
+      signed_parameters
     end
     private_class_method :signed_post_params_frd
 
@@ -47,8 +53,7 @@ module Lti
     # params once no matter how many times it appears. For query params since we copy them to the body, it should
     # appear a minimum of twice in the base string.
     def self.generate_params_deprecated(params, url, key, secret)
-      url.strip!
-      uri = URI.parse(url)
+      uri = URI.parse(url.strip)
 
       if uri.port == uri.default_port
         host = uri.host
@@ -81,6 +86,11 @@ module Lti
         key, val = param.split(/=/).map { |v| CGI.unescape(v) }
         hash[key] = val
       end
+
+      # note that this base string has duplicate oauth parameters in it when logged,
+      # though these parameters don't affect signature generation and oauth launches (I hope?)
+      Lti::Logging.lti_1_launch_generated(request.oauth_helper.signature_base_string)
+
       hash.stringify_keys
     end
     private_class_method :generate_params_deprecated

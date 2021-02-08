@@ -187,7 +187,7 @@ test('gets appointment groups when show scheduler activated', () => {
 })
 
 test('displays group name in tooltip', () => {
-  fakeENV.setup({CALENDAR: {BETTER_SCHEDULER: true}})
+  fakeENV.setup({CALENDAR: {SHOW_SCHEDULER: true}})
   const cal = makeCal()
   const $eventDiv = $(
     '<div class="event"><div class="fc-title"></div><div class="fc-content"></div></div>'

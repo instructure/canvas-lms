@@ -23,7 +23,13 @@ QUnit.module('GradingSchemeHelper', () => {
     let gradingScheme
 
     hooks.beforeEach(() => {
-      gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]]
+      gradingScheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0.5]
+      ]
     })
 
     test('returns 100 when the grade is the first scheme key', () => {
@@ -44,6 +50,12 @@ QUnit.module('GradingSchemeHelper', () => {
       strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 89.9)
     })
 
+    test('returns 0.01% below the next highest scheme value when higher by less than .1%', function() {
+      gradingScheme[0][1] = 0.9059
+      gradingScheme[1][1] = 0.9051
+      strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('B', gradingScheme), 90.58)
+    })
+
     test('rounds the returned score to two decimal places', () => {
       // grading scheme values support only two places of precision on percentages
       gradingScheme[0][1] = 0.8888888888
@@ -60,22 +72,46 @@ QUnit.module('GradingSchemeHelper', () => {
     })
 
     test('matches numerical scheme keys', () => {
-      gradingScheme = [['4.0', 0.9], ['3.5', 0.8], ['3.0', 0.7], ['2.5', 0.6], ['2.0', 0.5]]
+      gradingScheme = [
+        ['4.0', 0.9],
+        ['3.5', 0.8],
+        ['3.0', 0.7],
+        ['2.5', 0.6],
+        ['2.0', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('2.5', gradingScheme), 69)
     })
 
     test('matches scheme keys with arbitrary text', () => {
-      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      gradingScheme = [
+        ['4x', 0.9],
+        ['-*', 0.8],
+        ['å +', 0.7],
+        ['+4', 0.6],
+        ['!^', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('å +', gradingScheme), 79)
     })
 
     test('matches scheme keys with surrounding whitespace', () => {
-      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      gradingScheme = [
+        ['4x', 0.9],
+        ['-*', 0.8],
+        ['å +', 0.7],
+        ['+4', 0.6],
+        ['!^', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('   !^   ', gradingScheme), 59)
     })
 
     test('matches emoji scheme keys', () => {
-      gradingScheme = [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]]
+      gradingScheme = [
+        ['😂', 0.9],
+        ['🙂', 0.8],
+        ['😐', 0.7],
+        ['😢', 0.6],
+        ['💩', 0]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreUpperBound('😐', gradingScheme), 79)
     })
 
@@ -88,7 +124,13 @@ QUnit.module('GradingSchemeHelper', () => {
     let gradingScheme
 
     hooks.beforeEach(() => {
-      gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['F', 0.5]]
+      gradingScheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['F', 0.5]
+      ]
     })
 
     test('returns the lower bound of a grade', () => {
@@ -106,22 +148,46 @@ QUnit.module('GradingSchemeHelper', () => {
     })
 
     test('matches numerical scheme keys', () => {
-      gradingScheme = [['4.0', 0.9], ['3.5', 0.8], ['3.0', 0.7], ['2.5', 0.6], ['2.0', 0.5]]
+      gradingScheme = [
+        ['4.0', 0.9],
+        ['3.5', 0.8],
+        ['3.0', 0.7],
+        ['2.5', 0.6],
+        ['2.0', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('2.5', gradingScheme), 60)
     })
 
     test('matches scheme keys with arbitrary text', () => {
-      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      gradingScheme = [
+        ['4x', 0.9],
+        ['-*', 0.8],
+        ['å +', 0.7],
+        ['+4', 0.6],
+        ['!^', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('å +', gradingScheme), 70)
     })
 
     test('matches scheme keys with surrounding whitespace', () => {
-      gradingScheme = [['4x', 0.9], ['-*', 0.8], ['å +', 0.7], ['+4', 0.6], ['!^', 0.5]]
+      gradingScheme = [
+        ['4x', 0.9],
+        ['-*', 0.8],
+        ['å +', 0.7],
+        ['+4', 0.6],
+        ['!^', 0.5]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('   !^   ', gradingScheme), 50)
     })
 
     test('matches emoji scheme keys', () => {
-      gradingScheme = [['😂', 0.9], ['🙂', 0.8], ['😐', 0.7], ['😢', 0.6], ['💩', 0]]
+      gradingScheme = [
+        ['😂', 0.9],
+        ['🙂', 0.8],
+        ['😐', 0.7],
+        ['😢', 0.6],
+        ['💩', 0]
+      ]
       strictEqual(GradingSchemeHelper.gradeToScoreLowerBound('😐', gradingScheme), 70)
     })
 
@@ -132,7 +198,13 @@ QUnit.module('GradingSchemeHelper', () => {
 
   QUnit.module('.scoreToGrade()', () => {
     test('returns the lowest grade to below-scale scores', () => {
-      const gradingScheme = [['A', 0.9], ['B', 0.8], ['C', 0.7], ['D', 0.6], ['E', 0.5]]
+      const gradingScheme = [
+        ['A', 0.9],
+        ['B', 0.8],
+        ['C', 0.7],
+        ['D', 0.6],
+        ['E', 0.5]
+      ]
       equal(GradingSchemeHelper.scoreToGrade(40, gradingScheme), 'E')
     })
 

@@ -19,6 +19,20 @@ class QuotedValue < String
 end
 
 module PostgreSQLAdapterExtensions
+  def receive_timeout_wrapper
+    return yield unless @config[:receive_timeout]
+    Timeout.timeout(@config[:receive_timeout], PG::ConnectionBad, "receive timeout") { yield }
+  end
+
+  %I{begin_db_transaction create_savepoint active?}.each do |method|
+    class_eval <<-RUBY, __FILE__, __LINE__ + 1
+      def #{method}(*)
+        receive_timeout_wrapper { super }
+      end
+    RUBY
+  end
+
+
   def explain(arel, binds = [], analyze: false)
     sql = "EXPLAIN #{"ANALYZE " if analyze}#{to_sql(arel, binds)}"
     ActiveRecord::ConnectionAdapters::PostgreSQL::ExplainPrettyPrinter.new.pp(exec_query(sql, "EXPLAIN", binds))
@@ -42,7 +56,11 @@ module PostgreSQLAdapterExtensions
     begin
       result.check
     rescue => e
-      raise translate_exception(e, "COPY FROM STDIN")
+      if CANVAS_RAILS5_2
+        raise translate_exception(e, "COPY FROM STDIN")
+      else
+        raise translate_exception(e, message: e.message, sql: "COPY FROM STDIN", binds: [])
+      end
     end
     result.cmd_tuples
   end
@@ -69,7 +87,7 @@ module PostgreSQLAdapterExtensions
     foreign_key_name = foreign_key_name(from_table, options)
 
     if if_not_exists || delay_validation
-      schema = @config[:use_qualified_names] ? quote(shard.name) : 'current_schema()'
+      schema = quote(shard.name)
       valid = select_value("SELECT convalidated FROM pg_constraint INNER JOIN pg_namespace ON pg_namespace.oid=connamespace WHERE conname='#{foreign_key_name}' AND nspname=#{schema}", "SCHEMA")
       return if valid == true && if_not_exists
     end
@@ -132,9 +150,9 @@ module PostgreSQLAdapterExtensions
   # (for instance when using functions like LOWER)
   # this will lead to problems if we try to remove the index (index_exists? will return false)
   def indexes(table_name)
-    schema = shard.name if @config[:use_qualified_names]
+    schema = shard.name
 
-    result = query(<<-SQL, 'SCHEMA')
+    result = query(<<~SQL, 'SCHEMA')
          SELECT distinct i.relname, d.indisunique, d.indkey, pg_get_indexdef(d.indexrelid), t.oid
          FROM pg_class t
          INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -153,7 +171,7 @@ module PostgreSQLAdapterExtensions
       inddef = row[3]
       oid = row[4]
 
-      columns = Hash[query(<<-SQL, "SCHEMA")]
+      columns = Hash[query(<<~SQL, "SCHEMA")]
         SELECT a.attnum, a.attname
         FROM pg_attribute a
         WHERE a.attrelid = #{oid}
@@ -178,7 +196,7 @@ module PostgreSQLAdapterExtensions
 
   # some migration specs test migrations that add concurrent indexes; detect that, and strip the concurrent
   # but _only_ if there isn't another transaction in the stack
-  def add_index_options(_table_name, _column_name, _options = {})
+  def add_index_options(_table_name, _column_name, **)
     index_name, index_type, index_columns, index_options, algorithm, using = super
     algorithm = nil if Rails.env.test? && algorithm == "CONCURRENTLY" && !ActiveRecord::Base.in_transaction_in_test?
     [index_name, index_type, index_columns, index_options, algorithm, using]
@@ -191,9 +209,9 @@ module PostgreSQLAdapterExtensions
       index_name = options[:name].to_s if options.key?(:name)
       index_name ||= index_name(table_name, column_names)
 
-      schema = shard.name if use_qualified_names?
+      schema = shard.name
 
-      valid = select_value(<<-SQL, 'SCHEMA')
+      valid = select_value(<<~SQL, 'SCHEMA')
             SELECT indisvalid
             FROM pg_class t
             INNER JOIN pg_index d ON t.oid = d.indrelid
@@ -281,8 +299,8 @@ module PostgreSQLAdapterExtensions
     super(table_name, column_name, type, **options)
   end
 
-  def remove_column(table_name, column_name, type = nil, options = {})
-    return if options.is_a?(Hash) && options[:if_exists] && !column_exists?(table_name, column_name)
+  def remove_column(table_name, column_name, type = nil, if_exists: false, **options)
+    return if if_exists && !column_exists?(table_name, column_name)
     super
   end
 
@@ -296,7 +314,7 @@ module PostgreSQLAdapterExtensions
   def extension_installed?(extension)
     @extensions ||= {}
     @extensions.fetch(extension) do
-      select_value(<<-SQL)
+      select_value(<<~SQL)
         SELECT nspname
         FROM pg_extension
           INNER JOIN pg_namespace ON extnamespace=pg_namespace.oid
@@ -419,6 +437,54 @@ module PostgreSQLAdapterExtensions
       super
     ensure
       @nested_primary_keys = false
+    end
+  end
+
+  def icu_collations
+    return [] if postgresql_version < 120000
+    @collations ||= select_rows <<~SQL, "SCHEMA"
+      SELECT nspname, collname
+      FROM pg_collation
+      INNER JOIN pg_namespace ON collnamespace=pg_namespace.oid
+      WHERE
+        collprovider='i' AND
+        NOT collisdeterministic AND
+        collcollate LIKE '%-u-kn-true'
+    SQL
+  end
+
+  def create_icu_collations
+    return if postgresql_version < 120000
+    original_locale = I18n.locale
+
+    collation = "und-u-kn-true"
+    unless icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+      update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+    end
+
+    I18n.available_locales.each do |locale|
+      next if locale =~ /-x-/
+      I18n.locale = locale
+      next if Canvas::ICU.collator.rules.empty?
+      collation = "#{locale}-u-kn-true"
+      next if icu_collations.find { |_schema, extant_collation| extant_collation == collation }
+      update("CREATE COLLATION public.#{quote_column_name(collation)} (LOCALE=#{quote(collation)}, PROVIDER='icu', DETERMINISTIC=false)")
+    end
+  ensure
+    @collations = nil
+    I18n.locale = original_locale
+  end
+
+  def current_wal_lsn
+    unless instance_variable_defined?(:@has_wal_func)
+      @has_wal_func = select_value("SELECT true FROM pg_proc WHERE proname IN ('pg_current_wal_lsn','pg_current_xlog_location') LIMIT 1")
+    end
+    return unless @has_wal_func
+
+    if postgresql_version >= 100000
+      select_value("SELECT pg_current_wal_lsn()")
+    else
+      select_value("SELECT pg_current_xlog_location()")
     end
   end
 end

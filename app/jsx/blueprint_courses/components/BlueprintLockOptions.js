@@ -134,6 +134,7 @@ export default class BlueprintLockOptions extends React.Component {
           <div className="bcs_radio_input-group">
             <RadioInput
               name="course[use_blueprint_restrictions_by_object_type]"
+              size="small"
               label={generalLocking}
               value={general}
               onChange={this.onChange}
@@ -147,6 +148,7 @@ export default class BlueprintLockOptions extends React.Component {
                 this.granularRadioInput = c
               }}
               name="course[use_blueprint_restrictions_by_object_type]"
+              size="small"
               label={granularLocking}
               value={granular}
               onChange={this.onChange}
@@ -171,6 +173,7 @@ export default class BlueprintLockOptions extends React.Component {
           label={blueprintDescription}
           onChange={this.enableCourse}
           aria-label={this.props.disabledMessage}
+          size="small"
           value="on"
         />
       </div>

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2011 - present Instructure, Inc.
@@ -223,29 +225,33 @@ describe WikiPage do
       expect(@page.can_read_page?(@teacher)).to eq true
     end
 
-    it "allows account admins with :manage_wiki rights to read" do
-      account = @course.root_account
-      role = custom_account_role('CustomAccountUser', :account => account)
-      RoleOverride.manage_role_override(account, role, 'manage_wiki', :override => true)
-      admin = account_admin_user(:account => account, :role => role, :active_all => true)
-      expect(@page.can_read_page?(admin)).to eq true
+    context 'allows account admins to read' do
+      [:manage_wiki_create, :manage_wiki_update, :manage_wiki_delete].each do |perm|
+        it "with #{perm} rights" do
+          account = @course.root_account
+          role = custom_account_role('CustomAccountUser', :account => account)
+          RoleOverride.manage_role_override(account, role, perm, :override => true)
+          admin = account_admin_user(:account => account, :role => role, :active_all => true)
+          expect(@page.can_read_page?(admin)).to eq true
+        end
+      end
     end
   end
 
   describe '#can_edit_page?' do
-    it 'is true if the user has manage_wiki rights' do
+    it 'is true if the user has manage_wiki_update rights' do
       course_with_teacher(:active_all => true)
       page = @course.wiki_pages.create(:title => "some page", :editing_roles => 'teachers')
       page.workflow_state = 'unpublished'
       expect(page.can_edit_page?(@teacher)).to be_truthy
     end
 
-    describe "without :manage_wiki rights" do
+    describe "without :manage_wiki_update rights" do
       before :once do
         course_with_teacher(:active_all => true)
         course_with_ta(:course => @course, :active_all => true)
-        @course.account.role_overrides.create!(:role => teacher_role, :permission => 'manage_wiki', :enabled => false)
-        @course.account.role_overrides.create!(:role => ta_role, :permission => 'manage_wiki', :enabled => false)
+        @course.account.role_overrides.create!(:role => teacher_role, :permission => 'manage_wiki_update', :enabled => false)
+        @course.account.role_overrides.create!(:role => ta_role, :permission => 'manage_wiki_update', :enabled => false)
       end
 
       it 'does not grant teachers or TAs edit rights when editing roles are "Only teachers"' do
@@ -715,6 +721,75 @@ describe WikiPage do
     it "returns pages with assignment and student visibility" do
       expect(WikiPage.visible_to_students_in_course_with_da([@student1.id], [@course.id]))
         .to include @page_assigned, @page_unassigned
+    end
+  end
+
+  describe ".reinterpret_version_yaml" do
+    it "replaces the unescaped media comments" do
+      bad_yaml = <<-YAML
+---
+id: 787500
+wiki_id: 15160
+title: \"\\U0001F4D8\\U0001F4D5Ss10.20 | Social Studies: Warm Up - Las Cruces, New Mexico\"
+body: \"<p style=\\\"text-align: center;\\\"><a id=\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\" class=\"instructure_inline_media_comment audio_comment\" data-media_comment_type=\"audio\" data-alt=\"\" href=\"/media_objects/m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\"/></p>\\r\
+<p style=\\\"text-align: center;\\\"> </p>\\r\
+<p
+  style=\\\"text-align: center;\\\"><span style=\\\"font-size: 18pt;\\\">Geography is the
+  study of Earth and its land, water, air and people. We are concentrating on learning
+  about the physical features, climate and natural resources that affect an area and
+  its people.</span></p>\\r\
+  center;\\\"> </p>\"
+user_id: 
+created_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &1 2020-11-05 20:24:57.390301492 Z
+  zone: &2 !ruby/object:ActiveSupport::TimeZone
+    name: Etc/UTC
+  time: *1
+updated_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: *1
+  zone: *2
+  time: *1
+url: ss10-dot-20-|-social-studies-warm-up-las-cruces-new-mexico
+protected_editing: false
+revised_at: !ruby/object:ActiveSupport::TimeWithZone
+  utc: &3 2020-11-05 20:24:57.386639804 Z
+  zone: *2
+  time: *3
+context_id: 23167
+context_type: Course
+root_account_id: 1
+YAML
+      good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
+      expect(good_yaml).to include("style=\\\"text-align: center;\\\">")
+      expect(good_yaml).to include("<a id=\\\"media_comment_m-5Ej8kqbPvbAhbBX7zWCEtynxijhqH27P\\\"")
+    end
+
+    it "isn't overly greedy in matching other anchor tags" do
+      bad_yaml = <<-YAML
+---
+id: 19903
+wiki_id: 513
+title: Jason otitis media treatment
+body: \"<ul>\\r\\n
+                <li\n  class=\\\"distractors\\\"><a class=\\\"radio_link\\\" href=\\\"#\\\">Yes</a></li>\\r\\n
+                <li class=\\\"distractors\\\"><a\n  class=\\\"radio_link answer\\\" href=\\\"#\\\">No</a></li>\\r\\n
+              </ul>\\r\\n</div>\\r\\n
+              <div class=\\\"col-md-4\\\">
+                <img\n  src=\\\"/courses/348/files/102814/preview\\\" alt=\\\"Antibiotics\\\" width=\\\"100%\\\"\n  height=\\\"auto\\\" data-api-endpoint=\\\"https://dev.iheed.org/api/v1/courses/328/files/41094\\\"\n  data-api-returntype=\\\"File\\\">
+              </div>\\r\\n
+            </div>\\r\\n
+            <div class=\\\"feedback\\\">\\r\\n
+              <p>Jason\n  does not need antibiotics at this time. He is not systemically unwell, he has no\n  high-risk complications and there is no discharge from his ear.</p>\\r\\n
+            </div>\\r\\n
+            <div\n  class=\\\"feedback correct\\\">\\r\\n<p>Correct.</p>\\r\\n</div>\\r\\n
+            <div class=\\\"feedback\n  incorrect\\\">\\r\\n<p>Incorrect.</p>\\r\\n</div>\\r\\n
+          </div>\\r\\n
+        </div>\\r\\n<div class=\\\"content-box\\\">\\r\\n<div\n  class=\\\"grid-row spacer center-xs\\\">\\r\\n
+        <div class=\\\"col-md-4 text-left\\\">\\r\\n<p\n  class=\\\"text-info\\\">Listen to the audio to hear the advice you give Laura about\n  what to do next.</p>\\r\\n</div>\\r\\n<div class=\\\"col-md-4\\\">
+        <a id=\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\" class=\"instructure_inline_media_comment audio_comment\" href=\"/media_objects/m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\"/>\"
+YAML
+      good_yaml = WikiPage.reinterpret_version_yaml(bad_yaml)
+      expect(good_yaml).to include("<a id=\\\"media_comment_m-52Qmsrg9rxySvtzA6e9VdzxrB9FHZBVx\\\"")
     end
   end
 end

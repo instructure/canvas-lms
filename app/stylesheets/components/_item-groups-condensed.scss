@@ -45,7 +45,7 @@
     color: $ic-font-color-dark;
     position: relative;
     display: flex;
-
+    flex-wrap: wrap;
     .links {
       float: direction(right);
     }

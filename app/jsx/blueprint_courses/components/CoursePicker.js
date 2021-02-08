@@ -21,7 +21,8 @@ import $ from 'jquery'
 import React from 'react'
 import PropTypes from 'prop-types'
 import {ToggleDetails} from '@instructure/ui-toggle-details'
-import {Text, Spinner} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import 'compiled/jquery.rails_flash_notifications'
 import propTypes from '../propTypes'
 import CourseFilter from './CourseFilter'
@@ -61,7 +62,7 @@ export default class CoursePicker extends React.Component {
     this.fixIcons()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     if (this.state.announceChanges && !this.props.isLoadingCourses && nextProps.isLoadingCourses) {
       $.screenReaderFlashMessage(I18n.t('Loading courses started'))
     }

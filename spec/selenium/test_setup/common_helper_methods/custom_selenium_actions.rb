@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -276,6 +278,10 @@ module CustomSeleniumActions
   end
 
   def select_all_in_tiny(tiny_controlling_element)
+    select_in_tiny(tiny_controlling_element, 'body')
+  end
+
+  def select_in_tiny(tiny_controlling_element, css_selector)
     # This used to be a direct usage of "editorBox", which is sorta crummy because
     # we don't want acceptance tests to have special implementation knowledge of
     # the system under test.
@@ -285,9 +291,9 @@ module CustomSeleniumActions
     # cumbersome is because tinymce has it's actual interaction point down in
     # an iframe.
     src = %Q{
-      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('[role="application"]').find('iframe');
+      var $iframe = $("##{tiny_controlling_element.attribute(:id)}").siblings('[role="application"],[role="document"]').find('iframe');
       var iframeDoc = $iframe[0].contentDocument;
-      var domElement = iframeDoc.getElementsByTagName("body")[0];
+      var domElement = iframeDoc.querySelector("#{css_selector}")
       var selection = iframeDoc.getSelection();
       var range = iframeDoc.createRange();
       range.selectNodeContents(domElement);
@@ -304,14 +310,23 @@ module CustomSeleniumActions
   end
 
   def switch_editor_views(tiny_controlling_element)
-    if !tiny_controlling_element.is_a?(String)
-      tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+    if Account.default.feature_enabled?(:rce_enhancements)
+      switch_new_editor_views
+    else
+      if !tiny_controlling_element.is_a?(String)
+        tiny_controlling_element = "##{tiny_controlling_element.attribute(:id)}"
+      end
+      selector = tiny_controlling_element.to_s.to_json
+      assert_can_switch_views!
+      driver.execute_script(%Q{
+        $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
+      })
     end
-    selector = tiny_controlling_element.to_s.to_json
-    assert_can_switch_views!
-    driver.execute_script(%Q{
-      $(#{selector}).parent().parent().find("a.switch_views:visible, a.toggle_question_content_views_link:visible").click();
-    })
+  end
+
+  # Used for Enhanced RCE
+  def switch_new_editor_views
+    force_click('[data-btn-id="rce-edit-btn"]')
   end
 
   def clear_tiny(tiny_controlling_element, iframe_id=nil)
@@ -334,12 +349,12 @@ module CustomSeleniumActions
 
   def type_in_tiny(tiny_controlling_element, text, clear: false)
     selector = tiny_controlling_element.to_s.to_json
+    mce_class = Account.default.feature_enabled?(:rce_enhancements) ? ".tox-tinymce" : ".mce-tinymce"
     keep_trying_until do
-      driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').length > 0;")
+      driver.execute_script("return $(#{selector}).siblings('#{mce_class}').length > 0;")
     end
 
-    iframe_id = driver.execute_script("return $(#{selector}).siblings('.mce-tinymce').find('iframe')[0];")['id']
-
+    iframe_id = driver.execute_script("return $(#{selector}).siblings('#{mce_class}').find('iframe')[0];")['id']
     clear_tiny(tiny_controlling_element, iframe_id) if clear
 
     if text.length > 100 || text.lines.size > 1
@@ -411,8 +426,12 @@ module CustomSeleniumActions
 
   def click_option(select_css, option_text, select_by = :text)
     element = fj(select_css)
-    select = Selenium::WebDriver::Support::Select.new(element)
-    select.select_by(select_by, option_text)
+    if element.tag_name == 'input'
+      click_INSTUI_Select_option(element, option_text, select_by)
+    else
+      select = Selenium::WebDriver::Support::Select.new(element)
+      select.select_by(select_by, option_text)
+    end
   end
 
   def INSTUI_select(elem_or_css)
@@ -420,11 +439,16 @@ module CustomSeleniumActions
   end
 
   # implementation of click_option for use with INSTU's Select
-  # (tested with the CanvasSelect wrapper, untested with a raw instui Select)
+  # (tested with the CanvasSelect wrapper and instui SimpleSelect,
+  # untested with a raw instui Select)
   def click_INSTUI_Select_option(select, option_text, select_by = :text)
     cselect = INSTUI_select(select)
-    cselect.click # open the options list
     option_list_id = cselect.attribute('aria-controls')
+    if option_list_id.blank?
+      cselect.click
+      option_list_id = cselect.attribute('aria-controls')
+    end
+    
     if select_by == :text
       fj("##{option_list_id} [role='option']:contains(#{option_text})").click
     else

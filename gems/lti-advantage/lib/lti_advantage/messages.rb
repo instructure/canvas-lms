@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LtiAdvantage
   module Messages
     require_relative 'messages/jwt_message'

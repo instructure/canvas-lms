@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,6 +21,9 @@
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe CalendarEvent do
+  before(:once) do
+    Account.find_or_create_by!(id: 0).update(name: 'Dummy Root Account', workflow_state: 'deleted', root_account_id: nil)
+  end
 
   it "should sanitize description" do
     course_model
@@ -296,6 +301,61 @@ describe CalendarEvent do
     end
   end
 
+  context 'root account' do
+    it 'should set the root_account when the context is an appointment_group' do
+      course = Course.create!
+      ag = AppointmentGroup.create(:title => "test", :contexts => [course])
+      ag.publish!
+      appointment = ag.appointments.create(:start_at => '2012-01-01 12:00:00', :end_at => '2012-01-01 13:00:00')
+      expect(appointment.root_account_id).to eq ag.context.root_account_id
+    end
+
+    it 'should set the root_account when the context is a course' do
+      course = Course.create!
+      appointment = CalendarEvent.create!(title: 'test', context: course)
+      expect(appointment.root_account_id).to eq course.root_account_id
+    end
+
+    it 'should set the root_account when the context is a user if the effective context is set and is not a user' do
+      user = User.create!
+      course = Course.create!
+      appointment = CalendarEvent.create!(title: 'test', context: user, effective_context_code: course.asset_string)
+      expect(appointment.root_account_id).to eq course.root_account_id
+    end
+
+    it 'should set the root_account_id to 0 when the context is a user and there is no effective context' do
+      user = User.create!
+      appointment = CalendarEvent.create!(title: 'test', context: user)
+      expect(appointment.root_account_id).to eq 0
+    end
+
+    it 'should set the root_account when the context is a group' do
+      account = Account.create!
+      group = Group.create!(context: account)
+      appointment = CalendarEvent.create!(title: 'test', context: group)
+      expect(appointment.root_account_id).to eq group.root_account_id
+    end
+
+    it 'should set the root_account when the context is a course_section' do
+      course = Course.create!
+      section = course.course_sections.create!
+      appointment = CalendarEvent.create!(title: 'test', context: section)
+      expect(appointment.root_account_id).to eq section.root_account_id
+    end
+
+    it 'should set the root_account when assignment_group is not yet assigned to a course context' do
+      course = Course.create!
+      ag = AppointmentGroup.create(
+        :title => "test",
+        :contexts => [course],
+        :new_appointments => {
+            appt01: [Time.zone.now, Time.zone.now]
+        }
+      )
+      expect(ag.appointments[0].root_account_id).to eq course.root_account_id
+    end
+  end
+
   context "for_user_and_context_codes" do
     before :once do
       course_with_student(:active_all => true)
@@ -366,8 +426,7 @@ describe CalendarEvent do
       course_with_student(:active_all => true)
       @teacher = user_factory(active_all: true)
       @course.enroll_teacher(@teacher).accept!
-      channel = @student.communication_channels.create(:path => "test_channel_email_#{user_factory.id}", :path_type => "email")
-      channel.confirm
+      communication_channel(@student, {username: "test_channel_email_#{user_factory.id}@test.com", active_cc: true})
     end
 
     context "with calendar event created" do
@@ -483,8 +542,7 @@ describe CalendarEvent do
         course_with_observer(active_all: true, course: @course, associated_user_id: @student1.id)
 
         [@teacher, @student1, @student2, @observer].each do |user|
-          channel = user.communication_channels.create(:path => "test_channel_email_#{user.id}", :path_type => "email")
-          channel.confirm
+          communication_channel(user, {username: "test_channel_email_#{user.id}@test.com", active_cc: true})
         end
 
         @expected_users = [@teacher.id, @student1.id, @student2.id, @observer.id].sort
@@ -494,8 +552,22 @@ describe CalendarEvent do
         Message.where(notification_id: BroadcastPolicy.notification_finder.by_name(notification_name), user_id: @expected_users).pluck(:user_id).sort
       end
 
-      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
+      it 'should include course_ids from appointment_groups' do
         reservation = @appointment2.reserve_for(@group, @student1)
+        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id]})
+      end
+
+      it 'should include multiple course_ids' do
+        course2 = @course.root_account.courses.create!(name: 'course2', workflow_state: 'available')
+        course2.enroll_teacher(@teacher).accept!
+        ag = AppointmentGroup.create!(title: "test", contexts: [@course, course2])
+        appointment = ag.appointments.create!(start_at: '2012-01-01 12:00:00', end_at: '2012-01-01 13:00:00')
+        reservation = appointment.reserve_for(@student1, @student1)
+        expect(reservation.course_broadcast_data).to eql({root_account_id: @course.root_account_id, course_ids: [@course.id, course2.id]})
+      end
+
+      it "should notify all participants except the person reserving", priority: "1", test_id: 193149 do
+        @appointment2.reserve_for(@group, @student1)
         expect(message_recipients_for('Appointment Reserved For User')).to eq @expected_users - [@student1.id, @teacher.id]
       end
 
@@ -628,10 +700,14 @@ describe CalendarEvent do
     end
 
     it "should not let participants exceed max_appointments_per_participant" do
-      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :max_appointments_per_participant => 1,
+      ag = AppointmentGroup.create(
+        :title => "test",
+        :contexts => [@course],
+        :max_appointments_per_participant => 1,
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00'], ['2012-01-01 13:00:00', '2012-01-01 14:00:00']]
       )
       ag.publish!
+
       appointment = ag.appointments.first
       appointment2 = ag.appointments.last
 
@@ -751,19 +827,19 @@ describe CalendarEvent do
     end
 
     it "should copy the group attributes to the initial appointments" do
-      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello\nworld",
+      ag = AppointmentGroup.create(:title => "test", :contexts => [@course], :description => "hello world",
         :new_appointments => [['2012-01-01 12:00:00', '2012-01-01 13:00:00']]
       )
       e = ag.appointments.first
       expect(e.title).to eql 'test'
-      expect(e.description).to eql "hello<br/>\r\nworld"
+      expect(e.description).to eql "hello world"
     end
 
     it "should copy changed group attributes to existing appointments" do
-      @ag.update(:title => 'changed!', :description => "test\n123")
+      @ag.update(:title => 'changed!', :description => "test123")
       e = @ag.appointments.first.reload
       expect(e.title).to eql 'changed!'
-      expect(e.description).to eql "test<br/>\r\n123"
+      expect(e.description).to eql "test123"
     end
 
     it "should not copy group description if appointment is overridden" do
@@ -826,6 +902,17 @@ describe CalendarEvent do
 
       expect(@event.reload).to be_deleted
       expect(child.reload).to be_deleted
+    end
+
+    it "deletes the parent event after the last child event is deleted" do
+      calendar_event_model
+      sec2 = @course.course_sections.create! name: 'sec2'
+      child1 = @event.child_events.create! context: @course.default_section, start_at: 1.day.from_now
+      child2 = @event.child_events.create! context: sec2, start_at: 2.days.from_now
+      child1.destroy
+      expect(@event.reload).to be_active
+      child2.destroy
+      expect(@event.reload).to be_deleted
     end
 
     context "bulk updating" do
@@ -945,6 +1032,27 @@ describe CalendarEvent do
         e1.reload
         e1.update :remove_child_events => true
         expect(e1.child_events.reload).to be_empty
+      end
+
+      it "unsets all_day when deleting child events" do
+        s2 = @course.course_sections.create!
+        e1 = @course.calendar_events.create!({
+          title: 'foo',
+          start_at: "2020-10-29T00:00:00.000Z",
+          end_at: "2020-10-29T00:00:00.000Z",
+          updating_user: @user,
+          child_event_data: [
+            { start_at: "2020-10-27T10:00:00.000Z", end_at: "2020-10-27T11:00:00.000Z", context_code: @course.default_section.asset_string},
+            { start_at: "2020-10-27T14:00:00.000Z", end_at: "2020-10-27T15:00:00.000Z", context_code: s2.asset_string}
+          ]
+        })
+        e1 = CalendarEvent.find(e1.id)
+        e1.update({
+          start_at: "2020-10-27T10:00:00.000Z",
+          end_at: "2020-10-27T15:00:00.000Z",
+          remove_child_events: true
+        })
+        expect(e1.reload).not_to be_all_day
       end
     end
 

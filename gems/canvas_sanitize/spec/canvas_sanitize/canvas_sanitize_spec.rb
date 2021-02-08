@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -25,6 +27,12 @@ describe CanvasSanitize do
     context "when the HTML string contains anchor tags" do
       context "and the href uses the 'tel' protocol" do
         let(:html_string) { '<a href="tel:+14123815500">Call Number</a>' }
+
+        it { is_expected.to eq html_string }
+      end
+
+      context "and the href uses the 'skype' protocol" do
+        let(:html_string) { '<a href="skype:inst-support?call">Call Support</a>' }
 
         it { is_expected.to eq html_string }
       end

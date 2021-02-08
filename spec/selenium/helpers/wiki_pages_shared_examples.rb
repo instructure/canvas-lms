@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -26,8 +28,7 @@ RSpec.shared_examples "course_pages_granular_permissions" do
   end
 
   before do
-    set_granular_permission
-    @role = Role.get_built_in_role(@enrollment.type)
+    @role = Role.get_built_in_role(@enrollment.type, root_account_id: Account.default.id)
     unless @role.base_role_type == "TeacherEnrollment"
       raise "only base role type of TeacherEnrollment supported"
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 Instructure, Inc.
 #
@@ -35,7 +37,7 @@ describe "Outcomes Import API", type: :request do
   def available_json(expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/available",
       {
-        controller: 'outcomes_import_api',
+        controller: 'outcomes_academic_benchmark_import_api',
         action: 'available',
         account_id: @account.id.to_s,
         format: 'json',
@@ -51,7 +53,7 @@ describe "Outcomes Import API", type: :request do
   def create_json(guid:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
       {
-        controller: 'outcomes_import_api',
+        controller: 'outcomes_academic_benchmark_import_api',
         action: 'create',
         account_id: @account.id.to_s,
         format: 'json',
@@ -69,7 +71,7 @@ describe "Outcomes Import API", type: :request do
   def create_full_json(json:, expected_status: 200)
     api_call(:post, "/api/v1/global/outcomes_import",
       {
-        controller: 'outcomes_import_api',
+        controller: 'outcomes_academic_benchmark_import_api',
         action: 'create',
         account_id: @account.id.to_s,
         format: 'json',
@@ -85,7 +87,7 @@ describe "Outcomes Import API", type: :request do
   def status_json(migration_id:, expected_status: 200)
     api_call(:get, "/api/v1/global/outcomes_import/migration_status/#{migration_id}",
       {
-        controller: 'outcomes_import_api',
+        controller: 'outcomes_academic_benchmark_import_api',
         action: 'migration_status',
         account_id: @account.id.to_s,
         format: 'json',
@@ -182,7 +184,7 @@ describe "Outcomes Import API", type: :request do
         end
 
         it "includes the United Kingdom" do
-          expect(available_json.any?{|j| j[description_key] == "United Kingdom"}).to be_truthy
+          expect(available_json).to be_any {|j| j["title"] == "UK Department for Education"}
         end
 
         it "includes the common core standards" do
@@ -384,24 +386,23 @@ describe "Outcomes Import API", type: :request do
     allow(AcademicBenchmark).to receive(:import).and_return(cm_mock)
   end
   include_examples "outcomes import" do
-    let(:description_key){ "description" }
     let(:json_file) { "available_return_val.json" }
     def stub_ab_api
       standards_mock = double("standards")
       allow(standards_mock).to receive(:authorities).
         and_return(filename_to_hash("available_authorities.json").
                 map{ |a| AcademicBenchmarks::Standards::Authority.from_hash(a) })
-      allow(standards_mock).to receive(:authority_documents).
-        with(not_eq('CC').and(not_eq('NRC'))).
-        and_return(filename_to_hash("national_standards_authority_docs.json").
+      allow(standards_mock).to receive(:authority_publications).
+        with(not_eq('CC').and(not_eq('Achieve'))).
+        and_return(filename_to_hash("iste_authority_pubs.json").
                 map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-      allow(standards_mock).to receive(:authority_documents).
-        with('NRC').
-        and_return(filename_to_hash("ngss_nrc_authority_docs.json").
+      allow(standards_mock).to receive(:authority_publications).
+        with('Achieve').
+        and_return(filename_to_hash("achieve_authority_pubs.json").
                 map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
-      allow(standards_mock).to receive(:authority_documents).
+      allow(standards_mock).to receive(:authority_publications).
         with('CC').
-        and_return(filename_to_hash("common_core_authority_docs.json").
+        and_return(filename_to_hash("common_core_authority_pubs.json").
                map{ |d| AcademicBenchmarks::Standards::Document.from_hash(d) })
       allow(AcademicBenchmarks::Api::Standards).to receive(:new).and_return(standards_mock)
     end

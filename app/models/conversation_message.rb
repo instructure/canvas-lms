@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -22,7 +24,7 @@ class ConversationMessage < ActiveRecord::Base
   self.ignored_columns = %i[root_account_id]
 
   include HtmlTextHelper
-
+  include ConversationHelper
   include Rails.application.routes.url_helpers
   include SendToStream
   include SimpleTags::ReaderInstanceMethods
@@ -38,12 +40,13 @@ class ConversationMessage < ActiveRecord::Base
   delegate :participants, :to => :conversation
   delegate :subscribed_participants, :to => :conversation
 
+  before_create :set_root_account_ids
   after_create :generate_user_note!
   after_save :update_attachment_associations
 
   scope :human, -> { where("NOT generated") }
-  scope :with_attachments, -> { where("attachment_ids<>'' OR has_attachments") } # TODO: simplify post-migration
-  scope :with_media_comments, -> { where("media_comment_id IS NOT NULL OR has_media_objects") } # TODO: simplify post-migration
+  scope :with_attachments, -> { where("has_attachments") }
+  scope :with_media_comments, -> { where("has_media_objects") }
   scope :by_user, lambda { |user_or_id| where(:author_id => user_or_id) }
 
   def self.preload_latest(conversation_participants, author=nil)
@@ -54,13 +57,13 @@ class ConversationMessage < ActiveRecord::Base
           "(conversation_id=#{cp.conversation_id} AND user_id=#{cp.user_id})" }.join(" OR ")
         }) AND NOT generated
         AND (conversation_message_participants.workflow_state <> 'deleted' OR conversation_message_participants.workflow_state IS NULL)"
-      base_conditions << sanitize_sql([" AND author_id = ?", author.id]) if author
+      base_conditions += sanitize_sql([" AND author_id = ?", author.id]) if author
 
       # limit it for non-postgres so we can reduce the amount of extra data we
       # crunch in ruby (generally none, unless a conversation has multiple
       # most-recent messages, i.e. same created_at)
       unless connection.adapter_name == 'PostgreSQL'
-        base_conditions << <<-SQL
+        base_conditions += <<~SQL
           AND conversation_messages.created_at = (
             SELECT MAX(created_at)
             FROM conversation_messages cm2
@@ -71,7 +74,7 @@ class ConversationMessage < ActiveRecord::Base
         SQL
       end
 
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         ret = where(base_conditions).
           joins("JOIN #{ConversationMessageParticipant.quoted_table_name} ON conversation_messages.id = conversation_message_id").
           select("conversation_messages.*, conversation_participant_id, conversation_message_participants.user_id, conversation_message_participants.tags").
@@ -143,6 +146,10 @@ class ConversationMessage < ActiveRecord::Base
     write_attribute(:attachment_ids, ids.join(','))
   end
 
+  def relativize_attachment_ids(from_shard:, to_shard:)
+    self.attachment_ids = attachment_ids.map { |id| Shard.relative_id_for(id, from_shard, to_shard) }.sort
+  end
+
   def attachments
     self.attachment_associations.map(&:attachment)
   end
@@ -165,20 +172,6 @@ class ConversationMessage < ActiveRecord::Base
     conversation.conversation_participants.each do |p|
       p.delete_messages(self) # ensures cached stuff gets updated, etc.
     end
-  end
-
-  # TODO: remove once data has been migrated
-  def has_attachments?
-    ret = read_attribute(:has_attachments)
-    return ret unless ret.nil?
-    attachment_ids.present? || forwarded_messages.any?(&:has_attachments?)
-  end
-
-  # TODO: remove once data has been migrated
-  def has_media_objects?
-    ret = read_attribute(:has_media_objects)
-    return ret unless ret.nil?
-    media_comment_id.present? || forwarded_messages.any?(&:has_media_objects?)
   end
 
   def media_comment

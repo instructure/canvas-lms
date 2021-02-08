@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -30,6 +32,14 @@ module EventStream::Backend
 
     def available?
       !!database && database.available?
+    end
+
+    def database_name
+      database && database.keyspace
+    end
+
+    def database_fingerprint
+      database && database.fingerprint
     end
 
     def fetch_cql

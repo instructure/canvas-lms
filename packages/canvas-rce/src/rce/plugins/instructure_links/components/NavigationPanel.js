@@ -137,7 +137,12 @@ export default function NavigationPanel(props) {
         expanded={props.selectedAccordionIndex === 'navigation'}
         label={navigationSummary}
       >
-        <LinkSet type="navigation" collection={collection} onLinkClick={props.onLinkClick} />
+        <LinkSet
+          type="navigation"
+          collection={collection}
+          onLinkClick={props.onLinkClick}
+          contextType={props.contextType}
+        />
       </AccordionSection>
     </div>
   )

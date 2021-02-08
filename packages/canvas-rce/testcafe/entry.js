@@ -33,23 +33,31 @@ renderIntoDiv(document.getElementById('content'), {
         'paste',
         'table',
         'link',
+        'image',
+        'instructure_upload_image',
         'directionality',
         'lists',
         'wordcount',
         'instructure-ui-icons',
         'instructure_equation',
+        'instructure-embeds',
+        'instructure_condensed_buttons',
+        'instructure_documents',
+        'instructure_equation',
+        'instructure_media_embed',
         'instructure_image',
         'instructure_equella',
         'instructure_external_tools',
         'instructure_record',
         'instructure_links',
-        'instructure_condensed_buttons'
+        'instructure_html_view'
       ],
       menubar: true
     }
   },
   trayProps: {
     contextType: 'course',
-    contextId: '17'
+    contextId: '17',
+    containingContext: {type: 'course', contextId: '17', userId: '3'}
   }
 })

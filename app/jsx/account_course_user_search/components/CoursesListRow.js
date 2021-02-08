@@ -19,6 +19,7 @@
 import React from 'react'
 import {number, string, shape, arrayOf, bool} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 import {Tooltip} from '@instructure/ui-overlays'
 import {
@@ -66,6 +67,8 @@ export default class CoursesListRow extends React.Component {
       window.ENV && window.ENV.PERMISSIONS && window.ENV.PERMISSIONS.can_create_enrollments
   }
 
+  static displayName = 'Row'
+
   constructor(props) {
     super(props)
 
@@ -100,7 +103,10 @@ export default class CoursesListRow extends React.Component {
         )
       })
       const newStudents = newEnrollments.filter(e => e.enrollment.type === 'StudentEnrollment')
-      this.setState({newlyEnrolledStudents: this.state.newlyEnrolledStudents + newStudents.length})
+      this.setState(oldState => {
+        const newlyEnrolledStudents = oldState.newlyEnrolledStudents + newStudents.length
+        return {newlyEnrolledStudents}
+      })
     }
   }
 
@@ -169,8 +175,8 @@ export default class CoursesListRow extends React.Component {
     const settingsTip = I18n.t('Settings for %{name}', {name})
 
     return (
-      <tr>
-        <th scope="row" style={{textAlign: 'center'}}>
+      <Table.Row>
+        <Table.RowHeader textAlign="center">
           {isPublished ? (
             <span className="published-status published">
               <IconPublishLine size="x-small" />
@@ -181,8 +187,8 @@ export default class CoursesListRow extends React.Component {
               <ScreenReaderContent>{I18n.t('no')}</ScreenReaderContent>
             </span>
           )}
-        </th>
-        <td>
+        </Table.RowHeader>
+        <Table.Cell>
           <a href={url}>
             {name}
             {blueprint && (
@@ -192,10 +198,10 @@ export default class CoursesListRow extends React.Component {
               </Tooltip>
             )}
           </a>
-        </td>
-        {showSISIds && <td>{sis_course_id}</td>}
-        <td>{term.name}</td>
-        <td>
+        </Table.Cell>
+        {showSISIds && <Table.Cell>{sis_course_id}</Table.Cell>}
+        <Table.Cell>{term.name}</Table.Cell>
+        <Table.Cell>
           {(teachersToShow || []).map(teacher => (
             <div key={teacher.id}>
               <UserLink
@@ -213,10 +219,10 @@ export default class CoursesListRow extends React.Component {
             </Button>
           )}
           {!teachers && teacher_count && I18n.t('%{teacher_count} teachers', {teacher_count})}
-        </td>
-        <td>{subaccount_name}</td>
-        <td>{I18n.n(total_students + newlyEnrolledStudents)}</td>
-        <td style={{whiteSpace: 'nowrap', textAlign: 'end'}}>
+        </Table.Cell>
+        <Table.Cell>{subaccount_name}</Table.Cell>
+        <Table.Cell>{I18n.n(total_students + newlyEnrolledStudents)}</Table.Cell>
+        <Table.Cell textAlign="end">
           {this.renderAddEnrollments()}
           <Tooltip tip={statsTip}>
             <Button variant="icon" size="small" href={`${url}/statistics`}>
@@ -228,8 +234,8 @@ export default class CoursesListRow extends React.Component {
               <IconSettingsLine title={settingsTip} />
             </Button>
           </Tooltip>
-        </td>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
     )
   }
 }

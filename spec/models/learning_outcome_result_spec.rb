@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -15,10 +17,14 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
-
 require File.expand_path(File.dirname(__FILE__) + '/../spec_helper.rb')
 
 describe LearningOutcomeResult do
+
+  before :once do
+    @account = Account.default
+  end
+
   let_once(:course) do
     Course.create!
   end
@@ -87,14 +93,34 @@ describe LearningOutcomeResult do
         end
       end
 
-      context 'assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          # By default, an automatic post policy (post_manually: false) is associated to 
+          # an assignment.  Now that post policy is included in exclude_muted_associations
+          # the outcome result will appear in LMGB/SLMGB.  It will not appear for manual
+          # post policy assignment until the submission is posted.  See "manual posting 
+          # policy" test cases below.
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'not graded assignment with unposted submissions with default posting policy' do
+        it 'includes assignment result' do
+          assignment.update!(grading_type: 'not_graded')
+          expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
+        end
+      end
+
+      context 'graded assignment with unposted submissions with manual posting policy' do
+        it 'excludes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 0
         end
       end
 
-      context 'not graded assignment with unposted submissions' do
-        it 'excludes assignment result' do
+      context 'not graded assignment with unposted submissions with manual posting policy' do
+        it 'includes assignment results' do
+          assignment.post_policy.update!(post_manually: true)
           assignment.update!(grading_type: 'not_graded')
           expect(outcome_result_scope.exclude_muted_associations.count).to eq 1
         end
@@ -236,6 +262,86 @@ describe LearningOutcomeResult do
       learning_outcome_result.calculate_percent!
 
       expect(learning_outcome_result.percent).to eq 0.60
+    end
+
+    describe "with account_level_mastery_scales FF enabled" do
+      before do
+        course.root_account.enable_feature!(:account_level_mastery_scales)
+        @proficiency = outcome_proficiency_model(course)
+      end
+
+      it "properly calculates percent based on result.possible, if it exists" do
+        learning_outcome_result.update(score: 6, possible: 12)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 0.50
+      end
+
+      it "properly calculates percent based on resolved_outcome_proficiency if there is no result.possible value" do
+        learning_outcome_result.update(score: 6, possible: nil)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 6.to_f / @proficiency.points_possible.to_f
+      end
+
+      it "properly scales score to outcome_proficiency mastery level" do
+        allow(course.resolved_outcome_proficiency).to receive_messages({
+          points_possible: 5.0, mastery_points: 3.0
+        })
+        allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+        learning_outcome_result.update(score: 6, possible: 10)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 0.5143
+      end
+
+      it "properly scales score to outcome_proficiency.mastery_points with extra credit and when proficiency.points_possible is 0" do
+        allow(course.resolved_outcome_proficiency).to receive_messages({
+          mastery_points: 3.0, points_possible: 0.0
+        })
+
+        allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 1.0)
+        learning_outcome_result.update(score: 5, possible: 0.5)
+        learning_outcome_result.calculate_percent!
+
+        expect(learning_outcome_result.percent).to eq 10.0
+      end
+
+      it "does not use a scale if the outcome proficiency has 0 points possible" do
+        allow(course.resolved_outcome_proficiency).to receive_messages({
+          mastery_points: 3.0, points_possible: 0.0
+        })
+        allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+        learning_outcome_result.update(score: 6, possible: 10)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 0.60
+      end
+
+      it "does not use a scale if the outcome proficiency has 0 mastery points" do
+        allow(course.resolved_outcome_proficiency).to receive_messages({
+          points_possible: 5, mastery_points: 0
+        })
+        allow(learning_outcome_result.alignment).to receive_messages(mastery_score: 0.7)
+        learning_outcome_result.update(score: 6, possible: 10)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 0.60
+      end
+    end
+
+    describe "with account_level_mastery_scales FF disabled" do
+      before do
+        course.root_account.disable_feature!(:account_level_mastery_scales)
+        proficiency = outcome_proficiency_model(course)
+      end
+
+      it "properly calculates percent based on result.possible, if it exists" do
+        learning_outcome_result.update(score: 6, possible: 12)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq 0.50
+      end
+
+      it "properly calculates percent based on outcome.mastery_points even if an outcome proficiency object exists" do
+        learning_outcome_result.update(score: 1, possible: nil)
+        learning_outcome_result.calculate_percent!
+        expect(learning_outcome_result.percent).to eq (1.to_f / learning_outcome_result.learning_outcome.mastery_points.to_f)
+      end
     end
   end
 

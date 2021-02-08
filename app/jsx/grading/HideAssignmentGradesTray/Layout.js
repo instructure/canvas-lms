@@ -19,9 +19,11 @@
 import React from 'react'
 import {any, arrayOf, bool, shape, string} from 'prop-types'
 
+import {AccessibleContent} from '@instructure/ui-a11y'
+import {Badge, Text, Heading} from '@instructure/ui-elements'
 import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Heading} from '@instructure/ui-elements'
+
 import {View} from '@instructure/ui-layout'
 
 import I18n from 'i18n!hide_assignment_grades_tray'
@@ -38,7 +40,8 @@ export default function Layout({
   onHideClick,
   sections,
   sectionSelectionChanged,
-  selectedSectionIds
+  selectedSectionIds,
+  unhiddenCount
 }) {
   const hasSections = sections.length > 0
 
@@ -72,6 +75,22 @@ export default function Layout({
             <Heading as="h3" level="h4">
               {I18n.t('Hide Grades')}
             </Heading>
+            <div id="PostAssignmentGradesTray__Layout__UnpostedSummary">
+              <AccessibleContent alt={I18n.t('%{count} posted', {count: unhiddenCount})}>
+                <Badge
+                  count={unhiddenCount}
+                  countUntil={99}
+                  margin="small"
+                  placement="start center"
+                  type="count"
+                  variant="danger"
+                >
+                  <View as="div" margin="0 0 0 small">
+                    <Text size="small">{I18n.t('Posted')}</Text>
+                  </View>
+                </Badge>
+              </AccessibleContent>
+            </div>
           </View>
         }
         label={I18n.t('Hide Grades')}

@@ -31,7 +31,7 @@ Migration/ModelBehavior:
     - Canvas
     - DatabaseServer
     - DataFixup
-    - Shackles
+    - GuardRail
     - Switchman
     - Shard
     - Account.default

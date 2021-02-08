@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -23,7 +25,7 @@ class Version::Partitioner
   end
 
   def self.process
-    Shackles.activate(:deploy) do
+    GuardRail.activate(:deploy) do
       log '*' * 80
       log '-' * 80
 

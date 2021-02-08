@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -111,5 +113,11 @@ describe AssessmentQuestionBank do
     @bank.destroy
     @bank.reload
     expect(@bank.learning_outcome_alignments).to be_empty
+  end
+
+  context 'root_account_id' do
+    it "uses root_account value from account" do
+      expect(@bank.root_account_id).to eq Account.default.id
+    end
   end
 end

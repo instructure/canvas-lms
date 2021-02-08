@@ -30,7 +30,8 @@ const CurveGradesDialogManager = {
         !submissionsLoaded ||
         gradingType === 'pass_fail' ||
         pointsPossible == null ||
-        pointsPossible === 0,
+        pointsPossible === 0 ||
+        !assignment.grades_published,
 
       async onSelect(onClose) {
         if (!isAdmin && assignment.inClosedGradingPeriod) {

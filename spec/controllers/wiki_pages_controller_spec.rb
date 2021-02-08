@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -71,76 +73,6 @@ describe WikiPagesController do
       it "should render" do
         get 'revisions', params: {course_id: @course.id, wiki_page_id: @page.url}
         expect(response).to be_successful
-      end
-    end
-
-    describe "student planner" do
-      before :once do
-        course_with_teacher(active_all: true)
-        @page = @course.wiki_pages.create!(title: "plan for planning the planner's planned plan... plan", body: "")
-      end
-
-      before do
-        user_session @teacher
-      end
-
-      context "feature enabled" do
-        before :once do
-          @course.root_account.enable_feature! :student_planner
-        end
-
-        describe "GET 'index" do
-          it "should render" do
-            get 'index', params: {course_id: @course.id}
-            expect(response).to be_successful
-            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
-          end
-        end
-
-        describe "GET 'show" do
-          it "should render" do
-            get 'show', params: {course_id: @course.id, id: @page.url}
-            expect(response).to be_successful
-            expect(controller.js_env[:STUDENT_PLANNER_ENABLED]).to be_truthy
-          end
-        end
-      end
-    end
-
-    describe ':granular_permissions_wiki_pages in js_env' do
-      before do
-        course_with_teacher(active_all: true)
-        wiki_page_model({ title: 'Wiki Page' })
-        user_session @teacher
-      end
-
-      it 'should be true if the feature flag is turned on' do
-        @course.root_account.enable_feature! :granular_permissions_wiki_pages
-        get 'show', params: {course_id: @course.id, id: @page.url}
-        expect(response).to be_successful
-        expect(controller.js_env[:GRANULAR_PERMISSIONS_WIKI_PAGES]).to be_truthy
-      end
-
-      it 'should be false if the feature flag is turned on' do
-        @course.root_account.disable_feature! :granular_permissions_wiki_pages
-        get 'show', params: {course_id: @course.id, id: @page.url}
-        expect(response).to be_successful
-        expect(controller.js_env[:GRANULAR_PERMISSIONS_WIKI_PAGES]).to be_falsey
-      end
-
-      it 'should be accurate for sub accounts' do
-        root_account = Account.create!
-        sub_account = root_account.sub_accounts.create!
-        root_account.enable_feature!(:granular_permissions_wiki_pages)
-
-        course = sub_account.courses.create!
-        course_with_teacher(course: course, active_all: true)
-        page = @course.wiki_pages.create!(title: "immersive reader", body: "")
-        user_session @teacher
-
-        get 'show', params: {course_id: @course.id, id: page.url}
-        expect(response).to be_successful
-        expect(controller.js_env[:GRANULAR_PERMISSIONS_WIKI_PAGES]).to be_truthy
       end
     end
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -26,19 +28,20 @@ module Api::V1::Role
       :role => role.name,
       :label => role.label,
       :last_updated_at => role.updated_at,
-      :base_role_type => (role.built_in? && role.account_role?) ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
+      :base_role_type => role.built_in? && role.account_role? ? Role::DEFAULT_ACCOUNT_TYPE : role.base_role_type,
       :workflow_state => role.workflow_state,
-      :created_at => role.created_at.iso8601,
-      :permissions => {}
+      :created_at => role.created_at&.iso8601,
+      :permissions => {},
+      :is_account_role => role.account_role?
     }
 
     json[:account] = account_json(role.account, current_user, session, []) if role.account_id
 
     RoleOverride.manageable_permissions(account).keys.each do |permission|
-      perm = RoleOverride.permission_for(account, permission, role, account)
+      perm = RoleOverride.permission_for(account, permission, role, account, true)
       next if permission == :manage_developer_keys && !account.root_account?
       json[:permissions][permission] = permission_json(perm, current_user, session) if perm[:account_allows]
-    end
+    end unless opts[:skip_permissions]
 
     json
   end

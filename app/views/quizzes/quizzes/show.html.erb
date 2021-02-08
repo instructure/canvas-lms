@@ -134,16 +134,16 @@
       <% if can_do(@quiz, @current_user, :update) || can_do(@quiz, @current_user, :grade) || can_do(@quiz, @current_user, :review_grades) %>
       <div class="header-group-right">
         <% if can_do(@quiz, @current_user, :update) %>
-        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button' role='button'>
+        <a href="<%= edit_course_quiz_path(@context, @quiz) %>" class='btn edit_assignment_link quiz-edit-button'>
           <i class="icon-edit"></i> <%= admin_edit_title %>
         </a>
         <% end %>
 
         <div class="inline-block">
-          <a class="al-trigger btn" role="button" aria-haspopup="true" aria-owns="toolbar-1" href="#">
+          <button class=" al-trigger btn"  aria-haspopup="true" aria-owns="toolbar-1">
             <i class="icon-more" aria-hidden="true"></i>
             <span class="screenreader-only"><%= admin_manage_title %></span>
-          </a>
+          </button>
           <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
             <% if can_do(@quiz, @current_user, :update) && @assignment %>
               <li role="presentation">
@@ -249,16 +249,7 @@
             <% end %>
 
             <% if can_do(@quiz, @current_user, :manage) && @context.root_account.feature_enabled?(:direct_share) %>
-              <li role="presentation">
-                <a href="#" class="direct-share-send-to-menu-item">
-                  <i aria-hidden="true" class="icon-user"></i><%= t("Send To...") %>
-                </a>
-              </li>
-              <li role="presentation">
-                <a href="#" class="direct-share-copy-to-menu-item">
-                  <i aria-hidden="true" class="icon-duplicate"></i><%= t("Copy To...") %>
-                </a>
-              </li>
+              <%= render :partial => 'direct_share_buttons' %>
             <% end %>
 
             <%= external_tools_menu_items((@quiz_menu_tools || []), {link_class: "menu_tool_link", settings_key: :quiz_menu, in_list: true, url_params: {:quizzes => [@quiz.id]}}) %>
@@ -267,6 +258,23 @@
 
       </div>
       <% end %>
+    </div>
+  </div>
+
+  <% elsif can_do(@context, @current_user, :read_as_admin) && @context.root_account.feature_enabled?(:direct_share) %>
+  <div class="header-bar">
+    <div class="header-bar-right">
+        <div class="header-group-right">
+          <div class="inline-block">
+            <button class=" al-trigger btn"  aria-haspopup="true" aria-owns="toolbar-1">
+              <i class="icon-more" aria-hidden="true"></i>
+              <span class="screenreader-only"><%= admin_manage_title %></span>
+            </button>
+            <ul id="toolbar-1" class="al-options" role="menu" tabindex="0" aria-hidden="true" aria-expanded="false">
+              <%= render :partial => 'direct_share_buttons' %>
+            </ul>
+          </div>
+        </div>
     </div>
   </div>
   <% end %>
@@ -340,7 +348,9 @@
       <% end %>
     </div>
 
-    <% if can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
+    <% preview_mode = can_do(@quiz, @current_user, :preview) && !can_do(@context, @current_user, :participate_as_student) %>
+
+    <% if preview_mode %>
       <div class="preview_quiz_button">
         <%= link_to_preview_quiz('class' => "btn btn-primary", 'id' => "preview_quiz_button", 'preview' => 1) %>
       </div>
@@ -395,7 +405,7 @@
   <% end %>
 
   <% if @quiz.cant_go_back? %>
-    <%= render 'cant_go_back_warning' %>
+    <%= render 'cant_go_back_warning', preview: preview_mode %>
   <% end %>
 
   <%= prefetch_assignment_external_tools %>

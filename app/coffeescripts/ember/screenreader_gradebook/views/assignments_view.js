@@ -18,7 +18,7 @@
 import $ from 'jquery'
 import Ember from 'ember'
 import _ from 'underscore'
-import GradebookHeaderMenu from '../../../gradebook/GradebookHeaderMenu'
+import GradebookHeaderMenu from 'jsx/gradebook/views/GradebookHeaderMenu'
 import SubmissionDetailsDialog from '../../../SubmissionDetailsDialog'
 
 const AssignmentsView = Ember.View.extend({

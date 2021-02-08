@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -19,7 +21,7 @@
 module HasContentTags
 
   def update_associated_content_tags_later
-    send_later(:update_associated_content_tags) if @associated_content_tags_need_updating != false
+    delay.update_associated_content_tags if @associated_content_tags_need_updating != false
   end
 
   def update_associated_content_tags

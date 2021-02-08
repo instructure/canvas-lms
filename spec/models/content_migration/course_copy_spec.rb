@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # coding: utf-8
 #
 # Copyright (C) 2014 - present Instructure, Inc.
@@ -457,6 +459,7 @@ describe ContentMigration do
       @copy_from.enable_offline_web_export = true
       @copy_from.is_public_to_auth_users = true
       @copy_from.syllabus_course_summary = false
+      @copy_from.homeroom_course = true
       @copy_from.save!
 
       run_course_copy
@@ -474,6 +477,7 @@ describe ContentMigration do
       expect(@copy_to.name).to eq "tocourse"
       expect(@copy_to.course_code).to eq "tocourse"
       expect(@copy_to.syllabus_course_summary).to eq false
+      expect(@copy_to.homeroom_course).to eq true
       # other attributes changed from defaults are compared in clonable_attributes below
       atts = Course.clonable_attributes
       atts -= Canvas::Migration::MigratorHelper::COURSE_NO_COPY_ATTS
@@ -562,15 +566,17 @@ describe ContentMigration do
       tag_to = mod1_to.content_tags.first
       expect(mod1_to.completion_requirements).to eq [{:id => tag_to.id, :type => 'must_view'}]
       expect(mod1_to.require_sequential_progress).to be_truthy
-      expect(mod1_to.requirement_count).to be_truthy
+      expect(mod1_to.requirement_count).to eq 1
       mod2_to = @copy_to.context_modules.where(:migration_id => mig_id(mod2)).first
 
       expect(mod2_to.prerequisites.count).to eq 1
       expect(mod2_to.prerequisites.first[:id]).to eq mod1_to.id
 
       mod1.update_attribute(:require_sequential_progress, false)
+      mod1.update_attribute(:requirement_count, nil)
       run_course_copy
       expect(mod1_to.reload.require_sequential_progress).to be_falsey
+      expect(mod1_to.requirement_count).to eq nil
     end
 
     it "should sync module items (even when removed) on re-copy" do

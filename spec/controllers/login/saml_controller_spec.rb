@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -74,17 +76,25 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
+    saml_response = SAML2::Response.new
+    allow(saml_response).to receive(:errors).and_return([])
+    allow(saml_response).to receive(:issuer).and_return(double(id: 'such a lie'))
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [double('response2',
-              errors: [],
-              issuer: double(id: 'such a lie')),
-       nil]
+      [saml_response, nil]
     )
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
     controller.request.env['canvas.domain_root_account'] = account1
     post :create, params: {:SAMLResponse => "foo"}
     expect(response).to redirect_to(login_url)
+  end
+
+  it "wont support logout via login endpoint" do
+    allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
+      [SAML2::LogoutRequest.new,nil]
+    )
+    post :create, params: {:SAMLResponse => "foo"}
+    expect(response.status.to_i).to eq(400)
   end
 
   it "searches for assertion issuer" do
@@ -95,12 +105,12 @@ describe Login::SamlController do
     @pseudonym.account = account1
     @pseudonym.save!
 
+    saml_response = SAML2::Response.new
+    allow(saml_response).to receive(:errors).and_return([])
+    allow(saml_response).to receive(:issuer).and_return(nil)
+    allow(saml_response).to receive(:assertions).and_return([double(issuer: double(id: 'such a lie'))])
     allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-      [double('response2',
-              errors: [],
-              issuer: nil,
-              assertions: [double(issuer: double(id: 'such a lie'))]),
-       nil]
+      [saml_response, nil]
     )
     allow_any_instance_of(SAML2::Entity).to receive(:valid_response?)
 
@@ -423,8 +433,11 @@ describe Login::SamlController do
       end
 
       it "redirects to login screen with message if no AAC found" do
+        saml_response = SAML2::Response.new
+        allow(saml_response).to receive(:errors).and_return([])
+        allow(saml_response).to receive(:issuer).and_return(double(id: "hahahahahahaha"))
         allow(SAML2::Bindings::HTTP_POST).to receive(:decode).and_return(
-          [double('response2', errors: [], issuer: double(id: "hahahahahahaha")), nil]
+          [saml_response, nil]
         )
 
         session[:sentinel] = true
@@ -448,15 +461,15 @@ describe Login::SamlController do
 
       it "should redirect to default login" do
         get_new
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
       end
 
       it "should use the specified AAC" do
         get_new("#{@aac1.id}")
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac1.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac1.log_in_url)).to be_truthy
         controller.instance_variable_set(:@aac, nil)
         get_new("#{@aac2.id}")
-        expect(response.location.starts_with?(controller.delegated_auth_redirect_uri(@aac2.log_in_url))).to be_truthy
+        expect(response.location.starts_with?(@aac2.log_in_url)).to be_truthy
       end
 
       it "reject  unknown specified AAC" do
@@ -504,6 +517,20 @@ describe Login::SamlController do
           expect(response.location).to match %r{^https://example.com/idp2/slo\?SAMLResponse=}
         end
 
+        it "is a bad request if there's no destination to send the request to" do
+          expect(controller).to_not receive(:logout_current_user)
+          @aac3 = @account.authentication_providers.build(auth_type: 'saml')
+          @aac3.idp_entity_id = "https://example.com/idp3"
+          @aac3.log_in_url = "https://example.com/idp3/sso"
+          @aac3.log_out_url = nil
+          @aac3.save!
+          logout_request = SAML2::LogoutRequest.new
+          logout_request.issuer = SAML2::NameID.new(@aac3.idp_entity_id)
+          expect(SAML2::Bindings::HTTPRedirect).to receive(:decode).and_return(logout_request)
+          get :destroy, params: {:SAMLRequest => "foo"}
+          expect(response.status).to eq 400
+        end
+
         it "returns bad request if SAMLRequest parameter doesn't match an AAC" do
           logout_request = SAML2::LogoutRequest.new
           logout_request.issuer = SAML2::NameID.new("hahahahahahaha")
@@ -511,7 +538,6 @@ describe Login::SamlController do
 
           controller.request.env['canvas.domain_root_account'] = @account
           get :destroy, params: {:SAMLRequest => "foo"}
-
           expect(response.status).to eq 400
         end
       end
@@ -563,10 +589,14 @@ SAML
       saml_request = URI.decode_www_form(URI.parse(url).query).first.last
 
       controller.request.env['canvas.domain_root_account'] = account
+      expect(Canvas::Errors).to receive(:capture_exception) do |category, error, level|
+        expect(category).to eq(:saml)
+        expect(error.class).to eq(SAML2::UnsignedMessage)
+        expect(level).to eq(:warn)
+      end
       get :destroy, params: {SAMLRequest: saml_request}
 
       expect(response.status).to eq 400
-      expect(ErrorReport.last.message).to eq "SAML2::UnsignedMessage"
     end
 
     it "accepts an HTTP-POST message" do
@@ -823,7 +853,8 @@ SAML
     @pseudonym.save!
 
     controller.request.env['canvas.domain_root_account'] = @account
-    Timecop.freeze(Time.parse("2012-08-03T20:07:15Z")) do
+    Timecop.freeze(Time.zone.parse("2012-08-03T20:07:15Z")) do
+      Auditors::ActiveRecord::Partitioner.process
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:saml_unique_id]).to eq unique_id
@@ -850,10 +881,25 @@ SAML
     @pseudonym.save!
 
     controller.request.env['canvas.domain_root_account'] = @account
-    Timecop.freeze(Time.parse("2012-08-03T20:07:15Z")) do
+    Timecop.freeze(Time.zone.parse("2012-08-03T20:07:15Z")) do
+      Auditors::ActiveRecord::Partitioner.process
       post :create, params: { SAMLResponse: saml_response_fixture }
       expect(response).to redirect_to(dashboard_url(:login_success => 1))
       expect(session[:saml_unique_id]).to eq unique_id
+    end
+  end
+
+  describe '#metadata' do
+    it "does not persist the entity id if no saml provider exists" do
+      get :metadata
+      expect(Account.default.settings).not_to have_key(:saml_entity_id)
+    end
+
+    it "does persist the entity id if a saml provider exists" do
+      ap = Account.default.authentication_providers.create!(auth_type: 'saml')
+      expect(Account.default.reload.settings).not_to have_key(:saml_entity_id)
+      get :metadata
+      expect(Account.default.reload.settings[:saml_entity_id]).not_to be_blank
     end
   end
 end

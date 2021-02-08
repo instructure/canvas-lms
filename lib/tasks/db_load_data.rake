@@ -96,9 +96,10 @@ namespace :db do
           raise pseudonym.errors.full_messages.first if pseudonym.errors.size > 0
           raise "unknown error saving password"
         end
-        Role.clear_built_in_roles!
-        Account.site_admin.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
-        Account.default.account_users.where(user_id: user, role_id: Role.get_built_in_role('AccountAdmin')).first_or_create!
+        Account.site_admin.account_users.where(user_id: user,
+          role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.site_admin.id)).first_or_create!
+        Account.default.account_users.where(user_id: user,
+          role_id: Role.get_built_in_role('AccountAdmin', root_account_id: Account.default.id)).first_or_create!
         user
       rescue => e
         STDERR.puts "Problem creating administrative account, please try again: #{e}"

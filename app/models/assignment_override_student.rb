@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -98,6 +100,8 @@ class AssignmentOverrideStudent < ActiveRecord::Base
       .each {|aos| aos.assignment_override.skip_broadcasts = true; aos.destroy}
   end
 
+  attr_writer :no_enrollment
+
   private
 
   def clean_up_assignment_if_override_student_orphaned
@@ -125,6 +129,6 @@ class AssignmentOverrideStudent < ActiveRecord::Base
   end
 
   def set_root_account_id
-    self.root_account_id ||= assignment&.root_account_id
+    self.root_account_id ||= assignment&.root_account_id || quiz&.root_account_id
   end
 end

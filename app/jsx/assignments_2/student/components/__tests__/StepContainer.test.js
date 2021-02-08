@@ -20,7 +20,6 @@ import {render} from '@testing-library/react'
 
 import {mockAssignmentAndSubmission} from '../../mocks'
 import StepContainer from '../StepContainer'
-import StudentViewContext from '../Context'
 import {SubmissionMocks} from '../../graphqlData/Submission'
 
 const unavailableSteps = ['Unavailable', 'Upload', 'Submit', 'Not Graded Yet']
@@ -80,38 +79,6 @@ describe('the assignment is unavailable', () => {
     verifySteps(
       getByTestId('uploaded-step-container'),
       ['Uploaded', 'Submit', 'Not Graded Yet'],
-      getByText
-    )
-    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
-  })
-
-  it('renders the pizza tracker with the New Attempt step icon as locked for sumbitted assignments', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        state: 'submitted'
-      },
-      LockInfo: {isLocked: true}
-    })
-    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
-    verifySteps(
-      getByTestId('submitted-step-container'),
-      ['Uploaded', 'Submitted', 'Not Graded Yet', 'New Attempt'],
-      getByText
-    )
-    expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
-  })
-
-  it('renders the pizza tracker with the New Attempt step icon as locked for graded assignments', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Submission: {
-        state: 'graded'
-      },
-      LockInfo: {isLocked: true}
-    })
-    const {container, getByText, getByTestId} = render(<StepContainer {...props} />)
-    verifySteps(
-      getByTestId('graded-step-container'),
-      ['Uploaded', 'Submitted', 'Graded', 'New Attempt'],
       getByText
     )
     expect(container.querySelector('svg[name="IconLock"]')).toBeInTheDocument()
@@ -179,61 +146,6 @@ describe('the assignment is submitted', () => {
     const {getByTestId} = render(<StepContainer {...props} />)
     expect(getByTestId('submitted-step-container')).toBeInTheDocument()
   })
-
-  it('will render the Previous step if the Previous button is enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, getByText} = render(
-      <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Previous'))
-  })
-
-  it('will not render the Previous step if the Previous button is not enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, queryByText} = render(
-      <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Previous'))
-  })
-
-  it('will render the Next step if it is enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, getByText} = render(
-      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('Next'))
-  })
-
-  it('will not render the Next step if it is not enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, queryByText} = render(
-      <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('Next'))
-  })
-
-  it('will render the New Attempt step if more attempts are allowed', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.submitted})
-    const {getByTestId, getByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('submitted-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt step if more attempts are not allowed', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Assignment: {allowedAttempts: 1},
-      Submission: SubmissionMocks.submitted
-    })
-    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('submitted-step-container')).not.toContainElement(queryByText('New Attempt'))
-  })
 })
 
 describe('the assignment is graded', () => {
@@ -241,60 +153,5 @@ describe('the assignment is graded', () => {
     const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
     const {getByTestId, getByText} = render(<StepContainer {...props} />)
     verifySteps(getByTestId('graded-step-container'), gradedSteps, getByText)
-  })
-
-  it('will render the Previous step if the Previous button is enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, getByText} = render(
-      <StudentViewContext.Provider value={{prevButtonEnabled: true}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('graded-step-container')).toContainElement(getByText('Previous'))
-  })
-
-  it('will not render the Previous step if the Previous button is not enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, queryByText} = render(
-      <StudentViewContext.Provider value={{prevButtonEnabled: false}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Previous'))
-  })
-
-  it('will render the Next step if the Next button is is enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, getByText} = render(
-      <StudentViewContext.Provider value={{nextButtonEnabled: true}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('graded-step-container')).toContainElement(getByText('Next'))
-  })
-
-  it('will not render the Next step if the Next button is not enabled', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, queryByText} = render(
-      <StudentViewContext.Provider value={{nextButtonEnabled: false}}>
-        <StepContainer {...props} />
-      </StudentViewContext.Provider>
-    )
-    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('Next'))
-  })
-
-  it('will render the New Attempt button if more attempts are allowed', async () => {
-    const props = await mockAssignmentAndSubmission({Submission: SubmissionMocks.graded})
-    const {getByTestId, getByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('graded-step-container')).toContainElement(getByText('New Attempt'))
-  })
-
-  it('will not render the New Attempt step if more attempts are not allowed', async () => {
-    const props = await mockAssignmentAndSubmission({
-      Assignment: {allowedAttempts: 1},
-      Submission: SubmissionMocks.graded
-    })
-    const {getByTestId, queryByText} = render(<StepContainer {...props} />)
-    expect(getByTestId('graded-step-container')).not.toContainElement(queryByText('New Attempt'))
   })
 })

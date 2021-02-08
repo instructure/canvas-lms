@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -45,10 +47,6 @@ describe "Api::V1::CustomGradebookColumn" do
   end
 
   context "validations" do
-    before(:once) do
-      Account.site_admin.enable_feature!(:gradebook_reserved_importer_bugfix)
-    end
-
     GradebookImporter::GRADEBOOK_IMPORTER_RESERVED_NAMES.each do |reserved_column|
       it "won't allow creation if titled for gradebook reserved column #{reserved_column}" do
         expect { @course.custom_gradebook_columns.create!(title: reserved_column) }.to raise_error(ActiveRecord::RecordInvalid)

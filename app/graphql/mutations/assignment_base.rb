@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -106,7 +108,6 @@ class Mutations::AssignmentBase < Mutations::BaseMutation
   argument :assignment_group_id, ID, required: false
   argument :group_set_id, ID, required: false
   argument :allowed_attempts, Int, required: false
-  argument :muted, Boolean, "**This field is deprecated; use the postAssignmentGrades mutation instead.**", required: false
   argument :only_visible_to_overrides, Boolean, required: false
   argument :submission_types, [Types::AssignmentSubmissionType], required: false
   argument :peer_reviews, Mutations::AssignmentPeerReviewsUpdate, required: false

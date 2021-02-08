@@ -16,7 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {arrayOf, shape, string} from 'prop-types'
+import {arrayOf, bool, shape, string} from 'prop-types'
 
 const NotificationShape = shape({
   _id: string,
@@ -40,6 +40,7 @@ const ChannelShape = shape({
 })
 
 const NotificationPreferencesShape = shape({
+  sendScoresInEmails: bool,
   channels: arrayOf(ChannelShape)
 })
 

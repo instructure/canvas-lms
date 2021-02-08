@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 Instructure, Inc.
 #
@@ -1310,6 +1312,7 @@ describe AssignmentOverridesController, type: :request do
       end
 
       it "should succeed if formatted correctly" do
+        skip 'DEMO-119 (1/27/2021)'
         section = @course.course_sections.create!
         student = student_in_section(section)
         date = Time.zone.now.tomorrow

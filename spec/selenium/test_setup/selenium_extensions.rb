@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -16,12 +18,15 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 require_relative "../../support/call_stack_utils"
+require_relative 'selenium_driver_setup'
 
 module SeleniumExtensions
   class Error < ::RuntimeError; end
   class NestedWaitError < Error; end
 
   module ElementNotInteractableProtection
+    include SeleniumDriverSetup
+
     def click(*args)
       to_fail = false
 
@@ -36,6 +41,10 @@ module SeleniumExtensions
           Selenium::WebDriver::Wait.new(timeout: 2).until do
             displayed? && enabled?
           end
+          # https://bugs.chromium.org/p/chromedriver/issues/detail?id=3504
+          # bug in chrome, not scrolling to elements before attempting click. This will scroll to element
+          # then retry the click.
+          driver.action.move_to(self).perform
         rescue
           raise e
         end
@@ -49,7 +58,7 @@ module SeleniumExtensions
     attr_accessor :finder_proc
 
     (
-      Selenium::WebDriver::Element.instance_methods(false) +
+    Selenium::WebDriver::Element.instance_methods(false) +
       Selenium::WebDriver::SearchContext.instance_methods -
       %i[
         initialize
@@ -84,7 +93,7 @@ module SeleniumExtensions
     attr_accessor :ready_for_interaction
 
     (
-      Selenium::WebDriver::Driver.instance_methods(false) +
+    Selenium::WebDriver::Driver.instance_methods(false) +
       Selenium::WebDriver::SearchContext.instance_methods -
       %i[
         initialize

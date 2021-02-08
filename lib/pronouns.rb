@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -43,4 +45,11 @@ module Pronouns
     pronouns
   end
 
+  def match_pronoun(supplied_pronouns_str, account_pronouns_arr)
+    pronoun = clean_pronouns(supplied_pronouns_str)
+    account_pronouns_arr.each do |ap|
+      return ap if ap.casecmp(pronoun) == 0
+    end
+    nil
+  end
 end

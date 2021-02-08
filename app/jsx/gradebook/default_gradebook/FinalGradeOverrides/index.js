@@ -31,7 +31,7 @@ export default class FinalGradeOverrides {
   getGradeForUser(userId) {
     let gradingPeriodId = null
     if (this._gradebook.isFilteringColumnsByGradingPeriod()) {
-      gradingPeriodId = this._gradebook.getGradingPeriodToShow()
+      gradingPeriodId = this._gradebook.gradingPeriodId
     }
 
     return this._datastore.getGrade(userId, gradingPeriodId)
@@ -40,7 +40,7 @@ export default class FinalGradeOverrides {
   getPendingGradeInfoForUser(userId) {
     let gradingPeriodId = null
     if (this._gradebook.isFilteringColumnsByGradingPeriod()) {
-      gradingPeriodId = this._gradebook.getGradingPeriodToShow()
+      gradingPeriodId = this._gradebook.gradingPeriodId
     }
 
     return this._datastore.getPendingGradeInfo(userId, gradingPeriodId)
@@ -59,7 +59,7 @@ export default class FinalGradeOverrides {
 
     let gradingPeriodId = null
     if (this._gradebook.isFilteringColumnsByGradingPeriod()) {
-      gradingPeriodId = this._gradebook.getGradingPeriodToShow()
+      gradingPeriodId = this._gradebook.gradingPeriodId
     }
 
     this._datastore.addPendingGradeInfo(userId, gradingPeriodId, gradeOverrideInfo)

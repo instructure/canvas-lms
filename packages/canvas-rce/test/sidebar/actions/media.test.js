@@ -27,6 +27,7 @@ import {
 import alertHandler from '../../../src/rce/alertHandler'
 
 const sortBy = {sort: 'alphabetical', order: 'asc'}
+const searchString = 'hello'
 
 function getInitialState() {
   return {
@@ -58,13 +59,13 @@ describe('Media actions', () => {
     it('fetches initial page', () => {
       const dispatchSpy = sinon.spy()
       const getState = getInitialState
-      actions.fetchInitialMedia(sortBy)(dispatchSpy, getState)
+      actions.fetchInitialMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('fetches next page if necessary', () => {
       const dispatchSpy = sinon.spy()
       const getState = getInitialState
-      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('always fetches initial fetch page', () => {
@@ -76,7 +77,7 @@ describe('Media actions', () => {
         state.media.course.files = [{one: '1'}, {two: '2'}, {three: '3'}]
         return state
       }
-      actions.fetchInitialMedia(sortBy)(dispatchSpy, getState)
+      actions.fetchInitialMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('fetches if there is more to load', () => {
@@ -87,7 +88,7 @@ describe('Media actions', () => {
         state.media.course.hasMore = true
         return state
       }
-      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(dispatchSpy.called)
     })
     it('does not fetch if requested but no more to load', () => {
@@ -98,7 +99,7 @@ describe('Media actions', () => {
         state.media.course.hasMore = false
         return state
       }
-      actions.fetchNextMedia(sortBy)(dispatchSpy, getState)
+      actions.fetchNextMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(!dispatchSpy.called)
     })
     it('fetches media', async () => {
@@ -111,7 +112,7 @@ describe('Media actions', () => {
         }
         return state
       }
-      await actions.fetchMedia(sortBy)(dispatchSpy, getState)
+      await actions.fetchMedia(sortBy, searchString)(dispatchSpy, getState)
       assert(
         dispatchSpy.calledWith({type: actions.REQUEST_MEDIA, payload: {contextType: 'course'}})
       )

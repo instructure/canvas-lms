@@ -273,7 +273,7 @@ still be provided.</td>
 <td>text</td>
 <td></td>
 <td>✓</td>
-<td>User's preferred pronouns. Accepted values are determined by the account settings.</td>
+<td>User's preferred pronouns. Can pass "&lt;delete>" to remove the pronoun from the user.</td>
 </tr>
 <tr>
 <td>status</td>
@@ -717,7 +717,7 @@ is specified the default section for the course will be used</td>
 <td>enum</td>
 <td>✓</td>
 <td></td>
-<td>active, deleted, completed, inactive</td>
+<td>active, deleted, completed, inactive, deleted_last_completed&#42;&#42;</td>
 </tr>
 <tr>
 <td>associated_user_id</td>
@@ -736,10 +736,26 @@ Ignored for any role other than observer</td>
 <td>Defaults to false. When true, the enrollment will only allow the user to see
  and interact with users enrolled in the section given by course_section_id. </td>
 </tr>
+<tr>
+<td>notify</td>
+<td>boolean</td>
+<td></td>
+<td></td>
+<td>If true, a notification will be sent to the enrolled user. Notifications are
+ not sent by default. </td>
+</tr>
 </table>
 
 &#42; course_id or section_id is required, role or role_id is required, and
  user_id or user_integration_id is required.
+
+&#42;&#42; deleted_last_completed is not a state, but it combines the deleted
+ and completed states in a function that will delete an enrollment from a course
+ if there are at least one other active enrollment in the course. If it is the
+ last enrollment in the course it will complete it. This may be useful for when
+ a user moves to a different section of a course in which there are section
+ specific assignments. It offloads the logic required to determine if the
+ enrollment is the users last enrollment in the given course or not.
 
 When an enrollment is in a 'completed' state the student is limited to read-only access to the
 course.

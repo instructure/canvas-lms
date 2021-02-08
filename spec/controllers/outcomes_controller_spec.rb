@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -69,7 +71,7 @@ describe OutcomesController do
     it "should find a common core group from settings" do
       user_session(@admin)
       account_outcome
-      Setting.set(AcademicBenchmark.common_core_setting_key, @outcome_group.id)
+      allow(Shard.current).to receive(:settings).and_return({ common_core_outcome_group_id: @outcome_group.id })
       get 'index', params: {:account_id => @account.id}
       expect(assigns[:js_env][:COMMON_CORE_GROUP_ID]).to eq @outcome_group.id
     end
@@ -78,26 +80,43 @@ describe OutcomesController do
       user_session(@admin)
       get 'index', params: {:account_id => @account.id}
       permissions = assigns[:js_env][:PERMISSIONS]
-      [:manage_outcomes, :manage_rubrics, :manage_courses, :import_outcomes].each do |permission|
-        expect(permissions.key?(permission)).to be_truthy
+      [
+        :manage_outcomes, :manage_rubrics, :manage_courses, :import_outcomes, :manage_proficiency_scales,
+        :manage_proficiency_calculations
+      ].each do |permission|
+        expect(permissions).to have_key(permission)
       end
     end
 
-    context "import_outcomes_permission_fix FF" do
-      before do
+    context 'account_level_mastery_scales feature flag enabled' do
+      before(:once) do
+        @account.root_account.enable_feature! :account_level_mastery_scales
+      end
+
+      it 'includes proficiency roles' do
         user_session(@admin)
-        controller.instance_variable_set(:@domain_root_account, Account.default)
+        get 'index', params: {:account_id => @account.id}
+
+        %i[PROFICIENCY_CALCULATION_METHOD_ENABLED_ROLES PROFICIENCY_SCALES_ENABLED_ROLES].each do |key|
+          roles = controller.js_env[key]
+          expect(roles.length).to eq 1
+          expect(roles.dig(0, :role)).to eq 'AccountAdmin'
+        end
+      end
+    end
+
+    context "global_root_outcome_id" do
+      it "should return the global root group id for an account" do
+        global_id = LearningOutcomeGroup.global_root_outcome_group.id
+        user_session(@admin)
+        get 'index', params: {:account_id => @account.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq global_id
       end
 
-      it 'is false if the feature flag is off' do
-        get 'index', params: {:account_id => @account.id}
-        expect(assigns[:js_env][:IMPORT_OUTCOMES_PERMISSION_FIX]).to be_falsey
-      end
-
-      it 'is true if InstructureMiscPlugin is defined and the feature flag is on' do
-        Account.default.enable_feature!(:import_outcomes_permission_fix)
-        get 'index', params: {:account_id => @account.id}
-        expect(assigns[:js_env][:IMPORT_OUTCOMES_PERMISSION_FIX]).to be_truthy
+      it "should not return the global root id for a course" do
+        user_session(@admin)
+        get 'index', params: {:course_id => @course.id}
+        expect(assigns[:js_env][:GLOBAL_ROOT_OUTCOME_GROUP_ID]).to eq nil
       end
     end
   end

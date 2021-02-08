@@ -66,7 +66,9 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
         onSortByGradeAscending() {},
         onSortByGradeDescending() {},
         settingKey: 'grade'
-      }
+      },
+
+      viewUngradedAsZero: false
     }
   })
 
@@ -107,6 +109,23 @@ QUnit.module('GradebookGrid TotalGradeColumnHeader', suiteHooks => {
   test('displays "Total" as the column title', () => {
     mountComponent()
     ok($container.textContent.includes('Total'))
+  })
+
+  QUnit.module('secondary details', () => {
+    function getSecondaryDetail() {
+      return $container.querySelector('.Gradebook__ColumnHeaderDetailLine:nth-child(2)')
+    }
+
+    test('displays "Ungraded as 0" when view ungraded as 0 is selected', () => {
+      props.viewUngradedAsZero = true
+      mountComponent()
+      equal(getSecondaryDetail().textContent, 'Ungraded as 0')
+    })
+
+    test('are not present when not viewing ungraded as 0', () => {
+      mountComponent()
+      strictEqual(getSecondaryDetail(), null)
+    })
   })
 
   QUnit.module('"Options" menu trigger', () => {

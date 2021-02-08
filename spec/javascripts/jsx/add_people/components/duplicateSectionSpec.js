@@ -83,14 +83,14 @@ test('renders the table', () => {
   equal(rows.length, 5, 'five rows')
   const headings = rows[0].querySelectorAll('th')
   equal(headings.length, 6, 'six column headings')
-  const createNewRow = duplicateSection.querySelector('tr.create-new')
+  const createNewRow = duplicateSection.querySelector('tr[data-testid="create-new"]')
   ok(createNewRow, 'create new row exists')
 
   const createUserBtn = createNewRow.querySelector('button')
   ok(createUserBtn)
   equal(createUserBtn.innerText, 'Create a new user for "addr1"')
 
-  const skipUserRow = duplicateSection.querySelector('tr.skip-addr')
+  const skipUserRow = duplicateSection.querySelector('tr[data-testid="skip-addr"]')
   ok(skipUserRow, 'skip user row exists')
 
   const skipUserBtn = skipUserRow.querySelector('button')
@@ -171,6 +171,6 @@ test('cannot create a user', () => {
   )
   const duplicateSection = TestUtils.findRenderedDOMComponentWithClass(component, 'namelist')
 
-  const createNewRow = duplicateSection.querySelector('tr.create-new')
+  const createNewRow = duplicateSection.querySelector('tr[data-testid="create-new"]')
   equal(createNewRow, null, 'create new user row does not exist')
 })

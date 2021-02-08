@@ -19,6 +19,7 @@
 import {omitProps, safeCloneElement} from '@instructure/ui-react-utils'
 import PropTypes from 'prop-types'
 import React, {Component} from 'react'
+import classNames from 'classnames'
 import {View} from '@instructure/ui-layout'
 
 class Steps extends Component {
@@ -65,6 +66,10 @@ class Steps extends Component {
   }
 
   handlePlacement(numSteps, index) {
+    if (this.props.isCollapsed) {
+      return 'interior'
+    }
+
     const step = index + 1
 
     if (step === 1) {
@@ -108,7 +113,7 @@ class Steps extends Component {
         <ol className="steps">
           {React.Children.map(filteredChildren, (child, index) => (
             <li
-              className="step"
+              className={classNames('step', {'step-expanded': !this.props.isCollapsed})}
               aria-current={child.props.status === 'in-progress' ? 'true' : 'false'}
             >
               {safeCloneElement(child, {

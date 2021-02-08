@@ -24,7 +24,8 @@
 <% provide :right_side, render(:partial => 'shared/wiki_sidebar') %>
 
 <%
-  js_env :assignment_attempts_enabled => @context.feature_enabled?(:assignment_attempts)
+  js_env :assignment_attempts_enabled => @context.feature_enabled?(:assignment_attempts) && !@assignment.quiz_lti?
+  js_env :new_quizzes_modules_support => Account.site_admin.feature_enabled?(:new_quizzes_modules_support)
   css_bundle :assignments, :assignments_edit, :conditional_release_editor, :tinymce
   js_bundle :assignment_edit
 %>
@@ -35,11 +36,7 @@
   </div>
 <% end %>
 
-<% if ConditionalRelease::Service.enabled_in_context?(@context) %>
-<div id="edit_assignment_header-cr" class="header-bar"></div>
-<% else %>
 <div id="edit_assignment_header" class="<%= 'no-line' if @assignment.quiz_lti? %> header-bar"></div>
-<% end %>
 
 <%= render "shared/select_content_dialog", :only => [:external_tools], lti_app_placements: [Lti::ResourcePlacement::ASSIGNMENT_SELECTION, Lti::ResourcePlacement::RESOURCE_SELECTION] %>
 <div id="edit_letter_grades_form" style="display: none;">
@@ -57,8 +54,7 @@
       <a
         href="<%= context_url(@context, :context_rubrics_url) %>"
         class="add_rubric_link Button icon-plus"
-        style="<%= hidden if @assignment.rubric_association %>"
-        role="button"
+        style="<%= hidden if @assignment.active_rubric_association? %>"
       >
         <span aria-hidden="true"><%= t 'links.add_rubric', "Rubric" %></span>
         <span class="screenreader-only"><%= t('Add Rubric') %></span>

@@ -31,7 +31,7 @@ const types = {
     return I18n.t('observer', 'Observer')
   },
   get DesignerEnrollment() {
-    return I18n.t('course_designer', 'Course Designer')
+    return I18n.t('designer', 'Designer')
   }
 }
 

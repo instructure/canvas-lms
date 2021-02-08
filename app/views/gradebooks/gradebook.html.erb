@@ -26,8 +26,9 @@
   css_bundle :slickgrid, :gradebook
   js_bundle :gradebook
 %>
-
-<div id="keyboard_navigation"></div>
+<% unless @current_user.try(:prefers_no_keyboard_shortcuts?) %>
+  <div id="keyboard_navigation"></div>
+<% end %>
 
 <div id="gradebook_wrapper">
   <h1 class="screenreader-only"><%= t('Gradebook') %></h1>
@@ -47,10 +48,12 @@
       </div>
 
       <div id="gradebook-actions">
-        <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
-          <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
-          <i class="icon-keyboard-shortcuts"></i>
-        </button>
+        <% unless @current_user.try(:prefers_no_keyboard_shortcuts?) %>
+          <button id="keyboard-shortcuts" class="Button--icon-action Button--active" type="button">
+            <span class="screenreader-only"><%= t('Keyboard Shortcuts') %></span>
+            <i class="icon-keyboard-shortcuts"></i>
+          </button>
+        <% end %>
 
         <% if multiple_assignment_groups? %>
             <div class="gradebook-filter-container" id="assignment-group-filter-container"></div>

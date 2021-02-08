@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -24,7 +26,7 @@ module Lti
     describe GradebookServices, type: :controller do
       controller(ApplicationController) do
         include Lti::Ims::Concerns::GradebookServices
-        before_action :verify_user_in_context, :verify_line_item_in_context
+        before_action :prepare_line_item_for_ags!, :verify_user_in_context, :verify_line_item_in_context
         skip_before_action(
           :verify_access_token,
           :verify_developer_key,
@@ -115,12 +117,90 @@ module Lti
           end
         end
 
+        context 'when two students with enrollments were merged' do
+          let_once(:user_to_merge) { student_in_course(course: context).user }
+          let(:lti_id) { user_to_merge.lti_id }
+          let(:valid_params) do
+            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+          end
+
+          before do
+            user.enrollments.first.update!(workflow_state: 'active')
+            user_to_merge.enrollments.first.update!(workflow_state: 'active')
+
+            UserMerge.from(user_to_merge).into(user)
+          end
+
+          it 'successfuly find the active user using the user past lti id' do
+            get :index, params: valid_params
+
+            expect(response.code).to eq '200'
+            expect(parsed_response_body['user_id']).to eq user.id
+          end
+        end
+
+        context 'when student was deleted and it was not merged (is not a past user)' do
+          let(:lti_id) { user.lti_id }
+          let(:valid_params) do
+            { course_id: context.id, userId: lti_id, line_item_id: line_item.id }
+          end
+
+          before do
+            user.update!(workflow_state: 'deleted')
+          end
+
+          it 'fails to find user' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+            expect(JSON.parse(response.body)['errors']['message']).to eq('User not found in course or is not a student')
+          end
+        end
+
         context 'when line item does not exist' do
           before { user.enrollments.first.update!(workflow_state: 'active') }
 
           it 'fails to process the request' do
             get :index, params: {course_id: context.id, userId: user.id, line_item_id: LineItem.last.id + 1}
             expect(response).to be_not_found
+          end
+        end
+      end
+
+      describe '#prepare_line_item_for_ags!' do
+        before do
+          allow(controller).to receive(:developer_key).and_return(developer_key)
+        end
+
+        context 'when resource link id is missing' do
+          let(:valid_params) { {course_id: context.id, userId: user.id, line_item_id: line_item.id} }
+
+          it 'is ignored' do
+            expect_any_instance_of(Assignment).not_to receive(:prepare_for_ags_if_needed!)
+            get :index, params: valid_params
+          end
+        end
+
+        context 'when resource link id points to wrong assignment' do
+          let(:valid_params) {
+            a2 = assignment.clone
+            a2.lti_context_id = nil
+            a2.save
+            {course_id: context.id, userId: user.id, resourceLinkId: a2.lti_context_id}
+          }
+
+          it 'fails to match assignment tool' do
+            get :index, params: valid_params
+            expect(response.code).to eq '422'
+            expect(parsed_response_body['errors']['message']).to eq('Resource link id points to Tool not associated with this Context')
+          end
+        end
+
+        context 'with correct resource link id' do
+          let(:valid_params) { {course_id: context.id, userId: user.id, resourceLinkId: assignment.lti_context_id} }
+
+          it 'fixes up line items on assignment' do
+            expect_any_instance_of(Assignment).to receive(:prepare_for_ags_if_needed!)
+            get :index, params: valid_params
           end
         end
       end

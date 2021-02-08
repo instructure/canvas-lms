@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -94,31 +96,31 @@ describe "Wiki Pages" do
       end
 
       it "returns focus back to the item cog if the item was not deleted" do
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
         f('.delete-menu-item').click
         f('.ui-dialog-buttonset .btn').click
         wait_for_ajaximations
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "returns focus back to the item cog if escape was pressed" do
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
         f('.delete-menu-item').click
         f('.ui-dialog-buttonset .btn').send_keys(:escape)
         wait_for_ajaximations
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "returns focus back to the item cog if the dialog close was pressed" do
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
         f('.delete-menu-item').click
         f('.ui-dialog-titlebar-close').click
         wait_for_ajaximations
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "returns focus to the previous item title if it was deleted" do
-        triggers = ff('.al-trigger')
+        triggers = ff('tbody .al-trigger')
         titles = ff('.wiki-page-link')
         triggers.last.click
         ff('.delete-menu-item').last.click
@@ -128,7 +130,7 @@ describe "Wiki Pages" do
       end
 
       it "returns focus to the + Page button if there are no previous item cogs" do
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
         f('.delete-menu-item').click
         f('.ui-dialog-buttonset .btn-danger').click
         wait_for_ajaximations
@@ -139,47 +141,47 @@ describe "Wiki Pages" do
     context "Use as Front Page Link" do
       before :each do
         visit_course_wiki_index_page(@course.id)
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
       end
 
       it "should set focus back to the cog after setting" do
         f('.use-as-front-page-menu-item').click
         wait_for_ajaximations
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "should set focus to the next focusable item if you press Tab" do
         f('.use-as-front-page-menu-item').send_keys(:tab)
-        check_element_has_focus(ff('.wiki-page-link')[1])
+        check_element_has_focus(ff('.select-page-checkbox')[1])
       end
     end
 
     context "Cog menu" do
       before :each do
         visit_course_wiki_index_page(@course.id)
-        f('.al-trigger').click
+        f('tbody .al-trigger').click
         f('.edit-menu-item').click
       end
 
       it "should set focus back to the cog menu if you cancel the dialog" do
         f('.ui-dialog-buttonset .btn').click
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "sets focus back to the cog if you press escape" do
         f('.ui-dialog-buttonset .btn').send_keys(:escape)
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "sets focus back to the cog if you click the dialog close button" do
         f('.ui-dialog-titlebar-close').click
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
 
       it "should return focus to the dialog if you cancel, then reopen the dialog" do
         f('.ui-dialog-titlebar-close').click
-        check_element_has_focus(f('.al-trigger'))
-        f('.al-trigger').click
+        check_element_has_focus(f('tbody .al-trigger'))
+        f('tbody .al-trigger').click
         f('.edit-menu-item').click
         wait_for_ajaximations
         check_element_has_focus(ff('.page-edit-dialog .edit-control-text').last)
@@ -188,7 +190,7 @@ describe "Wiki Pages" do
       it "should set focus back to the cog menu if you edit the title and save" do
         f('.ui-dialog-buttonset .btn-primary').click
         wait_for_ajaximations
-        check_element_has_focus(f('.al-trigger'))
+        check_element_has_focus(f('tbody .al-trigger'))
       end
     end
 

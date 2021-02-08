@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -289,6 +291,34 @@ describe CourseProgress do
         requirement_completed_count: 4,
         next_requirement_url: nil,
         completed_at: @module2.context_module_progressions.first.completed_at.iso8601
+      })
+    end
+
+    it 'should still count as complete if the module has no requirements to speak of' do
+      @module1 = @course.context_modules.create!(:name => "module 01", :requirement_count => 1)
+      @module2 = @course.context_modules.create!(:name => "module 02", :requirement_count => nil)
+
+      @assignment1 = @course.assignments.create!(:title => "some assignment1")
+      @tag1 = @module2.add_item({:id => @assignment1.id, :type => 'assignment'})
+      @module2.completion_requirements = {
+        @tag1.id => {:type => 'must_submit'},
+      }
+
+      [@module1, @module2].each do |m|
+        m.publish
+        m.save!
+      end
+
+      student_in_course(:active_all => true)
+
+      submit_homework(@assignment1)
+
+      progress = CourseProgress.new(@course, @user).to_json
+      expect(progress).to eq({
+        requirement_count: 1,
+        requirement_completed_count: 1,
+        next_requirement_url: nil,
+        completed_at: @user.context_module_progressions.maximum(:completed_at).iso8601
       })
     end
 

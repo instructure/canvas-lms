@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -172,8 +174,12 @@ describe Pseudonym do
 
     it "should gracefully handle unreachable LDAP servers" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).and_raise(Net::LDAP::LdapError, "no connection to server")
+      expect(Canvas::Errors).to receive(:capture) do |ex, data, level|
+        expect(ex.class).to eq(Net::LDAP::LdapError)
+        expect(data[:account]).to eq(@pseudonym.account)
+        expect(level).to eq(:warn)
+      end.and_call_original
       expect{ @pseudonym.ldap_bind_result('blech') }.not_to raise_error
-      expect(ErrorReport.last.message).to eql("no connection to server")
     end
 
     it "passes a success result through" do
@@ -183,8 +189,11 @@ describe Pseudonym do
 
     it "should set last_timeout_failure on LDAP servers that timeout" do
       expect_any_instance_of(Net::LDAP).to receive(:bind_as).once.and_raise(Timeout::Error, "timed out")
+      expect(Canvas::Errors).to receive(:capture_exception) do |_subsystem, e, level|
+        expect(e.class.to_s).to eq("Timeout::Error")
+        expect(level).to eq(:warn)
+      end
       expect(@pseudonym.ldap_bind_result('test')).to be_falsey
-      expect(ErrorReport.last.message).to match(/timed out/)
       expect(@aac.reload.last_timeout_failure).to be > 1.minute.ago
     end
 
@@ -339,6 +348,13 @@ describe Pseudonym do
         expect(Pseudonym).to receive(:active).twice.and_return(Pseudonym.none)
         allow(GlobalLookups).to receive(:enabled?).and_return(true)
         Pseudonym.authenticate({ unique_id: 'abc', password: 'def' }, [Account.default.id, account2])
+      end
+
+      it "won't attempt silly queries" do
+        wat = " " * 3000
+        unique_id = "asdf#{wat}asdf"
+        creds = { unique_id: unique_id, password: 'foobar' }
+        expect(Pseudonym.authenticate(creds, [Account.default.id])).to eq(:impossible_credentials)
       end
     end
   end
@@ -689,6 +705,13 @@ describe Pseudonym do
       expect(Pseudonym).to receive(:associated_shards).and_raise("an error")
       expect(Pseudonym.find_all_by_arbitrary_credentials({ unique_id: 'a', password: 'abcdefgh' },
         [Account.default.id], '127.0.0.1')).to eq [p]
+    end
+
+    it "throws an error if your credentials are absurd" do
+      wat = " " * 3000
+      unique_id = "asdf#{wat}asdf"
+      creds = { unique_id: unique_id, password: 'foobar' }
+      expect{ Pseudonym.find_all_by_arbitrary_credentials(creds, [Account.default.id], '127.0.0.1') }.to raise_error(ImpossibleCredentialsError)
     end
   end
 end

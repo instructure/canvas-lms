@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -149,7 +151,9 @@ module Api
           :scope => 'root_account_id' }.freeze,
   }.freeze
 
-  MAX_ID_LENGTH = (2**63 - 1).to_s.length
+  MAX_ID = (2**63 - 1)
+  MAX_ID_LENGTH = MAX_ID.to_s.length
+  MAX_ID_RANGE = (-MAX_ID...MAX_ID)
   ID_REGEX = %r{\A\d{1,#{MAX_ID_LENGTH}}\z}
   USER_UUID_REGEX = %r{\Auuid:(\w{40,})\z}
 
@@ -510,7 +514,12 @@ module Api
 
   def user_can_download_attachment?(attachment, context, user)
     # checking on the context first can improve performance when checking many attachments for admins
-    (context && context.grants_any_right?(user, :manage_files, :read_as_admin)) || attachment.grants_right?(user, nil, :download)
+    context&.grants_any_right?(
+      user,
+      :manage_files,
+      :read_as_admin,
+      *RoleOverride::GRANULAR_FILE_PERMISSIONS
+    ) || attachment&.grants_right?(user, nil, :download)
   end
 
   def api_user_content(html, context = @context, user = @current_user, preloaded_attachments = {}, is_public=false)
@@ -573,11 +582,11 @@ module Api
   end
 
   def self.invalid_time_stamp_error(attribute, message)
-    Canvas::Errors.capture(
-      'invalid_date_time',
+    data = {
       message: "invalid #{attribute}",
       exception_message: message
-    )
+    }
+    Canvas::Errors.capture('invalid_date_time', data, :info)
   end
 
   # regex for valid iso8601 dates

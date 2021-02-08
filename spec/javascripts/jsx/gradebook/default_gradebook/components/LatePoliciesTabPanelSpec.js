@@ -23,7 +23,7 @@ import {mount} from 'enzyme'
 
 import {Alert} from '@instructure/ui-alerts'
 import {FormFieldGroup} from '@instructure/ui-form-field'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 
 import {DEFAULT_LATE_POLICY_DATA} from 'jsx/gradebook/default_gradebook/apis/GradebookSettingsModalApi'
 import LatePoliciesTabPanel from 'jsx/gradebook/default_gradebook/components/LatePoliciesTabPanel'

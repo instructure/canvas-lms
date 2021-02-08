@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -224,6 +226,7 @@ module Api::V1::Assignment
         'external_data' => external_tool_tag.external_data
       }
       tool_attributes.merge!(external_tool_tag.attributes.slice('content_type', 'content_id')) if external_tool_tag.content_id
+      tool_attributes.merge!('custom' => assignment.primary_resource_link&.custom)
       hash['external_tool_tag_attributes'] = tool_attributes
       hash['url'] = sessionless_launch_url(@context,
                                            :launch_type => 'assessment',
@@ -264,7 +267,7 @@ module Api::V1::Assignment
     end
 
     unless opts[:exclude_response_fields].include?('rubric')
-      if assignment.rubric_association
+      if assignment.active_rubric_association?
         hash['use_rubric_for_grading'] = !!assignment.rubric_association.use_for_grading
         if assignment.rubric_association.rubric
           hash['free_form_criterion_comments'] = !!assignment.rubric_association.rubric.free_form_criterion_comments
@@ -353,11 +356,27 @@ module Api::V1::Assignment
     end
 
     if submission = opts[:submission]
+      should_show_statistics = opts[:include_score_statistics] && assignment.can_view_score_statistics?(user)
+
       if submission.is_a?(Array)
         ActiveRecord::Associations::Preloader.new.preload(submission, :quiz_submission) if assignment.quiz?
         hash['submission'] = submission.map { |s| submission_json(s, assignment, user, session, assignment.context, params) }
+        should_show_statistics = should_show_statistics && submission.any? do |s|
+          s.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
+          s.eligible_for_showing_score_statistics?
+        end
       else
         hash['submission'] = submission_json(submission, assignment, user, session, assignment.context, params)
+        submission.assignment = assignment # Avoid extra query in submission.hide_grade_from_student? to get assignment
+        should_show_statistics = should_show_statistics && submission.eligible_for_showing_score_statistics?
+      end
+
+      if should_show_statistics && (stats = assignment&.score_statistic)
+        hash["score_statistics"] = {
+          'min' => stats.minimum.to_f.round(1),
+          'max': stats.maximum.to_f.round(1),
+          'mean': stats.mean.to_f.round(1)
+        }
       end
     end
 
@@ -380,14 +399,18 @@ module Api::V1::Assignment
       hash['planner_override'] = planner_override_json(override, user, session)
     end
 
-    if assignment.course.post_policies_enabled?
-      hash['post_manually'] = assignment.post_manually?
-    end
-
+    hash['post_manually'] = assignment.post_manually?
     hash['anonymous_grading'] = value_to_boolean(assignment.anonymous_grading)
     hash['anonymize_students'] = assignment.anonymize_students?
 
     hash['require_lockdown_browser'] = assignment.settings&.dig('lockdown_browser', 'require_lockdown_browser') || false
+
+    if opts[:include_can_submit] && !assignment.quiz? && !submission.is_a?(Array)
+      hash['can_submit'] = assignment.expects_submission? &&
+          assignment.rights_status(user, :submit)[:submit] &&
+          (submission.nil? || submission.attempts_left.nil? || submission.attempts_left > 0)
+    end
+
     hash
   end
 
@@ -477,12 +500,13 @@ module Api::V1::Assignment
     return :forbidden unless grading_periods_allow_submittable_create?(assignment, assignment_params)
 
     prepared_create = prepare_assignment_create_or_update(assignment, assignment_params, user, context)
+
     return false unless prepared_create[:valid]
 
     response = :created
 
     Assignment.suspend_due_date_caching do
-      assignment.quiz_lti! if assignment_params.key?(:quiz_lti)
+      assignment.quiz_lti! if assignment_params.key?(:quiz_lti) || assignment&.quiz_lti?
 
       response = if prepared_create[:overrides].present?
         create_api_assignment_with_overrides(prepared_create, user)
@@ -496,9 +520,6 @@ module Api::V1::Assignment
     DueDateCacher.recompute(prepared_create[:assignment], update_grades: calc_grades, executing_user: user)
     response
   rescue ActiveRecord::RecordInvalid
-    false
-  rescue Lti::AssignmentSubscriptionsHelper::AssignmentSubscriptionError => e
-    assignment.errors.add('plagiarism_tool_subscription', e)
     false
   end
 
@@ -652,6 +673,8 @@ module Api::V1::Assignment
       end
       update_params["submission_types"] = update_params["submission_types"].join(',')
     end
+
+    update_params["submission_types"] ||= "not_graded" if update_params["grading_type"] == "not_graded"
 
     if update_params.key?("assignment_group_id")
       ag_id = update_params.delete("assignment_group_id").presence
@@ -893,6 +916,9 @@ module Api::V1::Assignment
     return invalid unless assignment_editable_fields_valid?(updated_assignment, user)
     return invalid unless assignment_final_grader_valid?(updated_assignment, context)
 
+    custom_params = assignment_params.dig(:external_tool_tag_attributes, :custom_params)
+    assignment.lti_resource_link_custom_params = custom_params if custom_params.present?
+
     {
       assignment: assignment,
       overrides: overrides,
@@ -959,7 +985,7 @@ module Api::V1::Assignment
       assignment.tool_settings_tool = tool
     elsif assignment.persisted? && clear_tool_settings_tools?(assignment, assignment_params)
       # Destroy subscriptions and tool associations
-      assignment.send_later_if_production(:clear_tool_settings_tools)
+      assignment.delay_if_production.clear_tool_settings_tools
     end
   end
 

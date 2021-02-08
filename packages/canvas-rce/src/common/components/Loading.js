@@ -20,7 +20,7 @@ import PropTypes from 'prop-types'
 
 import React, {Component} from 'react'
 import formatMessage from '../../format-message'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
 import {StyleSheet, css} from 'aphrodite'
 
 function Loading(props) {

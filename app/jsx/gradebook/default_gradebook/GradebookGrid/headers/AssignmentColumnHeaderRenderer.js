@@ -54,7 +54,7 @@ function getProps(column, gradebook, options) {
   const assignment = gradebook.getAssignment(column.assignmentId)
 
   const gradeSortDataLoaded =
-    gradebook.contentLoadStates.assignmentsLoaded &&
+    gradebook.assignmentsLoadedForCurrentView() &&
     gradebook.contentLoadStates.studentsLoaded &&
     gradebook.contentLoadStates.submissionsLoaded
 
@@ -122,13 +122,10 @@ function getProps(column, gradebook, options) {
       }
     },
 
-    includeSpeedGraderMenuItem: gradebook.options.include_speed_grader_in_assignment_header_menu,
-
     postGradesAction: {
       featureEnabled: gradebook.postPolicies != null,
       hasGradesOrPostableComments,
       hasGradesOrCommentsToPost: students.some(student => isPostable(student.submission)),
-      newIconsEnabled: !!gradebook.options.new_post_policy_icons_enabled,
       onSelect(onExited) {
         if (gradebook.postPolicies) {
           gradebook.postPolicies.showPostAssignmentGradesTray({assignmentId, onExited})

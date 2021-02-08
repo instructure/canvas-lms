@@ -9,6 +9,9 @@
     {{#if logging}}
     <li class="logging"><a href="#loggingPane">{{#t "tab_labels.admin_tools_logging"}}Logging{{/t}}</a></li>
     {{/if}}
+    {{#if bouncedEmails}}
+    <li class="bouncedEmails"><a href="#bouncedEmailsPane">{{#t}}Bounced Emails{{/t}}</a></li>
+    {{/if}}
   </ul>
   <div id="adminToolsTabPanes">
     {{#if courseRestore}}
@@ -19,6 +22,9 @@
     {{/if}}
     {{#if logging}}
     <div id="loggingPane"></div>
+    {{/if}}
+    {{#if bouncedEmails}}
+    <div id="bouncedEmailsPane"></div>
     {{/if}}
   </div>
 </div>

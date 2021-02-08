@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -48,6 +50,18 @@ require 'spec_helper'
           expect(fullstory_app_key).to eql('12345')
           expect(@session[:fullstory_enabled]).to be_falsey
           expect(fullstory_enabled_for_session?(@session)).to be_falsey
+        end
+      end
+
+      it 'is disabled if account setting is disabled' do
+        account = double('Account')
+
+        allow(account).to receive(:settings).and_return({ enable_fullstory: false })
+        allow(FullStoryHelper).to receive(:rand).and_return(0.5)
+
+        override_dynamic_settings(config: {canvas: { fullstory: {sampling_rate: 1, app_key: '12345'} } }) do
+          fullstory_init(account, @session)
+          expect(@session[:fullstory_enabled]).to be_falsey
         end
       end
 

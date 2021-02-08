@@ -115,7 +115,9 @@ export default class CalculationMethodContent {
           }
         ),
         exampleScores: this.exampleScoreIntegers().join(', '),
-        exampleResult: numberFormat.outcomeScore(this.decayingAverage())
+        exampleResult: numberFormat.outcomeScore(this.decayingAverage()),
+        defaultInt: 65,
+        validRange: [1, 99]
       },
       n_mastery: {
         method: I18n.t(
@@ -142,7 +144,9 @@ export default class CalculationMethodContent {
           }
         ),
         exampleScores: this.exampleScoreIntegers().join(', '),
-        exampleResult: numberFormat.outcomeScore(this.nMastery())
+        exampleResult: numberFormat.outcomeScore(this.nMastery()),
+        defaultInt: 5,
+        validRange: [1, 5]
       },
       latest: {
         method: I18n.t('Latest Score'),

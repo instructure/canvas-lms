@@ -44,22 +44,14 @@
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_name"><%= t :name, 'Term Name:' %></label>
           <div class="controls">
-            <% if @context.root_account.feature_enabled?(:responsive_admin_settings) %>
-              <%= f.text_field :name, :class => "input-large", :disabled => (term && term == default_term) %>
-            <% else %>
-              <%= f.text_field :name, :class => "input-xlarge", :disabled => (term && term == default_term) %>
-            <% end %>
+            <%= f.text_field :name, :class => "input-large", :disabled => (term && term == default_term) %>
           </div>
         </div>
       <% if can_do(@root_account, @current_user, :manage_sis) %>
         <div class="control-group edit_term">
           <label class="control-label" for="enrollment_term_sis_source_id"><%= t :sis_source_id, 'SIS ID:' %></label>
           <div class="controls">
-            <% if @context.root_account.feature_enabled?(:responsive_admin_settings) %>
-              <%= f.text_field :sis_source_id, :class => "input-large" %>
-            <% else %>
-              <%= f.text_field :sis_source_id, :class => "input-xlarge" %>
-            <% end %>
+            <%= f.text_field :sis_source_id, :class => "input-large" %>
           </div>
         </div>
       <% end %>

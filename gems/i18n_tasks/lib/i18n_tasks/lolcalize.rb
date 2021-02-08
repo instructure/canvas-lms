@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -34,7 +36,7 @@ module I18nTasks
         if token =~ pattern
           token
         else
-          s = ''
+          s = +''
           token.chars.each_with_index do |c, i|
             s << (i % 2 == 1 ? c.upcase : c.downcase)
           end

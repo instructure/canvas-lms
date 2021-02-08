@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -54,10 +56,8 @@ module Latex
           if response.code.to_i == 200
             response.body
           else
-            Canvas::Errors.capture_exception(
-              :mathman_request,
-              CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
-            )
+            err = CanvasHttp::InvalidResponseCodeError.new(response.code.to_i)
+            Canvas::Errors.capture_exception(:mathman_request, err, :warn)
             return ""
           end
         end

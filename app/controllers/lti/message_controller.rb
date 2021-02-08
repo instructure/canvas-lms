@@ -136,6 +136,9 @@ module Lti
       elsif params[:module_item_id].present?
         tag = ContentTag.not_deleted.find_by(id: params[:module_item_id])
         (tag&.context_type == 'Assignment' && tag.context.context == @context) ? tag.context : nil
+      elsif params[:secure_params].present?
+        assignment = Assignment.from_secure_lti_params(params[:secure_params])
+        assignment&.root_account == @context.root_account ? assignment : nil
       end
     end
 

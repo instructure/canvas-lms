@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -217,29 +219,29 @@ describe "speed grader submissions" do
       wait_for_ajaximations
       rubric = f('#rubric_full')
       expect(rubric).to be_displayed
-      fj("span:contains('Rockin\''):visible").click
-      fj("span:contains('Amazing'):visible").click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Rockin'" }[0].click
+      ff(".rating-description").select { |elt| elt.displayed? && elt.text == "Amazing" }[0].click
       expect(f("span[data-selenium='rubric_total']")).to include_text('8')
       f('#rubric_full .save_rubric_button').click
       wait_for_ajaximations
       f('.toggle_full_rubric').click
       wait_for_ajaximations
 
-      expect(ff('td.criterion_points input').first).to have_value('3')
-      expect(ff('td.criterion_points input').second).to have_value('5')
+      expect(ff('td[data-testid="criterion-points"] input').first).to have_value('3')
+      expect(ff('td[data-testid="criterion-points"] input').second).to have_value('5')
       f('#gradebook_header .next').click
       wait_for_ajaximations
 
       expect(f('#rubric_full')).to be_displayed
-      expect(ffj('td.criterion_points input:visible').first).to have_attribute("value", "")
-      expect(ffj('td.criterion_points input:visible').second).to have_attribute("value", "")
+      expect(ffj('td[data-testid="criterion-points"] input:visible').first).to have_attribute("value", "")
+      expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "")
 
       f('#gradebook_header .prev').click
       wait_for_ajaximations
 
       expect(f('#rubric_full')).to be_displayed
-      expect(ffj('td.criterion_points input:visible').first).to have_attribute("value", "3")
-      expect(ffj('td.criterion_points input:visible').second).to have_attribute("value", "5")
+      expect(ffj('td[data-testid="criterion-points"] input:visible').first).to have_attribute("value", "3")
+      expect(ffj('td[data-testid="criterion-points"] input:visible').second).to have_attribute("value", "5")
     end
 
     it "should highlight submitted assignments and not non-submitted assignments for students", priority: "1",
@@ -255,12 +257,35 @@ describe "speed grader submissions" do
 
       get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
       image_element = f('#iframe_holder img')
-
       if Attachment.local_storage?
         expect(image_element.attribute('src')).to include('download')
       else
         expect(image_element.attribute('src')).to include('amazonaws')
       end
+
+      download_link = f('#submission_files_list .submission-file-download')
+      expect(download_link).to be_displayed
+      expect(download_link['href']).to include "/courses/#{@course.id}/assignments/#{@assignment.id}/submissions/#{@students[0].id}?download=#{@students[0].attachments.last.id}"
+
+      delete_link = f('#submission_files_list .submission-file-delete')
+      expect(delete_link).not_to be_displayed
+    end
+
+    it "deletes an attachment" do
+      filename, fullpath, _data = get_file("graded.png")
+      student_in_course(:user => user_with_pseudonym)
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+      add_attachment_student_assignment(filename, @student, fullpath)
+
+      user_session(account_admin_user)
+      get "/courses/#{@course.id}/gradebook/speed_grader?assignment_id=#{@assignment.id}"
+      delete_link = f('#submission_files_list .submission-file-delete')
+      expect(delete_link).to be_displayed
+      delete_link.click
+      driver.switch_to.alert.accept
+      wait_for_ajax_requests
+      expect(@student.attachments.last.filename).to eq 'file_removed.pdf'
     end
 
     context "turnitin" do

@@ -32,6 +32,9 @@ import UserDateRangeSearchFormView from 'compiled/views/accounts/admin_tools/Use
 import CommMessageItemView from 'compiled/views/accounts/admin_tools/CommMessageItemView'
 import messagesSearchResultsTemplate from 'jst/accounts/admin_tools/commMessagesSearchResults'
 import usersTemplate from 'jst/accounts/usersList'
+import React from 'react'
+import ReactDOM from 'react-dom'
+import BouncedEmailsView from '../bounced_emails/BouncedEmailsView'
 import ready from '@instructure/ready'
 
 // This is used by admin tools to display search results
@@ -70,7 +73,8 @@ ready(() => {
     tabs: {
       courseRestore: ENV.PERMISSIONS.restore_course,
       viewMessages: ENV.PERMISSIONS.view_messages,
-      logging: !!ENV.PERMISSIONS.logging
+      logging: !!ENV.PERMISSIONS.logging,
+      bouncedEmails: ENV.bounced_emails_admin_tool
     },
     restoreContentPaneView: new RestoreContentPaneView({
       courseSearchFormView: new CourseSearchFormView({model: restoreModel}),
@@ -84,4 +88,9 @@ ready(() => {
   })
 
   app.render()
+
+  const bouncedEmailsMountPoint = document.getElementById('bouncedEmailsPane')
+  if (bouncedEmailsMountPoint) {
+    ReactDOM.render(<BouncedEmailsView accountId={ENV.ACCOUNT_ID} />, bouncedEmailsMountPoint)
+  }
 })

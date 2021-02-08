@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -155,8 +157,6 @@ module SectionTabHelper
         I18n.t('Disabled. Not visible to students')
       elsif @tab.unused?
         I18n.t('No content. Not visible to students')
-      else
-        @tab.label
       end
     end
 

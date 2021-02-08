@@ -17,12 +17,13 @@
  */
 
 import I18n from 'i18n!permissions_role_tray_table_row'
-import PropTypes from 'prop-types'
+import {bool, func, node, oneOfType, string} from 'prop-types'
 import React from 'react'
 import {Button} from '@instructure/ui-buttons'
 import {View, Flex} from '@instructure/ui-layout'
 import {IconArrowOpenStartSolid} from '@instructure/ui-icons'
-import {Text} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-text'
+import {ConnectedGranularCheckbox} from './GranularCheckbox'
 import {ConnectedPermissionButton} from './PermissionButton'
 import permissionPropTypes from '../propTypes'
 
@@ -36,8 +37,36 @@ export default function RoleTrayTableRow({
   permission,
   permissionName,
   permissionLabel,
-  role
+  role,
+  permButton: PermButton,
+  permCheckbox: PermCheckbox
 }) {
+  const isGranular = typeof permission.group !== 'undefined'
+  let button
+
+  if (isGranular) {
+    button = (
+      <PermCheckbox
+        permission={role.permissions[permissionName]}
+        permissionName={permissionName}
+        permissionLabel={permissionLabel}
+        roleId={role.id}
+        roleLabel={role.label}
+      />
+    )
+  } else {
+    button = (
+      <PermButton
+        permission={role.permissions[permissionName]}
+        permissionName={permissionName}
+        permissionLabel={permissionLabel}
+        roleId={role.id}
+        roleLabel={role.label}
+        inTray
+      />
+    )
+  }
+
   return (
     <View as="div">
       <Flex justifyItems="space-between">
@@ -67,16 +96,7 @@ export default function RoleTrayTableRow({
         </Flex.Item>
 
         <Flex.Item>
-          <div className="ic-permissions__cell-content">
-            <ConnectedPermissionButton
-              permission={permission}
-              permissionName={permissionName}
-              permissionLabel={permissionLabel}
-              roleId={role.id}
-              roleLabel={role.label}
-              inTray
-            />
-          </div>
+          <div className="ic-permissions__cell-content">{button}</div>
         </Flex.Item>
       </Flex>
     </View>
@@ -84,16 +104,20 @@ export default function RoleTrayTableRow({
 }
 
 RoleTrayTableRow.propTypes = {
-  description: PropTypes.string,
-  expandable: PropTypes.bool,
+  description: string,
+  expandable: bool,
   permission: permissionPropTypes.rolePermission.isRequired,
-  permissionName: PropTypes.string.isRequired,
-  permissionLabel: PropTypes.string.isRequired,
+  permissionName: string.isRequired,
+  permissionLabel: string.isRequired,
   role: permissionPropTypes.role.isRequired,
-  title: PropTypes.string.isRequired
+  title: string.isRequired,
+  permButton: oneOfType([node, func]), // used for tests only
+  permCheckbox: oneOfType([node, func]) // used for tests only
 }
 
 RoleTrayTableRow.defaultProps = {
   description: '',
-  expandable: false
+  expandable: false,
+  permButton: ConnectedPermissionButton,
+  permCheckbox: ConnectedGranularCheckbox
 }

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -250,16 +252,16 @@ describe "Importing assignments" do
     expect(assignment.lock_at).not_to be_nil
   end
 
-  context 'when assignment uses a 1.3 tool' do
+  context 'when assignments use an LTI tool' do
     subject do
+      assignment # trigger create
       Importers::AssignmentImporter.import_from_migration(assignment_hash, course, migration)
       assignment.reload
     end
 
     let(:course) { course_model }
-    let(:use_1_3) { true }
-    let(:dev_key) { DeveloperKey.create! }
     let(:migration) { course.content_migrations.create! }
+
     let(:assignment) do
       course.assignments.create!(
         title: "test",
@@ -267,26 +269,19 @@ describe "Importing assignments" do
         unlock_at: 1.day.ago,
         lock_at: 1.day.from_now,
         peer_reviews_due_at: 2.days.from_now,
-        migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
+        migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6",
+        submission_types: 'external_tool',
+        external_tool_tag_attributes: { url: tool.url, content: tool },
+        points_possible: 10
       )
     end
-    let(:tool) do
-      course.context_external_tools.create!(
-        consumer_key: 'key',
-        shared_secret: 'secret',
-        name: 'test tool',
-        url: 'http://www.tool.com/launch',
-        settings: { use_1_3: use_1_3 },
-        workflow_state: 'public',
-        developer_key: dev_key
-      )
-    end
+
     let(:assignment_hash) do
       {
         "migration_id" => "ib4834d160d180e2e91572e8b9e3b1bc6",
         "assignment_group_migration_id" => "i2bc4b8ea8fac88f1899e5e95d76f3004",
         "workflow_state" => "published",
-        "title" => "LTI 1.3 Tool Assignment",
+        "title" => "Tool Assignment",
         "grading_type" => "points",
         "submission_types" => "external_tool",
         "points_possible" => 10,
@@ -294,16 +289,67 @@ describe "Importing assignments" do
         "peer_reviews_due_at" => nil,
         "lock_at" => nil,
         "unlock_at" => nil,
-        "external_tool_url" => tool.url
+        "external_tool_url" => tool_url,
+        "external_tool_id" => tool_id
       }
     end
 
-    it 'creates the assignment line item' do
-      expect { subject }.to change { assignment.line_items.count }.from(0).to 1
+    context 'and a matching tool is installed in the destination' do
+      let(:tool) { external_tool_model(context: course.root_account) }
+      let(:tool_id) { tool.id }
+      let(:tool_url) { tool.url }
+
+      context 'but the matching tool has a different ID' do
+        let(:tool_id) { tool.id + 1 }
+
+        it 'matches the tool via URL lookup' do
+          expect(subject.external_tool_tag.content).to eq tool
+        end
+      end
+
+      context 'but the matching tool has a different URL' do
+        let(:tool_url) { 'http://google.com/launch/2' }
+
+        it 'updates the URL' do
+          expect { subject }.to change { assignment.external_tool_tag.url }.from(tool.url).to tool_url
+        end
+      end
     end
 
-    it 'creates a resource link' do
-      expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
+    context 'and the tool uses LTI 1.3' do
+      let(:tool_id) { tool.id }
+      let(:tool_url) { tool.url }
+      let(:use_1_3) { true }
+      let(:dev_key) { DeveloperKey.create! }
+      let(:tool) do
+        course.context_external_tools.create!(
+          consumer_key: 'key',
+          shared_secret: 'secret',
+          name: 'test tool',
+          url: 'http://www.tool.com/launch',
+          settings: { use_1_3: use_1_3 },
+          workflow_state: 'public',
+          developer_key: dev_key
+        )
+      end
+      let(:assignment) do
+        course.assignments.create!(
+          title: "test",
+          due_at: Time.zone.now,
+          unlock_at: 1.day.ago,
+          lock_at: 1.day.from_now,
+          peer_reviews_due_at: 2.days.from_now,
+          migration_id: "ib4834d160d180e2e91572e8b9e3b1bc6"
+        )
+      end
+
+      it 'creates the assignment line item' do
+        expect { subject }.to change { assignment.line_items.count }.from(0).to 1
+      end
+
+      it 'creates a resource link' do
+        expect { subject }.to change { assignment.line_items.first&.resource_link.present? }.from(false).to true
+      end
     end
   end
 
@@ -515,7 +561,7 @@ describe "Importing assignments" do
       Importers::AssignmentImporter.import_from_migration(assign_hash, @course, migration)
     end
 
-    it "doesn't add a warning to the migratio if there is an active tool_proxy" do
+    it "doesn't add a warning to the migration if there is an active tool_proxy" do
       allow(Lti::ToolProxy).
         to receive(:find_active_proxies_for_context_by_vendor_code_and_product_code) {[tool_proxy]}
       course_model

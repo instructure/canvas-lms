@@ -27,7 +27,11 @@ export default function NotificationSettings() {
   return (
     <ApolloProvider client={client}>
       <AlertManager>
-        <CourseNotificationSettingsQuery courseId={ENV.COURSE.id} />
+        <CourseNotificationSettingsQuery
+          courseId={ENV.COURSE.id}
+          courseName={ENV.course_name}
+          userId={ENV.current_user_id}
+        />
       </AlertManager>
     </ApolloProvider>
   )

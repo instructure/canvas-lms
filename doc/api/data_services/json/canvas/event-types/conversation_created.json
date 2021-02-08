@@ -1,0 +1,40 @@
+{
+  "name": "conversation_created",
+  "definition": "The event is emitted anytime a new conversation is initiated by the sender.",
+  "trigger": "Triggered when a new conversation is created.",
+  "schema": {
+    "conversation_id": "The Canvas id of the conversation.",
+    "updated_at": "The time this conversation was updated."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000123",
+          "user_login": "inewton@example.com",
+          "user_sis_id": "456-T45",
+          "time_zone": "America/Denver",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "hostname": "oxana.instructure.com",
+          "http_method": "POST",
+          "client_ip": "93.184.216.34",
+          "url": "http://oxana.instructure.com/conversations",
+          "referrer": "http://oxana.instructure.com/conversations",
+          "producer": "canvas",
+          "event_name": "conversation_created",
+          "event_time": "2020-03-24T16:55:59.973Z"
+        },
+        "body": {
+          "conversation_id": "123456789",
+          "updated_at": "2018-09-24T06:00:00Z"
+        }
+      }
+    }
+  ]
+}

@@ -21,23 +21,25 @@ import _ from 'lodash'
 import I18n from 'i18n!IndividualStudentMasteryOutcomePopover'
 import {View, Flex} from '@instructure/ui-layout'
 import {Text} from '@instructure/ui-elements'
-import {Link} from '@instructure/ui-link'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
 import CalculationMethodContent from 'compiled/models/grade_summary/CalculationMethodContent'
 import {Popover} from '@instructure/ui-overlays'
 import {IconInfoLine} from '@instructure/ui-icons'
 import DatetimeDisplay from '../../shared/DatetimeDisplay'
-import {CloseButton} from '@instructure/ui-buttons'
+import {CloseButton, IconButton} from '@instructure/ui-buttons'
+import {Modal} from '@instructure/ui-modal'
+import WithBreakpoints, {breakpointsShape} from '../../shared/WithBreakpoints'
 import * as shapes from './shapes'
 
-export default class OutcomePopover extends React.Component {
+class OutcomePopover extends React.Component {
   static propTypes = {
     outcome: shapes.outcomeShape.isRequired,
-    outcomeProficiency: shapes.outcomeProficiencyShape
+    outcomeProficiency: shapes.outcomeProficiencyShape,
+    breakpoints: breakpointsShape
   }
 
   static defaultProps = {
-    outcomeProficiency: null
+    outcomeProficiency: null,
+    breakpoints: {}
   }
 
   constructor() {
@@ -76,17 +78,31 @@ export default class OutcomePopover extends React.Component {
   latestTime() {
     const {outcome} = this.props
     if (outcome.results.length > 0) {
-      return _.sortBy(outcome.results, r => r.submitted_or_assessed_at)[0].submitted_or_assessed_at
+      return _.sortBy(outcome.results, r => -r.submitted_or_assessed_at)[0].submitted_or_assessed_at
     }
     return null
   }
 
-  renderPopoverContent() {
+  renderSelectedRating() {
     const selectedRating = this.getSelectedRating()
+    return (
+      <Text size="small" weight="bold">
+        <div>
+          {selectedRating && (
+            <div style={{color: `#${selectedRating.color}`}}>{selectedRating.description}</div>
+          )}
+        </div>
+      </Text>
+    )
+  }
+
+  renderPopoverContent() {
     const latestTime = this.latestTime()
     const popoverContent = new CalculationMethodContent(this.props.outcome).present()
     const {method, exampleText, exampleScores, exampleResult} = popoverContent
-    const {outcome} = this.props
+    const {outcome, breakpoints} = this.props
+    const isVertical = !breakpoints.miniTablet
+
     return (
       <View as="div" padding="large" maxWidth="30rem">
         <CloseButton
@@ -103,7 +119,9 @@ export default class OutcomePopover extends React.Component {
                 {outcome.title}
               </div>
               <div>
+                {isVertical && <div>{this.renderSelectedRating()}</div>}
                 {I18n.t('Last Assessment: ')}
+                {isVertical && <br />}
                 {latestTime ? (
                   <DatetimeDisplay datetime={latestTime} format="%b %d, %l:%M %p" />
                 ) : (
@@ -111,17 +129,7 @@ export default class OutcomePopover extends React.Component {
                 )}
               </div>
             </Flex.Item>
-            <Flex.Item grow shrink align="stretch">
-              <Text size="small" weight="bold">
-                <div>
-                  {selectedRating && (
-                    <div style={{color: `#${selectedRating.color}`, textAlign: 'end'}}>
-                      {selectedRating.description}
-                    </div>
-                  )}
-                </div>
-              </Text>
-            </Flex.Item>
+            {!isVertical && <Flex.Item align="stretch">{this.renderSelectedRating()}</Flex.Item>}
           </Flex>
           <hr role="presentation" />
           <div>
@@ -143,8 +151,7 @@ export default class OutcomePopover extends React.Component {
     )
   }
 
-  render() {
-    const popoverContent = this.renderPopoverContent()
+  renderPopover() {
     return (
       <span>
         <Popover
@@ -155,26 +162,59 @@ export default class OutcomePopover extends React.Component {
           shouldContainFocus
         >
           <Popover.Trigger>
-            <Link
+            <IconButton
+              size="small"
+              margin="xx-small"
+              withBackground={false}
+              withBorder={false}
+              screenReaderLabel={I18n.t('Click to expand outcome details')}
+              renderIcon={IconInfoLine}
               onClick={() => this.setState(prevState => ({linkClicked: !prevState.linkClicked}))}
               onMouseEnter={() => this.setState({linkHover: true})}
               onMouseLeave={() => this.setState({linkHover: false})}
-            >
-              <span style={{color: 'black'}}>
-                <IconInfoLine />
-              </span>
-              <span>
-                {!this.state.linkClicked && (
-                  <ScreenReaderContent>
-                    {I18n.t('Click to expand outcome details')}
-                  </ScreenReaderContent>
-                )}
-              </span>
-            </Link>
+            />
           </Popover.Trigger>
-          <Popover.Content>{popoverContent}</Popover.Content>
+          <Popover.Content>{this.renderPopoverContent()}</Popover.Content>
         </Popover>
       </span>
     )
   }
+
+  renderModal() {
+    return (
+      <span>
+        <IconButton
+          size="small"
+          margin="xx-small"
+          withBackground={false}
+          withBorder={false}
+          screenReaderLabel={I18n.t('Click to expand outcome details')}
+          renderIcon={IconInfoLine}
+          onClick={() => this.setState(prevState => ({linkClicked: !prevState.linkClicked}))}
+        />
+        <Modal
+          open={this.state.linkClicked}
+          onDismiss={() =>
+            this.setState(prevState => prevState.linkClicked && this.setState({linkClicked: false}))
+          }
+          size="fullscreen"
+          label={I18n.t('Outcome Details')}
+        >
+          <Modal.Body>{this.renderPopoverContent()}</Modal.Body>
+        </Modal>
+      </span>
+    )
+  }
+
+  render() {
+    const {breakpoints} = this.props
+    const modalLayout = !breakpoints.miniTablet
+    if (modalLayout) {
+      return this.renderModal()
+    } else {
+      return this.renderPopover()
+    }
+  }
 }
+
+export default WithBreakpoints(OutcomePopover)

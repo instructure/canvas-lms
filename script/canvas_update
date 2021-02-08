@@ -27,7 +27,6 @@ function update_canvas {
 
   if [[ -z "$SKIP_CODE" ]] ; then
     update_plugins
-    checkout_master_canvas
     rebase_canvas
   fi
 

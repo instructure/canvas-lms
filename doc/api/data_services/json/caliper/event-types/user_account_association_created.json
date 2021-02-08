@@ -1,0 +1,69 @@
+{
+  "name": "user_account_association_created",
+  "definition": "The event is emitted anytime a user is created in an account.",
+  "trigger": "Triggered when a user is added to an account.",
+  "schema": {
+    "data[0].object.extensions[\"com.instructure.canvas\"]": {
+      "is_admin": "Indicates whether a user has an administrator role",
+      "user_id": "The Canvas id of the currently logged in user"
+    }
+  },
+  "examples": [
+    {
+      "payload": {
+        "sensor": "http://oxana.instructure.com/",
+        "sendTime": "2019-11-21T23:47:23.110Z",
+        "dataVersion": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+        "data": [
+          {
+            "@context": "http://purl.imsglobal.org/ctx/caliper/v1p1",
+            "id": "urn:uuid:97224c19-0b41-4d49-b6f6-1c4762ac9ed4",
+            "type": "Event",
+            "actor": {
+              "id": "urn:instructure:canvas:user:21070000000000987",
+              "type": "Person",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "user_login": "oxana",
+                  "user_sis_id": "OXANA123",
+                  "root_account_id": "21070000000000001",
+                  "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+                  "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+                  "entity_id": "21070000000000987"
+                }
+              }
+            },
+            "action": "Created",
+            "object": {
+              "id": "urn:instructure:canvas:account:21070000000000001",
+              "type": "Entity",
+              "dateCreated": "2019-11-01T19:11:00.000Z",
+              "dateModified": "2019-11-01T19:11:00.000Z",
+              "extensions": {
+                "com.instructure.canvas": {
+                  "is_admin": false,
+                  "user_id": "urn:instructure:canvas:user:21070000000042342"
+                }
+              }
+            },
+            "eventTime": "2019-11-01T19:11:00.890Z",
+            "edApp": {
+              "id": "http://oxana.instructure.com/",
+              "type": "SoftwareApplication"
+            },
+            "extensions": {
+              "com.instructure.canvas": {
+                "hostname": "oxana.instructure.com",
+                "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+                "user_agent": "Somebot/1.0",
+                "client_ip": "93.184.216.34",
+                "request_url": "https://oxana.instructure.com/api/v1/accounts/566/users",
+                "version": "1.0.0"
+              }
+            }
+          }
+        ]
+      }
+    }
+  ]
+}

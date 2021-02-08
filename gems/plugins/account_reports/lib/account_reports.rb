@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,9 +22,14 @@ require 'account_reports/engine'
 require 'zip'
 
 module AccountReports
+  class << self
+    attr_writer :handle_error
+  end
 
   # This hash is modified below and should not be frozen.
+  # rubocop:disable Lint/FreezeConstants, Style/MutableConstant
   REPORTS = {}
+  # rubocop:enable Lint/FreezeConstants, Style/MutableConstant
 
   Report = Struct.new(:type, :title, :description_partial, :parameters_partial, :parameters, :module, :proc, :parallel_proc) do
     def module_name
@@ -33,18 +40,40 @@ module AccountReports
       end
     end
 
+    def module_class
+      module_name.constantize
+    end
+
     def proc
       unless self[:proc]
-        self.proc = module_name.constantize.method(type)
+        self.proc = module_class.method(type)
       end
       self[:proc]
+    end
+
+    def parameters
+      self.parameters = :account_report_parameters if self[:parameters].nil?
+
+      begin
+        case (p = self[:parameters])
+        when Proc
+          self.parameters = instance_exec(&p)
+        when Symbol
+          self.parameters = module_class.send(p)
+        else
+          p
+        end
+      rescue => e
+        Rails.logger.error(e)
+        self.parameters = {}
+      end
     end
 
     def parallel_proc
       unless instance_variable_defined?(:@parallel_proc)
         @parallel_proc = self[:parallel_proc] ||
-          module_name.constantize.public_methods.include?(:"parallel_#{type}") &&
-          module_name.constantize.method(:"parallel_#{type}")
+          module_class.public_methods.include?(:"parallel_#{type}") &&
+          module_class.method(:"parallel_#{type}")
       end
       @parallel_proc
     end
@@ -83,14 +112,32 @@ module AccountReports
     begin
       REPORTS[account_report.report_type].proc.call(account_report)
     rescue => e
-      account_report.logger.error e
-      @er = ErrorReport.log_exception(nil, e, :user => account_report.user)
-      self.message_recipient(account_report, "Generating the report, #{account_report.report_type.to_s.titleize}, failed.  Please report the following error code to your system administrator: ErrorReport:#{@er.id}")
+      error_report_id = report_on_exception(e, {:user => account_report.user})
+      title = account_report.report_type.to_s.titleize
+      error_message = "Generating the report, #{title}, failed."
+      error_message += if error_report_id
+        " Please report the following error code to your system administrator: ErrorReport:#{error_report_id}"
+      else
+        " Unable to create error_report_id for #{e}"
+      end
+      self.finalize_report(account_report, error_message)
+      @er = nil
+    end
+  end
+
+  def self.report_on_exception(exception, context, level: :error)
+    if @handle_error.respond_to?(:call)
+      capture_outputs = @handle_error.call(exception, context, level)
+      # return the error_report id
+      capture_outputs[:error_report]
+    else
+      Rails.logger.error(exception)
+      nil
     end
   end
 
   def self.generate_file_name(account_report)
-    "#{account_report.report_type}_#{Time.now.strftime('%d_%b_%Y')}_#{account_report.id}"
+    "#{account_report.report_type}_#{Time.zone.now.strftime('%d_%b_%Y')}_#{account_report.id}"
   end
 
   def self.generate_file(account_report, ext = 'csv')
@@ -106,7 +153,7 @@ module AccountReports
       filename = generate_file_name(account_report)
       temp = Tempfile.open([filename, ".zip"])
       filepath = temp.path
-      filename << ".zip"
+      filename += ".zip"
       temp.close!
 
       Zip::File.open(filepath, Zip::File::CREATE) do |zipfile|
@@ -163,7 +210,7 @@ module AccountReports
         )
       end
     end
-    attachment
+    account_report.attachment = attachment
   end
 
   def self.failed_report(account_report)
@@ -176,24 +223,25 @@ module AccountReports
     account_report.parameters["extra_text"] = fail_text
   end
 
-  def self.message_recipient(account_report, message, csv=nil)
-    notification = NotificationFinder.new.by_name("Report Generated")
-    notification = NotificationFinder.new.by_name("Report Generation Failed") unless csv
-    attachment = report_attachment(account_report, csv) if csv
+  def self.finalize_report(account_report, message, csv=nil)
+    report_attachment(account_report, csv)
     account_report.message = message
-    account_report.parameters ||= {}
     failed_report(account_report) unless csv
     if account_report.workflow_state == 'aborted'
       account_report.parameters["extra_text"] = (I18n.t('Report has been aborted'))
     else
-      account_report.attachment = attachment
       account_report.workflow_state = csv ? 'complete' : 'error'
     end
     account_report.update_attribute(:progress, 100)
-    account_report.end_at ||= Time.now
-    account_report.save
-    notification.create_message(account_report, [account_report.user]) if notification
-    message
+    account_report.end_at ||= Time.zone.now
+    account_report.save!
+    message_recipient(account_report)
+  end
+
+  def self.message_recipient(account_report)
+    return account_report if account_report.parameters['skip_message']
+    notification = account_report.attachment ? NotificationFinder.new.by_name("Report Generated") : NotificationFinder.new.by_name("Report Generation Failed")
+    notification&.create_message(account_report, [account_report.user])
   end
 
 end

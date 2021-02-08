@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 require_relative '../../spec_helper'
 require_relative '../views_helper'
 
-describe "/shared/_originality_score_icon" do
+describe "shared/_originality_score_icon" do
   let(:error_data) { { status: "error" } }
   let(:pending_data) { {  status: "pending" } }
   let(:high_score_data) { { status: "scored", similarity_score: 75 } }

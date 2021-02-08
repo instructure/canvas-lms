@@ -18,6 +18,7 @@
 
 import React from 'react'
 import {mount, shallow} from 'enzyme'
+import {render, within} from '@testing-library/react'
 import {Set} from 'immutable'
 import IndividualStudentMastery from '../index'
 import fetchOutcomes from '../fetchOutcomes'
@@ -35,33 +36,25 @@ const props = {
 }
 
 it('renders the component', () => {
-  const wrapper = shallow(<IndividualStudentMastery {...props} />)
-  expect(wrapper).toMatchSnapshot()
+  const {getByText} = render(<IndividualStudentMastery {...props} />)
+  expect(getByText('Loading outcome results')).not.toBeNull()
 })
 
 it('attempts to load when mounted', () => {
-  mount(<IndividualStudentMastery {...props} />)
+  render(<IndividualStudentMastery {...props} />)
   expect(fetchOutcomes).toHaveBeenCalled()
-})
-
-it('renders loading before promise resolves', () => {
-  fetchOutcomes.mockImplementation(() => new Promise(() => {})) // unresolved promise
-  const wrapper = mount(<IndividualStudentMastery {...props} />)
-  expect(wrapper.find('Spinner')).toHaveLength(1)
 })
 
 it('renders error when error occurs during fetch', async () => {
   fetchOutcomes.mockImplementation(() => Promise.reject(new Error('foo')))
-  const wrapper = mount(<IndividualStudentMastery {...props} />)
-  await wrapper.instance().componentDidMount()
-  expect(wrapper.text()).toMatch('An error occurred')
+  const {findByText} = render(<IndividualStudentMastery {...props} />)
+  expect(await findByText(/An error occurred/)).not.toBeNull()
 })
 
 it('renders empty if no groups are returned', async () => {
   fetchOutcomes.mockImplementation(() => Promise.resolve({outcomeGroups: [], outcomes: []}))
-  const wrapper = mount(<IndividualStudentMastery {...props} />)
-  await wrapper.instance().componentDidMount()
-  expect(wrapper.text()).toMatch('There are no outcomes in the course')
+  const {findByText} = render(<IndividualStudentMastery {...props} />)
+  expect(await findByText(/There are no outcomes in the course/)).not.toBeNull()
 })
 
 it('renders outcome groups if they are returned', async () => {
@@ -71,9 +64,8 @@ it('renders outcome groups if they are returned', async () => {
       outcomes: []
     })
   )
-  const wrapper = shallow(<IndividualStudentMastery {...props} />)
-  await wrapper.instance().componentDidMount()
-  expect(wrapper.update().find('OutcomeGroup')).toHaveLength(1)
+  const {findByText} = render(<IndividualStudentMastery {...props} />)
+  expect(await findByText('Group')).not.toBeNull()
 })
 
 describe('expand and contract', () => {
@@ -100,6 +92,28 @@ describe('expand and contract', () => {
     )
   })
 
+  it('renders outcome groups in alphabetical order by title', async () => {
+    fetchOutcomes.mockImplementation(() =>
+      Promise.resolve({
+        outcomeGroups: [
+          {id: 1, title: 'ZZ Top Albums'},
+          {id: 2, title: 'Aerosmith Albums'},
+          {id: 3, title: 'Aardvark Albums'},
+          {id: 4, title: 'abba Albums'}
+        ],
+        outcomes: []
+      })
+    )
+    const {findAllByRole} = render(<IndividualStudentMastery {...props} />)
+    const groups = await findAllByRole('listitem')
+    expect(groups).toHaveLength(4)
+    expect(within(groups[0]).getByText('Aardvark Albums')).not.toBeNull()
+    expect(within(groups[1]).getByText('abba Albums')).not.toBeNull()
+    expect(within(groups[2]).getByText('Aerosmith Albums')).not.toBeNull()
+    expect(within(groups[3]).getByText('ZZ Top Albums')).not.toBeNull()
+  })
+
+  // legacy enzyme tests
   it('toggles elements to expanded when event fired', async () => {
     const wrapper = mount(<IndividualStudentMastery {...props} />)
     await wrapper.instance().componentDidMount()
@@ -146,26 +160,4 @@ describe('expand and contract', () => {
     wrapper.instance().contract()
     expect(props.onExpansionChange).toHaveBeenLastCalledWith(false, true)
   })
-})
-
-it('renders outcome groups in alphabetical order by title', async () => {
-  fetchOutcomes.mockImplementation(() =>
-    Promise.resolve({
-      outcomeGroups: [
-        {id: 1, title: 'ZZ Top Albums'},
-        {id: 2, title: 'Aerosmith Albums'},
-        {id: 3, title: 'Aardvark Albums'},
-        {id: 4, title: 'abba Albums'}
-      ],
-      outcomes: []
-    })
-  )
-  const wrapper = shallow(<IndividualStudentMastery {...props} />)
-  await wrapper.instance().componentDidMount()
-  const groups = wrapper.find('OutcomeGroup')
-  expect(groups).toHaveLength(4)
-  expect(groups.get(0).props.outcomeGroup.title).toEqual('Aardvark Albums')
-  expect(groups.get(1).props.outcomeGroup.title).toEqual('abba Albums')
-  expect(groups.get(2).props.outcomeGroup.title).toEqual('Aerosmith Albums')
-  expect(groups.get(3).props.outcomeGroup.title).toEqual('ZZ Top Albums')
 })

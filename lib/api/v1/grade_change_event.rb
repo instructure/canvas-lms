@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -26,19 +28,19 @@ module Api::V1::GradeChangeEvent
 
   def grade_change_event_json(event, user, session)
     links = {
-      assignment: Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current),
       course: Shard.relative_id_for(event.course_id, Shard.current, Shard.current),
       student: Shard.relative_id_for(event.student_id, Shard.current, Shard.current)&.to_s,
       grader: Shard.relative_id_for(event.grader_id, Shard.current, Shard.current)&.to_s,
       page_view: event.request_id && PageView.find_by_id(event.request_id).try(:id)
     }
+    links[:assignment] = Shard.relative_id_for(event.assignment_id, Shard.current, Shard.current) unless event.override_grade?
 
     json = {
       id: event.id,
       created_at: event.created_at.in_time_zone,
       event_type: event.event_type,
-      grade_before: event.grade_before,
-      grade_after: event.grade_after,
+      grade_before: display_grade(event: event, grade: event.grade_before, score: event.score_before),
+      grade_after: display_grade(event: event, grade: event.grade_after, score: event.score_after),
       excused_before: event.excused_before,
       excused_after: event.excused_after,
       graded_anonymously: event.graded_anonymously,
@@ -49,6 +51,7 @@ module Api::V1::GradeChangeEvent
     }
 
     json[:grade_current] = event.grade_current if event.grade_current.present?
+    json[:course_override_grade] = true if event.override_grade?
     json
   end
 
@@ -103,5 +106,14 @@ module Api::V1::GradeChangeEvent
       courses: courses_json(courses, user, session, [], []),
       users: users_json(users, user, session, [], @domain_root_account)
     }
+  end
+
+  def display_grade(event:, grade:, score:)
+    # Unlike for individual assignments, override grades get saved with blank
+    # grade_before/grade_after values if the course has no grading scheme.  If
+    # we have a score but no grade, fall back to showing the score.
+    return grade unless event.override_grade? && grade.blank?
+
+    score.present? ? I18n.n(score, percentage: true) : nil
   end
 end

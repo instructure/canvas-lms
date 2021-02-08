@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -31,7 +33,6 @@ class SubmissionDraft < ActiveRecord::Base
   validate :media_object_id_matches_media_object
 
   sanitize_field :body, CanvasSanitize::SANITIZE
-  sanitize_field :url, CanvasSanitize::SANITIZE
 
   before_save :validate_url
 

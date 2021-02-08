@@ -1,16 +1,4 @@
 ---
-anonymous_moderated_marking:
-  state: hidden
-  display_name: Anonymous Moderated Marking
-  description: Anonymous Moderated Marking allows teachers to select moderators to
-    anonymously grade assignments. After which a moderator can select or supply a
-    custom grade.
-  applies_to: Account
-  root_opt_in: true
-  beta: true
-  environments:
-    production:
-      state: disabled
 anonymous_marking:
   state: allowed
   display_name: Anonymous Grading

@@ -26,9 +26,8 @@ import 'jquery.instructure_misc_plugins' // ifExists, showIf
 import 'jquery.loadingImg'
 import 'vendor/jquery.scrollTo'
 import 'jqueryui/datepicker'
-import {isMathJaxLoaded, reloadElement, loadMathJax, isMathMLOnPage} from 'mathml'
-
-let specialDatesAreHidden = false
+import easy_student_view from 'easy_student_view'
+import mathml from 'mathml'
 
 RichContentEditor.preloadRemoteModule()
 
@@ -75,35 +74,13 @@ function highlightDate(date) {
 function highlightRelated(related_id, self) {
   const $syllabus = $('#syllabus')
 
-  $syllabus.find('.detail_list tr.related_event').removeClass('related_event')
+  $syllabus.find('tr.related_event').removeClass('related_event')
   if (related_id && $syllabus) {
     $syllabus
-      .find(`.detail_list tr.related-${related_id}`)
+      .find(`tr.related-${related_id}`)
       .not(self)
       .addClass('related_event')
   }
-}
-
-// Toggles whether special events/days are displayed
-function toggleSpecialDates() {
-  $('.special_date').each(function() {
-    const $specialEvent = $(this)
-    let $elementToHide = $specialEvent
-
-    // If all of the events on this day are special/overridden, hide the entire day
-    if (!$specialEvent.siblings().not('.special_date').length) {
-      $elementToHide = $specialEvent.closest('tr.date')
-    }
-
-    $elementToHide.toggle(specialDatesAreHidden)
-  })
-
-  const $toggle_special_dates = $('#toggle_special_dates_in_syllabus')
-  $toggle_special_dates.removeClass('hidden').removeClass('shown')
-  $toggle_special_dates.addClass(specialDatesAreHidden ? 'shown' : 'hidden')
-  specialDatesAreHidden = !specialDatesAreHidden
-
-  highlightDaysWithEvents()
 }
 
 // Binds to #syllabus dom events
@@ -119,7 +96,7 @@ function bindToSyllabus() {
     highlightDate(date)
   })
 
-  $syllabus.on('mouseenter mouseleave', 'tr.date .detail_list tr', function(ev) {
+  $syllabus.on('mouseenter mouseleave', 'tr.date.detail_list', function(ev) {
     let related_id = null
     if (ev.type === 'mouseenter') {
       const classNames = ($(this).attr('class') || '').split(/\s+/)
@@ -131,12 +108,6 @@ function bindToSyllabus() {
     }
 
     highlightRelated(related_id, this)
-  })
-
-  const $toggleSpecialDatesInSyllabus = $('#toggle_special_dates_in_syllabus')
-  $toggleSpecialDatesInSyllabus.on('click', ev => {
-    ev.preventDefault()
-    toggleSpecialDates()
   })
 
   highlightDaysWithEvents()
@@ -211,8 +182,11 @@ function bindToMiniCalendar() {
       const dateString = $(this)
         .find('.day_date')
         .attr('data-date')
-      if (!dateString || dateString > todayString) return false
-      $lastBefore = $(this)
+
+      if (dateString) {
+        if (dateString > todayString) return false
+        $lastBefore = dateString
+      }
     })
 
     changeMonth($mini_month, $.datepicker.formatDate('mm/dd/yy', new Date()))
@@ -221,7 +195,7 @@ function bindToMiniCalendar() {
     if (!$lastBefore) $lastBefore = $('tr.date:first')
 
     selectDate(todayString)
-    selectRow($lastBefore)
+    selectRow($(`tr.date.events_${$lastBefore}`))
   })
 }
 
@@ -267,6 +241,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     $edit_syllabus_link.hide()
     $course_syllabus.hide()
     $course_syllabus_details.hide()
+    easy_student_view.hide()
     $course_syllabus_body = RichContentEditor.freshNode($course_syllabus_body)
     $course_syllabus_body.val($course_syllabus.data('syllabus_body'))
     RichContentEditor.loadNewEditor($course_syllabus_body, {
@@ -285,6 +260,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     $edit_course_syllabus_form.hide()
     $edit_syllabus_link.show()
     $course_syllabus.show()
+    easy_student_view.show()
     const text = $.trim($course_syllabus.html())
     $course_syllabus_details.showIf(!text)
     RichContentEditor.destroyRCE($course_syllabus_body)
@@ -312,6 +288,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
 
   $edit_course_syllabus_form.on('click', '.cancel_button', ev => {
     ev.preventDefault()
+    RichContentEditor.closeRCE($course_syllabus_body)
     $edit_course_syllabus_form.triggerHandler('hide_edit')
   })
 
@@ -319,6 +296,7 @@ const bindToEditSyllabus = function(course_summary_enabled) {
     object_name: 'course',
 
     processData(data) {
+      RichContentEditor.closeRCE($course_syllabus_body) // I'd like to wait until success, but by then the RCE is gone
       const syllabus_body = RichContentEditor.callOnRCE($course_syllabus_body, 'get_code')
       data['course[syllabus_body]'] = syllabus_body
       return data
@@ -340,11 +318,13 @@ const bindToEditSyllabus = function(course_summary_enabled) {
       $course_syllabus.loadingImage('remove').html(data.course.syllabus_body)
       $course_syllabus.data('syllabus_body', data.course.syllabus_body)
       $course_syllabus_details.hide()
-      if (isMathMLOnPage()) {
-        if (isMathJaxLoaded()) {
-          reloadElement('content')
-        } else {
-          loadMathJax('MML_HTMLorMML.js')
+      if (!ENV.FEATURES.new_math_equation_handling) {
+        if (mathml.isMathMLOnPage()) {
+          if (mathml.isMathJaxLoaded()) {
+            mathml.reloadElement('content')
+          } else {
+            mathml.loadMathJax(undefined)
+          }
         }
       }
     },

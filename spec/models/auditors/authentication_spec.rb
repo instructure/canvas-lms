@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -68,7 +70,7 @@ describe Auditors::Authentication do
 
       it "doesn't record an error when not configured" do
         allow(Auditors::Authentication::Stream).to receive(:database).and_return(nil)
-        expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with(:auditors).once.and_return(false)
+        expect(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with("auditors").once.and_return(false)
         expect(Canvas::EventStreamLogger).to receive(:error).never
         Auditors::Authentication.record(@pseudonym, 'login')
       end
@@ -228,6 +230,34 @@ describe Auditors::Authentication do
         it "should include events from the other pseudonym's shard" do
           expect(Auditors::Authentication.for_user(@user).paginate(:per_page => 2)).
             to include(@event2)
+        end
+      end
+
+      context "different shard, db auditors" do
+        before do
+          allow(Auditors).to receive(:write_to_cassandra?).and_return(false)
+          allow(Auditors).to receive(:write_to_postgres?).and_return(true)
+          allow(Auditors).to receive(:read_from_cassandra?).and_return(false)
+          allow(Auditors).to receive(:read_from_postgres?).and_return(true)
+          @shard2.activate do
+            @account = account_model
+            user_with_pseudonym(account: @account, active_all: true)
+            @event1 = Auditors::Authentication.record(@pseudonym, 'login')
+          end
+          user_with_pseudonym(user: @user, active_all: true)
+          @event2 = Auditors::Authentication.record(@pseudonym, 'login')
+        end
+
+        it "should include events from the user's native shard" do
+          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          uuids = records.map(&:uuid)
+          expect(uuids).to include(@event1.id)
+        end
+
+        it "should include events from the other pseudonym's shard" do
+          records = Auditors::Authentication.for_user(@user).paginate(:per_page => 2)
+          uuids = records.map(&:uuid)
+          expect(uuids).to include(@event2.id)
         end
       end
     end

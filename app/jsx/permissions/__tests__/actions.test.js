@@ -176,6 +176,8 @@ it('tabChanged dispatches permissionsTabChanged', () => {
   expect(dispatchMock).toHaveBeenCalledWith(expectedDispatch)
 })
 
+/* eslint-disable promise/catch-or-return */
+/* eslint-disable promise/no-callback-in-promise */
 describe('api actions', () => {
   beforeEach(() => {
     moxios.install()
@@ -345,6 +347,16 @@ describe('api actions', () => {
       }
     }
 
+    const expectedApiBusyDispatch = {
+      type: 'API_PENDING',
+      payload: {id: '3', name: 'delete_course'}
+    }
+
+    const expectedApiUnbusyDispatch = {
+      type: 'API_COMPLETE',
+      payload: {id: '3', name: 'delete_course'}
+    }
+
     actions.modifyPermissions({
       name: 'delete_course',
       id: '3',
@@ -364,9 +376,11 @@ describe('api actions', () => {
           }
         })
         .then(() => {
+          expect(dispatchMock).toHaveBeenCalledWith(expectedApiBusyDispatch)
           expect(dispatchMock).toHaveBeenCalledWith(expectedUpdatePermsDispatch)
           expect(dispatchMock).toHaveBeenCalledWith(expectedFixFocusDispatch)
-          expect(dispatchMock).toHaveBeenCalledTimes(2)
+          expect(dispatchMock).toHaveBeenCalledWith(expectedApiUnbusyDispatch)
+          expect(dispatchMock).toHaveBeenCalledTimes(4)
           done()
         })
     })
@@ -412,3 +426,5 @@ describe('api actions', () => {
     })
   })
 })
+/* eslint-enable promise/catch-or-return */
+/* eslint-enable promise/no-callback-in-promise */

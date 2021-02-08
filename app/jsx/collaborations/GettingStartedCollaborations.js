@@ -34,7 +34,10 @@ class GettingStartedCollaborations extends React.Component {
           'Collaborations are web-based tools to work collaboratively on tasks like taking notes or grouped papers. Get started by adding a collaboration app.'
         )
         link = (
-          <a rel="external" href="https://community.canvaslms.com/docs/DOC-2627">
+          <a
+            rel="external"
+            href="https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61"
+          >
             {I18n.t('Learn more about collaborations')}
           </a>
         )
@@ -56,7 +59,7 @@ class GettingStartedCollaborations extends React.Component {
         )
       }
       link = (
-        <a href="https://community.canvaslms.com/docs/DOC-2627">
+        <a href="https://community.canvaslms.com/t5/Canvas-Basics-Guide/What-are-Collaborations/ta-p/61">
           {I18n.t('Learn more about collaborations')}
         </a>
       )

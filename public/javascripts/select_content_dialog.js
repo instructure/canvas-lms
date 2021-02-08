@@ -59,7 +59,7 @@ SelectContentDialog.deepLinkingListener = event => {
     event.data &&
     event.data.messageType === 'LtiDeepLinkingResponse'
   ) {
-    if (event.data.content_items.length > 1 && ENV.process_multiple_content_items_modules_index) {
+    if (event.data.content_items.length > 1) {
       processMultipleContentItems(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
@@ -84,7 +84,7 @@ SelectContentDialog.deepLinkingListener = event => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.dialog('close')
         })
-    } else {
+    } else if (event.data.content_items.length === 1) {
       processSingleContentItem(event)
         .then(result => {
           const $dialog = $('#resource_selection_dialog')
@@ -108,6 +108,15 @@ SelectContentDialog.deepLinkingListener = event => {
           const $dialog = $('#resource_selection_dialog')
           $dialog.dialog('close')
         })
+    } else if (event.data.content_items.length === 0) {
+      const $selectContextContentDialog = $('#select_context_content_dialog')
+      const $resourceSelectionDialog = $('#resource_selection_dialog')
+
+      $resourceSelectionDialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
+      $(window).off('beforeunload', SelectContentDialog.beforeUnloadHandler)
+
+      $resourceSelectionDialog.dialog('close')
+      $selectContextContentDialog.dialog('close')
     }
   }
 }
@@ -138,8 +147,10 @@ SelectContentDialog.handleContentItemResult = function(result, tool) {
   if (ENV.DEFAULT_ASSIGNMENT_TOOL_NAME && ENV.DEFAULT_ASSIGNMENT_TOOL_URL) {
     setDefaultToolValues(result, tool)
   }
+
   $('#external_tool_create_url').val(result.url)
   $('#external_tool_create_title').val(result.title || tool.name)
+  $('#external_tool_create_custom_params').val(JSON.stringify(result.custom))
   $('#context_external_tools_select .domain_message').hide()
 }
 
@@ -156,18 +167,23 @@ SelectContentDialog.Events = {
     e.preventDefault()
     const $tool = existingTool || $(this)
     const toolName = $tool.find('a').text()
+
+    SelectContentDialog.resetExternalToolFields()
+
     if ($tool.hasClass('selected') && !$tool.hasClass('resource_selection')) {
       $tool.removeClass('selected')
-      $('#external_tool_create_url').val('')
+
       $.screenReaderFlashMessage(I18n.t('Unselected external tool %{tool}', {tool: toolName}))
       return
     }
+
     $.screenReaderFlashMessage(I18n.t('Selected external tool %{tool}', {tool: toolName}))
     $tool
       .parents('.tools')
       .find('.tool.selected')
       .removeClass('selected')
     $tool.addClass('selected')
+
     if ($tool.hasClass('resource_selection')) {
       const tool = $tool.data('tool')
       const frameHeight = Math.max(Math.min($(window).height() - 100, 550), 100)
@@ -288,14 +304,9 @@ SelectContentDialog.Events = {
             if (item['@type'] === 'LtiLinkItem' && item.url) {
               SelectContentDialog.handleContentItemResult(item, tool)
             } else {
-              alert(
-                I18n.t(
-                  'invalid_lti_resource_selection',
-                  'There was a problem retrieving a valid link from the external tool'
-                )
-              )
-              $('#external_tool_create_url').val('')
-              $('#external_tool_create_title').val('')
+              alert(SelectContent.errorForUrlItem(item))
+
+              SelectContentDialog.resetExternalToolFields()
             }
             $('#resource_selection_dialog iframe').attr('src', 'about:blank')
             $dialog.off('dialogbeforeclose', SelectContentDialog.dialogCancelHandler)
@@ -334,6 +345,36 @@ SelectContentDialog.Events = {
       $('#external_tool_create_title').val(placement.title)
     }
   }
+}
+
+SelectContentDialog.extractContextExternalToolItemData = function() {
+  const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
+  let tool_type = 'context_external_tool'
+  let tool_id = 0
+
+  if (tool) {
+    if (tool.definition_type == 'Lti::MessageHandler') {
+      tool_type = 'lti/message_handler'
+    }
+
+    tool_id = tool.definition_id
+  }
+
+  return {
+    'item[type]': tool_type,
+    'item[id]': tool_id,
+    'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
+    'item[indent]': $('#content_tag_indent').val(),
+    'item[url]': $('#external_tool_create_url').val(),
+    'item[title]': $('#external_tool_create_title').val(),
+    'item[custom_params]': $('#external_tool_create_custom_params').val()
+  }
+}
+
+SelectContentDialog.resetExternalToolFields = function() {
+  $('#external_tool_create_url').val('')
+  $('#external_tool_create_title').val('')
+  $('#external_tool_create_custom_params').val('')
 }
 
 $(document).ready(function() {
@@ -448,6 +489,7 @@ $(document).ready(function() {
     }
 
     const item_type = $('#add_module_item_select').val()
+
     if (item_type == 'external_url') {
       var item_data = {
         'item[type]': $('#add_module_item_select').val(),
@@ -457,6 +499,7 @@ $(document).ready(function() {
         'item[new_tab]': $('#external_url_create_new_tab').attr('checked') ? '1' : '0',
         'item[indent]': $('#content_tag_indent').val()
       }
+
       item_data['item[url]'] = $('#content_tag_create_url').val()
       item_data['item[title]'] = $('#content_tag_create_title').val()
 
@@ -468,24 +511,10 @@ $(document).ready(function() {
         submit(item_data)
       }
     } else if (item_type == 'context_external_tool') {
-      const tool = $('#context_external_tools_select .tools .tool.selected').data('tool')
-      let tool_type = 'context_external_tool'
-      let tool_id = 0
-      if (tool) {
-        if (tool.definition_type == 'Lti::MessageHandler') {
-          tool_type = 'lti/message_handler'
-        }
-        tool_id = tool.definition_id
-      }
-      var item_data = {
-        'item[type]': tool_type,
-        'item[id]': tool_id,
-        'item[new_tab]': $('#external_tool_create_new_tab').attr('checked') ? '1' : '0',
-        'item[indent]': $('#content_tag_indent').val()
-      }
-      item_data['item[url]'] = $('#external_tool_create_url').val()
-      item_data['item[title]'] = $('#external_tool_create_title').val()
+      var item_data = SelectContentDialog.extractContextExternalToolItemData()
+
       $dialog.find('.alert-error').remove()
+
       if (item_data['item[url]'] === '') {
         const $errorBox = $('<div />', {class: 'alert alert-error', role: 'alert'}).css({
           marginTop: 8
@@ -515,22 +544,40 @@ $(document).ready(function() {
       )
       $options.each(function() {
         const $option = $(this)
+        let item_id = $option.val()
+        let quiz_type
+        if (item_type === 'quiz' && item_id !== 'new') {
+          ;[quiz_type, item_id] = item_id.split('_')
+        }
+        if (item_type === 'quiz' && item_id === 'new') {
+          quiz_type = $('input[name=quiz_engine_selection]:checked').val()
+        }
+        const quiz_lti = quiz_type === 'assignment'
         const item_data = {
-          'item[type]': item_type,
-          'item[id]': $option.val(),
+          'item[type]': quiz_type || item_type,
+          'item[id]': item_id,
           'item[title]': $option.text(),
-          'item[indent]': $('#content_tag_indent').val()
+          'item[indent]': $('#content_tag_indent').val(),
+          quiz_lti
         }
         if (item_data['item[id]'] == 'new') {
           if (!ENV?.FEATURES?.module_dnd) {
             $('#select_context_content_dialog').loadingImage()
           }
-          let url = $(
+          const $urls = $(
             '#select_context_content_dialog .module_item_option:visible:first .new .add_item_url'
-          ).attr('href')
+          )
+          let url = quiz_lti ? $urls.last().attr('href') : $urls.attr('href')
           let data = $(
             '#select_context_content_dialog .module_item_option:visible:first'
           ).getFormData()
+          if (quiz_lti) {
+            data = {
+              'assignment[title]': data['quiz[title]'],
+              'assignment[assignment_group_id]': data['quiz[assignment_group_id]'],
+              quiz_lti: 1
+            }
+          }
           const process_upload = function(data, done = true) {
             let obj
 
@@ -561,8 +608,9 @@ $(document).ready(function() {
               item_data['item[title]'] = item_data['item[title]'] || obj.display_name
             }
             const $option = $(document.createElement('option'))
-            $option.val(obj.id).text(item_data['item[title]'])
-            $('#' + item_data['item[type]'] + 's_select')
+            const obj_id = item_type === 'quiz' ? `${quiz_type || 'quiz'}_${obj.id}` : obj.id
+            $option.val(obj_id).text(item_data['item[title]'])
+            $('#' + item_type + 's_select')
               .find('.module_item_select option:last')
               .after($option)
             submit(item_data, done)
@@ -571,6 +619,7 @@ $(document).ready(function() {
           if (item_data['item[type]'] == 'assignment') {
             data['assignment[post_to_sis]'] = ENV.DEFAULT_POST_TO_SIS
           }
+
           if (item_data['item[type]'] == 'attachment') {
             if (!ENV?.FEATURES?.module_dnd) {
               const file = $('#module_attachment_uploaded_data')[0].files[0]
@@ -770,7 +819,9 @@ $(document).ready(function() {
           }
         }
       } else {
-        enable_disable_submit_button(currentSelectItem.selectedIndex > -1)
+        enable_disable_submit_button(
+          $(currentSelectItem).is(':hidden') || currentSelectItem.selectedIndex > -1
+        )
       }
     } else if (currentSelectItem && currentSelectItem.selectedIndex > -1) {
       $('.add_item_button')

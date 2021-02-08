@@ -99,28 +99,32 @@ class PeopleSearch extends React.Component {
   // rendering ------------------------------------
   render() {
     let exampleText = ''
-    let labelText = ''
+    let description = ''
+    let inputLabel = ''
     const message = this.getHint()
 
     switch (this.props.searchType) {
       case 'sis_user_id':
         exampleText = 'student_2708, student_3693'
-        labelText = I18n.t(
+        description = I18n.t(
           'Enter the SIS IDs of the users you would like to add, separated by commas or line breaks'
         )
+        inputLabel = I18n.t('SIS IDs (required)')
         break
       case 'unique_id':
         exampleText = 'lsmith, mfoster'
-        labelText = I18n.t(
+        description = I18n.t(
           'Enter the login IDs of the users you would like to add, separated by commas or line breaks'
         )
+        inputLabel = I18n.t('Login IDs (required)')
         break
       case 'cc_path':
       default:
         exampleText = 'lsmith@myschool.edu, mfoster@myschool.edu'
-        labelText = I18n.t(
+        description = I18n.t(
           'Enter the email addresses of the users you would like to add, separated by commas or line breaks'
         )
+        inputLabel = I18n.t('Email Addresses (required)')
     }
 
     return (
@@ -154,15 +158,18 @@ class PeopleSearch extends React.Component {
           ) : null}
         </RadioInputGroup>
         <fieldset>
-          <div style={{marginBottom: '.5em'}}>
-            {I18n.t('Example:')} {exampleText}
-          </div>
           <TextArea
-            label={<ScreenReaderContent>{labelText}</ScreenReaderContent>}
+            label={
+              <>
+                {inputLabel}
+                <ScreenReaderContent>{description}</ScreenReaderContent>
+              </>
+            }
             autoGrow={false}
             resize="vertical"
             height="9em"
             value={this.props.nameList}
+            placeholder={exampleText}
             textareaRef={ta => {
               this.namelistta = ta
             }}

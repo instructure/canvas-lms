@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -55,6 +57,10 @@ class CourseSection < ActiveRecord::Base
   include StickySisFields
   are_sis_sticky :course_id, :name, :start_at, :end_at, :restrict_enrollments_to_section_dates
 
+  def account
+    course.account
+  end
+
   def validate_section_dates
     if start_at.present? && end_at.present? && end_at < start_at
       self.errors.add(:end_at, t("End date cannot be before start date"))
@@ -69,7 +75,7 @@ class CourseSection < ActiveRecord::Base
   end
 
   def delete_enrollments_later_if_deleted
-    send_later_if_production(:delete_enrollments_if_deleted) if workflow_state == 'deleted' && saved_change_to_workflow_state?
+    delay_if_production.delete_enrollments_if_deleted if workflow_state == 'deleted' && saved_change_to_workflow_state?
   end
 
   def delete_enrollments_if_deleted
@@ -140,8 +146,20 @@ class CourseSection < ActiveRecord::Base
   end
 
   set_policy do
-    given { |user, session| self.course.grants_right?(user, session, :manage_sections) }
-    can :read and can :create and can :update and can :delete
+    given do |user, session|
+      self.course.grants_right?(user, session, :manage_sections_add)
+    end
+    can :read and can :create
+
+    given do |user, session|
+      self.course.grants_right?(user, session, :manage_sections_edit)
+    end
+    can :read and can :update
+
+    given do |user, session|
+      self.course.grants_right?(user, session, :manage_sections_delete)
+    end
+    can :read and can :delete
 
     given { |user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users) }
     can :read
@@ -169,9 +187,8 @@ class CourseSection < ActiveRecord::Base
 
   def update_account_associations_if_changed
     if (self.saved_change_to_course_id? || self.saved_change_to_nonxlist_course_id?) && !Course.skip_updating_account_associations?
-      Course.send_later_if_production_enqueue_args(:update_account_associations,
-                                      {:n_strand => ["update_account_associations", self.root_account_id]},
-                                      [self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
+      Course.delay_if_production(n_strand: ["update_account_associations", self.root_account_id]).
+        update_account_associations([self.course_id, self.course_id_before_last_save, self.nonxlist_course_id, self.nonxlist_course_id_before_last_save].compact.uniq)
     end
   end
 
@@ -249,7 +266,7 @@ class CourseSection < ActiveRecord::Base
     self.save!
     if enrollment_ids.any?
       self.all_enrollments.update_all all_attrs
-      Enrollment.send_later_if_production(:batch_add_to_favorites, enrollment_ids)
+      Enrollment.delay_if_production.batch_add_to_favorites(enrollment_ids)
     end
 
     Assignment.suspend_due_date_caching do
@@ -257,11 +274,11 @@ class CourseSection < ActiveRecord::Base
     end
 
     User.clear_cache_keys(user_ids, :enrollments)
-    EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
-      {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self, invalidate_access: true)
-    User.send_later_if_production(:update_account_associations, user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
+    EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id]).
+      invalidate_states_for_course_or_section(self, invalidate_access: true)
+    User.delay_if_production.update_account_associations(user_ids) if old_course.account_id != course.account_id && !User.skip_updating_account_associations?
     if old_course.id != self.course_id && old_course.id != self.nonxlist_course_id
-      old_course.send_later_if_production(:update_account_associations) unless Course.skip_updating_account_associations?
+      old_course.delay_if_production.update_account_associations unless Course.skip_updating_account_associations?
     end
 
     run_immediately = opts.include?(:run_jobs_immediately)
@@ -276,7 +293,7 @@ class CourseSection < ActiveRecord::Base
 
     # it's possible that some enrollments were created using an old copy of the course section before the crosslist,
     # so wait a little bit and then make sure they get cleaned up
-    self.send_later_if_production_enqueue_args(:ensure_enrollments_in_correct_section, {:max_attempts => 1, :run_at => 10.seconds.from_now})
+    delay_if_production(run_at: 10.seconds.from_now).ensure_enrollments_in_correct_section
   end
 
   def ensure_enrollments_in_correct_section
@@ -338,7 +355,7 @@ class CourseSection < ActiveRecord::Base
     data = SisBatchRollBackData.build_dependent_data(sis_batch: sis_batch, contexts: cs, updated_state: 'deleted', batch_mode_delete: batch_mode)
     CourseSection.where(id: cs.map(&:id)).update_all(workflow_state: 'deleted', updated_at: Time.zone.now)
     Enrollment.where(course_section_id: cs.map(&:id)).active.find_in_batches do |e_batch|
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         new_data = Enrollment::BatchStateUpdater.destroy_batch(e_batch, sis_batch: sis_batch, batch_mode: batch_mode)
         data.push(*new_data)
         SisBatchRollBackData.bulk_insert_roll_back_data(data)
@@ -362,8 +379,8 @@ class CourseSection < ActiveRecord::Base
 
   def update_enrollment_states_if_necessary
     if self.saved_change_to_restrict_enrollments_to_section_dates? || (self.restrict_enrollments_to_section_dates? && (saved_changes.keys & %w{start_at end_at}).any?)
-      EnrollmentState.send_later_if_production_enqueue_args(:invalidate_states_for_course_or_section,
-        {:n_strand => ["invalidate_enrollment_states", self.global_root_account_id]}, self)
+      EnrollmentState.delay_if_production(n_strand: ["invalidate_enrollment_states", self.global_root_account_id]).
+        invalidate_states_for_course_or_section(self)
     end
   end
 end

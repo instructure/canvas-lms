@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -122,6 +124,38 @@ describe "submissions" do
       expect(@submission.submission_type).to eq 'online_upload'
       expect(@submission.attachments.length).to eq 1
       expect(@submission.workflow_state).to eq 'submitted'
+    end
+
+    it "renders the webcam wraper when enable_webcam_submission is enabled", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "renders the webcam wraper when enable_webcam_submission is enabled and allowed_extensions has png", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["png"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(f('.attachment_wrapper')).to be_displayed
+    end
+
+    it "doesn't render the webcam wraper when enable_webcam_submission is enabled and allowed_extensions doens't have png", priority: "1" do
+      @course.root_account.enable_feature!(:enable_webcam_submission)
+      @assignment.submission_types = 'online_upload'
+      @assignment.allowed_extensions = ["pdf"]
+      @assignment.save!
+
+      get "/courses/#{@course.id}/assignments/#{@assignment.id}"
+      f('.submit_assignment_link').click
+      expect(element_exists?('.attachment_wrapper')).to be_falsy
     end
 
     it "should not allow a user to submit a file-submission assignment without attaching a file", priority: "1", test_id: 237023 do
@@ -350,8 +384,7 @@ describe "submissions" do
 
     describe 'uploaded files for submission' do
       def fixture_file_path(file)
-        path = ActionController::TestCase.respond_to?(:fixture_path) ? ActionController::TestCase.send(:fixture_path) : nil
-        return "#{path}#{file}"
+        RSpec.configuration.fixture_path.join(file).to_s
       end
 
       def make_folder_actions_visible

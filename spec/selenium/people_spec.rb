@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -272,6 +274,21 @@ describe "people" do
       wait_for_ajaximations
       expect(@course.groups.count).to eq group_count.to_i
       expect(f('.groups-with-count')).to include_text("Groups (#{group_count})")
+    end
+
+    it "should auto-create groups based on # of students" do
+      enroll_more_students
+      get "/courses/#{@course.id}/groups#new"
+      f("#new_category_name").send_keys("Groups of 2")
+      f("input#num_students").click
+      count_input = f("input[name='create_group_member_count']")
+      count_input.clear
+      count_input.send_keys 2
+      fj("button:contains('Save')").click
+      wait_for_ajax_requests # initiates job request
+      run_jobs
+      wait_for_ajaximations # finishes calculations and repopulates list
+      expect(ff("li.group").size).to eq 3
     end
 
     it "should edit a student group" do
@@ -788,7 +805,6 @@ describe "people" do
 
     context "student tray" do
       before :once do
-        preload_graphql_schema
         @account = Account.default
         @account.enable_feature!(:student_context_cards)
         @student = create_user('student@test.com')

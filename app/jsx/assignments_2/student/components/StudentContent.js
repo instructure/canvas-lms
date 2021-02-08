@@ -23,7 +23,8 @@ import Header from './Header'
 import I18n from 'i18n!assignments_2_student_content'
 import MissingPrereqs from './MissingPrereqs'
 import React, {Suspense, lazy} from 'react'
-import {Spinner} from '@instructure/ui-elements'
+import PropTypes from 'prop-types'
+import {Spinner} from '@instructure/ui-spinner'
 import {Submission} from '../graphqlData/Submission'
 
 const LoggedOutTabs = lazy(() => import('./LoggedOutTabs'))
@@ -33,7 +34,7 @@ function renderContentBaseOnAvailability({assignment, submission}) {
     const prereq = assignment.env.modulePrereq
     return <MissingPrereqs preReqTitle={prereq.title} preReqLink={prereq.link} />
   } else if (submission === null) {
-    // NOTE: handles case where user is not logged in
+    // NOTE: handles case where user is not logged in, or the course hasn't started yet
     return (
       <>
         <AssignmentToggleDetails description={assignment.description} />
@@ -58,14 +59,22 @@ function StudentContent(props) {
   // TODO: Move the button provider up one level
   return (
     <div data-testid="assignments-2-student-view">
-      <Header scrollThreshold={150} assignment={props.assignment} submission={props.submission} />
+      <Header
+        allSubmissions={props.allSubmissions}
+        assignment={props.assignment}
+        onChangeSubmission={props.onChangeSubmission}
+        scrollThreshold={150}
+        submission={props.submission}
+      />
       {renderContentBaseOnAvailability(props)}
     </div>
   )
 }
 
 StudentContent.propTypes = {
+  allSubmissions: PropTypes.arrayOf(Submission.shape),
   assignment: Assignment.shape,
+  onChangeSubmission: PropTypes.func.isRequired,
   submission: Submission.shape
 }
 

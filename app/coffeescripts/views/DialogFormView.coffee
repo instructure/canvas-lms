@@ -22,6 +22,14 @@ import wrapper from 'jst/DialogFormWrapper'
 import 'jqueryui/dialog'
 import '../jquery/fixDialogButtons'
 
+responsiveAwarenessEnabled = !!window.ENV?.FEATURES?.responsive_awareness
+export isSmallTablet = !window.matchMedia('(min-width: 550px)').matches
+export getResponsiveWidth = (tabletWidth, desktopWidth) ->
+  if responsiveAwarenessEnabled && isSmallTablet
+    return tabletWidth
+  else
+    return desktopWidth
+
 ##
 # Creates a form dialog.
 #

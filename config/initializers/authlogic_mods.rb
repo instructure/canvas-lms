@@ -36,15 +36,15 @@ callback_chain.insert(0, cb) if cb
 cb = callback_chain.delete(callback_chain.find { |cb| cb.filter == :persist_by_cookie })
 callback_chain.append(cb) if cb
 
-# be tolerant of using a slave
+# be tolerant of using a secondary
 module IgnoreSlaveErrors
   def save_record(alternate_record = nil)
     begin
       super
     rescue ActiveRecord::StatementInvalid => error
-      # "simulated" slave of a user with read-only access; probably the same error for Slony
+      # "simulated" secondary of a user with read-only access; probably the same error for Slony
       raise if !error.message.match(/PG(?:::)?Error: ERROR: +permission denied for relation/) &&
-          # real slave that's in recovery
+          # real secondary that's in recovery
           !error.message.match(/PG(?:::)?Error: ERROR: +cannot execute UPDATE in a read-only transaction/)
     end
   end

@@ -21,7 +21,7 @@ import createReactClass from 'create-react-class'
 import ReactDOM from 'react-dom'
 import $ from 'jquery'
 import I18n from 'i18n!student_groups'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import UserCollection from 'compiled/collections/UserCollection'
 import ContextGroupCollection from 'compiled/collections/ContextGroupCollection'
 import BackboneState from './mixins/BackboneState'
@@ -159,7 +159,10 @@ const StudentView = createReactClass({
   },
 
   _removeUser(groupModel, userId) {
-    groupModel.set('users', groupModel.get('users').filter(u => u.id !== userId))
+    groupModel.set(
+      'users',
+      groupModel.get('users').filter(u => u.id !== userId)
+    )
     // If user was a leader, unset the leader attribute.
     const leader = groupModel.get('leader')
     if (leader && leader.id === userId) {

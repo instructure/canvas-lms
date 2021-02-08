@@ -21,11 +21,11 @@ import {Badge, Text} from '@instructure/ui-elements'
 import ClosedDiscussionSVG from '../SVG/ClosedDiscussions.svg'
 import {Flex} from '@instructure/ui-layout'
 import FriendlyDatetime from '../../../shared/FriendlyDatetime'
-import {getCurrentAttempt} from './Attempt'
+import {getCurrentAttempt} from './AttemptSelect'
 import GradeDisplay from './GradeDisplay'
 import I18n from 'i18n!assignments_2'
 
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import React, {lazy, Suspense, useState} from 'react'
 import SubmissionManager from './SubmissionManager'
 import {Submission} from '../graphqlData/Submission'
@@ -54,9 +54,11 @@ function currentSubmissionGrade(assignment, submission) {
       <Text weight="bold">
         <GradeDisplay
           displaySize="medium"
+          gradingStatus={submission.gradingStatus}
           gradingType={assignment.gradingType}
           pointsPossible={assignment.pointsPossible}
           receivedGrade={currentGrade}
+          showGradeForExcused
         />
       </Text>
       <Text size="small">

@@ -23,7 +23,8 @@ import {bindActionCreators} from 'redux'
 import select from '../../shared/select'
 
 import {Alert} from '@instructure/ui-alerts'
-import {Heading, Table} from '@instructure/ui-elements'
+import {Heading} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent} from '@instructure/ui-a11y'
 
 import UnsyncedChange from './UnsyncedChange'
@@ -58,28 +59,25 @@ export default class UnsyncedChanges extends Component {
           <Heading level="h3">{heading}</Heading>
         </header>
         <div className="bcs__unsynced-item__table">
-          <Table
-            margin="medium auto"
-            caption={<ScreenReaderContent>{heading}</ScreenReaderContent>}
-          >
-            <thead className="screenreader-only">
-              <tr>
-                <th scope="col">
+          <Table margin="medium auto" caption={heading}>
+            <Table.Head className="screenreader-only">
+              <Table.Row>
+                <Table.ColHeader id="unsynced-changes-item">
                   <ScreenReaderContent>{I18n.t('Changed Item')}</ScreenReaderContent>
-                </th>
-                <th scope="col">
+                </Table.ColHeader>
+                <Table.ColHeader id="unsynced-changes-changetype">
                   <ScreenReaderContent>{I18n.t('Type of Change')}</ScreenReaderContent>
-                </th>
-                <th scope="col">
+                </Table.ColHeader>
+                <Table.ColHeader id="unsynced-changes-itemtype">
                   <ScreenReaderContent>{I18n.t('Type of Item')}</ScreenReaderContent>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+                </Table.ColHeader>
+              </Table.Row>
+            </Table.Head>
+            <Table.Body>
               {this.props.unsyncedChanges.map(change => (
                 <UnsyncedChange key={`${change.asset_type}_${change.asset_id}`} change={change} />
               ))}
-            </tbody>
+            </Table.Body>
           </Table>
         </div>
         <MigrationOptions />

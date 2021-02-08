@@ -18,10 +18,7 @@
 
 @import 'base/environment';
 
-body:not(.responsive_admin_settings) .ic-Layout-wrapper {
-  min-width: 1100px;
-}
-body.responsive_admin_settings .ic-Layout-wrapper {
+.ic-Layout-wrapper {
   @include desktop-only {
     min-width: 1100px;
   }
@@ -45,7 +42,7 @@ body.responsive_admin_settings .ic-Layout-wrapper {
   font-size: 1.2em;
   padding-#{direction(right)}: 20px;
 }
-body.responsive_admin_settings #terms .term td.header {
+#terms .term td.header {
   word-wrap: break-word;
 }
 .term .permissions {
@@ -54,36 +51,28 @@ body.responsive_admin_settings #terms .term td.header {
 #terms {
   border-collapse: collapse;
   width: 100%;
-}
-body.responsive_admin_settings #terms {
   @include mobile-only {
     display: block;
   }
 }
 @include mobile-only {
-  body.responsive_admin_settings #terms > tbody {
+  #terms > tbody {
     display: block;
   }
-  body.responsive_admin_settings #terms > tbody > tr.term > td {
+  #terms > tbody > tr.term > td {
     display: block;
   }
-  body.responsive_admin_settings td.permissions > table > tbody > tr > td:not(.edit_term_buttons) {
+  td.permissions > table > tbody > tr > td:not(.edit_term_buttons) {
     display: block;
   }
-  body.responsive_admin_settings td.permissions > table > tbody > tr > td:first-child {
+  td.permissions > table > tbody > tr > td:first-child {
     display: inline-block;
   }
 }
 #terms td {
   vertical-align: top;
 }
-body:not(.responsive_admin_settings) #terms td.header,
-body:not(.responsive_admin_settings) #terms td.permissions,
-body:not(.responsive_admin_settings) #terms td.links {
-  border-bottom: 1px solid #aaa;
-  padding: 2px 0;
-}
-body.responsive_admin_settings #terms > tbody > tr.term {
+#terms > tbody > tr.term {
   border-bottom: 1px solid #aaa;
   padding: 2px 0;
   @include mobile-only {

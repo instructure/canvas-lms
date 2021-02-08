@@ -16,13 +16,8 @@
 </div>
 
 <div class="group-category-contents {{#if ENV.IS_LARGE_ROSTER}}group-category-contents-condensed{{/if}}">
-  {{#if randomlyAssignStudentsInProgress}}
-    <div class="progress-container">
-      <h5 class="progress-title">{{#t "randomly_assigning_students"}}Randomly Assigning Students{{/t}}</h5>
-      <div class="progressbar ui-progressbar ui-widget ui-widget-content ui-corner-all" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{progress.completion}}">
-          <div class="ui-progressbar-value ui-widget-header ui-corner-left" style="width: {{progress.completion}}%;"></div>
-      </div>
-    </div>
+  {{#if groupCreationInProgress}}
+    <div class="progress-container" id="group-category-progress"></div>
   {{else}}
 
     {{#if ENV.IS_LARGE_ROSTER}}

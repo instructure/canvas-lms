@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -43,6 +45,33 @@ describe "assignments" do
 
     before :each do
       create_session(@pseudonym)
+    end
+
+    describe 'keyboard shortcuts' do
+      context 'when the user has keyboard shortcuts enabled' do
+        before do
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut "SHIFT-?"' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).to be_displayed
+        end
+      end
+
+      context 'when the user has keyboard shortcuts disabled' do
+        before do
+          @teacher.enable_feature!(:disable_keyboard_shortcuts)
+          get "/courses/#{@course.id}/assignments"
+        end
+
+        it 'keyboard shortcut dialog is not accesible when user disables keyboard shortcuts' do
+          driver.action.key_down(:shift).key_down('?').key_up(:shift).key_up('?').perform
+          keyboard_nav = f('#keyboard_navigation')
+          expect(keyboard_nav).not_to be_displayed
+        end
+      end
     end
 
     context "save and publish button" do
@@ -205,6 +234,8 @@ describe "assignments" do
 
     it "only allows an assignment editor to edit points and title if assignment " +
            "if assignment has multiple due dates", priority: "2", test_id: 622376 do
+      skip "DEMO-25 (8/21/20)"
+
       middle_number = '15'
       expected_date = (Time.now - 1.month).strftime("%b #{middle_number}")
       @assignment = @course.assignments.create!(
@@ -220,7 +251,9 @@ describe "assignments" do
       end
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
-      hover_and_click(".edit_assignment")
+      fj("#assignment_#{@assignment.id} a.al-trigger").click
+      wait_for_ajaximations
+      f("#assignment_#{@assignment.id} .edit_assignment").click
       expect(f("#content")).not_to contain_jqcss('.form-dialog .ui-datepicker-trigger:visible')
       # be_disabled
       expect(f('.multiple_due_dates input')).to be_disabled
@@ -427,7 +460,7 @@ describe "assignments" do
 
       it "should not allow deleting a frozen assignment from index page", priority:"2", test_id: 649309 do
         get "/courses/#{@course.id}/assignments"
-        fj("div#assignment_#{@frozen_assign.id} a.al-trigger").click
+        fj("div#assignment_#{@frozen_assign.id} button.al-trigger").click
         wait_for_ajaximations
         expect(f("div#assignment_#{@frozen_assign.id}")).to contain_css("a.delete_assignment.disabled")
       end
@@ -476,6 +509,8 @@ describe "assignments" do
 
       get "/courses/#{@course.id}/assignments"
       wait_for_ajaximations
+      # wait for jQuery UI sortable to be initialized
+      expect(f(".collectionViewItems.ui-sortable")).to be_displayed
       drag_with_js("#assignment_#{as[0].id}", 0, 50)
       wait_for_ajaximations
 
@@ -498,6 +533,8 @@ describe "assignments" do
 
         get "/courses/#{@course.id}/assignments"
         wait_for_ajaximations
+        # wait for jQuery UI sortable to be initialized
+        expect(f(".collectionViewItems.ui-sortable")).to be_displayed
         drag_with_js("#assignment_#{as[0].id} .draggable-handle", 0, 50)
         wait_for_ajaximations
 
@@ -697,7 +734,7 @@ describe "assignments" do
     it "should not show the moderation page if it is not a moderated assignment ", priority: "2", test_id: 609653 do
       @assignment.update_attribute(:moderated_grading, false)
       get "/courses/#{@course.id}/assignments/#{@assignment.id}/moderate"
-      expect(f('#content h1').text).to eql "Woops... Looks like nothing is here!"
+      expect(f('#content h1').text).to eql "Whoops... Looks like nothing is here!"
     end
   end
 

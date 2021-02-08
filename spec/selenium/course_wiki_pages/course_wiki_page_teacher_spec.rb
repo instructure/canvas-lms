@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # Copyright (C) 2019 - present Instructure, Inc.
 #
 # This file is part of Canvas.
@@ -29,6 +31,23 @@ describe 'course wiki pages' do
       @page = @course.wiki_pages.create!(title: 'han')
     end
 
+    it "should show the bulk delete button" do
+      visit_course_wiki_index_page(@course.id)
+
+      expect(bulk_delete_btn.attribute('disabled')).to eq('true')
+      expect(bulk_delete_btn).to be_displayed
+    end
+
+    it "deletes selected page" do
+      visit_course_wiki_index_page(@course.id)
+
+      select_wiki_page_checkbox.click
+      delete_selected_pages
+
+      confirm_delete_pages
+      expect(@course.wiki_pages.first.workflow_state).to eq('deleted')
+    end
+
     it "should show immersive Reader button whether page is published or unpublished" do
       @course.root_account.enable_feature!(:immersive_reader_wiki_pages)
       visit_wiki_page_view(@course.id, @page.title)
@@ -43,9 +62,7 @@ describe 'course wiki pages' do
     end
 
     context 'With granular permission on' do
-      it_behaves_like "course_pages_granular_permissions" do
-        let(:set_granular_permission) { @course.root_account.enable_feature!(:granular_permissions_wiki_pages) }
-      end
+      it_behaves_like "course_pages_granular_permissions"
     end
   end
 end

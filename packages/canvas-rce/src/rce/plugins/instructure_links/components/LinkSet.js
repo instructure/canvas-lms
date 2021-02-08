@@ -17,12 +17,12 @@
  */
 
 import React, {Component, useRef} from 'react'
-import {bool, func} from 'prop-types'
+import {bool, func, string} from 'prop-types'
 import {linksShape, linkType} from './propTypes'
 import formatMessage from '../../../../format-message'
-import {ScreenReaderContent} from '@instructure/ui-a11y'
-import {List} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {ScreenReaderContent} from '@instructure/ui-a11y-content'
+import {List} from '@instructure/ui-list'
+import {View} from '@instructure/ui-view'
 import uid from '@instructure/uid'
 
 import {
@@ -37,7 +37,7 @@ import Link from './Link'
  * This is needed only as long as `LinkSet` is a class component.
  */
 function IncrementalLoader(props) {
-  const {children, collection, fetchInitialPage, fetchNextPage} = props
+  const {children, collection, fetchInitialPage, fetchNextPage, contextType, searchString} = props
   const {hasMore, isLoading, links} = collection
   const lastItemRef = useRef(null)
 
@@ -45,8 +45,9 @@ function IncrementalLoader(props) {
     hasMore: hasMore && fetchNextPage != null,
     isLoading,
     lastItemRef,
-    contextType: 'course',
+    contextType,
     sortBy: {sort: 'alphabetical', order: 'asc'}, // not actually used in the query, but a required param
+    searchString,
 
     onLoadInitial() {
       if (fetchInitialPage) {
@@ -163,9 +164,11 @@ LinkSet.propTypes = {
   type: linkType.isRequired,
   collection: linksShape.isRequired,
   onLinkClick: func.isRequired,
+  contextType: string.isRequired,
   fetchInitialPage: func,
   fetchNextPage: func,
-  suppressRenderEmpty: bool
+  suppressRenderEmpty: bool,
+  searchString: string
 }
 
 export default LinkSet

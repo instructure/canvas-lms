@@ -40,11 +40,11 @@ export function failDocs({error, contextType}) {
 // dispatches the start of the load, requests a page for the collection from
 // the source, then dispatches the loaded page to the store on success or
 // clears the load on failure
-export function fetchDocs(sortBy) {
+export function fetchDocs() {
   return (dispatch, getState) => {
     const state = getState()
     return state.source
-      .fetchDocs({...state, ...sortBy})
+      .fetchDocs(state)
       .then(response =>
         dispatch(
           receiveDocs({response, contextType: state.contextType, contextId: state.contextId})
@@ -56,24 +56,24 @@ export function fetchDocs(sortBy) {
 
 // fetches a page only if a page is not already being loaded and the
 // collection is not yet completely loaded
-export function fetchNextDocs(sortBy) {
+export function fetchNextDocs() {
   return (dispatch, getState) => {
     const state = getState()
     const documents = state.documents[state.contextType]
 
     if (!documents?.isLoading && documents?.hasMore) {
       dispatch(requestDocs(state.contextType))
-      return dispatch(fetchDocs(sortBy))
+      return dispatch(fetchDocs())
     }
   }
 }
 
 // fetches the first page
-export function fetchInitialDocs(sortBy) {
+export function fetchInitialDocs() {
   return (dispatch, getState) => {
     const state = getState()
 
     dispatch(requestInitialDocs(state.contextType))
-    return dispatch(fetchDocs(sortBy))
+    return dispatch(fetchDocs())
   }
 }

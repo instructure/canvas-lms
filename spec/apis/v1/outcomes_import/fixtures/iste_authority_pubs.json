@@ -1,0 +1,38 @@
+[
+  {
+    "acronym": "ISTE",
+    "title": "NETS for Students",
+    "descr": "NETS for Students",
+    "guid": "99395B3C-C0DA-11DA-8BD7-97BD8BBE078D"
+  },
+  {
+    "acronym": "ISTE",
+    "descr": "ISTE Standards",
+    "title": "ISTE Standards",
+    "guid": "9F5F7F3C-5477-11E6-8A46-AE8E29C466BA"
+  },
+  {
+    "guid": "9426dcae-734c-40d5-abf6-fb748cd8be65",
+    "acronym": "ISTE",
+    "title": "ISTE Standards for Computer Science Educators",
+    "descr": "ISTE Standards for Computer Science Educators"
+  },
+  {
+    "guid": "2bf42eba-de83-49f9-bb7a-88fea5616502",
+    "acronym": "ISTE",
+    "title": "ISTE Standards for Coaches",
+    "descr": "ISTE Standards for Coaches"
+  },
+  {
+    "acronym": "ISTE",
+    "title": "NETS for Administrators",
+    "descr": "NETS for Administrators",
+    "guid": "993F2364-C0DA-11DA-98F4-97E8A2D02702"
+  },
+  {
+    "guid": "993F125C-C0DA-11DA-ACD9-80F47857C4EE",
+    "descr": "NETS for Teachers",
+    "title": "NETS for Teachers",
+    "acronym": "ISTE"
+  }
+]

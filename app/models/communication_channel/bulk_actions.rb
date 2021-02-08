@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -22,12 +24,13 @@ class CommunicationChannel
     # bulk_limit will be used to limit the number of results returned.
     REPORT_LIMIT = 10_000
 
-    attr_reader :account, :after, :before, :pattern, :path_type
+    attr_reader :account, :after, :before, :order, :pattern, :path_type
 
-    def initialize(account:, after: nil, before: nil, pattern: nil, path_type: nil, with_invalid_paths: false)
-      @account, @pattern, @path_type, @with_invalid_paths = account, pattern, path_type, with_invalid_paths
+    def initialize(account:, after: nil, before: nil, order: nil, pattern: nil, path_type: nil, with_invalid_paths: false)
+      @account, @pattern, @path_type, @with_invalid_paths= account, pattern, path_type, with_invalid_paths
       @after = Time.zone.parse(after) if after
       @before = Time.zone.parse(before) if before
+      @order = order&.downcase == 'desc' ? :desc : :asc
     end
 
     def matching_channels(for_report: false)
@@ -45,34 +48,49 @@ class CommunicationChannel
     end
 
     def count
-      Shackles.activate(:slave) do
+      GuardRail.activate(:secondary) do
         matching_channels.count
       end
     end
 
-    def report
-      Shackles.activate(:slave) do
+    def column_headers
+      [
+        I18n.t('User ID'),
+        I18n.t('Name'),
+        I18n.t('Communication channel ID'),
+        I18n.t('Type'),
+        I18n.t('Path')
+      ] + self.class.report_columns.keys
+    end
+
+    def column_data(cc)
+      [
+        cc.user.id,
+        cc.user.name,
+        cc.id,
+        cc.path_type,
+        cc.path_description
+      ] + self.class.report_columns.values.map { |value_generator| value_generator.to_proc.call(cc) }
+    end
+
+    def csv_report
+      GuardRail.activate(:secondary) do
         CSV.generate do |csv|
-          columns = self.class.report_columns
-
-          csv << [
-            I18n.t('User ID'),
-            I18n.t('Name'),
-            I18n.t('Communication channel ID'),
-            I18n.t('Type'),
-            I18n.t('Path')
-          ] + columns.keys
-
+          csv << column_headers
           matching_channels(for_report: true).preload(:user).each do |cc|
-            csv << [
-              cc.user.id,
-              cc.user.name,
-              cc.id,
-              cc.path_type,
-              cc.path_description
-            ] + columns.values.map { |value_generator| value_generator.to_proc.call(cc) }
+            csv << column_data(cc)
           end
         end
+      end
+    end
+
+    def json_report
+      GuardRail.activate(:secondary) do
+        data = [column_headers]
+        matching_channels(for_report: true).preload(:user).each do |cc|
+          data << column_data(cc).map { |col| col&.to_s } # stringify ids but leave nulls alone
+        end
+        data.to_json
       end
     end
 
@@ -89,7 +107,7 @@ class CommunicationChannel
       end
 
       def filter(ccs)
-        ccs = ccs.where('bounce_count > 0').order(:last_bounce_at)
+        ccs = ccs.where('bounce_count > 0').order(last_bounce_at: order)
         ccs = ccs.where('last_bounce_at < ?', before) if before
         ccs = ccs.where('last_bounce_at > ?', after) if after
         ccs
@@ -97,11 +115,11 @@ class CommunicationChannel
 
 
       def perform!
-        send_later(:reset_bounce_counts!)
+        delay.reset_bounce_counts!
         {scheduled_reset_approximate_count: count}
       end
 
-      private def reset_bounce_counts!
+      def reset_bounce_counts!
         matching_channels.to_a.each(&:reset_bounce_count!)
       end
     end
@@ -118,7 +136,7 @@ class CommunicationChannel
       end
 
       def filter(ccs)
-        ccs = ccs.where(workflow_state: 'unconfirmed').order(:created_at)
+        ccs = ccs.where(workflow_state: 'unconfirmed').order(created_at: order)
         ccs = ccs.where('created_at < ?', before) if before
         ccs = ccs.where('created_at > ?', after) if after
         ccs

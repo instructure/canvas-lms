@@ -17,7 +17,7 @@
 %>
 
 <div id="section_pages">
-  <% if @portfolio.user.account&.feature_enabled?(:eportfolio_moderation) && @portfolio.grants_right?(@current_user, :moderate) %>
+  <% if @portfolio.grants_right?(@current_user, :moderate) %>
     <% if @portfolio.spam? %>
       <%= form_for @portfolio, url: eportfolio_path(@portfolio), html: { id: 'mark_eportfolio_safe_form', class: 'ic-Form-group' }  do |f| %>
         <input type="hidden" name="eportfolio[spam_status]" value="marked_as_safe"/>

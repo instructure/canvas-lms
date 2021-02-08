@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -32,6 +34,14 @@ module EventStream::Backend
       active_record_type.connection.active?
     end
 
+    def database_name
+      active_record_type.connection.shard.name
+    end
+
+    def database_fingerprint
+      active_record_type.connection.shard.name
+    end
+
     def fetch(ids, strategy: :batch)
       active_record_type.where(uuid: ids)
     end
@@ -50,9 +60,10 @@ module EventStream::Backend
     end
 
     def index_on_insert(index, record)
-      entry = index.entry_proc.call(record)
-      key = index.key_proc ? index.key_proc.call(*entry) : entry
-      index.strategy_for(:active_record).insert(record, key)
+      if (entry = index.entry_proc.call(record))
+        key = index.key_proc ? index.key_proc.call(*entry) : entry
+        index.strategy_for(:active_record).insert(record, key)
+      end
     end
 
     def find_with_index(index, args)

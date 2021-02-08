@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {act, render, wait, waitForElementToBeRemoved} from '@testing-library/react'
+import {act, render, waitFor, waitForElementToBeRemoved} from '@testing-library/react'
 
 import Bridge from '../../../../bridge/Bridge'
 import * as fakeSource from '../../../../sidebar/sources/fake'
@@ -30,11 +30,13 @@ jest.mock('../../../../canvasFileBrowser/FileBrowser', () => {
 describe('RCE Plugins > CanvasContentTray', () => {
   let component
   let props
+  const editor = {id: 'editor_id'}
 
   function getProps(override = {}) {
     props = {
       bridge: new Bridge(),
-      containingContext: {type: 'course', contextId: '1201', userId: '17'},
+      editor,
+      containingContext: {contextType: 'course', contextId: '1201', userId: '17'},
       contextId: '1201',
       contextType: 'course',
       source: fakeSource,
@@ -44,12 +46,10 @@ describe('RCE Plugins > CanvasContentTray', () => {
     return props
   }
 
-  beforeEach(() => {
-    jest.setTimeout(20000)
-  })
-
   function renderComponent(trayprops) {
-    component = render(<CanvasContentTray {...getProps(trayprops)} />)
+    getProps(trayprops)
+    props.bridge.focusEditor(editor)
+    component = render(<CanvasContentTray {...props} />)
   }
 
   function getTray() {
@@ -62,26 +62,26 @@ describe('RCE Plugins > CanvasContentTray', () => {
 
   async function showTrayForPlugin(plugin) {
     act(() => {
-      props.bridge.controller.showTrayForPlugin(plugin)
+      props.bridge.showTrayForPlugin(plugin, 'editor_id')
     })
-    await wait(getTray, {timeout: 19500})
+    await waitFor(getTray, {timeout: 19500})
   }
 
   function getTrayLabel() {
     return getTray().getAttribute('aria-label')
   }
 
-  describe('Tray Label', () => {
+  describe('Tray Label in course context', () => {
     beforeEach(() => {
       renderComponent()
     })
 
+    // course
     it('is labeled with "Course Links" when using the "links" content type', async () => {
       await showTrayForPlugin('links')
       expect(getTrayLabel()).toEqual('Course Links')
     })
 
-    // course
     it('is labeled with "Course Images" when using the "images" content type', async () => {
       await showTrayForPlugin('course_images')
       expect(getTrayLabel()).toEqual('Course Images')
@@ -114,33 +114,69 @@ describe('RCE Plugins > CanvasContentTray', () => {
     })
   })
 
+  describe('Tray Label in group context', () => {
+    beforeEach(() => {
+      renderComponent({contextType: 'group'})
+    })
+
+    it('is labeled with "Group Links" when using the "links" content type', async () => {
+      await showTrayForPlugin('links')
+      expect(getTrayLabel()).toEqual('Group Links')
+    })
+
+    it('is labeled with "Group Images" when using the "images" content type', async () => {
+      await showTrayForPlugin('group_images')
+      expect(getTrayLabel()).toEqual('Group Images')
+    })
+
+    it('is labeled with "Group Media" when using the "media" content type', async () => {
+      await showTrayForPlugin('group_media')
+      expect(getTrayLabel()).toEqual('Group Media')
+    })
+
+    it('is labeled with "Group Documents" when using the "group_documents" content type', async () => {
+      await showTrayForPlugin('group_documents')
+      expect(getTrayLabel()).toEqual('Group Documents')
+    })
+  })
+
   describe('content panel', () => {
     beforeEach(() => {
       renderComponent()
     })
     it('is the links panel for links content types', async () => {
       await showTrayForPlugin('links')
-      expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+      )
     })
 
     it('is the documents panel for document content types', async () => {
       await showTrayForPlugin('course_documents')
-      expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-DocumentsPanel')).toBeInTheDocument()
+      )
     })
 
     it('is the images panel for image content types', async () => {
       await showTrayForPlugin('course_images')
-      expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-ImagesPanel')).toBeInTheDocument()
+      )
     })
 
     it('is the media panel for media content types', async () => {
       await showTrayForPlugin('course_media')
-      expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-MediaPanel')).toBeInTheDocument()
+      )
     })
 
     it('is the file browser for the all content type', async () => {
       await showTrayForPlugin('all')
-      expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-FilesPanel')).toBeInTheDocument()
+      )
     })
   })
 
@@ -149,20 +185,40 @@ describe('RCE Plugins > CanvasContentTray', () => {
       renderComponent()
     })
 
-    it('is set on tinymce after tray closes', async () => {
+    it('is set on tinymce after tray closes if focus was on the tray', async () => {
       const mockFocus = jest.fn()
       props.bridge.focusActiveEditor = mockFocus
 
       await showTrayForPlugin('links')
-      expect(component.getByTestId('CanvasContentTray')).toBeInTheDocument()
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+      )
 
-      const closeBtn = component.getByText('Close')
+      const closeBtn = component.getByRole('button', {name: 'Close'})
+      closeBtn.focus()
       closeBtn.click()
-      // immediatly after being asked to close, INSTUI Tray removes role='dialog' and
+      // immediately after being asked to close, INSTUI Tray removes role='dialog' and
       // adds aria-hidden='true', so the getTray() function above does not work
       await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
 
       expect(mockFocus).toHaveBeenCalledWith(false)
+    })
+
+    it('is not set on tinymce after tray closes if focus was elsewhere', async () => {
+      const mockFocus = jest.fn()
+      props.bridge.focusActiveEditor = mockFocus
+
+      await showTrayForPlugin('links')
+      await waitFor(() =>
+        expect(component.getByTestId('instructure_links-LinksPanel')).toBeInTheDocument()
+      )
+
+      props.bridge.hideTrays()
+      // immediately after being asked to close, INSTUI Tray removes role='dialog' and
+      // adds aria-hidden='true', so the getTray() function above does not work
+      await waitForElementToBeRemoved(() => component.queryByTestId('CanvasContentTray'))
+
+      expect(mockFocus).not.toHaveBeenCalled()
     })
   })
 })

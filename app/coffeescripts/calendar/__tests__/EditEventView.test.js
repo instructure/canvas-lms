@@ -81,7 +81,7 @@ describe('EditEventView', () => {
       enableConferences()
       render()
       const conferencingNode = within(document.body).getByText('Conferencing:')
-      expect(conferencingNode.closest('tr').className).not.toEqual('hide')
+      expect(conferencingNode.closest('fieldset').className).not.toEqual('hide')
     })
 
     describe('when context does not support conferences', () => {
@@ -91,7 +91,7 @@ describe('EditEventView', () => {
         await waitForRender()
         const conferencingRow = within(document.body)
           .getByText('Conferencing:')
-          .closest('tr')
+          .closest('fieldset')
         expect(conferencingRow.className).toEqual('hide')
       })
 
@@ -100,7 +100,7 @@ describe('EditEventView', () => {
         render({web_conference: {id: 1, conference_type: 'LtiConference', title: 'FooConf'}})
         const conferencingRow = within(document.body)
           .getByText('Conferencing:')
-          .closest('tr')
+          .closest('fieldset')
         await waitForRender()
         expect(conferencingRow.className).not.toEqual('hide')
         expect(getByText(conferencingRow, 'FooConf')).not.toBeNull()

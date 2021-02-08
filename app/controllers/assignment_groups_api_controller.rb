@@ -27,10 +27,11 @@ class AssignmentGroupsApiController < ApplicationController
   #
   # Returns the assignment group with the given id.
   #
-  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"|"submission"]
+  # @argument include[] ["assignments"|"discussion_topic"|"assignment_visibility"|"submission"|"score_statistics"]
   #   Associations to include with the group. "discussion_topic" and "assignment_visibility" and "submission"
-  #   are only valid if "assignments" is also included. The "assignment_visibility" option additionally
-  #   requires that the Differentiated Assignments course feature be turned on.
+  #   are only valid if "assignments" is also included. "score_statistics" is only valid if "submission" and
+  #   "assignments" are also included. The "assignment_visibility" option additionally requires that the Differentiated Assignments
+  #   course feature be turned on.
   #
   # @argument override_assignment_dates [Boolean]
   #   Apply assignment overrides for each assignment, defaults to true.
@@ -46,7 +47,7 @@ class AssignmentGroupsApiController < ApplicationController
       override_dates = value_to_boolean(params[:override_assignment_dates] || true)
       assignments = @assignment_group.visible_assignments(@current_user)
       if params[:grading_period_id].present?
-        assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(assignments)
+        assignments = GradingPeriod.for(@context).find_by(id: params[:grading_period_id]).assignments(@context, assignments)
       end
       if assignments.any? && includes.include?('submission')
         submissions = submissions_hash(['submission'], assignments)
@@ -142,6 +143,7 @@ class AssignmentGroupsApiController < ApplicationController
 
         if params[:move_assignments_to]
           @assignment_group.move_assignments_to params[:move_assignments_to]
+          recompute_student_scores
         end
       end
 
@@ -173,5 +175,11 @@ class AssignmentGroupsApiController < ApplicationController
   def valid_integration_data?(params)
     integration_data = params['integration_data']
     integration_data.is_a?(ActionController::Parameters) || integration_data.nil?
+  end
+
+  def recompute_student_scores
+    @context.recompute_student_scores
+  rescue
+    nil
   end
 end

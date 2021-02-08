@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -39,22 +41,29 @@ class FeatureFlag < ActiveRecord::Base
   end
 
   def enabled?
-    state == 'on'
+    state == Feature::STATE_ON || state == Feature::STATE_DEFAULT_ON
   end
 
-  def allowed?
-    state == 'allowed'
+  def can_override?
+    state == Feature::STATE_DEFAULT_OFF || state == Feature::STATE_DEFAULT_ON
   end
 
   def locked?(query_context)
-    !allowed? && (context_id != query_context.id || context_type != query_context.class.name)
+    !can_override? && (context_id != query_context.id || context_type != query_context.class.name)
   end
 
   def clear_cache
     if self.context
       self.class.connection.after_transaction_commit { self.context.feature_flag_cache.delete(self.context.feature_flag_cache_key(feature)) }
       self.context.touch if Feature.definitions[feature].try(:touch_context)
-      self.context.clear_cache_key(:feature_flags) if self.context.is_a?(Account)
+      if self.context.is_a?(Account)
+        if self.context.site_admin?
+          Switchman::DatabaseServer.send_in_each_region(self.context, :clear_cache_key, {}, :feature_flags)
+        else
+          self.context.clear_cache_key(:feature_flags)
+        end
+      end
+
       if ::Rails.env.development? && self.context.is_a?(Account) && Account.all_special_accounts.include?(self.context)
         Account.clear_special_account_cache!(true)
       end
@@ -64,7 +73,9 @@ class FeatureFlag < ActiveRecord::Base
   private
 
   def valid_state
-    errors.add(:state, "is not valid in context") unless %w(off on).include?(state) || context.is_a?(Account) && state == 'allowed'
+    unless [Feature::STATE_OFF, Feature::STATE_ON].include?(state) || context.is_a?(Account) && [Feature::STATE_DEFAULT_OFF, Feature::STATE_DEFAULT_ON].include?(state)
+      errors.add(:state, "is not valid in context")
+    end
   end
 
   def feature_applies

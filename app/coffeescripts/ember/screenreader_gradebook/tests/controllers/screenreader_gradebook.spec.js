@@ -127,8 +127,12 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       asyncHelper.waitForRequests().then(() => {
         srgb.set('hideStudentNames', true)
         equal(srgb.get('displayName'), 'hiddenName')
+      }))
+
+    test('displayName is sortable_name when hideStudentNames is false', () =>
+      asyncHelper.waitForRequests().then(() => {
         srgb.set('hideStudentNames', false)
-        equal(srgb.get('displayName'), 'name')
+        equal(srgb.get('displayName'), 'sortable_name')
       }))
 
     test('updateSubmission attaches the submission to the student', () =>
@@ -161,7 +165,7 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       asyncHelper.waitForRequests().then(() => {
         Ember.run(() => srgb.set('selectedSection', srgb.get('sections.lastObject')))
         equal(srgb.get('studentsInSelectedSection.length'), 6)
-        equal(srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy')
+        equal(srgb.get('studentsInSelectedSection.firstObject').name, 'Buffy Baker')
       }))
 
     test('sorting assignments by position', () =>
@@ -357,7 +361,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       initializeApp()
       gradingPeriodSet = {
         id: '1501',
-        gradingPeriods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+        gradingPeriods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
         weighted: true
       }
     })
@@ -439,7 +446,10 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
     test('normalizes the grading period set from the env', () => {
       ENV.GRADEBOOK_OPTIONS.grading_period_set = {
         id: '1501',
-        grading_periods: [{id: '701', weight: 50}, {id: '702', weight: 50}],
+        grading_periods: [
+          {id: '701', weight: 50},
+          {id: '702', weight: 50}
+        ],
         weighted: true
       }
       return asyncHelper.waitForRequests().then(() => {
@@ -836,12 +846,12 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      deepEqual(args[3], srgb.getGradingPeriodSet())
+      deepEqual(args[4], srgb.getGradingPeriodSet())
     })
 
     test('scopes effective due dates to the user', () => {
       srgb.calculate(student)
-      const dueDates = CourseGradeCalculator.calculate.lastCall.args[4]
+      const dueDates = CourseGradeCalculator.calculate.lastCall.args[5]
       deepEqual(Object.keys(dueDates), ['1', '2', '6']) // assignment ids
     })
 
@@ -852,8 +862,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      equal(typeof args[3], 'undefined')
       equal(typeof args[4], 'undefined')
+      equal(typeof args[5], 'undefined')
     })
 
     test('calculates grades without grading period data when effective due dates are not defined', () => {
@@ -863,8 +873,8 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
       deepEqual(args[0], srgb.submissionsForStudent(student))
       deepEqual(args[1], srgb.assignmentGroupsHash())
       deepEqual(args[2], srgb.get('weightingScheme'))
-      equal(typeof args[3], 'undefined')
       equal(typeof args[4], 'undefined')
+      equal(typeof args[5], 'undefined')
     })
   })
 
@@ -1097,22 +1107,96 @@ QUnit.module('ScreenReader Gradebook', suiteHooks => {
   QUnit.module('includeUngradedAssignments', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
+
+      window.ENV.GRADEBOOK_OPTIONS = {}
+      window.ENV.GRADEBOOK_OPTIONS.settings = {}
     })
 
-    test('returns true when include_ungraded_assignments is true', () => {
-      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
-      strictEqual(srgb.get('includeUngradedAssignments'), true)
+    QUnit.module('when storing in Gradebook preferences', gbHooks => {
+      gbHooks.beforeEach(() => {
+        window.ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server = true
+      })
+
+      test('returns true when the setting is passed as "true"', () => {
+        window.ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero = 'true'
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false when the setting is passed as "false"', () => {
+        window.ENV.GRADEBOOK_OPTIONS.settings.view_ungraded_as_zero = 'false'
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
+
+      test('falls back to the value in localStorage when no setting value is present', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false if no value exists in localStorage or in settings', () => {
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
+
+      test('returns the last-set value after being set', () => {
+        srgb.set('includeUngradedAssignments', true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
     })
 
-    test('returns false when include_ungraded_assignments is false', () => {
-      userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
-      strictEqual(srgb.get('includeUngradedAssignments'), false)
+    QUnit.module('when storing settings locally', () => {
+      test('returns true when include_ungraded_assignments is true', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(true)
+        strictEqual(srgb.get('includeUngradedAssignments'), true)
+      })
+
+      test('returns false when include_ungraded_assignments is false', () => {
+        userSettings.contextGet.withArgs('include_ungraded_assignments').returns(false)
+        strictEqual(srgb.get('includeUngradedAssignments'), false)
+      })
     })
   })
 
   QUnit.module('updateIncludeUngradedAssignmentsSetting', hooks => {
     hooks.beforeEach(() => {
       initializeApp()
+    })
+
+    QUnit.module('when storing settings in Gradebook preferences', gbHooks => {
+      gbHooks.beforeEach(() => {
+        window.ENV.GRADEBOOK_OPTIONS.save_view_ungraded_as_zero_to_server = true
+
+        const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`
+        ajax.defineFixture(url, {
+          response: [],
+          textStatus: 'success'
+        })
+      })
+
+      test('updateIncludeUngradedAssignmentsSetting uses the Gradebook settings endpoint', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        const url = `/api/v1/courses/${ENV.GRADEBOOK_OPTIONS.context_id}/gradebook_settings`
+        srgb.set('includeUngradedAssignments', false)
+        strictEqual(ajaxRequestSpy.firstCall.args[0].url, url)
+      })
+
+      test('updateIncludeUngradedAssignmentsSetting passes the updated setting state', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        srgb.set('includeUngradedAssignments', false)
+        deepEqual(ajaxRequestSpy.firstCall.args[0].data, {
+          gradebook_settings: {
+            view_ungraded_as_zero: 'false'
+          }
+        })
+      })
+    })
+
+    QUnit.module('when storing settings locally', () => {
+      test('updateIncludeUngradedAssignmentsSetting does not call the Gradebook settings endpoint', () => {
+        const ajaxRequestSpy = sandbox.stub(ajax, 'request')
+        srgb.set('includeUngradedAssignments', false)
+        equal(ajaxRequestSpy.callCount, 0)
+      })
     })
 
     test('changing includeUngradedAssignments calls updateIncludeUngradedAssignmentsSetting', () => {

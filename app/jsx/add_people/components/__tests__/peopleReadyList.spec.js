@@ -17,7 +17,7 @@
  */
 
 import React from 'react'
-import {shallow} from 'enzyme'
+import {shallow, mount} from 'enzyme'
 import PeopleReadyList from '../people_ready_list'
 
 const props = {
@@ -58,7 +58,7 @@ describe('PeopleReadyList', () => {
   })
 
   test('sets the correct values', () => {
-    const wrapper = shallow(<PeopleReadyList {...props} />)
+    const wrapper = mount(<PeopleReadyList {...props} />)
     const peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     const cols = peopleReadyList.find('thead th')
@@ -102,14 +102,14 @@ describe('PeopleReadyList', () => {
   })
 
   test('hides SIS ID column if not permitted', () => {
-    let wrapper = shallow(<PeopleReadyList {...props} canReadSIS />)
+    let wrapper = mount(<PeopleReadyList {...props} canReadSIS />)
     let peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     let cols = peopleReadyList.find('thead th')
     expect(cols.length).toEqual(5) // incluldes SIS ID column
     expect(cols.at(3).text()).toEqual('SIS ID')
 
-    wrapper = shallow(<PeopleReadyList {...props} canReadSIS={false} />)
+    wrapper = mount(<PeopleReadyList {...props} canReadSIS={false} />)
     peopleReadyList = wrapper.find('.addpeople__peoplereadylist')
 
     cols = peopleReadyList.find('thead th')

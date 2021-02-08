@@ -31,13 +31,11 @@ import saveMediaRecording, {saveClosedCaptions} from './saveMediaRecording'
 import translationShape from './translationShape'
 
 const ComputerPanel = React.lazy(() => import('./ComputerPanel'))
-const EmbedPanel = React.lazy(() => import('./EmbedPanel'))
 const MediaRecorder = React.lazy(() => import('./MediaRecorder'))
 
 export const PANELS = {
   COMPUTER: 0,
-  RECORD: 1,
-  EMBED: 2
+  RECORD: 1
 }
 
 export default class UploadMedia extends React.Component {
@@ -53,18 +51,15 @@ export default class UploadMedia extends React.Component {
     contextType: string,
     onStartUpload: func,
     onUploadComplete: func,
-    onEmbed: func,
     onDismiss: func,
     open: bool,
     tabs: shape({
-      embed: bool,
       record: bool,
       upload: bool
     }),
     uploadMediaTranslations: translationShape,
     // for testing
-    computerFile: instanceOf(File),
-    embedCode: string
+    computerFile: instanceOf(File)
   }
 
   constructor(props) {
@@ -75,12 +70,9 @@ export default class UploadMedia extends React.Component {
       defaultSelectedPanel = 0
     } else if (props.tabs.record) {
       defaultSelectedPanel = 1
-    } else if (props.tabs.embed) {
-      defaultSelectedPanel = 2
     }
 
     this.state = {
-      embedCode: props.embedCode || '',
       hasUploadedFile: false,
       selectedPanel: defaultSelectedPanel,
       computerFile: props.computerFile || null,
@@ -98,8 +90,6 @@ export default class UploadMedia extends React.Component {
         return !!this.state.computerFile
       case PANELS.RECORD:
         return !!this.state.recordedFile
-      case PANELS.EMBED:
-        return !!this.state.embedCode
       default:
         return false
     }
@@ -113,11 +103,6 @@ export default class UploadMedia extends React.Component {
       case PANELS.RECORD:
         this.uploadFile(this.state.recordedFile)
         break
-      case PANELS.EMBED: {
-        this.props.onDismiss()
-        this.props.onEmbed(this.state.embedCode)
-        break
-      }
       default:
         throw new Error('Selected Panel is invalid') // Should never get here
     }
@@ -164,8 +149,6 @@ export default class UploadMedia extends React.Component {
     const {
       COMPUTER_PANEL_TITLE,
       DRAG_FILE_TEXT,
-      EMBED_PANEL_TITLE,
-      EMBED_VIDEO_CODE_TEXT,
       LOADING_MEDIA,
       RECORD_PANEL_TITLE,
       MEDIA_RECORD_NOT_AVAILABLE
@@ -220,28 +203,12 @@ export default class UploadMedia extends React.Component {
             </Suspense>
           </Tabs.Panel>
         )}
-        {this.props.tabs.embed && (
-          <Tabs.Panel
-            key="embed"
-            isSelected={this.state.selectedPanel === PANELS.EMBED}
-            renderTitle={() => EMBED_PANEL_TITLE}
-          >
-            <Suspense fallback={LoadingIndicator(LOADING_MEDIA)}>
-              <EmbedPanel
-                label={EMBED_VIDEO_CODE_TEXT}
-                embedCode={this.state.embedCode}
-                setEmbedCode={embedCode => this.setState({embedCode})}
-              />
-            </Suspense>
-          </Tabs.Panel>
-        )}
       </Tabs>
     )
   }
 
   onModalClose = () => {
     this.setState({
-      embedCode: '',
       hasUploadedFile: false,
       selectedPanel: 0,
       computerFile: null

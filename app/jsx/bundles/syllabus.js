@@ -42,9 +42,7 @@ if (ENV.current_user_id) {
   )
 }
 
-if (ENV.STUDENT_PLANNER_ENABLED) {
-  collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
-}
+collections.push(new SyllabusPlannerCollection([ENV.context_asset_string]))
 
 // Perform a fetch on each collection
 //   The fetch continues fetching until no next link is returned
@@ -75,7 +73,7 @@ const deferreds = _.map(collections, collection => {
 // Create the aggregation collection and view
 const acollection = new SyllabusCollection(collections)
 const view = new SyllabusView({
-  el: '#syllabusContainer',
+  el: '#syllabusTableBody',
   collection: acollection,
   can_read: ENV.CAN_READ,
   is_valid_user: !!ENV.current_user_id

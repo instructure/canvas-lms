@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -30,7 +32,7 @@ module SupportHelpers
       end
 
       def broken_objects
-        @broken_objects ||= Shackles.activate(:slave) { load_broken_objects }
+        @broken_objects ||= GuardRail.activate(:secondary) { load_broken_objects }
       end
 
       private

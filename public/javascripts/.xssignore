@@ -17,5 +17,3 @@ vendor
 # vendor package in analytics
 /plugins/analytics/react-bootstrap-table.js
 
-# need better hinting, skipping this atm due to false positives in vendor code
-/client_apps

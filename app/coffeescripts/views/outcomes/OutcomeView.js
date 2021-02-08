@@ -29,6 +29,7 @@ import criterionHeaderTemplate from 'jst/outcomes/_criterionHeader'
 import {showConfirmOutcomeEdit} from 'jsx/outcomes/ConfirmOutcomeEditModal'
 import {addCriterionInfoButton} from 'jsx/outcomes/CriterionInfo'
 import 'jqueryui/dialog'
+import CalculationMethodContent from '../../models/grade_summary/CalculationMethodContent'
 
 // For outcomes in the main content view.
 
@@ -56,7 +57,10 @@ export default class OutcomeView extends OutcomeContentBase {
           }
         },
         mastery_points(data) {
-          if (_.isNaN(data.mastery_points) || data.mastery_points < 0) {
+          if (
+            !ENV.ACCOUNT_LEVEL_MASTERY_SCALES &&
+            (_.isNaN(data.mastery_points) || data.mastery_points < 0)
+          ) {
             return I18n.t('mastery_error', 'Must be greater than or equal to 0')
           }
         }
@@ -85,11 +89,14 @@ export default class OutcomeView extends OutcomeContentBase {
       assessed: this.model.get('assessed'),
       hasUpdateableRubrics: this.model.get('has_updateable_rubrics'),
       modifiedFields: this.getModifiedFields(newData),
-      onConfirm: _confirmEvent => OutcomeView.prototype.__proto__.submit.call(this, event) // super == submit
+      onConfirm: _confirmEvent => super.submit(event)
     })
   }
 
   getModifiedFields(data) {
+    if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+      return {}
+    }
     return {
       masteryPoints:
         data.mastery_points !== numberHelper.parse(this.originalConfirmableValues.mastery_points),
@@ -114,14 +121,19 @@ export default class OutcomeView extends OutcomeContentBase {
   // overriding superclass
   getFormData() {
     const data = super.getFormData()
-    data.mastery_points = numberHelper.parse(data.mastery_points)
-    data.ratings = _.map(data.ratings, rating =>
-      _.extend(rating, {points: numberHelper.parse(rating.points)})
-    )
-    if (['highest', 'latest'].includes(data.calculation_method)) {
-      delete data.calculation_int
+    if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+      delete data.mastery_points
+      delete data.ratings
     } else {
-      data.calculation_int = parseInt(numberHelper.parse(data.calculation_int))
+      data.mastery_points = numberHelper.parse(data.mastery_points)
+      data.ratings = _.map(data.ratings, rating =>
+        _.extend(rating, {points: numberHelper.parse(rating.points)})
+      )
+      if (['highest', 'latest'].includes(data.calculation_method)) {
+        delete data.calculation_int
+      } else {
+        data.calculation_int = parseInt(numberHelper.parse(data.calculation_int), 10)
+      }
     }
     return data
   }
@@ -285,12 +297,15 @@ export default class OutcomeView extends OutcomeContentBase {
           outcomeFormTemplate(
             _.extend(data, {
               calculationMethods: this.model.calculationMethods(),
-              use_rce_enhancements: ENV.use_rce_enhancements
+              use_rce_enhancements: ENV.use_rce_enhancements,
+              hideMasteryScale: ENV.ACCOUNT_LEVEL_MASTERY_SCALES
             })
           )
         )
 
-        addCriterionInfoButton(this.$el.find('#react-info-link')[0])
+        if (!ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+          addCriterionInfoButton(this.$el.find('#react-info-link')[0])
+        }
 
         this.readyForm()
         break
@@ -305,6 +320,21 @@ export default class OutcomeView extends OutcomeContentBase {
         if (!data.mastery_points) {
           data.mastery_points = 0
         }
+
+        if (ENV.ACCOUNT_LEVEL_MASTERY_SCALES) {
+          if (ENV.MASTERY_SCALE?.outcome_proficiency) {
+            data.ratings = ENV.MASTERY_SCALE.outcome_proficiency.ratings
+            data.mastery_points = data.ratings.find(r => r.mastery).points
+            data.points_possible = Math.max(...data.ratings.map(r => r.points))
+          }
+          if (ENV.MASTERY_SCALE?.outcome_calculation_method) {
+            const methodModel = new CalculationMethodContent(
+              ENV.MASTERY_SCALE.outcome_calculation_method
+            )
+            _.extend(data, ENV.MASTERY_SCALE.outcome_calculation_method, methodModel.present())
+          }
+        }
+
         var can_manage = !this.readOnly() && this.model.canManage()
         var can_edit = can_manage && this.model.isNative()
         var can_unlink = can_manage && this.model.outcomeLink.can_unlink
@@ -318,6 +348,8 @@ export default class OutcomeView extends OutcomeContentBase {
               setQuizMastery: this.setQuizMastery,
               useForScoring: this.useForScoring,
               isLargeRoster: ENV.IS_LARGE_ROSTER,
+              hideMasteryScale:
+                ENV.ACCOUNT_LEVEL_MASTERY_SCALES && !this.useForScoring && !this.setQuizMastery,
               assessedInContext:
                 !this.readOnly() &&
                 (this.model.outcomeLink.assessed ||

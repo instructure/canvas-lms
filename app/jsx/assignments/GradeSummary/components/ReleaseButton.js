@@ -21,7 +21,7 @@ import {bool, func, oneOf} from 'prop-types'
 import {Button} from '@instructure/ui-buttons'
 import {IconCheckMarkSolid} from '@instructure/ui-icons'
 import {PresentationContent} from '@instructure/ui-a11y'
-import {Spinner} from '@instructure/ui-elements'
+import {Spinner} from '@instructure/ui-spinner'
 import I18n from 'i18n!assignment_grade_summary'
 
 import {

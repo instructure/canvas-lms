@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -85,12 +87,16 @@ module Api::V1::QuizSubmission
   #   any associations requested.
   def quiz_submissions_json(quiz_submissions, quiz, user, session, context, includes, params)
     hash = {}
+
+    # Always preload submissions since we need to check whether the user can
+    # see each quiz submission's score
+    ActiveRecord::Associations::Preloader.new.preload(quiz_submissions, :submission)
+
     hash[:quiz_submissions] = [ quiz_submissions ].flatten.map do |qs|
       quiz_submission_json(qs, quiz, user, session, context)
     end
 
     if includes.include?('submission')
-      ActiveRecord::Associations::Preloader.new.preload(quiz_submissions, :submission)
       with_submissions = quiz_submissions.select { |qs| !!qs.submission }
 
       hash[:submissions] = with_submissions.map do |qs|
@@ -124,4 +130,3 @@ module Api::V1::QuizSubmission
     submission_zip(quiz, latest_submission)
   end
 end
-

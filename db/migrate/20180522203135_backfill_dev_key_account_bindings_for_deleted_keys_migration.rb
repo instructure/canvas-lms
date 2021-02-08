@@ -19,11 +19,6 @@ class BackfillDevKeyAccountBindingsForDeletedKeysMigration < ActiveRecord::Migra
   tag :postdeploy
 
   def up
-    ::DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys.send_later_if_production_enqueue_args(
-      :run,
-      priority: Delayed::LOW_PRIORITY,
-      max_attempts: 1,
-      n_strand: 'long_datafixups'
-    )
+    ::DataFixup::BackfillDevKeyAccountBindingsForDeletedKeys.delay_if_production(priority: Delayed::LOW_PRIORITY, n_strand: 'long_datafixups').run
   end
 end

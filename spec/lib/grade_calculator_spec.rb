@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -20,7 +22,6 @@ require_relative '../sharding_spec_helper'
 
 describe GradeCalculator do
   before :once do
-    Account.site_admin.enable_feature!(:grade_calculator_performance_improvements)
     course_with_student active_all: true
   end
 
@@ -481,6 +482,38 @@ describe GradeCalculator do
 
             it "does not incorporate unposted submissions when calculating the final grade" do
               expect(computed_score_data[:final][:grade]).to eq 25.0
+            end
+          end
+
+          context "with unposted anonymous assignments" do
+            let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: false) }
+            let(:computed_score_data) { calculator.compute_scores.first }
+
+            before(:each) do
+              @anonymized_assignment = @course.assignments.create!(anonymous_grading: true)
+              @anonymized_assignment.grade_student(@user, grade: "10", grader: @teacher)
+            end
+
+            it "does not incorporate submissions for unposted anonymous assignments" do
+              expect(computed_score_data[:current][:grade]).to eq 75.0
+            end
+
+            it "incorporates submissions for posted anonymous assignments" do
+              @anonymized_assignment.post_submissions
+              expect(computed_score_data[:current][:grade]).to eq 125.0
+            end
+
+            context "when including unposted anonymous assignments in grade calculations" do
+              let(:calculator) { GradeCalculator.new([@user.id], @course.id, ignore_muted: false, ignore_unposted_anonymous: false) }
+
+              it "incorporates submissions for unposted anonymous assignments" do
+                expect(computed_score_data[:current][:grade]).to eq 125.0
+              end
+
+              it "incorporates submissions for posted anonymous assignments" do
+                @anonymized_assignment.post_submissions
+                expect(computed_score_data[:current][:grade]).to eq 125.0
+              end
             end
           end
 
@@ -1894,4 +1927,20 @@ describe GradeCalculator do
     expect(grade_info).to eq({grade: 50, total: 25, possible: 50, dropped: []})
   end
 
+  context "error trapping" do
+    let(:calc) { GradeCalculator.new([@student.id], @course) }
+    context "deadlocks" do
+      it ".save_assignment_group_scores raises Delayed::RetriableError when deadlocked" do
+        allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
+
+        expect { calc.send(:save_assignment_group_scores, nil, nil) }.to raise_error(Delayed::RetriableError)
+      end
+
+      it ".save_course_and_grading_period_scores raises Delayed::RetriableError when deadlocked" do
+        allow(Score.connection).to receive(:execute).and_raise(ActiveRecord::Deadlocked)
+
+        expect { calc.send(:save_course_and_grading_period_scores) }.to raise_error(Delayed::RetriableError)
+      end
+    end
+  end
 end

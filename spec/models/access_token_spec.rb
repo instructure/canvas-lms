@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2012 - present Instructure, Inc.
 #
@@ -154,7 +156,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?).to eq false
+      expect(@at.reload.usable?).to eq false
     end
 
     it "Shouldn't be usable if dev key isn't active, even if we request with a refresh token" do
@@ -164,7 +166,7 @@ describe AccessToken do
       @at.developer_key = dk
       @at.save
 
-      expect(@at.usable?(:crypted_refresh_token)).to eq false
+      expect(@at.reload.usable?(:crypted_refresh_token)).to eq false
     end
   end
 
@@ -491,7 +493,6 @@ describe AccessToken do
   context 'broadcast policy' do
     before(:once) do
       Notification.create!(name: 'Manually Created Access Token Created')
-      Account.site_admin.enable_feature!(:notify_for_manually_created_access_tokens)
       user_model
     end
 
@@ -519,12 +520,6 @@ describe AccessToken do
       access_token = AccessToken.create!(user: @user, developer_key: developer_key)
       expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
     end
-
-    it 'should not send a notification if notify_for_manually_created_access_tokens is disabled' do
-      Account.site_admin.disable_feature!(:notify_for_manually_created_access_tokens)
-      access_token = AccessToken.create!(user: @user)
-      expect(access_token.messages_sent).not_to include('Manually Created Access Token Created')
-    end
   end
 
   describe 'root_account_id' do
@@ -540,7 +535,7 @@ describe AccessToken do
 
     it "inherits root_account value from siteadmin context" do
       at = AccessToken.create!(user: user_model, developer_key: site_admin_key)
-      expect(at.root_account_id).to be_nil
+      expect(at.root_account_id).to eq Account.site_admin.id
     end
 
     it "keeps set value if it already exists" do

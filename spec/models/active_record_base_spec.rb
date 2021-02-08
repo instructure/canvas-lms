@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -342,8 +344,8 @@ describe ActiveRecord::Base do
       arr1 = ['1, 2', 3, 'string with "quotes"', "another 'string'", "a fancy strîng"]
       arr2 = ['4', '5;', nil, "string with \t tab and \n newline and slash \\"]
       DeveloperKey.bulk_insert [
-        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1},
-        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2}
+        {name: "bulk_insert_1", workflow_state: "registered", redirect_uris: arr1, root_account_id: Account.default.id},
+        {name: "bulk_insert_2", workflow_state: "registered", redirect_uris: arr2, root_account_id: Account.default.id}
       ]
       names = DeveloperKey.order(:name).pluck(:redirect_uris)
       expect(names).to be_include(arr1.map(&:to_s))
@@ -483,6 +485,16 @@ describe ActiveRecord::Base do
 
     it "should do an update all with a join" do
       expect(Pseudonym.joins(:user).active.where(:users => {:name => 'a'}).update_all(:unique_id => 'pa3')).to eq 1
+      expect(@p1.reload.unique_id).to eq 'pa3'
+      expect(@p1_2.reload.unique_id).to eq 'pa2'
+      expect(@p2.reload.unique_id).to eq 'pb'
+    end
+
+    it "should do an update all with a join with join conditions spanning multiple lines" do
+      scope = Pseudonym.active.joins("INNER JOIN #{User.quoted_table_name} ON
+        pseudonyms.user_id=users.id AND
+        users.name='a'")
+      expect(scope.update_all(:unique_id => 'pa3')).to eq 1
       expect(@p1.reload.unique_id).to eq 'pa3'
       expect(@p1_2.reload.unique_id).to eq 'pa2'
       expect(@p2.reload.unique_id).to eq 'pb'
@@ -727,4 +739,61 @@ describe ActiveRecord::Base do
       expect(c.discussion_topics.temp_record.course.name).to eq c.name
     end
   end
+end
+
+describe ActiveRecord::ConnectionAdapters::ConnectionPool do
+  # create a private pool, with the same config as the regular pool, but ensure
+  # max_runtime is set
+  let(:spec) { ActiveRecord::ConnectionAdapters::ConnectionSpecification.new(
+    'spec',
+    ActiveRecord::Base.connection_pool.spec.config.merge(max_runtime: 30),
+    'postgresql_connection') }
+  let(:pool) { ActiveRecord::ConnectionAdapters::ConnectionPool.new(spec) }
+
+  it "doesn't evict a normal cycle" do
+    conn1 = pool.connection
+    pool.checkin(conn1)
+    expect(pool).to be_connected
+    conn2 = pool.connection
+    expect(conn2).to eql conn1
+  end
+
+  it "evicts connections on checkout" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    pool.checkin(conn1)
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+    conn2 = pool.connection
+    expect(conn2).not_to eql conn1
+  end
+
+  it "evicts connections on checkin" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    expect(conn1.runtime).to eq 0
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+
+    expect(conn1.runtime).to eq 60
+    pool.checkin(conn1)
+
+    expect(pool).not_to be_connected
+  end
+
+  it "evicts connections if you call flush" do
+    allow(Concurrent).to receive(:monotonic_time).and_return(0)
+
+    conn1 = pool.connection
+    pool.checkin(conn1)
+
+    allow(Concurrent).to receive(:monotonic_time).and_return(60)
+
+    pool.flush
+
+    expect(pool).not_to be_connected
+  end
+
 end

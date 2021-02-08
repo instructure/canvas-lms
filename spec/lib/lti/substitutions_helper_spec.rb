@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -16,8 +18,8 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 
-require File.expand_path(File.dirname(__FILE__) + '/../../spec_helper')
-require File.expand_path(File.dirname(__FILE__) + '/../../sharding_spec_helper')
+require 'spec_helper'
+require 'sharding_spec_helper'
 require_dependency "lti/substitutions_helper"
 
 module Lti
@@ -267,6 +269,12 @@ module Lti
         expect(lis_roles).to include 'Learner'
         expect(lis_roles).to include 'urn:lti:instrole:ims/lis/Administrator'
       end
+
+      it 'returns the correct role for a site admin user' do
+        Account.site_admin.account_users.create!(user: user)
+        lis_roles = subject.current_lis_roles
+        expect(lis_roles).to eq 'urn:lti:sysrole:ims/lis/SysAdmin'
+      end
     end
 
     describe '#concluded_course_enrollments' do
@@ -481,99 +489,157 @@ module Lti
       end
     end
 
-    describe '#recursively_fetch_previous_course_ids_and_context_ids' do
-      before do
-        course.save!
-        @c1 = Course.create!
-        @c1.root_account = root_account
-        @c1.account = account
-        @c1.lti_context_id = 'abc'
-        @c1.save
-
-        course.content_migrations.create!.tap do |cm|
-          cm.context = course
-          cm.workflow_state = 'imported'
-          cm.source_course = @c1
-          cm.save!
+    describe '#recursively_fetch_previous_lti_context_ids' do
+      context 'without any course copies' do
+        before do
+          course.save!
         end
 
-        @c2 = Course.create!
-        @c2.root_account = root_account
-        @c2.account = account
-        @c2.lti_context_id = 'def'
-        @c2.save!
-
-        course.content_migrations.create!.tap do |cm|
-          cm.context = course
-          cm.workflow_state = 'imported'
-          cm.source_course = @c2
-          cm.save!
-        end
-
-        @c3 = Course.create!
-        @c3.root_account = root_account
-        @c3.account = account
-        @c3.lti_context_id = 'ghi'
-        @c3.save!
-
-        @c1.content_migrations.create!.tap do |cm|
-          cm.context = @c1
-          cm.workflow_state = 'imported'
-          cm.source_course = @c3
-          cm.save!
+        it "should return empty (no previous lti context_ids)" do
+          expect(subject.recursively_fetch_previous_lti_context_ids).to be_empty
         end
       end
 
-      it "should return previous lti context_ids" do
-        expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
-      end
+      context 'with course copies' do
+        before do
+          course.save!
+          @c1 = Course.create!
+          @c1.root_account = root_account
+          @c1.account = account
+          @c1.lti_context_id = 'abc'
+          @c1.save
 
-      it "should invalidate cache on last copied migration" do
-        enable_cache do
-          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi}
-          @c4 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'jkl')
-          @c1.content_migrations.create!(:workflow_state => 'imported', :source_course => @c4)
-          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi} # not copied into subject course yet
+          course.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c1
+          )
 
-          @c5 = Course.create!(:root_account => root_account, :account => account, :lti_context_id => 'mno')
-          course.content_migrations.create!(:workflow_state => 'imported', :source_course => @c5) # direct copy
-          expect(subject.recursively_fetch_previous_lti_context_ids.split(",")).to match_array %w{abc def ghi jkl mno}
+          @c2 = Course.create!
+          @c2.root_account = root_account
+          @c2.account = account
+          @c2.lti_context_id = 'def'
+          @c2.save!
+
+          course.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c2
+          )
+
+          @c3 = Course.create!
+          @c3.root_account = root_account
+          @c3.account = account
+          @c3.lti_context_id = 'ghi'
+          @c3.save!
+
+          @c1.content_migrations.create!(
+            workflow_state: 'imported',
+            source_course: @c3
+          )
+        end
+
+        it "should return previous lti context_ids" do
+          expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
+        end
+
+        it "should invalidate cache on last copied migration" do
+          enable_cache do
+            expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc'
+            @c4 = Course.create!(root_account: root_account, account: account, lti_context_id: 'jkl')
+            @c1.content_migrations.create!(workflow_state: 'imported', source_course: @c4)
+            expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'ghi,def,abc' # not copied into subject course yet
+
+            @c5 = Course.create!(root_account: root_account, account: account, lti_context_id: 'mno')
+            course.content_migrations.create!(workflow_state: 'imported', source_course: @c5) # direct copy
+            expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'mno,jkl,ghi,def,abc'
+          end
+        end
+
+        context "when there are multiple content migrations pointing to the same source course" do
+          before do
+            @c3.content_migrations.create!(
+              workflow_state: 'imported',
+              source_course: @c2
+            )
+          end
+
+          it "should not return duplicates but still return in chronological order" do
+            expect(subject.recursively_fetch_previous_lti_context_ids).to eq 'def,ghi,abc'
+          end
+        end
+
+        context "when there are more than (limit=1000) content migration courses in the history" do
+          it 'should truncate after the limit of ids' do
+            4.upto(11) do
+              c = Course.create!
+              c.root_account = root_account
+              c.account = account
+              c.lti_context_id = SecureRandom.hex 3
+              c.save
+
+              course.content_migrations.create!(
+                workflow_state: 'imported',
+                source_course: c
+              )
+            end
+
+            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 10)
+            expect(recursive_course_lti_ids.split(',').length).to eq(11)
+            expect(recursive_course_lti_ids).to include 'truncated'
+          end
+
+          it "courses with nil lti_context_ids shouldn't block 'truncated' from showing properly" do
+            [nil, 'lti_context_id5'].each do |item|
+              c = Course.create!
+              c.root_account = root_account
+              c.account = account
+              c.lti_context_id = item
+              c.save
+
+              course.content_migrations.create!(
+                workflow_state: 'imported',
+                source_course: c
+              )
+            end
+
+            recursive_course_lti_ids = subject.recursively_fetch_previous_lti_context_ids(limit: 3)
+            expect(recursive_course_lti_ids).to eq 'lti_context_id5,ghi,def,truncated'
+          end
         end
       end
-    end
 
-    describe "section substitutions" do
-      before do
-        course.save!
-        @sec1 = course.course_sections.create(:name => 'sec1')
-        @sec1.sis_source_id = 'def'
-        @sec1.save!
-        @sec2 = course.course_sections.create!(:name => 'sec2')
-        @sec2.sis_source_id = 'abc'
-        @sec2.save!
-        # course.reload
+      describe "section substitutions" do
+        before do
+          course.save!
+          @sec1 = course.course_sections.create(:name => 'sec1')
+          @sec1.sis_source_id = 'def'
+          @sec1.save!
+          @sec2 = course.course_sections.create!(:name => 'sec2')
+          @sec2.sis_source_id = 'abc'
+          @sec2.save!
+          # course.reload
 
-        user.save!
-        @e1 = multiple_student_enrollment(user, @sec1, course: course)
-        @e2 = multiple_student_enrollment(user, @sec2, course: course)
-      end
+          user.save!
+          @e1 = multiple_student_enrollment(user, @sec1, course: course)
+          @e2 = multiple_student_enrollment(user, @sec2, course: course)
+        end
 
-      it "should return all canvas section ids" do
-        expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
-      end
+        it "should return all canvas section ids" do
+          expect(subject.section_ids).to eq [@sec1.id, @sec2.id].sort.join(',')
+        end
 
-      it "should return section restricted if all enrollments are restricted" do
-        [@e1, @e2].each{|e| e.update_attribute(:limit_privileges_to_course_section, true)}
-        expect(subject.section_restricted).to eq true
-      end
+        it "should return section restricted if all enrollments are restricted" do
+          [@e1, @e2].each{|e| e.update_attribute(:limit_privileges_to_course_section, true)}
+          expect(subject.section_restricted).to eq true
+        end
 
-      it "should not return section restricted if only one is" do
-        @e1.update_attribute(:limit_privileges_to_course_section, true)
-        expect(subject.section_restricted).to eq false
-      end
+        it "should not return section restricted if only one is" do
+          @e1.update_attribute(:limit_privileges_to_course_section, true)
+          expect(subject.section_restricted).to eq false
+        end
 
-      it "should return all canvas section sis ids" do
-        expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
+        it "should return all canvas section sis ids" do
+          expect(subject.section_sis_ids).to eq [@sec1.sis_source_id, @sec2.sis_source_id].sort.join(',')
+        end
       end
     end
 

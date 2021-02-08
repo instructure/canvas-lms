@@ -51,7 +51,13 @@
         <tr>
           <th scope="row">{{#t "details"}}Details{{/t}}</th>
           <td class="user_content">
-            <div class="event-detail-overflow">{{convertApiUserContent description}}</div>
+              <div class="event-detail-overflow">
+                  {{#if is_appointment_group}}
+                      {{linkify description}}
+                  {{else}}
+                      {{convertApiUserContent description}}
+                  {{/if}}
+              </div>
           </td>
         </tr>
       {{/if}}

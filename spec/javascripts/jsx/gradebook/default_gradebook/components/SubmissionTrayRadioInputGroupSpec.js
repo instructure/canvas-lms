@@ -22,6 +22,7 @@ import SubmissionTrayRadioInputGroup from 'jsx/gradebook/default_gradebook/compo
 
 function mountComponent(customProps) {
   const props = {
+    assignment: {anonymizeStudents: false},
     colors: {
       late: '#FEF7E5',
       missing: '#F99',
@@ -77,6 +78,33 @@ test('renders all SubmissionTrayRadioInputs disabled if disabled is false', func
 
 test('renders with "none" selected if the submission is not late, missing, or excused', function() {
   this.wrapper = mountComponent()
+  const radio = this.getRadioOption('none')
+  strictEqual(radio.checked, true)
+})
+
+test('renders with "none" selected if the submission is excused and the student is anonymous', function() {
+  this.wrapper = mountComponent({
+    assignment: {anonymizeStudents: true},
+    submission: {excused: true, late: false, missing: false, secondsLate: 0}
+  })
+  const radio = this.getRadioOption('none')
+  strictEqual(radio.checked, true)
+})
+
+test('renders with "none" selected if the submission is late and the student is anonymous', function() {
+  this.wrapper = mountComponent({
+    assignment: {anonymizeStudents: true},
+    submission: {excused: false, late: true, missing: false, secondsLate: 0}
+  })
+  const radio = this.getRadioOption('none')
+  strictEqual(radio.checked, true)
+})
+
+test('renders with "none" selected if the submission is missing and the student is anonymous', function() {
+  this.wrapper = mountComponent({
+    assignment: {anonymizeStudents: true},
+    submission: {excused: false, late: false, missing: true, secondsLate: 0}
+  })
   const radio = this.getRadioOption('none')
   strictEqual(radio.checked, true)
 })

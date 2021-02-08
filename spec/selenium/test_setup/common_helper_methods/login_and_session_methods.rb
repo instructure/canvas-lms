@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -125,14 +127,14 @@ module LoginAndSessionMethods
   end
 
   def displayed_username
-    f('[aria-label="Global Navigation"] a[href="/profile"]').click
+    f('#global_nav_profile_link').click
     f('[aria-label="Profile tray"] h2').text
   end
 
 
   def expect_logout_link_present
     logout_element = begin
-      f('[aria-label="Global Navigation"] a[href="/profile"]').click
+      f('#global_nav_profile_link').click
       wait_for_animations
       fj('form[action="/logout"] button:contains("Logout")')
     end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -16,6 +18,21 @@
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
 module Canvas::Redis
+  def self.clear_idle_connections
+    # every 1 minute, clear connections that have been idle at least a minute
+    clear_frequency = Setting.get("clear_idle_connections_frequency", 60).to_i
+    clear_timeout = Setting.get("clear_idle_connections_timeout", 60).to_i
+    @last_clear_time ||= Time.now.utc
+    if (Time.now.utc - @last_clear_time > clear_frequency)
+      @last_clear_time = Time.now.utc
+      # gather all the redises we can find
+      redises = Switchman.config[:cache_map].values.
+        map { |cache| cache.try(:redis) }.compact.uniq.
+        map { |redis| redis.try(:ring)&.nodes || [redis] }.inject([], &:concat).uniq
+      redises.each { |r| r._client.disconnect_if_idle(@last_clear_time - clear_timeout) }
+    end
+  end
+
   # try to grab a lock in Redis, returning false if the lock can't be held. If
   # the lock is grabbed and `ttl` is given, it'll be set to expire after `ttl`
   # seconds.
@@ -24,8 +41,7 @@ module Canvas::Redis
     full_key = lock_key(key)
     if Canvas.redis.setnx(full_key, 1)
       Canvas.redis.expire(full_key, ttl.to_i) if ttl
-      true
-    else
+      true else
       # key is already used
       false
     end
@@ -55,6 +71,10 @@ module Canvas::Redis
   def self.redis_failure?(redis_name)
     return false unless last_redis_failure[redis_name]
     # i feel this dangling rescue is justifiable, given the try-to-be-failsafe nature of this code
+    if redis_name =~ /localhost/
+      # talking to local redis should not short ciruit as long
+      return (Time.now - last_redis_failure[redis_name]) < (Setting.get('redis_local_failure_time', '2').to_i rescue 2)
+    end
     return (Time.now - last_redis_failure[redis_name]) < (Setting.get('redis_failure_time', '300').to_i rescue 300)
   end
 
@@ -68,7 +88,10 @@ module Canvas::Redis
 
   def self.handle_redis_failure(failure_retval, redis_name)
     Setting.skip_cache do
-      return failure_retval if redis_failure?(redis_name)
+      if redis_failure?(redis_name)
+        Rails.logger.warn("  [REDIS] Short circuiting due to recent redis failure (#{redis_name})")
+        return failure_retval
+      end
     end
     reply = yield
     raise reply if reply.is_a?(Exception)
@@ -76,7 +99,8 @@ module Canvas::Redis
   rescue ::Redis::BaseConnectionError, SystemCallError, ::Redis::CommandError => e
     # spring calls its after_fork hooks _after_ establishing a new db connection
     # after forking. so we don't get a chance to close the connection. just ignore
-    # the error
+    # the error (but lets use logging to make sure we know if it happens)
+    Rails.logger.error("  [REDIS] Query failure #{e.inspect} (#{redis_name})")
     return failure_retval if e.is_a?(::Redis::InheritedError) && defined?(Spring)
 
     # We want to rescue errors such as "max number of clients reached", but not
@@ -96,7 +120,7 @@ module Canvas::Redis
 
     Setting.skip_cache do
       if self.ignore_redis_failures?
-        Canvas::Errors.capture(e, type: :redis)
+        Canvas::Errors.capture_exception(:redis, e, :warn)
         last_redis_failure[redis_name] = Time.now
         failure_retval
       else
@@ -120,6 +144,10 @@ module Canvas::Redis
     }
 
   module Client
+    def disconnect_if_idle(since_when)
+      disconnect if !@process_start || @process_start < since_when
+    end
+
     def process(commands, *a, &b)
       # These instance vars are used by the added #log_request_response method.
       @processing_requests = commands.map(&:dup)
@@ -138,7 +166,7 @@ module Canvas::Redis
       last_command_args = Array.wrap(last_command)
       last_command = (last_command.respond_to?(:first) ? last_command.first : last_command).to_s
       failure_val = case last_command
-                    when 'keys', 'hmget'
+                    when 'keys', 'hmget', 'mget'
                       []
                     when 'scan'
                       ["0", []]
@@ -148,7 +176,6 @@ module Canvas::Redis
       if last_command == 'set' && (last_command_args.include?('XX') || last_command_args.include?('NX'))
         failure_val = :failure
       end
-
       Canvas::Redis.handle_redis_failure(failure_val, self.location) do
         super
       end
@@ -184,7 +211,14 @@ module Canvas::Redis
         host: location,
       }
       unless NON_KEY_COMMANDS.include?(command)
-        message[:key] = request.first
+        if command == :mset
+          # This is an array with a single element: an array alternating key/values
+          message[:key] = request.first { |v| v.first }.select.with_index { |_,i| (i) % 2 == 0 }
+        elsif command == :mget
+          message[:key] = request
+        else
+          message[:key] = request.first
+        end
       end
       if defined?(Marginalia)
         message[:controller] = Marginalia::Comment.controller
@@ -226,8 +260,8 @@ module Canvas::Redis
       if UNSUPPORTED_METHODS.include?(command.first.to_s)
         raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is not supported by Twemproxy, and so shouldn't be used in Canvas")
       end
-      if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && Shackles.environment != :deploy
-        raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running Shackles.activate!(:deploy)")
+      if ALLOWED_UNSUPPORTED.include?(command.first.to_s) && GuardRail.environment != :deploy
+        raise(UnsupportedRedisMethod, "Redis method `#{command.first}` is potentially dangerous, and should only be called from console, and only if you fully understand the consequences. If you're sure, retry after running GuardRail.activate!(:deploy)")
       end
       super
     end

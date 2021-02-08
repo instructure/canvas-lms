@@ -34,7 +34,6 @@ import calendarAppTemplate from 'jst/calendar/calendarApp'
 import commonEventFactory from './commonEventFactory'
 import ShowEventDetailsDialog from './ShowEventDetailsDialog'
 import EditEventDetailsDialog from './EditEventDetailsDialog'
-import Scheduler from './Scheduler'
 import CalendarNavigator from '../views/calendar/CalendarNavigator'
 import AgendaView from '../views/calendar/AgendaView'
 import calendarDefaults from './CalendarDefaults'
@@ -44,7 +43,7 @@ import htmlEscape from 'str/htmlEscape'
 import calendarEventFilter from './CalendarEventFilter'
 import schedulerActions from 'jsx/calendar/scheduler/actions'
 import 'fullcalendar'
-import 'fullcalendar/dist/lang-all'
+import 'fullcalendar_locales'
 import 'jsx/calendar/patches-to-fullcalendar'
 import 'jquery.instructure_misc_helpers'
 import 'jquery.instructure_misc_plugins'
@@ -55,6 +54,10 @@ import 'jqueryui/button'
 // <style> node in ie8
 const $styleContainer = $('<div id="calendar_color_style_overrides" />').appendTo('body')
 
+function isSomethingFullscreen(document) {
+  // safari requires webkit prefix
+  return !!document.fullscreenElement || !!document.webkitFullscreenElement
+}
 export default class Calendar {
   constructor(selector, contexts, manageContexts, dataSource, options) {
     this.contexts = contexts
@@ -67,12 +70,14 @@ export default class Calendar {
     this.displayAppointmentEvents = null
     this.activateEvent = this.options && this.options.activateEvent
 
+    this.somethingIsFullscreen = isSomethingFullscreen(document)
+
     this.activeAjax = 0
 
     this.subscribeToEvents()
     this.header = this.options.header
     this.schedulerState = {}
-    this.useBetterScheduler = !!this.options.schedulerStore
+    this.useScheduler = !!this.options.schedulerStore
     if (this.options.schedulerStore) {
       this.schedulerStore = this.options.schedulerStore
       this.schedulerState = this.schedulerStore.getState()
@@ -93,7 +98,6 @@ export default class Calendar {
       dataSource: this.dataSource,
       calendar: this
     })
-    this.scheduler = new Scheduler('.scheduler-wrapper', this)
 
     const fullCalendarParams = this.initializeFullCalendarParams()
 
@@ -155,10 +159,6 @@ export default class Calendar {
 
     this.header.selectView(this.getCurrentView())
 
-    if (data.view_name === 'scheduler' && data.appointment_group_id) {
-      this.scheduler.viewCalendarForGroupId(data.appointment_group_id)
-    }
-
     // enter find-appointment mode via sign-up-for-things notification URL
     if (data.find_appointment && this.schedulerStore) {
       const course = ENV.CALENDAR.CONTEXTS.filter(
@@ -197,7 +197,6 @@ export default class Calendar {
     this.header.on('week', () => this.loadView('week'))
     this.header.on('month', () => this.loadView('month'))
     this.header.on('agenda', () => this.loadView('agenda'))
-    this.header.on('scheduler', () => this.loadView('scheduler'))
     this.header.on('createNewEvent', this.addEventClick)
     this.header.on('refreshCalendar', this.reloadClick)
     this.header.on('done', this.schedulerSingleDoneClick)
@@ -322,12 +321,21 @@ export default class Calendar {
     })
   }
 
-  windowResize = view => {
+  windowResize = _view => {
+    if (
+      (!this.somethingIsFullscreen && isSomethingFullscreen(document)) ||
+      (this.somethingIsFullscreen && !isSomethingFullscreen(document))
+    ) {
+      // something just transitioned into or out of fullscreen.
+      // don't close the event popup
+      this.somethingIsFullscreen = isSomethingFullscreen(document)
+      return
+    }
     this.closeEventPopups()
     this.drawNowLine()
   }
 
-  eventRender = (event, element, view) => {
+  eventRender = (event, element, _view) => {
     const $element = $(element)
 
     const startDate = event.startDate()
@@ -422,25 +430,25 @@ export default class Calendar {
         {
           // fake up the jsEvent
           currentTarget: element,
-          pageX: element.offset().left + parseInt(element.width() / 2)
+          pageX: element.offset().left + parseInt(element.width() / 2, 10)
         },
         view
       )
     }
   }
 
-  eventDragStart = (event, jsEvent, ui, view) => {
+  eventDragStart = (event, _jsEvent, _ui, _view) => {
     $('.fc-highlight-skeleton').remove()
     this.lastEventDragged = event
     this.closeEventPopups()
   }
 
-  eventResizeStart = (event, jsEvent, ui, view) => {
+  eventResizeStart = (_event, _jsEvent, _ui, _view) => {
     this.closeEventPopups()
   }
 
   // event triggered by items being dropped from within the calendar
-  eventDrop = (event, delta, revertFunc, jsEvent, ui, view) => {
+  eventDrop = (event, delta, revertFunc, _jsEvent, _ui, _view) => {
     const minuteDelta = delta.asMinutes()
     return this._eventDrop(event, minuteDelta, event.allDay, revertFunc)
   }
@@ -497,7 +505,7 @@ export default class Calendar {
     return true
   }
 
-  eventResize = (event, delta, revertFunc, jsEvent, ui, view) => {
+  eventResize = (event, delta, revertFunc, _jsEvent, _ui, _view) => {
     return event.saveDates(null, revertFunc)
   }
 
@@ -507,7 +515,7 @@ export default class Calendar {
     return _.filter(this.contexts, c => _.includes(allowedContexts, c.asset_string))
   }
 
-  addEventClick = (event, jsEvent, view) => {
+  addEventClick = (event, _jsEvent, _view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -516,10 +524,10 @@ export default class Calendar {
     // create a new dummy event
     event = commonEventFactory(null, this.activeContexts())
     event.date = this.getCurrentDate()
-    return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
+    return new EditEventDetailsDialog(event, this.useScheduler).show()
   }
 
-  eventClick = (event, jsEvent, view) => {
+  eventClick = (event, jsEvent, _view) => {
     const $event = $(jsEvent.currentTarget)
     if (!$event.hasClass('event_pending')) {
       if (event.can_change_context) {
@@ -531,7 +539,7 @@ export default class Calendar {
     }
   }
 
-  dayClick = (date, jsEvent, view) => {
+  dayClick = (date, _jsEvent, _view) => {
     if (this.displayAppointmentEvents) {
       // Don't allow new event creation while in scheduler mode
       return
@@ -541,7 +549,7 @@ export default class Calendar {
     const event = commonEventFactory(null, this.activeContexts())
     event.date = date
     event.allDay = !date.hasTime()
-    return new EditEventDetailsDialog(event, this.useBetterScheduler).show()
+    return new EditEventDetailsDialog(event, this.useScheduler).show()
   }
 
   updateFragment(opts) {
@@ -560,10 +568,10 @@ export default class Calendar {
     }
     if (changed) {
       const fragment = '#' + $.param(data, this)
-      if (replaceState || location.hash === '') {
-        return history.replaceState(null, '', fragment)
+      if (replaceState || window.location.hash === '') {
+        return window.history.replaceState(null, '', fragment)
       } else {
-        return (location.href = fragment)
+        return (window.location.href = fragment)
       }
     }
   }
@@ -611,13 +619,14 @@ export default class Calendar {
     const now = fcUtil.now()
     const midnight = fcUtil.now()
     midnight.hours(0)
+    midnight.minutes(0)
     midnight.seconds(0)
     const seconds = moment.duration(now.diff(midnight)).asSeconds()
     this.$nowLine.toggle(this.isSameWeek(this.getCurrentDate(), now))
 
     this.$nowLine.css('width', $('.fc-body .fc-widget-content:first').css('width'))
     const secondHeight =
-      (($('.fc-time-grid').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
+      (($('.fc-time-grid .fc-slats').css('height') || '').replace('px', '') || 0) / 24 / 60 / 60
     this.$nowLine.css('top', `${seconds * secondHeight}px`)
   }
 
@@ -644,7 +653,7 @@ export default class Calendar {
   }
 
   // callback from minicalendar telling us an event from here was dragged there
-  dropOnMiniCalendar(date, allDay, jsEvent, ui) {
+  dropOnMiniCalendar(date, _allDay, _jsEvent, _ui) {
     const event = this.lastEventDragged
     if (!event) {
       return
@@ -677,7 +686,7 @@ export default class Calendar {
 
   // DOM callbacks
 
-  fragmentChange = (event, hash) => {
+  fragmentChange = (_event, _hash) => {
     const data = this.dataFromDocumentHash()
     if ($.isEmptyObject(data)) {
       return
@@ -696,9 +705,6 @@ export default class Calendar {
     }
     if (this.activeAjax === 0) {
       this.dataSource.clearCache()
-      if (this.currentView === 'scheduler') {
-        this.scheduler.loadData()
-      }
       return this.calendar.fullCalendar('refetchEvents')
     }
   }
@@ -924,34 +930,31 @@ export default class Calendar {
     this.header.showPrevNext()
     this.header.hideAgendaRecommendation()
 
-    if (view !== 'scheduler') {
-      this.updateFragment({appointment_group_id: null})
-      this.scheduler.viewingGroup = null
-      this.agenda.viewingGroup = null
-    }
+    this.updateFragment({appointment_group_id: null})
+    this.agenda.viewingGroup = null
 
-    if (view !== 'scheduler' && view !== 'agenda') {
+    if (view !== 'agenda') {
       // rerender title so agenda title doesnt stay
       const viewObj = this.calendar.fullCalendar('getView')
       this.viewRender(viewObj)
 
       this.displayAppointmentEvents = null
-      this.scheduler.hide()
       this.header.showAgendaRecommendation()
       this.calendar.show()
       this.schedulerNavigator.hide()
       this.calendar.fullCalendar('refetchEvents')
       this.calendar.fullCalendar('changeView', view === 'week' ? 'agendaWeek' : 'month')
-      return this.calendar.fullCalendar('render')
-    } else if (view === 'scheduler') {
-      this.calendar.hide()
-      this.header.showSchedulerTitle()
-      this.schedulerNavigator.hide()
-      return this.scheduler.show()
+      this.calendar.fullCalendar('render')
+      // HACK: events often start out in the wrong place when the calendar view is initialized to the week view
+      // and they snap into the right place after the window is resized.  so... pretend the window gets resized
+      if (view === 'week') {
+        setTimeout(() => {
+          $(window).trigger('resize')
+        }, 200)
+      }
     } else {
       this.calendar.hide()
-      this.scheduler.hide()
-      return this.header.hidePrevNext()
+      this.header.hidePrevNext()
     }
   }
 
@@ -1004,7 +1007,6 @@ export default class Calendar {
 
   schedulerSingleDoneClick = () => {
     this.agenda.viewingGroup = null
-    this.scheduler.doneClick()
     this.header.showSchedulerTitle()
     return this.schedulerNavigator.hide()
   }
@@ -1052,12 +1054,12 @@ export default class Calendar {
   dataFromDocumentHash = () => {
     let data = {}
     try {
-      const fragment = location.hash.substring(1)
+      const fragment = window.location.hash.substring(1)
       if (fragment.indexOf('=') !== -1) {
-        data = deparam(location.hash.substring(1)) || {}
+        data = deparam(window.location.hash.substring(1)) || {}
       } else {
         // legacy
-        data = $.parseJSON($.decodeFromHex(location.hash.substring(1))) || {}
+        data = $.parseJSON($.decodeFromHex(window.location.hash.substring(1))) || {}
       }
     } catch (e) {
       data = {}

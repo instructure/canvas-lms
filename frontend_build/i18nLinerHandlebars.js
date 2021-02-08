@@ -26,7 +26,7 @@ const {pick} = require('lodash')
 const {EmberHandlebars} = require('ember-template-compiler')
 const ScopedHbsExtractor = require('i18nliner-canvas/js/scoped_hbs_extractor')
 const {allFingerprintsFor} = require('brandable_css/lib/main')
-const PreProcessor = require('i18nliner-handlebars/dist/lib/pre_processor').default
+const PreProcessor = require('@instructure/i18nliner-handlebars/dist/lib/pre_processor').default
 require('i18nliner-canvas/js/scoped_hbs_pre_processor')
 
 // In this main file, we do a bunch of stuff to monkey-patch the default behavior of

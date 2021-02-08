@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -42,7 +44,7 @@ describe AssessmentRequest do
 
   describe 'peer review invitations' do
     before :once do
-      @student.communication_channels.create!(:path => 'test@example.com').confirm!
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       @notification_name = "Peer Review Invitation"
       notification = Notification.create!(:name => @notification_name, :category => 'Invitation')
       NotificationPolicy.create!(:notification => notification, :communication_channel => @student.communication_channel, :frequency => 'immediately')
@@ -80,7 +82,7 @@ describe AssessmentRequest do
     let(:notification)      { Notification.create!(:name => notification_name, :category => 'Invitation') }
 
     it "should send submission reminders" do
-      @student.communication_channels.create!(:path => 'test@example.com').confirm!
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => notification,
         :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
@@ -93,18 +95,19 @@ describe AssessmentRequest do
       @request.send_reminder!
 
       expect(@request.messages_sent.keys).to include(notification_name)
+      expect(@request.messages_sent[notification_name].count).to eq 1
       message = @request.messages_sent[notification_name].first
       expect(message.body).to include(@assignment.title)
     end
 
     it "should send to the correct url if anonymous" do
-      @student.communication_channels.create!(:path => 'test@example.com').confirm!
+      communication_channel(@student, {username: 'test@example.com', active_cc: true})
       NotificationPolicy.create!(:notification => notification,
         :communication_channel => @student.communication_channel, :frequency => 'immediately')
 
       rubric_model
       @association = @rubric.associate_with(@assignment, @course, :purpose => 'grading', :use_for_grading => true)
-      @assignment.update_attributes(:anonymous_peer_reviews => true)
+      @assignment.update(:anonymous_peer_reviews => true)
 
       @request.rubric_association = @association
       @request.save!
@@ -161,6 +164,29 @@ describe AssessmentRequest do
       @request.assessor = @teacher
       @request.save!
       expect(@ignore.reload).to eq @ignore
+    end
+  end
+
+  describe "#active_rubric_association?" do
+    before(:once) do
+      rubric_model
+      @association = @rubric.associate_with(@assignment, @course, purpose: 'grading', use_for_grading: true)
+      @request.rubric_association = @association
+      @request.save!
+    end
+
+    it "returns false if there is no rubric association" do
+      @request.update!(rubric_association: nil)
+      expect(@request).not_to be_active_rubric_association
+    end
+
+    it "returns false if the rubric association is soft-deleted" do
+      @association.destroy
+      expect(@request).not_to be_active_rubric_association
+    end
+
+    it "returns true if the rubric association exists and is active" do
+      expect(@request).to be_active_rubric_association
     end
   end
 end

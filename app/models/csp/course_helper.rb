@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -55,7 +57,9 @@ module Csp::CourseHelper
   def cached_tool_domains
     # invalidate when the course is touched
     Rails.cache.fetch(tool_domain_cache_key) do
-      Csp::Domain.domains_for_tools(self.context_external_tools.active)
+      self.context_external_tools.active.map do |tool|
+        Csp::Domain.domains_for_tool(tool)
+      end.flatten.compact.uniq
     end
   end
 

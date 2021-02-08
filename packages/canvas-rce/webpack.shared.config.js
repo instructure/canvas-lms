@@ -26,6 +26,9 @@ module.exports = {
         use: ['babel-loader'],
         exclude: /node_modules/
       }
+    ],
+    noParse: [
+      /i18nliner\/dist\/lib\/i18nliner/ // i18nLiner has a `require('fs')` that it doesn't actually need, ignore it.
     ]
   },
   plugins: [

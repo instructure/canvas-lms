@@ -181,20 +181,20 @@
                 <span id="assignment_submission_type_selection_launch_button_text"></span>
             </button>
           </div>
-          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolData.stringify}}"/>
+          <input type="hidden" id="assignment_submission_type_external_data" name="external_tool_tag_attributes[external_data]" value="{{externalToolDataStringified}}"/>
           {{!-- this is very specific to Mastery Connect currently.  We could potentially make this a dynamic partial based on the type of external data --}}
           <div>
-            <h3>
+            <h2>
               <span id="mc_external_data_assessment">{{name}}</span>
-            </h3>
+            </h2>
             <div id="mc_external_data_points">{{externalToolData.points}} {{#if externalToolData.points}} {{#t}}Points{{/t}} {{/if}}</div>
             <div id="mc_external_data_objectives">{{externalToolData.objectives}}</div>
             <div> </div>
-            <h4>
+            <h3>
               <span id="mc_external_data_tracker">{{externalToolData.trackerName}}</span>
-            </h4>
+            </h3>
             <div id="mc_external_data_tracker_alignment">{{externalToolData.trackerAlignment}}</div>
-            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{#if externalToolData.studentCount}} {{#t}}Students{{/t}} {{/if}}</div>
+            <div id="mc_external_data_students">{{externalToolData.studentCount}} {{externalToolDataStudentLabelText}}</div>
           </div>
         </div>
       </div>
@@ -216,6 +216,9 @@
             <label class="ic-Label" for="assignment_external_tool_tag_attributes_url">
               {{#t}}Enter or find an External Tool URL{{/t}}
             </label>
+            <input type="hidden" id="assignment_external_tool_tag_attributes_custom_params"
+              name="external_tool_tag_attributes[custom_params]"
+              value="{{externalToolCustomParamsStringified}}" />
             <div class="ic-Input-group">
               <div class="ic-Input-group__add-on" aria-hidden="true">
                 <i class="icon-link"></i>
@@ -245,16 +248,6 @@
                  style="display: none"/>
         </div>
 
-        {{#unless isQuizLTIAssignment}}
-          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
-            {{checkbox "externalToolNewTab"
-              id="assignment_external_tool_tag_attributes_new_tab"
-              name="external_tool_tag_attributes[new_tab]"
-              disabled=submissionTypesFrozen}}
-            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
-          </label>
-        {{/unless}}
-
         {{#if groupCategoryId}}
           <div class="alert assignment-edit-external-tool-alert">
             {{#t "external_tool_group_warning"}}
@@ -264,6 +257,17 @@
           </div>
         {{/if}}
       </div>
+      {{#unless isQuizLTIAssignment}}
+        <div id="external_tool_new_tab_container" style="display: none;">
+          <label for="assignment_external_tool_tag_attributes_new_tab" class="checkbox">
+            {{checkbox "externalToolNewTab"
+                       id="assignment_external_tool_tag_attributes_new_tab"
+                       name="external_tool_tag_attributes[new_tab]"
+                       disabled=submissionTypesFrozen}}
+            {{#t "label.external_tool_new_tab"}}Load This Tool In A New Tab{{/t}}
+          </label>
+        </div>
+      {{/unless}}
     </div>
   </div>
 </fieldset>

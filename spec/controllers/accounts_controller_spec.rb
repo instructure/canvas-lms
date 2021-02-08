@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -470,7 +472,6 @@ describe AccountsController do
     it "should overwrite account users' existing dashboard_view if specified" do
       account_with_admin_logged_in
       @subaccount = @account.sub_accounts.create!
-      @account.enable_feature! :student_planner
       @account.save!
 
       course_with_teacher(:account => @subaccount, :active_all => true)
@@ -661,6 +662,70 @@ describe AccountsController do
       end
     end
 
+    describe "privacy settings" do
+      let(:account) { account_model }
+      let(:sub_account) { account_model(root_account: account) }
+      let(:site_admin) { site_admin_user }
+      let(:payload) {
+        {
+          account: {
+            settings: {
+              enable_fullstory: '0',
+              enable_google_analytics: '0',
+            }
+          }
+        }
+      }
+
+      it 'accepts changes made by a siteadmin to a root account' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: account.id, **payload }
+        }.to change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.from(true).to(false).and change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }.from(true).to(false)
+      end
+
+      it 'ignores changes made to the site_admin account' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: Account.site_admin.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+
+      it 'ignores changes to sub accounts' do
+        user_session(site_admin)
+
+        expect {
+          post 'update', format: 'json', params: { id: sub_account.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+
+      it 'ignores changes from regular admins' do
+        user_session(account_admin_user(account: account))
+
+        expect {
+          post 'update', format: 'json', params: { id: account.id, **payload }
+        }.to not_change {
+          account.reload.settings.fetch(:enable_fullstory, true)
+        }.and not_change {
+          account.reload.settings.fetch(:enable_google_analytics, true)
+        }
+      end
+    end
+
     it "should be set and unset outgoing email name" do
       account_with_admin_logged_in
       post 'update', params: {:id => @account.id, :account => {
@@ -699,7 +764,7 @@ describe AccountsController do
       end
 
       it 'passes on correct value for new feature flags ui' do
-        account.root_account.enable_feature!(:new_features_ui)
+        Account.site_admin.enable_feature!(:new_features_ui)
         get 'settings', params: {account_id: account.id}
         expect(assigns.dig(:js_env, :NEW_FEATURES_UI)).to eq(true)
       end
@@ -856,6 +921,27 @@ describe AccountsController do
 
       expect(response).to be_successful
       expect(response.body).to match(/\"content\":\"custom content\"/)
+    end
+
+    it "should return default self_registration_type" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+
+      remove_user_session
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"self_registration_type\":\"none\"/)
+    end
+
+    it "should return other self_registration_type" do
+      @account.update_terms_of_service(terms_type: "custom", content: "custom content")
+      @account.canvas_authentication_provider.update_attribute(:self_registration, 'observer')
+
+      remove_user_session
+      get 'terms_of_service', params: {account_id: @account.id}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"self_registration_type\":\"observer\"/)
     end
   end
 
@@ -1176,24 +1262,82 @@ describe AccountsController do
       expect(response.body).to match(/\"name\":\"hot dog eating\".+\"name\":\"xylophone\"/)
     end
 
-    it "should be able to search by course name" do
+    it "should filter course search by teacher enrollment state" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
+      user = @c3.shard.activate { user_factory(name: 'rejected') }
       enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
       user.save!
       enrollment.course = @c3
-      enrollment.workflow_state = 'active'
+      enrollment.workflow_state = 'rejected'
       enrollment.save!
-      @c3.reload
 
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
+      user2 = @c3.shard.activate { user_factory(name: 'inactive') }
       enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
       user2.save!
       enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
+      enrollment2.workflow_state = 'inactive'
       enrollment2.save!
-      @c3.reload
+
+      user3 = @c3.shard.activate { user_factory(name: 'completed') }
+      enrollment3 = @c3.enroll_user(user, 'TeacherEnrollment')
+      user3.save!
+      enrollment3.course = @c3
+      enrollment3.workflow_state = 'completed'
+      enrollment3.save!
+
+      user4 = @c3.shard.activate { user_factory(name: 'deleted') }
+      enrollment4 = @c3.enroll_user(user2, 'TeacherEnrollment')
+      user4.save!
+      enrollment4.course = @c3
+      enrollment4.workflow_state = 'deleted'
+      enrollment4.save!
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "xylophone", sis_source_id: 52))
+      @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "hot dog eating", sis_source_id: 63))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "sis_course_id", order: "asc", search_by: "teacher", search_term: "teach"}
+
+      expect(JSON.parse(response.body.sub("while(1)\;", '')).length).to eq 2
+    end
+
+    it "should exclude teachers that don't have an active enrollment workflow state" do
+      user = user_factory(name: 'rejected')
+      enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+      enrollment.update!(workflow_state: 'rejected')
+
+      user2 = user_factory(name: 'inactive')
+      enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+      enrollment2.update!(workflow_state: 'inactive')
+
+      user3 = user_factory(name: 'completed')
+      enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+      enrollment3.update!(workflow_state: 'completed')
+
+      user4 = user_factory(name: 'deleted')
+      enrollment4 = @c1.enroll_user(user4, 'TeacherEnrollment')
+      enrollment4.update!(workflow_state: 'deleted')
+
+      user5 = user_factory(name: 'Teachy McTeacher')
+      enrollment5 = @c1.enroll_user(user5, 'TeacherEnrollment')
+      enrollment5.update!(workflow_state: 'active')
+
+      admin_logged_in(@account)
+
+      get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                  order: 'asc', search_by: 'course',
+                                  include: ['active_teachers']}
+
+      expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+      expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+      expect(response.body).not_to match(/\"display_name\":\"completed\"/)
+      expect(response.body).not_to match(/\"display_name\":\"deleted\"/)
+      expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+    end
+
+    it "should be able to search by course name" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30)
 
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 52))
 
@@ -1211,22 +1355,6 @@ describe AccountsController do
     it "should be able to search by course sis id" do
       @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: 30012)
 
-      user = @c3.shard.activate { user_factory(name: 'Zach Zachary') }
-      enrollment = @c3.enroll_user(user, 'TeacherEnrollment')
-      user.save!
-      enrollment.course = @c3
-      enrollment.workflow_state = 'active'
-      enrollment.save!
-      @c3.reload
-
-      user2 = @c3.shard.activate { user_factory(name: 'Example Another') }
-      enrollment2 = @c3.enroll_user(user2, 'TeacherEnrollment')
-      user2.save!
-      enrollment2.course = @c3
-      enrollment2.workflow_state = 'active'
-      enrollment2.save!
-      @c3.reload
-
       @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
 
       @c5 = course_with_teacher(name: 'Teachy McTeacher', course: course_factory(account: @account, course_name: "cappuccino", sis_source_id: 63))
@@ -1240,6 +1368,82 @@ describe AccountsController do
       expect(response.body).not_to match(/\"name\":\"apple\".+\"name\":\"Apps\".+\"name\":\"bar\".+\"name\":\"cappuccino\".+\"name\":\"foo\"/)
     end
 
+    it "should be able to search by a course sis id that is > than bigint max" do
+      @c3 = course_factory(account: @account, course_name: "apple", sis_source_id: "9223372036854775808")
+
+      @c4 = course_with_teacher(name: 'Teach Teacherson', course: course_factory(account: @account, course_name: "Apps", sis_source_id: 3002))
+
+      admin_logged_in(@account)
+      get 'courses_api', params: {account_id: @account.id, sort: "course_name", order: "asc", search_by: "course", search_term: "9223372036854775808"}
+
+      expect(response).to be_successful
+      expect(response.body).to match(/\"name\":\"apple\"/)
+      expect(response.body).not_to match(/\"name\":\"Apps\"/)
+    end
+
+    context "sharding" do
+      specs_require_sharding
+
+      it "excludes inactive teachers regardless of requestor's active shard" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        @shard1.activate do
+          get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                      order: 'asc', search_by: 'course',
+                                      include: ['active_teachers']}
+        end
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+
+      it "excludes cross-shard teachers without an active enrollment workflow state" do
+        user = user_factory(name: 'rejected')
+        enrollment = @c1.enroll_user(user, 'TeacherEnrollment')
+        enrollment.update!(workflow_state: 'rejected')
+
+        user2 = user_factory(name: 'inactive')
+        enrollment2 = @c1.enroll_user(user2, 'TeacherEnrollment')
+        enrollment2.update!(workflow_state: 'inactive')
+
+        user3 = user_factory(name: 'Teachy McTeacher')
+        enrollment3 = @c1.enroll_user(user3, 'TeacherEnrollment')
+        enrollment3.update!(workflow_state: 'active')
+
+        @shard1.activate { @user4 = user_factory(name: 'Cross Shard') }
+        enrollment4 = @c1.enroll_user(@user4, 'TeacherEnrollment')
+        enrollment4.update!(workflow_state: 'active')
+
+        admin_logged_in(@account)
+
+        get 'courses_api', params: {account_id: @account.id, sort: 'sis_course_id',
+                                    order: 'asc', search_by: 'course',
+                                    include: ['active_teachers']}
+
+        expect(response.body).not_to match(/\"display_name\":\"rejected\"/)
+        expect(response.body).not_to match(/\"display_name\":\"inactive\"/)
+        expect(response.body).to match(/\"display_name\":\"Teachy McTeacher\"/)
+        expect(response.body).to match(/\"display_name\":\"Cross Shard\"/)
+      end
+    end
   end
 
   describe "#eportfolio_moderation" do
@@ -1265,62 +1469,53 @@ describe AccountsController do
       user
     end
 
-    it "redirects the user to the account settings URL if the eportfolio_moderation flag is not enabled" do
+    let(:returned_portfolios) { assigns[:eportfolios] }
+
+    it "returns eportfolios that have been auto-flagged as spam, or manually marked as spam/safe" do
       get "eportfolio_moderation", params: {account_id: @account.id}
-      expect(response).to redirect_to(account_settings_url(@account))
+      expect(returned_portfolios.count).to eq 3
     end
 
-    context "when the eportfolio_moderation flag is enabled" do
-      before(:each) { @account.root_account.enable_feature!(:eportfolio_moderation) }
+    it "ignores portfolios belonging to deleted users" do
+      vanished_eportfolio = Eportfolio.create!(user_id: vanished_author.id, name: "hello", spam_status: "marked_as_spam")
 
-      let(:returned_portfolios) { assigns[:eportfolios] }
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios).not_to include(vanished_eportfolio)
+    end
 
-      it "returns eportfolios that have been auto-flagged as spam, or manually marked as spam/safe" do
-        get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.count).to eq 3
+    it "returns flagged_as_possible_spam results, then marked_as_spam, then marked_as_safe" do
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam", "not spam"]
+    end
+
+    it "excludes results from authors who have no portfolios marked as possible or definitive spam" do
+      safe_user = User.create!
+      safe_user.user_account_associations.create!(account: @account)
+      safe_eportfolio = safe_user.eportfolios.create!(name: ":)")
+      safe_eportfolio.update!(spam_status: "marked_as_safe")
+
+      get "eportfolio_moderation", params: {account_id: @account.id}
+      expect(returned_portfolios.pluck(:id)).not_to include(safe_eportfolio.id)
+    end
+
+    context "pagination" do
+      before(:once) do
+        Setting.set('eportfolio_moderation_results_per_page', 2)
       end
 
-      it "ignores portfolios belonging to deleted users" do
-        vanished_eportfolio = Eportfolio.create!(user_id: vanished_author.id, name: "hello", spam_status: "marked_as_spam")
-
+      it "does not return more than the specified results per page" do
         get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios).not_to include(vanished_eportfolio)
+        expect(returned_portfolios.count).to eq 2
       end
 
-      it "returns flagged_as_possible_spam results, then marked_as_spam, then marked_as_safe" do
+      it "returns the first page of results if no 'page' param is given" do
         get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam", "not spam"]
+        expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam"]
       end
 
-      it "excludes results from authors who have no portfolios marked as possible or definitive spam" do
-        safe_user = User.create!
-        safe_user.user_account_associations.create!(account: @account)
-        safe_eportfolio = safe_user.eportfolios.create!(name: ":)")
-        safe_eportfolio.update!(spam_status: "marked_as_safe")
-
-        get "eportfolio_moderation", params: {account_id: @account.id}
-        expect(returned_portfolios.pluck(:id)).not_to include(safe_eportfolio.id)
-      end
-
-      context "pagination" do
-        before(:once) do
-          Setting.set('eportfolio_moderation_results_per_page', 2)
-        end
-
-        it "does not return more than the specified results per page" do
-          get "eportfolio_moderation", params: {account_id: @account.id}
-          expect(returned_portfolios.count).to eq 2
-        end
-
-        it "returns the first page of results if no 'page' param is given" do
-          get "eportfolio_moderation", params: {account_id: @account.id}
-          expect(returned_portfolios.pluck(:name)).to eq ["maybe spam", "spam"]
-        end
-
-        it "paginates using the 'page' param if supplied" do
-          get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
-          expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
-        end
+      it "paginates using the 'page' param if supplied" do
+        get "eportfolio_moderation", params: {account_id: @account.id, page: 2}
+        expect(returned_portfolios.pluck(:name)).to eq ["not spam"]
       end
     end
   end

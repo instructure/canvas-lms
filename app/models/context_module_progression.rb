@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -54,11 +56,32 @@ class ContextModuleProgression < ActiveRecord::Base
     (self.requirements_met || []).any?{|r| r[:id] == item.id}
   end
 
-  def uncollapse!
-    return unless self.collapsed?
-    self.collapsed = false
-    self.save
+  def collapse!(skip_save: false)
+    update_collapse_state(true, skip_save: skip_save)
   end
+
+  def uncollapse!(skip_save: false)
+    update_collapse_state(false, skip_save: skip_save)
+  end
+
+  def update_collapse_state(collapsed_target_state, skip_save: false)
+    retry_count = 0
+    begin
+      return if self.collapsed == collapsed_target_state
+      self.collapsed = collapsed_target_state
+      self.save unless skip_save
+    rescue ActiveRecord::StaleObjectError => e
+      Canvas::Errors.capture_exception(:context_modules, e, :info)
+      retry_count += 1
+      if retry_count < 5
+        self.reload
+        retry
+      else
+        raise
+      end
+    end
+  end
+  private :update_collapse_state
 
   def uncomplete_requirement(id)
     requirement = requirements_met.find {|r| r[:id] == id}
@@ -244,16 +267,9 @@ class ContextModuleProgression < ActiveRecord::Base
     remove_incomplete_requirement(requirement[:id]) # start from a fresh slate so we don't hold onto a max score that doesn't exist anymore
     return if subs.blank?
 
-    if tag.course.post_policies_enabled?
-      if unposted_sub = subs.detect { |sub| sub.is_a?(Submission) && !sub.posted? }
-        # don't mark the progress as in-progress if they haven't submitted
-        self.update_incomplete_requirement!(requirement, nil) unless unposted_sub.unsubmitted?
-        return
-      end
-    elsif tag.assignment&.muted?
-      if subs.any? { |sub| sub.is_a?(Submission) && !sub.unsubmitted? }
-        self.update_incomplete_requirement!(requirement, nil)
-      end
+    if (unposted_sub = subs.detect { |sub| sub.is_a?(Submission) && !sub.posted? })
+      # don't mark the progress as in-progress if they haven't submitted
+      self.update_incomplete_requirement!(requirement, nil) unless unposted_sub.unsubmitted?
       return
     end
 
@@ -298,7 +314,7 @@ class ContextModuleProgression < ActiveRecord::Base
     begin
       if self.update_requirement_met(*args)
         self.save!
-        self.send_later_if_production(:evaluate!)
+        delay_if_production.evaluate!
       end
     rescue ActiveRecord::StaleObjectError
       # retry up to five times, otherwise return current (stale) data
@@ -319,7 +335,7 @@ class ContextModuleProgression < ActiveRecord::Base
   def mark_as_outdated!
     if self.new_record?
       mark_as_outdated
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         self.save!
       end
     else
@@ -426,7 +442,7 @@ class ContextModuleProgression < ActiveRecord::Base
 
       evaluate_current_position
 
-      Shackles.activate(:master) do
+      GuardRail.activate(:primary) do
         self.save
       end
 
@@ -451,13 +467,13 @@ class ContextModuleProgression < ActiveRecord::Base
     end
 
     # invalidate all, then re-evaluate each
-    Shackles.activate(:master) do
+    GuardRail.activate(:primary) do
       ContextModuleProgression.where(:id => progressions, :current => true).update_all(:current => false)
       User.where(:id => progressions.map(&:user_id)).touch_all
 
       progressions.each do |progression|
-        progression.send_later_if_production_enqueue_args(:evaluate!,
-          {:n_strand => ["dependent_progression_reevaluation", context_module.global_context_id]}, self)
+        progression.delay_if_production(n_strand: ["dependent_progression_reevaluation", context_module.global_context_id]).
+          evaluate!(self)
       end
     end
   end

@@ -18,7 +18,6 @@
 
 # @API Services
 class ServicesApiController < ApplicationController
-  
   # @API Get Kaltura config
   # Return the config information for the Kaltura plugin in json format.
   #
@@ -73,7 +72,8 @@ class ServicesApiController < ApplicationController
   def start_kaltura_session
     @user = @current_user
     if !@current_user
-      render :json => {:errors => {:base => t('must_be_logged_in', "You must be logged in to use Kaltura")}, :logged_in => false}
+      payload = { errors: {base: t('must_be_logged_in', "You must be logged in to use Kaltura")}, logged_in: false}
+      return render json: payload, status: :unauthorized
     end
     client = CanvasKaltura::ClientV3.new
     uid = "#{@user.id}_#{@domain_root_account.id}"

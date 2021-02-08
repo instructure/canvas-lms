@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - present Instructure, Inc.
 #
@@ -96,18 +98,18 @@ describe 'RequestThrottle' do
       Setting.remove("request_throttle.enabled")
     end
 
-    def set_blacklist(val)
-      Setting.set('request_throttle.blacklist', val)
+    def set_blocklist(val)
+      Setting.set('request_throttle.blocklist', val)
       RequestThrottle.reload!
     end
 
     it "should pass on other requests" do
-      allow(throttler).to receive(:whitelisted?).and_return(false)
-      allow(throttler).to receive(:blacklisted?).and_return(false)
+      allow(throttler).to receive(:approved?).and_return(false)
+      allow(throttler).to receive(:blocked?).and_return(false)
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
     end
 
-    it "should have headers even when disabled" do
+    it "should have headers even when disabled including cost tracking" do
       allow(RequestThrottle).to receive(:enabled?).and_return(false)
       allow(throttler).to receive(:calculate_cost).and_return(30)
 
@@ -115,42 +117,46 @@ describe 'RequestThrottle' do
       expected[1]['X-Request-Cost'] = '30'
       # hwm of 600 - cost of the request
       expected[1]['X-Rate-Limit-Remaining'] = '570.0'
-      expect(throttler.call(request_user_1)).to eq expected
+      output = throttler.call(request_user_1)
+      expect(output[1]['X-Request-Cost']).to eq('30')
+      remaining = output[1]['X-Rate-Limit-Remaining'].to_f
+      expect(remaining > 570.0).to be_truthy
+      expect(remaining < 580.0).to be_truthy
     end
 
-    it "should blacklist based on ip" do
-      set_blacklist('ip:1.2.3.4')
+    it "should block based on ip" do
+      set_blocklist('ip:1.2.3.4')
       expect(throttler.call(request_user_1)).to eq rate_limit_exceeded
       expect(strip_variable_headers(throttler.call(request_user_2))).to eq response
-      set_blacklist('ip:1.2.3.4,ip:4.3.2.1')
+      set_blocklist('ip:1.2.3.4,ip:4.3.2.1')
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
-    it "should blacklist based on user id" do
-      set_blacklist('user:2')
+    it "should block based on user id" do
+      set_blocklist('user:2')
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
-    it "still gets blacklisted if throttling disabled" do
+    it "still gets blocked if throttling disabled" do
       Setting.set("request_throttle.enabled", "false")
       expect(RequestThrottle.enabled?).to eq(false)
-      set_blacklist('user:2')
+      set_blocklist('user:2')
       expect(strip_variable_headers(throttler.call(request_user_1))).to eq response
       expect(throttler.call(request_user_2)).to eq rate_limit_exceeded
     end
 
-    it "should blacklist based on access token" do
-      set_blacklist("token:#{AccessToken.hashed_token(token2.full_token)}")
+    it "should block based on access token" do
+      set_blocklist("token:#{AccessToken.hashed_token(token2.full_token)}")
       expect(strip_variable_headers(throttler.call(request_query_token))).to eq response
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
-      set_blacklist("token:#{AccessToken.hashed_token(token1.full_token)},token:#{AccessToken.hashed_token(token2.full_token)}")
+      set_blocklist("token:#{AccessToken.hashed_token(token1.full_token)},token:#{AccessToken.hashed_token(token2.full_token)}")
       expect(throttler.call(request_query_token)).to eq rate_limit_exceeded
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
 
-    it "blacklists users even when using access tokens" do
-      set_blacklist('user:2')
+    it "blocks users even when using access tokens" do
+      set_blocklist('user:2')
       expect(throttler.call(request_header_token)).to eq rate_limit_exceeded
     end
   end
@@ -158,6 +164,11 @@ describe 'RequestThrottle' do
   describe ".list_from_setting" do
     it "should split the string and create a set" do
       Setting.set('list_test', 'a:x,b:y ,  z ')
+      expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
+    end
+
+    it "allows and ignores comments" do
+      Setting.set('list_test', 'a:x;for fun,b:y ; just cause,  z ')
       expect(RequestThrottle.list_from_setting('list_test')).to eq Set.new(%w[z b:y a:x])
     end
   end
@@ -190,11 +201,18 @@ describe 'RequestThrottle' do
         cost = throttle.calculate_cost(40, 2, {'extra-request-cost' => -100})
         expect(cost).to eq(42)
       end
+
+      it "weights the cost by settings" do
+        cpu_cost = Setting.set("request_throttle.cpu_cost_weight", "2.0")
+        db_cost = Setting.set("request_throttle.db_cost_weight", "0.5")
+        cost = throttle.calculate_cost(20, 4, {})
+        expect(cost).to eq(42)
+      end
     end
 
     before do
-      allow(throttler).to receive(:whitelisted?).and_return(false)
-      allow(throttler).to receive(:blacklisted?).and_return(false)
+      allow(throttler).to receive(:approved?).and_return(false)
+      allow(throttler).to receive(:blocked?).and_return(false)
     end
 
     it "should skip without redis enabled" do
@@ -364,6 +382,16 @@ describe 'RequestThrottle' do
           end
         end
 
+        it "does no reserving if status decided" do
+          Timecop.freeze('2012-01-29 12:00:00 UTC') do
+            @bucket.increment(0, 0, @current_time)
+            @bucket.reserve_capacity(20, request_prejudged: true) do
+              expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
+            end
+            expect(@bucket.redis.hget(@bucket.cache_key, 'count').to_f).to be_within(0.1).of(0)
+          end
+        end
+
         it "should still decrement when an error is thrown" do
           Timecop.freeze('2012-01-29 12:00:00 UTC') do
             @bucket.increment(0, 0, @current_time)
@@ -414,10 +442,19 @@ describe 'RequestThrottle' do
           expect(@bucket.get_up_front_cost_for_path("/somethingelse")).to eq @bucket.up_front_cost
         end
 
-        it "does nothing if disabled" do
-          expect(RequestThrottle).to receive(:enabled?).twice.and_return(false)
-          expect(@bucket).to receive(:increment).never
+        it "still tracks cost when disabled (for debugging)" do
+          allow(RequestThrottle).to receive(:enabled?).and_return(false)
+          expect(@bucket).to receive(:increment).twice
           @bucket.reserve_capacity {}
+        end
+
+        it "will always be allowed when disabled, even with full bucket" do
+          allow(RequestThrottle).to receive(:enabled?).and_return(false)
+          req = request_logged_out
+          allow(req).to receive(:fullpath).and_return("/")
+          allow(req).to receive(:env).and_return({'canvas.request_throttle.user_id' => ['123']})
+          allow(@bucket).to receive(:full?).and_return(true)
+          expect(throttler.allowed?(request_logged_out, @bucket)).to be_truthy
         end
 
         after do

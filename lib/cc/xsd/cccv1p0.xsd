@@ -98,6 +98,7 @@
         <xs:element name="show_total_grade_as_points" type="xs:boolean" minOccurs="0"/>
         <xs:element name="organize_epub_by_content_type" type="xs:boolean" minOccurs="0"/>
         <xs:element name="enable_offline_web_export" type="xs:boolean" minOccurs="0"/>
+        <xs:element name="homeroom_course" type="xs:boolean" minOccurs="0"/>
         <xs:element name="image_url" type="xs:string" minOccurs="0"/>
         <xs:element name="image_identifier_ref" type="xs:string" minOccurs="0"/>
         <xs:element name="default_view" minOccurs="0">
@@ -192,6 +193,7 @@
       <xs:element name="external_tool_external_identifier" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_url" type="xs:string" minOccurs="0"/>
       <xs:element name="external_tool_new_tab" type="xs:boolean" minOccurs="0"/>
+      <xs:element name="external_tool_data_json" type="xs:string" minOccurs="0"/>
       <xs:element name="freeze_on_copy" type="xs:boolean" minOccurs="0"/>
       <xs:element name="module_locked" type="xs:boolean" minOccurs="0"/>
       <xs:element name="muted" type="xs:boolean" minOccurs="0"/>

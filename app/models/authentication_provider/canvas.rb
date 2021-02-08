@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -27,10 +29,6 @@ class AuthenticationProvider::Canvas < AuthenticationProvider
 
   def self.recognized_params
     [ :self_registration, :enable_captcha ].freeze
-  end
-
-  def self.site_admin_params
-    [ :enable_captcha ].freeze
   end
 
   def self.login_button?

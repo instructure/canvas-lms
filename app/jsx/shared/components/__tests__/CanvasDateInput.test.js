@@ -226,34 +226,34 @@ describe('rendered month', () => {
 describe('error messages', () => {
   it('shows an error message if the input date is unparseable', () => {
     const {getByText} = renderAndDirtyInput('asdf')
-    expect(getByText("That's not a date!")).toBeInTheDocument()
+    expect(getByText('Invalid Date')).toBeInTheDocument()
   })
 
   it('clears error messages when the selectedDate changes', () => {
     const {props, rerender, queryByText} = renderAndDirtyInput('asdf')
     props.selectedDate = new Date()
     rerender(<CanvasDateInput {...props} />)
-    expect(queryByText("That's not a date!")).toBeNull()
+    expect(queryByText('Invalid Date')).toBeNull()
   })
 
   it('clears error messages when a day is clicked', () => {
     const date = new Date()
     const {getByText, queryByText} = renderAndDirtyInput('asdf', {selectedDate: date})
     fireEvent.click(getByText('15'))
-    expect(queryByText("That's not a date!")).toBeNull()
+    expect(queryByText('Invalid Date')).toBeNull()
   })
 
   it('clears error messages even when selectedDay is clicked', () => {
     const date = new Date()
     const {getByText, queryByText} = renderAndDirtyInput('asdf', {selectedDate: date})
     fireEvent.click(getByText('20'))
-    expect(queryByText("That's not a date!")).toBeNull()
+    expect(queryByText('Invalid Date')).toBeNull()
   })
 
   it('clears error messages when the input changes to an empty string', () => {
     const {getInput, queryByText} = renderAndDirtyInput('asdf')
     fireEvent.change(getInput(), {target: {value: ''}})
-    expect(queryByText("That's not a date!")).toBeNull()
+    expect(queryByText('Invalid Date')).toBeNull()
   })
 })
 
@@ -263,6 +263,12 @@ describe('messages', () => {
       messages: [{type: 'hint', text: 'my what an interesting date'}]
     })
     expect(getByText('my what an interesting date')).toBeInTheDocument()
+  })
+
+  it('shows a running result when requested', () => {
+    const {getByText} = renderAndDirtyInput('sat', {withRunningValue: true})
+    // The Saturday after our "current date" is 5/23/2020
+    expect(getByText('2020-05-23T00:00:00.000Z')).toBeInTheDocument()
   })
 })
 

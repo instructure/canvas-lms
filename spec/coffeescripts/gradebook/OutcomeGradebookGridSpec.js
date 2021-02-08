@@ -16,8 +16,8 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {isEqual, pluck} from 'underscore'
-import Grid from 'compiled/gradebook/OutcomeGradebookGrid'
+import {isEqual} from 'underscore'
+import Grid from 'jsx/gradebook/OutcomeGradebookGrid'
 import fakeENV from 'helpers/fakeENV'
 import 'i18n!gradebookOutcomeGradebookGrid'
 
@@ -32,9 +32,9 @@ QUnit.module('OutcomeGradebookGrid', {
 
 test('Grid.Math.mean', () => {
   const subject = [1, 1, 2, 4, 5]
-  ok(Grid.Math.mean(subject) === 2.6, 'returns a proper average')
-  ok(Grid.Math.mean(subject, true) === 3, 'optionally rounds result value')
-  ok(Grid.Math.mean([5, 12, 2]) === 6.33, 'rounds to two places')
+  strictEqual(Grid.Math.mean(subject), 2.6, 'returns a proper average')
+  strictEqual(Grid.Math.mean(subject, true), 3, 'optionally rounds result value')
+  strictEqual(Grid.Math.mean([5, 12, 2]), 6.33, 'rounds to two places')
 })
 
 test('Grid.Util._toRow', () => {
@@ -65,7 +65,10 @@ test('Grid.Util.toRows', () => {
     }
   ]
   ok(
-    isEqual(Grid.Util.toRows(rollups).map(r => r.student.id), [3, 1, 2]),
+    isEqual(
+      Grid.Util.toRows(rollups).map(r => r.student.id),
+      [3, 1, 2]
+    ),
     'returns rows in the same user order as rollups'
   )
 })

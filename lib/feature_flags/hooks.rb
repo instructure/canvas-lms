@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -62,25 +64,11 @@ module FeatureFlags
       root_account.settings&.dig(:provision, 'lti').present?
     end
 
-    def self.conditional_release_after_state_change_hook(user, context, _old_state, new_state)
-      if %w(on allowed).include?(new_state) && context.is_a?(Account)
-        if ConditionalRelease::Service.prefer_native?
-          context.root_account.tap do |ra|
-            ra.settings[:use_native_conditional_release] = true
-            ra.save!
-          end
-        else
-          @service_account = ConditionalRelease::Setup.new(context.id, user.id)
-          @service_account.activate!
-        end
-      end
-    end
-
     def self.analytics_2_after_state_change_hook(_user, context, _old_state, _new_state)
       # if we clear the nav cache before HAStore clears, it can be recached with stale FF data
       nav_cache = Lti::NavigationCache.new(context.root_account)
-      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 1.minute.from_now, max_attempts: 1})
-      nav_cache.send_later_if_production_enqueue_args(:invalidate_cache_key, {run_at: 5.minutes.from_now, max_attempts: 1})
+      nav_cache.delay_if_production(run_at: 1.minute.from_now).invalidate_cache_key
+      nav_cache.delay_if_production(run_at: 5.minutes.from_now).invalidate_cache_key
     end
 
     def self.k6_theme_hook(_user, _context, _from_state, transitions)
@@ -93,6 +81,37 @@ module FeatureFlags
       transitions['off']['message'] =
         I18n.t("Disabling the Elementary Theme will change the font in the Canvas interface for all users in your course.")
       transitions['off']['reload_page'] = true
+    end
+
+    def self.conditional_release_transition_hook(_user, context, _from_state, transitions)
+      if context.is_a?(Course)
+        transitions['off'] ||= {}
+        transitions['off']['message'] =
+          I18n.t("Disabling the Mastery Paths feature will release configured assignments and content to all students.
+                  If the feature is re-enabled, these assignments will need to be configured for Mastery Paths again.")
+      end
+    end
+
+    def self.conditional_release_after_change_hook(_user, context, _old_state, new_state)
+      if context.is_a?(Course) && new_state == "off"
+        ConditionalRelease::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+            n_strand: ["conditional_release_unassignment", context.global_root_account_id]).
+          release_mastery_paths_content_in_course(context)
+      end
+    end
+
+    def self.mastery_scales_after_change_hook(_user, context, _old_state, new_state)
+      if context.is_a?(Account) && OutcomesService::Service.enabled_in_context?(context)
+        OutcomesService::Service.delay_if_production(priority: Delayed::LOW_PRIORITY,
+            n_strand: [
+              'outcomes_service_toggle_context_proficiencies_feature_flag',
+              context.global_root_account_id
+            ]).
+          toggle_feature_flag(
+            context.root_account,
+            'context_proficiencies',
+            new_state == 'on')
+      end
     end
   end
 end

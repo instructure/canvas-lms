@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2015 - present Instructure, Inc.
 #
@@ -49,9 +51,11 @@ module LiveEvents
         LiveEvents.clear_context!
         yield block
         run_jobs
+
+        # Find the last message with a matching event_name
         @event_message = stream_client.data.map do |event|
           JSON.parse(event[:data])
-        end.find do |msg|
+        end.reverse.find do |msg|
           msg.dig('attributes', 'event_name') == @event_name
         end
       end
@@ -103,10 +107,11 @@ module LiveEvents
 
       def initialize(stream_name)
         @stream_name = stream_name
+        @data = []
       end
 
       def put_records(records:, stream_name:) # rubocop:disable Lint/UnusedMethodArgument
-        @data = records
+        @data += records
       end
     end
 

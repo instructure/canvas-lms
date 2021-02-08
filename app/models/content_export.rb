@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -79,17 +81,51 @@ class ContentExport < ActiveRecord::Base
     }
   end
 
+  def context_root_account(user = nil)
+    # Granular Permissions
+    #
+    # The primary use case for this method is for accurately checking
+    # feature flag enablement, given a user and the calling context.
+    # We want to prefer finding the root_account through the context
+    # of the authorizing resource or fallback to the user's active
+    # pseudonym's residing account.
+    return self.context.account if self.context.is_a?(User)
+
+    self.context.try(:root_account) || user&.account
+  end
+
   set_policy do
-    # file managers (typically course admins) can read all course exports (not zip or user-data exports)
-    given { |user, session| self.context.grants_right?(user, session, :manage_files) && [ZIP, USER_DATA].exclude?(self.export_type) }
+    #################### Begin legacy permission block #########################
+
+    given do |user, session|
+      !context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_right?(user, session, :manage_files) &&
+      [ZIP, USER_DATA].exclude?(self.export_type)
+    end
     can :manage_files and can :read
+
+    ##################### End legacy permission block ##########################
+
+    # file managers (typically course admins) can read all course exports (not zip or user-data exports)
+    given do |user, session|
+      context_root_account(user).feature_enabled?(:granular_permissions_course_files) &&
+      self.context.grants_any_right?(user, session, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS) &&
+      [ZIP, USER_DATA].exclude?(self.export_type)
+    end
+    can :read and can :manage_files
 
     # admins can create exports of any type
     given { |user, session| self.context.grants_right?(user, session, :read_as_admin) }
     can :create
 
-    # all users can read exports they created (in contexts they retain read permission)
-    given { |user, session| self.user == user && self.context.grants_right?(user, session, :read) }
+    # admins can read any export they created
+    given { |user, session| self.user == user && self.context.grants_right?(user, session, :read_as_admin) }
+    can :read
+
+    # all users can read zip/user data exports they created (in contexts they retain read permission)
+    # NOTE: other exports may be created on their behalf that they do *not* have direct access to;
+    # e.g. a common cartridge export created under the hood when a student creates a web zip export
+    given { |user, session| self.user == user && [ZIP, USER_DATA].include?(self.export_type) && self.context.grants_right?(user, session, :read) }
     can :read
 
     # non-admins can create zip or user-data exports, but not other types
@@ -97,7 +133,7 @@ class ContentExport < ActiveRecord::Base
     can :create
 
     # users can read exports that are shared with them
-    given { |user| ContentShare.where(user: user, content_export: self).exists? }
+    given { |user| user && user.content_shares.where(content_export: self).exists? }
     can :read
   end
 

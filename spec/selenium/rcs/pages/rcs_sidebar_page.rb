@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -112,6 +114,10 @@ module RCSSidebarPage
     f('#right-side a img')
   end
 
+  def close_button
+    f('[data-testid="CloseButton_ContentTray"] > button')
+  end
+
   # ---------------------- Actions ----------------------
 
   def click_pages_accordion
@@ -165,5 +171,10 @@ module RCSSidebarPage
 
   def click_image_link(title)
     image_link(title).click
+  end
+
+  def click_close_button
+    close_button.click
+    wait_for_ajaximations
   end
 end

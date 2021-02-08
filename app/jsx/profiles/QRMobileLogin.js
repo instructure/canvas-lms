@@ -29,12 +29,12 @@ import {Modal} from '@instructure/ui-modal'
 import {Button, CloseButton} from '@instructure/ui-buttons'
 import {Text} from '@instructure/ui-text'
 import {View} from '@instructure/ui-view'
-import moment from 'moment'
-import {object, bool} from 'prop-types'
+import {fromNow} from 'jsx/shared/datetime/fromNowFuzzy'
+import {number, bool} from 'prop-types'
 
-const REFRESH_INTERVAL = moment.duration(9.75, 'minutes') // 9 min 45 sec
-const POLL_INTERVAL = moment.duration(5, 'seconds')
-const QR_CODE_LIFETIME = moment.duration(10, 'minutes')
+const REFRESH_INTERVAL = 1000 * (9 * 60 + 45) // 9 min 45 sec
+const POLL_INTERVAL = 1000 * 5 // 5 sec
+const QR_CODE_LIFETIME = 1000 * 10 * 60 // 10 minutes
 
 const DISPLAY_STATE = {
   canceled: 0,
@@ -123,9 +123,12 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
     function displayValidFor(expireTime) {
       if (expireTime) validUntil = expireTime
       if (validUntil) {
-        const newValidFor = moment().isBefore(validUntil)
-          ? I18n.t('This code expires in %{timeFromNow}.', {timeFromNow: validUntil.fromNow(true)})
-          : I18n.t('This code has expired.')
+        const newValidFor =
+          Date.now() < validUntil
+            ? I18n.t('This code expires %{timeFromNow}.', {
+                timeFromNow: fromNow(validUntil)
+              })
+            : I18n.t('This code has expired.')
         setValidFor(newValidFor)
       }
     }
@@ -134,8 +137,8 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
       isFetching = true
       try {
         const {json} = await doFetchApi({path: '/canvas/login.png', method: 'POST'})
-        displayValidFor(moment().add(QR_CODE_LIFETIME))
-        refetchAt = moment().add(refreshInterval)
+        displayValidFor(Date.now() + QR_CODE_LIFETIME)
+        refetchAt = Date.now() + refreshInterval
         setImagePng(json.png)
       } catch (err) {
         showFlashAlert({
@@ -149,8 +152,8 @@ export function QRMobileLogin({refreshInterval, pollInterval, withWarning}) {
 
     function poll() {
       displayValidFor()
-      if (!isFetching && (!refetchAt || moment().isAfter(refetchAt))) getQRCode()
-      timerId = setTimeout(poll, pollInterval.asMilliseconds())
+      if (!isFetching && (!refetchAt || Date.now() > refetchAt)) getQRCode()
+      timerId = setTimeout(poll, pollInterval)
     }
 
     if (display === DISPLAY_STATE.displayed) poll()
@@ -245,8 +248,8 @@ const flexViewProps = {
 }
 
 QRMobileLogin.propTypes = {
-  refreshInterval: object,
-  pollInterval: object,
+  refreshInterval: number,
+  pollInterval: number,
   withWarning: bool
 }
 

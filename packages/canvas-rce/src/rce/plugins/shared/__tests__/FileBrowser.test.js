@@ -30,54 +30,48 @@ describe('RceFileBrowser', () => {
 
   it('invokes onFileSelect callback with appropriate data when a file is selected', () => {
     const onFileSelect = jest.fn()
-    render(
-      <RceFileBrowser
-        onFileSelect={onFileSelect}
-        fetchInitialMedia={() => {}}
-        fetchNextMedia={() => {}}
-        media={{
-          user: {
-            hasMore: false,
-            isLoading: false,
-            files: []
-          }
-        }}
-      />
-    )
+    render(<RceFileBrowser onFileSelect={onFileSelect} />)
     // This is the selectFile prop passed to the Canvas FileBrowser that we mocked above
     const selectFile = FileBrowser.mock.calls[0][0].selectFile
     selectFile({
       name: 'a file',
       src: '/file/download',
-      api: {url: '/file/download', 'content-type': 'application/pdf'}
+      api: {url: '/file/download?download_frd=1', 'content-type': 'application/pdf'}
     })
     expect(onFileSelect).toHaveBeenCalledWith({
       name: 'a file',
       title: 'a file',
-      href: '/file/download',
+      href: '/file?wrap=1',
+      embedded_iframe_url: undefined,
       content_type: 'application/pdf',
       target: '_blank',
       class: 'instructure_file_link instructure_scribd_file'
     })
   })
 
-  it('fetches media', () => {
-    const fetchInitialMedia = jest.fn()
-    render(
-      <RceFileBrowser
-        onFileSelect={() => {}}
-        fetchInitialMedia={fetchInitialMedia}
-        fetchNextMedia={() => {}}
-        media={{
-          user: {
-            hasMore: true,
-            isLoading: false,
-            files: []
-          }
-        }}
-      />
-    )
-
-    expect(fetchInitialMedia).toHaveBeenCalledWith({order: 'asc', sort: 'alphabetical'})
+  it('plumbs the media_id when a video file is selected', () => {
+    const onFileSelect = jest.fn()
+    render(<RceFileBrowser onFileSelect={onFileSelect} />)
+    // This is the selectFile prop passed to the Canvas FileBrowser that we mocked above
+    const selectFile = FileBrowser.mock.calls[0][0].selectFile
+    selectFile({
+      name: 'a video',
+      src: '/file/download',
+      api: {
+        url: '/file/download?download_frd=1',
+        'content-type': 'video/mp4',
+        media_entry_id: 'm-deadbeef'
+      }
+    })
+    expect(onFileSelect).toHaveBeenCalledWith({
+      name: 'a video',
+      title: 'a video',
+      href: '/file?wrap=1',
+      embedded_iframe_url: '/media_objects_iframe/m-deadbeef?type=video',
+      media_id: 'm-deadbeef',
+      content_type: 'video/mp4',
+      target: '_blank',
+      class: 'instructure_file_link'
+    })
   })
 })

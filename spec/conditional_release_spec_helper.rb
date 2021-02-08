@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2020 - present Instructure, Inc.
 #
@@ -42,4 +44,45 @@ RSpec.shared_examples 'a soft-deletable model' do
     instance.destroy!
     expect { copy.save! }.to_not raise_error
   end
+end
+
+# ensure this is loaded
+ConditionalRelease
+module ConditionalRelease
+  module SpecHelper
+    def setup_course_with_native_conditional_release(course: nil)
+      # set up a trigger assignment with rules and whatnot
+      course ||= course_with_student(:active_all => true) && @course
+      @trigger_assmt = course.assignments.create!(:points_possible => 10, submission_types: "online_text_entry")
+      @sub = @trigger_assmt.submit_homework(@student, body: "hi") if @student
+
+      @set1_assmt1 = course.assignments.create!(:only_visible_to_overrides => true) # one in one set
+      @set2_assmt1 = course.assignments.create!(:only_visible_to_overrides => true)
+      @set2_assmt2 = course.assignments.create!(:only_visible_to_overrides => true) # two in one set
+      @set3a_assmt = course.assignments.create!(:only_visible_to_overrides => true) # two sets in one range - will have to choose
+      @set3b_assmt = course.assignments.create!(:only_visible_to_overrides => true)
+
+      ranges = [
+        ScoringRange.new(:lower_bound => 0.7, :upper_bound => 1.0, :assignment_sets => [
+          AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set1_assmt1.id)])
+        ]),
+        ScoringRange.new(:lower_bound => 0.4, :upper_bound => 0.7, :assignment_sets => [
+          AssignmentSet.new(:assignment_set_associations => [
+            AssignmentSetAssociation.new(:assignment_id => @set2_assmt1.id),
+            AssignmentSetAssociation.new(:assignment_id => @set2_assmt2.id)
+          ])
+        ]),
+        ScoringRange.new(:lower_bound => 0, :upper_bound => 0.4, :assignment_sets => [
+          AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set3a_assmt.id)]),
+          AssignmentSet.new(:assignment_set_associations => [AssignmentSetAssociation.new(:assignment_id => @set3b_assmt.id)])
+        ])
+      ]
+      @rule = course.conditional_release_rules.create!(:trigger_assignment => @trigger_assmt, :scoring_ranges => ranges)
+
+      course.enable_feature!(:conditional_release)
+    end
+  end
+end
+RSpec.configure do |config|
+  config.include ConditionalRelease::SpecHelper
 end

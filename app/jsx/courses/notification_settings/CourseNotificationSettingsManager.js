@@ -56,7 +56,8 @@ export default function CourseNotifcationSettingsManager(props) {
             enabled: data.enabled,
             channelId: data.channel?._id,
             category: data.category?.split(' ').join('_'),
-            frequency: data.frequency
+            frequency: data.frequency,
+            sendScoresInEmails: data.sendScoresInEmails
           }
         })
       }

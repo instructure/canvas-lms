@@ -80,6 +80,7 @@ export default function DirectShareCoursePanel({sourceCourseId, contentSelection
         selectedModuleId={selectedModule?.id || null}
         setSelectedModule={setSelectedModule}
         setModuleItemPosition={setSelectedPosition}
+        disableModuleInsertion={contentSelection && 'modules' in contentSelection}
       />
       <ConfirmActionButtonBar
         padding="small 0 0 0"

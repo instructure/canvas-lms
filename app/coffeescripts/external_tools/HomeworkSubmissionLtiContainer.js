@@ -126,6 +126,7 @@ export default class HomeworkSubmissionLtiContainer {
       'ready',
       (function(_this) {
         return function(data) {
+          // render inline submitted file view
           let homeworkSubmissionView
           tool = this.model // this will return the model from returnView
           homeworkSubmissionView = _this.createHomeworkSubmissionView(tool, data)
@@ -135,6 +136,10 @@ export default class HomeworkSubmissionLtiContainer {
           _this.cleanupViewsForTool(tool)
           _this.renderedViews[tool.get('id')].push(homeworkSubmissionView)
           homeworkSubmissionView.render()
+
+          // close dialog if launched from the More tab
+          window.external_tool_dialog.ready(data.contentItems)
+
           return $('input.turnitin_pledge').click(e =>
             recordEulaAgreement('#eula_agreement_timestamp', e.target.checked)
           )

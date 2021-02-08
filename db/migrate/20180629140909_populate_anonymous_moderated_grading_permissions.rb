@@ -19,8 +19,8 @@ class PopulateAnonymousModeratedGradingPermissions < ActiveRecord::Migration[5.1
   tag :postdeploy
 
   def up
-    DataFixup::AddRoleOverridesForNewPermission.send_later_if_production(:run, :manage_grades, :select_final_grade)
+    DataFixup::AddRoleOverridesForNewPermission.delay_if_production.run(:manage_grades, :select_final_grade)
 
-    DataFixup::AddRoleOverridesForNewPermission.send_later_if_production(:run, :manage_account_settings, :view_audit_trail)
+    DataFixup::AddRoleOverridesForNewPermission.delay_if_production.run(:manage_account_settings, :view_audit_trail)
   end
 end

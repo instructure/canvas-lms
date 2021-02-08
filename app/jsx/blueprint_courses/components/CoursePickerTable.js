@@ -19,8 +19,10 @@
 import I18n from 'i18n!blueprint_settingsCoursePickerTable'
 import $ from 'jquery'
 import React from 'react'
+import {findDOMNode} from 'react-dom'
 import PropTypes from 'prop-types'
-import {Text, Table} from '@instructure/ui-elements'
+import {Text} from '@instructure/ui-elements'
+import {Table} from '@instructure/ui-table'
 import {ScreenReaderContent, PresentationContent} from '@instructure/ui-a11y'
 import {Checkbox} from '@instructure/ui-forms'
 import 'compiled/jquery.rails_flash_notifications'
@@ -46,14 +48,16 @@ export default class CoursePickerTable extends React.Component {
       selected: this.parseSelectedCourses(props.selectedCourses),
       selectedAll: false
     }
-    this._tableRef = null
+    this.tableRef = React.createRef()
+    this.tableBody = React.createRef()
+    this.selectAllCheckbox = React.createRef()
   }
 
   componentDidMount() {
     this.fixIcons()
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       selected: this.parseSelectedCourses(nextProps.selectedCourses),
       selectedAll: nextProps.selectedCourses.length === nextProps.courses.length
@@ -95,10 +99,13 @@ export default class CoursePickerTable extends React.Component {
   // this fixes them up so that doesn't happen.
   // Eventually this should get folded into instui via INSTUI-572
   fixIcons() {
-    if (this._tableRef) {
-      Array.prototype.forEach.call(this._tableRef.querySelectorAll('svg[aria-hidden]'), el => {
-        el.setAttribute('focusable', 'false')
-      })
+    if (this.tableRef.current) {
+      Array.prototype.forEach.call(
+        this.tableRef.current.querySelectorAll('svg[aria-hidden]'),
+        el => {
+          el.setAttribute('focusable', 'false')
+        }
+      )
     }
   }
 
@@ -125,41 +132,40 @@ export default class CoursePickerTable extends React.Component {
 
   handleFocusLoss(index) {
     if (this.props.courses.length === 0) {
-      this.selectAllCheckbox.focus()
+      this.selectAllCheckbox.current.focus()
     } else if (index >= this.props.courses.length) {
       this.handleFocusLoss(index - 1)
     } else {
-      this.tableBody
-        .querySelectorAll('.bca-table__course-row input[type="checkbox"]')
+      // eslint-disable-next-line react/no-find-dom-node
+      const elt = findDOMNode(this.tableBody.current)
+      elt
+        .querySelectorAll('[data-testid="bca-table__course-row"] input[type="checkbox"]')
         [index].focus()
     }
   }
 
-  renderColGroup() {
-    return (
-      <colgroup>
-        <col span="1" style={{width: '3%'}} />
-        <col span="1" style={{width: '32%'}} />
-        <col span="1" style={{width: '15%'}} />
-        <col span="1" style={{width: '15%'}} />
-        <col span="1" style={{width: '10%'}} />
-        <col span="1" style={{width: '25%'}} />
-      </colgroup>
-    )
-  }
-
   renderHeaders() {
     return (
-      <tr>
-        <th scope="col">
+      <Table.Row>
+        <Table.ColHeader id="picker-course-selection" width="3%">
           <ScreenReaderContent>{I18n.t('Course Selection')}</ScreenReaderContent>
-        </th>
-        <th scope="col">{I18n.t('Title')}</th>
-        <th scope="col">{I18n.t('Short Name')}</th>
-        <th scope="col">{I18n.t('Term')}</th>
-        <th scope="col">{I18n.t('SIS ID')}</th>
-        <th scope="col">{I18n.t('Teacher(s)')}</th>
-      </tr>
+        </Table.ColHeader>
+        <Table.ColHeader id="picker-title" width="32%">
+          {I18n.t('Title')}
+        </Table.ColHeader>
+        <Table.ColHeader id="picker-name" width="15%">
+          {I18n.t('Short Name')}
+        </Table.ColHeader>
+        <Table.ColHeader id="picker-term" width="15%">
+          {I18n.t('Term')}
+        </Table.ColHeader>
+        <Table.ColHeader id="picker-sisid" width="10%">
+          {I18n.t('SIS ID')}
+        </Table.ColHeader>
+        <Table.ColHeader id="picker-teachers" width="25%">
+          {I18n.t('Teacher(s)')}
+        </Table.ColHeader>
+      </Table.Row>
     )
   }
 
@@ -173,8 +179,8 @@ export default class CoursePickerTable extends React.Component {
 
   renderRows() {
     return this.props.courses.map(course => (
-      <tr id={`course_${course.id}`} key={course.id} className="bca-table__course-row">
-        <td>
+      <Table.Row id={`course_${course.id}`} key={course.id} data-testid="bca-table__course-row">
+        <Table.Cell>
           <Checkbox
             onChange={this.onSelectToggle}
             value={course.id}
@@ -187,19 +193,19 @@ export default class CoursePickerTable extends React.Component {
               </ScreenReaderContent>
             }
           />
-        </td>
-        <td>{this.renderCellText(course.original_name || course.name)}</td>
-        <td>{this.renderCellText(course.course_code)}</td>
-        <td>{this.renderCellText(course.term.name)}</td>
-        <td>{this.renderCellText(course.sis_course_id)}</td>
-        <td>
+        </Table.Cell>
+        <Table.Cell>{this.renderCellText(course.original_name || course.name)}</Table.Cell>
+        <Table.Cell>{this.renderCellText(course.course_code)}</Table.Cell>
+        <Table.Cell>{this.renderCellText(course.term.name)}</Table.Cell>
+        <Table.Cell>{this.renderCellText(course.sis_course_id)}</Table.Cell>
+        <Table.Cell>
           {this.renderCellText(
             course.teachers
               ? course.teachers.map(teacher => teacher.display_name).join(', ')
               : I18n.t('%{teacher_count} teachers', {teacher_count: course.teacher_count})
           )}
-        </td>
-      </tr>
+        </Table.Cell>
+      </Table.Row>
     ))
   }
 
@@ -209,9 +215,9 @@ export default class CoursePickerTable extends React.Component {
     }
 
     return (
-      <tr key="no-results" className="bca-table__no-results">
-        <td>{this.renderCellText(I18n.t('No results'))}</td>
-      </tr>
+      <Table.Row key="no-results" data-testid="bca-table__no-results">
+        <Table.Cell>{this.renderCellText(I18n.t('No results'))}</Table.Cell>
+      </Table.Row>
     )
   }
 
@@ -221,10 +227,9 @@ export default class CoursePickerTable extends React.Component {
     return (
       <div className="btps-table__header-wrapper">
         <PresentationContent as="div">
-          <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
-            {this.renderColGroup()}
-            <thead className="bca-table__head">{this.renderHeaders()}</thead>
-            <tbody />
+          <Table caption={I18n.t('Blueprint Courses')}>
+            <Table.Head>{this.renderHeaders()}</Table.Head>
+            <Table.Body />
           </Table>
         </PresentationContent>
         <div className="bca-table__select-all">
@@ -232,9 +237,7 @@ export default class CoursePickerTable extends React.Component {
             onChange={this.onSelectAllToggle}
             value="all"
             checked={this.state.selectedAll}
-            ref={c => {
-              this.selectAllCheckbox = c
-            }}
+            ref={this.selectAllCheckbox}
             label={
               <Text size="small">
                 {I18n.t(
@@ -251,26 +254,11 @@ export default class CoursePickerTable extends React.Component {
 
   render() {
     return (
-      <div
-        className="bca-table__wrapper"
-        ref={el => {
-          this._tableRef = el
-        }}
-      >
+      <div className="bca-table__wrapper" ref={this.tableRef}>
         {this.renderStickyHeaders()}
         <div className="bca-table__content-wrapper">
-          <Table caption={<ScreenReaderContent>{I18n.t('Blueprint Courses')}</ScreenReaderContent>}>
-            {this.renderColGroup()}
-            {/* on the real table, we'll include the headers again, but make them screen reader only */}
-            <ScreenReaderContent as="thead">{this.renderHeaders()}</ScreenReaderContent>
-            <tbody
-              className="bca-table__body"
-              ref={c => {
-                this.tableBody = c
-              }}
-            >
-              {this.renderBodyContent()}
-            </tbody>
+          <Table caption={I18n.t('Blueprint Courses')}>
+            <Table.Body ref={this.tableBody}>{this.renderBodyContent()}</Table.Body>
           </Table>
         </div>
       </div>

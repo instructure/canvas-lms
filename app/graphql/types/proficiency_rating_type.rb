@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -18,7 +20,7 @@
 
 module Types
   class ProficiencyRatingType < ApplicationObjectType
-    description 'Customized proficiency ratings'
+    description 'Customized proficiency rating'
 
     implements Interfaces::LegacyIDInterface
 

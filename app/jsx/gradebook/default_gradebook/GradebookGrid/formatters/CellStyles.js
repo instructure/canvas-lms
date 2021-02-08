@@ -38,9 +38,5 @@ export function classNamesForAssignmentCell(assignment, submissionData) {
     classNames.push('ungraded')
   }
 
-  if (assignment.muted) {
-    classNames.push('muted')
-  }
-
   return classNames
 }

@@ -19,7 +19,6 @@
 import React from 'react'
 import {render, fireEvent} from '@testing-library/react'
 import {UploadMedia} from '../index'
-import EmbedPanel from '../EmbedPanel'
 
 describe('UploadMedia', () => {
   it('calls onDismiss prop when closing', () => {
@@ -29,12 +28,5 @@ describe('UploadMedia', () => {
     const closeBtn = getAllByText('Close')[0]
     fireEvent.click(closeBtn)
     expect(handleDismiss).toHaveBeenCalled()
-  })
-
-  it('calls setEmbedCode when the embeded code textArea changes', () => {
-    const fakeSetEmbedCode = jest.fn()
-    const {getByLabelText} = render(<EmbedPanel embedCode="" setEmbedCode={fakeSetEmbedCode} />)
-    fireEvent.change(getByLabelText('Embed Video Code'), {target: {value: 'instructure.com'}})
-    expect(fakeSetEmbedCode).toHaveBeenCalledWith('instructure.com')
   })
 })

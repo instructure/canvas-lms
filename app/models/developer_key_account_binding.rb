@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -67,7 +69,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
   def self.find_in_account_priority(account_ids, developer_key_id, explicitly_set = true)
     raise 'Account ids must be integers' if account_ids.any? { |id| !id.is_a?(Integer) }
     account_ids_string = "{#{account_ids.join(',')}}"
-    binding_id = DeveloperKeyAccountBinding.connection.select_values(<<-SQL)
+    binding_id = DeveloperKeyAccountBinding.connection.select_values(<<~SQL)
       SELECT b.*
       FROM
           unnest('#{account_ids_string}'::int8[]) WITH ordinality AS i (id, ord)
@@ -86,7 +88,7 @@ class DeveloperKeyAccountBinding < ApplicationRecord
     return nil if developer_key.account_id.present?
     Shard.default.activate do
       MultiCache.fetch(site_admin_cache_key(developer_key)) do
-        Shackles.activate(:slave) do
+        GuardRail.activate(:secondary) do
           binding = self.where.not(workflow_state: ALLOW_STATE).find_by(
             account: Account.site_admin,
             developer_key: developer_key

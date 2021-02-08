@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2014 - present Instructure, Inc.
 #
@@ -17,6 +19,7 @@
 #
 
 class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
+  extend RootAccountResolver
   include CanvasPartman::Concerns::Partitioned
 
   # An event describing the student choosing an answer to a question.
@@ -26,6 +29,7 @@ class Quizzes::QuizSubmissionEvent < ActiveRecord::Base
   EVT_SUBMISSION_CREATED = "submission_created".freeze
 
   belongs_to :quiz_submission, class_name: 'Quizzes::QuizSubmission'
+  resolves_root_account through: :quiz_submission
 
   serialize :event_data, JSON
 

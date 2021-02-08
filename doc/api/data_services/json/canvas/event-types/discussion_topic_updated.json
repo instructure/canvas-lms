@@ -1,0 +1,61 @@
+{
+  "name": "discussion_topic_updated",
+  "definition": "The event is emitted anytime a discussion topic or course announcement is updated by an end user or API request. Only changes to the fields included in the body of the event payload will emit the `updated` event.",
+  "trigger": "Triggered when a discussion topic is modified in a course. Also triggered when a course announcement is modified in a course.",
+  "schema": {
+    "assignment_id": "The local Canvas id of the assignment.",
+    "body": "Body of the topic. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "context_id": "The Canvas id of the topic's context.",
+    "context_type": "The type of context the discussion_topicis used in.",
+    "discussion_topic_id": "The Canvas id of the new discussion topic.",
+    "is_announcement": "true if this topic was posted as an announcement, false otherwise.",
+    "lock_at": "The lock date (discussion is locked after this date), or null.",
+    "title": "Title of the topic. NOTE: This field will be truncated to only include the first 8192 characters.",
+    "updated_at": "The time at which this discussion was last modified in any way.",
+    "workflow_state": "The state of the discussion topic (active, deleted, post_delayed, unpublished)."
+  },
+  "examples": [
+    {
+      "payload": {
+        "metadata": {
+          "client_ip": "93.184.216.34",
+          "context_account_id": "21070000000000079",
+          "context_id": "21070000000000565",
+          "context_role": "TeacherEnrollment",
+          "context_sis_source_id": "2017.100.101.101-1",
+          "context_type": "Course",
+          "event_name": "discussion_topic_updated",
+          "event_time": "2019-11-04T13:57:43.295Z",
+          "hostname": "oxana.instructure.com",
+          "http_method": "PUT",
+          "producer": "canvas",
+          "referrer": "https://oxana.instructure.com/courses/565/discussion_topics",
+          "request_id": "1dd9dc6f-2fb0-4c19-a6c5-7ee1bf3ed295",
+          "root_account_id": "21070000000000001",
+          "root_account_lti_guid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs.oxana.instructure.com",
+          "root_account_uuid": "VicYj3cu5BIFpoZhDVU4DZumnlBrWi1grgJEzADs",
+          "session_id": "ef686f8ed684abf78cbfa1f6a58112b5",
+          "time_zone": "America/Los_Angeles",
+          "url": "https://oxana.instructure.com/api/v1/courses/565/discussion_topics/66871",
+          "user_account_id": "21070000000000001",
+          "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_14_3) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36",
+          "user_id": "21070000000000001",
+          "user_login": "oxana@example.com",
+          "user_sis_id": "456-T45"
+        },
+        "body": {
+          "assignment_id": "1234010",
+          "body": "<h3>Discuss this</h3> What do you think?",
+          "context_id": "565",
+          "context_type": "Course",
+          "discussion_topic_id": "21070000000066871",
+          "is_announcement": false,
+          "lock_at": "2019-11-05T13:38:00.218Z",
+          "title": "Sample discussion",
+          "updated_at": "2019-11-05T13:38:00.218Z",
+          "workflow_state": "active"
+        }
+      }
+    }
+  ]
+}

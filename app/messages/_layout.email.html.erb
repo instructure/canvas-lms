@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html dir="<%= I18n.rtl? ? 'rtl' : 'ltr' %>" lang="<%= I18n.locale.to_s %>">
 <head>
   <meta name="viewport" content="width=device-width">
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -95,7 +95,9 @@ Margin is capitalized to fix Outlook.com
                 <%= content(:footer_link).html_safe %> &nbsp;|&nbsp;
               <% end %>
 
-              <a href="<%= communication_profile_url %>" style="white-space: nowrap;"><%= t "Update your notification settings" %></a>
+              <% if !defined?(remove_profile_url_in_layout) || !remove_profile_url_in_layout %>
+                <a href="<%= communication_profile_url %>" style="white-space: nowrap;"><%= t "Update your notification settings" %></a>
+              <% end %>
 
             </td>
           </tr>

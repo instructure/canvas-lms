@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -28,6 +30,11 @@ class UserProfile < ActiveRecord::Base
               maximum: maximum_string_length, too_long: '%{count} characters is the maximum allowed'
             },
             allow_blank: true
+  validates :bio,
+            length: {
+              maximum: maximum_text_length, too_long: '%{count} characters is the maximum allowed'
+            },
+            allow_blank: true
 
   TAB_PROFILE,
   TAB_COMMUNICATION_PREFERENCES,
@@ -37,6 +44,7 @@ class UserProfile < ActiveRecord::Base
   TAB_OBSERVEES,
   TAB_QR_MOBILE_LOGIN,
   TAB_PAST_GLOBAL_ANNOUNCEMENTS,
+  TAB_TROPHY_CASE,
   TAB_CONTENT_SHARES =
     *0..10
 
@@ -90,6 +98,7 @@ class UserProfile < ActiveRecord::Base
         insert_observer_tabs(tabs, user)
         insert_qr_mobile_login_tab(tabs, user, opts)
         insert_past_global_announcements(tabs, user, opts)
+        insert_trophy_case(tabs, user, opts)
         tabs
       end
   end
@@ -176,7 +185,7 @@ class UserProfile < ActiveRecord::Base
   end
 
   def insert_past_global_announcements(tabs, user, opts)
-    if user && opts[:root_account]&.feature_enabled?(:past_announcements)
+    if user
       tabs <<
         {
           id: TAB_PAST_GLOBAL_ANNOUNCEMENTS,
@@ -184,6 +193,19 @@ class UserProfile < ActiveRecord::Base
           css_class: 'past_global_announcements',
           href: :account_notifications_path,
           no_args: {include_past: true}
+        }
+    end
+  end
+
+  def insert_trophy_case(tabs, user, opts)
+    if user && Account.site_admin.feature_enabled?(:trophy_case)
+      tabs <<
+        {
+          id: TAB_TROPHY_CASE,
+          label: I18n.t('#tabs.trophy_case', 'Trophy Case'),
+          css_class: 'trophy_case',
+          href: :trophy_case_path,
+          no_args: true
         }
     end
   end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2019 - present Instructure, Inc.
 #
@@ -60,6 +62,14 @@ describe Types::FileType do
     expect(
       file_type.resolve('url', request: ActionDispatch::TestRequest.create, current_user: @student)
     ).to be_nil
+  end
+
+  it 'has a thumbnail url' do
+    f = attachment_with_context(course, uploaded_data: stub_png_data, content_type: 'image/png')
+    f_type = GraphQLTypeTester.new(f, current_user: @teacher)
+    expect(
+        f_type.resolve('thumbnailUrl', request: ActionDispatch::TestRequest.create, current_user: @student).start_with?("http://localhost/images/thumbnails/show")
+    ).to be true
   end
 
   context 'submission preview url' do

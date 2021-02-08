@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -46,10 +48,9 @@ module Canvas
           begin
             @clients[key] = CanvasDynamoDB::Database.new(
               fingerprint,
-              config[:table_prefix],
-              config[:autoscaling_role_arn],
-              opts,
-              Rails.logger
+              prefix: config[:table_prefix],
+              client_opts: opts,
+              logger: Rails.logger
             )
           rescue Exception => exception
             Rails.logger.error "Failed to create DynamoDB client for #{key}: #{exception}"
@@ -79,9 +80,6 @@ module Canvas
         configs.keys
       end
 
-      def self.read_consistency_setting(category)
-        Cavas::Cassandra::DatabaseBuilder.read_consistency_setting(category)
-      end
     end
   end
 end

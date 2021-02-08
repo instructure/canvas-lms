@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2016 - present Instructure, Inc.
 #
@@ -27,7 +29,7 @@ module Canvas
 
     def self.state_for(workflows, context, user)
       workflows.inject({}) do |memo, label|
-        workflow = get(label) 
+        workflow = get(label)
         workflow ? memo.merge(workflow.state_for(context, user)) : memo
       end
     end
@@ -47,16 +49,20 @@ module Canvas
     #   passed around with every request in the service workflow.
     #
     register(:rich_content) do |context, user|
+      tool_context = context&.is_a?(Group) ? context.context : context
       {
         usage_rights_required: (
-          context &&
-          context.respond_to?(:usage_rights_required?) &&
-          context.usage_rights_required?
+          tool_context&.respond_to?(:usage_rights_required?) &&
+          tool_context&.usage_rights_required?
         ) || false,
         can_upload_files: (
           user &&
           context &&
-          context.grants_right?(user, :manage_files)
+          context.grants_any_right?(
+            user,
+            :manage_files,
+            :manage_files_add
+          )
         ) || false,
         can_create_pages: (
           user &&

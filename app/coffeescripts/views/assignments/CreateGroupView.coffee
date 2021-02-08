@@ -23,7 +23,7 @@ import numberHelper from 'jsx/shared/helpers/numberHelper'
 import AssignmentGroup from '../../models/AssignmentGroup'
 import NeverDropCollection from '../../collections/NeverDropCollection'
 import NeverDropCollectionView from './NeverDropCollectionView'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {isSmallTablet, getResponsiveWidth} from '../DialogFormView'
 import template from 'jst/assignments/CreateGroup'
 import wrapper from 'jst/EmptyDialogFormWrapper'
 import {shimGetterShorthand} from '../../legacyCoffeesScriptHelpers'
@@ -33,7 +33,7 @@ SHORT_HEIGHT = 250
 
 export default class CreateGroupView extends DialogFormView
   defaults:
-    width: 600
+    width: getResponsiveWidth(320, 550)
     height: 500
 
   events: _.extend({}, @::events,
@@ -166,6 +166,7 @@ export default class CreateGroupView extends DialogFormView
       editable_drop: @model.get('assignments').length > 0
       #Safari is not fully compatiable with html5 validation - needs to be set to text instead to ensure our validations work
       number_input: if !!navigator.userAgent.match(/Version\/[\d\.]+.*Safari/) then "text" else "number"
+      small_tablet: isSmallTablet
     })
 
   openAgain: ->

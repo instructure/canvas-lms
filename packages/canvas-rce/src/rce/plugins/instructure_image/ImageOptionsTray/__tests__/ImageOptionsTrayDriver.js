@@ -57,7 +57,7 @@ export default class ImageOptionsTrayDriver {
   }
 
   get $sizeSelect() {
-    return getByLabelText(this.$element, 'Size')
+    return getByLabelText(this.$element, /Size.*/)
   }
 
   get $doneButton() {
@@ -84,6 +84,10 @@ export default class ImageOptionsTrayDriver {
 
   get displayAs() {
     return this.$displayAsField.querySelector('input[type="radio"]:checked').value
+  }
+
+  get isDisplayAsDisabled() {
+    return this.$displayAsField.querySelectorAll('input[disabled]').length === 2
   }
 
   get size() {

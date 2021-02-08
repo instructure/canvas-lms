@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2013 - 2014 Instructure, Inc.
 #
@@ -23,6 +25,7 @@ require File.expand_path(File.dirname(__FILE__) + '/../../cassandra_spec_helper'
 describe "AuthenticationAudit API", type: :request do
   context "not configured" do
     before do
+      allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).and_call_original
       allow(Canvas::Cassandra::DatabaseBuilder).to receive(:configured?).with('auditors').and_return(false)
       site_admin_user(user: user_with_pseudonym(account: Account.site_admin))
     end

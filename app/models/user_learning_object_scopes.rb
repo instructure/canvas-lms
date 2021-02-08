@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2018 - present Instructure, Inc.
 #
@@ -61,7 +63,7 @@ module UserLearningObjectScopes
 
   def course_ids_for_todo_lists(permission_type, course_ids: nil, contexts: nil, include_concluded: false)
     shard.activate do
-      course_ids_result = Shackles.activate(:slave) do
+      course_ids_result = GuardRail.activate(:secondary) do
         if include_concluded
           all_course_ids
         else
@@ -130,7 +132,7 @@ module UserLearningObjectScopes
         cache_key = [self, "#{object_type}_needing_#{purpose}", course_ids_cache_key, params_cache_key].cache_key
 
         Rails.cache.fetch_with_batched_keys(cache_key, expires_in: expires_in, batch_object: self, batched_keys: :todo_list) do
-          result = Shackles.activate(:slave) do
+          result = GuardRail.activate(:secondary) do
             ids_by_shard.flat_map do |shard, shard_hash|
               shard.activate do
                 yield(*arguments_for_objects_needing(
@@ -249,7 +251,8 @@ module UserLearningObjectScopes
       ar_scope = ar_scope.joins(submission: :assignment).
         joins("INNER JOIN #{Submission.quoted_table_name} AS assessor_asset ON assessment_requests.assessor_asset_id = assessor_asset.id
                AND assessor_asset.assignment_id = assignments.id").
-        where(assessor_id: id)
+        where(assessor_id: id).
+        where(assessor_asset: { course_id: shard_course_ids })
       ar_scope = ar_scope.incomplete unless scope_only
       ar_scope = ar_scope.for_courses(shard_course_ids)
 
@@ -305,17 +308,30 @@ module UserLearningObjectScopes
     params = _params_hash(binding)
     # not really any harm in extending the expires_in since we touch the user anyway when grades change
     objects_needing('Assignment', 'grading', :manage_grades, params, 120.minutes, **params) do |assignment_scope|
-      as = assignment_scope.
-        joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
+      if Setting.get('assignments_needing_grading_new_style', 'true') == 'true'
+        submissions_needing_grading = Submission.select(:assignment_id, :user_id).
+            joins("INNER JOIN (#{assignment_scope.to_sql}) assignments ON assignment_id=assignments.id").
+          where(Submission.needs_grading_conditions)
+        student_enrollments = Enrollment.from("#{Enrollment.quoted_table_name} student_enrollments").
+            select("1").
+            where("student_enrollments.course_id=assignments.context_id").
+            where("student_enrollments.user_id=submissions_needing_grading.user_id AND student_enrollments.workflow_state='active'").
+            where("(enrollments.limit_privileges_to_course_section='f' OR student_enrollments.course_section_id=enrollments.course_section_id)")
+        as = assignment_scope.joins("INNER JOIN (#{submissions_needing_grading.to_sql}) AS submissions_needing_grading ON assignments.id=submissions_needing_grading.assignment_id").
+            where("EXISTS(?)", student_enrollments)
+      else
+        as = assignment_scope.
+          where("EXISTS (#{grader_visible_submissions_sql})")
+      end
+      as = as.joins("INNER JOIN #{Enrollment.quoted_table_name} ON enrollments.course_id = assignments.context_id").
         where(enrollments: {user_id: self, workflow_state: 'active', type: ['TeacherEnrollment', 'TaEnrollment']}).
-        where("EXISTS (#{grader_visible_submissions_sql})").
         group('assignments.id').
         order('assignments.due_at').
         preload(:context)
       if scope_only
         as # This needs the below `select` somehow to work
       else
-        Shackles.activate(:slave) do
+        GuardRail.activate(:secondary) do
           as.lazy.reject{|a| Assignments::NeedsGradingCountQuery.new(a, self).count == 0 }.take(limit).to_a
         end
       end

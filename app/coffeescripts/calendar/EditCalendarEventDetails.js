@@ -171,8 +171,6 @@ export default class EditCalendarEventDetails {
   }
 
   moreOptionsClick = jsEvent => {
-    if (this.event.object.parent_event_id) return
-
     jsEvent.preventDefault()
     const params = {return_to: window.location.href}
 

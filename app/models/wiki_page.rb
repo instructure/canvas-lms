@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2011 - present Instructure, Inc.
 #
@@ -81,12 +83,13 @@ class WikiPage < ActiveRecord::Base
   end
 
   scope :visible_to_user, -> (user_id) do
-    joins(sanitize_sql(["LEFT JOIN #{AssignmentStudentVisibility.quoted_table_name} as asv on wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?", user_id])).
-      where("wiki_pages.assignment_id IS NULL OR asv IS NOT NULL")
+    where("wiki_pages.assignment_id IS NULL OR EXISTS (SELECT 1 FROM #{AssignmentStudentVisibility.quoted_table_name} asv WHERE wiki_pages.assignment_id = asv.assignment_id AND asv.user_id = ?)", user_id)
   end
 
   TITLE_LENGTH = 255
   SIMPLY_VERSIONED_EXCLUDE_FIELDS = [:workflow_state, :editing_roles, :notify_of_update].freeze
+
+  self.ignored_columns = %i[view_count]
 
   def ensure_wiki_and_context
     self.wiki_id ||= (self.context.wiki_id || self.context.wiki.id)
@@ -393,18 +396,6 @@ class WikiPage < ActiveRecord::Base
     res
   end
 
-  def increment_view_count(user, context = nil)
-    Shackles.activate(:master) do
-      unless self.new_record?
-        self.with_versioning(false) do |p|
-          context ||= p.context
-          WikiPage.where(id: p).update_all("view_count=COALESCE(view_count, 0) + 1")
-          p.context_module_action(user, context, :read)
-        end
-      end
-    end
-  end
-
   def can_unpublish?
     return @can_unpublish unless @can_unpublish.nil?
     @can_unpublish = !is_front_page?
@@ -415,6 +406,35 @@ class WikiPage < ActiveRecord::Base
     return unless wiki_pages.any?
     front_page_url = context.wiki.get_front_page_url
     wiki_pages.each{|wp| wp.can_unpublish = !(wp.url == front_page_url)}
+  end
+
+  def self.reinterpret_version_yaml(yaml_string)
+    # TODO: This should be temporary.  For a long time
+    # course exports/imports would corrupt the yaml in the first version
+    # of an imported wiki page by trying to replace placeholders right
+    # in the yaml.  This doctors the yaml back, and can be removed
+    # when the "content_imports" exception type for psych syntax errors
+    # isn't happening anymore.
+    pattern_1 = /(\<a[^<>]*?id=.*?"media_comment.*?\/\>)/im
+    pattern_2 = /(\<a[^<>]*?id=.*?"media_comment.*?\<\/a\>)/
+    replacements = []
+    [pattern_1, pattern_2].each do |regex_pattern|
+      yaml_string.scan(regex_pattern).each do |matched_groups|
+        matched_groups.each do |group|
+          # this should be an UNESCAPED version of a media comment.
+          # let's try to escape it.
+          replacements << [group, group.inspect[1..-2]]
+        end
+      end
+    end
+    new_string = yaml_string.dup
+    replacements.each do |operation|
+      new_string = new_string.sub(operation[0], operation[1])
+    end
+    # if this works without throwing another error, we've
+    # cleaned up the yaml successfully
+    YAML::load( new_string )
+    new_string
   end
 
   # opts contains a set of related entities that should be duplicated.
@@ -438,7 +458,6 @@ class WikiPage < ActiveRecord::Base
       :user_id => self.user_id,
       :protected_editing => self.protected_editing,
       :editing_roles => self.editing_roles,
-      :view_count => 0,
       :todo_date => self.todo_date
     })
     if self.assignment && opts_with_default[:duplicate_assignment]

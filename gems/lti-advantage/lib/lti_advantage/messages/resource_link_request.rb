@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module LtiAdvantage::Messages
   # Class represeting an LTI 1.3 LtiResourceLinkRequest.
   class ResourceLinkRequest < JwtMessage

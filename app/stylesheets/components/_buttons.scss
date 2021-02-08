@@ -231,11 +231,11 @@ input[type="button"] {
     @include canvas-button(#0770A3, $ic-color-light);
   } @else {
     @include canvas-button(
-      var(--ic-brand-button--primary-bgd),
-      var(--ic-brand-button--primary-text),
-      false,
-      var(--ic-brand-button--primary-bgd-darkened-5),
-      var(--ic-brand-button--primary-bgd-darkened-15)
+        var(--ic-brand-button--primary-bgd),
+        var(--ic-brand-button--primary-text),
+        false,
+        var(--ic-brand-button--primary-bgd-darkened-5),
+        var(--ic-brand-button--primary-bgd-darkened-15)
     );
   }
 }
@@ -261,11 +261,11 @@ input[type="button"] {
     @include canvas-button($ic-color-dark, $ic-color-light);
   } @else {
     @include canvas-button(
-      var(--ic-brand-button--secondary-bgd),
-      var(--ic-brand-button--secondary-text),
-      false,
-      var(--ic-brand-button--secondary-bgd-darkened-5),
-      var(--ic-brand-button--secondary-bgd-darkened-15)
+        var(--ic-brand-button--secondary-bgd),
+        var(--ic-brand-button--secondary-text),
+        false,
+        var(--ic-brand-button--secondary-bgd-darkened-5),
+        var(--ic-brand-button--secondary-bgd-darkened-15)
     );
   }
 }
@@ -350,11 +350,15 @@ input[type="button"] {
   background: transparent;
   border: none;
   padding: 2px 4px;
-  border-radius: 0;
+  border-radius: 3px;
   color: $ic-icon-link-color;
+  outline: none;
   &:hover, &:focus {
     background: transparent;
     color: $ic-icon-link-color-hover;
+  }
+  &:focus {
+    @include button-focus-light;
   }
   &.active, &.Button--active, &:active {
     background: transparent;

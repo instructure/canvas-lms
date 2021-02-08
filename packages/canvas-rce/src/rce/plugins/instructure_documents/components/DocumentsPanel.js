@@ -21,8 +21,8 @@ import {arrayOf, bool, func, shape, string, objectOf, oneOf} from 'prop-types'
 import {fileShape} from '../../shared/fileShape'
 import formatMessage from '../../../../format-message'
 
-import {Text} from '@instructure/ui-elements'
-import {View} from '@instructure/ui-layout'
+import {Text} from '@instructure/ui-text'
+import {View} from '@instructure/ui-view'
 import Link from './Link'
 import {
   LoadMoreButton,
@@ -58,7 +58,7 @@ function renderLoadingError(_error) {
 }
 
 export default function DocumentsPanel(props) {
-  const {fetchInitialDocs, fetchNextDocs, contextType, sortBy} = props
+  const {fetchInitialDocs, fetchNextDocs, contextType, sortBy, searchString} = props
   const documents = props.documents[contextType]
   const {hasMore, isLoading, error, files} = documents
   const lastItemRef = useRef(null)
@@ -71,7 +71,8 @@ export default function DocumentsPanel(props) {
     onLoadMore: fetchNextDocs,
     records: files,
     contextType,
-    sortBy
+    sortBy,
+    searchString
   })
 
   const handleDocClick = file => {
@@ -116,5 +117,6 @@ DocumentsPanel.propTypes = {
   sortBy: shape({
     sort: oneOf(['date_added', 'alphabetical']).isRequired,
     order: oneOf(['asc', 'desc']).isRequired
-  }).isRequired
+  }).isRequired,
+  searchString: string
 }

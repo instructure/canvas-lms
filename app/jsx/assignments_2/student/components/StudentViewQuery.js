@@ -20,7 +20,7 @@ import errorShipUrl from 'jsx/shared/svg/ErrorShip.svg'
 import GenericErrorPage from '../../../shared/components/GenericErrorPage/index'
 import I18n from 'i18n!assignments_2_initial_query'
 import {LOGGED_OUT_STUDENT_VIEW_QUERY, STUDENT_VIEW_QUERY} from '../graphqlData/Queries'
-import LoadingIndicator from '../../shared/LoadingIndicator'
+import LoadingIndicator from 'jsx/shared/LoadingIndicator'
 import {useQuery} from 'react-apollo'
 import React from 'react'
 import {string} from 'prop-types'
@@ -36,6 +36,7 @@ function getAssignmentEnvVariables() {
     assignmentUrl: `${baseUrl}/assignments`,
     courseId: ENV.context_asset_string.split('_')[1],
     currentUser: ENV.current_user,
+    enrollmentState: ENV.enrollment_state,
     modulePrereq: null,
     moduleUrl: `${baseUrl}/modules`
   }

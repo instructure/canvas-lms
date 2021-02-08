@@ -23,12 +23,11 @@ import React from 'react'
 import ReactDOM from 'react-dom'
 import {View} from 'Backbone'
 
-import htmlEscape from 'str/htmlEscape'
 import Slick from 'vendor/slickgrid'
-import Grid from '../../gradebook/OutcomeGradebookGrid'
+import Grid from 'jsx/gradebook/OutcomeGradebookGrid'
 import userSettings from '../../userSettings'
-import CheckboxView from './CheckboxView'
-import SectionMenuView from '../gradebook/SectionMenuView'
+import CheckboxView from 'jsx/gradebook/views/CheckboxView'
+import SectionMenuView from 'jsx/gradebook/views/SectionMenuView'
 import SectionFilter from 'jsx/gradebook/default_gradebook/components/content-filters/SectionFilter'
 import template from 'jst/gradebook/outcome_gradebook'
 import 'vendor/jquery.ba-tinypubsub'
@@ -70,6 +69,8 @@ export default class OutcomeGradebookView extends View
       new CheckboxView(Dictionary.remedial)
     ]
 
+    inactive_concluded_lmgb_filters: ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
+
     ratings: []
 
     events:
@@ -85,6 +86,7 @@ export default class OutcomeGradebookView extends View
       if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
         @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
         @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
+      Grid.gridRef = @
 
     remove: ->
       super()
@@ -147,7 +149,8 @@ export default class OutcomeGradebookView extends View
       view.on('togglestate', @_createFilter("rating_#{i}")) for view, i in @checkboxes
       @updateExportLink(@learningMastery.getCurrentSectionId())
       @$('#no_results_outcomes').change(() -> _this._toggleOutcomesWithNoResults(this.checked))
-      @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
+      if !@inactive_concluded_lmgb_filters
+        @$('#no_results_students').change(() -> _this._toggleStudentsWithNoResults(this.checked))
 
     _setFilterSetting: (name, value) ->
       filters = userSettings.contextGet('lmgb_filters')
@@ -168,8 +171,19 @@ export default class OutcomeGradebookView extends View
         @grid.setColumns(@columns)
       Grid.View.redrawHeader(@grid, Grid.averageFn)
 
-    _toggleStudentsWithNoResults: (enabled) ->
+    _toggleStudentsWithNoResults: (enabled) =>
       @_setFilterSetting('students_no_results', enabled)
+      @updateExportLink(@learningMastery.getCurrentSectionId())
+      @_rerender()
+
+    _toggleStudentsWithInactiveEnrollments: (enabled) =>
+      @_setFilterSetting('inactive_enrollments', enabled)
+      @updateExportLink(@learningMastery.getCurrentSectionId())
+      @_rerender()
+
+    _toggleStudentsWithConcludedEnrollments: (enabled) =>
+      @_setFilterSetting('concluded_enrollments', enabled)
+      @updateExportLink(@learningMastery.getCurrentSectionId())
       @_rerender()
 
     _rerender: ->
@@ -180,7 +194,11 @@ export default class OutcomeGradebookView extends View
       @_loadOutcomes()
 
     _toggleSort: (e, {grid, sortAsc, sortCol}) =>
-      if sortCol.field == @sortField
+      target = $(e.target).attr('data-component')
+      # Don't sort if user clicks the enrollments filter kabob
+      if target == 'lmgb-student-filter-trigger'
+        return
+      else if sortCol.field == @sortField
         # Change sort direction
         @sortOrderAsc = !@sortOrderAsc
       else
@@ -201,11 +219,12 @@ export default class OutcomeGradebookView extends View
     #
     # Returns an object.
     toJSON: ->
-      _.extend({}, checkboxes: @checkboxes)
+      _.extend({}, checkboxes: @checkboxes, inactive_concluded_lmgb_filters: @inactive_concluded_lmgb_filters)
 
     _loadFilterSettings: ->
       @$('#no_results_outcomes').prop('checked', @._getFilterSetting('outcomes_no_results'))
-      @$('#no_results_students').prop('checked', @._getFilterSetting('students_no_results'))
+      if !@inactive_concluded_lmgb_filters
+        @$('#no_results_students').prop('checked', @._getFilterSetting('students_no_results'))
 
     # Public: Render the view once all needed data is loaded.
     #
@@ -227,8 +246,7 @@ export default class OutcomeGradebookView extends View
       Grid.Util.saveOutcomes(response.linked.outcomes)
       Grid.Util.saveStudents(response.linked.users)
       Grid.Util.saveOutcomePaths(response.linked.outcome_paths)
-      sections = @learningMastery.getSections().map(htmlEscape)
-      Grid.Util.saveSections(sections)
+      Grid.Util.saveSections(@learningMastery.getSections())
       [columns, rows] = Grid.Util.toGrid(response, column: { formatter: Grid.View.cell })
       @columns = columns
       if @$('#no_results_outcomes:checkbox:checked').length == 1
@@ -310,10 +328,24 @@ export default class OutcomeGradebookView extends View
       "/api/v1/courses/#{course}/outcome_rollups?rating_percents=true&per_page=20&include[]=outcomes&include[]=users&include[]=outcome_paths#{excluding}&page=#{page}#{sortParams}#{sectionParam}"
 
     _loadOutcomes: (page = 1) =>
-      exclude = if @$('#no_results_students').prop('checked') then 'missing_user_rollups' else ''
+      filter = @_getOutcomeFiltersParams()
       course = ENV.context_asset_string.split('_')[1]
       @$('.outcome-gradebook-wrapper').disableWhileLoading(@hasOutcomes)
-      @_loadPage(@_rollupsUrl(course, exclude, page))
+      @_loadPage(@_rollupsUrl(course, filter, page))
+
+    _getOutcomeFilters: ->
+      outcome_filters = []
+      if @inactive_concluded_lmgb_filters
+        if !@._getFilterSetting('inactive_enrollments') then outcome_filters.push('inactive_enrollments')
+        if !@._getFilterSetting('concluded_enrollments') then outcome_filters.push('concluded_enrollments')
+        if !@._getFilterSetting('students_no_results') then outcome_filters.push('missing_user_rollups')
+      else
+        if @._getFilterSetting('students_no_results') then outcome_filters.push('missing_user_rollups')
+
+      return outcome_filters
+
+    _getOutcomeFiltersParams: ->
+      return @_getOutcomeFilters().map((value)  => "&exclude[]=#{value}").join('')
 
     # Internal: Load a page of outcome results from the given URL.
     #
@@ -366,5 +398,11 @@ export default class OutcomeGradebookView extends View
 
     updateExportLink: (section) =>
       url = "#{ENV.GRADEBOOK_OPTIONS.context_url}/outcome_rollups.csv"
-      url += "?section_id=#{section}" if section and section != '0'
+      params = "#{@_getOutcomeFiltersParams()}"
+
+      if section and section != '0'
+        params += "&" if params != ''
+        params += "section_id=#{section}"
+
+      url += "?#{params}" if params != ''
       $('.export-content').attr('href', url)

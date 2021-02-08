@@ -44,7 +44,7 @@ unless defined?(CANVAS_RAILS5_2)
 
       result = nil
       keys.each do |key|
-        result = Net::HTTP.get_response(URI("http://localhost:8500/v1/kv/#{key}"))
+        result = Net::HTTP.get_response(URI("http://localhost:8500/v1/kv/#{key}?stale"))
         result = nil unless result.is_a?(Net::HTTPSuccess)
         break if result
       end

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 #
 # Copyright (C) 2017 - present Instructure, Inc.
 #
@@ -15,7 +17,7 @@
 # You should have received a copy of the GNU Affero General Public License along
 # with this program. If not, see <http://www.gnu.org/licenses/>.
 
-require File.expand_path(File.dirname(__FILE__) + '/spec_helper.rb')
+require 'spec_helper'
 
 RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
 
@@ -39,7 +41,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
   let(:tool_proxy_context) { account }
   let(:tool_proxy) { create_tool_proxy(tool_proxy_context) }
 
-  def create_tool_proxy(context)
+  def create_tool_proxy(context, overrides={})
     tp = Lti::ToolProxy.create!(
       context: context,
       guid: SecureRandom.uuid,
@@ -48,7 +50,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       product_version: '1',
       workflow_state: 'active',
       raw_data: {
-        'enabled_capability' => ['Security.splitSecret'],
+        'enabled_capability' => overrides[:enabled_capability] || ['Security.splitSecret'],
         'security_contract' => security_contract,
         'tool_profile' => {
           'lti_version' => 'LTI-2p0',
@@ -108,6 +110,7 @@ RSpec.shared_context "lti2_spec_helper", :shared_context => :metadata do
       },
       lti_version: '1'
     )
+
     Lti::ToolProxyBinding.where(context_id: context.id, context_type: context.class.to_s,
                                 tool_proxy_id: tp).first_or_create!
     tp

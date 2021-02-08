@@ -21,13 +21,20 @@ import $ from 'jquery'
 import ready from '@instructure/ready'
 import 'jqueryui/dialog'
 
+const startupHost = window.location.host
+
 function fetchCourses() {
+  // Defense-in-depth... it's hard to see how this could happen given
+  // the places in which this function is given control, but let's just
+  // make absolutely sure that we never load off-application HTML into
+  // the #catalog_content div.
+  if (window.location.host !== startupHost) return
   $('#catalog_content').load(window.location.href)
 }
 
 function handleNav(e) {
   let url
-  if (!history.pushState) {
+  if (!window.history.pushState) {
     return
   }
   if (this.href) {
@@ -35,7 +42,7 @@ function handleNav(e) {
   } else {
     url = `${this.action}?${$(this).serialize()}`
   }
-  history.pushState(null, '', url)
+  window.history.pushState(null, '', url)
   fetchCourses()
   e.preventDefault()
 }

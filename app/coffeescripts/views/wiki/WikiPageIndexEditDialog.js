@@ -16,15 +16,14 @@
 // with this program. If not, see <http://www.gnu.org/licenses/>.
 
 import I18n from 'i18n!pages'
-import DialogFormView from '../DialogFormView'
+import DialogFormView, {getResponsiveWidth} from '../DialogFormView'
 import wrapperTemplate from 'jst/wiki/WikiPageIndexEditDialog'
 
 const dialogDefaults = {
   fixDialogButtons: false,
   title: I18n.t('edit_dialog_title', 'Edit Page'),
-  width: 450,
+  width: getResponsiveWidth(240, 450),
   height: 230,
-  minWidth: 450,
   minHeight: 230
 }
 
