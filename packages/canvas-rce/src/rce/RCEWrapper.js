@@ -1262,6 +1262,11 @@ class RCEWrapper extends React.Component {
         type: this.props.trayProps.contextType,
         id: this.props.trayProps.contextId,
       },
+
+      canvas_rce_containing_context: {
+        type: this.props.trayProps.containingContext.contextType,
+        id: this.props.trayProps.containingContext.contextId
+      }
     }
   }
 

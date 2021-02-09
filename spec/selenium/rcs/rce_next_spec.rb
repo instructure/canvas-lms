@@ -585,6 +585,29 @@ describe 'RCE next tests', ignore_js_errors: true do
         wait_for_ajaximations
         expect(assignment_due_date_exists?(due_at)).to eq true
       end
+
+      context "without manage files permissions" do
+        before(:each) do
+          RoleOverride.create!(permission: 'manage_files', enabled: false, context: @course.account, role: teacher_role)
+        end
+
+        it 'should still allow inserting course links' do
+          title = 'Discussion-Title'
+          @discussion = @course.discussion_topics.create!(title: title)
+
+          visit_front_page_edit(@course)
+
+          click_links_toolbar_menu_button
+          click_course_links
+
+          click_discussions_accordion
+          click_course_item_link(title)
+
+          in_frame rce_page_body_ifr_id do
+            expect(wiki_body_anchor.attribute('href')).to include discussion_id_path(@course, @discussion)
+          end
+        end
+      end
     end
 
     context 'sidebar search' do
