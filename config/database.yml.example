@@ -12,6 +12,8 @@ development:
   adapter: postgresql
   encoding: utf8
   database: canvas_development
+  host: localhost
+  username: canvas
   password: your_password
   timeout: 5000
 
