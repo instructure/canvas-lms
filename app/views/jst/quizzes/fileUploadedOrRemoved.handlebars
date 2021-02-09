@@ -1,7 +1,7 @@
 {{#if fileUploaded}}
 
   <div class="file-status file-uploaded">
-    <em>
+    <em role="alert" aria-live="assertive">
     {{#t "quizzes.file_successfully_uploaded"}}
       Your file has been successfully uploaded.
       {{/t}}
@@ -9,7 +9,7 @@
   </div>
 {{else}}
   <div class="file-status file-removed">
-    <em>
+    <em role="alert" aria-live="assertive">
       {{#t "quizzes.files_removed"}}
         {{display_name}} has been removed.
       {{/t}}
