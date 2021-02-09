@@ -44,7 +44,7 @@ class MessageStudents extends React.Component {
 
     // Callbacks
     onExited: PropTypes.func,
-    onRequestClose: PropTypes.func
+    onRequestClose: PropTypes.func.isRequired
   }
 
   static defaultProps = {
@@ -156,9 +156,14 @@ class MessageStudents extends React.Component {
       e.preventDefault()
     }
 
-    this.setState({
-      open: false
-    })
+    this.setState(
+      {
+        open: false
+      },
+      () => {
+        this.props.onRequestClose()
+      }
+    )
   }
 
   handleSubmit = e => {
