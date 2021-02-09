@@ -36,6 +36,10 @@
   }
 }
 
+.unpublished_courses_redesign .ic-DashboardCard__box {
+  padding: $ic-sp 0 $ic-sp $ic-sp*1.5 !important;
+}
+
 // These overrides are required because InstUI Tabs don't natively support icons or
 // themeable "selected" colors.
 .ic-Dashboard-tabs {

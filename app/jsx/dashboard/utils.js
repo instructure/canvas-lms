@@ -18,6 +18,15 @@
 
 import {asJson, defaultFetchOptions} from '@instructure/js-utils'
 
+export const countByCourseId = arr =>
+  arr.reduce((acc, {course_id}) => {
+    if (!acc[course_id]) {
+      acc[course_id] = 0
+    }
+    acc[course_id]++
+    return acc
+  }, {})
+
 export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
@@ -30,3 +39,11 @@ export const fetchLatestAnnouncement = courseId =>
     }
     return null
   })
+
+export const fetchMissingAssignments = (userId = 'self') =>
+  asJson(
+    window.fetch(
+      `/api/v1/users/${userId}/missing_submissions?filter[]=submittable`,
+      defaultFetchOptions
+    )
+  )

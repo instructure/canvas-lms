@@ -19,6 +19,9 @@
 import {createContext} from 'react'
 
 const DEFAULT_CONTEXT = {
+  assignmentsDueToday: [],
+  assignmentsMissing: [],
+  isStudent: false,
   responsiveSize: 'large'
 }
 

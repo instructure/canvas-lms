@@ -115,6 +115,7 @@ beforeAll(() => {
     '[]'
   )
   fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
+  fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
 })
 
 afterAll(() => {

@@ -16,10 +16,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import React, {useEffect, useRef, useState} from 'react'
+import {Provider} from 'react-redux'
 import I18n from 'i18n!k5_dashboard'
 import PropTypes from 'prop-types'
 import $ from 'jquery'
-import {initializePlanner, responsiviser} from '@instructure/canvas-planner'
+import {initializePlanner, responsiviser, store} from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
@@ -27,10 +28,9 @@ import {View} from '@instructure/ui-view'
 import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardTabs, {TAB_IDS} from './DashboardTabs'
 import HomeroomPage from './pages/HomeroomPage'
-import K5DashboardContext from './K5DashboardContext'
 import loadCardDashboard from '../bundles/dashboard_card'
 import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
-import SchedulePage from './pages/SchedulePage'
+import SchedulePage from 'jsx/dashboard/pages/SchedulePage'
 import {theme} from './k5-theme'
 
 const getInitialTab = defaultTab => {
@@ -102,7 +102,7 @@ export const K5Dashboard = ({
     }
   }, [cards, currentTab])
 
-  const handleRequestTabChange = (_, {id}) => {
+  const handleRequestTabChange = id => {
     setCurrentTab(id)
     if (window.history.replaceState) {
       let newUrl = window.location.href
@@ -114,25 +114,34 @@ export const K5Dashboard = ({
   }
 
   return (
-    <K5DashboardContext.Provider value={{responsiveSize}}>
-      <ApplyTheme theme={theme}>
+    <ApplyTheme theme={theme}>
+      <Provider store={store}>
         <View as="section">
           <Heading level="h1" margin="medium 0 small 0">
             {I18n.t('Welcome, %{name}!', {name: display_name})}
           </Heading>
           <DashboardTabs
             currentTab={currentTab}
-            onRequestTabChange={handleRequestTabChange}
+            onRequestTabChange={(_, {id}) => handleRequestTabChange(id)}
             tabsRef={setTabsRef}
           />
-          {cards && <HomeroomPage cards={cards} visible={currentTab === TAB_IDS.HOMEROOM} />}
+          {cards && (
+            <HomeroomPage
+              cards={cards}
+              isStudent={plannerEnabled}
+              requestTabChange={handleRequestTabChange}
+              responsiveSize={responsiveSize}
+              visible={currentTab === TAB_IDS.HOMEROOM}
+            />
+          )}
           {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
         </View>
-      </ApplyTheme>
-    </K5DashboardContext.Provider>
+      </Provider>
+    </ApplyTheme>
   )
 }
 
+K5Dashboard.displayName = 'K5Dashboard'
 K5Dashboard.propTypes = {
   currentUser: PropTypes.shape({
     display_name: PropTypes.string

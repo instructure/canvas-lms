@@ -19,14 +19,27 @@
 import React from 'react'
 import fetchMock from 'fetch-mock'
 import {render, waitForElement} from '@testing-library/react'
-import K5DashboardCard from '../cards/K5DashboardCard'
-import {DashboardCardHeaderHero} from 'jsx/dashboard/cards/K5DashboardCard'
+import K5DashboardCard, {DashboardCardHeaderHero} from '../cards/K5DashboardCard'
+import K5DashboardContext from '../K5DashboardContext'
+
+import {TAB_IDS} from '../DashboardTabs'
+
+const defaultContext = {
+  assignmentsDueToday: {},
+  assignmentsMissing: {},
+  isStudent: true
+}
 
 const defaultProps = {
   id: 'test',
   href: '/courses/5',
-  originalName: 'test course'
+  originalName: 'test course',
+  requestTabChange: () => {}
 }
+
+beforeEach(() => {
+  fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
+})
 
 afterEach(() => {
   fetchMock.restore()
@@ -37,7 +50,7 @@ describe('DashboardCardHeaderHero', () => {
     backgroundColor: '#FFFFFF',
     onClick: () => {}
   }
-  it('doesnt add instFS query params if it doesnt use an inst-fs url', () => {
+  it("doesn't add instFS query params if it doesnt use an inst-fs url", () => {
     const {getByTestId} = render(
       <DashboardCardHeaderHero {...heroProps} image="https://example.com/path/to/image.png" />
     )
@@ -66,9 +79,8 @@ describe('DashboardCardHeaderHero', () => {
   })
 })
 
-describe('K-5 Dashboard Cards', () => {
+describe('K-5 Dashboard Card', () => {
   it('renders a link with the courses title', () => {
-    fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
     const {getByText} = render(<K5DashboardCard {...defaultProps} />)
     expect(getByText('test course')).toBeInTheDocument()
   })
@@ -82,11 +94,56 @@ describe('K-5 Dashboard Cards', () => {
           html_url: '/courses/test/discussion_topics/55',
           title: 'How do you do, fellow kids?'
         }
-      ])
+      ]),
+      {overwriteRoutes: true}
     )
     const {getByText} = render(<K5DashboardCard {...defaultProps} />)
     const linkText = await waitForElement(() => getByText('How do you do, fellow kids?'))
     const link = linkText.closest('a')
     expect(link.href).toBe('http://localhost/courses/test/discussion_topics/55')
+  })
+
+  it('displays "Nothing due today" if no assignments are due today', async () => {
+    const {getByText} = render(
+      <K5DashboardContext.Provider value={{...defaultContext}}>
+        <K5DashboardCard {...defaultProps} />
+      </K5DashboardContext.Provider>
+    )
+    const message = await waitForElement(() => getByText('Nothing due today'))
+    expect(message).toBeInTheDocument()
+  })
+
+  it('displays a link to the schedule tab if any assignments are due today', async () => {
+    const requestTabChange = jest.fn()
+    const {getByText} = render(
+      <K5DashboardContext.Provider value={{...defaultContext, assignmentsDueToday: {test: 3}}}>
+        <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
+      </K5DashboardContext.Provider>
+    )
+    const link = await waitForElement(() => getByText('3 due today'))
+    link.click()
+    expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
+  })
+
+  it('displays a link to the schedule tab if any assignments are missing', async () => {
+    const requestTabChange = jest.fn()
+    const {getByText} = render(
+      <K5DashboardContext.Provider value={{...defaultContext, assignmentsMissing: {test: 2}}}>
+        <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
+      </K5DashboardContext.Provider>
+    )
+    const link = await waitForElement(() => getByText('2 missing'))
+    link.click()
+    expect(requestTabChange).toHaveBeenCalledWith(TAB_IDS.SCHEDULE)
+  })
+
+  it("doesn't display anything in the assignment links section if the user is not a student", async () => {
+    const requestTabChange = jest.fn()
+    const {queryByText} = render(
+      <K5DashboardContext.Provider value={{...defaultContext, isStudent: false}}>
+        <K5DashboardCard {...defaultProps} requestTabChange={requestTabChange} />
+      </K5DashboardContext.Provider>
+    )
+    expect(queryByText('Nothing due today')).not.toBeInTheDocument()
   })
 })
