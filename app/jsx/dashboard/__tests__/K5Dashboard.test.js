@@ -41,16 +41,35 @@ const dashboardCards = [
     shortName: 'Econ 101',
     originalName: 'Economics 101',
     courseCode: 'ECON-001',
-    isHomeroom: false
+    isHomeroom: false,
+    canManage: true
   },
   {
     id: 'homeroom',
     assetString: 'course_2',
     href: '/courses/2',
-    shortName: 'Homeroom',
+    shortName: 'Homeroom1',
     originalName: 'Home Room',
     courseCode: 'HOME-001',
-    isHomeroom: true
+    isHomeroom: true,
+    canManage: true
+  }
+]
+const homeroomAnnouncement = [
+  {
+    title: 'Announcement here',
+    message: '<p>This is the announcement</p>',
+    html_url: 'http://google.com/announcement',
+    permissions: {
+      update: true
+    },
+    attachments: [
+      {
+        display_name: 'exam1.pdf',
+        url: 'http://google.com/download',
+        filename: '1608134586_366__exam1.pdf'
+      }
+    ]
   }
 ]
 const defaultEnv = {
@@ -111,10 +130,10 @@ beforeAll(() => {
   })
   fetchMock.get('/api/v1/courses/test/activity_stream/summary', JSON.stringify(cardSummary))
   fetchMock.get(
-    '/api/v1/courses/homeroom/discussion_topics?only_announcements=true&per_page=1',
-    '[]'
+    '/api/v1/announcements?context_codes=course_homeroom&active_only=true&per_page=1',
+    JSON.stringify(homeroomAnnouncement)
   )
-  fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
+  fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
   fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
 })
 
@@ -199,6 +218,15 @@ describe('K-5 Dashboard', () => {
       const wrapper = await renderDashboardHomeroomPage()
       expect(wrapper.getByText('Economics 101')).toBeInTheDocument()
       expect(wrapper.queryByText('Home Room')).toBeNull()
+    })
+
+    it('shows latest announcement from each homeroom', async () => {
+      const wrapper = await renderDashboardHomeroomPage()
+      expect(wrapper.getByText('Announcement here')).toBeInTheDocument()
+      expect(wrapper.getByText('This is the announcement')).toBeInTheDocument()
+      const attachment = wrapper.getByText('exam1.pdf')
+      expect(attachment).toBeInTheDocument()
+      expect(attachment.href).toBe('http://google.com/download')
     })
   })
 

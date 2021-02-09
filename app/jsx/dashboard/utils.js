@@ -30,7 +30,7 @@ export const countByCourseId = arr =>
 export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
-      `/api/v1/courses/${courseId}/discussion_topics?only_announcements=true&per_page=1`,
+      `/api/v1/announcements?context_codes=course_${courseId}&active_only=true&per_page=1`,
       defaultFetchOptions
     )
   ).then(data => {

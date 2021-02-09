@@ -20,7 +20,8 @@ import fetchMock from 'fetch-mock'
 
 import {fetchLatestAnnouncement} from 'jsx/dashboard/utils'
 
-const ANNOUNCEMENT_URL = '/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1'
+const ANNOUNCEMENT_URL =
+  '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1'
 
 afterEach(() => {
   fetchMock.restore()

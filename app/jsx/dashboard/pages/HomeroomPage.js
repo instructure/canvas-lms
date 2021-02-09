@@ -29,6 +29,7 @@ import K5DashboardContext from '../K5DashboardContext'
 import K5DashboardCard from '../cards/K5DashboardCard'
 import {createDashboardCards} from 'jsx/bundles/dashboard_card'
 import {countByCourseId, fetchLatestAnnouncement, fetchMissingAssignments} from '../utils'
+import HomeroomAnnouncementsLayout from 'jsx/dashboard/layout/HomeroomAnnouncementsLayout'
 
 export const fetchHomeroomAnnouncements = cards =>
   Promise.all(
@@ -37,15 +38,32 @@ export const fetchHomeroomAnnouncements = cards =>
       .map(course =>
         fetchLatestAnnouncement(course.id).then(announcement => {
           if (!announcement) {
-            return null
+            return {
+              courseId: course.id,
+              courseName: course.shortName,
+              courseUrl: course.href,
+              canEdit: course.canManage
+            }
+          }
+          let attachment
+          if (announcement.attachments[0]) {
+            attachment = {
+              display_name: announcement.attachments[0].display_name,
+              url: announcement.attachments[0].url,
+              filename: announcement.attachments[0].filename
+            }
           }
           return {
-            id: announcement.id,
-            title: announcement.title,
-            message: announcement.message,
-            url: announcement.html_url,
+            courseId: course.id,
             courseName: course.shortName,
-            courseUrl: course.href
+            courseUrl: course.href,
+            canEdit: announcement.permissions.update,
+            announcement: {
+              title: announcement.title,
+              message: announcement.message,
+              url: announcement.html_url,
+              attachment
+            }
           }
         })
       )
@@ -80,7 +98,9 @@ export const HomeroomPage = props => {
       aria-hidden={!visible}
     >
       {homeroomAnnouncements?.length > 0 && (
-        <View as="section">{/* Homeroom content will go here */}</View>
+        <View as="section">
+          <HomeroomAnnouncementsLayout homeroomAnnouncements={homeroomAnnouncements} />
+        </View>
       )}
       {cards?.length > 0 && (
         <View as="section">

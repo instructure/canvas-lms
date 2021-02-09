@@ -38,7 +38,7 @@ const defaultProps = {
 }
 
 beforeEach(() => {
-  fetchMock.get('/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1', '[]')
+  fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
 })
 
 afterEach(() => {
@@ -87,7 +87,7 @@ describe('K-5 Dashboard Card', () => {
 
   it('displays a link to the latest announcement if one exists', async () => {
     fetchMock.get(
-      '/api/v1/courses/test/discussion_topics?only_announcements=true&per_page=1',
+      '/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1',
       JSON.stringify([
         {
           id: '55',
