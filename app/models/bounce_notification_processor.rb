@@ -47,6 +47,8 @@ class BounceNotificationProcessor
 
   def process
     return nil unless self.class.enabled?
+    start = Time.now.utc
+
     bounce_queue.poll(config.slice(*POLL_PARAMS)) do |message|
       bounce_notification = parse_message(message)
       if bounce_notification
@@ -54,6 +56,11 @@ class BounceNotificationProcessor
       else
         InstStatsd::Statsd.increment('bounce_notification_processor.processed.no_bounce')
       end
+
+      # this job gets scheduled every 5 minutes; so don't run longer than 5 minutes for any
+      # particular instance, in order to release db resources and allow jobs to restart
+      # gracefully
+      break if Time.now.utc - start >= 5.minutes.to_i
     end
   end
 
