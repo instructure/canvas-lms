@@ -270,7 +270,7 @@ class Role < ActiveRecord::Base
         manageable << 'TeacherEnrollment'
       end
     end
-    if context.grants_right?(user, :manage_admin_users)
+    if !context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) && context.grants_right?(user, :manage_admin_users)
       manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     end
     manageable.uniq.sort
@@ -279,17 +279,22 @@ class Role < ActiveRecord::Base
   def self.add_delete_roles_by_user(user, context, other_manageable)
     addable = []
     deleteable = []
-    addable += ['TaEnrollment'] if context.grants_right?(user, :add_ta_to_course)
-    addable += ['ObserverEnrollment'] if context.grants_right?(user, :add_observer_to_course)
     addable += ['DesignerEnrollment'] if context.grants_right?(user, :add_designer_to_course)
-    deleteable += ['TaEnrollment'] if context.grants_right?(user, :remove_ta_from_course)
-    deleteable += ['ObserverEnrollment'] if context.grants_right?(user, :remove_observer_from_course)
     deleteable += ['DesignerEnrollment'] if context.grants_right?(user, :remove_designer_from_course)
+    addable += ['ObserverEnrollment'] if context.grants_right?(user, :add_observer_to_course)
+    deleteable += ['ObserverEnrollment'] if context.grants_right?(user, :remove_observer_from_course)
+    addable += ['TaEnrollment'] if context.grants_right?(user, :add_ta_to_course)
+    deleteable += ['TaEnrollment'] if context.grants_right?(user, :remove_ta_from_course)
+    addable += ['TeacherEnrollment'] if context.grants_right?(user, :add_teacher_to_course)
+    deleteable += ['TeacherEnrollment'] if context.grants_right?(user, :remove_teacher_from_course)
 
-    # should this be yet another granular add/remove permission instead? maybe next evolution
-    if other_manageable.include? 'TeacherEnrollment'
-      addable += ['TeacherEnrollment']
-      deleteable += ['TeacherEnrollment']
+    # Hopefully these go away when the granular permissions for all roles are fully implemented.
+    # Basically they're pulling in what :manage_students currently grants, as well as the old
+    # behavior of :manage_admin_users, plus that odd case where if a course has no teacher then
+    # anyone at all can add a teacher enrollment.
+    if other_manageable.include? 'ObserverEnrollment'
+      addable += ['ObserverEnrollment']
+      deleteable += ['ObserverEnrollment']
     end
 
     if other_manageable.include? 'StudentEnrollment'
@@ -297,12 +302,12 @@ class Role < ActiveRecord::Base
       deleteable += ['StudentEnrollment']
     end
 
-    if other_manageable.include? 'ObserverEnrollment'
-      addable += ['ObserverEnrollment']
-      deleteable += ['ObserverEnrollment']
+    if other_manageable.include? 'TeacherEnrollment'
+      addable += ['TeacherEnrollment']
+      deleteable += ['TeacherEnrollment']
     end
 
-    [addable, deleteable]
+    [addable.uniq, deleteable.uniq]
   end
 
   def self.compile_manageable_roles(role_data, user, context)

@@ -194,7 +194,7 @@ describe Role do
     end
   end
 
-  context "custom role helpers" do
+  describe "custom role helpers" do
     before :once do
       account_model
       @sub_account = @account.sub_accounts.create!
@@ -261,28 +261,114 @@ describe Role do
       end
     end
 
-    it "should set manageable_by_user correctly with manage_admin_users permission restricted" do
-      course_with_ta
-      @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
-
-      roles = Role.role_data(@course, @ta)
-      [ta_role, teacher_role, designer_role].each do |role|
-        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
+    context "with granular_permissions_manage_admin_users FF disabled" do
+      before :each do
+        course_with_ta
+        @course.root_account.disable_feature!(:granular_permissions_manage_admin_users)
       end
-      [student_role, observer_role].each do |role|
-        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+
+      it "should set manageable_by_user correctly with manage_admin_users permission restricted" do
+        @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_admin_users)
+
+        roles = Role.role_data(@course, @ta)
+        [ta_role, teacher_role, designer_role].each do |role|
+          expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_falsey
+        end
+        [student_role, observer_role].each do |role|
+          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+        end
+      end
+
+      it "should set manageable_by_user correctly with manage_students permission restricted" do
+        @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: :manage_admin_users)
+        @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
+
+        roles = Role.role_data(@course, @ta)
+        expect(roles.find{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
+        [observer_role, ta_role, teacher_role, designer_role].each do |role|
+          expect(roles.find{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+        end
       end
     end
 
-    it "should set manageable_by_user correctly with manage_students permission restricted" do
-      course_with_ta
-      @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: :manage_admin_users)
-      @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
+    context "with granular_permissions_manage_admin_users FF enabled" do
+      before :each do
+        course_with_ta
+        @course.root_account.enable_feature!(:granular_permissions_manage_admin_users)
+      end
 
-      roles = Role.role_data(@course, @ta)
-      expect(roles.detect{|r| r[:id] == student_role.id}[:manageable_by_user]).to be_falsey
-      [observer_role, ta_role, teacher_role, designer_role].each do |role|
-        expect(roles.detect{|r| r[:id] == role.id}[:manageable_by_user]).to be_truthy
+      describe "does all the addable/deleteable by user stuff right when manage_students is enabled" do
+        roles_to_test = %w(designer observer ta teacher student)
+        role_names = {
+          "designer" => "DesignerEnrollment",
+          "observer" => "ObserverEnrollment",
+          "ta" => "TaEnrollment",
+          "teacher" => "TeacherEnrollment",
+          "student" => "StudentEnrollment"
+        }
+        ["adding", "deleting"].each do |mode|
+          roles_to_test.each do |perm_role|
+            next if perm_role == "student"  # there's no granulars for adding/removing students yet
+            role_key_to_test = mode == "adding" ? :addable_by_user : :deleteable_by_user
+            opposite_role_key_to_test = mode == "adding" ? :deleteable_by_user : :addable_by_user
+            permission_key = mode == "adding" ? "add_#{perm_role}_to_course".to_sym : "remove_#{perm_role}_from_course"
+
+            it "when #{mode} a(n) #{perm_role}" do
+              @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: permission_key)
+
+              roles = Role.role_data(@course, @ta)
+              roles_to_test.each do |test_role|
+                manageable_by_manage_students = ["observer", "student"].include?(test_role)
+                value = roles.find { |r| r[:name] == role_names[test_role] }[role_key_to_test]
+                # For now, :manage_students lets you add not just students but observers, so
+                # that's true regardless of the setting of the granular permission.
+                # This will get fixed later.
+                desired = perm_role == test_role || manageable_by_manage_students
+                expect(value).to eq desired
+
+                # the opposite (add <-> delete) permission should always be false except for
+                # the ones controlled by manage_students
+                value = roles.find { |r| r[:name] == role_names[test_role] }[opposite_role_key_to_test]
+                expect(value).to eq manageable_by_manage_students
+              end
+            end
+          end
+        end
+      end
+
+      describe "does all the addable/deleteable by user stuff right when manage_students is disabled" do
+        roles_to_test = %w(designer observer ta teacher student)
+        role_names = {
+          "designer" => "DesignerEnrollment",
+          "observer" => "ObserverEnrollment",
+          "ta" => "TaEnrollment",
+          "teacher" => "TeacherEnrollment",
+          "student" => "StudentEnrollment"
+        }
+        ["adding", "deleting"].each do |mode|
+          roles_to_test.each do |perm_role|
+            next if perm_role == "student"  # there's no granulars for adding/removing students yet
+            role_key_to_test = mode == "adding" ? :addable_by_user : :deleteable_by_user
+            opposite_role_key_to_test = mode == "adding" ? :deleteable_by_user : :addable_by_user
+            permission_key = mode == "adding" ? "add_#{perm_role}_to_course".to_sym : "remove_#{perm_role}_from_course"
+
+            it "when #{mode} a(n) #{perm_role}" do
+              @course.account.role_overrides.create!(role: ta_role, enabled: true, permission: permission_key)
+              @course.account.role_overrides.create!(role: ta_role, enabled: false, permission: :manage_students)
+
+              roles = Role.role_data(@course, @ta)
+              roles_to_test.each do |test_role|
+                value = roles.find { |r| r[:name] == role_names[test_role] }[role_key_to_test]
+                desired = perm_role == test_role
+                expect(value).to eq desired
+
+                # the opposite (add <-> delete) permission should always be false
+                value = roles.find { |r| r[:name] == role_names[test_role] }[opposite_role_key_to_test]
+                expect(value).to be_falsey
+              end
+            end
+          end
+        end
       end
     end
   end
