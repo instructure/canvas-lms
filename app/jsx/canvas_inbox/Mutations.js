@@ -16,6 +16,7 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+import {ConversationMessage} from './graphqlData/ConversationMessage'
 import {ConversationParticipant} from './graphqlData/ConversationParticipant'
 import {ConversationParticipantWithConversation} from './graphqlData/ConversationParticipantWithConversation'
 import {Error} from './graphqlData/Error'
@@ -97,4 +98,38 @@ export const CREATE_CONVERSATION = gql`
   }
   ${Error.fragment}
   ${ConversationParticipantWithConversation.fragment}
+`
+
+export const ADD_CONVERSATION_MESSAGE = gql`
+  mutation AddConversationMessage(
+    $attachmentIds: [ID!]
+    $body: String!
+    $conversationId: ID!
+    $includedMessages: [ID!]
+    $mediaCommentId: ID
+    $mediaCommentType: String
+    $recipients: [String!]!
+  ) {
+    addConversationMessage(
+      input: {
+        attachmentIds: $attachmentIds
+        body: $body
+        conversationId: $conversationId
+        includedMessages: $includedMessages
+        mediaCommentId: $mediaCommentId
+        mediaCommentType: $mediaCommentType
+        recipients: $recipients
+      }
+    ) {
+      conversationMessage {
+        ...ConversationMessage
+      }
+      messageQueued
+      errors {
+        ...Error
+      }
+    }
+  }
+  ${Error.fragment}
+  ${ConversationMessage.fragment}
 `

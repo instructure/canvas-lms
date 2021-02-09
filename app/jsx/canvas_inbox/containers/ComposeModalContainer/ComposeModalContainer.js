@@ -30,7 +30,7 @@ import {uploadFiles} from 'jsx/shared/upload_file'
 
 import {Modal} from '@instructure/ui-modal'
 
-const ComposeModalContainer = (props) => {
+const ComposeModalContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
 
   const [attachments, setAttachments] = useState([])
@@ -41,11 +41,11 @@ const ComposeModalContainer = (props) => {
   const [sendIndividualMessages, setSendIndividualMessages] = useState(false)
   const [selectedContext, setSelectedContext] = useState()
 
-  const fileUploadUrl = (attachmentFolderId) => {
+  const fileUploadUrl = attachmentFolderId => {
     return `/api/v1/folders/${attachmentFolderId}/files`
   }
 
-  const addAttachment = async (e) => {
+  const addAttachment = async e => {
     const files = Array.from(e.currentTarget?.files)
     if (!files.length) {
       setOnFailure(I18n.t('Error adding files to conversation message'))
@@ -56,7 +56,7 @@ const ComposeModalContainer = (props) => {
       return {isLoading: true, id: file.url ? `${i}-${file.url}` : `${i}-${file.name}`}
     })
 
-    setAttachmentsToUpload((prev) => prev.concat(newAttachmentsToUpload))
+    setAttachmentsToUpload(prev => prev.concat(newAttachmentsToUpload))
     setOnSuccess(I18n.t('Uploading files'))
 
     try {
@@ -64,22 +64,22 @@ const ComposeModalContainer = (props) => {
         files,
         fileUploadUrl(ENV.CONVERSATIONS.ATTACHMENTS_FOLDER_ID)
       )
-      setAttachments((prev) => prev.concat(newFiles))
+      setAttachments(prev => prev.concat(newFiles))
     } catch (err) {
       setOnFailure(I18n.t('Error uploading files'))
     } finally {
-      setAttachmentsToUpload((prev) => {
+      setAttachmentsToUpload(prev => {
         const attachmentsStillUploading = prev.filter(
-          (file) => !newAttachmentsToUpload.includes(file)
+          file => !newAttachmentsToUpload.includes(file)
         )
         return attachmentsStillUploading
       })
     }
   }
 
-  const removeAttachment = (id) => {
-    setAttachments((prev) => {
-      const index = prev.findIndex((attachment) => attachment.id === id)
+  const removeAttachment = id => {
+    setAttachments(prev => {
+      const index = prev.findIndex(attachment => attachment.id === id)
       prev.splice(index, 1)
       return [...prev]
     })
@@ -90,11 +90,11 @@ const ComposeModalContainer = (props) => {
     addAttachment(e)
   }
 
-  const onSubjectChange = (value) => {
+  const onSubjectChange = value => {
     setSubject(value.currentTarget.value)
   }
 
-  const onBodyChange = (value) => {
+  const onBodyChange = value => {
     setBody(value)
     if (value) {
       setBodyMessages([])
@@ -102,10 +102,10 @@ const ComposeModalContainer = (props) => {
   }
 
   const onSendIndividualMessagesChange = () => {
-    setSendIndividualMessages((prev) => !prev)
+    setSendIndividualMessages(prev => !prev)
   }
 
-  const onContextSelect = (id) => {
+  const onContextSelect = id => {
     setSelectedContext(id)
   }
 
@@ -119,16 +119,29 @@ const ComposeModalContainer = (props) => {
   }
 
   const sendMessage = async () => {
-    await props.createConversation({
-      variables: {
-        attachmentIds: attachments.map((a) => a.id),
-        body,
-        contextCode: selectedContext,
-        recipients: ['5'], // TODO: replace this with selected users
-        subject,
-        groupConversation: !sendIndividualMessages,
-      },
-    })
+    if (props.isReply) {
+      await props.addConversationMessage({
+        variables: {
+          attachmentIds: attachments.map(a => a.id),
+          body,
+          includedMessages: props.pastConversation?.conversationMessagesConnection.nodes.map(
+            c => c._id
+          )
+        }
+      })
+    } else {
+      await props.createConversation({
+        variables: {
+          attachmentIds: attachments.map(a => a.id),
+          body,
+          contextCode: selectedContext,
+          recipients: ['5'], // TODO: replace this with selected users
+          subject,
+          groupConversation: !sendIndividualMessages
+        }
+      })
+    }
+
     props.onDismiss()
   }
 
@@ -210,6 +223,7 @@ const ComposeModalContainer = (props) => {
 export default ComposeModalContainer
 
 ComposeModalContainer.propTypes = {
+  addConversationMessage: PropTypes.func,
   courses: PropTypes.object,
   createConversation: PropTypes.func,
   isReply: PropTypes.bool,
@@ -217,5 +231,5 @@ ComposeModalContainer.propTypes = {
   open: PropTypes.bool,
   pastConversation: Conversation.shape,
   sendingMessage: PropTypes.bool,
-  setSendingMessage: PropTypes.func,
+  setSendingMessage: PropTypes.func
 }

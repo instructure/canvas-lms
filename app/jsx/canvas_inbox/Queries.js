@@ -78,6 +78,7 @@ export const REPLY_CONVERSATION_QUERY = gql`
         subject
         conversationMessagesConnection(participants: $participants) {
           nodes {
+            _id
             body
             createdAt
             author {

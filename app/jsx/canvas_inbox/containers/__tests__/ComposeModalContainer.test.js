@@ -17,10 +17,10 @@
  */
 
 import * as uploadFileModule from 'jsx/shared/upload_file'
+import {ADD_CONVERSATION_MESSAGE, CREATE_CONVERSATION} from '../../Mutations'
 import {AlertManagerContext} from 'jsx/shared/components/AlertManager'
 import ComposeModalManager from '../ComposeModalContainer/ComposeModalManager'
 import {COURSES_QUERY, REPLY_CONVERSATION_QUERY} from '../../Queries'
-import {CREATE_CONVERSATION} from '../../Mutations'
 import {createCache} from '../../../canvas-apollo'
 import {MockedProvider} from '@apollo/react-testing'
 import {mockQuery} from '../../mocks'
@@ -33,8 +33,8 @@ beforeEach(() => {
   window.ENV = {
     current_user_id: '1',
     CONVERSATIONS: {
-      ATTACHMENTS_FOLDER_ID: 1,
-    },
+      ATTACHMENTS_FOLDER_ID: 1
+    }
   }
 })
 
@@ -44,14 +44,14 @@ const createGraphqlMocks = () => {
       request: {
         query: COURSES_QUERY,
         variables: {
-          userID: '1',
+          userID: '1'
         },
         overrides: {
           Node: {
-            __typename: 'User',
-          },
-        },
-      },
+            __typename: 'User'
+          }
+        }
+      }
     },
     {
       request: {
@@ -62,37 +62,54 @@ const createGraphqlMocks = () => {
           contextCode: undefined,
           recipients: ['5'], // TODO: change this when we have an address book component
           subject: 'Potato Subject',
-          groupConversation: true,
+          groupConversation: true
         },
         overrides: {
           CreateConversationPayload: {
-            errors: null,
-          },
-        },
-      },
+            errors: null
+          }
+        }
+      }
     },
     {
       request: {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: 1,
-          participants: 1,
+          participants: 1
         },
         overrides: {
           Node: {
-            __typename: 'Conversation',
-          },
-        },
-      },
+            __typename: 'Conversation'
+          }
+        }
+      }
     },
+    {
+      request: {
+        query: ADD_CONVERSATION_MESSAGE,
+        variables: {
+          conversationId: 1,
+          recipients: ['1'],
+          attachmentIds: [],
+          body: 'Potato',
+          includedMessages: ['1a', '1a']
+        },
+        overrides: {
+          AddConversationMessagePayload: {
+            errors: null
+          }
+        }
+      }
+    }
   ]
 
   const mockResults = Promise.all(
-    mocks.map(async (m) => {
+    mocks.map(async m => {
       const result = await mockQuery(m.request.query, m.request.overrides, m.request.variables)
       return {
         request: {query: m.request.query, variables: m.request.variables},
-        result,
+        result
       }
     })
   )
@@ -119,8 +136,8 @@ describe('ComposeModalContainer', () => {
   const uploadFiles = (element, files) => {
     fireEvent.change(element, {
       target: {
-        files,
-      },
+        files
+      }
     })
   }
 
@@ -146,7 +163,7 @@ describe('ComposeModalContainer', () => {
     it('allows uploading multiple files', async () => {
       uploadFileModule.uploadFiles.mockResolvedValue([
         {id: '1', name: 'file1.jpg'},
-        {id: '2', name: 'file2.jpg'},
+        {id: '2', name: 'file2.jpg'}
       ])
       const {findByTestId} = await setup()
       const fileInput = await findByTestId('attachment-input')
@@ -259,16 +276,44 @@ describe('ComposeModalContainer', () => {
           nodes: [
             {
               author: {
-                _id: 1,
-              },
-            },
-          ],
-        },
+                _id: 1
+              }
+            }
+          ]
+        }
       })
 
       await waitForApolloLoading()
 
       expect(component.queryByTestId('past-messages')).toBeInTheDocument()
+    })
+
+    it('allows adding a message to a conversation', async () => {
+      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+      const component = await setup(jest.fn(), mockedSetOnSuccess, true, {
+        _id: 1,
+        conversationMessagesConnection: {
+          nodes: [
+            {
+              author: {
+                _id: 1
+              }
+            }
+          ]
+        }
+      })
+
+      await waitForApolloLoading()
+
+      // Set body
+      const bodyInput = component.getByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+      // Hit send
+      const button = component.getByTestId('send-button')
+      fireEvent.click(button)
+
+      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
     })
   })
 })
