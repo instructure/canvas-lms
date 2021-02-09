@@ -35,15 +35,26 @@ const ComposeModalManager = props => {
     variables: {
       userID: ENV.current_user_id?.toString()
     },
-    skip: props.isReply
+    skip: props.isReply || props.isReplyAll
   })
+
+  const getParticipants = () => {
+    const lastAuthorId = props.conversation?.conversationMessagesConnection.nodes[0].author._id.toString()
+    if (props.isReply && lastAuthorId !== ENV.current_user_id.toString()) {
+      return [lastAuthorId]
+    } else {
+      return props.conversation?.conversationMessagesConnection.nodes[0].recipients.map(r =>
+        r._id.toString()
+      )
+    }
+  }
 
   const replyConversationQuery = useQuery(REPLY_CONVERSATION_QUERY, {
     variables: {
       conversationID: props.conversation?._id,
-      participants: props.conversation?.conversationMessagesConnection.nodes[0].author._id
+      participants: getParticipants()
     },
-    skip: !props.isReply
+    skip: !(props.isReply || props.isReplyAll)
   })
 
   const updateConversationsCache = (cache, result) => {
@@ -54,7 +65,7 @@ const ComposeModalManager = props => {
           cache.readQuery({
             query: CONVERSATIONS_QUERY,
             variables: {
-              scope: props.isReply ? 'inbox' : 'sent',
+              scope: props.isReply || props.isReplyAll ? 'inbox' : 'sent',
               userID: ENV.current_user_id?.toString()
             }
           })
@@ -67,7 +78,7 @@ const ComposeModalManager = props => {
       return
     }
 
-    if (props.isReply) {
+    if (props.isReply || props.isReplyAll) {
       legacyNode.conversationsConnection.nodes
         .find(c => c.conversation._id === props.conversation._id)
         .conversation.conversationMessagesConnection.nodes.unshift(
@@ -82,7 +93,7 @@ const ComposeModalManager = props => {
     cache.writeQuery({
       query: CONVERSATIONS_QUERY,
       variables: {
-        scope: props.isReply ? 'inbox' : 'sent',
+        scope: props.isReply || props.isReplyAll ? 'inbox' : 'sent',
         userID: ENV.current_user_id?.toString()
       },
       data: {legacyNode}
@@ -90,14 +101,14 @@ const ComposeModalManager = props => {
   }
 
   const updateReplyConversationsCache = (cache, result) => {
-    if (props.isReply) {
+    if (props.isReply || props.isReplyAll) {
       const replyQueryResult = JSON.parse(
         JSON.stringify(
           cache.readQuery({
             query: REPLY_CONVERSATION_QUERY,
             variables: {
               conversationID: props.conversation?._id,
-              participants: props.conversation?.conversationMessagesConnection.nodes[0].author._id
+              participants: getParticipants()
             }
           })
         )
@@ -111,7 +122,7 @@ const ComposeModalManager = props => {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: props.conversation?._id,
-          participants: props.conversation?.conversationMessagesConnection.nodes[0].author._id
+          participants: getParticipants()
         },
         data: {legacyNode: replyQueryResult.legacyNode}
       })
@@ -119,7 +130,7 @@ const ComposeModalManager = props => {
   }
 
   const updateCache = (cache, result) => {
-    if (props.isReply) {
+    if (props.isReply || props.isReplyAll) {
       if (result.data.addConversationMessage.errors) {
         setOnFailure(I18n.t('Error occurred while adding message to conversation'))
         return
@@ -155,17 +166,6 @@ const ComposeModalManager = props => {
     onError: () => onConversationCreateComplete(false)
   })
 
-  const replyRecipients = () => {
-    if (
-      ENV.current_user_id === props.conversation?.conversationMessagesConnection.nodes[0].author._id
-    ) {
-      return props.conversation.conversationParticipantsConnection.nodes
-        .map(cp => cp.userId)
-        .filter(id => id !== ENV.current_user_id.toString())
-    }
-    return [props.conversation?.conversationMessagesConnection.nodes[0].author._id.toString()]
-  }
-
   if (!props.open) {
     return null
   }
@@ -192,13 +192,13 @@ const ComposeModalManager = props => {
           variables: {
             ...data.variables,
             conversationId: props.conversation?._id,
-            recipients: replyRecipients()
+            recipients: getParticipants()
           }
         })
       }}
       courses={coursesQuery?.data?.legacyNode}
       createConversation={createConversation}
-      isReply={props.isReply}
+      isReply={props.isReply || props.isReplyAll}
       onDismiss={props.onDismiss}
       open={props.open}
       pastConversation={replyConversationQuery?.data?.legacyNode}
@@ -211,6 +211,7 @@ const ComposeModalManager = props => {
 ComposeModalManager.propTypes = {
   conversation: Conversation.shape,
   isReply: PropTypes.bool,
+  isReplyAll: PropTypes.bool,
   onDismiss: PropTypes.func,
   open: PropTypes.bool
 }

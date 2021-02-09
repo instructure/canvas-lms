@@ -76,7 +76,7 @@ const createGraphqlMocks = () => {
         query: REPLY_CONVERSATION_QUERY,
         variables: {
           conversationID: 1,
-          participants: 1
+          participants: ['1337']
         },
         overrides: {
           Node: {
@@ -90,7 +90,38 @@ const createGraphqlMocks = () => {
         query: ADD_CONVERSATION_MESSAGE,
         variables: {
           conversationId: 1,
-          recipients: ['1'],
+          recipients: ['1337'],
+          attachmentIds: [],
+          body: 'Potato',
+          includedMessages: ['1a', '1a']
+        },
+        overrides: {
+          AddConversationMessagePayload: {
+            errors: null
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: REPLY_CONVERSATION_QUERY,
+        variables: {
+          conversationID: 1,
+          participants: ['1337', '1338']
+        },
+        overrides: {
+          Node: {
+            __typename: 'Conversation'
+          }
+        }
+      }
+    },
+    {
+      request: {
+        query: ADD_CONVERSATION_MESSAGE,
+        variables: {
+          conversationId: 1,
+          recipients: ['1337', '1338'],
           attachmentIds: [],
           body: 'Potato',
           includedMessages: ['1a', '1a']
@@ -116,7 +147,13 @@ const createGraphqlMocks = () => {
   return mockResults
 }
 
-const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn(), isReply, conversation) => {
+const setup = async (
+  setOnFailure = jest.fn(),
+  setOnSuccess = jest.fn(),
+  isReply,
+  isReplyAll,
+  conversation
+) => {
   const mocks = await createGraphqlMocks()
   return render(
     <AlertManagerContext.Provider value={{setOnFailure, setOnSuccess}}>
@@ -125,6 +162,7 @@ const setup = async (setOnFailure = jest.fn(), setOnSuccess = jest.fn(), isReply
           open
           onDismiss={jest.fn()}
           isReply={isReply}
+          isReplyAll={isReplyAll}
           conversation={conversation}
         />
       </MockedProvider>
@@ -270,13 +308,13 @@ describe('ComposeModalContainer', () => {
     })
 
     it('should include past messages', async () => {
-      const component = await setup(jest.fn(), jest.fn(), true, {
+      const component = await setup(jest.fn(), jest.fn(), true, false, {
         _id: 1,
         conversationMessagesConnection: {
           nodes: [
             {
               author: {
-                _id: 1
+                _id: 1337
               }
             }
           ]
@@ -288,16 +326,54 @@ describe('ComposeModalContainer', () => {
       expect(component.queryByTestId('past-messages')).toBeInTheDocument()
     })
 
-    it('allows adding a message to a conversation', async () => {
+    it('allows replying to a conversation', async () => {
       const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
-      const component = await setup(jest.fn(), mockedSetOnSuccess, true, {
+      const component = await setup(jest.fn(), mockedSetOnSuccess, true, false, {
         _id: 1,
         conversationMessagesConnection: {
           nodes: [
             {
               author: {
-                _id: 1
+                _id: 1337
               }
+            }
+          ]
+        }
+      })
+
+      await waitForApolloLoading()
+
+      // Set body
+      const bodyInput = component.getByTestId('message-body')
+      fireEvent.change(bodyInput, {target: {value: 'Potato'}})
+
+      // Hit send
+      const button = component.getByTestId('send-button')
+      fireEvent.click(button)
+
+      await wait(() => expect(mockedSetOnSuccess).toHaveBeenCalled())
+    })
+  })
+
+  describe('replyAll', () => {
+    it('allows replying all to a conversation', async () => {
+      const mockedSetOnSuccess = jest.fn().mockResolvedValue({})
+      const component = await setup(jest.fn(), mockedSetOnSuccess, false, true, {
+        _id: 1,
+        conversationMessagesConnection: {
+          nodes: [
+            {
+              author: {
+                _id: 1337
+              },
+              recipients: [
+                {
+                  _id: 1337
+                },
+                {
+                  _id: 1338
+                }
+              ]
             }
           ]
         }

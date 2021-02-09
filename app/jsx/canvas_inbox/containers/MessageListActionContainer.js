@@ -30,7 +30,7 @@ import React, {useContext} from 'react'
 import {reduceDuplicateCourses} from '../helpers/courses_helper'
 import {View} from '@instructure/ui-view'
 
-const MessageListActionContainer = (props) => {
+const MessageListActionContainer = props => {
   const {setOnFailure, setOnSuccess} = useContext(AlertManagerContext)
   const conversationsQuery = CONVERSATIONS_QUERY
   const userID = ENV.current_user_id?.toString()
@@ -40,7 +40,7 @@ const MessageListActionContainer = (props) => {
       JSON.stringify(
         cache.readQuery({
           query: conversationsQuery,
-          variables: {userID, scope: props.scope, course: props.course},
+          variables: {userID, scope: props.scope, course: props.course}
         })
       )
     )
@@ -48,7 +48,7 @@ const MessageListActionContainer = (props) => {
     const conversationIDsFromResult = result.data.deleteConversations.conversationIds
 
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
-      (conversationParticipant) => {
+      conversationParticipant => {
         return !conversationIDsFromResult.includes(conversationParticipant.conversation._id)
       }
     )
@@ -57,15 +57,15 @@ const MessageListActionContainer = (props) => {
     cache.writeQuery({
       query: conversationsQuery,
       variables: {userID, scope: props.scope, course: props.course},
-      data: conversationsFromCache,
+      data: conversationsFromCache
     })
   }
 
-  const handleDeleteComplete = (data) => {
+  const handleDeleteComplete = data => {
     const deletedSuccessMsg = I18n.t(
       {
         one: 'Message Deleted!',
-        other: 'Messages Deleted!',
+        other: 'Messages Deleted!'
       },
       {count: props.selectedConversations.length}
     )
@@ -88,7 +88,7 @@ const MessageListActionContainer = (props) => {
     },
     onError() {
       setOnFailure(I18n.t('Delete operation failed'))
-    },
+    }
   })
 
   const removeOutOfScopeConversationsFromCache = (cache, result) => {
@@ -100,17 +100,17 @@ const MessageListActionContainer = (props) => {
       JSON.stringify(
         cache.readQuery({
           query: conversationsQuery,
-          variables: {userID, scope: props.scope, course: props.course},
+          variables: {userID, scope: props.scope, course: props.course}
         })
       )
     )
 
     const conversationParticipantIDsFromResult = result.data.updateConversationParticipants.conversationParticipants.map(
-      (cp) => cp._id
+      cp => cp._id
     )
 
     const updatedCPs = conversationsFromCache.legacyNode.conversationsConnection.nodes.filter(
-      (conversationParticipant) =>
+      conversationParticipant =>
         !conversationParticipantIDsFromResult.includes(conversationParticipant._id)
     )
 
@@ -118,15 +118,15 @@ const MessageListActionContainer = (props) => {
     cache.writeQuery({
       query: conversationsQuery,
       variables: {userID, scope: props.scope, course: props.course},
-      data: conversationsFromCache,
+      data: conversationsFromCache
     })
   }
 
-  const handleArchiveComplete = (data) => {
+  const handleArchiveComplete = data => {
     const archiveSuccessMsg = I18n.t(
       {
         one: 'Message Archived!',
-        other: 'Messages Archived!',
+        other: 'Messages Archived!'
       },
       {count: props.selectedConversations.length}
     )
@@ -148,11 +148,11 @@ const MessageListActionContainer = (props) => {
     },
     onError() {
       setOnFailure(I18n.t('Archive operation failed'))
-    },
+    }
   })
 
   const {loading, error, data} = useQuery(COURSES_QUERY, {
-    variables: {userID},
+    variables: {userID}
   })
 
   if (loading) {
@@ -174,13 +174,13 @@ const MessageListActionContainer = (props) => {
         one:
           'Are you sure you want to delete your copy of this conversation? This action cannot be undone.',
         other:
-          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.',
+          'Are you sure you want to delete your copy of these conversations? This action cannot be undone.'
       },
       {count: props.selectedConversations.length}
     )
     const confirmResult = window.confirm(delMsg) // eslint-disable-line no-alert
     if (confirmResult) {
-      deleteConversations({variables: {ids: props.selectedConversations.map((convo) => convo._id)}})
+      deleteConversations({variables: {ids: props.selectedConversations.map(convo => convo._id)}})
     } else {
       // confirm message was cancelled by user
       props.deleteToggler(false)
@@ -191,7 +191,7 @@ const MessageListActionContainer = (props) => {
     const archiveConfirmMsg = I18n.t(
       {
         one: 'Are you sure you want to archive your copy of this conversation?',
-        other: 'Are you sure you want to archive your copy of these conversations?',
+        other: 'Are you sure you want to archive your copy of these conversations?'
       },
       {count: props.selectedConversations.length}
     )
@@ -200,9 +200,9 @@ const MessageListActionContainer = (props) => {
     if (confirmResult) {
       archiveConversationParticipants({
         variables: {
-          conversationIds: props.selectedConversations.map((convo) => convo._id),
-          workflowState: 'archived',
-        },
+          conversationIds: props.selectedConversations.map(convo => convo._id),
+          workflowState: 'archived'
+        }
       })
     } else {
       // confirm message was cancelled by user
@@ -227,7 +227,7 @@ const MessageListActionContainer = (props) => {
               favoriteCourses: data?.legacyNode?.favoriteCoursesConnection?.nodes,
               moreCourses,
               concludedCourses: [],
-              groups: data?.legacyNode?.favoriteGroupsConnection?.nodes,
+              groups: data?.legacyNode?.favoriteGroupsConnection?.nodes
             }}
             onCourseFilterSelect={props.onCourseFilterSelect}
           />
@@ -249,7 +249,7 @@ const MessageListActionContainer = (props) => {
             forward={() => {}}
             markAsUnread={() => {}}
             reply={props.onReply}
-            replyAll={() => {}}
+            replyAll={props.onReplyAll}
             star={() => {}}
           />
         </Flex.Item>
@@ -269,9 +269,10 @@ MessageListActionContainer.propTypes = {
   onCompose: PropTypes.func,
   selectedConversations: PropTypes.array,
   onReply: PropTypes.func,
+  onReplyAll: PropTypes.func,
   deleteToggler: PropTypes.func,
   deleteDisabled: PropTypes.bool,
   archiveToggler: PropTypes.func,
   archiveDisabled: PropTypes.bool,
-  onConversationRemove: PropTypes.func,
+  onConversationRemove: PropTypes.func
 }

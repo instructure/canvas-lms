@@ -30,11 +30,12 @@ const CanvasInbox = () => {
   const [deleteDisabled, setDeleteDisabled] = useState(true)
   const [archiveDisabled, setArchiveDisabled] = useState(true)
   const [isReply, setIsReply] = useState(false)
+  const [isReplyAll, setIsReplyAll] = useState(false)
 
-  const toggleSelectedConversations = (conversation) => {
+  const toggleSelectedConversations = conversation => {
     const updatedSelectedConversations = selectedConversations
 
-    const index = updatedSelectedConversations.findIndex((updatedSelectedConvo) => {
+    const index = updatedSelectedConversations.findIndex(updatedSelectedConvo => {
       return updatedSelectedConvo._id === conversation._id
     })
     if (index > -1) {
@@ -47,10 +48,10 @@ const CanvasInbox = () => {
     setArchiveDisabled(selectedConversations.length === 0)
   }
 
-  const removeFromSelectedConversations = (conversations) => {
-    const conversationIds = conversations.map((convo) => convo._id)
-    setSelectedConversations((prev) => {
-      const updated = prev.filter((selectedConvo) => !conversationIds.includes(selectedConvo._id))
+  const removeFromSelectedConversations = conversations => {
+    const conversationIds = conversations.map(convo => convo._id)
+    setSelectedConversations(prev => {
+      const updated = prev.filter(selectedConvo => !conversationIds.includes(selectedConvo._id))
       setDeleteDisabled(updated.length === 0)
       setArchiveDisabled(updated.length === 0)
       return updated
@@ -71,6 +72,10 @@ const CanvasInbox = () => {
             onCompose={() => setComposeModal(true)}
             onReply={() => {
               setIsReply(true)
+              setComposeModal(true)
+            }}
+            onReplyAll={() => {
+              setIsReplyAll(true)
               setComposeModal(true)
             }}
             deleteDisabled={deleteDisabled}
@@ -98,9 +103,11 @@ const CanvasInbox = () => {
       <ComposeModalManager
         conversation={selectedConversations[0]}
         isReply={isReply}
+        isReplyAll={isReplyAll}
         onDismiss={() => {
           setComposeModal(false)
           setIsReply(false)
+          setIsReplyAll(false)
         }}
         open={composeModal}
       />
