@@ -341,7 +341,7 @@
             <% else %>
               <% assignments = group.active_assignments.no_submittables %>
             <% end %>
-            <% assignments.reorder(Assignment.best_unicode_collation_key('title')).limit(200).pluck(:id, :title).each do |id, title| %>
+            <% assignments.reorder(Assignment.best_unicode_collation_key('title')).pluck(:id, :title).each do |id, title| %>
               <option value="<%= id %>"><%= title %></option>
             <% end %>
             </optgroup>
