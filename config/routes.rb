@@ -2076,6 +2076,7 @@ CanvasRails::Application.routes.draw do
         get prefix, action: :index, as: "#{context}_content_exports"
         post prefix, action: :create
         get "#{prefix}/:id", action: :show
+        put "#{prefix}/:id/fail", action: :fail
       end
       get "courses/:course_id/content_list", action: :content_list, as: "course_content_list"
     end
