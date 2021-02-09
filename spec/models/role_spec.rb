@@ -261,10 +261,10 @@ describe Role do
       end
     end
 
-    context "with granular_permissions_manage_admin_users FF disabled" do
+    context "with granular_permissions_manage_users FF disabled" do
       before :each do
         course_with_ta
-        @course.root_account.disable_feature!(:granular_permissions_manage_admin_users)
+        @course.root_account.disable_feature!(:granular_permissions_manage_users)
       end
 
       it "should set manageable_by_user correctly with manage_admin_users permission restricted" do
@@ -291,10 +291,10 @@ describe Role do
       end
     end
 
-    context "with granular_permissions_manage_admin_users FF enabled" do
+    context "with granular_permissions_manage_users FF enabled" do
       before :each do
         course_with_ta
-        @course.root_account.enable_feature!(:granular_permissions_manage_admin_users)
+        @course.root_account.enable_feature!(:granular_permissions_manage_users)
       end
 
       describe "does all the addable/deleteable by user stuff right when manage_students is enabled" do

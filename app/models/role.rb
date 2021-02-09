@@ -270,7 +270,7 @@ class Role < ActiveRecord::Base
         manageable << 'TeacherEnrollment'
       end
     end
-    if !context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) && context.grants_right?(user, :manage_admin_users)
+    if !context.root_account.feature_enabled?(:granular_permissions_manage_users) && context.grants_right?(user, :manage_admin_users)
       manageable += ['ObserverEnrollment', 'TeacherEnrollment', 'TaEnrollment', 'DesignerEnrollment']
     end
     manageable.uniq.sort
@@ -313,7 +313,7 @@ class Role < ActiveRecord::Base
   def self.compile_manageable_roles(role_data, user, context)
     # for use with the old sad enrollment dialog
     manageable = self.manageable_roles_by_user(user, context)
-    granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+    granular_admin = context.root_account.feature_enabled?(:granular_permissions_manage_users)
     addable, deleteable = self.add_delete_roles_by_user(user, context, manageable) if granular_admin
     role_data.inject([]) { |roles, role|
       is_manageable = manageable.include?(role[:base_role_name]) unless granular_admin

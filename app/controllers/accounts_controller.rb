@@ -1366,7 +1366,7 @@ class AccountsController < ApplicationController
       can_edit_users: @account.grants_any_right?(@current_user, session, :manage_user_logins),
       can_manage_groups: @account.grants_right?(@current_user, session, :manage_groups),           # access to view user groups?
     }
-    if @account.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+    if @account.root_account.feature_enabled?(:granular_permissions_manage_users)
       js_permissions[:can_create_enrollments] = @account.grants_any_right?(@current_user, session, :manage_students, :allow_course_admin_actions)
       js_permissions[:can_allow_course_admin_actions] = @account.grants_right?(@current_user, session, :allow_course_admin_actions)
     else

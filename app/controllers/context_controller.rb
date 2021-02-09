@@ -133,7 +133,7 @@ class ContextController < ApplicationController
       all_roles = Role.role_data(@context, @current_user)
       load_all_contexts(:context => @context)
       manage_students = @context.grants_right?(@current_user, session, :manage_students) && !MasterCourses::MasterTemplate.is_master_course?(@context)
-      manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+      manage_admins = if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       else
         @context.grants_right?(@current_user, session, :manage_admin_users)
@@ -145,7 +145,7 @@ class ContextController < ApplicationController
         add_users: manage_students || manage_admins,
         read_reports: @context.grants_right?(@current_user, session, :read_reports)
       }
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         js_permissions[:allow_course_admin_actions] = manage_admins
       else
         js_permissions[:manage_admin_users] = manage_admins
@@ -200,7 +200,7 @@ class ContextController < ApplicationController
   end
 
   def prior_users
-    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) ?
+    manage_admins = @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
       :allow_course_admin_actions :
       :manage_admin_users
     if authorized_action(@context, @current_user, [:manage_students, manage_admins, :read_prior_roster])

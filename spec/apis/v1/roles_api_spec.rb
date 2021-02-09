@@ -441,7 +441,7 @@ describe "Roles API", type: :request do
 
     describe "json response" do
       before :each do
-        @account.root_account.disable_feature!(:granular_permissions_manage_admin_users)
+        @account.root_account.disable_feature!(:granular_permissions_manage_users)
         @expected_permissions = [
           "become_user", "change_course_state", "create_collaborations",
           "create_conferences", "manage_account_memberships",
@@ -484,7 +484,7 @@ describe "Roles API", type: :request do
       end
 
       it "should return the expected json format with granular admin user permission on" do
-        @account.root_account.enable_feature!(:granular_permissions_manage_admin_users)
+        @account.root_account.enable_feature!(:granular_permissions_manage_users)
 
         # no longer have manage_admin_users, instead we have the new ones
         expected_perms = @expected_permissions - ["manage_admin_users"]

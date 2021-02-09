@@ -1401,7 +1401,7 @@ class CoursesController < ApplicationController
         :manage_feature_flags => @context.grants_right?(@current_user, session, :manage_feature_flags),
         :manage => @context.grants_right?(@current_user, session, :manage)
       }
-      if @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users)
+      if @context.root_account.feature_enabled?(:granular_permissions_manage_users)
         js_permissions[:allow_course_admin_actions] = @context.grants_right?(@current_user, session, :allow_course_admin_actions)
       else
         js_permissions[:manage_admin_users] = @context.grants_right?(@current_user, session, :manage_admin_users)
@@ -3440,7 +3440,7 @@ class CoursesController < ApplicationController
   end
 
   def manage_admin_users_perm
-    @context.root_account.feature_enabled?(:granular_permissions_manage_admin_users) ?
+    @context.root_account.feature_enabled?(:granular_permissions_manage_users) ?
       :allow_course_admin_actions :
       :manage_admin_users
   end
