@@ -1055,7 +1055,7 @@ nn:
       account_reports: 
         default: 
           last_user_access: 
-            text: "Denne rapporten viser siste pålogging for aktive brukarar."
+            text: "Denne rapporten viser siste innlogging for aktive brukarar. Legg merke til at \"Siste tilgang\" vert oppdatert kvart 10. minutt. Vi kan per i dag ikkje registrere aktivitet i mindre tidsrom enn det."
     learning_outcome_assignment_type_csv_parameters: 
       account_reports: 
         samuel_merrit_university: 
@@ -1405,7 +1405,7 @@ nn:
       open_report_description: "Opne skildring av rapport"
       page_header_title: Kontoinnstillingar
       page_title: Kontoinnstillingar
-      quiz_ip_filters_delete: "Fjern filter"
+      quiz_ip_filters_delete: "Fjern Quizen sitt IP-filter"
       quiz_ip_filters_help_message: |-
           IP-filter for quizar er ein måte å avgrense tilgang til spørsmål for datamaskiner i eit bestemt IP-område.
           
@@ -2332,6 +2332,7 @@ nn:
   an_error_occurred_while_loading_changes_9851b56f: "Det oppstod ein feil under lastinga av endringane"
   an_error_occurred_while_loading_courses_11d4571e: "Det oppstod ein feil under emneinnlastinga"
   an_error_occurred_while_loading_late_policies_c415f676: "Det oppstod ein feil under lastinga av tidlegare retningslinjer"
+  an_error_occurred_while_loading_the_mastery_calcul_f8e3d884: "Ein feil oppstod under innlasting av meistring %{error}"
   an_error_occurred_while_locking_announcements_8115ccd7: "Det oppstod ein feil under låsing av kunngjeringar."
   an_error_occurred_while_migrating_405ac0b5: "Det oppstod ein feil under overføringa."
   an_error_occurred_while_saving_account_proficiency_43e7fb6a: "Det oppstod ein feil under lagringa av ferdigheitsnivå for konto"
@@ -3724,6 +3725,11 @@ nn:
   body_9f663faf: Brødtekst
   body_f48fe5cd: "Brødtekst:"
   body_shadow_d36e8c2e: "Body Shadow"
+  body_text_you_can_view_the_assignment_here_url_a4d5092c: |-
+      %{body_text}
+      
+      Du kan sjå oppgåva her:
+      %{url}
   bolivia_591_9b8a7a5c: "Bolivia (+591)"
   bookmark_bank_46d729be: "Bokmerk %{bank}"
   bookmark_service: 
@@ -4430,6 +4436,11 @@ nn:
   canvas_parent_description: "Denne innstillinga styrer om foreldre kan knyttast til studentar ved institusjonen din gjennom mobilapplikasjonen Canvas Parent. "
   canvas_parent_improved_description: "Innstillinga kontrollerer om foreldre som opprettar eigne foreldrekontoar kan koplast til studentar ved din institusjon gjennom Canvas sin mobilapplikasjon for foreldre. Merk: Foreldre som er registrert som observatørar i Canvas kan bruke mobilapplikasjonen sjølv om funksjonen er deaktivert.  "
   canvas_revision_unknown: Ukjent
+  canvas_rewrites_file_urls_in_user_generated_conten_caa565e2: |-
+      Canvas skriv om URL for filar i innhald laga av brukaren.
+      I den prosessen vart "/download" lagt til på stader der det var uønska
+      og feil. Denne innstillinga oppdaterer omskriving av URL, slik at
+      ein kan forhåndsvise filer i Canvas utan å laste ned.
   canvas_student_id_c74f57bf: canvas_student_id
   canvas_thinks_response_is_valid_8cc4a67d: "Canvas vurderer svaret som gyldig"
   canvas_ticketing_email_connector_27e253ae: "Koplingspunkt for Canvas Ticketing e-post"
@@ -4581,6 +4592,7 @@ nn:
   click_to_sort_by_term_ascending_c3ef1eb7: "Klikk her for å sortere etter semester stigande"
   click_to_sort_by_term_descending_199c48c0: "Klikk her for å sortere etter semester synkande"
   click_to_sort_c81ff8c8: "Klikk her for å sortere."
+  click_to_split_set_here_9c35462a: "Klikk for å dele settet her"
   click_to_test_a_different_score_2e0bb6f0: "Klikk for å teste eit anna resultat"
   click_to_test_dropdown_b950974d: "Klikk her for å teste rullegardinmeny"
   click_to_view_event_details_b25dc1f3: "Klikk for å vise detaljar"
@@ -5135,7 +5147,7 @@ nn:
         upload_to: "Last opp til"
       import_quizzes_next_view: 
         import_new_quizzes: "Importer vurderingsinnhald som New Quizzes"
-        import_new_quizzes_help_text: "New Quizzes er den nye vurderingsmotoren i Canvas.%{p_p} For å vite meir, kontakt systemadministrator eller oppsøk"
+        import_new_quizzes_help_text: "\"Ny Quizzes\" er det nye testverktøyet i Canvas. %{p_p} For å lære meir kan du kontakte system-administrator eller besøke "
         import_quizzesNext_help_label: "Importer vurdering som New Quizzes-hjelpeikon"
         import_quizzesNext_help_text: "Quizzes.Next er den nye vurderingsmotoren i Canvas.%{p_p} For å vite meir, kontakt systemadministrator eller oppsøk"
         import_quizzesNext_help_title: "New Quizzes"
@@ -5526,7 +5538,7 @@ nn:
       edit_assignment_settings: "Rediger oppgåveinnstillingar"
       speed_grader: "Speed Grader™"
     url_show: 
-      new_tab: "Denne sida må opnast i eit nytt nettlesarvindauge."
+      new_tab: "Denne sida vart opna i eit nytt nettlesarvindauge."
   context_modules_api: 
     invalid_position: "Ugyldig plassering"
   context_modulespublic: 
@@ -6216,6 +6228,7 @@ nn:
     unknown: ukjent
   course_storage_391e1bd: "Lagringskapasitet for emne"
   course_syllabus_5de1b0af: Emneoversikt
+  course_usage_report_2e9d9da9: "Rapport over bruk av emnet"
   course_users: 
     greater_than_three: "Oppgi eit søkeord med tre eller fleire teikn"
     unknown_error: "Noko gjekk gale med søket. Prøv på nytt seinare."
@@ -7362,9 +7375,7 @@ nn:
       brukaren høve til å ha varselmeldinga open så lenge hen vil inntil den vert lukka.
   disable_all_read_only_scopes_f9ffdd28: "Deaktiver alle omfang med kun lesetilgang."
   disable_and_lock_7d0ef0e8: "Slå av og lås"
-  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: |-
-      Deaktiver Canvas-hurtigtastar. Brukarar som treng skjermlesar eller navigerer med tastatur
-      får ein betre oppleving når hurtigtastane er slått av.
+  disable_canvas_keyboard_shortcuts_some_users_using_c13ebd5: "Deaktiver Canvas-hurtigtastar. Brukarar som treng skjermlesar eller navigerer med tastatur får ei betre oppleving når hurtigtastane er slått av."
   disable_celebrations_description: "Aktivering av denne funksjonen skjuler alle feiringsanimasjonar."
   disable_content_security_policy_8660a787: "Slå av retningslinjer for innhaldstryggleik"
   disable_extra_filter_options_1d1cdc02: "deaktiver ekstra filterval"
@@ -7380,6 +7391,7 @@ nn:
   disabled_in_course_settings_d15ee35d: "* Slått av i emneinnstillingar"
   disabled_links_b3bdea99: "Deaktiverte lenker"
   disabled_not_visible_to_students_48d4a90d: "Slått av. Ikkje synleg for studentar"
+  disables_push_notifications_for_certain_types_3f57cde4: "Slå av push-varsel for nokre typar."
   disabling_f594bda: "Slår av..."
   disabling_post_to_sis_is_not_available_for_non_pub_ee031373: "Slå av Post til SIS er ikkje tilgjengeleg for ikkje-publiserte emne"
   disabling_sync_to_name_failed_e7521ebb: "Slå av synkronisering til %{name} mislukkast"
@@ -7902,7 +7914,7 @@ nn:
   edit_bank_92eb8e14: "Rediger %{bank}"
   edit_c5fbea07: Rediger
   edit_closed_captions_e5fdeb79: "Endre undertekstar"
-  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Endre undertekstar på videoer frå videomenyen i editoren"
+  edit_closed_captions_subtitles_to_videos_from_the__288ae432: "Endre undertekstar på videoar frå videomenyen i editoren"
   edit_collaboration_b014c18b: "Endre samarbeid"
   edit_comment_comment_e74afa04: "Rediger kommentar: %{comment}"
   edit_conference_title_6e234815: "Endre \"%{conference_title}\""
@@ -8855,6 +8867,7 @@ nn:
   filter_e3398407: Filter
   filter_ip_addresses_2f296bd2: "Filtrer IP-adresser"
   filter_messages_by_course_21a53fc4: "Filtrer meldingar etter emne"
+  filter_recent_user_accesses_by_term_30812659: "Filtrer nylege brukar-tilgangar etter termin."
   filter_replies_by_unread_342e8e90: "filtrer svar som ulesne"
   filter_roles_12cf2271: "Filtrer roller"
   filter_speedgrader_by_student_group_53683142: "Filtrer SpeedGrader etter studentgruppe"
@@ -9030,6 +9043,7 @@ nn:
       dei må oppdatere Google Docs-integrasjonen.
   google_docs_preview_9f41b23c: "Førehandsvising i Google Docs"
   google_drive_7cb003c9: "Google Drive"
+  google_meet_f896b61c: "Google Meet"
   google_template_29640bc0: Google-mal
   goto_first_page_650f1638: "Gå til første side"
   goto_last_page_405adce9: "Gå til siste side"
@@ -10345,6 +10359,7 @@ nn:
   has_turnitin_score_3e1cacf6: "Har Turnitin-resultat"
   haven_t_been_graded_d7dee5bb: "Er ikkje vurdert"
   haven_t_submitted_yet_e63834db: "Ikkje har levert"
+  he_him_99aea1a8: Han
   hebrew_88fbf778: Hebraisk
   hello_name_your_outcomes_import_failed_due_to_an_e_385db5d3: |-
       Hei %{name},
@@ -10385,6 +10400,7 @@ nn:
     Help: Hjelp
     Submitting_Ticket: "Sender feilmelding..."
     canvas_help_sub: "Finn svar på vanlege spørsmål"
+    covid: "Canvas-ressursar for Covid-19 "
     description: Skildring
     extreme_critical_emergency: "EKSTREMT KRITISK NØDSTILFELLE!"
     file_a_ticket_for_a_personal_response_from_our_support_team: "Send ei feilmelding med førespurnad om personleg hjelp, til brukarstøtteteamet"
@@ -10521,11 +10537,17 @@ nn:
   hour_s_b6e8d238: Time(ar)
   hours_late_989e9081: "Timar for seint"
   hover_over_me_496521b9: "Flytt peikaren over meg"
+  how_do_i_import_a_canvas_course_export_package_ed3aafd4: "Korleis importerer eg ein pakke som er eksportert frå eit Canvas-emne?"
+  how_do_i_move_and_organize_my_files_as_an_instruct_5ae4f9bd: "Korleis kan eg som faglærar rydde og organisere filene mine?"
+  how_do_i_move_or_reorder_a_module_e64a4baa: "Korleis flyttar eg eller omorganiser ein modul? "
+  how_do_i_publish_or_unpublish_a_page_as_an_instruc_5721ea3: "Korleis publiserer eller avpubliserer eg som faglærar ei side? "
+  how_do_i_use_speedgrader_e18e4ca2: "Korleis brukar eg SpeedGrader?"
   how_is_the_grade_determined_bb75bf53: "Korleis er vurderinga gjort?"
   how_is_this_affecting_you_b3b6a639: "Korleis verkar dette på deg?"
   how_many_minutes_ecca5ee7: "Kor mange minutt?"
   html5_media_recorder_in_rce_bb59b78f: "HTML5 mediainnspelar i RCE"
   html_editor_fb2ab713: HTML-redigeringsprogram
+  http_response_code_832d6baa: "HTTP-respons: %{code}"
   hungarian_fc7d30c9: Ungarsk
   hungary_36_cd3e515b: "Ungarn (+36)"
   i_agree_to_the_34aa16ce: "Eg godtar"
@@ -10607,6 +10629,7 @@ nn:
   if_set_the_grade_calculator_will_ignore_unposted_a_2f4abd00: "Dersom funksjonen er aktivert vil karakterutrekninga sjå vekk frå anonyme oppgåveinnleveringar som ikkje er posta når totalresultat reknast ut."
   if_set_the_gradebook_will_chunk_out_loading_of_ass_20a1e443: "Dersom funksjonen er aktivert vil vurderingsoversikta porsjonere lasting av oppgåver ved å hente oppgåver frå valt karaktersetjingsperiode først. "
   if_set_turns_off_post_to_sis_functionality_for_ass_2f6398ff: "Dersom denne er på, slår den av Post-til-SIS-funksjonalitet for oppgåver når karaktersetjingsperiode lukker, Gjeld kun når innstillingane for \"Aktiver ny SIS-integrasjon\" er aktivert. "
+  if_statistics_view_or_users_manage_login_details_i_18b00d5c: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøyet. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av."
   if_statistics_view_or_users_manage_login_details_i_da650b69: "Dersom 'Statistikk - vis' eller 'Brukarar - administrer innloggingsdetaljar' er slått på, kan ein brukar generere loggar for på- og avloggingsaktivitet frå administrasjonsverktøy. For å skjule på- og avloggingsaktivitet i administrasjonsverktøyet må begge løyve vere slått av. "
   if_the_open_registration_account_setting_is_enable_f3b9a75f: "Dersom open registrering er aktivert på kontonivå, kan brukarar med dette løyvet legge til studentar eller observatørar til eit emne via e-postadresse eller innloggings-ID sjølv om studenten eller observatøren ikke har ein Canvaskonto frå før."
   if_this_permission_is_disabled_and_courses_add_edi_9bafd797: |-
@@ -10714,6 +10737,7 @@ nn:
   importing_outcomes_e62a0375: "Importerer læringsmål"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Auk tilgjengelegheita til venstremenyen gjennom betre bruk av fargar, i tillegg til visuelle indikatorar og skjermlesarindikatorar for inaktive menyelement. "
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbetra visuell påminning til faglærar om å publisere emne"
+  in_a_few_seconds_538ddff3: "om ei kort stund"
   in_asset_link_students_are_clicking_bad_link_to_a__be07a02b: "i %{asset_link} klikkar studentane på %{bad_link}, som går til ei side i emnet ditt som ikkje eksisterar. "
   in_asset_link_students_are_clicking_bad_link_to_co_da1ae5ea: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald i eit anna emne."
   in_asset_link_students_are_clicking_bad_link_to_co_dae988cd: "I %{asset_link} klikkar studentane på %{bad_link} for å komme til innhald dei ikkje har tilgang til."
@@ -11180,6 +11204,7 @@ nn:
   learn_more_about_collaborations_2978f66d: "Lær meir om samarbeid"
   learning_mastery_5fc34276: "Meistringsbasert læring"
   learning_mastery_6ed4fd63: "Meistringsbasert læring..."
+  learning_mastery_context_name_a0b70957: "Meistringsbasert læring - %{context_name}"
   learning_mastery_gradebook_description: |-
       Vurderingsoversikt for meistringsbasert læring gir faglærarane ein metode til raskt å sjå framgang for
       studentar og emne i forhold til emnets læringsmål. Måla blir presenterte i eit karakterbokliknande
@@ -12656,7 +12681,7 @@ nn:
       email: 
         details: "Du må registrere deg i Canvas før du kan delta i klassa.  Du kan gå inn på emnesida her for å kome i gang."
         html: 
-          body: "Du er invitert til å delta i ein seksjon ved %{website}. Seksjonen er %{course}. Emnerolle: %{role_type}"
+          body: "Du er invitert til å delta i emnet %{course} ved %{account}. Di rolle i emnet er %{role_type}."
           details: "Du må registrere deg i Canvas før du kan delta i klassa."
           email: E-post
           link: "Klikk her for å sjå emnesida"
@@ -13807,7 +13832,8 @@ nn:
   never_df100b49: Aldri
   new_13daf639: Ny
   new_account_role_6e5c4964: "Ny kontorolle"
-  new_analytics_api_access_7eec1ead: "New Analytics API-tilgang"
+  new_analytics_api_access_7eec1ead: "Nye analysar API-tilgang"
+  new_analytics_f6147886: "Nye analysar"
   new_annotations_66932016: "Nye merknader"
   new_announcement_23af4598: "Ny kunngjering"
   new_announcement_title_30ba7c1b: "Ny kunngjering: %{title}"
@@ -13957,6 +13983,7 @@ nn:
   no_submission_for_assignment_a9cb6fe2: "Inga innlevering for %{assignment}"
   no_submission_for_assignmenttitle_243bd1f4: "Inga innlevering for %{assignmentTitle}"
   no_submissions_164cea23: "Ingen innleveringar"
+  no_submissions_have_been_uploaded_2fb02710: "Ingen innleveringar er lasta opp"
   no_terms_eab5ee7b: "Utan semester"
   no_tls_618add1a: "Ingen TLS"
   no_unassigned_terms_deb7b76b: "Ingen ikkje tilordna semester"
@@ -14117,9 +14144,8 @@ nn:
     grading_description: |-
         Inkluderer:
         
-        * Registrert/endra vurdering for oppgåve/innlevering
-        * Omgjort skjult oppgåveresultat
-        * Endra vekting for vurderingsresultat
+        * Vurderinga som er lagt inn/endra
+        * Vekting av endra vurdering
     grading_display: Karaktersetjing
     grading_policies_description: "Endring i retningslinjer for karaktersetjing på emnet"
     grading_policies_display: "Retningslinjer for karaktersetjing"
@@ -14440,6 +14466,7 @@ nn:
   only_show_announcement_on_current_account_domain_fc341eea: "Vis berre kunngjeringar for gjeldande konto."
   only_teachers_can_see_this_course_until_it_is_publ_6fac97a7: "Berre faglærarar kan sjå dette emnet før det er publisert"
   oops_something_went_wrong_importing_name_d382cac1: "Ops! Noke gjekk gale under importering av \"%{name}\""
+  oops_something_went_wrong_with_making_a_copy_of_or_22787360: "Noko gjekk gale under kopiering av \"%{original_assignment_name}\"."
   oops_something_went_wrong_with_making_a_copy_of_or_7e9d6695: "Noko gjekk gale under kopiering av \"%{originalAssignmentName}\""
   open_color_picker_f117df0a: "Opne fargeveljar"
   open_complete_incomplete_menu_cfe2033b: "Opne fullført/ikkje fullført-meny"
@@ -14867,7 +14894,7 @@ nn:
   placeholder_for_webhooks_access_in_canvas_catalog_b8c9d864: "Plasshalder for webhooks-tilgong i Canvas Catalog."
   placement_values_c0a2cf56: Passeringsverdiar
   placements_5b5e056b: Plasseringar
-  places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Plasserer ein knapp i øvste høgre hjørne av ein emneside som gir faglærar adgang til å enkelt byte til studentvising."
+  places_a_button_in_the_top_right_corner_of_course__1ed5ea4: "Plasserer ein knapp i øvste høgre hjørne av ei emneside som gir faglærar adgang til å enkelt skifte til studentvising."
   plagiarism_detection_platform_6ce67e66: "Plattform for plagiatkontroll"
   plagiarism_detection_platform_assignments_fc19e0bd: "Oppgåver til plagiatkontrollplattformen"
   plagiarism_detection_platform_users_b0e5410f: Plagiatkontrollbrukarar
@@ -14893,6 +14920,7 @@ nn:
   please_enter_a_name_for_this_link_318f01a4: "Oppgi eit namn for denne lenka."
   please_enter_a_search_term_with_three_or_more_char_53fd5ed8: "Oppgi eit søkeord med tre eller fleire teikn"
   please_enter_a_url_d2c868b5: "Oppgi ein URL"
+  please_enter_a_valid_url_e_g_http_example_com_b97051b4: "Skriv inn ein gyldig URL (til dømes http://example.com)"
   please_enter_a_valid_url_protocol_is_required_e_g__4bc49ab1: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://, tel:, mailto:)."
   please_enter_a_valid_url_protocol_is_required_e_g__c6ccfeca: "Skriv inn gyldig URL. Protokoll er nødvendig (f.eks. http://, https://, ftp://)."
   please_enter_your_label_name_7745272d: "Oppgi %{label_name}:"
@@ -15473,6 +15501,7 @@ nn:
   previous_export_c6a997f7: "Førre eksport"
   previous_message_8804f87e: "Førre melding"
   previous_module_item_2bb5e499: "Førre modul/element"
+  previous_module_item_a9e57348: "Førre modul-element"
   previous_month_7adf1380: "Førre månad"
   previous_month_bb1e3c84: "Førre månad"
   previous_page_928fc112: "Førre side"
@@ -16045,6 +16074,7 @@ nn:
       update_question_without_regrading: "Oppdater spørsmålet utan å setje karakterar på nytt"
   quiz_40ee61b1: quiz
   quiz_assignment_overrides_cec1973b: "Overstyring av quizoppgåver"
+  quiz_attempts_whose_availability_dates_have_passed_b0d98829: "Quiz-svar som ikkje lengre er tilgjengeleg vil bli sendt inn automatisk, sjølv om den utvida tida ikkje er gått ut."
   quiz_duplication_not_implemented_c1495585: "Duplikat for quiz er ikkje implementert"
   quiz_e0dcce8f: Quiz
   quiz_extensions_d2550649: "Quiz utvidingar"
@@ -17571,6 +17601,7 @@ nn:
       manage_role_overrides: "Administrer løyve"
       manage_rubrics: "Opprett og rediger vurderingsskjema"
       manage_sections: "Administrer (opprett/rediger/slett) emneseksjonar"
+      manage_sections_delete: "Slett seksjoner frå emnet"
       manage_sis: "Administrer SIS-data"
       manage_site_settings: "Administrer innstillingar for nettstader og programtillegg"
       manage_storage_quotas: "Administrer lagringskvotar"
@@ -17894,7 +17925,7 @@ nn:
         download_current_scores: "Last ned gjeldande resultat (.csv)"
         grading_history: "Vis vurderingshistorikk"
         hide_student_names_label: "Skjul studentnamn"
-        include_ungraded_assignments: "Behandle ikkje vurderte som 0"
+        include_ungraded_assignments: "Vis \"Ungraded\" som 0"
         set_group_weights: "Set vekting for grupper"
         show_concluded_enrollments_label: "Vis avslutta påmeldingar"
         show_notes: "Vis merknader i studentinformasjon"
@@ -18150,6 +18181,7 @@ nn:
   select_one_8e0af564: "Vel ein"
   select_one_b647b384: "Vel ein"
   select_one_of_the_options_c8b0c6e4: "Vel ein av alternativa:"
+  select_page_e93fc123: "Vel side"
   select_prerequisite_module_57894963: "Vel modulen som er føresetnad"
   select_prerequite_module_e9042bb0: "Vel modulen som er føresetnad"
   select_rubric_2aa2ffa2: "Vel vurderingsskjema"
@@ -19057,6 +19089,7 @@ nn:
   show_saved_what_if_scores_358bfe5f: "Vis lagra \"Kva-skjer-dersom\"-resultat"
   show_student_names_dcb40934: "Vis studentnamn"
   show_sub_accounts_for_account_name_fa71a658: "Vis underkonto for %{account_name}"
+  show_to_d57767f: "Vis til"
   showing_all_announcements_36ff0cec: "Viser alle kunngjeringar"
   showing_all_discussions_7e09f4b7: "Viser alle diskusjonar"
   showing_all_sets_of_grading_periods_6c160874: "Viser alle sett med karaktersetjingsperiodar."
@@ -19399,6 +19432,7 @@ nn:
   student_context_cards_376d2072: Studentkontekstkort
   student_context_cards_must_be_enabled_for_an_accou_f194b7c4: "Studentkontekstkort må vere aktivert på kontonivå av ein admin. Dersom løyvet ikkje er slått på, kan brukarar framleis sjå studentkontekstkort i vurderingsoversikta. "
   student_context_cards_must_be_enabled_for_an_accou_f84169cb: "Studentkontekstkort må vere slått på for ein konto av ein admin."
+  student_current_grades_afec68c8: "Studenten sine vurderingar"
   student_details_49901ceb: Studentdetaljar
   student_engagement_report_bf958028: Studentinvolveringsrapport
   student_extensions_d35a907: "Utvidingar for studentar"
@@ -19765,6 +19799,7 @@ nn:
       student_support_description: "Faglærar eller administrasjon er første kontaktpunkt. Dei kan enten svare på spørsmål eller kontakte brukarstøtte for deg. Ta kontakt via Meldingar. "
       support_desk_livechat: "Brukarstøtte direkte"
   support_favorite_lti_tools_in_the_rce_1680436d: "Støtte for favoritter av LTI-verktøy i teksteditoren"
+  support_latex_math_equations_almost_everywhere_6ce8ca24: "Gi støtte for LaTeX-uttrykk nesten over alt"
   svg_d5969386: SVG
   swahili_5caeb4ba: Swahili
   sweden_1add8e79: Sverige
@@ -19875,6 +19910,7 @@ nn:
   term_e1c1d390: Semester
   term_id_2e802ed1: Semester-ID
   term_id_74b933ef: semester-ID
+  term_name_30eb91a: term
   term_sis_7edb8ab7: semester-SIS
   term_sis_bfe0ae01: Semester-SIS
   term_start_b8c2aad1: semesterstart
@@ -19944,6 +19980,7 @@ nn:
   test_cluster_only_70e61c19: "Kun for test"
   testing_state_effd4a82: "Testar status"
   text_7f4593da: Tekst
+  text_df773ce4: tekst
   text_document_eacbcdb7: Tekstdokument
   text_entry_e1808b2f: "Tekstinnlegging i editor"
   text_entry_submission_7b0ae0c5: "Send inn teksten"
@@ -19966,6 +20003,7 @@ nn:
   the_app_was_added_successfully_3f785a23: "Appen er lagd til"
   the_app_was_deactivated_573520ab: "Appen er deaktivert"
   the_app_was_updated_successfully_3d71cd1b: "Appen er oppdatert"
+  the_assignment_group_named_tests_b2609160: "Nye analysar"
   the_attendance_tool_must_be_enabled_by_your_canvas_108e6dca: "Frammøteverktøyet må slåast på av din Canvasadministrator."
   the_beginning_date_for_submissions_9d890f3b: "Startdato for innleveringar"
   the_beginning_date_for_the_courses_to_report_on_9c224177: "Startdato for emna som rapporten gjeld for"
@@ -19993,7 +20031,9 @@ nn:
       kan ta litt tid for store emne. Du kan forlate
       sida og får ein e-post når nedlastinga
       er fullført.
+  the_end_date_for_discussion_entries_6ac1b0d9: "Sluttdato for diskusjonsinnlegg"
   the_end_date_for_submissions_66168efa: "Sluttdato for innleveringar"
+  the_end_date_to_for_submissions_submitted_at_720e8b06: "Sluttdato for innleveringar levert ved "
   the_ending_date_for_the_courses_to_report_on_1c417d5e: "Sluttdato for emna som rapporten gjeld for"
   the_ending_date_range_for_the_courses_to_report_on_99e0ea8f: "Sluttdatointervall som emnerapporten viser treff innanfor"
   the_error_stack_trace_if_there_is_one_b7e008a1: "Feil stabelsporing, om gjeldande"
@@ -20171,6 +20211,7 @@ nn:
   this_assignment_does_not_count_toward_the_final_gr_29ede05f: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_does_not_count_toward_the_final_gr_a5c238e2: "Denne oppgåva blir ikkje rekna med i sluttresultatet"
   this_assignment_has_been_excused_87f1dc13: "Oppgåva er fritatt."
+  this_assignment_has_no_default_dates_ae314295: "Denne innleveringa har ingen standard-datoar."
   this_assignment_is_currently_being_moderated_ffd280f2: "Denne oppgåva er under retting akkurat no"
   this_assignment_is_currently_muted_that_means_stud_94d63139: "Denne oppgåva er skjult. Det betyr at studentane ikkje kan sjå vurderingsresultata og tilbakemeldingane. Vil du oppheve skjuling?"
   this_assignment_is_dropped_and_will_not_be_conside_35c3e198: "Oppgåva er fjerna og er ikkje med i den totale utrekninga"
@@ -20655,8 +20696,10 @@ nn:
   to_edit_a_student_s_section_users_add_remove_stude_f974cf: |-
       For å endre seksjonen til ein student, må 'Brukarar - legg til / fjern studentar frå emne' og 'Samtalar - send meldingar til individuelle emnemedlem' òg vere slått på.
       For å endre seksjonen til ein faglærar, undervisingsassistent eller ein designar, må 'Brukarar - legg til / fjern faglærarar, designarar eller undervisingsassistentar frå andre emne til dette emnet' og 'Samtalar - send meldingar til individuelle emnemedlem' òg vere slått på.
+  to_edit_blueprint_lock_settings_on_the_discussions_9dfd2c8f: "For å endre låseinnstillingar i diskusjonsoversikta for blueprintemne, må 'Emne - legg til / endre / slett' og 'Diskusjonar - vis' òg vere slått på. Dersom løyvet ikkje er slått på og 'Emne - legg til / endre / slett' og 'Diskusjonar - vis' er slått på, kan låseinnstillingane for blueprintemne endrast i enkeltståande diskusjonar."
   to_edit_course_grading_schemes_courses_add_edit_de_bdcf3563: "For å endre vurderingsskjema for emne, må 'Emne - legg til / endre / slett' òg vere slått på."
   to_edit_course_settings_courses_add_edit_delete_mu_7354470c: "For å endre emneinnstillingar, må 'Emne - legg til / endre / slett' vere slått på. "
+  to_edit_course_settings_courses_add_edit_delete_mu_844988d0: "For å endre emneinnstillingar, må 'Emne - legg til / endre / slett' vere slått på. "
   to_edit_user_details_modify_login_details_or_chang_381a5b72: |-
       For å endre brukardetaljar, modifisere innloggingsdetaljar eller endre brukarpassord, må 'Brukarar - administrere innloggingsdeltajar' òg vere slått på.
       For å sjå sidevisingar for ein brukar, må 'Statistikk - vis' òg vere slått på.
@@ -20692,6 +20735,7 @@ nn:
       For å sjå kolonna for brukar-SIS-ID i CSV-fila for analyse av quizelement, må 'SIS-data - les' òg vere slått på.
       For å sjå innleveringsloggen, må 'Quizar - vis innleveringslogg' òg vere slått på.
   to_moderate_a_quiz_grades_edit_must_also_be_enable_72ca6ca1: "For å moderere ein quiz må 'Vurderingar - endre' òg vere slått på."
+  to_moderate_grades_grades_select_final_grade_for_m_57d4f675: "For å redigere vurderingar må 'Vurderingar - vel moderering av sluttresultat' òg vere slått på. For å legge inn eller skjule vurderingar må 'Vurderingar - Endre' òg vere slått på."
   to_moderate_grades_grades_select_final_grade_for_m_8c605763: "For å moderere vurderingar må 'Vurderingar - vel moderering av sluttvurdering' òg  vere slått på."
   to_obtain_a_client_id_an_account_admin_will_need_t_33f4063e: "For å få ein klient-ID, må kontoadministrator generere ein LTI-utviklarnøkkel."
   to_pin_a_discussion_to_the_top_of_the_page_drag_a__bfe476c3: "Dersom du vil feste ein diskusjon øvst på sida, kan du dra ein diskusjon dit eller velje Fest i innstillingsmenyen."
@@ -20714,6 +20758,7 @@ nn:
   to_search_for_a_course_in_the_restore_courses_tab__46e75739: |-
       For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på.
       For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på.
+  to_search_for_a_course_in_the_restore_courses_tab__a903343: "For å søke etter eit emne i gjenopprett emne-fana, må 'Emneinnhald - vis' òg vere slått på. For å gjenopprette eit sletta emne i ein konto, må 'Emne - legg til / endre / slette', 'Emneinnhald - vis' og 'Emne - opphev sletting' alle vere slått på. "
   to_search_grade_change_logs_grades_view_change_log_8d2f6d30: "For å søke etter vurderingsloggar, må 'Vurderingar - vis endringsloggar' òg vere slått på."
   to_search_grade_change_logs_grades_view_change_log_d4d40cf2: "For å søke i vurderingsloggane, må 'Vurderingar - vis endringsloggar' òg vere slått på."
   to_see_the_course_setup_checklist_option_on_the_co_41322a29: "For å sjå sjekklista for emneoppsett på forsida til emnet, må 'Administrer ( legg til / endre / slett ) emne' òg vere slått på. "
@@ -20745,6 +20790,7 @@ nn:
   to_view_or_edit_a_user_s_sis_id_or_integration_id__9abfc21d: "For å sjå eller endre SIS-ID eller integrasjons-ID til ein brukar, må 'Brukarar - vis liste' og 'Brukarar - administrer innloggingsdetaljar' òg vere slått på. "
   to_view_recent_announcements_on_the_home_page_cour_ffc52530: "For å sjå nylege kunngjeringar på emneforsida, må 'Emneinnhald - vis' vere slått på og boksen vis nylege kunngjeringar på emneforsida må vere haka av i emneinnstillingar. For å administrere kunngjeringar på emne, må 'Diskusjonar - moderer' òg vere slått på."
   to_view_student_analytics_analytics_view_must_also_8a41d86e: "For å sjå anaylsedata for student, må 'Analyse - vis' òg vere slått på."
+  to_view_student_analytics_analytics_view_must_also_a735c0b4: "For å sjå analysedata for student, må 'Analyse - vis' òg vere slått på."
   to_view_student_analytics_in_course_analytics_anal_9466b742: "For å sjå analysedata for student i eit emne, må 'Analyse - vis' òg vere slått på."
   to_view_student_analytics_in_course_analytics_grad_91d58a8a: "For å sjå aktivitetsdata for student i emnestatistikk må 'Vurderingar - sjå alle vurderingar' òg vere slått på"
   to_view_student_analytics_users_view_list_and_anal_2c2776b2: "For å sjå aktivitetsdata for studentar, må 'Brukarar - vis liste' og 'Analyse - vis' må `og vere slått på."
@@ -20767,6 +20813,7 @@ nn:
       For å sjå SIS-ID-ar, må 'SIS-data - les' vere slått på. For å legge til ein brukar til eit emne via SIS-ID, må 'SIS-data - administrer' òg vere slått på.
       For å endre seksjonen til ein faglærar eller ein undervisingsassistent, må 'Samtalar - send meldingar til individuelle emnemedlem' òg vere slått på.
       For å lenke ein observatør til ein student, må 'Samtalar - send meldingar til individuelle emnemedlem' òg vere slått på.
+  to_view_the_list_of_users_in_the_course_users_view_bc0462e3: "For å sjå deltakarlista for emnet må 'Brukarar - vis liste' òg vere slått på. For å legge til brukarar via SIS-ID må 'Brukarar - legg til / fjern studentar frå emnet' og/eller 'Brukarar - legg til / fjern faglærarar, kursdesignarar eller undervisingsassistentar frå emna' òg vere slått på."
   to_view_the_list_of_users_in_the_course_users_view_f5a54b37: |
       For å sjå liste av personar i eit emne, må 'Brukarar - vis liste' vere aktivert.
       For å sjå SIS-ID-ar, må 'SIS-data - les' vere aktivert. For å legge til ein person til eit emne via SIS-ID, må 'SIS-data - administrer' òg vere aktivert.
@@ -20839,7 +20886,10 @@ nn:
     folder_tree_instructions: "Bruk navigasjonspilene opp eller ned for å bla gjennom trestrukturen. Trykk høgre for å vise mappene, trykk venstre for å skjule dei og trykk på Enter for elementet du har valt."
   trinidad_and_tobago_1_fc2d8d1c: "Trinidad og Tobago (+1)"
   trophy: 
+    butterfly_display_name: Sommarfugl
+    medal_display_name: Medalje
     star_display_name: "Merk med stjerne"
+    thumbs_up_description: "Skildring av \"Tommel opp\""
   truncated_56b1a661: Avkorta
   trusted_account_669ba397: "Godkjent konto"
   trusted_account_url_e6200e41: "Godkjend konto-URL"
@@ -20900,6 +20950,7 @@ nn:
   unauthorized_message: "JWT-signatur er ugyldig"
   unauthorized_to_delete_this_file_a1271224: "Har ikkje autorisasjon til å fjerne denne fila"
   unavailable_46d2c344: Utilgjengeleg
+  unavailable_c04e4c93: "ikkje tilgjengeleg"
   unbookmark_bank_70569249: "Fjern bokmerke %{bank}"
   unbookmark_this_question_bank_d87d1a07: "Fjern bokmerke for denne spørsmålsbanken"
   unchanged_aca18e02: "[Uendra]"
@@ -21032,6 +21083,7 @@ nn:
   update_tool_7d48ef2a: "Oppdater %{tool}"
   update_your_notification_settings_ed9564f3: "Oppdater varslingsinnstillingane"
   updated_2c1e8615: Oppdatert
+  updated_after_3a81825c: "Oppdatert etter"
   updated_group_group_name_727b1d98: "Oppdatert gruppe %{group_name}"
   updated_terms_of_service_82f34148: "Oppdaterte vilkår for bruk"
   updated_ui_for_searching_and_displaying_users_and__6755e08e: "Oppdatert brukargrensesnitt som søker etter og viser brukarar og emne i ein konto."
@@ -21305,6 +21357,7 @@ nn:
   user_successfully_re_activated_b897e35b: "Brukaren er aktivert"
   user_successfully_removed_a366ca5f: "Brukaren er fjerna."
   user_vaildation_issues_panel_66b66945: "Panel for brukarvalideringssaker"
+  user_with_genitive_settings_b39e02ba: "%{user_with_genitive} innstillingar"
   usercount_respondents_1521244: "%{userCount} respondentar"
   usercount_users_found_8c07f1f2: "Funne %{userCount} brukarar."
   userinfo_d21114ef: Brukarinformasjon
@@ -21643,6 +21696,7 @@ nn:
   view_the_assignment_e61ca4fc: "Vis oppgåva"
   view_this_message_in_conversations_5a16bc9f: "Vis denne meldinga i samtalar"
   view_toolname_placements_4a5724d1: "Vis %{toolName}-plasseringar"
+  view_ungraded_as_0_1a9631a1: "Vis \"Ungraded\" som 0"
   view_user_groups_538f22b4: "Vis brukargrupper"
   view_user_groups_d2bfa855: "Vis brukargrupper"
   viewed_6b75c21e: Vist
@@ -22092,6 +22146,7 @@ nn:
   you_ve_been_given_an_account_role_for_the_account__18e0ef38: "Du er tildelt ein kontorolle for kontoen %{account} ved %{website}. Rolletype: %{role_type}."
   you_ve_been_invited_to_course_90764f1: "Du er invitert til %{course}."
   you_ve_been_invited_to_course_course_role_role_typ_b8ab8f22: "Du er invitert til %{course}. Kursrolle: %{role_type}"
+  you_ve_been_invited_to_participate_in_a_class_at_a_af5cae6d: "Du er invitert til å delta i emnet %{course} ved %{account}. Di rolle i emnet er %{role_type}."
   you_ve_been_invited_to_participate_in_a_class_at_w_b87cd481: "Du er invitert til å delta i ein seksjon ved %{website}. Seksjonen er %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_participate_in_the_course_c_a8d1f6a8: "Du er invitert til å delta på emnet %{course}. Emnerolle: %{role_type}"
   you_ve_been_invited_to_peer_review_reviewee_82580fb: "Du er invitert til fagfellevurdering av %{reviewee}."
