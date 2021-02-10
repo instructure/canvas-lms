@@ -1517,7 +1517,7 @@ class ApplicationController < ActionController::Base
     # This causes controller#action from not being set on x-canvas-meta header.
     set_response_headers
 
-    if config.consider_all_requests_local
+    if Rails.application.config.consider_all_requests_local
       rescue_action_locally(exception, level: level)
     else
       rescue_action_in_public(exception, level: level)
@@ -1677,7 +1677,7 @@ class ApplicationController < ActionController::Base
     else
       # this ensures the logging will still happen so you can see backtrace, etc.
       Canvas::Errors.capture(exception, {}, level)
-      super
+      raise exception
     end
   end
 
