@@ -23,7 +23,7 @@ module AcademicBenchmarks
       delegate :description, to: :statement
 
       def resolve_number
-        @resolve_number ||= (number&.enhanced || number&.raw)
+        number&.prefix_enhanced
       end
 
       def build_outcomes(ratings={}, parent=nil)
@@ -49,27 +49,12 @@ module AcademicBenchmarks
         hash
       end
 
-      # standards don't have titles so they are built from parent standards/groups
-      # it is generated like this:
-      # if I have a number, use it and all parent nums on standards
-      # if I don't have a number, use my description (potentially truncated at 50)
       def build_num_title
-        if parent.is_a?(Standard) && parent.resolve_number.present?
-          base = parent.build_num_title
-          if base && resolve_number
-            resolve_number.include?(base) ? resolve_number : [base, resolve_number].join(".")
-          else
-            base || resolve_number
-          end
-        elsif resolve_number.present?
-          resolve_number
-        else
-          cropped_description
-        end
+        resolve_number.presence || cropped_description
       end
 
       def build_title
-        if resolve_number
+        if resolve_number.present?
           [build_num_title, cropped_description].join(" - ")
         else
           cropped_description
