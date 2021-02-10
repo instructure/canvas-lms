@@ -69,8 +69,6 @@ export default class OutcomeGradebookView extends View
       new CheckboxView(Dictionary.remedial)
     ]
 
-    inactive_concluded_lmgb_filters: ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
-
     ratings: []
 
     events:
@@ -83,6 +81,8 @@ export default class OutcomeGradebookView extends View
     constructor: (options) ->
       super
       @_validateOptions(options)
+      this.inactive_concluded_lmgb_filters = ENV.GRADEBOOK_OPTIONS?.inactive_concluded_lmgb_filters
+
       if ENV.GRADEBOOK_OPTIONS.outcome_proficiency?.ratings
         @ratings = ENV.GRADEBOOK_OPTIONS.outcome_proficiency.ratings
         @checkboxes = @ratings.map (rating) -> new CheckboxView({color: "\##{rating.color}", label: rating.description})
@@ -174,16 +174,19 @@ export default class OutcomeGradebookView extends View
     _toggleStudentsWithNoResults: (enabled) =>
       @_setFilterSetting('students_no_results', enabled)
       @updateExportLink(@learningMastery.getCurrentSectionId())
+      @focusFilterKebab = true
       @_rerender()
 
     _toggleStudentsWithInactiveEnrollments: (enabled) =>
       @_setFilterSetting('inactive_enrollments', enabled)
       @updateExportLink(@learningMastery.getCurrentSectionId())
+      @focusFilterKebab = true
       @_rerender()
 
     _toggleStudentsWithConcludedEnrollments: (enabled) =>
       @_setFilterSetting('concluded_enrollments', enabled)
       @updateExportLink(@learningMastery.getCurrentSectionId())
+      @focusFilterKebab = true
       @_rerender()
 
     _rerender: ->
@@ -235,6 +238,11 @@ export default class OutcomeGradebookView extends View
       $.when(@hasOutcomes).then(@renderGrid)
       this
 
+    focusFilterKebabIfNeeded: =>
+      if @focusFilterKebab
+        document.querySelector('button[data-component=lmgb-student-filter-trigger]')?.focus()
+      @focusFilterKebab = false
+
     # Internal: Render SlickGrid component.
     #
     # response - Outcomes rollup data from API.
@@ -267,6 +275,7 @@ export default class OutcomeGradebookView extends View
         @_attachEvents()
         Grid.section = @learningMastery.getCurrentSectionId()
         Grid.View.redrawHeader(@grid,  Grid.averageFn)
+      @focusFilterKebabIfNeeded()
 
     isLoaded: false
     onShow: ->
