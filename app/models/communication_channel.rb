@@ -42,7 +42,7 @@ class CommunicationChannel < ActiveRecord::Base
   validate :validate_email, if: lambda { |cc| cc.path_type == TYPE_EMAIL && cc.new_record? }
   validate :not_otp_communication_channel, :if => lambda { |cc| cc.path_type == TYPE_SMS && cc.retired? && !cc.new_record? }
   after_commit :check_if_bouncing_changed
-  after_save :clear_user_email_cache
+  after_save :clear_user_email_cache, if: -> { workflow_state_before_last_save != workflow_state }
 
   acts_as_list :scope => :user
 

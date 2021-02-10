@@ -182,6 +182,18 @@ describe CommunicationChannel do
     end
   end
 
+  it "should not update cache if workflow_state doesn't change" do
+    cc = communication_channel_model
+    expect(cc.user).to receive(:clear_email_cache!).never
+    cc.save!
+  end
+
+  it "should update cache if workflow_state does change" do
+    cc = communication_channel_model
+    expect(cc.user).to receive(:clear_email_cache!).once
+    cc.destroy
+  end
+
   it "should use a 15-digit confirmation code for default or email path_type settings" do
     communication_channel_model
     expect(@cc.path_type).to eql('email')
