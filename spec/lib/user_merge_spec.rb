@@ -460,15 +460,22 @@ describe UserMerge do
     it "should move and uniquify observed users" do
       student1 = user_model
       student2 = user_model
+      student3 = user_model
       add_linked_observer(student1, user1)
       add_linked_observer(student2, user1)
+      add_linked_observer(student3, user1)
       add_linked_observer(student2, user2)
+
+      # make sure active link from user 1 comes over even if user 2 has
+      # a destroyed link
+      link = add_linked_observer(student3, user2)
+      link.destroy
 
       UserMerge.from(user1).into(user2)
       user1.reload
       expect(user1.linked_students).to be_empty
       user2.reload
-      expect(user2.linked_students.sort_by(&:id)).to eql [student1, student2]
+      expect(user2.linked_students.sort_by(&:id)).to eql [student1, student2, student3]
     end
 
     it "should move conversations to the new user" do
