@@ -653,6 +653,17 @@ pipeline {
                   } catch(e) {
                     jsReady = false
 
+                    if(configuration.isChangeMerged()) {
+                      // DEBUG: Sometimes a node can get polluted and produce an error like
+                      // The git source https://github.com/rails-api/active_model_serializers.git is not yet checked out
+                      // Take the last successful layer and upload it so it can be debugged.
+
+                      sh """
+                        docker tag \$(docker images | awk '{print \$3}' | awk 'NR==2') $KARMA_RUNNER_IMAGE-failed
+                        ./build/new-jenkins/docker-with-flakey-network-protection.sh push $KARMA_RUNNER_IMAGE-failed
+                      """
+                    }
+
                     throw e
                   }
                 })

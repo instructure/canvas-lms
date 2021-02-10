@@ -38,7 +38,7 @@ fi
 
 tag_many $KARMA_BUILDER_SELECTED_TAG local/karma-builder ${KARMA_BUILDER_TAGS[SAVE_TAG]}
 
-DOCKER_BUILDKIT=1 docker build \
+docker build \
   --build-arg PATCHSET_TAG="$PATCHSET_TAG" \
   --build-arg RAILS_LOAD_ALL_LOCALES="$RAILS_LOAD_ALL_LOCALES" \
   --file Dockerfile.jenkins.karma-runner \
