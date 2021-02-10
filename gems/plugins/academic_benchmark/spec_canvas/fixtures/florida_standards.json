@@ -8,8 +8,7 @@
     "id": "AF2EAFAE-CCB8-11DD-A7C8-69619DFF4B22",
     "attributes": {
       "number": {
-        "raw": "SS.912.A:",
-        "enhanced": "SS.912.A"
+        "prefix_enhanced": "SS.912.A"
       },
       "disciplines": {
         "subjects": [
@@ -130,8 +129,7 @@
         ]
       },
       "number": {
-        "raw": "SS.912.A.1:",
-        "enhanced": "SS.912.A.1"
+        "prefix_enhanced": "SS.912.A.1"
       }
     }
   },
@@ -188,8 +186,7 @@
         ]
       },
       "number": {
-        "enhanced": "SS.912.A.2",
-        "raw": "SS.912.A.2:"
+        "prefix_enhanced": "SS.912.A.2"
       }
     },
     "type": "standards",
@@ -259,8 +256,7 @@
       },
       "status": "active",
       "number": {
-        "enhanced": "SS.912.A.3",
-        "raw": "SS.912.A.3:"
+        "prefix_enhanced": "SS.912.A.3"
       },
       "disciplines": {
         "subjects": [
@@ -330,8 +326,7 @@
         "descr": "Social Studies"
       },
       "number": {
-        "raw": "SS.912.A.4:",
-        "enhanced": "SS.912.A.4"
+        "prefix_enhanced": "SS.912.A.4"
       },
       "disciplines": {
         "subjects": [
@@ -364,8 +359,7 @@
         ]
       },
       "number": {
-        "enhanced": "SS.912.A.5",
-        "raw": "SS.912.A.5:"
+        "prefix_enhanced": "SS.912.A.5"
       },
       "status": "active",
       "document": {
@@ -423,8 +417,7 @@
     "type": "standards",
     "attributes": {
       "number": {
-        "enhanced": "SS.912.A.6",
-        "raw": "SS.912.A.6:"
+        "prefix_enhanced": "SS.912.A.6"
       },
       "disciplines": {
         "subjects": [
@@ -505,8 +498,7 @@
         ]
       },
       "number": {
-        "raw": "SS.912.A.7:",
-        "enhanced": "SS.912.A.7"
+        "prefix_enhanced": "SS.912.A.7"
       },
       "document": {
         "guid": "B8D35264-C801-11DD-B8FE-F90E9DFF4B22",
@@ -596,8 +588,7 @@
       ],
       "guid": "AF2F887A-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "enhanced": "SS.912.A.1.1",
-        "raw": "SS.912.A.1.1"
+        "prefix_enhanced": "SS.912.A.1.1"
       },
       "disciplines": {
         "subjects": [
@@ -666,8 +657,7 @@
       },
       "level": 3,
       "number": {
-        "raw": "SS.912.A.1.2",
-        "enhanced": "SS.912.A.1.2"
+        "prefix_enhanced": "SS.912.A.1.2"
       },
       "disciplines": {
         "subjects": [
@@ -723,8 +713,7 @@
       ],
       "guid": "AF3058F4-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "enhanced": "SS.912.A.1.3",
-        "raw": "SS.912.A.1.3"
+        "prefix_enhanced": "SS.912.A.1.3"
       },
       "disciplines": {
         "subjects": [
@@ -825,8 +814,7 @@
       ],
       "guid": "AF30C56E-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "raw": "SS.912.A.1.4",
-        "enhanced": "SS.912.A.1.4"
+        "prefix_enhanced": "SS.912.A.1.4"
       },
       "disciplines": {
         "subjects": [
@@ -912,8 +900,7 @@
       ],
       "guid": "AF31281A-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "raw": "SS.912.A.1.5",
-        "enhanced": "SS.912.A.1.5"
+        "prefix_enhanced": "SS.912.A.1.5"
       },
       "education_levels": {
         "grades": [
@@ -963,8 +950,7 @@
       ],
       "guid": "AF319610-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "enhanced": "SS.912.A.1.6",
-        "raw": "SS.912.A.1.6"
+        "prefix_enhanced": "SS.912.A.1.6"
       },
       "disciplines": {
         "subjects": [
@@ -1052,8 +1038,7 @@
       ],
       "guid": "AF31F8F8-CCB8-11DD-A7C8-69619DFF4B22",
       "number": {
-        "raw": "SS.912.A.1.7",
-        "enhanced": "SS.912.A.1.7"
+        "prefix_enhanced": "SS.912.A.1.7"
       },
       "education_levels": {
         "grades": [
