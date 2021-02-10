@@ -227,7 +227,12 @@ const K5DashboardCard = ({
             }}
           >
             <div
-              style={{overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'}}
+              style={{
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                textTransform: 'uppercase',
+                whiteSpace: 'nowrap'
+              }}
               title={originalName}
             >
               {originalName}

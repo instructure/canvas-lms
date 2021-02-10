@@ -26,6 +26,7 @@ import {View} from '@instructure/ui-view'
 
 import apiUserContent from 'compiled/str/apiUserContent'
 import DashboardTabs, {TAB_IDS} from './DashboardTabs'
+import GradesPage from './pages/GradesPage'
 import HomeroomPage from './pages/HomeroomPage'
 import loadCardDashboard from '../bundles/dashboard_card'
 import {showFlashAlert, showFlashError} from '../shared/FlashAlert'
@@ -132,6 +133,7 @@ export const K5Dashboard = ({
             />
           )}
           {plannerInitialized && <SchedulePage visible={currentTab === TAB_IDS.SCHEDULE} />}
+          <GradesPage visible={currentTab === TAB_IDS.GRADES} />
         </View>
       </Provider>
     </ApplyTheme>

@@ -72,6 +72,32 @@ const homeroomAnnouncement = [
     ]
   }
 ]
+const gradeCourses = [
+  {
+    id: 'test',
+    name: 'Economics 101',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: 82,
+        computed_current_grade: 'B-'
+      }
+    ],
+    homeroom_course: false
+  },
+  {
+    id: 'homeroom',
+    name: 'Homeroom Class',
+    has_grading_periods: false,
+    enrollments: [
+      {
+        computed_current_score: null,
+        computed_current_grade: null
+      }
+    ],
+    homeroom_course: true
+  }
+]
 const defaultEnv = {
   current_user: currentUser,
   FEATURES: {
@@ -135,6 +161,10 @@ beforeAll(() => {
   )
   fetchMock.get('/api/v1/announcements?context_codes=course_test&active_only=true&per_page=1', '[]')
   fetchMock.get('/api/v1/users/self/missing_submissions?filter[]=submittable', '[]')
+  fetchMock.get(
+    '/api/v1/users/self/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active',
+    JSON.stringify(gradeCourses)
+  )
 })
 
 afterAll(() => {
@@ -236,6 +266,17 @@ describe('K-5 Dashboard', () => {
         <K5Dashboard {...defaultProps} defaultTab="tab-schedule" plannerEnabled />
       )
       await waitForElement(() => getByText("Looks like there isn't anything here"))
+    })
+  })
+
+  describe('Grades Section', () => {
+    it('displays a score summary for each non-homeroom course', async () => {
+      const {getByText, queryByText} = render(
+        <K5Dashboard {...defaultProps} defaultTab="tab-grades" />
+      )
+      await waitForElement(() => getByText('Economics 101'))
+      expect(getByText('B-')).toBeInTheDocument()
+      expect(queryByText('Homeroom Class')).not.toBeInTheDocument()
     })
   })
 })

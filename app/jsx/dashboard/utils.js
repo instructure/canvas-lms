@@ -27,6 +27,34 @@ export const countByCourseId = arr =>
     return acc
   }, {})
 
+export const fetchGrades = (userId = 'self') =>
+  asJson(
+    window.fetch(
+      `/api/v1/users/${userId}/courses?include[]=total_scores&include[]=current_grading_period_scores&include[]=course_image&enrollment_type=student&enrollment_state=active`,
+      defaultFetchOptions
+    )
+  ).then(courses =>
+    courses.map(course => {
+      // Grades are the same across all enrollments, just look at first one
+      const hasGradingPeriods = course.has_grading_periods
+      const enrollment = course.enrollments[0]
+      return {
+        courseId: course.id,
+        courseName: course.name,
+        courseImage: course.image_download_url,
+        hasGradingPeriods,
+        enrollment,
+        score: hasGradingPeriods
+          ? enrollment.current_period_computed_current_score
+          : enrollment.computed_current_score,
+        grade: hasGradingPeriods
+          ? enrollment.current_period_computed_current_grade
+          : enrollment.computed_current_grade,
+        isHomeroom: course.homeroom_course
+      }
+    })
+  )
+
 export const fetchLatestAnnouncement = courseId =>
   asJson(
     window.fetch(
