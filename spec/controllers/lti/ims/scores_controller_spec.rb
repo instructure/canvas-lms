@@ -622,6 +622,35 @@ module Lti::Ims
           it_behaves_like 'an unprocessable entity'
         end
 
+        context 'when model validation fails (score_maximum is not a number)' do
+          let(:params_overrides) do
+            super().merge(scoreGiven: 12.3456, scoreMaximum: 45.678)
+          end
+
+          before do
+            allow_any_instance_of(Lti::Result).to receive(:update!).and_raise(
+              ActiveRecord::RecordInvalid, Lti::Result.new.tap do |rf|
+                rf.errors.add(:score_maximum, 'bogus error')
+              end
+            )
+          end
+
+          it_behaves_like 'an unprocessable entity'
+
+          it 'does not update the submission' do
+            expect {
+              result
+              send_request
+            }.to_not change { result.submission.reload.score }
+          end
+
+          it 'has the model validation error in the response' do
+            result
+            send_request
+            expect(response.body).to include('bogus error')
+          end
+        end
+
         context 'when user_id not found in course' do
           let(:user) { student_in_course(course: course_model, active_all: true).user }
           it_behaves_like 'an unprocessable entity'

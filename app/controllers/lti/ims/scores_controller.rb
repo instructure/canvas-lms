@@ -319,13 +319,16 @@ module Lti::Ims
     end
 
     def update_or_create_result
-      submission = score_submission
-      if result.nil?
-        @_result = line_item.results.create!(
-          scores_params.merge(created_at: timestamp, updated_at: timestamp, user: user, submission: submission)
-        )
-      else
-        result.update!(scores_params.merge(updated_at: timestamp))
+      Submission.transaction do
+        # As a transaction, the submission update is rolled back if result update fails.
+        submission = score_submission
+        if result.nil?
+          @_result = line_item.results.create!(
+            scores_params.merge(created_at: timestamp, updated_at: timestamp, user: user, submission: submission)
+          )
+        else
+          result.update!(scores_params.merge(updated_at: timestamp))
+        end
       end
     end
 
