@@ -4348,7 +4348,7 @@ nn:
   cannot_be_nil_when_course_id_is_nil_f539388: "kan ikkje vere null når course_id er null"
   cannot_be_present_when_account_id_is_present_f7d9b51f: "kan ikkje vere til stades når account_id er til stades"
   cannot_be_present_when_course_id_is_present_785e6a59: "kan ikkje vere til stades når course_id er til stades"
-  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikkje endre ein overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
+  cannot_change_an_override_due_date_to_a_date_withi_8b1be496: "Kan ikkje setje overstyrt innleveringsfrist til ein dato innanfor ein lukka karaktersetjingsperiode"
   cannot_change_role_name_to_label_already_in_use_c8126e4e: "Kan ikkje endre rollenamn til %{label}: er i bruk allereie"
   cannot_change_the_default_term_name_edc2279b: "Kan ikkje endre namn på standardsemester"
   cannot_change_the_due_date_of_an_override_in_a_clo_4b3a4dcd: "Kan ikkje endre innleveringsfristen etter overstyring i ein lukka karaktersetjingsperiode"
