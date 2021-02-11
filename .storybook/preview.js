@@ -1,6 +1,8 @@
 import React from 'react'
 import {ApplyTheme} from '@instructure/ui-themeable'
 import {ApplyTextDirection} from '@instructure/ui-i18n'
+import I18n from 'i18n-js'
+import i18nLolcalize from 'coffeescripts/str/i18nLolcalize'
 import '@instructure/canvas-high-contrast-theme'
 import '@instructure/canvas-theme'
 
@@ -14,7 +16,7 @@ export const globalTypes = {
     description: 'Default or High Contrast',
     defaultValue: 'canvas',
     toolbar: {
-      icon: 'user',
+      icon: 'accessibility',
       items: ['canvas', 'canvas-high-contrast']
     }
   },
@@ -25,6 +27,15 @@ export const globalTypes = {
     toolbar: {
       icon: 'transfer',
       items: ['ltr', 'rtl']
+    }
+  },
+  lolcalize: {
+    name: 'LOLcalize',
+    description: 'Enable/Disable LOLcalize (requires page refresh to take effect)',
+    defaultValue: 'disable',
+    toolbar: {
+      icon: 'facehappy',
+      items: ['enable', 'disable']
     }
   }
 }
@@ -42,9 +53,19 @@ const bidirectionalProvider = (Story, context) => {
   const direction = context.globals.bidirectional
   return (
     <ApplyTextDirection dir={direction}>
-          <Story {...context}/>
+      <Story {...context}/>
     </ApplyTextDirection>
   )
 }
 
-export const decorators = [canvasThemeProvider, bidirectionalProvider]
+const lolcalizeProvider = (Story, context) => {
+  const enableLolcalize = context.globals.lolcalize
+  if (enableLolcalize === 'enable') {
+    I18n.CallHelpers.normalizeDefault = i18nLolcalize
+  }
+  return (
+    <Story {...context}/>
+  )
+}
+
+export const decorators = [canvasThemeProvider, bidirectionalProvider, lolcalizeProvider]
