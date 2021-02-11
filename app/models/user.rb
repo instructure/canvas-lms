@@ -2662,6 +2662,7 @@ class User < ActiveRecord::Base
       return true if type == 'TaEnrollment' && course.grants_right?(self, session, :add_ta_to_course)
       return true if type == 'DesignerEnrollment' && course.grants_right?(self, session, :add_designer_to_course)
       return true if type == 'ObserverEnrollment' && course.grants_right?(self, session, :add_observer_to_course)
+      return true if type == 'TeacherEnrollment' && course.grants_right?(self, session, :add_teacher_to_course)
     end
     if course.grants_right?(self, session, :manage_students)
       if %w{StudentEnrollment ObserverEnrollment}.include?(type) || (type == 'TeacherEnrollment' && course.teacherless?)
