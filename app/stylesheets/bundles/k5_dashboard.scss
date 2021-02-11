@@ -41,10 +41,28 @@
 }
 
 // These overrides are required because InstUI Tabs don't natively support icons or
-// themeable "selected" colors.
+// themeable "selected" colors. There are also some properties required for the
+// animated sticky header transitions that can't be accomplished easily via InstUI.
 .ic-Dashboard-tabs {
+  position: sticky;
+  // This is a trick to let our JS code know when position: sticky has kicked in.
+  // See https://developers.google.com/web/updates/2017/09/sticky-headers.
+  top: -1px;
+  padding-top: 1px;
+  border-bottom: $ic-border-color 1px solid;
+  // We need a higher z-index than the planner items, some of which are at 1.
+  z-index: 2;
+
+  & h1 {
+    transition: font-size 0.1s ease;
+  }
+
   & [role="tab"] {
     padding: 0.75rem 1.25rem;
+  }
+
+  & [role="tabpanel"] {
+    display: none;
   }
 
   & .ic-Dashboard-tabs__tab {

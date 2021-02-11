@@ -16,17 +16,19 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import React from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import PropTypes from 'prop-types'
 import classnames from 'classnames'
 import I18n from 'i18n!dashboard'
-import {Tabs} from '@instructure/ui-tabs'
+import {Heading} from '@instructure/ui-heading'
 import {
   IconBankLine,
   IconCalendarMonthLine,
   IconHomeLine,
   IconStarLightLine
 } from '@instructure/ui-icons'
+import {Tabs} from '@instructure/ui-tabs'
+import {View} from '@instructure/ui-view'
 
 export const TAB_IDS = {
   HOMEROOM: 'tab-homeroom',
@@ -67,33 +69,57 @@ DashboardIconTab.propTypes = {
   selected: PropTypes.bool.isRequired
 }
 
-const DashboardTabs = ({currentTab, onRequestTabChange, tabsRef}) => {
+const DashboardTabs = ({currentTab, name, onRequestTabChange, tabsRef}) => {
+  const [sticky, setSticky] = useState(false)
+  const containerRef = useRef(null)
+  useEffect(() => {
+    // Need to copy the value of containerRef on mount so it will still be
+    // available when the cleanup function runs.
+    const cachedRef = containerRef.current
+    // This IntersectionObserver will let us know when position: sticky has kicked in
+    // on the tabs. See https://developers.google.com/web/updates/2017/09/sticky-headers
+    const observer = new IntersectionObserver(
+      ([e]) => {
+        setSticky(e.intersectionRatio < 1)
+      },
+      {threshold: [1]}
+    )
+    observer.observe(cachedRef)
+    return () => observer.unobserve(cachedRef)
+  }, [])
+
   return (
-    <div className="ic-Dashboard-tabs">
-      <Tabs elementRef={tabsRef} onRequestTabChange={onRequestTabChange} tabOverflow="scroll">
-        {Object.keys(TABS).map(id => (
-          <Tabs.Panel
-            id={id}
-            key={id}
-            renderTitle={
-              <DashboardIconTab
-                icon={TABS[id].icon}
-                label={TABS[id].label}
-                selected={currentTab === id}
-              />
-            }
-            selected={currentTab === id}
-          >
-            <span />
-          </Tabs.Panel>
-        ))}
-      </Tabs>
+    <div className="ic-Dashboard-tabs" ref={containerRef}>
+      <View as="div" padding="medium 0 0 0" background="primary">
+        <Heading as="h1" level={sticky ? 'h2' : 'h1'} margin="0 0 small 0">
+          {I18n.t('Welcome, %{name}!', {name})}
+        </Heading>
+        <Tabs elementRef={tabsRef} onRequestTabChange={onRequestTabChange} tabOverflow="scroll">
+          {Object.keys(TABS).map(id => (
+            <Tabs.Panel
+              id={id}
+              key={id}
+              renderTitle={
+                <DashboardIconTab
+                  icon={TABS[id].icon}
+                  label={TABS[id].label}
+                  selected={currentTab === id}
+                />
+              }
+              selected={currentTab === id}
+            >
+              <span />
+            </Tabs.Panel>
+          ))}
+        </Tabs>
+      </View>
     </div>
   )
 }
 
 DashboardTabs.propTypes = {
   currentTab: PropTypes.string.isRequired,
+  name: PropTypes.string.isRequired,
   onRequestTabChange: PropTypes.func.isRequired,
   tabsRef: PropTypes.func
 }

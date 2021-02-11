@@ -84,7 +84,9 @@ export const HomeroomPage = props => {
       )}
       {cards?.length > 0 && (
         <View as="section">
-          <Heading level="h2">{I18n.t('My Subjects')}</Heading>
+          <Heading level="h2" margin="medium 0 0 0">
+            {I18n.t('My Subjects')}
+          </Heading>
           <K5DashboardContext.Provider
             value={{assignmentsDueToday, assignmentsMissing, isStudent, responsiveSize}}
           >

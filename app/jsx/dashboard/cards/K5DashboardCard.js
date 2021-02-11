@@ -152,7 +152,7 @@ const AssignmentLinks = ({color, requestTabChange, numDueToday = 0, numMissing =
   )
 }
 
-AssignmentLinks.displayName = 'AssignmentsLinks'
+AssignmentLinks.displayName = 'AssignmentLinks'
 AssignmentLinks.propTypes = {
   color: PropTypes.string.isRequired,
   requestTabChange: PropTypes.func.isRequired,
@@ -198,7 +198,7 @@ const K5DashboardCard = ({
   const dashboardCard = (
     <div
       className="ic-DashboardCard"
-      style={{opacity: isDragging ? 1 : 1, transform: 'translate3d(0,0,0)', width: responsiveWidth}}
+      style={{opacity: isDragging ? 0 : 1, transform: 'translate3d(0,0,0)', width: responsiveWidth}}
       aria-label={originalName}
       data-testid="k5-dashboard-card"
     >

@@ -22,7 +22,6 @@ import PropTypes from 'prop-types'
 import $ from 'jquery'
 import {initializePlanner, responsiviser, store} from '@instructure/canvas-planner'
 import {ApplyTheme} from '@instructure/ui-themeable'
-import {Heading} from '@instructure/ui-heading'
 import {View} from '@instructure/ui-view'
 
 import apiUserContent from 'compiled/str/apiUserContent'
@@ -117,11 +116,9 @@ export const K5Dashboard = ({
     <ApplyTheme theme={theme}>
       <Provider store={store}>
         <View as="section">
-          <Heading level="h1" margin="medium 0 small 0">
-            {I18n.t('Welcome, %{name}!', {name: display_name})}
-          </Heading>
           <DashboardTabs
             currentTab={currentTab}
+            name={display_name}
             onRequestTabChange={(_, {id}) => handleRequestTabChange(id)}
             tabsRef={setTabsRef}
           />
