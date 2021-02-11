@@ -875,7 +875,7 @@ class Enrollment < ActiveRecord::Base
     can_remove = [StudentEnrollment].include?(self.class) &&
       context.grants_right?(user, session, :manage_students) &&
       context.id == ((context.is_a? Course) ? self.course_id : self.course_section_id)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users)
+    can_remove || context.grants_right?(user, session, manage_admin_users_perm)
   end
 
   # Determine if a user has permissions to delete this enrollment.
@@ -888,11 +888,16 @@ class Enrollment < ActiveRecord::Base
   def can_be_deleted_by(user, context, session)
     return context.grants_right?(user, session, :use_student_view) if fake_student?
 
-    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) &&
-      context.grants_right?(user, session, :manage_students)
-    can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
-    can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
-    can_remove &&= context.id == ((context.is_a? Course) ? self.course_id : self.course_section_id)
+    can_remove = [StudentEnrollment, ObserverEnrollment].include?(self.class) && context.grants_right?(user, session, :manage_students)
+
+    if self.root_account.feature_enabled? :granular_permissions_manage_users
+      can_remove ||= can_delete_via_granular(user, session, context)
+      can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :allow_course_admin_actions)
+    else
+      can_remove ||= context.grants_right?(user, session, :manage_admin_users) unless student?
+      can_remove &&= self.user_id != user.id || context.account.grants_right?(user, session, :manage_admin_users)
+    end
+    can_remove && context.id == (context.is_a?(Course) ? self.course_id : self.course_section_id)
   end
 
   def pending?
@@ -1214,7 +1219,7 @@ class Enrollment < ActiveRecord::Base
   end
 
   set_policy do
-    given {|user, session| self.course.grants_any_right?(user, session, :manage_students, :manage_admin_users, :read_roster)}
+    given { |user, session| self.course.grants_any_right?(user, session, :manage_students, manage_admin_users_perm, :read_roster) }
     can :read
 
     given { |user| self.user == user }
@@ -1533,6 +1538,17 @@ class Enrollment < ActiveRecord::Base
       user_id: user,
       type: Array.wrap(types)
     ).where.not(id: id).where.not(workflow_state: :deleted)
+  end
+
+  def manage_admin_users_perm
+    self.root_account.feature_enabled?(:granular_permissions_manage_users) ? :allow_course_admin_actions : :manage_admin_users
+  end
+
+  def can_delete_via_granular(user, session, context)
+    self.teacher? && context.grants_right?(user, session, :remove_teacher_from_course) ||
+    self.ta? && context.grants_right?(user, session, :remove_ta_from_course) ||
+    self.designer? && context.grants_right?(user, session, :remove_designer_from_course) ||
+    self.observer? && context.grants_right?(user, session, :remove_observer_from_course)
   end
 
   def remove_user_as_final_grader?
