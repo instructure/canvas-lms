@@ -20,6 +20,7 @@
 require_relative '../common'
 require_relative 'groups_common'
 require_relative 'shared_examples_common'
+require_relative '../rcs/pages/rce_next_page'
 
 # ======================================================================================================================
 # Shared Examples
@@ -27,6 +28,7 @@ require_relative 'shared_examples_common'
 shared_examples 'home_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   it "should display a coming up section with relevant events", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273602, teacher: 319909) do
     # Create an event to have something in the Coming up Section
@@ -77,6 +79,7 @@ end
 shared_examples 'announcements_page' do |context|
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   it "should center the add announcement button if no announcements are present", priority: pick_priority(context, student: "1", teacher: "2"), test_id: pick_test_id(context, student: 273606, teacher: 324936) do
     get announcements_page
@@ -131,8 +134,10 @@ end
 shared_examples 'announcements_page_v2' do
   include GroupsCommon
   include SharedExamplesCommon
+  include RCENextPage
 
   before(:each) do
+    Account.default.enable_feature!(:rce_enhancements)
     stub_rcs_config
   end
 
@@ -163,20 +168,22 @@ shared_examples 'announcements_page_v2' do
 
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
-    expect(f('#editor_tabs')).to be_displayed
-
-    fj('[role="tabpanel"] button:contains("Announcements")').click
+    click_links_toolbar_menu_button
+    click_group_links
     wait_for_ajaximations
-    expect(fln('Group Announcement')).to be_displayed
-    expect(f("#content")).not_to contain_link('Course Announcement')
+    announcements_accordion_button.click
+    wait_for_ajaximations
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 
   it "should only access group files in announcements right content pane", ignore_js_errors: true do
     add_test_files
     get announcements_page
     expect_new_page_load { f('#add_announcement').click }
-    expand_files_on_content_pane
-    expect(ff('svg[name=IconDocument]').size).to eq 1
+    click_document_toolbar_menu_button
+    click_group_documents
+    wait_for_ajaximations
+    expect(ff('div[data-testid="instructure_links-Link"]').size).to eq 1
   end
 
   it "should have an Add External Feed link on announcements", ignore_js_errors: true do

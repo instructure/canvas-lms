@@ -281,7 +281,7 @@ describe "groups" do
         verify_no_course_user_access(discussions_page)
       end
 
-      it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626 do
+      it "should allow discussions to be deleted by their creator", priority: "1", test_id: 329626, ignore_js_errors: true do
         DiscussionTopic.create!(context: @testgroup.first, user: @user, title: 'Delete Me', message: 'Discussion text')
         get discussions_page
         expect(ff('.discussion-title').size).to eq 1
@@ -335,7 +335,7 @@ describe "groups" do
     # permission stuff is released, and I don't want to complicate the git history
     # for this file
     RSpec.shared_examples "group_pages_student_granular_permissions" do
-    describe "pages page" do
+      describe "pages page" do
       it_behaves_like 'pages_page', :student
 
       it "should allow group members to create a page", priority: "1", test_id: 273611 do

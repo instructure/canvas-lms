@@ -185,13 +185,10 @@ module WikiAndTinyCommon
     @root_folder = Folder.root_folders(@course).first
     @text_file = @root_folder.attachments.create!(:filename => title,
                                                   :context => @course) { |a| a.content_type = 'text/plain' }
-    get "/courses/#{@course.id}/pages/front-page/edit"
-    wait_for_tiny(f("form.edit-form .edit-content"))
     click_document_toolbar_menu_button
     click_course_documents
     fj("[aria-label='Course Documents'] [role='button']:contains('#{title}')").click
-    force_click('form.edit-form button.submit')
-    wait_for_ajax_requests
+    click_content_tray_close_button
   end
   def tiny_rce_ifr_id
     f('.tox-editor-container iframe')['id']
