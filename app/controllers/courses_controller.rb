@@ -3365,11 +3365,20 @@ class CoursesController < ApplicationController
     end
 
     permissions_to_precalculate = [:read_sis, :manage_sis]
-    permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE if includes.include?('tabs')
-    # TODO: move granular file permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
-    # after :manage_files gets removed from role overrides
-    if @domain_root_account.feature_enabled?(:granular_permissions_course_files) && includes.include?('tabs')
-      permissions_to_precalculate += RoleOverride::GRANULAR_FILE_PERMISSIONS
+    if includes.include?('tabs')
+      permissions_to_precalculate += SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
+
+      # TODO: move granular file permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
+      # after :manage_files gets removed from role overrides
+      if @domain_root_account.feature_enabled?(:granular_permissions_course_files)
+        permissions_to_precalculate += RoleOverride::GRANULAR_FILE_PERMISSIONS
+      end
+
+      # TODO: move granular user permissions to SectionTabHelper::PERMISSIONS_TO_PRECALCULATE
+      # when removing :granular_permissions_manage_users flag
+      if @domain_root_account.feature_enabled?(:granular_permissions_manage_users)
+        permissions_to_precalculate += RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
+      end
     end
 
     all_precalculated_permissions = @current_user.precalculate_permissions_for_courses(courses, permissions_to_precalculate)

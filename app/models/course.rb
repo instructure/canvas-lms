@@ -2948,7 +2948,8 @@ class Course < ActiveRecord::Base
         tabs -= hidden_exteral_tabs if hidden_exteral_tabs.present? && !(opts[:api] && check_for_permission.call(:read_as_admin))
 
         delete_unless.call([TAB_GRADES], :read_grades, :view_all_grades, :manage_grades)
-        delete_unless.call([TAB_PEOPLE], :read_roster, :manage_students, :manage_admin_users)
+
+        delete_unless.call([TAB_PEOPLE], :read_roster)
         delete_unless.call([TAB_DISCUSSIONS], :read_forum, :post_to_forum, :create_forum, :moderate_forum)
         delete_unless.call([TAB_SETTINGS], :read_as_admin)
         delete_unless.call([TAB_ANNOUNCEMENTS], :read_announcements)
@@ -2977,6 +2978,10 @@ class Course < ActiveRecord::Base
 
         if self.root_account.feature_enabled?(:granular_permissions_course_files)
           additional_checks[TAB_FILES] = RoleOverride::GRANULAR_FILE_PERMISSIONS
+        end
+
+        if self.root_account.feature_enabled?(:granular_permissions_manage_users)
+          additional_checks[TAB_PEOPLE] = RoleOverride::GRANULAR_MANAGE_USER_PERMISSIONS
         end
 
         tabs.reject! do |t|

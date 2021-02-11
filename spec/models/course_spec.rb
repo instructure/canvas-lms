@@ -2574,6 +2574,19 @@ describe Course, "tabs_available" do
       tab_ids = @course.uncached_tabs_available(@teacher, include_hidden_unused: true).map{|t| t[:id] }
       expect(tab_ids).to_not include(Course::TAB_ANNOUNCEMENTS)
     end
+
+    it "should show people tab with granular permissions if hidden" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      @course.tab_configuration = [{
+        id: Course::TAB_PEOPLE,
+        label: "People",
+        css_class: 'people',
+        href: :course_users_path,
+        hidden: true
+      }]
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).to be_include(Course::TAB_PEOPLE)
+    end
   end
 
   context "students" do
@@ -2595,6 +2608,19 @@ describe Course, "tabs_available" do
       tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
       expect(tab_ids).not_to be_include(Course::TAB_SETTINGS)
       expect(tab_ids.length).to be > 0
+    end
+
+    it "should hide people tab with granular permissions if hidden" do
+      @course.root_account.enable_feature!(:granular_permissions_manage_users)
+      @course.tab_configuration = [{
+        id: Course::TAB_PEOPLE,
+        label: "People",
+        css_class: 'people',
+        href: :course_users_path,
+        hidden: true
+      }]
+      tab_ids = @course.tabs_available(@user).map{|t| t[:id] }
+      expect(tab_ids).not_to be_include(Course::TAB_PEOPLE)
     end
 
     it "should show grades tab for students" do
