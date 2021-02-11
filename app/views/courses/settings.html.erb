@@ -29,8 +29,6 @@
   can_manage_master_courses = can_manage_courses && can_do(@context.account, @current_user, :manage_master_courses)
   has_multiple_sections = @context.course_sections.active.count > 1
 
-  can_see_users = can_do(@context, @current_user, :read_roster, :manage_students, :manage_admin_users)
-
   is_master_course = MasterCourses::MasterTemplate.is_master_course?(@context)
   blueprint_subscription = @context.master_course_subscriptions.active.first
   master_course = blueprint_subscription&.master_template&.course

@@ -646,25 +646,25 @@ class RoleOverride < ActiveRecord::Base
       account_allows: lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_users) }
     },
 
-     :manage_assignments => {
-       :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
-       :label_v2 => lambda { t("Assignments and Quizzes - add / edit / delete") },
-       :available_to => [
-         'TaEnrollment',
-         'DesignerEnrollment',
-         'TeacherEnrollment',
-         'TeacherlessStudentEnrollment',
-         'ObserverEnrollment',
-         'AccountAdmin',
-         'AccountMembership'
-       ],
-       :true_for => [
-         'TaEnrollment',
-         'DesignerEnrollment',
-         'TeacherEnrollment',
-         'AccountAdmin'
-       ],
-       :acts_as_access_token_scope => true
+    :manage_assignments => {
+      :label => lambda { t('permissions.manage_assignments', "Manage (add / edit / delete) assignments and quizzes") },
+      :label_v2 => lambda { t("Assignments and Quizzes - add / edit / delete") },
+      :available_to => [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'TeacherlessStudentEnrollment',
+        'ObserverEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ],
+      :acts_as_access_token_scope => true
     },
     :manage_calendar => {
       :label => lambda { t('permissions.manage_calendar', "Add, edit and delete events on the course calendar") },

@@ -105,14 +105,6 @@
                     publish_course: course_path(@context)
                   },
                   permissions: {
-                    # Sending the permissions just so maybe later we can extract this easier.
-                    can_manage_content: can_do(@context, @current_user, :manage_content),
-                    can_manage_students: can_do(@context, @current_user, :manage_students),
-                    can_manage_assignments: can_do(@context, @current_user, :manage_assignments),
-                    can_manage_files: can_do(@context, @current_user, :manage_files, *RoleOverride::GRANULAR_FILE_PERMISSIONS),
-                    can_update: can_do(@context, @current_user, :update),
-                    can_manage_calendar: can_do(@context, @current_user, :manage_calendar),
-                    can_manage_admin_users: can_do(@context, @current_user, :manage_admin_users),
                     can_change_course_state: can_do(@context, @current_user, :change_course_state)
                   }
                 }
