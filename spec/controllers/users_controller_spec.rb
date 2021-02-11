@@ -290,6 +290,27 @@ describe UsersController do
       expect(courses.map { |c| c['label'] }).to eq %w(a B c d)
     end
 
+    it "should sort the results of manageable_courses by term with default term first then alphabetically" do
+      # Default term
+      course_with_teacher_logged_in(:course_name => "E", :active_all => 1)
+      future_term = EnrollmentTerm.create(start_at: 1.day.from_now, root_account: @teacher.account)
+      past_term = EnrollmentTerm.create(start_at: 1.day.ago, root_account: @teacher.account)
+      # Future terms
+      %w(b a).each do |name|
+        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => future_term.id)
+      end
+      # Past terms
+      %w(d c).each do |name|
+        course_with_teacher(:course_name => name, :user => @teacher, :active_all => 1, :enrollment_term_id => past_term.id)
+      end
+
+      get 'manageable_courses', params: {:user_id => @teacher.id}
+      expect(response).to be_successful
+
+      courses = json_parse
+      expect(courses.map { |c| c['label'] }).to eq %w(E c d a b)
+    end
+
     it "should not include courses that an admin doesn't have rights to see" do
       @role1 = custom_account_role('subadmin', :account => Account.default)
       account_admin_user_with_role_changes(:role => @role1, :role_changes => {})

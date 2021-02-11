@@ -771,12 +771,19 @@ class UsersController < ApplicationController
         @context.manageable_courses(include_concluded).limit(limit)
       @courses += scope.select("courses.*,#{Course.best_unicode_collation_key('name')} AS sort_key").order('sort_key').preload(:enrollment_term).to_a
     end
-    @courses = @courses.sort_by(&:sort_key)[0, limit]
+
+    @courses = @courses.sort_by do |c|
+      [
+        c.enrollment_term.default_term? ? CanvasSort::First : CanvasSort::Last, # Default term first
+        c.enrollment_term.start_at || CanvasSort::First, # Most recent start_at
+        c.sort_key # Alphabetical
+      ]
+    end[0, limit]
 
     @courses = @courses.select { |c| c.grants_right?(@current_user, :read_as_admin) && c.grants_right?(@current_user, :read) }
 
     render :json => @courses.map { |c|
-      { :label => c.name,
+      { :label => c.nickname_for(@current_user),
         :id => c.id,
         :course_code => c.course_code,
         :sis_id => c.sis_source_id,

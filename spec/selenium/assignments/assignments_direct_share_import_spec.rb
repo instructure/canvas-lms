@@ -128,11 +128,11 @@ describe 'assignments' do
         expect(course_dropdown_list[0].text).to include 'Second Course2'
       end
 
-      it 'copy tray lists concluded courses' do
+      it 'copy tray does not list concluded courses' do
         course_search_dropdown.click
         wait_for_ajaximations
 
-        expect(course_dropdown_list[0].text).to include 'Third Course3'
+        expect(course_dropdown_list[0].text).not_to include 'Third Course3'
       end
 
       it 'copy tray lists course modules' do
