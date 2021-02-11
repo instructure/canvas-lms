@@ -515,7 +515,7 @@ class ExternalToolsController < ApplicationController
     return nil unless params[:url]
 
     resource_link = Lti::ResourceLink.where(
-      lookup_id: params[:resource_link_lookup_id],
+      lookup_uuid: params[:resource_link_lookup_id],
       context: @context,
       root_account_id: tool.root_account_id
     ).active.take.tap do |resource_link|

@@ -32,7 +32,7 @@ module Lti
       let(:unknown_context_id) { (Course.maximum(:id) || 0) + 1 }
       let(:resource_link) do
         if tool.present? && tool.use_1_3?
-          resource_link_model(overrides: {resource_link_id: assignment.lti_context_id})
+          resource_link_model(overrides: {resource_link_uuid: assignment.lti_context_id})
         else
           resource_link_model
         end
@@ -147,7 +147,7 @@ module Lti
               label: label,
               resourceId: resource_id,
               tag: tag,
-              resourceLinkId: item.resource_link.resource_link_id
+              resourceLinkId: item.resource_link.resource_link_uuid
             }.with_indifferent_access
 
             expect(parsed_response_body).to eq expected_response
@@ -307,7 +307,8 @@ module Lti
             it 'creates a line item with resource link, tag, and extensions' do
               send_request
               expect(item.resource_link).to_not be_blank
-              expect(item.resource_link.resource_link_id).to_not be_blank
+              expect(item.resource_link.resource_link_id).to_not be_blank # we'll remove this on part 4 commit
+              expect(item.resource_link.resource_link_uuid).to_not be_blank
               expect(item.tag).to_not be_blank
               expect(item.extensions).to_not be_blank
             end
@@ -324,7 +325,7 @@ module Lti
                 label: label,
                 resourceId: resource_id,
                 tag: tag,
-                resourceLinkId: item.resource_link.resource_link_id
+                resourceLinkId: item.resource_link.resource_link_uuid
               }.with_indifferent_access
 
               expect(parsed_response_body).to eq expected_response
@@ -486,7 +487,7 @@ module Lti
             id: "http://test.host/api/lti/courses/#{course.id}/line_items/#{line_item.id}",
             scoreMaximum: 10.0,
             label: 'Test Line Item',
-            resourceLinkId: line_item.resource_link.resource_link_id
+            resourceLinkId: line_item.resource_link.resource_link_uuid
           }.with_indifferent_access
 
           expect(parsed_response_body).to eq expected_response
@@ -527,7 +528,7 @@ module Lti
             scoreMaximum: 10.0,
             label: 'Test Line Item',
             tag: tag,
-            resourceLinkId: line_item.resource_link.resource_link_id
+            resourceLinkId: line_item.resource_link.resource_link_uuid
           }.with_indifferent_access
           expect(parsed_response_body).to eq expected_response
         end
@@ -659,7 +660,7 @@ module Lti
               tool: tool
             )
           end
-          let(:params_overrides) { super().merge(resource_link_id: line_item_new_lti_link.resource_link.resource_link_id) }
+          let(:params_overrides) { super().merge(resource_link_id: line_item_new_lti_link.resource_link.resource_link_uuid) }
 
           it 'correctly queries by resource_link_id' do
             send_request

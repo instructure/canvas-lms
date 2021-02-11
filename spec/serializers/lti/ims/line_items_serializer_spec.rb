@@ -20,7 +20,7 @@
 require 'spec_helper'
 
 RSpec.describe Lti::Ims::LineItemsSerializer do
-  let(:resource_link) { resource_link_model(overrides: {resource_link_id: assignment.lti_context_id}) }
+  let(:resource_link) { resource_link_model(overrides: {resource_link_uuid: assignment.lti_context_id}) }
   let_once(:course) { course_model }
   let(:tool) {
     ContextExternalTool.create!(
@@ -72,7 +72,7 @@ RSpec.describe Lti::Ims::LineItemsSerializer do
           label: line_item.label,
           resourceId: line_item.resource_id,
           tag: line_item.tag,
-          resourceLinkId: line_item.resource_link&.resource_link_id
+          resourceLinkId: line_item.resource_link&.resource_link_uuid
         }
       )
     end
