@@ -2822,6 +2822,14 @@ class Course < ActiveRecord::Base
     }]
   end
 
+  def self.default_homeroom_tabs
+    default_tabs = Course.default_tabs
+    homeroom_tabs = [default_tabs.find {|tab| tab[:id] == TAB_ANNOUNCEMENTS}]
+    homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_PEOPLE}
+    homeroom_tabs << default_tabs.find {|tab| tab[:id] == TAB_SETTINGS}
+    homeroom_tabs.compact
+  end
+
   def tab_hidden?(id)
     tab = self.tab_configuration.find{|t| t[:id] == id}
     return tab && tab[:hidden]
@@ -2843,7 +2851,7 @@ class Course < ActiveRecord::Base
 
   def uncached_tabs_available(user, opts)
     # make sure t() is called before we switch to the secondary, in case we update the user's selected locale in the process
-    default_tabs = Course.default_tabs
+    default_tabs = elementary_homeroom_course? ? Course.default_homeroom_tabs : Course.default_tabs
 
     GuardRail.activate(:secondary) do
       # We will by default show everything in default_tabs, unless the teacher has configured otherwise.
@@ -2872,7 +2880,8 @@ class Course < ActiveRecord::Base
       end
       tabs.compact!
       tabs += default_tabs
-      tabs += external_tabs
+      tabs += external_tabs unless elementary_homeroom_course?
+
       # Ensure that Settings is always at the bottom
       tabs.delete_if {|t| t[:id] == TAB_SETTINGS }
       tabs << settings_tab
@@ -3097,6 +3106,10 @@ class Course < ActiveRecord::Base
   add_setting :usage_rights_required, :boolean => true, :default => false, :inherited => true
 
   add_setting :homeroom_course, :boolean => true, :default => false
+
+  def elementary_homeroom_course?
+    homeroom_course? && account&.feature_enabled?(:canvas_for_elementary)
+  end
 
   def user_can_manage_own_discussion_posts?(user)
     return true if allow_student_discussion_editing?
