@@ -486,15 +486,19 @@ describe "Roles API", type: :request do
       it "should return the expected json format with granular admin user permission on" do
         @account.root_account.enable_feature!(:granular_permissions_manage_users)
 
-        # no longer have manage_admin_users, instead we have the new ones
-        expected_perms = @expected_permissions - ["manage_admin_users"]
+        # no longer have manage_admin_users or manage_students, instead we have the new ones
+        expected_perms = @expected_permissions - ["manage_admin_users", "manage_students"]
         expected_perms += [
           "allow_course_admin_actions",
+          "add_teacher_to_course",
           "add_ta_to_course",
           "add_designer_to_course",
+          "add_student_to_course",
           "add_observer_to_course",
+          "remove_teacher_from_course",
           "remove_ta_from_course",
           "remove_designer_from_course",
+          "remove_student_from_course",
           "remove_observer_from_course"
         ]
 

@@ -80,6 +80,19 @@ class RoleOverride < ActiveRecord::Base
 
   # Common set of granular permissions for checking rights against
   GRANULAR_FILE_PERMISSIONS = [:manage_files_add, :manage_files_edit, :manage_files_delete].freeze
+  GRANULAR_MANAGE_USER_PERMISSIONS = [
+    :allow_course_admin_actions,
+    :add_student_to_course,
+    :add_teacher_to_course,
+    :add_ta_to_course,
+    :add_observer_to_course,
+    :add_designer_to_course,
+    :remove_student_from_course,
+    :remove_teacher_from_course,
+    :remove_ta_from_course,
+    :remove_observer_from_course,
+    :remove_designer_from_course
+  ].freeze
 
   # immediately register stock canvas-lms permissions
   # NOTE: manage_alerts = Global Announcements and manage_interaction_alerts = Alerts
@@ -584,6 +597,8 @@ class RoleOverride < ActiveRecord::Base
         "AccountMembership"
       ],
       true_for: [
+        "TaEnrollment",
+        "DesignerEnrollment",
         "TeacherEnrollment",
         "AccountAdmin"
       ],
@@ -602,6 +617,8 @@ class RoleOverride < ActiveRecord::Base
         "AccountMembership"
       ],
       true_for: [
+        "TaEnrollment",
+        "DesignerEnrollment",
         "TeacherEnrollment",
         "AccountAdmin"
       ],
@@ -914,22 +931,62 @@ class RoleOverride < ActiveRecord::Base
       true_for: %w[AccountAdmin TeacherEnrollment DesignerEnrollment]
     },
     :manage_students => {
-         :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
-         :label_v2 => lambda { t("Users - add / remove students in courses") },
-         :available_to => [
-           'TaEnrollment',
-           'DesignerEnrollment',
-           'TeacherEnrollment',
-           'TeacherlessStudentEnrollment',
-           'AccountAdmin',
-           'AccountMembership'
-         ],
-         :true_for => [
-           'TaEnrollment',
-           'DesignerEnrollment',
-           'TeacherEnrollment',
-           'AccountAdmin'
-         ]
+      :label => lambda { t('permissions.manage_students', "Add/remove students for the course") },
+      :label_v2 => lambda { t("Users - add / remove students in courses") },
+      :available_to => [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'TeacherlessStudentEnrollment',
+        'AccountAdmin',
+        'AccountMembership'
+      ],
+      :true_for => [
+        'TaEnrollment',
+        'DesignerEnrollment',
+        'TeacherEnrollment',
+        'AccountAdmin'
+      ]
+    },
+    add_student_to_course: {
+      label: lambda { t("Add Students to courses") },
+      label_v2: lambda { t("Add Students to courses") },
+      available_to: [
+        "TaEnrollment",
+        "DesignerEnrollment",
+        "TeacherEnrollment",
+        "AccountAdmin",
+        "AccountMembership"
+      ],
+      true_for: [
+        "TaEnrollment",
+        "DesignerEnrollment",
+        "TeacherEnrollment",
+        "AccountAdmin"
+      ],
+      group: "manage_course_student_enrollments",
+      group_label: lambda { t("Users - Students") },
+      account_allows: lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_users) }
+    },
+    remove_student_from_course: {
+      label: lambda { t("Remove Students from courses") },
+      label_v2: lambda { t("Remove Students from courses") },
+      available_to: [
+        "TaEnrollment",
+        "DesignerEnrollment",
+        "TeacherEnrollment",
+        "AccountAdmin",
+        "AccountMembership"
+      ],
+      true_for: [
+        "TaEnrollment",
+        "DesignerEnrollment",
+        "TeacherEnrollment",
+        "AccountAdmin"
+      ],
+      group: "manage_course_student_enrollments",
+      group_label: lambda { t("Users - Students") },
+      account_allows: lambda { |a| a.root_account.feature_enabled?(:granular_permissions_manage_users) }
     },
     :manage_user_notes => {
        :label => lambda { t('permissions.manage_user_notes', "Manage faculty journal entries") },
