@@ -25,7 +25,7 @@ class Lti::ResourceLink < ApplicationRecord
 
   validates :context_external_tool_id, :context_id, :context_type, :lookup_uuid,
             :resource_link_uuid, presence: true
-  validates :lookup_uuid, uniqueness: true
+  validates :lookup_uuid, uniqueness: { scope: [:context_id, :context_type] }
 
   belongs_to :context_external_tool
   belongs_to :context, polymorphic: [:account, :assignment, :course]
