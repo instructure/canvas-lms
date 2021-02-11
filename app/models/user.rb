@@ -1086,7 +1086,7 @@ class User < ActiveRecord::Base
       # only delete the user's communication channels when the last account is
       # removed (they don't belong to any particular account). they will always
       # be on the user's shard
-      self.communication_channels.each(&:destroy) unless has_other_root_accounts
+      self.communication_channels.unretired.find_each(&:destroy) unless has_other_root_accounts
 
       self.update_account_associations
     end
