@@ -88,9 +88,11 @@ module CustomSeleniumActions
   # can (but wait if necessary), e.g.
   #
   #   expect(f('#content')).not_to contain_jqcss('.gone:visible')
-  def fj(selector, scope = nil)
+  def fj(selector, scope = nil, timeout: nil)
+    wait_opts = { method: :fj }
+    wait_opts[:timeout] = timeout if timeout
     stale_element_protection do
-      wait_for(method: :fj) do
+      wait_for(**wait_opts) do
         find_with_jquery selector, scope
       end or raise Selenium::WebDriver::Error::NoSuchElementError, "Unable to locate element: #{selector.inspect}"
     end

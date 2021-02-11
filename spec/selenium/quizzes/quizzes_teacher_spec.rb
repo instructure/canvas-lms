@@ -278,24 +278,6 @@ describe "quizzes" do
 
     end
 
-    it "should indicate when it was last saved", priority: "1", test_id: 210065 do
-      skip("flaky after rails 6 upgrade, FOO-1594")
-      skip_if_safari(:alert)
-      user_session(@student)
-      take_quiz do
-        indicator = f('#last_saved_indicator')
-        expect(indicator.text).to eq 'Not saved'
-        f('.answer .question_input').click
-
-        # too fast, this always fails
-        # indicator.text.should == 'Saving...'
-
-        wait_for_ajax_requests
-        expect(indicator.text).to match(/^Quiz saved at \d+:\d+(pm|am)$/)
-      end
-      user_session(@user)
-    end
-
     it "should validate numerical input data", priority: "1", test_id: 210066 do
       skip_if_safari(:alert)
       @quiz = quiz_with_new_questions do |bank, quiz|
