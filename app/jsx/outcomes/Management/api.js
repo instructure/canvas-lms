@@ -16,9 +16,9 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
-import {gql} from 'jsx/canvas-apollo'
 import axios from 'axios'
 import pluralize from 'str/pluralize'
+import {gql} from 'jsx/canvas-apollo'
 
 const groupFragment = gql`
   fragment GroupFragment on LearningOutcomeGroup {
@@ -85,6 +85,15 @@ export const GROUP_DETAIL_QUERY = gql`
     }
   }
 `
+export const updateOutcomeGroup = (contextType, contextId, group) => {
+  return axios.put(
+    `/api/v1/${pluralize(contextType).toLowerCase()}/${contextId}/outcome_groups/${group._id}`,
+    {
+      title: group.title,
+      description: group.description
+    }
+  )
+}
 
 export const removeOutcomeGroup = (contextType, contextId, groupId) =>
   axios.delete(

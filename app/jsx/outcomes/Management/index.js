@@ -34,6 +34,7 @@ import useCanvasContext from 'jsx/outcomes/shared/hooks/useCanvasContext'
 import useModal from '../../shared/hooks/useModal'
 import useGroupDetail from '../shared/hooks/useGroupDetail'
 import MoveModal from './MoveModal'
+import EditGroupModal from './EditGroupModal'
 import GroupRemoveModal from './GroupRemoveModal'
 import OutcomeRemoveModal from './OutcomeRemoveModal'
 import useModalWithData from 'jsx/outcomes/shared/hooks/useModalWithData'
@@ -93,6 +94,7 @@ const OutcomeManagementPanel = () => {
 
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const [isGroupRemoveModalOpen, openGroupRemoveModal, closeGroupRemoveModal] = useModal()
+  const [isEditGroupModalOpen, openEditGroupModal, closeEditGroupModal] = useModal()
   const [
     outcomeRemoveModalData,
     openOutcomeRemoveModal,
@@ -103,6 +105,8 @@ const OutcomeManagementPanel = () => {
       openMoveGroupModal()
     } else if (action === 'remove') {
       openGroupRemoveModal()
+    } else if (action === 'edit') {
+      openEditGroupModal()
     }
   }
   const outcomeMenuHandler = (id, action) => {
@@ -218,6 +222,13 @@ const OutcomeManagementPanel = () => {
               outcomeId={outcomeRemoveModalData?.id}
               isOpen={outcomeRemoveModalData?.open}
               onCloseHandler={closeOutcomeRemoveModal}
+            />
+          )}
+          {group && (
+            <EditGroupModal
+              outcomeGroup={group}
+              isOpen={isEditGroupModalOpen}
+              onCloseHandler={closeEditGroupModal}
             />
           )}
         </>
