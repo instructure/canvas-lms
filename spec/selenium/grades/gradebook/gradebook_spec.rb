@@ -103,21 +103,21 @@ describe "Gradebook" do
     end
 
     it 'toggles the presence of "Ungraded as 0" in the Total grade column header' do
-      expect(Gradebook.assignment_header_cell_element('Total').text).not_to include('Ungraded as 0')
+      expect(Gradebook.assignment_header_cell_element('Total').text).not_to include('UNGRADED AS 0')
 
       Gradebook.select_view_dropdown
       Gradebook.select_view_ungraded_as_zero
 
-      expect(Gradebook.assignment_header_cell_element('Total').text).to include('Ungraded as 0')
+      expect(Gradebook.assignment_header_cell_element('Total').text).to include('UNGRADED AS 0')
     end
 
     it 'toggles the presence of "Ungraded as 0" in assignment group grade column header' do
-      expect(Gradebook.assignment_header_cell_element('first assignment group').text).not_to include('Ungraded as 0')
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).not_to include('UNGRADED AS 0')
 
       Gradebook.select_view_dropdown
       Gradebook.select_view_ungraded_as_zero
 
-      expect(Gradebook.assignment_header_cell_element('first assignment group').text).to include('Ungraded as 0')
+      expect(Gradebook.assignment_header_cell_element('first assignment group').text).to include('UNGRADED AS 0')
     end
 
     it 'toggles which version of the total grade is displayed for a student' do

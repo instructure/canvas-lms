@@ -29,7 +29,7 @@ import ColumnHeader from './ColumnHeader'
 
 function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGroups}) {
   if (weightedGroups || viewUngradedAsZero) {
-    let secondaryLine
+    let secondaryLine, secondaryLineExt
 
     if (weightedGroups) {
       const weightValue = assignmentGroup.groupWeight || 0
@@ -39,11 +39,14 @@ function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGro
         strip_insignificant_zeros: true
       })
 
-      secondaryLine = viewUngradedAsZero
-        ? I18n.t('%{weight} of grade/Ungraded as 0', {weight})
-        : I18n.t('%{weight} of grade', {weight})
+      if (viewUngradedAsZero) {
+        secondaryLine = I18n.t('%{weight} of grade/', {weight})
+        secondaryLineExt = I18n.t('Ungraded as 0')
+      } else {
+        secondaryLine = I18n.t('%{weight} of grade', {weight})
+      }
     } else {
-      secondaryLine = I18n.t('Ungraded as 0')
+      secondaryLineExt = I18n.t('Ungraded as 0')
     }
 
     return (
@@ -55,6 +58,11 @@ function AssignmentGroupDetail({assignmentGroup, viewUngradedAsZero, weightedGro
         <span className="Gradebook__ColumnHeaderDetailLine Gradebook__ColumnHeaderDetail--secondary">
           <Text weight="normal" fontStyle="normal" size="x-small">
             {secondaryLine}
+            {typeof secondaryLineExt !== 'undefined' && secondaryLineExt.length > 0 && (
+              <Text weight="bold" transform="uppercase" fontStyle="normal" size="x-small">
+                {secondaryLineExt}
+              </Text>
+            )}
           </Text>
         </span>
       </span>
