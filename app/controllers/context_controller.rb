@@ -154,8 +154,6 @@ class ContextController < ApplicationController
         ALL_ROLES: all_roles,
         SECTIONS: sections.map { |s| { id: s.id.to_s, name: s.name} },
         CONCLUDED_SECTIONS: concluded_sections,
-        USER_LISTS_URL: polymorphic_path([@context, :user_lists], format: :json),
-        ENROLL_USERS_URL: course_enroll_users_url(@context),
         SEARCH_URL: search_recipients_url,
         COURSE_ROOT_URL: "/courses/#{@context.id}",
         CONTEXTS: @contexts,

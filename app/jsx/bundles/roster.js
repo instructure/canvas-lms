@@ -19,9 +19,7 @@
 import ready from '@instructure/ready'
 import I18n from 'i18n!roster_publicjs'
 import {Model} from 'Backbone'
-import CreateUserList from 'compiled/models/CreateUserList'
 import Role from 'compiled/models/Role'
-import CreateUsersView from 'compiled/views/courses/roster/CreateUsersView'
 import RoleSelectView from 'compiled/views/courses/roster/RoleSelectView'
 import rosterUsersTemplate from 'jst/courses/roster/rosterUsers'
 import RosterUserCollection from 'compiled/collections/RosterUserCollection'
@@ -74,17 +72,6 @@ const roleSelectView = new RoleSelectView({
   collection: users,
   rolesCollection
 })
-const createUsersView = new CreateUsersView({
-  collection: users,
-  rolesCollection,
-  model: new CreateUserList({
-    sections: ENV.SECTIONS,
-    roles: ENV.ALL_ROLES,
-    readURL: ENV.USER_LISTS_URL,
-    updateURL: ENV.ENROLL_USERS_URL
-  }),
-  courseModel: course
-})
 const resendInvitationsView = new ResendInvitationsView({
   model: course,
   resendInvitationsUrl: ENV.resend_invitations_url,
@@ -95,8 +82,9 @@ const resendInvitationsView = new ResendInvitationsView({
 })
 
 class GroupCategoryCollectionForThisCourse extends GroupCategoryCollection {}
-GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${ENV.course &&
-  ENV.course.id}/group_categories?per_page=50`
+GroupCategoryCollectionForThisCourse.prototype.url = `/api/v1/courses/${
+  ENV.course && ENV.course.id
+}/group_categories?per_page=50`
 
 const groupCategories = new GroupCategoryCollectionForThisCourse()
 
@@ -109,7 +97,6 @@ const app = new RosterView({
   rosterTabsView,
   inputFilterView,
   roleSelectView,
-  createUsersView,
   resendInvitationsView,
   collection: users,
   roles: ENV.ALL_ROLES,
@@ -130,9 +117,7 @@ users.once('reset', () =>
         userCount: numUsers
       })
     }
-    return $('#aria_alerts')
-      .empty()
-      .text(msg)
+    return $('#aria_alerts').empty().text(msg)
   })
 )
 
