@@ -1794,11 +1794,13 @@ nb:
   add_course_406cb773: "Legg til emne"
   add_course_assignments_628ed6d0: "Legg til oppgaver for emnet"
   add_course_calendar_events_146154a5: "Legg til kalenderhendelser for emnet"
+  add_course_files_4e0f1abc: "Legg til emnefiler"
   add_criterion_eb9587ef: "Legg til kriterium"
   add_custom_link_22059c0: "Legg til tilpasset lenke"
   add_designers_to_courses_9588820b: "Legg til designere til emner"
   add_discussion_653dab4c: "Legg til diskusjon"
   add_domain_f15bc6c1: "Legg til domene"
+  add_edit_delete_files_573a4d62: "legg til / rediger / slett filer"
   add_edit_delete_sections_d32c5b4d: "legg til / rediger / slett seksjoner"
   add_email_address_aef3b61: "Legg til e-postadresse"
   add_existing_content_7e36da66: "Legg til eksisterende innhold"
@@ -1809,6 +1811,7 @@ nb:
   add_grading_period_6f774dc3: "Legg til vurderingsperiode"
   add_grading_scheme_81e23c05: "Legg til vurderingsskala"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Legg til vurderingsskala i administrators vurderingsrapporter"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Legg til tillatelser på detaljnivå rundt administrering av emnefiler"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Legg til tillatelser på detaljnivå rundt administrering av emneseksjoner"
   add_group_c84f9e9d: "Legg til gruppe"
   add_group_set_f9809e11: "Legg til gruppesett"
@@ -2104,6 +2107,8 @@ nb:
   allow_users_to_comment_45b8f753: "Lar brukere kommentere"
   allowed_attempts_4e229caa: "Tillatte forsøk"
   allowed_domains_ee7868c8: "Tillatte domener"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Tillatt for underkontoer/emner, som standard av"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Tillatt for underkontoer/emner, som standard på"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Lar en bruker bruke Opptre som bruker-lenken på studentenes kontekstkort"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Lar en bruker vise SIS-ID-en i en brukers innloggingsdetaljer."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Lar en bruker vise brukeres SIS-ID-er på et emnes Folk-side."
@@ -3159,6 +3164,7 @@ nb:
     assignment_group_selector: 
       assignment_group: Oppgavegruppe
       assignment_group_options: 
+        create_group: "Opprett gruppe"
         new_group: "Ny gruppe"
     assignment_groups_count: 
       one: "1 gruppe"
@@ -5091,6 +5097,7 @@ nb:
   classic_quizzes_dee3c7b7: "Klassisk Quizzes"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Klassiske testalternativer for tidsbestemte tester uten innlevering"
   clear_2084585f: Tøm
+  clear_search_field_75f595c7: "Tøm søkefelt"
   clear_selected_file_82388e50: "Fjern valgt fil"
   clear_user_cache_ef079f7f: "Tøm bruker-Cache"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klikk “Avbryt” hvis du ikke vil at koden skal vises."
@@ -5336,6 +5343,7 @@ nb:
   collapse_all_50275533: "Kollaps alle"
   collapse_group_c2af7cad: "Kollaps gruppe"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Kollapse liste over medlemmene i gruppen for %{groupName}"
+  collapse_outcome_description_de471564: "Trekk inn læringsmålbeskrivelse"
   collapse_subdiscussion_89af1f5c: "Kollapse Sub diskusjon"
   collapse_tutorial_tray_66ee7dc1: "Kollaps lærebrettet (Tutorial Tray)"
   collapsed_510aa02a: Kollapset
@@ -6553,6 +6561,9 @@ nb:
   count_files_were_ignored_2f9c054a: 
     one: "(1) filen ble ignorert"
     other: "(%{count}) filer ble ignorert"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 «%{groupTitle}» læringsmål"
+    other: "%{count} «%{groupTitle}» læringsmål"
   count_hidden_e8d2c57c: "%{count} skjult"
   count_images_found_for_term_a93635ed: "%{count} bilder funnet for %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6581,6 +6592,9 @@ nb:
     one: "1 valg"
     other: "%{count} valg"
   count_options_loaded_cd59cc3b: "%{count} alternativ lastet."
+  count_outcomes_selected_55902958: 
+    one: "1 læringsmål valgt"
+    other: "%{count} læringsmål valgt"
   count_page_views_b40102b3: 
     one: "1 sidevisning"
     other: "%{count} sidevisninger"
@@ -6819,7 +6833,10 @@ nb:
   course_favorites_from_dashboard_27a3515a: "Emnefavoritter fra dashbordet"
   course_files_62deb8f8: "Filer for emne"
   course_files_a31f97fc: "Filer for emne"
+  course_files_add_2eede390: "Emnefiler - legg til"
   course_files_add_edit_delete_24678a2f: "Emnefiler - legg til / rediger / slett"
+  course_files_delete_fae0effe: "Emnefiler - slett"
+  course_files_edit_d05d4e8b: "Emnefiler - rediger"
   course_found_f5a40cd3: "Emner funnet"
   course_found_not_deleted_a20f72f0: "Emner funnet (ikke slettet)"
   course_grade_grade_in_course_code_9fa854db: "Emnekarakter: %{grade}% i %{course_code}"
@@ -7609,6 +7626,8 @@ nb:
   create_edit_line_item_scores_116482c7: "Opprette / Redigere resultater i ordrelinje"
   create_educational_resources_8219326e: "Opprett undervisningsressurser"
   create_failed_15d07ad4: "Opprettelsen feilet"
+  create_file_71aa1922: "[ Opprett fil ]"
+  create_file_s_188549e6: "[ Opprett fil(er) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Opprett filter etter RCE medieopplasting/-opptak"
   create_interactive_course_content_76665336: "Opprette interaktivt emneinnhold"
   create_item_base: 
@@ -8053,6 +8072,7 @@ nb:
   delete_comment_a71040c3: "Slett kommentar"
   delete_comment_comment_d32ffc85: "Slett kommentar: %{comment}"
   delete_comment_commenttext_c8afe129: "Slett kommentar: %{commentText}"
+  delete_course_files_ee9e769: "Slett emnefiler"
   delete_criterion_row_80c3b3b: "Slett kriterie rad"
   delete_current_message_5da0221a: "Slett denne meldingen"
   delete_current_module_item_21fefc54: "Slett nåværende modul/element"
@@ -8349,6 +8369,7 @@ nb:
   disabled_3b1b332a: "Slått av"
   disabled_and_locked_d14dc6c2: "Deaktivert og Låst"
   disabled_by_default_7d822dcb: "Deaktivert som Standard"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Deaktivert for alle underkontoer/emner"
   disabled_in_course_settings_d15ee35d: "* Deaktivert i emneinnstillinger"
   disabled_links_b3bdea99: "Deaktiverte lenker"
   disabled_locked_dab351d6: "Deaktivert (låst)"
@@ -8840,6 +8861,7 @@ nb:
   download_submission_comments_2a6c0395: "Laste ned innleveringskommentarer"
   download_submissions_7454665f: "Last ned innleveringer"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Last ned den komplette listen over feil og advarsler her."
+  download_these_results_as_csv_9a890883: "Last ned disse resultatene som en CSV"
   download_this_file_669f9174: "Last ned denne filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedlasting av innholdet for emne gir tilgang til innhold mens du er frakoblet. Innhold kan omfatte filer, sider, oppgaver, diskusjonstemaer eller tester. Klikk \"Generer ePub\" for hvert emne og åpne med en hvilken som helst eReader programvare for å vise."
   draft_92507c72: (utkast)
@@ -8978,6 +9000,7 @@ nb:
   edit_collaboration_b014c18b: "Rediger samarbeid"
   edit_comment_comment_e74afa04: "Rediger kommentar: %{comment}"
   edit_conference_title_6e234815: "Redigere %{conference_title}\""
+  edit_course_files_d046ef82: "Rediger emnefiller"
   edit_course_role_3b992fc2: "Rediger emnerolle"
   edit_criterion_5e4dadca: "Endre kriterium"
   edit_criterion_description_5828919: "Rediger kriterium beskrivelse"
@@ -9185,6 +9208,7 @@ nb:
   enabled_and_locked_49ff3de4: "Aktivert og Låst"
   enabled_ba7cab66: Aktivert
   enabled_by_default_e530d6ed: "Aktivert som Standard"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Aktivert for alle underkontoer/emner"
   enabled_links_be110215: "Aktiverte lenker"
   enabled_locked_3cf7c256: "Aktivert (låst)"
   enabled_unlocked_8d3a5df7: "Aktivert (ulåst)"
@@ -9750,6 +9774,7 @@ nb:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Utvid listen over gruppemedlemmer for %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Utvides eller skjul Kalendere"
   expand_or_collapse_undated_items_b901de09: "Utvide eller skjule Udaterte elementer"
+  expand_outcome_description_c5bdd70b: "Utvid læringsmålbeskrivelse"
   expand_permission_b45bf097: "Utvid %{permission}"
   expand_permission_c61d5958: "Utvid tillatelser"
   expand_subdiscussion_cd226ed4: "Utvid underdiskusjon"
@@ -11358,6 +11383,7 @@ nb:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Detaljerte innstillinger for %{contextType} varsler vil bli gjort tilgjengelig for konfigurering i fremtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljerte innstillinger for emnevarsler vil bli gjort tilgjengelig for konfigurering i fremtiden."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Tillatelser på detaljnivå for Legg til/Fjern administratorroller fra emne"
+  granular_permissions_for_managing_course_files_1ed7f019: "Tillatelser på detaljnivå for administrering av emnefiler"
   granular_permissions_for_managing_course_sections_da4b04b: "Tillatelser på detaljnivå for administrering av emneseksjoner"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerte tillatelser for håndtering av wiki-sider"
   graph_bar_b5daa23d: "Grafisk søyle"
@@ -12402,6 +12428,7 @@ nb:
   importing_outcomes_e62a0375: "importerer resultater"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Forbedre tilgjengeligheten til venstrehandsmenyen gjennom bedre bruk av farger og det visuelle, og skjermleserindikatorer til inaktive menyartikler."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Forbedre synligheten av dra og slipp i filer"
+  improved_interface_with_ongoing_updates_7316bdef: "Forbedret grensesnitt med pågående oppdateringer"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Forbedret Nye tester-støtte for moduler inkludert å opprette Nye tester fra moduler"
   improved_outcomes_management_4692f886: "Forbedret administrasjon av læringsmål"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Forbedrede visuelle påminnelser for å oppmuntre instruktører til å publisere emner"
@@ -13202,6 +13229,7 @@ nb:
   loading_last_attended_date_5a42463: "Laster inn dato for siste oppmøte"
   loading_mastery_paths_c558a766: "Laster mestringsstier ..."
   loading_media_32847745: "Laster medie"
+  loading_message_list_226a131e: "Laster inn meldingsliste"
   loading_more_grade_history_results_b235de5: "Laster flere resultater over karakterhistorie."
   loading_more_gradebook_history_results_810f6d2e: "Laster inn flere historikk resultater fra karakteroversikten."
   loading_more_results_1d437202: "Laster flere resultater"
@@ -13444,6 +13472,7 @@ nb:
   malformed_csv_aaa4b7f2: "Misformet CSV"
   maltese_916925e8: Maltesisk
   manage_access_bd923d8d: "Administrere tilgang"
+  manage_add_edit_delete_course_files_162c1a65: "Administrer ( legg til / rediger / slett ) filer for emne"
   manage_add_edit_delete_pages_5c73f2fb: "Administrer (legg til/rediger/slett) sider"
   manage_announcement_with_title_title_f2ce92de: "Administrer kunngjøring med tittel %{title}"
   manage_app_list_994cc26c: "Administrer app-liste"
@@ -13457,6 +13486,7 @@ nb:
       delete_avatar: "Er du sikker på at du ønsker å slette denne brukerens profilbilde?"
       lock_avatar: "Hvis du låser dette bildet, godkjenner du det og hindrer andre brukere fra å oppdatere det. Fortsett?"
   manage_b88f7150: Administrer
+  manage_course_files_57e07038: "Administrer emnefiler"
   manage_course_sections_f482d1b3: "Administrer emneseksjoner"
   manage_discussion_title_a2ecb3fb: "Administrere diskusjon %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Administrer registreringsstatus, opprett grupper og legg til brukere fra denne siden."
@@ -15975,6 +16005,7 @@ nb:
   nav_text_active_a924ae88: "Nav tekst aktiv"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering lar en bruker vise folk-lenken i emnenavigasjon."
   navigation_icon_45db938e: Navigasjons-ikon
+  navigation_menu_fd782ff8: Navigasjonsmeny
   near_mastery_f25174a4: "Nær ekspertise"
   need_a_canvas_account_221d18ed: "Trenger du en Canvas-konto?"
   need_help_setting_up_your_course_2b763141: "Trenger du hjelp til å sette opp emnet ditt?"
@@ -16043,7 +16074,7 @@ nb:
   new_question_group_d9306280: "Ny spørsmålsgruppe"
   new_quiz_34aacba6: "Ny test"
   new_quiz_statistics_desc: "Aktivere den nye quizstatistikkside for et kurs."
-  new_quizzes_dbda7e0a: "Ny Quizzes"
+  new_quizzes_dbda7e0a: "Nye Tester"
   new_quizzes_importing_c167dce0: "Ny Quizzes importering"
   new_quizzes_migration_during_course_import_copy_e9dd124e: "Migrering av nye tester under emneimport/-kopiering"
   new_quizzes_migration_enabled_by_default_5f9bcc81: "Migrasjon av nye tester er aktivert som standard"
@@ -16839,6 +16870,7 @@ nb:
   outcome_imports_c496a81f: "Importerte læringsmål"
   outcome_mastery_scales_8c3a814d: "Ekspertiseskalaer for læringsmål"
   outcome_mastery_scales_add_edit_171551c: "Ekspertiseskalaer for læringsmål - Legg til/rediger"
+  outcome_menu_4fe5813: Læringsmålmeny
   outcome_path_mastery_points: "%{path} ekspertisepoeng"
   outcome_path_result: "%{path} resultat"
   outcome_proficiency_calculations_5959b681: "Ferdighetsberegninger for læringsmål"
@@ -19066,6 +19098,7 @@ nb:
           select_all_banks: "Velg alle"
           view_question_banks: "Vis spørsmålsbanker for emner"
         options: 
+          create_group: "[ Opprett gruppe ]"
           new_group: "[ Ny gruppe ]"
           no_group: "[ Ingen gruppe ]"
         select_a_question_bank: "Velg en spørsmålsbank fra listen nedenfor for å koble den til testen som en spørsmålsgruppe."
@@ -20058,6 +20091,7 @@ nb:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Uavhengig av hvorvidt denne tillatelsen er aktivert eller deaktivert vil brukere ha muligheten til å administrere hendelser på den personlige kalenderen deres."
   regenerate_3e4679f8: Regenerere
   regenerate_epub_395c8e56: "regenerere ePub"
+  regenerating_themes_462e6cd9: "Gjenoppretter temaer…"
   region_47e29025: "Region:"
   region_939f2a6c: Region
   register_email_efc06d59: "Registrer e-post"
@@ -20793,6 +20827,7 @@ nb:
   search_discussion_by_title_30466604: "Søk etter diskusjon etter tittel"
   search_endpoints_d5abf37f: "Søk etter sluttpunkt"
   search_entries_or_author_63fb0a86: "Søk oppføringer eller forfatter"
+  search_field_234156fc: Søkefelt
   search_flickr_6f28b02e: "Søk i flickr"
   search_for_a_deleted_course_by_id_f553398d: "Søk etter et slettet emne ved hjelp av ID"
   search_for_files_7541fb28: "Søk etter filer"
@@ -20807,6 +20842,7 @@ nb:
   search_term_must_be_at_least_num_characters_669098ed: "Søkeordet må være på minst %{num} tegn"
   search_title_body_or_author_1d26711f: "Søk tittel, innholdstekst eller forfatter"
   search_users_48b1789e: "Søk brukere..."
+  search_within_grouptitle_4d38272f: "Søk i %{groupTitle}"
   searching_b0207e7f: Søker
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Lete etter kunngjøringer i seksjoner må vare nøyaktig et emne"
   searching_for_courses_8cc5f904: "Søker etter emner…"
@@ -20998,6 +21034,7 @@ nb:
   select_one_8e0af564: "Velg én"
   select_one_b647b384: "Velg en"
   select_one_of_the_options_c8b0c6e4: "Velg ett av alternativene:"
+  select_outcome_7e6e2562: "Velg læringsmål: "
   select_page_e93fc123: "Velg side"
   select_prerequisite_module_57894963: "Velg forutsetningmodul"
   select_prerequite_module_e9042bb0: "Velg forutsetningmodul"
@@ -21008,11 +21045,17 @@ nb:
   select_students_for_review_6e004a12: "Velg student som skal gjennomgåes"
   select_sub_account_6704196a: "Velg underkonto"
   select_term_f8083fb0: "Velg termin"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Velg filen du ønsker å assosiere, eller egg til flere filer ved å velge «Opprett fil»."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Velg filen du ønsker å assosiere, eller egg til flere filer ved å velge \"Ny fil\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge \"Ny fil\"."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge «Opprett fil»."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Velg filene du ønsker å assosiere, eller legg til flere filer ved å velge «Opprett fil(er)»."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Velg filere du ønsker å assosiere, eller legg til flere filer ved å velge \"Ny(e) fil(er)\"."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge \"Ny(e) fil(er)\"."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Velg filen du ønsker å assosiere med denne *modulen*, eller legg til flere filer ved å velge «Opprett fil(er)»."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Velg siden du vil tilknytte, eller legg til en ny side ved å velge \"Ny side\"."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Velg siden du vil tilknytte, eller legg til en ny side ved å velge «Opprett side»."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Velg siden du vil tilknytte denne *modulen*, eller legg til en ny side ved å velge «Opprett side»."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Velg siden du vil tilknytte denne *modulen*, eller legg til en ny side ved å velge \"Ny side\"."
   select_title_for_deletion_45b08247: "Velg %{title} for sletting"
   select_type_of_prerequisite_8d6fa902: "Velg type forutsetning"
@@ -21732,10 +21775,21 @@ nb:
       add_to_module: "Legg til %{item} til *modul*"
       assignment_item: Oppgave
       assignment_item_select_label: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge \"Ny oppgave\"."
+      assignment_item_select_label_create: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge «Opprett oppgave»."
+      assignment_item_select_label_new: "Velg oppgave du vil knytte til, eller legger til en oppgave ved å velge «Ny oppgave»."
       assignment_notice: "Velg hvilken oppgave du vil forbinde med denne *modulen*, eller legg til en oppgave ved å velge \"Ny oppgave\"."
       content_page_item: Side
+      create_assignment_notice: "Velg hvilken oppgave du vil forbinde med denne *modulen*, eller legg til en oppgave ved å velge «Opprett oppgave»."
+      create_assignment_option: "[ Opprett oppgave ]"
+      create_page_option: "[ Opprett side ]"
+      create_quiz_notice: "Velg testen du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge «Opprett test»."
+      create_quiz_option: "[ Opprett test ]"
+      create_topic_notice: "Velg temaet du vil forbinde med denne *modulen*, eller legg til et nytt ved å velge «Opprett tema»."
+      create_topic_option: "[ Opprett tema ]"
       discussion_item: Diskusjon
       discussion_topic_select_label: "Velg tema du ønsker å assosiere, eller legge til et emne ved å velge \"Nytt Emne\"."
+      discussion_topic_select_label_create: "Velg tema du ønsker å assosiere, eller legge til et emne ved å velge «Opprett tema»."
+      discussion_topic_select_label_new: "Velg tema du ønsker å assosiere, eller legge til et emne ved å velge «Nytt tema»."
       domain_match_notice: "For å bruke dette verktøyet må domenet matche %{domain}"
       external_tool_item: "Eksternt verktøy"
       external_tool_notice: "Velg et verktøy fra lista nedenfor, eller skriv inn en URL for et eksternt verktøy som du vet allerede er satt opp med Basic LTI for å lenke til denne *modulen*."
@@ -21755,6 +21809,7 @@ nb:
         header: Topptekst
         indentation: Innrykk
         page_name: Sidenavn
+        quiz_engine: Test-motor
         quiz_group: Gruppe
         quiz_name: "Navn på test"
         topic_name: Temanavn
@@ -21762,16 +21817,21 @@ nb:
         wiki_page_name: Sidenavn
         wiki_page_namem: Oppgavenavn
       loading: Laster...
+      new_assignment_notice: "Velg hvilken oppgave du vil forbinde med denne *modulen*, eller legg til en oppgave ved å velge «Ny oppgave»."
       new_assignment_option: "[ Ny oppgave ]"
       new_page_option: "[ Ny side ]"
+      new_quiz_notice: "Velg testen du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge «Ny test»."
       new_quiz_option: "[ Ny test ]"
       new_tab: "Last i ny fane"
+      new_topic_notice: "Velg temaet du vil forbinde med denne *modulen*, eller legg til et nytt ved å velge «Nytt tema»."
       new_topic_option: "[ Nytt tema]"
       options: 
         assignments: Oppgaver
       quiz_item: Test
       quiz_notice: "Velg testen du ønsker å assosiere med denne *modulen*, eller legg til en ny ved å velge \"Ny test\"."
       quiz_select_label: "Velg testen du vil knytte til, eller legge til en ny side ved å velge \"Ny test\"."
+      quiz_select_label_create: "Velg testen du vil knytte til, eller legge til en ny side ved å velge «Opprett test»."
+      quiz_select_label_new: "Velg testen du vil knytte til, eller legge til en ny side ved å velge «Ny test»."
       select_item_type_label: "Velg innhold type for å legge til."
       sub_header_notice: "Skriv inn teksten du vil legge til som en *modul* underoverskrift"
       text_header_item: Overskrift
@@ -23159,6 +23219,7 @@ nb:
   the_module_item_is_locked_27fe420b: "Modul elementet er låst."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De nyligste resultat for brukeren %{current_user_name} og læringsmålet %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Den neste tilgjengelige avtalen i dette emnet er på *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Det originale tester-grensesnittet"
   the_preceding_content_is_partner_provided_d753928c: "Det foregående innholdet er gitt av en partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Den tidligere SIS-batchen ble avbrutt"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Ferdighetsberegningen ble satt av administratoren din og gjelder for alle emner på denne kontoen."
@@ -24280,7 +24341,9 @@ nb:
   unable_to_find_extension_3fe61b3c: "kan ikke finne tillegg"
   unable_to_find_filetype_7b620f02: "kan ikke finne filtype"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Fant ingen treff for disse e-postadressene i institusjonen din. Velg de du vil opprette som nye brukere. De som ikke er markert vil bli hoppet over."
+  unable_to_load_courses_menu_7074ea04: "Kunne ikke laste inn emnemeny."
   unable_to_load_lti_1_3_tools_cf169f9: "Ikke mulig å laste LTI 1,3 verktøyet"
+  unable_to_load_messages_2b158fd0: "Kunne ikke laste inn meldinger. "
   unable_to_read_file_2d04b0c: "Kan ikke lese filen"
   unable_to_remove_app_4293cb53: "Kan ikke fjerne app"
   unable_to_save_new_discussion_topic_99239f3f: "kan ikke lagre nytt diskusjonsemne"
