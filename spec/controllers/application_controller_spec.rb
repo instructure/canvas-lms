@@ -1017,7 +1017,7 @@ RSpec.describe ApplicationController do
                 assignment.line_items.destroy_all
 
                 Lti::ResourceLink.where(
-                  resource_link_id: assignment.lti_context_id
+                  resource_link_uuid: assignment.lti_context_id
                 ).destroy_all
 
                 assignment.update!(lti_context_id: SecureRandom.uuid)
@@ -1031,7 +1031,7 @@ RSpec.describe ApplicationController do
 
               it 'creates the LTI resource link' do
                 expect(
-                  Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)
+                  Lti::ResourceLink.where(resource_link_uuid: assignment.lti_context_id)
                 ).to be_present
               end
             end

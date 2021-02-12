@@ -249,7 +249,7 @@ module Lti
 
       def resource_link
         @_resource_link ||= ResourceLink.find_by(
-          resource_link_id: params[:resourceLinkId],
+          resource_link_uuid: params[:resourceLinkId],
           context_external_tool: tool
         )
       end
@@ -263,7 +263,7 @@ module Lti
             {
               context: context,
               lti_line_items: { client_id: developer_key.global_id }
-            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_id: rlid } } : {})
+            }.merge!(rlid.present? ? { lti_resource_links: { resource_link_uuid: rlid } } : {})
           )
 
         {

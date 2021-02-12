@@ -768,7 +768,7 @@ describe ExternalToolsController do
           get 'retrieve', params: {
             course_id: @course.id,
             url: 'http://www.example.com/launch',
-            resource_link_lookup_id: rl.lookup_id
+            resource_link_lookup_id: rl.lookup_uuid
           }
         }
 
@@ -2133,7 +2133,7 @@ describe ExternalToolsController do
             assignment.line_items.destroy_all
 
             Lti::ResourceLink.where(
-              resource_link_id: assignment.lti_context_id
+              resource_link_uuid: assignment.lti_context_id
             ).destroy_all
 
             get :generate_sessionless_launch, params: params
@@ -2144,7 +2144,7 @@ describe ExternalToolsController do
           end
 
           it 'creates the missing resource link' do
-            expect(Lti::ResourceLink.where(resource_link_id: assignment.lti_context_id)).to be_present
+            expect(Lti::ResourceLink.where(resource_link_uuid: assignment.lti_context_id)).to be_present
           end
         end
       end

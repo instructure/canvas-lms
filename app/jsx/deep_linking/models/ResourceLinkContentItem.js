@@ -21,14 +21,14 @@ import LinkContentItem from './LinkContentItem'
 export default class ResourceLinkContentItem extends LinkContentItem {
   constructor(json, ltiEndpoint, selection) {
     super(json, ltiEndpoint, selection)
-    this.url = `${ltiEndpoint}?${this.ltiEndpointParams(json.url, json.lookup_id)}`
+    this.url = `${ltiEndpoint}?${this.ltiEndpointParams(json.url, json.lookup_uuid)}`
   }
 
-  ltiEndpointParams(url, lookupId) {
+  ltiEndpointParams(url, lookupUuid) {
     let endpointParams = 'display=borderless'
 
-    if (lookupId !== null && lookupId !== undefined) {
-      endpointParams += `&resource_link_lookup_id=${lookupId}`
+    if (lookupUuid !== null && lookupUuid !== undefined) {
+      endpointParams += `&resource_link_lookup_id=${lookupUuid}`
     }
 
     return `${endpointParams}&url=${encodeURIComponent(url)}`
