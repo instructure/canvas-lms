@@ -75,8 +75,7 @@
       },
       "label": null,
       "number": {
-        "enhanced": null,
-        "raw": null
+        "prefix_enhanced": null
       },
       "level": 2,
       "section": {
@@ -161,8 +160,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.1",
-        "raw": "1."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.1"
       },
       "guid": "CEB87C92-67AD-11DF-AB5F-995D9DFF4B22",
       "document": {
@@ -237,8 +235,7 @@
       },
       "guid": "CEB8EE66-67AD-11DF-AB5F-995D9DFF4B22",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.2",
-        "raw": "2."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.2"
       },
       "label": "Anchor Standard",
       "education_levels": {
@@ -351,8 +348,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.3",
-        "raw": "3."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.3"
       },
       "document": {
         "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22",
@@ -440,8 +436,7 @@
         }
       },
       "number": {
-        "enhanced": null,
-        "raw": null
+        "prefix_enhanced": null
       },
       "label": null,
       "education_levels": {
@@ -579,8 +574,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.4",
-        "raw": "4."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.4"
       },
       "document": {
         "publication": {
@@ -638,8 +632,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.5",
-        "raw": "5."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.5"
       },
       "education_levels": {
         "grades": [
@@ -784,8 +777,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.6",
-        "raw": "6."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.6"
       },
       "document": {
         "publication": {
@@ -861,8 +853,7 @@
       },
       "label": null,
       "number": {
-        "raw": null,
-        "enhanced": null
+        "prefix_enhanced": null
       },
       "education_levels": {
         "grades": [
@@ -930,8 +921,7 @@
       },
       "level": 3,
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.7",
-        "raw": "7."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.7"
       },
       "label": "Anchor Standard",
       "education_levels": {
@@ -1030,8 +1020,7 @@
     "attributes": {
       "label": "Anchor Standard",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.8",
-        "raw": "8."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.8"
       },
       "education_levels": {
         "grades": [
@@ -1179,8 +1168,7 @@
         ]
       },
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.9",
-        "raw": "9."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.9"
       },
       "label": "Anchor Standard",
       "document": {
@@ -1281,8 +1269,7 @@
         ]
       },
       "number": {
-        "raw": null,
-        "enhanced": null
+        "prefix_enhanced": null
       },
       "label": null,
       "guid": "CEBFA968-67AD-11DF-AB5F-995D9DFF4B22",
@@ -1322,8 +1309,7 @@
     "id": "CEC08B44-67AD-11DF-AB5F-995D9DFF4B22",
     "attributes": {
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R.10",
-        "raw": "10."
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R.10"
       },
       "label": "Anchor Standard",
       "education_levels": {
@@ -1468,8 +1454,7 @@
         ]
       },
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.R",
-        "raw": null
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.R"
       },
       "label": "Strand",
       "document": {
@@ -1550,8 +1535,7 @@
       },
       "guid": "CEC34096-67AD-11DF-AB5F-995D9DFF4B22",
       "number": {
-        "enhanced": "CCSS.ELA-Literacy.CCRA.W",
-        "raw": null
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.W"
       },
       "label": "Strand",
       "education_levels": {
@@ -1610,8 +1594,7 @@
     "type": "standards",
     "attributes": {
       "number": {
-        "raw": null,
-        "enhanced": null
+        "prefix_enhanced": null
       },
       "label": null,
       "education_levels": {
@@ -1740,8 +1723,7 @@
         "guid": "CF6A375C-67AD-11DF-AB5F-995D9DFF4B22"
       },
       "number": {
-        "raw": "1.",
-        "enhanced": "CCSS.ELA-Literacy.CCRA.W.1"
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.W.1"
       },
       "label": "Anchor Standard",
       "education_levels": {
@@ -1903,8 +1885,7 @@
       },
       "label": "Anchor Standard",
       "number": {
-        "raw": "2.",
-        "enhanced": "CCSS.ELA-Literacy.CCRA.W.2"
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.W.2"
       }
     },
     "id": "CEC57CD0-67AD-11DF-AB5F-995D9DFF4B22"
@@ -1952,8 +1933,7 @@
       },
       "guid": "CEC665B4-67AD-11DF-AB5F-995D9DFF4B22",
       "number": {
-        "raw": "3.",
-        "enhanced": "CCSS.ELA-Literacy.CCRA.W.3"
+        "prefix_enhanced": "CCSS.ELA-Literacy.CCRA.W.3"
       },
       "label": "Anchor Standard",
       "education_levels": {
