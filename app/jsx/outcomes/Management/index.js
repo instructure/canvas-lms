@@ -33,6 +33,7 @@ import {useManageOutcomes} from 'jsx/outcomes/shared/treeBrowser'
 import {useCanvasContext} from 'jsx/outcomes/shared/hooks'
 import useModal from '../../shared/hooks/useModal'
 import OutcomeMoveModal from './OutcomeMoveModal'
+import useGroupDetail from '../shared/hooks/useGroupDetail'
 
 const NoOutcomesBillboard = ({contextType}) => {
   const isCourse = contextType === 'Course'
@@ -82,11 +83,10 @@ const OutcomeManagementPanel = () => {
     collections,
     queryCollections,
     rootId,
-    detailGroupIsLoading,
-    detailGroup,
-    detailGroupLoadMore,
     selectedGroupId
   } = useManageOutcomes()
+  const {loading, group, loadMore} = useGroupDetail(selectedGroupId)
+  
   const [isMoveGroupModalOpen, openMoveGroupModal, closeMoveGroupModal] = useModal()
   const onSelectOutcomeGroupMenuHandler = (_, value) => {
     if (value === 'move') openMoveGroupModal()
@@ -164,8 +164,8 @@ const OutcomeManagementPanel = () => {
                 {selectedGroupId && (
                   <ManageOutcomesView
                     key={selectedGroupId}
-                    outcomeGroup={detailGroup}
-                    loading={detailGroupIsLoading}
+                    outcomeGroup={group}
+                    loading={loading}
                     selectedOutcomes={selectedOutcomes}
                     searchString={searchString}
                     onSelectOutcomesHandler={onSelectOutcomesHandler}
@@ -173,7 +173,7 @@ const OutcomeManagementPanel = () => {
                     onOutcomeMenuHandler={noop}
                     onSearchChangeHandler={onSearchChangeHandler}
                     onSearchClearHandler={onSearchClearHandler}
-                    loadMore={detailGroupLoadMore}
+                    loadMore={loadMore}
                   />
                 )}
               </View>
@@ -184,7 +184,7 @@ const OutcomeManagementPanel = () => {
             <ManageOutcomesFooter selected={selected} onRemoveHandler={noop} onMoveHandler={noop} />
           )}
           <OutcomeMoveModal
-            title={detailGroup ? detailGroup.title : ''}
+            title={group ? group.title : ''}
             type="group"
             isOpen={isMoveGroupModalOpen}
             onCloseHandler={closeMoveGroupModal}

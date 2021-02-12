@@ -21,24 +21,25 @@ import I18n from 'i18n!OutcomeManagement'
 import $ from 'jquery'
 import {useState, useEffect} from 'react'
 import {useApolloClient} from 'react-apollo'
-import {GROUP_DETAIL_QUERY} from './api'
+import {GROUP_DETAIL_QUERY} from '../../Management/api'
+import {ACCOUNT_FOLDER_ID} from '../treeBrowser'
 
-const useGroupDetail = (id) => {
+const useGroupDetail = id => {
   const client = useApolloClient()
   const [group, setGroup] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
 
-  const load = (currentGroup) => {
-    if (id) {
+  const load = currentGroup => {
+    if (id && String(id) !== String(ACCOUNT_FOLDER_ID)) {
       setLoading(true)
       client
         .query({
           query: GROUP_DETAIL_QUERY,
           variables: {
             id,
-            outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor,
-          },
+            outcomesCursor: currentGroup?.outcomes?.pageInfo?.endCursor
+          }
         })
         .then(({data}) => {
           if (!currentGroup) {
@@ -48,15 +49,15 @@ const useGroupDetail = (id) => {
               ...data.group,
               outcomes: {
                 pageInfo: data.group.outcomes.pageInfo,
-                nodes: [...currentGroup.outcomes.nodes, ...data.group.outcomes.nodes],
-              },
+                nodes: [...currentGroup.outcomes.nodes, ...data.group.outcomes.nodes]
+              }
             })
           }
         })
         .finally(() => {
           setLoading(false)
         })
-        .catch((err) => {
+        .catch(err => {
           setError(err)
         })
     }
@@ -86,7 +87,7 @@ const useGroupDetail = (id) => {
     loading,
     group,
     error,
-    loadMore,
+    loadMore
   }
 }
 

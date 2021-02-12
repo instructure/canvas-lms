@@ -24,16 +24,32 @@ describe('FindOutcomesView', () => {
   let onChangeHandlerMock
   let onClearHandlerMock
   let onAddAllHandlerMock
+  let onLoadMoreHandlerMock
   const defaultProps = (props = {}) => ({
     collection: {
-      id: 1,
+      id: '1',
       name: 'State Standards',
       outcomesCount: 3
     },
+    outcomes: {
+      nodes: [
+        {
+          _id: '11',
+          title: 'Outcome 1',
+          description: 'Outcome 1 description'
+        }
+      ],
+      pageInfo: {
+        endCursor: 'abc',
+        hasNextPage: true
+      }
+    },
+    loading: false,
     searchString: '123',
     onChangeHandler: onChangeHandlerMock,
     onClearHandler: onClearHandlerMock,
     onAddAllHandler: onAddAllHandlerMock,
+    loadMore: onLoadMoreHandlerMock,
     ...props
   })
 
@@ -41,6 +57,7 @@ describe('FindOutcomesView', () => {
     onChangeHandlerMock = jest.fn()
     onClearHandlerMock = jest.fn()
     onAddAllHandlerMock = jest.fn()
+    onLoadMoreHandlerMock = jest.fn()
   })
 
   afterEach(() => {
@@ -108,14 +125,14 @@ describe('FindOutcomesView', () => {
     expect(onAddAllHandlerMock).toHaveBeenCalled()
   })
 
-  it('marks outcome as added when toggle is turned on', () => {
+  it('shows outcome as added when toggle is turned on', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
     const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
     fireEvent.click(toggle)
     expect(toggle).toBeChecked()
   })
 
-  it('marks outcome as removed when toggle is turned off', () => {
+  it('shows outcome as removed when toggle is turned off', () => {
     const {getAllByText} = render(<FindOutcomesView {...defaultProps()} />)
     const toggle = getAllByText('Add outcome')[0].closest('label').previousSibling
     fireEvent.click(toggle)
@@ -135,5 +152,22 @@ describe('FindOutcomesView', () => {
       />
     )
     expect(getByText('Add All Outcomes').closest('button')).toHaveAttribute('disabled')
+  })
+
+  it('shows large loader if data is loading and outcomes are missing/undefined', () => {
+    const {getByTestId} = render(
+      <FindOutcomesView {...defaultProps({loading: true, outcomes: null})} />
+    )
+    expect(getByTestId('loading')).toBeInTheDocument()
+  })
+
+  it('shows "Load More" button if there are more outcomes and data is loaded', () => {
+    const {getByText} = render(<FindOutcomesView {...defaultProps()} />)
+    expect(getByText('Load More')).toBeInTheDocument()
+  })
+
+  it('shows small loader if there are more outcomes and data is loading', () => {
+    const {getByTestId} = render(<FindOutcomesView {...defaultProps({loading: true})} />)
+    expect(getByTestId('load-more-loading')).toBeInTheDocument()
   })
 })

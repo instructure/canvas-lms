@@ -18,11 +18,12 @@
 
 import React from 'react'
 import useGroupDetail from '../useGroupDetail'
-import {createCache} from '../../../canvas-apollo'
-import {renderHook, act} from '@testing-library/react-hooks/dom'
-import {groupDetailMocks} from './mocks'
+import {createCache} from '../../../../canvas-apollo'
+import {renderHook, act} from '@testing-library/react-hooks'
+import {groupDetailMocks} from '../../../Management/__tests__/mocks'
 import $ from 'jquery'
 import {MockedProvider} from '@apollo/react-testing'
+import {ACCOUNT_FOLDER_ID} from '../../treeBrowser'
 
 describe('groupDetailHook', () => {
   let cache, mocks
@@ -88,5 +89,14 @@ describe('groupDetailHook', () => {
       'Outcome 2 - Group 2',
       'Outcome 3 - Group 2'
     ])
+  })
+
+  it('should not load group info if ACCOUNT_FOLDER_ID passed as id', async () => {
+    const {result} = renderHook(() => useGroupDetail(ACCOUNT_FOLDER_ID), {wrapper})
+    expect(result.current.loading).toBe(true)
+    expect(result.current.group).toBe(null)
+    await act(async () => jest.runAllTimers())
+    expect(result.current.loading).toBe(true)
+    expect(result.current.group).toBe(null)
   })
 })

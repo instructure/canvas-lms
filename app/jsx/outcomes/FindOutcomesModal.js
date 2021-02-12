@@ -17,6 +17,7 @@
  */
 
 import React from 'react'
+import PropTypes from 'prop-types'
 import I18n from 'i18n!FindOutcomesModal'
 import {Spinner} from '@instructure/ui-spinner'
 import {Text} from '@instructure/ui-text'
@@ -28,20 +29,23 @@ import Modal from '../shared/components/InstuiModal'
 import TreeBrowser from './Management/TreeBrowser'
 import FindOutcomesBillboard from './FindOutcomesBillboard'
 import FindOutcomesView from './FindOutcomesView'
-import useSearch from '../shared/hooks/useSearch'
-import {useFindOutcomeModal} from './shared/treeBrowser'
+import {useFindOutcomeModal, ACCOUNT_FOLDER_ID} from './shared/treeBrowser'
 import {useCanvasContext} from './shared/hooks'
+import useGroupDetail from './shared/hooks/useGroupDetail'
 
 const FindOutcomesModal = ({open, onCloseHandler}) => {
   const {contextType} = useCanvasContext()
   const {
+    rootId,
     isLoading,
     collections,
-    selectedCollection,
-    updateSelectedCollection,
-    rootId
+    selectedGroupId,
+    toggleGroupId,
+    searchString,
+    updateSearch,
+    clearSearch
   } = useFindOutcomeModal(open)
-  const [searchString, onChangeHandler, onClearHandler] = useSearch()
+  const {group, loading, loadMore} = useGroupDetail(selectedGroupId)
 
   return (
     <Modal
@@ -65,7 +69,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             overflowY="visible"
             overflowX="auto"
           >
-            <View as="div" padding="small none none x-small">
+            <View as="div" padding="small x-small none x-small">
               <Heading level="h3">
                 <Text size="large" weight="light" fontStyle="normal">
                   {I18n.t('Outcome Groups')}
@@ -78,7 +82,7 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
                   </div>
                 ) : (
                   <TreeBrowser
-                    onCollectionToggle={updateSelectedCollection}
+                    onCollectionToggle={toggleGroupId}
                     collections={collections}
                     rootId={rootId}
                   />
@@ -102,13 +106,16 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
             overflowY="visible"
             overflowX="auto"
           >
-            {selectedCollection !== null ? (
+            {selectedGroupId && String(selectedGroupId) !== String(ACCOUNT_FOLDER_ID) ? (
               <FindOutcomesView
-                collection={collections[selectedCollection]}
+                collection={collections[selectedGroupId]}
+                outcomes={group?.outcomes}
                 searchString={searchString}
-                onChangeHandler={onChangeHandler}
-                onClearHandler={onClearHandler}
+                onChangeHandler={updateSearch}
+                onClearHandler={clearSearch}
                 onAddAllHandler={() => {}}
+                loading={loading}
+                loadMore={loadMore}
               />
             ) : (
               <FindOutcomesBillboard />
@@ -123,6 +130,11 @@ const FindOutcomesModal = ({open, onCloseHandler}) => {
       </Modal.Footer>
     </Modal>
   )
+}
+
+FindOutcomesModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  onCloseHandler: PropTypes.func.isRequired
 }
 
 export default FindOutcomesModal

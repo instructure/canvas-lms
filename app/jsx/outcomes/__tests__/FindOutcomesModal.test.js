@@ -48,9 +48,9 @@ describe('FindOutcomesModal', () => {
 
   const render = (
     children,
-    {contextType = 'Account', contextId = '1', mocks = findModalMocks()} = {}
+    {contextType = 'Account', contextId = '1', mocks = findModalMocks(), renderer = rtlRender} = {}
   ) => {
-    return rtlRender(
+    return renderer(
       <OutcomesContext.Provider value={{env: {contextType, contextId}}}>
         <MockedProvider cache={cache} mocks={mocks}>
           {children}
@@ -101,6 +101,21 @@ describe('FindOutcomesModal', () => {
     expect(onCloseHandlerMock).toHaveBeenCalledTimes(1)
   })
 
+  it('clears selected outcome group on modal close', async () => {
+    const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
+    await act(async () => jest.runAllTimers())
+    fireEvent.click(getByText('Account Standards'))
+    fireEvent.click(getByText('Root Account Outcome Group 0'))
+    await act(async () => jest.runAllTimers())
+    expect(getByText('Add All Outcomes')).toBeInTheDocument()
+    fireEvent.click(getByText('Done'))
+    render(<FindOutcomesModal {...defaultProps({open: false})} />, {renderer: rerender})
+    await act(async () => jest.runAllTimers())
+    render(<FindOutcomesModal {...defaultProps()} />, {renderer: rerender})
+    await act(async () => jest.runAllTimers())
+    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
+  })
+
   describe('within an account context', () => {
     it('renders the parent account groups', async () => {
       const {getByText} = render(<FindOutcomesModal {...defaultProps()} />)
@@ -140,23 +155,6 @@ describe('FindOutcomesModal', () => {
       await act(async () => jest.runAllTimers())
       expect(flashMock).toHaveBeenCalledWith('An error occurred while loading course outcomes.')
     })
-  })
-
-  it('clears selected outcome group on modal close', async () => {
-    const {getByText, queryByText, rerender} = render(<FindOutcomesModal {...defaultProps()} />)
-    await act(async () => jest.runAllTimers())
-    fireEvent.click(getByText('Account Standards'))
-    expect(getByText('Add All Outcomes')).toBeInTheDocument()
-    fireEvent.click(getByText('Done'))
-    rerender(
-      <OutcomesContext.Provider value={{env: {contextType: 'Account', contextId: '1'}}}>
-        <MockedProvider cache={cache} mocks={findModalMocks()}>
-          <FindOutcomesModal {...defaultProps({open: false})} />
-        </MockedProvider>
-      </OutcomesContext.Provider>
-    )
-    await act(async () => jest.runAllTimers())
-    expect(queryByText('Add All Outcomes')).not.toBeInTheDocument()
   })
 
   describe('global standards', () => {
