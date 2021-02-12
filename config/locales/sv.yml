@@ -1797,11 +1797,13 @@ sv:
   add_course_406cb773: "Lägg till kurs"
   add_course_assignments_628ed6d0: "Lägg till kursuppgifter"
   add_course_calendar_events_146154a5: "Lägg till händelser i kurskalendern"
+  add_course_files_4e0f1abc: "Lägg till kursfiler"
   add_criterion_eb9587ef: "Lägg till kriterium"
   add_custom_link_22059c0: "Lägg till anpassad länk"
   add_designers_to_courses_9588820b: "Lägg till designers i kurser"
   add_discussion_653dab4c: "Lägg till diskussion"
   add_domain_f15bc6c1: "Lägg till domän"
+  add_edit_delete_files_573a4d62: "lägg till/redigera/ta bort filer"
   add_edit_delete_sections_d32c5b4d: "lägg till/redigera/ta bort sektioner"
   add_email_address_aef3b61: "Lägg till e-postadress"
   add_existing_content_7e36da66: "Lägg till befintligt innehåll"
@@ -1812,6 +1814,7 @@ sv:
   add_grading_period_6f774dc3: "Lägg till bedömningsperiod"
   add_grading_scheme_81e23c05: " Lägg till bedömningsschema"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Lägg till omdömesschema till administratörsomdömesrapport"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Lägg till granulära behörigheter för hantering av kursfiler"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Lägg till granulära behörigheter för hantering av kurssektioner"
   add_group_c84f9e9d: "Lägg till grupp"
   add_group_set_f9809e11: "Lägg till gruppuppsättning"
@@ -2107,6 +2110,8 @@ sv:
   allow_users_to_comment_45b8f753: "Tillåt användare att kommentera"
   allowed_attempts_4e229caa: "Tillåtna försök"
   allowed_domains_ee7868c8: "Tillåtna domäner"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Tillåts för alla underkonton/kurser, standard av."
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Tillåts för alla underkonton/kurser, standard på."
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Gör det möjligt för användaren att få åtkomst till länken Agera som användare på studentkontextkort"
   allows_a_user_to_view_the_sis_id_in_a_user_s_login_802288b9: "Gör att användare kan se SIS-ID:t i en användares inloggningsuppgifter."
   allows_a_user_to_view_user_sis_ids_in_a_course_peo_dd6404c: "Gör att användare kan se SIS-ID:t på sidan Personer i en kurs."
@@ -3163,6 +3168,7 @@ sv:
     assignment_group_selector: 
       assignment_group: Uppgiftsgrupp
       assignment_group_options: 
+        create_group: "Skapa grupp"
         new_group: "Ny grupp"
     assignment_groups_count: 
       one: "1 Grupp"
@@ -5106,6 +5112,7 @@ sv:
   classic_quizzes_dee3c7b7: "Classic Quizzes"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Alternativ för klassisk Quizzes för tidsinställda quiz utan inlämning"
   clear_2084585f: Rensa
+  clear_search_field_75f595c7: "Rensa sökfältet"
   clear_selected_file_82388e50: "Rensa vald fil"
   clear_user_cache_ef079f7f: "Rensa användar-cacheminne"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Klicka på \"Avbryt\" om du inte vill visa koden."
@@ -5351,6 +5358,7 @@ sv:
   collapse_all_50275533: "Dölj alla"
   collapse_group_c2af7cad: "Komprimera grupp"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Stäng listan av gruppmedlemmar för %{groupName}"
+  collapse_outcome_description_de471564: "Dölj beskrivningen för lärandemål"
   collapse_subdiscussion_89af1f5c: "Stäng underdiskussion"
   collapse_tutorial_tray_66ee7dc1: "Stäng självstudiefack"
   collapsed_510aa02a: Förminskad
@@ -6565,6 +6573,9 @@ sv:
   count_files_were_ignored_2f9c054a: 
     one: "(1) fil ignorerades"
     other: "(%{count}) filer ignorerades"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 \"%{groupTitle}\"-lärandemål"
+    other: "%{count} \"%{groupTitle}\"-lärandemål"
   count_hidden_e8d2c57c: "%{count} dold"
   count_images_found_for_term_a93635ed: "%{count} bilder hittades för %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -6593,6 +6604,9 @@ sv:
     one: "1 Alternativ"
     other: "%{count} Alternativ"
   count_options_loaded_cd59cc3b: "%{count} alternativ inlästa."
+  count_outcomes_selected_55902958: 
+    one: "1 lärandemål har valts"
+    other: "%{count} lärandemål är valda"
   count_page_views_b40102b3: 
     one: "1 sidvisning"
     other: "%{count} sidvisning"
@@ -6831,7 +6845,10 @@ sv:
   course_favorites_from_dashboard_27a3515a: "Kursfavoriter från översikten"
   course_files_62deb8f8: Kursfiler
   course_files_a31f97fc: Kursfiler
+  course_files_add_2eede390: "Kursfiler – lägg till"
   course_files_add_edit_delete_24678a2f: "Kursfiler – lägg till/redigera/ta bort"
+  course_files_delete_fae0effe: "Kursfiler – ta bort"
+  course_files_edit_d05d4e8b: "Kursfiler – redigera"
   course_found_f5a40cd3: "Kurs hittad"
   course_found_not_deleted_a20f72f0: "Kurs hittad (ej borttagen)"
   course_grade_grade_in_course_code_9fa854db: "Kursomdöme: %{grade}% i %{course_code}"
@@ -7624,6 +7641,8 @@ sv:
   create_edit_line_item_scores_116482c7: "Skapa/redigera radobjekt för poäng"
   create_educational_resources_8219326e: "Skapa utbildningsresurser"
   create_failed_15d07ad4: "Skapandet misslyckades"
+  create_file_71aa1922: "[ Skapa fil ]"
+  create_file_s_188549e6: "[ Skapa filer ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Skapa filer efter RCE-medieuppladdning eller -inspelning"
   create_interactive_course_content_76665336: "Skapa interaktivt kursinnehåll"
   create_item_base: 
@@ -8068,6 +8087,7 @@ sv:
   delete_comment_a71040c3: "Radera kommentar"
   delete_comment_comment_d32ffc85: "Ta bort kommentar: %{comment}"
   delete_comment_commenttext_c8afe129: "Radera kommentar: %{commentText}"
+  delete_course_files_ee9e769: "Ta bort kursfiler"
   delete_criterion_row_80c3b3b: "Ta bort kriterium rad"
   delete_current_message_5da0221a: "Radera nuvarande meddelande"
   delete_current_module_item_21fefc54: "Radera nuvarande modul/objekt"
@@ -8364,6 +8384,7 @@ sv:
   disabled_3b1b332a: Inaktiverad
   disabled_and_locked_d14dc6c2: "Inaktiverad och låst"
   disabled_by_default_7d822dcb: "Inaktiverad som standard"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Inaktiverad för alla underkonton/kurser"
   disabled_in_course_settings_d15ee35d: "* Inaktiverad i kursinställningar"
   disabled_links_b3bdea99: "Inaktiverade länkar"
   disabled_locked_dab351d6: "Inaktiverad (låst)"
@@ -8855,6 +8876,7 @@ sv:
   download_submission_comments_2a6c0395: "Ladda ned inlämningskommentarer"
   download_submissions_7454665f: "Ladda ner inlämningar"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Hämta hela listan med fel och varningar här."
+  download_these_results_as_csv_9a890883: "Ladda ned dessa resultat i en CSV-fil"
   download_this_file_669f9174: "Ladda ner den här filen"
   downloading_course_content_allows_access_to_conten_164d9336: "Nedladdning av kursinnehåll ger tillgång till innehållet offline. Innehållet kan vara filer, sidor, uppgifter, diskussionsämnen eller quiz. Klicka på ”Generera ePub” för varje kurs och öppna med en e-läsare för att visa."
   draft_92507c72: (utkast)
@@ -8991,6 +9013,7 @@ sv:
   edit_collaboration_b014c18b: "Redigera samarbete"
   edit_comment_comment_e74afa04: "Redigera kommentar: %{comment}"
   edit_conference_title_6e234815: "Redigera \"%{conference_title}\""
+  edit_course_files_d046ef82: "Redigera kursfiler"
   edit_course_role_3b992fc2: "Redigera kursroll"
   edit_criterion_5e4dadca: Redigera-kriterium
   edit_criterion_description_5828919: "Redigera beskrivning av kriterium"
@@ -9198,6 +9221,7 @@ sv:
   enabled_and_locked_49ff3de4: "Aktiverat och låst"
   enabled_ba7cab66: Aktiverad
   enabled_by_default_e530d6ed: "Aktiverat som standard"
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Aktiverad för alla underkonton/kurser"
   enabled_links_be110215: "Aktiverade länkar"
   enabled_locked_3cf7c256: "Aktiverad (låst)"
   enabled_unlocked_8d3a5df7: "Aktiverad (olåst)"
@@ -9763,6 +9787,7 @@ sv:
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Ta fram listan av gruppmedlemmar för %{groupName}"
   expand_or_collapse_calendars_9854b0d0: "Förstora eller minska kalendrar"
   expand_or_collapse_undated_items_b901de09: "Förstora elle minska odaterade föremål"
+  expand_outcome_description_c5bdd70b: "Visa beskrivningen för lärandemål"
   expand_permission_b45bf097: "Expandera %{permission}"
   expand_permission_c61d5958: "Ta fram behörighet"
   expand_subdiscussion_cd226ed4: "Ta fram underdiskussion"
@@ -11366,6 +11391,7 @@ sv:
   granular_contexttype_notification_settings_will_be_c5dfc901: "Detaljerade %{contextType}-aviseringsinställningar kan konfigureras här i framtiden."
   granular_course_notification_settings_will_be_conf_68f122db: "Detaljinställningar för kursaviseringar kan konfigureras här i framtiden."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Granulära behörigheter för administratörsroller för Lägg till/ta bort i kurser."
+  granular_permissions_for_managing_course_files_1ed7f019: "Granulära behörigheter för hantering av kursfiler"
   granular_permissions_for_managing_course_sections_da4b04b: "Granulära behörigheter för hantering av kurssektioner"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Detaljerade behörigheter för hantering av wikisidor"
   graph_bar_b5daa23d: Diagramstapel
@@ -12410,6 +12436,7 @@ sv:
   importing_outcomes_e62a0375: "importerar resultat"
   improve_accessibility_of_left_hand_menu_through_be_908fb002: "Förbättra tillgängligheten för vänstermenyn genom att använda färger samt indikatorer för visuella objekt och skärmläsarobjekt i inaktiva menyobjekt."
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Bättre identifiering av dra- och släppfunktionen i Filer"
+  improved_interface_with_ongoing_updates_7316bdef: "Förbättrat gränssnitt med löpande uppdateringar"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Förbättrat stöd för New Quizzes i Moduler, däribland skapande av New Quizzes från Moduler"
   improved_outcomes_management_4692f886: "Förbättrad hantering av lärandemål"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Förbättrade visuella påminnelser som uppmuntrar instruktörer att publicera kurser"
@@ -13213,6 +13240,7 @@ sv:
   loading_last_attended_date_5a42463: "Läser in senaste närvarodatum"
   loading_mastery_paths_c558a766: "Laddar Mastery Paths..."
   loading_media_32847745: "Läser in media"
+  loading_message_list_226a131e: "Läser in meddelandelistan"
   loading_more_grade_history_results_b235de5: "Laddar mer historik för betygsresultat."
   loading_more_gradebook_history_results_810f6d2e: "Läser in fler resultat från historiken för bedömningsöversikten."
   loading_more_results_1d437202: "Läser in fler resultat"
@@ -13455,6 +13483,7 @@ sv:
   malformed_csv_aaa4b7f2: "Felaktig CSV"
   maltese_916925e8: Maltesiska
   manage_access_bd923d8d: "Hantera åtkomst"
+  manage_add_edit_delete_course_files_162c1a65: "Hantera (lägg till/redigera/radera) kursfiler"
   manage_add_edit_delete_pages_5c73f2fb: "Hantera (lägg till/redigera/radera) sidor"
   manage_announcement_with_title_title_f2ce92de: "Hantera tillkännagivande med titel %{title}"
   manage_app_list_994cc26c: "Hantera applista"
@@ -13468,6 +13497,7 @@ sv:
       delete_avatar: "Vill du verkligen radera den här användarens profilbild?"
       lock_avatar: "Låser du den här bilden kommer den godkännas och användare kommer inte kunna uppdatera den.  Fortsätt?"
   manage_b88f7150: Hantera
+  manage_course_files_57e07038: "Hantera kursfiler"
   manage_course_sections_f482d1b3: "Hantera kurssektioner"
   manage_discussion_title_a2ecb3fb: "Hantera diskussioner %{title}"
   manage_enrollment_status_create_groups_and_add_use_3c91de1b: "Hantera registreringsstatus, skapa grupper och lägg till användare från denna sida."
@@ -15995,6 +16025,7 @@ sv:
   nav_text_active_a924ae88: "Navigeringstext aktiv"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navigering gör det möjligt för användaren att se länken Personer i kursnavigeringen."
   navigation_icon_45db938e: Navigationsikon
+  navigation_menu_fd782ff8: Navigeringsmeny
   near_mastery_f25174a4: "Nära måluppfyllelse"
   need_a_canvas_account_221d18ed: "Behöver du ett Canvas-konto?"
   need_help_setting_up_your_course_2b763141: "Behöver du hjälp med att skapa din kurs?"
@@ -16862,6 +16893,7 @@ sv:
   outcome_imports_c496a81f: Lärandemålsimporter
   outcome_mastery_scales_8c3a814d: "Måluppfyllelseskalor för lärandemål"
   outcome_mastery_scales_add_edit_171551c: "Skalor för lärandemålskompetenser – lägg till/redigera"
+  outcome_menu_4fe5813: Lärandemålsmeny
   outcome_path_mastery_points: "%{path} poäng för måluppfyllelse"
   outcome_path_result: "%{path} resultat"
   outcome_proficiency_calculations_5959b681: "Beräkningar för lärandemålskompetenser"
@@ -19083,6 +19115,7 @@ sv:
           select_all_banks: "Välj alla"
           view_question_banks: "Visa kursers frågebanker"
         options: 
+          create_group: "[ Skapa grupp ]"
           new_group: "[ Ny grupp ]"
           no_group: "[ Ingen grupp ]"
         select_a_question_bank: "Välj en frågebank från listan nedanför för att länka den till detta quiz som en frågegrupp."
@@ -20073,6 +20106,7 @@ sv:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Oavsett om den här behörigheten är aktiverad eller inaktiverad kommer användarna ändå att kunna hantera händelser i sina personliga kalendrar."
   regenerate_3e4679f8: Regenerera
   regenerate_epub_395c8e56: "Omgenerera ePub"
+  regenerating_themes_462e6cd9: "Omgenererar teman..."
   region_47e29025: "Region:"
   region_939f2a6c: Region
   register_email_efc06d59: "Registrera e-post"
@@ -20808,6 +20842,7 @@ sv:
   search_discussion_by_title_30466604: "Sök diskussion efter titel"
   search_endpoints_d5abf37f: "Sök slutpunkter"
   search_entries_or_author_63fb0a86: "Sök efter inlägg eller författare"
+  search_field_234156fc: Sökfält
   search_flickr_6f28b02e: "Sök på flickr"
   search_for_a_deleted_course_by_id_f553398d: "Sök efter en raderad kurs med ID"
   search_for_files_7541fb28: "Sök efter filer"
@@ -20822,6 +20857,7 @@ sv:
   search_term_must_be_at_least_num_characters_669098ed: "Söktermen måste bestå av minst %{num} tecken"
   search_title_body_or_author_1d26711f: "Söker efter titel, brödtext, eller författare"
   search_users_48b1789e: "Sök efter användare..."
+  search_within_grouptitle_4d38272f: "Sök i %{groupTitle}"
   searching_b0207e7f: Söker
   searching_for_announcements_in_sections_must_span__80e4dfe4: "Sökning efter anslag i sektioner måste omfatta exakt en kurs"
   searching_for_courses_8cc5f904: "Söker efter Canvas-kurser..."
@@ -21013,6 +21049,7 @@ sv:
   select_one_8e0af564: "Välj en"
   select_one_b647b384: "Välj ett alternativ"
   select_one_of_the_options_c8b0c6e4: "Välj ett av alternativen:"
+  select_outcome_7e6e2562: "Välj lärandemål"
   select_page_e93fc123: "Välj sida"
   select_prerequisite_module_57894963: "Välj förutsättningsmodul"
   select_prerequite_module_e9042bb0: "Välj förutsättningsmodul"
@@ -21023,11 +21060,17 @@ sv:
   select_students_for_review_6e004a12: "Välj studenter att bedöma"
   select_sub_account_6704196a: "Välj underkonto"
   select_term_f8083fb0: "Välj termin"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Välj de filer du vill koppla eller lägg till en fil genom att välja ”Skapa fil”."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Välj den fil du vill associera eller lägg till en fil genom att välja \"Ny fil\"."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Välj den fil du vill associera med den här *modulen* eller lägg till en fil genom att välja ”Ny fil”."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Välj de filer du vill koppla till den här *modulen* eller lägg till en fil genom att välja ”Skapa fil”."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Välj de filer du vill koppla eller lägg till filer genom att välja ”Skapa filer”."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Välj de filer du vill associera eller lägg till filer genom att välja ”Nya filer”."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Välj de filer du vill associera med den här *modulen* eller lägg till filer genom att välja ”Nya filer”."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Välj de filer du vill koppla till den här *modulen* eller lägg till filer genom att välja ”Skapa filer”."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Välj den sida som du vill associera eller lägg till en ny sida genom att välja ”Ny sida\"."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Välj den sida du vill koppla, eller skapa en ny genom att välja ”Skapa sida”."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Välj den sida du vill koppla till den här *modulen* eller lägg till en ny genom att välja ”Skapa sida”."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Välj den sida som du vill associera med denna *modul* eller lägg till en ny sida genom att välja ”Ny sida\"."
   select_title_for_deletion_45b08247: "Välj %{title} för radering"
   select_type_of_prerequisite_8d6fa902: "Välj typ av förutsättning"
@@ -21741,10 +21784,21 @@ sv:
       add_to_module: "Lägg till %{item} till *modul*"
       assignment_item: Uppgift
       assignment_item_select_label: "Välj den uppgiften du vill associera eller lägg till en uppgift genom att välja ”Ny uppgift”."
+      assignment_item_select_label_create: "Välj den uppgift du vill koppla eller lägg till en uppgift genom att välja ”Skapa uppgift”."
+      assignment_item_select_label_new: "Välj den uppgift du vill koppla eller lägg till en uppgift genom att välja ”Ny uppgift”."
       assignment_notice: "Välj den uppgift du vill associera till den här *modulen* eller lägg till en uppgift genom att välja ”Ny uppgift”."
       content_page_item: Sida
+      create_assignment_notice: "Välj den uppgift du vill koppla till den här *modulen* eller lägg till en uppgift genom att välja ”Skapa uppgift”."
+      create_assignment_option: "[ Skapa uppgift ]"
+      create_page_option: "[ Skapa sida ]"
+      create_quiz_notice: "Välj det quiz du vill koppla till den här *modulen* eller lägg till en ny genom att välja ”Skapa quiz”."
+      create_quiz_option: "[ Skapa quiz ]"
+      create_topic_notice: "Välj det ämne du vill koppla till den här *modulen* eller lägg till ett ämne genom att välja ”Skapa ämne”."
+      create_topic_option: "[ Skapa ämne]"
       discussion_item: Diskussion
       discussion_topic_select_label: "Välj det ämne du vill associera eller lägga till ett ämne genom att välja ”Nytt ämne”."
+      discussion_topic_select_label_create: "Välj det ämne du vill koppla eller lägg till ett ämne genom att välja ”Skapa ämne”."
+      discussion_topic_select_label_new: "Välj det ämne du vill koppla eller lägga till ett ämne genom att välja ”Nytt ämne”."
       domain_match_notice: "för att använda det här verktyget måste domänen matcha %{domain}"
       external_tool_item: "Externt verktyg"
       external_tool_notice: "Välj ett verktyg i listan nedan, eller ange en länk till ett externt verktyg som du vet är konfigurerad med Basic LTI, för att lägga till den till den här *modulen*."
@@ -21764,6 +21818,7 @@ sv:
         header: Rubrik
         indentation: Indrag
         page_name: Sidnamn
+        quiz_engine: Quiz-motor
         quiz_group: Grupp
         quiz_name: Quiznamn
         topic_name: "Ämnets namn"
@@ -21771,16 +21826,21 @@ sv:
         wiki_page_name: Sidnamn
         wiki_page_namem: "Uppgiftens namn"
       loading: "Laddar ..."
+      new_assignment_notice: "Välj den uppgift du vill associera till den här *modulen* eller lägg till en uppgift genom att välja ”Ny uppgift”."
       new_assignment_option: "[ Ny uppgift ]"
       new_page_option: "[ Ny sida ]"
+      new_quiz_notice: "Välj det quiz du vill koppla till den här *modulen* eller skapa ett nytt genom att välja ”Nytt quiz”."
       new_quiz_option: "[ Nytt quiz ]"
       new_tab: "Öppna i ny flik"
+      new_topic_notice: "Välj det ämne du vill koppla till den här *modulen* eller lägg till ett ämne genom att välja ”Nytt ämne”."
       new_topic_option: "[ Nytt ämne ]"
       options: 
         assignments: Uppgifter
       quiz_item: Quiz
       quiz_notice: "Välj det quiz du vill lägga till i den här *modulen* eller skapa ett nytt genom att välja ”Nytt quiz”."
       quiz_select_label: "Välj det quiz du vill lägga till eller skapa ett nytt genom att välja ”Nytt quiz”."
+      quiz_select_label_create: "Välj det quiz du vill koppla, eller skapa ett nytt genom att välja ”Skapa quiz”."
+      quiz_select_label_new: "Välj det quiz du vill koppla eller lägg till ett nytt genom att välja ”Nytt quiz”."
       select_item_type_label: "Välj den sortens innehåll du vill lägga till."
       sub_header_notice: "Skriv texten du vill lägga till som *modulens* underrubrik"
       text_header_item: Textrubrik
@@ -23165,6 +23225,7 @@ sv:
   the_module_item_is_locked_27fe420b: "Modulobjektet är låst"
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "De senaste resultaten för användaren %{current_user_name} och lärandemålen %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "Nästa tillgängliga möte i denna kurs är den *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "Gränssnittet för ursprungliga quizet"
   the_preceding_content_is_partner_provided_d753928c: "Det föregående innehållet har tillhandahållits av partner"
   the_previous_sis_batch_was_aborted_d7d89955: "Föregående SIS-batch avbröts"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "Kompetensberäkningen angavs av din administratör och gäller för alla kurser i det här kontot."
@@ -24287,7 +24348,9 @@ sv:
   unable_to_find_extension_3fe61b3c: "hittade inte tillägg"
   unable_to_find_filetype_7b620f02: "hittade inte filtyp"
   unable_to_find_matches_for_these_email_addresses_i_c2305106: "Omöjligt att hitta matchningar för dessa e-postadresser vid din institution. Välj den som du vill skapa som nya användare. Ej valda kommer att hoppas över."
+  unable_to_load_courses_menu_7074ea04: "Det gick inte att läsa in kursmenyn."
   unable_to_load_lti_1_3_tools_cf169f9: "Det gick inte att läsa in Lti 1.3-verktyg"
+  unable_to_load_messages_2b158fd0: "Det gick inte att läsa in meddelandena. "
   unable_to_read_file_2d04b0c: "Det gick inte att läsa filen"
   unable_to_remove_app_4293cb53: "Kunde inte ta bort appen"
   unable_to_save_new_discussion_topic_99239f3f: "det går inte att spara nytt diskussionsämne"
