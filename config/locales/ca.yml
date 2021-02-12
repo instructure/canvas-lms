@@ -1162,11 +1162,13 @@ ca:
   add_course_406cb773: "Afegeix un curs"
   add_course_assignments_628ed6d0: "Afegeix tasques al curs"
   add_course_calendar_events_146154a5: "Afegeix esdeveniments al calendari del curs"
+  add_course_files_4e0f1abc: "Afegeix fitxers del curs"
   add_criterion_eb9587ef: "Afegeix un criteri"
   add_custom_link_22059c0: "Afegeix un enllaç personalitzat"
   add_designers_to_courses_9588820b: "Afegeix dissenyadors als cursos"
   add_discussion_653dab4c: "Afegeix un debat"
   add_domain_f15bc6c1: "Afegeix un domini"
+  add_edit_delete_files_573a4d62: "afegeix/edita/suprimeix fitxers"
   add_edit_delete_sections_d32c5b4d: "afegeix/edita/suprimeix seccions"
   add_email_address_aef3b61: "Afegeix adreça electrònica"
   add_existing_content_7e36da66: "Afegeix contingut existent"
@@ -1177,6 +1179,7 @@ ca:
   add_grading_period_6f774dc3: "Afegeix un període de qualificació"
   add_grading_scheme_81e23c05: " Afegeix un esquema de qualificació"
   add_grading_scheme_to_admin_grade_reports_23eb8c6e: "Afegeix un esquema de qualificació als informes de qualificació d'administradors"
+  add_granularity_to_permissions_around_managing_cou_2244c94a: "Afegeix granularitat als permisos relacionats amb l’administració dels fitxers del curs"
   add_granularity_to_permissions_around_managing_cou_4a5bc486: "Afegeix granularitat als permisos relacionats amb l’administració de les seccions del curs"
   add_group_c84f9e9d: "Afegeix un grup"
   add_group_set_f9809e11: "Afegeix un conjunt de grups"
@@ -1422,6 +1425,8 @@ ca:
   allow_users_to_comment_45b8f753: "Permet que els usuaris facin comentaris"
   allowed_attempts_4e229caa: "Intents permesos"
   allowed_domains_ee7868c8: "Dominis permesos"
+  allowed_for_subaccounts_courses_default_off_da598c11: "Permès per a comptes secundaris/cursos, desactivat per defecte"
+  allowed_for_subaccounts_courses_default_on_e485ec7f: "Permès per a comptes secundaris/cursos, activat per defecte"
   allows_a_user_to_access_the_act_as_user_link_on_st_7d3e3e3d: "Permet als usuaris accedir a l'enllaç Actua com a usuari a les targetes de context de l'estudiant"
   allows_account_course_level_mastery_scales_and_cal_da88d5a0: "Permet càlculs i escales de domini a nivell de compte i de curs, substituint els mètodes de càlcul i les classificacions de criteri per resultats"
   allows_account_level_mastery_scales_and_proficienc_43899cf6: "Permet les escales de domini a nivell del compte i els càlculs de competència, substituint les escales per resultats"
@@ -2140,6 +2145,7 @@ ca:
     assignment_group_selector: 
       assignment_group: "Grup de tasques"
       assignment_group_options: 
+        create_group: "Crea un grup"
         new_group: "Grup nou"
     assignment_list_item: 
       delete: Suprimeix
@@ -3505,6 +3511,7 @@ ca:
   classic_quizzes_dee3c7b7: "Qüestionaris clàssics"
   classic_quizzes_option_for_timed_quizzes_without_s_567b117d: "Opció de Qüestionaris clàssics per als qüestionaris amb límit de temps sense entrega"
   clear_2084585f: Suprimeix
+  clear_search_field_75f595c7: "Esborra el camp de cerca"
   clear_selected_file_82388e50: "Suprimeix el fitxer seleccionat"
   clear_user_cache_ef079f7f: "Suprimeix la memòria cau de l'usuari"
   click_cancel_if_you_don_t_want_the_code_displayed_ff7b1846: "Feu clic a \"Cancel·la\" si no voleu que es mostri el codi."
@@ -3708,6 +3715,7 @@ ca:
   collaborations_tutorial_tray_9219d9d: "Safata de tutorial sobre les col·laboracions"
   collapse_all_50275533: "Redueix-ho tot"
   collapse_list_of_group_members_for_groupname_d6c66fa0: "Redueix la llista de membres del grup %{groupName}"
+  collapse_outcome_description_de471564: "Redueix la descripció del resultat"
   collapse_subdiscussion_89af1f5c: "Redueix el"
   collapse_tutorial_tray_66ee7dc1: "Redueix la safata de tutorial"
   collapsed_510aa02a: Reduït
@@ -4631,6 +4639,9 @@ ca:
   count_files_were_ignored_2f9c054a: 
     one: "S'ha ignorat (1) fitxer"
     other: "S'han ignorat (%{count}) fitxers"
+  count_grouptitle_outcomes_4ddea09: 
+    one: "1 resultat de \"%{groupTitle}\""
+    other: "%{count} resultats de \"%{groupTitle}\""
   count_hidden_e8d2c57c: "%{count} amagades"
   count_images_found_for_term_a93635ed: "S'ha trobat %{count} imatges per a %{term}"
   count_items_deleted_successfully_a287aa53: 
@@ -4654,6 +4665,9 @@ ca:
     one: "1 opció"
     other: "Opcions de l'%{count}"
   count_options_loaded_cd59cc3b: "S'han carregat %{count} opcions."
+  count_outcomes_selected_55902958: 
+    one: "1 resultat seleccionat"
+    other: "%{count} resultats seleccionats"
   count_pages_selected_for_deletion_1ab0f684: 
     one: "%{count} pàgina seleccionada per suprimir-la"
     other: "%{count} pàgines seleccionades per suprimir-les"
@@ -4832,7 +4846,10 @@ ca:
   course_favorites_from_dashboard_27a3515a: "Preferits del curs del tauler"
   course_files_62deb8f8: "Fitxers del curs"
   course_files_a31f97fc: "Fitxers del curs"
+  course_files_add_2eede390: "Fitxers del curs - afegeix"
   course_files_add_edit_delete_24678a2f: "Fitxers del curs - afegeix/edita/suprimeix"
+  course_files_delete_fae0effe: "Fitxers del curs - suprimeix"
+  course_files_edit_d05d4e8b: "Fitxers del curs - edita"
   course_found_f5a40cd3: "S'ha trobat el curs"
   course_found_not_deleted_a20f72f0: "S'ha trobat el curs (no s'ha suprimit)"
   course_grade_grade_in_course_code_9fa854db: "Qualificació del curs: %{grade}% a %{course_code}"
@@ -5430,6 +5447,8 @@ ca:
   create_developer_key_78de8510: "Crea una clau de desenvolupador"
   create_discussion_topics_8330d52b: "Crea temes de debat"
   create_failed_15d07ad4: "No s'ha pogut crear"
+  create_file_71aa1922: "[ Crea un fitxer ]"
+  create_file_s_188549e6: "[ Crea fitxer(s) ]"
   create_files_after_rce_media_upload_recording_77d75a96: "Crear fitxers després de carregar/enregistrar elements multimèdia a l’RCE"
   create_interactive_course_content_76665336: "Creeu contingut del curs interactiu"
   create_live_event_subscriptions_on_toolproxy_7c8378b1: "Crear subscripcions a esdeveniments en directe a ToolProxy"
@@ -5821,6 +5840,7 @@ ca:
   delete_comment_a71040c3: "Suprimeix el comentari"
   delete_comment_comment_d32ffc85: "Suprimeix el comentari: %{comment}"
   delete_comment_commenttext_c8afe129: "Suprimeix el comentari: %{commentText}"
+  delete_course_files_ee9e769: "Suprimeix fitxers del curs"
   delete_criterion_row_80c3b3b: "Suprimeix la fila del criteri"
   delete_current_message_5da0221a: "Suprimeix el missatge actual"
   delete_current_module_item_21fefc54: "Suprimeix el mòdul/element actual"
@@ -5986,6 +6006,7 @@ ca:
   disabled_18c33a73: (inhabilitat)
   disabled_3b1b332a: Inhabilitat
   disabled_and_locked_d14dc6c2: "Inhabilitat i bloquejat"
+  disabled_for_all_subaccounts_courses_6c8938e0: "Inhabilitat per a tots els comptes secundaris/cursos"
   disabled_links_b3bdea99: "Enllaços inhabilitats"
   disabled_locked_dab351d6: "Inhabilitat (bloquejat)"
   disabled_not_visible_to_students_2c9d693f: "S'ha inhabilitat. No és visible per als estudiants."
@@ -6328,6 +6349,7 @@ ca:
   download_submission_comments_2a6c0395: "Baixa els comentaris sobre l'entrega"
   download_submissions_7454665f: "Baixa les entregues"
   download_the_complete_list_of_errors_and_warnings__7d993f7b: "Baixa la llista completa d'errors i advertiments aquí."
+  download_these_results_as_csv_9a890883: "Baixa aquests resultats com a CSV"
   download_this_file_669f9174: "Baixa aquest fitxer"
   downloading_course_content_allows_access_to_conten_164d9336: "La baixada del contingut del curs permet accedir al contingut fora de línia. El contingut pot incloure fitxers, pàgines, tasques, temes de debat o qüestionaris. Feu clic a \"Genera l'ePub\" per a cada curs i obriu-lo amb qualsevol software eReader per visualitzar-ho."
   draft_92507c72: (esborrany)
@@ -6432,6 +6454,7 @@ ca:
   edit_collaboration_b014c18b: "Edita la col·laboració"
   edit_comment_comment_e74afa04: "Edita el comentari: %{comment}"
   edit_conference_title_6e234815: "Edita \"%{conference_title}\""
+  edit_course_files_d046ef82: "Edita els fitxers del curs"
   edit_course_role_3b992fc2: "Edita el rol del curs"
   edit_criterion_5e4dadca: "Edita el criteri"
   edit_criterion_description_5828919: "Edita la descripció del criteri"
@@ -6579,6 +6602,7 @@ ca:
   enable_the_security_tab_on_the_settings_page_to_ad_eab7c954: "Permet habilitar la pestanya Seguretat a la pàgina de configuració per ajustar la configuració de la norma de seguretat de contingut"
   enabled_and_locked_49ff3de4: "Habilitat i bloquejat"
   enabled_ba7cab66: Activat
+  enabled_for_all_subaccounts_courses_e2ee4b2: "Habilitat per a tots els comptes secundaris/cursos"
   enabled_links_be110215: "Enllaços habilitats"
   enabled_locked_3cf7c256: "Habilitat (bloquejat)"
   enabled_unlocked_8d3a5df7: "Habilitat (desbloquejat)"
@@ -7092,6 +7116,7 @@ ca:
   expand_collapse_title_outcome_group_student_meets__46ffef48: "Desplega/redueix el grup de resultats de %{title}, l'assoliment del domini dels estudiants de %{mastery_count} de %{count} resultats"
   expand_global_navigation_2c28d5d4: "Desplega la navegació global"
   expand_list_of_group_members_for_groupname_9ce9d2f7: "Desplega la llista de membres del grup %{groupName}"
+  expand_outcome_description_c5bdd70b: "Expandeix la descripció del resultat"
   expand_permission_b45bf097: "Desplega %{permission}"
   expand_permission_c61d5958: "Desplega el permís"
   expand_subdiscussion_cd226ed4: "Desplega el debat secundari"
@@ -7883,6 +7908,7 @@ ca:
   granular_contexttype_notification_settings_will_be_c5dfc901: "La configuració de les notificacions de granularitat %{contextType} es podrà ajustar aquí en el futur."
   granular_course_notification_settings_will_be_conf_68f122db: "La configuració de les notificacions de granularitat del curs es podrà ajustar aquí en el futur."
   granular_permissions_for_add_remove_admin_roles_fr_9a06a75d: "Permisos de granularitat per afegir/suprimir rols d’administrador del curs"
+  granular_permissions_for_managing_course_files_1ed7f019: "Permisos de granularitat per administrar fitxers del curs"
   granular_permissions_for_managing_course_sections_da4b04b: "Permisos de granularitat per administrar seccions del curs"
   granular_permissions_for_managing_wiki_pages_3ed89a84: "Permisos de granularitat per administrar pàgines wiki"
   graph_bar_b5daa23d: "Diagrama de barres"
@@ -8640,6 +8666,7 @@ ca:
   importing_name_8f2b131d: "S'està important \"%{name}\""
   importing_outcomes_e62a0375: "s'estan important els resultats"
   improve_discoverability_of_drag_and_drop_in_files_421e9e25: "Millor visibilitat de l'opció d'arrossegar i deixar anar a Fitxers"
+  improved_interface_with_ongoing_updates_7316bdef: "Interfície millorada amb actualitzacions continues"
   improved_new_quizzes_support_with_modules_includin_3c9cdfab: "Admissió millorada de Qüestionaris nous amb Mòduls, inclosa la creació de qüestionaris nous des dels Mòduls"
   improved_outcomes_management_4692f886: "Administració millorada dels resultats"
   improved_visual_reminders_to_encourage_instructors_f203c7f: "Recordatoris visuals millorats per animar els instructors a publicar els cursos"
@@ -9284,6 +9311,7 @@ ca:
   loading_graders_f6a76142: "S'estan carregant els qualificadors"
   loading_last_attended_date_5a42463: "S'està carregant l'última data d'assistència"
   loading_media_32847745: "S'estan carregant els elements multimèdia"
+  loading_message_list_226a131e: "S'està carregant la llista de missatges"
   loading_more_gradebook_history_results_810f6d2e: "S'estan carregant més resultats de l'historial del llibre de qualificacions."
   loading_more_results_1d437202: "S'estan carregant més resultats"
   loading_more_results_def6df65: "S'estan carregant més resultats..."
@@ -9477,6 +9505,7 @@ ca:
   malformed_csv_aaa4b7f2: "CSV amb format incorrecte"
   maltese_916925e8: Maltès
   manage_access_bd923d8d: "Administra l'accés"
+  manage_add_edit_delete_course_files_162c1a65: "Administra (afegeix/edita/suprimeix) els fitxers del curs"
   manage_add_edit_delete_pages_5c73f2fb: "Administra (afegeix/edita/suprimeix) pàgines"
   manage_app_list_994cc26c: "Administra la llista d'aplicacions"
   manage_assignment_31a132fb: "Administra la tasca"
@@ -9489,6 +9518,7 @@ ca:
       delete_avatar: "Segur que voleu suprimir aquesta imatge del perfil de l'usuari?"
       lock_avatar: "En bloquejar aquesta imatge, s'aprovarà i s'impedirà que l'usuari l'actualitzi.  Voleu continuar?"
   manage_b88f7150: Administra
+  manage_course_files_57e07038: "Administra els fitxers del curs"
   manage_course_sections_f482d1b3: "Administra seccions del curs"
   manage_grading_schemes_in_context_name_e3678273: "Administra els esquemes de qualificació a %{context_name}"
   manage_group_group_name_ac8578c6: "Administra el grup %{group_name}"
@@ -11424,6 +11454,7 @@ ca:
   nav_text_94206145: "Text de navegació"
   nav_text_active_a924ae88: "Text de navegació actiu"
   navigation_allows_user_to_view_the_people_link_in__dd533d29: "Navegació permet a l'usuari visualitzar l'enllaç Persones a la Navegació del curs."
+  navigation_menu_fd782ff8: "Menú de navegació"
   near_mastery_f25174a4: "Domini gairebé assolit"
   need_a_canvas_account_221d18ed: "Necessiteu un compte del Canvas?"
   needs_grading_9143d47c: "S'ha de qualificar"
@@ -12138,6 +12169,7 @@ ca:
   outcome_imports_c496a81f: "Importacions de resultats"
   outcome_mastery_scales_8c3a814d: "Escales de domini de resultats"
   outcome_mastery_scales_add_edit_171551c: "Escales de domini del resultats - afegeix/edita"
+  outcome_menu_4fe5813: "Menú de resultats"
   outcome_path_mastery_points: "Punts de domini de %{path}"
   outcome_path_result: "Resultat de %{path}"
   outcome_proficiency_calculations_5959b681: "Càlculs de competència del resultats"
@@ -13577,15 +13609,15 @@ ca:
       discrimination_index_dialog_trigger: "Obteniu més informació sobre l'Índex de discriminació."
     download_submissions: "Baixa tots els fitxers"
     duration_in_hours: 
-      one: 1 hora
+      one: "1 hora"
       other: "%{count} hores"
     duration_in_hours_and_minutes: "%{hours} i %{minutes}"
     duration_in_minutes: 
-      one: 1 minut
+      one: "1 minut"
       other: "%{count} minuts"
     duration_in_minutes_and_seconds: "%{minutes} i %{seconds}"
     duration_in_seconds: 
-      one: 1 segon
+      one: "1 segon"
       other: "%{count} segons"
     empty_question_breakdown: "No hi ha estadístiques disponibles per a la pregunta."
     loading_questions: "S'estan carregant les estadístiques de la pregunta. Espereu una estona."
@@ -13820,6 +13852,7 @@ ca:
           select_all_banks: "Selecciona-ho tot"
           view_question_banks: "Visualitza els bancs de preguntes del curs"
         options: 
+          create_group: "[ Crea un grup ]"
           new_group: "[ Grup nou ]"
           no_group: "[ Cap grup ]"
         select_a_question_bank: "Seleccioneu un banc de preguntes de la llista següent per enllaçar-lo a aquest qüestionari com a grup de preguntes."
@@ -14606,6 +14639,7 @@ ca:
   regardless_of_whether_this_permission_is_enabled_o_a16e31b5: "Independentment de si el permís està habilitat o inhabilitat, els usuaris encara podran administrar els esdeveniments al seu calendari personal."
   regenerate_3e4679f8: "Torna a generar"
   regenerate_epub_395c8e56: "Torna a generar l'ePub"
+  regenerating_themes_462e6cd9: "S’estan tornant a generar el temes..."
   register_email_efc06d59: "Registra l'adreça electrònica"
   register_slack_email_1f6d7e6d: "Registra l'adreça electrònica de l'Slack"
   registration: 
@@ -15190,6 +15224,7 @@ ca:
   search_discussion_by_title_30466604: "Cerca el debat per títol"
   search_endpoints_d5abf37f: "Cerca extrems"
   search_entries_or_author_63fb0a86: "Cerca entrades o l'autor"
+  search_field_234156fc: "Camp de cerca"
   search_flickr_6f28b02e: "Cerca al Flickr"
   search_for_a_deleted_course_by_id_f553398d: "Cerca un curs suprimit per ID"
   search_for_files_7541fb28: "Cerca fitxers"
@@ -15201,6 +15236,7 @@ ca:
   search_people_as_you_type_in_this_field_the_list_o_5755e8ad: "Cerqueu persones. A mesura que escriviu en aquest camp, la llista de persones es filtrarà automàticament per incloure només aquells membres que coincideixin amb la vostra entrada."
   search_permissions_915bbd09: "Cerca permisos"
   search_term_must_be_at_least_num_characters_669098ed: "Els termes de cerca han de tenir com a mínim %{num} caràcters"
+  search_within_grouptitle_4d38272f: "Cerca dins de %{groupTitle}"
   searching_b0207e7f: "S'està cercant"
   searching_for_announcements_in_sections_must_span__80e4dfe4: "La cerca d'anuncis a les seccions s'ha de fer exactament en un curs"
   secondary_button_36a86f03: "Botó secundari"
@@ -15367,6 +15403,7 @@ ca:
   select_one_8e0af564: "Seleccioneu-ne un"
   select_one_b647b384: "Selecciona'n un"
   select_one_of_the_options_c8b0c6e4: "Seleccioneu una de les opcions:"
+  select_outcome_7e6e2562: "Selecciona el resultat"
   select_page_e93fc123: "Selecciona la pàgina"
   select_prerequisite_module_57894963: "Selecciona el mòdul de prerequisit"
   select_prerequite_module_e9042bb0: "Selecciona el mòdul de prerequisit"
@@ -15375,11 +15412,17 @@ ca:
   select_student_name_caaff244: "Selecciona l'estudiant %{name}"
   select_sub_account_6704196a: "Selecciona el compte secundari"
   select_term_f8083fb0: "Selecciona el període acadèmic"
+  select_the_file_you_want_to_associate_or_add_a_fil_ea6cd1c0: "Seleccioneu el fitxer que voleu associar o seleccioneu \"Crea un fitxer\" per afegir un fitxer."
   select_the_file_you_want_to_associate_or_add_a_fil_eedd8dc4: "Seleccioneu el fitxer que voleu associar o seleccioneu \"Fitxer nou\" per afegir un fitxer."
   select_the_file_you_want_to_associate_with_this_mo_c88fcd46: "Seleccioneu el fitxer que voleu associar amb aquest *mòdul* o seleccioneu \"Fitxer nou\" per afegir un fitxer."
+  select_the_file_you_want_to_associate_with_this_mo_fd198c86: "Seleccioneu el fitxer que voleu associar amb aquest *mòdul* o seleccioneu \"Crea un fitxer\" per afegir un fitxer."
+  select_the_files_you_want_to_associate_or_add_file_741ad4fa: "Seleccioneu els fitxers que voleu associar o seleccioneu \"Crea fitxer(s)\" per afegir fitxers."
   select_the_files_you_want_to_associate_or_add_file_9acd7878: "Seleccioneu els fitxers que voleu associar o seleccioneu \"Fitxer(s) nou(s)\" per afegir fitxers."
   select_the_files_you_want_to_associate_with_this_m_82677c50: "Seleccioneu els fitxers que voleu associar amb aquest *mòdul* o seleccioneu \"Fitxer(s) nou(s)\" per afegir fitxers."
+  select_the_files_you_want_to_associate_with_this_m_fedc2638: "Seleccioneu els fitxers que voleu associar amb aquest *mòdul* o seleccioneu \"Crea fitxer(s)\" per afegir fitxers."
   select_the_page_you_want_to_associate_or_add_a_new_83af9f82: "Seleccioneu la pàgina que voleu associar o seleccioneu \"Pàgina nova\" per afegir-ne una de nova."
+  select_the_page_you_want_to_associate_or_add_a_new_ca82cdfd: "Seleccioneu la pàgina que voleu associar o seleccioneu \"Crea una pàgina\" per afegir-ne una de nova."
+  select_the_page_you_want_to_associate_with_this_mo_3a8f3f47: "Seleccioneu la pàgina que voleu associar amb aquest *mòdul* o seleccioneu \"Crea una pàgina\" per afegir-ne una de nova."
   select_the_page_you_want_to_associate_with_this_mo_47e6cfd9: "Seleccioneu la pàgina que voleu associar amb aquest *mòdul* o seleccioneu \"Pàgina nova\" per afegir-ne una de nova."
   select_title_for_deletion_45b08247: "Selecciona %{title} per a la supressió"
   select_type_of_prerequisite_8d6fa902: "Selecciona el tipus de prerequisit"
@@ -15860,10 +15903,21 @@ ca:
       add_to_module: "Afegeix %{item} al *mòdul*"
       assignment_item: Tasca
       assignment_item_select_label: "Seleccioneu la tasca que voleu associar o seleccioneu \"Tasca nova\" per afegir una tasca nova."
+      assignment_item_select_label_create: "Seleccioneu la tasca que voleu associar o seleccioneu \"Crea una tasca\" per afegir una tasca nova."
+      assignment_item_select_label_new: "Seleccioneu la tasca que voleu associar o seleccioneu \"Tasca nova\" per afegir una tasca nova."
       assignment_notice: "Seleccioneu la tasca que voleu associar amb aquest *mòdul* o seleccioneu \"Tasca nova\" per afegir una tasca."
       content_page_item: Pàgina
+      create_assignment_notice: "Seleccioneu la tasca que voleu associar amb aquest *mòdul* o seleccioneu \"Crea una tasca\" per afegir una tasca."
+      create_assignment_option: "[ Crea una tasca ]"
+      create_page_option: "[ Crea una pàgina ]"
+      create_quiz_notice: "Seleccioneu el qüestionari que voleu associar amb aquest *mòdul* o seleccioneu \"Crea un qüestionari\" per afegir-ne un de nou."
+      create_quiz_option: "[ Crea un qüestionari ]"
+      create_topic_notice: "Seleccioneu el tema que voleu associar amb aquest *mòdul* o seleccioneu \"Crea un tema\" per afegir un tema."
+      create_topic_option: "[ Crea un tema ]"
       discussion_item: Debat
       discussion_topic_select_label: "Seleccioneu el tema que voleu associar o seleccioneu \"Tema nou\" per afegir un tema."
+      discussion_topic_select_label_create: "Seleccioneu el tema que voleu associar o seleccioneu \"Crea un tema\" per afegir un tema."
+      discussion_topic_select_label_new: "Seleccioneu el tema que voleu associar o seleccioneu \"Tema nou\" per afegir un tema."
       domain_match_notice: "per utilitzar aquesta eina, el domini ha de coincidir amb %{domain}"
       external_tool_item: "Eina externa"
       external_tool_notice: "Seleccioneu una eina de la llista següent o introduïu un URL d'una eina externa que ja sapigueu que està configurada amb Basic LTI per afegir-hi un enllaç en aquest *mòdul*."
@@ -15882,6 +15936,7 @@ ca:
         header: Capçalera
         indentation: Sagnat
         page_name: "Nom de la pàgina"
+        quiz_engine: "Motor de qüestionari"
         quiz_group: Grup
         quiz_name: "Nom del qüestionari"
         topic_name: "Nom del tema"
@@ -15889,16 +15944,21 @@ ca:
         wiki_page_name: "Nom de la pàgina"
         wiki_page_namem: "Nom de la tasca"
       loading: "S'està carregant..."
+      new_assignment_notice: "Seleccioneu la tasca que voleu associar amb aquest *mòdul* o seleccioneu \"Tasca nova\" per afegir una tasca."
       new_assignment_option: "[ Tasca nova ]"
       new_page_option: "[ Pàgina nova ]"
+      new_quiz_notice: "Seleccioneu el qüestionari que voleu associar amb aquest *mòdul* o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
       new_quiz_option: "[ Qüestionari nou ]"
       new_tab: "Carrega en una pestanya nova"
+      new_topic_notice: "Seleccioneu el tema que voleu associar amb aquest *mòdul* o seleccioneu \"Tema nou\" per afegir un tema."
       new_topic_option: "[ Tema nou ]"
       options: 
         assignments: Tasques
       quiz_item: Qüestionari
       quiz_notice: "Seleccioneu el qüestionari que voleu associar amb aquest *mòdul* o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
       quiz_select_label: "Seleccioneu el qüestionari que voleu associar o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
+      quiz_select_label_create: "Seleccioneu el qüestionari que voleu associar o seleccioneu \"Crea un qüestionari\" per afegir-ne un de nou."
+      quiz_select_label_new: "Seleccioneu el qüestionari que voleu associar o seleccioneu \"Qüestionari nou\" per afegir-ne un de nou."
       select_item_type_label: "Seleccioneu el tipus de contingut que voleu afegir."
       sub_header_notice: "Escriviu el text que voleu afegir com a capçalera secundària d'un *mòdul*"
       text_header_item: "Capçalera de text"
@@ -16921,6 +16981,7 @@ ca:
   the_module_item_is_locked_27fe420b: "L'element del mòdul està bloquejat."
   the_most_recent_scores_for_user_current_user_name__ea82f0b6: "Les puntuacions més recents de l'usuari %{current_user_name} i el resultat %{outcome_name}."
   the_next_available_appointment_in_this_course_is_o_da10316c: "La propera cita disponible en aquest curs és el *%{date}*"
+  the_original_quizzes_interface_fcda53bc: "La interfície original del qüestionaris"
   the_preceding_content_is_partner_provided_d753928c: "El contingut anterior està proporcionat per proveïdors"
   the_previous_sis_batch_was_aborted_d7d89955: "El lot anterior del SIS s'ha abandonat"
   the_proficiency_calculation_was_set_by_your_admin__c31f8e95: "El vostre administrador ha establert el càlcul de la competència, que s’aplica a tots els cursos d’aquest compte."
@@ -17735,6 +17796,8 @@ ca:
   unable_to_delete_assignment_abcf8d62: "No es pot suprimir la tasca"
   unable_to_dismiss_update_df1e32eb: "No es pot descartar l'aplicació"
   unable_to_find_extension_3fe61b3c: "no s'ha pogut trobar l'extensió"
+  unable_to_load_courses_menu_7074ea04: "No s’ha pogut carregar el menú de cursos."
+  unable_to_load_messages_2b158fd0: "No s'han pogut carregar els missatges. "
   unable_to_read_file_2d04b0c: "No es pot llegir el fitxer"
   unable_to_remove_app_4293cb53: "No es pot suprimir l'aplicació"
   unable_to_save_new_discussion_topic_99239f3f: "No es pot desar un nou tema de debat."
