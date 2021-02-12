@@ -689,6 +689,13 @@ class SubmissionsApiController < ApplicationController
         @submission.save!
       end
 
+      if @submission.context.is_a?(Course)
+        @submission.context.student_enrollments.where(user: @submission.user).each do |student_enrollment|
+          Enrollment.recompute_final_score(student_enrollment.user_id, student_enrollment.course_id)
+          student_enrollment.publish_as_v2
+        end
+      end
+
       assessment = params[:rubric_assessment]
       if assessment.is_a?(ActionController::Parameters) && @assignment.rubric_association
         # prepend each key with "criterion_", which is required by the current
